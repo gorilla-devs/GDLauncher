@@ -340,7 +340,6 @@
     <EmbeddedResource Include="EmbeddedResources\SevenZipSharp.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="TODO.txt" />
     <Resource Include="FodyWeavers.xml" />
     <None Include="bin\System.Threading.Tasks.Dataflow.dll" />
     <None Include="bin\Newtonsoft.Json.dll" />
