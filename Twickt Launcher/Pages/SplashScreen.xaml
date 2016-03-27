@@ -1,0 +1,24 @@
+﻿<Page x:Class="Twickt_Launcher.Pages.SplashScreen"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Twickt_Launcher.Pages"
+      xmlns:gif="http://wpfanimatedgif.codeplex.com"
+      mc:Ignorable="d" 
+      FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:system="clr-namespace:System;assembly=mscorlib"
+      d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF"
+      Title="SplashScreen" Loaded="Page_Loaded">
+
+    <Grid>
+        <Label x:Name="mainContent" Content="Starting..." HorizontalAlignment="Left" Margin="195,237,0,0" VerticalAlignment="Top" FontSize="64" Visibility="Hidden"/>
+        <Label x:Name="firstLabel" Content="Label" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
+        <Label x:Name="secondLabel" Content="Label" HorizontalAlignment="Left" Margin="10,173,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
+        <ProgressBar Name="progressbar" HorizontalAlignment="Left" Height="32" Margin="10,413,0,0" VerticalAlignment="Top" Width="674" Visibility="Hidden"/>
+        <Label x:Name="mbToDownload" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,450,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
+        <Label x:Name="kbps" Content="kbps" HorizontalAlignment="Left" Margin="520,450,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
+        <ProgressBar Name="load" HorizontalAlignment="Left" Height="406" Margin="148,80,0,0" VerticalAlignment="Top" Width="409" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
+    </Grid>
+</Page>

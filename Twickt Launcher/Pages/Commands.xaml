@@ -1,0 +1,27 @@
+﻿<Page
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Twickt_Launcher.Pages"
+      xmlns:awe="http://schemas.awesomium.com/winfx" x:Class="Twickt_Launcher.Pages.Commands"
+      mc:Ignorable="d" 
+      d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF"
+      Title="Commands">
+
+    <Grid>
+        <TextBlock Margin="10,55,510,549">           
+    <Hyperlink NavigateUri="http://wiki.ess3.net/wiki/Command_Reference" RequestNavigate="Hyperlink_RequestNavigate">
+        Essentials
+    </Hyperlink>
+        </TextBlock>
+        <TextBlock Margin="10,81,510,523">           
+    <Hyperlink NavigateUri="http://minecraft.gamepedia.com/Commands" RequestNavigate="Hyperlink_RequestNavigate">
+        Vanilla Commands
+    </Hyperlink>
+        </TextBlock>
+        <TextBlock Margin="10,107,510,497"><Hyperlink NavigateUri="https://github.com/Multiverse/Multiverse-Core/wiki/Command-Reference" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="Multiverse"/></Hyperlink></TextBlock>
+        <TextBlock Margin="10,133,510,471"><Hyperlink NavigateUri="http://wiki.sk89q.com/wiki/WorldEdit/Reference" RequestNavigate="Hyperlink_RequestNavigate"><Run Text="WorldEdit"/></Hyperlink></TextBlock>
+
+    </Grid>
+</Page>

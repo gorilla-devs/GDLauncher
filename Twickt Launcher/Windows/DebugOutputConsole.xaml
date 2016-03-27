@@ -1,0 +1,19 @@
+﻿<Window x:Class="Twickt_Launcher.Windows.DebugOutputConsole"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Twickt_Launcher.Windows"
+        mc:Ignorable="d"
+        Title="DebugOutputConsole" Height="389" Width="794" ResizeMode="NoResize">
+    <Grid>
+        <ScrollViewer HorizontalAlignment="Left" Height="303" Margin="10,10,0,0" VerticalAlignment="Top" Width="768">
+            <TextBox x:Name="debug" TextWrapping="Wrap" Text="" IsReadOnly="True"/>
+        </ScrollViewer>
+        <Button x:Name="button" Content="Save Log" HorizontalAlignment="Left" Margin="10,318,0,0" VerticalAlignment="Top" Width="95" Click="button_Click"/>
+        <Button x:Name="button1" Content="Copy to Clipboard" HorizontalAlignment="Left" Margin="407,318,0,0" VerticalAlignment="Top" Width="148" Click="button1_Click"/>
+        <Button x:Name="button2" Content="Force Close MC" HorizontalAlignment="Left" Margin="642,318,0,0" VerticalAlignment="Top" Width="136"/>
+        <Button x:Name="button3" Content="Go to Admin" HorizontalAlignment="Left" Margin="211,318,0,0" VerticalAlignment="Top" Width="115" Click="button3_Click"/>
+
+    </Grid>
+</Window>

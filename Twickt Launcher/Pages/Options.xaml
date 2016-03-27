@@ -1,0 +1,40 @@
+﻿<Page x:Class="Twickt_Launcher.Pages.Options"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:local="clr-namespace:Twickt_Launcher.Pages"
+      mc:Ignorable="d" 
+      FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+      d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF"
+      Title="Options" ShowsNavigationUI="False" Loaded="Page_Loaded">
+    <Grid>
+        <Label x:Name="downloadThreadsLabel" Content="Download Threads" HorizontalAlignment="Left" Margin="10,20,0,0" VerticalAlignment="Top" FontSize="18.667"/>
+        <ComboBox x:Name="downloadThreads" HorizontalAlignment="Left" Margin="617,20,0,0" VerticalAlignment="Top" Width="67"/>
+        <Separator HorizontalAlignment="Left" Height="15" Margin="10,55,0,0" VerticalAlignment="Top" Width="674"/>
+        <Label x:Name="autoCheckForUpdatesLabel" Content="Automatically Check For Updates" HorizontalAlignment="Left" Margin="10,69,0,0" VerticalAlignment="Top" FontSize="18.667"/>
+        <Separator HorizontalAlignment="Left" Height="15" Margin="10,104,0,0" VerticalAlignment="Top" Width="674"/>
+        <ToggleButton x:Name="autoCheckForUpdates" HorizontalAlignment="Right" Margin="0,77,10,526" IsChecked="{Binding IsChecked, ElementName=MenuToggleButton, Mode=TwoWay}" Width="67" />
+        <Label x:Name="autoUpdateLabel" Content="Automatically Update The Launcher" HorizontalAlignment="Left" Margin="10,116,0,0" VerticalAlignment="Top" FontSize="18.667"/>
+        <Separator HorizontalAlignment="Left" Height="15" Margin="10,151,0,0" VerticalAlignment="Top" Width="674"/>
+        <ToggleButton x:Name="autoUpdate" HorizontalAlignment="Right" Margin="0,124,10,479" IsChecked="{Binding IsChecked, ElementName=MenuToggleButton, Mode=TwoWay}" Width="67"/>
+        <Button x:Name="save" Content="Save" HorizontalAlignment="Left" Margin="609,583,0,0" VerticalAlignment="Top" Width="75" Click="save_Click"/>
+        <Label x:Name="startingPage" Content="Launcher Starting Page" HorizontalAlignment="Left" Margin="10,163,0,0" VerticalAlignment="Top" FontSize="18.667"/>
+        <Separator HorizontalAlignment="Left" Height="15" Margin="10,198,0,0" VerticalAlignment="Top" Width="674"/>
+        <ComboBox x:Name="startingPageValue" HorizontalAlignment="Left" Margin="564,171,0,0" VerticalAlignment="Top" Width="120">
+        </ComboBox>
+        <Label x:Name="checkforUpdates" Content="Check Now For Updates" HorizontalAlignment="Left" Margin="10,210,0,0" VerticalAlignment="Top" FontSize="18.667"/>
+        <Button x:Name="checkUpdatesNow" Content="Check" HorizontalAlignment="Left" Margin="609,213,0,0" VerticalAlignment="Top" Width="75" Click="checkUpdatesNow_Click"/>
+        <Separator HorizontalAlignment="Left" Height="15" Margin="10,245,0,0" VerticalAlignment="Top" Width="674"/>
+        <Label x:Name="javaFolder" Content="Java Path" HorizontalAlignment="Left" Margin="10,257,0,0" VerticalAlignment="Top" FontSize="18.667"/>
+        <TextBox x:Name="JavaPath" HorizontalAlignment="Left" Height="39" Margin="312,257,0,0" TextWrapping="NoWrap" Text=" " VerticalAlignment="Top" Width="372" materialDesign:TextFieldAssist.Hint="Java Path" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+        <Separator HorizontalAlignment="Left" Height="15" Margin="10,292,0,0" VerticalAlignment="Top" Width="674"/>
+        <Label x:Name="DebugMaxLinesLabel" Content="Console Max Lines" HorizontalAlignment="Left" Margin="10,306,0,0" VerticalAlignment="Top" FontSize="18.667"/>
+        <TextBox x:Name="ConsoleMaxLines" HorizontalAlignment="Left" Height="39" Margin="581,306,0,0" TextWrapping="Wrap" Text=" " VerticalAlignment="Top" Width="103" materialDesign:TextFieldAssist.Hint="Max Lines" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+        <Separator HorizontalAlignment="Left" Height="15" Margin="10,341,0,0" VerticalAlignment="Top" Width="674"/>
+        <Label x:Name="downloadThreadsLabel_Copy" Content="RAM (GB)" HorizontalAlignment="Left" Margin="10,358,0,0" VerticalAlignment="Top" FontSize="18.667"/>
+        <ComboBox x:Name="ram" HorizontalAlignment="Left" Margin="581,358,0,0" VerticalAlignment="Top" Width="103"/>
+        <Separator HorizontalAlignment="Left" Height="15" Margin="10,393,0,0" VerticalAlignment="Top" Width="674"/>
+    </Grid>
+</Page>

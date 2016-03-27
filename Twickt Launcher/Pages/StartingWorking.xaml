@@ -1,0 +1,25 @@
+﻿<Page x:Class="Twickt_Launcher.Pages.StartingWorking"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Twickt_Launcher.Pages"
+      mc:Ignorable="d" 
+      FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+      d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF"
+      Title="StartingWorking" Loaded="Page_Loaded">
+
+    <Grid>
+        <ProgressBar Name="totalProgress" HorizontalAlignment="Left" Height="26" Margin="10,92,0,0" VerticalAlignment="Top" Width="623" />
+        <Label x:Name="totalPercentage" Content="totalPercentage" HorizontalAlignment="Left" Margin="638,92,0,0" VerticalAlignment="Top" Width="46"/>
+        <Label x:Name="workingThreadsLabel" Content="Working Threads:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="110"/>
+        <Label x:Name="workingThreads" Content="WorkingThreads" HorizontalAlignment="Left" Margin="125,10,0,0" VerticalAlignment="Top" Width="186"/>
+        <Button x:Name="cancel" Content="Cancel" HorizontalAlignment="Left" Margin="589,571,0,0" VerticalAlignment="Top" Width="95" Height="44" Click="cancel_Click"/>
+        <Label x:Name="workingThreadsLabel_Copy" Content="Modpack:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" Width="110"/>
+        <Label x:Name="modpackName" Content="MODPACK" HorizontalAlignment="Left" Margin="125,36,0,0" VerticalAlignment="Top" Width="186"/>
+        <Label x:Name="workingThreadsLabel_Copy1" Content="Files:" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="110"/>
+        <Label x:Name="filesToDownload" Content="0/0" HorizontalAlignment="Left" Margin="125,67,0,0" VerticalAlignment="Top" Width="186"/>
+        <Button x:Name="getbacktomodpack" Content="Go back to Modpacks" HorizontalAlignment="Left" Margin="10,123,0,0" VerticalAlignment="Top" Width="674" Height="67" FontSize="21.333" Visibility="Hidden" Click="getbacktomodpack_Click"/>
+
+    </Grid>
+</Page>

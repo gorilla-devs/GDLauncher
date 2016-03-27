@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="Twickt_Launcher.Dialogs.UpdateAvailable"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
+             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+             mc:Ignorable="d" Height="134" Background="#FFFFFF" Width="275">
+    <Grid>
+        <Label x:Name="label" Content="An update is available" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="140"/>
+        <Label x:Name="updateVersion" Content="version -> version" HorizontalAlignment="Left" Margin="155,10,0,0" VerticalAlignment="Top" Width="113"/>
+        <Separator HorizontalAlignment="Left" Height="9" Margin="10,36,0,0" VerticalAlignment="Top" Width="258"/>
+        <Label x:Name="label1" Content="Do you want to update?" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Button x:Name="yes" Content="Yes" HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="yes"/>
+        <Button x:Name="no" Content="No" HorizontalAlignment="Left" Margin="193,95,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="no"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="Twickt_Launcher.Dialogs.OptionsUpdates"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
+             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+             mc:Ignorable="d" Background="#FFFFFF" Height="57.223" Width="248">
+    <Grid>
+        <Label x:Name="label" Content="Label" HorizontalAlignment="Center" Margin="14,10,4,10" VerticalAlignment="Center" Height="37" Width="230" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+    </Grid>
+</UserControl>

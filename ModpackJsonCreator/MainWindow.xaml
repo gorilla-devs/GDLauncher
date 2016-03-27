@@ -1,0 +1,17 @@
+﻿<Window x:Class="ModpackJsonCreator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:ModpackJsonCreator"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="238.017" Width="533.514" AllowDrop="True" DragEnter="FolderPath_DragEnter" Drop="FolderPath_Drop">
+    <Grid>
+        <TextBox x:Name="FolderPath" HorizontalAlignment="Left" Height="39" AllowDrop="True" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="506" materialDesign:TextFieldAssist.Hint="Folder Path" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+        <Button x:Name="jsonCreate" Content="Create Json" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" Width="122" Click="jsonCreate_Click"/>
+        <TextBox x:Name="modpackname" HorizontalAlignment="Left" Height="39" Margin="12,54,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" materialDesign:TextFieldAssist.Hint="Modpack Name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+        <TextBox x:Name="modpackpath" HorizontalAlignment="Left" Height="39" Margin="12,98,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" materialDesign:TextFieldAssist.Hint="Modpack Path" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+
+    </Grid>
+</Window>
