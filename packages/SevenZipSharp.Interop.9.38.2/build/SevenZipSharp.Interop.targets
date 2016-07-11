@@ -1,0 +1,141 @@
+<!--
+ *
+ * SevenZipSharp.Interop.targets (copy from System.Data.SQLite.Core.targets) -
+ *
+ * WARNING: This MSBuild file requires MSBuild 4.0 features.
+ *
+ * Written by Joe Mistachkin and David Archer.
+ * Released to the public domain, use at your own risk!
+ *
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+  ******************************************************************************
+  **                          Load Per-User Settings                          **
+  ******************************************************************************
+  -->
+
+  <!--
+      NOTE: If the per-user settings file exists, import it now.  The contained
+            settings, if any, will override the default ones provided below.
+  -->
+  <Import Condition="'$(MSBuildThisFileDirectory)' != '' And
+                     HasTrailingSlash('$(MSBuildThisFileDirectory)') And
+                     Exists('$(MSBuildThisFileDirectory)\SevenZipSharp.Interop.targets.user')"
+          Project="$(MSBuildThisFileDirectory)\SevenZipSharp.Interop.targets.user" />
+
+  <!--
+  ******************************************************************************
+  **                    SevenZipSharp Interop Library Build Items                    **
+  ******************************************************************************
+  -->
+
+  <ItemGroup>
+    <SevenZipSharpInteropFiles Condition="'$(MSBuildThisFileDirectory)' != '' And
+                                   HasTrailingSlash('$(MSBuildThisFileDirectory)')"
+                        Include="$(MSBuildThisFileDirectory)**\7z.*" />
+  </ItemGroup>
+
+  <!--
+  ******************************************************************************
+  **                   SevenZipSharp Interop Library Content Items                   **
+  ******************************************************************************
+  -->
+
+  <ItemGroup Condition="'$(ContentSevenZipSharpInteropFiles)' != '' And
+                        '$(ContentSevenZipSharpInteropFiles)' != 'false' And
+                        '@(SevenZipSharpInteropFiles)' != ''">
+    <Content Include="@(SevenZipSharpInteropFiles)">
+      <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!--
+  ******************************************************************************
+  **                   SevenZipSharp Interop Library Build Targets                   **
+  ******************************************************************************
+  -->
+
+  <Target Name="CopySevenZipSharpInteropFiles"
+          Condition="'$(CopySevenZipSharpInteropFiles)' != 'false' And
+                     '$(OutDir)' != '' And
+                     HasTrailingSlash('$(OutDir)') And
+                     Exists('$(OutDir)')"
+          Inputs="@(SevenZipSharpInteropFiles)"
+          Outputs="@(SevenZipSharpInteropFiles -> '$(OutDir)%(RecursiveDir)%(Filename)%(Extension)')">
+    <!--
+        NOTE: Copy "7z.dll" and all related files, for every
+              architecture that we support, to the build output directory.
+    -->
+    <Copy SourceFiles="@(SevenZipSharpInteropFiles)"
+          DestinationFiles="@(SevenZipSharpInteropFiles -> '$(OutDir)%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
+  <!--
+  ******************************************************************************
+  -->
+
+  <Target Name="CleanSevenZipSharpInteropFiles"
+          Condition="'$(CleanSevenZipSharpInteropFiles)' != 'false' And
+                     '$(OutDir)' != '' And
+                     HasTrailingSlash('$(OutDir)') And
+                     Exists('$(OutDir)')">
+    <!--
+        NOTE: Delete "7z.dll" and all related files, for every
+              architecture that we support, from the build output directory.
+    -->
+    <Delete Files="@(SevenZipSharpInteropFiles -> '$(OutDir)%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
+  <!--
+  ******************************************************************************
+  -->
+
+  <Target Name="CollectSevenZipSharpInteropFiles"
+          Condition="'$(CollectSevenZipSharpInteropFiles)' != 'false'">
+    <ItemGroup>
+      <FilesForPackagingFromProject Include="@(SevenZipSharpInteropFiles)">
+        <DestinationRelativePath>bin\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+    </ItemGroup>
+  </Target>
+
+  <!--
+  ******************************************************************************
+  **                 SevenZipSharp Interop Library Build Properties                  **
+  ******************************************************************************
+  -->
+
+  <PropertyGroup>
+    <PostBuildEventDependsOn>
+      $(PostBuildEventDependsOn);
+      CopySevenZipSharpInteropFiles;
+    </PostBuildEventDependsOn>
+    <BuildDependsOn>
+      $(BuildDependsOn);
+      CopySevenZipSharpInteropFiles;
+    </BuildDependsOn>
+    <CleanDependsOn>
+      $(CleanDependsOn);
+      CleanSevenZipSharpInteropFiles;
+    </CleanDependsOn>
+  </PropertyGroup>
+
+  <!--
+  ******************************************************************************
+  **     SevenZipSharp Interop Library Publish Properties for Visual Studio 201x     **
+  ******************************************************************************
+  -->
+
+  <PropertyGroup Condition="'$(VisualStudioVersion)' == '' Or
+                            '$(VisualStudioVersion)' == '10.0' Or
+                            '$(VisualStudioVersion)' == '11.0' Or
+                            '$(VisualStudioVersion)' == '12.0' Or
+                            '$(VisualStudioVersion)' == '14.0'">
+    <PipelineCollectFilesPhaseDependsOn>
+      CollectSevenZipSharpInteropFiles;
+      $(PipelineCollectFilesPhaseDependsOn);
+    </PipelineCollectFilesPhaseDependsOn>
+  </PropertyGroup>
+</Project>

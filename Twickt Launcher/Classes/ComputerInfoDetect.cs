@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -93,6 +95,14 @@ namespace Twickt_Launcher.Classes
             {
                 return 32;
             }
+        }
+
+        public static bool isDirOK()
+        {
+            if (Path.GetDirectoryName(Assembly.GetEntryAssembly().Location).Contains(" "))
+                return false;
+            else
+                return true;
         }
 
 

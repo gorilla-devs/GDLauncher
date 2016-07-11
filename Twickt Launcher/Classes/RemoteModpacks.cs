@@ -185,7 +185,6 @@ namespace Twickt_Launcher.Classes
             }
         }
 
-
         /*public static async Task<string[]> ModpacksFirstPage()
         {
             if (description.ContainsKey(modpackname))

@@ -13,8 +13,11 @@
     <Grid>
         <Label x:Name="remoteModpacksLabel" Content="Remote Modpacks" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" Width="167" FontSize="18.667"/>
         <ListBox x:Name="remoteModpacks" HorizontalAlignment="Left" Height="270" Margin="10,94,0,0" VerticalAlignment="Top" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" SelectionChanged="remoteModpacks_SelectionChanged"/>
+        <Label x:Name="localModpacksLabel" Content="Local Modpacks" HorizontalAlignment="Left" Margin="517,54,0,0" VerticalAlignment="Top" Width="167" FontSize="18.667"/>
+        <ListBox x:Name="localModpacks" HorizontalAlignment="Left" Height="270" Margin="517,94,0,0" VerticalAlignment="Top" Width="167"/>
         <Button x:Name="start" Content="Start" HorizontalAlignment="Left" Margin="227,544,0,0" VerticalAlignment="Top" Width="220" Height="71" FontSize="26.667" Click="start_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2"/>
         <TextBox x:Name="remoteModpacksSearch" HorizontalAlignment="Left" Height="39" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="167" materialDesign:TextFieldAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" TextChanged="textBox_TextChanged"/>
+        <TextBox x:Name="localModpacksSearch" HorizontalAlignment="Left" Height="39" Margin="517,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="167" materialDesign:TextFieldAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
         <Button x:Name="addLocalModpack" HorizontalAlignment="Left" Margin="517,369,0,0" VerticalAlignment="Top" Width="50" Click="addLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
             <materialDesign:PackIcon Kind="Plus" />
         </Button>

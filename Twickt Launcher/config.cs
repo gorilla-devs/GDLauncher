@@ -19,7 +19,8 @@ namespace Twickt_Launcher
         public static string MCEditLink = "https://download.nodecdn.net/containers/mcedit/download/dev/mcedit2-win64-2.0.0alpha-921.exe";
         public static string loginWebService = "https://webservices.twickt.com/login.php";
         public static string bugReportWebService = "https://webservices.twickt.com/bugs.php";
-        //test
+        public static string javaDownloadURL32 = "jPortable_8_Update_91_repack.paf";
+        public static string javaDownloadURL64 = "jPortable64_8_Update_91_repack.paf";
 
         /* public static byte[] client_privateKey = Utilities.HexToBinary("e4e60492628af3697e10760f73bc1673750f5a5d6d084ece9181f734fe15fa66");
          public static byte[] client_publicKey = Utilities.HexToBinary("08cca3e936bd0f08ab70a645dca5c1cb058eaee99396b9fd1e764dc7f2a3347f");

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- ============================================================ -->
+  <!-- Build targets                                                -->
+  <!-- ============================================================ -->
+  <!-- 
+  Is run once after build, checks if the project's nuget package's .nuspec depends on Baseclass.Contrib.Nuget.Output and copies everything which is in the
+  output folder to the builds OutDir.
+  -->
+  <Target Name="CopyToOutput" AfterTargets="Compile" DependsOnTargets="CollectNugetOutputFiles">
+    <Copy SourceFiles="@(NugetOutputFiles)" DestinationFiles="@(NugetOutputFiles->'$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
+  <!-- 
+  Is run once after clean, delete all files that match files collected by the CollectNugetOutputFiles task.
+  -->
+  <Target Name="CleanOutput" AfterTargets="Clean" DependsOnTargets="CollectNugetOutputFiles">
+    <Delete Files="@(NugetOutputFiles->'$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
+  <!--
+  Is run once per file which has been deleted by the CleanOutput target, if the containing folder is empty it gets deleted.
+  -->
+  <Target Name="CleanEmptyFolder" Inputs="@(NugetOutputFiles)" Outputs="%(Identity).Dummy" AfterTargets="CleanOutput">
+    <ItemGroup>
+      <EmptyCheck Include="$(OutDir)%(NugetOutputFiles.RecursiveDir)**\*.*" />
+    </ItemGroup>
+
+    <RemoveDir Condition="'@(EmptyCheck)' == '' And '%(NugetOutputFiles.RecursiveDir)' != ''" Directories="$(OutDir)%(NugetOutputFiles.RecursiveDir)" />
+  </Target>
+
+  <!-- ============================================================ -->
+  <!-- Web publication targets                                      -->
+  <!-- ============================================================ -->
+  
+  <PropertyGroup>
+    <PipelineCollectFilesPhaseDependsOn>
+    $(PipelineCollectFilesPhaseDependsOn);
+    CollectNugetPackageFiles;
+    </PipelineCollectFilesPhaseDependsOn>
+  </PropertyGroup>
+
+  <!--
+  Is run once during the PipelineCollectFilesPhase to fill FilesForPackagingFromProject with the files from NugetOutputFiles
+  -->
+  <Target Name="CollectNugetPackageFiles" DependsOnTargets="CollectNugetOutputFiles">
+    <ItemGroup>
+      <FilesForPackagingFromProject Include="@(NugetOutputFiles)" >
+        <DestinationRelativePath>bin\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+    </ItemGroup>
+  </Target>
+
+  <!-- ============================================================ -->
+  <!-- Common targets                                               -->
+  <!-- ============================================================ -->
+  
+  <ItemGroup>
+    <NupkgFiles Include="$(MSBuildThisFileDirectory)\..\..\..\*\*.nupkg"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageFiles Include="$(MSBuildProjectDirectory)\packages.config"/>
+  </ItemGroup>
+  
+  <!--
+  Is run once to compute the NugetOutputFiles item from the NuGet dependencies of the project
+  -->
+  <Target Name="CollectNugetOutputFiles">
+    <Message Text="Collecting NuGet output files for $(MSBuildProjectName):" />
+    
+    <PackageFilter PackageConfigs="@(PackageFiles)" NugetPackages="@(NupkgFiles)">
+      <Output ItemName="FilteredNugetPackages" TaskParameter="Result" />
+    </PackageFilter>
+
+    <Message Text="@(FilteredNugetPackages->'%(RecursiveDir)%(Filename)%(Extension)', '%0D%0A')" />
+    <Message Text="Total filtered packages : @(FilteredNugetPackages->Count())" /> 
+    
+    <ItemGroup>
+      <NugetOutputFiles Include="%(FilteredNugetPackages.RootDir)%(FilteredNugetPackages.Directory)\output\**\*.*" />
+    </ItemGroup>
+    
+    <Message Text="@(NugetOutputFiles->'%(RecursiveDir)%(Filename)%(Extension)', '%0D%0A')" />
+    <Message Text="Total files collected : @(NugetOutputFiles->Count())" /> 
+  </Target>
+
+  <!--
+  Filter the NugetPackages list to only include nuget packages referenced in the PackageConfigs list which depend on Baseclass.Contrib.Nuget.Output
+  -->
+  <PropertyGroup Condition=" '$(MSBuildToolsVersion)' == '14.0' ">
+    <BuildTaskPath>$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll</BuildTaskPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(MSBuildToolsVersion)' != '14.0' ">
+    <BuildTaskPath>$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll</BuildTaskPath>
+  </PropertyGroup>
+  
+  <UsingTask TaskName="PackageFilter" TaskFactory="CodeTaskFactory" AssemblyFile="$(BuildTaskPath)">
+    <ParameterGroup>
+      <PackageConfigs ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <NugetPackages ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Result ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>        
+      <Reference Include="System.Xml"/>
+      <Reference Include="System.Xml.Linq"/>
+      <Reference Include="WindowsBase" />
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.IO.Packaging" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Threading" />
+      <Using Namespace="System.Xml" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[                
+            var usedPackages = new HashSet<string>(); // packaged used by the project
+            try
+            {                
+                foreach (var packageConfig in PackageConfigs)
+                {
+                    var path = packageConfig.GetMetadata("FullPath");
+                    var xml = new XmlDocument();
+                    xml.LoadXml(File.ReadAllText(path));
+                    var deps = xml.GetElementsByTagName("package");
+                    foreach (XmlNode dep in deps)
+                    {
+                        if (dep.Attributes == null)
+                        {
+                            continue;
+                        }
+                        var id = dep.Attributes.GetNamedItem("id").Value;
+                        if ("Baseclass.Contrib.Nuget.Output".Equals(id))
+                        {
+                            continue;
+                        }
+                        var version = dep.Attributes.GetNamedItem("version").Value;
+                        var s = string.Format("{0}.{1}", id, version);
+                        usedPackages.Add(s);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.LogError("Failed to load package files: {0}", e.Message);
+                return false;
+            }
+
+            var usedNugetPackages = new List<ITaskItem>(); // list of nuget packages used by the project
+            try
+            {
+                foreach (var nugetPackage in NugetPackages)
+                {                    
+                    var path = nugetPackage.GetMetadata("FullPath");
+                    var parts = path.Split(Path.DirectorySeparatorChar);
+                    usedNugetPackages.AddRange(from part in parts where usedPackages.Contains(part) select nugetPackage);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.LogError("Failed to filter nuget specs: {0}", e.Message);
+                return false;
+            }
+
+            var result = new List<ITaskItem>(); // list of nuget packages used by the project that depends on Baseclass.Contrib.Nuget.Output
+            foreach (var nugetPackage in usedNugetPackages)
+            {
+                var path = nugetPackage.GetMetadata("FullPath");
+                var nupkgpath = Path.GetDirectoryName(path);
+
+                using (var archive = Package.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    var nuspec = archive.GetParts().Single(part => part.Uri.ToString().EndsWith(".nuspec"));
+                    var nugetSpec = Path.Combine(nupkgpath, Path.GetFileName(nuspec.Uri.ToString()));
+
+                    // use a mutex to ensure that only one process unzip the nuspec
+                    // and that one process do not start reading it due to its existence while another one is still writing it.
+                    Mutex mut = new Mutex(false, "UnzipNuSpec");
+                    try
+                    {
+                      mut.WaitOne();
+                      
+                      if (!File.Exists(nugetSpec))
+                      {
+                          // unpack the nuget spec file from the package
+                          try
+                          {
+                              using (var outputstream = new FileStream(nugetSpec, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+                              {
+                                  using (var nspecstream = nuspec.GetStream())
+                                  {
+                                      nspecstream.CopyTo(outputstream);
+                                  }
+                              }
+                          }
+                          catch (IOException)
+                          {
+                              if (!File.Exists(nugetSpec))
+                              {
+                                  throw;
+                              }
+                          }
+                      }
+                    }
+                    finally
+                    {
+                      mut.ReleaseMutex();
+                    }
+
+                    var xml = new XmlDocument();
+                    xml.LoadXml(File.ReadAllText(nugetSpec));
+                    var deps = xml.GetElementsByTagName("dependency");
+                    foreach (XmlNode dep in deps)
+                    {
+                        if (dep.Attributes == null)
+                        {
+                            continue;
+                        }
+                        var id = dep.Attributes.GetNamedItem("id").Value;
+                        if ("Baseclass.Contrib.Nuget.Output".Equals(id))
+                        {
+                            result.Add(new TaskItem(nugetPackage));
+                            break;
+                        }
+                    }
+                }
+            }
+            Result = result.ToArray();
+            return true;
+  ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+</Project>

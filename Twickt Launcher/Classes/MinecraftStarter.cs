@@ -1,5 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -139,7 +138,6 @@ namespace Twickt_Launcher.Classes
                 });
                 process.ErrorDataReceived += new DataReceivedEventHandler((s, e) =>
                 {
-                    Window1.singleton.Show();
                     if (e.Data != null)
                     {
                         Application.Current.Dispatcher.Invoke(new Action(() =>
@@ -150,10 +148,9 @@ namespace Twickt_Launcher.Classes
                 });
 
                 process.Start();
-                var error = new Dialogs.OptionsUpdates("Modpack started, it could take a while!");
-                await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
+
                 //process.WaitForExit();
 
                 //ok = (process.ExitCode == 0);
@@ -169,23 +166,7 @@ namespace Twickt_Launcher.Classes
             Console.Write(launch);
             Process.Start(startInfo);*/
 
-        }
 
-        private static async void erroropenEvent(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
-        {
-            try
-            {
-                await Task.Delay(2000);
-                eventArgs.Session.Close();
-            }
-            catch (TaskCanceledException)
-            {
-                /*cancelled by user...tidy up and dont close as will have already closed */
-            }
-            catch
-            {
-
-            }
         }
     }
 }

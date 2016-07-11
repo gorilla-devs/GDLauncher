@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Unofficial.Ionic.Zip</id>
+        <version>1.9.1.8</version>
+        <authors>Dino Chiesa</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A nuget hosted feed for Ioniz.zip</description>
+    </metadata>
+</package>

@@ -24,8 +24,8 @@
                         <ListBoxItem Name="Home" Content="Home"></ListBoxItem>
                         <ListBoxItem Name="Options" Content="Options"></ListBoxItem>
                         <ListBoxItem Name="Modpacks" Content="Minecraft"></ListBoxItem>
-                        <ListBoxItem Name="Debug" Content="Debug"></ListBoxItem>
                         <ListBoxItem Name="Commands" Content="Commands"></ListBoxItem>
+                        <ListBoxItem Name="Debug" Content="Debug"></ListBoxItem>
                         <ListBoxItem Name="ContactMe" Content="Report a bug"></ListBoxItem>
                     </ListBox>
                     <Image VerticalAlignment="Bottom" Margin="0 360 0 16" Source="Images/Twickt Logo 200x41px v2.png" Stretch="Fill" Width="146" Height="38"/>

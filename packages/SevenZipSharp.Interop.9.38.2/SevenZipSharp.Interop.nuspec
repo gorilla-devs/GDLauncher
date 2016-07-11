@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>SevenZipSharp.Interop</id>
+    <version>9.38.2</version>
+    <authors>Luuk Sommers</authors>
+    <owners>Luuk Sommers</owners>
+    <projectUrl>https://github.com/luuksommers/SevenZipSharp.Interop/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This package installs the interop libraries needed for SevenZipSharp. It are the original compiled versions from 7-zip.org version 9.38. This way you don't need to have 7-zip installed to make use of SevenZipSharp. This package copies the dll's to the x86 and x64 directories in the output directory (Using MSBuild Targets). Please check the project site to setup SevenZipSharp's SetLibraryPath</description>
+    <summary>This package installs the interop libraries needed for SevenZipSharp.</summary>
+    <language>en-US</language>
+    <tags>7zip SevenZipSharp</tags>
+    <dependencies>
+      <dependency id="SevenZipSharp" version="0.64.0" />
+    </dependencies>
+  </metadata>
+</package>

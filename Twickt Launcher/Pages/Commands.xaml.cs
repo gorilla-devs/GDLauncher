@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 namespace Twickt_Launcher.Pages
 {
     /// <summary>
-    /// Logica di interazione per Commands.xaml
+    /// Interaction logic for Commands.xaml
     /// </summary>
     public partial class Commands : Page
     {
@@ -25,7 +25,6 @@ namespace Twickt_Launcher.Pages
         {
             InitializeComponent();
         }
-
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));

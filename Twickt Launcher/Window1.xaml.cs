@@ -89,7 +89,6 @@ namespace Twickt_Launcher
                     case "System.Windows.Controls.ListBoxItem: Report a bug":
                         MainPage.Navigate(new Pages.Report_Bug());
                         break;
-
                 }
             }
         }

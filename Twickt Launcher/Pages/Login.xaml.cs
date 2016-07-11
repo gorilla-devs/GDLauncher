@@ -61,6 +61,7 @@ namespace Twickt_Launcher.Pages
         private async void button_Click(object sender, RoutedEventArgs e)
         {
             loading.Visibility = Visibility.Visible;
+            sha256(password.Password);
             var client = new WebClient();
             var values = new NameValueCollection();
             values["username"] = username.Text;
@@ -69,7 +70,7 @@ namespace Twickt_Launcher.Pages
             var response = client.UploadValues(config.loginWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
-            if (responseString.Contains("true"))
+            if(responseString.Contains("true"))
             {
                 var userdata = responseString.Split(';');
 

@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -35,6 +37,24 @@ namespace Twickt_Launcher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            if(Classes.ComputerInfoDetect.isDirOK() == false)
+            {
+                MessageBox.Show("E' stato rilevato un errore nella directory. Il percorso dove risiede il launcher non puo' contenere spazi!(Stiamo lavorando per fixare)");
+                Application.Current.Shutdown();
+            }
+
+            using (var webClient = new System.Net.WebClient())
+            {
+                var json = webClient.DownloadString(config.updateWebsite + "/Modpacks.json");
+                dynamic stuff = JObject.Parse(json);
+                string launcherStatus = stuff.LauncherStatus;
+                if(launcherStatus.ToString() == "disabled")
+                {
+                    MessageBox.Show("Launcher non attivo");
+                    Application.Current.Shutdown();
+                }
+            }
+
             Windows.DebugOutputConsole console = new Windows.DebugOutputConsole();
             if (Window1.singleton.started == false)
             {

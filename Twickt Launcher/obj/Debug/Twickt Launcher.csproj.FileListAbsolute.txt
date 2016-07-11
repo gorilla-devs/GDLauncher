@@ -1,0 +1,288 @@
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe.config
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.pdb
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\App.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.cache
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.lref
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.g.resources
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt_Launcher.Properties.Resources.resources
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.csproj.GenerateResource.Cache
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.exe
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.pdb
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignColors.dll
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignThemes.Wpf.dll
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\App.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.csprojResolveAssemblyReference.cache
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Profiles.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Profiles.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.g.cs
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.baml
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Newtonsoft.Json.dll
+G:\OwnCloud\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Newtonsoft.Json.xml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe.config
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.exe
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.pdb
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.pdb
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Profiles.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\App.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.cache
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.lref
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\App.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Profiles.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.g.resources
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt_Launcher.Properties.Resources.resources
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.csproj.GenerateResource.Cache
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\UpdateAvailable.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\UpdateAvailable.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\OptionsUpdates.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\OptionsUpdates.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\SevenZipSharp.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\ModpackLoading.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\ModpackLoading.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\WizardWelcomePage.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\WizardWelcomePage.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\AutomaticUpdatesWizard.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\JavaPathWizard.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\AutomaticUpdatesWizard.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\JavaPathWizard.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignThemes.Wpf.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_Content.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Ionic.Zip.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignColors.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Newtonsoft.Json.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\System.Threading.Tasks.Dataflow.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Aero.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.DataGrid.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.Toolkit.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\de\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\es\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\fr\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\hu\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\it\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\pt-BR\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\ro\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\ru\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\sv\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\NEW GRAFICA\Twickt Launcher\Twickt Launcher\bin\Debug\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe.config
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.pdb
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Ionic.Zip.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignColors.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignThemes.Wpf.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Newtonsoft.Json.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\SevenZipSharp.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\System.Threading.Tasks.Dataflow.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Aero.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.DataGrid.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.Toolkit.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\de\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\es\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\fr\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\hu\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\it\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\pt-BR\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\ro\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\ru\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\sv\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\ModpackLoading.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\OptionsUpdates.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\UpdateAvailable.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Profiles.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\AutomaticUpdatesWizard.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\JavaPathWizard.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\WizardWelcomePage.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\App.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_Content.g.cs
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.cache
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.lref
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\App.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\ModpackLoading.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\OptionsUpdates.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\UpdateAvailable.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Profiles.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\AutomaticUpdatesWizard.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\JavaPathWizard.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Wizard\WizardWelcomePage.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.baml
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.g.resources
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt_Launcher.Properties.Resources.resources
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.csproj.GenerateResource.Cache
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.exe
+G:\DRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.pdb
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe.config
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.pdb
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Ionic.Zip.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignColors.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignThemes.Wpf.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Newtonsoft.Json.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\SevenZipSharp.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\System.Threading.Tasks.Dataflow.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Aero.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.DataGrid.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.Toolkit.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\de\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\es\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\fr\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\hu\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\it\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\pt-BR\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\ro\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\ru\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\sv\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\ModpackLoading.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\OptionsUpdates.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\UpdateAvailable.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Admin.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Login.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Report Bug.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Windows\DebugOutputConsole.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\App.g.cs
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.cache
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.lref
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\App.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\ModpackLoading.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\OptionsUpdates.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\UpdateAvailable.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Admin.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Login.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Report Bug.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Windows\DebugOutputConsole.baml
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.g.resources
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt_Launcher.Properties.Resources.resources
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.csproj.GenerateResource.Cache
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.exe
+C:\Users\david\Google Drive\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.pdb
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe.config
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.exe
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Twickt Launcher.pdb
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Ionic.Zip.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignColors.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\MaterialDesignThemes.Wpf.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Newtonsoft.Json.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\SevenZipSharp.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\System.Threading.Tasks.Dataflow.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Aero.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.DataGrid.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\Xceed.Wpf.Toolkit.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\de\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\es\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\fr\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\hu\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\it\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\pt-BR\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\ro\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\ru\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\sv\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\bin\Debug\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\ModpackLoading.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\OptionsUpdates.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\UpdateAvailable.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Admin.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Commands.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Login.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Report Bug.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Windows\DebugOutputConsole.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\App.g.cs
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.cache
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher_MarkupCompile.lref
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\App.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\ModpackLoading.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\OptionsUpdates.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Dialogs\UpdateAvailable.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Admin.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Commands.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Debug.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Home.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Login.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Modpacks.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Options.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\Report Bug.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\SplashScreen.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Pages\StartingWorking.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Window1.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Windows\DebugOutputConsole.baml
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.g.resources
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt_Launcher.Properties.Resources.resources
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.csproj.GenerateResource.Cache
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.exe
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.pdb
+E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Twickt Launcher\obj\Debug\Twickt Launcher.csprojResolveAssemblyReference.cache

@@ -114,12 +114,12 @@ namespace Twickt_Launcher.Pages
                 filesToDownload.Content = count.ToString() + "/" + count.ToString();
                 totalProgress.Value = 100;
                 totalPercentage.Content = "100%";
+                await Task.Delay(1000);
+                getbacktomodpack.Visibility = Visibility.Visible;
 
 
             }
             Classes.MinecraftStarter.Minecraft_Start();
-            await Task.Delay(1500);
-            getbacktomodpack.Visibility = Visibility.Visible;
         }
 
         //------------------------------------------------------------------------------------------------------------------------------

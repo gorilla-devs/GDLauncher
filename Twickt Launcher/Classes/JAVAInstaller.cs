@@ -52,11 +52,11 @@ namespace Twickt_Launcher.Classes
             //i .exe sono zip in verita'
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
             {
-                url = config.updateWebsite + "java/jPortable64_8_Update_73.paf.7z";
+                url = config.updateWebsite + "java/" + config.javaDownloadURL64 + ".7z";
             }
             else
             {
-                url = config.updateWebsite + "java/jPortable_8_Update_73.paf.7z";
+                url = config.updateWebsite + "java/" + config.javaDownloadURL32 + ".7z";
             }
             Uri uri = new Uri(url);
 
@@ -76,12 +76,12 @@ namespace Twickt_Launcher.Classes
             }
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
             {
-                Properties.Settings.Default["JavaPath"] = config.M_F_P + "runtime\\jre\\jPortable64_8_Update_73.paf\\";
+                Properties.Settings.Default["JavaPath"] = config.M_F_P + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
                 Properties.Settings.Default.Save();
             }
             else
             {
-                Properties.Settings.Default["JavaPath"] = config.M_F_P + "runtime\\jre\\jPortable_8_Update_73.paf\\";
+                Properties.Settings.Default["JavaPath"] = config.M_F_P + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
                 Properties.Settings.Default.Save();
             }
         }

@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+            FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Twickt_Launcher.Pages"
       mc:Ignorable="d" 
@@ -11,6 +11,7 @@
       Title="Login" KeyDown="Page_KeyDown">
 
     <Grid>
+
         <materialDesign:PackIcon Kind="Key" Foreground="{Binding ElementName=PasswordBox, Path=BorderBrush}" HorizontalAlignment="Right" Margin="0,312,430,0" />
         <materialDesign:PackIcon Kind="Account" Margin="248,275,0,0" />
         <TextBox x:Name="username" Text="" Margin="269,261,227,320"  materialDesign:TextFieldAssist.Hint="Username/Email" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>

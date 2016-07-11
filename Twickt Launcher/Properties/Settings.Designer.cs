@@ -37,7 +37,7 @@ namespace Twickt_Launcher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.5")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -106,7 +106,7 @@ namespace Twickt_Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("800")]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public string DebugMaxLines {
             get {
                 return ((string)(this["DebugMaxLines"]));
@@ -137,18 +137,6 @@ namespace Twickt_Launcher.Properties {
             }
             set {
                 this["disableHashCheck"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("false")]
-        public string ChangelogUpdateShow {
-            get {
-                return ((string)(this["ChangelogUpdateShow"]));
-            }
-            set {
-                this["ChangelogUpdateShow"] = value;
             }
         }
     }
