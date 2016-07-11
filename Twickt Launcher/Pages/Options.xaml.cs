@@ -53,6 +53,10 @@ namespace Twickt_Launcher.Pages
                 ram.Items.Add("2");
                 ram.Items.Add("3");
                 ram.Items.Add("4");
+                ram.Items.Add("5");
+                ram.Items.Add("6");
+                ram.Items.Add("7");
+                ram.Items.Add("8");
             }
 
         }
