@@ -1,0 +1,20 @@
+﻿<Page x:Class="Twickt_Launcher.Dialogs.HowTo"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
+      mc:Ignorable="d" 
+      d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF">
+
+    <Grid>
+        <Button x:Name="button" HorizontalAlignment="Left" Content="Ho capito" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="564,583,0,0" VerticalAlignment="Top" Width="120" Click="button_Click" />
+        <Image x:Name="___Twickt_Launcher_component_Image4_png" Margin="10,10,478,411" Source="/Twickt Launcher;component/Image4.png" Stretch="Fill"/>
+        <Image x:Name="___Twickt_Launcher_component_Image5_png" Margin="478,200,10,221" Source="/Twickt Launcher;component/Image5.png" Stretch="Fill"/>
+        <Image x:Name="___Twickt_Launcher_component_Image6_png" Margin="10,410,478,10" Source="/Twickt Launcher;component/Image6.png" Stretch="Fill"/>
+        <Label x:Name="label" Content="Una volta effettuato il login clicca sul pulsante 'Modpacks'" HorizontalAlignment="Left" Margin="221,80,0,0" VerticalAlignment="Top" Width="433" FontSize="16" Height="42"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,240,0,0" TextWrapping="Wrap" Text="Successivamente seleziona la modpack che preferisci. Clicca ora il pulsante Start. Una volta atteso il download, dopo alcuni secondi il gioco si avviera'!" VerticalAlignment="Top" Height="131" Width="463" FontSize="16"/>
+        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="231,428,0,0" TextWrapping="Wrap" Text="Le volte successive, se la modpack che hai selezionato e' una di quelle elencate nella Home, potrai avviare il gioco direttamente dal pulsante blu nelle tiles della home.          Buon Game!" VerticalAlignment="Top" Height="130" Width="441" FontSize="16"/>
+    </Grid>
+</Page>

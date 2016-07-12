@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twickt Launcher", "Twickt Launcher\Twickt Launcher.csproj", "{E3D9C474-8A5C-40D7-AC66-35797C15FD9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twickt Launcher", "Twickt-Launcher\Twickt Launcher.csproj", "{E3D9C474-8A5C-40D7-AC66-35797C15FD9C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModpackJsonCreator", "ModpackJsonCreator\ModpackJsonCreator.csproj", "{F5EB8719-82DB-43D8-A160-5D7FF27A7426}"
 EndProject
