@@ -32,6 +32,8 @@ namespace Twickt_Launcher.Pages
         public SplashScreen()
         {
             InitializeComponent();
+            Window1.singleton.MenuToggleButton.IsEnabled = false;
+            Window1.singleton.popupbox.IsEnabled = false;
             singleton = this;
         }
 
@@ -42,7 +44,6 @@ namespace Twickt_Launcher.Pages
                 MessageBox.Show("E' stato rilevato un errore nella directory. Il percorso dove risiede il launcher non puo' contenere spazi!(Stiamo lavorando per fixare)");
                 Application.Current.Shutdown();
             }
-
             using (var webClient = new System.Net.WebClient())
             {
                 var json = webClient.DownloadString(config.updateWebsite + "/Modpacks.json");
@@ -60,8 +61,17 @@ namespace Twickt_Launcher.Pages
             {
                 Window1.singleton.started = true;
                 Windows.DebugOutputConsole.singleton.Write("Extracting DLL");
-                EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "7z86.dll");
-                EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "SevenZipSharp.dll");
+                try
+                {
+                    EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "7z86.dll");
+                    EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "SevenZipSharp.dll");
+                }
+                catch(System.IO.IOException)
+                {}
+                catch
+                {
+                    MessageBox.Show("Errore estraendo le librerie");
+                }
                 //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "libsodium.dll");
                 //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "Sodium.dll");
                 Windows.DebugOutputConsole.singleton.Write("DLL extracted");

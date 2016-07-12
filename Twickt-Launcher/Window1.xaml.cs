@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -113,6 +114,15 @@ namespace Twickt_Launcher
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
+        }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            Directory.Delete(config.M_F_P, true);
+            Window1.singleton.started = false;
+            Classes.JSON.urls.Clear();
+            MainPage.Navigate(new Pages.SplashScreen());
+
         }
     }
 }

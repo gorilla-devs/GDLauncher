@@ -35,7 +35,7 @@ namespace Twickt_Launcher.Classes
     class JSON
     {
         //FORMATO ARRAY:  name, sha1, path, url, check
-        protected static List<string[]> urls = new List<string[]>();
+        public static List<string[]> urls = new List<string[]>();
         static int arch = ComputerInfoDetect.GetComputerArchitecture();
 
         public static async Task<List<string[]>> AnalyzeAssets()
