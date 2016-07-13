@@ -116,6 +116,7 @@ namespace Twickt_Launcher.Pages
                 totalPercentage.Content = "100%";
                 await Task.Delay(1000);
                 getbacktomodpack.Visibility = Visibility.Visible;
+                loadingimagegif.Visibility = Visibility.Hidden;
 
 
             }

@@ -9,7 +9,7 @@
       d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF">
 
     <Grid>
-        <Button x:Name="button" HorizontalAlignment="Left" Content="Ho capito" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="564,583,0,0" VerticalAlignment="Top" Width="120" Click="button_Click" />
+        <Button x:Name="button" HorizontalAlignment="Left" Content="Ho capito" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="564,583,0,0" VerticalAlignment="Top" Width="120" Click="button_Click" />
         <Image x:Name="___Twickt_Launcher_component_Image4_png" Margin="10,10,478,411" Source="/Twickt Launcher;component/Image4.png" Stretch="Fill"/>
         <Image x:Name="___Twickt_Launcher_component_Image5_png" Margin="478,200,10,221" Source="/Twickt Launcher;component/Image5.png" Stretch="Fill"/>
         <Image x:Name="___Twickt_Launcher_component_Image6_png" Margin="10,410,478,10" Source="/Twickt Launcher;component/Image6.png" Stretch="Fill"/>

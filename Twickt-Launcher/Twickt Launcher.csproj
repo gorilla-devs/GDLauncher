@@ -113,6 +113,10 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WpfAnimatedGif, Version=1.4.14.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.1.4.14\lib\net\WpfAnimatedGif.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock, Version=2.6.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.2.6\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
       <Private>True</Private>
@@ -156,6 +160,9 @@
     <Compile Include="Classes\ModpackStartupCheck.cs" />
     <Compile Include="Classes\RemoteModpacks.cs" />
     <Compile Include="config.cs" />
+    <Compile Include="Dialogs\Changelog.xaml.cs">
+      <DependentUpon>Changelog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\HowTo.xaml.cs">
       <DependentUpon>HowTo.xaml</DependentUpon>
     </Compile>
@@ -202,6 +209,10 @@
     <Compile Include="Windows\DebugOutputConsole.xaml.cs">
       <DependentUpon>DebugOutputConsole.xaml</DependentUpon>
     </Compile>
+    <Page Include="Dialogs\Changelog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\HowTo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -363,6 +374,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\giphy.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />

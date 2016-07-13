@@ -318,16 +318,48 @@ namespace Twickt_Launcher.Classes
         public static async Task<List<string[]>> GetFiles(string modpackname, bool justlibraries = false, bool justforge = false)
         {
             Windows.DebugOutputConsole.singleton.Write("Analyzing JSON files");
-            if(urls.Count != 0 && justforge == false && justlibraries == false)
+            try
+            {
+                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Json Files";
+            }
+            catch { }
+
+
+            if (urls.Count != 0 && justforge == false && justlibraries == false)
             {
                 Windows.DebugOutputConsole.singleton.Write("URLS list already present. Not going to download it again");
                 return urls;
             }
             List<string[]> list = new List<string[]>();
+            try
+            {
+                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Assets";
+            }
+            catch { }
             List<string[]> assets = await AnalyzeAssets();
+            try
+            {
+                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Main Jar";
+            }
+            catch { }
             List<string[]> mainjar = await AnalyzeMainJar();
+            try
+            {
+                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Standard Libraries";
+            }
+            catch { }
             List<string[]> libraries = await AnalyzeStdLibraries();
+            try
+            {
+                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Forge Libraries";
+            }
+            catch { }
             List<string[]> forge = await AnalyzeForgeLibraries(modpackname);
+            try
+            {
+                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Mods";
+            }
+            catch { }
             List<string[]> mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname);
 
             if ((justforge == false) && (justlibraries == false))

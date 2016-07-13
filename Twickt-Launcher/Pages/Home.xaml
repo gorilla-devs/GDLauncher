@@ -11,17 +11,21 @@
       Title="Home" ShowsNavigationUI="False" Background="White" Loaded="Page_Loaded">
 
     <Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <materialDesign:Card Margin="10" Height="100" Width="300">
+                <Image x:Name="image" HorizontalAlignment="Center" Height="46" VerticalAlignment="Center" Width="230" Source="/Twickt Launcher;component/Images/Twickt Logo 200x41px v2.png" Stretch="UniformToFill"/>
+            </materialDesign:Card>
+            <materialDesign:Card Margin="10" Height="100" Width="300">
+                <Label x:Name="label" Content="The Simpler, The Better!" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="22"/>
+            </materialDesign:Card>
+        </StackPanel>
+
+
         <ScrollViewer Width="674" Margin="10,123,10,192" Visibility="Hidden">
             <TextBlock x:Name="changelogs" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Background="#BBDEFB" Padding="10"/>
         </ScrollViewer>
-        <Image x:Name="twitterLink" HorizontalAlignment="Left" Height="55" Margin="44,538,0,0" VerticalAlignment="Top" Width="55" Source="/Twickt Launcher;component/Images/Icons/twitter.png" Cursor="Hand" MouseDown="twitterLink_MouseDown"/>
-        <Image x:Name="facebookLink" HorizontalAlignment="Left" Height="55" Margin="231,538,0,0" VerticalAlignment="Top" Width="55" Source="/Twickt Launcher;component/Images/Icons/facebook.png" Cursor="Hand" MouseDown="facebookLink_MouseDown"/>
-        <Image x:Name="emailLink" HorizontalAlignment="Left" Height="55" Margin="410,538,0,0" VerticalAlignment="Top" Width="55" Source="/Twickt Launcher;component/Images/Icons/gmail.png" Cursor="Hand" MouseDown="emailLink_MouseDown"/>
-        <Image x:Name="websiteLink" HorizontalAlignment="Left" Height="55" Margin="588,538,0,0" VerticalAlignment="Top" Width="55" Source="/Twickt Launcher;component/Images/Icons/website.png" Cursor="Hand" MouseDown="websiteLink_MouseDown"/>
-        <Image x:Name="image" HorizontalAlignment="Left" Height="46" Margin="110,38,0,0" VerticalAlignment="Top" Width="230" Source="/Twickt Launcher;component/Images/Twickt Logo 200x41px v2.png" Stretch="UniformToFill"/>
-        <Label x:Name="label" Content="The Simpler, The Better!" HorizontalAlignment="Left" Margin="348,38,0,0" VerticalAlignment="Top" FontSize="24"/>
-        <Button x:Name="button" Content="Modpacks" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="10,438,0,0" VerticalAlignment="Top" Width="674" Height="46" Click="button_Click"/>
-        <WrapPanel Margin="20,123,10,192" Orientation="Horizontal" HorizontalAlignment="Center" Width="664">
+        <Button x:Name="button" Content="Modpacks" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="10,462,0,0" VerticalAlignment="Top" Width="674" Height="46" Click="button_Click"/>
+        <WrapPanel Margin="20,147,10,168" Orientation="Horizontal" HorizontalAlignment="Center" Width="664">
             <materialDesign:Card Width="200" Margin="10" HorizontalAlignment="Left">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -110,5 +114,22 @@
                 </Grid>
             </materialDesign:Card>
         </WrapPanel>
+        <Button x:Name="changelog" Content="Changelogs" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="260,121,0,0" VerticalAlignment="Top" Width="180" Height="39" Click="changelog_Click"/>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,525,0,0" HorizontalAlignment="Center">
+                <materialDesign:Card Margin="10 0 5 0" Cursor="Hand" MouseDown="twitterLink_MouseDown">
+                    <Image x:Name="twitterLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/twitter.png"/>
+                </materialDesign:Card>
+                <materialDesign:Card Margin="10 0 5 0"  Cursor="Hand" MouseDown="facebookLink_MouseDown">
+                    <Image x:Name="facebookLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/facebook.png"/>
+                </materialDesign:Card>
+                <materialDesign:Card Margin="10 0 5 0"  Cursor="Hand" MouseDown="emailLink_MouseDown">
+                    <Image x:Name="emailLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/gmail.png"/>
+                </materialDesign:Card>
+                <materialDesign:Card Margin="10 0 5 0"  Cursor="Hand" MouseDown="websiteLink_MouseDown">
+                    <Image x:Name="websiteLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/website.png"/>
+                </materialDesign:Card>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>

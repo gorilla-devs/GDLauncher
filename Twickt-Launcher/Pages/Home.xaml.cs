@@ -124,5 +124,11 @@ namespace Twickt_Launcher.Pages
         {
 
         }
+
+        private async void changelog_Click(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
+            //await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
+        }
     }
 }

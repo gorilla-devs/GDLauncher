@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
-             mc:Ignorable="d" Background="#FFFFFF" Height="107.823" Width="144.757">
+             mc:Ignorable="d" Background="#FFFFFF" Height="107.823" Width="167.993">
     <Grid>
-        <ProgressBar HorizontalAlignment="Left" Height="31" Margin="93,10,0,0" VerticalAlignment="Top" Width="38" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
-        <Label x:Name="label" Content="Loading..." HorizontalAlignment="Right" Margin="0,10,52,0" VerticalAlignment="Top" FontSize="16" Width="83"/>
-        <ProgressBar Name="forgeProgress" HorizontalAlignment="Left" Height="13" Margin="10,59,0,0" VerticalAlignment="Top" Width="121" Visibility="Hidden"/>
-        <Label x:Name="whatdoing" Content="Label" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top" Width="121" Visibility="Hidden"/>
+        <ProgressBar HorizontalAlignment="Left" Height="37" Margin="114,10,0,0" VerticalAlignment="Top" Width="44" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
+        <Label x:Name="label" Content="Loading..." HorizontalAlignment="Right" Margin="0,13,70,0" VerticalAlignment="Top" FontSize="16" Width="82"/>
+        <ProgressBar Name="forgeProgress" HorizontalAlignment="Left" Height="13" Margin="10,59,0,0" VerticalAlignment="Top" Width="148" Visibility="Visible"/>
+        <Label x:Name="whatdoing" Content="" HorizontalAlignment="Center" Margin="10,77,10,0" VerticalAlignment="Top" Width="148" Visibility="Visible"/>
 
     </Grid>
 </UserControl>
