@@ -14,7 +14,7 @@
         <Label x:Name="label" Content="Contact me/Report a problem" HorizontalAlignment="Left" Margin="162,10,0,0" VerticalAlignment="Top" FontSize="26.667"/>
         <TextBox x:Name="body" HorizontalAlignment="Left" Height="273" Margin="10,110,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="674"/>
         <Label x:Name="label1" Content="Describe your problem" HorizontalAlignment="Left" Margin="10,81,0,0" VerticalAlignment="Top" Width="393"/>
-        <Button x:Name="send" Content="Send" HorizontalAlignment="Left" Margin="10,461,0,0" VerticalAlignment="Top" Width="132" Click="send_Click"/>
+        <Button x:Name="send" Content="Send" Foreground="White" HorizontalAlignment="Left" Margin="10,461,0,0" VerticalAlignment="Top" Width="132" Click="send_Click"/>
         <Label x:Name="op1" Content="Label" HorizontalAlignment="Left" Margin="10,432,0,0" VerticalAlignment="Top"/>
         <Label x:Name="sign" Content="+" HorizontalAlignment="Left" Margin="53,432,0,0" VerticalAlignment="Top" Width="38" HorizontalContentAlignment="Center"/>
         <Label x:Name="op2" Content="Label" HorizontalAlignment="Left" Margin="96,432,0,0" VerticalAlignment="Top"/>

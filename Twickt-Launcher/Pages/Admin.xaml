@@ -10,7 +10,7 @@
 
     <Grid>
         <CheckBox x:Name="disableHashCheck" Content="Disable hashsum file check for modpacks" HorizontalAlignment="Left" Margin="10,75,0,0" VerticalAlignment="Top" Width="277" Height="22"/>
-        <Button x:Name="save" Content="Save" HorizontalAlignment="Left" Margin="609,583,0,0" VerticalAlignment="Top" Width="75" Click="save_Click"/>
+        <Button x:Name="save" Content="Save" HorizontalAlignment="Left" Foreground="White" Margin="609,583,0,0" VerticalAlignment="Top" Width="75" Click="save_Click"/>
         <Label x:Name="label" Content="USE WITH CAUTION!" HorizontalAlignment="Left" Margin="199,10,0,0" VerticalAlignment="Top" Width="285" FontSize="29.333"/>
         <Label x:Name="label1" Content="Forge Version(Just 1.7.10)" HorizontalAlignment="Left" Margin="10,102,0,0" VerticalAlignment="Top" Width="151"/>
         <TextBox x:Name="forgeVersion" HorizontalAlignment="Left" Height="23" Margin="166,103,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="211"/>

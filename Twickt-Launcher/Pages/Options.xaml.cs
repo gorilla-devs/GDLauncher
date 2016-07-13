@@ -35,7 +35,7 @@ namespace Twickt_Launcher.Pages
                 if (navWindow != null) navWindow.ShowsNavigationUI = false;
             }));
 
-            for (int i = 1; i <= 15; i++)
+            for (int i = 1; i <= 30; i++)
             {
                 downloadThreads.Items.Add(i.ToString());
             }
