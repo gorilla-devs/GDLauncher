@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Twickt_Launcher.Pages"
       mc:Ignorable="d" 
       FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
@@ -10,16 +11,33 @@
       Title="StartingWorking" Loaded="Page_Loaded">
 
     <Grid>
-        <ProgressBar Name="totalProgress" HorizontalAlignment="Left" Height="26" Margin="10,92,0,0" VerticalAlignment="Top" Width="623" />
-        <Label x:Name="totalPercentage" Content="totalPercentage" HorizontalAlignment="Left" Margin="638,92,0,0" VerticalAlignment="Top" Width="46"/>
-        <Label x:Name="workingThreadsLabel" Content="Working Threads:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="110"/>
-        <Label x:Name="workingThreads" Content="WorkingThreads" HorizontalAlignment="Left" Margin="125,10,0,0" VerticalAlignment="Top" Width="186"/>
-        <Button x:Name="cancel" Content="Cancel" HorizontalAlignment="Left" Margin="589,571,0,0" VerticalAlignment="Top" Width="95" Height="44" Click="cancel_Click"/>
-        <Label x:Name="workingThreadsLabel_Copy" Content="Modpack:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" Width="110"/>
-        <Label x:Name="modpackName" Content="MODPACK" HorizontalAlignment="Left" Margin="125,36,0,0" VerticalAlignment="Top" Width="186"/>
-        <Label x:Name="workingThreadsLabel_Copy1" Content="Files:" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="110"/>
-        <Label x:Name="filesToDownload" Content="0/0" HorizontalAlignment="Left" Margin="125,67,0,0" VerticalAlignment="Top" Width="186"/>
-        <Button x:Name="getbacktomodpack" Content="Go back to Modpacks" HorizontalAlignment="Left" Margin="10,123,0,0" VerticalAlignment="Top" Width="674" Height="67" FontSize="21.333" Visibility="Hidden" Click="getbacktomodpack_Click"/>
-
+        <StackPanel>
+            <materialDesign:Card Margin="6 20 6 0" Background="{DynamicResource MaterialDesignPaper}" Padding="10" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                <StackPanel Orientation="Horizontal">
+                    <Label x:Name="workingThreadsLabel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="110">Working Threads:</Label>
+                    <Label x:Name="workingThreads" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186">WorkingThreads</Label>
+                </StackPanel>
+            </materialDesign:Card>
+            <materialDesign:Card Margin="6 7 6 0" Background="{DynamicResource MaterialDesignPaper}" Padding="10" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                <StackPanel Orientation="Horizontal">
+                    <Label x:Name="workingThreadsLabel_Copy" Content="Modpack:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="110"/>
+                    <Label x:Name="modpackName" Content="MODPACK" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186"/>
+                </StackPanel>
+            </materialDesign:Card>
+            <materialDesign:Card Margin="6 7 6 0" Background="{DynamicResource MaterialDesignPaper}" Padding="10" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                <StackPanel Orientation="Horizontal">
+                    <Label x:Name="workingThreadsLabel_Copy1" Content="Files:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="110"/>
+                    <Label x:Name="filesToDownload" Content="0/0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="186"/>
+                </StackPanel>
+            </materialDesign:Card>
+            <materialDesign:Card Margin="6 7 6 0" Background="{DynamicResource MaterialDesignPaper}" Padding="10" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                <StackPanel Orientation="Horizontal">
+                    <ProgressBar Name="totalProgress" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="600" />
+                    <Label x:Name="totalPercentage" Content="totalPercentage" HorizontalAlignment="Left" VerticalAlignment="Top" Width="46"/>
+                </StackPanel>
+            </materialDesign:Card>
+            <Button x:Name="getbacktomodpack" Margin="6 20 6 0" Foreground="White" Content="Go back to Modpacks" HorizontalAlignment="Left" VerticalAlignment="Top" Width="674" Height="67" FontSize="21.333" Visibility="Visible" Click="getbacktomodpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth3"/>
+        </StackPanel>
+        <Button x:Name="cancel" Content="Cancel" Foreground="White" HorizontalAlignment="Left" Margin="589,571,0,0" VerticalAlignment="Top" Width="95" Height="44" Click="cancel_Click"/>
     </Grid>
 </Page>
