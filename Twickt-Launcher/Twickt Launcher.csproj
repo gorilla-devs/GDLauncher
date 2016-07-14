@@ -358,22 +358,22 @@
     <Resource Include="Images\tag-agradecimentos-minecraft-minecraft.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image1.png" />
+    <Resource Include="Images\Image1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image2.png" />
+    <Resource Include="Images\Image2.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image3.png" />
+    <Resource Include="Images\Image3.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image4.png" />
+    <Resource Include="Images\Image4.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image5.png" />
+    <Resource Include="Images\Image5.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Image6.png" />
+    <Resource Include="Images\Image6.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\giphy.gif" />
