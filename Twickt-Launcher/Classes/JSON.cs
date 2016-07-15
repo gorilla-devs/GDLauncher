@@ -37,6 +37,9 @@ namespace Twickt_Launcher.Classes
         //FORMATO ARRAY:  name, sha1, path, url, check
         public static List<string[]> urls = new List<string[]>();
         static int arch = ComputerInfoDetect.GetComputerArchitecture();
+        public static RemoteModpacks remotemodpacks = new RemoteModpacks();
+        public static List<string> downloadingVersion;
+        public static string assetsurl;
 
         public static async Task<List<string[]>> AnalyzeAssets()
         {
@@ -46,7 +49,12 @@ namespace Twickt_Launcher.Classes
             {
                 data = e.Result;
             };
-            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/indexes/1.7.10.json"));
+            await c.DownloadStringTaskAsync(new Uri(assetsurl));
+            MessageBox.Show(config.M_F_P + downloadingVersion[0] + "\\assets\\indexes\\" + downloadingVersion[0] + ".json");
+            if (!Directory.Exists(config.M_F_P + downloadingVersion[0] + "\\assets\\indexes\\"))
+                Directory.CreateDirectory(config.M_F_P + downloadingVersion[0] + "\\assets\\indexes\\");
+            await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + downloadingVersion[0] + "\\assets\\indexes\\" + downloadingVersion[0] + ".json");
+
             List<string[]> assets = new List<string[]>();
             MyClass json = JsonConvert.DeserializeObject<MyClass>(data);
             var names = json.Objects.Keys.ToList();
@@ -59,7 +67,7 @@ namespace Twickt_Launcher.Classes
                 var url = "http://resources.download.minecraft.net/";
                 var finalurl = "";
                 finalurl = url + hash.Substring(0, 2) + "/" + hash;
-                assets.Add(new string[4] { name, hash, path, finalurl });
+                assets.Add(new string[4] { name, hash, "\\" + downloadingVersion[0] + path, finalurl });
                 i++;
             }
             return assets;
@@ -78,7 +86,7 @@ namespace Twickt_Launcher.Classes
                 }
                 catch { }
             };
-            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/1.7.10/1.7.10.json"));
+            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + downloadingVersion[0] + "/" + downloadingVersion[0] + ".json"));
             try
             {
                 dynamic json = JsonConvert.DeserializeObject(data);
@@ -102,9 +110,18 @@ namespace Twickt_Launcher.Classes
                     }
 
                 }
+                foreach (var item in json["assetIndex"])
+                {
+                    var param = item.ToString();
+                    if (param.Contains("url"))
+                    {
+                        param = param.Replace("\"url\": \"", "");
+                        assetsurl = param.Replace("\"", "");
+                    }
+                }
                 path = "";
                 name = "mainjar";
-                matrix.Add(new string[4] { name, hash, path, url });
+                matrix.Add(new string[4] { name, hash, "\\" + downloadingVersion[0] + path, url });
             }
             catch (JsonReaderException jex)
             {
@@ -121,7 +138,7 @@ namespace Twickt_Launcher.Classes
             {
                 data = e.Result;
             };
-            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/1.7.10/1.7.10.json"));
+            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + downloadingVersion[0] + "/" + downloadingVersion[0] + ".json"));
             List<string[]> libraries = new List<string[]>();
             dynamic json = JsonConvert.DeserializeObject(data);
             int i = 0;
@@ -170,7 +187,7 @@ namespace Twickt_Launcher.Classes
                     }
                 }
                 catch { }
-                libraries.Add(new string[4] { name, hash, path, url });
+                libraries.Add(new string[4] { name, hash, "\\" + downloadingVersion[0] + path, url });
             }
             return libraries;
         }
@@ -317,6 +334,8 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<List<string[]>> GetFiles(string modpackname, bool justlibraries = false, bool justforge = false)
         {
+            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
+
             Windows.DebugOutputConsole.singleton.Write("Analyzing JSON files");
             try
             {
@@ -324,25 +343,19 @@ namespace Twickt_Launcher.Classes
             }
             catch { }
 
-
-            if (urls.Count != 0 && justforge == false && justlibraries == false)
-            {
-                Windows.DebugOutputConsole.singleton.Write("URLS list already present. Not going to download it again");
-                return urls;
-            }
             List<string[]> list = new List<string[]>();
-            try
-            {
-                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Assets";
-            }
-            catch { }
-            List<string[]> assets = await AnalyzeAssets();
             try
             {
                 Pages.Modpacks.loading.whatdoing.Content = "Analyzing Main Jar";
             }
             catch { }
             List<string[]> mainjar = await AnalyzeMainJar();
+            try
+            {
+                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Assets";
+            }
+            catch { }
+            List<string[]> assets = await AnalyzeAssets();
             try
             {
                 Pages.Modpacks.loading.whatdoing.Content = "Analyzing Standard Libraries";

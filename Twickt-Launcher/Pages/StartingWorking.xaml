@@ -13,7 +13,7 @@
 
     <Grid>
         <StackPanel Background="#f4f4f4">
-            <Image x:Name="loadingimagegif" Margin="0 300" HorizontalAlignment="Center" gif:ImageBehavior.RepeatBehavior="Forever" gif:ImageBehavior.AnimatedSource="/Twickt Launcher;component/Images/giphy.gif" Height="288"/>
+           
         </StackPanel>
         <StackPanel>
             <materialDesign:Card Margin="6 20 6 0" Background="{DynamicResource MaterialDesignPaper}" Padding="10" materialDesign:ShadowAssist.ShadowDepth="Depth3">

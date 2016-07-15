@@ -23,6 +23,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Twickt_Launcher.Classes;
 
 namespace Twickt_Launcher.Pages
 {
@@ -35,10 +36,11 @@ namespace Twickt_Launcher.Pages
         static WebClient webClient = new WebClient();               // Our WebClient that will be doing the downloading for us
         static Stopwatch sw = new Stopwatch();                      // The stopwatch which we will be using to calculate the download speed
         private Queue<string> _downloadlibraries = new Queue<string>();
-        string mainjar = config.M_F_P + @"versions\1.7.10\1.7.10.jar";
+        string mainjar;
         static int actual = 0;
         public static bool tempcontinuedownload = true;
         public static StartingWorking singleton;
+        public static List<string> downloadingVersion;
 
         public static List<string> urls;
         public StartingWorking()
@@ -76,9 +78,10 @@ namespace Twickt_Launcher.Pages
 
 
             */
+            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString());
+            mainjar = config.M_F_P + @"versions\" + downloadingVersion[0] + "\\" + downloadingVersion[0] + ".jar";
             workingThreads.Content = Properties.Settings.Default["download_threads"].ToString();
             modpackName.Content = Modpacks.singleton.remoteModpacks.SelectedItem.ToString();
-
             int count = urls.Count;
             if (urls != null && urls.Count != 0)
             {
@@ -116,11 +119,11 @@ namespace Twickt_Launcher.Pages
                 totalPercentage.Content = "100%";
                 await Task.Delay(1000);
                 getbacktomodpack.Visibility = Visibility.Visible;
-                loadingimagegif.Visibility = Visibility.Hidden;
 
 
             }
             Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString());
+            JSON.urls.Clear();
         }
 
         //------------------------------------------------------------------------------------------------------------------------------
@@ -134,7 +137,7 @@ namespace Twickt_Launcher.Pages
             try
             {
                 int count = urls.Count;
-                var temp = config.M_F_P + @"temp\";
+                var temp = config.M_F_P + downloadingVersion[0] + "\\" + @"temp\";
                 if (!Directory.Exists(@temp))
                 {
                     Directory.CreateDirectory(@temp);
@@ -142,13 +145,11 @@ namespace Twickt_Launcher.Pages
 
                 sw.Start();
                 webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler((sender, e) => client_DownloadProgressChanged(sender, e));
-                string DebugFile = "";
                 if (url.Contains("https://libraries.minecraft.net"))
                 {
-                    string dir = config.M_F_P + @"libraries\" + url.Replace("https://libraries.minecraft.net", "");
+                    string dir = config.M_F_P + downloadingVersion[0] + "\\" + @"libraries\" + url.Replace("https://libraries.minecraft.net", "");
                     //localpath = localpath.Replace("/","\\");
                     string FileName = System.IO.Path.GetFileName(dir);
-                    DebugFile = url.Replace("https://libraries.minecraft.net", "");
                     //MessageBox.Show(FileName);
                     dir = System.IO.Path.GetDirectoryName(@dir);
                     //MessageBox.Show(@dir);
@@ -164,14 +165,17 @@ namespace Twickt_Launcher.Pages
                         using (var fileStream = new FileStream(@dir + "\\" + FileName, FileMode.Create, FileAccess.Write))
                         {
                             await content.CopyToAsync(fileStream);
+                            content.Dispose();
+                            client.Dispose();
+                            fileStream.Flush();
+                            fileStream.Close();
                         }
                     }
                 }
-                else if (url.Contains("https://launcher.mojang.com/mc/game/1.7.10/client/e80d9b3bf5085002218d4be59e668bac718abbc6/client.jar"))
+                else if (url.Contains("https://launcher.mojang.com/mc/game/"))
                 {
-                    string dir = config.M_F_P + @"versions\1.7.10\";
-                    DebugFile = url.Replace("https://launcher.mojang.com/mc/game/1.7.10/client/e80d9b3bf5085002218d4be59e668bac718abbc6/client.jar", "");
-                    string FileName = "1.7.10.jar";
+                    string dir = config.M_F_P + downloadingVersion[0] + "\\" + @"versions\" + downloadingVersion[0] + "\\";
+                    string FileName = "" + downloadingVersion[0] + ".jar";
 
                     //MessageBox.Show(FileName);
                     //MessageBox.Show(@dir);
@@ -187,13 +191,16 @@ namespace Twickt_Launcher.Pages
                         using (var fileStream = new FileStream(@dir + "\\" + FileName, FileMode.Create, FileAccess.Write))
                         {
                             await content.CopyToAsync(fileStream);
+                            content.Dispose();
+                            client.Dispose();
+                            fileStream.Flush();
+                            fileStream.Close();
                         }
                     }
                 }
                 else if (url.Contains("http://resources.download.minecraft.net/"))
                 {
-                    string dir = config.M_F_P + @"assets\objects\" + url.Replace("http://resources.download.minecraft.net/", "");
-                    DebugFile = url.Replace("http://resources.download.minecraft.net/", "");
+                    string dir = config.M_F_P + downloadingVersion[0] + "\\" + @"assets\objects\" + url.Replace("http://resources.download.minecraft.net/", "");
                     string FileName = System.IO.Path.GetFileName(dir);
 
                     //MessageBox.Show(FileName);
@@ -211,13 +218,16 @@ namespace Twickt_Launcher.Pages
                         using (var fileStream = new FileStream(@dir + "\\" + FileName, FileMode.Create, FileAccess.Write))
                         {
                             await content.CopyToAsync(fileStream);
+                            content.Dispose();
+                            client.Dispose();
+                            fileStream.Flush();
+                            fileStream.Close();
                         }
                     }
                 }
                 else if (url.Contains("http://files.minecraftforge.net/maven/"))
                 {
-                    string dir = config.M_F_P + @"libraries\" + url.Replace("http://files.minecraftforge.net/maven/", "");
-                    DebugFile = url.Replace("http://files.minecraftforge.net/maven/", "");
+                    string dir = config.M_F_P + downloadingVersion[0] + "\\" + @"libraries\" + url.Replace("http://files.minecraftforge.net/maven/", "");
                     string FileName = System.IO.Path.GetFileName(dir);
 
                     //MessageBox.Show(FileName);
@@ -235,13 +245,16 @@ namespace Twickt_Launcher.Pages
                         using (var fileStream = new FileStream(@dir + "\\" + FileName, FileMode.Create, FileAccess.Write))
                         {
                             await content.CopyToAsync(fileStream);
+                            content.Dispose();
+                            client.Dispose();
+                            fileStream.Flush();
+                            fileStream.Close();
                         }
                     }
                 }
                 else if (url.Contains(config.updateWebsite))
                 {
-                    string dir = config.M_F_P + @"instances\" + url.Replace(config.updateWebsite, "");
-                    DebugFile = url.Replace(config.updateWebsite, "");
+                    string dir = config.M_F_P + downloadingVersion[0] + "\\" + @"instances\" + url.Replace(config.updateWebsite, "");
                     string FileName = System.IO.Path.GetFileName(dir);
                     dir = System.IO.Path.GetDirectoryName(@dir);
                     if (!Directory.Exists(@dir))
@@ -256,6 +269,10 @@ namespace Twickt_Launcher.Pages
                         using (var fileStream = new FileStream(@dir + "\\" + FileName, FileMode.Create, FileAccess.Write))
                         {
                             await content.CopyToAsync(fileStream);
+                            content.Dispose();
+                            client.Dispose();
+                            fileStream.Flush();
+                            fileStream.Close();
                         }
                     }
                 }
@@ -324,23 +341,23 @@ namespace Twickt_Launcher.Pages
         public static async Task ExtractNatives(string url)
         {
             string dir = "";
-            string natives = config.M_F_P + @"natives-win\";
+            string natives = config.M_F_P + downloadingVersion[0] + "\\" + @"natives-win\";
             if (url.Contains("https://libraries.minecraft.net"))
             {
-                dir = config.M_F_P + @"libraries\" + url.Replace("https://libraries.minecraft.net", "");
+                dir = config.M_F_P + downloadingVersion[0] + "\\" + @"libraries\" + url.Replace("https://libraries.minecraft.net", "");
             }
 
             else if (url.Contains("http://resources.download.minecraft.net/"))
             {
-                dir = config.M_F_P + @"libraries\" + url.Replace("http://resources.download.minecraft.net/", "");
+                dir = config.M_F_P + downloadingVersion[0] + "\\" + @"libraries\" + url.Replace("http://resources.download.minecraft.net/", "");
             }
 
             else if (url.Contains("http://files.minecraftforge.net/maven/"))
             {
-                dir = config.M_F_P + @"libraries\" + url.Replace("http://files.minecraftforge.net/maven/", "");
+                dir = config.M_F_P + downloadingVersion[0] + "\\" + @"libraries\" + url.Replace("http://files.minecraftforge.net/maven/", "");
             }
 
-            var temp = config.M_F_P + @"temp\";
+            var temp = config.M_F_P + downloadingVersion[0] + "\\" + @"temp\";
 
             //CONTROLLA SE ESISTE LA CARTELLA DOVE METTERE I NATIVES, ALTRIMENTI LA CREA
             if (!Directory.Exists(@natives))
@@ -354,7 +371,7 @@ namespace Twickt_Launcher.Pages
                     //ESTRAE LA LISTA JSON DI ROBA DA SCARICARE E IL FILE JAR PRINCIPALE DI FORGE
                     try
                     {
-                        zip.ExtractAll(@natives);
+                        zip.ExtractAll(@natives, ExtractExistingFileAction.OverwriteSilently);
                     }
                     catch (Exception e)
                     {

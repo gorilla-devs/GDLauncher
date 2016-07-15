@@ -11,8 +11,10 @@ namespace Twickt_Launcher.Classes
 {
     class MinecraftStarter
     {
+        public static List<string> downloadingVersion;
         public static async void Minecraft_Start(string modpackname)
         {
+            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
             string gamedir = await Classes.RemoteModpacks.GetModpacksDir(modpackname);
 
             string getForge = await Classes.RemoteModpacks.IsModpackForgeNeeded(modpackname);
@@ -25,13 +27,13 @@ namespace Twickt_Launcher.Classes
             List<String[]> urlsforge = await JSON.GetFiles(modpackname, false, true);
             List<String[]> urlslibraries = await JSON.GetFiles(modpackname, true, false);
             string launch =@"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Xmx" + Properties.Settings.Default["RAM"] + "G -Xms" + "256" + "M " + ((String.Compare(Properties.Settings.Default["RAM"].ToString(), "3") > 0) ? "-XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+UseNUMA -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=30 -XX:GCPauseIntervalMillis=150 -XX:+UseAdaptiveGCBoundary -XX:-UseGCOverheadLimit -XX:+UseBiasedLocking -XX:SurvivorRatio=8 -XX:TargetSurvivorRatio=90 -XX:MaxTenuringThreshold=15 -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true -XX:+UseFastAccessorMethods -XX:+UseCompressedOops -XX:+OptimizeStringConcat -XX:+AggressiveOpts -XX:ReservedCodeCacheSize=2048m -XX:+UseCodeCacheFlushing -XX:SoftRefLRUPolicyMSPerMB=10000 -XX:ParallelGCThreads=10 " : "-XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+UseNUMA -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=30 -XX:GCPauseIntervalMillis=150 -XX:+UseAdaptiveGCBoundary -XX:-UseGCOverheadLimit -XX:+UseBiasedLocking -XX:SurvivorRatio=8 -XX:TargetSurvivorRatio=90 -XX:MaxTenuringThreshold=15 -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true -XX:+UseFastAccessorMethods -XX:+UseCompressedOops -XX:+OptimizeStringConcat -XX:+AggressiveOpts -XX:ReservedCodeCacheSize=2048m -XX:+UseCodeCacheFlushing -XX:SoftRefLRUPolicyMSPerMB=2000 -XX:ParallelGCThreads=10 ") +
-                           @"-Djava.library.path=" + config.M_F_P + @"natives-win\ " +
+                           @"-Djava.library.path=" + config.M_F_P + downloadingVersion[0] + @"\natives-win\ " +
 
                            @"-cp ";
             if (forge == true)
-                launch += "\"" + config.M_F_P + @"libraries\net\minecraftforge\forge\" + config.forgeversion + @"\forge-" + config.forgeversion + @".jar" + "\";";
+                launch += "\"" + config.M_F_P + downloadingVersion[0] + @"\libraries\net\minecraftforge\forge\" + config.forgeversion + @"\forge-" + config.forgeversion + @".jar" + "\";";
             else
-                launch += "\"" + config.M_F_P + @"versions\1.7.10\1.7.10.jar" + "\";";
+                launch += "\"" + config.M_F_P + downloadingVersion[0] + @"\versions\" + downloadingVersion[0] + "\\" + downloadingVersion[0] + ".jar" + "\";";
             if (forge == true)
             {
                 foreach (string[] url in urlsforge)
@@ -40,7 +42,7 @@ namespace Twickt_Launcher.Classes
                         continue;
                     if (url[3].Contains("https://libraries.minecraft.net"))
                     {
-                        string dir = config.M_F_P + @"libraries\" + url[3].Replace("https://libraries.minecraft.net", "");
+                        string dir = config.M_F_P + downloadingVersion[0] + @"\libraries\" + url[3].Replace("https://libraries.minecraft.net", "");
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
                         if (!Directory.Exists(@dir))
@@ -51,7 +53,7 @@ namespace Twickt_Launcher.Classes
                     }
                     if (url[3].Contains("http://files.minecraftforge.net/maven/"))
                     {
-                        string dir = config.M_F_P + @"libraries\" + url[3].Replace("http://files.minecraftforge.net/maven/", "");
+                        string dir = config.M_F_P + downloadingVersion[0] + @"\libraries\" + url[3].Replace("http://files.minecraftforge.net/maven/", "");
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
                         if (!Directory.Exists(@dir))
@@ -68,7 +70,7 @@ namespace Twickt_Launcher.Classes
                     continue;
                 if (url[3].Contains("https://libraries.minecraft.net"))
                 {
-                    string dir = config.M_F_P + @"libraries\" + url[3].Replace("https://libraries.minecraft.net", "");
+                    string dir = config.M_F_P + downloadingVersion[0] + @"\libraries\" + url[3].Replace("https://libraries.minecraft.net", "");
                     string FileName = Path.GetFileName(dir);
                     dir = Path.GetDirectoryName(@dir);
                     if (!Directory.Exists(@dir))
@@ -81,7 +83,7 @@ namespace Twickt_Launcher.Classes
                 {
                     if (url[3].Contains("http://files.minecraftforge.net/maven/"))
                     {
-                        string dir = config.M_F_P + @"libraries\" + url[3].Replace("http://files.minecraftforge.net/maven/", "");
+                        string dir = config.M_F_P + downloadingVersion[0] + @"\libraries\" + url[3].Replace("http://files.minecraftforge.net/maven/", "");
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
                         if (!Directory.Exists(@dir))
@@ -93,7 +95,7 @@ namespace Twickt_Launcher.Classes
                 }
             }
             if (forge == true)
-                launch += config.M_F_P + @"versions\1.7.10\1.7.10.jar";
+                launch += config.M_F_P + downloadingVersion[0] + @"\versions\" + downloadingVersion[0] + "\\" + downloadingVersion[0] + ".jar";
 
 
 
@@ -102,10 +104,10 @@ namespace Twickt_Launcher.Classes
                            //"--accessToken " + MojangLogin.getAccessToken() + " " +
                            //"--username killpowa " +
                            "--accessToken 0 " +
-                           "--version " + config.forgeversion + " " +
-                           ((forge == true) ? "--gameDir \"" + config.minecraftfolder + "\\instances\\" + gamedir + "\" " : "--gameDir \"" + config.minecraftfolder + "\" ") +
-                           "--assetsDir " + config.minecraftfolder + "\\assets\\ " +
-                           "--assetIndex 1.7.10 " +
+                           "--version " +  downloadingVersion[0] + " " +
+                           ((forge == true) ? "--gameDir \"" + config.minecraftfolder + "\\" + downloadingVersion[0] + "\\instances\\" + gamedir + "\" " : "--gameDir \"" + config.minecraftfolder + "\\" + downloadingVersion[0] + "\" ") +
+                           "--assetsDir " + config.minecraftfolder + "\\" + downloadingVersion[0] + "\\assets\\ " +
+                           "--assetIndex " + downloadingVersion[0] + " " +
                            "--userProperties {} " +
                            //"--uuid " + MojangLogin.getUUID() + " " +
                            "--uuid 3b40f99969e64dbcabd01f87cddcb1fd " +

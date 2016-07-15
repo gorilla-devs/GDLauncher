@@ -28,6 +28,7 @@ namespace Twickt_Launcher.Pages
         public static Modpacks singleton;
         public List<string> registrationList;
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
+        public static List<string> downloadingVersion;
         public Modpacks()
         {
             InitializeComponent();
@@ -37,17 +38,22 @@ namespace Twickt_Launcher.Pages
 
         private async void start_Click(object sender, RoutedEventArgs e)
         {
+            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(remoteModpacks.SelectedValue.ToString());
             //VERIFICA SE SI E' SELEZIONATA UNA MODPACK
-            if(remoteModpacks.SelectedIndex == -1)
+            if (remoteModpacks.SelectedIndex == -1)
             {
                 var error = new Dialogs.OptionsUpdates("Select a modpack!");
                 await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
                 return;
             }
             //SE LA DIRECTORY ESISTE INIZIA, ALTRIMENTI LA CREA
-            if (!Directory.Exists(config.M_F_P + "instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString())))
+            if (!Directory.Exists(config.M_F_P + downloadingVersion[0] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString())))
             {
-                Directory.CreateDirectory(config.M_F_P + "instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString()));
+                Directory.CreateDirectory(config.M_F_P + downloadingVersion[0] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString()));
+            }
+            if(!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\twickt-launcher\\" + downloadingVersion[0] + "\\"))
+            {
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\twickt-launcher\\" + downloadingVersion[0] + "\\instances\\");
             }
             var result = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
             if (result.ToString() == "DownloadNeeded")

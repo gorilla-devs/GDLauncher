@@ -252,7 +252,6 @@ namespace Twickt_Launcher.Classes
                 data = e.Result;
             };
             await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
-            List<string> modpacks = new List<string>();
             dynamic json = JsonConvert.DeserializeObject(data);
             foreach (var item in json["Modpacks"])
             {
@@ -264,6 +263,37 @@ namespace Twickt_Launcher.Classes
                 }
             }
             return null;
+        }
+
+        public static async Task<List<string>> GetMinecraftUrlsAndData(string modpackname)
+        {
+            List<string> info = new List<string>();
+            /*
+             * Serve
+             * -la versione
+             * l'url del json
+             * 
+             * */
+            if (modpackname.Contains("[R]"))
+                modpackname = modpackname.Replace("[R] ", "");
+            WebClient c = new WebClient();
+            string data = "";
+            c.DownloadStringCompleted += (sender, e) =>
+            {
+                data = e.Result;
+            };
+            await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
+            dynamic json = JsonConvert.DeserializeObject(data);
+            foreach (var item in json["Modpacks"])
+            {
+                var name = (string)item["name"];
+                var version = (string)item["version"];
+                if (modpackname == name)
+                {
+                    info.Add(version);
+                }
+            }
+            return info;
         }
 
     }
