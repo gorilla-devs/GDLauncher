@@ -288,9 +288,11 @@ namespace Twickt_Launcher.Classes
             {
                 var name = (string)item["name"];
                 var version = (string)item["version"];
+                var directory = (string)item["directory"];
                 if (modpackname == name)
                 {
                     info.Add(version);
+                    info.Add(directory);
                 }
             }
             return info;

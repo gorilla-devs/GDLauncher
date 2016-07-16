@@ -47,13 +47,9 @@ namespace Twickt_Launcher.Pages
                 return;
             }
             //SE LA DIRECTORY ESISTE INIZIA, ALTRIMENTI LA CREA
-            if (!Directory.Exists(config.M_F_P + downloadingVersion[0] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString())))
+            if (!Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString())))
             {
-                Directory.CreateDirectory(config.M_F_P + downloadingVersion[0] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString()));
-            }
-            if(!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\twickt-launcher\\" + downloadingVersion[0] + "\\"))
-            {
-                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\twickt-launcher\\" + downloadingVersion[0] + "\\instances\\");
+                Directory.CreateDirectory(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString()));
             }
             var result = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
             if (result.ToString() == "DownloadNeeded")

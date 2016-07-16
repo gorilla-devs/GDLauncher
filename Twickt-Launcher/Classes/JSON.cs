@@ -50,10 +50,9 @@ namespace Twickt_Launcher.Classes
                 data = e.Result;
             };
             await c.DownloadStringTaskAsync(new Uri(assetsurl));
-            MessageBox.Show(config.M_F_P + downloadingVersion[0] + "\\assets\\indexes\\" + downloadingVersion[0] + ".json");
-            if (!Directory.Exists(config.M_F_P + downloadingVersion[0] + "\\assets\\indexes\\"))
-                Directory.CreateDirectory(config.M_F_P + downloadingVersion[0] + "\\assets\\indexes\\");
-            await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + downloadingVersion[0] + "\\assets\\indexes\\" + downloadingVersion[0] + ".json");
+            if (!Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\assets\\indexes\\"))
+                Directory.CreateDirectory(config.M_F_P + downloadingVersion[1] + "\\assets\\indexes\\");
+            await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + downloadingVersion[1] + "\\assets\\indexes\\" + downloadingVersion[0] + ".json");
 
             List<string[]> assets = new List<string[]>();
             MyClass json = JsonConvert.DeserializeObject<MyClass>(data);
@@ -67,7 +66,7 @@ namespace Twickt_Launcher.Classes
                 var url = "http://resources.download.minecraft.net/";
                 var finalurl = "";
                 finalurl = url + hash.Substring(0, 2) + "/" + hash;
-                assets.Add(new string[4] { name, hash, "\\" + downloadingVersion[0] + path, finalurl });
+                assets.Add(new string[4] { name, hash, "\\" + downloadingVersion[1] + path, finalurl });
                 i++;
             }
             return assets;
@@ -121,7 +120,7 @@ namespace Twickt_Launcher.Classes
                 }
                 path = "";
                 name = "mainjar";
-                matrix.Add(new string[4] { name, hash, "\\" + downloadingVersion[0] + path, url });
+                matrix.Add(new string[4] { name, hash, "\\" + downloadingVersion[1] + path, url });
             }
             catch (JsonReaderException jex)
             {
@@ -187,7 +186,7 @@ namespace Twickt_Launcher.Classes
                     }
                 }
                 catch { }
-                libraries.Add(new string[4] { name, hash, "\\" + downloadingVersion[0] + path, url });
+                libraries.Add(new string[4] { name, hash, "\\" + downloadingVersion[1] + path, url });
             }
             return libraries;
         }
@@ -215,14 +214,43 @@ namespace Twickt_Launcher.Classes
 
             if (forge == true)
             {
-                var temp = config.M_F_P + @"temp\";
-                var urlforge = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + config.forgeversion  + "/forge-" + config.forgeversion + "-installer.jar";
-                var libraries = config.M_F_P + @"libraries\";
+                var temp = config.M_F_P + downloadingVersion[1] + @"\temp\";
+                var forgejson = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json";
+                string urlforge = "";
+                string forgeversion = "";
+                //GETTING FORGE JAR URL
+                WebClient c = new WebClient();
+                string data = "";
+                c.DownloadStringCompleted += (sender, e) =>
+                {
+                    data = e.Result;
+                };
+                await c.DownloadStringTaskAsync(new Uri(forgejson));
+                try
+                {
+                    List<string> modpacks = new List<string>();
+                    var json = Newtonsoft.Json.Linq.JObject.Parse(data);
+                    var promos = json["promos"].ToObject<Dictionary<string, string>>();
+                    foreach (var entry in promos)
+                    {
+                        if (entry.Key == downloadingVersion[0] + "-latest")
+                        {
+                            forgeversion = entry.Value;
+                            urlforge = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + downloadingVersion[0] + "-" + entry.Value + "-" + downloadingVersion[0] + "/forge-" + downloadingVersion[0] + "-" + entry.Value + "-" + downloadingVersion[0] + "-installer.jar";
+                            config.forgeversion = downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0];
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+                var libraries = config.M_F_P + downloadingVersion[1] + @"\libraries\";
                 if (!Directory.Exists(@temp))
                 {
                     Directory.CreateDirectory(@temp);
                 }
-                if (!File.Exists(@temp + "forge-" + config.forgeversion + "-installer.jar"))
+                if (!File.Exists(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"))
                 {
                     using (WebClient webClient = new WebClient())
                     {
@@ -235,27 +263,27 @@ namespace Twickt_Launcher.Classes
                         {
                             Pages.Modpacks.loading.forgeProgress.Value = e.ProgressPercentage;
                         };
-                        await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + config.forgeversion + "-installer.jar"));
+                        await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"));
                         Pages.Modpacks.loading.whatdoing.Content = "Forge Downloaded";
                         //Add them to the local
                         //DebugMode.sendToConsole("Forge Downloaded");
                     }
 
-                    if (File.Exists(@temp + "forge-" + config.forgeversion + "-installer.jar"))
+                    if (File.Exists(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"))
                     {
                         //DebugMode.sendToConsole("Extracting necessary files from forge");
-                        using (ZipFile zip = ZipFile.Read(@temp + "forge-" + config.forgeversion + "-installer.jar"))
+                        using (ZipFile zip = ZipFile.Read(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"))
                         {
                             //ESTRAE LA LISTA JSON DI ROBA DA SCARICARE E IL FILE JAR PRINCIPALE DI FORGE
                             await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("install_profile.json", "\\", @temp));
-                            await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("forge-" + config.forgeversion + "-universal.jar", "\\", @temp));
+                            await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-universal.jar", "\\", @temp));
                         }
                         //CONTROLLA SE ESISTE LA CARTELLA DOVE METTERE IL FILE JAR, SE NON ESISTE LA CREA
-                        if (!Directory.Exists(@libraries + "net\\minecraftforge\\forge\\" + config.forgeversion + " \\"))
+                        if (!Directory.Exists(@libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + " \\"))
                         {
-                            Directory.CreateDirectory(@libraries + "net\\minecraftforge\\forge\\" + config.forgeversion + "\\");
+                            Directory.CreateDirectory(@libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "\\");
                         }
-                        File.Move(@temp + "forge-" + config.forgeversion + "-universal.jar", @libraries + "net\\minecraftforge\\forge\\" + config.forgeversion + "\\" + "forge-" + config.forgeversion + ".jar");
+                        File.Move(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-universal.jar", @libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "\\" + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + ".jar");
                     }
                     else
                     {
@@ -326,7 +354,7 @@ namespace Twickt_Launcher.Classes
                         dir =  finalurl.Replace("http://files.minecraftforge.net/maven/", "");
                     
                     dir = System.IO.Path.GetDirectoryName(@dir);
-                    Libraries.Add(new string[4] { package, "nohash", dir, finalurl });
+                    Libraries.Add(new string[4] { package, "nohash", "\\" + downloadingVersion[1] + dir, finalurl });
                 }
             }
             return Libraries;

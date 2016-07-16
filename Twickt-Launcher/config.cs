@@ -12,7 +12,7 @@ namespace Twickt_Launcher
     {
         public static string updateWebsite = "https://launcher.twickt.com/";
         public static string minecraftfolder = "minecraft";
-        public static string forgeversion = "1.7.10-10.13.4.1614-1.7.10";
+        public static string forgeversion = "";
         public static string logfile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + minecraftfolder + @"\launcher_logs.txt";
         public static string M_F_P = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + minecraftfolder + @"\";
         public static string profiles = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\profiles\";
