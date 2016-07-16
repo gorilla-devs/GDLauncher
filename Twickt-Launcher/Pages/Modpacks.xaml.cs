@@ -69,7 +69,25 @@ namespace Twickt_Launcher.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             await Classes.RemoteModpacks.GetModpacksList();
+            string[] x = await Classes.RemoteModpacks.GetModpacksDirectoryList();
             registrationList = remoteModpacks.Items.Cast<string>().ToList();
+            try
+            {
+                var modpackslist = Directory.GetDirectories(config.M_F_P);
+                foreach (var element in modpackslist)
+                {
+                    string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
+                    string projectName = System.IO.Path.GetFileName(fullPath);
+                    if (Array.IndexOf(x, projectName) == -1)
+                    {
+                        localModpacks.Items.Add(projectName);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private async void remoteModpacks_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -88,6 +106,25 @@ namespace Twickt_Launcher.Pages
         private async void refreshRemoteModpacks_Click(object sender, RoutedEventArgs e)
         {
             await Classes.RemoteModpacks.GetModpacksList();
+            string[] x = await Classes.RemoteModpacks.GetModpacksDirectoryList();
+            localModpacks.Items.Clear();
+            try
+            {
+                var modpackslist = Directory.GetDirectories(config.M_F_P);
+                foreach (var element in modpackslist)
+                {
+                    string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
+                    string projectName = System.IO.Path.GetFileName(fullPath);
+                    if (Array.IndexOf(x, projectName) == -1)
+                    {
+                        localModpacks.Items.Add(projectName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void textBox_TextChanged(object sender, TextChangedEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -49,7 +50,7 @@ namespace Twickt_Launcher.Classes
                         {
                             var name = (string)item["name"];
                             var file = (string)item["file"];
-                            Pages.Modpacks.singleton.remoteModpacks.Items.Add("[R] " + name);
+                            Pages.Modpacks.singleton.remoteModpacks.Items.Add(name);
                             modpacks.Add(file);
                         }
                     }
@@ -77,8 +78,6 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<string> GetModpacksDescription(string modpackname)
         {
-            if (modpackname.Contains("[R]"))
-                modpackname = modpackname.Replace("[R] ", "");
             if (description.ContainsKey(modpackname))
             {
                 return description[modpackname];
@@ -110,8 +109,6 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<List<string[]>> GetModpacksFiles(string modpackname, bool justname = false)
         {
-            if (modpackname.Contains("[R]"))
-                modpackname = modpackname.Replace("[R] ", "");
             try
             {
                 WebClient c = new WebClient();
@@ -218,8 +215,6 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<string> IsModpackForgeNeeded(string modpackname)
         {
-            if (modpackname.Contains("[R]"))
-                modpackname = modpackname.Replace("[R] ", "");
             WebClient c = new WebClient();
             string data = "";
             c.DownloadStringCompleted += (sender, e) =>
@@ -243,8 +238,6 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<string> GetModpacksDir(string modpackname)
         {
-            if (modpackname.Contains("[R]"))
-                modpackname = modpackname.Replace("[R] ", "");
             WebClient c = new WebClient();
             string data = "";
             c.DownloadStringCompleted += (sender, e) =>
@@ -274,8 +267,6 @@ namespace Twickt_Launcher.Classes
              * l'url del json
              * 
              * */
-            if (modpackname.Contains("[R]"))
-                modpackname = modpackname.Replace("[R] ", "");
             WebClient c = new WebClient();
             string data = "";
             c.DownloadStringCompleted += (sender, e) =>
@@ -296,6 +287,31 @@ namespace Twickt_Launcher.Classes
                 }
             }
             return info;
+        }
+
+        public static async Task<string[]> GetModpacksDirectoryList()
+        {
+            List<string> info = new List<string>();
+            /*
+             * Serve
+             * -la versione
+             * l'url del json
+             * 
+             * */
+            WebClient c = new WebClient();
+            string data = "";
+            c.DownloadStringCompleted += (sender, e) =>
+            {
+                data = e.Result;
+            };
+            await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
+            dynamic json = JsonConvert.DeserializeObject(data);
+            foreach (var item in json["Modpacks"])
+            {
+                var directory = (string)item["directory"];
+                    info.Add(directory);
+            }
+            return info.ToArray();
         }
 
     }
