@@ -20,6 +20,8 @@ namespace Twickt_Launcher.Classes
         public static WebClient webClient = new WebClient();
         public static Stopwatch sw = new Stopwatch();
         public static string javaversion = "";
+        public static Int64 bytes_total;
+        public static long AverageSpeed;
         public static async Task<bool> isJavaInstalled()
         {
             if (!Directory.Exists(config.M_F_P + "runtime"))
@@ -62,6 +64,8 @@ namespace Twickt_Launcher.Classes
 
             webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
             webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
+            webClient.OpenRead(url);
+            bytes_total = Convert.ToInt64(webClient.ResponseHeaders["Content-Length"]) / 1024;
             sw.Start();
             await webClient.DownloadFileTaskAsync(new Uri(url), config.M_F_P + "runtime\\java.7z");
             try
@@ -93,11 +97,27 @@ namespace Twickt_Launcher.Classes
             Pages.SplashScreen.singleton.mbToDownload.Content = string.Format("{0} MB / {1} MB",
             (e.BytesReceived / 1024d / 1024d).ToString("0"),
             (e.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
-
         }
 
         private static async void Completed(object sender, AsyncCompletedEventArgs e)
         {
+            AverageSpeed = bytes_total / sw.Elapsed.Seconds;
+            SessionData.AverageDownloadSpeed = AverageSpeed;
+            if (AverageSpeed < 1000)
+                Properties.Settings.Default["download_threads"] = "4";
+            else if (AverageSpeed >= 1000 && AverageSpeed <= 3000)
+                Properties.Settings.Default["download_threads"] = "10";
+            else if (AverageSpeed > 3000 && AverageSpeed < 5000)
+                Properties.Settings.Default["download_threads"] = "14";
+            else if (AverageSpeed > 5000 && AverageSpeed < 7000)
+                Properties.Settings.Default["download_threads"] = "22";
+            else if (AverageSpeed > 7000 && AverageSpeed < 10000)
+                Properties.Settings.Default["download_threads"] = "26";
+            else if (AverageSpeed > 10000)
+                Properties.Settings.Default["download_threads"] = "30";
+
+            Properties.Settings.Default.Save();
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates("Basandoci sulla tua velocita' di download abbiamo impostato un numero ottimale di threads di download (" + AverageSpeed + " kb/s)", 600), "RootDialog", ExtendedOpenedEventHandler);
             sw.Reset();
             if (e.Cancelled == true)
             {
@@ -109,5 +129,19 @@ namespace Twickt_Launcher.Classes
 
             }
         }
+
+        private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+        {
+            try
+            {
+                await Task.Delay(3000);
+                eventArgs.Session.Close();
+            }
+            catch (TaskCanceledException)
+            {
+                /*cancelled by user...tidy up and dont close as will have already closed */
+            }
+        }
+
     }
 }

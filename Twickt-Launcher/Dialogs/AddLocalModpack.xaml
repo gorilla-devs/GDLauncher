@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="Twickt_Launcher.Dialogs.AddLocalModpack"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
+             Height="417" Width="500" Background="White">
+    <Grid>
+        <materialDesign:Card Margin="20 0 20 40" Padding="15" VerticalAlignment="Center">
+            <StackPanel>
+                <Label x:Name="label" Content="Add a local modpack" VerticalAlignment="Top" FontSize="18"/>
+                <DockPanel Margin="0 30 0 0">
+                    <Label Content="Version"/>
+                    <ComboBox Width="150" SelectedIndex="0" HorizontalAlignment="Right">
+                        <ComboBoxItem Content="1.7.2"/>
+                        <ComboBoxItem Content="1.7.10"/>
+                        <ComboBoxItem Content="1.8.0"/>
+                        <ComboBoxItem Content="1.8.9"/>
+                        <ComboBoxItem Content="1.10.2"/>
+                    </ComboBox>
+                </DockPanel>
+                <DockPanel  Margin="0 20 0 0">
+                    <Label Content="Name"/>
+                    <TextBox Width="150" HorizontalAlignment="Right" materialDesign:HintAssist.Hint="Modpack's name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                </DockPanel>
+                <DockPanel  Margin="0 20 0 0">
+                    <Label Content="Forge?"/>
+                    <ComboBox Width="150" HorizontalAlignment="Right" SelectedIndex="1">
+                        <ComboBoxItem Content="Forge"/>
+                        <ComboBoxItem Content="No Forge"/>
+                    </ComboBox>
+                </DockPanel>
+                <DockPanel Margin="0 20 0 0">
+                    <Button x:Name="back" Content="Back" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Top" Width="75" Command="materialDesign:DialogHost.CloseDialogCommand"/>
+                    <Button x:Name="add" Content="Add" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Top" Width="75"/>
+                </DockPanel>
+            </StackPanel>
+        </materialDesign:Card>
+        <ProgressBar HorizontalAlignment="Left" Height="17" Margin="41,334,0,0" VerticalAlignment="Top" Width="417" IsIndeterminate="True"/>
+    </Grid>
+</UserControl>

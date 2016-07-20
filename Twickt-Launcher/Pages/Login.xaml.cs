@@ -1,4 +1,5 @@
 ﻿using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -70,12 +71,28 @@ namespace Twickt_Launcher.Pages
             var response = client.UploadValues(config.loginWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
-            if(responseString.Contains("true"))
+            if (responseString.Contains("true"))
             {
                 var userdata = responseString.Split(';');
 
                 SessionData.username = userdata[1];
                 SessionData.email = userdata[2];
+                SessionData.isAdmin = userdata[3];
+                if(userdata[3] == "false")
+                {
+                    using (var webClient = new System.Net.WebClient())
+                    {
+                        var json = webClient.DownloadString(config.updateWebsite + "/Modpacks.json");
+                        dynamic stuff = JObject.Parse(json);
+                        string OnlyAdmin = stuff.OnlyAdmin;
+                        if (OnlyAdmin.ToString() == "true")
+                        {
+                            await DialogHost.Show(new Dialogs.OptionsUpdates("Actually only Admins can login. We are sorry for that!", 350), "RootDialog", ExtendedOpenedEventHandler);
+                            loading.Visibility = Visibility.Hidden;
+                            return;
+                        }
+                    }
+                }
                 Window1.singleton.MenuToggleButton.IsEnabled = true;
                 Window1.singleton.popupbox.IsEnabled = true;
                 Window1.singleton.loggedinName.Text = "Logged in as " + userdata[1];

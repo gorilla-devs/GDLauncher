@@ -38,7 +38,6 @@ namespace Twickt_Launcher.Pages
 
         private async void start_Click(object sender, RoutedEventArgs e)
         {
-            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(remoteModpacks.SelectedValue.ToString());
             //VERIFICA SE SI E' SELEZIONATA UNA MODPACK
             if (remoteModpacks.SelectedIndex == -1)
             {
@@ -46,6 +45,7 @@ namespace Twickt_Launcher.Pages
                 await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
                 return;
             }
+            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(remoteModpacks.SelectedValue.ToString());
             //SE LA DIRECTORY ESISTE INIZIA, ALTRIMENTI LA CREA
             if (!Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString())))
             {
@@ -64,16 +64,25 @@ namespace Twickt_Launcher.Pages
 
         private async void addLocalModpack_Click(object sender, RoutedEventArgs e)
         {
+            var result = await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddLocalModpack(), "RootDialog");
+        }
+
+        private void editLocalModpack_Click(object sender, RoutedEventArgs e)
+        {
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!Directory.Exists(config.LocalModpacks))
+            {
+                Directory.CreateDirectory(config.LocalModpacks);
+            }
             await Classes.RemoteModpacks.GetModpacksList();
-            string[] x = await Classes.RemoteModpacks.GetModpacksDirectoryList();
+            string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
             registrationList = remoteModpacks.Items.Cast<string>().ToList();
             try
             {
-                var modpackslist = Directory.GetDirectories(config.M_F_P);
+                var modpackslist = Directory.GetDirectories(config.LocalModpacks);
                 foreach (var element in modpackslist)
                 {
                     string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
@@ -106,11 +115,11 @@ namespace Twickt_Launcher.Pages
         private async void refreshRemoteModpacks_Click(object sender, RoutedEventArgs e)
         {
             await Classes.RemoteModpacks.GetModpacksList();
-            string[] x = await Classes.RemoteModpacks.GetModpacksDirectoryList();
+            string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
             localModpacks.Items.Clear();
             try
             {
-                var modpackslist = Directory.GetDirectories(config.M_F_P);
+                var modpackslist = Directory.GetDirectories(config.LocalModpacks);
                 foreach (var element in modpackslist)
                 {
                     string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
@@ -197,8 +206,15 @@ namespace Twickt_Launcher.Pages
             }
         }
 
-        private void editLocalModpack_Click(object sender, RoutedEventArgs e)
+        private async void start_local_Click(object sender, RoutedEventArgs e)
         {
+            if (localModpacks.SelectedIndex == -1)
+            {
+                var error = new Dialogs.OptionsUpdates("Select a modpack!");
+                await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
+                return;
+            }
+            Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.localModpacks.SelectedItem.ToString());
         }
     }
 }

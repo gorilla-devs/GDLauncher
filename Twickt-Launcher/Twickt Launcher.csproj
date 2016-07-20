@@ -156,10 +156,14 @@
     <Compile Include="Classes\ComputerInfoDetect.cs" />
     <Compile Include="Classes\JAVAInstaller.cs" />
     <Compile Include="Classes\JSON.cs" />
+    <Compile Include="Classes\LocalModpacks.cs" />
     <Compile Include="Classes\MinecraftStarter.cs" />
     <Compile Include="Classes\ModpackStartupCheck.cs" />
     <Compile Include="Classes\RemoteModpacks.cs" />
     <Compile Include="config.cs" />
+    <Compile Include="Dialogs\AddLocalModpack.xaml.cs">
+      <DependentUpon>AddLocalModpack.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Changelog.xaml.cs">
       <DependentUpon>Changelog.xaml</DependentUpon>
     </Compile>
@@ -209,6 +213,10 @@
     <Compile Include="Windows\DebugOutputConsole.xaml.cs">
       <DependentUpon>DebugOutputConsole.xaml</DependentUpon>
     </Compile>
+    <Page Include="Dialogs\AddLocalModpack.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\Changelog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

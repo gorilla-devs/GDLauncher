@@ -23,11 +23,11 @@ namespace Twickt_Launcher.Dialogs
         public OptionsUpdates(string message, int width = 248, int height = 57)
         {
             InitializeComponent();
-            label.Content = message;
+            textBlock.Text = message;
             this.Width = width;
             this.Height = height;
-            label.Height = height - 18;
-            label.Width = width - 18;
+            textBlock.Height = height - 5;
+            textBlock.Width = width - 20;
         }
     }
 }

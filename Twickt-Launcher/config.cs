@@ -15,6 +15,7 @@ namespace Twickt_Launcher
         public static string forgeversion = "";
         public static string logfile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + minecraftfolder + @"\launcher_logs.txt";
         public static string M_F_P = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + minecraftfolder + @"\";
+        public static string LocalModpacks = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + minecraftfolder + @"\LocalModpacks\";
         public static string profiles = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\profiles\";
         public static string MCEditLink = "https://download.nodecdn.net/containers/mcedit/download/dev/mcedit2-win64-2.0.0alpha-921.exe";
         public static string loginWebService = "https://webservices.twickt.com/login.php";

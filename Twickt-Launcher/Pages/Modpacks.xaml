@@ -16,13 +16,13 @@
         <Label x:Name="localModpacksLabel" Content="Local Modpacks" HorizontalAlignment="Left" Margin="517,54,0,0" VerticalAlignment="Top" Width="167" FontSize="18.667"/>
         <ListBox x:Name="localModpacks" HorizontalAlignment="Left" Height="270" Margin="517,94,0,0" VerticalAlignment="Top" Width="167">
         </ListBox>
-        <Button x:Name="start" Content="Start" HorizontalAlignment="Left" Foreground="White" Margin="227,544,0,0" VerticalAlignment="Top" Width="220" Height="71" FontSize="26.667" Click="start_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2"/>
+        <Button x:Name="start" Content="Start" HorizontalAlignment="Left" Foreground="White" Margin="10,405,0,0" VerticalAlignment="Top" Width="167" Height="71" FontSize="26.667" Click="start_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2"/>
         <TextBox x:Name="remoteModpacksSearch" HorizontalAlignment="Left" Height="39" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="167" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" TextChanged="textBox_TextChanged"/>
         <TextBox x:Name="localModpacksSearch" HorizontalAlignment="Left" Height="39" Margin="517,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="167" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
-        <Button x:Name="addLocalModpack" HorizontalAlignment="Left" Margin="517,369,0,0" Foreground="White" VerticalAlignment="Top" Width="50" Click="addLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+        <Button x:Name="addLocalModpack" HorizontalAlignment="Left" Margin="510,369,0,0" Foreground="White" VerticalAlignment="Top" Width="50" Click="addLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
             <materialDesign:PackIcon Kind="Plus" />
         </Button>
-        <Button x:Name="editLocalModpack" HorizontalAlignment="Left" Margin="572,369,0,0" Foreground="White" VerticalAlignment="Top" Width="50" Click="editLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+        <Button x:Name="editLocalModpack" HorizontalAlignment="Left" Margin="565,369,0,0" Foreground="White" VerticalAlignment="Top" Width="57" Click="editLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
             <materialDesign:PackIcon Kind="Pencil" />
         </Button>
         <Button x:Name="deleteLocalModpack" HorizontalAlignment="Left" Margin="627,369,0,0" Foreground="White" VerticalAlignment="Top" Width="50" materialDesign:ShadowAssist.ShadowDepth="Depth2">
@@ -34,5 +34,6 @@
         <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="32" FontSize="16" Margin="96,47,104,0" Height="273">
             <TextBlock x:Name="description" TextWrapping="Wrap"></TextBlock>
         </materialDesign:Card>
+        <Button x:Name="start_local" Content="Start" HorizontalAlignment="Left" Foreground="White" Margin="510,405,0,0" VerticalAlignment="Top" Width="167" Height="71" FontSize="26.667" materialDesign:ShadowAssist.ShadowDepth="Depth2" Click="start_local_Click"/>
     </Grid>
 </Page>

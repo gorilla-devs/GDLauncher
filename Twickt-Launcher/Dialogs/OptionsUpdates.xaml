@@ -7,7 +7,6 @@
              FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
              mc:Ignorable="d" Background="#FFFFFF" Height="57.223" Width="248">
     <Grid>
-        <Label x:Name="label" Content="Label" HorizontalAlignment="Center" Margin="14,10,4,10" VerticalAlignment="Center" Height="37" Width="230" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="10,3,0,0" TextWrapping="Wrap" Text="TextBlock" TextAlignment="Center" VerticalAlignment="Center" Width="52" Height="44"/>
     </Grid>
 </UserControl>

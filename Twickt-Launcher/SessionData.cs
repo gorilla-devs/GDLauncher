@@ -10,8 +10,10 @@ namespace Twickt_Launcher
     {
         public static string changelog = "";
         public static string latestVersion = "";
+        public static long AverageDownloadSpeed;
         //DATI utente
         public static string username = "";
         public static string email = "";
+        public static string isAdmin = "";
     }
 }
