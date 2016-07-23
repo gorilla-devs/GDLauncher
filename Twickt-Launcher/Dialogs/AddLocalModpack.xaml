@@ -12,7 +12,7 @@
                 <Label x:Name="label" Content="Add a local modpack" VerticalAlignment="Top" FontSize="18"/>
                 <DockPanel Margin="0 30 0 0">
                     <Label Content="Version"/>
-                    <ComboBox Width="150" SelectedIndex="0" HorizontalAlignment="Right">
+                    <ComboBox Name="version" Width="150" SelectedIndex="0" HorizontalAlignment="Right">
                         <ComboBoxItem Content="1.7.2"/>
                         <ComboBoxItem Content="1.7.10"/>
                         <ComboBoxItem Content="1.8.0"/>
@@ -22,18 +22,18 @@
                 </DockPanel>
                 <DockPanel  Margin="0 20 0 0">
                     <Label Content="Name"/>
-                    <TextBox Width="150" HorizontalAlignment="Right" materialDesign:HintAssist.Hint="Modpack's name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                    <TextBox Name="name" Width="150" HorizontalAlignment="Right" materialDesign:HintAssist.Hint="Modpack's name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
                 </DockPanel>
                 <DockPanel  Margin="0 20 0 0">
                     <Label Content="Forge?"/>
-                    <ComboBox Width="150" HorizontalAlignment="Right" SelectedIndex="1">
+                    <ComboBox Name="forge" Width="150" HorizontalAlignment="Right" SelectedIndex="1">
                         <ComboBoxItem Content="Forge"/>
                         <ComboBoxItem Content="No Forge"/>
                     </ComboBox>
                 </DockPanel>
                 <DockPanel Margin="0 20 0 0">
                     <Button x:Name="back" Content="Back" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Top" Width="75" Command="materialDesign:DialogHost.CloseDialogCommand"/>
-                    <Button x:Name="add" Content="Add" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Top" Width="75"/>
+                    <Button x:Name="add" Content="Add" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Top" Width="75" Click="add_Click"/>
                 </DockPanel>
             </StackPanel>
         </materialDesign:Card>

@@ -34,6 +34,7 @@
         <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="32" FontSize="16" Margin="96,47,104,0" Height="273">
             <TextBlock x:Name="description" TextWrapping="Wrap"></TextBlock>
         </materialDesign:Card>
+        <Label Name="isinstalled" Margin="197,331,279,261"></Label>
         <Button x:Name="start_local" Content="Start" HorizontalAlignment="Left" Foreground="White" Margin="510,405,0,0" VerticalAlignment="Top" Width="167" Height="71" FontSize="26.667" materialDesign:ShadowAssist.ShadowDepth="Depth2" Click="start_local_Click"/>
     </Grid>
 </Page>

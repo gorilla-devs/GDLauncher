@@ -101,7 +101,7 @@ namespace Twickt_Launcher.Pages
             //SE LA DIRECTORY ESISTE ABILITA IL PULSANTE, ALTRIMENTI LA CREA
             if (Directory.Exists(config.M_F_P + "instances\\" + await RemoteModpacks.GetModpacksDir("Brotherhood Of Heroes")))
             {
-                Classes.MinecraftStarter.Minecraft_Start("BrotherHood Of Heroes");
+                //Classes.MinecraftStarter.Minecraft_Start("BrotherHood Of Heroes");
             }
             else
             {

@@ -12,10 +12,19 @@ namespace Twickt_Launcher.Classes
     {
         static List<string[]> urls;
         public static List<string> downloadingVersion;
-        public static async Task<List<string>> CheckFiles(string modpackname)
+        public static async Task<List<string>> CheckFiles(string modpackname, bool remote)
         {
-            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
-            urls = await JSON.GetFiles(modpackname);
+            if (remote == true)
+                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
+            else
+                downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
+
+            if (remote == true)
+                urls = await JSON.GetFiles(modpackname);
+            else
+                urls = await JSON.GetFiles(modpackname, false, false, false);
+
+
             if (Properties.Settings.Default["disableHashCheck"].ToString() == "false")
             {
                 Pages.Modpacks.loading.whatdoing.Content = "Analyzing Files";
@@ -26,7 +35,7 @@ namespace Twickt_Launcher.Classes
                 {
                     if (url[3].Contains("https://libraries.minecraft.net"))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"libraries\" + url[2].Replace("/", "\\");
+                        string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[2].Replace("/", "\\");
                         string FileName = Path.GetFileName(url[3]);
                         dir = Path.GetDirectoryName(@dir);
                         if (!File.Exists(@dir + "\\" + FileName))
@@ -39,7 +48,7 @@ namespace Twickt_Launcher.Classes
                     }
                     else if (url[3].Contains("https://launcher.mojang.com/mc/game/"))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"versions\" + downloadingVersion[0] + "\\";
+                        string dir = config.M_F_P + downloadingVersion[1] + @"\versions\" + downloadingVersion[0] + "\\";
                         string FileName = downloadingVersion[0] + ".jar";
                         if (!File.Exists(@dir + "\\" + FileName))
                         {
@@ -68,7 +77,7 @@ namespace Twickt_Launcher.Classes
                     }
                     else if (url[3].Contains("http://files.minecraftforge.net/maven/"))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"libraries\" + url[2];
+                        string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[2];
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
                         string[] lines = url[0].Split(':');
@@ -79,7 +88,7 @@ namespace Twickt_Launcher.Classes
                     }
                     else if (url[3].Contains(config.updateWebsite))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"instances\" + url[0].Replace(":", "\\");
+                        string dir = config.M_F_P + downloadingVersion[1] + @"\instances\" + url[0].Replace(":", "\\");
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
                         if (!File.Exists(@dir + "\\" + FileName))

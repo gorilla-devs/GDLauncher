@@ -35,5 +35,19 @@ namespace Twickt_Launcher.Classes
             return info.ToArray();
         }
 
+        public static async Task<List<string>> GetMinecraftUrlsAndData(string modpackname)
+        {
+            List<string> info = new List<string>();
+
+            // Read the file and display it line by line.
+            string text = System.IO.File.ReadAllText(config.M_F_P + @"LocalModpacks\" + modpackname.Replace(" ", "_") + "\\" + modpackname.Replace(" ", "_") + ".dat");
+            Dictionary<string, string> htmlAttributes = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
+            info.Add(htmlAttributes["version"]);
+            info.Add(@"LocalModpacks\" + modpackname.Replace(" ", "_"));
+            info.Add(htmlAttributes["forge"]);
+
+            return info;
+        }
+
     }
 }

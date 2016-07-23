@@ -41,15 +41,18 @@ namespace Twickt_Launcher.Pages
         public static bool tempcontinuedownload = true;
         public static StartingWorking singleton;
         public static List<string> downloadingVersion;
+        public static bool remote;
+        public static string modpackname;
 
         public static List<string> urls;
-        public StartingWorking()
+        public StartingWorking(bool rem, string mdpack)
         {
             InitializeComponent();
             Window1.singleton.MenuToggleButton.IsEnabled = false;
             singleton = this;
             getbacktomodpack.Visibility = Visibility.Hidden;
-
+            remote = rem;
+            modpackname = mdpack;
         }
 
         private void cancel_Click(object sender, RoutedEventArgs e)
@@ -78,10 +81,14 @@ namespace Twickt_Launcher.Pages
 
 
             */
-            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString());
+            if (remote == true)
+                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
+            else
+                downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
+
             mainjar = config.M_F_P + @"versions\" + downloadingVersion[0] + "\\" + downloadingVersion[0] + ".jar";
             workingThreads.Content = Properties.Settings.Default["download_threads"].ToString();
-            modpackName.Content = Modpacks.singleton.remoteModpacks.SelectedItem.ToString();
+            modpackName.Content = modpackname;
             int count = urls.Count;
             if (urls != null && urls.Count != 0)
             {
@@ -122,7 +129,7 @@ namespace Twickt_Launcher.Pages
 
 
             }
-            Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString());
+            Classes.MinecraftStarter.Minecraft_Start(modpackname, (remote == true) ? true : false);
             JSON.urls.Clear();
         }
 

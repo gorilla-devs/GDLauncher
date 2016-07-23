@@ -54,11 +54,11 @@ namespace Twickt_Launcher.Pages
             var result = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
             if (result.ToString() == "DownloadNeeded")
             {
-                Window1.singleton.MainPage.Navigate(new Pages.StartingWorking());
+                Window1.singleton.MainPage.Navigate(new Pages.StartingWorking(true, Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString()));
             }
             else
             {
-                Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString());
+                Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString(), true);
             }
         }
 
@@ -67,8 +67,10 @@ namespace Twickt_Launcher.Pages
             var result = await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddLocalModpack(), "RootDialog");
         }
 
-        private void editLocalModpack_Click(object sender, RoutedEventArgs e)
+        private async void editLocalModpack_Click(object sender, RoutedEventArgs e)
         {
+            var urls = await ModpackStartupCheck.CheckFiles(localModpacks.SelectedValue.ToString(), false);
+            MessageBox.Show(urls.Count.ToString());
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -103,6 +105,11 @@ namespace Twickt_Launcher.Pages
         {
             try
             {
+                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(remoteModpacks.SelectedValue.ToString());
+                if (Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString())))
+                    isinstalled.Content = "Installed";
+                else
+                    isinstalled.Content = "Not Installed";
                 description.Text = await Classes.RemoteModpacks.GetModpacksDescription(remoteModpacks.SelectedItem.ToString());
             }
             catch
@@ -161,7 +168,7 @@ namespace Twickt_Launcher.Pages
         {
             try
             {
-                Pages.StartingWorking.urls = await ModpackStartupCheck.CheckFiles(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString());
+                Pages.StartingWorking.urls = await ModpackStartupCheck.CheckFiles(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString(), true);
 
 
                 if (Pages.StartingWorking.urls.Count != 0)
@@ -214,7 +221,7 @@ namespace Twickt_Launcher.Pages
                 await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
                 return;
             }
-            Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.localModpacks.SelectedItem.ToString());
+            Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.localModpacks.SelectedItem.ToString(), false);
         }
     }
 }

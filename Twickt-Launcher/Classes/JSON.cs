@@ -66,7 +66,7 @@ namespace Twickt_Launcher.Classes
                 var url = "http://resources.download.minecraft.net/";
                 var finalurl = "";
                 finalurl = url + hash.Substring(0, 2) + "/" + hash;
-                assets.Add(new string[4] { name, hash, "\\" + downloadingVersion[1] + path, finalurl });
+                assets.Add(new string[4] { name, hash,  "\\" + path, finalurl });
                 i++;
             }
             return assets;
@@ -120,7 +120,7 @@ namespace Twickt_Launcher.Classes
                 }
                 path = "";
                 name = "mainjar";
-                matrix.Add(new string[4] { name, hash, "\\" + downloadingVersion[1] + path, url });
+                matrix.Add(new string[4] { name, hash, "\\" + path, url });
             }
             catch (JsonReaderException jex)
             {
@@ -186,7 +186,7 @@ namespace Twickt_Launcher.Classes
                     }
                 }
                 catch { }
-                libraries.Add(new string[4] { name, hash, "\\" + downloadingVersion[1] + path, url });
+                libraries.Add(new string[4] { name, hash,  "\\" + path, url });
             }
             return libraries;
         }
@@ -204,10 +204,9 @@ namespace Twickt_Launcher.Classes
         public static async Task<List<string[]>> AnalyzeForgeLibraries(string modpackname)
         {
             List<string[]> Libraries = new List<string[]>();
-
-            string getForge = await Classes.RemoteModpacks.IsModpackForgeNeeded(modpackname);
+            
             bool forge;
-            if (getForge == "false")
+            if (downloadingVersion[2] == "false")
                 forge = false;
             else
                 forge = true;
@@ -263,7 +262,13 @@ namespace Twickt_Launcher.Classes
                         {
                             Pages.Modpacks.loading.forgeProgress.Value = e.ProgressPercentage;
                         };
+
+
+                        //FIXARE ERRORE 404 FORGE
                         await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"));
+
+
+
                         Pages.Modpacks.loading.whatdoing.Content = "Forge Downloaded";
                         //Add them to the local
                         //DebugMode.sendToConsole("Forge Downloaded");
@@ -354,17 +359,22 @@ namespace Twickt_Launcher.Classes
                         dir =  finalurl.Replace("http://files.minecraftforge.net/maven/", "");
                     
                     dir = System.IO.Path.GetDirectoryName(@dir);
-                    Libraries.Add(new string[4] { package, "nohash", "\\" + downloadingVersion[1] + dir, finalurl });
+                    Libraries.Add(new string[4] { package, "nohash",  "\\" + dir, finalurl });
                 }
             }
             return Libraries;
         }
 
-        public static async Task<List<string[]>> GetFiles(string modpackname, bool justlibraries = false, bool justforge = false)
+        public static async Task<List<string[]>> GetFiles(string modpackname, bool justlibraries = false, bool justforge = false, bool remote = true)
         {
-            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
+            if (remote == true)
+                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
+            else
+                downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
+
 
             Windows.DebugOutputConsole.singleton.Write("Analyzing JSON files");
+            List<string[]> mods = new List<string[]>();
             try
             {
                 Pages.Modpacks.loading.whatdoing.Content = "Analyzing Json Files";
@@ -396,12 +406,15 @@ namespace Twickt_Launcher.Classes
             }
             catch { }
             List<string[]> forge = await AnalyzeForgeLibraries(modpackname);
-            try
+            if (remote == true)
             {
-                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Mods";
+                try
+                {
+                    Pages.Modpacks.loading.whatdoing.Content = "Analyzing Mods";
+                }
+                catch { }
+                mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname);
             }
-            catch { }
-            List<string[]> mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname);
 
             if ((justforge == false) && (justlibraries == false))
                 list.AddRange(assets);
@@ -411,7 +424,7 @@ namespace Twickt_Launcher.Classes
                 list.AddRange(libraries);
             if ((justlibraries == false && justforge == true) || (justlibraries == false && justforge == false))
                 list.AddRange(forge);
-            if (justlibraries == false && justforge == false)
+            if ((justlibraries == false && justforge == false) && (remote == true))
                 list.AddRange(mods);
             Windows.DebugOutputConsole.singleton.Write("JSON files analyzed");
             urls = list;

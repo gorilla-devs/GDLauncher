@@ -280,10 +280,12 @@ namespace Twickt_Launcher.Classes
                 var name = (string)item["name"];
                 var version = (string)item["version"];
                 var directory = (string)item["directory"];
+                var forge = (string)item["forge"];
                 if (modpackname == name)
                 {
                     info.Add(version);
                     info.Add(directory);
+                    info.Add(forge);
                 }
             }
             return info;

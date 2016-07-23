@@ -12,20 +12,44 @@ namespace Twickt_Launcher.Classes
     class MinecraftStarter
     {
         public static List<string> downloadingVersion;
-        public static async void Minecraft_Start(string modpackname)
+        public static async void Minecraft_Start(string modpackname, bool remote)
         {
-            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
-            string gamedir = await Classes.RemoteModpacks.GetModpacksDir(modpackname);
-
-            string getForge = await Classes.RemoteModpacks.IsModpackForgeNeeded(modpackname);
+            string gamedir = "";
+            string getForge = "";
+            string gamedirectory = "";
             bool forge;
-            if (getForge == "false")
-                forge = false;
+            List<String[]> urlsforge = new List<string[]>();
+            List<String[]> urlslibraries = new List<string[]>();
+            if (remote == true)
+            {
+                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
+                gamedir = await Classes.RemoteModpacks.GetModpacksDir(modpackname);
+                getForge = await Classes.RemoteModpacks.IsModpackForgeNeeded(modpackname);
+                if (getForge == "false")
+                    forge = false;
+                else
+                    forge = true;
+
+                gamedirectory = ((forge == true) ? "\"" + config.minecraftfolder + "\\" + downloadingVersion[1] + "\\instances\\" + gamedir + "\" " : "\"" + config.minecraftfolder + "\\" + downloadingVersion[1] + "\" ");
+                urlsforge = await JSON.GetFiles(modpackname, false, true);
+                urlslibraries = await JSON.GetFiles(modpackname, true, false);
+            }
             else
-                forge = true;
+            {
+                downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
+                gamedir = modpackname;
+                getForge = downloadingVersion[2];
+                if (getForge == "false")
+                    forge = false;
+                else
+                    forge = true;
+
+                gamedirectory = "\"" + config.LocalModpacks + modpackname + "\" ";
+
+                urlsforge = await JSON.GetFiles(modpackname, false, true, false);
+                urlslibraries = await JSON.GetFiles(modpackname, true, false, false);
+            }
             
-            List<String[]> urlsforge = await JSON.GetFiles(modpackname, false, true);
-            List<String[]> urlslibraries = await JSON.GetFiles(modpackname, true, false);
             string launch =@"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Xmx" + Properties.Settings.Default["RAM"] + "G -Xms" + "256" + "M " + ((String.Compare(Properties.Settings.Default["RAM"].ToString(), "3") > 0) ? "-XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+UseNUMA -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=30 -XX:GCPauseIntervalMillis=150 -XX:+UseAdaptiveGCBoundary -XX:-UseGCOverheadLimit -XX:+UseBiasedLocking -XX:SurvivorRatio=8 -XX:TargetSurvivorRatio=90 -XX:MaxTenuringThreshold=15 -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true -XX:+UseFastAccessorMethods -XX:+UseCompressedOops -XX:+OptimizeStringConcat -XX:+AggressiveOpts -XX:ReservedCodeCacheSize=2048m -XX:+UseCodeCacheFlushing -XX:SoftRefLRUPolicyMSPerMB=10000 -XX:ParallelGCThreads=10 " : "-XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+UseNUMA -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=30 -XX:GCPauseIntervalMillis=150 -XX:+UseAdaptiveGCBoundary -XX:-UseGCOverheadLimit -XX:+UseBiasedLocking -XX:SurvivorRatio=8 -XX:TargetSurvivorRatio=90 -XX:MaxTenuringThreshold=15 -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true -XX:+UseFastAccessorMethods -XX:+UseCompressedOops -XX:+OptimizeStringConcat -XX:+AggressiveOpts -XX:ReservedCodeCacheSize=2048m -XX:+UseCodeCacheFlushing -XX:SoftRefLRUPolicyMSPerMB=2000 -XX:ParallelGCThreads=10 ") +
                            @"-Djava.library.path=" + config.M_F_P + downloadingVersion[1] + @"\natives-win\ " +
 
@@ -105,7 +129,7 @@ namespace Twickt_Launcher.Classes
                            //"--username killpowa " +
                            "--accessToken 0 " +
                            "--version " +  downloadingVersion[0] + " " +
-                           ((forge == true) ? "--gameDir \"" + config.minecraftfolder + "\\" + downloadingVersion[1] + "\\instances\\" + gamedir + "\" " : "--gameDir \"" + config.minecraftfolder + "\\" + downloadingVersion[1] + "\" ") +
+                           "--gameDir " + gamedirectory +
                            "--assetsDir " + config.minecraftfolder + "\\" + downloadingVersion[1] + "\\assets\\ " +
                            "--assetIndex " + downloadingVersion[1] + " " +
                            "--userProperties {} " +
