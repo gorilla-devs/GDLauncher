@@ -203,9 +203,21 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<List<string[]>> AnalyzeForgeLibraries(string modpackname)
         {
+            ///////////////////////
+            //DEFINIZIONE VARIABILI
+            ///////////////////////
             List<string[]> Libraries = new List<string[]>();
-            
+            string urlforge = "";
+            string forgeversion = "";
+            WebClient c = new WebClient();
+            string data = "";
+            string forgefilename = "";
             bool forge;
+            var temp = config.M_F_P + downloadingVersion[1] + @"\temp\";
+            var forgejson = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json";
+            /////////////////////////////////////////
+            //CONTROLLO SE FORGE E' DA SCARICARE O NO
+            /////////////////////////////////////////
             if (downloadingVersion[2] == "false")
                 forge = false;
             else
@@ -213,30 +225,40 @@ namespace Twickt_Launcher.Classes
 
             if (forge == true)
             {
-                var temp = config.M_F_P + downloadingVersion[1] + @"\temp\";
-                var forgejson = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json";
-                string urlforge = "";
-                string forgeversion = "";
-                //GETTING FORGE JAR URL
-                WebClient c = new WebClient();
-                string data = "";
+                ///////////////////////
+                //GETTING FORGE VERSION JSON FILE
                 c.DownloadStringCompleted += (sender, e) =>
                 {
                     data = e.Result;
                 };
                 await c.DownloadStringTaskAsync(new Uri(forgejson));
+                //////////////////////
                 try
                 {
+                    //READING FORGE VERSION JSON FILE AND PARSING IT
                     List<string> modpacks = new List<string>();
                     var json = Newtonsoft.Json.Linq.JObject.Parse(data);
                     var promos = json["promos"].ToObject<Dictionary<string, string>>();
                     foreach (var entry in promos)
                     {
+                        //SE LA VERSIONE DI MINECRAFT VIENE TROVATA VIENE PRESA LA RELATIVA VERSIONE DI FORGE
+                        //DATO CHE FORGE UTILIZZA DUE TIPI DI URL VIENE FATTA UNA PROVA SUL PRIMO, SE DA ERRORE SI USA IL SECONDO
                         if (entry.Key == downloadingVersion[0] + "-latest")
                         {
                             forgeversion = entry.Value;
-                            urlforge = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + downloadingVersion[0] + "-" + entry.Value + "-" + downloadingVersion[0] + "/forge-" + downloadingVersion[0] + "-" + entry.Value + "-" + downloadingVersion[0] + "-installer.jar";
-                            config.forgeversion = downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0];
+                            forgefilename = downloadingVersion[0] + "-" + entry.Value + "-" + downloadingVersion[0];
+                            WebRequest webRequest = WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + forgefilename + "/forge-" + forgefilename + "-installer.jar");
+                            WebResponse webResponse;
+                            try
+                            {
+                                webResponse = webRequest.GetResponse();
+
+                            }
+                            catch //If exception thrown then couldn't get response from address
+                            {
+                                forgefilename = downloadingVersion[0] + "-" + entry.Value;
+                            }
+                            
                         }
                     }
                 }
@@ -244,16 +266,23 @@ namespace Twickt_Launcher.Classes
                 {
                     MessageBox.Show(ex.ToString());
                 }
+                //VIENE SETTATA LA VERSIONE DI FORGE GLOBALMENTE NEL LAUNCHER
+                config.forgeversion = downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0];
+                /////////////////////////////////////////////////////////////
                 var libraries = config.M_F_P + downloadingVersion[1] + @"\libraries\";
                 if (!Directory.Exists(@temp))
                 {
                     Directory.CreateDirectory(@temp);
                 }
-                if (!File.Exists(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"))
+                //VIENE SCARICATO IL FILE INSTALLER.JAR DI FORGE CHE CONTIENE SIA IL JSON DEI FILE DI FORGE SIA FORGE VERO E PROPRIO, QUINDI ESTRAIAMO QUEI DUE FILE
+                //E CANCELLIAMO L'INSTALLER
+                if (!File.Exists(@temp + "forge-" + forgefilename + "-installer.jar"))
                 {
                     using (WebClient webClient = new WebClient())
                     {
-                        //DebugMode.sendToConsole("Downloading Forge");
+                        ///////////////////////////////////////////////
+                        //VIENE SCARICATO L'INSTALLER
+                        urlforge = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + forgefilename + "/forge-" + forgefilename + "-installer.jar";
                         webClient.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                         Pages.Modpacks.loading.forgeProgress.Visibility = System.Windows.Visibility.Visible;
                         Pages.Modpacks.loading.whatdoing.Visibility = System.Windows.Visibility.Visible;
@@ -262,39 +291,46 @@ namespace Twickt_Launcher.Classes
                         {
                             Pages.Modpacks.loading.forgeProgress.Value = e.ProgressPercentage;
                         };
-
-
-                        //FIXARE ERRORE 404 FORGE
+                        
                         await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"));
-
-
-
                         Pages.Modpacks.loading.whatdoing.Content = "Forge Downloaded";
-                        //Add them to the local
-                        //DebugMode.sendToConsole("Forge Downloaded");
+                        //////////////////////////////////////////////
                     }
-
+                    ////////////////////////////////////////////////////////////////////////////////////////
+                    //VERIFICA SE L'INSTALLER SCARICATO ESISTE, SE ESISTE PROCEDE CON L'ESTRAZIONE DEI DUE FILES
                     if (File.Exists(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"))
                     {
-                        //DebugMode.sendToConsole("Extracting necessary files from forge");
                         using (ZipFile zip = ZipFile.Read(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"))
                         {
                             //ESTRAE LA LISTA JSON DI ROBA DA SCARICARE E IL FILE JAR PRINCIPALE DI FORGE
-                            await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("install_profile.json", "\\", @temp));
-                            await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-universal.jar", "\\", @temp));
+                            await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("install_profile.json", "\\", @temp, ExtractExistingFileAction.OverwriteSilently));
+                            await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-universal.jar", "\\", @temp, ExtractExistingFileAction.OverwriteSilently));
                         }
-                        //CONTROLLA SE ESISTE LA CARTELLA DOVE METTERE IL FILE JAR, SE NON ESISTE LA CREA
+                        //CONTROLLA SE ESISTE LA CARTELLA DOVE METTERE IL FILE PRINCIPALE DI FORGE, SE NON ESISTE LA CREA
                         if (!Directory.Exists(@libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + " \\"))
                         {
                             Directory.CreateDirectory(@libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "\\");
                         }
-                        File.Move(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-universal.jar", @libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "\\" + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + ".jar");
-                    }
+                        await Task.Delay(500);
+                        try
+                        {
+                            //SPOSTA IL FILE PRINCIPALE DI FORGE APPENA ESTRATTO NELLA CARTELLA LIBRARIES
+                            File.Move(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-universal.jar", @libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "\\" + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + ".jar");
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Il file temporaneo di forge non e' stato trovato.(Dovrebbe funzionare comunque)");
+                        }
+                        }
                     else
                     {
                         //NON ESISTE IL FILE INSTALLER
                     }
                 }
+
+                /////////////////////////////////////////////////////////////////////////////////////////////////////
+                //INIZIA LA LETTURA DEL FILE JSON APPENA ESTRATTO CON LA LISTA DI TUTTE LE LIBRERIE E I DATI DI FORGE
+                /////////////////////////////////////////////////////////////////////////////////////////////////////
                 var dataforge = File.ReadAllText(@temp + "install_profile.json");
                 dynamic jsonforge = JsonConvert.DeserializeObject(dataforge);
                 foreach (var item in jsonforge["versionInfo"]["libraries"])
@@ -359,7 +395,8 @@ namespace Twickt_Launcher.Classes
                         dir =  finalurl.Replace("http://files.minecraftforge.net/maven/", "");
                     
                     dir = System.IO.Path.GetDirectoryName(@dir);
-                    Libraries.Add(new string[4] { package, "nohash",  "\\" + dir, finalurl });
+                    if(((string)item["clientreq"] != "False") || ((string)item["clientreq"] == ""))
+                        Libraries.Add(new string[4] { package, "nohash",  "\\" + dir, finalurl });
                 }
             }
             return Libraries;

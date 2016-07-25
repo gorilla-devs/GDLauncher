@@ -393,15 +393,15 @@ namespace Twickt_Launcher.Pages
         {
             if (url.Contains("http://files.minecraftforge.net/maven/"))
             {
-                string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url.Replace("http://files.minecraftforge.net/maven/", "");
-                //localpath = localpath.Replace("/","\\");
-                string FileName = System.IO.Path.GetFileName(dir);
-                dir = System.IO.Path.GetDirectoryName(@dir);
-                //MessageBox.Show(@dir);
-                if (!Directory.Exists(@dir))
-                {
-                    Directory.CreateDirectory(@dir);
-                }
+                    string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url.Replace("http://files.minecraftforge.net/maven/", "");
+                    //localpath = localpath.Replace("/","\\");
+                    string FileName = System.IO.Path.GetFileName(dir);
+                    dir = System.IO.Path.GetDirectoryName(@dir);
+                    //MessageBox.Show(@dir);
+                    if (!Directory.Exists(@dir))
+                    {
+                        Directory.CreateDirectory(@dir);
+                    }
                 /*//DECOMPRIME XZ
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "xz.exe");
@@ -413,45 +413,49 @@ namespace Twickt_Launcher.Pages
                 startInfo.CreateNoWindow = true;
                 Process processo = Process.Start(startInfo);
                 processo.WaitForExit();*/
-
-
+                
                 if (!File.Exists(@dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar")))
-                {
-                    SevenZipBase.SetLibraryPath(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + @"7z86.dll");
-                    if (!File.Exists(@dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack")))
                     {
-                        SevenZipExtractor se = new SevenZipExtractor(@dir + "\\" + FileName);  //FILE XZ
-                        await Task.Factory.StartNew(() => se.BeginExtractArchive(@dir + "\\")).ContinueWith((ante) => Thread.Sleep(400));
-                        File.Move(@dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack.tar"), @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack"));
+                        SevenZipBase.SetLibraryPath(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + @"7z86.dll");
+                        if (!File.Exists(@dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack")))
+                        {
+                        try
+                        {
+                            SevenZipExtractor se = new SevenZipExtractor(@dir + "\\" + FileName);  //FILE XZ
+                            await Task.Factory.StartNew(() => se.BeginExtractArchive(@dir + "\\")).ContinueWith((ante) => Thread.Sleep(400));
+                            File.Move(@dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack.tar"), @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack"));
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.InnerException.ToString());
+                        }
                     }
-
 
                     //DECOMPRIME PACK200
                     if (File.Exists(@dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack")))
-                    {
-                        string filename1 = Classes.ComputerInfoDetect.GetJavaInstallationPath() + "\\bin\\unpack200.exe";
-                        //string cParams1 = "\"" + @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack") + "\" \"" + @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar") + "\"";
-                        //Setup the Process with the ProcessStartInfo class
-                        ProcessStartInfo startInfo1 = new ProcessStartInfo();
-                        startInfo1.FileName = filename1;
-                        startInfo1.UseShellExecute = false;
-                        startInfo1.RedirectStandardOutput = false;
-                        startInfo1.Arguments = "\"" + @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack") + "\" \"" + @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar") + "\"";
-                        startInfo1.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                        startInfo1.CreateNoWindow = true;
+                        {
+                            string filename1 = Classes.ComputerInfoDetect.GetJavaInstallationPath() + "\\bin\\unpack200.exe";
+                            //string cParams1 = "\"" + @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack") + "\" \"" + @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar") + "\"";
+                            //Setup the Process with the ProcessStartInfo class
+                            ProcessStartInfo startInfo1 = new ProcessStartInfo();
+                            startInfo1.FileName = filename1;
+                            startInfo1.UseShellExecute = false;
+                            startInfo1.RedirectStandardOutput = false;
+                            startInfo1.Arguments = "\"" + @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar.pack") + "\" \"" + @dir + "\\" + FileName.Replace(".jar.pack.xz", ".jar") + "\"";
+                            startInfo1.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                            startInfo1.CreateNoWindow = true;
 
-                        //Start the process
-                        Process processo1 = Process.Start(startInfo1);
-                        processo1.WaitForExit();
-                        //Process proc1 = Process.Start(filename1, cParams1);
+                            //Start the process
+                            Process processo1 = Process.Start(startInfo1);
+                            processo1.WaitForExit();
+                            //Process proc1 = Process.Start(filename1, cParams1);
+                        }
+                        else
+                        {
+                        }
                     }
-                    else
-                    {
-                    }
-                }
 
-                //await Logger.sendToConsole("Extracting " + @dir + "\\" + FileName);
-
+                    //await Logger.sendToConsole("Extracting " + @dir + "\\" + FileName);
             }
         }
 

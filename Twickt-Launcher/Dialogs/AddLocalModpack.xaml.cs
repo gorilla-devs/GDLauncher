@@ -23,13 +23,23 @@ namespace Twickt_Launcher.Dialogs
     /// </summary>
     public partial class AddLocalModpack : UserControl
     {
+        public static bool close = false;
         public AddLocalModpack()
         {
             InitializeComponent();
+            version.IsEnabled = true;
+            name.IsEnabled = true;
+            forge.IsEnabled = true;
+            add.IsEnabled = true;
         }
 
         private async void add_Click(object sender, RoutedEventArgs e)
         {
+            version.IsEnabled = false;
+            name.IsEnabled = false;
+            forge.IsEnabled = false;
+            add.IsEnabled = false;
+            back.IsEnabled = false;
             if (!Directory.Exists(config.LocalModpacks + name.Text))
             {
                 Directory.CreateDirectory(config.LocalModpacks + name.Text);
@@ -58,6 +68,8 @@ namespace Twickt_Launcher.Dialogs
             {
                 throw;
             }
+            back.IsEnabled = true;
+            close = true;
         }
     }
 }

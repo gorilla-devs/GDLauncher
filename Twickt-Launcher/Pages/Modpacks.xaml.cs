@@ -62,17 +62,6 @@ namespace Twickt_Launcher.Pages
             }
         }
 
-        private async void addLocalModpack_Click(object sender, RoutedEventArgs e)
-        {
-            var result = await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddLocalModpack(), "RootDialog");
-        }
-
-        private async void editLocalModpack_Click(object sender, RoutedEventArgs e)
-        {
-            var urls = await ModpackStartupCheck.CheckFiles(localModpacks.SelectedValue.ToString(), false);
-            MessageBox.Show(urls.Count.ToString());
-        }
-
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             if (!Directory.Exists(config.LocalModpacks))
@@ -188,6 +177,21 @@ namespace Twickt_Launcher.Pages
             }
         }
 
+        private static async void ExtendedOpenedEventHandlerLocal(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+        {
+            do
+            {
+                await Task.Delay(1000);
+            }
+            while (Dialogs.AddLocalModpack.close == false);
+            try
+            {
+                Dialogs.AddLocalModpack.close = false;
+                eventArgs.Session.Close();
+            }
+            catch { }
+        }
+
         private static void ExtendedClosingEventHandler(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
         {
             if(loading.forgeProgress.IsVisible == true)
@@ -222,6 +226,20 @@ namespace Twickt_Launcher.Pages
                 return;
             }
             Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.localModpacks.SelectedItem.ToString(), false);
+            //MessageBox.Show("This feature is not ready yet");
+        }
+
+        private async void addLocalModpack_Click(object sender, RoutedEventArgs e)
+        {
+            var result = await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddLocalModpack(), "RootDialog", ExtendedOpenedEventHandlerLocal);
+            //MessageBox.Show("This feature is not ready yet");
+        }
+
+        private async void editLocalModpack_Click(object sender, RoutedEventArgs e)
+        {
+            var urls = await ModpackStartupCheck.CheckFiles(localModpacks.SelectedValue.ToString(), false);
+            MessageBox.Show(urls.Count.ToString());
+            //MessageBox.Show("This feature is not ready yet");
         }
     }
 }
