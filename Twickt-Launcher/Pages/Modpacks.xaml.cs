@@ -29,6 +29,7 @@ namespace Twickt_Launcher.Pages
         public List<string> registrationList;
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
         public static List<string> downloadingVersion;
+        public static Dialogs.AddLocalModpack localmodpackadd = new Dialogs.AddLocalModpack();
         public Modpacks()
         {
             InitializeComponent();
@@ -231,7 +232,7 @@ namespace Twickt_Launcher.Pages
 
         private async void addLocalModpack_Click(object sender, RoutedEventArgs e)
         {
-            var result = await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddLocalModpack(), "RootDialog", ExtendedOpenedEventHandlerLocal);
+            await MaterialDesignThemes.Wpf.DialogHost.Show(localmodpackadd, "RootDialog", ExtendedOpenedEventHandlerLocal);
             //MessageBox.Show("This feature is not ready yet");
         }
 

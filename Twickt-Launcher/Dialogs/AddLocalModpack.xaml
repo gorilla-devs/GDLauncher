@@ -13,10 +13,9 @@
                 <DockPanel Margin="0 30 0 0">
                     <Label Content="Version"/>
                     <ComboBox Name="version" Width="150" SelectedIndex="0" HorizontalAlignment="Right">
-                        <ComboBoxItem Content="1.7.2"/>
                         <ComboBoxItem Content="1.7.10"/>
-                        <ComboBoxItem Content="1.8.0"/>
                         <ComboBoxItem Content="1.8.9"/>
+                        <ComboBoxItem Content="1.9.4"/>
                         <ComboBoxItem Content="1.10.2"/>
                     </ComboBox>
                 </DockPanel>
@@ -37,6 +36,6 @@
                 </DockPanel>
             </StackPanel>
         </materialDesign:Card>
-        <ProgressBar HorizontalAlignment="Left" Height="17" Margin="41,334,0,0" VerticalAlignment="Top" Width="417" IsIndeterminate="True"/>
+        <ProgressBar Name="progress" HorizontalAlignment="Left" Height="17" Margin="41,334,0,0" VerticalAlignment="Top" Visibility="Hidden" Width="417"/>
     </Grid>
 </UserControl>

@@ -13,6 +13,9 @@ namespace Twickt_Launcher
         public static string updateWebsite = "https://launcher.twickt.com/";
         public static string minecraftfolder = "minecraft";
         public static string forgeversion = "";
+        public static string mainclass = "";
+        public static string arguments = "";
+        public static string forgefilepath = "";
         public static string logfile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + minecraftfolder + @"\launcher_logs.txt";
         public static string M_F_P = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + minecraftfolder + @"\";
         public static string LocalModpacks = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + minecraftfolder + @"\LocalModpacks\";
