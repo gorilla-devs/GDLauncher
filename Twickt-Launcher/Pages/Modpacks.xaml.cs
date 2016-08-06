@@ -236,11 +236,16 @@ namespace Twickt_Launcher.Pages
             //MessageBox.Show("This feature is not ready yet");
         }
 
-        private async void editLocalModpack_Click(object sender, RoutedEventArgs e)
+        private void deleteLocalModpack_Click(object sender, RoutedEventArgs e)
         {
-            var urls = await ModpackStartupCheck.CheckFiles(localModpacks.SelectedValue.ToString(), false);
-            MessageBox.Show(urls.Count.ToString());
-            //MessageBox.Show("This feature is not ready yet");
+            try
+            {
+                Directory.Delete(config.LocalModpacks + localModpacks.SelectedValue.ToString(), true);
+            }
+            catch
+            {
+                MessageBox.Show("Non e' stato possibile cancellare la cartella");
+            }
         }
     }
 }

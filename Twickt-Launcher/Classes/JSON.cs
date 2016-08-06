@@ -283,7 +283,6 @@ namespace Twickt_Launcher.Classes
                 {
                     using (WebClient webClient = new WebClient())
                     {
-                        MessageBox.Show("Downloading forge");
                         ///////////////////////////////////////////////
                         //VIENE SCARICATO L'INSTALLER
                         urlforge = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + forgefilename + "/forge-" + forgefilename + "-installer.jar";

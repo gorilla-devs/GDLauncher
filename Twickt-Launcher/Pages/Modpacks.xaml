@@ -19,13 +19,10 @@
         <Button x:Name="start" Content="Start" HorizontalAlignment="Left" Foreground="White" Margin="10,405,0,0" VerticalAlignment="Top" Width="167" Height="71" FontSize="26.667" Click="start_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2"/>
         <TextBox x:Name="remoteModpacksSearch" HorizontalAlignment="Left" Height="39" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="167" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" TextChanged="textBox_TextChanged"/>
         <TextBox x:Name="localModpacksSearch" HorizontalAlignment="Left" Height="39" Margin="517,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="167" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
-        <Button x:Name="addLocalModpack" HorizontalAlignment="Left" Margin="510,369,0,0" Foreground="White" VerticalAlignment="Top" Width="50" Click="addLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+        <Button x:Name="addLocalModpack" HorizontalAlignment="Left" Margin="510,369,0,0" Foreground="White" VerticalAlignment="Top" Width="80" Click="addLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
             <materialDesign:PackIcon Kind="Plus" />
         </Button>
-        <Button x:Name="editLocalModpack" HorizontalAlignment="Left" Margin="565,369,0,0" Foreground="White" VerticalAlignment="Top" Width="57" Click="editLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
-            <materialDesign:PackIcon Kind="Pencil" />
-        </Button>
-        <Button x:Name="deleteLocalModpack" HorizontalAlignment="Left" Margin="627,369,0,0" Foreground="White" VerticalAlignment="Top" Width="50" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+        <Button x:Name="deleteLocalModpack" HorizontalAlignment="Left" Margin="595,369,0,0" Foreground="White" VerticalAlignment="Top" Width="82" materialDesign:ShadowAssist.ShadowDepth="Depth2" Click="deleteLocalModpack_Click">
             <materialDesign:PackIcon Kind="Delete" />
         </Button>
         <Button x:Name="refreshRemoteModpacks" HorizontalAlignment="Left" Margin="10,368,0,0" Foreground="White" VerticalAlignment="Top" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" Click="refreshRemoteModpacks_Click">

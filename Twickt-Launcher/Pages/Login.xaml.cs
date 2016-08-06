@@ -151,10 +151,19 @@ namespace Twickt_Launcher.Pages
             }
         }
 
+
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             username.Text = "test";
             password.Password = "test";
+        }
+
+        private void Page_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key.Equals(Key.Return))
+            {
+                button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            }
         }
 
         private void button1_Copy_Click(object sender, RoutedEventArgs e)
@@ -165,8 +174,7 @@ namespace Twickt_Launcher.Pages
 
         private async void label1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var error = new Dialogs.OptionsUpdates("Contact Davide Ceschia for registration!", 350);
-            await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Register(), "RootDialog", ExtendedOpenedEventHandlerLocal);
         }
 
 
@@ -186,13 +194,20 @@ namespace Twickt_Launcher.Pages
 
             }
         }
-
-        private void Page_KeyDown(object sender, KeyEventArgs e)
+        private static async void ExtendedOpenedEventHandlerLocal(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
         {
-            if (e.Key.Equals(Key.Return))
+            do
             {
-                button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                await Task.Delay(100);
             }
+            while (Dialogs.Register.close == false);
+            try
+            {
+                Dialogs.Register.close = false;
+                eventArgs.Session.Close();
+            }
+            catch { }
         }
+
     }
 }

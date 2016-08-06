@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Twickt_Launcher.Dialogs.Register"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             Height="400" Width="500" Background="White">
+    <Grid>
+        <StackPanel VerticalAlignment="Center">
+            <materialDesign:Card Width="450" Height="250" materialDesign:ShadowAssist.ShadowDepth="Depth3" >
+                <StackPanel>
+                    <Label FontSize="20" HorizontalAlignment="Center">Twickt Launcher Registration Form</Label>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <materialDesign:PackIcon Kind="Account" Margin="0 0 15 0" VerticalAlignment="Center"/>
+                        <TextBox Name="username" Width="130" materialDesign:HintAssist.Hint="Username" materialDesign:HintAssist.IsFloating="True"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
+                        <materialDesign:PackIcon Kind="Email" Margin="0 0 15 0" VerticalAlignment="Center"/>
+                        <TextBox Name="email" Width="130" materialDesign:HintAssist.Hint="Email" materialDesign:HintAssist.IsFloating="True"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
+                        <materialDesign:PackIcon Kind="Key" Margin="0 0 15 0" Foreground="{Binding ElementName=PasswordBox, Path=BorderBrush}" VerticalAlignment="Center"/>
+                        <PasswordBox Name="password" Width="130" materialDesign:HintAssist.Hint="Password" materialDesign:HintAssist.IsFloating="True"></PasswordBox>
+                    </StackPanel>
+                    <Button Content="Register" Foreground="White" Width="100" Margin="0 20 0 0" Click="Button_Click"></Button>
+                </StackPanel>
+            </materialDesign:Card>
+        </StackPanel>
+    </Grid>
+</UserControl>
