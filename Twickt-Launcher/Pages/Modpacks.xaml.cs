@@ -227,13 +227,11 @@ namespace Twickt_Launcher.Pages
                 return;
             }
             Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.localModpacks.SelectedItem.ToString(), false);
-            //MessageBox.Show("This feature is not ready yet");
         }
 
         private async void addLocalModpack_Click(object sender, RoutedEventArgs e)
         {
             await MaterialDesignThemes.Wpf.DialogHost.Show(localmodpackadd, "RootDialog", ExtendedOpenedEventHandlerLocal);
-            //MessageBox.Show("This feature is not ready yet");
         }
 
         private void deleteLocalModpack_Click(object sender, RoutedEventArgs e)

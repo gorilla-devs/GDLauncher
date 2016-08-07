@@ -33,6 +33,7 @@ namespace Twickt_Launcher.Classes
                 List<string> Libraries = new List<string>();
                 foreach (string[] url in urls)
                 {
+
                     if (url[3].Contains("https://libraries.minecraft.net"))
                     {
                         string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[2].Replace("/", "\\");

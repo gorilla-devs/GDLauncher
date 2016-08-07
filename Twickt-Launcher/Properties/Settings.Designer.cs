@@ -37,7 +37,7 @@ namespace Twickt_Launcher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.9")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -149,6 +149,18 @@ namespace Twickt_Launcher.Properties {
             }
             set {
                 this["firstTimeHowTo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string sessiondata {
+            get {
+                return ((string)(this["sessiondata"]));
+            }
+            set {
+                this["sessiondata"] = value;
             }
         }
     }

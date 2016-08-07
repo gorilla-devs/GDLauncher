@@ -107,6 +107,9 @@ namespace Twickt_Launcher
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
+            Properties.Settings.Default["Sessiondata"] = "";
+            Properties.Settings.Default["keepMeLoggedIn"] = false;
+            Properties.Settings.Default.Save();
             MainPage.Navigate(new Pages.Login());
             loggedinName.Text = "";
         }

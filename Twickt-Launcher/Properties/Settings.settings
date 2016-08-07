@@ -6,7 +6,7 @@
       <Value Profile="(Default)">Empty</Value>
     </Setting>
     <Setting Name="version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">1.8</Value>
+      <Value Profile="(Default)">1.9</Value>
     </Setting>
     <Setting Name="RAM" Type="System.String" Scope="User">
       <Value Profile="(Default)">1</Value>
@@ -34,6 +34,9 @@
     </Setting>
     <Setting Name="firstTimeHowTo" Type="System.String" Scope="User">
       <Value Profile="(Default)">true</Value>
+    </Setting>
+    <Setting Name="sessiondata" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

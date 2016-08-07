@@ -84,7 +84,22 @@ namespace Twickt_Launcher.Pages
                 {
                     await JAVAInstaller.DownloadJava();
                 }
-                Window1.singleton.MainPage.Navigate(new Pages.Login());
+                if(Properties.Settings.Default["keepMeLoggedIn"].ToString() == "True")
+                {
+                    var data = Properties.Settings.Default["Sessiondata"].ToString().Split(';');
+                    SessionData.username = data[0];
+                    SessionData.email = data[1];
+                    SessionData.isAdmin = data[2];
+                    Window1.singleton.MenuToggleButton.IsEnabled = true;
+                    Window1.singleton.popupbox.IsEnabled = true;
+                    Window1.singleton.loggedinName.Text = "Logged in as " + SessionData.username;
+                    Window1.singleton.MainPage.Navigate(new Pages.Home());
+                }
+                else
+                {
+                    Window1.singleton.MainPage.Navigate(new Pages.Login());
+                }
+
             }
         }
 

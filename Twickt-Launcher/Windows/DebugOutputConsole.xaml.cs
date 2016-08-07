@@ -27,7 +27,15 @@ namespace Twickt_Launcher.Windows
         {
             InitializeComponent();
             singleton = this;
-            
+            if(SessionData.isAdmin == "true")
+            {
+                button3.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                button3.Visibility = Visibility.Hidden;
+            }
+
             
         }
 

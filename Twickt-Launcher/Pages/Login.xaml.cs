@@ -47,7 +47,7 @@ namespace Twickt_Launcher.Pages
             return new string(chars);
         }
 
-        static string sha256(string password)
+        public static string sha256(string password)
         {
             System.Security.Cryptography.SHA256Managed crypt = new System.Security.Cryptography.SHA256Managed();
             System.Text.StringBuilder hash = new System.Text.StringBuilder();
@@ -96,6 +96,8 @@ namespace Twickt_Launcher.Pages
                 Window1.singleton.MenuToggleButton.IsEnabled = true;
                 Window1.singleton.popupbox.IsEnabled = true;
                 Window1.singleton.loggedinName.Text = "Logged in as " + userdata[1];
+                Properties.Settings.Default["Sessiondata"] = SessionData.username + ";" + SessionData.email + ";" + SessionData.isAdmin;
+                Properties.Settings.Default.Save();
                 if (keepMeIn.IsChecked == true)
                 {
                     Properties.Settings.Default["keepMeLoggedIn"] = true;

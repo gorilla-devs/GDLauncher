@@ -98,6 +98,10 @@ namespace Twickt_Launcher.Classes
                             Pages.SplashScreen.singleton.mainContent.Content = "Updating...";
                             Windows.DebugOutputConsole.singleton.Write("Update Found");
                         }
+                        else
+                        {
+                            Application.Current.Shutdown();
+                        }
 
 
                     }

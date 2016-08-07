@@ -23,6 +23,7 @@ namespace Twickt_Launcher
         public static string MCEditLink = "https://download.nodecdn.net/containers/mcedit/download/dev/mcedit2-win64-2.0.0alpha-921.exe";
         public static string loginWebService = "https://webservices.twickt.com/login.php";
         public static string bugReportWebService = "https://webservices.twickt.com/bugs.php";
+        public static string RegisterWebService = "https://webservices.twickt.com/process.php";
         public static string javaDownloadURL32 = "jPortable_8_Update_91_repack.paf";
         public static string javaDownloadURL64 = "jPortable64_8_Update_91_repack.paf";
 

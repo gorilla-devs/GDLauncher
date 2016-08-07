@@ -56,6 +56,8 @@ namespace Twickt_Launcher.Pages
                 Properties.Settings.Default["DebugMaxLines"] = "30";
                 Properties.Settings.Default["RAM"] = "1";
                 Properties.Settings.Default["firstTimeHowTo"] = "true";
+                Properties.Settings.Default["sessiondata"] = "";
+                Properties.Settings.Default["keepMeLoggedIn"] = false;
                 Properties.Settings.Default.Save();
             }
 
