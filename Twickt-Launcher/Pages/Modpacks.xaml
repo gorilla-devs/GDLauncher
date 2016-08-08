@@ -12,7 +12,21 @@
 
     <Grid>
         <Label x:Name="remoteModpacksLabel" Content="Remote Modpacks" HorizontalAlignment="Left" Margin="10,54,0,0" VerticalAlignment="Top" Width="167" FontSize="18.667"/>
-        <ListBox x:Name="remoteModpacks" HorizontalAlignment="Left" Height="270" Margin="10,94,0,0" VerticalAlignment="Top" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" SelectionChanged="remoteModpacks_SelectionChanged"/>
+        <ListBox x:Name="remoteModpacks" HorizontalAlignment="Left" Height="270" Margin="10,94,0,0" VerticalAlignment="Top" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" SelectionChanged="remoteModpacks_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}">
+                        <TextBlock.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem x:Name="delete" Header="Clear local data"/>
+                                <MenuItem x:Name="mods" Header="Mods"/>
+                                <MenuItem Header="Not Yet Implemented" IsEnabled="False"/>
+                            </ContextMenu>
+                        </TextBlock.ContextMenu>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <Label x:Name="localModpacksLabel" Content="Local Modpacks" HorizontalAlignment="Left" Margin="517,54,0,0" VerticalAlignment="Top" Width="167" FontSize="18.667"/>
         <ListBox x:Name="localModpacks" HorizontalAlignment="Left" Height="270" Margin="517,94,0,0" VerticalAlignment="Top" Width="167">
         </ListBox>
