@@ -234,11 +234,32 @@ namespace Twickt_Launcher.Pages
             await MaterialDesignThemes.Wpf.DialogHost.Show(localmodpackadd, "RootDialog", ExtendedOpenedEventHandlerLocal);
         }
 
-        private void deleteLocalModpack_Click(object sender, RoutedEventArgs e)
+        private async void deleteLocalModpack_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                Directory.Delete(config.LocalModpacks + localModpacks.SelectedValue.ToString(), true);
+                var modpackname = localModpacks.SelectedValue.ToString();
+                await Task.Run(() => Directory.Delete(config.LocalModpacks + modpackname, true));
+                await Classes.RemoteModpacks.GetModpacksList();
+                string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
+                localModpacks.Items.Clear();
+                try
+                {
+                    var modpackslist = Directory.GetDirectories(config.LocalModpacks);
+                    foreach (var element in modpackslist)
+                    {
+                        string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
+                        string projectName = System.IO.Path.GetFileName(fullPath);
+                        if (Array.IndexOf(x, projectName) == -1)
+                        {
+                            localModpacks.Items.Add(projectName);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
             catch
             {

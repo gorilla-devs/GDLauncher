@@ -130,7 +130,14 @@ namespace Twickt_Launcher.Pages
             }
             else
             {
-                await DialogHost.Show(new Dialogs.OptionsUpdates("Wrong username or password"), "RootDialog", ExtendedOpenedEventHandler);
+                if (responseString.Contains("notconfirmed"))
+                {
+                    await DialogHost.Show(new Dialogs.OptionsUpdates("Account not confirmed"), "RootDialog", ExtendedOpenedEventHandler);
+                }
+                else
+                {
+                    await DialogHost.Show(new Dialogs.OptionsUpdates("Wrong username or password"), "RootDialog", ExtendedOpenedEventHandler);
+                }
             }
 
             //alice encrypts a message for bob

@@ -6,35 +6,36 @@
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             Height="400" Width="500" Background="White">
+             Height="430" Width="500" Background="White">
     <Grid>
         <StackPanel VerticalAlignment="Center">
-            <materialDesign:Card Width="450" Height="350" materialDesign:ShadowAssist.ShadowDepth="Depth3" >
+            <materialDesign:Card Width="450" Height="370" materialDesign:ShadowAssist.ShadowDepth="Depth3" >
                 <StackPanel>
                     <Label FontSize="20" HorizontalAlignment="Center">Twickt Launcher Registration Form</Label>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <materialDesign:PackIcon Kind="Account" Margin="0 0 15 0" VerticalAlignment="Center"/>
-                        <TextBox Name="username" Width="130" materialDesign:HintAssist.Hint="Username" materialDesign:HintAssist.IsFloating="True"></TextBox>
+                        <TextBox Name="username" Width="130" materialDesign:HintAssist.Hint="Username" materialDesign:HintAssist.IsFloating="True" GotFocus="username_GotFocus"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
                         <materialDesign:PackIcon Kind="Email" Margin="0 0 15 0" VerticalAlignment="Center"/>
-                        <TextBox Name="email" Width="130" materialDesign:HintAssist.Hint="Email" materialDesign:HintAssist.IsFloating="True"></TextBox>
+                        <TextBox Name="email" Width="130" materialDesign:HintAssist.Hint="Email" materialDesign:HintAssist.IsFloating="True" GotFocus="email_GotFocus"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
                         <materialDesign:PackIcon Kind="Key" Margin="0 0 15 0" Foreground="{Binding ElementName=PasswordBox, Path=BorderBrush}" VerticalAlignment="Center"/>
-                        <PasswordBox Name="password" Width="130" materialDesign:HintAssist.Hint="Password" materialDesign:HintAssist.IsFloating="True"></PasswordBox>
+                        <PasswordBox Name="password" Width="130" materialDesign:HintAssist.Hint="Password" materialDesign:HintAssist.IsFloating="True" GotFocus="password_GotFocus"></PasswordBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
                         <materialDesign:PackIcon Kind="Key" Margin="0 0 15 0" Foreground="{Binding ElementName=PasswordBox, Path=BorderBrush}" VerticalAlignment="Center"/>
-                        <PasswordBox Name="passwordcheck" Width="130" materialDesign:HintAssist.Hint="Confirm Password" materialDesign:HintAssist.IsFloating="True"></PasswordBox>
+                        <PasswordBox Name="passwordcheck" Width="130" materialDesign:HintAssist.Hint="Confirm Password" materialDesign:HintAssist.IsFloating="True" GotFocus="passwordcheck_GotFocus"></PasswordBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
                         <materialDesign:PackIcon Kind="Delta" Margin="0 0 15 0" VerticalAlignment="Center"/>
-                        <TextBox Name="controllo" Width="130" materialDesign:HintAssist.Hint="Security Check" materialDesign:HintAssist.IsFloating="True"></TextBox>
+                        <TextBox Name="controllo" Width="130" materialDesign:HintAssist.Hint="Security Check" materialDesign:HintAssist.IsFloating="True" GotFocus="controllo_GotFocus"></TextBox>
                     </StackPanel>
+                    <Label Name="error" HorizontalAlignment="Center" Foreground="Red" Visibility="Hidden" FontSize="10">CIAO</Label>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
-                        <Button Content="Back" Foreground="White" Width="100" Margin="0 20 0 0" Command="materialDesign:DialogHost.CloseDialogCommand"></Button>
-                        <Button Content="Register" Foreground="White" Width="100" Margin="0 20 0 0" Click="Button_Click"></Button>
+                        <Button Name="back" Content="Back" Foreground="White" Width="100" Margin="0 20 0 0" Command="materialDesign:DialogHost.CloseDialogCommand"></Button>
+                        <Button Name="register" Content="Register" Foreground="White" Width="100" Margin="0 20 0 0" Click="Button_Click"></Button>
                     </StackPanel>
                 </StackPanel>
             </materialDesign:Card>

@@ -36,26 +36,59 @@ namespace Twickt_Launcher.Dialogs
             MaterialDesignThemes.Wpf.HintAssist.SetHint(controllo, (nums1[0] + " + " + nums1[1] + " = "));
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (String.IsNullOrEmpty(username.Text) || String.IsNullOrEmpty(password.Password) || String.IsNullOrEmpty(passwordcheck.Password) || String.IsNullOrEmpty(email.Text))
             {
-                MessageBox.Show("Compila tutti i campi");
+                error.Visibility = Visibility.Visible;
+                error.Content = "Compila tutti i campi";
                 return;
             }
-            if(!IsValidEmail(email.Text))
+            if (!IsValidEmail(email.Text))
             {
-                MessageBox.Show("Email non valida");
+                error.Visibility = Visibility.Visible;
+                error.Content = "Email non valida";
                 return;
             }
             if (password.Password != passwordcheck.Password)
             {
-                MessageBox.Show("Le password non corrispondono");
+                error.Visibility = Visibility.Visible;
+                error.Content = "Le password non corrispondono";
                 return;
             }
             if (controllo.Text != sum.ToString())
             {
-                MessageBox.Show("Controllo errato");
+                //Per evitare lo spam automatico delle registrazioni sono necessari parecchi controlli
+                error.Visibility = Visibility.Visible;
+                error.Content = "Controllo errato - Aspetta 5 secondi";
+                List<int> nums1 = Classes.AntiSpam.GenerateRandomNumbers();
+                sum = nums1[0] + nums1[1];
+                MaterialDesignThemes.Wpf.HintAssist.SetHint(controllo, (nums1[0] + " + " + nums1[1] + " = "));
+                controllo.Text = "";
+                register.IsEnabled = false;
+                back.IsEnabled = false;
+                username.IsEnabled = false;
+                email.IsEnabled = false;
+                password.IsEnabled = false;
+                passwordcheck.IsEnabled = false;
+                controllo.IsEnabled = false;
+                await Task.Delay(1000);
+                error.Content = "Controllo errato - Aspetta 4 secondi";
+                await Task.Delay(1000);
+                error.Content = "Controllo errato - Aspetta 3 secondi";
+                await Task.Delay(1000);
+                error.Content = "Controllo errato - Aspetta 2 secondi";
+                await Task.Delay(1000);
+                error.Content = "Controllo errato - Aspetta 1 secondi";
+                await Task.Delay(1000);
+                error.Content = "Controllo errato";
+                register.IsEnabled = true;
+                back.IsEnabled = true;
+                username.IsEnabled = true;
+                email.IsEnabled = true;
+                password.IsEnabled = true;
+                passwordcheck.IsEnabled = true;
+                controllo.IsEnabled = true;
                 return;
             }
 
@@ -68,8 +101,15 @@ namespace Twickt_Launcher.Dialogs
             var response = client.UploadValues(config.RegisterWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
-            //FARE UN CONTROLLO SULLA REGISTRAZUIBE
-                close = true;
+            if (responseString.Contains("OK"))
+            {
+                MessageBox.Show("Registrazione completata, attiva l'account via mail e poi potrai loggarti ");
+            }
+            else
+            {
+                MessageBox.Show("C'e' stato un errore con la registrazione. Riprova piu' tardi o contatta il supporto");
+            }
+            close = true;
         }
 
         public bool IsValidEmail(string strIn)
@@ -122,5 +162,31 @@ namespace Twickt_Launcher.Dialogs
             }
             return match.Groups[1].Value + domainName;
         }
+        #region Hide Error on Textbox Focus
+        private void username_GotFocus(object sender, RoutedEventArgs e)
+        {
+            error.Visibility = Visibility.Hidden;
+        }
+
+        private void email_GotFocus(object sender, RoutedEventArgs e)
+        {
+            error.Visibility = Visibility.Hidden;
+        }
+
+        private void password_GotFocus(object sender, RoutedEventArgs e)
+        {
+            error.Visibility = Visibility.Hidden;
+        }
+
+        private void passwordcheck_GotFocus(object sender, RoutedEventArgs e)
+        {
+            error.Visibility = Visibility.Hidden;
+        }
+
+        private void controllo_GotFocus(object sender, RoutedEventArgs e)
+        {
+            error.Visibility = Visibility.Hidden;
+        }
+        #endregion
     }
 }
