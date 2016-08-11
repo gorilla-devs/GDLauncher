@@ -54,11 +54,11 @@ namespace Twickt_Launcher.Classes
             //i .exe sono zip in verita'
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
             {
-                url = config.updateWebsite + "java/" + config.javaDownloadURL64 + ".7z";
+                url = config.updateWebsite + "java/" + config.javaDownloadURL64 + ".zip";
             }
             else
             {
-                url = config.updateWebsite + "java/" + config.javaDownloadURL32 + ".7z";
+                url = config.updateWebsite + "java/" + config.javaDownloadURL32 + ".zip";
             }
             Uri uri = new Uri(url);
 
@@ -67,12 +67,13 @@ namespace Twickt_Launcher.Classes
             webClient.OpenRead(url);
             bytes_total = Convert.ToInt64(webClient.ResponseHeaders["Content-Length"]) / 1024;
             sw.Start();
-            await webClient.DownloadFileTaskAsync(new Uri(url), config.M_F_P + "runtime\\java.7z");
+            await webClient.DownloadFileTaskAsync(new Uri(url), config.M_F_P + "runtime\\java.zip");
+            Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Visible;
+            Pages.SplashScreen.singleton.firstLabel.Content = "Extracting JAVA";
             try
             {
-                SevenZipBase.SetLibraryPath(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + @"7z86.dll");
-                SevenZipExtractor se = new SevenZipExtractor(config.M_F_P + "runtime\\java.7z");
-                await Task.Factory.StartNew(() => se.BeginExtractArchive(config.M_F_P + "runtime\\jre\\")).ContinueWith((ante) => Thread.Sleep(200)); ;
+                ZipFile zip = ZipFile.Read(config.M_F_P + "runtime\\java.zip");
+                await Task.Factory.StartNew(() => zip.ExtractAll(config.M_F_P + "runtime\\jre\\", ExtractExistingFileAction.OverwriteSilently)).ContinueWith((ante) => Thread.Sleep(200)); ;
             }
             catch(TargetInvocationException e)
             {
@@ -117,7 +118,6 @@ namespace Twickt_Launcher.Classes
                 Properties.Settings.Default["download_threads"] = "30";
 
             Properties.Settings.Default.Save();
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates("Basandoci sulla tua velocita' di download abbiamo impostato un numero ottimale di threads di download (" + AverageSpeed + " kb/s)", 600), "RootDialog", ExtendedOpenedEventHandler);
             sw.Reset();
             if (e.Cancelled == true)
             {
@@ -127,19 +127,6 @@ namespace Twickt_Launcher.Classes
             else
             {
 
-            }
-        }
-
-        private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
-        {
-            try
-            {
-                await Task.Delay(3000);
-                eventArgs.Session.Close();
-            }
-            catch (TaskCanceledException)
-            {
-                /*cancelled by user...tidy up and dont close as will have already closed */
             }
         }
 

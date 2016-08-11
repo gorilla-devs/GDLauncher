@@ -21,10 +21,15 @@ namespace Twickt_Launcher.Dialogs
     public partial class ModpackLoading : UserControl
     {
         public static ModpackLoading singleton;
-        public ModpackLoading()
+        public ModpackLoading(bool btn = false, string message = "Loading...")
         {
             InitializeComponent();
             singleton = this;
+            if (btn == true)
+                button.Visibility = Visibility.Visible;
+
+            forgeProgress.Value = 0;
+            label.Content = message;
         }
     }
 }

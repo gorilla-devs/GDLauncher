@@ -232,9 +232,9 @@ namespace Twickt_Launcher.Pages
                         }
                     }
                 }
-                else if (url.Contains("http://files.minecraftforge.net/maven/"))
+                else if (url.Contains("http://search.maven.org/remotecontent?filepath="))
                 {
-                    string dir = config.M_F_P + downloadingVersion[1] + "\\" + @"libraries\" + url.Replace("http://files.minecraftforge.net/maven/", "");
+                    string dir = config.M_F_P + downloadingVersion[1] + "\\" + @"libraries\" + url.Replace("http://search.maven.org/remotecontent?filepath=", "");
                     string FileName = System.IO.Path.GetFileName(dir);
 
                     //MessageBox.Show(FileName);
@@ -359,7 +359,7 @@ namespace Twickt_Launcher.Pages
                 dir = config.M_F_P + downloadingVersion[1] + "\\" + @"libraries\" + url.Replace("http://resources.download.minecraft.net/", "");
             }
 
-            else if (url.Contains("http://files.minecraftforge.net/maven/"))
+            else if (url.Contains("http://search.maven.org/remotecontent?filepath="))
             {
                 dir = config.M_F_P + downloadingVersion[1] + "\\" + @"libraries\" + url.Replace("http://files.minecraftforge.net/maven/", "");
             }

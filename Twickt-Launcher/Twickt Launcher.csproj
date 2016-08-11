@@ -353,10 +353,6 @@
     <Resource Include="Ionic.Zip.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EmbeddedResources\7z86.dll" />
-    <EmbeddedResource Include="EmbeddedResources\SevenZipSharp.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="TODO.txt" />
     <Resource Include="FodyWeavers.xml" />
     <None Include="bin\System.Threading.Tasks.Dataflow.dll" />
@@ -364,10 +360,6 @@
     <None Include="bin\MaterialDesignThemes.Wpf.dll" />
     <None Include="bin\MaterialDesignColors.dll" />
     <None Include="bin\Ionic.Zip.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="EmbeddedResources\libsodium.dll" />
-    <EmbeddedResource Include="EmbeddedResources\Sodium.dll" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\tag-agradecimentos-minecraft-minecraft.jpg" />
@@ -389,6 +381,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Image6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EmbeddedResources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />

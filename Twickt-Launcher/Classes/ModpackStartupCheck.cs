@@ -76,7 +76,7 @@ namespace Twickt_Launcher.Classes
                                 Libraries.Add(url[3]);
                         }
                     }
-                    else if (url[3].Contains("http://files.minecraftforge.net/maven/"))
+                    else if (url[3].Contains("http://search.maven.org/remotecontent?filepath="))
                     {
                         string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[2];
                         string FileName = Path.GetFileName(dir);

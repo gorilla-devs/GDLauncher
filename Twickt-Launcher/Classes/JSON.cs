@@ -388,9 +388,9 @@ namespace Twickt_Launcher.Classes
                         {
                             url = (string)item["url"];
                             string[] lines = package.Split(':');
-                            finalurl = url + lines[0].Replace('.', '/') + "/" + lines[1] + "/" + lines[2] + "/" + lines[1] + "-" + lines[2];
+                            finalurl = "http://search.maven.org/remotecontent?filepath=" + lines[0].Replace('.', '/') + "/" + lines[1] + "/" + lines[2] + "/" + lines[1] + "-" + lines[2];
                             //SI AGGIUNGE L'ESTENSIONE .pack.xz PER I FILE DI FORGE
-                            finalurl = finalurl + ".jar.pack.xz";
+                            finalurl = finalurl + ".jar";
                         }
 
                     }
@@ -407,7 +407,9 @@ namespace Twickt_Launcher.Classes
                     
                     if(finalurl.Contains("http://files.minecraftforge.net/maven/"))
                         dir =  finalurl.Replace("http://files.minecraftforge.net/maven/", "");
-                    
+                    if (finalurl.Contains("http://search.maven.org/remotecontent?filepath="))
+                        dir = finalurl.Replace("http://search.maven.org/remotecontent?filepath=", "");
+
                     dir = System.IO.Path.GetDirectoryName(@dir);
                     if(((string)item["clientreq"] != "False") || ((string)item["clientreq"] == ""))
                         Libraries.Add(new string[4] { package, "nohash",  "\\" + dir, finalurl });

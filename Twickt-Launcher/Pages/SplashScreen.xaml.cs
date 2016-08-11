@@ -63,8 +63,8 @@ namespace Twickt_Launcher.Pages
                 Windows.DebugOutputConsole.singleton.Write("Extracting DLL");
                 try
                 {
-                    EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "7z86.dll");
-                    EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "SevenZipSharp.dll");
+                    //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "7z86.dll");
+                    //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "SevenZipSharp.dll");
                 }
                 catch(System.IO.IOException)
                 {}

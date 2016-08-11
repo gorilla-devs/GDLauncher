@@ -13,7 +13,6 @@
 
     <Grid>
         <StackPanel Background="#f4f4f4">
-           
         </StackPanel>
         <StackPanel>
             <materialDesign:Card Margin="6 20 6 0" Background="{DynamicResource MaterialDesignPaper}" Padding="10" materialDesign:ShadowAssist.ShadowDepth="Depth3">

@@ -11,9 +11,13 @@ namespace Twickt_Launcher.Classes
 {
     class MinecraftStarter
     {
+        public static Dialogs.ModpackLoading loading;
         public static List<string> downloadingVersion;
         public static async void Minecraft_Start(string modpackname, bool remote)
         {
+            loading = new Dialogs.ModpackLoading(true, "Starting...");
+            MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", OpenEvent);
+            loading.forgeProgress.Value = 15;
             string gamedir = "";
             string getForge = "";
             string gamedirectory = "";
@@ -49,6 +53,7 @@ namespace Twickt_Launcher.Classes
                 urlsforge = await JSON.GetFiles(modpackname, false, true, false);
                 urlslibraries = await JSON.GetFiles(modpackname, true, false, false);
             }
+
             
             string launch =@"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Xmx" + Properties.Settings.Default["RAM"] + "G -Xms" + "256" + "M " + ((String.Compare(Properties.Settings.Default["RAM"].ToString(), "3") > 0) ? "-XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+UseNUMA -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=30 -XX:GCPauseIntervalMillis=150 -XX:+UseAdaptiveGCBoundary -XX:-UseGCOverheadLimit -XX:+UseBiasedLocking -XX:SurvivorRatio=8 -XX:TargetSurvivorRatio=90 -XX:MaxTenuringThreshold=15 -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true -XX:+UseFastAccessorMethods -XX:+UseCompressedOops -XX:+OptimizeStringConcat -XX:+AggressiveOpts -XX:ReservedCodeCacheSize=2048m -XX:+UseCodeCacheFlushing -XX:SoftRefLRUPolicyMSPerMB=10000 -XX:ParallelGCThreads=10 " : "-XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+UseNUMA -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15 -XX:MaxGCPauseMillis=30 -XX:GCPauseIntervalMillis=150 -XX:+UseAdaptiveGCBoundary -XX:-UseGCOverheadLimit -XX:+UseBiasedLocking -XX:SurvivorRatio=8 -XX:TargetSurvivorRatio=90 -XX:MaxTenuringThreshold=15 -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true -XX:+UseFastAccessorMethods -XX:+UseCompressedOops -XX:+OptimizeStringConcat -XX:+AggressiveOpts -XX:ReservedCodeCacheSize=2048m -XX:+UseCodeCacheFlushing -XX:SoftRefLRUPolicyMSPerMB=2000 -XX:ParallelGCThreads=10 ") +
                            @"-Djava.library.path=" + config.M_F_P + downloadingVersion[1] + @"\natives-win\ " +
@@ -75,9 +80,9 @@ namespace Twickt_Launcher.Classes
                         }
                         launch = launch + ("\"" + @dir + "\\" + FileName + "\"" + ";");
                     }
-                    if (url[3].Contains("http://files.minecraftforge.net/maven/"))
+                    if (url[3].Contains("http://search.maven.org/remotecontent?filepath="))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[3].Replace("http://files.minecraftforge.net/maven/", "");
+                        string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[3].Replace("http://search.maven.org/remotecontent?filepath=", "");
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
                         if (!Directory.Exists(@dir))
@@ -105,9 +110,9 @@ namespace Twickt_Launcher.Classes
                 }
                 if (forge == true)
                 {
-                    if (url[3].Contains("http://files.minecraftforge.net/maven/"))
+                    if (url[3].Contains("http://search.maven.org/remotecontent?filepath="))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[3].Replace("http://files.minecraftforge.net/maven/", "");
+                        string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[3].Replace("http://search.maven.org/remotecontent?filepath=", "");
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
                         if (!Directory.Exists(@dir))
@@ -175,6 +180,7 @@ namespace Twickt_Launcher.Classes
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.Arguments = launch;
                 Windows.DebugOutputConsole.singleton.Write(launch);
+                loading.forgeProgress.Value = 25;
 
                 process.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
                 {
@@ -183,6 +189,18 @@ namespace Twickt_Launcher.Classes
                         Application.Current.Dispatcher.Invoke(new Action(() =>
                         {
                             Windows.DebugOutputConsole.singleton.Write(e.Data.ToString());
+                            if (e.Data.ToString().Contains("Loading tweak class name"))
+                            {
+                                loading.forgeProgress.Value = 50;
+                            }
+                            if(e.Data.ToString().Contains("Setting user:"))
+                            {
+                                loading.forgeProgress.Value = 75;
+                            }
+                            if (e.Data.ToString().Contains("LWJGL Version:"))
+                            {
+                                loading.forgeProgress.Value = 100;
+                            }
                         }));
 
                     }
@@ -217,6 +235,20 @@ namespace Twickt_Launcher.Classes
             Console.Write(launch);
             Process.Start(startInfo);*/
 
+
+        }
+
+        private static async void OpenEvent(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+        {
+            while(loading.forgeProgress.Value != 100)
+            {
+                await Task.Delay(2000);
+            }
+            try
+            {
+                eventArgs.Session.Close();
+            }
+            catch { }
 
         }
     }

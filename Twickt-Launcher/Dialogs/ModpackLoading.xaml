@@ -3,13 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
              mc:Ignorable="d" Background="#FFFFFF" Height="107.823" Width="167.993">
     <Grid>
         <ProgressBar HorizontalAlignment="Left" Height="37" Margin="114,10,0,0" VerticalAlignment="Top" Width="44" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
         <Label x:Name="label" Content="Loading..." HorizontalAlignment="Right" Margin="0,13,70,0" VerticalAlignment="Top" FontSize="16" Width="82"/>
         <ProgressBar Name="forgeProgress" HorizontalAlignment="Left" Height="13" Margin="10,59,0,0" VerticalAlignment="Top" Width="148" Visibility="Visible"/>
-        <Label x:Name="whatdoing" Content="" HorizontalAlignment="Center" Margin="10,77,10,0" VerticalAlignment="Top" Width="148" Visibility="Visible"/>
+        <Label x:Name="whatdoing" HorizontalAlignment="Center" Margin="10,77,10,0" VerticalAlignment="Top" Width="148" Visibility="Visible"></Label>
+        <Button x:Name="button" Content="Close" Foreground="White" Width="75" Margin="83,77,10,4" Height="Auto" Command="materialDesign:DialogHost.CloseDialogCommand" Visibility="Hidden"/>
 
     </Grid>
 </UserControl>

@@ -29,7 +29,7 @@ namespace Twickt_Launcher.Pages
         public List<string> registrationList;
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
         public static List<string> downloadingVersion;
-        public static Dialogs.AddLocalModpack localmodpackadd = new Dialogs.AddLocalModpack();
+        public static Dialogs.AddLocalModpack localmodpackadd;
         public Modpacks()
         {
             InitializeComponent();
@@ -182,7 +182,7 @@ namespace Twickt_Launcher.Pages
         {
             do
             {
-                await Task.Delay(1000);
+                await Task.Delay(2000);
             }
             while (Dialogs.AddLocalModpack.close == false);
             try
@@ -231,6 +231,7 @@ namespace Twickt_Launcher.Pages
 
         private async void addLocalModpack_Click(object sender, RoutedEventArgs e)
         {
+            localmodpackadd = new Dialogs.AddLocalModpack();
             await MaterialDesignThemes.Wpf.DialogHost.Show(localmodpackadd, "RootDialog", ExtendedOpenedEventHandlerLocal);
         }
 

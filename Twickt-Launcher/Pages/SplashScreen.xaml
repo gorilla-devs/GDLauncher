@@ -14,11 +14,12 @@
 
     <Grid>
         <Label x:Name="mainContent" Content="Starting..." HorizontalAlignment="Left" Margin="195,237,0,0" VerticalAlignment="Top" FontSize="64" Visibility="Hidden"/>
-        <Label x:Name="firstLabel" Content="Label" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
+        <Label x:Name="firstLabel" Content="Label" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Visible"/>
         <Label x:Name="secondLabel" Content="Label" HorizontalAlignment="Left" Margin="10,173,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
         <ProgressBar Name="progressbar" HorizontalAlignment="Left" Height="32" Margin="10,413,0,0" VerticalAlignment="Top" Width="674" Visibility="Hidden"/>
         <Label x:Name="mbToDownload" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,450,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
         <Label x:Name="kbps" Content="kbps" HorizontalAlignment="Left" Margin="520,450,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
         <ProgressBar Name="load" HorizontalAlignment="Left" Height="406" Margin="148,80,0,0" VerticalAlignment="Top" Width="409" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
+        <ProgressBar Name="firstlabelprogress" HorizontalAlignment="Left" Height="28" Margin="10,165,0,0" Visibility="Hidden" VerticalAlignment="Top" Width="66" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
     </Grid>
 </Page>
