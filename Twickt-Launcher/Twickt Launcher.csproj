@@ -372,9 +372,7 @@
   <ItemGroup>
     <Resource Include="Images\Image6.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="EmbeddedResources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="favicon.ico" />
   </ItemGroup>

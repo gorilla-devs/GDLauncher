@@ -134,10 +134,15 @@ namespace Twickt_Launcher.Pages
                 {
                     await DialogHost.Show(new Dialogs.OptionsUpdates("Account not confirmed"), "RootDialog", ExtendedOpenedEventHandler);
                 }
+                else if(responseString.Contains("banned"))
+                {
+                    await DialogHost.Show(new Dialogs.OptionsUpdates("Account Banned"), "RootDialog", ExtendedOpenedEventHandler);
+                }
                 else
                 {
                     await DialogHost.Show(new Dialogs.OptionsUpdates("Wrong username or password"), "RootDialog", ExtendedOpenedEventHandler);
                 }
+
             }
 
             //alice encrypts a message for bob
