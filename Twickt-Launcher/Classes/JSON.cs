@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -39,6 +40,7 @@ namespace Twickt_Launcher.Classes
         static int arch = ComputerInfoDetect.GetComputerArchitecture();
         public static RemoteModpacks remotemodpacks = new RemoteModpacks();
         public static List<string> downloadingVersion;
+        public static Stopwatch sw = new Stopwatch();
         public static string assetsurl;
 
         public static async Task<List<string[]>> AnalyzeAssets()
@@ -290,14 +292,18 @@ namespace Twickt_Launcher.Classes
                         Pages.Modpacks.loading.forgeProgress.Visibility = System.Windows.Visibility.Visible;
                         Pages.Modpacks.loading.whatdoing.Visibility = System.Windows.Visibility.Visible;
                         Pages.Modpacks.loading.whatdoing.Content = "Downloading Forge";
-                        Pages.Modpacks.localmodpackadd.progress.Visibility = Visibility.Visible;
+                        if(Pages.Modpacks.singleton.local.IsSelected)
+                            Pages.Modpacks.localmodpackadd.progress.Visibility = Visibility.Visible;
                         webClient.DownloadProgressChanged += (s, e) =>
                         {
                             Pages.Modpacks.loading.forgeProgress.Value = e.ProgressPercentage;
-                            Pages.Modpacks.localmodpackadd.progress.Value = e.ProgressPercentage;
+                            if (Pages.Modpacks.singleton.local.IsSelected)
+                                Pages.Modpacks.localmodpackadd.progress.Value = e.ProgressPercentage;
+                            Pages.Modpacks.loading.whatdoing.Content = "Downloading Forge " + string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
                         };
-                        
+                        sw.Start();
                         await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"));
+                        sw.Stop();
                         Pages.Modpacks.loading.whatdoing.Content = "Forge Downloaded";
                         //////////////////////////////////////////////
                     }

@@ -37,7 +37,7 @@ namespace Twickt_Launcher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.9")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.9.1")]
         public string version {
             get {
                 return ((string)(this["version"]));

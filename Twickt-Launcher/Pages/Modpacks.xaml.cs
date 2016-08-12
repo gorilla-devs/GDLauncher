@@ -30,6 +30,8 @@ namespace Twickt_Launcher.Pages
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
         public static List<string> downloadingVersion;
         public static Dialogs.AddLocalModpack localmodpackadd;
+        private bool loaded = false;
+        private object lastSelectedModpacksType;
         public Modpacks()
         {
             InitializeComponent();
@@ -39,27 +41,40 @@ namespace Twickt_Launcher.Pages
 
         private async void start_Click(object sender, RoutedEventArgs e)
         {
-            //VERIFICA SE SI E' SELEZIONATA UNA MODPACK
-            if (remoteModpacks.SelectedIndex == -1)
+            if (remote.IsSelected)
             {
-                var error = new Dialogs.OptionsUpdates("Select a modpack!");
-                await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
-                return;
-            }
-            downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(remoteModpacks.SelectedValue.ToString());
-            //SE LA DIRECTORY ESISTE INIZIA, ALTRIMENTI LA CREA
-            if (!Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString())))
-            {
-                Directory.CreateDirectory(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString()));
-            }
-            var result = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
-            if (result.ToString() == "DownloadNeeded")
-            {
-                Window1.singleton.MainPage.Navigate(new Pages.StartingWorking(true, Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString()));
+                //VERIFICA SE SI E' SELEZIONATA UNA MODPACK
+                if (ModpacksLRList.SelectedIndex == -1)
+                {
+                    var error = new Dialogs.OptionsUpdates("Select a modpack!");
+                    await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
+                    return;
+                }
+                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(ModpacksLRList.SelectedValue.ToString());
+                //SE LA DIRECTORY ESISTE INIZIA, ALTRIMENTI LA CREA
+                if (!Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(ModpacksLRList.SelectedValue.ToString())))
+                {
+                    Directory.CreateDirectory(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(ModpacksLRList.SelectedValue.ToString()));
+                }
+                var result = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
+                if (result.ToString() == "DownloadNeeded")
+                {
+                    Window1.singleton.MainPage.Navigate(new Pages.StartingWorking(true, Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString()));
+                }
+                else
+                {
+                    Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString(), true);
+                }
             }
             else
             {
-                Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString(), true);
+                if (ModpacksLRList.SelectedIndex == -1)
+                {
+                    var error = new Dialogs.OptionsUpdates("Select a modpack!");
+                    await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
+                    return;
+                }
+                Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString(), false);
             }
         }
 
@@ -69,38 +84,22 @@ namespace Twickt_Launcher.Pages
             {
                 Directory.CreateDirectory(config.LocalModpacks);
             }
-            await Classes.RemoteModpacks.GetModpacksList();
-            string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
-            registrationList = remoteModpacks.Items.Cast<string>().ToList();
-            try
-            {
-                var modpackslist = Directory.GetDirectories(config.LocalModpacks);
-                foreach (var element in modpackslist)
-                {
-                    string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
-                    string projectName = System.IO.Path.GetFileName(fullPath);
-                    if (Array.IndexOf(x, projectName) == -1)
-                    {
-                        localModpacks.Items.Add(projectName);
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
+            await ModpacksRefreshMethod();
+            registrationList = ModpacksLRList.Items.Cast<string>().ToList();
+            lastSelectedModpacksType = remote;
+            loaded = true;
         }
 
-        private async void remoteModpacks_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ModpacksLRList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
-                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(remoteModpacks.SelectedValue.ToString());
-                if (Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(remoteModpacks.SelectedValue.ToString())))
+                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(ModpacksLRList.SelectedValue.ToString());
+                if (Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(ModpacksLRList.SelectedValue.ToString())))
                     isinstalled.Content = "Installed";
                 else
                     isinstalled.Content = "Not Installed";
-                description.Text = await Classes.RemoteModpacks.GetModpacksDescription(remoteModpacks.SelectedItem.ToString());
+                description.Text = await Classes.RemoteModpacks.GetModpacksDescription(ModpacksLRList.SelectedItem.ToString());
             }
             catch
             {
@@ -109,47 +108,65 @@ namespace Twickt_Launcher.Pages
             
         }
 
-        private async void refreshRemoteModpacks_Click(object sender, RoutedEventArgs e)
+
+        private async Task ModpacksRefreshMethod()
         {
-            await Classes.RemoteModpacks.GetModpacksList();
-            string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
-            localModpacks.Items.Clear();
-            try
+            if (remote.IsSelected)
             {
-                var modpackslist = Directory.GetDirectories(config.LocalModpacks);
-                foreach (var element in modpackslist)
+                deleteLocalModpack.IsEnabled = false;
+                addLocalModpack.IsEnabled = false;
+                await Classes.RemoteModpacks.GetModpacksList();
+            }
+            else
+            {
+                deleteLocalModpack.IsEnabled = true;
+                addLocalModpack.IsEnabled = true;
+                string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
+                Pages.Modpacks.singleton.ModpacksLRList.Items.Clear();
+                try
                 {
-                    string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
-                    string projectName = System.IO.Path.GetFileName(fullPath);
-                    if (Array.IndexOf(x, projectName) == -1)
+                    var modpackslist = Directory.GetDirectories(config.LocalModpacks);
+                    foreach (var element in modpackslist)
                     {
-                        localModpacks.Items.Add(projectName);
+                        string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
+                        string projectName = System.IO.Path.GetFileName(fullPath);
+                        if (Array.IndexOf(x, projectName) == -1)
+                        {
+                            ModpacksLRList.Items.Add(projectName);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
+            registrationList = ModpacksLRList.Items.Cast<string>().ToList();
+        }
+
+        private async void refreshRemoteModpacks_Click(object sender, RoutedEventArgs e)
+        {
+            ModpacksLRList.Items.Clear();
+            await ModpacksRefreshMethod();
         }
 
         private void textBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (remoteModpacksSearch.Text != "")
             {
-                remoteModpacks.Items.Clear();
+                ModpacksLRList.Items.Clear();
                 foreach (var i in registrationList)
                 {
                     if (i.ToLower().Contains(remoteModpacksSearch.Text.ToLower()))
-                        remoteModpacks.Items.Add(i);
+                        ModpacksLRList.Items.Add(i);
                 }
             }
             else
             {
-                remoteModpacks.Items.Clear();
+                ModpacksLRList.Items.Clear();
                 foreach (var i in registrationList)
                 {
-                    remoteModpacks.Items.Add(i);
+                    ModpacksLRList.Items.Add(i);
                 }
             }
         }
@@ -158,7 +175,7 @@ namespace Twickt_Launcher.Pages
         {
             try
             {
-                Pages.StartingWorking.urls = await ModpackStartupCheck.CheckFiles(Pages.Modpacks.singleton.remoteModpacks.SelectedItem.ToString(), true);
+                Pages.StartingWorking.urls = await ModpackStartupCheck.CheckFiles(Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString(), true);
 
 
                 if (Pages.StartingWorking.urls.Count != 0)
@@ -218,17 +235,6 @@ namespace Twickt_Launcher.Pages
             }
         }
 
-        private async void start_local_Click(object sender, RoutedEventArgs e)
-        {
-            if (localModpacks.SelectedIndex == -1)
-            {
-                var error = new Dialogs.OptionsUpdates("Select a modpack!");
-                await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
-                return;
-            }
-            Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.localModpacks.SelectedItem.ToString(), false);
-        }
-
         private async void addLocalModpack_Click(object sender, RoutedEventArgs e)
         {
             localmodpackadd = new Dialogs.AddLocalModpack();
@@ -239,11 +245,11 @@ namespace Twickt_Launcher.Pages
         {
             try
             {
-                var modpackname = localModpacks.SelectedValue.ToString();
+                var modpackname = ModpacksLRList.SelectedValue.ToString();
                 await Task.Run(() => Directory.Delete(config.LocalModpacks + modpackname, true));
                 await Classes.RemoteModpacks.GetModpacksList();
                 string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
-                localModpacks.Items.Clear();
+                ModpacksLRList.Items.Clear();
                 try
                 {
                     var modpackslist = Directory.GetDirectories(config.LocalModpacks);
@@ -253,7 +259,7 @@ namespace Twickt_Launcher.Pages
                         string projectName = System.IO.Path.GetFileName(fullPath);
                         if (Array.IndexOf(x, projectName) == -1)
                         {
-                            localModpacks.Items.Add(projectName);
+                            ModpacksLRList.Items.Add(projectName);
                         }
                     }
                 }
@@ -265,6 +271,25 @@ namespace Twickt_Launcher.Pages
             catch
             {
                 MessageBox.Show("Non e' stato possibile cancellare la cartella");
+            }
+        }
+        private void filter_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Filter");
+        }
+
+        private async void modpackstypeselection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(modpackstypeselection.SelectedItem == null)
+            {
+                modpackstypeselection.SelectedItem = lastSelectedModpacksType;
+                return;
+            }
+            lastSelectedModpacksType = modpackstypeselection.SelectedItem;
+
+            if (loaded == true)
+            {
+                await ModpacksRefreshMethod();
             }
         }
     }

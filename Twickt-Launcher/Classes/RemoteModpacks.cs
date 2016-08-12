@@ -27,7 +27,7 @@ namespace Twickt_Launcher.Classes
             {
                 Application.Current.Dispatcher.Invoke(new Action(async () =>
                 {
-                    Pages.Modpacks.singleton.remoteModpacks.Items.Clear();
+                    Pages.Modpacks.singleton.ModpacksLRList.Items.Clear();
                     string data = "";
                     WebClient c = new WebClient();
                     c.DownloadStringCompleted += (sender1, e) =>
@@ -50,7 +50,7 @@ namespace Twickt_Launcher.Classes
                         {
                             var name = (string)item["name"];
                             var file = (string)item["file"];
-                            Pages.Modpacks.singleton.remoteModpacks.Items.Add(name);
+                            Pages.Modpacks.singleton.ModpacksLRList.Items.Add(name);
                             modpacks.Add(file);
                         }
                     }

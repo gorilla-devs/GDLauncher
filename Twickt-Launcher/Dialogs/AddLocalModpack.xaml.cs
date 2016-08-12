@@ -35,15 +35,24 @@ namespace Twickt_Launcher.Dialogs
 
         private async void add_Click(object sender, RoutedEventArgs e)
         {
+            if (String.IsNullOrEmpty(name.Text) || name.Text.Contains(" "))
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "Errore: Nome vuoto oppure contiene spazi";
+                return;
+            }
+            if (Directory.Exists(config.LocalModpacks + name.Text))
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "Errore: Esiste gia' una modpack con questo nome";
+                return;
+            }
+            Directory.CreateDirectory(config.LocalModpacks + name.Text);
             version.IsEnabled = false;
             name.IsEnabled = false;
             forge.IsEnabled = false;
             add.IsEnabled = false;
             back.IsEnabled = false;
-            if (!Directory.Exists(config.LocalModpacks + name.Text))
-            {
-                Directory.CreateDirectory(config.LocalModpacks + name.Text);
-            }
             Dictionary<string, string> points = new Dictionary<string, string>
             {
                     { "version", version.Text },
@@ -70,6 +79,11 @@ namespace Twickt_Launcher.Dialogs
             }
             back.IsEnabled = true;
             close = true;
+        }
+
+        private void name_GotFocus(object sender, RoutedEventArgs e)
+        {
+            error.Visibility = Visibility.Hidden;
         }
     }
 }

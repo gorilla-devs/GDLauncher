@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("Twickt Launcher")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Twickt Launcher")]
+[assembly: AssemblyCompany("Twickt")]
 [assembly: AssemblyProduct("Twickt Launcher")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCopyright("Copyright ©  2016 Twickt, All Rights Reserved.")]
 [assembly: AssemblyTrademark("Twickt Launcher")]
 [assembly: AssemblyCulture("")]
 

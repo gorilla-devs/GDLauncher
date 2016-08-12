@@ -7,10 +7,10 @@
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
              Height="417" Width="500" Background="White">
     <Grid>
-        <materialDesign:Card Margin="20 0 20 40" Padding="15" VerticalAlignment="Center">
+        <materialDesign:Card Margin="20" Padding="15" VerticalAlignment="Center">
             <StackPanel>
                 <Label x:Name="label" Content="Add a local modpack" VerticalAlignment="Top" FontSize="18"/>
-                <DockPanel Margin="0 30 0 0">
+                <DockPanel Margin="0 20 0 0">
                     <Label Content="Version"/>
                     <ComboBox Name="version" Width="150" SelectedIndex="0" HorizontalAlignment="Right">
                         <ComboBoxItem Content="1.6.4"/>
@@ -24,7 +24,7 @@
                 </DockPanel>
                 <DockPanel  Margin="0 20 0 0">
                     <Label Content="Name"/>
-                    <TextBox Name="name" Width="150" HorizontalAlignment="Right" materialDesign:HintAssist.Hint="Modpack's name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+                    <TextBox Name="name" Width="150" HorizontalAlignment="Right" materialDesign:HintAssist.Hint="Modpack's name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" GotFocus="name_GotFocus"/>
                 </DockPanel>
                 <DockPanel  Margin="0 20 0 0">
                     <Label Content="Forge?"/>
@@ -33,12 +33,14 @@
                         <ComboBoxItem Content="No Forge"/>
                     </ComboBox>
                 </DockPanel>
+                <Label Name="error" HorizontalAlignment="Center" Foreground="Red" Visibility="Hidden" FontSize="10">CIAO</Label>
                 <DockPanel Margin="0 20 0 0">
                     <Button x:Name="back" Content="Back" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Top" Width="75" Command="materialDesign:DialogHost.CloseDialogCommand"/>
                     <Button x:Name="add" Content="Add" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Top" Width="75" Click="add_Click"/>
                 </DockPanel>
+                <TextBlock Margin="0 10 0 0" TextWrapping="Wrap" Foreground="Blue">Le versioni di mc inferiori alla 1.7.10 sono ancora in fase di testing, cosi' come tutte le versioni intermedie tra le major releases</TextBlock>
             </StackPanel>
         </materialDesign:Card>
-        <ProgressBar Name="progress" HorizontalAlignment="Left" Height="17" Margin="41,334,0,0" VerticalAlignment="Top" Visibility="Hidden" Width="417"/>
+        <ProgressBar Name="progress" HorizontalAlignment="Left" Height="17" Margin="40,390,0,0" VerticalAlignment="Top" Visibility="Hidden" Width="417"/>
     </Grid>
 </UserControl>
