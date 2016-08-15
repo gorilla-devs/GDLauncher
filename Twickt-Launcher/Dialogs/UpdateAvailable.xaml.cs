@@ -24,10 +24,11 @@ namespace Twickt_Launcher.Dialogs
         private CancellationTokenSource _cancellationTokenSource;
 
 
-        public UpdateAvailable(string actualVersion, string newVersion)
+        public UpdateAvailable(string actualVersion, string newVersion, string message = "Do you want to update?")
         {
             InitializeComponent();
             updateVersion.Content = actualVersion + " -> " + newVersion;
+            label1.Content = message;
         }
     }
 }

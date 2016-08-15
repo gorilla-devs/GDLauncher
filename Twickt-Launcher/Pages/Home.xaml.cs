@@ -63,6 +63,22 @@ namespace Twickt_Launcher.Pages
             {
                 changelogs.Text = SessionData.changelog;
             }
+            if(SessionData.lastUser == "" || SessionData.userCount == "")
+            {
+                var client = new WebClient();
+                var response = client.UploadValues(config.statisticsWebService, new System.Collections.Specialized.NameValueCollection());
+                var responseString = Encoding.Default.GetString(response);
+                var tempdata = responseString.Split(';');
+                totalUsers.Text = "Total users: " + tempdata[0];
+                lastRegistered.Text = "Last registered: " + tempdata[1];
+                SessionData.lastUser = "Last registered: " + tempdata[1];
+                SessionData.userCount = "Total users: " + tempdata[0];
+            }
+            else
+            {
+                totalUsers.Text = SessionData.userCount;
+                lastRegistered.Text = SessionData.lastUser;
+            }
         }
 
         private void websiteLink_MouseDown(object sender, MouseButtonEventArgs e)
@@ -98,16 +114,7 @@ namespace Twickt_Launcher.Pages
 
         private async void modpack2start_Click(object sender, RoutedEventArgs e)
         {
-            //SE LA DIRECTORY ESISTE ABILITA IL PULSANTE, ALTRIMENTI LA CREA
-            if (Directory.Exists(config.M_F_P + "instances\\" + await RemoteModpacks.GetModpacksDir("Brotherhood Of Heroes")))
-            {
-                //Classes.MinecraftStarter.Minecraft_Start("BrotherHood Of Heroes");
-            }
-            else
-            {
-                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates("Questa modpack non e' attualmente installata. Andare nella sezione modpacks e avviarla da li la prima volta", 400, 300), "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
-            }
-           
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates("Questa funzione non e' ancora disponibile", 250, 50), "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
         }
         private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
         {
@@ -129,6 +136,37 @@ namespace Twickt_Launcher.Pages
         {
             await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
             //await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var client = new WebClient();
+            var response = client.UploadValues(config.statisticsWebService, new System.Collections.Specialized.NameValueCollection());
+            var responseString = Encoding.Default.GetString(response);
+            var tempdata = responseString.Split(';');
+            totalUsers.Text = "Total users: " + tempdata[0];
+            lastRegistered.Text = "Last registered: " + tempdata[1];
+            SessionData.lastUser = "Last registered: " + tempdata[1];
+            SessionData.userCount = "Total users: " + tempdata[0];
+            statisticsupdatedlabel.Visibility = Visibility.Visible;
+            await Task.Delay(850);
+            statisticsupdatedlabel.Visibility = Visibility.Hidden;
+        }
+
+        private async void problems_Click(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates(@"Per risolvere i tuoi problemi con il launcher, il primo tentativo e' di cancellare la cartella di minecraft del launcher.
+                                                                                        Cliccando su procedi verrai portato alla cartella minecraft dove potrai spostare i tuoi salvataggi del gioco e successivamente cancellare la cartella. Per un funzionamento ottimale del launcher ti consigliamo di riavviarlo dopo tale procedura
+                                                                                        ", 330, 270, true, "Procedi"), "RootDialog");
+            
+            string filePath = config.M_F_P;
+
+            // combine the arguments together
+            // it doesn't matter if there is a space after ','
+            string argument = "/select, \"" + filePath + "\"";
+
+            System.Diagnostics.Process.Start("explorer.exe", argument);
+
         }
     }
 }

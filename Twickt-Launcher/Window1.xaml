@@ -46,7 +46,7 @@
                         <materialDesign:PopupBox Name="popupbox" DockPanel.Dock="Right" Foreground="White" PlacementMode="BottomAndAlignRightEdges">
                             <StackPanel>
                                 <Button Content="Show Debug Console" Click="Button_Click_2"/>
-                                <Button Content="Any Problem With the game?" Click="Button_Click_5"/>
+                                <Button Content="Open game dir" Click="Button_Click_5"/>
                                 <Button Content="Logout" Click="Button_Click_3"/>
                             </StackPanel>
                         </materialDesign:PopupBox>

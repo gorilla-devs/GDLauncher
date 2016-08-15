@@ -54,3 +54,22 @@ E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\Modp
 E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.csproj.GenerateResource.Cache
 E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.exe
 E:\DATA-GDRIVE\Twickt\Progetti\Launcher\Testing\testing-1.5\Twickt Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.pdb
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\bin\Debug\ModpackJsonCreator.exe.config
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\bin\Debug\ModpackJsonCreator.exe
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\bin\Debug\ModpackJsonCreator.pdb
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\bin\Debug\MaterialDesignColors.dll
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\bin\Debug\MaterialDesignThemes.Wpf.dll
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.csprojResolveAssemblyReference.cache
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\MainWindow.g.cs
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\App.g.cs
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator_MarkupCompile.cache
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator_MarkupCompile.lref
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\App.baml
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\MainWindow.baml
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.g.resources
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.Properties.Resources.resources
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.csproj.GenerateResource.Cache
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.exe
+C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.pdb

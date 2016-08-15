@@ -68,7 +68,7 @@ namespace Twickt_Launcher.Pages
             values["username"] = username.Text;
             values["password"] = sha256(password.Password);
 
-            var response = client.UploadValues(config.loginWebService, values);
+            var response = await client.UploadValuesTaskAsync(config.loginWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
             if (responseString.Contains("true"))
@@ -96,9 +96,9 @@ namespace Twickt_Launcher.Pages
                 Window1.singleton.MenuToggleButton.IsEnabled = true;
                 Window1.singleton.popupbox.IsEnabled = true;
                 Window1.singleton.loggedinName.Text = "Logged in as " + userdata[1];
-                Properties.Settings.Default["Sessiondata"] = SessionData.username + ";" + SessionData.email + ";" + SessionData.isAdmin;
-                Properties.Settings.Default.Save();
-                if (keepMeIn.IsChecked == true)
+                //Properties.Settings.Default["Sessiondata"] = SessionData.username + ";" + SessionData.email + ";" + SessionData.isAdmin;
+                //Properties.Settings.Default.Save();
+                /*if (keepMeIn.IsChecked == true)
                 {
                     Properties.Settings.Default["keepMeLoggedIn"] = true;
                     Properties.Settings.Default.Save();
@@ -107,7 +107,7 @@ namespace Twickt_Launcher.Pages
                 {
                     Properties.Settings.Default["keepMeLoggedIn"] = false;
                     Properties.Settings.Default.Save();
-                }
+                }*/
                 if(Properties.Settings.Default["firstTimeHowTo"].ToString() == "true")
                 {
                     Window1.singleton.MainPage.Navigate(new Dialogs.HowTo());
@@ -132,7 +132,7 @@ namespace Twickt_Launcher.Pages
             {
                 if (responseString.Contains("notconfirmed"))
                 {
-                    await DialogHost.Show(new Dialogs.OptionsUpdates("Account not confirmed"), "RootDialog", ExtendedOpenedEventHandler);
+                    await DialogHost.Show(new Dialogs.OptionsUpdates("Account not confirmed yet. Check your email"), "RootDialog", ExtendedOpenedEventHandler);
                 }
                 else if(responseString.Contains("banned"))
                 {
@@ -165,25 +165,12 @@ namespace Twickt_Launcher.Pages
             }
         }
 
-
-        private void button1_Click(object sender, RoutedEventArgs e)
-        {
-            username.Text = "test";
-            password.Password = "test";
-        }
-
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key.Equals(Key.Return))
             {
                 button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
             }
-        }
-
-        private void button1_Copy_Click(object sender, RoutedEventArgs e)
-        {
-            username.Text = "Admin";
-            password.Password = "Admin";
         }
 
         private async void label1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -223,5 +210,9 @@ namespace Twickt_Launcher.Pages
             catch { }
         }
 
+        private async void keepMeIn_Checked(object sender, RoutedEventArgs e)
+        {
+            await DialogHost.Show(new Dialogs.OptionsUpdates("Funzione temporaneamente disabilitata per motivi di sicurezza"), "RootDialog", ExtendedOpenedEventHandler);
+        }
     }
 }

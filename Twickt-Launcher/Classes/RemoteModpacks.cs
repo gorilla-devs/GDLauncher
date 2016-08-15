@@ -16,7 +16,7 @@ namespace Twickt_Launcher.Classes
         public static Dictionary<string, string> description = new Dictionary<string, string>();
         public static async Task<string[]> GetModpacksList()
         {
-            var result = await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates("Loading Modpacks"), "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
+            var result = await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates(lang.languageswitch.loadingModpacks), "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
             Window1.singleton.MenuToggleButton.IsChecked = false;
             return (string[])result;
         }
@@ -38,7 +38,7 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show("Non e' stato possibile scaricare la lista delle modpacks");
+                            MessageBox.Show(lang.languageswitch.couldNotGetModpacksList);
                         }
                     };
                     await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "/Modpacks.json"));
@@ -54,7 +54,7 @@ namespace Twickt_Launcher.Classes
                             modpacks.Add(file);
                         }
                     }
-                    catch (JsonReaderException jex)
+                    catch (JsonReaderException)
                     {
                         throw;
                     }
@@ -121,7 +121,7 @@ namespace Twickt_Launcher.Classes
                     }
                     catch
                     {
-                        MessageBox.Show("Non e' stato possibile scaricare la lista dei files della modpack");
+                        MessageBox.Show(lang.languageswitch.couldNotGetModpackFiles);
                     }
                 };
                 await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
@@ -147,7 +147,6 @@ namespace Twickt_Launcher.Classes
 
 
                     string[] lines = package.Split(':');
-                    finalurl = baseurl;
                     bool first = true;
                     foreach (string s in lines)
                     {
@@ -169,7 +168,7 @@ namespace Twickt_Launcher.Classes
 
                         }
                     }
-                    libraries.Add(new string[4] { package, hash, finalurl, config.updateWebsite + url });
+                    libraries.Add(new string[4] { package, hash, @"\instances\" + finalurl.Replace("/", "\\"), config.updateWebsite + url });
 
                 }
                 return libraries;
@@ -177,7 +176,7 @@ namespace Twickt_Launcher.Classes
             }
             catch
             {
-                MessageBox.Show("Errore nel ricevere i files della modpack");
+                MessageBox.Show(lang.languageswitch.errorGettingModpackFiles);
                 return null;
             }
         }
@@ -281,11 +280,14 @@ namespace Twickt_Launcher.Classes
                 var version = (string)item["version"];
                 var directory = (string)item["directory"];
                 var forge = (string)item["forge"];
+                var strictFiles = (string)item["strictFiles"];
+
                 if (modpackname == name)
                 {
                     info.Add(version);
                     info.Add(directory);
                     info.Add(forge);
+                    info.Add(strictFiles);
                 }
             }
             return info;

@@ -70,7 +70,6 @@ namespace Twickt_Launcher.Dialogs
             {
                 Pages.StartingWorking.urls = await ModpackStartupCheck.CheckFiles(name.Text, false);
 
-
                 Window1.singleton.MainPage.Navigate(new Pages.StartingWorking(false, name.Text));
             }
             catch

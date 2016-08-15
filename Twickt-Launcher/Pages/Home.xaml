@@ -26,96 +26,36 @@
         </ScrollViewer>
         <Button x:Name="button" Content="Modpacks" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="10,462,0,0" VerticalAlignment="Top" Width="674" Height="46" Click="button_Click"/>
         <WrapPanel Margin="20,147,10,168" Orientation="Horizontal" HorizontalAlignment="Center" Width="664">
-            <materialDesign:Card Width="200" Margin="10" HorizontalAlignment="Left">
+            <materialDesign:Card Width="400" Margin="83 10 10 10" Height="289">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="140" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Image Source="/Twickt Launcher;component/Images/tag-agradecimentos-minecraft-minecraft.jpg" Height="140" Stretch="Fill" />
-                    <Button Name="modpack1start" IsEnabled="False" Grid.Row="0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-        				HorizontalAlignment="Right" VerticalAlignment="Bottom"
-        				Margin="0 0 16 -20">
-                        <materialDesign:PackIcon Kind="Play" />
-                    </Button>
-                    <StackPanel Grid.Row="1" Margin="8 24 8 0" >
-                        <TextBlock FontWeight="Bold"><Run Text="Modpack Name"/></TextBlock>
-                        <TextBlock TextWrapping="Wrap" VerticalAlignment="Center"><Run Text="Modpack description. Modpack description. Modpack description"/></TextBlock>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Right" Grid.Row="2" Orientation="Horizontal" Margin="8">
-                        <Button Style="{StaticResource MaterialDesignToolButton}" Width="30" Padding="2 0 2 0"
-        					materialDesign:RippleAssist.IsCentered="True">
-                            <materialDesign:PackIcon Kind="ShareVariant" />
-                        </Button>
-                        <Button Style="{StaticResource MaterialDesignToolButton}" Width="30" Padding="2 0 2 0"
-        					materialDesign:RippleAssist.IsCentered="True">
-                            <materialDesign:PackIcon Kind="Heart" />
-                        </Button>
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-            <materialDesign:Card Width="200" Margin="10" HorizontalAlignment="Right">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="140" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Image Source="/Twickt Launcher;component/Images/tag-agradecimentos-minecraft-minecraft.jpg" Height="140" Stretch="Fill" />
+                    <materialDesign:PackIcon Kind="InformationOutline"  Width="150" Height="150" HorizontalAlignment="Center" Foreground="#BBDEFB"/>
                     <Button Name="modpack2start" Grid.Row="0" IsEnabled="True" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
             			HorizontalAlignment="Right" VerticalAlignment="Bottom"
             			Margin="0 0 16 -20" Click="modpack2start_Click" Loaded="modpack2start_Loaded">
-                        <materialDesign:PackIcon Kind="Play" />
+                        <materialDesign:PackIcon Kind="Account" />
                     </Button>
                     <StackPanel Grid.Row="1" Margin="8 24 8 0" >
-                        <TextBlock FontWeight="Bold"><Run Text="BrotherHood Of Heroes"/></TextBlock>
-                        <TextBlock TextWrapping="Wrap" VerticalAlignment="Center"><Run Text="Una modpack tecnica ancora in via di sviluppo. Buon Game a tutti quanti!"/></TextBlock>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Right" Grid.Row="2" Orientation="Horizontal" Margin="8">
-                        <Button Style="{StaticResource MaterialDesignToolButton}" Width="30" Padding="2 0 2 0"
-            				materialDesign:RippleAssist.IsCentered="True">
-                            <materialDesign:PackIcon Kind="ShareVariant" />
+                        <TextBlock FontWeight="Bold"><Run Text="Some info"/></TextBlock>
+                        <TextBlock Name="totalUsers" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Name="lastRegistered" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+                        <Button Width="100" HorizontalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth2" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click_1">
+                            <materialDesign:PackIcon Kind="Autorenew" Width="33" Height="22" Foreground="#2962FF"/>
                         </Button>
-                        <Button Style="{StaticResource MaterialDesignToolButton}" Width="30" Padding="2 0 2 0"
-            				materialDesign:RippleAssist.IsCentered="True">
-                            <materialDesign:PackIcon Kind="Heart" />
-                        </Button>
-                    </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-            <materialDesign:Card Width="200" Margin="10" HorizontalAlignment="Right">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="140" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Image Source="/Twickt Launcher;component/Images/tag-agradecimentos-minecraft-minecraft.jpg" Height="140" Stretch="Fill" />
-                    <Button Name="modpack3start" IsEnabled="False" Grid.Row="0" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-            			HorizontalAlignment="Right" VerticalAlignment="Bottom"
-            			Margin="0 0 16 -20">
-                        <materialDesign:PackIcon Kind="Play" />
-                    </Button>
-                    <StackPanel Grid.Row="1" Margin="8 24 8 0" >
-                        <TextBlock FontWeight="Bold"><Run Text="Modpack Name"/></TextBlock>
-                        <TextBlock TextWrapping="Wrap" VerticalAlignment="Center"><Run Text="Modpack description. Modpack description. Modpack description"/></TextBlock>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Right" Grid.Row="2" Orientation="Horizontal" Margin="8">
-                        <Button Style="{StaticResource MaterialDesignToolButton}" Width="30" Padding="2 0 2 0"
-            				materialDesign:RippleAssist.IsCentered="True">
-                            <materialDesign:PackIcon Kind="ShareVariant" />
-                        </Button>
-                        <Button Style="{StaticResource MaterialDesignToolButton}" Width="30" Padding="2 0 2 0"
-            				materialDesign:RippleAssist.IsCentered="True">
-                            <materialDesign:PackIcon Kind="Heart" />
-                        </Button>
+                        <Label Name="statisticsupdatedlabel" FontSize="10" HorizontalAlignment="Center" Foreground="Green" Visibility="Hidden">Updated</Label>
                     </StackPanel>
                 </Grid>
             </materialDesign:Card>
         </WrapPanel>
-        <Button x:Name="changelog" Content="Changelogs" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="260,121,0,0" VerticalAlignment="Top" Width="180" Height="39" Click="changelog_Click"/>
-            <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="changelog" Content="Changelogs" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="155,121,0,0" VerticalAlignment="Top" Width="180" Height="39" Click="changelog_Click"/>
+            <Button x:Name="problems" Content="Problems?" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="20,121,0,0" VerticalAlignment="Top" Width="180" Height="39" Click="problems_Click"/>
+        </StackPanel>
+        <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,525,0,0" HorizontalAlignment="Center">
                 <materialDesign:Card Margin="10 0 5 0" Cursor="Hand" MouseDown="twitterLink_MouseDown">
                     <Image x:Name="twitterLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/twitter.png"/>

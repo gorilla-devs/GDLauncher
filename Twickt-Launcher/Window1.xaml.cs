@@ -121,11 +121,13 @@ namespace Twickt_Launcher
 
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
-            Directory.Delete(config.M_F_P, true);
-            Window1.singleton.started = false;
-            Classes.JSON.urls.Clear();
-            MainPage.Navigate(new Pages.SplashScreen());
+            string filePath = config.M_F_P;
 
+            // combine the arguments together
+            // it doesn't matter if there is a space after ','
+            string argument = "/select, \"" + filePath + "\"";
+
+            System.Diagnostics.Process.Start("explorer.exe", argument);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Twickt_Launcher.Classes
                             {
                                 if (e.Data != null)
                                 {
-                                    Windows.DebugOutputConsole.singleton.Write("There has been an error with JAVA Path (Process JAVA Recognition - ErrorDataReceived - JavaPath Empty)");
+                                    Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.javaPathError);
                                 }
                             });
 

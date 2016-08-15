@@ -39,11 +39,17 @@ namespace Twickt_Launcher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if(Classes.ComputerInfoDetect.isDirOK() == false)
+            /*if(Classes.ComputerInfoDetect.isDirOK() == false)
             {
-                MessageBox.Show("E' stato rilevato un errore nella directory. Il percorso dove risiede il launcher non puo' contenere spazi!(Stiamo lavorando per fixare)");
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates(@"Il launcher attualmente non puo' messere messo in un percorso che contiene spazi.
+                                                                                            Esempio di percorso sbagliato:
+                                                                                            C:/Users/Nome Utente/Desktop/Twickt Launcher/
+                                                                                            Esempio di percorso corretto:
+                                                                                            C:/Users/Nome_Utente/Desktop/Twickt_Launcher/
+                                                                                            Se il tuo nome utente ha degli spazi ti consigliamo di mettere il launcher in C:/Users/Pubblic/", 330, 270, true), "RootDialog");
+                
                 Application.Current.Shutdown();
-            }
+            }*/
             using (var webClient = new System.Net.WebClient())
             {
                 var json = webClient.DownloadString(config.updateWebsite + "/Modpacks.json");
@@ -51,7 +57,7 @@ namespace Twickt_Launcher.Pages
                 string launcherStatus = stuff.LauncherStatus;
                 if(launcherStatus.ToString() == "disabled")
                 {
-                    MessageBox.Show("Launcher non attivo");
+                    MessageBox.Show("Launcher in manutenzione. Riprova tra poco");
                     Application.Current.Shutdown();
                 }
             }
@@ -76,8 +82,11 @@ namespace Twickt_Launcher.Pages
                 //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "Sodium.dll");
                 Windows.DebugOutputConsole.singleton.Write("DLL extracted");
 
+
                 string update = await AutoUpdater.CheckVersion();
                 await AutoUpdater.Download(update);
+
+
                 //SETTING UP JAVA
 
                 if(await JAVAInstaller.isJavaInstalled() == false)

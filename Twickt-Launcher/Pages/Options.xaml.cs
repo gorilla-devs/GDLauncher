@@ -64,8 +64,6 @@ namespace Twickt_Launcher.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             downloadThreads.SelectedValue = Properties.Settings.Default["download_threads"];
-            autoCheckForUpdates.IsChecked = (bool)Properties.Settings.Default["autoCheckForUpdates"];
-            autoUpdate.IsChecked = (bool)Properties.Settings.Default["autoUpdate"];
             startingPageValue.SelectedValue  = Properties.Settings.Default["startingPage"];
             JavaPath.Text = ComputerInfoDetect.GetJavaInstallationPath();
             ConsoleMaxLines.Text = Properties.Settings.Default["DebugMaxLines"].ToString();
@@ -76,6 +74,8 @@ namespace Twickt_Launcher.Pages
         {
             optionsrequest = true;
             string update = await AutoUpdater.CheckVersion();
+            if(Window1.versionok == false)
+                Window1.singleton.MainPage.Navigate(new Pages.SplashScreen());
             await AutoUpdater.Download(update);
             optionsrequest = false;
         }
@@ -128,8 +128,6 @@ namespace Twickt_Launcher.Pages
                 return;
             }
             Properties.Settings.Default["download_threads"] = downloadThreads.SelectedValue;
-            Properties.Settings.Default["autoCheckForUpdates"] = autoCheckForUpdates.IsChecked;
-            Properties.Settings.Default["autoUpdate"] = autoUpdate.IsChecked;
             Properties.Settings.Default["startingPage"] = startingPageValue.SelectedValue;
             Properties.Settings.Default["JavaPath"] = JavaPath.Text;
             Properties.Settings.Default["DebugMaxLines"] = ConsoleMaxLines.Text;

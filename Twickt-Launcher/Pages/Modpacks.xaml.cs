@@ -27,7 +27,7 @@ namespace Twickt_Launcher.Pages
     {
         public static Modpacks singleton;
         public List<string> registrationList;
-        public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
+        public static Dialogs.ModpackLoading loading;
         public static List<string> downloadingVersion;
         public static Dialogs.AddLocalModpack localmodpackadd;
         private bool loaded = false;
@@ -41,6 +41,7 @@ namespace Twickt_Launcher.Pages
 
         private async void start_Click(object sender, RoutedEventArgs e)
         {
+            loading = new Dialogs.ModpackLoading();
             if (remote.IsSelected)
             {
                 //VERIFICA SE SI E' SELEZIONATA UNA MODPACK

@@ -37,7 +37,7 @@ namespace Twickt_Launcher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.9.1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.9.2")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -53,30 +53,6 @@ namespace Twickt_Launcher.Properties {
             }
             set {
                 this["RAM"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool autoCheckForUpdates {
-            get {
-                return ((bool)(this["autoCheckForUpdates"]));
-            }
-            set {
-                this["autoCheckForUpdates"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool autoUpdate {
-            get {
-                return ((bool)(this["autoUpdate"]));
-            }
-            set {
-                this["autoUpdate"] = value;
             }
         }
         

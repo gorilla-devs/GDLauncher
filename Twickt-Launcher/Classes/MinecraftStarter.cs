@@ -15,7 +15,7 @@ namespace Twickt_Launcher.Classes
         public static List<string> downloadingVersion;
         public static async void Minecraft_Start(string modpackname, bool remote)
         {
-            loading = new Dialogs.ModpackLoading(true, "Starting...");
+            loading = new Dialogs.ModpackLoading(true, lang.languageswitch.starting + "...");
             MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", OpenEvent);
             loading.forgeProgress.Value = 15;
             string gamedir = "";
@@ -34,7 +34,7 @@ namespace Twickt_Launcher.Classes
                 else
                     forge = true;
 
-                gamedirectory = ((forge == true) ? "\"" + config.minecraftfolder + "\\" + downloadingVersion[1] + "\\instances\\" + gamedir + "\" " : "\"" + config.minecraftfolder + "\\" + downloadingVersion[1] + "\" ");
+                gamedirectory = ((forge == true) ? "\"" + config.M_F_P + "\\" + downloadingVersion[1] + "\\instances\\" + gamedir + "\" " : "\"" + config.M_F_P + "\\" + downloadingVersion[1] + "\" ");
                 urlsforge = await JSON.GetFiles(modpackname, false, true);
                 urlslibraries = await JSON.GetFiles(modpackname, true, false);
             }
@@ -166,8 +166,6 @@ namespace Twickt_Launcher.Classes
                         );
             }
 
-            bool ok = false;
-
             Process process = new Process();
             
             try
@@ -226,7 +224,7 @@ namespace Twickt_Launcher.Classes
             }
             catch(Exception e)
             {
-                Windows.DebugOutputConsole.singleton.Write("FATAL ERROR "  + e);
+                Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.fatalError + " "  + e);
             }
 
             /*ProcessStartInfo startInfo = new ProcessStartInfo();

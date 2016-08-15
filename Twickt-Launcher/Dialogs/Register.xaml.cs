@@ -44,6 +44,18 @@ namespace Twickt_Launcher.Dialogs
                 error.Content = "Compila tutti i campi";
                 return;
             }
+            if(username.Text.Length > 20)
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "L'username non puo' essere piu' lungo di 20 caratteri";
+                return;
+            }
+            if (password.Password.Length < 6)
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "La password deve essere lunga almeno 6 caratteri";
+                return;
+            }
             if (!IsValidEmail(email.Text))
             {
                 error.Visibility = Visibility.Visible;
@@ -97,11 +109,12 @@ namespace Twickt_Launcher.Dialogs
             values["username"] = username.Text;
             values["email"] = email.Text;
             values["password"] = Pages.Login.sha256(password.Password);
-
-            var response = client.UploadValues(config.RegisterWebService, values);
+            register.IsEnabled = false;
+            var response = await client.UploadValuesTaskAsync(config.RegisterWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
-            if (responseString.Contains("OK"))
+            MessageBox.Show(responseString);
+            if (responseString.Contains("OK") && responseString.Contains("sent"))
             {
                 MessageBox.Show("Registrazione completata, attiva l'account via mail e poi potrai loggarti ");
             }

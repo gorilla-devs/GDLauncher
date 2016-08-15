@@ -6,16 +6,10 @@
       <Value Profile="(Default)">Empty</Value>
     </Setting>
     <Setting Name="version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">1.9.1</Value>
+      <Value Profile="(Default)">1.9.2</Value>
     </Setting>
     <Setting Name="RAM" Type="System.String" Scope="User">
       <Value Profile="(Default)">1</Value>
-    </Setting>
-    <Setting Name="autoCheckForUpdates" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="autoUpdate" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="download_threads" Type="System.String" Scope="User">
       <Value Profile="(Default)">4</Value>

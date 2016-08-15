@@ -41,7 +41,7 @@ namespace Twickt_Launcher.Windows
 
         public async void Write(string message)
         {
-            int lines;
+            /*int lines;
             if (Int32.TryParse(Properties.Settings.Default["DebugMaxLines"].ToString(), out lines))
             {
 
@@ -51,7 +51,9 @@ namespace Twickt_Launcher.Windows
                     debug.SelectionLength = debug.Text.IndexOf("\n", 0) + 1;
                     debug.SelectedText = "";
                 }
-            }
+            }*/
+            if (debug.LineCount > 600)
+                debug.Text = "";
             consoleText += ("[" + DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss") + "] " + message + "\n\r");
             debug.Text += ("[" + DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss") + "] " + message + "\n\r");
             debug.CaretIndex = debug.Text.Length;

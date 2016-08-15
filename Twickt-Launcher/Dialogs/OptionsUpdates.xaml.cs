@@ -20,14 +20,26 @@ namespace Twickt_Launcher.Dialogs
     /// </summary>
     public partial class OptionsUpdates : UserControl
     {
-        public OptionsUpdates(string message, int width = 248, int height = 57)
+        public OptionsUpdates(string message, int width = 248, int height = 57, bool button = false, string buttontext = "Close")
         {
             InitializeComponent();
             textBlock.Text = message;
             this.Width = width;
             this.Height = height;
-            textBlock.Height = height - 5;
-            textBlock.Width = width - 20;
+            if (button == false)
+            {
+                btn.Visibility = Visibility.Hidden;
+                textBlock.Height = height - 5;
+                textBlock.Width = width - 20;
+            }
+            else
+            {
+                btn.Visibility = Visibility.Visible;
+                textBlock.Height = height - 33;
+                textBlock.Width = width - 20;
+                btn.Content = buttontext;
+            }
         }
+
     }
 }

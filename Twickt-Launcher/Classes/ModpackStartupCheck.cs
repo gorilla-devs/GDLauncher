@@ -19,24 +19,54 @@ namespace Twickt_Launcher.Classes
             else
                 downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
 
+
             if (remote == true)
                 urls = await JSON.GetFiles(modpackname);
             else
                 urls = await JSON.GetFiles(modpackname, false, false, false);
 
-
+            if (remote == true && downloadingVersion[3] == "true")
+            {
+                try
+                {
+                    string[] localFiles = Directory.GetFiles(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(modpackname) + "\\mods", "*", SearchOption.AllDirectories);
+                    foreach (string file in localFiles)
+                    {
+                        bool filegood = false;
+                        foreach (string[] url in urls)
+                        {
+                            if (url[3].Contains(config.updateWebsite))
+                            {
+                                var localfilename = Path.GetFileName(file);
+                                var remotefilename = Path.GetFileName(url[2]);
+                                if (localfilename == remotefilename)
+                                    filegood = true;
+                            }
+                        }
+                        if (filegood == false)
+                            File.Delete(file);
+                        filegood = false;
+                    }
+                }
+                catch(IOException)
+                {}
+                catch
+                {
+                    MessageBox.Show(lang.languageswitch.mixFileCheckError);
+                }
+            }
             if (Properties.Settings.Default["disableHashCheck"].ToString() == "false")
             {
-                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Files";
+                if (Pages.Modpacks.singleton.remote.IsSelected)
+                    Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingFiles;
                 var temp = config.M_F_P + downloadingVersion[1] + @"temp\";
                 int count = urls.Count;
                 List<string> Libraries = new List<string>();
                 foreach (string[] url in urls)
                 {
-
                     if (url[3].Contains("https://libraries.minecraft.net"))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[2].Replace("/", "\\");
+                        string dir = config.M_F_P + downloadingVersion[1] + url[2];
                         string FileName = Path.GetFileName(url[3]);
                         dir = Path.GetDirectoryName(@dir);
                         if (!File.Exists(@dir + "\\" + FileName))
@@ -49,8 +79,9 @@ namespace Twickt_Launcher.Classes
                     }
                     else if (url[3].Contains("https://launcher.mojang.com/mc/game/"))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"\versions\" + downloadingVersion[0] + "\\";
-                        string FileName = downloadingVersion[0] + ".jar";
+                        string dir = config.M_F_P + downloadingVersion[1] + url[2];
+                        string FileName = Path.GetFileName(dir);
+                        dir = Path.GetDirectoryName(@dir);
                         if (!File.Exists(@dir + "\\" + FileName))
                         {
                             Libraries.Add(url[3]);
@@ -78,18 +109,17 @@ namespace Twickt_Launcher.Classes
                     }
                     else if (url[3].Contains("http://search.maven.org/remotecontent?filepath="))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"\libraries\" + url[2];
+                        string dir = config.M_F_P + downloadingVersion[1] + url[2];
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
-                        string[] lines = url[0].Split(':');
-                        if (!File.Exists(@dir + "\\" + FileName + "\\" + lines[1] + "-" + lines[2] + ".jar"))
+                        if (!File.Exists(@dir + "\\" + FileName))
                         {
                             Libraries.Add(url[3]);
                         }
                     }
                     else if (url[3].Contains(config.updateWebsite))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + @"\instances\" + url[0].Replace(":", "\\");
+                        string dir = config.M_F_P + downloadingVersion[1] + url[2];
                         string FileName = Path.GetFileName(dir);
                         dir = Path.GetDirectoryName(@dir);
                         if (!File.Exists(@dir + "\\" + FileName))

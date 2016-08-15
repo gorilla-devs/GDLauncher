@@ -22,11 +22,10 @@ namespace Twickt_Launcher.Classes
         public long second = 0;
         public static string documents = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Twickt\\";
         public static WebClient webClient = new WebClient();
-        private static CancellationTokenSource _cancellationTokenSource;
 
         public static async Task<string> CheckVersion()
         {
-            Windows.DebugOutputConsole.singleton.Write("Checking for updates");
+            Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.checkingForUpdates);
             string data = "";
             WebClient c = new WebClient();
             string update = "";
@@ -38,7 +37,7 @@ namespace Twickt_Launcher.Classes
                 }
                 catch
                 {
-                    MessageBox.Show("Non e' stato possibile verificare la versione");
+                    MessageBox.Show(lang.languageswitch.couldNotVerifyVersion);
                 }
             };
             try
@@ -47,9 +46,10 @@ namespace Twickt_Launcher.Classes
             }
             catch
             {
-                MessageBox.Show("C'e' stato un errore scaricando le versioni. Il programma ora si chiudera' per motivi di sicurezza");
+                MessageBox.Show(lang.languageswitch.errorDownloadingVersionsList);
                 Application.Current.Shutdown();
             }
+
             try
             {
                 dynamic json = JsonConvert.DeserializeObject(data);
@@ -61,73 +61,69 @@ namespace Twickt_Launcher.Classes
                 update = versionurl;
                 if (String.Compare(Properties.Settings.Default["version"].ToString(), minimumversion) < 0)
                 {
-                    Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.load.Visibility = Visibility.Hidden;
-                    Window1.singleton.MainPage.Navigate(new Pages.SplashScreen());
-                    Window1.versionok = false;
-                    Pages.SplashScreen.singleton.firstLabel.Content = "Updating the launcher(Compulsory Update)";
-                    Pages.SplashScreen.singleton.secondLabel.Content = "Updating " + Properties.Settings.Default["version"].ToString() + " to " + version;
-                    Pages.SplashScreen.singleton.mainContent.Content = "Updating...";
-                    Windows.DebugOutputConsole.singleton.Write("Update Found");
-                    return update;
+                    var test = new Dialogs.UpdateAvailable(Properties.Settings.Default["version"].ToString(), version, lang.languageswitch.youMustUpdate);
+                    var result = await MaterialDesignThemes.Wpf.DialogHost.Show(test, "RootDialog");
+                    if (result.ToString() == "yes")
+                    {
+                        Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
+                        Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
+                        Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
+                        Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
+                        Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
+                        Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
+                        Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
+                        Pages.SplashScreen.singleton.load.Visibility = Visibility.Hidden;
+                        Window1.versionok = false;
+                        Pages.SplashScreen.singleton.firstLabel.Content = lang.languageswitch.updatingLauncherCompulsory;
+                        Pages.SplashScreen.singleton.secondLabel.Content = lang.languageswitch.updating + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
+                        Pages.SplashScreen.singleton.mainContent.Content = lang.languageswitch.updating + "...";
+                        Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.compulsoryUpdateFound);
+                        return update;
+                    }
+                    else
+                    {
+                        Application.Current.Shutdown();
+                    }
                 }
-                if (String.Compare(Properties.Settings.Default["version"].ToString(), version) < 0 || Properties.Settings.Default["version"].ToString() == "")
+                else if (String.Compare(Properties.Settings.Default["version"].ToString(), version) < 0 || Properties.Settings.Default["version"].ToString() == "")
                 {
                     Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
                     Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
                     Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
+                    Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
                     Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
                     Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
                     Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
                     Pages.SplashScreen.singleton.load.Visibility = Visibility.Hidden;
-                    if ((bool)Properties.Settings.Default["autoUpdate"] == false)
+                    var test = new Dialogs.UpdateAvailable(Properties.Settings.Default["version"].ToString(), version);
+                    var result = await MaterialDesignThemes.Wpf.DialogHost.Show(test, "RootDialog");
+                    if (result.ToString() == "yes")
                     {
-                        var test = new Dialogs.UpdateAvailable(Properties.Settings.Default["version"].ToString(), version);
-                        var result = await MaterialDesignThemes.Wpf.DialogHost.Show(test, "RootDialog");
-                        if (result.ToString() == "yes")
-                        {
-                            Window1.singleton.MainPage.Navigate(new Pages.SplashScreen());
-                            Window1.versionok = false;
-                            Pages.SplashScreen.singleton.firstLabel.Content = "Updating the launcher";
-                            Pages.SplashScreen.singleton.secondLabel.Content = "Updating " + Properties.Settings.Default["version"].ToString() + " to " + version;
-                            Pages.SplashScreen.singleton.mainContent.Content = "Updating...";
-                            Windows.DebugOutputConsole.singleton.Write("Update Found");
-                        }
-                        else
-                        {
-                            Application.Current.Shutdown();
-                        }
-
-
+                        Window1.versionok = false;
+                        Pages.SplashScreen.singleton.firstLabel.Content = lang.languageswitch.updatingLauncher;
+                        Pages.SplashScreen.singleton.secondLabel.Content = lang.languageswitch.updating + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
+                        Pages.SplashScreen.singleton.mainContent.Content = lang.languageswitch.updating + "...";
+                        Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.updateFound);
                     }
                     else
                     {
-                        Window1.versionok = false;
-                        Pages.SplashScreen.singleton.firstLabel.Content = "Updating the launcher";
-                        Pages.SplashScreen.singleton.secondLabel.Content = "Updating " + Properties.Settings.Default["version"].ToString() + " to " + version;
-                        Pages.SplashScreen.singleton.mainContent.Content = "Updating...";
-                        Windows.DebugOutputConsole.singleton.Write("Update Found");
+
                     }
                 }
                 else
                 {
                     if (Pages.Options.optionsrequest == true)
                     {
-                        await DialogHost.Show(new Dialogs.OptionsUpdates("No Updates Available"), "RootDialog", ExtendedOpenedEventHandler);
-                        Windows.DebugOutputConsole.singleton.Write("No Updates Available");
+                        await DialogHost.Show(new Dialogs.OptionsUpdates(lang.languageswitch.noUpdatesAvailable, 248, 40), "RootDialog", ExtendedOpenedEventHandler);
+                        Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.noUpdatesAvailable);
                     }
                     else
                     {
-                        Windows.DebugOutputConsole.singleton.Write("No Updates Available");
+                        Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.noUpdatesAvailable);
                     }
                 }
             }
-            catch (JsonReaderException jex)
+            catch (JsonReaderException)
             {
             }
             catch (Exception e)
@@ -207,7 +203,8 @@ namespace Twickt_Launcher.Classes
             }
             else
             {
-                await DialogHost.Show(new Dialogs.OptionsUpdates("In a few moments we will open the new version"), "RootDialog", ExtendedOpenedEventHandler);
+                MessageBox.Show(lang.languageswitch.openingNewVersion);
+                //await DialogHost.Show(new Dialogs.OptionsUpdates("In a few moments we will open the new version"), "RootDialog", ExtendedOpenedEventHandler);
             }
 
         }

@@ -93,7 +93,6 @@ namespace Twickt_Launcher.Classes
                 dynamic json = JsonConvert.DeserializeObject(data);
                 var hash = "";
                 var url = "";
-                var path = "";
                 var name = "";
 
                 foreach (var item in json["downloads"]["client"])
@@ -120,11 +119,10 @@ namespace Twickt_Launcher.Classes
                         assetsurl = param.Replace("\"", "");
                     }
                 }
-                path = "";
                 name = "mainjar";
-                matrix.Add(new string[4] { name, hash, "\\" + path, url });
+                matrix.Add(new string[4] { name, hash, "\\" + @"\versions\" + downloadingVersion[0] + "\\" + downloadingVersion[0] + ".jar" , url });
             }
-            catch (JsonReaderException jex)
+            catch (JsonReaderException)
             {
                 throw;
             }
@@ -142,7 +140,6 @@ namespace Twickt_Launcher.Classes
             await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + downloadingVersion[0] + "/" + downloadingVersion[0] + ".json"));
             List<string[]> libraries = new List<string[]>();
             dynamic json = JsonConvert.DeserializeObject(data);
-            int i = 0;
             var hash = "";
             var url = "";
             var path = "";
@@ -170,7 +167,7 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show("ERRORE A " + name);
+                            MessageBox.Show(lang.languageswitch.errorIn + " " + name);
                         }
                     }
                     else if (item["natives"]["windows"] == "natives-windows-${arch}")
@@ -183,12 +180,12 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show("ERRORE A " + name);
+                            MessageBox.Show(lang.languageswitch.errorIn + " " + name);
                         }
                     }
                 }
                 catch { }
-                libraries.Add(new string[4] { name, hash,  "\\" + path, url });
+                libraries.Add(new string[4] { name, hash,  "\\" + @"\libraries\" + path.Replace("/", "\\"), url });
             }
             return libraries;
         }
@@ -227,6 +224,7 @@ namespace Twickt_Launcher.Classes
                 forge = false;
             else
                 forge = true;
+
 
             if (forge == true)
             {
@@ -279,6 +277,7 @@ namespace Twickt_Launcher.Classes
                 {
                     Directory.CreateDirectory(@temp);
                 }
+
                 //VIENE SCARICATO IL FILE INSTALLER.JAR DI FORGE CHE CONTIENE SIA IL JSON DEI FILE DI FORGE SIA FORGE VERO E PROPRIO, QUINDI ESTRAIAMO QUEI DUE FILE
                 //E CANCELLIAMO L'INSTALLER
                 if (!File.Exists(@temp + "forge-" + forgefilename + "-installer.jar"))
@@ -289,22 +288,29 @@ namespace Twickt_Launcher.Classes
                         //VIENE SCARICATO L'INSTALLER
                         urlforge = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + forgefilename + "/forge-" + forgefilename + "-installer.jar";
                         webClient.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                        Pages.Modpacks.loading.forgeProgress.Visibility = System.Windows.Visibility.Visible;
-                        Pages.Modpacks.loading.whatdoing.Visibility = System.Windows.Visibility.Visible;
-                        Pages.Modpacks.loading.whatdoing.Content = "Downloading Forge";
+                        if (Pages.Modpacks.singleton.remote.IsSelected)
+                        {
+                            Pages.Modpacks.loading.forgeProgress.Visibility = System.Windows.Visibility.Visible;
+                            Pages.Modpacks.loading.whatdoing.Visibility = System.Windows.Visibility.Visible;
+                            Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.downloadingForge;
+                        }
                         if(Pages.Modpacks.singleton.local.IsSelected)
                             Pages.Modpacks.localmodpackadd.progress.Visibility = Visibility.Visible;
                         webClient.DownloadProgressChanged += (s, e) =>
                         {
-                            Pages.Modpacks.loading.forgeProgress.Value = e.ProgressPercentage;
                             if (Pages.Modpacks.singleton.local.IsSelected)
                                 Pages.Modpacks.localmodpackadd.progress.Value = e.ProgressPercentage;
-                            Pages.Modpacks.loading.whatdoing.Content = "Downloading Forge " + string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                            if (Pages.Modpacks.singleton.remote.IsSelected)
+                            {
+                                Pages.Modpacks.loading.forgeProgress.Value = e.ProgressPercentage;
+                                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.downloadingForge + " " + string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                            }
                         };
                         sw.Start();
                         await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"));
                         sw.Stop();
-                        Pages.Modpacks.loading.whatdoing.Content = "Forge Downloaded";
+                        if (Pages.Modpacks.singleton.remote.IsSelected)
+                            Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.downloadedForge;
                         //////////////////////////////////////////////
                     }
                     ////////////////////////////////////////////////////////////////////////////////////////
@@ -335,12 +341,12 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show("Il file estratto di forge non e' stato trovato. Minecraft e' probabile che non partira'");
+                            MessageBox.Show(lang.languageswitch.extractedForgeNotFound);
                         }
                         }
                     else
                     {
-                        MessageBox.Show("Non esiste il file installer di forge. Non e' stato scaricato?");
+                        MessageBox.Show(lang.languageswitch.forgeInstallerNotExist);
                     }
                 }
 
@@ -368,10 +374,10 @@ namespace Twickt_Launcher.Classes
                         {
                             url = (string)item["url"];
                         }
-                        catch (JsonReaderException jex)
+                        catch (JsonReaderException)
                         {
                         }
-                        catch (Exception ex) //some other exception
+                        catch (Exception) //some other exception
                         {
                             throw;
                         }
@@ -397,14 +403,15 @@ namespace Twickt_Launcher.Classes
                             finalurl = "http://search.maven.org/remotecontent?filepath=" + lines[0].Replace('.', '/') + "/" + lines[1] + "/" + lines[2] + "/" + lines[1] + "-" + lines[2];
                             //SI AGGIUNGE L'ESTENSIONE .pack.xz PER I FILE DI FORGE
                             finalurl = finalurl + ".jar";
+                            dir = finalurl.Replace("http://search.maven.org/remotecontent?filepath=", "") + "\\" + lines[1] + "-" + lines[2] + ".jar";
                         }
 
                     }
-                    catch (JsonReaderException jex)
+                    catch (JsonReaderException)
                     {
                         throw;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         throw;
                     }
@@ -412,13 +419,15 @@ namespace Twickt_Launcher.Classes
                     name = lines1[1] + "-" + lines1[2];
                     
                     if(finalurl.Contains("http://files.minecraftforge.net/maven/"))
-                        dir =  finalurl.Replace("http://files.minecraftforge.net/maven/", "");
+                        dir =  dir.Replace("http://files.minecraftforge.net/maven/", "");
                     if (finalurl.Contains("http://search.maven.org/remotecontent?filepath="))
-                        dir = finalurl.Replace("http://search.maven.org/remotecontent?filepath=", "");
+                        dir = dir.Replace("http://search.maven.org/remotecontent?filepath=", "");
 
                     dir = System.IO.Path.GetDirectoryName(@dir);
-                    if(((string)item["clientreq"] != "False") || ((string)item["clientreq"] == ""))
-                        Libraries.Add(new string[4] { package, "nohash",  "\\" + dir, finalurl });
+                    if (((string)item["clientreq"] != "False") || ((string)item["clientreq"] == ""))
+                    {
+                        Libraries.Add(new string[4] { package, "nohash", @"\libraries\" + dir, finalurl });
+                    }
                 }
             }
             return Libraries;
@@ -432,36 +441,36 @@ namespace Twickt_Launcher.Classes
                 downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
 
 
-            Windows.DebugOutputConsole.singleton.Write("Analyzing JSON files");
+            Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.analyzingJsonFiles);
             List<string[]> mods = new List<string[]>();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Json Files";
+                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingJsonFiles;
             }
             catch { }
 
             List<string[]> list = new List<string[]>();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Main Jar";
+                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingMainJar;
             }
             catch { }
             List<string[]> mainjar = await AnalyzeMainJar();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Assets";
+                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingAssets;
             }
             catch { }
             List<string[]> assets = await AnalyzeAssets();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Standard Libraries";
+                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingStandardLibraries;
             }
             catch { }
             List<string[]> libraries = await AnalyzeStdLibraries();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = "Analyzing Forge Libraries";
+                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingForgeLibraries;
             }
             catch { }
             List<string[]> forge = await AnalyzeForgeLibraries(modpackname);
@@ -469,7 +478,7 @@ namespace Twickt_Launcher.Classes
             {
                 try
                 {
-                    Pages.Modpacks.loading.whatdoing.Content = "Analyzing Mods";
+                    Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingMods;
                 }
                 catch { }
                 mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname);
@@ -485,7 +494,7 @@ namespace Twickt_Launcher.Classes
                 list.AddRange(forge);
             if ((justlibraries == false && justforge == false) && (remote == true))
                 list.AddRange(mods);
-            Windows.DebugOutputConsole.singleton.Write("JSON files analyzed");
+            Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.jsonFileAnalyzed);
             urls = list;
 
             return list.Distinct().ToList();

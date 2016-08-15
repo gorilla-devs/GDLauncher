@@ -9,12 +9,56 @@
       d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF">
 
     <Grid>
-        <Button x:Name="button" HorizontalAlignment="Left" Content="Ho capito" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="564,583,0,0" VerticalAlignment="Top" Width="120" Click="button_Click" />
-        <Image x:Name="___Twickt_Launcher_component_Image4_png" Margin="10,10,478,411" Source="/Twickt Launcher;component/Images/Image4.png" Stretch="Fill"/>
-        <Image x:Name="___Twickt_Launcher_component_Image5_png" Margin="478,200,10,221" Source="/Twickt Launcher;component/Images/Image5.png" Stretch="Fill"/>
-        <Image x:Name="___Twickt_Launcher_component_Image6_png" Margin="10,410,478,10" Source="/Twickt Launcher;component/Images/Image6.png" Stretch="Fill"/>
-        <Label x:Name="label" Content="Una volta effettuato il login clicca sul pulsante 'Modpacks'" HorizontalAlignment="Left" Margin="221,80,0,0" VerticalAlignment="Top" Width="433" FontSize="16" Height="42"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,240,0,0" TextWrapping="Wrap" Text="Successivamente seleziona la modpack che preferisci. Clicca ora il pulsante Start. Una volta atteso il download, dopo alcuni secondi il gioco si avviera'!" VerticalAlignment="Top" Height="131" Width="463" FontSize="16"/>
-        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="231,428,0,0" TextWrapping="Wrap" Text="Le volte successive, se la modpack che hai selezionato e' una di quelle elencate nella Home, potrai avviare il gioco direttamente dal pulsante blu nelle tiles della home.          Buon Game!" VerticalAlignment="Top" Height="130" Width="441" FontSize="16"/>
+        <StackPanel>
+            <StackPanel>
+                <Label x:Name="label" Content="Benvenuto in Twickt Launcher" HorizontalAlignment="Center" Margin="139,10,5,0" VerticalAlignment="Top" Width="550" Height="57" FontSize="30"/>
+                <materialDesign:Card Padding="10" Margin="10">
+                    <TextBlock x:Name="textBlock" Padding="10" HorizontalAlignment="Left" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Top">
+                        Twickt Launcher e' un launcher custom di minecraft, che permette, diversamente
+                        da quello ufficiale, una maggiore integrazione con le modpacks,
+                        oltre che tantissime altre features. Se le vuoi conoscere tutte basta
+                        che clicchi 
+                        <Hyperlink Click="Hyperlink_Click">
+                            qui
+                        </Hyperlink>
+                    </TextBlock>
+                </materialDesign:Card>
+            </StackPanel>
+            <StackPanel>
+                <materialDesign:Card Padding="10" Margin="10 0 10 10">
+                    <TextBlock x:Name="textBlock1" Padding="10" HorizontalAlignment="Left" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Top">
+                        Prima di avviare il launcher abbiamo bisogno che tu decida alcune opzioni.
+                        <LineBreak/>
+                        Devi indicarci quanta ram vuoi che il launcher utilizzi e che dia a Minecraft.
+                        <LineBreak/>
+                        Dato che e' fatto principalmente per pacchetti moddati, ti consigliamo di dargli almeno 2 o 3 giga.
+                        <LineBreak/>
+                        Tieni anche conto di quanta RAM disponibile hai.
+                        <LineBreak/>
+                        <Label>Ram Attuale Disponibile: </Label><Label Name="freeram">Calcolo...</Label>
+                        <Label Name="errorlowram" FontSize="12" Foreground="Red" Visibility="Hidden">Attenzione, la ram disponibile e' scarsa</Label>
+                        <LineBreak/>
+                        <ComboBox x:Name="ram" Width="100" SelectedIndex="2">
+                            <ComboBoxItem>1</ComboBoxItem>
+                            <ComboBoxItem>2</ComboBoxItem>
+                            <ComboBoxItem>3</ComboBoxItem>
+                            <ComboBoxItem>4</ComboBoxItem>
+                            <ComboBoxItem>5</ComboBoxItem>
+                            <ComboBoxItem>6</ComboBoxItem>
+                            <ComboBoxItem>7</ComboBoxItem>
+                            <ComboBoxItem>8</ComboBoxItem>
+                        </ComboBox> GB
+                    </TextBlock>
+                </materialDesign:Card>
+                <materialDesign:Card Padding="10" Margin="10 0 10 10">
+                    <TextBlock Foreground="Blue" TextWrapping="Wrap">
+                        Se hai problemi col launcher oppure ci sono bugs, nel 90% dei casi e' 
+                        sufficiente cancellare la cartella minecraft che si trova nella stessa cartella
+                        dove e' il launcher.
+                    </TextBlock>
+                </materialDesign:Card>
+            </StackPanel>
+        </StackPanel>
+        <Button x:Name="button" HorizontalAlignment="Left" Content="Procedi" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" VerticalAlignment="Top" Width="120" Click="button_Click" Margin="564,583,0,0" />
     </Grid>
 </Page>

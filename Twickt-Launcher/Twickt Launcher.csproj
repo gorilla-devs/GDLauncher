@@ -187,6 +187,7 @@
     <Compile Include="Dialogs\UpdateAvailable.xaml.cs">
       <DependentUpon>UpdateAvailable.xaml</DependentUpon>
     </Compile>
+    <Compile Include="lang\languageswitch.cs" />
     <Compile Include="Pages\Admin.xaml.cs">
       <DependentUpon>Admin.xaml</DependentUpon>
     </Compile>

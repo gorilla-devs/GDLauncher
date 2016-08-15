@@ -28,9 +28,9 @@ namespace Twickt_Launcher.Classes
                 return false;
             else
             {
-                if(File.Exists(config.M_F_P + "runtime\\java.7z"))
+                if(File.Exists(config.M_F_P + "runtime\\java.zip"))
                 {
-                    File.Delete(config.M_F_P + "runtime\\java.7z");
+                    File.Delete(config.M_F_P + "runtime\\java.zip");
                 }
                 return true;
             }
@@ -47,18 +47,20 @@ namespace Twickt_Launcher.Classes
             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.load.Visibility = Visibility.Hidden;
-            Pages.SplashScreen.singleton.mainContent.Content = "Please wait...";
-            Pages.SplashScreen.singleton.firstLabel.Content = "Downloading JAVA";
+            Pages.SplashScreen.singleton.mainContent.Content = lang.languageswitch.pleaseWait;
+            Pages.SplashScreen.singleton.firstLabel.Content = lang.languageswitch.downloadingJava;
             Pages.SplashScreen.singleton.secondLabel.Content = "";
             string url = "";
             //i .exe sono zip in verita'
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
             {
-                url = config.updateWebsite + "java/" + config.javaDownloadURL64 + ".zip";
+                url = "https://s3.eu-central-1.amazonaws.com/twicktlauncher/" + "java/" + config.javaDownloadURL64 + ".zip";
+                MessageBox.Show(url);
+                Clipboard.SetText(url);
             }
             else
             {
-                url = config.updateWebsite + "java/" + config.javaDownloadURL32 + ".zip";
+                url = "https://s3.eu-central-1.amazonaws.com/twicktlauncher/" + "java/" + config.javaDownloadURL32 + ".zip";
             }
             Uri uri = new Uri(url);
 
@@ -69,7 +71,7 @@ namespace Twickt_Launcher.Classes
             sw.Start();
             await webClient.DownloadFileTaskAsync(new Uri(url), config.M_F_P + "runtime\\java.zip");
             Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.firstLabel.Content = "Extracting JAVA";
+            Pages.SplashScreen.singleton.firstLabel.Content = lang.languageswitch.extractingJava;
             try
             {
                 ZipFile zip = ZipFile.Read(config.M_F_P + "runtime\\java.zip");
@@ -105,17 +107,17 @@ namespace Twickt_Launcher.Classes
             AverageSpeed = bytes_total / sw.Elapsed.Seconds;
             SessionData.AverageDownloadSpeed = AverageSpeed;
             if (AverageSpeed < 1000)
-                Properties.Settings.Default["download_threads"] = "4";
+                Properties.Settings.Default["download_threads"] = "2";
             else if (AverageSpeed >= 1000 && AverageSpeed <= 3000)
-                Properties.Settings.Default["download_threads"] = "10";
+                Properties.Settings.Default["download_threads"] = "3";
             else if (AverageSpeed > 3000 && AverageSpeed < 5000)
-                Properties.Settings.Default["download_threads"] = "14";
+                Properties.Settings.Default["download_threads"] = "5";
             else if (AverageSpeed > 5000 && AverageSpeed < 7000)
-                Properties.Settings.Default["download_threads"] = "22";
+                Properties.Settings.Default["download_threads"] = "7";
             else if (AverageSpeed > 7000 && AverageSpeed < 10000)
-                Properties.Settings.Default["download_threads"] = "26";
+                Properties.Settings.Default["download_threads"] = "9";
             else if (AverageSpeed > 10000)
-                Properties.Settings.Default["download_threads"] = "30";
+                Properties.Settings.Default["download_threads"] = "11";
 
             Properties.Settings.Default.Save();
             sw.Reset();

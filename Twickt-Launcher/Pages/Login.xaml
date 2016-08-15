@@ -31,13 +31,14 @@
                     </Button>
                     <StackPanel HorizontalAlignment="Center">
                         <ProgressBar Name="loading" HorizontalAlignment="Left" Height="15" VerticalAlignment="Top" Width="219" IsIndeterminate="True" Visibility="Hidden"/>
-                        <CheckBox x:Name="keepMeIn" HorizontalAlignment="Center" Content="Keep me signed in" VerticalAlignment="Top"/>
+                        <CheckBox x:Name="keepMeIn" HorizontalAlignment="Center" Content="Keep me signed in" VerticalAlignment="Top" Checked="keepMeIn_Checked"/>
                     </StackPanel>
                 </StackPanel>
             </materialDesign:Card>
             <materialDesign:Card Margin="0 10 0 0" Height="100" materialDesign:ShadowAssist.ShadowDepth="Depth3" Cursor="Hand" MouseLeftButtonDown="label1_MouseLeftButtonDown">
                 <Label x:Name="label1" Content="Not Registered?" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
             </materialDesign:Card>
+            <Label Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: The launcher is still in beta and could have bug. Translations are still in progress</Label>
         </StackPanel>
     </Grid>
 </Page>
