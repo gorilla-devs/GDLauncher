@@ -68,6 +68,12 @@ namespace Twickt_Launcher.Dialogs
                 error.Content = "Le password non corrispondono";
                 return;
             }
+            if (TOS.IsChecked == false)
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "Devi accettare le condizioni di servizio";
+                return;
+            }
             if (controllo.Text != sum.ToString())
             {
                 //Per evitare lo spam automatico delle registrazioni sono necessari parecchi controlli
@@ -113,10 +119,23 @@ namespace Twickt_Launcher.Dialogs
             var response = await client.UploadValuesTaskAsync(config.RegisterWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
-            MessageBox.Show(responseString);
             if (responseString.Contains("OK") && responseString.Contains("sent"))
             {
                 MessageBox.Show("Registrazione completata, attiva l'account via mail e poi potrai loggarti ");
+            }
+            else if (responseString.Contains("email_taken"))
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "Email gia' in uso";
+                register.IsEnabled = true;
+                return;
+            }
+            else if (responseString.Contains("username_taken"))
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "Username gia' in uso";
+                register.IsEnabled = true;
+                return;
             }
             else
             {
@@ -201,5 +220,10 @@ namespace Twickt_Launcher.Dialogs
             error.Visibility = Visibility.Hidden;
         }
         #endregion
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://twickt.com/terms-of-service/");
+        }
     }
 }

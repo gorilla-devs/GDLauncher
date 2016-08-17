@@ -29,7 +29,7 @@
                             <TextBlock Text="{Binding}">
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem x:Name="delete" Header="Clear local data"/>
+                                        <MenuItem x:Name="delete" Header="Uninstall Modpack"/>
                                         <MenuItem x:Name="mods" Header="Mods"/>
                                         <MenuItem Header="Not Yet Implemented" IsEnabled="False"/>
                                     </ContextMenu>

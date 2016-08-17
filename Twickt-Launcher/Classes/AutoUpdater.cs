@@ -156,7 +156,8 @@ namespace Twickt_Launcher.Classes
                     MessageBox.Show(e.ToString());
                     return;
                 }
-
+                Properties.Settings.Default["firstTimeHowTo"] = "true";
+                Properties.Settings.Default.Save();
                 ProcessStartInfo Info = new ProcessStartInfo();
                 Info.Arguments = "/C choice /C Y /N /D Y /T 3 & Del " + "\"" +
                        System.Reflection.Assembly.GetExecutingAssembly().Location + "\"";

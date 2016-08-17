@@ -50,14 +50,13 @@ namespace Twickt_Launcher.Pages
             var values = new NameValueCollection();
             values["username"] = SessionData.username;
             values["message"] = body.Text;
-            values["ip"] = "123";
 
 
             var response = client.UploadValues(config.bugReportWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
 
-            if(responseString == "ok")
+            if(responseString.Contains("sent"))
             {
                 MessageBox.Show("Message sent");
                 body.Text = "";
@@ -74,24 +73,6 @@ namespace Twickt_Launcher.Pages
             op2.Content = nums1[1];
             sum = nums1[0] + nums1[1];
 
-        }
-
-        public string GetPublicIP()
-        {
-            String direction = "";
-            WebRequest request = WebRequest.Create("http://checkip.dyndns.org/");
-            using (WebResponse response = request.GetResponse())
-            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
-            {
-                direction = stream.ReadToEnd();
-            }
-
-            //Search for the ip in the html
-            int first = direction.IndexOf("Address: ") + 9;
-            int last = direction.LastIndexOf("</body>");
-            direction = direction.Substring(first, last - first);
-
-            return direction;
         }
     }
 }

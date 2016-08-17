@@ -9,7 +9,7 @@
              Height="430" Width="500" Background="White">
     <Grid>
         <StackPanel VerticalAlignment="Center">
-            <materialDesign:Card Width="450" Height="370" materialDesign:ShadowAssist.ShadowDepth="Depth3" >
+            <materialDesign:Card Width="450" Height="390" materialDesign:ShadowAssist.ShadowDepth="Depth3" >
                 <StackPanel>
                     <Label FontSize="20" HorizontalAlignment="Center">Twickt Launcher Registration Form</Label>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -32,7 +32,12 @@
                         <materialDesign:PackIcon Kind="Delta" Margin="0 0 15 0" VerticalAlignment="Center"/>
                         <TextBox Name="controllo" Width="130" materialDesign:HintAssist.Hint="Security Check" materialDesign:HintAssist.IsFloating="True" GotFocus="controllo_GotFocus"></TextBox>
                     </StackPanel>
-                    <Label Name="error" HorizontalAlignment="Center" Foreground="Red" Visibility="Hidden" FontSize="10">CIAO</Label>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
+                        <CheckBox Name="TOS">
+                            <TextBlock>I have read and agree to the <Hyperlink Click="Hyperlink_Click">terms of service</Hyperlink></TextBlock>
+                        </CheckBox>
+                    </StackPanel>
+                    <Label Name="error" HorizontalAlignment="Center" Foreground="Red" Visibility="Hidden" FontSize="10">ERROR</Label>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
                         <Button Name="back" Content="Back" Foreground="White" Width="100" Margin="0 20 0 0" Command="materialDesign:DialogHost.CloseDialogCommand"></Button>
                         <Button Name="register" Content="Register" Foreground="White" Width="100" Margin="0 20 0 0" Click="Button_Click"></Button>

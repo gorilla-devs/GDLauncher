@@ -16,12 +16,66 @@ namespace Twickt_Launcher.Classes
         public static Dictionary<string, string> description = new Dictionary<string, string>();
         public static async Task<string[]> GetModpacksList()
         {
-            var result = await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates(lang.languageswitch.loadingModpacks), "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
+            var result = await Task.Run(() => RefreshRemote());
             Window1.singleton.MenuToggleButton.IsChecked = false;
             return (string[])result;
         }
 
-        private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+        private static async Task<string[]> RefreshRemote()
+        {
+            List<string> modpacks = new List<string>();
+            try
+            {
+                Application.Current.Dispatcher.Invoke(new Action(async () =>
+                {
+                    Pages.Modpacks.singleton.refreshRemoteModpacks.IsEnabled = false;
+                    Pages.Modpacks.singleton.ModpacksLRList.Items.Clear();
+                    string data = "";
+                    WebClient c = new WebClient();
+                    c.DownloadStringCompleted += (sender1, e) =>
+                    {
+                        try
+                        {
+                            data = e.Result;
+                        }
+                        catch
+                        {
+                            MessageBox.Show(lang.languageswitch.couldNotGetModpacksList);
+                        }
+                    };
+                    await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "/Modpacks.json"));
+                    try
+                    {
+                        dynamic json = JsonConvert.DeserializeObject(data);
+                        foreach (var item in json["Modpacks"])
+                        {
+                            var name = (string)item["name"];
+                            var file = (string)item["file"];
+                            Pages.Modpacks.singleton.ModpacksLRList.Items.Add(name);
+                            modpacks.Add(file);
+                        }
+                    }
+                    catch (JsonReaderException)
+                    {
+                        throw;
+                    }
+                    catch
+                    {
+                    }
+                    RemoteModpacks.close = true;
+                    await Task.Delay(100);
+                    Pages.Modpacks.singleton.refreshRemoteModpacks.IsEnabled = true;
+                }));
+                return modpacks.ToArray();
+
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /*private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
         {
             try
             {
@@ -67,14 +121,9 @@ namespace Twickt_Launcher.Classes
             }
             catch (TaskCanceledException)
             {
-                /*cancelled by user...tidy up and dont close as will have already closed */
+                //cancelled by user...tidy up and dont close as will have already closed
             }
-        }
-
-        private static void ExtendedClosingEventHandler(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
-        {
-
-        }
+        }*/
 
         public static async Task<string> GetModpacksDescription(string modpackname)
         {

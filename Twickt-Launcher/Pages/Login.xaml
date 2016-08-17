@@ -39,6 +39,7 @@
                 <Label x:Name="label1" Content="Not Registered?" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
             </materialDesign:Card>
             <Label Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: The launcher is still in beta and could have bug. Translations are still in progress</Label>
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: We are migrating our online infrastructure to some new datacenters. You could experience some problems</TextBlock>
         </StackPanel>
     </Grid>
 </Page>

@@ -39,17 +39,6 @@ namespace Twickt_Launcher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            /*if(Classes.ComputerInfoDetect.isDirOK() == false)
-            {
-                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates(@"Il launcher attualmente non puo' messere messo in un percorso che contiene spazi.
-                                                                                            Esempio di percorso sbagliato:
-                                                                                            C:/Users/Nome Utente/Desktop/Twickt Launcher/
-                                                                                            Esempio di percorso corretto:
-                                                                                            C:/Users/Nome_Utente/Desktop/Twickt_Launcher/
-                                                                                            Se il tuo nome utente ha degli spazi ti consigliamo di mettere il launcher in C:/Users/Pubblic/", 330, 270, true), "RootDialog");
-                
-                Application.Current.Shutdown();
-            }*/
             using (var webClient = new System.Net.WebClient())
             {
                 var json = webClient.DownloadString(config.updateWebsite + "/Modpacks.json");
@@ -66,21 +55,6 @@ namespace Twickt_Launcher.Pages
             if (Window1.singleton.started == false)
             {
                 Window1.singleton.started = true;
-                Windows.DebugOutputConsole.singleton.Write("Extracting DLL");
-                try
-                {
-                    //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "7z86.dll");
-                    //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "SevenZipSharp.dll");
-                }
-                catch(System.IO.IOException)
-                {}
-                catch
-                {
-                    MessageBox.Show("Errore estraendo le librerie");
-                }
-                //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "libsodium.dll");
-                //EmbeddedResourceExtract("Twickt_Launcher", System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "EmbeddedResources", "Sodium.dll");
-                Windows.DebugOutputConsole.singleton.Write("DLL extracted");
 
 
                 string update = await AutoUpdater.CheckVersion();
@@ -110,16 +84,6 @@ namespace Twickt_Launcher.Pages
                 }
 
             }
-        }
-
-        public static void EmbeddedResourceExtract(string nameSpace, string outDirectory, string internalFilePath, string resourcename)
-        {
-            Assembly assembly = Assembly.GetCallingAssembly();
-            using (Stream s = assembly.GetManifestResourceStream(nameSpace + "." + internalFilePath + "." + resourcename))
-            using (BinaryReader r = new BinaryReader(s))
-            using (FileStream fs = new FileStream(outDirectory + "\\" + resourcename, FileMode.OpenOrCreate))
-            using (BinaryWriter w = new BinaryWriter(fs))
-                w.Write(r.ReadBytes((int)s.Length));
         }
     }
 }

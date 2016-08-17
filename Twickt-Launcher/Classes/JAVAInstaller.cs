@@ -54,13 +54,11 @@ namespace Twickt_Launcher.Classes
             //i .exe sono zip in verita'
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
             {
-                url = "https://s3.eu-central-1.amazonaws.com/twicktlauncher/" + "java/" + config.javaDownloadURL64 + ".zip";
-                MessageBox.Show(url);
-                Clipboard.SetText(url);
+                url = config.updateWebsite + "java/" + config.javaDownloadURL64 + ".zip";
             }
             else
             {
-                url = "https://s3.eu-central-1.amazonaws.com/twicktlauncher/" + "java/" + config.javaDownloadURL32 + ".zip";
+                url = config.updateWebsite + "java/" + config.javaDownloadURL32 + ".zip";
             }
             Uri uri = new Uri(url);
 
