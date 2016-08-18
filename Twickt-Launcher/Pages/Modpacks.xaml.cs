@@ -37,6 +37,7 @@ namespace Twickt_Launcher.Pages
             InitializeComponent();
             Window1.singleton.MenuToggleButton.IsEnabled = true;
             singleton = this;
+            //transition.SelectedIndex = 1;
         }
 
         private async void start_Click(object sender, RoutedEventArgs e)
@@ -51,14 +52,17 @@ namespace Twickt_Launcher.Pages
                     await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
                     return;
                 }
-                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(ModpacksLRList.SelectedValue.ToString());
+                string actualModpackName = ModpacksLRList.SelectedValue.ToString();
+                var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(actualModpackName));
+                var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+
                 //SE LA DIRECTORY ESISTE INIZIA, ALTRIMENTI LA CREA
-                if (!Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(ModpacksLRList.SelectedValue.ToString())))
+                if (!Directory.Exists(config.M_F_P + info[5] + "\\instances\\" + info[5]))
                 {
-                    Directory.CreateDirectory(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(ModpacksLRList.SelectedValue.ToString()));
+                    Directory.CreateDirectory(config.M_F_P + info[5] + "\\instances\\" + info[5]);
                 }
-                var result = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
-                if (result.ToString() == "DownloadNeeded")
+                var resultCheck = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
+                if (resultCheck.ToString() == "DownloadNeeded")
                 {
                     Window1.singleton.MainPage.Navigate(new Pages.StartingWorking(true, Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString()));
                 }
@@ -81,6 +85,7 @@ namespace Twickt_Launcher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            //transition.SelectedIndex = 1;
             if (!Directory.Exists(config.LocalModpacks))
             {
                 Directory.CreateDirectory(config.LocalModpacks);
@@ -95,16 +100,28 @@ namespace Twickt_Launcher.Pages
         {
             try
             {
-                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(ModpacksLRList.SelectedValue.ToString());
-                if (Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(ModpacksLRList.SelectedValue.ToString())))
-                    isinstalled.Content = "Installed";
+                string actualModpackName = ModpacksLRList.SelectedValue.ToString();
+                var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(actualModpackName));
+                var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                if (Directory.Exists(config.M_F_P + info[5] + "\\instances\\" + info[5]))
+                {
+                    isinstalled.Content = @"Installed";
+                    version.Content = info[2];
+                    forge.Content = (info[3] == "true") ? "With Forge" : "Without Forge";
+                    start.Content = "Play";
+                }
                 else
+                {
                     isinstalled.Content = "Not Installed";
-                description.Text = await Classes.RemoteModpacks.GetModpacksDescription(ModpacksLRList.SelectedItem.ToString());
+                    version.Content = info[2];
+                    forge.Content = (info[3] == "true") ? "With Forge" : "Without Forge";
+                    start.Content = "Install";
+                }
+                description.Text = info[1];
             }
-            catch
+            catch(Exception ex)
             {
-                Windows.DebugOutputConsole.singleton.Write("Could not get modpack description");
+                Windows.DebugOutputConsole.singleton.Write("Could not get modpack description-- " + ex);
             }
             
         }
@@ -116,7 +133,16 @@ namespace Twickt_Launcher.Pages
             {
                 deleteLocalModpack.IsEnabled = false;
                 addLocalModpack.IsEnabled = false;
-                await Classes.RemoteModpacks.GetModpacksList();
+                refreshRemoteModpacks.IsEnabled = false;
+                ModpacksLRList.Items.Clear();
+                var remotelist = await Classes.RemoteModpacks.GetModpacksList();
+                refreshRemoteModpacks.IsEnabled = true;
+
+                foreach (var x in remotelist.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.None))
+                {
+                    var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                    ModpacksLRList.Items.Add(z[0]);
+                }
             }
             else
             {
@@ -281,7 +307,7 @@ namespace Twickt_Launcher.Pages
 
         private async void modpackstypeselection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(modpackstypeselection.SelectedItem == null)
+            if (modpackstypeselection.SelectedItem == null)
             {
                 modpackstypeselection.SelectedItem = lastSelectedModpacksType;
                 return;
@@ -292,6 +318,26 @@ namespace Twickt_Launcher.Pages
             {
                 await ModpacksRefreshMethod();
             }
+        }
+
+        private async void addpack_Click(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddPack(), "RootDialog", ExtendedOpenedEventHandlerAddPack);
+        }
+
+        private static async void ExtendedOpenedEventHandlerAddPack(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+        {
+            do
+            {
+                await Task.Delay(100);
+            }
+            while (Dialogs.Register.close == false);
+            try
+            {
+                Dialogs.Register.close = false;
+                eventArgs.Session.Close();
+            }
+            catch { }
         }
     }
 }

@@ -67,7 +67,9 @@ namespace Twickt_Launcher.Pages
                 {
                     await JAVAInstaller.DownloadJava();
                 }
-                if(Properties.Settings.Default["keepMeLoggedIn"].ToString() == "True")
+                transition.SelectedIndex = 1;
+                await Task.Delay(350);
+                if (Properties.Settings.Default["keepMeLoggedIn"].ToString() == "True")
                 {
                     var data = Properties.Settings.Default["Sessiondata"].ToString().Split(';');
                     SessionData.username = data[0];

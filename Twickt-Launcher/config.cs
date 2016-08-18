@@ -23,8 +23,8 @@ namespace Twickt_Launcher
         public static string loginWebService = "https://webservices.twickt.com/login.php";
         public static string bugReportWebService = "https://webservices.twickt.com/bugs.php";
         public static string RegisterWebService = "https://webservices.twickt.com/process.php";
-        //public static string RegisterWebService = "https://webservices.twickt.com/registration_testing.php";
         public static string statisticsWebService = "https://webservices.twickt.com/InfoStatistics.php";
+        public static string modpacksWebService = "https://webservices.twickt.com/modpacks.php";
         public static string javaDownloadURL32 = "jPortable_8_Update_101.paf";
         public static string javaDownloadURL64 = "jPortable64_8_Update_101.paf";
 

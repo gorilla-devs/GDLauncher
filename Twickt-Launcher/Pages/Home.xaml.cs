@@ -33,6 +33,7 @@ namespace Twickt_Launcher.Pages
                 var navWindow = Window.GetWindow(this) as NavigationWindow;
                 if (navWindow != null) navWindow.ShowsNavigationUI = false;
             }));
+            transition.SelectedIndex = 0;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -79,6 +80,7 @@ namespace Twickt_Launcher.Pages
                 totalUsers.Text = SessionData.userCount;
                 lastRegistered.Text = SessionData.lastUser;
             }
+            transition.SelectedIndex = 1;
         }
 
         private void websiteLink_MouseDown(object sender, MouseButtonEventArgs e)
@@ -167,6 +169,20 @@ namespace Twickt_Launcher.Pages
 
             System.Diagnostics.Process.Start("explorer.exe", argument);
 
+        }
+
+        private async void toAccount_Click(object sender, RoutedEventArgs e)
+        {
+            statistics_account.SelectedIndex = 1;
+            await Task.Delay(300);
+            statistics_account.SelectedIndex = 2;
+        }
+
+        private async void toStats_Click(object sender, RoutedEventArgs e)
+        {
+            statistics_account.SelectedIndex = 3;
+            await Task.Delay(300);
+            statistics_account.SelectedIndex = 0;
         }
     }
 }

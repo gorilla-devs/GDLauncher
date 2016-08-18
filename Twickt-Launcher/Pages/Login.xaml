@@ -7,39 +7,53 @@
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Twickt_Launcher.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF"
-      Title="Login" KeyDown="Page_KeyDown">
+      d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="White"
+      Title="Login" KeyDown="Page_KeyDown" Loaded="Page_Loaded">
 
     <Grid>
-        <StackPanel Margin="70 120 70 70">
-            <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth3">
-                <StackPanel Margin="20 20 20 20">
-                    <Label x:Name="label" Content="Twickt Launcher Login" HorizontalAlignment="Center" VerticalAlignment="Top" Width="233" Height="34" FontSize="21.333"/>
-                    <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center">
-                        <materialDesign:PackIcon Kind="Account" VerticalAlignment="Center"/>
-                        <TextBox x:Name="username" Margin="20 0 0 0" Width="200" Text=""  materialDesign:HintAssist.Hint="Username/Email" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center">
-                        <materialDesign:PackIcon Kind="Key" Foreground="{Binding ElementName=PasswordBox, Path=BorderBrush}" VerticalAlignment="Center"/>
-                        <PasswordBox x:Name="password" Margin="20 0 0 0" Width="200" materialDesign:HintAssist.Hint="Password"/>
-                    </StackPanel>
-                    <Button  x:Name="button" HorizontalAlignment="Center" Margin="0 10" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" VerticalAlignment="Top" Width="219" Click="button_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Padding="15,0,10,0">Log In</TextBlock>
-                            <materialDesign:PackIcon Kind="ArrowRight"/>
-                        </StackPanel>
-                    </Button>
-                    <StackPanel HorizontalAlignment="Center">
-                        <ProgressBar Name="loading" HorizontalAlignment="Left" Height="15" VerticalAlignment="Top" Width="219" IsIndeterminate="True" Visibility="Hidden"/>
-                        <CheckBox x:Name="keepMeIn" HorizontalAlignment="Center" Content="Keep me signed in" VerticalAlignment="Top" Checked="keepMeIn_Checked"/>
+        <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="1">
+
+            <!-- you can use a slide for each page, let's add a touch of fade for our first page  -->
+            <materialDesign:TransitionerSlide Background="White">
+                
+            </materialDesign:TransitionerSlide>
+            <materialDesign:TransitionerSlide Background="White" OpeningEffect="{materialDesign:TransitionEffect Kind=SlideInFromTop}">
+                <StackPanel>
+                    <StackPanel Margin="70 120 70 70">
+                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                            <StackPanel Margin="20 20 20 20">
+                                <Label x:Name="label" Content="Twickt Launcher Login" HorizontalAlignment="Center" VerticalAlignment="Top" Width="233" Height="34" FontSize="21.333"/>
+                                <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center">
+                                    <materialDesign:PackIcon Kind="Account" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="username" Margin="20 0 0 0" Width="200" Text=""  materialDesign:HintAssist.Hint="Username/Email" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center">
+                                    <materialDesign:PackIcon Kind="Key" Foreground="{Binding ElementName=PasswordBox, Path=BorderBrush}" VerticalAlignment="Center"/>
+                                    <PasswordBox x:Name="password" Margin="20 0 0 0" Width="200" materialDesign:HintAssist.Hint="Password"/>
+                                </StackPanel>
+                                <Button  x:Name="button" HorizontalAlignment="Center" Margin="0 10" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" VerticalAlignment="Top" Width="219" Click="button_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Padding="15,0,10,0">Log In</TextBlock>
+                                        <materialDesign:PackIcon Kind="ArrowRight"/>
+                                    </StackPanel>
+                                </Button>
+                                <StackPanel HorizontalAlignment="Center">
+                                    <ProgressBar Name="loading" HorizontalAlignment="Left" Height="15" VerticalAlignment="Top" Width="219" IsIndeterminate="True" Visibility="Hidden"/>
+                                    <CheckBox x:Name="keepMeIn" HorizontalAlignment="Center" Content="Keep me signed in" VerticalAlignment="Top" Checked="keepMeIn_Checked"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </materialDesign:Card>
+                        <materialDesign:Card Margin="0 10 0 0" Height="100" materialDesign:ShadowAssist.ShadowDepth="Depth3" Cursor="Hand" MouseLeftButtonDown="label1_MouseLeftButtonDown">
+                            <Label x:Name="label1" Content="Not Registered?" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+                        </materialDesign:Card>
+                        <Label Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: The launcher is still in beta and could have bug. Translations are still in progress</Label>
+                        <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: We are migrating our online infrastructure to some new datacenters. You could experience some problems</TextBlock>
                     </StackPanel>
                 </StackPanel>
-            </materialDesign:Card>
-            <materialDesign:Card Margin="0 10 0 0" Height="100" materialDesign:ShadowAssist.ShadowDepth="Depth3" Cursor="Hand" MouseLeftButtonDown="label1_MouseLeftButtonDown">
-                <Label x:Name="label1" Content="Not Registered?" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
-            </materialDesign:Card>
-            <Label Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: The launcher is still in beta and could have bug. Translations are still in progress</Label>
-            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: We are migrating our online infrastructure to some new datacenters. You could experience some problems</TextBlock>
-        </StackPanel>
+            </materialDesign:TransitionerSlide>
+            <materialDesign:TransitionerSlide Background="#4CAF50">
+                <TextBlock FontSize="20" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center">Loading</TextBlock>
+            </materialDesign:TransitionerSlide>
+        </materialDesign:Transitioner>
     </Grid>
 </Page>

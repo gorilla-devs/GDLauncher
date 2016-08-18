@@ -41,7 +41,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -169,6 +169,9 @@
     <Compile Include="Dialogs\AddLocalModpack.xaml.cs">
       <DependentUpon>AddLocalModpack.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\AddPack.xaml.cs">
+      <DependentUpon>AddPack.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Changelog.xaml.cs">
       <DependentUpon>Changelog.xaml</DependentUpon>
     </Compile>
@@ -223,6 +226,10 @@
       <DependentUpon>DebugOutputConsole.xaml</DependentUpon>
     </Compile>
     <Page Include="Dialogs\AddLocalModpack.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\AddPack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Twickt_Launcher"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         mc:Ignorable="d"
-        Title="Window1" Height="700" Width="700" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="Green" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        Title="Twickt Launcher" Height="700" Width="700" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="Green" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <materialDesign:DialogHost Identifier="RootDialog">
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
             <materialDesign:DrawerHost.LeftDrawerContent >

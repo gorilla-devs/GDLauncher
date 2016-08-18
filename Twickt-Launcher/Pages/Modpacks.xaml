@@ -23,7 +23,7 @@
                     <ListBoxItem Name="local" Width="80" HorizontalContentAlignment="Center">Locali</ListBoxItem>
                 </ListBox>
                 <Label x:Name="remoteModpacksLabel" Content="Modpackslist" Margin="0" Width="167" FontSize="18.667"/>
-                <ListBox x:Name="ModpacksLRList" Height="300" Margin="0" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" SelectionChanged="ModpacksLRList_SelectionChanged">
+                <ListBox x:Name="ModpacksLRList" Height="300" Foreground="Black" Margin="0" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" SelectionChanged="ModpacksLRList_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}">
@@ -52,16 +52,21 @@
                     </Button>
                 </StackPanel>
 
-                <Button x:Name="start" Content="Start" Foreground="White" Width="167" Height="71" FontSize="26.667" Click="start_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2"/>
+                <Button x:Name="start" Content="Play" Foreground="White" Width="167" Height="71" FontSize="26.667" Click="start_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2"/>
             </StackPanel>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="485">
-                <materialDesign:Card Margin="10" Height="600">
+                <Button Name="addpack" Width="100" HorizontalAlignment="Left" Margin="10 10 0 0" Foreground="White" Click="addpack_Click">Add Pack</Button>
+                <materialDesign:Card Margin="10" Height="570">
                     <StackPanel>
-                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="10" FontSize="16" Margin="20" Height="350">
+                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="10" FontSize="16" Margin="20 10 20 10" Height="350">
                             <TextBlock x:Name="description" TextWrapping="Wrap"></TextBlock>
                         </materialDesign:Card>
                         <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="10" FontSize="16" Margin="20 0 20 0" Height="150">
-                            <Label Name="isinstalled">Installed</Label>
+                            <StackPanel>
+                                <Label Name="isinstalled">Installed</Label>
+                                <Label Name="version">Version</Label>
+                                <Label Name="forge">Forge</Label>
+                            </StackPanel>
                         </materialDesign:Card>
                     </StackPanel>
                 </materialDesign:Card>

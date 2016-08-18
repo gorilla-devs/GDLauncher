@@ -11,65 +11,103 @@
       Title="Home" ShowsNavigationUI="False" Background="White" Loaded="Page_Loaded">
 
     <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <materialDesign:Card Margin="10" Height="100" Width="300">
-                <Image x:Name="image" HorizontalAlignment="Center" Height="46" VerticalAlignment="Center" Width="230" Source="/Twickt Launcher;component/Images/Twickt Logo 200x41px v2.png" Stretch="UniformToFill"/>
-            </materialDesign:Card>
-            <materialDesign:Card Margin="10" Height="100" Width="300">
-                <Label x:Name="label" Content="The Simpler, The Better!" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="22"/>
-            </materialDesign:Card>
-        </StackPanel>
-
-
-        <ScrollViewer Width="674" Margin="10,123,10,192" Visibility="Hidden">
+        <ScrollViewer Width="674" Margin="10,0,10,192" Visibility="Hidden">
             <TextBlock x:Name="changelogs" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Background="#BBDEFB" Padding="10"/>
         </ScrollViewer>
-        <Button x:Name="button" Content="Modpacks" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="10,462,0,0" VerticalAlignment="Top" Width="674" Height="46" Click="button_Click"/>
-        <WrapPanel Margin="20,147,10,168" Orientation="Horizontal" HorizontalAlignment="Center" Width="664">
-            <materialDesign:Card Width="400" Margin="83 10 10 10" Height="289">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="140" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <materialDesign:PackIcon Kind="InformationOutline"  Width="150" Height="150" HorizontalAlignment="Center" Foreground="#BBDEFB"/>
-                    <Button Name="modpack2start" Grid.Row="0" IsEnabled="True" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-            			HorizontalAlignment="Right" VerticalAlignment="Bottom"
-            			Margin="0 0 16 -20" Click="modpack2start_Click" Loaded="modpack2start_Loaded">
-                        <materialDesign:PackIcon Kind="Account" />
-                    </Button>
-                    <StackPanel Grid.Row="1" Margin="8 24 8 0" >
-                        <TextBlock FontWeight="Bold"><Run Text="Some info"/></TextBlock>
-                        <TextBlock Name="totalUsers" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
-                        <TextBlock Name="lastRegistered" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
-                        <Button Width="100" HorizontalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth2" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click_1">
-                            <materialDesign:PackIcon Kind="Autorenew" Width="33" Height="22" Foreground="#2962FF"/>
-                        </Button>
-                        <Label Name="statisticsupdatedlabel" FontSize="10" HorizontalAlignment="Center" Foreground="Green" Visibility="Hidden">Updated</Label>
+        <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="1">
+            <materialDesign:TransitionerSlide Background="#4CAF50">
+                <TextBlock FontSize="20" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center">Loading</TextBlock>
+            </materialDesign:TransitionerSlide>
+            <materialDesign:TransitionerSlide Background="White" OpeningEffect="{materialDesign:TransitionEffect Kind=FadeIn}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <materialDesign:Card Margin="10" Height="100" Width="300">
+                            <Image x:Name="image" HorizontalAlignment="Center" Height="46" VerticalAlignment="Center" Width="230" Source="/Twickt Launcher;component/Images/Twickt Logo 200x41px v2.png" Stretch="UniformToFill"/>
+                        </materialDesign:Card>
+                        <materialDesign:Card Margin="10" Height="100" Width="300">
+                            <Label x:Name="label" Content="The Simpler, The Better!" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="22"/>
+                        </materialDesign:Card>
                     </StackPanel>
-                </Grid>
-            </materialDesign:Card>
-        </WrapPanel>
-        <StackPanel Orientation="Horizontal">
-            <Button x:Name="changelog" Content="Changelogs" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="155,121,0,0" VerticalAlignment="Top" Width="180" Height="39" Click="changelog_Click"/>
-            <Button x:Name="problems" Content="Problems?" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="20,121,0,0" VerticalAlignment="Top" Width="180" Height="39" Click="problems_Click"/>
-        </StackPanel>
-        <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,525,0,0" HorizontalAlignment="Center">
-                <materialDesign:Card Margin="10 0 5 0" Cursor="Hand" MouseDown="twitterLink_MouseDown">
-                    <Image x:Name="twitterLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/twitter.png"/>
-                </materialDesign:Card>
-                <materialDesign:Card Margin="10 0 5 0"  Cursor="Hand" MouseDown="facebookLink_MouseDown">
-                    <Image x:Name="facebookLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/facebook.png"/>
-                </materialDesign:Card>
-                <materialDesign:Card Margin="10 0 5 0"  Cursor="Hand" MouseDown="emailLink_MouseDown">
-                    <Image x:Name="emailLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/gmail.png"/>
-                </materialDesign:Card>
-                <materialDesign:Card Margin="10 0 5 0"  Cursor="Hand" MouseDown="websiteLink_MouseDown">
-                    <Image x:Name="websiteLink" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/website.png"/>
-                </materialDesign:Card>
-            </StackPanel>
-        </StackPanel>
+                    <WrapPanel Margin="20,0,10,0" Orientation="Horizontal" HorizontalAlignment="Center" Width="664">
+                        <materialDesign:Card Width="400" Margin="83 0 10 10" Height="289">
+                            <materialDesign:Transitioner Name="statistics_account" Grid.Row="1" SelectedIndex="0">
+                                <materialDesign:TransitionerSlide Background="White">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="140" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <materialDesign:PackIcon Kind="InformationOutline"  Width="150" Height="150" HorizontalAlignment="Center" Foreground="#BBDEFB"/>
+                                        <Button Name="toAccount" Grid.Row="0" IsEnabled="True" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
+            			                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            			                Margin="0 0 16 -20" Loaded="modpack2start_Loaded" Click="toAccount_Click">
+                                            <materialDesign:PackIcon Kind="Account" />
+                                        </Button>
+                                        <StackPanel Grid.Row="1" Margin="8 24 8 0" >
+                                            <TextBlock FontWeight="Bold"><Run Text="Some info"/></TextBlock>
+                                            <TextBlock Name="totalUsers" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+                                            <TextBlock Name="lastRegistered" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
+                                            <Button Width="100" HorizontalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth2" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click_1">
+                                                <materialDesign:PackIcon Kind="Autorenew" Width="33" Height="22" Foreground="#2962FF"/>
+                                            </Button>
+                                            <Label Name="statisticsupdatedlabel" FontSize="10" HorizontalAlignment="Center" Foreground="Green" Visibility="Hidden">Updated</Label>
+                                        </StackPanel>
+                                    </Grid>
+                                </materialDesign:TransitionerSlide>
+                                <materialDesign:TransitionerSlide Background="#2962FF">
+                                </materialDesign:TransitionerSlide>
+                                <materialDesign:TransitionerSlide Background="White">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="140" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <materialDesign:PackIcon Kind="Account"  Width="150" Height="150" HorizontalAlignment="Center" Foreground="#BBDEFB"/>
+                                        <Button Name="toStats" Grid.Row="0" IsEnabled="True" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
+            			                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            			                    Margin="0 0 16 -20" Click="toStats_Click">
+                                            <materialDesign:PackIcon Kind="InformationOutline" />
+                                        </Button>
+                                        <StackPanel Grid.Row="1" Margin="8 24 8 0" >
+                                            <TextBlock FontWeight="Bold"><Run Text="Account info"/></TextBlock>
+                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Your Username</TextBlock>
+                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Your Email</TextBlock>
+                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Other Info</TextBlock>
+                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Other Info</TextBlock>
+                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Other Info</TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+                                </materialDesign:TransitionerSlide>
+                                <materialDesign:TransitionerSlide Background="#2962FF">
+                                </materialDesign:TransitionerSlide>
+                            </materialDesign:Transitioner>
+                        </materialDesign:Card>
+                    </WrapPanel>
+                    <Button x:Name="button" Content="Modpacks" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="10,0,0,0" VerticalAlignment="Top" Width="674" Height="46" Click="button_Click"/>
+                    <StackPanel Orientation="Horizontal">
+                    <Button x:Name="changelog" Content="Changelogs" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="155,10,0,0" VerticalAlignment="Top" Width="180" Height="39" Click="changelog_Click"/>
+                    <Button x:Name="problems" Content="Problems?" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="20,10,0,0" VerticalAlignment="Top" Width="180" Height="39" Click="problems_Click"/>
+                </StackPanel>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,0" HorizontalAlignment="Center">
+                        <materialDesign:Card Margin="10 10 5 0" Cursor="Hand" MouseDown="twitterLink_MouseDown">
+                            <Image x:Name="twitterLink" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/twitter.png"/>
+                        </materialDesign:Card>
+                        <materialDesign:Card Margin="10 10 5 0"  Cursor="Hand" MouseDown="facebookLink_MouseDown">
+                            <Image x:Name="facebookLink" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/facebook.png"/>
+                        </materialDesign:Card>
+                        <materialDesign:Card Margin="10 10 5 0"  Cursor="Hand" MouseDown="emailLink_MouseDown">
+                            <Image x:Name="emailLink" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/gmail.png"/>
+                        </materialDesign:Card>
+                        <materialDesign:Card Margin="10 10 5 0"  Cursor="Hand" MouseDown="websiteLink_MouseDown">
+                            <Image x:Name="websiteLink" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center" Height="55" Width="55" Source="/Twickt Launcher;component/Images/Icons/website.png"/>
+                        </materialDesign:Card>
+                    </StackPanel>
+                </StackPanel>
+                </StackPanel>
+            </materialDesign:TransitionerSlide>
+        </materialDesign:Transitioner>
     </Grid>
 </Page>
