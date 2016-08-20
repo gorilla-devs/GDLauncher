@@ -82,18 +82,19 @@ namespace Twickt_Launcher.Pages
                 SessionData.isAdmin = userdata[3];
                 if(userdata[3] == "false")
                 {
-                    using (var webClient = new System.Net.WebClient())
+                    try
                     {
-                        var json = webClient.DownloadString(config.updateWebsite + "/Modpacks.json");
-                        dynamic stuff = JObject.Parse(json);
-                        string OnlyAdmin = stuff.OnlyAdmin;
-                        if (OnlyAdmin.ToString() == "true")
+                        var client1 = new WebClient();
+                        var values1 = new System.Collections.Specialized.NameValueCollection();
+                        var response1 = await client1.UploadValuesTaskAsync(config.launcherStatusWebService, values1);
+                        var responseString1 = Encoding.Default.GetString(response1);
+                        if (responseString1.Contains("enabled;true"))
                         {
-                            await DialogHost.Show(new Dialogs.OptionsUpdates("Actually only Admins can login. We are sorry for that!", 350), "RootDialog", ExtendedOpenedEventHandler);
-                            loading.Visibility = Visibility.Hidden;
-                            return;
+                            MessageBox.Show("Attualmente solo i fucking admin possono accedere. Tu sei plebeo e riprovi piu' tardi");
+                            Application.Current.Shutdown();
                         }
                     }
+                    catch { }
                 }
                 Window1.singleton.MenuToggleButton.IsEnabled = true;
                 Window1.singleton.popupbox.IsEnabled = true;

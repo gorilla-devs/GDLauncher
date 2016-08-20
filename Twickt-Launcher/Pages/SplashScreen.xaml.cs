@@ -39,17 +39,19 @@ namespace Twickt_Launcher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            using (var webClient = new System.Net.WebClient())
+            try
             {
-                var json = webClient.DownloadString(config.updateWebsite + "/Modpacks.json");
-                dynamic stuff = JObject.Parse(json);
-                string launcherStatus = stuff.LauncherStatus;
-                if(launcherStatus.ToString() == "disabled")
+                var client = new WebClient();
+                var values = new System.Collections.Specialized.NameValueCollection();
+                var response = await client.UploadValuesTaskAsync(config.launcherStatusWebService, values);
+                var responseString = Encoding.Default.GetString(response);
+                if (responseString.Contains("disabled"))
                 {
-                    MessageBox.Show("Launcher in manutenzione. Riprova tra poco");
+                    MessageBox.Show("Launcher attualmente in manutenzione, riprova piu' tardi");
                     Application.Current.Shutdown();
                 }
             }
+            catch { }
 
             Windows.DebugOutputConsole console = new Windows.DebugOutputConsole();
             if (Window1.singleton.started == false)

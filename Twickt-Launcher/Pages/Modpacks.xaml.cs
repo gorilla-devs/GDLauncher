@@ -37,7 +37,7 @@ namespace Twickt_Launcher.Pages
             InitializeComponent();
             Window1.singleton.MenuToggleButton.IsEnabled = true;
             singleton = this;
-            //transition.SelectedIndex = 1;
+            transition.SelectedIndex = 0;
         }
 
         private async void start_Click(object sender, RoutedEventArgs e)
@@ -57,9 +57,9 @@ namespace Twickt_Launcher.Pages
                 var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
 
                 //SE LA DIRECTORY ESISTE INIZIA, ALTRIMENTI LA CREA
-                if (!Directory.Exists(config.M_F_P + info[5] + "\\instances\\" + info[5]))
+                if (!Directory.Exists(config.M_F_P + info[4] + "\\instances\\" + info[4]))
                 {
-                    Directory.CreateDirectory(config.M_F_P + info[5] + "\\instances\\" + info[5]);
+                    Directory.CreateDirectory(config.M_F_P + info[4] + "\\instances\\" + info[4]);
                 }
                 var resultCheck = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
                 if (resultCheck.ToString() == "DownloadNeeded")
@@ -85,7 +85,7 @@ namespace Twickt_Launcher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            //transition.SelectedIndex = 1;
+            transition.SelectedIndex = 1;
             if (!Directory.Exists(config.LocalModpacks))
             {
                 Directory.CreateDirectory(config.LocalModpacks);
@@ -138,7 +138,7 @@ namespace Twickt_Launcher.Pages
                 var remotelist = await Classes.RemoteModpacks.GetModpacksList();
                 refreshRemoteModpacks.IsEnabled = true;
 
-                foreach (var x in remotelist.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.None))
+                foreach (var x in remotelist.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
                     ModpacksLRList.Items.Add(z[0]);

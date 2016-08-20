@@ -75,66 +75,28 @@ namespace Twickt_Launcher.Classes
             }
         }
 
-        public static async Task<string> GetModpacksDescription(string modpackname)
-        {
-            if (description.ContainsKey(modpackname))
-            {
-                return description[modpackname];
-            }
-            else
-            {
-                WebClient c = new WebClient();
-                string data = "";
-                c.DownloadStringCompleted += (sender, e) =>
-                {
-                    data = e.Result;
-                };
-                await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "/Modpacks.json"));
-                List<string> modpacks = new List<string>();
-                dynamic json = JsonConvert.DeserializeObject(data);
-                foreach (var item in json["Modpacks"])
-                {
-                    var name = (string)item["name"];
-                    var descriptionLocal = (string)item["description"];
-                    if (modpackname == name)
-                    {
-                        description[modpackname] = descriptionLocal;
-                        return descriptionLocal;
-                    }
-                }
-                return null;
-            }
-        }
-
         public static async Task<List<string[]>> GetModpacksFiles(string modpackname, bool justname = false)
         {
-            try
+            List<string[]> libraries = new List<string[]>();
+            string temp;
+            var client = new WebClient();
+            var values = new System.Collections.Specialized.NameValueCollection();
+            values["target"] = "specific";
+            values["name"] = modpackname;
+            values["allinfo"] = "true";
+
+            var response = await client.UploadValuesTaskAsync(config.modpacksWebService, values);
+
+            var responseString = Encoding.Default.GetString(response);
+
+            if (!responseString.Contains("0results"))
+                temp = responseString.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None)[6];
+            else
             {
-                WebClient c = new WebClient();
-                string data = "";
-                c.DownloadStringCompleted += (sender, e) =>
-                {
-                    try
-                    {
-                        data = e.Result;
-                    }
-                    catch
-                    {
-                        MessageBox.Show(lang.languageswitch.couldNotGetModpackFiles);
-                    }
-                };
-                await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
-                List<string> modpacks = new List<string>();
-                dynamic json1 = JsonConvert.DeserializeObject(data);
-                foreach (var item in json1["Modpacks"])
-                {
-                    var name = (string)item["name"];
-                    if (name == modpackname)
-                        modpackname = (string)item["file"];
-                }
-                await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + modpackname));
-                List<string[]> libraries = new List<string[]>();
-                dynamic json = JsonConvert.DeserializeObject(data);
+                MessageBox.Show("Error getting modpacks");
+                return null;
+            }
+            dynamic json = JsonConvert.DeserializeObject(temp);
 
                 foreach (var item in json["libraries"])
                 {
@@ -171,120 +133,35 @@ namespace Twickt_Launcher.Classes
 
                 }
                 return libraries;
-
-            }
-            catch
-            {
-                MessageBox.Show(lang.languageswitch.errorGettingModpackFiles);
-                return null;
-            }
         }
 
         public static async Task<string> IsModpackForgeNeeded(string modpackname)
         {
-            WebClient c = new WebClient();
-            string data = "";
-            c.DownloadStringCompleted += (sender, e) =>
-            {
-                data = e.Result;
-            };
-            await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
-            List<string> modpacks = new List<string>();
-            dynamic json = JsonConvert.DeserializeObject(data);
-            foreach (var item in json["Modpacks"])
-            {
-                var name = (string)item["name"];
-                var forge = (string)item["forge"];
-                if (modpackname == name)
-                {
-                    return forge;
-                }
-            }
-            return null;
+            var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(modpackname));
+            var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+            return info[3];
+
         }
 
         public static async Task<string> GetModpacksDir(string modpackname)
         {
-            WebClient c = new WebClient();
-            string data = "";
-            c.DownloadStringCompleted += (sender, e) =>
-            {
-                data = e.Result;
-            };
-            await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
-            dynamic json = JsonConvert.DeserializeObject(data);
-            foreach (var item in json["Modpacks"])
-            {
-                var name = (string)item["name"];
-                var file = (string)item["file"];
-                if (modpackname == name)
-                {
-                    return file.Replace(".json", "");
-                }
-            }
-            return null;
+            var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(modpackname));
+            var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+            return info[4];
         }
 
         public static async Task<List<string>> GetMinecraftUrlsAndData(string modpackname)
         {
-            List<string> info = new List<string>();
-            /*
-             * Serve
-             * -la versione
-             * l'url del json
-             * 
-             * */
-            WebClient c = new WebClient();
-            string data = "";
-            c.DownloadStringCompleted += (sender, e) =>
-            {
-                data = e.Result;
-            };
-            await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
-            dynamic json = JsonConvert.DeserializeObject(data);
-            foreach (var item in json["Modpacks"])
-            {
-                var name = (string)item["name"];
-                var version = (string)item["version"];
-                var directory = (string)item["directory"];
-                var forge = (string)item["forge"];
-                var strictFiles = (string)item["strictFiles"];
-
-                if (modpackname == name)
-                {
-                    info.Add(version);
-                    info.Add(directory);
-                    info.Add(forge);
-                    info.Add(strictFiles);
-                }
-            }
-            return info;
+            var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(modpackname));
+            var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+            List<string> returned = new List<string>();
+            returned.Add(info[2]);
+            returned.Add(info[4]);
+            returned.Add(info[3]);
+            returned.Add(info[5]);
+            return returned;
         }
 
-        public static async Task<string[]> GetModpacksDirectoryList()
-        {
-            List<string> info = new List<string>();
-            /*
-             * Serve
-             * -la versione
-             * l'url del json
-             * 
-             * */
-            WebClient c = new WebClient();
-            string data = "";
-            c.DownloadStringCompleted += (sender, e) =>
-            {
-                data = e.Result;
-            };
-            await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
-            dynamic json = JsonConvert.DeserializeObject(data);
-            foreach (var item in json["Modpacks"])
-            {
-                var directory = (string)item["directory"];
-                    info.Add(directory);
-            }
-            return info.ToArray();
-        }
 
     }
 }

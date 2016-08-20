@@ -139,5 +139,17 @@ namespace Twickt_Launcher.Properties {
                 this["sessiondata"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("true")]
+        public string justUpdated {
+            get {
+                return ((string)(this["justUpdated"]));
+            }
+            set {
+                this["justUpdated"] = value;
+            }
+        }
     }
 }

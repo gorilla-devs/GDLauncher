@@ -13,24 +13,27 @@ namespace Twickt_Launcher.Classes
         public static async Task<string[]> GetModpacksDirectoryList()
         {
             List<string> info = new List<string>();
-            /*
-             * Serve
-             * -la versione
-             * l'url del json
-             * 
-             * */
-            WebClient c = new WebClient();
-            string data = "";
-            c.DownloadStringCompleted += (sender, e) =>
+            string[] temp;
+            var client = new WebClient();
+            var values = new System.Collections.Specialized.NameValueCollection();
+            values["target"] = "generic";
+
+            var response = await client.UploadValuesTaskAsync(config.modpacksWebService, values);
+
+            var responseString = Encoding.Default.GetString(response);
+
+            if (!responseString.Contains("0results"))
             {
-                data = e.Result;
-            };
-            await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "Modpacks.json"));
-            dynamic json = JsonConvert.DeserializeObject(data);
-            foreach (var item in json["Modpacks"])
+                foreach (var x in responseString.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                    info.Add(z[4]);
+                }
+            }
+            else
             {
-                var directory = (string)item["directory"];
-                info.Add(directory);
+                System.Windows.MessageBox.Show("Error getting modpacks");
+                return null;
             }
             return info.ToArray();
         }

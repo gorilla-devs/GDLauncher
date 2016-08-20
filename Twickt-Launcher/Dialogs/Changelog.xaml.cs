@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +24,39 @@ namespace Twickt_Launcher.Dialogs
         public Changelog()
         {
             InitializeComponent();
+            Task.Factory.StartNew(() => loadChangelog()).Wait();
+            //for(qualcosa)
+            //crea una nuova card
+
+        }
+        public static async Task loadChangelog()
+        {
+            string data = "";
+            WebClient c = new WebClient();
+            c.DownloadStringCompleted += (s, ex) =>
+            {
+                try
+                {
+                    data = ex.Result;
+                }
+                catch
+                {
+                    MessageBox.Show("Non e' stato possibile scaricare il changelogs");
+                }
+            };
+            /*changelogs.Text = "Loading...";
+            changelogs.FontSize = 32;
+            changelogs.FontSize = 12;*/
+            if (SessionData.changelog == "")
+            {
+                await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "/changelog.html"));
+                SessionData.changelog = data;
+                //changelogs.Text = data;
+            }
+            else
+            {
+                //changelogs.Text = SessionData.changelog;
+            }
         }
     }
 }

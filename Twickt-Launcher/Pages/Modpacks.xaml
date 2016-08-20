@@ -10,67 +10,76 @@
       Title="Modpacks" Loaded="Page_Loaded">
 
     <Grid>
-        <StackPanel Orientation="Horizontal">
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
-                <StackPanel Orientation="Horizontal" Width="200">
-                    <TextBox x:Name="remoteModpacksSearch" Height="39" Width="120" Margin="20 20 10 20" TextWrapping="Wrap" Text="" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" TextChanged="textBox_TextChanged"/>
-                    <Button Name="filter" Click="filter_Click" Style="{StaticResource MaterialDesignFlatButton}">
-                        <materialDesign:PackIcon Kind="Filter" VerticalAlignment="Center"/>
-                    </Button>
-                </StackPanel>
-                <ListBox Name="modpackstypeselection" SelectionMode="Single" Style="{StaticResource MaterialDesignToolToggleListBox}" SelectedIndex="0" HorizontalAlignment="Center" SelectionChanged="modpackstypeselection_SelectionChanged">
-                    <ListBoxItem Name="remote" Width="80" HorizontalContentAlignment="Center">Remote</ListBoxItem>
-                    <ListBoxItem Name="local" Width="80" HorizontalContentAlignment="Center">Locali</ListBoxItem>
-                </ListBox>
-                <Label x:Name="remoteModpacksLabel" Content="Modpackslist" Margin="0" Width="167" FontSize="18.667"/>
-                <ListBox x:Name="ModpacksLRList" Height="300" Foreground="Black" Margin="0" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" SelectionChanged="ModpacksLRList_SelectionChanged">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}">
-                                <TextBlock.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem x:Name="delete" Header="Uninstall Modpack"/>
-                                        <MenuItem x:Name="mods" Header="Mods"/>
-                                        <MenuItem Header="Not Yet Implemented" IsEnabled="False"/>
-                                    </ContextMenu>
-                                </TextBlock.ContextMenu>
-                            </TextBlock>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+        <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="1">
+            <materialDesign:TransitionerSlide Background="#4CAF50">
+                <TextBlock FontSize="20" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center">Loading</TextBlock>
+            </materialDesign:TransitionerSlide>
+            <materialDesign:TransitionerSlide Background="White" OpeningEffect="{materialDesign:TransitionEffect Kind=FadeIn}">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" Width="200">
+                            <TextBox x:Name="remoteModpacksSearch" Height="39" Width="120" Margin="20 20 10 20" TextWrapping="Wrap" Text="" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" TextChanged="textBox_TextChanged"/>
+                            <Button Name="filter" Click="filter_Click" Style="{StaticResource MaterialDesignFlatButton}">
+                                <materialDesign:PackIcon Kind="Filter" VerticalAlignment="Center"/>
+                            </Button>
+                        </StackPanel>
+                        <ListBox Name="modpackstypeselection" SelectionMode="Single" Style="{StaticResource MaterialDesignToolToggleListBox}" SelectedIndex="0" HorizontalAlignment="Center" SelectionChanged="modpackstypeselection_SelectionChanged">
+                            <ListBoxItem Name="remote" Width="80" HorizontalContentAlignment="Center">Remote</ListBoxItem>
+                            <ListBoxItem Name="local" Width="80" HorizontalContentAlignment="Center">Locali</ListBoxItem>
+                        </ListBox>
+                        <Label x:Name="remoteModpacksLabel" Content="Modpackslist" Margin="0" Width="167" FontSize="18.667"/>
+                        <ListBox x:Name="ModpacksLRList" Height="300" Foreground="Black" Margin="0" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" SelectionChanged="ModpacksLRList_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}">
+                                        <TextBlock.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem x:Name="delete" Header="Uninstall Modpack"/>
+                                                <MenuItem x:Name="mods" Header="Mods"/>
+                                                <MenuItem x:Name="changelog" Header="Changelog"/>
+                                                <MenuItem x:Name="report" Header="Report"/>
+                                                <MenuItem Header="Not Yet Implemented" IsEnabled="False"/>
+                                            </ContextMenu>
+                                        </TextBlock.ContextMenu>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
-                <Button x:Name="refreshRemoteModpacks" Margin="0 20 0 0" Foreground="White" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" Click="refreshRemoteModpacks_Click">
-                    <materialDesign:PackIcon Kind="Autorenew" Width="33" Height="22" />
-                </Button>
+                        <Button x:Name="refreshRemoteModpacks" Margin="0 20 0 0" Foreground="White" Width="167" materialDesign:ShadowAssist.ShadowDepth="Depth2" Click="refreshRemoteModpacks_Click">
+                            <materialDesign:PackIcon Kind="Autorenew" Width="33" Height="22" />
+                        </Button>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 5 ">
-                    <Button x:Name="addLocalModpack" Width="80" Margin="0 1 3 1" Foreground="White" Click="addLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
-                        <materialDesign:PackIcon Kind="Plus" />
-                    </Button>
-                    <Button x:Name="deleteLocalModpack" Margin="3 1 0 1" Width="80" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Click="deleteLocalModpack_Click">
-                        <materialDesign:PackIcon Kind="Delete" />
-                    </Button>
-                </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 5 ">
+                            <Button x:Name="addLocalModpack" Width="80" Margin="0 1 3 1" Foreground="White" Click="addLocalModpack_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+                                <materialDesign:PackIcon Kind="Plus" />
+                            </Button>
+                            <Button x:Name="deleteLocalModpack" Margin="3 1 0 1" Width="80" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Click="deleteLocalModpack_Click">
+                                <materialDesign:PackIcon Kind="Delete" />
+                            </Button>
+                        </StackPanel>
 
-                <Button x:Name="start" Content="Play" Foreground="White" Width="167" Height="71" FontSize="26.667" Click="start_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2"/>
-            </StackPanel>
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="485">
-                <Button Name="addpack" Width="100" HorizontalAlignment="Left" Margin="10 10 0 0" Foreground="White" Click="addpack_Click">Add Pack</Button>
-                <materialDesign:Card Margin="10" Height="570">
-                    <StackPanel>
-                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="10" FontSize="16" Margin="20 10 20 10" Height="350">
-                            <TextBlock x:Name="description" TextWrapping="Wrap"></TextBlock>
-                        </materialDesign:Card>
-                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="10" FontSize="16" Margin="20 0 20 0" Height="150">
+                        <Button x:Name="start" Content="Play" Foreground="White" Width="167" Height="71" FontSize="26.667" Click="start_Click" materialDesign:ShadowAssist.ShadowDepth="Depth2"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="485">
+                        <Button Name="addpack" Width="100" HorizontalAlignment="Left" Margin="10 10 0 0" Foreground="White" Click="addpack_Click">Add Pack</Button>
+                        <materialDesign:Card Margin="10" Height="570">
                             <StackPanel>
-                                <Label Name="isinstalled">Installed</Label>
-                                <Label Name="version">Version</Label>
-                                <Label Name="forge">Forge</Label>
+                                <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="10" FontSize="16" Margin="20 10 20 10" Height="350">
+                                    <TextBlock x:Name="description" TextWrapping="Wrap"></TextBlock>
+                                </materialDesign:Card>
+                                <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth2" Padding="10" FontSize="16" Margin="20 0 20 0" Height="150">
+                                    <StackPanel>
+                                        <Label Name="isinstalled">Installed</Label>
+                                        <Label Name="version">Version</Label>
+                                        <Label Name="forge">Forge</Label>
+                                    </StackPanel>
+                                </materialDesign:Card>
                             </StackPanel>
                         </materialDesign:Card>
                     </StackPanel>
-                </materialDesign:Card>
-            </StackPanel>
-        </StackPanel>
+                </StackPanel>
+            </materialDesign:TransitionerSlide>
+        </materialDesign:Transitioner>
     </Grid>
 </Page>

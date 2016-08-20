@@ -157,6 +157,7 @@ namespace Twickt_Launcher.Classes
                     return;
                 }
                 Properties.Settings.Default["firstTimeHowTo"] = "true";
+                Properties.Settings.Default["justUpdated"] = "true";
                 Properties.Settings.Default.Save();
                 ProcessStartInfo Info = new ProcessStartInfo();
                 Info.Arguments = "/C choice /C Y /N /D Y /T 3 & Del " + "\"" +

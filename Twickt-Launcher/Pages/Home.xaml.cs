@@ -38,32 +38,6 @@ namespace Twickt_Launcher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            string data = "";
-            WebClient c = new WebClient();
-            c.DownloadStringCompleted += (s, ex) =>
-            {
-                try
-                {
-                    data = ex.Result;
-                }
-                catch
-                {
-                    MessageBox.Show("Non e' stato possibile scaricare il changelogs");
-                }
-            };
-            changelogs.Text = "Loading...";
-            changelogs.FontSize = 32;
-            changelogs.FontSize = 12;
-            if(SessionData.changelog == "")
-            {
-                await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "/changelog.html"));
-                SessionData.changelog = data;
-                changelogs.Text = data;
-            }
-            else
-            {
-                changelogs.Text = SessionData.changelog;
-            }
             if(SessionData.lastUser == "" || SessionData.userCount == "")
             {
                 var client = new WebClient();
@@ -81,6 +55,13 @@ namespace Twickt_Launcher.Pages
                 lastRegistered.Text = SessionData.lastUser;
             }
             transition.SelectedIndex = 1;
+            if(Properties.Settings.Default["justUpdated"].ToString() == "true")
+            {
+                await Task.Delay(400);
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
+                Properties.Settings.Default["justUpdated"] = "false";
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void websiteLink_MouseDown(object sender, MouseButtonEventArgs e)
@@ -137,7 +118,6 @@ namespace Twickt_Launcher.Pages
         private async void changelog_Click(object sender, RoutedEventArgs e)
         {
             await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
-            //await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
