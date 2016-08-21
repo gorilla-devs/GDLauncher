@@ -103,6 +103,7 @@ namespace Twickt_Launcher.Classes
                     var package = (string)item["name"];
                     var hash = (string)item["hash"]; ;
                     var url = (string)item["url"]; ;
+                    var check = (string)item["check"];
                     var baseurl = config.updateWebsite;
                     var finalurl = "";
 
@@ -126,10 +127,9 @@ namespace Twickt_Launcher.Classes
                             {
                                 finalurl += "/" + s;
                             }
-
                         }
                     }
-                    libraries.Add(new string[4] { package, hash, @"\instances\" + finalurl.Replace("/", "\\"), config.updateWebsite + url });
+                    libraries.Add(new string[5] { package, hash, @"\instances\" + finalurl.Replace("/", "\\"), config.updateWebsite + url, check });
 
                 }
                 return libraries;

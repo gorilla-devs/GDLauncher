@@ -136,8 +136,8 @@ namespace Twickt_Launcher.Classes
                                "--accessToken 0 " +
                                "--version " + downloadingVersion[0] + (forge == true ? "-forge" + config.forgeversion : "") + " " +
                                "--gameDir " + gamedirectory +
-                               "--assetsDir " + config.minecraftfolder + "\\" + downloadingVersion[1] + "\\assets\\ " +
-                               "--assetIndex " + config.minecraftfolder + "\\" + downloadingVersion[0] + " " +
+                               "--assetsDir " + config.M_F_P + "\\" + downloadingVersion[1] + "\\assets\\ " +
+                               "--assetIndex " + downloadingVersion[0] + " " +
                                "--userProperties {} " +
                                //"--uuid " + MojangLogin.getUUID() + " " +
                                "--uuid 0 ";
@@ -152,9 +152,9 @@ namespace Twickt_Launcher.Classes
                         ).Replace(
                         "${game_directory}", gamedirectory
                         ).Replace(
-                        "${assets_root}", config.minecraftfolder + "\\\\" + downloadingVersion[1] + "\\assets\\"
+                        "${assets_root}", config.M_F_P + "\\" + downloadingVersion[1] + "\\assets\\"
                         ).Replace(
-                        "${assets_index_name}", config.minecraftfolder + "\\\\" + downloadingVersion[0]
+                        "${assets_index_name}", downloadingVersion[0]
                         ).Replace(
                         "${auth_uuid}", "0"
                         ).Replace(

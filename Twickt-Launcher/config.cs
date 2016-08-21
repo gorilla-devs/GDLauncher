@@ -26,6 +26,8 @@ namespace Twickt_Launcher
         public static string statisticsWebService = "https://webservices.twickt.com/InfoStatistics.php";
         public static string modpacksWebService = "https://webservices.twickt.com/modpacks.php";
         public static string launcherStatusWebService = "https://webservices.twickt.com/launcher_status.php";
+        public static string changelogsWebService = "https://webservices.twickt.com/changelogs.php";
+        public static string updatessWebService = "https://webservices.twickt.com/updates.php";
         public static string javaDownloadURL32 = "jPortable_8_Update_101.paf";
         public static string javaDownloadURL64 = "jPortable64_8_Update_101.paf";
 

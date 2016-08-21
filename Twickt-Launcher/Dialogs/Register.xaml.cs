@@ -121,7 +121,7 @@ namespace Twickt_Launcher.Dialogs
             var responseString = Encoding.Default.GetString(response);
             if (responseString.Contains("OK") && responseString.Contains("sent"))
             {
-                MessageBox.Show("Registrazione completata, attiva l'account via mail e poi potrai loggarti ");
+                MessageBox.Show("Registrazione completata, attiva l'account via mail e poi potrai loggarti. Se non attivato entro 24 ore da questo momento, l'account verra' automaticamente cancellato ");
             }
             else if (responseString.Contains("email_taken"))
             {

@@ -34,7 +34,7 @@
                                     <TextBlock Text="{Binding}">
                                         <TextBlock.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem x:Name="delete" Header="Uninstall Modpack"/>
+                                                <MenuItem x:Name="delete" Header="Uninstall Modpack" Click="delete_Click"/>
                                                 <MenuItem x:Name="mods" Header="Mods"/>
                                                 <MenuItem x:Name="changelog" Header="Changelog"/>
                                                 <MenuItem x:Name="report" Header="Report"/>

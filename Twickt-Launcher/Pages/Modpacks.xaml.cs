@@ -103,7 +103,7 @@ namespace Twickt_Launcher.Pages
                 string actualModpackName = ModpacksLRList.SelectedValue.ToString();
                 var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(actualModpackName));
                 var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                if (Directory.Exists(config.M_F_P + info[5] + "\\instances\\" + info[5]))
+                if (Directory.Exists(config.M_F_P + info[4]))
                 {
                     isinstalled.Content = @"Installed";
                     version.Content = info[2];
@@ -123,7 +123,6 @@ namespace Twickt_Launcher.Pages
             {
                 Windows.DebugOutputConsole.singleton.Write("Could not get modpack description-- " + ex);
             }
-            
         }
 
 
@@ -338,6 +337,33 @@ namespace Twickt_Launcher.Pages
                 eventArgs.Session.Close();
             }
             catch { }
+        }
+
+        private async void delete_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string actualModpackName = ModpacksLRList.SelectedValue.ToString();
+                var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(actualModpackName));
+                var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                if (Directory.Exists(config.M_F_P + info[4]))
+                {
+                    await Task.Run(() => Directory.Delete(config.M_F_P + info[4], true));
+                    isinstalled.Content = "Not Installed";
+                    start.Content = "Install";
+                    MessageBox.Show("Modpack deleted");
+
+                }
+                else
+                {
+                    MessageBox.Show("Not installed. What to delete?");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Something not expected happened. Make sure no files on that folder are used and that no explorer is opened there, then try again");
+                Windows.DebugOutputConsole.singleton.Write("Error deleting modpack-- " + ex);
+            }
         }
     }
 }

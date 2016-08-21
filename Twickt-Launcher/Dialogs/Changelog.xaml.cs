@@ -24,38 +24,56 @@ namespace Twickt_Launcher.Dialogs
         public Changelog()
         {
             InitializeComponent();
-            Task.Factory.StartNew(() => loadChangelog()).Wait();
-            //for(qualcosa)
-            //crea una nuova card
-
+            
         }
         public static async Task loadChangelog()
         {
-            string data = "";
-            WebClient c = new WebClient();
-            c.DownloadStringCompleted += (s, ex) =>
-            {
-                try
-                {
-                    data = ex.Result;
-                }
-                catch
-                {
-                    MessageBox.Show("Non e' stato possibile scaricare il changelogs");
-                }
-            };
-            /*changelogs.Text = "Loading...";
-            changelogs.FontSize = 32;
-            changelogs.FontSize = 12;*/
             if (SessionData.changelog == "")
             {
-                await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "/changelog.html"));
-                SessionData.changelog = data;
-                //changelogs.Text = data;
+                var client = new WebClient();
+                var values = new System.Collections.Specialized.NameValueCollection();
+
+                var response = await client.UploadValuesTaskAsync(config.changelogsWebService, values);
+
+                var responseString = Encoding.Default.GetString(response);
+
+                if (!responseString.Contains("0results"))
+                {
+                    SessionData.changelog = responseString;
+                }
+                else
+                {
+                    MessageBox.Show("Error getting modpacks");
+                }
             }
-            else
+        }
+
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            await loadChangelog();
+            var rows = SessionData.changelog.Split(new string[] { "<<<<|||;;;|||>>>>" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var row in rows)
             {
-                //changelogs.Text = SessionData.changelog;
+                var x = new MaterialDesignThemes.Wpf.Card();
+                x.Margin = new Thickness(5);
+                x.Width = 400;
+                container.Children.Add(x);
+                var insiderStackPanel = new StackPanel();
+                var title = new Label();
+                title.FontSize = 17;
+                var content = new TextBlock();
+                content.TextWrapping = TextWrapping.Wrap;
+                content.Margin = new Thickness(5);
+                var segment = row.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries);
+                title.Content = segment[0];
+                var lines = segment[1].Split(new string[] { "<<|;|>>" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var line in lines)
+                {
+                    content.Text += line;
+                }
+                insiderStackPanel.Children.Add(title);
+                insiderStackPanel.Children.Add(content);
+                x.Content = insiderStackPanel;
             }
         }
     }

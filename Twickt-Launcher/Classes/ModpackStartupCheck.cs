@@ -75,6 +75,8 @@ namespace Twickt_Launcher.Classes
                         }
                         else
                         {
+                            if (JSON.Hash(@dir + "\\" + FileName) != url[1])
+                                Libraries.Add(url[3]);
                         }
                     }
                     else if (url[3].Contains("https://launcher.mojang.com/mc/game/"))
@@ -119,18 +121,24 @@ namespace Twickt_Launcher.Classes
                     }
                     else if (url[3].Contains(config.updateWebsite))
                     {
-                        string dir = config.M_F_P + downloadingVersion[1] + url[2];
-                        string FileName = Path.GetFileName(dir);
-                        dir = Path.GetDirectoryName(@dir);
-                        if (!File.Exists(@dir + "\\" + FileName))
+                        if (url[4] == "true")
                         {
-                            Libraries.Add(url[3]);
-                        }
-                        else
-                        {
-                            if (JSON.Hash(@dir + "\\" + FileName) != url[1])
+                            string dir = config.M_F_P + downloadingVersion[1] + url[2];
+                            string FileName = Path.GetFileName(dir);
+                            dir = Path.GetDirectoryName(@dir);
+                            if (!File.Exists(@dir + "\\" + FileName))
+                            {
                                 Libraries.Add(url[3]);
+                            }
+                            else
+                            {
+                                if (JSON.Hash(@dir + "\\" + FileName) != url[1])
+                                {
+                                    Libraries.Add(url[3]);
+                                }
+                            }
                         }
+
                     }
                 }
                 return Libraries;

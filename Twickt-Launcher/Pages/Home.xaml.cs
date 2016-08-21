@@ -66,7 +66,7 @@ namespace Twickt_Launcher.Pages
 
         private void websiteLink_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            System.Diagnostics.Process.Start("http://launcher.twickt.com");
+            System.Diagnostics.Process.Start("https://twickt.com");
         }
 
         private void facebookLink_MouseDown(object sender, MouseButtonEventArgs e)
@@ -81,7 +81,7 @@ namespace Twickt_Launcher.Pages
 
         private void emailLink_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            System.Diagnostics.Process.Start("mailto:davide.ceschia@twickt.com");
+            System.Diagnostics.Process.Start("mailto:davide.ceschia@gmail.com");
         }
 
         private void button_Click(object sender, RoutedEventArgs e)

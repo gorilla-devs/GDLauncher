@@ -25,28 +25,23 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<string> CheckVersion()
         {
+            string update = "";
             Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.checkingForUpdates);
             string data = "";
-            WebClient c = new WebClient();
-            string update = "";
-            c.DownloadStringCompleted += (sender, e) =>
+            var client = new WebClient();
+            var values = new System.Collections.Specialized.NameValueCollection();
+
+            var response = await client.UploadValuesTaskAsync(config.updatessWebService, values);
+
+            var responseString = Encoding.Default.GetString(response);
+
+            if (!responseString.Contains("0results"))
             {
-                try
-                {
-                    data = e.Result;
-                }
-                catch
-                {
-                    MessageBox.Show(lang.languageswitch.couldNotVerifyVersion);
-                }
-            };
-            try
-            {
-                await c.DownloadStringTaskAsync(new Uri(config.updateWebsite + "/launcher/versions.json"));
+                data = responseString;
             }
-            catch
+            else
             {
-                MessageBox.Show(lang.languageswitch.errorDownloadingVersionsList);
+                MessageBox.Show("Error getting updates. Shutting down");
                 Application.Current.Shutdown();
             }
 
@@ -82,6 +77,7 @@ namespace Twickt_Launcher.Classes
                     }
                     else
                     {
+                        MessageBox.Show("Questo aggiornamento e' necessario per avviare il launcher. Se non aggiorni non potrai avviare il launcher.");
                         Application.Current.Shutdown();
                     }
                 }

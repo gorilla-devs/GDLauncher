@@ -20,7 +20,7 @@
                 <StackPanel>
                     <Label x:Name="mainContent" Foreground="White" Content="Starting..." HorizontalAlignment="Left" Margin="195,0,0,0" VerticalAlignment="Top" FontSize="64" Visibility="Hidden"/>
                     <StackPanel Orientation="Horizontal">
-                        <Label x:Name="firstLabel" Foreground="White" Content="Loading" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
+                        <Label x:Name="firstLabel" Foreground="White" Content="Loading..." HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Visible"/>
                         <ProgressBar Name="firstlabelprogress" Foreground="White" HorizontalAlignment="Left" Height="28" Margin="10,0,0,0" Visibility="Hidden" VerticalAlignment="Top" Width="66" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
                     </StackPanel>
                     <Label x:Name="secondLabel" Foreground="White" Content="Label" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
@@ -31,7 +31,7 @@
                 </StackPanel>
             </materialDesign:TransitionerSlide>
             <materialDesign:TransitionerSlide Background="White">
-
+                
             </materialDesign:TransitionerSlide>
         </materialDesign:Transitioner>
     </Grid>
