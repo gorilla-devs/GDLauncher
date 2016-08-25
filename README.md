@@ -2,14 +2,14 @@
 Twickt Launcher is a Minecraft launcher written in C#. <br>
 It's main goal is to be a custom minecraft launcher with the possibility to upload modpacks, check files hashes and more but with a really good-looking graphic. Infact we use <a href="https://material.google.com/">Material Design</a> for it!
 
-#Some Screenshots
-<a href="https://twickt.com/our-launcher/#images"><b>SEE SOME SCREENSHOTS</b></a>
-
 #Features
 The main features are listed here:
 - Custom login through your server and database(mysql)
 - Really easy customization
 - Multiple languages(under development)
+- Parallel files download(up to 30 threads)
+- Saves to Cloud synchronization(divided per modpack and version)
+- Modpacks Bookmarks system
 - Debug Console (With the possibility to save the log)
 - Admin Page(to finish)
 - Login and Registration page directly in the launcher(using the webservices)
@@ -27,6 +27,9 @@ The main features are listed here:
 - Startup HowTo Guide
 - Dynamic and programmatic changelog system (webservices)
 - possibility for users to upload modpacks (private / semi-private) (under development)
+
+#More info
+<a href="https://twickt.com/our-launcher/"><b>SEE MORE INFO</b></a>
 
 #See it in action
 You can download a demo directly from my official website: https://twickt.com.<br>
@@ -48,3 +51,13 @@ If you want to contribute to this project you are more than welcome! Just create
 The source code of Twickt Launcher is given under GNU GENERAL PUBLIC LICENSE Version 3 Licence.<br>
 Read <a href="https://github.com/killpowa/Twickt-Launcher/blob/master/LICENSE">HERE</a> for more informations.<br>
 <b>We do not forgive unauthorized uses of this source code. You are expected to follow and respect the licence.</b>
+
+#Some screenshots
+<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180425.png" width="400">
+<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180512.png" width="400">
+<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180614.png" width="400">
+<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180656.png" width="400">
+<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180724.png" width="400">
+<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180756.png" width="400">
+<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181031.png" width="400">
+<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181122.png" width="400">
