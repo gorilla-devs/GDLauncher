@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,21 +17,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Twickt_Launcher.Dialogs
+namespace Twickt_Launcher.Pages
 {
     /// <summary>
-    /// Logica di interazione per UpdateAvailable.xaml
+    /// Logica di interazione per ModpacksMarket.xaml
     /// </summary>
-    public partial class UpdateAvailable : UserControl
+    public partial class ModpacksMarket : Page
     {
-        private CancellationTokenSource _cancellationTokenSource;
-
-
-        public UpdateAvailable(string actualVersion, string newVersion, string message = "Do you want to update?")
+        public ModpacksMarket()
         {
             InitializeComponent();
-            updateVersion.Content = actualVersion + " -> " + newVersion;
-            label1.Content = message;
         }
     }
 }

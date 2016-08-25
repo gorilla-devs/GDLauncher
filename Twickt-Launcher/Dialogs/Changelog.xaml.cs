@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2016 Twickt / Ceschia Davide
+//Application idea, code and time are given by Davide Ceschia / Twickt
+//You may use them according to the GNU GPL v.3 Licence
+//GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -65,7 +69,7 @@ namespace Twickt_Launcher.Dialogs
                 content.TextWrapping = TextWrapping.Wrap;
                 content.Margin = new Thickness(5);
                 var segment = row.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries);
-                title.Content = segment[0];
+                title.Content = segment[0] + " - " + segment[2];
                 var lines = segment[1].Split(new string[] { "<<|;|>>" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var line in lines)
                 {

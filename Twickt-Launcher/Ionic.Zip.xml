@@ -1,4 +1,13 @@
 <?xml version="1.0"?>
+<!--
+Sample license text.
+-->
+#region copyright
+/* Developed and coded by Twickt (Davide Ceschia)
+visit https://twickt.com for more info about the project or https://davideceschia.me for more info about the developer
+Distributed under GNU GPL v3(https://github.com/killpowa/Twickt-Launcher/blob/master/LICENSE)
+*/
+#endregion
 <doc>
     <assembly>
         <name>Ionic.Zip</name>

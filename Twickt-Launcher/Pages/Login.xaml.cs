@@ -1,4 +1,8 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿// Copyright (c) 2016 Twickt / Ceschia Davide
+//Application idea, code and time are given by Davide Ceschia / Twickt
+//You may use them according to the GNU GPL v.3 Licence
+//GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

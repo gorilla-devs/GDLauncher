@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2016 Twickt / Ceschia Davide
+//Application idea, code and time are given by Davide Ceschia / Twickt
+//You may use them according to the GNU GPL v.3 Licence
+//GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -41,22 +45,26 @@ namespace Twickt_Launcher.Windows
 
         public async void Write(string message)
         {
-            /*int lines;
-            if (Int32.TryParse(Properties.Settings.Default["DebugMaxLines"].ToString(), out lines))
+            await Task.Run(() =>
             {
-
-                while (debug.LineCount > lines)
+                Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
-                    debug.SelectionStart = 0;
-                    debug.SelectionLength = debug.Text.IndexOf("\n", 0) + 1;
-                    debug.SelectedText = "";
-                }
-            }*/
-            if (debug.LineCount > 600)
-                debug.Text = "";
-            consoleText += ("[" + DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss") + "] " + message + "\n\r");
-            debug.Text += ("[" + DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss") + "] " + message + "\n\r");
-            debug.CaretIndex = debug.Text.Length;
+                    int lines;
+                    if (Int32.TryParse(Properties.Settings.Default["DebugMaxLines"].ToString(), out lines))
+                    {
+
+                        while (debug.LineCount > lines)
+                        {
+                            debug.SelectionStart = 0;
+                            debug.SelectionLength = debug.Text.IndexOf("\n", 0) + 1;
+                            debug.SelectedText = "";
+                        }
+                    }
+                    consoleText += ("[" + DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss") + "] " + message + "\n\r");
+                    debug.Text += ("[" + DateTime.Now.ToString("dd-MM-yyyy hh:mm:ss") + "] " + message + "\n\r");
+                    debug.CaretIndex = debug.Text.Length;
+                }));
+            });
         }
 
         protected override void OnContentRendered(EventArgs e)

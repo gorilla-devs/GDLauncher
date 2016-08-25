@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2016 Twickt / Ceschia Davide
+//Application idea, code and time are given by Davide Ceschia / Twickt
+//You may use them according to the GNU GPL v.3 Licence
+//GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -198,7 +202,9 @@ namespace Twickt_Launcher.Classes
                             if (e.Data.ToString().Contains("LWJGL Version:"))
                             {
                                 loading.forgeProgress.Value = 100;
+                                Window1.singleton.Hide();
                             }
+
                         }));
 
                     }
@@ -214,26 +220,17 @@ namespace Twickt_Launcher.Classes
                     }
                 });
 
-                process.Start();
+                await Task.Run(() => process.Start());
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
-                //process.WaitForExit();
-
-                //ok = (process.ExitCode == 0);
+                await Task.Run(() => process.WaitForExit());
+                Window1.singleton.Show();
             }
             catch(Exception e)
             {
                 Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.fatalError + " "  + e);
             }
-
-            /*ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = ComputerInfoDetect.GetJavaInstallationPath() + "//bin//java.exe";
-            startInfo.Arguments = launch;
-            Console.Write(launch);
-            Process.Start(startInfo);*/
-
-
         }
 
         private static async void OpenEvent(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)

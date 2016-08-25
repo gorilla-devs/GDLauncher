@@ -1,4 +1,7 @@
-﻿<Window x:Class="Twickt_Launcher.Window1"
+﻿<!--
+Sample license text.
+-->
+<Window x:Class="Twickt_Launcher.Window1"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -23,7 +26,8 @@
                         </ListBox.ItemTemplate>
                         <ListBoxItem Name="Home" Content="Home"></ListBoxItem>
                         <ListBoxItem Name="Options" Content="Options"></ListBoxItem>
-                        <ListBoxItem Name="Modpacks" Content="Minecraft"></ListBoxItem>
+                        <ListBoxItem Name="Modpacks" Content="Modpacks Market"></ListBoxItem>
+                        <ListBoxItem Name="installedModpacks" Content="Installed Modpacks"></ListBoxItem>
                         <ListBoxItem Name="Commands" Content="Commands"></ListBoxItem>
                         <ListBoxItem Name="Debug" Content="Debug"></ListBoxItem>
                         <ListBoxItem Name="ContactMe" Content="Report a bug"></ListBoxItem>

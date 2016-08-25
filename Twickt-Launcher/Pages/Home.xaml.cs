@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2016 Twickt / Ceschia Davide
+//Application idea, code and time are given by Davide Ceschia / Twickt
+//You may use them according to the GNU GPL v.3 Licence
+//GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -81,13 +85,7 @@ namespace Twickt_Launcher.Pages
 
         private void emailLink_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            System.Diagnostics.Process.Start("mailto:davide.ceschia@gmail.com");
-        }
-
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-            Window1.singleton.MainPage.Navigate(new Pages.Modpacks());
-            Window1.singleton.NavigationMenu.SelectedIndex = 2;
+            System.Diagnostics.Process.Start("mailto:davide.ceschia@twickt.com");
         }
 
         private void image1_AnimationCompleted(object sender, RoutedEventArgs e)
@@ -163,6 +161,18 @@ namespace Twickt_Launcher.Pages
             statistics_account.SelectedIndex = 3;
             await Task.Delay(300);
             statistics_account.SelectedIndex = 0;
+        }
+
+        private void installedModpacks_Click(object sender, RoutedEventArgs e)
+        {
+            Window1.singleton.MainPage.Navigate(new Pages.Modpacks());
+            Window1.singleton.NavigationMenu.SelectedIndex = 3;
+        }
+
+        private void MarketModpacks_Click(object sender, RoutedEventArgs e)
+        {
+            Window1.singleton.MainPage.Navigate(new Pages.ModpacksMarket());
+            Window1.singleton.NavigationMenu.SelectedIndex = 2;
         }
     }
 }

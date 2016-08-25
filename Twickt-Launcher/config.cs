@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2016 Twickt / Ceschia Davide
+//Application idea, code and time are given by Davide Ceschia / Twickt
+//You may use them according to the GNU GPL v.3 Licence
+//GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,7 +23,6 @@ namespace Twickt_Launcher
         public static string logfile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\launcher_logs.txt";
         public static string M_F_P = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\";
         public static string LocalModpacks = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\LocalModpacks\";
-        public static string MCEditLink = "https://download.nodecdn.net/containers/mcedit/download/dev/mcedit2-win64-2.0.0alpha-921.exe";
         public static string loginWebService = "https://webservices.twickt.com/login.php";
         public static string bugReportWebService = "https://webservices.twickt.com/bugs.php";
         public static string RegisterWebService = "https://webservices.twickt.com/process.php";

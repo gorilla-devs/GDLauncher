@@ -1,4 +1,8 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿// Copyright (c) 2016 Twickt / Ceschia Davide
+//Application idea, code and time are given by Davide Ceschia / Twickt
+//You may use them according to the GNU GPL v.3 Licence
+//GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,7 +46,7 @@ namespace Twickt_Launcher.Pages
 
         private async void start_Click(object sender, RoutedEventArgs e)
         {
-            loading = new Dialogs.ModpackLoading();
+            /*loading = new Dialogs.ModpackLoading();
             if (remote.IsSelected)
             {
                 //VERIFICA SE SI E' SELEZIONATA UNA MODPACK
@@ -80,23 +84,23 @@ namespace Twickt_Launcher.Pages
                     return;
                 }
                 Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString(), false);
-            }
+            }*/
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             transition.SelectedIndex = 1;
-            if (!Directory.Exists(config.LocalModpacks))
+            /*if (!Directory.Exists(config.LocalModpacks))
             {
                 Directory.CreateDirectory(config.LocalModpacks);
             }
             await ModpacksRefreshMethod();
             registrationList = ModpacksLRList.Items.Cast<string>().ToList();
             lastSelectedModpacksType = remote;
-            loaded = true;
+            loaded = true;*/
         }
 
-        private async void ModpacksLRList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        /*private async void ModpacksLRList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
@@ -253,7 +257,7 @@ namespace Twickt_Launcher.Pages
             }
             catch (TaskCanceledException)
             {
-                /*cancelled by user...tidy up and dont close as will have already closed */
+                //cancelled by user...tidy up and dont close as will have already closed
             }
             catch
             {
@@ -364,6 +368,6 @@ namespace Twickt_Launcher.Pages
                 MessageBox.Show("Something not expected happened. Make sure no files on that folder are used and that no explorer is opened there, then try again");
                 Windows.DebugOutputConsole.singleton.Write("Error deleting modpack-- " + ex);
             }
-        }
+        }*/
     }
 }
