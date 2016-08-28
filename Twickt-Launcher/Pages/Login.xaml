@@ -51,6 +51,7 @@ Sample license text.
                         </materialDesign:Card>
                         <Label Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: The launcher is still in beta and could have bug. Translations are still in progress</Label>
                         <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: We are migrating our online infrastructure to some new datacenters. You could experience some problems</TextBlock>
+                        <TextBlock Name="language" TextAlignment="Center" FontSize="15"></TextBlock>
                     </StackPanel>
                 </StackPanel>
             </materialDesign:TransitionerSlide>

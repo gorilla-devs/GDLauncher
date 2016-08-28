@@ -51,8 +51,8 @@ namespace Twickt_Launcher.Classes
             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.load.Visibility = Visibility.Hidden;
-            Pages.SplashScreen.singleton.mainContent.Content = lang.languageswitch.pleaseWait;
-            Pages.SplashScreen.singleton.firstLabel.Content = lang.languageswitch.downloadingJava;
+            Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("pleaseWait");
+            Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingJava");
             Pages.SplashScreen.singleton.secondLabel.Content = "";
             string url = "";
             //i .exe sono zip in verita'
@@ -73,7 +73,7 @@ namespace Twickt_Launcher.Classes
             sw.Start();
             await webClient.DownloadFileTaskAsync(new Uri(url), config.M_F_P + "runtime\\java.zip");
             Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.firstLabel.Content = lang.languageswitch.extractingJava;
+            Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("extractingJava");
             try
             {
                 ZipFile zip = ZipFile.Read(config.M_F_P + "runtime\\java.zip");

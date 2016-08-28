@@ -36,7 +36,7 @@ namespace Twickt_Launcher.Classes
             }
             else
             {
-                System.Windows.MessageBox.Show("Error getting modpacks");
+                System.Windows.MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("couldNotGetModpacksList"));
                 return null;
             }
             return info.ToArray();

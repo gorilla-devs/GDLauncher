@@ -56,7 +56,7 @@ namespace Twickt_Launcher.Classes
                             {
                                 if (e.Data != null)
                                 {
-                                    Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.javaPathError);
+                                    Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("javaPathError"));
                                 }
                             });
 

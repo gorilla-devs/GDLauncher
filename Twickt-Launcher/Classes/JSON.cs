@@ -171,7 +171,7 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show(lang.languageswitch.errorIn + " " + name);
+                            MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("errorIn") + " " + name);
                         }
                     }
                     else if (item["natives"]["windows"] == "natives-windows-${arch}")
@@ -184,7 +184,7 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show(lang.languageswitch.errorIn + " " + name);
+                            MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("errorIn") + " " + name);
                         }
                     }
                 }
@@ -296,7 +296,7 @@ namespace Twickt_Launcher.Classes
                         {
                             Pages.Modpacks.loading.forgeProgress.Visibility = System.Windows.Visibility.Visible;
                             Pages.Modpacks.loading.whatdoing.Visibility = System.Windows.Visibility.Visible;
-                            Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.downloadingForge;
+                            Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingForge");
                         }
                         if(Pages.Modpacks.singleton.local.IsSelected)
                             Pages.Modpacks.localmodpackadd.progress.Visibility = Visibility.Visible;
@@ -307,14 +307,14 @@ namespace Twickt_Launcher.Classes
                             if (Pages.Modpacks.singleton.remote.IsSelected)
                             {
                                 Pages.Modpacks.loading.forgeProgress.Value = e.ProgressPercentage;
-                                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.downloadingForge + " " + string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingForge") + " " + string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
                             }
                         };
                         sw.Start();
                         await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"));
                         sw.Stop();
                         if (Pages.Modpacks.singleton.remote.IsSelected)
-                            Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.downloadedForge;
+                            Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadedForge");
                         //////////////////////////////////////////////
                     }
                     ////////////////////////////////////////////////////////////////////////////////////////
@@ -345,12 +345,12 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show(lang.languageswitch.extractedForgeNotFound);
+                            MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("extractedForgeNotFound"));
                         }
                         }
                     else
                     {
-                        MessageBox.Show(lang.languageswitch.forgeInstallerNotExist);
+                        MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("forgeInstallerNotExist"));
                     }
                 }
 
@@ -449,32 +449,32 @@ namespace Twickt_Launcher.Classes
             List<string[]> mods = new List<string[]>();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingJsonFiles;
+                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analysingJsonFiles");
             }
             catch { }
 
             List<string[]> list = new List<string[]>();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingMainJar;
+                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingMainJar");
             }
             catch { }
             List<string[]> mainjar = await AnalyzeMainJar();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingAssets;
+                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingAssets");
             }
             catch { }
             List<string[]> assets = await AnalyzeAssets();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingStandardLibraries;
+                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingStandardLibraries");
             }
             catch { }
             List<string[]> libraries = await AnalyzeStdLibraries();
             try
             {
-                Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingForgeLibraries;
+                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingForgeLibraries");
             }
             catch { }
             List<string[]> forge = await AnalyzeForgeLibraries(modpackname);
@@ -482,7 +482,7 @@ namespace Twickt_Launcher.Classes
             {
                 try
                 {
-                    Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingMods;
+                    Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingMods");
                 }
                 catch { }
                 mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname);
@@ -498,7 +498,7 @@ namespace Twickt_Launcher.Classes
                 list.AddRange(forge);
             if ((justlibraries == false && justforge == false) && (remote == true))
                 list.AddRange(mods);
-            Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.jsonFileAnalyzed);
+            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("jsonFileAnalyzed"));
             urls = list;
 
             return list.Distinct().ToList();

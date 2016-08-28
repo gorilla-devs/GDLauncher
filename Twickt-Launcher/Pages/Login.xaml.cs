@@ -36,6 +36,7 @@ namespace Twickt_Launcher.Pages
             Window1.singleton.MenuToggleButton.IsEnabled = false;
             Window1.singleton.popupbox.IsEnabled = false;
             transition.SelectedIndex = 0;
+            language.Text = Thread.CurrentThread.CurrentUICulture.Name;
 
         }
 

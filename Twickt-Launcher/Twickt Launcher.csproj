@@ -180,6 +180,9 @@
     <Compile Include="Dialogs\HowTo.xaml.cs">
       <DependentUpon>HowTo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ModpackFullScreen.xaml.cs">
+      <DependentUpon>ModpackFullScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ModpackLoading.xaml.cs">
       <DependentUpon>ModpackLoading.xaml</DependentUpon>
     </Compile>
@@ -191,6 +194,21 @@
     </Compile>
     <Compile Include="Dialogs\UpdateAvailable.xaml.cs">
       <DependentUpon>UpdateAvailable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="it-IT.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>it-IT.resx</DependentUpon>
+    </Compile>
+    <Compile Include="lang\lang.Designer.cs">
+      <DependentUpon>lang.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="lang\lang.it.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>lang.it.resx</DependentUpon>
     </Compile>
     <Compile Include="lang\languageswitch.cs" />
     <Compile Include="Pages\Admin.xaml.cs">
@@ -243,6 +261,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\HowTo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ModpackFullScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -332,6 +354,18 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="lang\lang.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>lang.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="lang\lang.it.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>lang.it.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="it-IT.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>it-IT.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -380,15 +414,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\modpacks.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Image4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Image5.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Image6.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

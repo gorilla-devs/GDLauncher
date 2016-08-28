@@ -40,7 +40,7 @@ namespace Twickt_Launcher.Classes
                     return responseString;
                 else
                 {
-                    MessageBox.Show("Error getting modpacks");
+                    MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("couldNotGetModpacksList"));
                     return null;
                 }
 
@@ -97,7 +97,7 @@ namespace Twickt_Launcher.Classes
                 temp = responseString.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None)[6];
             else
             {
-                MessageBox.Show("Error getting modpacks");
+                MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("couldNotGetModpacksList"));
                 return null;
             }
             dynamic json = JsonConvert.DeserializeObject(temp);

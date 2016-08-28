@@ -25,6 +25,7 @@ Sample license text.
                 <StackPanel>
                     <StackPanel Margin="10" Height="40" VerticalAlignment="Top" Orientation="Horizontal">
                     <TextBox Width="180" HorizontalAlignment="Left" VerticalAlignment="Top" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
+                    <Button Margin="20 0 0 0" Foreground="White">Create Local Modpack</Button>
                     </StackPanel>
                     <StackPanel Margin="20">
                         <materialDesign:Card Height="500">

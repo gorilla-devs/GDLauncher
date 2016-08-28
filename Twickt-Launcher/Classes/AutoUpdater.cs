@@ -30,7 +30,7 @@ namespace Twickt_Launcher.Classes
         public static async Task<string> CheckVersion()
         {
             string update = "";
-            Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.checkingForUpdates);
+            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("checkingForUpdates"));
             string data = "";
             var client = new WebClient();
             var values = new System.Collections.Specialized.NameValueCollection();
@@ -60,7 +60,7 @@ namespace Twickt_Launcher.Classes
                 update = versionurl;
                 if (String.Compare(Properties.Settings.Default["version"].ToString(), minimumversion) < 0)
                 {
-                    var test = new Dialogs.UpdateAvailable(Properties.Settings.Default["version"].ToString(), version, lang.languageswitch.youMustUpdate);
+                    var test = new Dialogs.UpdateAvailable(Properties.Settings.Default["version"].ToString(), version, Pages.SplashScreen.singleton.manager.GetString("youMustUpdate"));
                     var result = await MaterialDesignThemes.Wpf.DialogHost.Show(test, "RootDialog");
                     if (result.ToString() == "yes")
                     {
@@ -73,10 +73,10 @@ namespace Twickt_Launcher.Classes
                         Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
                         Pages.SplashScreen.singleton.load.Visibility = Visibility.Hidden;
                         Window1.versionok = false;
-                        Pages.SplashScreen.singleton.firstLabel.Content = lang.languageswitch.updatingLauncherCompulsory;
-                        Pages.SplashScreen.singleton.secondLabel.Content = lang.languageswitch.updating + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
-                        Pages.SplashScreen.singleton.mainContent.Content = lang.languageswitch.updating + "...";
-                        Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.compulsoryUpdateFound);
+                        Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updatingLauncherCompulsory");
+                        Pages.SplashScreen.singleton.secondLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
+                        Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + "...";
+                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("compulsoryUpdateFound"));
                         return update;
                     }
                     else
@@ -100,10 +100,10 @@ namespace Twickt_Launcher.Classes
                     if (result.ToString() == "yes")
                     {
                         Window1.versionok = false;
-                        Pages.SplashScreen.singleton.firstLabel.Content = lang.languageswitch.updatingLauncher;
-                        Pages.SplashScreen.singleton.secondLabel.Content = lang.languageswitch.updating + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
-                        Pages.SplashScreen.singleton.mainContent.Content = lang.languageswitch.updating + "...";
-                        Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.updateFound);
+                        Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updatingLauncher");
+                        Pages.SplashScreen.singleton.secondLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
+                        Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + "...";
+                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("updateFound"));
                     }
                     else
                     {
@@ -114,12 +114,12 @@ namespace Twickt_Launcher.Classes
                 {
                     if (Pages.Options.optionsrequest == true)
                     {
-                        await DialogHost.Show(new Dialogs.OptionsUpdates(lang.languageswitch.noUpdatesAvailable, 248, 40), "RootDialog", ExtendedOpenedEventHandler);
-                        Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.noUpdatesAvailable);
+                        await DialogHost.Show(new Dialogs.OptionsUpdates(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"), 248, 40), "RootDialog", ExtendedOpenedEventHandler);
+                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
                     }
                     else
                     {
-                        Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.noUpdatesAvailable);
+                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
                     }
                 }
             }
@@ -205,7 +205,7 @@ namespace Twickt_Launcher.Classes
             }
             else
             {
-                MessageBox.Show(lang.languageswitch.openingNewVersion);
+                MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("openingNewVersion"));
                 //await DialogHost.Show(new Dialogs.OptionsUpdates("In a few moments we will open the new version"), "RootDialog", ExtendedOpenedEventHandler);
             }
 

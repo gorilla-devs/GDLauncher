@@ -19,7 +19,7 @@ namespace Twickt_Launcher.Classes
         public static List<string> downloadingVersion;
         public static async void Minecraft_Start(string modpackname, bool remote)
         {
-            loading = new Dialogs.ModpackLoading(true, lang.languageswitch.starting + "...");
+            loading = new Dialogs.ModpackLoading(true, Pages.SplashScreen.singleton.manager.GetString("starting") + "...");
             MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", OpenEvent);
             loading.forgeProgress.Value = 15;
             string gamedir = "";
@@ -229,7 +229,7 @@ namespace Twickt_Launcher.Classes
             }
             catch(Exception e)
             {
-                Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.fatalError + " "  + e);
+                Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("fatalError") + " "  + e);
             }
         }
 

@@ -56,13 +56,13 @@ namespace Twickt_Launcher.Classes
                 {}
                 catch
                 {
-                    MessageBox.Show(lang.languageswitch.mixFileCheckError);
+                    MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("mixFileCheckError"));
                 }
             }
             if (Properties.Settings.Default["disableHashCheck"].ToString() == "false")
             {
                 if (Pages.Modpacks.singleton.remote.IsSelected)
-                    Pages.Modpacks.loading.whatdoing.Content = lang.languageswitch.analyzingFiles;
+                    Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingFiles");
                 var temp = config.M_F_P + downloadingVersion[1] + @"temp\";
                 int count = urls.Count;
                 List<string> Libraries = new List<string>();

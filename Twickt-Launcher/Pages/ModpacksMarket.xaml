@@ -10,8 +10,7 @@ Sample license text.
       xmlns:local="clr-namespace:Twickt_Launcher.Pages"
       mc:Ignorable="d" 
       FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Height="625" Width="694" Background="#FFFFFF"
-      Title="Modpacks">
-
+      Title="Modpacks" Loaded="Page_Loaded">
     <Grid>
         <ListBox Name="modpackstypeselection" SelectionMode="Single" Style="{StaticResource MaterialDesignToolToggleListBox}" SelectedIndex="0" HorizontalAlignment="Center" >
             <ListBoxItem Name="remote" Width="80" HorizontalContentAlignment="Center">Remote</ListBoxItem>
@@ -24,143 +23,19 @@ Sample license text.
             <materialDesign:TransitionerSlide Background="White" OpeningEffect="{materialDesign:TransitionEffect Kind=FadeIn}">
                 <StackPanel>
                     <StackPanel Margin="10" Height="40" VerticalAlignment="Top" Orientation="Horizontal">
-                        <TextBox Width="180" HorizontalAlignment="Left" VerticalAlignment="Top" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
-                        <Button Margin="10 0 10 0" Foreground="White">Add Private Pack</Button>
-                        <Button Margin="10 0 10 0" Foreground="White">Upload Your Pack</Button>
-                        <Button Margin="10 0 10 0" Foreground="White">Installed Modpacks</Button>
+                        <TextBox Width="140" HorizontalAlignment="Left" VerticalAlignment="Top" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
+                        <Button Margin="5 0 5 0" Foreground="White">Add Private Pack</Button>
+                        <Button Margin="5 0 5 0" Foreground="White">Upload Your Pack</Button>
+                        <Button Name="goToInstalledModpacks" Margin="5 0 5 0" Foreground="White" Click="goToInstalledModpacks_Click">Installed Modpacks</Button>
+                        <Button Name="refresh" Margin="5 0 5 0" Foreground="White" Click="refresh_Click">
+                            <materialDesign:PackIcon Kind="Refresh" />
+                        </Button>
                     </StackPanel>
                     <StackPanel Margin="20">
                         <materialDesign:Card Height="500">
                             <ScrollViewer>
-                                <WrapPanel Orientation="Horizontal" >
-                                    <materialDesign:Card Height="320" Width="300" Margin="4" HorizontalAlignment="Left">
-                                        <StackPanel>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 16 -130" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Fullscreen"/>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 66 -130" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="ShareVariant"/>
-                                            </Button>
-                                            <Image Source="/Images/modpacks.jpg" Stretch="Fill" Width="300" Height="120">
-                                            </Image>
-                                            <Label Margin="0 10 0 0" FontSize="15" HorizontalAlignment="Center">BrotherHood Of Heroes</Label>
-                                            <ScrollViewer Height="70">
-                                                <TextBlock TextWrapping="Wrap">
-                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eu ligula massa. Fusce commodo euismod neque eu vulputate. Quisque in ligula sed sem fermentum ultrices nec ac mi. Nam luctus elementum fringilla. Ut nisi urna, sodales a sollicitudin nec, pharetra sed ante. Sed tellus libero, vulputate nec consectetur eu, vulputate non dui. Vivamus nisi tortor, tristique eu ultrices sed, rutrum eu turpis. Fusce id scelerisque nunc.
-                                                </TextBlock>
-                                            </ScrollViewer>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Label VerticalAlignment="Center">Rate this modpack</Label>
-                                                <materialDesign:RatingBar Margin="10">
-                                                </materialDesign:RatingBar>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Foreground="White" Margin="15 0 3 0">Install</Button>
-                                                <Button Foreground="White">View Mods</Button>
-                                                <Button Foreground="White" Margin="3 0 0 0">Website</Button>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </materialDesign:Card>
-                                    <materialDesign:Card Height="320" Width="300" Margin="4" HorizontalAlignment="Left">
-                                        <StackPanel>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 16 -130" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Fullscreen"/>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 66 -130" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="ShareVariant"/>
-                                            </Button>
-                                            <Image Source="/Images/modpacks.jpg" Stretch="Fill" Width="300" Height="120">
-                                            </Image>
-                                            <Label Margin="0 10 0 0" FontSize="15" HorizontalAlignment="Center">BrotherHood Of Heroes</Label>
-                                            <ScrollViewer Height="70">
-                                                <TextBlock TextWrapping="Wrap">
-                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eu ligula massa. Fusce commodo euismod neque eu vulputate. Quisque in ligula sed sem fermentum ultrices nec ac mi. Nam luctus elementum fringilla. Ut nisi urna, sodales a sollicitudin nec, pharetra sed ante. Sed tellus libero, vulputate nec consectetur eu, vulputate non dui. Vivamus nisi tortor, tristique eu ultrices sed, rutrum eu turpis. Fusce id scelerisque nunc.
-                                                </TextBlock>
-                                            </ScrollViewer>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Label VerticalAlignment="Center">Rate this modpack</Label>
-                                                <materialDesign:RatingBar Margin="10">
-                                                </materialDesign:RatingBar>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Foreground="White" Margin="15 0 3 0">Install</Button>
-                                                <Button Foreground="White">View Mods</Button>
-                                                <Button Foreground="White" Margin="3 0 0 0">Website</Button>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </materialDesign:Card>
-                                    <materialDesign:Card Height="320" Width="300" Margin="4" HorizontalAlignment="Left">
-                                        <StackPanel>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 16 -130" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Fullscreen"/>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 66 -130" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="ShareVariant"/>
-                                            </Button>
-                                            <Image Source="/Images/modpacks.jpg" Stretch="Fill" Width="300" Height="120">
-                                            </Image>
-                                            <Label Margin="0 10 0 0" FontSize="15" HorizontalAlignment="Center">BrotherHood Of Heroes</Label>
-                                            <ScrollViewer Height="70">
-                                                <TextBlock TextWrapping="Wrap">
-                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eu ligula massa. Fusce commodo euismod neque eu vulputate. Quisque in ligula sed sem fermentum ultrices nec ac mi. Nam luctus elementum fringilla. Ut nisi urna, sodales a sollicitudin nec, pharetra sed ante. Sed tellus libero, vulputate nec consectetur eu, vulputate non dui. Vivamus nisi tortor, tristique eu ultrices sed, rutrum eu turpis. Fusce id scelerisque nunc.
-                                                </TextBlock>
-                                            </ScrollViewer>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Label VerticalAlignment="Center">Rate this modpack</Label>
-                                                <materialDesign:RatingBar Margin="10">
-                                                </materialDesign:RatingBar>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Foreground="White" Margin="15 0 3 0">Install</Button>
-                                                <Button Foreground="White">View Mods</Button>
-                                                <Button Foreground="White" Margin="3 0 0 0">Website</Button>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </materialDesign:Card>
-                                    <materialDesign:Card Height="320" Width="300" Margin="4" HorizontalAlignment="Left">
-                                        <StackPanel>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 16 -130" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Fullscreen"/>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 66 -130" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="ShareVariant"/>
-                                            </Button>
-                                            <Image Source="/Images/modpacks.jpg" Stretch="Fill" Width="300" Height="120">
-                                            </Image>
-                                            <Label Margin="0 10 0 0" FontSize="15" HorizontalAlignment="Center">BrotherHood Of Heroes</Label>
-                                            <ScrollViewer Height="70">
-                                                <TextBlock TextWrapping="Wrap">
-                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eu ligula massa. Fusce commodo euismod neque eu vulputate. Quisque in ligula sed sem fermentum ultrices nec ac mi. Nam luctus elementum fringilla. Ut nisi urna, sodales a sollicitudin nec, pharetra sed ante. Sed tellus libero, vulputate nec consectetur eu, vulputate non dui. Vivamus nisi tortor, tristique eu ultrices sed, rutrum eu turpis. Fusce id scelerisque nunc.
-                                                </TextBlock>
-                                            </ScrollViewer>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Label VerticalAlignment="Center">Rate this modpack</Label>
-                                                <materialDesign:RatingBar Margin="10">
-                                                </materialDesign:RatingBar>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Foreground="White" Margin="15 0 3 0">Install</Button>
-                                                <Button Foreground="White">View Mods</Button>
-                                                <Button Foreground="White" Margin="3 0 0 0">Website</Button>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </materialDesign:Card>
+                                <WrapPanel Name="modpacksContainer" Orientation="Horizontal" >
+                                    
                                 </WrapPanel>
                             </ScrollViewer>
                         </materialDesign:Card>
