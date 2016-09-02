@@ -28,7 +28,7 @@ namespace Twickt_Launcher.Pages
         {
             InitializeComponent();
             installedRelease.Content = "v " + Properties.Settings.Default["version"];
-            keepmein.Content = Properties.Settings.Default["keepMeLoggedIn"].ToString();
+            keepmein.Content = Properties.Settings.Default["RememberUsername"].ToString();
         }
     }
 }

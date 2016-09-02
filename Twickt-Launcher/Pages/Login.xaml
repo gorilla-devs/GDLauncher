@@ -42,7 +42,7 @@ Sample license text.
                                 </Button>
                                 <StackPanel HorizontalAlignment="Center">
                                     <ProgressBar Name="loading" HorizontalAlignment="Left" Height="15" VerticalAlignment="Top" Width="219" IsIndeterminate="True" Visibility="Hidden"/>
-                                    <CheckBox x:Name="keepMeIn" HorizontalAlignment="Center" Content="Keep me signed in" VerticalAlignment="Top" Checked="keepMeIn_Checked"/>
+                                    <CheckBox x:Name="keepMeIn" HorizontalAlignment="Center" Content="Remember username" VerticalAlignment="Top"/>
                                 </StackPanel>
                             </StackPanel>
                         </materialDesign:Card>

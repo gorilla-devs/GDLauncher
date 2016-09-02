@@ -94,13 +94,13 @@ namespace Twickt_Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool keepMeLoggedIn {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RememberUsername {
             get {
-                return ((bool)(this["keepMeLoggedIn"]));
+                return ((string)(this["RememberUsername"]));
             }
             set {
-                this["keepMeLoggedIn"] = value;
+                this["RememberUsername"] = value;
             }
         }
         

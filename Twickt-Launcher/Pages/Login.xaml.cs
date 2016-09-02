@@ -108,16 +108,16 @@ namespace Twickt_Launcher.Pages
                 await Task.Delay(500);
                 //Properties.Settings.Default["Sessiondata"] = SessionData.username + ";" + SessionData.email + ";" + SessionData.isAdmin;
                 //Properties.Settings.Default.Save();
-                /*if (keepMeIn.IsChecked == true)
+                if (keepMeIn.IsChecked == true)
                 {
-                    Properties.Settings.Default["keepMeLoggedIn"] = true;
+                    Properties.Settings.Default["RememberUsername"] = username.Text;
                     Properties.Settings.Default.Save();
                 }
                 else
                 {
-                    Properties.Settings.Default["keepMeLoggedIn"] = false;
+                    Properties.Settings.Default["RememberUsername"] = "";
                     Properties.Settings.Default.Save();
-                }*/
+                }
                 if (Properties.Settings.Default["firstTimeHowTo"].ToString() == "true")
                 {
                     Window1.singleton.MainPage.Navigate(new Dialogs.HowTo());
@@ -220,15 +220,16 @@ namespace Twickt_Launcher.Pages
             catch { }
         }
 
-        private async void keepMeIn_Checked(object sender, RoutedEventArgs e)
-        {
-            await DialogHost.Show(new Dialogs.OptionsUpdates("Funzione temporaneamente disabilitata per motivi di sicurezza"), "RootDialog", ExtendedOpenedEventHandler);
-        }
-
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             await Task.Delay(50);
             transition.SelectedIndex = 1;
+            if(Properties.Settings.Default["RememberUsername"].ToString() != "")
+            {
+                username.Text = Properties.Settings.Default["RememberUsername"].ToString();
+                password.Focus();
+                keepMeIn.IsChecked = true;
+            }
 
         }
     }

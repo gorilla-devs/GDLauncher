@@ -38,12 +38,24 @@ namespace Twickt_Launcher.Pages
 
         public async Task RefreshModpacks()
         {
+            //CREA IL LABEL DI ATTESA
+            Label waitlabel = new Label();
+            waitlabel.Content = "Loading Modpacks, please wait...";
+            waitlabel.FontSize = 30;
+            modpacksContainer.Children.Add(waitlabel);
+
+            //INIZIA A SCARICARE LA LISTA DELLE MODPACKS E A CREARE LE CARDS
             var remotelist = await Classes.RemoteModpacks.GetModpacksList();
             foreach (var x in remotelist.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
                 CreateModpackCard(z[0], z[1]);
             }
+
+
+            //RIMUOVE IL LABEL TI ATTESA
+            modpacksContainer.Children.Remove(waitlabel);
         }
 
         protected void CreateModpackCard(string name, string description)
@@ -80,7 +92,7 @@ namespace Twickt_Launcher.Pages
             fullscreenbutton.VerticalAlignment = VerticalAlignment.Bottom;
             fullscreenbutton.Margin = new Thickness(0, 0, 16, -130);
             Panel.SetZIndex(fullscreenbutton, 10);
-            fullscreenbutton.Click += new RoutedEventHandler((sender, e) => fullscreen_click(this, e, card.Name));
+            fullscreenbutton.Click += new RoutedEventHandler((sender, e) => fullscreen_click(this, e, card.Name, name));
 
             var sharebutton = new Button();
             var iconpackshare = new MaterialDesignThemes.Wpf.PackIcon();
@@ -138,6 +150,8 @@ namespace Twickt_Launcher.Pages
             buttonStackPanel.Children.Add(button1);
             buttonStackPanel.Children.Add(button2);
             buttonStackPanel.Children.Add(button3);
+            button1.Click += new RoutedEventHandler((sender, e) => installModpack_click(this, e, card.Name, name));
+            button2.Click += new RoutedEventHandler((sender, e) => mods_click(this, e, card.Name, name));
 
 
             insiderStackPanel.Children.Add(fullscreenbutton);
@@ -150,11 +164,22 @@ namespace Twickt_Launcher.Pages
             modpacksContainer.Children.Add(card);
         }
 
-        async void fullscreen_click(object sender, RoutedEventArgs e, string card)
+        async void fullscreen_click(object sender, RoutedEventArgs e, string card, string modpackName)
         {
             MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksContainer.FindName(card);
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ModpackFullScreen(), "RootDialog");
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ModpackFullScreen(modpackName), "RootDialog");
         }
+        async void mods_click(object sender, RoutedEventArgs e, string card, string modpackName)
+        {
+            MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksContainer.FindName(card);
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ModpackFullScreen(modpackName, true), "RootDialog");
+        }
+        async void installModpack_click(object sender, RoutedEventArgs e, string card, string modpackName)
+        {
+            MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksContainer.FindName(card);
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(), "RootDialog");
+        }
+
 
         private void goToInstalledModpacks_Click(object sender, RoutedEventArgs e)
         {
@@ -166,6 +191,11 @@ namespace Twickt_Launcher.Pages
         {
             modpacksContainer.Children.Clear();
             await RefreshModpacks();
+        }
+
+        private async void addPrivatePackCode_Click(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddPack(), "RootDialog");
         }
     }
 }

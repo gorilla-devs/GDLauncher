@@ -20,8 +20,8 @@
     <Setting Name="DebugMaxLines" Type="System.String" Scope="User">
       <Value Profile="(Default)">30</Value>
     </Setting>
-    <Setting Name="keepMeLoggedIn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="RememberUsername" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="disableHashCheck" Type="System.String" Scope="User">
       <Value Profile="(Default)">false</Value>

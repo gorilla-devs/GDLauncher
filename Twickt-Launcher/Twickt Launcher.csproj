@@ -90,8 +90,8 @@
       <HintPath>..\packages\MaterialDesignColors.1.1.3\lib\net45\MaterialDesignColors.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=2.0.0.638, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.2.0.0.638\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.1.0.657, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.1.0.657\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -161,6 +161,7 @@
     <Compile Include="Classes\AntiSpam.cs" />
     <Compile Include="Classes\AutoUpdater.cs" />
     <Compile Include="Classes\ComputerInfoDetect.cs" />
+    <Compile Include="Classes\Downloader.cs" />
     <Compile Include="Classes\JAVAInstaller.cs" />
     <Compile Include="Classes\JSON.cs" />
     <Compile Include="Classes\LocalModpacks.cs" />
@@ -180,6 +181,9 @@
     <Compile Include="Dialogs\HowTo.xaml.cs">
       <DependentUpon>HowTo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\InstallModpack.xaml.cs">
+      <DependentUpon>InstallModpack.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ModpackFullScreen.xaml.cs">
       <DependentUpon>ModpackFullScreen.xaml</DependentUpon>
     </Compile>
@@ -194,11 +198,6 @@
     </Compile>
     <Compile Include="Dialogs\UpdateAvailable.xaml.cs">
       <DependentUpon>UpdateAvailable.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="it-IT.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>it-IT.resx</DependentUpon>
     </Compile>
     <Compile Include="lang\lang.Designer.cs">
       <DependentUpon>lang.resx</DependentUpon>
@@ -261,6 +260,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\HowTo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\InstallModpack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -361,10 +364,6 @@
     <EmbeddedResource Include="lang\lang.it.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>lang.it.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="it-IT.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>it-IT.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

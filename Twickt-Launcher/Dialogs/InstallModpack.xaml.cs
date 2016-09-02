@@ -16,18 +16,13 @@ using System.Windows.Shapes;
 namespace Twickt_Launcher.Dialogs
 {
     /// <summary>
-    /// Logica di interazione per ModpackFullScreen.xaml
+    /// Logica di interazione per InstallModpack.xaml
     /// </summary>
-    public partial class ModpackFullScreen : UserControl
+    public partial class InstallModpack : UserControl
     {
-        public ModpackFullScreen(string modpackName, bool mods = false)
+        public InstallModpack()
         {
             InitializeComponent();
-            if(mods == true)
-            {
-                modpackstypeselection.SelectedIndex = 1;
-            }
-            modpackNameLabel.Content = modpackName;
         }
     }
 }

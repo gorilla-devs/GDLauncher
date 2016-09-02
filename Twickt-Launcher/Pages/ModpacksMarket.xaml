@@ -24,7 +24,7 @@ Sample license text.
                 <StackPanel>
                     <StackPanel Margin="10" Height="40" VerticalAlignment="Top" Orientation="Horizontal">
                         <TextBox Width="140" HorizontalAlignment="Left" VerticalAlignment="Top" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
-                        <Button Margin="5 0 5 0" Foreground="White">Add Private Pack</Button>
+                        <Button Name="addPrivatePackCode" Margin="5 0 5 0" Foreground="White" Click="addPrivatePackCode_Click">Add Private Pack</Button>
                         <Button Margin="5 0 5 0" Foreground="White">Upload Your Pack</Button>
                         <Button Name="goToInstalledModpacks" Margin="5 0 5 0" Foreground="White" Click="goToInstalledModpacks_Click">Installed Modpacks</Button>
                         <Button Name="refresh" Margin="5 0 5 0" Foreground="White" Click="refresh_Click">

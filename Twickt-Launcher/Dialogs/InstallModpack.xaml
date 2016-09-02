@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="Twickt_Launcher.Dialogs.InstallModpack"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
+             Height="300" Width="480" Background="White">
+    <materialDesign:Card Height="270" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Margin="20 10 20 0">
+            <DockPanel>
+                <Label>Installing Modpack: </Label>
+                <Label Name="modpackname" HorizontalAlignment="Right">NOME</Label>
+            </DockPanel>
+            <DockPanel>
+                <Label>Required MC Version:</Label>
+                <Label HorizontalAlignment="Right">VERSIONE</Label>
+            </DockPanel>
+            <DockPanel>
+                <Label>Required Forge Version:</Label>
+                <Label HorizontalAlignment="Right">VERSIONE</Label>
+            </DockPanel>
+            <DockPanel>
+                <Label>Number of Mods:</Label>
+                <Label HorizontalAlignment="Right">100</Label>
+            </DockPanel>
+            <DockPanel>
+                <Label>Installing Modpack:</Label>
+                <Label HorizontalAlignment="Right">NOME</Label>
+            </DockPanel>
+            <DockPanel>
+                <Label VerticalAlignment="Center">Instance Name:</Label>
+                <TextBox HorizontalAlignment="Right" Width="200" materialDesign:HintAssist.Hint="Instance Name" materialDesign:HintAssist.IsFloating="True"></TextBox>
+            </DockPanel>
+            <DockPanel Margin="0 10 0 0">
+                <Label VerticalAlignment="Center">Modpack Version:</Label>
+                <ComboBox Width="200" HorizontalAlignment="Right" SelectedIndex="0">
+                    <ComboBoxItem>Versione 1</ComboBoxItem>
+                    <ComboBoxItem>Versione 2</ComboBoxItem>
+                    <ComboBoxItem>Versione 3</ComboBoxItem>
+                    <ComboBoxItem>Versione 4</ComboBoxItem>
+                </ComboBox>
+            </DockPanel>
+            <DockPanel HorizontalAlignment="Center" Margin="0 10 0 0">
+                <Button Foreground="White" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
+                <Button Foreground="White" Width="150" Margin="35 0 0 0">Install</Button>
+            </DockPanel>
+
+            
+        </StackPanel>
+    </materialDesign:Card>
+</UserControl>

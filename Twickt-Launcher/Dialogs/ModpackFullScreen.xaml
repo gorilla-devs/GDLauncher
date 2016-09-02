@@ -8,10 +8,13 @@
              mc:Ignorable="d" 
              Height="600" Width="600" Background="White">
     <Grid>
-        <ListBox Name="modpackstypeselection" SelectionMode="Single" Style="{StaticResource MaterialDesignToolToggleListBox}" SelectedIndex="0" HorizontalAlignment="Center">
-            <ListBoxItem Name="info" Width="140" HorizontalContentAlignment="Center">Informations</ListBoxItem>
-            <ListBoxItem Name="mods" Width="140" HorizontalContentAlignment="Center">Mods</ListBoxItem>
-        </ListBox>
+        <StackPanel>
+            <Label Name="modpackNameLabel" HorizontalAlignment="Center" FontSize="20"></Label>
+            <ListBox Name="modpackstypeselection" SelectionMode="Single" Style="{StaticResource MaterialDesignToolToggleListBox}" SelectedIndex="0" HorizontalAlignment="Center" Margin="0 10 0 0">
+                <ListBoxItem Name="info" Width="140" HorizontalContentAlignment="Center">Informations</ListBoxItem>
+                <ListBoxItem Name="mods" Width="140" HorizontalContentAlignment="Center">Mods</ListBoxItem>
+            </ListBox>
+        </StackPanel>
         <Button Name="close" Content="Close" Foreground="White" Height="30" Command="materialDesign:DialogHost.CloseDialogCommand" Margin="418,560,22,10"/>
     </Grid>
 </UserControl>
