@@ -42,7 +42,7 @@ namespace Twickt_Launcher.Classes
             return info.ToArray();
         }
 
-        public static async Task<List<string>> GetMinecraftUrlsAndData(string modpackname)
+        public static async Task<List<string>> GetModpackInfo(string modpackname)
         {
             List<string> info = new List<string>();
 

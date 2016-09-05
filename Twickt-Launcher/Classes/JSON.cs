@@ -56,9 +56,9 @@ namespace Twickt_Launcher.Classes
                 data = e.Result;
             };
             await c.DownloadStringTaskAsync(new Uri(assetsurl));
-            if (!Directory.Exists(config.M_F_P + downloadingVersion[1] + "\\assets\\indexes\\"))
-                Directory.CreateDirectory(config.M_F_P + downloadingVersion[1] + "\\assets\\indexes\\");
-            await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + downloadingVersion[1] + "\\assets\\indexes\\" + downloadingVersion[0] + ".json");
+            if (!Directory.Exists(config.M_F_P + SessionData.instancename + "\\assets\\indexes\\"))
+                Directory.CreateDirectory(config.M_F_P + SessionData.instancename + "\\assets\\indexes\\");
+            await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + SessionData.instancename + "\\assets\\indexes\\" + downloadingVersion[0] + ".json");
 
             List<string[]> assets = new List<string[]>();
             MyClass json = JsonConvert.DeserializeObject<MyClass>(data);
@@ -439,11 +439,7 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<List<string[]>> GetFiles(string modpackname, bool justlibraries = false, bool justforge = false, bool remote = true)
         {
-            if (remote == true)
-                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
-            else
-                downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
-
+            downloadingVersion = await RemoteModpacks.GetModpackInfo(modpackname);
 
             Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.analyzingJsonFiles);
             List<string[]> mods = new List<string[]>();
@@ -478,15 +474,10 @@ namespace Twickt_Launcher.Classes
             }
             catch { }
             List<string[]> forge = await AnalyzeForgeLibraries(modpackname);
-            if (remote == true)
-            {
-                try
-                {
-                    Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingMods");
-                }
-                catch { }
-                mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname);
-            }
+
+            Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingMods");
+
+            mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname);
 
             if ((justforge == false) && (justlibraries == false))
                 list.AddRange(assets);

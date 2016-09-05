@@ -18,10 +18,7 @@ namespace Twickt_Launcher.Classes
         public static List<string> downloadingVersion;
         public static async Task<List<string>> CheckFiles(string modpackname, bool remote)
         {
-            if (remote == true)
-                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
-            else
-                downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
+            downloadingVersion = await RemoteModpacks.GetModpackInfo(modpackname);
 
 
             if (remote == true)
@@ -33,7 +30,7 @@ namespace Twickt_Launcher.Classes
             {
                 try
                 {
-                    string[] localFiles = Directory.GetFiles(config.M_F_P + downloadingVersion[1] + "\\instances\\" + await RemoteModpacks.GetModpacksDir(modpackname) + "\\mods", "*", SearchOption.AllDirectories);
+                    string[] localFiles = Directory.GetFiles(config.M_F_P + SessionData.instancename + "\\instances\\" + SessionData.instancename + "\\mods", "*", SearchOption.AllDirectories);
                     foreach (string file in localFiles)
                     {
                         bool filegood = false;

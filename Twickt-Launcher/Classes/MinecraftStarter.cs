@@ -17,7 +17,7 @@ namespace Twickt_Launcher.Classes
     {
         public static Dialogs.ModpackLoading loading;
         public static List<string> downloadingVersion;
-        public static async void Minecraft_Start(string modpackname, bool remote)
+        /*public static async void Minecraft_Start(string modpackname, bool remote)
         {
             loading = new Dialogs.ModpackLoading(true, Pages.SplashScreen.singleton.manager.GetString("starting") + "...");
             MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", OpenEvent);
@@ -31,7 +31,7 @@ namespace Twickt_Launcher.Classes
             if (remote == true)
             {
                 downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
-                gamedir = await Classes.RemoteModpacks.GetModpacksDir(modpackname);
+                gamedir = SessionData.instancename;
                 getForge = await Classes.RemoteModpacks.IsModpackForgeNeeded(modpackname);
                 if (getForge == "false")
                     forge = false;
@@ -245,6 +245,6 @@ namespace Twickt_Launcher.Classes
             }
             catch { }
 
-        }
+        }*/
     }
 }

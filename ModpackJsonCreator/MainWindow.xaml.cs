@@ -23,14 +23,14 @@ namespace ModpackJsonCreator
     public class Library
     {
         public string name { get; set; }
-        public string hash { get; set; }
+        /*public string hash { get; set; }
         public string url { get; set; }
-        public string check { get; set; }
+        public string check { get; set; }*/
     }
 
     public class JSON
     {
-        public string ModpackName { get; set; }
+        //public string ModpackName { get; set; }
         public List<Library> libraries { get; set; }
     }
     /// <summary>
@@ -73,7 +73,6 @@ namespace ModpackJsonCreator
         private void jsonCreate_Click(object sender, RoutedEventArgs e)
         {
             JSON account = new JSON();
-            account.ModpackName = modpackname.Text;
             account.libraries = new List<Library> { };
 
             string[] files = Directory.GetFiles(FolderPath.Text, "*.*", SearchOption.AllDirectories);
@@ -82,14 +81,12 @@ namespace ModpackJsonCreator
             {
                 string hash = Hash(file);
                 var name = System.IO.Path.GetFileName(file);
-                var localpath = file.Replace(FolderPath.Text + "\\", "").Replace("\\", ":");
+                var localpath = file.Replace(FolderPath.Text + "\\", "").Replace("\\", "/");
                 var websitepath = file.Replace(FolderPath.Text + "\\", "").Replace("\\", "/");
-                var check = "true";
-                var url = modpackpath.Text + "/" + websitepath;
-                account.libraries.Add(new Library { name = modpackpath.Text + ":" + localpath , hash = hash, url = url, check = check }); 
+                account.libraries.Add(new Library { name = "https://dl.twickt.com/packs/" + modpackname.Text.Replace(" ", "_").ToLower() + "/" + localpath}); 
             }
             string json = JsonConvert.SerializeObject(account, Formatting.Indented);
-            System.IO.File.WriteAllText(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" +  modpackpath.Text + ".json", json);
+            System.IO.File.WriteAllText(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + modpackname.Text.Replace(" ", "_").ToLower() + ".json", json);
         }
 
         //hex encoding of the hash, in uppercase.

@@ -85,10 +85,7 @@ namespace Twickt_Launcher.Pages
 
 
             */
-            if (remote == true)
-                downloadingVersion = await RemoteModpacks.GetMinecraftUrlsAndData(modpackname);
-            else
-                downloadingVersion = await LocalModpacks.GetMinecraftUrlsAndData(modpackname);
+                downloadingVersion = await RemoteModpacks.GetModpackInfo(modpackname);
 
             mainjar = config.M_F_P + @"versions\" + downloadingVersion[0] + "\\" + downloadingVersion[0] + ".jar";
             workingThreads.Content = Properties.Settings.Default["download_threads"].ToString();
@@ -133,7 +130,7 @@ namespace Twickt_Launcher.Pages
 
 
             }
-            Classes.MinecraftStarter.Minecraft_Start(modpackname, (remote == true) ? true : false);
+            //Classes.MinecraftStarter.Minecraft_Start(modpackname, (remote == true) ? true : false);
             JSON.urls.Clear();
         }
 

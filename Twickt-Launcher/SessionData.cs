@@ -22,5 +22,7 @@ namespace Twickt_Launcher
         //STATISTICHE
         public static string userCount = "";
         public static string lastUser = "";
+        //NOME ISTANZA DA CREARE(SI PULISCE APPENA CREATA
+        public static string instancename = "";
     }
 }

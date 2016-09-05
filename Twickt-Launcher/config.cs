@@ -14,7 +14,7 @@ namespace Twickt_Launcher
 {
     class config
     {
-        public static string updateWebsite = "https://launcher.twickt.com/";
+        public static string updateWebsite = "https://dl.twickt.com/";
         public static string minecraftfolder = "twickt";
         public static string forgeversion = "";
         public static string mainclass = "";
@@ -23,14 +23,14 @@ namespace Twickt_Launcher
         public static string logfile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\launcher_logs.txt";
         public static string M_F_P = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\";
         public static string LocalModpacks = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\LocalModpacks\";
-        public static string loginWebService = "https://webservices.twickt.com/login.php";
-        public static string bugReportWebService = "https://webservices.twickt.com/bugs.php";
-        public static string RegisterWebService = "https://webservices.twickt.com/process.php";
-        public static string statisticsWebService = "https://webservices.twickt.com/InfoStatistics.php";
-        public static string modpacksWebService = "https://webservices.twickt.com/modpacks.php";
-        public static string launcherStatusWebService = "https://webservices.twickt.com/launcher_status.php";
-        public static string changelogsWebService = "https://webservices.twickt.com/changelogs.php";
-        public static string updatessWebService = "https://webservices.twickt.com/updates.php";
+        public static string loginWebService = "https://webservices.twickt.com/beta/login.php";
+        public static string bugReportWebService = "https://webservices.twickt.com/beta/bugs.php";
+        public static string RegisterWebService = "https://webservices.twickt.com/beta/process.php";
+        public static string statisticsWebService = "https://webservices.twickt.com/beta/InfoStatistics.php";
+        public static string modpacksWebService = "https://webservices.twickt.com/beta/modpacks.php";
+        public static string launcherStatusWebService = "https://webservices.twickt.com/beta/launcher_status.php";
+        public static string changelogsWebService = "https://webservices.twickt.com/beta/changelogs.php";
+        public static string updatessWebService = "https://webservices.twickt.com/beta/updates.php";
         public static string javaDownloadURL32 = "jPortable_8_Update_101.paf";
         public static string javaDownloadURL64 = "jPortable64_8_Update_101.paf";
 

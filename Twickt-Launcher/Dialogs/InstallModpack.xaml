@@ -14,19 +14,19 @@
             </DockPanel>
             <DockPanel>
                 <Label>Required MC Version:</Label>
-                <Label HorizontalAlignment="Right">VERSIONE</Label>
+                <Label Name="mc_version" HorizontalAlignment="Right">VERSIONE</Label>
             </DockPanel>
             <DockPanel>
                 <Label>Required Forge Version:</Label>
-                <Label HorizontalAlignment="Right">VERSIONE</Label>
+                <Label Name="forge_version" HorizontalAlignment="Right">VERSIONE</Label>
             </DockPanel>
             <DockPanel>
                 <Label>Number of Mods:</Label>
-                <Label HorizontalAlignment="Right">100</Label>
+                <Label Name="mods_numb" HorizontalAlignment="Right">100</Label>
             </DockPanel>
             <DockPanel>
-                <Label>Installing Modpack:</Label>
-                <Label HorizontalAlignment="Right">NOME</Label>
+                <Label>Creation date:</Label>
+                <Label Name="creation_date" HorizontalAlignment="Right">DATA</Label>
             </DockPanel>
             <DockPanel>
                 <Label VerticalAlignment="Center">Instance Name:</Label>
@@ -34,16 +34,12 @@
             </DockPanel>
             <DockPanel Margin="0 10 0 0">
                 <Label VerticalAlignment="Center">Modpack Version:</Label>
-                <ComboBox Width="200" HorizontalAlignment="Right" SelectedIndex="0">
-                    <ComboBoxItem>Versione 1</ComboBoxItem>
-                    <ComboBoxItem>Versione 2</ComboBoxItem>
-                    <ComboBoxItem>Versione 3</ComboBoxItem>
-                    <ComboBoxItem>Versione 4</ComboBoxItem>
+                <ComboBox Name="versionsList" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged">
                 </ComboBox>
             </DockPanel>
             <DockPanel HorizontalAlignment="Center" Margin="0 10 0 0">
                 <Button Foreground="White" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
-                <Button Foreground="White" Width="150" Margin="35 0 0 0">Install</Button>
+                <Button Name="install" Foreground="White" Width="150" Margin="35 0 0 0" Click="install_Click">Install</Button>
             </DockPanel>
 
             
