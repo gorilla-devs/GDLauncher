@@ -6,9 +6,9 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
              mc:Ignorable="d" 
-             Height="600" Width="600" Background="White">
+             Height="600" Width="600" Background="White" Loaded="UserControl_Loaded">
     <Grid>
-        <StackPanel>
+        <StackPanel Name="Main">
             <Label Name="modpackNameLabel" HorizontalAlignment="Center" FontSize="20"></Label>
             <ListBox Name="modpackstypeselection" SelectionMode="Single" Style="{StaticResource MaterialDesignToolToggleListBox}" SelectedIndex="0" HorizontalAlignment="Center" Margin="0 10 0 0">
                 <ListBoxItem Name="info" Width="140" HorizontalContentAlignment="Center">Informations</ListBoxItem>

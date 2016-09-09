@@ -81,37 +81,38 @@ namespace Twickt_Launcher.Classes
             }
         }
 
-        public static async Task<List<string[]>> GetModpacksFiles(string modpackname)
+        public static async Task<List<string[]>> GetModpacksFiles(string modpackname, string versionName, string instanceName)
         {
             List<string[]> libraries = new List<string[]>();
-            string temp;
+            string[] temp;
             var client = new WebClient();
             var values = new System.Collections.Specialized.NameValueCollection();
-            values["target"] = "specific";
+            values["target"] = "specificVersion";
             values["name"] = modpackname;
+            values["versionName"] = versionName;
+
 
             var response = await client.UploadValuesTaskAsync(config.modpacksWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
 
             if (!responseString.Contains("0results"))
-                temp = responseString.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.None)[6];
+                temp = responseString.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
             else
             {
                 MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("couldNotGetModpacksList"));
                 return null;
             }
 
-            dynamic json = JsonConvert.DeserializeObject(temp);
+            dynamic json = JsonConvert.DeserializeObject(temp[3]);
 
                 foreach (var item in json["libraries"])
                 {
                     var package = (string)item["name"];
 
                     //RESTITUISCE L'URL COMPLETO DEL DOWNLOAD
-                    libraries.Add(new string[1] { package });
-
-            }
+                    libraries.Add(new string[4] { System.IO.Path.GetFileName(package), null, "Packs\\" + instanceName + "\\mods\\" + System.IO.Path.GetFileName(package), package });
+                }
                 return libraries;
         }
 

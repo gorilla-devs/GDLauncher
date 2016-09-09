@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -25,9 +26,11 @@ namespace Twickt_Launcher.Dialogs
     public partial class InstallModpack : UserControl
     {
         static string name;
+        public static InstallModpack singleton;
         public InstallModpack(string modpackname)
         {
             InitializeComponent();
+            singleton = this;
             name = modpackname;
             var client = new WebClient();
             var values = new NameValueCollection();
@@ -66,6 +69,7 @@ namespace Twickt_Launcher.Dialogs
                     mc_version.Content = z[4];
                     forge_version.Content = z[2];
                     mods_numb.Content = jObj["libraries"].Count();
+
                     creation_date.Content = z[5];
                 }
             }
@@ -73,11 +77,33 @@ namespace Twickt_Launcher.Dialogs
 
         private async void install_Click(object sender, RoutedEventArgs e)
         {
-            var urls = await Classes.RemoteModpacks.GetModpacksFiles("BrotherHood Of Heroes"); //BISOGNA METTERE LA VERSIONE DELLA MODPACK
-            foreach (var url in urls)
+            if(String.IsNullOrEmpty(instanceTextName.Text))
+            {
+                MessageBox.Show("Nome istanza vuoto");
+                return;
+            }
+            if(Directory.Exists(config.M_F_P + "Packs\\" + instanceTextName.Text))
+            {
+                MessageBox.Show("Nome istanza gia' esistente");
+                return;
+            }
+            transition.SelectedIndex = 1;
+            workingThreadsText.Content = Properties.Settings.Default["download_threads"].ToString();
+            modpackName.Content = versionsList.Text;
+            var files = await Classes.JSON.GetFiles(name, instanceTextName.Text, mc_version.Content.ToString(), forge_version.Content.ToString(), versionsList.Text);
+            await Classes.Downloader.MCDownload(files, instanceTextName.Text);
+            cancelButton.Visibility = Visibility.Hidden;
+            continueButton.Visibility = Visibility.Visible;
+            installationEndedIcon.Visibility = Visibility.Visible;
+            installationEndedText.Visibility = Visibility.Visible;
+            /*foreach(var file in files)
+            {
+                MessageBox.Show(config.M_F_P + file[2]);
+            }*/
+            /*foreach (var url in urls)
             {
                 MessageBox.Show(url[0]);
-            }
+            }*/
         }
     }
 }

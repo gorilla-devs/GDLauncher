@@ -22,6 +22,7 @@ namespace Twickt_Launcher
         public static string forgefilepath = "";
         public static string logfile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\launcher_logs.txt";
         public static string M_F_P = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\";
+        public static string javaLocal = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\";
         public static string LocalModpacks = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\LocalModpacks\";
         public static string loginWebService = "https://webservices.twickt.com/beta/login.php";
         public static string bugReportWebService = "https://webservices.twickt.com/beta/bugs.php";

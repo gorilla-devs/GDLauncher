@@ -32,9 +32,9 @@ namespace Twickt_Launcher.Classes
                 return false;
             else
             {
-                if(File.Exists(config.M_F_P + "runtime\\java.zip"))
+                if(File.Exists(config.javaLocal + "runtime\\java.zip"))
                 {
-                    File.Delete(config.M_F_P + "runtime\\java.zip");
+                    File.Delete(config.javaLocal + "runtime\\java.zip");
                 }
                 return true;
             }
@@ -42,8 +42,8 @@ namespace Twickt_Launcher.Classes
 
         public static async Task DownloadJava()
         {
-            if (!Directory.Exists(config.M_F_P + "runtime\\jre"))
-                Directory.CreateDirectory(config.M_F_P + "runtime\\jre");
+            if (!Directory.Exists(config.javaLocal + "runtime\\jre"))
+                Directory.CreateDirectory(config.javaLocal + "runtime\\jre");
             Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
@@ -71,13 +71,13 @@ namespace Twickt_Launcher.Classes
             webClient.OpenRead(url);
             bytes_total = Convert.ToInt64(webClient.ResponseHeaders["Content-Length"]) / 1024;
             sw.Start();
-            await webClient.DownloadFileTaskAsync(new Uri(url), config.M_F_P + "runtime\\java.zip");
+            await webClient.DownloadFileTaskAsync(new Uri(url), config.javaLocal + "runtime\\java.zip");
             Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("extractingJava");
             try
             {
-                ZipFile zip = ZipFile.Read(config.M_F_P + "runtime\\java.zip");
-                await Task.Factory.StartNew(() => zip.ExtractAll(config.M_F_P + "runtime\\jre\\", ExtractExistingFileAction.OverwriteSilently)).ContinueWith((ante) => Thread.Sleep(200)); ;
+                ZipFile zip = ZipFile.Read(config.javaLocal + "runtime\\java.zip");
+                await Task.Factory.StartNew(() => zip.ExtractAll(config.javaLocal + "runtime\\jre\\", ExtractExistingFileAction.OverwriteSilently)).ContinueWith((ante) => Thread.Sleep(200)); ;
             }
             catch(TargetInvocationException e)
             {
@@ -85,12 +85,12 @@ namespace Twickt_Launcher.Classes
             }
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
             {
-                Properties.Settings.Default["JavaPath"] = config.M_F_P + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
+                Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
                 Properties.Settings.Default.Save();
             }
             else
             {
-                Properties.Settings.Default["JavaPath"] = config.M_F_P + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
+                Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
                 Properties.Settings.Default.Save();
             }
         }

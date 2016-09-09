@@ -21,12 +21,12 @@ namespace Twickt_Launcher.Classes
             downloadingVersion = await RemoteModpacks.GetModpackInfo(modpackname);
 
 
-            if (remote == true)
+            /*if (remote == true)
                 urls = await JSON.GetFiles(modpackname);
             else
-                urls = await JSON.GetFiles(modpackname, false, false, false);
+                urls = await JSON.GetFiles(modpackname, false, false, false);*/
 
-            if (remote == true && downloadingVersion[3] == "true")
+            /*if (remote == true && downloadingVersion[3] == "true")
             {
                 try
                 {
@@ -55,7 +55,7 @@ namespace Twickt_Launcher.Classes
                 {
                     MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("mixFileCheckError"));
                 }
-            }
+            }*/
             if (Properties.Settings.Default["disableHashCheck"].ToString() == "false")
             {
                 if (Pages.Modpacks.singleton.remote.IsSelected)

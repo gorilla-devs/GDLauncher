@@ -39,46 +39,18 @@ namespace Twickt_Launcher.Classes
     }
     class JSON
     {
-        //FORMATO ARRAY:  name, sha1, path, url, check
+        //FORMATO ARRAY:  name, sha1, path, url
         public static List<string[]> urls = new List<string[]>();
         static int arch = ComputerInfoDetect.GetComputerArchitecture();
         public static RemoteModpacks remotemodpacks = new RemoteModpacks();
-        public static List<string> downloadingVersion;
+        public static List<string> downloadingVersion; //await RemoteModpacks.GetModpackInfo(modpackname);
+                                                       //forge_version, mc-version, json, creation_date
         public static Stopwatch sw = new Stopwatch();
+
+        //L'URL viene preso nella funzione mainjar(), poiche' il link si trova nel json
         public static string assetsurl;
-
-        public static async Task<List<string[]>> AnalyzeAssets()
-        {
-            WebClient c = new WebClient();
-            string data = "";
-            c.DownloadStringCompleted += (sender, e) =>
-            {
-                data = e.Result;
-            };
-            await c.DownloadStringTaskAsync(new Uri(assetsurl));
-            if (!Directory.Exists(config.M_F_P + SessionData.instancename + "\\assets\\indexes\\"))
-                Directory.CreateDirectory(config.M_F_P + SessionData.instancename + "\\assets\\indexes\\");
-            await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + SessionData.instancename + "\\assets\\indexes\\" + downloadingVersion[0] + ".json");
-
-            List<string[]> assets = new List<string[]>();
-            MyClass json = JsonConvert.DeserializeObject<MyClass>(data);
-            var names = json.Objects.Keys.ToList();
-            int i = 0;
-            foreach (var item in names)
-            {
-                var hash = json.Objects[item].Hash;
-                var name = hash;
-                var path = @"\assets\objects\" + hash.Substring(0, 2) + "\\" + hash;
-                var url = "http://resources.download.minecraft.net/";
-                var finalurl = "";
-                finalurl = url + hash.Substring(0, 2) + "/" + hash;
-                assets.Add(new string[4] { name, hash,  "\\" + path, finalurl });
-                i++;
-            }
-            return assets;
-        }
-
-        public static async Task<List<string[]>> AnalyzeMainJar()
+        
+        public static async Task<List<string[]>> AnalyzeMainJar(string version, string instanceName)
         {
             List<string[]> matrix = new List<string[]>();
             string data = "";
@@ -91,7 +63,7 @@ namespace Twickt_Launcher.Classes
                 }
                 catch { }
             };
-            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + downloadingVersion[0] + "/" + downloadingVersion[0] + ".json"));
+            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + version + "/" + version + ".json"));
             try
             {
                 dynamic json = JsonConvert.DeserializeObject(data);
@@ -112,7 +84,6 @@ namespace Twickt_Launcher.Classes
                         param = param.Replace("\"sha1\": \"", "");
                         hash = param.Replace("\"", "");
                     }
-
                 }
                 foreach (var item in json["assetIndex"])
                 {
@@ -124,7 +95,7 @@ namespace Twickt_Launcher.Classes
                     }
                 }
                 name = "mainjar";
-                matrix.Add(new string[4] { name, hash, "\\" + @"\versions\" + downloadingVersion[0] + "\\" + downloadingVersion[0] + ".jar" , url });
+                matrix.Add(new string[4] { name, hash, ("Packs\\" + instanceName + "\\" + @"\versions\" + version + "\\" + version + ".jar"), url });
             }
             catch (JsonReaderException)
             {
@@ -133,7 +104,7 @@ namespace Twickt_Launcher.Classes
             return matrix;
         }
 
-        public static async Task<List<string[]>> AnalyzeStdLibraries()
+        public static async Task<List<string[]>> AnalyzeStdLibraries(string version, string instanceName)
         {
             WebClient c = new WebClient();
             string data = "";
@@ -141,13 +112,13 @@ namespace Twickt_Launcher.Classes
             {
                 data = e.Result;
             };
-            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + downloadingVersion[0] + "/" + downloadingVersion[0] + ".json"));
+            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + version + "/" + version + ".json"));
             List<string[]> libraries = new List<string[]>();
             dynamic json = JsonConvert.DeserializeObject(data);
             var hash = "";
             var url = "";
             var path = "";
-            
+
             foreach (var item in json["libraries"])
             {
                 var name = (string)item["name"];
@@ -189,9 +160,40 @@ namespace Twickt_Launcher.Classes
                     }
                 }
                 catch { }
-                libraries.Add(new string[4] { name, hash,  "\\" + @"\libraries\" + path.Replace("/", "\\"), url });
+                libraries.Add(new string[4] { name, hash, "Packs\\" + instanceName + @"\libraries\" + path.Replace("/", "\\"), url });
             }
             return libraries;
+        }
+
+        public static async Task<List<string[]>> AnalyzeAssets(string version, string instanceName)
+        {
+            WebClient c = new WebClient();
+            string data = "";
+            c.DownloadStringCompleted += (sender, e) =>
+            {
+                data = e.Result;
+            };
+            await c.DownloadStringTaskAsync(new Uri(assetsurl));
+            if (!Directory.Exists(config.M_F_P + "Packs\\" + instanceName + "\\assets\\indexes\\"))
+                Directory.CreateDirectory(config.M_F_P + "Packs\\" + instanceName + "\\assets\\indexes\\");
+            await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + "Packs\\" + instanceName + "\\assets\\indexes\\" + version + ".json");
+
+            List<string[]> assets = new List<string[]>();
+            MyClass json = JsonConvert.DeserializeObject<MyClass>(data);
+            var names = json.Objects.Keys.ToList();
+            int i = 0;
+            foreach (var item in names)
+            {
+                var hash = json.Objects[item].Hash;
+                var name = hash;
+                var path = @"\assets\objects\" + hash.Substring(0, 2) + "\\" + hash;
+                var url = "http://resources.download.minecraft.net/";
+                var finalurl = "";
+                finalurl = url + hash.Substring(0, 2) + "/" + hash;
+                assets.Add(new string[4] { name, hash, "Packs\\" + instanceName + "\\" + path, finalurl });
+                i++;
+            }
+            return assets;
         }
 
         public static string Hash(string str)
@@ -204,7 +206,7 @@ namespace Twickt_Launcher.Classes
             return BitConverter.ToString(data).Replace("-", "").ToLower();
         }
 
-        public static async Task<List<string[]>> AnalyzeForgeLibraries(string modpackname)
+        public static async Task<List<string[]>> AnalyzeForgeLibraries(string modpackname, string version, string instanceName)
         {
             ///////////////////////
             //DEFINIZIONE VARIABILI
@@ -218,20 +220,11 @@ namespace Twickt_Launcher.Classes
             string tweakclass = "";
             string mainclass = "";
             string forgefilepath = "";
-            bool forge;
-            var temp = config.M_F_P + downloadingVersion[1] + @"\temp\";
+            var temp = config.M_F_P + "Packs\\" + instanceName + @"\temp\";
             var forgejson = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json";
             /////////////////////////////////////////
             //CONTROLLO SE FORGE E' DA SCARICARE O NO
             /////////////////////////////////////////
-            if (downloadingVersion[2] == "false")
-                forge = false;
-            else
-                forge = true;
-
-
-            if (forge == true)
-            {
                 ///////////////////////
                 //GETTING FORGE VERSION JSON FILE
                 c.DownloadStringCompleted += (sender, e) =>
@@ -250,10 +243,10 @@ namespace Twickt_Launcher.Classes
                     {
                         //SE LA VERSIONE DI MINECRAFT VIENE TROVATA VIENE PRESA LA RELATIVA VERSIONE DI FORGE
                         //DATO CHE FORGE UTILIZZA DUE TIPI DI URL VIENE FATTA UNA PROVA SUL PRIMO, SE DA ERRORE SI USA IL SECONDO
-                        if (entry.Key == downloadingVersion[0] + "-latest")
+                        if (entry.Key == version + "-latest")
                         {
                             forgeversion = entry.Value;
-                            forgefilename = downloadingVersion[0] + "-" + entry.Value + "-" + downloadingVersion[0];
+                            forgefilename = version + "-" + entry.Value + "-" + version;
                             WebRequest webRequest = WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + forgefilename + "/forge-" + forgefilename + "-installer.jar");
                             WebResponse webResponse;
                             try
@@ -263,7 +256,7 @@ namespace Twickt_Launcher.Classes
                             }
                             catch //If exception thrown then couldn't get response from address
                             {
-                                forgefilename = downloadingVersion[0] + "-" + entry.Value;
+                                forgefilename = version + "-" + entry.Value;
                             }
                             
                         }
@@ -274,9 +267,9 @@ namespace Twickt_Launcher.Classes
                     MessageBox.Show(ex.ToString());
                 }
                 //VIENE SETTATA LA VERSIONE DI FORGE GLOBALMENTE NEL LAUNCHER
-                config.forgeversion = downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0];
+                config.forgeversion = version + "-" + forgeversion + "-" + version;
                 /////////////////////////////////////////////////////////////
-                var libraries = config.M_F_P + downloadingVersion[1] + @"\libraries\";
+                var libraries = config.M_F_P + "Packs\\" + instanceName + @"\libraries\";
                 if (!Directory.Exists(@temp))
                 {
                     Directory.CreateDirectory(@temp);
@@ -292,36 +285,25 @@ namespace Twickt_Launcher.Classes
                         //VIENE SCARICATO L'INSTALLER
                         urlforge = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + forgefilename + "/forge-" + forgefilename + "-installer.jar";
                         webClient.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                        if (Pages.Modpacks.singleton.remote.IsSelected)
-                        {
-                            Pages.Modpacks.loading.forgeProgress.Visibility = System.Windows.Visibility.Visible;
-                            Pages.Modpacks.loading.whatdoing.Visibility = System.Windows.Visibility.Visible;
-                            Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingForge");
-                        }
-                        if(Pages.Modpacks.singleton.local.IsSelected)
-                            Pages.Modpacks.localmodpackadd.progress.Visibility = Visibility.Visible;
+                        Dialogs.InstallModpack.singleton.whatDoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingForge");
                         webClient.DownloadProgressChanged += (s, e) =>
                         {
-                            if (Pages.Modpacks.singleton.local.IsSelected)
-                                Pages.Modpacks.localmodpackadd.progress.Value = e.ProgressPercentage;
-                            if (Pages.Modpacks.singleton.remote.IsSelected)
-                            {
-                                Pages.Modpacks.loading.forgeProgress.Value = e.ProgressPercentage;
-                                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingForge") + " " + string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
-                            }
+                                Dialogs.InstallModpack.singleton.forgeProgression.Value = e.ProgressPercentage;
+                                Dialogs.InstallModpack.singleton.forgeTextProgression.Content =  string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
                         };
                         sw.Start();
-                        await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"));
+                        await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + version + "-" + forgeversion + "-" + version + "-installer.jar"));
+                        Dialogs.InstallModpack.singleton.forgeTextProgression.Content = "Forge Downloaded";
                         sw.Stop();
-                        if (Pages.Modpacks.singleton.remote.IsSelected)
-                            Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadedForge");
+                        /*if (Pages.Modpacks.singleton.remote.IsSelected)
+                            Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadedForge");*/
                         //////////////////////////////////////////////
                     }
                     ////////////////////////////////////////////////////////////////////////////////////////
                     //VERIFICA SE L'INSTALLER SCARICATO ESISTE, SE ESISTE PROCEDE CON L'ESTRAZIONE DEI DUE FILES
-                    if (File.Exists(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"))
+                    if (File.Exists(@temp + "forge-" + version + "-" + forgeversion + "-" + version + "-installer.jar"))
                     {
-                        using (ZipFile zip = ZipFile.Read(@temp + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "-installer.jar"))
+                        using (ZipFile zip = ZipFile.Read(@temp + "forge-" + version + "-" + forgeversion + "-" + version + "-installer.jar"))
                         {
                             //ESTRAE LA LISTA JSON DI ROBA DA SCARICARE E IL FILE JAR PRINCIPALE DI FORGE
                             await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("install_profile.json", "\\", @temp, ExtractExistingFileAction.OverwriteSilently));
@@ -332,16 +314,16 @@ namespace Twickt_Launcher.Classes
                             await Task.Factory.StartNew(() => zip.ExtractSelectedEntries(forgefilepath, "\\", @temp, ExtractExistingFileAction.OverwriteSilently));
                         }
                         //CONTROLLA SE ESISTE LA CARTELLA DOVE METTERE IL FILE PRINCIPALE DI FORGE, SE NON ESISTE LA CREA
-                        if (!Directory.Exists(@libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + " \\"))
+                        if (!Directory.Exists(@libraries + "net\\minecraftforge\\forge\\" + version + "-" + forgeversion + "-" + version + " \\"))
                         {
-                            Directory.CreateDirectory(@libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "\\");
+                            Directory.CreateDirectory(@libraries + "net\\minecraftforge\\forge\\" + version + "-" + forgeversion + "-" + version + "\\");
                         }
                         await Task.Delay(500);
                         try
                         {
                             //MessageBox.Show(@temp + forgefilepath);
                             //SPOSTA IL FILE PRINCIPALE DI FORGE APPENA ESTRATTO NELLA CARTELLA LIBRARIES
-                            File.Move(@temp + forgefilepath, @libraries + "net\\minecraftforge\\forge\\" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + "\\" + "forge-" + downloadingVersion[0] + "-" + forgeversion + "-" + downloadingVersion[0] + ".jar");
+                            File.Move(@temp + forgefilepath, @libraries + "net\\minecraftforge\\forge\\" + version + "-" + forgeversion + "-" + version + "\\" + "forge-" + version + "-" + forgeversion + "-" + version + ".jar");
                         }
                         catch
                         {
@@ -430,67 +412,43 @@ namespace Twickt_Launcher.Classes
                     dir = System.IO.Path.GetDirectoryName(@dir);
                     if (((string)item["clientreq"] != "False") || ((string)item["clientreq"] == ""))
                     {
-                        Libraries.Add(new string[4] { package, "nohash", @"\libraries\" + dir, finalurl });
+                        Libraries.Add(new string[4] { package, "nohash", "Packs\\" + instanceName + @"\libraries\" + dir, finalurl });
                     }
                 }
-            }
             return Libraries;
         }
 
-        public static async Task<List<string[]>> GetFiles(string modpackname, bool justlibraries = false, bool justforge = false, bool remote = true)
+        public static async Task<List<string[]>> GetFiles(string modpackname, string instanceName, string version, string forgeVersion, string modpackVersion,  bool justlibraries = false)
         {
             downloadingVersion = await RemoteModpacks.GetModpackInfo(modpackname);
 
-            Windows.DebugOutputConsole.singleton.Write(lang.languageswitch.analyzingJsonFiles);
-            List<string[]> mods = new List<string[]>();
-            try
-            {
-                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analysingJsonFiles");
-            }
-            catch { }
-
             List<string[]> list = new List<string[]>();
-            try
-            {
-                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingMainJar");
-            }
-            catch { }
-            List<string[]> mainjar = await AnalyzeMainJar();
-            try
-            {
-                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingAssets");
-            }
-            catch { }
-            List<string[]> assets = await AnalyzeAssets();
-            try
-            {
-                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingStandardLibraries");
-            }
-            catch { }
-            List<string[]> libraries = await AnalyzeStdLibraries();
-            try
-            {
-                Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingForgeLibraries");
-            }
-            catch { }
-            List<string[]> forge = await AnalyzeForgeLibraries(modpackname);
 
-            Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("analyzingMods");
-
-            mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname);
-
-            if ((justforge == false) && (justlibraries == false))
-                list.AddRange(assets);
-            if ((justforge == false) && (justlibraries == false))
-                list.AddRange(mainjar);
-            if ((justlibraries == false && justforge == false) || (justlibraries == true && justforge == false))
-                list.AddRange(libraries);
-            if ((justlibraries == false && justforge == true) || (justlibraries == false && justforge == false))
+            Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Main Jar";
+            List<string[]> mainjar = await AnalyzeMainJar(version, instanceName);
+            list.AddRange(mainjar);
+            Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Libs";
+            List <string[]> libraries = await AnalyzeStdLibraries(version, instanceName);
+            list.AddRange(libraries);
+            Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Assets";
+            List<string[]> assets = await AnalyzeAssets(version, instanceName);
+            list.AddRange(assets);
+            if(forgeVersion != "false")
+            {
+                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Forge";
+                List<string[]> forge = await AnalyzeForgeLibraries(modpackname, version, instanceName);
                 list.AddRange(forge);
-            if ((justlibraries == false && justforge == false) && (remote == true))
+                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Mods";
+                List<string[]> mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname, modpackVersion, instanceName);
                 list.AddRange(mods);
-            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("jsonFileAnalyzed"));
-            urls = list;
+            }
+            Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysis Finished";
+            Dialogs.InstallModpack.singleton.analysisprogress.Visibility = Visibility.Hidden;
+            Dialogs.InstallModpack.singleton.analysisprogress.Width = 0;
+            Dialogs.InstallModpack.singleton.analysisprogress.Margin = new Thickness(0);
+            Dialogs.InstallModpack.singleton.analysisended.Margin = new Thickness(20, 10, 10, 0);
+            Dialogs.InstallModpack.singleton.analysisended.Width = 50;
+            Dialogs.InstallModpack.singleton.analysisended.Height = 50;
 
             return list.Distinct().ToList();
         }

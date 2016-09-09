@@ -5,44 +5,95 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
-             Height="300" Width="480" Background="White">
-    <materialDesign:Card Height="270" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <StackPanel Margin="20 10 20 0">
-            <DockPanel>
-                <Label>Installing Modpack: </Label>
-                <Label Name="modpackname" HorizontalAlignment="Right">NOME</Label>
-            </DockPanel>
-            <DockPanel>
-                <Label>Required MC Version:</Label>
-                <Label Name="mc_version" HorizontalAlignment="Right">VERSIONE</Label>
-            </DockPanel>
-            <DockPanel>
-                <Label>Required Forge Version:</Label>
-                <Label Name="forge_version" HorizontalAlignment="Right">VERSIONE</Label>
-            </DockPanel>
-            <DockPanel>
-                <Label>Number of Mods:</Label>
-                <Label Name="mods_numb" HorizontalAlignment="Right">100</Label>
-            </DockPanel>
-            <DockPanel>
-                <Label>Creation date:</Label>
-                <Label Name="creation_date" HorizontalAlignment="Right">DATA</Label>
-            </DockPanel>
-            <DockPanel>
-                <Label VerticalAlignment="Center">Instance Name:</Label>
-                <TextBox HorizontalAlignment="Right" Width="200" materialDesign:HintAssist.Hint="Instance Name" materialDesign:HintAssist.IsFloating="True"></TextBox>
-            </DockPanel>
-            <DockPanel Margin="0 10 0 0">
-                <Label VerticalAlignment="Center">Modpack Version:</Label>
-                <ComboBox Name="versionsList" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged">
-                </ComboBox>
-            </DockPanel>
-            <DockPanel HorizontalAlignment="Center" Margin="0 10 0 0">
-                <Button Foreground="White" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
-                <Button Name="install" Foreground="White" Width="150" Margin="35 0 0 0" Click="install_Click">Install</Button>
-            </DockPanel>
+             Height="335" Width="480" Background="White">
+    <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="0">
 
-            
-        </StackPanel>
-    </materialDesign:Card>
+        <!-- you can use a slide for each page, let's add a touch of fade for our first page  -->
+        <materialDesign:TransitionerSlide>
+            <materialDesign:Card Height="270" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Margin="20 10 20 0">
+                    <DockPanel>
+                        <Label>Installing Modpack:</Label>
+                        <Label Name="modpackname" HorizontalAlignment="Right">NOME</Label>
+                    </DockPanel>
+                    <DockPanel>
+                        <Label>Required MC Version:</Label>
+                        <Label Name="mc_version" HorizontalAlignment="Right">VERSIONE</Label>
+                    </DockPanel>
+                    <DockPanel>
+                        <Label>Required Forge Version:</Label>
+                        <Label Name="forge_version" HorizontalAlignment="Right">VERSIONE</Label>
+                    </DockPanel>
+                    <DockPanel>
+                        <Label>Number of Mods:</Label>
+                        <Label Name="mods_numb" HorizontalAlignment="Right">100</Label>
+                    </DockPanel>
+                    <DockPanel>
+                        <Label>Creation date:</Label>
+                        <Label Name="creation_date" HorizontalAlignment="Right">DATA</Label>
+                    </DockPanel>
+                    <DockPanel>
+                        <Label VerticalAlignment="Center">Instance Name:</Label>
+                        <TextBox Name="instanceTextName" HorizontalAlignment="Right" Width="200" materialDesign:HintAssist.Hint="Instance Name" materialDesign:HintAssist.IsFloating="True"></TextBox>
+                    </DockPanel>
+                    <DockPanel Margin="0 10 0 0">
+                        <Label VerticalAlignment="Center">Modpack Version:</Label>
+                        <ComboBox Name="versionsList" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged">
+                        </ComboBox>
+                    </DockPanel>
+                    <DockPanel HorizontalAlignment="Center" Margin="0 10 0 0">
+                        <Button Foreground="White" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
+                        <Button Name="install" Foreground="White" Width="150" Margin="35 0 0 0" Click="install_Click">Install</Button>
+                    </DockPanel>
+
+
+                </StackPanel>
+            </materialDesign:Card>
+        </materialDesign:TransitionerSlide>
+        <materialDesign:TransitionerSlide Background="White">
+            <StackPanel>
+                <materialDesign:Card Width="440" Height="90" Margin="0 5 0 0">
+                    <DockPanel>
+                        <ProgressBar Name="analysisprogress" HorizontalAlignment="Left" Margin="20 0 20 10" Width="50" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
+                        <materialDesign:PackIcon Name="analysisended" Kind="CheckboxMarkedCircleOutline" VerticalAlignment="Center" Height="0" Width="0" Foreground="#4CAF50"/>
+                        <Label Name="whatDoing" VerticalAlignment="Center">Analysing</Label>
+                        <StackPanel Visibility="Visible">
+                            <ProgressBar Name="forgeProgression" Margin="30 40 30 0"></ProgressBar>
+                            <Label Name="forgeTextProgression" HorizontalAlignment="Center" FontSize="12">Forge download percentage</Label>
+                        </StackPanel>
+                    </DockPanel>
+                </materialDesign:Card>
+                <materialDesign:Card Width="440" Height="70" Margin="0 5 0 0">
+                    <StackPanel>
+                        <DockPanel>
+                        <Label>Working Threads:</Label>
+                        <Label Name="workingThreadsText">NUMBER</Label>
+                        </DockPanel>
+                        <DockPanel>
+                            <Label>Modpack Name:</Label>
+                            <Label Name="modpackName">Name</Label>
+                        </DockPanel>
+                    </StackPanel>
+                </materialDesign:Card>
+                <materialDesign:Card Width="440" Height="100" Margin="0 5 0 0">
+                    <StackPanel>
+                        <DockPanel>
+                            <Label>Files:</Label>
+                            <Label Name="filesToDownload">0/0</Label>
+                        </DockPanel>
+                        <DockPanel>
+                            <ProgressBar Name="progressBarDownload" Margin="10"></ProgressBar>
+                        </DockPanel>
+                        <Label Name="totalPercentage" HorizontalAlignment="Center">10%</Label>
+                    </StackPanel>
+                </materialDesign:Card>
+                <DockPanel>
+                    <Button Name="cancelButton" Margin="10" Width="130" HorizontalAlignment="Left" Foreground="White">Cancel</Button>
+                    <materialDesign:PackIcon Name="installationEndedIcon" Kind="CheckboxMarkedCircleOutline" Margin="100 0 0 0" VerticalAlignment="Center" Height="30" Width="30" Foreground="#4CAF50" Visibility="Hidden"/>
+                    <Label Name="installationEndedText" VerticalAlignment="Center" Visibility="Hidden">Installed</Label>
+                    <Button Name="continueButton" Margin="10" Width="130" HorizontalAlignment="Right" Foreground="White" Visibility="Hidden" Command="materialDesign:DialogHost.CloseDialogCommand">Continue</Button>
+                </DockPanel>
+            </StackPanel>
+        </materialDesign:TransitionerSlide>
+    </materialDesign:Transitioner>
 </UserControl>

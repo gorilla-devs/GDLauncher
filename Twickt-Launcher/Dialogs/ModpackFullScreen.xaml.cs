@@ -29,5 +29,14 @@ namespace Twickt_Launcher.Dialogs
             }
             modpackNameLabel.Content = modpackName;
         }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            if(modpackstypeselection.SelectedIndex == 1)
+            {
+                ListBox modslist = new ListBox();
+                Main.Children.Add(modslist);
+            }
+        }
     }
 }
