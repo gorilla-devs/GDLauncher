@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
-             Height="335" Width="480" Background="White">
+             Height="335" Width="480" Background="White" Loaded="UserControl_Loaded">
     <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="0">
 
         <!-- you can use a slide for each page, let's add a touch of fade for our first page  -->
@@ -38,8 +38,7 @@
                     </DockPanel>
                     <DockPanel Margin="0 10 0 0">
                         <Label VerticalAlignment="Center">Modpack Version:</Label>
-                        <ComboBox Name="versionsList" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged">
-                        </ComboBox>
+                        <ComboBox Name="versionsList" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged"/>
                     </DockPanel>
                     <DockPanel HorizontalAlignment="Center" Margin="0 10 0 0">
                         <Button Foreground="White" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
@@ -84,7 +83,7 @@
                         <DockPanel>
                             <ProgressBar Name="progressBarDownload" Margin="10"></ProgressBar>
                         </DockPanel>
-                        <Label Name="totalPercentage" HorizontalAlignment="Center">10%</Label>
+                        <Label Name="totalPercentage" HorizontalAlignment="Center">0%</Label>
                     </StackPanel>
                 </materialDesign:Card>
                 <DockPanel>

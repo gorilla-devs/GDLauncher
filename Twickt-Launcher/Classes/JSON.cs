@@ -17,7 +17,20 @@ using System.Windows;
 
 namespace Twickt_Launcher.Classes
 {
+    public class Lib
+    {
+        public string path { get; set; }
+    }
 
+    public class JSONModpack
+    {
+        public string modpackName { get; set; }
+        public string instanceName { get; set; }
+        public string forgeVersion { get; set; }
+        public string mc_version { get; set; }
+        public string tweakClass { get; set; }
+        public List<Lib> libs { get; set; }
+    }
     public class MyClass
     {
         [JsonProperty("objects")]
@@ -45,6 +58,8 @@ namespace Twickt_Launcher.Classes
         public static RemoteModpacks remotemodpacks = new RemoteModpacks();
         public static List<string> downloadingVersion; //await RemoteModpacks.GetModpackInfo(modpackname);
                                                        //forge_version, mc-version, json, creation_date
+                                                       
+        public static JSONModpack packjson = new JSONModpack();
         public static Stopwatch sw = new Stopwatch();
 
         //L'URL viene preso nella funzione mainjar(), poiche' il link si trova nel json
@@ -52,6 +67,7 @@ namespace Twickt_Launcher.Classes
         
         public static async Task<List<string[]>> AnalyzeMainJar(string version, string instanceName)
         {
+            packjson.tweakClass = "net.minecraft.client.main.Main";
             List<string[]> matrix = new List<string[]>();
             string data = "";
             WebClient c = new WebClient();
@@ -344,6 +360,7 @@ namespace Twickt_Launcher.Classes
                 tweakclass = jsonforge["versionInfo"]["minecraftArguments"];
                 mainclass = jsonforge["versionInfo"]["mainClass"];
                 config.mainclass = mainclass;
+                packjson.tweakClass = mainclass;
                 config.arguments = tweakclass;
                 foreach (var item in jsonforge["versionInfo"]["libraries"])
                 {
@@ -420,6 +437,14 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<List<string[]>> GetFiles(string modpackname, string instanceName, string version, string forgeVersion, string modpackVersion,  bool justlibraries = false)
         {
+
+            //SCRITTURA JSON MODPACK
+            packjson.modpackName = modpackname;
+            packjson.instanceName = instanceName;
+            packjson.forgeVersion = forgeVersion;
+            packjson.mc_version = version;
+            packjson.libs = new List<Lib>();
+
             downloadingVersion = await RemoteModpacks.GetModpackInfo(modpackname);
 
             List<string[]> list = new List<string[]>();
@@ -442,6 +467,30 @@ namespace Twickt_Launcher.Classes
                 List<string[]> mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname, modpackVersion, instanceName);
                 list.AddRange(mods);
             }
+            //AGGIUNGE LE LIBRERIE AL JSON
+            foreach(var item in libraries)
+            {
+                if (item[3].Contains("platform"))
+                    continue;
+                if (item[3].Contains("https://libraries.minecraft.net"))
+                {
+                    packjson.libs.Add(new Lib { path = item[2] });
+                }
+                if (forgeVersion != "false")
+                {
+                    if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
+                    {
+                        packjson.libs.Add(new Lib { path = item[2] });
+                    }
+                }
+            }
+            string json = JsonConvert.SerializeObject(packjson, Formatting.Indented);
+            if(!Directory.Exists(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json")))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json"));
+            }
+            System.IO.File.WriteAllText(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json", json);
+
             Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysis Finished";
             Dialogs.InstallModpack.singleton.analysisprogress.Visibility = Visibility.Hidden;
             Dialogs.InstallModpack.singleton.analysisprogress.Width = 0;

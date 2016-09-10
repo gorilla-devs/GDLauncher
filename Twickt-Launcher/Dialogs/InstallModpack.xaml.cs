@@ -27,50 +27,100 @@ namespace Twickt_Launcher.Dialogs
     {
         static string name;
         public static InstallModpack singleton;
+        public static string vanillajson;
         public InstallModpack(string modpackname)
         {
             InitializeComponent();
             singleton = this;
             name = modpackname;
-            var client = new WebClient();
-            var values = new NameValueCollection();
-            values["target"] = "specific";
-            values["name"] = name;
-
-            var response = client.UploadValues(config.modpacksWebService, values);
-
-            var responseString = Encoding.Default.GetString(response);
-            foreach (var x in responseString.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+        }
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (name == "Minecraft Vanilla")
             {
-                var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
-                versionsList.Items.Add(z[0]);
+                var client = new WebClient();
+                vanillajson = await client.DownloadStringTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+                dynamic parsed = JsonConvert.DeserializeObject(vanillajson);
+                var versions = parsed.versions;
+                foreach (var item in versions)
+                {
+                    versionsList.Items.Add((string)item.id);
+                }
+                await Task.Delay(100);
+                foreach (var item in versions)
+                {
+                    if (versionsList.Text == (string)item.id)
+                    {
+                        modpackname.Content = (string)item.id;
+                        mc_version.Content = (string)item.id;
+                        forge_version.Content = "false";
+                        mods_numb.Content = "0";
+                        creation_date.Content = (string)item.releaseTime;
+                    }
+                }
+            }
+            else
+            {
+                var client = new WebClient();
+                var values = new NameValueCollection();
+                values["target"] = "specific";
+                values["name"] = name;
+
+                var response = client.UploadValues(config.modpacksWebService, values);
+
+                var responseString = Encoding.Default.GetString(response);
+                foreach (var x in responseString.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                    //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
+                    versionsList.Items.Add(z[0]);
+                }
             }
         }
 
         private async void versionsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var client = new WebClient();
-            var values = new NameValueCollection();
-            values["target"] = "specific";
-            values["name"] = name;
-
-            var response = await client.UploadValuesTaskAsync(config.modpacksWebService, values);
-
-            var responseString = Encoding.Default.GetString(response);
-            foreach (var x in responseString.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+            if (name == "Minecraft Vanilla")
             {
-                var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
-                if(versionsList.Text == z[0])
+                await Task.Delay(100);
+                dynamic parsed = JsonConvert.DeserializeObject(vanillajson);
+                var versions = parsed.versions;
+                foreach (var item in versions)
                 {
-                    JObject jObj = (JObject)JsonConvert.DeserializeObject(z[3]);
-                    modpackname.Content = z[0];
-                    mc_version.Content = z[4];
-                    forge_version.Content = z[2];
-                    mods_numb.Content = jObj["libraries"].Count();
+                    if (versionsList.Text == (string)item.id)
+                    {
+                        modpackname.Content = (string)item.id;
+                        mc_version.Content = (string)item.id;
+                        forge_version.Content = "false";
+                        mods_numb.Content = "0";
+                        creation_date.Content = (string)item.releaseTime;
+                    }
+                }
+            }
+            else
+            {
+                var client = new WebClient();
+                var values = new NameValueCollection();
+                values["target"] = "specific";
+                values["name"] = name;
 
-                    creation_date.Content = z[5];
+                var response = await client.UploadValuesTaskAsync(config.modpacksWebService, values);
+
+                var responseString = Encoding.Default.GetString(response);
+                foreach (var x in responseString.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                    //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
+                    if (versionsList.Text == z[0])
+                    {
+                        JObject jObj = (JObject)JsonConvert.DeserializeObject(z[3]);
+                        modpackname.Content = z[0];
+                        mc_version.Content = z[4];
+                        forge_version.Content = z[2];
+                        mods_numb.Content = jObj["libraries"].Count();
+
+                        creation_date.Content = z[5];
+                    }
                 }
             }
         }
@@ -96,14 +146,8 @@ namespace Twickt_Launcher.Dialogs
             continueButton.Visibility = Visibility.Visible;
             installationEndedIcon.Visibility = Visibility.Visible;
             installationEndedText.Visibility = Visibility.Visible;
-            /*foreach(var file in files)
-            {
-                MessageBox.Show(config.M_F_P + file[2]);
-            }*/
-            /*foreach (var url in urls)
-            {
-                MessageBox.Show(url[0]);
-            }*/
         }
+
+
     }
 }

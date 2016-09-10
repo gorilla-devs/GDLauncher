@@ -66,7 +66,7 @@ namespace Twickt_Launcher.Pages
             {
                 modpacksContainer.RegisterName(card.Name, card);
             }
-            catch
+            catch(Exception e)
             {
                 modpacksContainer.UnregisterName(card.Name);
                 modpacksContainer.RegisterName(card.Name, card);
