@@ -25,10 +25,13 @@ namespace Twickt_Launcher.Classes
     public class JSONModpack
     {
         public string modpackName { get; set; }
+        public string modpackVersion { get; set; }
         public string instanceName { get; set; }
         public string forgeVersion { get; set; }
         public string mc_version { get; set; }
-        public string tweakClass { get; set; }
+        public string mainClass { get; set; }
+        public string arguments { get; set; }
+        public string version_type { get; set; }
         public List<Lib> libs { get; set; }
     }
     public class MyClass
@@ -67,7 +70,6 @@ namespace Twickt_Launcher.Classes
         
         public static async Task<List<string[]>> AnalyzeMainJar(string version, string instanceName)
         {
-            packjson.tweakClass = "net.minecraft.client.main.Main";
             List<string[]> matrix = new List<string[]>();
             string data = "";
             WebClient c = new WebClient();
@@ -86,7 +88,9 @@ namespace Twickt_Launcher.Classes
                 var hash = "";
                 var url = "";
                 var name = "";
-
+                packjson.mainClass = json.mainClass;
+                packjson.arguments = json.minecraftArguments;
+                packjson.version_type = json.type;
                 foreach (var item in json["downloads"]["client"])
                 {
                     var param = item.ToString();
@@ -360,7 +364,8 @@ namespace Twickt_Launcher.Classes
                 tweakclass = jsonforge["versionInfo"]["minecraftArguments"];
                 mainclass = jsonforge["versionInfo"]["mainClass"];
                 config.mainclass = mainclass;
-                packjson.tweakClass = mainclass;
+                packjson.mainClass = mainclass;
+                packjson.arguments = tweakclass;
                 config.arguments = tweakclass;
                 foreach (var item in jsonforge["versionInfo"]["libraries"])
                 {
@@ -441,6 +446,7 @@ namespace Twickt_Launcher.Classes
             //SCRITTURA JSON MODPACK
             packjson.modpackName = modpackname;
             packjson.instanceName = instanceName;
+            packjson.modpackVersion = modpackVersion;
             packjson.forgeVersion = forgeVersion;
             packjson.mc_version = version;
             packjson.libs = new List<Lib>();
@@ -448,6 +454,7 @@ namespace Twickt_Launcher.Classes
             downloadingVersion = await RemoteModpacks.GetModpackInfo(modpackname);
 
             List<string[]> list = new List<string[]>();
+            List<string[]> forge = new List<string[]>();
 
             Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Main Jar";
             List<string[]> mainjar = await AnalyzeMainJar(version, instanceName);
@@ -461,14 +468,30 @@ namespace Twickt_Launcher.Classes
             if(forgeVersion != "false")
             {
                 Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Forge";
-                List<string[]> forge = await AnalyzeForgeLibraries(modpackname, version, instanceName);
+                forge = await AnalyzeForgeLibraries(modpackname, version, instanceName);
                 list.AddRange(forge);
                 Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Mods";
                 List<string[]> mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname, modpackVersion, instanceName);
                 list.AddRange(mods);
             }
             //AGGIUNGE LE LIBRERIE AL JSON
-            foreach(var item in libraries)
+            if (forgeVersion != "false")
+            {
+                foreach (var item in forge)
+                {
+                    if (item[3].Contains("platform"))
+                        continue;
+                    if (item[3].Contains("https://libraries.minecraft.net"))
+                    {
+                        packjson.libs.Add(new Lib { path = item[2] });
+                    }
+                    if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
+                    {
+                        packjson.libs.Add(new Lib { path = item[2] });
+                    }
+                }
+            }
+            foreach (var item in libraries)
             {
                 if (item[3].Contains("platform"))
                     continue;
@@ -484,6 +507,7 @@ namespace Twickt_Launcher.Classes
                     }
                 }
             }
+            packjson.libs = packjson.libs.Distinct().ToList();
             string json = JsonConvert.SerializeObject(packjson, Formatting.Indented);
             if(!Directory.Exists(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json")))
             {
@@ -498,7 +522,6 @@ namespace Twickt_Launcher.Classes
             Dialogs.InstallModpack.singleton.analysisended.Margin = new Thickness(20, 10, 10, 0);
             Dialogs.InstallModpack.singleton.analysisended.Width = 50;
             Dialogs.InstallModpack.singleton.analysisended.Height = 50;
-
             return list.Distinct().ToList();
         }
 

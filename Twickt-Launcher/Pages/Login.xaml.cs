@@ -185,7 +185,14 @@ namespace Twickt_Launcher.Pages
 
         private async void label1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Register(), "RootDialog", ExtendedOpenedEventHandlerLocal);
+            try
+            {
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Register(), "RootDialog", ExtendedOpenedEventHandlerLocal);
+            }
+            catch(InvalidOperationException ex)
+            {
+
+            }
         }
 
 

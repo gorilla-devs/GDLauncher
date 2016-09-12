@@ -56,7 +56,7 @@ namespace Twickt_Launcher.Pages
             values["message"] = body.Text;
 
 
-            var response = client.UploadValues(config.bugReportWebService, values);
+            var response = await client.UploadValuesTaskAsync(config.bugReportWebService, values);
 
             var responseString = Encoding.Default.GetString(response);
 

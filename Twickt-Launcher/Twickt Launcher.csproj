@@ -166,12 +166,8 @@
     <Compile Include="Classes\JSON.cs" />
     <Compile Include="Classes\LocalModpacks.cs" />
     <Compile Include="Classes\MinecraftStarter.cs" />
-    <Compile Include="Classes\ModpackStartupCheck.cs" />
     <Compile Include="Classes\RemoteModpacks.cs" />
     <Compile Include="config.cs" />
-    <Compile Include="Dialogs\AddLocalModpack.xaml.cs">
-      <DependentUpon>AddLocalModpack.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\AddPack.xaml.cs">
       <DependentUpon>AddPack.xaml</DependentUpon>
     </Compile>
@@ -195,6 +191,9 @@
     </Compile>
     <Compile Include="Dialogs\Register.xaml.cs">
       <DependentUpon>Register.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SyncToCloud.xaml.cs">
+      <DependentUpon>SyncToCloud.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\UpdateAvailable.xaml.cs">
       <DependentUpon>UpdateAvailable.xaml</DependentUpon>
@@ -237,8 +236,8 @@
     <Compile Include="Pages\SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\StartingWorking.xaml.cs">
-      <DependentUpon>StartingWorking.xaml</DependentUpon>
+    <Compile Include="Pages\Upload_Your_Pack.xaml.cs">
+      <DependentUpon>Upload_Your_Pack.xaml</DependentUpon>
     </Compile>
     <Compile Include="SessionData.cs" />
     <Compile Include="Window1.xaml.cs">
@@ -247,10 +246,6 @@
     <Compile Include="Windows\DebugOutputConsole.xaml.cs">
       <DependentUpon>DebugOutputConsole.xaml</DependentUpon>
     </Compile>
-    <Page Include="Dialogs\AddLocalModpack.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\AddPack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -280,6 +275,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Register.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SyncToCloud.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -327,7 +326,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\StartingWorking.xaml">
+    <Page Include="Pages\Upload_Your_Pack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

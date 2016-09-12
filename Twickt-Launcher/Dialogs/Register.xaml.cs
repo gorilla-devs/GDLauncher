@@ -38,6 +38,7 @@ namespace Twickt_Launcher.Dialogs
             List<int> nums1 = Classes.AntiSpam.GenerateRandomNumbers();
             sum = nums1[0] + nums1[1];
             MaterialDesignThemes.Wpf.HintAssist.SetHint(controllo, (nums1[0] + " + " + nums1[1] + " = "));
+            linkMojang.IsChecked = true;
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -71,6 +72,27 @@ namespace Twickt_Launcher.Dialogs
                 error.Visibility = Visibility.Visible;
                 error.Content = "Le password non corrispondono";
                 return;
+            }
+            if(linkMojang.IsChecked == true)
+            {
+                if (String.IsNullOrEmpty(mojanguser.Text))
+                {
+                    error.Visibility = Visibility.Visible;
+                    error.Content = "Inserisci un nome utente Mojang";
+                    return;
+                }
+                if (String.IsNullOrEmpty(mojangpass.Password))
+                {
+                    error.Visibility = Visibility.Visible;
+                    error.Content = "Inserisci una password Mojang";
+                    return;
+                }
+                if(mojanguser.Text != username.Text)
+                {
+                    error.Visibility = Visibility.Visible;
+                    error.Content = "Il nome utente di Twickt deve essere uguale a quello di Mojang";
+                    return;
+                }
             }
             if (TOS.IsChecked == false)
             {
@@ -228,6 +250,19 @@ namespace Twickt_Launcher.Dialogs
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://twickt.com/terms-of-service/");
+        }
+
+        private void linkMojang_Checked(object sender, RoutedEventArgs e)
+        {
+                mojanguser.IsEnabled = true;
+                mojangpass.IsEnabled = true;
+        }
+
+        private void linkMojang_Unchecked(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("If you do not link a minecraft premium account, your Twickt account will have low priority. This means that if someone else registers with the same username as you but with a linked Premium account, your account will be deleted and the premium account will be created. We suggest you to link a minecraft premium account to have high priority!");
+            mojanguser.IsEnabled = false;
+            mojangpass.IsEnabled = false;
         }
     }
 }

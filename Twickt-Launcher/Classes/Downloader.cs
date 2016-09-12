@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ionic.Zip;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -81,10 +82,10 @@ namespace Twickt_Launcher.Classes
                         await content.CopyToAsync(fileStream);
                     }
                 }
-                /*if (url.Contains("platform"))
+                if (url[3].Contains("platform"))
                 {
-                    await ExtractNatives(url);
-                }*/
+                    await ExtractNatives(url[2], instanceName);
+                }
                 Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
                     string urlnum = Dialogs.InstallModpack.singleton.filesToDownload.Content.ToString().Split('/')[0];
@@ -104,6 +105,36 @@ namespace Twickt_Launcher.Classes
                 MessageBox.Show("ERRORE A SCARICARE " + url[3] + " " + e);
             }
 
+        }
+
+        public static async Task ExtractNatives(string file, string instanceName)
+        {
+            string dir = config.M_F_P + file;
+            string natives = config.M_F_P + "Packs\\" + instanceName + "\\" + @"natives-win\";
+
+            var temp = config.M_F_P + "Packs\\" + instanceName + "\\" + @"temp\";
+
+            //CONTROLLA SE ESISTE LA CARTELLA DOVE METTERE I NATIVES, ALTRIMENTI LA CREA
+            if (!Directory.Exists(@natives))
+            {
+                Directory.CreateDirectory(@natives);
+            }
+            if (File.Exists(@dir))
+            {
+                using (ZipFile zip = ZipFile.Read(@dir))
+                {
+                    //ESTRAE LA LISTA JSON DI ROBA DA SCARICARE E IL FILE JAR PRINCIPALE DI FORGE
+                    try
+                    {
+                        zip.ExtractAll(@natives, ExtractExistingFileAction.OverwriteSilently);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.ToString());
+                    }
+
+                }
+            }
         }
     }
 }

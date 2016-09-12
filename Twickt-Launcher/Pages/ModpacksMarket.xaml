@@ -12,10 +12,6 @@ Sample license text.
       FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Height="625" Width="694" Background="#FFFFFF"
       Title="Modpacks" Loaded="Page_Loaded">
     <Grid>
-        <ListBox Name="modpackstypeselection" SelectionMode="Single" Style="{StaticResource MaterialDesignToolToggleListBox}" SelectedIndex="0" HorizontalAlignment="Center" >
-            <ListBoxItem Name="remote" Width="80" HorizontalContentAlignment="Center">Remote</ListBoxItem>
-            <ListBoxItem Name="local" Width="80" HorizontalContentAlignment="Center">Locali</ListBoxItem>
-        </ListBox>
         <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="1">
             <materialDesign:TransitionerSlide Background="#4CAF50">
                 <TextBlock FontSize="20" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center">Loading</TextBlock>
@@ -26,7 +22,7 @@ Sample license text.
                         <TextBox Width="140" HorizontalAlignment="Left" VerticalAlignment="Top" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
                         <Button Name="addPrivatePackCode" Margin="5 0 5 0" Foreground="White" Click="addPrivatePackCode_Click">Add Private Pack</Button>
                         <Button Margin="5 0 5 0" Foreground="White">Upload Your Pack</Button>
-                        <Button Name="goToInstalledModpacks" Margin="5 0 5 0" Foreground="White" Click="goToInstalledModpacks_Click">Installed Modpacks</Button>
+                        <Button Name="goToInstalledModpacks" Margin="5 0 5 0" Foreground="White" Click="goToInstalledModpacks_Click" Height="40" VerticalAlignment="Top">Installed Modpacks</Button>
                         <Button Name="refresh" Margin="5 0 5 0" Foreground="White" Click="refresh_Click">
                             <materialDesign:PackIcon Kind="Refresh" />
                         </Button>

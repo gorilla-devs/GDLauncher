@@ -118,14 +118,18 @@ namespace Twickt_Launcher.Classes
 
         public static async Task<List<string>> GetModpackInfo(string modpackname)
         {
-            var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(modpackname));
-            var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-            List<string> returned = new List<string>();
-            returned.Add(info[2]);
-            returned.Add(info[4]);
-            returned.Add(info[3]);
-            returned.Add(info[5]);
-            return returned;
+            if (modpackname != "Minecraft Vanilla")
+            {
+                var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(modpackname));
+                var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                List<string> returned = new List<string>();
+                returned.Add(info[2]);
+                returned.Add(info[4]);
+                returned.Add(info[3]);
+                returned.Add(info[5]);
+                return returned;
+            }
+            return null;
         }
 
 

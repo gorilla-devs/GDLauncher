@@ -33,7 +33,6 @@ namespace Twickt_Launcher.Pages
         public List<string> registrationList;
         public static Dialogs.ModpackLoading loading;
         public static List<string> downloadingVersion;
-        public static Dialogs.AddLocalModpack localmodpackadd;
         private bool loaded = false;
         private object lastSelectedModpacksType;
         public Modpacks()
@@ -43,331 +42,163 @@ namespace Twickt_Launcher.Pages
             singleton = this;
             transition.SelectedIndex = 0;
         }
-
-        private async void start_Click(object sender, RoutedEventArgs e)
-        {
-            /*loading = new Dialogs.ModpackLoading();
-            if (remote.IsSelected)
-            {
-                //VERIFICA SE SI E' SELEZIONATA UNA MODPACK
-                if (ModpacksLRList.SelectedIndex == -1)
-                {
-                    var error = new Dialogs.OptionsUpdates("Select a modpack!");
-                    await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
-                    return;
-                }
-                string actualModpackName = ModpacksLRList.SelectedValue.ToString();
-                var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(actualModpackName));
-                var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-
-                //SE LA DIRECTORY ESISTE INIZIA, ALTRIMENTI LA CREA
-                if (!Directory.Exists(config.M_F_P + info[4] + "\\instances\\" + info[4]))
-                {
-                    Directory.CreateDirectory(config.M_F_P + info[4] + "\\instances\\" + info[4]);
-                }
-                var resultCheck = await MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
-                if (resultCheck.ToString() == "DownloadNeeded")
-                {
-                    Window1.singleton.MainPage.Navigate(new Pages.StartingWorking(true, Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString()));
-                }
-                else
-                {
-                    Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString(), true);
-                }
-            }
-            else
-            {
-                if (ModpacksLRList.SelectedIndex == -1)
-                {
-                    var error = new Dialogs.OptionsUpdates("Select a modpack!");
-                    await MaterialDesignThemes.Wpf.DialogHost.Show(error, "RootDialog", erroropenEvent);
-                    return;
-                }
-                Classes.MinecraftStarter.Minecraft_Start(Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString(), false);
-            }*/
-        }
-
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             transition.SelectedIndex = 1;
-            /*if (!Directory.Exists(config.LocalModpacks))
+            if(!Directory.Exists(config.M_F_P + "Packs\\"))
             {
-                Directory.CreateDirectory(config.LocalModpacks);
+                Directory.CreateDirectory(config.M_F_P + "Packs\\");
             }
-            await ModpacksRefreshMethod();
-            registrationList = ModpacksLRList.Items.Cast<string>().ToList();
-            lastSelectedModpacksType = remote;
-            loaded = true;*/
+            await modpacksUpdate();
         }
 
-        /*private async void ModpacksLRList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public async Task modpacksUpdate()
         {
-            try
+            modpacksListContainer.Children.Clear();
+            var dirlist = Directory.GetDirectories(config.M_F_P + "Packs\\");
+            if (dirlist.Count() != 0)
             {
-                string actualModpackName = ModpacksLRList.SelectedValue.ToString();
-                var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(actualModpackName));
-                var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                if (Directory.Exists(config.M_F_P + info[4]))
+                foreach (var dir in dirlist)
                 {
-                    isinstalled.Content = @"Installed";
-                    version.Content = info[2];
-                    forge.Content = (info[3] == "true") ? "With Forge" : "Without Forge";
-                    start.Content = "Play";
-                }
-                else
-                {
-                    isinstalled.Content = "Not Installed";
-                    version.Content = info[2];
-                    forge.Content = (info[3] == "true") ? "With Forge" : "Without Forge";
-                    start.Content = "Install";
-                }
-                description.Text = info[1];
-            }
-            catch(Exception ex)
-            {
-                Windows.DebugOutputConsole.singleton.Write("Could not get modpack description-- " + ex);
-            }
-        }
+                    var card = new MaterialDesignThemes.Wpf.Card();
+                    card.Name = "card" + new DirectoryInfo(dir.Replace(" ", "")).Name;
+                    try
+                    {
+                        modpacksListContainer.RegisterName(card.Name, card);
+                    }
+                    catch
+                    {
+                        modpacksListContainer.UnregisterName(card.Name);
+                        modpacksListContainer.RegisterName(card.Name, card);
+                    }
+                    card.Height = 200;
+                    card.Width = 620;
+                    card.Margin = new Thickness(10);
+                    card.HorizontalAlignment = HorizontalAlignment.Left;
+                    var insiderStackPanel = new StackPanel();
+                    insiderStackPanel.Orientation = Orientation.Horizontal;
 
+                    card.Content = insiderStackPanel;
+                    //INSIDE STACKPANEL
 
-        private async Task ModpacksRefreshMethod()
-        {
-            if (remote.IsSelected)
-            {
-                deleteLocalModpack.IsEnabled = false;
-                addLocalModpack.IsEnabled = false;
-                refreshRemoteModpacks.IsEnabled = false;
-                ModpacksLRList.Items.Clear();
-                var remotelist = await Classes.RemoteModpacks.GetModpacksList();
-                refreshRemoteModpacks.IsEnabled = true;
+                    Style buttonstyle = Application.Current.FindResource("MaterialDesignFloatingActionMiniAccentButton") as Style;
 
-                foreach (var x in remotelist.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                    ModpacksLRList.Items.Add(z[0]);
+                    var bookmarkbutton = new Button();
+                    var iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
+                    iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.Bookmark;
+                    bookmarkbutton.Content = iconpackbookmark;
+                    bookmarkbutton.Style = buttonstyle;
+                    bookmarkbutton.HorizontalAlignment = HorizontalAlignment.Right;
+                    bookmarkbutton.VerticalAlignment = VerticalAlignment.Bottom;
+                    bookmarkbutton.Margin = new Thickness(0, 0, -35, 0);
+                    Panel.SetZIndex(bookmarkbutton, 10);
+
+                    var cloudbutton = new Button();
+                    var iconpackcloud = new MaterialDesignThemes.Wpf.PackIcon();
+                    iconpackcloud.Kind = MaterialDesignThemes.Wpf.PackIconKind.Cloud;
+                    cloudbutton.Content = iconpackcloud;
+                    cloudbutton.Style = buttonstyle;
+                    cloudbutton.HorizontalAlignment = HorizontalAlignment.Right;
+                    cloudbutton.VerticalAlignment = VerticalAlignment.Bottom;
+                    cloudbutton.Margin = new Thickness(0, 0, -80, 0);
+                    Panel.SetZIndex(cloudbutton, 10);
+                    cloudbutton.Click += new RoutedEventHandler((sender, e) => cloud_click(this, e, card.Name, dir));
+
+                    var image = new Image();
+                    image.Source = new BitmapImage(new Uri(@"/Images/modpacks.jpg", UriKind.Relative));
+                    image.Stretch = Stretch.Fill;
+                    image.Width = 300;
+                    image.Height = 120;
+
+                    var datastackpanel = new StackPanel();
+                    datastackpanel.Width = 290;
+
+                    insiderStackPanel.Children.Add(bookmarkbutton);
+                    insiderStackPanel.Children.Add(cloudbutton);
+                    insiderStackPanel.Children.Add(image);
+                    insiderStackPanel.Children.Add(datastackpanel);
+
+                    var title = new Label();
+                    title.FontSize = 15;
+                    title.HorizontalAlignment = HorizontalAlignment.Center;
+                    title.Content = new DirectoryInfo(dir).Name;
+                    datastackpanel.Children.Add(title);
+
+                    var playedHours = new Label();
+                    playedHours.Content = "Played Hours: 0";
+                    datastackpanel.Children.Add(playedHours);
+
+                    var lastSyncCloud = new Label();
+                    lastSyncCloud.Content = "Last Synchronization to cloud: Never";
+                    datastackpanel.Children.Add(lastSyncCloud);
+
+                    var modpackVersion = new Label();
+                    modpackVersion.Content = "Modpack Version: Unknown";
+                    datastackpanel.Children.Add(modpackVersion);
+
+                    var buttonStackPanel = new StackPanel();
+                    buttonStackPanel.Orientation = Orientation.Horizontal;
+                    buttonStackPanel.HorizontalAlignment = HorizontalAlignment.Center;
+                    datastackpanel.Children.Add(buttonStackPanel);
+
+                    var playbutton = new Button();
+                    playbutton.Content = "Play";
+                    playbutton.Foreground = new SolidColorBrush(Colors.White);
+                    playbutton.Margin = new Thickness(20, 30, 3, 0);
+                    playbutton.Click += new RoutedEventHandler((sender, e) => play_click(this, e, card.Name, dir));
+
+                    var deletebutton = new Button();
+                    deletebutton.Content = "Delete";
+                    deletebutton.Foreground = new SolidColorBrush(Colors.White);
+                    deletebutton.Margin = new Thickness(3, 30, 0, 0);
+                    deletebutton.Click += new RoutedEventHandler((sender, e) => delete_click(this, e, card.Name, dir));
+
+                    buttonStackPanel.Children.Add(playbutton);
+                    buttonStackPanel.Children.Add(deletebutton);
+
+                    modpacksListContainer.Children.Add(card);
                 }
             }
             else
             {
-                deleteLocalModpack.IsEnabled = true;
-                addLocalModpack.IsEnabled = true;
-                string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
-                Pages.Modpacks.singleton.ModpacksLRList.Items.Clear();
-                try
-                {
-                    var modpackslist = Directory.GetDirectories(config.LocalModpacks);
-                    foreach (var element in modpackslist)
-                    {
-                        string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
-                        string projectName = System.IO.Path.GetFileName(fullPath);
-                        if (Array.IndexOf(x, projectName) == -1)
-                        {
-                            ModpacksLRList.Items.Add(projectName);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-            }
-            registrationList = ModpacksLRList.Items.Cast<string>().ToList();
-        }
-
-        private async void refreshRemoteModpacks_Click(object sender, RoutedEventArgs e)
-        {
-            ModpacksLRList.Items.Clear();
-            await ModpacksRefreshMethod();
-        }
-
-        private void textBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (remoteModpacksSearch.Text != "")
-            {
-                ModpacksLRList.Items.Clear();
-                foreach (var i in registrationList)
-                {
-                    if (i.ToLower().Contains(remoteModpacksSearch.Text.ToLower()))
-                        ModpacksLRList.Items.Add(i);
-                }
-            }
-            else
-            {
-                ModpacksLRList.Items.Clear();
-                foreach (var i in registrationList)
-                {
-                    ModpacksLRList.Items.Add(i);
-                }
+                var label = new Label();
+                label.Name = "nomodpacks";
+                label.Content = "No installed modpack";
+                label.FontSize = 30;
+                modpacksListContainer.Children.Add(label);
             }
         }
 
-        private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+
+        async void play_click(object sender, RoutedEventArgs e, string card, string dir)
         {
-            try
-            {
-                Pages.StartingWorking.urls = await ModpackStartupCheck.CheckFiles(Pages.Modpacks.singleton.ModpacksLRList.SelectedItem.ToString(), true);
-
-
-                if (Pages.StartingWorking.urls.Count != 0)
-                {
-                    Windows.DebugOutputConsole.singleton.Write("Some files are not present or different from the server. Going to download them");
-                    eventArgs.Session.Close("DownloadNeeded");
-                }
-                else
-                {
-                    //START MINECRAFT
-                    eventArgs.Session.Close("Nope");
-                }
-            }
-            catch
-            {
-
-            }
+            MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card);
+            Classes.MinecraftStarter.Minecraft_Start(dir);
         }
 
-        private static async void ExtendedOpenedEventHandlerLocal(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+        async void cloud_click(object sender, RoutedEventArgs e, string card, string dir)
         {
-            do
-            {
-                await Task.Delay(2000);
-            }
-            while (Dialogs.AddLocalModpack.close == false);
-            try
-            {
-                Dialogs.AddLocalModpack.close = false;
-                eventArgs.Session.Close();
-            }
-            catch { }
+            MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card);
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.SyncToCloud(), "RootDialog");
         }
 
-        private static void ExtendedClosingEventHandler(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
+        async void delete_click(object sender, RoutedEventArgs e, string card, string dir)
         {
-            if(loading.forgeProgress.IsVisible == true)
-                loading.forgeProgress.Visibility = Visibility.Hidden;
-            if (loading.whatdoing.IsVisible == true)
-                loading.whatdoing.Visibility = Visibility.Hidden;
+            MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card);
+            if (Directory.Exists(dir))
+                Directory.Delete(dir, true);
+            await modpacksUpdate();
         }
 
-        private static async void erroropenEvent(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+        private void gotoMarket_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                await Task.Delay(1200);
-                eventArgs.Session.Close();
-            }
-            catch (TaskCanceledException)
-            {
-                //cancelled by user...tidy up and dont close as will have already closed
-            }
-            catch
-            {
-
-            }
+            Window1.singleton.MainPage.Navigate(new Pages.ModpacksMarket());
+            Window1.singleton.NavigationMenu.SelectedIndex = 2;
         }
 
-        private async void addLocalModpack_Click(object sender, RoutedEventArgs e)
+        private async void refresh_Click(object sender, RoutedEventArgs e)
         {
-            localmodpackadd = new Dialogs.AddLocalModpack();
-            await MaterialDesignThemes.Wpf.DialogHost.Show(localmodpackadd, "RootDialog", ExtendedOpenedEventHandlerLocal);
+            await modpacksUpdate();
         }
-
-        private async void deleteLocalModpack_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var modpackname = ModpacksLRList.SelectedValue.ToString();
-                await Task.Run(() => Directory.Delete(config.LocalModpacks + modpackname, true));
-                await Classes.RemoteModpacks.GetModpacksList();
-                string[] x = await Classes.LocalModpacks.GetModpacksDirectoryList();
-                ModpacksLRList.Items.Clear();
-                try
-                {
-                    var modpackslist = Directory.GetDirectories(config.LocalModpacks);
-                    foreach (var element in modpackslist)
-                    {
-                        string fullPath = System.IO.Path.GetFullPath(element).TrimEnd(System.IO.Path.DirectorySeparatorChar);
-                        string projectName = System.IO.Path.GetFileName(fullPath);
-                        if (Array.IndexOf(x, projectName) == -1)
-                        {
-                            ModpacksLRList.Items.Add(projectName);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-            }
-            catch
-            {
-                MessageBox.Show("Non e' stato possibile cancellare la cartella");
-            }
-        }
-        private void filter_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Filter");
-        }
-
-        private async void modpackstypeselection_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (modpackstypeselection.SelectedItem == null)
-            {
-                modpackstypeselection.SelectedItem = lastSelectedModpacksType;
-                return;
-            }
-            lastSelectedModpacksType = modpackstypeselection.SelectedItem;
-
-            if (loaded == true)
-            {
-                await ModpacksRefreshMethod();
-            }
-        }
-
-        private async void addpack_Click(object sender, RoutedEventArgs e)
-        {
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddPack(), "RootDialog", ExtendedOpenedEventHandlerAddPack);
-        }
-
-        private static async void ExtendedOpenedEventHandlerAddPack(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
-        {
-            do
-            {
-                await Task.Delay(100);
-            }
-            while (Dialogs.Register.close == false);
-            try
-            {
-                Dialogs.Register.close = false;
-                eventArgs.Session.Close();
-            }
-            catch { }
-        }
-
-        private async void delete_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                string actualModpackName = ModpacksLRList.SelectedValue.ToString();
-                var result = await Task.Run(() => RemoteModpacks.GetSpecificModpackInfo(actualModpackName));
-                var info = result.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                if (Directory.Exists(config.M_F_P + info[4]))
-                {
-                    await Task.Run(() => Directory.Delete(config.M_F_P + info[4], true));
-                    isinstalled.Content = "Not Installed";
-                    start.Content = "Install";
-                    MessageBox.Show("Modpack deleted");
-
-                }
-                else
-                {
-                    MessageBox.Show("Not installed. What to delete?");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Something not expected happened. Make sure no files on that folder are used and that no explorer is opened there, then try again");
-                Windows.DebugOutputConsole.singleton.Write("Error deleting modpack-- " + ex);
-            }
-        }*/
     }
 }

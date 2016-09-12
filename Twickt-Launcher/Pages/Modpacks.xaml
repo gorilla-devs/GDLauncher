@@ -13,10 +13,6 @@ Sample license text.
       Title="Modpacks" Loaded="Page_Loaded">
 
     <Grid>
-        <ListBox Name="modpackstypeselection" SelectionMode="Single" Style="{StaticResource MaterialDesignToolToggleListBox}" SelectedIndex="0" HorizontalAlignment="Center" >
-            <ListBoxItem Name="remote" Width="80" HorizontalContentAlignment="Center">Remote</ListBoxItem>
-            <ListBoxItem Name="local" Width="80" HorizontalContentAlignment="Center">Locali</ListBoxItem>
-        </ListBox>
         <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="1">
             <materialDesign:TransitionerSlide Background="#4CAF50">
                 <TextBlock FontSize="20" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center">Loading</TextBlock>
@@ -24,98 +20,16 @@ Sample license text.
             <materialDesign:TransitionerSlide Background="White" OpeningEffect="{materialDesign:TransitionEffect Kind=FadeIn}">
                 <StackPanel>
                     <StackPanel Margin="10" Height="40" VerticalAlignment="Top" Orientation="Horizontal">
-                    <TextBox Width="180" HorizontalAlignment="Left" VerticalAlignment="Top" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
-                    <Button Margin="20 0 0 0" Foreground="White">Create Local Modpack</Button>
-                    <Button Margin="20 0 0 0" Foreground="White">Go to Market</Button>
+                        <TextBox Width="180" HorizontalAlignment="Left" VerticalAlignment="Top" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
+                        <Button Name="gotoMarket" Margin="20 0 0 0" Foreground="White" Click="gotoMarket_Click">Go to Market</Button>
+                        <Button Name="refresh" Margin="5 0 5 0" Foreground="White" Click="refresh_Click">
+                            <materialDesign:PackIcon Kind="Refresh" />
+                        </Button>
                     </StackPanel>
                     <StackPanel Margin="20">
                         <materialDesign:Card Height="500">
                             <ScrollViewer>
-                                <WrapPanel Orientation="Horizontal" >
-                                    <materialDesign:Card Height="200" Width="620" Margin="10" HorizontalAlignment="Left">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 -35 0" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Bookmark"/>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 -80 0" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Cloud"/>
-                                            </Button>
-                                            <Image Source="/Images/modpacks.jpg" Stretch="Fill" Width="300" Height="120">
-                                            </Image>
-                                            <StackPanel Width="290">
-                                                <Label Margin="0 0 0 0" FontSize="15" HorizontalAlignment="Center">BrotherHood Of Heroes</Label>
-                                                <Label>Played Hours: 50</Label>
-                                                <Label>Last Synchronization to cloud: 23/08/2016 - 13:55</Label>
-                                                <Label>Version: Brotherhood Of Heroes v1.1</Label>
-
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 30 0 0">
-                                                    <Button Foreground="White" Margin="15 0 3 0">Play</Button>
-                                                    <Button Foreground="White">View Mods</Button>
-                                                    <Button Foreground="White" Margin="3 0 0 0">Delete</Button>
-                                                </StackPanel>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </materialDesign:Card>
-                                    <materialDesign:Card Height="200" Width="620" Margin="10" HorizontalAlignment="Left">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 -35 0" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Bookmark"/>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 -80 0" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Cloud"/>
-                                            </Button>
-                                            <Image Source="/Images/modpacks.jpg" Stretch="Fill" Width="300" Height="120">
-                                            </Image>
-                                            <StackPanel Width="290">
-                                                <Label Margin="0 0 0 0" FontSize="15" HorizontalAlignment="Center">BrotherHood Of Heroes</Label>
-                                                <Label>Played Hours: 50</Label>
-                                                <Label>Last Synchronization to cloud: 23/08/2016 - 13:55</Label>
-                                                <Label>Version: Brotherhood Of Heroes v1.1</Label>
-
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 30 0 0">
-                                                    <Button Foreground="White" Margin="15 0 3 0">Play</Button>
-                                                    <Button Foreground="White">View Mods</Button>
-                                                    <Button Foreground="White" Margin="3 0 0 0">Delete</Button>
-                                                </StackPanel>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </materialDesign:Card>
-                                    <materialDesign:Card Height="200" Width="620" Margin="10" HorizontalAlignment="Left">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 -35 0" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Bookmark"/>
-                                            </Button>
-                                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                        Margin="0 0 -80 0" Panel.ZIndex="10">
-                                                <materialDesign:PackIcon Foreground="White" Kind="Cloud"/>
-                                            </Button>
-                                            <Image Source="/Images/modpacks.jpg" Stretch="Fill" Width="300" Height="120">
-                                            </Image>
-                                            <StackPanel Width="290">
-                                                <Label Margin="0 0 0 0" FontSize="15" HorizontalAlignment="Center">BrotherHood Of Heroes</Label>
-                                                <Label>Played Hours: 50</Label>
-                                                <Label>Last Synchronization to cloud: 23/08/2016 - 13:55</Label>
-                                                <Label>Version: Brotherhood Of Heroes v1.1</Label>
-
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 30 0 0">
-                                                    <Button Foreground="White" Margin="15 0 3 0">Play</Button>
-                                                    <Button Foreground="White">View Mods</Button>
-                                                    <Button Foreground="White" Margin="3 0 0 0">Delete</Button>
-                                                </StackPanel>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </materialDesign:Card>
+                                <WrapPanel Name="modpacksListContainer" Orientation="Horizontal" >
                                 </WrapPanel>
                             </ScrollViewer>
                         </materialDesign:Card>

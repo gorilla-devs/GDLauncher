@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="Twickt_Launcher.Pages.Upload_Your_Pack"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+              xmlns:local="clr-namespace:Twickt_Launcher.Pages"
+              mc:Ignorable="d" 
+              FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Height="625" Width="694" Background="#FFFFFF">
+    <StackPanel>
+        <Label FontSize="20" HorizontalAlignment="Center">UPLOAD A MODPACK</Label>
+        
+    </StackPanel>
+</UserControl>

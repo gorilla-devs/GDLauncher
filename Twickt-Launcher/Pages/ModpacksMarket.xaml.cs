@@ -103,18 +103,22 @@ namespace Twickt_Launcher.Pages
             sharebutton.VerticalAlignment = VerticalAlignment.Bottom;
             sharebutton.Margin = new Thickness(0, 0, 66, -130);
             Panel.SetZIndex(sharebutton, 10);
+            insiderStackPanel.Children.Add(fullscreenbutton);
+            insiderStackPanel.Children.Add(sharebutton);
 
             var image = new Image();
             image.Source = new BitmapImage(new Uri(@"/Images/modpacks.jpg", UriKind.Relative));
             image.Stretch = Stretch.Fill;
             image.Width = 300;
             image.Height = 120;
+            insiderStackPanel.Children.Add(image);
 
             var title = new Label();
             title.Content = name;
             title.Margin = new Thickness(0, 10, 0, 0);
             title.FontSize = 15;
             title.HorizontalAlignment = HorizontalAlignment.Center;
+            insiderStackPanel.Children.Add(title);
 
             var scrollviewer = new ScrollViewer();
             scrollviewer.Height = 70;
@@ -122,6 +126,7 @@ namespace Twickt_Launcher.Pages
             textblock.TextWrapping = TextWrapping.Wrap;
             textblock.Text = description;
             scrollviewer.Content = textblock;
+            insiderStackPanel.Children.Add(scrollviewer);
 
             var ratingStackPanel = new StackPanel();
             ratingStackPanel.Orientation = Orientation.Horizontal;
@@ -133,6 +138,7 @@ namespace Twickt_Launcher.Pages
             ratingbar.Margin = new Thickness(10);
             ratingStackPanel.Children.Add(ratingtitle);
             ratingStackPanel.Children.Add(ratingbar);
+            insiderStackPanel.Children.Add(ratingStackPanel);
 
             var buttonStackPanel = new StackPanel();
             buttonStackPanel.Orientation = Orientation.Horizontal;
@@ -152,15 +158,8 @@ namespace Twickt_Launcher.Pages
             buttonStackPanel.Children.Add(button3);
             button1.Click += new RoutedEventHandler((sender, e) => installModpack_click(this, e, card.Name, name));
             button2.Click += new RoutedEventHandler((sender, e) => mods_click(this, e, card.Name, name));
-
-
-            insiderStackPanel.Children.Add(fullscreenbutton);
-            insiderStackPanel.Children.Add(sharebutton);
-            insiderStackPanel.Children.Add(image);
-            insiderStackPanel.Children.Add(title);
-            insiderStackPanel.Children.Add(scrollviewer);
-            insiderStackPanel.Children.Add(ratingStackPanel);
             insiderStackPanel.Children.Add(buttonStackPanel);
+
             modpacksContainer.Children.Add(card);
         }
 

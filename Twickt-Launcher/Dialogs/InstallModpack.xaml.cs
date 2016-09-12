@@ -127,7 +127,7 @@ namespace Twickt_Launcher.Dialogs
 
         private async void install_Click(object sender, RoutedEventArgs e)
         {
-            if(String.IsNullOrEmpty(instanceTextName.Text))
+            if (String.IsNullOrEmpty(instanceTextName.Text))
             {
                 MessageBox.Show("Nome istanza vuoto");
                 return;
