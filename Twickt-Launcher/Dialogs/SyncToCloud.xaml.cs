@@ -20,9 +20,32 @@ namespace Twickt_Launcher.Dialogs
     /// </summary>
     public partial class SyncToCloud : UserControl
     {
+        //Directory.GetLastWriteTime per vedere l'ultima data di modifica di una cartella
         public SyncToCloud()
         {
             InitializeComponent();
+            for(int i = 0; i < 10; i++)
+            {
+                DockPanel dock = new DockPanel();
+                CheckBox checkbox = new CheckBox();
+                Label label = new Label();
+                cloudSavesList.Children.Add(dock);
+                dock.Children.Add(checkbox);
+                dock.Children.Add(label);
+                checkbox.Content = "SOMESOMESOMESOMESO";
+                label.Content = " - 15/06/2015";
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                DockPanel dock = new DockPanel();
+                CheckBox checkbox = new CheckBox();
+                Label label = new Label();
+                localSavesList.Children.Add(dock);
+                dock.Children.Add(checkbox);
+                dock.Children.Add(label);
+                checkbox.Content = "SOMESOMESOMESOMESO";
+                label.Content = " - 15/06/2015";
+            }
         }
     }
 }

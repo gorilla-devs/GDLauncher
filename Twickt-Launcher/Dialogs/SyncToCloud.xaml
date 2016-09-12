@@ -6,8 +6,58 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
              FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-             mc:Ignorable="d" Height="200" Background="#FFFFFF" Width="350">
+             mc:Ignorable="d" Height="640" Background="#FFFFFF" Width="640">
     <StackPanel>
-        <Button Margin="-210 160 0 0" Width="100" Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand">BACK</Button>
+        <Label HorizontalAlignment="Center" FontSize="20">Cloud Syncing Service</Label>
+        <DockPanel>
+            <Label>Modpack Version ID: </Label>
+            <Label FontWeight="ExtraBold">BrotherHood Of Heroes 2.0</Label>
+        </DockPanel>
+        <DockPanel>
+            <Label>Account Quota:</Label>
+            <Label FontWeight="ExtraBold">23MB/100MB</Label>
+            <ProgressBar Value="23" Width="130"></ProgressBar>
+            <Label FontWeight="ExtraBold">23%</Label>
+        </DockPanel>
+        <DockPanel Margin="10">
+            <StackPanel HorizontalAlignment="Left">
+                <DockPanel HorizontalAlignment="Center">
+                    <Label FontSize="15">Local</Label>
+                    <materialDesign:PackIcon VerticalAlignment="Center" Kind="LaptopChromebook" />
+                </DockPanel>
+                <materialDesign:Card HorizontalAlignment="Left" Width="300" Height="300">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                        <StackPanel Name="localSavesList">
+                        </StackPanel>
+                    </ScrollViewer>
+                </materialDesign:Card>
+                <Button Margin="10" Foreground="White">Upload Selected</Button>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Right">
+                <DockPanel HorizontalAlignment="Center">
+                    <Label FontSize="15">Cloud</Label>
+                    <materialDesign:PackIcon VerticalAlignment="Center" Kind="Cloud" />
+                </DockPanel>
+
+                <materialDesign:Card HorizontalAlignment="Left" Width="300" Height="300">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                        <StackPanel Name="cloudSavesList">
+                        </StackPanel>
+                    </ScrollViewer>
+                </materialDesign:Card>
+                <Button Margin="10" Foreground="White">Download Selected</Button>
+            </StackPanel>
+        </DockPanel>
+        <StackPanel>
+            <Label HorizontalAlignment="Center" FontWeight="Bold">Operation: None</Label>
+            <DockPanel>
+                <ProgressBar Margin="10 0 0 0" Width="500"></ProgressBar>
+                <Label>0%</Label>
+                <Label>0MB/0MB</Label>
+            </DockPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0 60 0 0">
+            <Button Margin="4" Width="100" Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand">BACK</Button>
+        </StackPanel>
     </StackPanel>
 </UserControl>
