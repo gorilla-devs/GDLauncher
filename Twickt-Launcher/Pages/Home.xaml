@@ -31,61 +31,10 @@ Sample license text.
                             <Label x:Name="label" Content="The Simpler, The Better!" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="22"/>
                         </materialDesign:Card>
                     </StackPanel>
-                    <WrapPanel Margin="20,0,10,0" Orientation="Horizontal" HorizontalAlignment="Center" Width="664">
-                        <materialDesign:Card Width="400" Margin="83 0 10 10" Height="289">
-                            <materialDesign:Transitioner Name="statistics_account" Grid.Row="1" SelectedIndex="0">
-                                <materialDesign:TransitionerSlide Background="White">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="140" />
-                                            <RowDefinition Height="*" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <materialDesign:PackIcon Kind="InformationOutline"  Width="150" Height="150" HorizontalAlignment="Center" Foreground="#BBDEFB"/>
-                                        <Button Name="toAccount" Grid.Row="0" IsEnabled="True" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-            			                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-            			                Margin="0 0 16 -20" Loaded="modpack2start_Loaded" Click="toAccount_Click">
-                                            <materialDesign:PackIcon Kind="Account" />
-                                        </Button>
-                                        <StackPanel Grid.Row="1" Margin="8 24 8 0" >
-                                            <TextBlock FontWeight="Bold"><Run Text="Some info"/></TextBlock>
-                                            <TextBlock Name="totalUsers" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
-                                            <TextBlock Name="lastRegistered" TextWrapping="Wrap" VerticalAlignment="Center"></TextBlock>
-                                            <Button Width="100" HorizontalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth2" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click_1">
-                                                <materialDesign:PackIcon Kind="Autorenew" Width="33" Height="22" Foreground="#2962FF"/>
-                                            </Button>
-                                            <Label Name="statisticsupdatedlabel" FontSize="10" HorizontalAlignment="Center" Foreground="Green" Visibility="Hidden">Updated</Label>
-                                        </StackPanel>
-                                    </Grid>
-                                </materialDesign:TransitionerSlide>
-                                <materialDesign:TransitionerSlide Background="#2962FF">
-                                </materialDesign:TransitionerSlide>
-                                <materialDesign:TransitionerSlide Background="White">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="140" />
-                                            <RowDefinition Height="*" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <materialDesign:PackIcon Kind="Account"  Width="150" Height="150" HorizontalAlignment="Center" Foreground="#BBDEFB"/>
-                                        <Button Name="toStats" Grid.Row="0" IsEnabled="True" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
-            			                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
-            			                    Margin="0 0 16 -20" Click="toStats_Click">
-                                            <materialDesign:PackIcon Kind="InformationOutline" />
-                                        </Button>
-                                        <StackPanel Grid.Row="1" Margin="8 24 8 0" >
-                                            <TextBlock FontWeight="Bold"><Run Text="Account info"/></TextBlock>
-                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Your Username</TextBlock>
-                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Your Email</TextBlock>
-                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Other Info</TextBlock>
-                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Other Info</TextBlock>
-                                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center">Other Info</TextBlock>
-                                        </StackPanel>
-                                    </Grid>
-                                </materialDesign:TransitionerSlide>
-                                <materialDesign:TransitionerSlide Background="#2962FF">
-                                </materialDesign:TransitionerSlide>
-                            </materialDesign:Transitioner>
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <materialDesign:Card Width="600" Height="289">
+                            <WrapPanel Name="bookmarksContainer" Margin="0 15 0 0">
+                            </WrapPanel>
                         </materialDesign:Card>
                     </WrapPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

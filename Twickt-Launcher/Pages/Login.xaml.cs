@@ -35,6 +35,7 @@ namespace Twickt_Launcher.Pages
             InitializeComponent();
             Window1.singleton.MenuToggleButton.IsEnabled = false;
             Window1.singleton.popupbox.IsEnabled = false;
+            Window1.singleton.homeButton.IsEnabled = false;
             transition.SelectedIndex = 0;
             language.Text = Thread.CurrentThread.CurrentUICulture.Name;
 
@@ -103,6 +104,7 @@ namespace Twickt_Launcher.Pages
                 }
                 Window1.singleton.MenuToggleButton.IsEnabled = true;
                 Window1.singleton.popupbox.IsEnabled = true;
+                Window1.singleton.homeButton.IsEnabled = true;
                 Window1.singleton.loggedinName.Text = "Logged in as " + userdata[1];
                 transition.SelectedIndex = 2;
                 await Task.Delay(500);

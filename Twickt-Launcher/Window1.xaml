@@ -44,8 +44,11 @@ Sample license text.
                         <Button Foreground="White" Width="48" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                             <materialDesign:PackIcon Kind="WindowClose" />
                         </Button>
-                        <Button Foreground="White" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                        <Button Foreground="White" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                             <materialDesign:PackIcon Kind="WindowMinimize" />
+                        </Button>
+                        <Button Name="homeButton" Foreground="Green" Width="48" DockPanel.Dock="Right" materialDesign:ShadowAssist.ShadowDepth="Depth1" Click="Button_Click_6">
+                            <materialDesign:PackIcon Kind="Home" />
                         </Button>
                         <materialDesign:PopupBox Name="popupbox" DockPanel.Dock="Right" Foreground="White" PlacementMode="BottomAndAlignRightEdges">
                             <StackPanel>

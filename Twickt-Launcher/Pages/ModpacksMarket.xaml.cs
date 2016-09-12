@@ -114,6 +114,7 @@ namespace Twickt_Launcher.Pages
             insiderStackPanel.Children.Add(image);
 
             var title = new Label();
+            title.FontWeight = FontWeights.ExtraBold;
             title.Content = name;
             title.Margin = new Thickness(0, 10, 0, 0);
             title.FontSize = 15;

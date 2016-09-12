@@ -42,6 +42,7 @@ namespace Twickt_Launcher.Pages
             InitializeComponent();
             Window1.singleton.MenuToggleButton.IsEnabled = false;
             Window1.singleton.popupbox.IsEnabled = false;
+            Window1.singleton.homeButton.IsEnabled = false;
             singleton = this;
             
             CultureInfo culture;

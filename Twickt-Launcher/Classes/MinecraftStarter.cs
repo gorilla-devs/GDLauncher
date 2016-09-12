@@ -19,6 +19,9 @@ namespace Twickt_Launcher.Classes
         public static Dialogs.ModpackLoading loading;
         public static async void Minecraft_Start(string dir)
         {
+            loading = new Dialogs.ModpackLoading(true, Pages.SplashScreen.singleton.manager.GetString("starting") + "...");
+                        MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", OpenEvent);
+            loading.forgeProgress.Value = 15;
             var json = File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
             dynamic decoded = JsonConvert.DeserializeObject(json);
             var forge = decoded.forgeVersion;
@@ -115,7 +118,7 @@ namespace Twickt_Launcher.Classes
                         Application.Current.Dispatcher.Invoke(new Action(() =>
                         {
                             Windows.DebugOutputConsole.singleton.Write(e.Data.ToString());
-                            /*if (e.Data.ToString().Contains("Loading tweak class name"))
+                            if (e.Data.ToString().Contains("Loading tweak class name"))
                             {
                                 loading.forgeProgress.Value = 50;
                             }
@@ -127,7 +130,7 @@ namespace Twickt_Launcher.Classes
                             {
                                 loading.forgeProgress.Value = 100;
                                 Window1.singleton.Hide();
-                            }*/
+                            }
 
                         }));
 

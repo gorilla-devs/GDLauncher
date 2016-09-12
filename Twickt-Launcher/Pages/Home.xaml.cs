@@ -2,6 +2,7 @@
 //Application idea, code and time are given by Davide Ceschia / Twickt
 //You may use them according to the GNU GPL v.3 Licence
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,23 +41,40 @@ namespace Twickt_Launcher.Pages
             transition.SelectedIndex = 0;
         }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object senderx, RoutedEventArgs ee)
         {
-            if(SessionData.lastUser == "" || SessionData.userCount == "")
+            System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
+            if (x.Count != 0)
             {
-                var client = new WebClient();
-                var response = client.UploadValues(config.statisticsWebService, new System.Collections.Specialized.NameValueCollection());
-                var responseString = Encoding.Default.GetString(response);
-                var tempdata = responseString.Split(';');
-                totalUsers.Text = "Total users: " + tempdata[0];
-                lastRegistered.Text = "Last registered: " + tempdata[1];
-                SessionData.lastUser = "Last registered: " + tempdata[1];
-                SessionData.userCount = "Total users: " + tempdata[0];
+                foreach (var i in x)
+                {
+                    var json = System.IO.File.ReadAllText(i + "\\" + new DirectoryInfo(i).Name + ".json");
+                    dynamic decoded = JsonConvert.DeserializeObject(json);
+                    var card = new MaterialDesignThemes.Wpf.Card();
+                    card.Height = 90;
+                    card.Width = 200;
+                    Label lab = new Label();
+                    lab.Content = decoded.instanceName;
+                    lab.FontWeight = FontWeights.ExtraBold;
+                    Button play = new Button();
+                    play.Content = "Play";
+                    play.Foreground = new SolidColorBrush(Colors.White);
+                    play.Click += new RoutedEventHandler((sender, e) => play_click(this, e, i));
+                    bookmarksContainer.Children.Add(card);
+                    StackPanel panel = new StackPanel();
+                    play.Margin = new Thickness(10, 20, 10, 0);
+                    lab.HorizontalAlignment = HorizontalAlignment.Center;
+                    panel.Children.Add(lab);
+                    panel.Children.Add(play);
+                    card.Content = panel;
+                }
             }
             else
             {
-                totalUsers.Text = SessionData.userCount;
-                lastRegistered.Text = SessionData.lastUser;
+                Label lab = new Label();
+                lab.FontSize = 15;
+                lab.Content = "No bookmarks. Go to installed modpacks and bookmark some modpacks there";
+                bookmarksContainer.Children.Add(lab);
             }
             transition.SelectedIndex = 1;
             if(Properties.Settings.Default["justUpdated"].ToString() == "true")
@@ -66,6 +84,11 @@ namespace Twickt_Launcher.Pages
                 Properties.Settings.Default["justUpdated"] = "false";
                 Properties.Settings.Default.Save();
             }
+        }
+
+        async void play_click(object sender, RoutedEventArgs e, string dir)
+        {
+            Classes.MinecraftStarter.Minecraft_Start(dir);
         }
 
         private void websiteLink_MouseDown(object sender, MouseButtonEventArgs e)
@@ -118,21 +141,6 @@ namespace Twickt_Launcher.Pages
             await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
         }
 
-        private async void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            var client = new WebClient();
-            var response = client.UploadValues(config.statisticsWebService, new System.Collections.Specialized.NameValueCollection());
-            var responseString = Encoding.Default.GetString(response);
-            var tempdata = responseString.Split(';');
-            totalUsers.Text = "Total users: " + tempdata[0];
-            lastRegistered.Text = "Last registered: " + tempdata[1];
-            SessionData.lastUser = "Last registered: " + tempdata[1];
-            SessionData.userCount = "Total users: " + tempdata[0];
-            statisticsupdatedlabel.Visibility = Visibility.Visible;
-            await Task.Delay(850);
-            statisticsupdatedlabel.Visibility = Visibility.Hidden;
-        }
-
         private async void problems_Click(object sender, RoutedEventArgs e)
         {
             await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates(@"Per risolvere i tuoi problemi con il launcher, il primo tentativo e' di cancellare la cartella di minecraft del launcher.
@@ -147,20 +155,6 @@ namespace Twickt_Launcher.Pages
 
             System.Diagnostics.Process.Start("explorer.exe", argument);
 
-        }
-
-        private async void toAccount_Click(object sender, RoutedEventArgs e)
-        {
-            statistics_account.SelectedIndex = 1;
-            await Task.Delay(300);
-            statistics_account.SelectedIndex = 2;
-        }
-
-        private async void toStats_Click(object sender, RoutedEventArgs e)
-        {
-            statistics_account.SelectedIndex = 3;
-            await Task.Delay(300);
-            statistics_account.SelectedIndex = 0;
         }
 
         private void installedModpacks_Click(object sender, RoutedEventArgs e)

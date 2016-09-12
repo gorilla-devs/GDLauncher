@@ -127,5 +127,10 @@ namespace Twickt_Launcher
 
             System.Diagnostics.Process.Start("explorer.exe", argument);
         }
+
+        private void Button_Click_6(object sender, RoutedEventArgs e)
+        {
+            MainPage.Navigate(new Pages.Home());
+        }
     }
 }

@@ -85,13 +85,22 @@ namespace Twickt_Launcher.Pages
 
                     var bookmarkbutton = new Button();
                     var iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
-                    iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.Bookmark;
+                    System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
+                    if(x.Contains(dir))
+                    {
+                        iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.BookmarkCheck;
+                    }
+                    else
+                    {
+                        iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.Bookmark;
+                    }
                     bookmarkbutton.Content = iconpackbookmark;
                     bookmarkbutton.Style = buttonstyle;
                     bookmarkbutton.HorizontalAlignment = HorizontalAlignment.Right;
                     bookmarkbutton.VerticalAlignment = VerticalAlignment.Bottom;
                     bookmarkbutton.Margin = new Thickness(0, 0, -35, 0);
                     Panel.SetZIndex(bookmarkbutton, 10);
+                    bookmarkbutton.Click += new RoutedEventHandler((sender, e) => bookmark_click(this, e, card.Name, dir, bookmarkbutton));
 
                     var cloudbutton = new Button();
                     var iconpackcloud = new MaterialDesignThemes.Wpf.PackIcon();
@@ -182,9 +191,44 @@ namespace Twickt_Launcher.Pages
             await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.SyncToCloud(), "RootDialog");
         }
 
+        async void bookmark_click(object sender, RoutedEventArgs e, string card, string dir, Button bookmark)
+        {
+            MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card);
+
+            var iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
+            System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
+            foreach(var i in x)
+            {
+                if (i == dir)
+                {
+                    x.Remove(dir);
+                    iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
+                    iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.Bookmark;
+                    bookmark.Content = iconpackbookmark;
+                    Properties.Settings.Default.Save();
+                    return;
+                }
+            }
+            x.Add(dir);
+            iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
+            iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.BookmarkCheck;
+            bookmark.Content = iconpackbookmark;
+            Properties.Settings.Default.Save();
+        }
+
         async void delete_click(object sender, RoutedEventArgs e, string card, string dir)
         {
             MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card);
+            System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
+            foreach (var i in x)
+            {
+                if (i == dir)
+                {
+                    x.Remove(dir);
+                    break;
+                }
+            }
+            Properties.Settings.Default.Save();
             if (Directory.Exists(dir))
                 Directory.Delete(dir, true);
             await modpacksUpdate();
