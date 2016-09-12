@@ -23,7 +23,7 @@ Sample license text.
                         <Button Name="addPrivatePackCode" Margin="5 0 5 0" Foreground="White" Click="addPrivatePackCode_Click">Add Private Pack</Button>
                         <Button Margin="5 0 5 0" Foreground="White">Upload Your Pack</Button>
                         <Button Name="goToInstalledModpacks" Margin="5 0 5 0" Foreground="White" Click="goToInstalledModpacks_Click" Height="40" VerticalAlignment="Top">Installed Modpacks</Button>
-                        <Button Name="refresh" Margin="5 0 5 0" Foreground="White" Click="refresh_Click">
+                        <Button Name="refresh" ToolTip="Refresh" Margin="5 0 5 0" Foreground="White" Click="refresh_Click">
                             <materialDesign:PackIcon Kind="Refresh" />
                         </Button>
                     </StackPanel>

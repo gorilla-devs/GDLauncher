@@ -48,25 +48,37 @@ namespace Twickt_Launcher.Pages
             {
                 foreach (var i in x)
                 {
-                    var json = System.IO.File.ReadAllText(i + "\\" + new DirectoryInfo(i).Name + ".json");
-                    dynamic decoded = JsonConvert.DeserializeObject(json);
-                    var card = new MaterialDesignThemes.Wpf.Card();
-                    card.Height = 90;
-                    card.Width = 200;
-                    Label lab = new Label();
-                    lab.Content = decoded.instanceName;
-                    lab.FontWeight = FontWeights.ExtraBold;
-                    Button play = new Button();
-                    play.Content = "Play";
-                    play.Foreground = new SolidColorBrush(Colors.White);
-                    play.Click += new RoutedEventHandler((sender, e) => play_click(this, e, i));
-                    bookmarksContainer.Children.Add(card);
-                    StackPanel panel = new StackPanel();
-                    play.Margin = new Thickness(10, 20, 10, 0);
-                    lab.HorizontalAlignment = HorizontalAlignment.Center;
-                    panel.Children.Add(lab);
-                    panel.Children.Add(play);
-                    card.Content = panel;
+                    try
+                    {
+                        var json = System.IO.File.ReadAllText(i + "\\" + new DirectoryInfo(i).Name + ".json");
+                        dynamic decoded = JsonConvert.DeserializeObject(json);
+                        var card = new MaterialDesignThemes.Wpf.Card();
+                        card.Height = 90;
+                        card.Width = 200;
+                        Label lab = new Label();
+                        lab.Content = decoded.instanceName;
+                        lab.FontWeight = FontWeights.ExtraBold;
+                        Button play = new Button();
+                        play.Content = "Play";
+                        play.Foreground = new SolidColorBrush(Colors.White);
+                        play.Click += new RoutedEventHandler((sender, e) => play_click(this, e, i));
+                        bookmarksContainer.Children.Add(card);
+                        StackPanel panel = new StackPanel();
+                        play.Margin = new Thickness(10, 20, 10, 0);
+                        lab.HorizontalAlignment = HorizontalAlignment.Center;
+                        panel.Children.Add(lab);
+                        panel.Children.Add(play);
+                        card.Content = panel;
+                    }
+                    catch
+                    {
+                        x.Remove(i);
+                        Label lab = new Label();
+                        lab.FontSize = 15;
+                        lab.Content = "An error occurred. We fixed it. Reload this page";
+                        bookmarksContainer.Children.Add(lab);
+                        break;
+                    }
                 }
             }
             else

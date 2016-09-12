@@ -38,8 +38,18 @@ Sample license text.
                         </materialDesign:Card>
                     </WrapPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button x:Name="MarketModpacks" Content="Go to Modpacks's Market" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="0,0,30,0" VerticalAlignment="Top" Width="270" Height="46" Click="MarketModpacks_Click"/>
-                        <Button x:Name="installedModpacks" Content="Go to Installed Modpacks" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="30,0,0,0" VerticalAlignment="Top" Width="270" Height="46" Click="installedModpacks_Click"/>
+                        <Button x:Name="MarketModpacks" Foreground="White" HorizontalAlignment="Left" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="0,0,30,0" VerticalAlignment="Top" Width="270" Height="46" Click="MarketModpacks_Click">
+                            <DockPanel>
+                                <materialDesign:PackIcon Kind="Cart"  Width="20" Height="20" VerticalAlignment="Center"/>
+                                <Label Foreground="White">Go to Modpack's Market</Label>
+                            </DockPanel>
+                        </Button>
+                        <Button x:Name="installedModpacks" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="30,0,0,0" VerticalAlignment="Top" Width="270" Height="46" Click="installedModpacks_Click">
+                            <DockPanel>
+                                <materialDesign:PackIcon Kind="Package"  Width="20" Height="20" VerticalAlignment="Center"/>
+                                <Label Foreground="White">Go to Installed Modpacks</Label>
+                            </DockPanel>
+                        </Button>
                     </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button x:Name="changelog" Content="Changelogs" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Margin="0,10,30,0" VerticalAlignment="Top" Width="180" Height="39" Click="changelog_Click"/>

@@ -89,10 +89,12 @@ namespace Twickt_Launcher.Pages
                     if(x.Contains(dir))
                     {
                         iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.BookmarkCheck;
+                        bookmarkbutton.ToolTip = "This modpack is bookmarked";
                     }
                     else
                     {
                         iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.Bookmark;
+                        bookmarkbutton.ToolTip = "This modpack is not bookmarked";
                     }
                     bookmarkbutton.Content = iconpackbookmark;
                     bookmarkbutton.Style = buttonstyle;
@@ -105,6 +107,7 @@ namespace Twickt_Launcher.Pages
                     var cloudbutton = new Button();
                     var iconpackcloud = new MaterialDesignThemes.Wpf.PackIcon();
                     iconpackcloud.Kind = MaterialDesignThemes.Wpf.PackIconKind.Cloud;
+                    cloudbutton.ToolTip = "Cloud Syncing Service";
                     cloudbutton.Content = iconpackcloud;
                     cloudbutton.Style = buttonstyle;
                     cloudbutton.HorizontalAlignment = HorizontalAlignment.Right;
@@ -205,6 +208,7 @@ namespace Twickt_Launcher.Pages
                     iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
                     iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.Bookmark;
                     bookmark.Content = iconpackbookmark;
+                    bookmark.ToolTip = "This modpack is not bookmarked";
                     Properties.Settings.Default.Save();
                     return;
                 }
@@ -213,6 +217,7 @@ namespace Twickt_Launcher.Pages
             iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
             iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.BookmarkCheck;
             bookmark.Content = iconpackbookmark;
+            bookmark.ToolTip = "This modpack is bookmarked";
             Properties.Settings.Default.Save();
         }
 

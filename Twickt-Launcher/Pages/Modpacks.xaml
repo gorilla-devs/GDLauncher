@@ -22,7 +22,7 @@ Sample license text.
                     <StackPanel Margin="10" Height="40" VerticalAlignment="Top" Orientation="Horizontal">
                         <TextBox Width="180" HorizontalAlignment="Left" VerticalAlignment="Top" materialDesign:HintAssist.Hint="Search" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
                         <Button Name="gotoMarket" Margin="20 0 0 0" Foreground="White" Click="gotoMarket_Click">Go to Market</Button>
-                        <Button Name="refresh" Margin="5 0 5 0" Foreground="White" Click="refresh_Click">
+                        <Button Name="refresh" ToolTip="Refresh" Margin="5 0 5 0" Foreground="White" Click="refresh_Click">
                             <materialDesign:PackIcon Kind="Refresh" />
                         </Button>
                     </StackPanel>

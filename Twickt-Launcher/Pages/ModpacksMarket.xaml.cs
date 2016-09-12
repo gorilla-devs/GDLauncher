@@ -84,6 +84,7 @@ namespace Twickt_Launcher.Pages
             Style buttonstyle = Application.Current.FindResource("MaterialDesignFloatingActionMiniAccentButton") as Style;
 
             var fullscreenbutton = new Button();
+            fullscreenbutton.ToolTip = "Fullscreen";
             var iconpackfullscreen = new MaterialDesignThemes.Wpf.PackIcon();
             iconpackfullscreen.Kind = MaterialDesignThemes.Wpf.PackIconKind.Fullscreen;
             fullscreenbutton.Content = iconpackfullscreen;
@@ -95,6 +96,7 @@ namespace Twickt_Launcher.Pages
             fullscreenbutton.Click += new RoutedEventHandler((sender, e) => fullscreen_click(this, e, card.Name, name));
 
             var sharebutton = new Button();
+            sharebutton.ToolTip = "Share";
             var iconpackshare = new MaterialDesignThemes.Wpf.PackIcon();
             iconpackshare.Kind = MaterialDesignThemes.Wpf.PackIconKind.ShareVariant;
             sharebutton.Content = iconpackshare;
