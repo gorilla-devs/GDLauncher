@@ -36,10 +36,18 @@ namespace Twickt_Launcher.Dialogs
         }
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            loading.Visibility = Visibility.Visible;
             if (name == "Minecraft Vanilla")
             {
                 var client = new WebClient();
-                vanillajson = await client.DownloadStringTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+                try
+                {
+                    vanillajson = await client.DownloadStringTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+                }
+                catch
+                {
+                    MessageBox.Show("Errore di rete");
+                }
                 dynamic parsed = JsonConvert.DeserializeObject(vanillajson);
                 var versions = parsed.versions;
                 foreach (var item in versions)
@@ -76,10 +84,12 @@ namespace Twickt_Launcher.Dialogs
                     versionsList.Items.Add(z[0]);
                 }
             }
+            loading.Visibility = Visibility.Hidden;
         }
 
         private async void versionsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            loading.Visibility = Visibility.Visible;
             if (name == "Minecraft Vanilla")
             {
                 await Task.Delay(100);
@@ -123,6 +133,7 @@ namespace Twickt_Launcher.Dialogs
                     }
                 }
             }
+            loading.Visibility = Visibility.Hidden;
         }
 
         private async void install_Click(object sender, RoutedEventArgs e)

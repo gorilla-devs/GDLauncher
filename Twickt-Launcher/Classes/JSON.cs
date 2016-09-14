@@ -84,7 +84,7 @@ namespace Twickt_Launcher.Classes
             await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + version + "/" + version + ".json"));
             try
             {
-                dynamic json = JsonConvert.DeserializeObject(data);
+                dynamic json = await Task.Run( () => JsonConvert.DeserializeObject(data));
                 var hash = "";
                 var url = "";
                 var name = "";
@@ -134,7 +134,7 @@ namespace Twickt_Launcher.Classes
             };
             await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + version + "/" + version + ".json"));
             List<string[]> libraries = new List<string[]>();
-            dynamic json = JsonConvert.DeserializeObject(data);
+            dynamic json = await Task.Run( () => JsonConvert.DeserializeObject(data));
             var hash = "";
             var url = "";
             var path = "";
@@ -199,7 +199,7 @@ namespace Twickt_Launcher.Classes
             await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + "Packs\\" + instanceName + "\\assets\\indexes\\" + version + ".json");
 
             List<string[]> assets = new List<string[]>();
-            MyClass json = JsonConvert.DeserializeObject<MyClass>(data);
+            MyClass json = await Task.Run( () => JsonConvert.DeserializeObject<MyClass>(data));
             var names = json.Objects.Keys.ToList();
             int i = 0;
             foreach (var item in names)
@@ -257,7 +257,7 @@ namespace Twickt_Launcher.Classes
                 {
                     //READING FORGE VERSION JSON FILE AND PARSING IT
                     List<string> modpacks = new List<string>();
-                    var json = Newtonsoft.Json.Linq.JObject.Parse(data);
+                    var json = await Task.Run( () => Newtonsoft.Json.Linq.JObject.Parse(data));
                     var promos = json["promos"].ToObject<Dictionary<string, string>>();
                     foreach (var entry in promos)
                     {
@@ -329,7 +329,7 @@ namespace Twickt_Launcher.Classes
                             await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("install_profile.json", "\\", @temp, ExtractExistingFileAction.OverwriteSilently));
                             //LEGGE DAL FILE PROFILE JSON IL NOME DEL FILE DI FORGE DA ESTRARRE
                             var x = File.ReadAllText(@temp + "install_profile.json");
-                            dynamic x1 = JsonConvert.DeserializeObject(x);
+                            dynamic x1 = await Task.Run( () => JsonConvert.DeserializeObject(x));
                             forgefilepath = x1["install"]["filePath"];
                             await Task.Factory.StartNew(() => zip.ExtractSelectedEntries(forgefilepath, "\\", @temp, ExtractExistingFileAction.OverwriteSilently));
                         }
@@ -360,7 +360,7 @@ namespace Twickt_Launcher.Classes
                 //INIZIA LA LETTURA DEL FILE JSON APPENA ESTRATTO CON LA LISTA DI TUTTE LE LIBRERIE E I DATI DI FORGE
                 /////////////////////////////////////////////////////////////////////////////////////////////////////
                 var dataforge = File.ReadAllText(@temp + "install_profile.json");
-                dynamic jsonforge = JsonConvert.DeserializeObject(dataforge);
+                dynamic jsonforge = await Task.Run ( () => JsonConvert.DeserializeObject(dataforge));
                 tweakclass = jsonforge["versionInfo"]["minecraftArguments"];
                 mainclass = jsonforge["versionInfo"]["mainClass"];
                 config.mainclass = mainclass;
@@ -451,27 +451,27 @@ namespace Twickt_Launcher.Classes
             packjson.mc_version = version;
             packjson.libs = new List<Lib>();
 
-            downloadingVersion = await RemoteModpacks.GetModpackInfo(modpackname);
+            downloadingVersion = await Task.Run(() => RemoteModpacks.GetModpackInfo(modpackname));
 
             List<string[]> list = new List<string[]>();
             List<string[]> forge = new List<string[]>();
 
             Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Main Jar";
-            List<string[]> mainjar = await AnalyzeMainJar(version, instanceName);
+            List<string[]> mainjar = await Task.Run(() => AnalyzeMainJar(version, instanceName));
             list.AddRange(mainjar);
             Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Libs";
-            List <string[]> libraries = await AnalyzeStdLibraries(version, instanceName);
+            List <string[]> libraries = await Task.Run( () => AnalyzeStdLibraries(version, instanceName));
             list.AddRange(libraries);
             Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Assets";
-            List<string[]> assets = await AnalyzeAssets(version, instanceName);
+            List<string[]> assets = await Task.Run(() => AnalyzeAssets(version, instanceName));
             list.AddRange(assets);
             if(forgeVersion != "false")
             {
                 Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Forge";
-                forge = await AnalyzeForgeLibraries(modpackname, version, instanceName);
+                forge = await Task.Run(() => AnalyzeForgeLibraries(modpackname, version, instanceName));
                 list.AddRange(forge);
                 Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Mods";
-                List<string[]> mods = await Classes.RemoteModpacks.GetModpacksFiles(modpackname, modpackVersion, instanceName);
+                List<string[]> mods = await Task.Run(() => Classes.RemoteModpacks.GetModpacksFiles(modpackname, modpackVersion, instanceName));
                 list.AddRange(mods);
             }
             //AGGIUNGE LE LIBRERIE AL JSON
@@ -508,12 +508,12 @@ namespace Twickt_Launcher.Classes
                 }
             }
             packjson.libs = packjson.libs.Distinct().ToList();
-            string json = JsonConvert.SerializeObject(packjson, Formatting.Indented);
+            string json = await Task.Run( () => JsonConvert.SerializeObject(packjson, Formatting.Indented));
             if(!Directory.Exists(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json")))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json"));
             }
-            System.IO.File.WriteAllText(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json", json);
+            await Task.Run( () =>System.IO.File.WriteAllText(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json", json));
 
             Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysis Finished";
             Dialogs.InstallModpack.singleton.analysisprogress.Visibility = Visibility.Hidden;

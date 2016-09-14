@@ -135,37 +135,47 @@ namespace Twickt_Launcher.Dialogs
                 controllo.IsEnabled = true;
                 return;
             }
+            try
+            {
+                var client = new WebClient();
+                var values = new NameValueCollection();
+                values["username"] = username.Text;
+                values["email"] = email.Text;
+                values["password"] = Pages.Login.sha256(password.Password);
+                register.IsEnabled = false;
+                var response = await client.UploadValuesTaskAsync(config.RegisterWebService, values);
 
-            var client = new WebClient();
-            var values = new NameValueCollection();
-            values["username"] = username.Text;
-            values["email"] = email.Text;
-            values["password"] = Pages.Login.sha256(password.Password);
-            register.IsEnabled = false;
-            var response = await client.UploadValuesTaskAsync(config.RegisterWebService, values);
-
-            var responseString = Encoding.Default.GetString(response);
-            if (responseString.Contains("OK") && responseString.Contains("sent"))
-            {
-                MessageBox.Show("Registrazione completata, attiva l'account via mail e poi potrai loggarti. Se non attivato entro 24 ore da questo momento, l'account verra' automaticamente cancellato ");
+                var responseString = Encoding.Default.GetString(response);
+                if (responseString.Contains("OK") && responseString.Contains("sent"))
+                {
+                    MessageBox.Show("Registrazione completata, attiva l'account via mail e poi potrai loggarti. Se non attivato entro 24 ore da questo momento, l'account verra' automaticamente cancellato ");
+                }
+                else if (responseString.Contains("email_taken"))
+                {
+                    error.Visibility = Visibility.Visible;
+                    error.Content = "Email gia' in uso";
+                    register.IsEnabled = true;
+                    return;
+                }
+                else if (responseString.Contains("username_taken"))
+                {
+                    error.Visibility = Visibility.Visible;
+                    error.Content = "Username gia' in uso";
+                    register.IsEnabled = true;
+                    return;
+                }
+                else
+                {
+                    MessageBox.Show("C'e' stato un errore con la registrazione. Riprova piu' tardi o contatta il supporto");
+                }
             }
-            else if (responseString.Contains("email_taken"))
+            catch (TimeoutException timeout)
             {
-                error.Visibility = Visibility.Visible;
-                error.Content = "Email gia' in uso";
-                register.IsEnabled = true;
-                return;
+                MessageBox.Show("Timeout del server. Probabilmente hai una connessione molto instabile");
             }
-            else if (responseString.Contains("username_taken"))
+            catch (WebException interneterror)
             {
-                error.Visibility = Visibility.Visible;
-                error.Content = "Username gia' in uso";
-                register.IsEnabled = true;
-                return;
-            }
-            else
-            {
-                MessageBox.Show("C'e' stato un errore con la registrazione. Riprova piu' tardi o contatta il supporto");
+                MessageBox.Show("C'e' stato un errore con la rete.");
             }
             close = true;
         }

@@ -76,87 +76,95 @@ namespace Twickt_Launcher.Pages
             values["username"] = username.Text;
             values["password"] = sha256(password.Password);
 
-            var response = await client.UploadValuesTaskAsync(config.loginWebService, values);
-
-            var responseString = Encoding.Default.GetString(response);
-            if (responseString.Contains("true"))
+            try
             {
-                var userdata = responseString.Split(';');
-
-                SessionData.username = userdata[1];
-                SessionData.email = userdata[2];
-                SessionData.isAdmin = userdata[3];
-                if(userdata[3] == "false")
+                var response = await client.UploadValuesTaskAsync(config.loginWebService, values);
+                var responseString = Encoding.Default.GetString(response);
+                if (responseString.Contains("true"))
                 {
-                    try
+                    var userdata = responseString.Split(';');
+
+                    SessionData.username = userdata[1];
+                    SessionData.email = userdata[2];
+                    SessionData.isAdmin = userdata[3];
+                    if (userdata[3] == "false")
                     {
-                        var client1 = new WebClient();
-                        var values1 = new System.Collections.Specialized.NameValueCollection();
-                        var response1 = await client1.UploadValuesTaskAsync(config.launcherStatusWebService, values1);
-                        var responseString1 = Encoding.Default.GetString(response1);
-                        if (responseString1.Contains("enabled;true"))
+                        try
                         {
-                            MessageBox.Show("Attualmente solo i fucking admin possono accedere. Tu sei plebeo e riprovi piu' tardi");
-                            Application.Current.Shutdown();
+                            var client1 = new WebClient();
+                            var values1 = new System.Collections.Specialized.NameValueCollection();
+                            var response1 = await client1.UploadValuesTaskAsync(config.launcherStatusWebService, values1);
+                            var responseString1 = Encoding.Default.GetString(response1);
+                            if (responseString1.Contains("enabled;true"))
+                            {
+                                MessageBox.Show("Attualmente solo i fucking admin possono accedere. Tu sei plebeo e riprovi piu' tardi");
+                                Application.Current.Shutdown();
+                            }
+                        }
+                        catch { }
+                    }
+                    Window1.singleton.MenuToggleButton.IsEnabled = true;
+                    Window1.singleton.popupbox.IsEnabled = true;
+                    Window1.singleton.homeButton.IsEnabled = true;
+                    Window1.singleton.loggedinName.Text = "Logged in as " + userdata[1];
+                    transition.SelectedIndex = 2;
+                    await Task.Delay(500);
+                    //Properties.Settings.Default["Sessiondata"] = SessionData.username + ";" + SessionData.email + ";" + SessionData.isAdmin;
+                    //Properties.Settings.Default.Save();
+                    if (keepMeIn.IsChecked == true)
+                    {
+                        Properties.Settings.Default["RememberUsername"] = username.Text;
+                        Properties.Settings.Default.Save();
+                    }
+                    else
+                    {
+                        Properties.Settings.Default["RememberUsername"] = "";
+                        Properties.Settings.Default.Save();
+                    }
+                    if (Properties.Settings.Default["firstTimeHowTo"].ToString() == "true")
+                    {
+                        Window1.singleton.MainPage.Navigate(new Dialogs.HowTo());
+                    }
+                    else
+                    {
+                        if (Properties.Settings.Default["startingPage"].ToString() == "Home")
+                        {
+                            Window1.singleton.MainPage.Navigate(new Pages.Home());
+                            Window1.singleton.NavigationMenu.SelectedIndex = 0;
+                        }
+
+                        else if (Properties.Settings.Default["startingPage"].ToString() == "Modpacks")
+                        {
+                            Window1.singleton.MainPage.Navigate(new Pages.Modpacks());
+                            Window1.singleton.NavigationMenu.SelectedIndex = 2;
                         }
                     }
-                    catch { }
-                }
-                Window1.singleton.MenuToggleButton.IsEnabled = true;
-                Window1.singleton.popupbox.IsEnabled = true;
-                Window1.singleton.homeButton.IsEnabled = true;
-                Window1.singleton.loggedinName.Text = "Logged in as " + userdata[1];
-                transition.SelectedIndex = 2;
-                await Task.Delay(500);
-                //Properties.Settings.Default["Sessiondata"] = SessionData.username + ";" + SessionData.email + ";" + SessionData.isAdmin;
-                //Properties.Settings.Default.Save();
-                if (keepMeIn.IsChecked == true)
-                {
-                    Properties.Settings.Default["RememberUsername"] = username.Text;
-                    Properties.Settings.Default.Save();
                 }
                 else
                 {
-                    Properties.Settings.Default["RememberUsername"] = "";
-                    Properties.Settings.Default.Save();
-                }
-                if (Properties.Settings.Default["firstTimeHowTo"].ToString() == "true")
-                {
-                    Window1.singleton.MainPage.Navigate(new Dialogs.HowTo());
-                }
-                else
-                {
-                    if (Properties.Settings.Default["startingPage"].ToString() == "Home")
+                    if (responseString.Contains("notconfirmed"))
                     {
-                        Window1.singleton.MainPage.Navigate(new Pages.Home());
-                        Window1.singleton.NavigationMenu.SelectedIndex = 0;
+                        await DialogHost.Show(new Dialogs.OptionsUpdates("Account not confirmed yet. Check your email"), "RootDialog", ExtendedOpenedEventHandler);
+                    }
+                    else if (responseString.Contains("banned"))
+                    {
+                        await DialogHost.Show(new Dialogs.OptionsUpdates("Account Banned"), "RootDialog", ExtendedOpenedEventHandler);
+                    }
+                    else
+                    {
+                        await DialogHost.Show(new Dialogs.OptionsUpdates("Wrong username or password"), "RootDialog", ExtendedOpenedEventHandler);
                     }
 
-                    else if (Properties.Settings.Default["startingPage"].ToString() == "Modpacks")
-                    {
-                        Window1.singleton.MainPage.Navigate(new Pages.Modpacks());
-                        Window1.singleton.NavigationMenu.SelectedIndex = 2;
-                    }
                 }
-
             }
-            else
+            catch (TimeoutException timeout)
             {
-                if (responseString.Contains("notconfirmed"))
-                {
-                    await DialogHost.Show(new Dialogs.OptionsUpdates("Account not confirmed yet. Check your email"), "RootDialog", ExtendedOpenedEventHandler);
-                }
-                else if(responseString.Contains("banned"))
-                {
-                    await DialogHost.Show(new Dialogs.OptionsUpdates("Account Banned"), "RootDialog", ExtendedOpenedEventHandler);
-                }
-                else
-                {
-                    await DialogHost.Show(new Dialogs.OptionsUpdates("Wrong username or password"), "RootDialog", ExtendedOpenedEventHandler);
-                }
-
+                MessageBox.Show("Timeout del server. Probabilmente hai una connessione molto instabile");
             }
-
+            catch(WebException interneterror)
+            {
+                MessageBox.Show("C'e' stato un errore con la rete.");
+            }
             //alice encrypts a message for bob
             //var encrypted = PublicKeyBox.Create(MESSAGE, nonce, alice.PrivateKey, bob.PublicKey);
             //bob decrypt the message

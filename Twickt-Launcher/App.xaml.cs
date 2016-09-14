@@ -32,13 +32,17 @@ namespace Twickt_Launcher
             var values = new NameValueCollection();
             values["username"] = SessionData.username;
             values["message"] = "AUTOMATIC ERROR REPORTING -- <br><br><br>" + e.ExceptionObject.ToString();
-            var response = client.UploadValues(config.bugReportWebService, values);
-            var responseString = Encoding.Default.GetString(response);
-            if (responseString.Contains("sent"))
+
+            try
             {
-                MessageBox.Show("Thank you for your patience!");
+                var response = client.UploadValues(config.bugReportWebService, values);
+                var responseString = Encoding.Default.GetString(response);
+                if (responseString.Contains("sent"))
+                {
+                    MessageBox.Show("Thank you for your patience!");
+                }
             }
-            else
+            catch
             {
                 MessageBox.Show("There are too many fucking errors here. Application is going to shut down");
             }
