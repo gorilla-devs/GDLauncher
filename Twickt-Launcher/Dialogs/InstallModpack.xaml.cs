@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,6 +30,7 @@ namespace Twickt_Launcher.Dialogs
         public static InstallModpack singleton;
         public static string vanillajson;
         private static Classes.Downloader downloader;
+        public static CancellationTokenSource ctoken;
         public InstallModpack(string modpackname)
         {
             InitializeComponent();
@@ -149,13 +151,14 @@ namespace Twickt_Launcher.Dialogs
                 MessageBox.Show("Nome istanza gia' esistente");
                 return;
             }
+            ctoken = new CancellationTokenSource();
             transition.SelectedIndex = 1;
             workingThreadsText.Content = Properties.Settings.Default["download_threads"].ToString();
             modpackName.Content = versionsList.Text;
             var files = await Classes.JSON.GetFiles(name, instanceTextName.Text, mc_version.Content.ToString(), forge_version.Content.ToString(), versionsList.Text);
             cancelButton.IsEnabled = true;
             downloader = new Classes.Downloader();
-            await downloader.MCDownload(files, instanceTextName.Text);
+            await downloader.MCDownload(files, instanceTextName.Text, ctoken.Token);
             cancelButton.Visibility = Visibility.Hidden;
             continueButton.Visibility = Visibility.Visible;
             installationEndedIcon.Visibility = Visibility.Visible;
@@ -165,9 +168,17 @@ namespace Twickt_Launcher.Dialogs
         private async void cancelButton_Click(object sender, RoutedEventArgs e)
         {
             downloader._cts.Cancel();
+            ctoken.Cancel();
             await Task.Run( () => Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                Directory.Delete(config.M_F_P + "Packs\\" + instanceTextName.Text, true);
+                try
+                {
+                    Directory.Delete(config.M_F_P + "Packs\\" + instanceTextName.Text, true);
+                }
+                catch
+                {
+                    MessageBox.Show("Errore cercando di cancellare la modpack di cui si e' interrotta l'installazione. Procedere cancellandola manualmente dalla sezione modpacks installate");
+                }
             })));
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
         }

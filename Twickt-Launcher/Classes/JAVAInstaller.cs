@@ -28,15 +28,20 @@ namespace Twickt_Launcher.Classes
         public static long AverageSpeed;
         public static async Task<bool> isJavaInstalled()
         {
-            if (!Directory.Exists(config.M_F_P + "runtime"))
+            if (File.Exists(config.javaLocal + "runtime\\java.zip"))
+            {
+                File.Delete(config.javaLocal + "runtime\\java.zip");
+            }
+            if (Properties.Settings.Default["JavaPath"].ToString() == "Empty")
+            {
                 return false;
+            }
             else
             {
-                if(File.Exists(config.javaLocal + "runtime\\java.zip"))
-                {
-                    File.Delete(config.javaLocal + "runtime\\java.zip");
-                }
-                return true;
+                    if (Directory.Exists(Properties.Settings.Default["JavaPath"].ToString()))
+                        return true;
+                    else
+                        return false;
             }
         }
 

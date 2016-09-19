@@ -3,6 +3,8 @@
 //You may use them according to the GNU GPL v.3 Licence
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
 using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,6 +62,22 @@ namespace Twickt_Launcher.Pages
             {
                 foreach (var dir in dirlist)
                 {
+                    string modpackversion;
+                    string modpackname;
+                    string mcversion;
+                    try
+                    {
+                        var json = System.IO.File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
+                        dynamic jObj = JsonConvert.DeserializeObject(json);
+                        modpackname = jObj.modpackName;
+                        modpackversion = jObj.modpackVersion;
+                        mcversion = jObj.mc_version;
+
+                    }
+                    catch (FileNotFoundException ex)
+                    {
+                        continue;
+                    }
                     var card = new MaterialDesignThemes.Wpf.Card();
                     card.Name = "card" + new DirectoryInfo(dir.Replace(" ", "")).Name;
                     try
@@ -132,21 +150,23 @@ namespace Twickt_Launcher.Pages
 
                     var title = new Label();
                     title.FontSize = 15;
+                    title.FontWeight = FontWeights.ExtraBold;
                     title.HorizontalAlignment = HorizontalAlignment.Center;
                     title.Content = new DirectoryInfo(dir).Name;
                     datastackpanel.Children.Add(title);
 
-                    var playedHours = new Label();
-                    playedHours.Content = "Played Hours: 0";
-                    datastackpanel.Children.Add(playedHours);
-
-                    var lastSyncCloud = new Label();
-                    lastSyncCloud.Content = "Last Synchronization to cloud: Never";
-                    datastackpanel.Children.Add(lastSyncCloud);
+                    var modpackName = new Label();
+                    modpackName.Content = "Modpack Name: " + modpackname;
+                    datastackpanel.Children.Add(modpackName);
 
                     var modpackVersion = new Label();
-                    modpackVersion.Content = "Modpack Version: Unknown";
+                    modpackVersion.Content = "Modpack Version: " + modpackversion;
                     datastackpanel.Children.Add(modpackVersion);
+
+                    var minecraftversion = new Label();
+                    minecraftversion.Content = "MC Version: " + mcversion;
+                    datastackpanel.Children.Add(minecraftversion);
+
 
                     var buttonStackPanel = new StackPanel();
                     buttonStackPanel.Orientation = Orientation.Horizontal;
@@ -185,6 +205,16 @@ namespace Twickt_Launcher.Pages
         async void play_click(object sender, RoutedEventArgs e, string card, string dir)
         {
             MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card);
+            try
+            {
+                var json = System.IO.File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show("This cannot be run. We suggest you to delete it");
+                return;
+            }
+
             Classes.MinecraftStarter.Minecraft_Start(dir);
         }
 
@@ -213,6 +243,15 @@ namespace Twickt_Launcher.Pages
                     return;
                 }
             }
+            try
+            {
+                var json = System.IO.File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
+            }
+            catch(FileNotFoundException ex)
+            {
+                MessageBox.Show("This modpack cannot be bookmarked. We suggest you to delete it");
+                return;
+            }
             x.Add(dir);
             iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
             iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.BookmarkCheck;
@@ -234,8 +273,17 @@ namespace Twickt_Launcher.Pages
                 }
             }
             Properties.Settings.Default.Save();
-            if (Directory.Exists(dir))
-                Directory.Delete(dir, true);
+                try
+                {
+                    if (Directory.Exists(dir))
+                    {
+                        Directory.Delete(dir, true);
+                    }
+                }
+                catch(Exception)
+                {
+                    MessageBox.Show("Cannot delete directory. Try again");
+                }
             await modpacksUpdate();
         }
 

@@ -70,7 +70,7 @@ namespace Twickt_Launcher.Pages
                         panel.Children.Add(play);
                         card.Content = panel;
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         x.Remove(i);
                         Label lab = new Label();

@@ -14,10 +14,11 @@ namespace Twickt_Launcher.Classes
 {
     class Downloader
     {
-        public CancellationTokenSource _cts = new CancellationTokenSource();
+        public CancellationTokenSource _cts;
         public List<string[]> urlsList = new List<string[]>();
-        public async Task MCDownload(List<string[]> urls, string instanceName)
+        public async Task MCDownload(List<string[]> urls, string instanceName, CancellationToken _ctsblock)
         {
+            _cts = new CancellationTokenSource();
             int count = urls.Count;
             urlsList = urls;
             Dialogs.InstallModpack.singleton.filesToDownload.Content = "0" + "/" + urls.Count;
@@ -43,14 +44,21 @@ namespace Twickt_Launcher.Classes
                         }));
                         MessageBox.Show("ERRORE IN" + url + "\r\n" + e);
                     }
-                }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = Int32.Parse(Properties.Settings.Default["download_threads"].ToString()) });
+                }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = Int32.Parse(Properties.Settings.Default["download_threads"].ToString()), CancellationToken = _ctsblock });
 
                 foreach (var url in urls)
                 {
                         block.Post(url);
                 }
                 block.Complete();
-                await block.Completion;
+                try
+                {
+                    await block.Completion;
+                }
+                catch(TaskCanceledException)
+                {
+                    return;
+                }
                 Dialogs.InstallModpack.singleton.filesToDownload.Content = urls.Count + "/" + urls.Count;
                 Dialogs.InstallModpack.singleton.totalPercentage.Content = "100%";
                 Dialogs.InstallModpack.singleton.progressBarDownload.Value = 100;
