@@ -27,6 +27,7 @@ The main features are listed here:
 - Startup HowTo Guide
 - Dynamic and programmatic changelog system (webservices)
 - possibility for users to upload modpacks (private / semi-private) (under development)
+- Complete website with two factors authentication and a lot more!(coming soon)
 
 #More info
 <a href="https://twickt.com/our-launcher/"><b>SEE MORE INFO</b></a>
