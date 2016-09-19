@@ -82,6 +82,12 @@ namespace Twickt_Launcher.Pages
                 var responseString = Encoding.Default.GetString(response);
                 if (responseString.Contains("true"))
                 {
+                    /*var values1 = new NameValueCollection();
+                    values["username"] = username.Text;
+                    values["password"] = sha256(password.Password);
+                    var response1 = await client.UploadValuesTaskAsync(config.loginWebService, values1);
+                    var responseString1 = Encoding.Default.GetString(response);*/
+
                     var userdata = responseString.Split(';');
 
                     SessionData.username = userdata[1];

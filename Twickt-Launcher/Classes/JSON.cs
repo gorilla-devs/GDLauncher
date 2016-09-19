@@ -305,15 +305,16 @@ namespace Twickt_Launcher.Classes
                         //VIENE SCARICATO L'INSTALLER
                         urlforge = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + forgefilename + "/forge-" + forgefilename + "-installer.jar";
                         webClient.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                        Dialogs.InstallModpack.singleton.whatDoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingForge");
                         webClient.DownloadProgressChanged += (s, e) =>
                         {
+                            Application.Current.Dispatcher.Invoke(new Action(() =>
+                            {
                                 Dialogs.InstallModpack.singleton.forgeProgression.Value = e.ProgressPercentage;
-                                Dialogs.InstallModpack.singleton.forgeTextProgression.Content =  string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
-                        };
+                                Dialogs.InstallModpack.singleton.forgeTextProgression.Content = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                            }));
+                            };
                         sw.Start();
                         await webClient.DownloadFileTaskAsync(new Uri(urlforge), (@temp + "forge-" + version + "-" + forgeversion + "-" + version + "-installer.jar"));
-                        Dialogs.InstallModpack.singleton.forgeTextProgression.Content = "Forge Downloaded";
                         sw.Stop();
                         /*if (Pages.Modpacks.singleton.remote.IsSelected)
                             Pages.Modpacks.loading.whatdoing.Content = Pages.SplashScreen.singleton.manager.GetString("downloadedForge");*/

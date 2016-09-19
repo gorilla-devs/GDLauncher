@@ -42,11 +42,10 @@ namespace Twickt_Launcher
                     MessageBox.Show("Thank you for your patience!");
                 }
             }
-            catch
+            catch(Exception ez)
             {
-                MessageBox.Show("There are too many fucking errors here. Application is going to shut down");
+                MessageBox.Show("There are too many fucking errors here. Application is going to shut down" + ez.InnerException);
             }
-            Application.Current.Shutdown();
         }
     }
 }

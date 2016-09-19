@@ -28,6 +28,7 @@ namespace Twickt_Launcher.Dialogs
         static string name;
         public static InstallModpack singleton;
         public static string vanillajson;
+        private static Classes.Downloader downloader;
         public InstallModpack(string modpackname)
         {
             InitializeComponent();
@@ -152,13 +153,23 @@ namespace Twickt_Launcher.Dialogs
             workingThreadsText.Content = Properties.Settings.Default["download_threads"].ToString();
             modpackName.Content = versionsList.Text;
             var files = await Classes.JSON.GetFiles(name, instanceTextName.Text, mc_version.Content.ToString(), forge_version.Content.ToString(), versionsList.Text);
-            await Classes.Downloader.MCDownload(files, instanceTextName.Text);
+            cancelButton.IsEnabled = true;
+            downloader = new Classes.Downloader();
+            await downloader.MCDownload(files, instanceTextName.Text);
             cancelButton.Visibility = Visibility.Hidden;
             continueButton.Visibility = Visibility.Visible;
             installationEndedIcon.Visibility = Visibility.Visible;
             installationEndedText.Visibility = Visibility.Visible;
         }
 
-
+        private async void cancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            downloader._cts.Cancel();
+            await Task.Run( () => Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                Directory.Delete(config.M_F_P + "Packs\\" + instanceTextName.Text, true);
+            })));
+            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+        }
     }
 }

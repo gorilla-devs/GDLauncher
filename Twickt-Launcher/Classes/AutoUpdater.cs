@@ -35,18 +35,26 @@ namespace Twickt_Launcher.Classes
             var client = new WebClient();
             var values = new System.Collections.Specialized.NameValueCollection();
 
-            var response = await client.UploadValuesTaskAsync(config.updatessWebService, values);
-
-            var responseString = Encoding.Default.GetString(response);
-
-            if (!responseString.Contains("0results"))
+            try
             {
-                data = responseString;
+                var response = await client.UploadValuesTaskAsync(config.updatessWebService, values);
+
+                var responseString = Encoding.Default.GetString(response);
+
+                if (!responseString.Contains("0results"))
+                {
+                    data = responseString;
+                }
+                else
+                {
+                    MessageBox.Show("Error getting updates. Shutting down");
+                    Application.Current.Shutdown();
+                }
+
             }
-            else
+            catch
             {
-                MessageBox.Show("Error getting updates. Shutting down");
-                Application.Current.Shutdown();
+                MessageBox.Show("Error updating");
             }
 
             try
@@ -128,7 +136,7 @@ namespace Twickt_Launcher.Classes
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString());
+                MessageBox.Show("ERROR"); ;
             }
             return update;
         }
@@ -136,19 +144,24 @@ namespace Twickt_Launcher.Classes
 
         public async static Task Download(string url)
         {
-            string filename = "";
-            Uri uri = new Uri(url);
-            filename = System.IO.Path.GetFileName(uri.LocalPath);
-            webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-            webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-            sw.Start();
             if (Window1.versionok == false)
             {
+                string filename = "";
+
                 try
                 {
+                    Uri uri = new Uri(url);
+                    filename = System.IO.Path.GetFileName(uri.LocalPath);
+                    webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
+                    webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
+                    sw.Start();
                     await webClient.DownloadFileTaskAsync(new Uri(url), Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename);
                     Properties.Settings.Default["version"] = SessionData.latestVersion;
                     Properties.Settings.Default.Save();
+                }
+                catch(UriFormatException)
+                {
+                    MessageBox.Show("Could not verify version");
                 }
                 catch(Exception e)
                 {

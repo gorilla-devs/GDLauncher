@@ -24,6 +24,7 @@ namespace Twickt_Launcher.Pages
     /// </summary>
     public partial class ModpacksMarket : Page
     {
+        public static bool iscancelled = false;
         public ModpacksMarket()
         {
             InitializeComponent();
@@ -179,9 +180,14 @@ namespace Twickt_Launcher.Pages
         async void installModpack_click(object sender, RoutedEventArgs e, string card, string modpackName)
         {
             MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksContainer.FindName(card);
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(modpackName), "RootDialog");
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(modpackName), "RootDialog", null, ExtendedClosingEventHandler);
         }
+        private static async void ExtendedClosingEventHandler(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
+        {
+            await Task.Delay(300);
+            MessageBox.Show("L'installazione della modpack non e' terminata. Si consiglia di andare nella pagina delle modpacks installate e cancellarla(aspettare almeno 40 secondi prima di cancellarla)");
 
+        }
 
         private void goToInstalledModpacks_Click(object sender, RoutedEventArgs e)
         {

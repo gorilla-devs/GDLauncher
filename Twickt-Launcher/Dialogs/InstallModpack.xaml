@@ -87,7 +87,7 @@
                     </StackPanel>
                 </materialDesign:Card>
                 <DockPanel>
-                    <Button Name="cancelButton" Margin="10" Width="130" HorizontalAlignment="Left" Foreground="White">Cancel</Button>
+                    <Button Name="cancelButton" Margin="10" Width="130" HorizontalAlignment="Left" IsEnabled="false" Foreground="White" Click="cancelButton_Click">Cancel</Button>
                     <materialDesign:PackIcon Name="installationEndedIcon" Kind="CheckboxMarkedCircleOutline" Margin="100 0 0 0" VerticalAlignment="Center" Height="30" Width="30" Foreground="#4CAF50" Visibility="Hidden"/>
                     <Label Name="installationEndedText" VerticalAlignment="Center" Visibility="Hidden">Installed</Label>
                     <Button Name="continueButton" Margin="10" Width="130" HorizontalAlignment="Right" Foreground="White" Visibility="Hidden" Command="materialDesign:DialogHost.CloseDialogCommand">Continue</Button>

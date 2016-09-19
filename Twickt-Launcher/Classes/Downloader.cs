@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
@@ -13,8 +14,9 @@ namespace Twickt_Launcher.Classes
 {
     class Downloader
     {
-        public static List<string[]> urlsList = new List<string[]>();
-        public static async Task MCDownload(List<string[]> urls, string instanceName)
+        public CancellationTokenSource _cts = new CancellationTokenSource();
+        public List<string[]> urlsList = new List<string[]>();
+        public async Task MCDownload(List<string[]> urls, string instanceName)
         {
             int count = urls.Count;
             urlsList = urls;
@@ -45,9 +47,8 @@ namespace Twickt_Launcher.Classes
 
                 foreach (var url in urls)
                 {
-                    block.Post(url);
+                        block.Post(url);
                 }
-
                 block.Complete();
                 await block.Completion;
                 Dialogs.InstallModpack.singleton.filesToDownload.Content = urls.Count + "/" + urls.Count;
@@ -58,7 +59,7 @@ namespace Twickt_Launcher.Classes
             }
         }
 
-        public static async Task DownloadLibraries(string[] url, string instanceName, IProgress<int> progress = null)
+        public async Task DownloadLibraries(string[] url, string instanceName, IProgress<int> progress = null)
         {
             try
             {
@@ -70,16 +71,27 @@ namespace Twickt_Launcher.Classes
                 //sw.Start();
                 //webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler((sender, e) => client_DownloadProgressChanged(sender, e));
                 using (HttpClient client = new HttpClient())
-                using (HttpResponseMessage response = await client.GetAsync(url[3]))
-                using (HttpContent content = response.Content)
                 {
-                    if (!Directory.Exists(Path.GetDirectoryName(config.M_F_P + url[2])))
+                    try
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + url[2]));
+                        using (HttpResponseMessage response = await client.GetAsync(url[3], _cts.Token))
+                        {
+                            using (HttpContent content = response.Content)
+                            {
+                                if (!Directory.Exists(Path.GetDirectoryName(config.M_F_P + url[2])))
+                                {
+                                    Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + url[2]));
+                                }
+                                using (var fileStream = new FileStream(config.M_F_P + url[2], FileMode.Create, FileAccess.Write))
+                                {
+                                    await content.CopyToAsync(fileStream);
+                                }
+                            }
+                        }
                     }
-                    using (var fileStream = new FileStream(config.M_F_P + url[2], FileMode.Create, FileAccess.Write))
+                    catch(TaskCanceledException)
                     {
-                        await content.CopyToAsync(fileStream);
+                        return;
                     }
                 }
                 if (url[3].Contains("platform"))
