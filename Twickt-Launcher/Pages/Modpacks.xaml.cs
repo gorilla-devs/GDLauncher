@@ -230,6 +230,7 @@ namespace Twickt_Launcher.Pages
 
             var iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
             System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
+            var numbookmarks = x.Count;
             foreach(var i in x)
             {
                 if (i == dir)
@@ -252,12 +253,20 @@ namespace Twickt_Launcher.Pages
                 MessageBox.Show("This modpack cannot be bookmarked. We suggest you to delete it");
                 return;
             }
-            x.Add(dir);
-            iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
-            iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.BookmarkCheck;
-            bookmark.Content = iconpackbookmark;
-            bookmark.ToolTip = "This modpack is bookmarked";
-            Properties.Settings.Default.Save();
+            if (numbookmarks < 3)
+            {
+                x.Add(dir);
+                iconpackbookmark = new MaterialDesignThemes.Wpf.PackIcon();
+                iconpackbookmark.Kind = MaterialDesignThemes.Wpf.PackIconKind.BookmarkCheck;
+                bookmark.Content = iconpackbookmark;
+                bookmark.ToolTip = "This modpack is bookmarked";
+                Properties.Settings.Default.Save();
+            }
+            else
+            {
+                MessageBox.Show("You can have maximum 3 bookmarks");
+                return;
+            }
         }
 
         async void delete_click(object sender, RoutedEventArgs e, string card, string dir)

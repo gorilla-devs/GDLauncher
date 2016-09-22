@@ -44,7 +44,7 @@ namespace Twickt_Launcher
             }
             catch(Exception ez)
             {
-                MessageBox.Show("There are too many fucking errors here. Application is going to shut down" + ez.InnerException);
+                MessageBox.Show("We could not collect any information for some unknown reasons. Please contact davide.ceschia@gmail.com and ask for assistence" + ez.InnerException);
             }
         }
     }

@@ -69,12 +69,14 @@ namespace Twickt_Launcher.Pages
 
         private async void button_Click(object sender, RoutedEventArgs e)
         {
+            button.IsEnabled = false;
             loading.Visibility = Visibility.Visible;
             sha256(password.Password);
             var client = new WebClient();
             var values = new NameValueCollection();
             values["username"] = username.Text;
             values["password"] = sha256(password.Password);
+            values["appVersion"] = Properties.Settings.Default["version"].ToString();
 
             try
             {
@@ -176,6 +178,7 @@ namespace Twickt_Launcher.Pages
             //bob decrypt the message
             //var decrypted = PublicKeyBox.Open(encrypted, nonce, bob.PrivateKey, alice.PublicKey);
             loading.Visibility = Visibility.Hidden;
+            button.IsEnabled = true;
         }
 
         private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
@@ -196,18 +199,6 @@ namespace Twickt_Launcher.Pages
             if (e.Key.Equals(Key.Return))
             {
                 button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
-            }
-        }
-
-        private async void label1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
-                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Register(), "RootDialog", ExtendedOpenedEventHandlerLocal);
-            }
-            catch(InvalidOperationException ex)
-            {
-
             }
         }
 
@@ -254,6 +245,18 @@ namespace Twickt_Launcher.Pages
                 keepMeIn.IsChecked = true;
             }
 
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Register(), "RootDialog", ExtendedOpenedEventHandlerLocal);
+            }
+            catch (InvalidOperationException ex)
+            {
+
+            }
         }
     }
 }

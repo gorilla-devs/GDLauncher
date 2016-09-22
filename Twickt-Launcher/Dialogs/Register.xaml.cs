@@ -2,10 +2,12 @@
 //Application idea, code and time are given by Davide Ceschia / Twickt
 //You may use them according to the GNU GPL v.3 Licence
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -31,6 +33,7 @@ namespace Twickt_Launcher.Dialogs
         public static bool close = false;
         bool invalid = false;
         int sum;
+        string ACCESS_TOKEN;
         public Register()
         {
             InitializeComponent();
@@ -87,10 +90,14 @@ namespace Twickt_Launcher.Dialogs
                     error.Content = "Inserisci una password Mojang";
                     return;
                 }
-                if(mojanguser.Text != username.Text)
+                if(mojanguser.Text == username.Text || mojanguser.Text == email.Text)
+                {
+
+                }
+                else
                 {
                     error.Visibility = Visibility.Visible;
-                    error.Content = "Il nome utente di Twickt deve essere uguale a quello di Mojang";
+                    error.Content = "Il nome utente/mail di Twickt deve essere uguale a quello di Mojang";
                     return;
                 }
             }
@@ -143,6 +150,11 @@ namespace Twickt_Launcher.Dialogs
                 values["email"] = email.Text;
                 values["password"] = Pages.Login.sha256(password.Password);
                 register.IsEnabled = false;
+                if (linkMojang.IsChecked == true)
+                {
+                    ObtainAccessToken(mojanguser.Text, mojangpass.Password);
+                    MessageBox.Show(GetAccessToken());
+                }
                 var response = await client.UploadValuesTaskAsync(config.RegisterWebService, values);
 
                 var responseString = Encoding.Default.GetString(response);
@@ -175,7 +187,7 @@ namespace Twickt_Launcher.Dialogs
             }
             catch (WebException interneterror)
             {
-                MessageBox.Show("C'e' stato un errore con la rete.");
+                MessageBox.Show("C'e' stato un errore con la rete." + interneterror.Message);
             }
             close = true;
         }
@@ -211,6 +223,36 @@ namespace Twickt_Launcher.Dialogs
             catch (RegexMatchTimeoutException)
             {
                 return false;
+            }
+        }
+
+
+
+        public string GetAccessToken()
+        {
+            return ACCESS_TOKEN;
+        }
+        public void ObtainAccessToken(string username, string password)
+        {
+            //RITORNA 403 FORBIDDEN SE I DATI SONO SBAGLIATI
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://authserver.mojang.com/authenticate");
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "POST";
+
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                string json = "{\"agent\":{\"name\":\"Minecraft\",\"version\":1},\"username\":\"" + username + "\",\"password\":\"" + password + "\",\"clientToken\":\"6c9d237d-8fbf-44ef-b46b-0b8a854bf391\"}";
+
+                streamWriter.Write(json);
+                streamWriter.Flush();
+                streamWriter.Close();
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    ACCESS_TOKEN = result;
+                }
             }
         }
 

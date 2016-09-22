@@ -46,11 +46,12 @@ Sample license text.
                                 </StackPanel>
                             </StackPanel>
                         </materialDesign:Card>
-                        <materialDesign:Card Margin="0 10 0 0" Height="100" materialDesign:ShadowAssist.ShadowDepth="Depth3" Cursor="Hand" MouseLeftButtonDown="label1_MouseLeftButtonDown">
-                            <Label x:Name="label1" Content="Not Registered?" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+                        <materialDesign:Card Margin="0 10 0 0" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                            <Button Click="Button_Click_1" Height="100" Style="{StaticResource MaterialDesignFlatButton}">
+                                <Label x:Name="label1" Content="Not Registered?" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+                            </Button>
                         </materialDesign:Card>
-                        <Label Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: The launcher is still in beta and could have bug. Translations are still in progress</Label>
-                        <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: We are migrating our online infrastructure to some new datacenters. You could experience some problems</TextBlock>
+                        <Label Margin="0 10" HorizontalAlignment="Center" Foreground="Blue">WARNING: The launcher is still in beta and could have bugs. Translations are still in progress</Label>
                         <TextBlock Name="language" TextAlignment="Center" FontSize="15"></TextBlock>
                     </StackPanel>
                 </StackPanel>

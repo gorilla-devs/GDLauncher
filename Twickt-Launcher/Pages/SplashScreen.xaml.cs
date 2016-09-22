@@ -40,6 +40,7 @@ namespace Twickt_Launcher.Pages
         public SplashScreen()
         {
             InitializeComponent();
+            firstlabelprogress.Visibility = Visibility.Visible;
             Window1.singleton.MenuToggleButton.IsEnabled = false;
             Window1.singleton.popupbox.IsEnabled = false;
             Window1.singleton.homeButton.IsEnabled = false;
@@ -85,6 +86,7 @@ namespace Twickt_Launcher.Pages
             catch { }
 
             Windows.DebugOutputConsole console = new Windows.DebugOutputConsole();
+            firstlabelprogress.Visibility = Visibility.Hidden;
             if (Window1.singleton.started == false)
             {
                 Window1.singleton.started = true;
@@ -99,6 +101,7 @@ namespace Twickt_Launcher.Pages
                 {
                     await JAVAInstaller.DownloadJava();
                 }
+
                 transition.SelectedIndex = 1;
                 await Task.Delay(350);
                 Window1.singleton.MainPage.Navigate(new Pages.Login());

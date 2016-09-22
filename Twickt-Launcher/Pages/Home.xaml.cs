@@ -53,11 +53,16 @@ namespace Twickt_Launcher.Pages
                         var json = System.IO.File.ReadAllText(i + "\\" + new DirectoryInfo(i).Name + ".json");
                         dynamic decoded = JsonConvert.DeserializeObject(json);
                         var card = new MaterialDesignThemes.Wpf.Card();
-                        card.Height = 90;
-                        card.Width = 200;
+                        card.Height = 170;
+                        card.Width = 190;
+                        card.Margin = new Thickness(5, 0, 3, 3);
                         Label lab = new Label();
                         lab.Content = decoded.instanceName;
                         lab.FontWeight = FontWeights.ExtraBold;
+                        Label modpacknamelabel = new Label();
+                        modpacknamelabel.Content = "Pack Name: " + decoded.modpackName;
+                        Label mcversionlabel = new Label();
+                        mcversionlabel.Content = "MC Version: " + decoded.mc_version;
                         Button play = new Button();
                         play.Content = "Play";
                         play.Foreground = new SolidColorBrush(Colors.White);
@@ -67,6 +72,8 @@ namespace Twickt_Launcher.Pages
                         play.Margin = new Thickness(10, 20, 10, 0);
                         lab.HorizontalAlignment = HorizontalAlignment.Center;
                         panel.Children.Add(lab);
+                        panel.Children.Add(modpacknamelabel);
+                        panel.Children.Add(mcversionlabel);
                         panel.Children.Add(play);
                         card.Content = panel;
                     }
@@ -75,7 +82,14 @@ namespace Twickt_Launcher.Pages
                         x.Remove(i);
                         Label lab = new Label();
                         lab.FontSize = 15;
-                        lab.Content = "An error occurred. We fixed it. Reload this page";
+                        var sadface = new MaterialDesignThemes.Wpf.PackIcon();
+                        sadface.VerticalAlignment = VerticalAlignment.Center;
+                        sadface.Width = 30;
+                        sadface.Height = 30;
+                        sadface.Margin = new Thickness(3, 0, 0, 0);
+                        sadface.Kind = MaterialDesignThemes.Wpf.PackIconKind.EmoticonSad;
+                        lab.Content = " An error occurred. We fixed it. Reload this page";
+                        bookmarksContainer.Children.Add(sadface);
                         bookmarksContainer.Children.Add(lab);
                         break;
                     }
@@ -84,8 +98,15 @@ namespace Twickt_Launcher.Pages
             else
             {
                 Label lab = new Label();
+                var sadface = new MaterialDesignThemes.Wpf.PackIcon();
+                sadface.VerticalAlignment = VerticalAlignment.Center;
+                sadface.Width = 30;
+                sadface.Height = 30;
+                sadface.Margin = new Thickness(3, 0, 0, 0);
+                sadface.Kind = MaterialDesignThemes.Wpf.PackIconKind.EmoticonSad;
                 lab.FontSize = 15;
-                lab.Content = "No bookmarks. Go to installed modpacks and bookmark some modpacks there";
+                lab.Content = " No bookmarks. Go to installed modpacks and bookmark some modpacks there";
+                bookmarksContainer.Children.Add(sadface);
                 bookmarksContainer.Children.Add(lab);
             }
             transition.SelectedIndex = 1;
