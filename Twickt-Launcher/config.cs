@@ -27,7 +27,7 @@ namespace Twickt_Launcher
         public static string loginWebService = "https://webservices.twickt.com/login.php";
         public static string bugReportWebService = "https://webservices.twickt.com/bugs.php";
         public static string RegisterWebService = "https://webservices.twickt.com/process.php";
-        public static string modpacksWebService = "https://webservices.twickt.com/modpacks.php";
+        public static string modpacksWebService = "https://webservices.twickt.com/modpacks1.php";
         public static string launcherStatusWebService = "https://webservices.twickt.com/launcher_status.php";
         public static string changelogsWebService = "https://webservices.twickt.com/changelogs.php";
         public static string updatessWebService = "https://webservices.twickt.com/updates.php";

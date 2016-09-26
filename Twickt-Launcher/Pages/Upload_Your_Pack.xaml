@@ -3,12 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-              xmlns:local="clr-namespace:Twickt_Launcher.Pages"
-              mc:Ignorable="d" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
               FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Height="625" Width="694" Background="#FFFFFF">
-    <StackPanel>
-        <Label FontSize="20" HorizontalAlignment="Center">UPLOAD A MODPACK</Label>
-        
+    <StackPanel Margin="10">
+        <Label FontSize="20" HorizontalAlignment="Center">CREATE A MODPACK</Label>
+        <DockPanel>
+            <TextBox x:Name="FolderPath" HorizontalAlignment="Left" Height="39" AllowDrop="True" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="506" materialDesign:HintAssist.Hint="Folder Path" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" TextChanged="FolderPath_TextChanged"/>
+            <Button Width="50" Style="{StaticResource MaterialDesignFlatButton}" HorizontalAlignment="Left" Click="Button_Click">
+                <materialDesign:PackIcon Kind="Folder" />
+            </Button>
+        </DockPanel>
+        <TextBox x:Name="modpackname" HorizontalAlignment="Left" Height="39" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="504" materialDesign:HintAssist.Hint="Modpack Name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
+        <Button Foreground="White" Click="Button_Click_1">Analyze</Button>
+        <materialDesign:Card Height="350">
+            <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <StackPanel Name="fileslist">
+                
+                </StackPanel>
+            </ScrollViewer>
+        </materialDesign:Card>
+        <Button x:Name="jsonCreate" Content="Create Json" HorizontalAlignment="Left" VerticalAlignment="Top" Width="122" Foreground="White"/>
     </StackPanel>
 </UserControl>

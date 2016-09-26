@@ -37,7 +37,8 @@ Sample license text.
                             </WrapPanel>
                         </materialDesign:Card>
                     </WrapPanel>
-                    <materialDesign:Card HorizontalAlignment="Center" Width="468" Margin="0 35 0 0">
+                    <Label Name="welcomeadmin" HorizontalAlignment="Center" Visibility="Hidden" FontSize="15" Margin="0 20 0 0" Foreground="Blue">Welcome back ADMIN!</Label>
+                    <materialDesign:Card HorizontalAlignment="Center" Width="468" Margin="0 15 0 0">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <StackPanel HorizontalAlignment="Center">

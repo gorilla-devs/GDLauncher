@@ -34,15 +34,25 @@ namespace Twickt_Launcher.Dialogs
             Window1.singleton.popupbox.IsEnabled = false;
             Window1.singleton.homeButton.IsEnabled = false;
             InitializeComponent();
-            var ramCounter = new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes", true);
-
-            Application.Current.Dispatcher.Invoke(new Action(() =>
+            try
             {
-                freeram.Content = Convert.ToInt32(ramCounter.NextValue() / 1024).ToString() + "GB";
-            }));
-            sw.Start();
-            sw.Elapsed += new ElapsedEventHandler(sw_Tick);
-            sw.Interval = 2000; // in miliseconds
+                var ramCounter = new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes", true);
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    freeram.Content = Convert.ToInt32(ramCounter.NextValue() / 1024).ToString() + "GB";
+                }));
+                sw.Start();
+                sw.Elapsed += new ElapsedEventHandler(sw_Tick);
+                sw.Interval = 2000; // in miliseconds
+            }
+            catch(InvalidOperationException)
+            {
+                freeram.Content = "Error. Please open a cmd as Administrator and run: lodctr /r";
+            }
+            catch
+            {
+                freeram.Content = "Unknown error";
+            }
         }
         private void sw_Tick(object source, ElapsedEventArgs e)
         {

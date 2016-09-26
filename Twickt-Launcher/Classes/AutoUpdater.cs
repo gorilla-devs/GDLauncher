@@ -147,14 +147,13 @@ namespace Twickt_Launcher.Classes
             if (Window1.versionok == false)
             {
                 string filename = "";
-
+                Uri uri = new Uri(url);
+                filename = System.IO.Path.GetFileName(uri.LocalPath);
+                webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
+                webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
+                sw.Start();
                 try
                 {
-                    Uri uri = new Uri(url);
-                    filename = System.IO.Path.GetFileName(uri.LocalPath);
-                    webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-                    webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-                    sw.Start();
                     await webClient.DownloadFileTaskAsync(new Uri(url), Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename);
                     Properties.Settings.Default["version"] = SessionData.latestVersion;
                     Properties.Settings.Default.Save();
@@ -166,7 +165,7 @@ namespace Twickt_Launcher.Classes
                 catch(Exception e)
                 {
                     File.Delete(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename);
-                    MessageBox.Show(e.ToString());
+                    MessageBox.Show(e.Message);
                     return;
                 }
                 Properties.Settings.Default["firstTimeHowTo"] = "true";

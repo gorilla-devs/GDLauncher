@@ -39,6 +39,8 @@ namespace Twickt_Launcher.Pages
                 if (navWindow != null) navWindow.ShowsNavigationUI = false;
             }));
             transition.SelectedIndex = 0;
+            if (SessionData.isAdmin == "true")
+                welcomeadmin.Visibility = Visibility.Visible;
         }
 
         private async void Page_Loaded(object senderx, RoutedEventArgs ee)

@@ -92,9 +92,9 @@ namespace Twickt_Launcher.Pages
 
                     var userdata = responseString.Split(';');
 
-                    SessionData.username = userdata[1];
-                    SessionData.email = userdata[2];
-                    SessionData.isAdmin = userdata[3];
+                    SessionData.username = userdata[2];
+                    SessionData.email = userdata[3];
+                    SessionData.isAdmin = userdata[4];
                     if (userdata[3] == "false")
                     {
                         try
@@ -114,7 +114,7 @@ namespace Twickt_Launcher.Pages
                     Window1.singleton.MenuToggleButton.IsEnabled = true;
                     Window1.singleton.popupbox.IsEnabled = true;
                     Window1.singleton.homeButton.IsEnabled = true;
-                    Window1.singleton.loggedinName.Text = "Logged in as " + userdata[1];
+                    Window1.singleton.loggedinName.Text = "Logged in as " + username.Text;
                     transition.SelectedIndex = 2;
                     await Task.Delay(500);
                     //Properties.Settings.Default["Sessiondata"] = SessionData.username + ";" + SessionData.email + ";" + SessionData.isAdmin;

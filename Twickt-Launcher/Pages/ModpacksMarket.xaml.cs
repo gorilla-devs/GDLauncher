@@ -45,12 +45,30 @@ namespace Twickt_Launcher.Pages
             modpacksContainer.Children.Add(waitlabel);
 
             //INIZIA A SCARICARE LA LISTA DELLE MODPACKS E A CREARE LE CARDS
-            var remotelist = await Classes.RemoteModpacks.GetModpacksList();
-            foreach (var x in remotelist.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+            string type = "";
+            string selecteditem = modpackstype.SelectedItem.ToString().Replace("System.Windows.Controls.ComboBoxItem: ", "");
+            if (selecteditem == "Officials")
+                type = "official";
+            if (selecteditem == "By Users")
+                type = "byuser";
+            if (selecteditem == "Not Approved Yet")
+                type = "notyetapproved";
+            var remotelist = await Classes.RemoteModpacks.GetModpacksList(type);
+            if (!String.IsNullOrEmpty(remotelist))
             {
-                var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
-                CreateModpackCard(z[0], z[1]);
+                foreach (var x in remotelist.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
+                    //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
+                    CreateModpackCard(z[0], z[1]);
+                }
+            }
+            else
+            {
+                Label nomodpacks = new Label();
+                nomodpacks.Content = "No Modpacks...";
+                nomodpacks.FontSize = 30;
+                modpacksContainer.Children.Add(nomodpacks);
             }
 
 
@@ -200,6 +218,22 @@ namespace Twickt_Launcher.Pages
         private async void addPrivatePackCode_Click(object sender, RoutedEventArgs e)
         {
             await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.AddPack(), "RootDialog");
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Window1.singleton.MainPage.Navigate(new Pages.Upload_Your_Pack());
+        }
+
+        private async void modpackstype_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                modpacksContainer.Children.Clear();
+                await RefreshModpacks();
+            }
+            catch(NullReferenceException)
+            { }
         }
     }
 }
