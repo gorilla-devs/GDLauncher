@@ -23,6 +23,6 @@
                 </StackPanel>
             </ScrollViewer>
         </materialDesign:Card>
-        <Button x:Name="jsonCreate" Content="Create Json" HorizontalAlignment="Left" VerticalAlignment="Top" Width="122" Foreground="White"/>
+        <Button x:Name="jsonCreate" Content="Upload" HorizontalAlignment="Left" VerticalAlignment="Top" Width="122" Foreground="White" Click="jsonCreate_Click"/>
     </StackPanel>
 </UserControl>

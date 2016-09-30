@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -107,5 +108,30 @@ namespace Twickt_Launcher.Pages
             else
                 textbox.Text = "https://minecraft.curseforge.com/projects/NomeDellaMod/files/IdDellaMod";
         }
+
+        private async void jsonCreate_Click(object sender, RoutedEventArgs e)
+        {
+            var client = new System.Net.WebClient();
+            var values = new NameValueCollection();
+            values["upload"] = "";
+            values["name"] = modpackname.Text;
+
+            try
+            {
+                var response = await client.UploadValuesTaskAsync(config.modpacksupload, values);
+                var responseString = Encoding.Default.GetString(response);
+                MessageBox.Show(responseString);
+                if (responseString.Contains("MatchFound"))
+                {
+                    MessageBox.Show("Nome gia' preso");
+                    return;
+                }
+                MessageBox.Show("CARICATA");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
-}
+    }

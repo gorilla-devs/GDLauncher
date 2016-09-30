@@ -23,7 +23,7 @@ Sample license text.
                         <Button Name="addPrivatePackCode" Margin="5 0 5 0" Foreground="White" Click="addPrivatePackCode_Click" ToolTip="Add Private Pack">
                             <materialDesign:PackIcon Kind="Plus" />
                         </Button>
-                        <Button Margin="5 0 5 0" Foreground="White" ToolTip="Upload your Modpack" Click="Button_Click">
+                        <Button Name="modpackupload" IsEnabled="False" Margin="5 0 5 0" Foreground="White" ToolTip="Upload your Modpack" Click="Button_Click">
                             <materialDesign:PackIcon Kind="Upload" />
                         </Button>
                         <Button Name="goToInstalledModpacks" Margin="5 0 5 0" Foreground="White" Click="goToInstalledModpacks_Click" Height="40" VerticalAlignment="Top" ToolTip="Go to Installed Modpacks">
@@ -35,7 +35,6 @@ Sample license text.
                         <ComboBox Name="modpackstype" Width="150" SelectedIndex="0" SelectionChanged="modpackstype_SelectionChanged">
                             <ComboBoxItem>Officials</ComboBoxItem>
                             <ComboBoxItem>By Users</ComboBoxItem>
-                            <ComboBoxItem>Not Approved Yet</ComboBoxItem>
                         </ComboBox>
                     </StackPanel>
                     <StackPanel Margin="20">

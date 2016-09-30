@@ -33,6 +33,11 @@ namespace Twickt_Launcher.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             transition.SelectedIndex = 1;
+            if(SessionData.isAdmin == "true")
+            {
+                modpackstype.Items.Add("Not Approved Yet");
+                modpackupload.IsEnabled = true;
+            }
             await RefreshModpacks();
         }
 
