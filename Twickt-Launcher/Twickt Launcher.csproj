@@ -208,7 +208,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>lang.it.resx</DependentUpon>
     </Compile>
-    <Compile Include="lang\languageswitch.cs" />
     <Compile Include="Pages\Admin.xaml.cs">
       <DependentUpon>Admin.xaml</DependentUpon>
     </Compile>
@@ -407,7 +406,6 @@
     <Resource Include="Ionic.Zip.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="TODO.txt" />
     <Resource Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>

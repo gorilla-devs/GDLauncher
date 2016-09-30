@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿/*Installer dei pacchetti*/
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -7,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -141,12 +144,18 @@ namespace Twickt_Launcher.Dialogs
 
         private async void install_Click(object sender, RoutedEventArgs e)
         {
+            Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
             if (String.IsNullOrEmpty(instanceTextName.Text))
             {
                 MessageBox.Show("Nome istanza vuoto");
                 return;
             }
-            if(Directory.Exists(config.M_F_P + "Packs\\" + instanceTextName.Text))
+            if (!rg.IsMatch(instanceTextName.Text) || (instanceTextName.Text.Contains(" ")))
+            {
+                MessageBox.Show("Solo lettere e numero ammessi");
+                return;
+            }
+            if (Directory.Exists(config.M_F_P + "Packs\\" + instanceTextName.Text))
             {
                 MessageBox.Show("Nome istanza gia' esistente");
                 return;

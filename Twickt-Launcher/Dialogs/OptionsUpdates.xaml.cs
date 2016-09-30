@@ -2,6 +2,8 @@
 //Application idea, code and time are given by Davide Ceschia / Twickt
 //You may use them according to the GNU GPL v.3 Licence
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+
+/*Finestra per l'aggiornamento del launcher*/
 using System;
 using System.Collections.Generic;
 using System.Linq;

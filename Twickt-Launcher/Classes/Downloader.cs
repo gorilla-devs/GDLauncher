@@ -1,4 +1,5 @@
-﻿using Ionic.Zip;
+﻿/*Questa classe scarica tutti i files che le vengono dati, serve in pratica per scaricare i pacchetti*/
+using Ionic.Zip;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -2,6 +2,10 @@
 //Application idea, code and time are given by Davide Ceschia / Twickt
 //You may use them according to the GNU GPL v.3 Licence
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+
+
+/*Pagina delle modpacks installate*/
+
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -78,11 +82,20 @@ namespace Twickt_Launcher.Pages
                     {
                         continue;
                     }
+                    catch(JsonException)
+                    {
+                        MessageBox.Show("Errore durante il parsing del JSON di " + "card" + new DirectoryInfo(dir.Replace(" ", "")).Name);
+                        continue;
+                    }
                     var card = new MaterialDesignThemes.Wpf.Card();
                     card.Name = "card" + new DirectoryInfo(dir.Replace(" ", "")).Name;
                     try
                     {
                         modpacksListContainer.RegisterName(card.Name, card);
+                    }
+                    catch(ArgumentException)
+                    {
+                        MessageBox.Show("Errore con la registrazione del nome dell'istanza: " + card.Name);
                     }
                     catch
                     {

@@ -1,4 +1,6 @@
-﻿using System;
+﻿/*Pagina delle informazioni riguardanti i pacchetti*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

@@ -2,6 +2,9 @@
 //Application idea, code and time are given by Davide Ceschia / Twickt
 //You may use them according to the GNU GPL v.3 Licence
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+
+
+/*Classe di entrata del programma*/
 using System;
 using System.Windows;
 using System.Globalization;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿/*Sincronizzazione in cloud dei salvataggi(ancora da implementare)
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

@@ -2,6 +2,8 @@
 //Application idea, code and time are given by Davide Ceschia / Twickt
 //You may use them according to the GNU GPL v.3 Licence
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
+
+/*Raccoglie tutta la lista di URLs necessari per scaricare il pacchetto*/
 using Ionic.Zip;
 using Newtonsoft.Json;
 using System;
