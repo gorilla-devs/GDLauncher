@@ -1,4 +1,4 @@
-﻿/*Sincronizzazione in cloud dei salvataggi(ancora da implementare)
+﻿/*Sincronizzazione in cloud dei salvataggi(ancora da implementare)*/
 
 using System;
 using System.Collections.Generic;
