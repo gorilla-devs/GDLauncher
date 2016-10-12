@@ -15,7 +15,7 @@ Sample license text.
         </ScrollViewer>
         <Button x:Name="button" Content="Save Log" HorizontalAlignment="Left" Margin="10,318,0,0" VerticalAlignment="Top" Width="95" Click="button_Click"/>
         <Button x:Name="button1" Content="Copy to Clipboard" HorizontalAlignment="Left" Margin="407,318,0,0" VerticalAlignment="Top" Width="148" Click="button1_Click"/>
-        <Button x:Name="button2" Content="Force Close MC" HorizontalAlignment="Left" Margin="642,318,0,0" VerticalAlignment="Top" Width="136"/>
+        <Button x:Name="button2" Content="Force Close MC" HorizontalAlignment="Left" Margin="642,318,0,0" IsEnabled="False" VerticalAlignment="Top" Width="136"/>
         <Button x:Name="button3" Content="Go to Admin" HorizontalAlignment="Left" Margin="211,318,0,0" VerticalAlignment="Top" Width="115" Click="button3_Click"/>
 
     </Grid>
