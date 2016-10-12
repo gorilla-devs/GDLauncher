@@ -101,7 +101,15 @@ namespace Twickt_Launcher.Pages
                 //SETTING UP JAVA
                 if (await JAVAInstaller.isJavaInstalled() == false)
                 {
-                    await JAVAInstaller.DownloadJava();
+                    try
+                    {
+                        await JAVAInstaller.DownloadJava();
+
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Error downloading JAVA");
+                    }
                 }
 
                 transition.SelectedIndex = 1;
