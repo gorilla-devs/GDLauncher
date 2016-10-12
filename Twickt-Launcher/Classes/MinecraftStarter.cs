@@ -77,7 +77,7 @@ namespace Twickt_Launcher.Classes
                 string arguments = args.Replace(
                         "${auth_player_name}", SessionData.username
                         ).Replace(
-                        "${version_name}", (string)decoded.mc_version + "-forge" + (string)decoded.mc_version + " - " + forge + " - " + (string)decoded.mc_version + " "
+                        "${version_name}", (string)decoded.mc_version + "-forge" + (string)decoded.mc_version + "-" + forge + "-" + (string)decoded.mc_version + " "
                         ).Replace(
                         "${game_directory}", dir
                         ).Replace(
@@ -147,6 +147,11 @@ namespace Twickt_Launcher.Classes
                             Windows.DebugOutputConsole.singleton.Write(e.Data.ToString());
                         }));
                     }
+                });
+                Window1.singleton.debugconsole.button2.IsEnabled = true;
+                Window1.singleton.debugconsole.button2.Click += new RoutedEventHandler((s, e) =>
+                {
+                    process.Kill();
                 });
 
                 await Task.Run(() => process.Start());

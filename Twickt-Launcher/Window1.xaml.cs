@@ -24,6 +24,7 @@ namespace Twickt_Launcher
         public static Window1 singleton;
         public bool started = false;
         public static bool versionok = true;
+        public Windows.DebugOutputConsole debugconsole = new Windows.DebugOutputConsole();
         public Window1()
         {
             InitializeComponent();
@@ -103,7 +104,6 @@ namespace Twickt_Launcher
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            Windows.DebugOutputConsole debugconsole = new Windows.DebugOutputConsole();
             debugconsole.Show();
         }
 
