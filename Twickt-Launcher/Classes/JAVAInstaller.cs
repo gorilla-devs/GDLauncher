@@ -78,7 +78,14 @@ namespace Twickt_Launcher.Classes
             webClient.OpenRead(url);
             bytes_total = Convert.ToInt64(webClient.ResponseHeaders["Content-Length"]) / 1024;
             sw.Start();
-            await webClient.DownloadFileTaskAsync(new Uri(url), config.javaLocal + "runtime\\java.zip");
+            try
+            {
+                await webClient.DownloadFileTaskAsync(new Uri(url), config.javaLocal + "runtime\\java.zip");
+            }
+            catch
+            {
+                MessageBox.Show("Errore nel download di JAVA. Minecraft potrebbe non avviarsi correttamente");
+            }
             Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("extractingJava");
             try

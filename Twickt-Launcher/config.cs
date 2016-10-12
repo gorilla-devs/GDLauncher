@@ -16,7 +16,7 @@ namespace Twickt_Launcher
 {
     class config
     {
-        public static string updateWebsite = "http://dl.twickt.com/";
+        public static string updateWebsite = "https://dl.twickt.com/";
         public static string minecraftfolder = "twickt";
         public static string forgeversion = "";
         public static string mainclass = "";
