@@ -86,15 +86,7 @@ namespace Twickt_Launcher.Pages
         protected void CreateModpackCard(string name, string description)
         {
             var card = new MaterialDesignThemes.Wpf.Card();
-            try
-            {
-                card.Name = "card" + name.Replace(" ", "");
-            }
-            catch
-            {
-                MessageBox.Show("Invalid Instance Name. Delete it please");
-            }
-
+            card.Name = "card" + name.Replace(" ", "");
             try
             {
                 modpacksContainer.RegisterName(card.Name, card);

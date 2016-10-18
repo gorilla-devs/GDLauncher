@@ -93,9 +93,10 @@ namespace Twickt_Launcher.Pages
                     {
                         modpacksListContainer.RegisterName(card.Name, card);
                     }
-                    catch(ArgumentException)
+                    catch(ArgumentException e)
                     {
-                        MessageBox.Show("Errore con la registrazione del nome dell'istanza: " + card.Name);
+                        modpacksListContainer.UnregisterName(card.Name);
+                        modpacksListContainer.RegisterName(card.Name, card);
                     }
                     catch
                     {
