@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using System.Timers;
 
 namespace Twickt_Launcher
 {
@@ -34,7 +35,36 @@ namespace Twickt_Launcher
                 if (navWindow != null) navWindow.ShowsNavigationUI = false;
             }));
             singleton = this;
+            Timer myTimer = new Timer();
+            myTimer.Elapsed += new ElapsedEventHandler(DisplayTimeEvent);
+            myTimer.Interval = 5000; // 1000 ms is one second
+            myTimer.Start();
         }
+
+        public void DisplayTimeEvent(object source, ElapsedEventArgs e)
+        {
+            try
+            {
+                using (var client = new System.Net.WebClient())
+                {
+                    using (var stream = client.OpenRead("https://www.google.com"))
+                    {
+                        Application.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            internetDisabled.Visibility = Visibility.Hidden;
+                        }));
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    internetDisabled.Visibility = Visibility.Visible;
+                }));
+            }
+        }
+
         private void button_Click(object sender, RoutedEventArgs e)
         {
 

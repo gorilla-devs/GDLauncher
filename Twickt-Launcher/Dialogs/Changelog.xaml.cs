@@ -34,23 +34,29 @@ namespace Twickt_Launcher.Dialogs
         }
         public static async Task loadChangelog()
         {
-            if (SessionData.changelog == "")
+            try
             {
-                var client = new WebClient();
-                var values = new System.Collections.Specialized.NameValueCollection();
-
-                var response = await client.UploadValuesTaskAsync(config.changelogsWebService, values);
-
-                var responseString = Encoding.Default.GetString(response);
-
-                if (!responseString.Contains("0results"))
+                if (SessionData.changelog == "")
                 {
-                    SessionData.changelog = responseString;
+                    var client = new WebClient();
+                    var values = new System.Collections.Specialized.NameValueCollection();
+
+                    var response = await client.UploadValuesTaskAsync(config.changelogsWebService, values);
+
+                    var responseString = Encoding.Default.GetString(response);
+
+                    if (!responseString.Contains("0results"))
+                    {
+                        SessionData.changelog = responseString;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error getting modpacks");
+                    }
                 }
-                else
-                {
-                    MessageBox.Show("Error getting modpacks");
-                }
+            }
+            catch(Exception e)
+            {
             }
         }
 

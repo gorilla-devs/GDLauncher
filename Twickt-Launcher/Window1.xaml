@@ -57,6 +57,7 @@ Sample license text.
                                 <Button Content="Logout" Click="Button_Click_3"/>
                             </StackPanel>
                         </materialDesign:PopupBox>
+                        <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="red" ToolTip="Internet Not Working" Width="48" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
                         <TextBlock HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center" FontSize="22" DockPanel.Dock="Top">Twickt Official Beta Launcher</TextBlock>
                         <TextBlock Name="loggedinName" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" FontSize="12"></TextBlock>
                     </DockPanel>

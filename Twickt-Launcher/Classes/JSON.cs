@@ -454,33 +454,49 @@ namespace Twickt_Launcher.Classes
             packjson.mc_version = version;
             packjson.libs = new List<Lib>();
 
-            downloadingVersion = await Task.Run(() => RemoteModpacks.GetModpackInfo(modpackname));
-
-            List<string[]> list = new List<string[]>();
-            List<string[]> forge = new List<string[]>();
-
-            Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Main Jar";
-            List<string[]> mainjar = await Task.Run(() => AnalyzeMainJar(version, instanceName));
-            list.AddRange(mainjar);
-            Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Libs";
-            List <string[]> libraries = await Task.Run( () => AnalyzeStdLibraries(version, instanceName));
-            list.AddRange(libraries);
-            Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Assets";
-            List<string[]> assets = await Task.Run(() => AnalyzeAssets(version, instanceName));
-            list.AddRange(assets);
-            if(forgeVersion != "false")
+            try
             {
-                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Forge";
-                forge = await Task.Run(() => AnalyzeForgeLibraries(modpackname, version, instanceName));
-                list.AddRange(forge);
-                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Mods";
-                List<string[]> mods = await Task.Run(() => Classes.RemoteModpacks.GetModpacksFiles(modpackname, modpackVersion, instanceName));
-                list.AddRange(mods);
-            }
-            //AGGIUNGE LE LIBRERIE AL JSON
-            if (forgeVersion != "false")
-            {
-                foreach (var item in forge)
+                downloadingVersion = await Task.Run(() => RemoteModpacks.GetModpackInfo(modpackname));
+
+                List<string[]> list = new List<string[]>();
+                List<string[]> forge = new List<string[]>();
+
+                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Main Jar";
+                List<string[]> mainjar = await Task.Run(() => AnalyzeMainJar(version, instanceName));
+                list.AddRange(mainjar);
+                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Libs";
+                List<string[]> libraries = await Task.Run(() => AnalyzeStdLibraries(version, instanceName));
+                list.AddRange(libraries);
+                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Assets";
+                List<string[]> assets = await Task.Run(() => AnalyzeAssets(version, instanceName));
+                list.AddRange(assets);
+                if (forgeVersion != "false")
+                {
+                    Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Forge";
+                    forge = await Task.Run(() => AnalyzeForgeLibraries(modpackname, version, instanceName));
+                    list.AddRange(forge);
+                    Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Mods";
+                    List<string[]> mods = await Task.Run(() => Classes.RemoteModpacks.GetModpacksFiles(modpackname, modpackVersion, instanceName));
+                    list.AddRange(mods);
+                }
+                //AGGIUNGE LE LIBRERIE AL JSON
+                if (forgeVersion != "false")
+                {
+                    foreach (var item in forge)
+                    {
+                        if (item[3].Contains("platform"))
+                            continue;
+                        if (item[3].Contains("https://libraries.minecraft.net"))
+                        {
+                            packjson.libs.Add(new Lib { path = item[2] });
+                        }
+                        if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
+                        {
+                            packjson.libs.Add(new Lib { path = item[2] });
+                        }
+                    }
+                }
+                foreach (var item in libraries)
                 {
                     if (item[3].Contains("platform"))
                         continue;
@@ -488,44 +504,37 @@ namespace Twickt_Launcher.Classes
                     {
                         packjson.libs.Add(new Lib { path = item[2] });
                     }
-                    if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
+                    if (forgeVersion != "false")
                     {
-                        packjson.libs.Add(new Lib { path = item[2] });
+                        if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
+                        {
+                            packjson.libs.Add(new Lib { path = item[2] });
+                        }
                     }
                 }
-            }
-            foreach (var item in libraries)
-            {
-                if (item[3].Contains("platform"))
-                    continue;
-                if (item[3].Contains("https://libraries.minecraft.net"))
+                packjson.libs = packjson.libs.Distinct().ToList();
+                string json = await Task.Run(() => JsonConvert.SerializeObject(packjson, Formatting.Indented));
+                if (!Directory.Exists(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json")))
                 {
-                    packjson.libs.Add(new Lib { path = item[2] });
+                    Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json"));
                 }
-                if (forgeVersion != "false")
-                {
-                    if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
-                    {
-                        packjson.libs.Add(new Lib { path = item[2] });
-                    }
-                }
-            }
-            packjson.libs = packjson.libs.Distinct().ToList();
-            string json = await Task.Run( () => JsonConvert.SerializeObject(packjson, Formatting.Indented));
-            if(!Directory.Exists(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json")))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json"));
-            }
-            await Task.Run( () =>System.IO.File.WriteAllText(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json", json));
+                await Task.Run(() => System.IO.File.WriteAllText(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json", json));
 
-            Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysis Finished";
-            Dialogs.InstallModpack.singleton.analysisprogress.Visibility = Visibility.Hidden;
-            Dialogs.InstallModpack.singleton.analysisprogress.Width = 0;
-            Dialogs.InstallModpack.singleton.analysisprogress.Margin = new Thickness(0);
-            Dialogs.InstallModpack.singleton.analysisended.Margin = new Thickness(20, 10, 10, 0);
-            Dialogs.InstallModpack.singleton.analysisended.Width = 50;
-            Dialogs.InstallModpack.singleton.analysisended.Height = 50;
-            return list.Distinct().ToList();
+                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysis Finished";
+                Dialogs.InstallModpack.singleton.analysisprogress.Visibility = Visibility.Hidden;
+                Dialogs.InstallModpack.singleton.analysisprogress.Width = 0;
+                Dialogs.InstallModpack.singleton.analysisprogress.Margin = new Thickness(0);
+                Dialogs.InstallModpack.singleton.analysisended.Margin = new Thickness(20, 10, 10, 0);
+                Dialogs.InstallModpack.singleton.analysisended.Width = 50;
+                Dialogs.InstallModpack.singleton.analysisended.Height = 50;
+                return list.Distinct().ToList();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show("Some error occurred in JSON Class");
+            }
+            return null;
+
         }
 
 
