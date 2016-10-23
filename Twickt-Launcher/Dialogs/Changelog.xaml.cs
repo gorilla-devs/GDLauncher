@@ -57,6 +57,7 @@ namespace Twickt_Launcher.Dialogs
             }
             catch(Exception e)
             {
+
             }
         }
 
