@@ -61,4 +61,4 @@ Read <a href="https://github.com/killpowa/Twickt-Launcher/blob/master/LICENSE">H
 <img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180724.png" width="400">
 <img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180756.png" width="400">
 <img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181031.png" width="400">
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181122.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181122.png" width="400">
