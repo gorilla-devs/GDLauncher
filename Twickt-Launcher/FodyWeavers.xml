@@ -3,6 +3,5 @@
 Sample license text.
 -->
 <Weavers>
-  <Costura/>
-  <Costura/>
+  <Costura />
 </Weavers>

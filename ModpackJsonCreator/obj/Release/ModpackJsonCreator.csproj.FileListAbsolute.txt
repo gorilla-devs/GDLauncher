@@ -55,3 +55,4 @@ C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Release\
 C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Release\ModpackJsonCreator.csproj.GenerateResource.Cache
 C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Release\ModpackJsonCreator.exe
 C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Release\ModpackJsonCreator.pdb
+C:\Users\david\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Release\ModpackJsonCreator.csproj.CoreCompileInputs.cache
