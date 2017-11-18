@@ -54,11 +54,11 @@ Read <a href="https://github.com/killpowa/Twickt-Launcher/blob/master/LICENSE">H
 <b>We do not forgive unauthorized uses of this source code. You are expected to follow and respect the licence.</b>
 
 #Some screenshots
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180425.png" width="400">
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180512.png" width="400">
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180614.png" width="400">
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180656.png" width="400">
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180724.png" width="400">
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180756.png" width="400">
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181031.png" width="400">
-<img src="https://twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181122.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180425.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180512.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180614.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180656.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180724.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-180756.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181031.png" width="400">
+<img src="https://old.twickt.com/wp-content/uploads/2016/08/ice_screenshot_20160825-181122.png" width="400">
