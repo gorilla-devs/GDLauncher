@@ -13,7 +13,7 @@ Sample license text.
     <Grid>
         <StackPanel>
             <TextBlock x:Name="textBlock" HorizontalAlignment="Center" TextWrapping="Wrap" Text="TextBlock" TextAlignment="Center" VerticalAlignment="Center" Width="52" Height="44"/>
-            <Button Name="btn" Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand">Close</Button>
+            <Button Name="btn" Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand" Style="{DynamicResource MaterialDesignRaisedAccentButton}">Close</Button>
         </StackPanel>
     </Grid>
 </UserControl>

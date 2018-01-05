@@ -72,15 +72,7 @@ namespace Twickt_Launcher
 
         private void UIElement_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MenuToggleButton.IsChecked = false;
-        }
-
-        private void Home_Selected(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void Options_Selected(object sender, RoutedEventArgs e)
-        {
+            //MenuToggleButton.IsChecked = false;
         }
 
         private void ColorZone_MouseDown(object sender, MouseButtonEventArgs e)
@@ -117,9 +109,6 @@ namespace Twickt_Launcher
                     case "System.Windows.Controls.ListBoxItem: Modpacks Market":
                         MainPage.Navigate(new Pages.ModpacksMarket());
                         break;
-                    case "System.Windows.Controls.ListBoxItem: Commands":
-                        MainPage.Navigate(new Pages.Commands());
-                        break;
                     case "System.Windows.Controls.ListBoxItem: Report a bug":
                         MainPage.Navigate(new Pages.Report_Bug());
                         break;
@@ -142,7 +131,7 @@ namespace Twickt_Launcher
             Properties.Settings.Default["Sessiondata"] = "";
             Properties.Settings.Default.Save();
             MainPage.Navigate(new Pages.Login());
-            loggedinName.Text = "";
+            //loggedinName.Text = "";
         }
 
         private void Button_Click_4(object sender, RoutedEventArgs e)

@@ -12,8 +12,8 @@ Sample license text.
     <Grid>
         <ProgressBar HorizontalAlignment="Left" Height="37" Margin="176,10,0,0" VerticalAlignment="Top" Width="44" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
         <Label x:Name="label" Content="Loading..." HorizontalAlignment="Right" Margin="0,10,138,0" VerticalAlignment="Top" FontSize="16" Width="82"/>
-        <ProgressBar Name="forgeProgress" HorizontalAlignment="Left" Height="13" Margin="10,59,0,0" VerticalAlignment="Top" Width="210" Visibility="Visible"/>
+        <ProgressBar Name="forgeProgress" HorizontalAlignment="Left" Height="13" Margin="10,59,0,0" VerticalAlignment="Top" Width="210" Visibility="Visible" Background="#4CAF50"/>
         <Label x:Name="whatdoing" HorizontalAlignment="Center" Margin="10,77,10,0" VerticalAlignment="Top" Width="210" Visibility="Visible"></Label>
-        <Button x:Name="button" Content="Close" Foreground="White" Width="75" Margin="145,77,10,4" Height="Auto" Command="materialDesign:DialogHost.CloseDialogCommand" Visibility="Hidden"/>
+        <Button x:Name="button" Content="Close" Foreground="Black" Width="75" Margin="145,77,10,4" Height="Auto" Command="materialDesign:DialogHost.CloseDialogCommand" Visibility="Hidden" Style="{DynamicResource MaterialDesignFlatButton}"/>
     </Grid>
 </UserControl>

@@ -17,13 +17,14 @@ Sample license text.
         <Label x:Name="label" Content="Contact me/Report a problem" HorizontalAlignment="Left" Margin="162,10,0,0" VerticalAlignment="Top" FontSize="26.667"/>
         <TextBox x:Name="body" HorizontalAlignment="Left" Height="273" Margin="10,110,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="674"/>
         <Label x:Name="label1" Content="Describe your problem" HorizontalAlignment="Left" Margin="10,81,0,0" VerticalAlignment="Top" Width="393"/>
-        <Button x:Name="send" Content="Send" Foreground="White" HorizontalAlignment="Left" Margin="10,461,0,0" VerticalAlignment="Top" Width="132" Click="send_Click"/>
+        <Button x:Name="send" Content="Send" Foreground="White" HorizontalAlignment="Left" Margin="10,461,0,0" VerticalAlignment="Top" Width="132" Click="send_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
         <Label x:Name="op1" Content="Label" HorizontalAlignment="Left" Margin="10,432,0,0" VerticalAlignment="Top"/>
         <Label x:Name="sign" Content="+" HorizontalAlignment="Left" Margin="53,432,0,0" VerticalAlignment="Top" Width="38" HorizontalContentAlignment="Center"/>
         <Label x:Name="op2" Content="Label" HorizontalAlignment="Left" Margin="96,432,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label5" Content="AntiSpam Verification" HorizontalAlignment="Left" Margin="10,388,0,0" VerticalAlignment="Top" Width="197" FontSize="18.667"/>
         <Label x:Name="label6" Content="=" HorizontalAlignment="Left" Margin="139,432,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="result" HorizontalAlignment="Left" Height="23" Margin="182,433,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Home" Foreground="White" HorizontalAlignment="Left" Margin="10,597,0,0" VerticalAlignment="Top" Width="132" Click="Button_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
 
     </Grid>
 </Page>

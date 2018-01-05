@@ -18,6 +18,6 @@ Sample license text.
                 </StackPanel>
             </ScrollViewer>
         </materialDesign:Card>
-            <Button Name="close" Content="Close" Foreground="White" Height="30" Margin="363,560,10,10" Command="materialDesign:DialogHost.CloseDialogCommand"/>
+        <Button Name="close" Content="Close" Foreground="White" Height="30" Margin="363,560,10,10" Command="materialDesign:DialogHost.CloseDialogCommand" Style="{DynamicResource MaterialDesignRaisedButton}"/>
     </Grid>
 </UserControl>

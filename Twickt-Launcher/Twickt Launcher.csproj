@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Twickt_Launcher</RootNamespace>
-    <AssemblyName>Twickt Launcher</AssemblyName>
+    <AssemblyName>GDLauncher</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -76,6 +76,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Twickt_Launcher.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Costura, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
@@ -164,11 +167,15 @@
     <Compile Include="Classes\MinecraftStarter.cs" />
     <Compile Include="Classes\RemoteModpacks.cs" />
     <Compile Include="config.cs" />
+    <Compile Include="DialogHostExtensions.cs" />
     <Compile Include="Dialogs\AddPack.xaml.cs">
       <DependentUpon>AddPack.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Changelog.xaml.cs">
       <DependentUpon>Changelog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Eula.xaml.cs">
+      <DependentUpon>Eula.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\HowTo.xaml.cs">
       <DependentUpon>HowTo.xaml</DependentUpon>
@@ -206,9 +213,6 @@
     </Compile>
     <Compile Include="Pages\Admin.xaml.cs">
       <DependentUpon>Admin.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\Commands.xaml.cs">
-      <DependentUpon>Commands.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Debug.xaml.cs">
       <DependentUpon>Debug.xaml</DependentUpon>
@@ -249,6 +253,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\Eula.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\HowTo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -282,10 +290,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Admin.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\Commands.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -407,24 +411,32 @@
   <ItemGroup>
     <Resource Include="Images\modpacks.jpg" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\block.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="favicon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\homeLogo.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Baseclass.Contrib.Nuget.Output.2.3.0\build\net40\Baseclass.Contrib.Nuget.Output.targets" Condition="Exists('..\packages\Baseclass.Contrib.Nuget.Output.2.3.0\build\net40\Baseclass.Contrib.Nuget.Output.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Baseclass.Contrib.Nuget.Output.2.3.0\build\net40\Baseclass.Contrib.Nuget.Output.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Baseclass.Contrib.Nuget.Output.2.3.0\build\net40\Baseclass.Contrib.Nuget.Output.targets'))" />
-    <Error Condition="!Exists('..\packages\Fody.2.2.0\build\net452\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.2.0\build\net452\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets'))" />
     <Error Condition="!Exists('..\packages\SevenZipSharp.Interop.9.38.3\build\SevenZipSharp.Interop.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SevenZipSharp.Interop.9.38.3\build\SevenZipSharp.Interop.targets'))" />
+    <Error Condition="!Exists('..\packages\Baseclass.Contrib.Nuget.Output.2.4.1\build\net40\Baseclass.Contrib.Nuget.Output.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Baseclass.Contrib.Nuget.Output.2.4.1\build\net40\Baseclass.Contrib.Nuget.Output.targets'))" />
+    <Error Condition="!Exists('..\packages\Fody.2.3.15\build\net452\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.3.15\build\net452\Fody.targets'))" />
   </Target>
-  <Import Project="..\packages\Fody.2.2.0\build\net452\Fody.targets" Condition="Exists('..\packages\Fody.2.2.0\build\net452\Fody.targets')" />
   <Import Project="..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" />
   <Import Project="..\packages\SevenZipSharp.Interop.9.38.3\build\SevenZipSharp.Interop.targets" Condition="Exists('..\packages\SevenZipSharp.Interop.9.38.3\build\SevenZipSharp.Interop.targets')" />
+  <Import Project="..\packages\Baseclass.Contrib.Nuget.Output.2.4.1\build\net40\Baseclass.Contrib.Nuget.Output.targets" Condition="Exists('..\packages\Baseclass.Contrib.Nuget.Output.2.4.1\build\net40\Baseclass.Contrib.Nuget.Output.targets')" />
+  <Import Project="..\packages\Fody.2.3.15\build\net452\Fody.targets" Condition="Exists('..\packages\Fody.2.3.15\build\net452\Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

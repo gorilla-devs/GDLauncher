@@ -80,5 +80,11 @@ namespace Twickt_Launcher.Pages
             sum = nums1[0] + nums1[1];
 
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Window1.singleton.MainPage.Navigate(new Pages.Home());
+            Window1.singleton.NavigationMenu.SelectedIndex = 0;
+        }
     }
 }

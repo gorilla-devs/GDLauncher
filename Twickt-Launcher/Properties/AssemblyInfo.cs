@@ -11,13 +11,13 @@ using System.Windows;
 // Le informazioni generali relative a un assembly sono controllate dal seguente 
 // set di attributi. Modificare i valori di questi attributi per modificare le informazioni
 // associate a un assembly.
-[assembly: AssemblyTitle("Twickt Launcher")]
+[assembly: AssemblyTitle("GDLauncher")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Twickt")]
+[assembly: AssemblyCompany("GorillaDevs")]
 [assembly: AssemblyProduct("Twickt Launcher")]
 [assembly: AssemblyCopyright("Copyright ©  2016 Twickt, All Rights Reserved.")]
-[assembly: AssemblyTrademark("Twickt Launcher")]
+[assembly: AssemblyTrademark("GDLauncher")]
 [assembly: AssemblyCulture("")]
 
 // Se si imposta ComVisible su false, i tipi in questo assembly non saranno visibili 

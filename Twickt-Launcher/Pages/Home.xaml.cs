@@ -24,6 +24,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Twickt_Launcher.Classes;
 
+
 namespace Twickt_Launcher.Pages
 {
     /// <summary>
@@ -32,131 +33,280 @@ namespace Twickt_Launcher.Pages
     public partial class Home : Page
     {
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
+        public Windows.DebugOutputConsole debugconsole = new Windows.DebugOutputConsole();
+        public static Home singleton;
+
         public Home()
         {
             InitializeComponent();
+            singleton = this;
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
             {
                 var navWindow = Window.GetWindow(this) as NavigationWindow;
                 if (navWindow != null) navWindow.ShowsNavigationUI = false;
             }));
             transition.SelectedIndex = 0;
-            if (SessionData.isAdmin == "true")
-                welcomeadmin.Visibility = Visibility.Visible;
+
         }
 
         private async void Page_Loaded(object senderx, RoutedEventArgs ee)
         {
+
             System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
-            if (x.Count != 0)
-            {
-                foreach (var i in x)
-                {
-                    try
-                    {
-                        var json = System.IO.File.ReadAllText(i + "\\" + new DirectoryInfo(i).Name + ".json");
-                        dynamic decoded = JsonConvert.DeserializeObject(json);
-                        var card = new MaterialDesignThemes.Wpf.Card();
-                        card.Height = 170;
-                        card.Width = 190;
-                        card.Margin = new Thickness(5, 0, 3, 3);
-                        Label lab = new Label();
-                        lab.Content = decoded.instanceName;
-                        lab.FontWeight = FontWeights.ExtraBold;
-                        Label modpacknamelabel = new Label();
-                        modpacknamelabel.Content = "Pack Name: " + decoded.modpackName;
-                        Label mcversionlabel = new Label();
-                        mcversionlabel.Content = "MC Version: " + decoded.mc_version;
-                        Button play = new Button();
-                        play.Content = "Play";
-                        play.Foreground = new SolidColorBrush(Colors.White);
-                        play.Click += new RoutedEventHandler((sender, e) => play_click(this, e, i));
-                        bookmarksContainer.Children.Add(card);
-                        StackPanel panel = new StackPanel();
-                        play.Margin = new Thickness(10, 20, 10, 0);
-                        lab.HorizontalAlignment = HorizontalAlignment.Center;
-                        panel.Children.Add(lab);
-                        panel.Children.Add(modpacknamelabel);
-                        panel.Children.Add(mcversionlabel);
-                        panel.Children.Add(play);
-                        card.Content = panel;
-                    }
-                    catch(Exception ex)
-                    {
-                        x.Remove(i);
-                        Label lab = new Label();
-                        lab.FontSize = 15;
-                        var sadface = new MaterialDesignThemes.Wpf.PackIcon();
-                        sadface.VerticalAlignment = VerticalAlignment.Center;
-                        sadface.Width = 30;
-                        sadface.Height = 30;
-                        sadface.Margin = new Thickness(3, 0, 0, 0);
-                        sadface.Kind = MaterialDesignThemes.Wpf.PackIconKind.EmoticonSad;
-                        lab.Content = " An error occurred. We fixed it. Reload this page";
-                        bookmarksContainer.Children.Add(sadface);
-                        bookmarksContainer.Children.Add(lab);
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                Label lab = new Label();
-                var sadface = new MaterialDesignThemes.Wpf.PackIcon();
-                sadface.VerticalAlignment = VerticalAlignment.Center;
-                sadface.Width = 30;
-                sadface.Height = 30;
-                sadface.Margin = new Thickness(3, 0, 0, 0);
-                sadface.Kind = MaterialDesignThemes.Wpf.PackIconKind.EmoticonSad;
-                lab.FontSize = 15;
-                lab.Content = " No bookmarks. Go to installed modpacks and bookmark some modpacks there";
-                bookmarksContainer.Children.Add(sadface);
-                bookmarksContainer.Children.Add(lab);
-            }
             transition.SelectedIndex = 1;
-            if(Properties.Settings.Default["justUpdated"].ToString() == "true")
+            if (Properties.Settings.Default["justUpdated"].ToString() == "true")
             {
                 await Task.Delay(400);
                 await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
                 Properties.Settings.Default["justUpdated"] = "false";
                 Properties.Settings.Default.Save();
             }
+            if (!Directory.Exists(config.M_F_P + "Packs\\"))
+            {
+                Directory.CreateDirectory(config.M_F_P + "Packs\\");
+            }
+            await ModpacksUpdate();
         }
 
-        async void play_click(object sender, RoutedEventArgs e, string dir)
+
+
+        public async Task ModpacksUpdate()
         {
+            modpacksListContainer.Children.Clear();
+            var dirlist = Directory.GetDirectories(config.M_F_P + "Packs\\");
+            if (dirlist.Count() != 0)
+            {
+                foreach (var dir in dirlist)
+                {
+                    string modpackversion;
+                    string modpackname;
+                    string mcversion;
+                    try
+                    {
+                        var json = System.IO.File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
+                        dynamic jObj = JsonConvert.DeserializeObject(json);
+                        modpackname = jObj.modpackName;
+                        modpackversion = jObj.modpackVersion;
+                        mcversion = jObj.mc_version;
+
+                    }
+                    catch (FileNotFoundException ex)
+                    {
+                        continue;
+                    }
+                    catch (JsonException)
+                    {
+                        MessageBox.Show("Errore durante il parsing del JSON di " + "card" + new DirectoryInfo(dir.Replace(" ", "")).Name);
+                        continue;
+                    }
+                    var card = new MaterialDesignThemes.Wpf.Card();
+                    card.Name = "card" + new DirectoryInfo(dir.Replace(" ", "")).Name;
+                    try
+                    {
+                        modpacksListContainer.RegisterName(card.Name, card);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        modpacksListContainer.UnregisterName(card.Name);
+                        modpacksListContainer.RegisterName(card.Name, card);
+                    }
+                    catch
+                    {
+                        modpacksListContainer.UnregisterName(card.Name);
+                        modpacksListContainer.RegisterName(card.Name, card);
+                    }
+                    card.Height = 285;
+                    card.Width = 240;
+                    card.Margin = new Thickness(0, 3, 10, 10);
+                    card.HorizontalAlignment = HorizontalAlignment.Left;
+                    var insiderStackPanel = new StackPanel();
+
+                    card.Content = insiderStackPanel;
+                    //INSIDE STACKPANEL
+
+                    Style buttonstyle = Application.Current.FindResource("MaterialDesignFloatingActionButton") as Style;
+
+                    var startBtn = new Button();
+                    var iconpackplay = new MaterialDesignThemes.Wpf.PackIcon();
+                    iconpackplay.Kind = MaterialDesignThemes.Wpf.PackIconKind.Play;
+                    startBtn.ToolTip = "Start Pack";
+                    startBtn.Content = iconpackplay;
+                    startBtn.Foreground = new SolidColorBrush(Colors.White);
+                    startBtn.Style = buttonstyle;
+                    startBtn.HorizontalAlignment = HorizontalAlignment.Right;
+                    startBtn.VerticalAlignment = VerticalAlignment.Bottom;
+                    startBtn.Margin = new Thickness(0, -30, 15, 0);
+                    Panel.SetZIndex(startBtn, 10);
+                    startBtn.Click += new RoutedEventHandler((sender, e) => play_click(this, e, card.Name, dir));
+
+                    var image = new Image();
+                    image.Source = new BitmapImage(new Uri(@"/Images/block.png", UriKind.Relative));
+                    image.Stretch = Stretch.UniformToFill;
+                    image.VerticalAlignment = VerticalAlignment.Top;
+                    image.Height = 130;
+
+                    var title = new Label();
+                    title.Foreground = new SolidColorBrush(Colors.White);
+                    title.FontSize = 20;
+                    title.FontWeight = FontWeights.ExtraBold;
+                    title.Margin = new Thickness(0, -70, 0, 0);
+                    title.HorizontalAlignment = HorizontalAlignment.Center;
+                    title.Content = new DirectoryInfo(dir).Name;
+
+                    var datastackpanel = new StackPanel();
+                    insiderStackPanel.Children.Add(image);
+                    insiderStackPanel.Children.Add(title);
+                    insiderStackPanel.Children.Add(startBtn);
+                    insiderStackPanel.Children.Add(datastackpanel);
+
+
+                    var modpackName = new Label();
+                    modpackName.HorizontalAlignment = HorizontalAlignment.Center;
+                    modpackName.Content = "Modpack Name: " + modpackname;
+                    datastackpanel.Children.Add(modpackName);
+
+                    var modpackVersion = new Label();
+                    modpackVersion.HorizontalAlignment = HorizontalAlignment.Center;
+                    modpackVersion.Content = "Modpack Version: " + modpackversion;
+                    datastackpanel.Children.Add(modpackVersion);
+
+                    var minecraftversion = new Label();
+                    minecraftversion.HorizontalAlignment = HorizontalAlignment.Center;
+                    minecraftversion.Content = "MC Version: " + mcversion;
+                    datastackpanel.Children.Add(minecraftversion);
+
+
+                    var buttonStackPanel = new StackPanel();
+                    buttonStackPanel.Orientation = Orientation.Horizontal;
+                    buttonStackPanel.HorizontalAlignment = HorizontalAlignment.Center;
+                    buttonStackPanel.Margin = new Thickness(12, 0, 12, 12);
+                    datastackpanel.Children.Add(buttonStackPanel);
+
+                    Style btnStyle = Application.Current.FindResource("MaterialDesignToolButton") as Style;
+
+
+                    var manageBtn = new Button();
+                    var iconpackwrench = new MaterialDesignThemes.Wpf.PackIcon();
+                    iconpackwrench.Kind = MaterialDesignThemes.Wpf.PackIconKind.Wrench;
+                    manageBtn.Content = iconpackwrench;
+                    manageBtn.Width = 30;
+                    MaterialDesignThemes.Wpf.RippleAssist.SetIsCentered(manageBtn, true);
+                    manageBtn.Margin = new Thickness(0, 0, 0, 0);
+                    manageBtn.Padding = new Thickness(2, 0, 2, 0);
+                    manageBtn.Style = btnStyle;
+                    //manageBtn.Click += new RoutedEventHandler((sender, e) => play_click(this, e, card.Name, dir));
+
+                    var deletebutton = new Button();
+                    var iconpackdelete = new MaterialDesignThemes.Wpf.PackIcon();
+                    iconpackdelete.Kind = MaterialDesignThemes.Wpf.PackIconKind.Delete;
+                    deletebutton.Content = iconpackdelete;
+                    MaterialDesignThemes.Wpf.RippleAssist.SetIsCentered(deletebutton, true);
+                    deletebutton.Width = 30;
+                    deletebutton.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#F44336"));
+                    deletebutton.Style = btnStyle;
+                    deletebutton.Margin = new Thickness(0, 0, 0, 0);
+                    deletebutton.Padding = new Thickness(2, 0, 2, 0);//delete_click(this, e, card.Name, dir)
+                    deletebutton.Click += new RoutedEventHandler(async (sender, e) =>
+                    {
+                        deletebutton.IsEnabled = false;
+                        MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(startBtn, true);
+                        MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndeterminate(startBtn, true);
+                        MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIndicatorForeground(startBtn, (SolidColorBrush)(new BrushConverter().ConvertFrom("#183b45")));
+                        MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card.Name);
+                        await Task.Delay(500);
+                        System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
+                        foreach (var i in x)
+                        {
+                            if (i == dir)
+                            {
+                                x.Remove(dir);
+                                break;
+                            }
+                        }
+                        Properties.Settings.Default.Save();
+                        try
+                        {
+                            if (Directory.Exists(dir))
+                            {
+                                Directory.Delete(dir, true);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show("Cannot delete directory. Try again");
+                        }
+                        if (!Directory.Exists(config.M_F_P + "Packs\\"))
+                        {
+                            Directory.CreateDirectory(config.M_F_P + "Packs\\");
+                        }
+                        await ModpacksUpdate();
+                    });
+
+                    buttonStackPanel.Children.Add(manageBtn);
+                    buttonStackPanel.Children.Add(deletebutton);
+                    modpacksListContainer.Children.Add(card);
+                }
+
+            }
+            Style styleaddNew = Application.Current.FindResource("MaterialDesignFloatingActionButton") as Style;
+
+            var addNewBtn = new Button();
+            var iconpackplus = new MaterialDesignThemes.Wpf.PackIcon();
+            iconpackplus.Kind = MaterialDesignThemes.Wpf.PackIconKind.Plus;
+            addNewBtn.ToolTip = "Add New Pack";
+            addNewBtn.Content = iconpackplus;
+            addNewBtn.Foreground = new SolidColorBrush(Colors.White);
+            addNewBtn.Style = styleaddNew;
+            addNewBtn.HorizontalAlignment = HorizontalAlignment.Center;
+            addNewBtn.VerticalAlignment = VerticalAlignment.Center;
+            Panel.SetZIndex(addNewBtn, 10);
+            addNewBtn.Click += new RoutedEventHandler(async (sender, e) =>
+            {
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(), "RootDialog", null, ExtendedClosingEventHandler);
+                if (!Directory.Exists(config.M_F_P + "Packs\\"))
+                {
+                    Directory.CreateDirectory(config.M_F_P + "Packs\\");
+                }
+                await ModpacksUpdate();
+            });
+
+
+            var addNew = new MaterialDesignThemes.Wpf.Card();
+            addNew.Height = 285;
+            addNew.Width = 240;
+            addNew.Margin = new Thickness(0, 3, 10, 10);
+            addNew.HorizontalAlignment = HorizontalAlignment.Left;
+            addNew.Content = addNewBtn;
+
+            modpacksListContainer.Children.Add(addNew);
+        }
+
+        async void play_click(object sender, RoutedEventArgs e, string card, string dir)
+        {
+            MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card);
+            try
+            {
+                var json = System.IO.File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show("This cannot be run. We suggest you to delete it");
+                return;
+            }
+
             Classes.MinecraftStarter.Minecraft_Start(dir);
         }
 
-        private void websiteLink_MouseDown(object sender, MouseButtonEventArgs e)
+        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://twickt.com");
+            ScrollViewer scrollviewer = sender as ScrollViewer;
+            if (e.Delta > 0)
+                scrollviewer.LineLeft();
+            else
+                scrollviewer.LineRight();
+            e.Handled = true;
         }
 
-        private void facebookLink_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://www.facebook.com/twicktlauncher/");
-        }
-
-        private void twitterLink_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://twitter.com/twicktlab");
-        }
-
-        private void emailLink_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            System.Diagnostics.Process.Start("mailto:davide.ceschia@twickt.com");
-        }
-
-        private void image1_AnimationCompleted(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private async void modpack2start_Click(object sender, RoutedEventArgs e)
-        {
-                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates("Questa funzione non e' ancora disponibile", 250, 50), "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
-        }
         private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
         {
             await Task.Delay(1200);
@@ -164,11 +314,6 @@ namespace Twickt_Launcher.Pages
         }
 
         private static void ExtendedClosingEventHandler(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
-        {
-
-        }
-
-        private void modpack2start_Loaded(object sender, RoutedEventArgs e)
         {
 
         }
@@ -183,7 +328,7 @@ namespace Twickt_Launcher.Pages
             await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates(@"Per risolvere i tuoi problemi con il launcher, il primo tentativo e' di cancellare la cartella di minecraft del launcher.
                                                                                         Cliccando su procedi verrai portato alla cartella minecraft dove potrai spostare i tuoi salvataggi del gioco e successivamente cancellare la cartella. Per un funzionamento ottimale del launcher ti consigliamo di riavviarlo dopo tale procedura
                                                                                         ", 330, 270, true, "Procedi"), "RootDialog");
-            
+
             string filePath = config.M_F_P;
 
             // combine the arguments together
@@ -194,16 +339,21 @@ namespace Twickt_Launcher.Pages
 
         }
 
-        private void installedModpacks_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Window1.singleton.MainPage.Navigate(new Pages.Modpacks());
-            Window1.singleton.NavigationMenu.SelectedIndex = 3;
+            Window1.singleton.MainPage.Navigate(new Pages.Options());
+            Window1.singleton.NavigationMenu.SelectedIndex = 1;
         }
 
-        private void MarketModpacks_Click(object sender, RoutedEventArgs e)
+        private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Window1.singleton.MainPage.Navigate(new Pages.ModpacksMarket());
-            Window1.singleton.NavigationMenu.SelectedIndex = 2;
+            debugconsole.Show();
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            Window1.singleton.MainPage.Navigate(new Pages.Report_Bug());
+            Window1.singleton.NavigationMenu.SelectedIndex = 4;
         }
     }
 }

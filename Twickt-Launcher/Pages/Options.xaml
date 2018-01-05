@@ -16,13 +16,13 @@ Sample license text.
         <Label x:Name="downloadThreadsLabel" Content="Download Threads" HorizontalAlignment="Left" Margin="10,20,0,0" VerticalAlignment="Top" FontSize="18.667"/>
         <ComboBox x:Name="downloadThreads" materialDesign:ComboBoxAssist.ShowSelectedItem="{Binding ElementName=DisplaySelectedItemCheckBox, Path=IsChecked}" HorizontalAlignment="Left" Margin="617,20,0,0" VerticalAlignment="Top" Width="67"/>
         <Separator HorizontalAlignment="Left" Height="15" Margin="10,55,0,0" VerticalAlignment="Top" Width="674"/>
-        <Button x:Name="save" Content="Save" Foreground="White" HorizontalAlignment="Left" Margin="609,583,0,0" VerticalAlignment="Top" Width="75" Click="save_Click"/>
+        <Button x:Name="save" Content="Save" Foreground="White" HorizontalAlignment="Left" Margin="609,583,0,0" VerticalAlignment="Top" Width="75" Click="save_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
         <Label x:Name="startingPage" Content="Launcher Starting Page" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top" FontSize="18.667"/>
         <Separator HorizontalAlignment="Left" Height="15" Margin="10,105,0,0" VerticalAlignment="Top" Width="674"/>
         <ComboBox x:Name="startingPageValue" materialDesign:ComboBoxAssist.ShowSelectedItem="{Binding ElementName=DisplaySelectedItemCheckBox, Path=IsChecked}" HorizontalAlignment="Left" Margin="564,78,0,0" VerticalAlignment="Top" Width="120">
         </ComboBox>
         <Label x:Name="checkforUpdates" Content="Check Now For Updates" HorizontalAlignment="Left" Margin="10,117,0,0" VerticalAlignment="Top" FontSize="18.667"/>
-        <Button x:Name="checkUpdatesNow" Content="Check" Foreground="White" HorizontalAlignment="Left" Margin="609,120,0,0" VerticalAlignment="Top" Width="75" Click="checkUpdatesNow_Click"/>
+        <Button x:Name="checkUpdatesNow" Content="Check" Foreground="White" HorizontalAlignment="Left" Margin="609,120,0,0" VerticalAlignment="Top" Width="75" Click="checkUpdatesNow_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
         <Separator HorizontalAlignment="Left" Height="15" Margin="10,152,0,0" VerticalAlignment="Top" Width="674"/>
         <Label x:Name="javaFolder" Content="Java Path" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" FontSize="18.667"/>
         <TextBox x:Name="JavaPath" HorizontalAlignment="Left" Height="39" Margin="312,164,0,0" TextWrapping="NoWrap" Text=" " VerticalAlignment="Top" Width="372" materialDesign:HintAssist.Hint="Java Path" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"/>
@@ -33,5 +33,6 @@ Sample license text.
         <Label x:Name="downloadThreadsLabel_Copy" Content="RAM (GB)" HorizontalAlignment="Left" Margin="10,265,0,0" VerticalAlignment="Top" FontSize="18.667"/>
         <ComboBox x:Name="ram" materialDesign:ComboBoxAssist.ShowSelectedItem="{Binding ElementName=DisplaySelectedItemCheckBox, Path=IsChecked}" HorizontalAlignment="Left" Margin="581,265,0,0" VerticalAlignment="Top" Width="103"/>
         <Separator HorizontalAlignment="Left" Height="15" Margin="10,300,0,0" VerticalAlignment="Top" Width="674"/>
+        <Button Content="Home" Foreground="White" HorizontalAlignment="Left" Margin="10,583,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click" Style="{DynamicResource MaterialDesignRaisedButton}"/>
     </Grid>
 </Page>

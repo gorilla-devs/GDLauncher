@@ -156,5 +156,11 @@ namespace Twickt_Launcher.Pages
             catch
             { }
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Window1.singleton.MainPage.Navigate(new Pages.Home());
+            Window1.singleton.NavigationMenu.SelectedIndex = 0;
+        }
     }
 }

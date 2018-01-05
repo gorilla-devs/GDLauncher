@@ -43,9 +43,8 @@ namespace Twickt_Launcher.Pages
         {
             InitializeComponent();
             firstlabelprogress.Visibility = Visibility.Visible;
-            Window1.singleton.MenuToggleButton.IsEnabled = false;
+            //Window1.singleton.MenuToggleButton.IsEnabled = false;
             Window1.singleton.popupbox.IsEnabled = false;
-            Window1.singleton.homeButton.IsEnabled = false;
             singleton = this;
             
             CultureInfo culture;
@@ -60,7 +59,7 @@ namespace Twickt_Launcher.Pages
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
 
-            Assembly resourceAssembly = Assembly.Load("Twickt Launcher");
+            Assembly resourceAssembly = Assembly.Load("GDLauncher");
             string manifest = "Twickt_Launcher.lang.lang";
             manager = new ResourceManager(manifest, resourceAssembly);
 
@@ -73,19 +72,8 @@ namespace Twickt_Launcher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var client = new WebClient();
-                var values = new System.Collections.Specialized.NameValueCollection();
-                var response = await client.UploadValuesTaskAsync(config.launcherStatusWebService, values);
-                var responseString = Encoding.Default.GetString(response);
-                if (responseString.Contains("disabled"))
-                {
-                    MessageBox.Show(SplashScreen.singleton.manager.GetString("launcherMaintenance"));
-                    Application.Current.Shutdown();
-                }
-            }
-            catch { }
+            if(Properties.Settings.Default.eula == false)
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Eula(), "RootDialog");
 
             Windows.DebugOutputConsole console = new Windows.DebugOutputConsole();
             firstlabelprogress.Visibility = Visibility.Hidden;

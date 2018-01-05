@@ -123,17 +123,17 @@ namespace Twickt_Launcher.Classes
             AverageSpeed = bytes_total / sw.Elapsed.Seconds;
             SessionData.AverageDownloadSpeed = AverageSpeed;
             if (AverageSpeed < 1000)
-                Properties.Settings.Default["download_threads"] = "2";
+                Properties.Settings.Default["download_threads"] = "8";
             else if (AverageSpeed >= 1000 && AverageSpeed <= 3000)
-                Properties.Settings.Default["download_threads"] = "3";
+                Properties.Settings.Default["download_threads"] = "12";
             else if (AverageSpeed > 3000 && AverageSpeed < 5000)
-                Properties.Settings.Default["download_threads"] = "5";
+                Properties.Settings.Default["download_threads"] = "16";
             else if (AverageSpeed > 5000 && AverageSpeed < 7000)
-                Properties.Settings.Default["download_threads"] = "7";
+                Properties.Settings.Default["download_threads"] = "23";
             else if (AverageSpeed > 7000 && AverageSpeed < 10000)
-                Properties.Settings.Default["download_threads"] = "9";
+                Properties.Settings.Default["download_threads"] = "26";
             else if (AverageSpeed > 10000)
-                Properties.Settings.Default["download_threads"] = "11";
+                Properties.Settings.Default["download_threads"] = "30";
 
             Properties.Settings.Default.Save();
             sw.Reset();

@@ -44,7 +44,7 @@ namespace Twickt_Launcher.Pages
         public Modpacks()
         {
             InitializeComponent();
-            Window1.singleton.MenuToggleButton.IsEnabled = true;
+           // Window1.singleton.MenuToggleButton.IsEnabled = true;
             singleton = this;
             transition.SelectedIndex = 0;
         }

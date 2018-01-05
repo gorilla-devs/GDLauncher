@@ -8,6 +8,19 @@
              Height="335" Width="480" Background="White" Loaded="UserControl_Loaded">
     <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="0">
 
+
+        <materialDesign:TransitionerSlide>
+                <StackPanel Margin="20 10 20 0">
+                    <DockPanel>
+                        <Button Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="295" Width="220" Click="Button_Click">
+                            Minecraft Vanilla
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="295" Width="220" Click="Button_Click_1">
+                            Minecraft Forge
+                        </Button>
+                    </DockPanel>
+                </StackPanel>
+        </materialDesign:TransitionerSlide>
         <!-- you can use a slide for each page, let's add a touch of fade for our first page  -->
         <materialDesign:TransitionerSlide>
             <materialDesign:Card Height="280" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -41,10 +54,10 @@
                         <ComboBox Name="versionsList" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged"/>
                     </DockPanel>
                     <DockPanel HorizontalAlignment="Center" Margin="0 10 0 0">
-                        <Button Foreground="White" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
-                        <Button Name="install" Foreground="White" Width="150" Margin="35 0 0 0" Click="install_Click">Install</Button>
+                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
+                        <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="35 0 0 0" Click="install_Click">Install</Button>
                     </DockPanel>
-                    <ProgressBar Name="loading" Width="400" Margin="0 10 0 0" IsIndeterminate="True" Visibility="Hidden"></ProgressBar>
+                    <ProgressBar Name="loading" Background="#4CAF50" Width="400" Margin="0 10 0 0" IsIndeterminate="True" Visibility="Hidden"></ProgressBar>
 
                 </StackPanel>
             </materialDesign:Card>
@@ -87,10 +100,10 @@
                     </StackPanel>
                 </materialDesign:Card>
                 <DockPanel>
-                    <Button Name="cancelButton" Margin="10" Width="130" HorizontalAlignment="Left" IsEnabled="false" Foreground="White" Click="cancelButton_Click">Cancel</Button>
+                    <Button Name="cancelButton" Style="{StaticResource MaterialDesignFlatButton}" Margin="10" Width="130" HorizontalAlignment="Left" IsEnabled="false" Click="cancelButton_Click">Cancel</Button>
                     <materialDesign:PackIcon Name="installationEndedIcon" Kind="CheckboxMarkedCircleOutline" Margin="100 0 0 0" VerticalAlignment="Center" Height="30" Width="30" Foreground="#4CAF50" Visibility="Hidden"/>
                     <Label Name="installationEndedText" VerticalAlignment="Center" Visibility="Hidden">Installed</Label>
-                    <Button Name="continueButton" Margin="10" Width="130" HorizontalAlignment="Right" Foreground="White" Visibility="Hidden" Command="materialDesign:DialogHost.CloseDialogCommand">Continue</Button>
+                    <Button Name="continueButton" Margin="10" Style="{StaticResource MaterialDesignFlatButton}" Width="130" HorizontalAlignment="Right" Visibility="Hidden" Command="materialDesign:DialogHost.CloseDialogCommand">Continue</Button>
                 </DockPanel>
             </StackPanel>
         </materialDesign:TransitionerSlide>

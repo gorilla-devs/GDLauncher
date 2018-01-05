@@ -23,94 +23,26 @@ Sample license text.
             </materialDesign:TransitionerSlide>
             <materialDesign:TransitionerSlide Background="White" OpeningEffect="{materialDesign:TransitionEffect Kind=FadeIn}">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <materialDesign:Card Margin="10" Height="100" Width="300">
-                            <Image x:Name="image" HorizontalAlignment="Center" Height="46" VerticalAlignment="Center" Width="230" Source="/Twickt Launcher;component/Images/Twickt Logo 200x41px v2.png" Stretch="UniformToFill"/>
-                        </materialDesign:Card>
-                        <materialDesign:Card Margin="10" Height="100" Width="300">
-                            <Label x:Name="label" Content="The Simpler, The Better!" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="22"/>
-                        </materialDesign:Card>
-                    </StackPanel>
-                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <materialDesign:Card Width="600" Height="200">
-                            <WrapPanel Name="bookmarksContainer" Margin="0 15 0 0">
-                            </WrapPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                    <Image Source="/Images/homeLogo.png" Height="170" Margin="0 40 0 0"></Image>
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 30 0 15" >
+                        <materialDesign:Card Width="630" Height="330" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+                            <ScrollViewer PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible">
+                                <StackPanel Margin="15 15 0 0" Orientation="Horizontal" Name="modpacksListContainer">
+                                </StackPanel>
+                            </ScrollViewer>
                         </materialDesign:Card>
                     </WrapPanel>
-                    <Label Name="welcomeadmin" HorizontalAlignment="Center" Visibility="Hidden" FontSize="15" Margin="0 20 0 0" Foreground="Blue">Welcome back ADMIN!</Label>
-                    <materialDesign:Card HorizontalAlignment="Center" Width="468" Margin="0 15 0 0">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel HorizontalAlignment="Center">
-                                    <Button x:Name="MarketModpacks" Height="40" Style="{StaticResource MaterialDesignFlatButton}" Click="MarketModpacks_Click">
-                                        <DockPanel Width="210">
-                                            <materialDesign:PackIcon Kind="Cart"  Width="20" Height="20" VerticalAlignment="Center"/>
-                                            <Label>Modpack's Market</Label>
-                                        </DockPanel>
-                                    </Button>
-                                </StackPanel>
-                                <StackPanel HorizontalAlignment="Center">
-                                    <Button x:Name="installedModpacks" Height="40" Style="{StaticResource MaterialDesignFlatButton}" Click="installedModpacks_Click">
-                                        <DockPanel Width="210">
-                                            <materialDesign:PackIcon Kind="Package"  Width="20" Height="20" VerticalAlignment="Center"/>
-                                            <Label>Installed Modpacks</Label>
-                                        </DockPanel>
-                                    </Button>
-                                </StackPanel>
-                            </StackPanel>
-                            <DockPanel>
-                                <StackPanel HorizontalAlignment="Center">
-                                    <Button x:Name="changelog" Height="40" Style="{StaticResource MaterialDesignFlatButton}"  Click="changelog_Click">
-                                        <DockPanel Width="210">
-                                            <materialDesign:PackIcon Kind="Cart"  Width="20" Height="20" VerticalAlignment="Center"/>
-                                            <Label>Changelog</Label>
-                                        </DockPanel>
-                                    </Button>
-                                </StackPanel>
-                                <StackPanel HorizontalAlignment="Center">
-                                    <Button x:Name="problems" Height="40" Style="{StaticResource MaterialDesignFlatButton}" Click="problems_Click">
-                                        <DockPanel Width="210">
-                                            <materialDesign:PackIcon Kind="Package"  Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                            <Label>Support Center</Label>
-                                        </DockPanel>
-                                    </Button>
-                                </StackPanel>
-                            </DockPanel>
-                        </StackPanel>
-                    </materialDesign:Card>
-                    <materialDesign:Card HorizontalAlignment="Center" Margin="3 20 0 0" Width="468">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel HorizontalAlignment="Center">
-                                    <Button Height="40" Margin="4 0 0 0" Style="{StaticResource MaterialDesignFlatButton}">
-                                        <DockPanel Width="120">
-                                            <materialDesign:PackIcon Kind="Link"  Width="20" Height="20" VerticalAlignment="Center"/>
-                                            <Label>Website</Label>
-                                        </DockPanel>
-                                    </Button>
-                                </StackPanel>
-                                <StackPanel HorizontalAlignment="Center">
-                                    <Button Height="40" Style="{StaticResource MaterialDesignFlatButton}">
-                                        <DockPanel Width="120">
-                                            <materialDesign:PackIcon Kind="FacebookBox"  Width="20" Height="20" VerticalAlignment="Center"/>
-                                            <Label>Facebook</Label>
-                                        </DockPanel>
-                                    </Button>
-                                </StackPanel>
-                                <DockPanel>
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <Button Height="40" Style="{StaticResource MaterialDesignFlatButton}">
-                                            <DockPanel Width="120">
-                                                <materialDesign:PackIcon Kind="Email" Width="20" Height="20" VerticalAlignment="Center"/>
-                                                <Label>Email</Label>
-                                            </DockPanel>
-                                        </Button>
-                                    </StackPanel>
-                                </DockPanel>
-                            </StackPanel>
-                        </StackPanel>
-                    </materialDesign:Card>
-                    <StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="130" Click="Button_Click">
+                            Options
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="130" Click="Button_Click_1">
+                            Console
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="130" Click="Button_Click_2">
+                            Report A Bug
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </materialDesign:TransitionerSlide>

@@ -32,9 +32,8 @@ namespace Twickt_Launcher.Dialogs
         Timer sw = new Timer();
         public HowTo()
         {
-            Window1.singleton.MenuToggleButton.IsEnabled = false;
+            //Window1.singleton.MenuToggleButton.IsEnabled = false;
             Window1.singleton.popupbox.IsEnabled = false;
-            Window1.singleton.homeButton.IsEnabled = false;
             InitializeComponent();
             try
             {
@@ -86,9 +85,8 @@ namespace Twickt_Launcher.Dialogs
             Properties.Settings.Default["firstTimeHowTo"] = "false";
             Properties.Settings.Default["RAM"] = ram.Text;
             Properties.Settings.Default.Save();
-            Window1.singleton.MenuToggleButton.IsEnabled = true;
+            //Window1.singleton.MenuToggleButton.IsEnabled = true;
             Window1.singleton.popupbox.IsEnabled = true;
-            Window1.singleton.homeButton.IsEnabled = true;
             Window1.singleton.MainPage.Navigate(new Pages.Home());
             Window1.singleton.NavigationMenu.SelectedIndex = 0;
 

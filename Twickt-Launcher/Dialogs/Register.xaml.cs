@@ -151,7 +151,7 @@ namespace Twickt_Launcher.Dialogs
                 var values = new NameValueCollection();
                 values["username"] = username.Text;
                 values["email"] = email.Text;
-                values["password"] = Pages.Login.sha256(password.Password);
+                values["password"] = password.Password;
                 register.IsEnabled = false;
                 if (linkMojang.IsChecked == true)
                 {

@@ -19,7 +19,7 @@ Sample license text.
         <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="0">
 
             <!-- you can use a slide for each page, let's add a touch of fade for our first page  -->
-            <materialDesign:TransitionerSlide Background="#4CAF50">
+            <materialDesign:TransitionerSlide Background="#183b45">
                 <StackPanel>
                     <Label x:Name="mainContent" Foreground="White" Content="Starting..." HorizontalAlignment="Left" Margin="195,0,0,0" VerticalAlignment="Top" FontSize="64" Visibility="Hidden"/>
                     <StackPanel Orientation="Horizontal">

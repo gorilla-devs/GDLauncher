@@ -34,13 +34,16 @@ namespace Twickt_Launcher.Dialogs
         public static string vanillajson;
         private static Classes.Downloader downloader;
         public static CancellationTokenSource ctoken;
-        public InstallModpack(string modpackname)
+        public static string whatToInstall = null;
+        public InstallModpack()
         {
             InitializeComponent();
             singleton = this;
-            name = modpackname;
+            name = whatToInstall;
+            DialogHostExtensions.SetCloseOnClickAway(this, true);
         }
-        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+
+        public async Task LoadPackData()
         {
             loading.Visibility = Visibility.Visible;
             if (name == "Minecraft Vanilla")
@@ -91,6 +94,11 @@ namespace Twickt_Launcher.Dialogs
                 }
             }
             loading.Visibility = Visibility.Hidden;
+
+        }
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadPackData();
         }
 
         private async void versionsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -144,6 +152,7 @@ namespace Twickt_Launcher.Dialogs
 
         private async void install_Click(object sender, RoutedEventArgs e)
         {
+            DialogHostExtensions.SetCloseOnClickAway(this, false);
             Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
             if (String.IsNullOrEmpty(instanceTextName.Text))
             {
@@ -161,7 +170,7 @@ namespace Twickt_Launcher.Dialogs
                 return;
             }
             ctoken = new CancellationTokenSource();
-            transition.SelectedIndex = 1;
+            transition.SelectedIndex = 2;
             workingThreadsText.Content = Properties.Settings.Default["download_threads"].ToString();
             modpackName.Content = versionsList.Text;
             var files = await Classes.JSON.GetFiles(name, instanceTextName.Text, mc_version.Content.ToString(), forge_version.Content.ToString(), versionsList.Text);
@@ -190,6 +199,21 @@ namespace Twickt_Launcher.Dialogs
                 }
             })));
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            name = "Minecraft Vanilla";
+            transition.SelectedIndex = 1;
+            await LoadPackData();
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            name = "Forge Stock";
+            transition.SelectedIndex = 1;
+            await LoadPackData();
+
         }
     }
 }

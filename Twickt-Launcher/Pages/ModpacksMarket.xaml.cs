@@ -204,7 +204,7 @@ namespace Twickt_Launcher.Pages
         async void installModpack_click(object sender, RoutedEventArgs e, string card, string modpackName)
         {
             MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksContainer.FindName(card);
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(modpackName), "RootDialog", null, ExtendedClosingEventHandler);
+            //await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(modpackName), "RootDialog", null, ExtendedClosingEventHandler);
         }
         private static async void ExtendedClosingEventHandler(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
         {

@@ -22,7 +22,7 @@ namespace Twickt_Launcher.Classes
         public static async Task<string> GetModpacksList(string type)
         {
             var result = await Task.Run(() => RefreshRemote(type));
-            Window1.singleton.MenuToggleButton.IsChecked = false;
+            //Window1.singleton.MenuToggleButton.IsChecked = false;
             return result;
         }
 

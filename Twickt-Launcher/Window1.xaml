@@ -10,8 +10,8 @@ Sample license text.
         xmlns:local="clr-namespace:Twickt_Launcher"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         mc:Ignorable="d"
-        Title="Twickt Launcher" Height="700" Width="700" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="Green" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
-    <materialDesign:DialogHost Identifier="RootDialog">
+        Title="Twickt Launcher" Height="700" Width="700" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+    <materialDesign:DialogHost Identifier="RootDialog" CloseOnClickAway="{Binding Path=DialogContent.(local:DialogHostExtensions.CloseOnClickAway), RelativeSource={RelativeSource Self}, FallbackValue=True}">
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
             <materialDesign:DrawerHost.LeftDrawerContent >
                 <StackPanel Orientation="Vertical">
@@ -37,29 +37,22 @@ Sample license text.
             </materialDesign:DrawerHost.LeftDrawerContent>
             <DockPanel Name="maincontent">
                 <materialDesign:ColorZone Name="header" Padding="16" materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                                          Mode="PrimaryMid" DockPanel.Dock="Top" MouseDown="ColorZone_MouseDown">
+                                          Background="#183b45" DockPanel.Dock="Top" MouseDown="ColorZone_MouseDown">
                     <DockPanel>
-                        <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" ToolTip="Menu" Foreground="White" IsChecked="False"
-                                      x:Name="MenuToggleButton"/>
-                        <Button Foreground="White" ToolTip="Close" Width="48" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                        <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Close" Width="48" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                             <materialDesign:PackIcon Kind="WindowClose" />
                         </Button>
-                        <Button Foreground="White" ToolTip="Minimize" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                        <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Minimize" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                             <materialDesign:PackIcon Kind="WindowMinimize" />
-                        </Button>
-                        <Button Name="homeButton" Foreground="Green" ToolTip="Go to Home" Width="48" DockPanel.Dock="Right" materialDesign:ShadowAssist.ShadowDepth="Depth1" Click="Button_Click_6">
-                            <materialDesign:PackIcon Kind="Home" />
                         </Button>
                         <materialDesign:PopupBox Name="popupbox" DockPanel.Dock="Right" ToolTip="Options" Foreground="White" PlacementMode="BottomAndAlignRightEdges">
                             <StackPanel>
                                 <Button Content="Show Debug Console" Click="Button_Click_2"/>
                                 <Button Content="Open game dir" Click="Button_Click_5"/>
-                                <Button Content="Logout" Click="Button_Click_3"/>
+                                <Button Content="Change Username" Click="Button_Click_3"/>
                             </StackPanel>
                         </materialDesign:PopupBox>
                         <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="red" ToolTip="Internet Not Working" Width="48" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
-                        <TextBlock HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center" FontSize="22" DockPanel.Dock="Top">Twickt Official Beta Launcher</TextBlock>
-                        <TextBlock Name="loggedinName" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" FontSize="12"></TextBlock>
                     </DockPanel>
                 </materialDesign:ColorZone>
                 <Frame Name="MainPage" NavigationUIVisibility="Hidden"></Frame>
@@ -67,4 +60,5 @@ Sample license text.
 
         </materialDesign:DrawerHost>
     </materialDesign:DialogHost>
+
 </Window>
