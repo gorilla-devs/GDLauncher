@@ -30,7 +30,12 @@ Sample license text.
                     <ProgressBar Name="progressbar" Foreground="White" HorizontalAlignment="Left" Height="32" Margin="10,0,0,0" VerticalAlignment="Top" Width="674" Visibility="Hidden"/>
                     <Label x:Name="mbToDownload" Foreground="White" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
                     <Label x:Name="kbps" Foreground="White" Content="kbps" HorizontalAlignment="Left" Margin="520,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
-                    <ProgressBar x:Name="load" HorizontalAlignment="Left" Foreground="White" Height="284" Margin="10,0,0,0" VerticalAlignment="Top" Width="674" IsIndeterminate="True" Visibility="Hidden"/>
+                    <StackPanel Orientation="Horizontal">
+                        <ProgressBar Name="postUpdate" Foreground="White" HorizontalAlignment="Left" Height="28" Margin="10,0,0,0" Visibility="Hidden" VerticalAlignment="Top" Width="66" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
+                        <Label Name="postUpdatePreText" Foreground="White" Margin="20 17 0 0" FontSize="20" Visibility="Hidden">New version downloaded. Restarting in</Label>
+                        <Label Name="postUpdateText" Foreground="White" Margin="0 17 0 0" FontSize="25" FontWeight="Heavy" Visibility="Hidden">5</Label>
+                        <Label Name="postUpdatePostText" Foreground="White" Margin="0 17 0 0" FontSize="20" Visibility="Hidden">seconds</Label>
+                    </StackPanel>
                 </StackPanel>
             </materialDesign:TransitionerSlide>
             <materialDesign:TransitionerSlide Background="White">

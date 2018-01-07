@@ -15,7 +15,7 @@ Sample license text.
         <Label x:Name="updateVersion" Content="version -> version" HorizontalAlignment="Left" Margin="155,10,0,0" VerticalAlignment="Top" Width="113"/>
         <Separator HorizontalAlignment="Left" Height="9" Margin="10,36,0,0" VerticalAlignment="Top" Width="258"/>
         <Label x:Name="label1" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <Button x:Name="yes" Content="Yes" HorizontalAlignment="Left" Foreground="White" Margin="10,95,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="yes" Style="{DynamicResource MaterialDesignRaisedAccentButton}"/>
-        <Button x:Name="no" Content="No" HorizontalAlignment="Left" Foreground="White" Margin="193,95,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="no" Style="{DynamicResource MaterialDesignRaisedAccentButton}"/>
+        <Button x:Name="yes" Content="Yes" HorizontalAlignment="Left" Foreground="White" Margin="190,95,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="yes" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+        <Button x:Name="no" Content="No" HorizontalAlignment="Left" Foreground="White" Margin="10,95,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="no" Style="{DynamicResource MaterialDesignRaisedButton}"/>
     </Grid>
 </UserControl>

@@ -98,6 +98,7 @@ namespace Twickt_Launcher.Dialogs
         }
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            await Task.Delay(400);
             await LoadPackData();
         }
 
@@ -205,6 +206,7 @@ namespace Twickt_Launcher.Dialogs
         {
             name = "Minecraft Vanilla";
             transition.SelectedIndex = 1;
+            await Task.Delay(300);
             await LoadPackData();
         }
 
@@ -212,6 +214,7 @@ namespace Twickt_Launcher.Dialogs
         {
             name = "Forge Stock";
             transition.SelectedIndex = 1;
+            await Task.Delay(300);
             await LoadPackData();
 
         }

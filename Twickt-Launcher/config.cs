@@ -16,7 +16,7 @@ namespace Twickt_Launcher
 {
     class config
     {
-        public static string updateWebsite = "https://gorilladevs.ams3.digitaloceanspaces.com/dl/";
+        public static string updateWebsite = "https://dl.gorilladevs.com/";
         public static string minecraftfolder = "GorillaDevs";
         public static string forgeversion = "";
         public static string mainclass = "";
@@ -32,7 +32,7 @@ namespace Twickt_Launcher
         public static string modpacksWebService = "https://api.twickt.com/modpacks1.php";
         public static string launcherStatusWebService = "https://api.twickt.com/launcher_status.php";
         public static string changelogsWebService = "https://api.twickt.com/changelogs.php";
-        public static string updatessWebService = "https://ams3.digitaloceanspaces.com/gorilladevs/launcher_versions.json";
+        public static string updatessWebService = "https://dl.gorilladevs.com/launcher_versions.json";
         public static string modpacksupload = "https://api.twickt.com/modpacksupload.php";
 
         public static string javaDownloadURL32 = "java8_152";

@@ -36,14 +36,33 @@ namespace Twickt_Launcher.Classes
             }
             if (Properties.Settings.Default["JavaPath"].ToString() == "Empty")
             {
-                return false;
+                if (Directory.Exists(config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64) ||
+                    Directory.Exists(config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL32))
+                {
+                    if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
+                    {
+                        Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
+                        Properties.Settings.Default.Save();
+                    }
+                    else
+                    {
+                        Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
+                        Properties.Settings.Default.Save();
+                    }
+                    return true;
+                }
+                else
+                    return false;
             }
             else
             {
-                    if (Directory.Exists(Properties.Settings.Default["JavaPath"].ToString()))
-                        return true;
-                    else
-                        return false;
+                if (Directory.Exists(Properties.Settings.Default["JavaPath"].ToString()))
+                {
+                    return true;
+                }
+                else{
+                    return false;
+                }
             }
         }
 
@@ -57,7 +76,6 @@ namespace Twickt_Launcher.Classes
             Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.load.Visibility = Visibility.Hidden;
             Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("pleaseWait");
             Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingJava");
             Pages.SplashScreen.singleton.secondLabel.Content = "";
@@ -111,16 +129,31 @@ namespace Twickt_Launcher.Classes
 
         public static void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            Pages.SplashScreen.singleton.progressbar.Value = e.ProgressPercentage;
-            Pages.SplashScreen.singleton.kbps.Content = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
-            Pages.SplashScreen.singleton.mbToDownload.Content = string.Format("{0} MB / {1} MB",
-            (e.BytesReceived / 1024d / 1024d).ToString("0"),
-            (e.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
+            try
+            {
+                Pages.SplashScreen.singleton.progressbar.Value = e.ProgressPercentage;
+                Pages.SplashScreen.singleton.kbps.Content = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                Pages.SplashScreen.singleton.mbToDownload.Content = string.Format("{0} MB / {1} MB",
+                (e.BytesReceived / 1024d / 1024d).ToString("0"),
+                (e.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
+            }
+            catch
+            {
+                MessageBox.Show("Unknown error calculating download speed. Could be DivideByZeroException");
+            }
+
         }
 
         private static async void Completed(object sender, AsyncCompletedEventArgs e)
         {
-            AverageSpeed = bytes_total / sw.Elapsed.Seconds;
+            try
+            {
+                AverageSpeed = bytes_total / sw.Elapsed.Seconds;
+            }
+            catch
+            {
+                MessageBox.Show("Unknown error calculating download speed. Could be DivideByZeroException");
+            }
             SessionData.AverageDownloadSpeed = AverageSpeed;
             if (AverageSpeed < 1000)
                 Properties.Settings.Default["download_threads"] = "8";

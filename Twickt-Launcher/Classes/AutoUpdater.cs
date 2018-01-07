@@ -47,51 +47,53 @@ namespace Twickt_Launcher.Classes
             }
             catch
             {
-                MessageBox.Show("Error updating");
+                MessageBox.Show("There was an error while checking for updates. If you keep seeing this error it could mean some url are broken and you must download manually the new version. visit https://gorilladevs.com/");
             }
 
             try
             {
-                dynamic json = JsonConvert.DeserializeObject(data);
-                var version = (string)json["LatestVersion"];
-                var versionurl = (string)json["LatestVersionURL"];
-                SessionData.latestVersion = version;
-                update = versionurl;
-                if (String.Compare(Properties.Settings.Default["version"].ToString(), version) < 0 || Properties.Settings.Default["version"].ToString() == "")
+                if (data != "")
                 {
-                    Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
-                    Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
-                    Pages.SplashScreen.singleton.load.Visibility = Visibility.Hidden;
-                    var test = new Dialogs.UpdateAvailable(Properties.Settings.Default["version"].ToString(), version);
-                    var result = await MaterialDesignThemes.Wpf.DialogHost.Show(test, "RootDialog");
-                    if (result.ToString() == "yes")
+                    dynamic json = JsonConvert.DeserializeObject(data);
+                    var version = (string)json["LatestVersion"];
+                    var versionurl = (string)json["LatestVersionURL"];
+                    SessionData.latestVersion = version;
+                    update = versionurl;
+                    if (String.Compare(Properties.Settings.Default["version"].ToString(), version) < 0 || Properties.Settings.Default["version"].ToString() == "")
                     {
-                        Window1.versionok = false;
-                        Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updatingLauncher");
-                        Pages.SplashScreen.singleton.secondLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
-                        Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + "...";
-                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("updateFound"));
-                    }
-                    else
-                    {
+                        var test = new Dialogs.UpdateAvailable(Properties.Settings.Default["version"].ToString(), version);
+                        var result = await MaterialDesignThemes.Wpf.DialogHost.Show(test, "RootDialog");
+                        if (result.ToString() == "yes")
+                        {
+                            Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
+                            Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
+                            Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
+                            Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
+                            Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
+                            Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
+                            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
+                            Window1.versionok = false;
+                            Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updatingLauncher");
+                            Pages.SplashScreen.singleton.secondLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
+                            Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + "...";
+                            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("updateFound"));
+                        }
+                        else
+                        {
 
-                    }
-                }
-                else
-                {
-                    if (Pages.Options.optionsrequest == true)
-                    {
-                        await DialogHost.Show(new Dialogs.OptionsUpdates(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"), 248, 40), "RootDialog", ExtendedOpenedEventHandler);
-                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
+                        }
                     }
                     else
                     {
-                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
+                        if (Pages.Options.optionsrequest == true)
+                        {
+                            await DialogHost.Show(new Dialogs.OptionsUpdates(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"), 248, 40), "RootDialog", ExtendedOpenedEventHandler);
+                            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
+                        }
+                        else
+                        {
+                            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
+                        }
                     }
                 }
             }
@@ -100,7 +102,7 @@ namespace Twickt_Launcher.Classes
             }
             catch (Exception e)
             {
-                MessageBox.Show("ERROR"); ;
+                MessageBox.Show("Unknown error parsing updates"); ;
             }
             return update;
         }
@@ -121,6 +123,7 @@ namespace Twickt_Launcher.Classes
                     await webClient.DownloadFileTaskAsync(new Uri(url), Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename);
                     Properties.Settings.Default["version"] = SessionData.latestVersion;
                     Properties.Settings.Default.Save();
+                    
                 }
                 catch(UriFormatException)
                 {
@@ -128,10 +131,30 @@ namespace Twickt_Launcher.Classes
                 }
                 catch(Exception e)
                 {
-                    File.Delete(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename);
-                    MessageBox.Show(e.Message);
+                    MessageBox.Show("Unknown error downloading new version");
                     return;
                 }
+                Pages.SplashScreen.singleton.postUpdate.Visibility = Visibility.Visible;
+                Pages.SplashScreen.singleton.postUpdateText.Visibility = Visibility.Visible;
+                Pages.SplashScreen.singleton.postUpdatePreText.Visibility = Visibility.Visible;
+                Pages.SplashScreen.singleton.postUpdatePostText.Visibility = Visibility.Visible;
+                Pages.SplashScreen.singleton.postUpdateText.Content = "5";
+                await Task.Delay(1000);
+                
+                Pages.SplashScreen.singleton.postUpdateText.Content = "4";
+                await Task.Delay(1000);
+                
+                Pages.SplashScreen.singleton.postUpdateText.Content = "3";
+                await Task.Delay(1000);
+                
+                Pages.SplashScreen.singleton.postUpdateText.Content = "2";
+                await Task.Delay(1000);
+                
+                Pages.SplashScreen.singleton.postUpdateText.Content = "1";
+                await Task.Delay(1000);
+
+                Pages.SplashScreen.singleton.postUpdateText.Content = "0";
+
                 Properties.Settings.Default["firstTimeHowTo"] = "true";
                 Properties.Settings.Default["justUpdated"] = "true";
                 Properties.Settings.Default.Save();
@@ -173,6 +196,7 @@ namespace Twickt_Launcher.Classes
 
         private static async void Completed(object sender, AsyncCompletedEventArgs e)
         {
+            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
             sw.Reset();
             if (e.Cancelled == true)
             {
@@ -181,7 +205,6 @@ namespace Twickt_Launcher.Classes
             }
             else
             {
-                MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("openingNewVersion"));
                 //await DialogHost.Show(new Dialogs.OptionsUpdates("In a few moments we will open the new version"), "RootDialog", ExtendedOpenedEventHandler);
             }
 

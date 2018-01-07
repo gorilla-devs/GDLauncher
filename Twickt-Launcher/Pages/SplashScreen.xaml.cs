@@ -92,11 +92,10 @@ namespace Twickt_Launcher.Pages
                     try
                     {
                         await JAVAInstaller.DownloadJava();
-
                     }
                     catch
                     {
-                        MessageBox.Show("Error downloading JAVA");
+                        MessageBox.Show("Error setting up java. If this error keeps showing up, consider contacting GorillaDevs on our website: https://gorilladevs.com");
                     }
                 }
 

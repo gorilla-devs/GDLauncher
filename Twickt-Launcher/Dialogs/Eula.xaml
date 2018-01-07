@@ -150,10 +150,6 @@
                         </TextBlock>
                         <Label FontSize="20">13. GorillaDevs Launcher</Label>
                         <TextBlock TextWrapping="Wrap" FontSize="13">
-
-                        </TextBlock>
-                        <Label FontSize="20">About Us</Label>
-                        <TextBlock TextWrapping="Wrap" FontSize="13">
                             <LineBreak /><LineBreak />GorillaDevs is not associated with Mojang Synergies AB, Microsoft, Forge Development LLC and Minecraft in any way. The game "Minecraft" itself is developed by Mojang Synergies AB. Neither Mojang Synergies AB nor Microsoft are responsable for the contents, files and Services available on, but not limited to, this website.
                             <LineBreak /><LineBreak />By using GorillaDevs's Launcher and related Services, User affirms to have an original licence of Minecraft, legally bought on their website and to accept and agree  Mojang Synergies AB's TOS (https://account.mojang.com/terms).
                             <LineBreak /><LineBreak />GorillaDevs does not host any file of the game itself, all the files are downloaded directly from the creator's website.
