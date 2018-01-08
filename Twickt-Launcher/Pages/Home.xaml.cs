@@ -340,13 +340,14 @@ namespace Twickt_Launcher.Pages
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            Window1.singleton.MainPage.Navigate(new Pages.Options());
-            Window1.singleton.NavigationMenu.SelectedIndex = 1;
-        }
+			// Window1.singleton.MainPage.Navigate(new Pages.Options());
+			// Window1.singleton.NavigationMenu.SelectedIndex = 1;
+			await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Options(), null, null);
+		}
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+		private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             debugconsole.Show();
         }

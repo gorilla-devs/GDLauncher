@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Twickt_Launcher.Dialogs.Options"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
+             mc:Ignorable="d" Height="600" Width="630" Background="White">
+	<DockPanel>
+		<StackPanel DockPanel.Dock="Left" Width="140" Orientation="Vertical">
+			<Button Name="general" Margin="10" Foreground="White" Click="general_Click">Generali</Button>
+			<Button Name="graphics" Margin="10" Foreground="White" Click="graphics_Click">Grafica</Button>
+			<Button Name="preferences" Margin="10" Foreground="White" Click="preferences_Click">Preferenze</Button>
+			<Button Name="others" Margin="10" Foreground="White" Click="others_Click">Altro</Button>
+		</StackPanel>
+		<Rectangle Width="1" Fill="Black"></Rectangle>
+		<materialDesign:Transitioner Name="transitioner" AutoApplyTransitionOrigins="True" SelectedIndex="0" DockPanel.Dock="Right" Margin="20">
+			<materialDesign:TransitionerSlide>
+				<Label>Generali</Label>
+			</materialDesign:TransitionerSlide>
+			<materialDesign:TransitionerSlide>
+				<Label>Grafica</Label>
+			</materialDesign:TransitionerSlide>
+			<materialDesign:TransitionerSlide>
+				<Label>Preferenze</Label>
+			</materialDesign:TransitionerSlide>
+			<materialDesign:TransitionerSlide>
+				<Label>Altro</Label>
+			</materialDesign:TransitionerSlide>
+		</materialDesign:Transitioner>
+	</DockPanel>
+</UserControl>
