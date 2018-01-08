@@ -26,36 +26,22 @@
             <materialDesign:Card Height="280" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel Margin="20 10 20 0">
                     <DockPanel>
-                        <Label>Installing Modpack:</Label>
-                        <Label Name="modpackname" HorizontalAlignment="Right">NOME</Label>
-                    </DockPanel>
-                    <DockPanel>
-                        <Label>Required MC Version:</Label>
-                        <Label Name="mc_version" HorizontalAlignment="Right">VERSIONE</Label>
-                    </DockPanel>
-                    <DockPanel>
-                        <Label>Required Forge Version:</Label>
-                        <Label Name="forge_version" HorizontalAlignment="Right">VERSIONE</Label>
-                    </DockPanel>
-                    <DockPanel>
-                        <Label>Number of Mods:</Label>
-                        <Label Name="mods_numb" HorizontalAlignment="Right">100</Label>
-                    </DockPanel>
-                    <DockPanel>
-                        <Label>Creation date:</Label>
-                        <Label Name="creation_date" HorizontalAlignment="Right">DATA</Label>
-                    </DockPanel>
-                    <DockPanel>
-                        <Label VerticalAlignment="Center">Instance Name:</Label>
+                        <Label VerticalAlignment="Center">Pack Name:</Label>
                         <TextBox Name="instanceTextName" HorizontalAlignment="Right" Width="200" materialDesign:HintAssist.Hint="Instance Name" materialDesign:HintAssist.IsFloating="True"></TextBox>
                     </DockPanel>
                     <DockPanel Margin="0 10 0 0">
-                        <Label VerticalAlignment="Center">Modpack Version:</Label>
+                        <Label VerticalAlignment="Center">Versions:</Label>
                         <ComboBox Name="versionsList" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged"/>
                     </DockPanel>
-                    <DockPanel HorizontalAlignment="Center" Margin="0 10 0 0">
+                    <DockPanel Margin="0 10 0 0">
+                        <CheckBox Name="forgeAllVersions" Visibility="Hidden" Content="Show All Versions" Width="200" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignCheckBox}" Checked="forgeAllVersions_Checked" Unchecked="forgeAllVersions_Unchecked"/>
+                    </DockPanel>
+                    <DockPanel Margin="0 10 0 0">
+                        <Label Name="forgeVersionsText" VerticalAlignment="Center" Visibility="Hidden">Forge Versions:</Label>
+                        <ComboBox Name="forgeVersions" Width="200" Visibility="Hidden" HorizontalAlignment="Right" SelectedIndex="0"/>                    </DockPanel>
+                    <DockPanel HorizontalAlignment="Center" Margin="0 70 0 0">
                         <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
-                        <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="35 0 0 0" Click="install_Click">Install</Button>
+                        <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="35 0 0 0" IsEnabled="False" Click="install_Click">Install</Button>
                     </DockPanel>
                     <ProgressBar Name="loading" Background="#4CAF50" Width="400" Margin="0 10 0 0" IsIndeterminate="True" Visibility="Hidden"></ProgressBar>
 

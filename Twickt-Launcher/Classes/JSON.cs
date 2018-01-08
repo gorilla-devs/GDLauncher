@@ -60,9 +60,7 @@ namespace Twickt_Launcher.Classes
         //FORMATO ARRAY:  name, sha1, path, url
         public static List<string[]> urls = new List<string[]>();
         static int arch = ComputerInfoDetect.GetComputerArchitecture();
-        public static RemoteModpacks remotemodpacks = new RemoteModpacks();
-        public static List<string> downloadingVersion; //await RemoteModpacks.GetModpackInfo(modpackname);
-                                                       //forge_version, mc-version, json, creation_date
+        //public static RemoteModpacks remotemodpacks = new RemoteModpacks();
                                                        
         public static JSONModpack packjson = new JSONModpack();
         public static Stopwatch sw = new Stopwatch();
@@ -91,6 +89,7 @@ namespace Twickt_Launcher.Classes
                 var url = "";
                 var name = "";
                 packjson.mainClass = json.mainClass;
+                
                 packjson.arguments = json.minecraftArguments;
                 packjson.version_type = json.type;
                 foreach (var item in json["downloads"]["client"])
@@ -456,7 +455,6 @@ namespace Twickt_Launcher.Classes
 
             try
             {
-                downloadingVersion = await Task.Run(() => RemoteModpacks.GetModpackInfo(modpackname));
 
                 List<string[]> list = new List<string[]>();
                 List<string[]> forge = new List<string[]>();
@@ -476,8 +474,6 @@ namespace Twickt_Launcher.Classes
                     forge = await Task.Run(() => AnalyzeForgeLibraries(modpackname, version, instanceName));
                     list.AddRange(forge);
                     Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Mods";
-                    List<string[]> mods = await Task.Run(() => Classes.RemoteModpacks.GetModpacksFiles(modpackname, modpackVersion, instanceName));
-                    list.AddRange(mods);
                 }
                 //AGGIUNGE LE LIBRERIE AL JSON
                 if (forgeVersion != "false")

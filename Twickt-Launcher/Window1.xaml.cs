@@ -103,12 +103,12 @@ namespace Twickt_Launcher
                     case "System.Windows.Controls.ListBoxItem: Debug":
                         MainPage.Navigate(new Pages.Debug());
                         break;
-                    case "System.Windows.Controls.ListBoxItem: Installed Modpacks":
+                    /*case "System.Windows.Controls.ListBoxItem: Installed Modpacks":
                         MainPage.Navigate(new Pages.Modpacks());
                         break;
                     case "System.Windows.Controls.ListBoxItem: Modpacks Market":
                         MainPage.Navigate(new Pages.ModpacksMarket());
-                        break;
+                        break;*/
                     case "System.Windows.Controls.ListBoxItem: Report a bug":
                         MainPage.Navigate(new Pages.Report_Bug());
                         break;

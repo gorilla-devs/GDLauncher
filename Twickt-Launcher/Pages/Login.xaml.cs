@@ -79,11 +79,8 @@ namespace Twickt_Launcher.Pages
             }
             else
             {
-                if (Properties.Settings.Default["startingPage"].ToString() == "Home")
-                {
-                    Window1.singleton.MainPage.Navigate(new Pages.Home());
-                    Window1.singleton.NavigationMenu.SelectedIndex = 0;
-                }
+                Window1.singleton.MainPage.Navigate(new Pages.Home());
+                Window1.singleton.NavigationMenu.SelectedIndex = 0;
             }
             loading.Visibility = Visibility.Hidden;
             button.IsEnabled = true;

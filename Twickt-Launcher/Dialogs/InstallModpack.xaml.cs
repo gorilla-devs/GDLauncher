@@ -35,6 +35,7 @@ namespace Twickt_Launcher.Dialogs
         private static Classes.Downloader downloader;
         public static CancellationTokenSource ctoken;
         public static string whatToInstall = null;
+        public static List<string> forgeAllVersionsList = new List<string>();
         public InstallModpack()
         {
             InitializeComponent();
@@ -61,45 +62,29 @@ namespace Twickt_Launcher.Dialogs
                 var versions = parsed.versions;
                 foreach (var item in versions)
                 {
-                    versionsList.Items.Add((string)item.id);
-                }
-                await Task.Delay(100);
-                foreach (var item in versions)
-                {
-                    if (versionsList.Text == (string)item.id)
+                    if (!Regex.IsMatch((string)item.id, "[a-z]"))
                     {
-                        modpackname.Content = (string)item.id;
-                        mc_version.Content = (string)item.id;
-                        forge_version.Content = "false";
-                        mods_numb.Content = "0";
-                        creation_date.Content = (string)item.releaseTime;
+                        versionsList.Items.Add((string)item.id);
                     }
                 }
+                await Task.Delay(100);
             }
             else
             {
-                var client = new WebClient();
-                var values = new NameValueCollection();
-                values["target"] = "specific";
-                values["name"] = name;
-
-                var response = client.UploadValues(config.modpacksWebService, values);
-
-                var responseString = Encoding.Default.GetString(response);
-                foreach (var x in responseString.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+                dynamic json = JsonConvert.DeserializeObject(Encoding.Default.GetString(Pages.Home.singleton.forgeJSON));
+                foreach (var x in json["promos"])
                 {
-                    var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                    //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
-                    versionsList.Items.Add(z[0]);
+                    if(!versionsList.Items.Contains(json["number"][x.Value.ToString()]["mcversion"]))
+                        versionsList.Items.Add(json["number"][x.Value.ToString()]["mcversion"]);
                 }
             }
+            versionsList.SelectedIndex = 0;
             loading.Visibility = Visibility.Hidden;
 
         }
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             await Task.Delay(400);
-            await LoadPackData();
         }
 
         private async void versionsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -110,42 +95,44 @@ namespace Twickt_Launcher.Dialogs
                 await Task.Delay(100);
                 dynamic parsed = JsonConvert.DeserializeObject(vanillajson);
                 var versions = parsed.versions;
-                foreach (var item in versions)
-                {
-                    if (versionsList.Text == (string)item.id)
-                    {
-                        modpackname.Content = (string)item.id;
-                        mc_version.Content = (string)item.id;
-                        forge_version.Content = "false";
-                        mods_numb.Content = "0";
-                        creation_date.Content = (string)item.releaseTime;
-                    }
-                }
             }
             else
             {
-                var client = new WebClient();
-                var values = new NameValueCollection();
-                values["target"] = "specific";
-                values["name"] = name;
-
-                var response = await client.UploadValuesTaskAsync(config.modpacksWebService, values);
-
-                var responseString = Encoding.Default.GetString(response);
-                foreach (var x in responseString.Split(new string[] { "<<<||;;||>>>" }, StringSplitOptions.RemoveEmptyEntries))
+                if (forgeAllVersions.IsChecked.Value)
                 {
-                    var z = x.Split(new string[] { "<<|;|>>" }, StringSplitOptions.None);
-                    //DIVIDE LE STRINGHE RESTITUENDO z[0] (il nome della modpack) e z[1] (la descrizione della modpack)
-                    if (versionsList.Text == z[0])
+                    dynamic json = JsonConvert.DeserializeObject(Encoding.Default.GetString(Pages.Home.singleton.forgeJSON));
+                    try
                     {
-                        JObject jObj = (JObject)JsonConvert.DeserializeObject(z[3]);
-                        modpackname.Content = z[0];
-                        mc_version.Content = z[4];
-                        forge_version.Content = z[2];
-                        mods_numb.Content = jObj["libraries"].Count();
+                        forgeVersions.Items.Clear();
+                        foreach (var x in json["number"])
+                        {
 
-                        creation_date.Content = z[5];
+                            if (Convert.ToString(x.Value.mcversion) == versionsList.SelectedValue.ToString())
+                            {
+                                forgeVersions.Items.Add(Convert.ToString(x.Value.version));
+                            }
+                        }
                     }
+                    catch { }
+                    forgeVersions.SelectedIndex = 0;
+                }
+                else
+                {
+                    dynamic json = JsonConvert.DeserializeObject(Encoding.Default.GetString(Pages.Home.singleton.forgeJSON));
+                    try
+                    {
+                        forgeVersions.Items.Clear();
+                        foreach (var x in json["number"])
+                        {
+                            IDictionary<string, JToken> dictionary = json["promos"];
+                            if (dictionary.ContainsKey(Convert.ToString(x.Name)))
+                            {
+                                forgeVersions.Items.Add(Convert.ToString(x.Value.version));
+                            }
+                        }
+                    }
+                    catch { }
+                    forgeVersions.SelectedIndex = 0;
                 }
             }
             loading.Visibility = Visibility.Hidden;
@@ -174,7 +161,13 @@ namespace Twickt_Launcher.Dialogs
             transition.SelectedIndex = 2;
             workingThreadsText.Content = Properties.Settings.Default["download_threads"].ToString();
             modpackName.Content = versionsList.Text;
-            var files = await Classes.JSON.GetFiles(name, instanceTextName.Text, mc_version.Content.ToString(), forge_version.Content.ToString(), versionsList.Text);
+            string forgeVersion = "false";
+            try
+            {
+                forgeVersion = forgeVersions.SelectedValue.ToString();
+            }
+            catch { }
+            var files = await Classes.JSON.GetFiles(name, instanceTextName.Text, versionsList.SelectedValue.ToString(), forgeVersion, versionsList.Text);
             cancelButton.IsEnabled = true;
             downloader = new Classes.Downloader();
             await downloader.MCDownload(files, instanceTextName.Text, ctoken.Token);
@@ -208,15 +201,68 @@ namespace Twickt_Launcher.Dialogs
             transition.SelectedIndex = 1;
             await Task.Delay(300);
             await LoadPackData();
+            install.IsEnabled = true;
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             name = "Forge Stock";
+            forgeAllVersions.Visibility = Visibility.Visible;
+            var client = new WebClient();
+            loading.IsIndeterminate = false;
+            forgeAllVersions.IsEnabled = false;
+            forgeVersions.Visibility = Visibility.Visible;
+            forgeVersionsText.Visibility = Visibility.Visible;
+            forgeVersions.IsEnabled = false;
+            versionsList.IsEnabled = false;
+            client.DownloadProgressChanged += (s, ee) =>
+            {
+                loading.Value = ee.ProgressPercentage;
+            };
             transition.SelectedIndex = 1;
+            loading.Visibility = Visibility.Visible;
             await Task.Delay(300);
-            await LoadPackData();
+            if(Pages.Home.singleton.forgeJSON == null)
+            {
+                HttpWebRequest request = (HttpWebRequest)System.Net.WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
+                request.Method = "HEAD";
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                string disposition = response.Headers["Content-Length"];
+                Console.WriteLine(disposition);
+                Pages.Home.singleton.forgeJSON = await client.DownloadDataTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
 
+            }
+            dynamic json = JsonConvert.DeserializeObject(Encoding.Default.GetString(Pages.Home.singleton.forgeJSON));
+            foreach (var x in json["number"])
+            {
+                forgeAllVersionsList.Add(Convert.ToString(x.Value.mcversion));
+            }
+            forgeAllVersionsList = forgeAllVersionsList.Distinct().ToList();
+            loading.IsIndeterminate = true;
+            await LoadPackData();
+            install.IsEnabled = true;
+            forgeVersions.IsEnabled = true;
+            forgeAllVersions.IsEnabled = true;
+            loading.Visibility = Visibility.Hidden;
+            versionsList.IsEnabled = true;
+
+
+        }
+
+        private void forgeAllVersions_Checked(object sender, RoutedEventArgs e)
+        {
+            versionsList.Items.Clear();
+            foreach (var item in forgeAllVersionsList)
+            {
+                versionsList.Items.Add(item);
+            }
+            versionsList.SelectedIndex = versionsList.Items.Count - 1;
+        }
+
+        private async void forgeAllVersions_Unchecked(object sender, RoutedEventArgs e)
+        {
+            versionsList.Items.Clear();
+            await LoadPackData();
         }
     }
 }

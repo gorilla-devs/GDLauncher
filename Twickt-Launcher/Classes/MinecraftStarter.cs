@@ -24,6 +24,7 @@ namespace Twickt_Launcher.Classes
             loading = new Dialogs.ModpackLoading(true, Pages.SplashScreen.singleton.manager.GetString("starting") + "...");
                         MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", OpenEvent);
             loading.forgeProgress.Value = 15;
+            await Task.Delay(1000);
             var json = File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
             dynamic decoded = JsonConvert.DeserializeObject(json);
             var forge = decoded.forgeVersion;

@@ -88,7 +88,7 @@ namespace Twickt_Launcher.Windows
 
         private void button3_Click(object sender, RoutedEventArgs e)
         {
-            Window1.singleton.MainPage.Navigate(new Pages.Admin());
+            //Window1.singleton.MainPage.Navigate(new Pages.Admin());
             //Window1.singleton.MenuToggleButton.IsEnabled = true;
         }
 

@@ -176,5 +176,17 @@ namespace Twickt_Launcher.Properties {
                 this["eula"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string forgeJSONContentLength {
+            get {
+                return ((string)(this["forgeJSONContentLength"]));
+            }
+            set {
+                this["forgeJSONContentLength"] = value;
+            }
+        }
     }
 }

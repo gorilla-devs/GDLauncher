@@ -163,14 +163,9 @@
     <Compile Include="Classes\Downloader.cs" />
     <Compile Include="Classes\JAVAInstaller.cs" />
     <Compile Include="Classes\JSON.cs" />
-    <Compile Include="Classes\LocalModpacks.cs" />
     <Compile Include="Classes\MinecraftStarter.cs" />
-    <Compile Include="Classes\RemoteModpacks.cs" />
     <Compile Include="config.cs" />
     <Compile Include="DialogHostExtensions.cs" />
-    <Compile Include="Dialogs\AddPack.xaml.cs">
-      <DependentUpon>AddPack.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\Changelog.xaml.cs">
       <DependentUpon>Changelog.xaml</DependentUpon>
     </Compile>
@@ -183,17 +178,11 @@
     <Compile Include="Dialogs\InstallModpack.xaml.cs">
       <DependentUpon>InstallModpack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ModpackFullScreen.xaml.cs">
-      <DependentUpon>ModpackFullScreen.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\ModpackLoading.xaml.cs">
       <DependentUpon>ModpackLoading.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\OptionsUpdates.xaml.cs">
       <DependentUpon>OptionsUpdates.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Register.xaml.cs">
-      <DependentUpon>Register.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\SyncToCloud.xaml.cs">
       <DependentUpon>SyncToCloud.xaml</DependentUpon>
@@ -211,9 +200,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>lang.it.resx</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Admin.xaml.cs">
-      <DependentUpon>Admin.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\Debug.xaml.cs">
       <DependentUpon>Debug.xaml</DependentUpon>
     </Compile>
@@ -223,20 +209,11 @@
     <Compile Include="Pages\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Modpacks.xaml.cs">
-      <DependentUpon>Modpacks.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ModpacksMarket.xaml.cs">
-      <DependentUpon>ModpacksMarket.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\Report Bug.xaml.cs">
       <DependentUpon>Report Bug.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\Upload_Your_Pack.xaml.cs">
-      <DependentUpon>Upload_Your_Pack.xaml</DependentUpon>
     </Compile>
     <Compile Include="SessionData.cs" />
     <Compile Include="Window1.xaml.cs">
@@ -245,10 +222,6 @@
     <Compile Include="Windows\DebugOutputConsole.xaml.cs">
       <DependentUpon>DebugOutputConsole.xaml</DependentUpon>
     </Compile>
-    <Page Include="Dialogs\AddPack.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\Changelog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -265,10 +238,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ModpackFullScreen.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\ModpackLoading.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -277,19 +246,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\Register.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\SyncToCloud.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\UpdateAvailable.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\Admin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -305,14 +266,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\Modpacks.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ModpacksMarket.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Pages\Options.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -322,10 +275,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\SplashScreen.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\Upload_Your_Pack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
