@@ -26,7 +26,6 @@ namespace Twickt_Launcher
         public static string M_F_P = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\";
         public static string javaLocal = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\";
         public static string LocalModpacks = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\LocalModpacks\";
-        public static string loginWebService = "https://api.twickt.com/login.php";
         public static string bugReportWebService = "https://api.twickt.com/bugs.php";
         public static string changelogsWebService = "https://api.twickt.com/changelogs.php";
         public static string updatessWebService = "https://dl.gorilladevs.com/launcher_versions.json";

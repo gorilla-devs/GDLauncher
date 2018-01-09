@@ -20,8 +20,19 @@ namespace Twickt_Launcher
     /// </summary>
     public partial class App : Application
     {
-        void App_Startup(object sender, StartupEventArgs e)
+        async void App_Startup(object sender, StartupEventArgs e)
         {
+            var externalip = await new WebClient().DownloadDataTaskAsync(new Uri("http://icanhazip.com"));
+            var analytics = await new WebClient().DownloadDataTaskAsync(
+                new Uri(
+                    "https://www.google-analytics.com/collect?v=1&tid=UA-112169830-1&cid="+externalip+ "&t=pageview")
+                
+                );
+
+
+            Console.WriteLine(Encoding.Default.GetString(analytics));
+
+
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
         }
 

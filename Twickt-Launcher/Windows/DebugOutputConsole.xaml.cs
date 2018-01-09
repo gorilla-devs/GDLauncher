@@ -97,5 +97,11 @@ namespace Twickt_Launcher.Windows
             Clipboard.SetText(debug.Text);
             MessageBox.Show("Copied to clipboard");
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+                e.Cancel = true;
+                Visibility = Visibility.Hidden;
+        }
     }
 }

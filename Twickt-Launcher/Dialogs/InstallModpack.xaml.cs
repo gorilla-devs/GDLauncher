@@ -71,7 +71,7 @@ namespace Twickt_Launcher.Dialogs
             }
             else
             {
-                dynamic json = JsonConvert.DeserializeObject(Encoding.Default.GetString(Pages.Home.singleton.forgeJSON));
+                dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
                 foreach (var x in json["promos"])
                 {
                     if(!versionsList.Items.Contains(json["number"][x.Value.ToString()]["mcversion"]))
@@ -98,9 +98,10 @@ namespace Twickt_Launcher.Dialogs
             }
             else
             {
+                //TUTTE LE VERSIONI
                 if (forgeAllVersions.IsChecked.Value)
                 {
-                    dynamic json = JsonConvert.DeserializeObject(Encoding.Default.GetString(Pages.Home.singleton.forgeJSON));
+                    dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
                     try
                     {
                         forgeVersions.Items.Clear();
@@ -116,22 +117,32 @@ namespace Twickt_Launcher.Dialogs
                     catch { }
                     forgeVersions.SelectedIndex = 0;
                 }
+                //SOLO QUELLE PROMOS
                 else
                 {
-                    dynamic json = JsonConvert.DeserializeObject(Encoding.Default.GetString(Pages.Home.singleton.forgeJSON));
+                    dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
                     try
                     {
+                        List<string> promos = new List<string>();
+                        foreach (var x in json["promos"])
+                        {
+                            promos.Add(x.Value.ToString());
+                        }
                         forgeVersions.Items.Clear();
+
                         foreach (var x in json["number"])
                         {
-                            IDictionary<string, JToken> dictionary = json["promos"];
-                            if (dictionary.ContainsKey(Convert.ToString(x.Name)))
+                            if (promos.Contains(Convert.ToString(x.Value.build)))
                             {
-                                forgeVersions.Items.Add(Convert.ToString(x.Value.version));
+                                if (Convert.ToString(x.Value.mcversion) == versionsList.SelectedValue.ToString())
+                                {
+                                    forgeVersions.Items.Add(Convert.ToString(x.Value.version));
+                                }
                             }
                         }
                     }
-                    catch { }
+                    catch(Exception ex) {
+                    }
                     forgeVersions.SelectedIndex = 0;
                 }
             }
@@ -159,7 +170,6 @@ namespace Twickt_Launcher.Dialogs
             }
             ctoken = new CancellationTokenSource();
             transition.SelectedIndex = 2;
-            workingThreadsText.Content = Properties.Settings.Default["download_threads"].ToString();
             modpackName.Content = versionsList.Text;
             string forgeVersion = "false";
             try
@@ -222,17 +232,28 @@ namespace Twickt_Launcher.Dialogs
             transition.SelectedIndex = 1;
             loading.Visibility = Visibility.Visible;
             await Task.Delay(300);
-            if(Pages.Home.singleton.forgeJSON == null)
+            HttpWebRequest request = (HttpWebRequest)System.Net.WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
+            request.Method = "HEAD";
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            string disposition = response.Headers["Content-Length"];
+
+            //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
+            if (Pages.Home.singleton.forgeJSON == null)
             {
-                HttpWebRequest request = (HttpWebRequest)System.Net.WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
-                request.Method = "HEAD";
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                string disposition = response.Headers["Content-Length"];
-                Console.WriteLine(disposition);
-                Pages.Home.singleton.forgeJSON = await client.DownloadDataTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
+                if (!File.Exists(config.M_F_P + "forgeVersions.json") || Properties.Settings.Default.forgeJSONContentLength != disposition)
+                {
+                    await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
+                    Properties.Settings.Default.forgeJSONContentLength = disposition;
+                    Properties.Settings.Default.Save();
+                }
+                await Task.Delay(300);
+                using (StreamReader r = new StreamReader(config.M_F_P + "forgeVersions.json"))
+                {
+                    Pages.Home.singleton.forgeJSON = await r.ReadToEndAsync();
+                }
 
             }
-            dynamic json = JsonConvert.DeserializeObject(Encoding.Default.GetString(Pages.Home.singleton.forgeJSON));
+            dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
             foreach (var x in json["number"])
             {
                 forgeAllVersionsList.Add(Convert.ToString(x.Value.mcversion));
@@ -251,6 +272,7 @@ namespace Twickt_Launcher.Dialogs
 
         private void forgeAllVersions_Checked(object sender, RoutedEventArgs e)
         {
+            forgeVersions.Items.Clear();
             versionsList.Items.Clear();
             foreach (var item in forgeAllVersionsList)
             {
@@ -261,6 +283,7 @@ namespace Twickt_Launcher.Dialogs
 
         private async void forgeAllVersions_Unchecked(object sender, RoutedEventArgs e)
         {
+            forgeVersions.Items.Clear();
             versionsList.Items.Clear();
             await LoadPackData();
         }

@@ -5,28 +5,108 @@
 			 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
-             mc:Ignorable="d" Height="600" Width="630" Background="White">
+             mc:Ignorable="d" Height="500" Width="580" Background="White" Loaded="UserControl_Loaded">
 	<DockPanel>
 		<StackPanel DockPanel.Dock="Left" Width="140" Orientation="Vertical">
-			<Button Name="general" Margin="10" Foreground="White" Click="general_Click">Generali</Button>
+			<Button Name="general" IsEnabled="False" Margin="10" Foreground="White" Click="general_Click">Generali</Button>
 			<Button Name="graphics" Margin="10" Foreground="White" Click="graphics_Click">Grafica</Button>
 			<Button Name="preferences" Margin="10" Foreground="White" Click="preferences_Click">Preferenze</Button>
 			<Button Name="others" Margin="10" Foreground="White" Click="others_Click">Altro</Button>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 215 0 0">
+                <Label>Version: </Label>
+                <Label Name="versionINFO"></Label>
+            </StackPanel>
+            <Button Name="closeDialog" Margin="10 10 10 10" Foreground="White" Click="closeDialog_Click">Close</Button>
 		</StackPanel>
-		<Rectangle Width="1" Fill="Black"></Rectangle>
-		<materialDesign:Transitioner Name="transitioner" AutoApplyTransitionOrigins="True" SelectedIndex="0" DockPanel.Dock="Right" Margin="20">
-			<materialDesign:TransitionerSlide>
-				<Label>Generali</Label>
-			</materialDesign:TransitionerSlide>
-			<materialDesign:TransitionerSlide>
-				<Label>Grafica</Label>
-			</materialDesign:TransitionerSlide>
-			<materialDesign:TransitionerSlide>
-				<Label>Preferenze</Label>
-			</materialDesign:TransitionerSlide>
-			<materialDesign:TransitionerSlide>
-				<Label>Altro</Label>
-			</materialDesign:TransitionerSlide>
-		</materialDesign:Transitioner>
-	</DockPanel>
+        <StackPanel Margin="20">
+            <materialDesign:Card Height="415" Width="400" Padding="4">
+                <materialDesign:Transitioner SelectedIndex="0" Name="transitioner" AutoApplyTransitionOrigins="True" DockPanel.Dock="Right" Margin="20">
+                    <materialDesign:TransitionerSlide>
+                        <materialDesign:TransitionerSlide.BackwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.BackwardWipe>
+                        <materialDesign:TransitionerSlide.ForwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.ForwardWipe>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label>Dedicated RAM to MC</Label>
+                                <ComboBox x:Name="ram" Margin="120 0 0 0" VerticalAlignment="Top" Height="30" Width="67"/>
+                            </StackPanel>
+                            <Separator Margin="0 20 0 20"></Separator>
+                            <StackPanel Orientation="Horizontal">
+                                <Label>Link Mojang Account</Label>
+                                <Button Name="manageMojangAccount" Margin="100 0 0 0" Foreground="White" VerticalAlignment="Top" Height="30" Width="100" Content="Manage" Click="manageMojangAccount_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </materialDesign:TransitionerSlide>
+                    <materialDesign:TransitionerSlide>
+                        <materialDesign:TransitionerSlide.BackwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.BackwardWipe>
+                        <materialDesign:TransitionerSlide.ForwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.ForwardWipe>
+                        <Label>Grafica</Label>
+                    </materialDesign:TransitionerSlide>
+                    <materialDesign:TransitionerSlide>
+                        <materialDesign:TransitionerSlide.BackwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.BackwardWipe>
+                        <materialDesign:TransitionerSlide.ForwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.ForwardWipe>
+                        <Label>Preferenze</Label>
+                    </materialDesign:TransitionerSlide>
+                    <materialDesign:TransitionerSlide>
+                        <materialDesign:TransitionerSlide.BackwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.BackwardWipe>
+                        <materialDesign:TransitionerSlide.ForwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.ForwardWipe>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label VerticalAlignment="Center">Parallel Downloads</Label>
+                                <ComboBox x:Name="downloadThreads" Width="67" Height="30" Margin="137 0 0 0"/>
+                            </StackPanel>
+                            <Separator Margin="0 20 0 20"></Separator>
+                            <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                                <Label VerticalAlignment="Center">Show Changelog on new update</Label>
+                                <CheckBox Margin="110 0 0 0" VerticalAlignment="Top" Height="30" Width="67"/>
+                            </StackPanel>
+                            <Separator Margin="0 20 0 20"></Separator>
+                            <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                                <Label VerticalAlignment="Center">Java Path</Label>
+                                <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="10 0 5 0" HorizontalScrollBarVisibility="Auto" Width="220">
+                                    <TextBox Name="JavaPath" IsEnabled="False" VerticalAlignment="Top" Height="30" MinWidth="220"/>
+                                </ScrollViewer>
+                                <Button Name="JavaPathFolderBrowser" Foreground="White" Click="JavaPathFolderBrowser_Click">
+                                    <materialDesign:PackIcon Kind="Folder"></materialDesign:PackIcon></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </materialDesign:TransitionerSlide>
+                    <materialDesign:TransitionerSlide>
+                        <materialDesign:TransitionerSlide.BackwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.BackwardWipe>
+                        <materialDesign:TransitionerSlide.ForwardWipe>
+                            <materialDesign:FadeWipe />
+                        </materialDesign:TransitionerSlide.ForwardWipe>
+                        <StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="20 0 20 0">
+                                <TextBox Name="mojangEmail" materialDesign:HintAssist.Hint="Mojang Email" materialDesign:HintAssist.IsFloating="True" Margin="0 0 0 10"></TextBox>
+                                <PasswordBox Name="mojangPassword" materialDesign:HintAssist.Hint="Mojang Password" materialDesign:HintAssist.IsFloating="True"></PasswordBox>
+                                <Button Name="mojangLoginBtn" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Click="mojangLoginBtn_Click">Login</Button>
+                                <TextBlock TextWrapping="Wrap">This is not yet working. Will be coming on next release (3.x)</TextBlock>
+                            </StackPanel>
+                            <Button Name="backToGeneral" Foreground="White" Width="80" HorizontalAlignment="Left" Margin="10 170 0 0" Click="backToGeneral_Click">Back</Button>
+                        </StackPanel>
+                    </materialDesign:TransitionerSlide>
+                </materialDesign:Transitioner>
+            </materialDesign:Card>
+        </StackPanel>
+        <materialDesign:Snackbar DockPanel.Dock="Bottom" Margin="-500 0 0 0" Name="snackbarSave">
+        </materialDesign:Snackbar>
+    </DockPanel>
 </UserControl>

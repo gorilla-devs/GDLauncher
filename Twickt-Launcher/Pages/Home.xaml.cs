@@ -35,7 +35,7 @@ namespace Twickt_Launcher.Pages
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
         public Windows.DebugOutputConsole debugconsole = new Windows.DebugOutputConsole();
         public static Home singleton;
-        public byte[] forgeJSON = null;
+        public string forgeJSON = null;
 
         public Home()
         {
@@ -82,13 +82,14 @@ namespace Twickt_Launcher.Pages
                     string modpackversion;
                     string modpackname;
                     string mcversion;
+                    string forge;
                     try
                     {
                         var json = System.IO.File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
                         dynamic jObj = JsonConvert.DeserializeObject(json);
-                        modpackname = jObj.modpackName;
                         modpackversion = jObj.modpackVersion;
                         mcversion = jObj.mc_version;
+                        forge = jObj.forgeVersion;
 
                     }
                     catch (FileNotFoundException ex)
@@ -161,30 +162,52 @@ namespace Twickt_Launcher.Pages
                     insiderStackPanel.Children.Add(datastackpanel);
 
 
-                    var modpackName = new Label();
-                    modpackName.HorizontalAlignment = HorizontalAlignment.Center;
-                    modpackName.Content = "Modpack Name: " + modpackname;
-                    datastackpanel.Children.Add(modpackName);
-
-                    var modpackVersion = new Label();
-                    modpackVersion.HorizontalAlignment = HorizontalAlignment.Center;
-                    modpackVersion.Content = "Modpack Version: " + modpackversion;
-                    datastackpanel.Children.Add(modpackVersion);
-
                     var minecraftversion = new Label();
                     minecraftversion.HorizontalAlignment = HorizontalAlignment.Center;
-                    minecraftversion.Content = "MC Version: " + mcversion;
+                    minecraftversion.Content = "Version: " + mcversion;
                     datastackpanel.Children.Add(minecraftversion);
+
+
+                    var ForgeVersion = new Label();
+                    ForgeVersion.HorizontalAlignment = HorizontalAlignment.Center;
+                    if (forge != "false")
+                    {
+                        ForgeVersion.Content = "Forge Version: " + forge;
+                    }
+                    else
+                    {
+                        ForgeVersion.Content = "Vanilla";
+                    }
+                    datastackpanel.Children.Add(ForgeVersion);
 
 
                     var buttonStackPanel = new StackPanel();
                     buttonStackPanel.Orientation = Orientation.Horizontal;
                     buttonStackPanel.HorizontalAlignment = HorizontalAlignment.Center;
-                    buttonStackPanel.Margin = new Thickness(12, 0, 12, 12);
+                    buttonStackPanel.Margin = new Thickness(12, 26, 12, 12);
                     datastackpanel.Children.Add(buttonStackPanel);
 
                     Style btnStyle = Application.Current.FindResource("MaterialDesignToolButton") as Style;
 
+
+                    var folderButton = new Button();
+                    var iconpackfolder = new MaterialDesignThemes.Wpf.PackIcon();
+                    iconpackfolder.Kind = MaterialDesignThemes.Wpf.PackIconKind.Folder;
+                    folderButton.Content = iconpackfolder;
+                    MaterialDesignThemes.Wpf.RippleAssist.SetIsCentered(folderButton, true);
+                    folderButton.Width = 30;
+                    folderButton.Style = btnStyle;
+                    folderButton.Margin = new Thickness(0, 0, 0, 0);
+                    folderButton.ToolTip = "Open Pack's Folder";
+                    folderButton.Padding = new Thickness(2, 0, 2, 0);//delete_click(this, e, card.Name, dir)
+                    folderButton.Click += new RoutedEventHandler(async (sender, e) =>
+                    {
+                        // combine the arguments together
+                        // it doesn't matter if there is a space after ','
+                        string argument = "\"" + dir + "\"";
+
+                        System.Diagnostics.Process.Start("explorer.exe", argument);
+                    });
 
                     var manageBtn = new Button();
                     var iconpackwrench = new MaterialDesignThemes.Wpf.PackIcon();
@@ -194,8 +217,11 @@ namespace Twickt_Launcher.Pages
                     MaterialDesignThemes.Wpf.RippleAssist.SetIsCentered(manageBtn, true);
                     manageBtn.Margin = new Thickness(0, 0, 0, 0);
                     manageBtn.Padding = new Thickness(2, 0, 2, 0);
+                    manageBtn.ToolTip = "Manage This Pack";
                     manageBtn.Style = btnStyle;
-                    //manageBtn.Click += new RoutedEventHandler((sender, e) => play_click(this, e, card.Name, dir));
+                    manageBtn.Click += new RoutedEventHandler(async (sender, e) => {
+                        await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack());
+                    });
 
                     var deletebutton = new Button();
                     var iconpackdelete = new MaterialDesignThemes.Wpf.PackIcon();
@@ -206,6 +232,7 @@ namespace Twickt_Launcher.Pages
                     deletebutton.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#F44336"));
                     deletebutton.Style = btnStyle;
                     deletebutton.Margin = new Thickness(0, 0, 0, 0);
+                    deletebutton.ToolTip = "Delete This Pack";
                     deletebutton.Padding = new Thickness(2, 0, 2, 0);//delete_click(this, e, card.Name, dir)
                     deletebutton.Click += new RoutedEventHandler(async (sender, e) =>
                     {
@@ -243,6 +270,8 @@ namespace Twickt_Launcher.Pages
                         await ModpacksUpdate();
                     });
 
+
+                    buttonStackPanel.Children.Add(folderButton);
                     buttonStackPanel.Children.Add(manageBtn);
                     buttonStackPanel.Children.Add(deletebutton);
                     modpacksListContainer.Children.Add(card);

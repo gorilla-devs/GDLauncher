@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="Twickt_Launcher.Dialogs.ManagePack"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
+             mc:Ignorable="d" 
+             Height="600" Width="500" Background="White">
+    <StackPanel>
+        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Margin="0 50 0 0" FontSize="20">We are still working on this... Coming on next major release (3.x)</TextBlock>
+        <Button Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 460 0 0" Width="100">Back</Button>
+    </StackPanel>
+</UserControl>

@@ -12,11 +12,11 @@
         <materialDesign:TransitionerSlide>
                 <StackPanel Margin="20 10 20 0">
                     <DockPanel>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="295" Width="220" Click="Button_Click">
-                            Minecraft Vanilla
+                        <Button FontSize="40" FontWeight="Bold" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="295" Width="220" Click="Button_Click">
+                            Vanilla
                         </Button>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="295" Width="220" Click="Button_Click_1">
-                            Minecraft Forge
+                        <Button FontSize="40" FontWeight="Bold" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="295" Width="220" Click="Button_Click_1">
+                            Forge
                         </Button>
                     </DockPanel>
                 </StackPanel>
@@ -38,8 +38,9 @@
                     </DockPanel>
                     <DockPanel Margin="0 10 0 0">
                         <Label Name="forgeVersionsText" VerticalAlignment="Center" Visibility="Hidden">Forge Versions:</Label>
-                        <ComboBox Name="forgeVersions" Width="200" Visibility="Hidden" HorizontalAlignment="Right" SelectedIndex="0"/>                    </DockPanel>
-                    <DockPanel HorizontalAlignment="Center" Margin="0 70 0 0">
+                        <ComboBox Name="forgeVersions" Width="200" Visibility="Hidden" HorizontalAlignment="Right" SelectedIndex="0"/>                    
+                    </DockPanel>
+                    <DockPanel HorizontalAlignment="Center" Margin="0 75 0 0">
                         <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
                         <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="35 0 0 0" IsEnabled="False" Click="install_Click">Install</Button>
                     </DockPanel>
@@ -61,20 +62,12 @@
                         </StackPanel>
                     </DockPanel>
                 </materialDesign:Card>
-                <materialDesign:Card Width="440" Height="70" Margin="0 5 0 0">
+                <materialDesign:Card Width="440" Height="120" Margin="0 5 0 0">
                     <StackPanel>
                         <DockPanel>
-                        <Label>Working Threads:</Label>
-                        <Label Name="workingThreadsText">NUMBER</Label>
-                        </DockPanel>
-                        <DockPanel>
-                            <Label>Modpack Name:</Label>
+                            <Label>Minecraft Version:</Label>
                             <Label Name="modpackName">Name</Label>
                         </DockPanel>
-                    </StackPanel>
-                </materialDesign:Card>
-                <materialDesign:Card Width="440" Height="100" Margin="0 5 0 0">
-                    <StackPanel>
                         <DockPanel>
                             <Label>Files:</Label>
                             <Label Name="filesToDownload">0/0</Label>
@@ -85,6 +78,7 @@
                         <Label Name="totalPercentage" HorizontalAlignment="Center">0%</Label>
                     </StackPanel>
                 </materialDesign:Card>
+                <TextBlock Foreground="Red" Name="isError" TextWrapping="Wrap" FontSize="10" Visibility="Hidden" Padding="10 0 10 0" Margin="0 45 0 0">There may have been some errors while downloading the game. It shouldn't be a problem though. If you experience any issue, try to reinstall this pack again or contact us!</TextBlock>
                 <DockPanel>
                     <Button Name="cancelButton" Style="{StaticResource MaterialDesignFlatButton}" Margin="10" Width="130" HorizontalAlignment="Left" IsEnabled="false" Click="cancelButton_Click">Cancel</Button>
                     <materialDesign:PackIcon Name="installationEndedIcon" Kind="CheckboxMarkedCircleOutline" Margin="100 0 0 0" VerticalAlignment="Center" Height="30" Width="30" Foreground="#4CAF50" Visibility="Hidden"/>

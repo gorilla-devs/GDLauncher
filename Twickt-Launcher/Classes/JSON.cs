@@ -73,6 +73,24 @@ namespace Twickt_Launcher.Classes
             List<string[]> matrix = new List<string[]>();
             string data = "";
             WebClient c = new WebClient();
+            string versionURL = "";
+            var downloadedJSON = await c.DownloadDataTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+            dynamic versionsJSON = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(downloadedJSON));
+            try
+            {
+                foreach (var v in versionsJSON["versions"])
+                {
+                    if (version == Convert.ToString(v.id))
+                        versionURL = Convert.ToString(v.url);
+                }
+            }
+            catch(Exception e)
+            {
+                Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
+            }
+
+
+
             c.DownloadStringCompleted += (sender1, e) =>
             {
                 try
@@ -81,7 +99,7 @@ namespace Twickt_Launcher.Classes
                 }
                 catch { }
             };
-            await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + version + "/" + version + ".json"));
+            await c.DownloadStringTaskAsync(versionURL);
             try
             {
                 dynamic json = await Task.Run( () => JsonConvert.DeserializeObject(data));
@@ -163,7 +181,7 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("errorIn") + " " + name);
+                            Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
                         }
                     }
                     else if (item["natives"]["windows"] == "natives-windows-${arch}")
@@ -176,7 +194,7 @@ namespace Twickt_Launcher.Classes
                         }
                         catch
                         {
-                            MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("errorIn") + " " + name);
+                            Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
                         }
                     }
                 }
@@ -527,7 +545,7 @@ namespace Twickt_Launcher.Classes
             }
             catch(Exception e)
             {
-                MessageBox.Show("Some error occurred in JSON Class");
+                MessageBox.Show(e.Message);
             }
             return null;
 

@@ -37,7 +37,7 @@ namespace Twickt_Launcher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.9")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.9.1")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -58,7 +58,7 @@ namespace Twickt_Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
         public string download_threads {
             get {
                 return ((string)(this["download_threads"]));

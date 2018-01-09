@@ -43,7 +43,7 @@ namespace Twickt_Launcher.Classes
                         {
                             Windows.DebugOutputConsole.singleton.Write("ERRORE IN" + url + "\r\n" + e);
                         }));
-                        MessageBox.Show("ERRORE IN" + url + "\r\n" + e);
+                        Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
                     }
                 }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = Int32.Parse(Properties.Settings.Default["download_threads"].ToString()), CancellationToken = _ctsblock });
 
@@ -123,7 +123,10 @@ namespace Twickt_Launcher.Classes
             }
             catch(Exception e)
             {
-                MessageBox.Show("ERRORE A SCARICARE " + url[3] + " " + e);
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
+                }));
             }
 
         }

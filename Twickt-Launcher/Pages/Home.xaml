@@ -26,7 +26,7 @@ Sample license text.
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
                     <Image Source="/Images/homeLogo.png" Height="170" Margin="0 40 0 0"></Image>
                     <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 30 0 15" >
-                        <materialDesign:Card Width="630" Height="330" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+                        <materialDesign:Card Width="630" Height="330" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                             <ScrollViewer PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible">
                                 <StackPanel Margin="15 15 0 0" Orientation="Horizontal" Name="modpacksListContainer">
                                 </StackPanel>
@@ -39,9 +39,6 @@ Sample license text.
                         </Button>
                         <Button Style="{StaticResource MaterialDesignFlatButton}" Width="130" Click="Button_Click_1">
                             Console
-                        </Button>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="130" Click="Button_Click_2">
-                            Report A Bug
                         </Button>
                     </StackPanel>
                 </StackPanel>

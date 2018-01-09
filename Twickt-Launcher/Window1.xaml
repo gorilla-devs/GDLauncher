@@ -47,9 +47,24 @@ Sample license text.
                         </Button>
                         <materialDesign:PopupBox Name="popupbox" DockPanel.Dock="Right" ToolTip="Options" Foreground="White" PlacementMode="BottomAndAlignRightEdges">
                             <StackPanel>
-                                <Button Content="Show Debug Console" Click="Button_Click_2"/>
-                                <Button Content="Open game dir" Click="Button_Click_5"/>
-                                <Button Content="Change Username" Click="Button_Click_3"/>
+                                <Button Click="Button_Click_2">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Console" VerticalAlignment="Center"></materialDesign:PackIcon>
+                                        <Label>Show Console</Label>
+                                    </StackPanel>
+                                </Button>
+                                <Button Click="Button_Click_5">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Folder" VerticalAlignment="Center"></materialDesign:PackIcon>
+                                        <Label>Open Game Folder</Label>
+                                    </StackPanel>
+                                </Button>
+                                <Button Click="Button_Click_3">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Account" VerticalAlignment="Center"></materialDesign:PackIcon>
+                                        <Label>Change Username</Label>
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
                         </materialDesign:PopupBox>
                         <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="red" ToolTip="Internet Not Working" Width="48" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
