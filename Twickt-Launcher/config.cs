@@ -18,7 +18,6 @@ namespace Twickt_Launcher
     {
         public static string updateWebsite = "https://dl.gorilladevs.com/";
         public static string minecraftfolder = "GorillaDevs";
-        public static string forgeversion = "";
         public static string mainclass = "";
         public static string arguments = "";
         public static string forgefilepath = "";

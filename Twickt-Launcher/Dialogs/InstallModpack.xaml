@@ -68,10 +68,16 @@
                             <Label>Minecraft Version:</Label>
                             <Label Name="modpackName">Name</Label>
                         </DockPanel>
-                        <DockPanel>
-                            <Label>Files:</Label>
-                            <Label Name="filesToDownload">0/0</Label>
-                        </DockPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <Label>Files:</Label>
+                                <Label Name="filesToDownload">0/0</Label>
+                            </StackPanel>
+                            <StackPanel Margin="130 0 0 0" Orientation="Horizontal">
+                                <Label>Downloaded:</Label>
+                                <Label Name="downloadedMB">0 MB</Label>
+                            </StackPanel>
+                        </StackPanel>
                         <DockPanel>
                             <ProgressBar Name="progressBarDownload" Margin="10"></ProgressBar>
                         </DockPanel>
@@ -79,6 +85,10 @@
                     </StackPanel>
                 </materialDesign:Card>
                 <TextBlock Foreground="Red" Name="isError" TextWrapping="Wrap" FontSize="10" Visibility="Hidden" Padding="10 0 10 0" Margin="0 45 0 0">There may have been some errors while downloading the game. It shouldn't be a problem though. If you experience any issue, try to reinstall this pack again or contact us!</TextBlock>
+                <StackPanel Name="cleaningUp" Visibility="Hidden" Orientation="Horizontal" Margin="120 -50 0 0">
+                    <Label FontSize="30" HorizontalAlignment="Center">Cleaning up</Label>
+                    <ProgressBar Margin="10 -14 0 0" Width="50" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
+                </StackPanel>
                 <DockPanel>
                     <Button Name="cancelButton" Style="{StaticResource MaterialDesignFlatButton}" Margin="10" Width="130" HorizontalAlignment="Left" IsEnabled="false" Click="cancelButton_Click">Cancel</Button>
                     <materialDesign:PackIcon Name="installationEndedIcon" Kind="CheckboxMarkedCircleOutline" Margin="100 0 0 0" VerticalAlignment="Center" Height="30" Width="30" Foreground="#4CAF50" Visibility="Hidden"/>

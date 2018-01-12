@@ -189,20 +189,24 @@ namespace Twickt_Launcher.Dialogs
 
         private async void cancelButton_Click(object sender, RoutedEventArgs e)
         {
-            downloader._cts.Cancel();
-            ctoken.Cancel();
-            await Task.Run( () => Application.Current.Dispatcher.Invoke(new Action(() =>
+            cancelButton.IsEnabled = false;
+            cleaningUp.Visibility = Visibility.Visible;
+            await Task.Run(() => downloader._cts.Cancel());
+            await Task.Run(() => ctoken.Cancel());
+
+            await Task.Run( () => Application.Current.Dispatcher.Invoke(new Action(async () =>
             {
                 try
                 {
                     Directory.Delete(config.M_F_P + "Packs\\" + instanceTextName.Text, true);
                 }
-                catch
+                catch(Exception ex)
                 {
-                    MessageBox.Show("Errore cercando di cancellare la modpack di cui si e' interrotta l'installazione. Procedere cancellandola manualmente dalla sezione modpacks installate");
+                    Console.WriteLine(ex.InnerException);
                 }
             })));
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -237,22 +241,26 @@ namespace Twickt_Launcher.Dialogs
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             string disposition = response.Headers["Content-Length"];
 
-            //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
-            if (Pages.Home.singleton.forgeJSON == null)
-            {
-                if (!File.Exists(config.M_F_P + "forgeVersions.json") || Properties.Settings.Default.forgeJSONContentLength != disposition)
-                {
-                    await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
-                    Properties.Settings.Default.forgeJSONContentLength = disposition;
-                    Properties.Settings.Default.Save();
-                }
-                await Task.Delay(300);
-                using (StreamReader r = new StreamReader(config.M_F_P + "forgeVersions.json"))
-                {
-                    Pages.Home.singleton.forgeJSON = await r.ReadToEndAsync();
-                }
 
-            }
+            await Task.Run(async () => {
+                //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
+                if (Pages.Home.singleton.forgeJSON == null)
+                {
+                    if (!File.Exists(config.M_F_P + "forgeVersions.json") || Properties.Settings.Default.forgeJSONContentLength != disposition)
+                    {
+                        await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
+                        Properties.Settings.Default.forgeJSONContentLength = disposition;
+                        Properties.Settings.Default.Save();
+                    }
+                    await Task.Delay(300);
+                    using (StreamReader r = new StreamReader(config.M_F_P + "forgeVersions.json"))
+                    {
+                        Pages.Home.singleton.forgeJSON = await r.ReadToEndAsync();
+                    }
+
+                }
+            });
+
             dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
             foreach (var x in json["number"])
             {

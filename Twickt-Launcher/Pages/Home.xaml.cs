@@ -256,7 +256,7 @@ namespace Twickt_Launcher.Pages
                         {
                             if (Directory.Exists(dir))
                             {
-                                Directory.Delete(dir, true);
+                                await Task.Run(() => Directory.Delete(dir, true));
                             }
                         }
                         catch (Exception)
@@ -293,6 +293,7 @@ namespace Twickt_Launcher.Pages
             addNewBtn.Click += new RoutedEventHandler(async (sender, e) =>
             {
                 await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(), "RootDialog", null, ExtendedClosingEventHandler);
+                Dialogs.InstallModpack.singleton.downloadedMB.Content = "0 MB";
                 if (!Directory.Exists(config.M_F_P + "Packs\\"))
                 {
                     Directory.CreateDirectory(config.M_F_P + "Packs\\");

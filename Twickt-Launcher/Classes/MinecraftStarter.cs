@@ -34,7 +34,7 @@ namespace Twickt_Launcher.Classes
 
                            @"-cp ";
             if (forge != "false")
-                launch += "\"" + dir + @"\\libraries\net\minecraftforge\forge\" + decoded.mc_version + "-" + forge + "-" + decoded.mc_version + @"\\forge-" + decoded.mc_version + "-" + forge + "-" + decoded.mc_version + @".jar" + ";";
+                launch += "\"" + dir + @"\\libraries\net\minecraftforge\forge\" + decoded.forgeFileName + @"\\forge-" + decoded.forgeFileName + @".jar" + ";";
             else
                 launch += "\"" + dir + @"\\versions\\" + decoded.mc_version + "\\\\" + decoded.mc_version + ".jar" + ";";
 
