@@ -15,8 +15,8 @@ using System.Windows;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("GorillaDevs")]
-[assembly: AssemblyProduct("Twickt Launcher")]
-[assembly: AssemblyCopyright("Copyright ©  2016 Twickt, All Rights Reserved.")]
+[assembly: AssemblyProduct("GDLauncher")]
+[assembly: AssemblyCopyright("Copyright ©  2016 GorillaDevs, All Rights Reserved.")]
 [assembly: AssemblyTrademark("GDLauncher")]
 [assembly: AssemblyCulture("")]
 
@@ -55,5 +55,5 @@ using System.Windows;
 // È possibile specificare tutti i valori oppure impostare valori predefiniti per i numeri relativi alla revisione e alla build 
 // usando l'asterisco '*' come illustrato di seguito:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("2.9.3.0")]
+[assembly: AssemblyFileVersion("2.9.3.0")]

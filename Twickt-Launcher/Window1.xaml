@@ -10,7 +10,7 @@ Sample license text.
         xmlns:local="clr-namespace:Twickt_Launcher"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         mc:Ignorable="d"
-        Title="Twickt Launcher" Height="700" Width="700" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        Title="GDLauncher" Height="700" Width="700" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <materialDesign:DialogHost Identifier="RootDialog" CloseOnClickAway="{Binding Path=DialogContent.(local:DialogHostExtensions.CloseOnClickAway), RelativeSource={RelativeSource Self}, FallbackValue=True}">
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
             <materialDesign:DrawerHost.LeftDrawerContent >

@@ -35,7 +35,6 @@ namespace Twickt_Launcher.Pages
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
         public Windows.DebugOutputConsole debugconsole = new Windows.DebugOutputConsole();
         public static Home singleton;
-        public string forgeJSON = null;
 
         public Home()
         {

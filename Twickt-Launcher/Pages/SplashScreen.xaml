@@ -30,6 +30,12 @@ Sample license text.
                     <ProgressBar Name="progressbar" Foreground="White" HorizontalAlignment="Left" Height="32" Margin="10,0,0,0" VerticalAlignment="Top" Width="674" Visibility="Hidden"/>
                     <Label x:Name="mbToDownload" Foreground="White" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
                     <Label x:Name="kbps" Foreground="White" Content="kbps" HorizontalAlignment="Left" Margin="520,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
+                    <StackPanel>
+                        <Label Name="downloadingForgeJSON" Foreground="White" Content="Downloading Forge Data" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
+                        <ProgressBar Name="downloadingForgeJSONProgress" Foreground="White" HorizontalAlignment="Left" Height="32" Margin="10,0,0,0" VerticalAlignment="Top" Width="674" Visibility="Hidden"/>
+                        <Label Name="forgeJSONMbToDownload" Foreground="White" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
+                        <Label Name="forgeJSONSpeed" Foreground="White" Content="kbps" HorizontalAlignment="Left" Margin="520,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <ProgressBar Name="postUpdate" Foreground="White" HorizontalAlignment="Left" Height="28" Margin="10,0,0,0" Visibility="Hidden" VerticalAlignment="Top" Width="66" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
                         <Label Name="postUpdatePreText" Foreground="White" Margin="20 17 0 0" FontSize="20" Visibility="Hidden">New version downloaded. Restarting in</Label>

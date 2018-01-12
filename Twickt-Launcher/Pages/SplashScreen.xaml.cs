@@ -4,9 +4,11 @@
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
 
 /*Splashscreen*/
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -36,6 +38,8 @@ namespace Twickt_Launcher.Pages
     public partial class SplashScreen : Page
     {
         private CancellationTokenSource _cancellationTokenSource;
+        public static Stopwatch sw = new Stopwatch();
+        public string forgeJson = null;
         public static SplashScreen singleton;
         public ResourceManager manager = Properties.Resources.ResourceManager;
 
@@ -99,6 +103,52 @@ namespace Twickt_Launcher.Pages
                     }
                 }
 
+                //CHECKING FORGE JSON
+                HttpWebRequest request = (HttpWebRequest)System.Net.WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
+                request.Method = "HEAD";
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                string disposition = response.Headers["Content-Length"];
+
+
+                sw.Start();
+                var client = new WebClient();
+                client.DownloadProgressChanged += (s, ee) =>
+                {
+                    downloadingForgeJSONProgress.Value = ee.ProgressPercentage;
+                    forgeJSONSpeed.Content = string.Format("{0} kb/s", (ee.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                    forgeJSONMbToDownload.Content = string.Format("{0} MB / {1} MB",
+                    (ee.BytesReceived / 1024d / 1024d).ToString("0"),
+                    (ee.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
+                };
+                //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
+                if (!File.Exists(config.M_F_P + "forgeVersions.json") || Properties.Settings.Default.forgeJSONContentLength != disposition)
+                {
+                    downloadingForgeJSONProgress.Visibility = Visibility.Visible;
+                    downloadingForgeJSON.Visibility = Visibility.Visible;
+                    forgeJSONSpeed.Visibility = Visibility.Visible;
+                    forgeJSONMbToDownload.Visibility = Visibility.Visible;
+                    await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
+                    Properties.Settings.Default.forgeJSONContentLength = disposition;
+                    Properties.Settings.Default.Save();
+                }
+                using (StreamReader r = new StreamReader(config.M_F_P + "forgeVersions.json"))
+                {
+                    forgeJson = await r.ReadToEndAsync();
+                }
+                try
+                {
+                    dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
+                }
+                catch
+                {
+                    downloadingForgeJSONProgress.Visibility = Visibility.Visible;
+                    downloadingForgeJSON.Visibility = Visibility.Visible;
+                    forgeJSONSpeed.Visibility = Visibility.Visible;
+                    forgeJSONMbToDownload.Visibility = Visibility.Visible;
+                    await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
+                    Properties.Settings.Default.forgeJSONContentLength = disposition;
+                    Properties.Settings.Default.Save();
+                }
                 transition.SelectedIndex = 1;
                 await Task.Delay(350);
                 Window1.singleton.MainPage.Navigate(new Pages.Login());

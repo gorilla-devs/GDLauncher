@@ -19,10 +19,11 @@ namespace Twickt_Launcher.Classes
     {
         public CancellationTokenSource _cts;
         public static Stopwatch sw = new Stopwatch();
-        public float totalMB = 0;
+        public float totalMB;
         public List<string[]> urlsList = new List<string[]>();
         public async Task MCDownload(List<string[]> urls, string instanceName, CancellationToken _ctsblock)
         {
+            totalMB = 0;
             _cts = new CancellationTokenSource();
             sw.Start();
             int count = urls.Count;
@@ -75,12 +76,15 @@ namespace Twickt_Launcher.Classes
                     return;
                 }
 
-                sw.Stop();
+                myTimer.Stop();
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    Dialogs.InstallModpack.singleton.downloadedMB.Content = null;
+                }));
                 Dialogs.InstallModpack.singleton.filesToDownload.Content = urls.Count + "/" + urls.Count;
                 Dialogs.InstallModpack.singleton.totalPercentage.Content = "100%";
                 Dialogs.InstallModpack.singleton.progressBarDownload.Value = 100;
-
-
+                return;
             }
         }
 

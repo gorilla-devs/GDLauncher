@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twickt Launcher", "Twickt-Launcher\Twickt Launcher.csproj", "{E3D9C474-8A5C-40D7-AC66-35797C15FD9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDLauncher", "Twickt-Launcher\GDLauncher.csproj", "{E3D9C474-8A5C-40D7-AC66-35797C15FD9C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModpackJsonCreator", "ModpackJsonCreator\ModpackJsonCreator.csproj", "{F5EB8719-82DB-43D8-A160-5D7FF27A7426}"
 EndProject
@@ -25,5 +25,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9BC138B9-821C-4174-9147-2ECEAFADE486}
 	EndGlobalSection
 EndGlobal

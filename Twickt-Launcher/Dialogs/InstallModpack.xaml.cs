@@ -71,7 +71,7 @@ namespace Twickt_Launcher.Dialogs
             }
             else
             {
-                dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
+                dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
                 foreach (var x in json["promos"])
                 {
                     if(!versionsList.Items.Contains(json["number"][x.Value.ToString()]["mcversion"]))
@@ -101,7 +101,7 @@ namespace Twickt_Launcher.Dialogs
                 //TUTTE LE VERSIONI
                 if (forgeAllVersions.IsChecked.Value)
                 {
-                    dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
+                    dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
                     try
                     {
                         forgeVersions.Items.Clear();
@@ -120,7 +120,7 @@ namespace Twickt_Launcher.Dialogs
                 //SOLO QUELLE PROMOS
                 else
                 {
-                    dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
+                    dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
                     try
                     {
                         List<string> promos = new List<string>();
@@ -222,46 +222,15 @@ namespace Twickt_Launcher.Dialogs
         {
             name = "Forge Stock";
             forgeAllVersions.Visibility = Visibility.Visible;
-            var client = new WebClient();
             loading.IsIndeterminate = false;
             forgeAllVersions.IsEnabled = false;
             forgeVersions.Visibility = Visibility.Visible;
             forgeVersionsText.Visibility = Visibility.Visible;
             forgeVersions.IsEnabled = false;
             versionsList.IsEnabled = false;
-            client.DownloadProgressChanged += (s, ee) =>
-            {
-                loading.Value = ee.ProgressPercentage;
-            };
             transition.SelectedIndex = 1;
             loading.Visibility = Visibility.Visible;
-            await Task.Delay(300);
-            HttpWebRequest request = (HttpWebRequest)System.Net.WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
-            request.Method = "HEAD";
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            string disposition = response.Headers["Content-Length"];
-
-
-            await Task.Run(async () => {
-                //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
-                if (Pages.Home.singleton.forgeJSON == null)
-                {
-                    if (!File.Exists(config.M_F_P + "forgeVersions.json") || Properties.Settings.Default.forgeJSONContentLength != disposition)
-                    {
-                        await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
-                        Properties.Settings.Default.forgeJSONContentLength = disposition;
-                        Properties.Settings.Default.Save();
-                    }
-                    await Task.Delay(300);
-                    using (StreamReader r = new StreamReader(config.M_F_P + "forgeVersions.json"))
-                    {
-                        Pages.Home.singleton.forgeJSON = await r.ReadToEndAsync();
-                    }
-
-                }
-            });
-
-            dynamic json = JsonConvert.DeserializeObject(Pages.Home.singleton.forgeJSON);
+            dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
             foreach (var x in json["number"])
             {
                 forgeAllVersionsList.Add(Convert.ToString(x.Value.mcversion));

@@ -125,6 +125,9 @@ namespace Twickt_Launcher.Classes
                 Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
                 Properties.Settings.Default.Save();
             }
+            Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Hidden;
+            Pages.SplashScreen.singleton.firstLabel.Content = "Java Extraction Completed";
+            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
         }
 
         public static void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
