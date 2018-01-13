@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Twickt_Launcher
+namespace GDLauncher
 {
     class SessionData
     {

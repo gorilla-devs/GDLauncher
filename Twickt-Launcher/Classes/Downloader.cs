@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
 
-namespace Twickt_Launcher.Classes
+namespace GDLauncher.Classes
 {
     class Downloader
     {

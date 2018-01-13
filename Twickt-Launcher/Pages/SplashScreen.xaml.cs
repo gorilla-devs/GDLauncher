@@ -28,9 +28,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Twickt_Launcher.Classes;
+using GDLauncher.Classes;
 
-namespace Twickt_Launcher.Pages
+namespace GDLauncher.Pages
 {
     /// <summary>
     /// Logica di interazione per SplashScreen.xaml
@@ -64,7 +64,7 @@ namespace Twickt_Launcher.Pages
             Thread.CurrentThread.CurrentUICulture = culture;
 
             Assembly resourceAssembly = Assembly.Load("GDLauncher");
-            string manifest = "Twickt_Launcher.lang.lang";
+            string manifest = "GDLauncher.lang.lang";
             manager = new ResourceManager(manifest, resourceAssembly);
 
             /*string greeting = String.Format("The current culture is {0}.\n{1}",
@@ -121,7 +121,7 @@ namespace Twickt_Launcher.Pages
                     (ee.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
                 };
                 //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
-                if (!File.Exists(config.M_F_P + "forgeVersions.json") || Properties.Settings.Default.forgeJSONContentLength != disposition)
+                if (!File.Exists(config.M_F_P + "forgeVersions.json") || (Properties.Settings.Default.forgeJSONContentLength != disposition && Properties.Settings.Default.forgeJSONContentLength != ""))
                 {
                     downloadingForgeJSONProgress.Visibility = Visibility.Visible;
                     downloadingForgeJSON.Visibility = Visibility.Visible;

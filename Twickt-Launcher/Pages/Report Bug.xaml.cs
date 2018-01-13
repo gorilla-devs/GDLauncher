@@ -24,7 +24,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Twickt_Launcher.Pages
+namespace GDLauncher.Pages
 {
     /// <summary>
     /// Logica di interazione per Report_Bug.xaml

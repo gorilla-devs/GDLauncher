@@ -1,29 +1,23 @@
 ﻿<!--
 Sample license text.
 -->
-<Page x:Class="Twickt_Launcher.Dialogs.HowTo"
+<UserControl x:Class="GDLauncher.Dialogs.HowTo"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:local="clr-namespace:Twickt_Launcher.Dialogs"
-      mc:Ignorable="d" 
-      d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF">
+      xmlns:local="clr-namespace:GDLauncher.Dialogs"
+      mc:Ignorable="d" Height="600" Width="500" Background="White">
 
     <Grid>
         <StackPanel>
             <StackPanel>
-                <Label x:Name="label" Content="Benvenuto in Twickt Launcher" HorizontalAlignment="Center" Margin="139,10,5,0" VerticalAlignment="Top" Width="550" Height="57" FontSize="30"/>
+                <Label x:Name="label" Content="Welcome to GDLauncher" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="30"/>
                 <materialDesign:Card Padding="10" Margin="10">
                     <TextBlock x:Name="textBlock" Padding="10" HorizontalAlignment="Left" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Top">
-                        Twickt Launcher e' un launcher custom di minecraft, che permette, diversamente
-                        da quello ufficiale, una maggiore integrazione con le modpacks,
-                        oltre che tantissime altre features. Se le vuoi conoscere tutte basta
-                        che clicchi 
-                        <Hyperlink Click="Hyperlink_Click">
-                            qui
-                        </Hyperlink>
+                        DGLauncher e' un launcher custom di minecraft, sviluppato con l'idea di essere piu' semplice e funzionale
+                        e fornire maggiore personalizzazione e funzioni all'utente
                     </TextBlock>
                 </materialDesign:Card>
             </StackPanel>
@@ -34,7 +28,7 @@ Sample license text.
                         <LineBreak/>
                         Devi indicarci quanta ram vuoi che il launcher utilizzi e che dia a Minecraft.
                         <LineBreak/>
-                        Dato che e' fatto principalmente per pacchetti moddati, ti consigliamo di dargli almeno 2 o 3 giga.
+                        Noi ti consigliamo di dargli almeno 2 o 3 giga.
                         <LineBreak/>
                         Tieni anche conto di quanta RAM disponibile hai.
                         <LineBreak/>
@@ -53,15 +47,8 @@ Sample license text.
                         </ComboBox> GB
                     </TextBlock>
                 </materialDesign:Card>
-                <materialDesign:Card Padding="10" Margin="10 0 10 10">
-                    <TextBlock Foreground="Blue" TextWrapping="Wrap">
-                        Se hai problemi col launcher oppure ci sono bugs, nel 90% dei casi e' 
-                        sufficiente cancellare la cartella minecraft che si trova nella stessa cartella
-                        dove e' il launcher.
-                    </TextBlock>
-                </materialDesign:Card>
             </StackPanel>
+            <Button x:Name="button" HorizontalAlignment="Right" Margin="0 120 20 0" Content="Procedi" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Width="120" Click="button_Click" />
         </StackPanel>
-        <Button x:Name="button" HorizontalAlignment="Left" Content="Procedi" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" VerticalAlignment="Top" Width="120" Click="button_Click" Margin="564,583,0,0" />
     </Grid>
-</Page>
+</UserControl>

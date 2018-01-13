@@ -22,9 +22,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Twickt_Launcher.Classes;
+using GDLauncher.Classes;
 
-namespace Twickt_Launcher.Pages
+namespace GDLauncher.Pages
 {
     /// <summary>
     /// Logica di interazione per Options.xaml

@@ -25,7 +25,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Twickt_Launcher.Pages
+namespace GDLauncher.Pages
 {
     /// <summary>
     /// Logica di interazione per Login.xaml
@@ -73,15 +73,8 @@ namespace Twickt_Launcher.Pages
                 Properties.Settings.Default["RememberUsername"] = "";
                 Properties.Settings.Default.Save();
             }
-            if (Properties.Settings.Default["firstTimeHowTo"].ToString() == "true")
-            {
-                Window1.singleton.MainPage.Navigate(new Dialogs.HowTo());
-            }
-            else
-            {
-                Window1.singleton.MainPage.Navigate(new Pages.Home());
-                Window1.singleton.NavigationMenu.SelectedIndex = 0;
-            }
+            Window1.singleton.MainPage.Navigate(new Pages.Home());
+            Window1.singleton.NavigationMenu.SelectedIndex = 0;
             loading.Visibility = Visibility.Hidden;
             button.IsEnabled = true;
         }

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Twickt_Launcher.Dialogs
+namespace GDLauncher.Dialogs
 {
     /// <summary>
     /// Interaction logic for ManagePack.xaml

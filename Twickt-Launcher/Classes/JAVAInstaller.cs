@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Twickt_Launcher.Classes
+namespace GDLauncher.Classes
 {
     class JAVAInstaller
     {

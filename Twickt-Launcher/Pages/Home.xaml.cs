@@ -22,10 +22,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Twickt_Launcher.Classes;
+using GDLauncher.Classes;
 
 
-namespace Twickt_Launcher.Pages
+namespace GDLauncher.Pages
 {
     /// <summary>
     /// Logica di interazione per Home.xaml
@@ -54,6 +54,11 @@ namespace Twickt_Launcher.Pages
 
             System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
             transition.SelectedIndex = 1;
+            if (Properties.Settings.Default["firstTimeHowTo"].ToString() == "true")
+            {
+                await Task.Delay(400);
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.HowTo(), "RootDialog");
+            }
             if (Properties.Settings.Default["justUpdated"].ToString() == "true")
             {
                 await Task.Delay(400);

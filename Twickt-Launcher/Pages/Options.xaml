@@ -1,13 +1,13 @@
 ﻿<!--
 Sample license text.
 -->
-<Page x:Class="Twickt_Launcher.Pages.Options"
+<Page x:Class="GDLauncher.Pages.Options"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:local="clr-namespace:Twickt_Launcher.Pages"
+      xmlns:local="clr-namespace:GDLauncher.Pages"
       mc:Ignorable="d" 
       FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
       d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694" Background="#FFFFFF"

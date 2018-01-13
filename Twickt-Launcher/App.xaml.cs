@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Twickt_Launcher
+namespace GDLauncher
 {
     /// <summary>
     /// Logica di interazione per App.xaml

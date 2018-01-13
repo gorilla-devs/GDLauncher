@@ -15,7 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Timers;
 
-namespace Twickt_Launcher
+namespace GDLauncher
 {
     /// <summary>
     /// Logica di interazione per Window1.xaml
@@ -153,6 +153,11 @@ namespace Twickt_Launcher
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
             MainPage.Navigate(new Pages.Home());
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

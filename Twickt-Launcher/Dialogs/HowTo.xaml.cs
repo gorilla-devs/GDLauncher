@@ -22,12 +22,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Twickt_Launcher.Dialogs
+namespace GDLauncher.Dialogs
 {
     /// <summary>
     /// Interaction logic for HowTo.xaml
     /// </summary>
-    public partial class HowTo : Page
+    public partial class HowTo : UserControl
     {
         Timer sw = new Timer();
         public HowTo()
@@ -85,10 +85,7 @@ namespace Twickt_Launcher.Dialogs
             Properties.Settings.Default["firstTimeHowTo"] = "false";
             Properties.Settings.Default["RAM"] = ram.Text;
             Properties.Settings.Default.Save();
-            //Window1.singleton.MenuToggleButton.IsEnabled = true;
-            Window1.singleton.popupbox.IsEnabled = true;
-            Window1.singleton.MainPage.Navigate(new Pages.Home());
-            Window1.singleton.NavigationMenu.SelectedIndex = 0;
+            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
 
         }
 

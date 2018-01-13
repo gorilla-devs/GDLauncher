@@ -19,7 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Twickt_Launcher.Dialogs
+namespace GDLauncher.Dialogs
 {
     /// <summary>
     /// Logica di interazione per OptionsUpdates.xaml
