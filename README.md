@@ -1,4 +1,5 @@
 # GDLauncher
+<img src="https://gorilladevs.com/assets/logo.png" width="240">
 
 ## Table of content
 
