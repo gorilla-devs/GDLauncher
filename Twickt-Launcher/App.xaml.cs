@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -20,20 +21,30 @@ namespace GDLauncher
     /// </summary>
     public partial class App : Application
     {
+        private static readonly System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
         async void App_Startup(object sender, StartupEventArgs e)
         {
-            var externalip = await new WebClient().DownloadDataTaskAsync(new Uri("http://icanhazip.com"));
-            var analytics = await new WebClient().DownloadDataTaskAsync(
-                new Uri(
-                    "https://www.google-analytics.com/collect?v=1&tid=UA-112169830-1&cid="+externalip+ "&t=pageview")
-                
-                );
-
-
-            Console.WriteLine(Encoding.Default.GetString(analytics));
+            string screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth.ToString();
+            string screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight.ToString();
+            CultureInfo ci = CultureInfo.InstalledUICulture;
+            Console.WriteLine(GDLauncher.Properties.Settings.Default["uuid"].ToString());
+            if (GDLauncher.Properties.Settings.Default["uuid"].ToString() == "")
+            {
+                GDLauncher.Properties.Settings.Default["uuid"] = Guid.NewGuid().ToString();
+                GDLauncher.Properties.Settings.Default.Save();
+            }
+            CSharpAnalytics.AutoMeasurement.Instance = new CSharpAnalytics.WpfAutoMeasurement();
+            CSharpAnalytics.AutoMeasurement.Start(new CSharpAnalytics.MeasurementConfiguration("UA-112169830-1", "GDLauncher", GDLauncher.Properties.Settings.Default.version));
+            CSharpAnalytics.AutoMeasurement.Client.TrackEvent("Started", "Startup", "Launcher started");
 
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+
+            AppDomain.CurrentDomain.ProcessExit += (s, ex) =>
+            {
+
+            };
+
         }
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)

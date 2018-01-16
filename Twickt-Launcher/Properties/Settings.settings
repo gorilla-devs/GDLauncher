@@ -6,7 +6,7 @@
       <Value Profile="(Default)">Empty</Value>
     </Setting>
     <Setting Name="version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">2.9.3.1</Value>
+      <Value Profile="(Default)">2.9.3.2</Value>
     </Setting>
     <Setting Name="RAM" Type="System.String" Scope="User">
       <Value Profile="(Default)">1</Value>
@@ -33,7 +33,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="justUpdated" Type="System.String" Scope="User">
-      <Value Profile="(Default)">false</Value>
+      <Value Profile="(Default)">true</Value>
     </Setting>
     <Setting Name="bookmarks" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
@@ -43,6 +43,9 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="forgeJSONContentLength" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="uuid" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

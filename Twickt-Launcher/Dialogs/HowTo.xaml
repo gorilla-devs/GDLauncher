@@ -16,7 +16,7 @@ Sample license text.
                 <Label x:Name="label" Content="Welcome to GDLauncher" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="30"/>
                 <materialDesign:Card Padding="10" Margin="10">
                     <TextBlock x:Name="textBlock" Padding="10" HorizontalAlignment="Left" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Top">
-                        DGLauncher e' un launcher custom di minecraft, sviluppato con l'idea di essere piu' semplice e funzionale
+                        GDLauncher e' un launcher custom di minecraft, sviluppato con l'idea di essere piu' semplice e funzionale
                         e fornire maggiore personalizzazione e funzioni all'utente
                     </TextBlock>
                 </materialDesign:Card>

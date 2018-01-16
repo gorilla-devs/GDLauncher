@@ -1,0 +1,25 @@
+﻿<Window x:Class="GDLauncher.Windows.ServerManager"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GDLauncher.Windows"
+        mc:Ignorable="d"
+        Title="ServerManager" Height="600" Width="600" WindowStyle="None" ResizeMode="NoResize">
+    <DockPanel Name="maincontent">
+        <materialDesign:ColorZone Name="header" Padding="16" materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                          Background="#183b45" DockPanel.Dock="Top" MouseDown="ColorZone_MouseDown">
+            <DockPanel>
+                <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Close" Width="48" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                    <materialDesign:PackIcon Kind="WindowClose" />
+                </Button>
+                <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Minimize" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                    <materialDesign:PackIcon Kind="WindowMinimize" />
+                </Button>
+                <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="red" ToolTip="Internet Not Working" Width="48" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
+            </DockPanel>
+        </materialDesign:ColorZone>
+        <Frame Name="MainPage" NavigationUIVisibility="Hidden"></Frame>
+    </DockPanel>
+</Window>

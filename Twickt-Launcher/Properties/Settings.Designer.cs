@@ -37,7 +37,7 @@ namespace GDLauncher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.9.3.1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.9.3.2")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -142,7 +142,7 @@ namespace GDLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("false")]
+        [global::System.Configuration.DefaultSettingValueAttribute("true")]
         public string justUpdated {
             get {
                 return ((string)(this["justUpdated"]));
@@ -186,6 +186,18 @@ namespace GDLauncher.Properties {
             }
             set {
                 this["forgeJSONContentLength"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string uuid {
+            get {
+                return ((string)(this["uuid"]));
+            }
+            set {
+                this["uuid"] = value;
             }
         }
     }

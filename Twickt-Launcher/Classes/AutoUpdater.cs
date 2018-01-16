@@ -155,7 +155,7 @@ namespace GDLauncher.Classes
 
                 Pages.SplashScreen.singleton.postUpdateText.Content = "0";
 
-                Properties.Settings.Default["firstTimeHowTo"] = "true";
+                Properties.Settings.Default["firstTimeHowTo"] = "false";
                 Properties.Settings.Default["justUpdated"] = "true";
                 Properties.Settings.Default.Save();
                 ProcessStartInfo Info = new ProcessStartInfo();

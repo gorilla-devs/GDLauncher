@@ -40,6 +40,7 @@ namespace GDLauncher.Pages
         {
             InitializeComponent();
             singleton = this;
+            CSharpAnalytics.AutoMeasurement.Client.TrackScreenView("Home");
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
             {
                 var navWindow = Window.GetWindow(this) as NavigationWindow;
@@ -390,6 +391,11 @@ namespace GDLauncher.Pages
         {
             Window1.singleton.MainPage.Navigate(new Pages.Report_Bug());
             Window1.singleton.NavigationMenu.SelectedIndex = 4;
+        }
+
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManageServers());
         }
     }
 }

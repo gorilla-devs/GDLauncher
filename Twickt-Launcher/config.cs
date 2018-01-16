@@ -26,7 +26,6 @@ namespace GDLauncher
         public static string javaLocal = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\";
         public static string LocalModpacks = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\" + minecraftfolder + @"\LocalModpacks\";
         public static string bugReportWebService = "https://api.twickt.com/bugs.php";
-        public static string changelogsWebService = "https://api.twickt.com/changelogs.php";
         public static string updatessWebService = "https://dl.gorilladevs.com/launcher_versions.json";
         public static string javaDownloadURL32 = "java8_152";
         public static string javaDownloadURL64 = "java8_152_64";

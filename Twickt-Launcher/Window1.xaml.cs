@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Timers;
+using System.Net;
 
 namespace GDLauncher
 {
@@ -83,7 +84,7 @@ namespace GDLauncher
             }
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }

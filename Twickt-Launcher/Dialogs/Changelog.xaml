@@ -14,9 +14,8 @@ Sample license text.
         <materialDesign:Card Height="510" Width="450" Margin="0 20 0 0" materialDesign:ShadowAssist.ShadowDepth="Depth3">
             <ScrollViewer>
                 <StackPanel Name="container" Margin="20">
-                    <Label FontSize="30" Margin="0 0 0 25">Welcome to the new version!</Label>
+                    <Label FontSize="30" Margin="0 0 0 25">Launcher Versions</Label>
                     <TextBlock TextWrapping="Wrap" FontSize="20" TextAlignment="Justify" LineHeight="32">Hello there.
-                    You just updated version!
                     Before you continue we would like to inform you
                     of a few things. When we release a new version, usually we just fix bugs and do some improvements, but it
                     may happen that we do some breaking-changes. If you experience any issue after an update, consider deleting

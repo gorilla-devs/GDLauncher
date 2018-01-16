@@ -85,6 +85,9 @@
       <HintPath>..\packages\Costura.Fody.1.6.2\lib\dotnet\Costura.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="CSharpAnalytics.Net45, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSharpAnalytics.1.2.1\lib\net45\CSharpAnalytics.Net45.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
@@ -195,6 +198,9 @@
     <Compile Include="Dialogs\ManagePack.xaml.cs">
       <DependentUpon>ManagePack.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ManageServers.xaml.cs">
+      <DependentUpon>ManageServers.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ModpackLoading.xaml.cs">
       <DependentUpon>ModpackLoading.xaml</DependentUpon>
     </Compile>
@@ -242,6 +248,9 @@
     <Compile Include="Windows\DebugOutputConsole.xaml.cs">
       <DependentUpon>DebugOutputConsole.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\ServerManager.xaml.cs">
+      <DependentUpon>ServerManager.xaml</DependentUpon>
+    </Compile>
     <Page Include="Dialogs\Changelog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -259,6 +268,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ManagePack.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ManageServers.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -311,6 +324,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\DebugOutputConsole.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ServerManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

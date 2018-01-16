@@ -25,9 +25,11 @@ namespace GDLauncher.Dialogs
         public Options()
         {
             InitializeComponent();
+            CSharpAnalytics.AutoMeasurement.Client.TrackScreenView("Options");
+
         }
 
-		private void general_Click(object sender, RoutedEventArgs e)
+        private void general_Click(object sender, RoutedEventArgs e)
 		{
             general.IsEnabled = false;
             graphics.IsEnabled = true;
