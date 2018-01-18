@@ -21,7 +21,7 @@
 		</StackPanel>
         <StackPanel Margin="20">
             <materialDesign:Card Height="415" Width="400" Padding="4">
-                <materialDesign:Transitioner SelectedIndex="0" Name="transitioner" AutoApplyTransitionOrigins="True" DockPanel.Dock="Right" Margin="20">
+                <materialDesign:Transitioner SelectedIndex="1" Name="transitioner" AutoApplyTransitionOrigins="True" DockPanel.Dock="Right" Margin="20">
                     <materialDesign:TransitionerSlide>
                         <materialDesign:TransitionerSlide.BackwardWipe>
                             <materialDesign:FadeWipe />
@@ -48,7 +48,35 @@
                         <materialDesign:TransitionerSlide.ForwardWipe>
                             <materialDesign:FadeWipe />
                         </materialDesign:TransitionerSlide.ForwardWipe>
-                        <Label>Grafica</Label>
+
+						<StackPanel>
+
+							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+								<Label VerticalAlignment="Center">MaxFps</Label>
+								<ComboBox x:Name="GraphicsCombo" Width="67" Height="30" Margin="205 0 0 0"/>
+							</StackPanel>
+							<Separator Margin="0 20 0 20"></Separator>
+							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+								<Label VerticalAlignment="Center">renderDistance</Label>
+								<ComboBox x:Name="GraphicsCombo2" Width="67" Height="30" Margin="165 0 0 0"/>
+							</StackPanel>
+							<Separator Margin="0 20 0 20"></Separator>
+							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+								<Label VerticalAlignment="Center">FullScreen</Label>
+								<CheckBox Name="chkFeatureEnabled" Checked="chkFeatureEnabled_Checked" Margin="240 0 0 0"/>
+							</StackPanel>
+							<Separator Margin="0 20 0 20"></Separator>
+							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+								<Label VerticalAlignment="Center">fancyGraphics</Label>
+								<CheckBox Name="chkFeatureEnabled1" Checked="chkFeatureEnabled_Checked" Margin="220 0 0 0"/>
+							</StackPanel>
+							<Separator Margin="0 20 0 20"></Separator>
+							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+								<Label VerticalAlignment="Center">enableVsync</Label>
+								<CheckBox Name="chkFeatureEnabled2" Checked="chkFeatureEnabled_Checked" Margin="227 0 0 0"/>
+							</StackPanel>
+						</StackPanel>
+						
                     </materialDesign:TransitionerSlide>
                     <materialDesign:TransitionerSlide>
                         <materialDesign:TransitionerSlide.BackwardWipe>

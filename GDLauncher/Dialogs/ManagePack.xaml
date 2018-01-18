@@ -7,8 +7,8 @@
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
              mc:Ignorable="d" 
              Height="600" Width="500" Background="White">
-    <StackPanel>
-        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Margin="0 50 0 0" FontSize="20">We are still working on this... Coming on next major release (3.x)</TextBlock>
-        <Button Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 460 0 0" Width="100">Back</Button>
-    </StackPanel>
+	<StackPanel>
+		<TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Margin="23,50,22,0" FontSize="20"><Run Text="We are still working on this... Coming on next major release (3.x)"/></TextBlock>
+		<Button Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 460 0 0" Width="100" Content="Back"/>
+	</StackPanel>
 </UserControl>
