@@ -198,8 +198,8 @@
     <Compile Include="Dialogs\ManagePack.xaml.cs">
       <DependentUpon>ManagePack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ManageServers.xaml.cs">
-      <DependentUpon>ManageServers.xaml</DependentUpon>
+    <Compile Include="Dialogs\ServerList.xaml.cs">
+      <DependentUpon>ServerList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ModpackLoading.xaml.cs">
       <DependentUpon>ModpackLoading.xaml</DependentUpon>
@@ -209,6 +209,36 @@
     </Compile>
     <Compile Include="Dialogs\OptionsUpdates.xaml.cs">
       <DependentUpon>OptionsUpdates.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\AddNewServer.xaml.cs">
+      <DependentUpon>AddNewServer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\Ban.xaml.cs">
+      <DependentUpon>Ban.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\DEOP.xaml.cs">
+      <DependentUpon>DEOP.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\Gamemode.xaml.cs">
+      <DependentUpon>Gamemode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\GiveItem.xaml.cs">
+      <DependentUpon>GiveItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\Kick.xaml.cs">
+      <DependentUpon>Kick.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\OP.xaml.cs">
+      <DependentUpon>OP.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\Pardon.xaml.cs">
+      <DependentUpon>Pardon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\Say.xaml.cs">
+      <DependentUpon>Say.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Server\Commands\Teleport.xaml.cs">
+      <DependentUpon>Teleport.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\SyncToCloud.xaml.cs">
       <DependentUpon>SyncToCloud.xaml</DependentUpon>
@@ -271,7 +301,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ManageServers.xaml">
+    <Page Include="Dialogs\ServerList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -284,6 +314,46 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\OptionsUpdates.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\AddNewServer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\Ban.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\DEOP.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\Gamemode.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\GiveItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\Kick.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\OP.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\Pardon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\Say.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Server\Commands\Teleport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -304,10 +374,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Login.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\Options.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -333,9 +399,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Pages\Options.xaml.cs">
-      <DependentUpon>Options.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

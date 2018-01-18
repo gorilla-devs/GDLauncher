@@ -89,34 +89,6 @@ namespace GDLauncher
             Application.Current.Shutdown();
         }
 
-        private void NavigationMenu_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (started == true)
-            {
-                switch (NavigationMenu.SelectedItem.ToString())
-                {
-                    case "System.Windows.Controls.ListBoxItem: Home":
-                        MainPage.Navigate(new Pages.Home());
-                        break;
-                    case "System.Windows.Controls.ListBoxItem: Options":
-                        MainPage.Navigate(new Pages.Options());
-                        break;
-                    case "System.Windows.Controls.ListBoxItem: Debug":
-                        MainPage.Navigate(new Pages.Debug());
-                        break;
-                    /*case "System.Windows.Controls.ListBoxItem: Installed Modpacks":
-                        MainPage.Navigate(new Pages.Modpacks());
-                        break;
-                    case "System.Windows.Controls.ListBoxItem: Modpacks Market":
-                        MainPage.Navigate(new Pages.ModpacksMarket());
-                        break;*/
-                    case "System.Windows.Controls.ListBoxItem: Report a bug":
-                        MainPage.Navigate(new Pages.Report_Bug());
-                        break;
-                }
-            }
-        }
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             MainPage.Navigate(new Pages.SplashScreen());

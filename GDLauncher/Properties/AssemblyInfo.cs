@@ -55,5 +55,5 @@ using System.Windows;
 // È possibile specificare tutti i valori oppure impostare valori predefiniti per i numeri relativi alla revisione e alla build 
 // usando l'asterisco '*' come illustrato di seguito:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.9.3.1")]
-[assembly: AssemblyFileVersion("2.9.3.1")]
+[assembly: AssemblyVersion("2.9.3.3")]
+[assembly: AssemblyFileVersion("2.9.3.3")]

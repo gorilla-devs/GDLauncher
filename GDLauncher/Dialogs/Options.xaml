@@ -10,8 +10,9 @@
 		<StackPanel DockPanel.Dock="Left" Width="140" Orientation="Vertical">
 			<Button Name="general" IsEnabled="False" Margin="10" Foreground="White" Click="general_Click">Generali</Button>
 			<Button Name="graphics" Margin="10" Foreground="White" Click="graphics_Click">Grafica</Button>
-			<Button Name="preferences" Margin="10" Foreground="White" Click="preferences_Click">Preferenze</Button>
 			<Button Name="others" Margin="10" Foreground="White" Click="others_Click">Altro</Button>
+            <Button Name="preferences" Visibility="Hidden" Margin="10" Foreground="White" Click="preferences_Click">Preferenze</Button>
+
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 215 0 0">
                 <Label>Version: </Label>
                 <Label Name="versionINFO"></Label>
@@ -31,12 +32,12 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label>Dedicated RAM to MC</Label>
-                                <ComboBox x:Name="ram" Margin="120 0 0 0" VerticalAlignment="Top" Height="30" Width="67"/>
+                                <ComboBox x:Name="ram" Margin="150 0 0 0" VerticalAlignment="Top" Height="30" Width="67"/>
                             </StackPanel>
                             <Separator Margin="0 20 0 20"></Separator>
                             <StackPanel Orientation="Horizontal">
                                 <Label>Link Mojang Account</Label>
-                                <Button Name="manageMojangAccount" Margin="100 0 0 0" Foreground="White" VerticalAlignment="Top" Height="30" Width="100" Content="Manage" Click="manageMojangAccount_Click"/>
+                                <Button Name="manageMojangAccount" Margin="125 0 0 0" Foreground="White" VerticalAlignment="Top" Height="30" Width="100" Content="Manage" Click="manageMojangAccount_Click"/>
                             </StackPanel>
                         </StackPanel>
                     </materialDesign:TransitionerSlide>
@@ -68,12 +69,12 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label VerticalAlignment="Center">Parallel Downloads</Label>
-                                <ComboBox x:Name="downloadThreads" Width="67" Height="30" Margin="137 0 0 0"/>
+                                <ComboBox x:Name="downloadThreads" Width="67" Height="30" Margin="155 0 0 0"/>
                             </StackPanel>
                             <Separator Margin="0 20 0 20"></Separator>
                             <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-                                <Label VerticalAlignment="Center">Show Changelog on new update</Label>
-                                <CheckBox Margin="110 0 0 0" VerticalAlignment="Top" Height="30" Width="67"/>
+                                <Label VerticalAlignment="Center">Hide the launcher when game is launched</Label>
+                                <CheckBox Name="autoHideLauncher" Margin="80 0 0 0" VerticalAlignment="Top" Height="30" Width="30"/>
                             </StackPanel>
                             <Separator Margin="0 20 0 20"></Separator>
                             <StackPanel Orientation="Horizontal" Margin="0 0 0 0">

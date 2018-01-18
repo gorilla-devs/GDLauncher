@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="GDLauncher.Dialogs.Server.Commands.Teleport"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             Height="120" Width="450" Background="White">
+    <StackPanel Margin="20">
+        <StackPanel Orientation="Horizontal">
+            <TextBox Name="user1" Width="200" Margin="0 0 10 0" materialDesign:HintAssist.Hint="What do you want to teleport?" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
+            <TextBox Name="user2" Width="200" materialDesign:HintAssist.Hint="To whom?" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
+        </StackPanel>
+        <Button Margin="0 10 0 0" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click">Teleport</Button>
+    </StackPanel>
+</UserControl>

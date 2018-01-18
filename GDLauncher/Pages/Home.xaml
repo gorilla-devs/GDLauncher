@@ -38,7 +38,7 @@ Sample license text.
                         <Button Style="{StaticResource MaterialDesignFlatButton}" Width="130" Click="Button_Click_1">
                             Console
                         </Button>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="130" Click="Button_Click_3">
+                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="140" Click="Button_Click_3">
                             Manage Servers
                         </Button>
                     </StackPanel>

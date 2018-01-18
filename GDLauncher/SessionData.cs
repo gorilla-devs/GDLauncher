@@ -21,9 +21,5 @@ namespace GDLauncher
         //DATI utente
         public static string username = "";
         public static string email = "";
-        public static string isAdmin = "";
-        //STATISTICHE
-        public static string userCount = "";
-        public static string lastUser = "";
     }
 }

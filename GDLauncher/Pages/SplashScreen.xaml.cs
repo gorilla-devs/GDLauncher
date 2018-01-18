@@ -48,7 +48,6 @@ namespace GDLauncher.Pages
             InitializeComponent();
             firstlabelprogress.Visibility = Visibility.Visible;
             //Window1.singleton.MenuToggleButton.IsEnabled = false;
-            Window1.singleton.popupbox.IsEnabled = false;
             singleton = this;
             
             CultureInfo culture;
@@ -76,7 +75,11 @@ namespace GDLauncher.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if(Properties.Settings.Default.eula == false)
+            if (!Directory.Exists(config.M_F_P + "Servers\\"))
+            {
+                Directory.CreateDirectory(config.M_F_P + "Servers\\");
+            }
+            if (Properties.Settings.Default.eula == false)
                 await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Eula(), "RootDialog");
 
             Windows.DebugOutputConsole console = new Windows.DebugOutputConsole();
@@ -103,55 +106,69 @@ namespace GDLauncher.Pages
                     }
                 }
 
-                //CHECKING FORGE JSON
-                HttpWebRequest request = (HttpWebRequest)System.Net.WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
-                request.Method = "HEAD";
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                string disposition = response.Headers["Content-Length"];
-
-
-                sw.Start();
-                var client = new WebClient();
-                client.DownloadProgressChanged += (s, ee) =>
-                {
-                    downloadingForgeJSONProgress.Value = ee.ProgressPercentage;
-                    forgeJSONSpeed.Content = string.Format("{0} kb/s", (ee.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
-                    forgeJSONMbToDownload.Content = string.Format("{0} MB / {1} MB",
-                    (ee.BytesReceived / 1024d / 1024d).ToString("0"),
-                    (ee.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
-                };
-                //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
-                if (!File.Exists(config.M_F_P + "forgeVersions.json") || (Properties.Settings.Default.forgeJSONContentLength != disposition && Properties.Settings.Default.forgeJSONContentLength != ""))
-                {
-                    downloadingForgeJSONProgress.Visibility = Visibility.Visible;
-                    downloadingForgeJSON.Visibility = Visibility.Visible;
-                    forgeJSONSpeed.Visibility = Visibility.Visible;
-                    forgeJSONMbToDownload.Visibility = Visibility.Visible;
-                    await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
-                    Properties.Settings.Default.forgeJSONContentLength = disposition;
-                    Properties.Settings.Default.Save();
-                }
-                using (StreamReader r = new StreamReader(config.M_F_P + "forgeVersions.json"))
-                {
-                    forgeJson = await r.ReadToEndAsync();
-                }
                 try
                 {
-                    dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
+                    //CHECKING FORGE JSON
+                    HttpWebRequest request = (HttpWebRequest)System.Net.WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
+                    request.Method = "HEAD";
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    string disposition = response.Headers["Content-Length"];
+                    sw.Start();
+                    var client = new WebClient();
+                    client.DownloadProgressChanged += (s, ee) =>
+                    {
+                        downloadingForgeJSONProgress.Value = ee.ProgressPercentage;
+                        forgeJSONSpeed.Content = string.Format("{0} kb/s", (ee.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                        forgeJSONMbToDownload.Content = string.Format("{0} MB / {1} MB",
+                        (ee.BytesReceived / 1024d / 1024d).ToString("0"),
+                        (ee.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
+                    };
+                    //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
+                    if (!File.Exists(config.M_F_P + "forgeVersions.json") || (Properties.Settings.Default.forgeJSONContentLength != disposition && Properties.Settings.Default.forgeJSONContentLength != ""))
+                    {
+                        downloadingForgeJSONProgress.Visibility = Visibility.Visible;
+                        downloadingForgeJSON.Visibility = Visibility.Visible;
+                        forgeJSONSpeed.Visibility = Visibility.Visible;
+                        forgeJSONMbToDownload.Visibility = Visibility.Visible;
+                        await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
+                        Properties.Settings.Default.forgeJSONContentLength = disposition;
+                        Properties.Settings.Default.Save();
+                    }
+                    using (StreamReader r = new StreamReader(config.M_F_P + "forgeVersions.json"))
+                    {
+                        forgeJson = await r.ReadToEndAsync();
+                    }
+                    try
+                    {
+                        dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
+                    }
+                    catch
+                    {
+                        downloadingForgeJSONProgress.Visibility = Visibility.Visible;
+                        downloadingForgeJSON.Visibility = Visibility.Visible;
+                        forgeJSONSpeed.Visibility = Visibility.Visible;
+                        forgeJSONMbToDownload.Visibility = Visibility.Visible;
+                        await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
+                        Properties.Settings.Default.forgeJSONContentLength = disposition;
+                        Properties.Settings.Default.Save();
+                    }
+
                 }
-                catch
-                {
-                    downloadingForgeJSONProgress.Visibility = Visibility.Visible;
-                    downloadingForgeJSON.Visibility = Visibility.Visible;
-                    forgeJSONSpeed.Visibility = Visibility.Visible;
-                    forgeJSONMbToDownload.Visibility = Visibility.Visible;
-                    await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
-                    Properties.Settings.Default.forgeJSONContentLength = disposition;
-                    Properties.Settings.Default.Save();
-                }
+                catch { }
+
+
+
                 transition.SelectedIndex = 1;
-                await Task.Delay(350);
-                Window1.singleton.MainPage.Navigate(new Pages.Login());
+                await Task.Delay(450);
+
+                if (Properties.Settings.Default["RememberUsername"].ToString() != "")
+                {
+                    SessionData.username = Properties.Settings.Default["RememberUsername"].ToString();
+                    SessionData.email = Properties.Settings.Default["RememberUsername"].ToString();
+                    Window1.singleton.MainPage.Navigate(new Pages.Home());
+                }
+                else
+                    Window1.singleton.MainPage.Navigate(new Pages.Login());
 
             }
         }

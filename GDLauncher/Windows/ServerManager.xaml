@@ -6,20 +6,54 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GDLauncher.Windows"
         mc:Ignorable="d"
-        Title="ServerManager" Height="600" Width="600" WindowStyle="None" ResizeMode="NoResize">
-    <DockPanel Name="maincontent">
-        <materialDesign:ColorZone Name="header" Padding="16" materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                                          Background="#183b45" DockPanel.Dock="Top" MouseDown="ColorZone_MouseDown">
-            <DockPanel>
-                <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Close" Width="48" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
-                    <materialDesign:PackIcon Kind="WindowClose" />
-                </Button>
-                <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Minimize" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
-                    <materialDesign:PackIcon Kind="WindowMinimize" />
-                </Button>
-                <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="red" ToolTip="Internet Not Working" Width="48" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
+        Title="ServerManager" Height="600" Width="600" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Closing="Window_Closing">
+    <materialDesign:DialogHost Identifier="ServerDialog" CloseOnClickAway="True">
+        <StackPanel>
+            <DockPanel Name="maincontent">
+                <materialDesign:ColorZone Name="header" Height="40" Padding="0 0 10 0" materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                              Background="#183b45" DockPanel.Dock="Top" MouseDown="ColorZone_MouseDown">
+                    <DockPanel>
+                        <Label Name="headerTitle" Foreground="White" FontSize="20" Margin="20 0 0 0"></Label>
+                        <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Close" Width="48" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                            <materialDesign:PackIcon Kind="WindowClose" />
+                        </Button>
+                        <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Minimize" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                            <materialDesign:PackIcon Kind="WindowMinimize" />
+                        </Button>
+                        <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="red" ToolTip="Internet Not Working" Width="48" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
+                    </DockPanel>
+                </materialDesign:ColorZone>
+                <Frame Name="MainPage" NavigationUIVisibility="Hidden"></Frame>
             </DockPanel>
-        </materialDesign:ColorZone>
-        <Frame Name="MainPage" NavigationUIVisibility="Hidden"></Frame>
-    </DockPanel>
+            <StackPanel>
+                <Button Name="start" Height="50" Width="150" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Click="start_Click">START</Button>
+                <ScrollViewer Name="_scrollViewer" HorizontalAlignment="Left" Height="303" VerticalAlignment="Top" Width="590">
+                    <TextBlock x:Name="console" TextWrapping="Wrap" Text=""/>
+                </ScrollViewer>
+                <StackPanel Name="actions" Margin="10" Orientation="Horizontal" IsEnabled="False">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Width="115">
+                        <Button Name="ban" Style="{StaticResource MaterialDesignFlatButton}" Click="ban_Click">Ban</Button>
+                        <Button Name="pardon" Style="{StaticResource MaterialDesignFlatButton}" Click="pardon_Click">Unban</Button>
+                        <Button Name="gamemode" Style="{StaticResource MaterialDesignFlatButton}" Click="gamemode_Click">Gamemode</Button>
+                        <Button Name="teleport" Style="{StaticResource MaterialDesignFlatButton}" Click="teleport_Click">Teleport</Button>
+                        <Button Name="giveItem" IsEnabled="False" Style="{StaticResource MaterialDesignFlatButton}" Click="giveItem_Click">Give Item</Button>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  Width="115">
+                        <Button Name="op" Style="{StaticResource MaterialDesignFlatButton}" Click="op_Click">OP</Button>
+                        <Button Name="DEOP" Style="{StaticResource MaterialDesignFlatButton}" Click="DEOP_Click">deOP</Button>
+                        <Button Name="kick" Style="{StaticResource MaterialDesignFlatButton}" Click="kick_Click">Kick</Button>
+                        <Button Name="sayCommand" Style="{StaticResource MaterialDesignFlatButton}" Click="sayCommand_Click">Say</Button>
+                        <Button IsEnabled="False" Style="{StaticResource MaterialDesignFlatButton}">Whitelist</Button>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Height="40" VerticalAlignment="Top">
+                        <materialDesign:PackIcon Kind="Lambda" Margin="0 6 0 0" Height="30" Width="30"/>
+                        <TextBox Name="customCommandText" Margin="10 0 0 0" Width="200" Text=""  materialDesign:HintAssist.Hint="Custom Command" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center" KeyUp="customCommandText_KeyUp"/>
+                        <Button Name="execCustomCommand" Style="{StaticResource MaterialDesignFlatButton}" Click="execCustomCommand_Click">
+                            <materialDesign:PackIcon Kind="ArrowRight"/>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </materialDesign:DialogHost>
 </Window>

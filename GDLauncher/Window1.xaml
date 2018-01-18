@@ -18,7 +18,7 @@ Sample license text.
                     <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                                   HorizontalAlignment="Right" Margin="16"
                                   IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
-                    <ListBox x:Name="NavigationMenu" Margin="0 16 0 16" PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp" Width="150" SelectionChanged="NavigationMenu_SelectionChanged">
+                    <ListBox x:Name="NavigationMenu" Margin="0 16 0 16" PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp" Width="150">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="domain:Page">
                                 <TextBlock Text="{Binding Name}" Margin="32 0 32 0"/>
@@ -67,7 +67,7 @@ Sample license text.
                                 </Button>
                             </StackPanel>
                         </materialDesign:PopupBox>
-                        <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="red" ToolTip="Internet Not Working" Width="48" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
+                        <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="#F44336" ToolTip="Internet Not Working" Width="30" Height="30" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
                     </DockPanel>
                 </materialDesign:ColorZone>
                 <Frame Name="MainPage" NavigationUIVisibility="Hidden"></Frame>

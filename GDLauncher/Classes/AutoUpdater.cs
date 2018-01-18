@@ -85,15 +85,7 @@ namespace GDLauncher.Classes
                     }
                     else
                     {
-                        if (Pages.Options.optionsrequest == true)
-                        {
-                            await DialogHost.Show(new Dialogs.OptionsUpdates(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"), 248, 40), "RootDialog", ExtendedOpenedEventHandler);
-                            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
-                        }
-                        else
-                        {
-                            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
-                        }
+                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
                     }
                 }
             }

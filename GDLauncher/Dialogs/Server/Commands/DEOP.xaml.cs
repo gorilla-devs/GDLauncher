@@ -13,22 +13,22 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GDLauncher.Dialogs
+namespace GDLauncher.Dialogs.Server.Commands
 {
     /// <summary>
-    /// Interaction logic for ManageServers.xaml
+    /// Interaction logic for DEOP.xaml
     /// </summary>
-    public partial class ManageServers : UserControl
+    public partial class DEOP : UserControl
     {
-        public ManageServers()
+        public DEOP()
         {
             InitializeComponent();
         }
 
-        private void ListViewItem_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Windows.ServerManager manager = new Windows.ServerManager();
-            manager.Show();
+            Windows.ServerManager.singleton.process.StandardInput.WriteLine("/deop " + user.Text);
+            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
         }
     }
 }

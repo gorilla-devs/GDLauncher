@@ -132,7 +132,7 @@ namespace GDLauncher.Classes
                             if (e.Data.ToString().Contains("LWJGL Version:"))
                             {
                                 loading.forgeProgress.Value = 100;
-                                Window1.singleton.Hide();
+                                if (Properties.Settings.Default.autoHideLauncher == true) Window1.singleton.Hide();
                             }
 
                         }));
@@ -160,7 +160,7 @@ namespace GDLauncher.Classes
                 process.BeginErrorReadLine();
 
                 await Task.Run(() => process.WaitForExit());
-                Window1.singleton.Show();
+                if (Properties.Settings.Default.autoHideLauncher == true) Window1.singleton.Show();
             }
             catch(Exception e)
             {

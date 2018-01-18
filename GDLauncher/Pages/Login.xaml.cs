@@ -36,7 +36,6 @@ namespace GDLauncher.Pages
         {
             InitializeComponent();
             //Window1.singleton.MenuToggleButton.IsEnabled = false;
-            Window1.singleton.popupbox.IsEnabled = false;
             transition.SelectedIndex = 0;
             //language.Text = Thread.CurrentThread.CurrentUICulture.Name;
 
@@ -56,10 +55,8 @@ namespace GDLauncher.Pages
             }
             SessionData.username = username.Text;
             SessionData.email = username.Text;
-            SessionData.isAdmin = "false";
 
             //Window1.singleton.MenuToggleButton.IsEnabled = true;
-            Window1.singleton.popupbox.IsEnabled = true;
             //Window1.singleton.loggedinName.Text = "Logged in as " + username.Text;
             transition.SelectedIndex = 2;
             await Task.Delay(500);

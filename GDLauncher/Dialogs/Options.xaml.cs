@@ -102,6 +102,10 @@ namespace GDLauncher.Dialogs
             JavaPath.Text = Classes.ComputerInfoDetect.GetJavaInstallationPath();
             downloadThreads.SelectionChanged += downloadThreads_SelectionChanged;
             ram.SelectionChanged += ram_SelectionChanged;
+            if (Properties.Settings.Default.autoHideLauncher == true) autoHideLauncher.IsChecked = true;
+            else autoHideLauncher.IsChecked = false;
+            autoHideLauncher.Checked += new RoutedEventHandler(autoHideLauncher_Checked);
+            autoHideLauncher.Unchecked += new RoutedEventHandler(autoHideLauncher_Unchecked);
 
 
         }
@@ -190,6 +194,20 @@ namespace GDLauncher.Dialogs
             Properties.Settings.Default["RAM"] = ram.SelectedValue;
             Properties.Settings.Default.Save();
             saved("Dedicated RAM Saved: " + Properties.Settings.Default["RAM"]);
+        }
+
+        private void autoHideLauncher_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.autoHideLauncher = true;
+            Properties.Settings.Default.Save();
+            saved("Saved");
+        }
+
+        private void autoHideLauncher_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.autoHideLauncher = false;
+            Properties.Settings.Default.Save();
+            saved("Saved");
         }
     }
 }

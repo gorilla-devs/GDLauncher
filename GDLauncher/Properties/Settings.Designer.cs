@@ -37,7 +37,7 @@ namespace GDLauncher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.9.3.2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.9.3.3")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -198,6 +198,18 @@ namespace GDLauncher.Properties {
             }
             set {
                 this["uuid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool autoHideLauncher {
+            get {
+                return ((bool)(this["autoHideLauncher"]));
+            }
+            set {
+                this["autoHideLauncher"] = value;
             }
         }
     }

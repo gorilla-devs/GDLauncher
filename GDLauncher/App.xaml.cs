@@ -68,6 +68,7 @@ namespace GDLauncher
             {
                 MessageBox.Show("We could not collect any information for some unknown reasons. Please contact davide.ceschia@gmail.com and ask for assistence" + ez.InnerException);
             }
+            Application.Current.Shutdown();
         }
     }
 }

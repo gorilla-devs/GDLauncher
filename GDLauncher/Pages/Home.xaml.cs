@@ -35,6 +35,7 @@ namespace GDLauncher.Pages
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
         public Windows.DebugOutputConsole debugconsole = new Windows.DebugOutputConsole();
         public static Home singleton;
+        public static Dialogs.ServerList serverList = new Dialogs.ServerList();
 
         public Home()
         {
@@ -55,23 +56,21 @@ namespace GDLauncher.Pages
 
             System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
             transition.SelectedIndex = 1;
-            if (Properties.Settings.Default["firstTimeHowTo"].ToString() == "true")
-            {
-                await Task.Delay(400);
-                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.HowTo(), "RootDialog");
-            }
-            if (Properties.Settings.Default["justUpdated"].ToString() == "true")
-            {
-                await Task.Delay(400);
-                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
-                Properties.Settings.Default["justUpdated"] = "false";
-                Properties.Settings.Default.Save();
-            }
             if (!Directory.Exists(config.M_F_P + "Packs\\"))
             {
                 Directory.CreateDirectory(config.M_F_P + "Packs\\");
             }
             await ModpacksUpdate();
+            if (Properties.Settings.Default["firstTimeHowTo"].ToString() == "true")
+            {
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.HowTo(), "RootDialog");
+            }
+            if (Properties.Settings.Default["justUpdated"].ToString() == "true")
+            {
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
+                Properties.Settings.Default["justUpdated"] = "false";
+                Properties.Settings.Default.Save();
+            }
         }
 
 
@@ -225,7 +224,7 @@ namespace GDLauncher.Pages
                     manageBtn.ToolTip = "Manage This Pack";
                     manageBtn.Style = btnStyle;
                     manageBtn.Click += new RoutedEventHandler(async (sender, e) => {
-                        await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack());
+                        await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack(), "RootDialog");
                     });
 
                     var deletebutton = new Button();
@@ -297,7 +296,7 @@ namespace GDLauncher.Pages
             Panel.SetZIndex(addNewBtn, 10);
             addNewBtn.Click += new RoutedEventHandler(async (sender, e) =>
             {
-                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(), "RootDialog", null, ExtendedClosingEventHandler);
+                await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(), "RootDialog");
                 Dialogs.InstallModpack.singleton.downloadedMB.Content = "0 MB";
                 if (!Directory.Exists(config.M_F_P + "Packs\\"))
                 {
@@ -349,37 +348,11 @@ namespace GDLauncher.Pages
             eventArgs.Session.Close();
         }
 
-        private static void ExtendedClosingEventHandler(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
-        {
-
-        }
-
-        private async void changelog_Click(object sender, RoutedEventArgs e)
-        {
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Changelog(), "RootDialog");
-        }
-
-        private async void problems_Click(object sender, RoutedEventArgs e)
-        {
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.OptionsUpdates(@"Per risolvere i tuoi problemi con il launcher, il primo tentativo e' di cancellare la cartella di minecraft del launcher.
-                                                                                        Cliccando su procedi verrai portato alla cartella minecraft dove potrai spostare i tuoi salvataggi del gioco e successivamente cancellare la cartella. Per un funzionamento ottimale del launcher ti consigliamo di riavviarlo dopo tale procedura
-                                                                                        ", 330, 270, true, "Procedi"), "RootDialog");
-
-            string filePath = config.M_F_P;
-
-            // combine the arguments together
-            // it doesn't matter if there is a space after ','
-            string argument = "/select, \"" + filePath + "\"";
-
-            System.Diagnostics.Process.Start("explorer.exe", argument);
-
-        }
-
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
 			// Window1.singleton.MainPage.Navigate(new Pages.Options());
 			// Window1.singleton.NavigationMenu.SelectedIndex = 1;
-			await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Options(), null, null);
+			await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Options(), "RootDialog");
 		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -395,7 +368,7 @@ namespace GDLauncher.Pages
 
         private async void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManageServers());
+            await MaterialDesignThemes.Wpf.DialogHost.Show(serverList, "RootDialog");
         }
     }
 }
