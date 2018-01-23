@@ -5,137 +5,38 @@
 			 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
-             mc:Ignorable="d" Height="500" Width="580" Background="White" Loaded="UserControl_Loaded">
-	<DockPanel>
-		<StackPanel DockPanel.Dock="Left" Width="140" Orientation="Vertical">
-			<Button Name="general" IsEnabled="False" Margin="10" Foreground="White" Click="general_Click">Generali</Button>
-			<Button Name="graphics" Margin="10" Foreground="White" Click="graphics_Click">Grafica</Button>
-			<Button Name="others" Margin="10" Foreground="White" Click="others_Click">Altro</Button>
-            <Button Name="preferences" Visibility="Hidden" Margin="10" Foreground="White" Click="preferences_Click">Preferenze</Button>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 215 0 0">
-                <Label>Version: </Label>
-                <Label Name="versionINFO"></Label>
+             mc:Ignorable="d" Height="500" Width="400" Background="White" Loaded="UserControl_Loaded">
+    <Grid>
+        <DockPanel>
+            <StackPanel Margin="20">
+                <StackPanel Orientation="Horizontal">
+                    <Label>Dedicated RAM to MC</Label>
+                    <ComboBox x:Name="ram" Margin="150 0 0 0" VerticalAlignment="Top" Height="30" Width="67"/>
+                </StackPanel>
+                <Separator Margin="0 20 0 20"></Separator>
+                <StackPanel Orientation="Horizontal">
+                    <Label VerticalAlignment="Center">Parallel Downloads</Label>
+                    <ComboBox x:Name="downloadThreads" Width="67" Height="30" Margin="155 0 0 0"/>
+                </StackPanel>
+                <Separator Margin="0 20 0 20"></Separator>
+                <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                    <Label VerticalAlignment="Center">Hide the launcher when game is launched</Label>
+                    <CheckBox Name="autoHideLauncher" Margin="80 0 0 0" VerticalAlignment="Top" Height="30" Width="30"/>
+                </StackPanel>
+                <Separator Margin="0 20 0 20"></Separator>
+                <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
+                    <Label VerticalAlignment="Center">Java Path</Label>
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="10 0 5 0" HorizontalScrollBarVisibility="Auto" Width="220">
+                        <TextBox Name="JavaPath" IsEnabled="False" VerticalAlignment="Top" Height="30" MinWidth="220"/>
+                    </ScrollViewer>
+                    <Button Name="JavaPathFolderBrowser" Foreground="White" Click="JavaPathFolderBrowser_Click">
+                        <materialDesign:PackIcon Kind="Folder"></materialDesign:PackIcon>
+                    </Button>
+                </StackPanel>
             </StackPanel>
-            <Button Name="closeDialog" Margin="10 10 10 10" Foreground="White" Click="closeDialog_Click">Close</Button>
-		</StackPanel>
-        <StackPanel Margin="20">
-            <materialDesign:Card Height="415" Width="400" Padding="4">
-                <materialDesign:Transitioner SelectedIndex="1" Name="transitioner" AutoApplyTransitionOrigins="True" DockPanel.Dock="Right" Margin="20">
-                    <materialDesign:TransitionerSlide>
-                        <materialDesign:TransitionerSlide.BackwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.BackwardWipe>
-                        <materialDesign:TransitionerSlide.ForwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.ForwardWipe>
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label>Dedicated RAM to MC</Label>
-                                <ComboBox x:Name="ram" Margin="150 0 0 0" VerticalAlignment="Top" Height="30" Width="67"/>
-                            </StackPanel>
-                            <Separator Margin="0 20 0 20"></Separator>
-                            <StackPanel Orientation="Horizontal">
-                                <Label>Link Mojang Account</Label>
-                                <Button Name="manageMojangAccount" Margin="125 0 0 0" Foreground="White" VerticalAlignment="Top" Height="30" Width="100" Content="Manage" Click="manageMojangAccount_Click"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </materialDesign:TransitionerSlide>
-                    <materialDesign:TransitionerSlide>
-                        <materialDesign:TransitionerSlide.BackwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.BackwardWipe>
-                        <materialDesign:TransitionerSlide.ForwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.ForwardWipe>
-
-						<StackPanel>
-
-							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-								<Label VerticalAlignment="Center">MaxFps</Label>
-								<ComboBox x:Name="GraphicsCombo" Width="67" Height="30" Margin="205 0 0 0"/>
-							</StackPanel>
-							<Separator Margin="0 20 0 20"></Separator>
-							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-								<Label VerticalAlignment="Center">renderDistance</Label>
-								<ComboBox x:Name="GraphicsCombo2" Width="67" Height="30" Margin="165 0 0 0"/>
-							</StackPanel>
-							<Separator Margin="0 20 0 20"></Separator>
-							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-								<Label VerticalAlignment="Center">FullScreen</Label>
-								<CheckBox Name="chkFeatureEnabled" Checked="chkFeatureEnabled_Checked" Margin="240 0 0 0"/>
-							</StackPanel>
-							<Separator Margin="0 20 0 20"></Separator>
-							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-								<Label VerticalAlignment="Center">fancyGraphics</Label>
-								<CheckBox Name="chkFeatureEnabled1" Checked="chkFeatureEnabled_Checked" Margin="220 0 0 0"/>
-							</StackPanel>
-							<Separator Margin="0 20 0 20"></Separator>
-							<StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-								<Label VerticalAlignment="Center">enableVsync</Label>
-								<CheckBox Name="chkFeatureEnabled2" Checked="chkFeatureEnabled_Checked" Margin="227 0 0 0"/>
-							</StackPanel>
-						</StackPanel>
-						
-                    </materialDesign:TransitionerSlide>
-                    <materialDesign:TransitionerSlide>
-                        <materialDesign:TransitionerSlide.BackwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.BackwardWipe>
-                        <materialDesign:TransitionerSlide.ForwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.ForwardWipe>
-                        <Label>Preferenze</Label>
-                    </materialDesign:TransitionerSlide>
-                    <materialDesign:TransitionerSlide>
-                        <materialDesign:TransitionerSlide.BackwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.BackwardWipe>
-                        <materialDesign:TransitionerSlide.ForwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.ForwardWipe>
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label VerticalAlignment="Center">Parallel Downloads</Label>
-                                <ComboBox x:Name="downloadThreads" Width="67" Height="30" Margin="155 0 0 0"/>
-                            </StackPanel>
-                            <Separator Margin="0 20 0 20"></Separator>
-                            <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-                                <Label VerticalAlignment="Center">Hide the launcher when game is launched</Label>
-                                <CheckBox Name="autoHideLauncher" Margin="80 0 0 0" VerticalAlignment="Top" Height="30" Width="30"/>
-                            </StackPanel>
-                            <Separator Margin="0 20 0 20"></Separator>
-                            <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-                                <Label VerticalAlignment="Center">Java Path</Label>
-                                <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="10 0 5 0" HorizontalScrollBarVisibility="Auto" Width="220">
-                                    <TextBox Name="JavaPath" IsEnabled="False" VerticalAlignment="Top" Height="30" MinWidth="220"/>
-                                </ScrollViewer>
-                                <Button Name="JavaPathFolderBrowser" Foreground="White" Click="JavaPathFolderBrowser_Click">
-                                    <materialDesign:PackIcon Kind="Folder"></materialDesign:PackIcon></Button>
-                            </StackPanel>
-                        </StackPanel>
-                    </materialDesign:TransitionerSlide>
-                    <materialDesign:TransitionerSlide>
-                        <materialDesign:TransitionerSlide.BackwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.BackwardWipe>
-                        <materialDesign:TransitionerSlide.ForwardWipe>
-                            <materialDesign:FadeWipe />
-                        </materialDesign:TransitionerSlide.ForwardWipe>
-                        <StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="20 0 20 0">
-                                <TextBox Name="mojangEmail" materialDesign:HintAssist.Hint="Mojang Email" materialDesign:HintAssist.IsFloating="True" Margin="0 0 0 10"></TextBox>
-                                <PasswordBox Name="mojangPassword" materialDesign:HintAssist.Hint="Mojang Password" materialDesign:HintAssist.IsFloating="True"></PasswordBox>
-                                <Button Name="mojangLoginBtn" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Click="mojangLoginBtn_Click">Login</Button>
-                                <TextBlock TextWrapping="Wrap">This is not yet working. Will be coming on next release (3.x)</TextBlock>
-                            </StackPanel>
-                            <Button Name="backToGeneral" Foreground="White" Width="80" HorizontalAlignment="Left" Margin="10 170 0 0" Click="backToGeneral_Click">Back</Button>
-                        </StackPanel>
-                    </materialDesign:TransitionerSlide>
-                </materialDesign:Transitioner>
-            </materialDesign:Card>
-        </StackPanel>
-        <materialDesign:Snackbar DockPanel.Dock="Bottom" Margin="-500 0 0 0" Name="snackbarSave">
+        </DockPanel>
+        <Button Name="closeDialog" Width="100" Margin="10,458,290,10" Click="closeDialog_Click" Style="{StaticResource MaterialDesignFlatButton}">Close</Button>
+        <materialDesign:Snackbar DockPanel.Dock="Bottom" Margin="0 0 0 0" Name="snackbarSave">
         </materialDesign:Snackbar>
-    </DockPanel>
+    </Grid>
 </UserControl>

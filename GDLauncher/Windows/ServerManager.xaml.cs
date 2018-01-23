@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,6 +25,7 @@ namespace GDLauncher.Windows
         bool started = false;
         public Process process;
         public static ServerManager singleton;
+        public string data;
         public ServerManager(string serverName)
         {
             InitializeComponent();
@@ -187,6 +189,17 @@ namespace GDLauncher.Windows
         private async void DEOP_Click(object sender, RoutedEventArgs e)
         {
             await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Server.Commands.DEOP(), "ServerDialog");
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WebClient client = new WebClient();
+            data = await client.DownloadStringTaskAsync("http://minecraft-ids.grahamedgecombe.com/items.json");
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Server.Settings(Dir), "ServerDialog");
         }
     }
 }

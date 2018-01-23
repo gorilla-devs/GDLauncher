@@ -60,7 +60,7 @@ namespace GDLauncher.Pages
             //Window1.singleton.loggedinName.Text = "Logged in as " + username.Text;
             transition.SelectedIndex = 2;
             await Task.Delay(500);
-            if (keepMeIn.IsChecked == true)
+            /*if (keepMeIn.IsChecked == true)
             {
                 Properties.Settings.Default["RememberUsername"] = username.Text;
                 Properties.Settings.Default.Save();
@@ -69,7 +69,7 @@ namespace GDLauncher.Pages
             {
                 Properties.Settings.Default["RememberUsername"] = "";
                 Properties.Settings.Default.Save();
-            }
+            }*/
             Window1.singleton.MainPage.Navigate(new Pages.Home());
             Window1.singleton.NavigationMenu.SelectedIndex = 0;
             loading.Visibility = Visibility.Hidden;
@@ -92,9 +92,14 @@ namespace GDLauncher.Pages
             if (Properties.Settings.Default["RememberUsername"].ToString() != "")
             {
                 username.Text = Properties.Settings.Default["RememberUsername"].ToString();
-                keepMeIn.IsChecked = true;
+                //keepMeIn.IsChecked = true;
             }
 
+        }
+
+        private void TextBlock_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            loginKind.SelectedIndex = 1;
         }
     }
 }

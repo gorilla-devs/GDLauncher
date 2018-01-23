@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GDLauncher.Windows"
         mc:Ignorable="d"
-        Title="ServerManager" Height="600" Width="600" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Closing="Window_Closing">
+        Title="ServerManager" Height="600" Width="600" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Closing="Window_Closing" Loaded="Window_Loaded">
     <materialDesign:DialogHost Identifier="ServerDialog" CloseOnClickAway="True">
         <StackPanel>
             <DockPanel Name="maincontent">
@@ -25,9 +25,12 @@
                 </materialDesign:ColorZone>
                 <Frame Name="MainPage" NavigationUIVisibility="Hidden"></Frame>
             </DockPanel>
-            <StackPanel>
-                <Button Name="start" Height="50" Width="150" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Click="start_Click">START</Button>
-                <ScrollViewer Name="_scrollViewer" HorizontalAlignment="Left" Height="303" VerticalAlignment="Top" Width="590">
+            <StackPanel Margin="30 0 0 0">
+                <StackPanel Orientation="Horizontal">
+                    <Button Name="start" Height="50" Width="150" Foreground="White" Margin="0 10 0 0" Click="start_Click">START</Button>
+                    <Button Width="150" Height="50" Margin="30 10 0 0" Foreground="White" Click="Button_Click">Settings</Button>
+                </StackPanel>
+                <ScrollViewer Name="_scrollViewer" HorizontalAlignment="Left" Height="290" VerticalAlignment="Top" Margin="0 20 0 0" Width="590">
                     <TextBlock x:Name="console" TextWrapping="Wrap" Text=""/>
                 </ScrollViewer>
                 <StackPanel Name="actions" Margin="10" Orientation="Horizontal" IsEnabled="False">
@@ -36,14 +39,14 @@
                         <Button Name="pardon" Style="{StaticResource MaterialDesignFlatButton}" Click="pardon_Click">Unban</Button>
                         <Button Name="gamemode" Style="{StaticResource MaterialDesignFlatButton}" Click="gamemode_Click">Gamemode</Button>
                         <Button Name="teleport" Style="{StaticResource MaterialDesignFlatButton}" Click="teleport_Click">Teleport</Button>
-                        <Button Name="giveItem" IsEnabled="False" Style="{StaticResource MaterialDesignFlatButton}" Click="giveItem_Click">Give Item</Button>
+                        <Button Name="giveItem" Style="{StaticResource MaterialDesignFlatButton}" Click="giveItem_Click">Give Item</Button>
                     </StackPanel>
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Left"  Width="115">
                         <Button Name="op" Style="{StaticResource MaterialDesignFlatButton}" Click="op_Click">OP</Button>
                         <Button Name="DEOP" Style="{StaticResource MaterialDesignFlatButton}" Click="DEOP_Click">deOP</Button>
                         <Button Name="kick" Style="{StaticResource MaterialDesignFlatButton}" Click="kick_Click">Kick</Button>
                         <Button Name="sayCommand" Style="{StaticResource MaterialDesignFlatButton}" Click="sayCommand_Click">Say</Button>
-                        <Button IsEnabled="False" Style="{StaticResource MaterialDesignFlatButton}">Whitelist</Button>
+                        <Button Style="{StaticResource MaterialDesignFlatButton}">Whitelist</Button>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Height="40" VerticalAlignment="Top">
                         <materialDesign:PackIcon Kind="Lambda" Margin="0 6 0 0" Height="30" Width="30"/>

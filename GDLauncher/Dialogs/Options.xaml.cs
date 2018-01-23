@@ -25,48 +25,10 @@ namespace GDLauncher.Dialogs
         public Options()
         {
             InitializeComponent();
-            CSharpAnalytics.AutoMeasurement.Client.TrackScreenView("Options");
+            DialogHostExtensions.SetCloseOnClickAway(this, true);
+
 
         }
-
-        private void general_Click(object sender, RoutedEventArgs e)
-		{
-            general.IsEnabled = false;
-            graphics.IsEnabled = true;
-            preferences.IsEnabled = true;
-            others.IsEnabled = true;
-			transitioner.SelectedIndex = 0;
-		}
-
-		private void graphics_Click(object sender, RoutedEventArgs e)
-		{
-            general.IsEnabled = true;
-            graphics.IsEnabled = false;
-            preferences.IsEnabled = true;
-            others.IsEnabled = true;
-            transitioner.SelectedIndex = 1;
-
-		}
-
-		private void preferences_Click(object sender, RoutedEventArgs e)
-		{
-            general.IsEnabled = true;
-            graphics.IsEnabled = true;
-            preferences.IsEnabled = false;
-            others.IsEnabled = true;
-            transitioner.SelectedIndex = 2;
-
-		}
-
-		private void others_Click(object sender, RoutedEventArgs e)
-		{
-            general.IsEnabled = true;
-            graphics.IsEnabled = true;
-            preferences.IsEnabled = true;
-            others.IsEnabled = false;
-            transitioner.SelectedIndex = 3;
-
-		}
 
         private void closeDialog_Click(object sender, RoutedEventArgs e)
         {
@@ -95,8 +57,7 @@ namespace GDLauncher.Dialogs
                 ram.Items.Add("8");
             }
 
-
-            versionINFO.Content = Properties.Settings.Default.version;
+            
             downloadThreads.SelectedValue = Properties.Settings.Default["download_threads"];
             ram.SelectedValue = Properties.Settings.Default["RAM"];
             JavaPath.Text = Classes.ComputerInfoDetect.GetJavaInstallationPath();
@@ -127,36 +88,6 @@ namespace GDLauncher.Dialogs
             snackbarSave.IsActive = true; 
              await Task.Delay(3000);
             snackbarSave.IsActive = false;
-        }
-
-        private void manageMojangAccount_Click(object sender, RoutedEventArgs e)
-        {
-            transitioner.SelectedIndex = 4;
-        }
-
-        private void backToGeneral_Click(object sender, RoutedEventArgs e)
-        {
-            general.IsEnabled = false;
-            graphics.IsEnabled = true;
-            preferences.IsEnabled = true;
-            others.IsEnabled = true;
-            transitioner.SelectedIndex = 0;
-        }
-
-        private void mojangLoginBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if(mojangLoginBtn.Content.ToString() == "Login")
-            {
-                mojangLoginBtn.Content = "Unlink Account";
-                mojangEmail.IsEnabled = false;
-                mojangPassword.IsEnabled = false;
-            }
-            else
-            {
-                mojangLoginBtn.Content = "Login";
-                mojangEmail.IsEnabled = true;
-                mojangPassword.IsEnabled = true;
-            }
         }
 
         private void JavaPathFolderBrowser_Click(object sender, RoutedEventArgs e)

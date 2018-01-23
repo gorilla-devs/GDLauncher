@@ -4,8 +4,8 @@
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
 
 /*Scarica e posiziona java nella cartella giusta*/
-using Ionic.Zip;
-using SevenZip;
+using ICSharpCode.SharpZipLib.GZip;
+using ICSharpCode.SharpZipLib.Tar;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,17 +36,17 @@ namespace GDLauncher.Classes
             }
             if (Properties.Settings.Default["JavaPath"].ToString() == "Empty")
             {
-                if (Directory.Exists(config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64) ||
-                    Directory.Exists(config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL32))
+                if (Directory.Exists(config.javaLocal + "runtime\\jre\\" + config.jre64FileName) ||
+                    Directory.Exists(config.javaLocal + "runtime\\jre\\" + config.jre32FileName))
                 {
                     if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
                     {
-                        Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
+                        Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.jre64FileName + "\\";
                         Properties.Settings.Default.Save();
                     }
                     else
                     {
-                        Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
+                        Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.jre32FileName + "\\";
                         Properties.Settings.Default.Save();
                     }
                     return true;
@@ -77,39 +77,47 @@ namespace GDLauncher.Classes
             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("pleaseWait");
-            Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("downloadingJava");
+            Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("downloadingJava");
             Pages.SplashScreen.singleton.secondLabel.Content = "";
             string url = "";
             //i .exe sono zip in verita'
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
             {
-                url = config.updateWebsite + "java/" + config.javaDownloadURL64 + ".zip";
+                url = config.jre64URL;
             }
             else
             {
-                url = config.updateWebsite + "java/" + config.javaDownloadURL32 + ".zip";
+                url = config.jre32URL;
             }
             Uri uri = new Uri(url);
 
             webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
             webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-            webClient.OpenRead(url);
-            bytes_total = Convert.ToInt64(webClient.ResponseHeaders["Content-Length"]) / 1024;
+            webClient.Headers.Set("Cookie", "oraclelicense=accept-securebackup-cookie");
             sw.Start();
             try
             {
                 await webClient.DownloadFileTaskAsync(new Uri(url), config.javaLocal + "runtime\\java.zip");
             }
-            catch
+            catch(Exception e)
             {
-                MessageBox.Show("Errore nel download di JAVA. Minecraft potrebbe non avviarsi correttamente");
+                MessageBox.Show("Errore nel download di JAVA. Minecraft potrebbe non avviarsi correttamente" + e.Message);
             }
             Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("extractingJava");
+            Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("extractingJava");
             try
             {
-                ZipFile zip = ZipFile.Read(config.javaLocal + "runtime\\java.zip");
-                await Task.Factory.StartNew(() => zip.ExtractAll(config.javaLocal + "runtime\\jre\\", ExtractExistingFileAction.OverwriteSilently)).ContinueWith((ante) => Thread.Sleep(200)); ;
+                using (Stream targetStream = new GZipInputStream(File.OpenRead(config.javaLocal + "runtime\\java.zip")))
+                {
+                    using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(targetStream, TarBuffer.DefaultBlockFactor))
+                    {
+                        await Task.Factory.StartNew(() =>
+                        {
+                            tarArchive.ExtractContents(config.javaLocal + "runtime\\jre");
+                        })
+                        .ContinueWith((ante) => Thread.Sleep(200)); ;
+                    }
+                }
             }
             catch(TargetInvocationException e)
             {
@@ -117,16 +125,16 @@ namespace GDLauncher.Classes
             }
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
             {
-                Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
+                Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.jre64FileName + "\\";
                 Properties.Settings.Default.Save();
             }
             else
             {
-                Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.javaDownloadURL64 + "\\";
+                Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.jre32FileName + "\\";
                 Properties.Settings.Default.Save();
             }
             Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Hidden;
-            Pages.SplashScreen.singleton.firstLabel.Content = "Java Extraction Completed";
+            Pages.SplashScreen.singleton.firstLabel.Text = "Java Extraction Completed";
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
         }
 
@@ -147,7 +155,7 @@ namespace GDLauncher.Classes
 
         }
 
-        private static async void Completed(object sender, AsyncCompletedEventArgs e)
+        private static void Completed(object sender, AsyncCompletedEventArgs e)
         {
             try
             {

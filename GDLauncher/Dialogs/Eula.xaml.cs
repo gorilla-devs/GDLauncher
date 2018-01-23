@@ -41,5 +41,16 @@ namespace GDLauncher.Dialogs
         {
             Application.Current.Shutdown();
         }
+
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (e.VerticalChange > 0)
+            {
+                if (e.VerticalOffset + e.ViewportHeight == e.ExtentHeight)
+                {
+                    accept.IsEnabled = true;
+                }
+            }
+        }
     }
 }

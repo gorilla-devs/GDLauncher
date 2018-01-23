@@ -73,12 +73,16 @@ namespace GDLauncher.Dialogs
                 delete.Margin = new Thickness(0, 0, 10, 0);
                 delete.Click += (s, ex) =>
                 {
-                    if (Directory.Exists(dir))
+                    try
                     {
-                        Directory.Delete(dir, true);
+                        if (Directory.Exists(dir))
+                        {
+                            Directory.Delete(dir, true);
+                        }
+                        serversList.Children.Remove(item);
                     }
-                    serversList.Children.Clear();
-                    refreshServers();
+                    catch { }
+
                 };
 
 
@@ -89,22 +93,29 @@ namespace GDLauncher.Dialogs
                 button.Content = "Open Manager";
                 button.Click += async (s, ex) =>
                 {
-                    if (!started)
+                    if (Directory.Exists(dir))
                     {
-                        MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
-                        await Task.Delay(300);
-                        Windows.ServerManager manager = new Windows.ServerManager(dir);
-                        started = true;
-                        button.IsEnabled = false;
-                        delete.IsEnabled = false;
-                        label.Content = Path.GetFileName(dir) + " (active)";
-                        manager.Show();
-                        manager.Closed += (ss, ee) =>
+                        if (!started)
                         {
-                            button.IsEnabled = true;
-                            delete.IsEnabled = true;
-                            label.Content = Path.GetFileName(dir);
-                        };
+                            button.IsEnabled = false;
+                            delete.IsEnabled = false;
+                            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+                            await Task.Delay(300);
+                            Windows.ServerManager manager = new Windows.ServerManager(dir);
+                            started = true;
+                            label.Content = Path.GetFileName(dir) + " (active)";
+                            manager.Show();
+                            manager.Closed += (ss, ee) =>
+                            {
+                                button.IsEnabled = true;
+                                delete.IsEnabled = true;
+                                label.Content = Path.GetFileName(dir);
+                            };
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("This server does not exist. Maybe it has been manually deleted");
                     }
                 };
                 
@@ -117,6 +128,83 @@ namespace GDLauncher.Dialogs
                 serversList.Children.Add(item);
             }
         }
+
+
+        public void addNew(string dir)
+        {
+            var dockpanel = new DockPanel();
+            MaterialDesignThemes.Wpf.Card item = new MaterialDesignThemes.Wpf.Card();
+            item.Margin = new Thickness(0, 0, 0, 10);
+            item.Height = 70;
+            item.Content = dockpanel;
+
+            var label = new Label();
+            label.FontSize = 16;
+            label.Margin = new Thickness(10, 0, 0, 0);
+            label.VerticalAlignment = VerticalAlignment.Center;
+            label.Content = Path.GetFileName(dir);
+            label.HorizontalAlignment = HorizontalAlignment.Left;
+
+            var buttonsPanel = new DockPanel();
+            buttonsPanel.HorizontalAlignment = HorizontalAlignment.Right;
+
+
+            Style buttonstyle = Application.Current.FindResource("MaterialDesignFlatButton") as Style;
+
+            var delete = new Button();
+            delete.Width = 60;
+            delete.Style = buttonstyle;
+            delete.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#F44336"));
+            var iconpackplay = new MaterialDesignThemes.Wpf.PackIcon();
+            iconpackplay.Kind = MaterialDesignThemes.Wpf.PackIconKind.Delete;
+            delete.Content = iconpackplay;
+            delete.Margin = new Thickness(0, 0, 10, 0);
+            delete.Click += (s, ex) =>
+            {
+                if (Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, true);
+                }
+                serversList.Children.Remove(item);
+            };
+
+
+
+            var button = new Button();
+            button.Width = 130;
+            button.Style = buttonstyle;
+            button.Content = "Open Manager";
+            button.Click += async (s, ex) =>
+            {
+                if (!started)
+                {
+                    MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+                    await Task.Delay(300);
+                    Windows.ServerManager manager = new Windows.ServerManager(dir);
+                    started = true;
+                    button.IsEnabled = false;
+                    delete.IsEnabled = false;
+                    label.Content = Path.GetFileName(dir) + " (active)";
+                    manager.Show();
+                    manager.Closed += (ss, ee) =>
+                    {
+                        button.IsEnabled = true;
+                        delete.IsEnabled = true;
+                        label.Content = Path.GetFileName(dir);
+                    };
+                }
+            };
+
+
+            dockpanel.Children.Add(label);
+            buttonsPanel.Children.Add(button);
+            buttonsPanel.Children.Add(delete);
+            dockpanel.Children.Add(buttonsPanel);
+
+            serversList.Children.Add(item);
+            
+        }
+
 
         private void addNewServer_Click(object sender, RoutedEventArgs e)
         {

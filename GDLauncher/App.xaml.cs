@@ -21,8 +21,8 @@ namespace GDLauncher
     /// </summary>
     public partial class App : Application
     {
-        private static readonly System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
-        async void App_Startup(object sender, StartupEventArgs e)
+        //private static readonly System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
+        void App_Startup(object sender, StartupEventArgs e)
         {
             string screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth.ToString();
             string screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight.ToString();
@@ -33,9 +33,6 @@ namespace GDLauncher
                 GDLauncher.Properties.Settings.Default["uuid"] = Guid.NewGuid().ToString();
                 GDLauncher.Properties.Settings.Default.Save();
             }
-            CSharpAnalytics.AutoMeasurement.Instance = new CSharpAnalytics.WpfAutoMeasurement();
-            CSharpAnalytics.AutoMeasurement.Start(new CSharpAnalytics.MeasurementConfiguration("UA-112169830-1", "GDLauncher", GDLauncher.Properties.Settings.Default.version));
-            CSharpAnalytics.AutoMeasurement.Client.TrackEvent("Started", "Startup", "Launcher started");
 
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;

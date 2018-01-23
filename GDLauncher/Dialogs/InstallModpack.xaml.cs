@@ -40,7 +40,6 @@ namespace GDLauncher.Dialogs
         {
             InitializeComponent();
             singleton = this;
-            CSharpAnalytics.AutoMeasurement.Client.TrackScreenView("InstallPack");
             name = whatToInstall;
             DialogHostExtensions.SetCloseOnClickAway(this, true);
         }
@@ -195,7 +194,7 @@ namespace GDLauncher.Dialogs
             await Task.Run(() => downloader._cts.Cancel());
             await Task.Run(() => ctoken.Cancel());
 
-            await Task.Run( () => Application.Current.Dispatcher.Invoke(new Action(async () =>
+            await Task.Run( () => Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 try
                 {

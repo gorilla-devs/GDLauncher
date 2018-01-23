@@ -33,7 +33,6 @@ namespace GDLauncher.Dialogs
         public HowTo()
         {
             //Window1.singleton.MenuToggleButton.IsEnabled = false;
-            Window1.singleton.popupbox.IsEnabled = false;
             InitializeComponent();
             try
             {

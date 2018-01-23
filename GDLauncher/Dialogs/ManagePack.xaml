@@ -7,8 +7,26 @@
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
              mc:Ignorable="d" 
              Height="600" Width="500" Background="White">
-	<StackPanel>
-		<TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Margin="23,50,22,0" FontSize="20"><Run Text="We are still working on this... Coming on next major release (3.x)"/></TextBlock>
-		<Button Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 460 0 0" Width="100" Content="Back"/>
-	</StackPanel>
+    <Grid>
+
+        <StackPanel>
+            <materialDesign:Card Width="400" Height="150" Margin="0 10 0 0">
+                <StackPanel>
+                    <DockPanel VerticalAlignment="Top" Margin="0 20 0 0">
+                        <Label VerticalAlignment="Center" Margin="10 0 0 0">Rename Instance</Label>
+                        <TextBox Name="instanceName" materialDesign:HintAssist.IsFloating="True" materialDesign:HintAssist.Hint="Instance Name" Width="200"></TextBox>
+                    </DockPanel>
+                    <Button Name="changeInstanceName" Foreground="White" Width="200" Margin="0 20 0 0" Click="changeInstanceName_Click">Change Instance Name</Button>
+                </StackPanel>
+            </materialDesign:Card>
+            <materialDesign:Card Width="400" Height="370" Margin="0 10 0 0" AllowDrop="True"  DragEnter="Card_DragEnter" DragLeave="Card_DragLeave" Drop="Card_Drop">
+                <StackPanel Name="filesList" Width="400" Height="370">
+
+                </StackPanel>
+            </materialDesign:Card>
+            <Button Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 20 0 0" Width="100" Content="Back"/>
+        </StackPanel>
+        <Label x:Name="dragInfo" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Drag and drop the mod jar to add it" Margin="140,346,160,229"/>
+
+    </Grid>
 </UserControl>

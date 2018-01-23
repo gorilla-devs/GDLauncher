@@ -41,7 +41,6 @@ namespace GDLauncher.Pages
         {
             InitializeComponent();
             singleton = this;
-            CSharpAnalytics.AutoMeasurement.Client.TrackScreenView("Home");
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
             {
                 var navWindow = Window.GetWindow(this) as NavigationWindow;
@@ -204,7 +203,7 @@ namespace GDLauncher.Pages
                     folderButton.Margin = new Thickness(0, 0, 0, 0);
                     folderButton.ToolTip = "Open Pack's Folder";
                     folderButton.Padding = new Thickness(2, 0, 2, 0);//delete_click(this, e, card.Name, dir)
-                    folderButton.Click += new RoutedEventHandler(async (sender, e) =>
+                    folderButton.Click += new RoutedEventHandler((sender, e) =>
                     {
                         // combine the arguments together
                         // it doesn't matter if there is a space after ','
@@ -224,7 +223,7 @@ namespace GDLauncher.Pages
                     manageBtn.ToolTip = "Manage This Pack";
                     manageBtn.Style = btnStyle;
                     manageBtn.Click += new RoutedEventHandler(async (sender, e) => {
-                        await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack(), "RootDialog");
+                        await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack(dir), "RootDialog");
                     });
 
                     var deletebutton = new Button();
@@ -316,7 +315,7 @@ namespace GDLauncher.Pages
             modpacksListContainer.Children.Add(addNew);
         }
 
-        async void play_click(object sender, RoutedEventArgs e, string card, string dir)
+        void play_click(object sender, RoutedEventArgs e, string card, string dir)
         {
             MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card);
             try
@@ -347,13 +346,6 @@ namespace GDLauncher.Pages
             await Task.Delay(1200);
             eventArgs.Session.Close();
         }
-
-        private async void Button_Click(object sender, RoutedEventArgs e)
-        {
-			// Window1.singleton.MainPage.Navigate(new Pages.Options());
-			// Window1.singleton.NavigationMenu.SelectedIndex = 1;
-			await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Options(), "RootDialog");
-		}
 
 		private void Button_Click_1(object sender, RoutedEventArgs e)
         {

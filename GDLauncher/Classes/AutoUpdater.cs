@@ -73,7 +73,7 @@ namespace GDLauncher.Classes
                             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
                             Window1.versionok = false;
-                            Pages.SplashScreen.singleton.firstLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updatingLauncher");
+                            Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("updatingLauncher");
                             Pages.SplashScreen.singleton.secondLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
                             Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + "...";
                             Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("updateFound"));
@@ -104,6 +104,7 @@ namespace GDLauncher.Classes
         {
             if (Window1.versionok == false)
             {
+                Pages.SplashScreen.singleton.waiting.Visibility = Visibility.Hidden;
                 string filename = "";
                 Uri uri = new Uri(url);
                 filename = System.IO.Path.GetFileName(uri.LocalPath);
@@ -186,7 +187,7 @@ namespace GDLauncher.Classes
 
         }
 
-        private static async void Completed(object sender, AsyncCompletedEventArgs e)
+        private static void Completed(object sender, AsyncCompletedEventArgs e)
         {
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
             sw.Reset();

@@ -10,7 +10,7 @@ Sample license text.
         xmlns:local="clr-namespace:GDLauncher"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         mc:Ignorable="d"
-        Title="GDLauncher" Height="700" Width="700" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="GDLauncher" Height="700" Width="600" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <materialDesign:DialogHost Identifier="RootDialog" CloseOnClickAway="{Binding Path=DialogContent.(local:DialogHostExtensions.CloseOnClickAway), RelativeSource={RelativeSource Self}, FallbackValue=True}">
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
             <materialDesign:DrawerHost.LeftDrawerContent >
@@ -67,6 +67,9 @@ Sample license text.
                                 </Button>
                             </StackPanel>
                         </materialDesign:PopupBox>
+                        <Button DockPanel.Dock="Right" Foreground="White" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click_7">
+                            <materialDesign:PackIcon Kind="Settings" VerticalAlignment="Center"></materialDesign:PackIcon>
+                        </Button>
                         <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="#F44336" ToolTip="Internet Not Working" Width="30" Height="30" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
                     </DockPanel>
                 </materialDesign:ColorZone>

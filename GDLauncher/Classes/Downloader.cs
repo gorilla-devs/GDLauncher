@@ -1,12 +1,13 @@
 ﻿/*Questa classe scarica tutti i files che le vengono dati, serve in pratica per scaricare i pacchetti*/
-using Ionic.Zip;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
+//using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -184,15 +185,10 @@ namespace GDLauncher.Classes
             }
             if (File.Exists(@dir))
             {
-                using (ZipFile zip = ZipFile.Read(@dir))
-                {
-                    //ESTRAE LA LISTA JSON DI ROBA DA SCARICARE E IL FILE JAR PRINCIPALE DI FORGE
-                    await Task.Run(() => {
-                        token.ThrowIfCancellationRequested();
-                        zip.ExtractAll(@natives, ExtractExistingFileAction.OverwriteSilently);
-                    }, token);
-                }
+                Classes.ZipSharp.ExtractZipFile(dir, null, @natives);
             }
         }
+
+        
     }
 }

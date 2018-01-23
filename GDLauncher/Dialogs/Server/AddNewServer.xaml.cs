@@ -51,12 +51,29 @@ namespace GDLauncher.Dialogs.Server
 
         private async void createServerBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (serverName.Text == "")
-                return;
-            if (!Directory.Exists(config.M_F_P + "Servers\\" + serverName.Text + "\\"))
+            Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
+            if (String.IsNullOrEmpty(serverName.Text))
             {
-                Directory.CreateDirectory(config.M_F_P + "Servers\\" + serverName.Text + "\\");
+                error.Visibility = Visibility.Visible;
+                error.Content = "Nome istanza vuoto";
+                return;
             }
+            if (!rg.IsMatch(serverName.Text) || (serverName.Text.Contains(" ")))
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "Solo lettere e numero ammessi";
+                return;
+            }
+            if (Directory.Exists(config.M_F_P + "Servers\\" + serverName.Text + "\\"))
+            {
+                error.Visibility = Visibility.Visible;
+                error.Content = "Nome istanza gia' esistente";
+                return;
+            }
+            error.Visibility = Visibility.Hidden;
+            serverName.IsEnabled = false;
+            MCversions.IsEnabled = false;
+            Directory.CreateDirectory(config.M_F_P + "Servers\\" + serverName.Text + "\\");
             client.DownloadProgressChanged += (s, es) =>
             {
                 progress.Value = es.ProgressPercentage;
@@ -71,6 +88,8 @@ namespace GDLauncher.Dialogs.Server
             }
             catch (WebException) { }
 
+            Dialogs.ServerList.singleton.addNew(config.M_F_P + "Servers\\" + serverName.Text);
+
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
         }
 
@@ -79,9 +98,14 @@ namespace GDLauncher.Dialogs.Server
             if (client.IsBusy)
             {
                 client.CancelAsync();
+                await Task.Delay(500);
+                try
+                {
+                    Directory.Delete(config.M_F_P + "Servers\\" + serverName.Text, true);
+                }
+                catch { }
             }
-            await Task.Delay(500);
-            Directory.Delete(config.M_F_P + "Servers\\" + serverName.Text, true);
+            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
         }
     }
 }

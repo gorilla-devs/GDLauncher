@@ -4,7 +4,6 @@
 //GITHUB Project: https://github.com/killpowa/Twickt-Launcher
 
 /*Raccoglie tutta la lista di URLs necessari per scaricare il pacchetto*/
-using Ionic.Zip;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -331,16 +330,16 @@ namespace GDLauncher.Classes
                 //VERIFICA SE L'INSTALLER SCARICATO ESISTE, SE ESISTE PROCEDE CON L'ESTRAZIONE DEI DUE FILES
                 if (File.Exists(@temp + "forge-" + forgefilename + "-installer.jar"))
                 {
-                    using (ZipFile zip = ZipFile.Read(@temp + "forge-" + forgefilename + "-installer.jar"))
-                    {
-                        //ESTRAE LA LISTA JSON DI ROBA DA SCARICARE E IL FILE JAR PRINCIPALE DI FORGE
-                        await Task.Factory.StartNew(() => zip.ExtractSelectedEntries("install_profile.json", "\\", @temp, ExtractExistingFileAction.OverwriteSilently));
-                        //LEGGE DAL FILE PROFILE JSON IL NOME DEL FILE DI FORGE DA ESTRARRE
-                        var x = File.ReadAllText(@temp + "install_profile.json");
-                        dynamic x1 = await Task.Run( () => JsonConvert.DeserializeObject(x));
-                        forgefilepath = x1["install"]["filePath"];
-                        await Task.Factory.StartNew(() => zip.ExtractSelectedEntries(forgefilepath, "\\", @temp, ExtractExistingFileAction.OverwriteSilently));
-                    }
+                    //ESTRAE LA LISTA JSON DI ROBA DA SCARICARE E IL FILE JAR PRINCIPALE DI FORGE
+                    Classes.ZipSharp.ExtractZipFile(@temp + "forge-" + forgefilename + "-installer.jar", null, @temp, "install_profile.json");
+
+                    //LEGGE DAL FILE PROFILE JSON IL NOME DEL FILE DI FORGE DA ESTRARRE
+                    var x = File.ReadAllText(@temp + "install_profile.json");
+                    dynamic x1 = await Task.Run( () => JsonConvert.DeserializeObject(x));
+                    forgefilepath = x1["install"]["filePath"];
+                    Classes.ZipSharp.ExtractZipFile(@temp + "forge-" + forgefilename + "-installer.jar", null, @temp, forgefilepath);
+                    
+                    
                     //CONTROLLA SE ESISTE LA CARTELLA DOVE METTERE IL FILE PRINCIPALE DI FORGE, SE NON ESISTE LA CREA
                     if (!Directory.Exists(@libraries + "net\\minecraftforge\\forge\\" + forgefilename + " \\"))
                     {

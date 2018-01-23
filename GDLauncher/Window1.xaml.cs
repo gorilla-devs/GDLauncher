@@ -30,12 +30,9 @@ namespace GDLauncher
         public Window1()
         {
             InitializeComponent();
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
-            {
-                var navWindow = Window.GetWindow(this) as NavigationWindow;
-                if (navWindow != null) navWindow.ShowsNavigationUI = false;
-            }));
             singleton = this;
+            MainPage.JournalOwnership = JournalOwnership.OwnsJournal;
+            MainPage.Navigated += new NavigatedEventHandler(NavigationService_Navigated);
             Timer myTimer = new Timer();
             myTimer.Elapsed += new ElapsedEventHandler(DisplayTimeEvent);
             myTimer.Interval = 5000; // 1000 ms is one second
@@ -57,7 +54,7 @@ namespace GDLauncher
                     }
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
@@ -84,7 +81,7 @@ namespace GDLauncher
             }
         }
 
-        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }
@@ -131,6 +128,16 @@ namespace GDLauncher
         private void Window_Closed(object sender, EventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private async void Button_Click_7(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Options(), "RootDialog");
+        }
+
+        private void NavigationService_Navigated(object sender, NavigationEventArgs e)
+        {
+            MainPage.RemoveBackEntry();
         }
     }
 }

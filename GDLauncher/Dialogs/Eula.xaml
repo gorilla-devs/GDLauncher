@@ -10,7 +10,7 @@
     <Grid>
         <StackPanel>
             <materialDesign:Card Height="500" Margin="10">
-                <ScrollViewer>
+                <ScrollViewer Name="scrollBar" ScrollChanged="ScrollViewer_ScrollChanged">
                     <StackPanel Margin="20">
                         <Label FontSize="25" HorizontalAlignment="Center">Terms of Service</Label>
                         <Label FontSize="20">About Us</Label>
@@ -23,7 +23,7 @@
                         <TextBlock TextWrapping="Wrap" FontSize="13">
                             Please read this carefully. These terms of service (“Terms”), along with GorillaDevs’s privacy policy located at https://gorilladevs.com/privacy (“Privacy Policy”), form a binding contract between you and GorillaDevs (“GorillaDevs”). By using a GorillaDevs website and/or GorillaDevs's services you (“User”) hereby agree to be bound by these Terms. Otherwise, please discontinue the use of this website and/or GorillaDevs service(s).<LineBreak /><LineBreak />
                             In this Terms, we refer to the Sites, our desktop and mobile applications, and the products and services offered by GorillaDevs through the Sites and our desktop and mobile software applications (including all Content (defined below) available through the Sites and our desktop and mobile software applications) as the "Service"(Services). These Terms of Service describe the terms and conditions applicable to your access and use of the Service.<LineBreak /><LineBreak />
-                            GorillaDevs permits you to view and use the Service for your personal, non-commercial use, provided you comply with the terms and conditions of these Terms of Service. Except as otherwise expressly permitted in writing, the User must respect the licences of the software provided by GorillaDevs. More informations about the single licences may be found on our Github page: https://github.com/killpowa.<LineBreak /><LineBreak />
+                            GorillaDevs permits you to view and use the Service for your personal, non-commercial use, provided you comply with the terms and conditions of these Terms of Service. Except as otherwise expressly permitted in writing, the User must respect the licences of the software provided by GorillaDevs. More informations about the single licences may be found on our Github page: https://github.com/gorilla-devs.<LineBreak /><LineBreak />
                         GorillaDevs reserves the right at any time and from time to time to modify or discontinue, temporarily or permanently, the Services (or any part thereof) with or without notice. User agrees that GorillaDevs shall not be liable to User or to any third party for any modification, suspension, or discontinuance of the Services.<LineBreak /><LineBreak />
                         In order to access some features of the Service, you will have to create an account. You must be at least 18 years of age to register an account and by creating an account, you represent that you are at least 18 years old. Minor children may only access account-related features using a parent or guardian's account so long as the parent or guardian consents and accepts full responsibility for the conduct of the child. When creating your account, you must provide accurate and complete information. If your contact information changes, you agree that you will promptly update the account information to reflect those changes. You are solely responsible for the activity that occurs on your account, and you must keep your account password secure. You must notify GorillaDevs immediately of any breach of security or unauthorized use of your account.<LineBreak /><LineBreak />
                         User may not use the Services if User does not accept the Terms. User can accept the Terms by either clicking to accept or agree to the Terms, where this option is made available to User by GorillaDevs; or by actually using the Services. In the latter case, User understands and agrees that GorillaDevs will treat User’s use of the Services as acceptance of the Terms from that point onwards.<LineBreak /><LineBreak />
@@ -151,7 +151,7 @@
                         <Label FontSize="20">13. GorillaDevs Launcher</Label>
                         <TextBlock TextWrapping="Wrap" FontSize="13">
                             <LineBreak /><LineBreak />GorillaDevs is not associated with Mojang Synergies AB, Microsoft, Forge Development LLC and Minecraft in any way. The game "Minecraft" itself is developed by Mojang Synergies AB. Neither Mojang Synergies AB nor Microsoft are responsable for the contents, files and Services available on, but not limited to, this website.
-                            <LineBreak /><LineBreak />By using GorillaDevs's Launcher and related Services, User affirms to have an original licence of Minecraft, legally bought on their website and to accept and agree  Mojang Synergies AB's TOS (https://account.mojang.com/terms).
+                            <LineBreak /><LineBreak />By using GorillaDevs's Launcher and related Services, User affirms to have an original licence of Minecraft, legally bought on their website and to accept and agree  Mojang Synergies AB's TOS (https://account.mojang.com/terms) and Oracle's TOS (https://www.oracle.com/legal/terms.html).
                             <LineBreak /><LineBreak />GorillaDevs does not host any file of the game itself, all the files are downloaded directly from the creator's website.
                             <LineBreak /><LineBreak />The launcher is just a tool and does not mean to hurt anyone in any way. If you have any complain please contact us.
 
@@ -162,7 +162,7 @@
             <Label HorizontalAlignment="Center">In order to use GorillaDevs Launcher you need to accept the Terms above.</Label>
             <DockPanel Margin="0 7 0 0">
                 <Button DockPanel.Dock="Left" Margin="17 0 0 0" Width="150" Style="{DynamicResource MaterialDesignFlatButton}" Click="Button_Click_1">Decline</Button>
-                <Button DockPanel.Dock="Right" Margin="130 0 0 0" Width="150" Style="{DynamicResource MaterialDesignFlatButton}" Click="Button_Click">Accept</Button>
+                <Button Name="accept" DockPanel.Dock="Right" IsEnabled="False" Margin="130 0 0 0" Width="150" Style="{DynamicResource MaterialDesignFlatButton}" Click="Button_Click">Accept</Button>
             </DockPanel>
         </StackPanel>
     </Grid>

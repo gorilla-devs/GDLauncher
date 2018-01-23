@@ -5,9 +5,39 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             Height="120" Width="250" Background="White">
-    <StackPanel Margin="20">
-        <TextBox Name="user" materialDesign:HintAssist.Hint="What do you want to say?" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
-        <Button Margin="0 10 0 0" Style="{StaticResource MaterialDesignFlatButton}">Send Message</Button>
-    </StackPanel>
+             Height="450" Width="500" Background="White" Loaded="UserControl_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="67*"/>
+            <RowDefinition Height="83*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="53*"/>
+            <ColumnDefinition Width="47*"/>
+        </Grid.ColumnDefinitions>
+        <ProgressBar Name="loading" IsIndeterminate="False" Visibility="Visible" Width="380" Height="30" Margin="59,5.2,61,213.6" FontSize="30" Panel.ZIndex="1000" Grid.ColumnSpan="2" Grid.Row="1"/>
+        <StackPanel Margin="20,20,20,19.6" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <StackPanel Orientation="Horizontal">
+                <TextBox Name="user" Width="200" materialDesign:HintAssist.Hint="Who needs this items?" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
+                <TextBox Name="quantity" Margin="40 00 0 0" Width="200" materialDesign:HintAssist.Hint="How many?" Style="{DynamicResource MaterialDesignFloatingHintTextBox}"></TextBox>
+            </StackPanel>
+            <StackPanel Margin="20">
+                <materialDesign:Card>
+                    <Grid>
+                        <ScrollViewer Name="scrollView" Visibility="Hidden" Height="300">
+                            <StackPanel Name="items" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+
+                            </StackPanel>
+                        </ScrollViewer>
+                        <StackPanel Name="isSelected" Orientation="Vertical" Visibility="Hidden">
+                            <Image Width="100" Height="100" Name="selectedImage" Margin="0 30 0 0" HorizontalAlignment="Center"></Image>
+                            <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0 30 0 0" Name="selectedText" FontSize="25"></TextBlock>
+                            <Button Width="150" HorizontalAlignment="Left" Margin="10 67 0 0" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click_1">Change Item</Button>
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+            </StackPanel>
+            <Button Margin="0 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click">Give Items</Button>
+        </StackPanel>
+    </Grid>
 </UserControl>
