@@ -26,21 +26,14 @@ Sample license text.
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
                     <Image Source="/Images/homeLogo.png" Height="170" Margin="0 40 0 0"></Image>
                     <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 30 0 15" >
-                            <ScrollViewer PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible">
-                                <StackPanel Margin="15 15 0 0" Orientation="Horizontal" Name="modpacksListContainer">
-                                </StackPanel>
-                            </ScrollViewer>
+                        <ScrollViewer PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto">
+                            <StackPanel Margin="15 15 0 0" Orientation="Horizontal" Name="modpacksListContainer">
+                            </StackPanel>
+                        </ScrollViewer>
                     </WrapPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="130" Click="Button_Click_1">
-                            Console
-                        </Button>
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" Width="140" Click="Button_Click_3">
-                            Manage Servers
-                        </Button>
-                    </StackPanel>
                 </StackPanel>
             </materialDesign:TransitionerSlide>
         </materialDesign:Transitioner>
+        <materialDesign:Snackbar MessageQueue="{materialDesign:MessageQueue}" HorizontalAlignment="Center" x:Name="SnackbarThree" />
     </Grid>
 </Page>

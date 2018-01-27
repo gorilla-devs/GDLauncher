@@ -92,7 +92,7 @@ namespace GDLauncher.Classes
             catch (JsonReaderException)
             {
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 MessageBox.Show("Unknown error parsing updates"); ;
             }
@@ -122,7 +122,7 @@ namespace GDLauncher.Classes
                 {
                     MessageBox.Show("Could not verify version");
                 }
-                catch(Exception e)
+                catch(Exception)
                 {
                     MessageBox.Show("Unknown error downloading new version");
                     return;

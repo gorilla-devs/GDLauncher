@@ -27,10 +27,9 @@ namespace GDLauncher
             string screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth.ToString();
             string screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight.ToString();
             CultureInfo ci = CultureInfo.InstalledUICulture;
-            Console.WriteLine(GDLauncher.Properties.Settings.Default["uuid"].ToString());
-            if (GDLauncher.Properties.Settings.Default["uuid"].ToString() == "")
+            if (GDLauncher.Properties.Settings.Default.clientToken.ToString() == "")
             {
-                GDLauncher.Properties.Settings.Default["uuid"] = Guid.NewGuid().ToString();
+                GDLauncher.Properties.Settings.Default.clientToken = Guid.NewGuid().ToString();
                 GDLauncher.Properties.Settings.Default.Save();
             }
 

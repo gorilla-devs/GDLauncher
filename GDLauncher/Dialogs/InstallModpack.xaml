@@ -4,7 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain1="clr-namespace:GDLauncher.Classes"
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
+             d:DataContext="{d:DesignInstance domain1:TextFieldsViewModel}"
+             mc:Ignorable="d"
              Height="335" Width="480" Background="White" Loaded="UserControl_Loaded">
     <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="0">
 
@@ -21,13 +24,28 @@
                     </DockPanel>
                 </StackPanel>
         </materialDesign:TransitionerSlide>
+        <materialDesign:TransitionerSlide Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel>
+                <TextBlock TextWrapping="Wrap" Margin="30" FontSize="20">We are going to download forge directly from their servers. Since they have to pay the bills,
+                 we are going to redirect you on their home page. You can just close it right away and keep on using our launcher</TextBlock>
+                <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="0 50 0 0" Click="Button_Click_2">Continue</Button>
+            </StackPanel>
+        </materialDesign:TransitionerSlide>
         <!-- you can use a slide for each page, let's add a touch of fade for our first page  -->
         <materialDesign:TransitionerSlide>
             <materialDesign:Card Height="280" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel Margin="20 10 20 0">
                     <DockPanel>
                         <Label VerticalAlignment="Center">Pack Name:</Label>
-                        <TextBox Name="instanceTextName" HorizontalAlignment="Right" Width="200" materialDesign:HintAssist.Hint="Instance Name" materialDesign:HintAssist.IsFloating="True"></TextBox>
+                        <TextBox Name="instanceTextName" HorizontalAlignment="Right" Width="200" materialDesign:HintAssist.Hint="Instance Name" materialDesign:HintAssist.IsFloating="True" TextChanged="instanceTextName_TextChanged">
+                            <TextBox.Text>
+                                <Binding Path="Name" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain1:NotEmptyValidationRule xmlns:domain1="clr-namespace:GDLauncher.Classes" ValidatesOnTargetUpdated="True" />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
                     </DockPanel>
                     <DockPanel Margin="0 10 0 0">
                         <Label VerticalAlignment="Center">Versions:</Label>
@@ -38,7 +56,7 @@
                     </DockPanel>
                     <DockPanel Margin="0 10 0 0">
                         <Label Name="forgeVersionsText" VerticalAlignment="Center" Visibility="Hidden">Forge Versions:</Label>
-                        <ComboBox Name="forgeVersions" Width="200" Visibility="Hidden" HorizontalAlignment="Right" SelectedIndex="0"/>                    
+                        <ComboBox Name="forgeVersions" Width="200" Visibility="Hidden" HorizontalAlignment="Right" SelectedIndex="0"/>
                     </DockPanel>
                     <DockPanel HorizontalAlignment="Center" Margin="0 75 0 0">
                         <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>

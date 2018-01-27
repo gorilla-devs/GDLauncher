@@ -85,7 +85,7 @@ namespace GDLauncher.Classes
                         versionURL = Convert.ToString(v.url);
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
             }

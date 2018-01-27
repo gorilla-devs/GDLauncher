@@ -12,12 +12,11 @@
             <materialDesign:Card Height="500" Margin="10">
                 <ScrollViewer Name="scrollBar" ScrollChanged="ScrollViewer_ScrollChanged">
                     <StackPanel Margin="20">
-                        <Label FontSize="25" HorizontalAlignment="Center">Terms of Service</Label>
+                        <Label FontSize="25" HorizontalAlignment="Center">Terms of Service v1.3 - 24/01/2018</Label>
                         <Label FontSize="20">About Us</Label>
                         <TextBlock TextWrapping="Wrap" FontSize="13">
                             GorillaDevs is a global multimedia and technology trademark focused on, but not limited to, creating services to enhance the users gaming experience and their daily use computer experience <LineBreak /><LineBreak />
-                            GorillaDevs is owned by Davide Ceschia.<LineBreak /><LineBreak />
-                            To contact GorillaDevs (Davide Ceschia), please email davide.ceschia@gmail.com.<LineBreak /><LineBreak />
+                            To contact GorillaDevs, please email staff@gorilladevs.com.<LineBreak /><LineBreak />
                         </TextBlock>
                         <Label FontSize="20">Terms</Label>
                         <TextBlock TextWrapping="Wrap" FontSize="13">
@@ -146,7 +145,7 @@
                         </TextBlock>
                         <Label FontSize="20">12. General</Label>
                         <TextBlock TextWrapping="Wrap" FontSize="13">
-                            <LineBreak /><LineBreak />This agreement will be governed by the laws of Italy without giving effect to any conflicts of law principles that may require the application of the laws of a different country. The United Nations Convention on Contracts for the International Sale of Goods does not apply to this agreement. All actions or proceedings arising under or related to this agreement must be brought in the Pisa Courthouse, and each party hereby agrees to irrevocably submit to the jurisdiction and venue of any such court in all such actions or proceedings. If any provision of this agreement is determined by a court of competent jurisdiction to be invalid, illegal, or unenforceable, the remaining provisions of this agreement shall not be affected or impaired thereby. User may not assign or transfer this agreement without obtaining GorillaDevs’s prior written consent, and any purported assignment or transfer in violation of this Section 10 will be null and void.
+                            <LineBreak /><LineBreak />This agreement will be governed by the laws of Italy without giving effect to any conflicts of law principles that may require the application of the laws of a different country. The United Nations Convention on Contracts for the International Sale of Goods does not apply to this agreement. All actions or proceedings arising under or related to this agreement must be brought in the Courthouse of Udine, and each party hereby agrees to irrevocably submit to the jurisdiction and venue of any such court in all such actions or proceedings. If any provision of this agreement is determined by a court of competent jurisdiction to be invalid, illegal, or unenforceable, the remaining provisions of this agreement shall not be affected or impaired thereby. User may not assign or transfer this agreement without obtaining GorillaDevs’s prior written consent, and any purported assignment or transfer in violation of this Section 10 will be null and void.
                         </TextBlock>
                         <Label FontSize="20">13. GorillaDevs Launcher</Label>
                         <TextBlock TextWrapping="Wrap" FontSize="13">

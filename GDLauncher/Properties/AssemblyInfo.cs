@@ -16,8 +16,8 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("GorillaDevs")]
 [assembly: AssemblyProduct("GDLauncher")]
-[assembly: AssemblyCopyright("Copyright ©  2016 GorillaDevs, All Rights Reserved.")]
-[assembly: AssemblyTrademark("GDLauncher")]
+[assembly: AssemblyCopyright("Trademark™ 2018 GorillaDevs, All Rights Reserved.")]
+[assembly: AssemblyTrademark("GorillaDevs")]
 [assembly: AssemblyCulture("")]
 
 // Se si imposta ComVisible su false, i tipi in questo assembly non saranno visibili 
@@ -57,3 +57,5 @@ using System.Windows;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.9.4.0")]
 [assembly: AssemblyFileVersion("2.9.4.0")]
+[assembly: NeutralResourcesLanguage("en")]
+

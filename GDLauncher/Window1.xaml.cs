@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Timers;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace GDLauncher
 {
@@ -98,10 +99,17 @@ namespace GDLauncher
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default["Sessiondata"] = "";
+            Window1.singleton.offlineMode.Visibility = Visibility.Hidden;
+            Properties.Settings.Default.premiumaAccessToken = "";
+            Properties.Settings.Default.RememberUsername = "";
+            Properties.Settings.Default.premiumUUID = "";
+            Properties.Settings.Default.premiumUsername = "";
             Properties.Settings.Default.Save();
+            settings.IsEnabled = false;
+            server.IsEnabled = false;
+            logout.IsEnabled = false;
+
             MainPage.Navigate(new Pages.Login());
-            //loggedinName.Text = "";
         }
 
         private void Button_Click_4(object sender, RoutedEventArgs e)
@@ -109,15 +117,16 @@ namespace GDLauncher
             WindowState = WindowState.Minimized;
         }
 
-        private void Button_Click_5(object sender, RoutedEventArgs e)
+        private async void Button_Click_5(object sender, RoutedEventArgs e)
         {
             string filePath = config.M_F_P;
 
             // combine the arguments together
             // it doesn't matter if there is a space after ','
             string argument = "/select, \"" + filePath + "\"";
-
-            System.Diagnostics.Process.Start("explorer.exe", argument);
+            await Task.Run(() => {
+                System.Diagnostics.Process.Start("explorer.exe", argument);
+            });
         }
 
         private void Button_Click_6(object sender, RoutedEventArgs e)
@@ -138,6 +147,18 @@ namespace GDLauncher
         private void NavigationService_Navigated(object sender, NavigationEventArgs e)
         {
             MainPage.RemoveBackEntry();
+        }
+
+        private async void server_Click(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(Pages.Home.singleton.serverList, "RootDialog");
+
+        }
+
+        private void consoleBtn_Click(object sender, RoutedEventArgs e)
+        {
+            debugconsole.Show();
+
         }
     }
 }

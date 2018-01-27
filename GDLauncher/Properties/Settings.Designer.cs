@@ -37,7 +37,7 @@ namespace GDLauncher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.9.4.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.0")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -192,12 +192,12 @@ namespace GDLauncher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string uuid {
+        public string clientToken {
             get {
-                return ((string)(this["uuid"]));
+                return ((string)(this["clientToken"]));
             }
             set {
-                this["uuid"] = value;
+                this["clientToken"] = value;
             }
         }
         
@@ -210,6 +210,54 @@ namespace GDLauncher.Properties {
             }
             set {
                 this["autoHideLauncher"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string premiumaAccessToken {
+            get {
+                return ((string)(this["premiumaAccessToken"]));
+            }
+            set {
+                this["premiumaAccessToken"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string premiumUUID {
+            get {
+                return ((string)(this["premiumUUID"]));
+            }
+            set {
+                this["premiumUUID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string premiumUsername {
+            get {
+                return ((string)(this["premiumUsername"]));
+            }
+            set {
+                this["premiumUsername"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool isLegacy {
+            get {
+                return ((bool)(this["isLegacy"]));
+            }
+            set {
+                this["isLegacy"] = value;
             }
         }
     }

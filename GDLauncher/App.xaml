@@ -12,10 +12,23 @@ Sample license text.
 
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Green.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Blue.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="PrimaryHueLightBrush" Color="#00A843"/>
+            <SolidColorBrush x:Key="PrimaryHueLightForegroundBrush" Color="#ffffff"/>
+            <SolidColorBrush x:Key="PrimaryHueMidBrush" Color="#00A843"/>
+            <SolidColorBrush x:Key="PrimaryHueMidForegroundBrush" Color="#ffffff"/>
+            <SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1B7C42"/>
+            <SolidColorBrush x:Key="PrimaryHueDarkForegroundBrush" Color="#ffffff"/>
+            
+            
+            <!--
+            PRIMARY-> #1A5363
+            GREEN  -> #00A843
+            RED    -> #DD4706
+            YELLOW -> #F2E609
+            BLUE   -> #226AC9
+            -->
         </ResourceDictionary>
     </Application.Resources>
 </Application>

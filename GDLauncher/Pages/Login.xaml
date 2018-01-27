@@ -10,7 +10,7 @@ Sample license text.
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:GDLauncher.Pages"
       mc:Ignorable="d" 
-      Height="625" Width="600" Background="White"
+      Height="645" Width="600" Background="White"
       Title="Login" KeyDown="Page_KeyDown" Loaded="Page_Loaded">
 
     <Grid>
@@ -29,7 +29,9 @@ Sample license text.
                             </Ellipse.Fill>
                         </Ellipse>
                     </materialDesign:Card>
-                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth1" Width="300" Height="270" Margin="0 25 0 0">
+                    <Label Name="MojangOrOffline" Margin="-160, -210, 0, 0" FontSize="20" Panel.ZIndex="20000" Width="100" Height="50">Mojang</Label>
+                    <Label Margin="210, -210, 0, 0" FontSize="20" Panel.ZIndex="20000" Width="100" Height="50">Login</Label>
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth1" Width="300" Height="350" Margin="0 25 0 0">
                         <materialDesign:Transitioner Name="loginKind" SelectedIndex="0" Margin="0 30 0 0">
                             <materialDesign:TransitionerSlide>
                                 <materialDesign:TransitionerSlide.BackwardWipe>
@@ -38,26 +40,32 @@ Sample license text.
                                 <materialDesign:TransitionerSlide.ForwardWipe>
                                     <materialDesign:CircleWipe />
                                 </materialDesign:TransitionerSlide.ForwardWipe>
-                                <StackPanel Margin="20 20 20 20">
+                                <StackPanel Margin="20 30 20 20">
                                     <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center">
                                         <materialDesign:PackIcon Kind="Account" VerticalAlignment="Center"/>
-                                        <TextBox Margin="20 0 0 0" Width="200" Text=""  materialDesign:HintAssist.Hint="Username" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center"/>
+                                        <TextBox Name="premiumUsername" Margin="20 0 0 0" Width="200" Text=""  materialDesign:HintAssist.Hint="Username / Email" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center">
                                         <materialDesign:PackIcon Kind="Key" VerticalAlignment="Center"/>
-                                        <TextBox Margin="20 0 0 0" Width="200" Text=""  materialDesign:HintAssist.Hint="Password" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center"/>
+                                        <PasswordBox Name="premiumPassword" Margin="20 0 0 0" Width="200"  materialDesign:HintAssist.Hint="Password" Style="{DynamicResource MaterialDesignFloatingHintPasswordBox}" VerticalAlignment="Center"/>
                                     </StackPanel>
-                                    <Label HorizontalAlignment="Center" Foreground="Red" Visibility="Hidden" FontSize="10">ERROR</Label>
-                                    <Button HorizontalAlignment="Center" Margin="0 10" VerticalAlignment="Top" Foreground="White" Width="240" Click="button_Click" Style="{StaticResource MaterialDesignRaisedButton}" materialDesign:ShadowAssist.ShadowDepth="Depth0">
+                                    <Label Name="premiumError" HorizontalAlignment="Center" Foreground="Red" Visibility="Hidden" FontSize="10">ERR</Label>
+                                    <Button Name="premiumLogin" HorizontalAlignment="Center" Margin="0 10" VerticalAlignment="Top" Foreground="White" Width="240" Style="{StaticResource MaterialDesignRaisedButton}" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="premiumLogin_Click">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Padding="15,0,10,0">Login</TextBlock>
                                             <materialDesign:PackIcon Kind="ArrowRight"/>
                                         </StackPanel>
                                     </Button>
-                                    <TextBlock Cursor="Hand" HorizontalAlignment="Center" MouseLeftButtonUp="TextBlock_MouseLeftButtonUp">Login offline instead</TextBlock>
                                     <StackPanel HorizontalAlignment="Center">
-                                        <ProgressBar HorizontalAlignment="Left" Height="15" VerticalAlignment="Top" Width="219" IsIndeterminate="True" Visibility="Hidden"/>
+                                        <ProgressBar Name="loading" HorizontalAlignment="Left" VerticalAlignment="Top" Width="219" IsIndeterminate="True" Visibility="Hidden"/>
                                     </StackPanel>
+                                    <DockPanel Margin="0 10 0 0">
+                                        <CheckBox Name="premiumRemember" Content="Remember Me"></CheckBox>
+                                        <Button HorizontalAlignment="Right" ToolTip="Help, i cannot login" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click">
+                                            <materialDesign:PackIcon Kind="Help"/>
+                                        </Button>
+                                    </DockPanel>
+                                    <TextBlock Cursor="Hand" Margin="0 31 0 0" HorizontalAlignment="Center" MouseLeftButtonUp="TextBlock_MouseLeftButtonUp">Continue offline instead</TextBlock>
                                 </StackPanel>
                             </materialDesign:TransitionerSlide>
                             <materialDesign:TransitionerSlide>
@@ -67,28 +75,28 @@ Sample license text.
                                 <materialDesign:TransitionerSlide.ForwardWipe>
                                     <materialDesign:CircleWipe />
                                 </materialDesign:TransitionerSlide.ForwardWipe>
-                                <StackPanel Margin="20 20 20 20">
-                                    <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center">
+                                <StackPanel Margin="20 20 20 0">
+                                    <StackPanel Orientation="Horizontal" Margin="0 10 0 0" Height="40" HorizontalAlignment="Center">
                                         <materialDesign:PackIcon Kind="Account" VerticalAlignment="Center"/>
                                         <TextBox x:Name="username" Margin="20 0 0 0" Width="200" Text=""  materialDesign:HintAssist.Hint="Username" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <Label Name="error" HorizontalAlignment="Center" Foreground="Red" Visibility="Hidden" FontSize="10">ERROR</Label>
-                                    <Button  x:Name="button" HorizontalAlignment="Center" Margin="0 10" materialDesign:ShadowAssist.ShadowDepth="Depth1" VerticalAlignment="Top" Width="219" Click="button_Click" Style="{StaticResource MaterialDesignFlatButton}">
+                                    <TextBlock FontSize="10" Foreground="#226AC9" HorizontalAlignment="Center" TextWrapping="Wrap">Keep in mind that by logging in offline-mode you affirm to own a legit version of the game. Check our EULA for more</TextBlock>
+                                    <Button x:Name="button" HorizontalAlignment="Center" Foreground="White" Margin="0 20 0 0" materialDesign:ShadowAssist.ShadowDepth="Depth0" VerticalAlignment="Top" Width="240" Click="offline_login" Style="{StaticResource MaterialDesignRaisedButton}">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Padding="15,0,10,0">Continue</TextBlock>
                                             <materialDesign:PackIcon Kind="ArrowRight"/>
                                         </StackPanel>
                                     </Button>
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <ProgressBar Name="loading" HorizontalAlignment="Left" Height="15" VerticalAlignment="Top" Width="219" IsIndeterminate="True" Visibility="Hidden"/>
-                                    </StackPanel>
+                                    <CheckBox Name="offlineRemember" Content="Remember me" Margin="0 10 0 0"></CheckBox>
+                                    <TextBlock Cursor="Hand" Margin="0 65 0 0" HorizontalAlignment="Center" MouseLeftButtonUp="TextBlock_MouseLeftButtonUp_1">Login Premium Instead</TextBlock>
                                 </StackPanel>
                             </materialDesign:TransitionerSlide>
                         </materialDesign:Transitioner>
                     </materialDesign:Card>
                 </Grid>
             </materialDesign:TransitionerSlide>
-            <materialDesign:TransitionerSlide Background="#183b45">
+            <materialDesign:TransitionerSlide Background="#1A5363">
                 <TextBlock FontSize="20" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center">Loading</TextBlock>
             </materialDesign:TransitionerSlide>
         </materialDesign:Transitioner>

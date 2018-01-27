@@ -6,7 +6,7 @@
       <Value Profile="(Default)">Empty</Value>
     </Setting>
     <Setting Name="version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">2.9.4.0</Value>
+      <Value Profile="(Default)">3.0</Value>
     </Setting>
     <Setting Name="RAM" Type="System.String" Scope="User">
       <Value Profile="(Default)">1</Value>
@@ -45,10 +45,22 @@
     <Setting Name="forgeJSONContentLength" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="uuid" Type="System.String" Scope="User">
+    <Setting Name="clientToken" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="autoHideLauncher" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="premiumaAccessToken" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="premiumUUID" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="premiumUsername" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="isLegacy" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

@@ -42,6 +42,8 @@ namespace GDLauncher.Dialogs
             singleton = this;
             name = whatToInstall;
             DialogHostExtensions.SetCloseOnClickAway(this, true);
+            DataContext = new Classes.TextFieldsViewModel();
+
         }
 
         public async Task LoadPackData()
@@ -141,7 +143,7 @@ namespace GDLauncher.Dialogs
                             }
                         }
                     }
-                    catch(Exception ex) {
+                    catch(Exception) {
                     }
                     forgeVersions.SelectedIndex = 0;
                 }
@@ -153,11 +155,6 @@ namespace GDLauncher.Dialogs
         {
             DialogHostExtensions.SetCloseOnClickAway(this, false);
             Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
-            if (String.IsNullOrEmpty(instanceTextName.Text))
-            {
-                MessageBox.Show("Nome istanza vuoto");
-                return;
-            }
             if (!rg.IsMatch(instanceTextName.Text) || (instanceTextName.Text.Contains(" ")))
             {
                 MessageBox.Show("Solo lettere e numero ammessi");
@@ -169,7 +166,7 @@ namespace GDLauncher.Dialogs
                 return;
             }
             ctoken = new CancellationTokenSource();
-            transition.SelectedIndex = 2;
+            transition.SelectedIndex = 3;
             modpackName.Content = versionsList.Text;
             string forgeVersion = "false";
             try
@@ -212,10 +209,9 @@ namespace GDLauncher.Dialogs
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             name = "Minecraft Vanilla";
-            transition.SelectedIndex = 1;
+            transition.SelectedIndex = 2;
             await Task.Delay(300);
             await LoadPackData();
-            install.IsEnabled = true;
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
@@ -238,7 +234,6 @@ namespace GDLauncher.Dialogs
             forgeAllVersionsList = forgeAllVersionsList.Distinct().ToList();
             loading.IsIndeterminate = true;
             await LoadPackData();
-            install.IsEnabled = true;
             forgeVersions.IsEnabled = true;
             forgeAllVersions.IsEnabled = true;
             loading.Visibility = Visibility.Hidden;
@@ -263,6 +258,25 @@ namespace GDLauncher.Dialogs
             forgeVersions.Items.Clear();
             versionsList.Items.Clear();
             await LoadPackData();
+        }
+
+        private void instanceTextName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if(instanceTextName.Text.Contains(" ") || string.IsNullOrEmpty(instanceTextName.Text))
+            {
+                install.IsEnabled = false;
+            }
+            else
+            {
+                install.IsEnabled = true;
+            }
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://files.minecraftforge.net/");
+            transition.SelectedIndex = 2;
+
         }
     }
 }

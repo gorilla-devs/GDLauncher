@@ -32,7 +32,7 @@ Sample license text.
                         <LineBreak/>
                         Tieni anche conto di quanta RAM disponibile hai.
                         <LineBreak/>
-                        <Label>Ram Attuale Disponibile: </Label><Label Name="freeram">Calcolo...</Label>
+                        <Label>Ram Attualmente Libera: </Label><Label Name="freeram">Calcolo...</Label>
                         <Label Name="errorlowram" FontSize="12" Foreground="Red" Visibility="Hidden">Attenzione, la ram disponibile e' scarsa</Label>
                         <LineBreak/>
                         <ComboBox x:Name="ram" Width="100" SelectedIndex="2">

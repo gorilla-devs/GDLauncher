@@ -50,7 +50,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>true</Prefer32Bit>
@@ -158,6 +158,10 @@
     <Compile Include="Classes\JAVAInstaller.cs" />
     <Compile Include="Classes\JSON.cs" />
     <Compile Include="Classes\MinecraftStarter.cs" />
+    <Compile Include="Classes\MojangAPIs.cs" />
+    <Compile Include="Classes\NotEmptyValidationRule.cs" />
+    <Compile Include="Classes\NotifyPropertyChangedExtension.cs" />
+    <Compile Include="Classes\TextFieldsViewModel.cs" />
     <Compile Include="Classes\ZipSharp.cs" />
     <Compile Include="config.cs" />
     <Compile Include="DialogHostExtensions.cs" />
@@ -175,6 +179,9 @@
     </Compile>
     <Compile Include="Dialogs\ManagePack.xaml.cs">
       <DependentUpon>ManagePack.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\PostLogin.xaml.cs">
+      <DependentUpon>PostLogin.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ServerList.xaml.cs">
       <DependentUpon>ServerList.xaml</DependentUpon>
@@ -279,6 +286,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ManagePack.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PostLogin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -438,13 +449,13 @@
     <Resource Include="Images\block.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="favicon.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\homeLogo.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="favicon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

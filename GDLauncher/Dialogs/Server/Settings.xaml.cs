@@ -30,7 +30,6 @@ namespace GDLauncher.Dialogs.Server
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string line;
             if(File.Exists(dir + @"\\server.properties"))
             {
                 string text = File.ReadAllText(dir + @"\\server.properties");

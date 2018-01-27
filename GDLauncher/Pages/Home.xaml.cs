@@ -33,9 +33,9 @@ namespace GDLauncher.Pages
     public partial class Home : Page
     {
         public static Dialogs.ModpackLoading loading = new Dialogs.ModpackLoading();
-        public Windows.DebugOutputConsole debugconsole = new Windows.DebugOutputConsole();
         public static Home singleton;
-        public static Dialogs.ServerList serverList = new Dialogs.ServerList();
+        public Dialogs.ServerList serverList = new Dialogs.ServerList();
+
 
         public Home()
         {
@@ -70,6 +70,16 @@ namespace GDLauncher.Pages
                 Properties.Settings.Default["justUpdated"] = "false";
                 Properties.Settings.Default.Save();
             }
+
+            if(Properties.Settings.Default.premiumUsername != "")
+            {
+                //use the message queue to send a message.
+                var messageQueue = SnackbarThree.MessageQueue;
+                var message = "Welcome back " + Properties.Settings.Default.premiumUsername + "! :)";
+
+                //the message queue can be called from any thread
+                Task.Factory.StartNew(() => messageQueue.Enqueue(message));
+            }
         }
 
 
@@ -95,7 +105,7 @@ namespace GDLauncher.Pages
                         forge = jObj.forgeVersion;
 
                     }
-                    catch (FileNotFoundException ex)
+                    catch (FileNotFoundException)
                     {
                         continue;
                     }
@@ -110,7 +120,7 @@ namespace GDLauncher.Pages
                     {
                         modpacksListContainer.RegisterName(card.Name, card);
                     }
-                    catch (ArgumentException e)
+                    catch (ArgumentException)
                     {
                         modpacksListContainer.UnregisterName(card.Name);
                         modpacksListContainer.RegisterName(card.Name, card);
@@ -286,7 +296,7 @@ namespace GDLauncher.Pages
             var addNewBtn = new Button();
             var iconpackplus = new MaterialDesignThemes.Wpf.PackIcon();
             iconpackplus.Kind = MaterialDesignThemes.Wpf.PackIconKind.Plus;
-            addNewBtn.ToolTip = "Add New Pack";
+            addNewBtn.ToolTip = "Add New Instance";
             addNewBtn.Content = iconpackplus;
             addNewBtn.Foreground = new SolidColorBrush(Colors.White);
             addNewBtn.Style = styleaddNew;
@@ -296,7 +306,6 @@ namespace GDLauncher.Pages
             addNewBtn.Click += new RoutedEventHandler(async (sender, e) =>
             {
                 await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.InstallModpack(), "RootDialog");
-                Dialogs.InstallModpack.singleton.downloadedMB.Content = "0 MB";
                 if (!Directory.Exists(config.M_F_P + "Packs\\"))
                 {
                     Directory.CreateDirectory(config.M_F_P + "Packs\\");
@@ -322,7 +331,7 @@ namespace GDLauncher.Pages
             {
                 var json = System.IO.File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 MessageBox.Show("This cannot be run. We suggest you to delete it");
                 return;
@@ -345,22 +354,6 @@ namespace GDLauncher.Pages
         {
             await Task.Delay(1200);
             eventArgs.Session.Close();
-        }
-
-		private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            debugconsole.Show();
-        }
-
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            Window1.singleton.MainPage.Navigate(new Pages.Report_Bug());
-            Window1.singleton.NavigationMenu.SelectedIndex = 4;
-        }
-
-        private async void Button_Click_3(object sender, RoutedEventArgs e)
-        {
-            await MaterialDesignThemes.Wpf.DialogHost.Show(serverList, "RootDialog");
         }
     }
 }
