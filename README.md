@@ -72,7 +72,6 @@ This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) fil
 ## Acknowledgments
 
 * Wish you a happy day :D
-
-![Login](https://github.com/gorilla-devs/GDLauncher/blob/master/login.gif)
-![Packs](https://github.com/gorilla-devs/GDLauncher/blob/master/packs.gif)
-![Loading](https://github.com/gorilla-devs/GDLauncher/raw/master/loading.gif)
+![Login](https://gorilladevs.com/assets/login.gif)
+![Packs](https://gorilladevs.com/assets/packs.gif)
+![Loading](https://gorilladevs.com/assets/loading.gif)

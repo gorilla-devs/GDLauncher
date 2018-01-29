@@ -8,7 +8,7 @@
         Title="Crashed" Height="400" Width="400" WindowStartupLocation="CenterScreen">
     <Grid>
         <Label FontSize="25" HorizontalAlignment="Center">Opps, the launcher just crashed</Label>
-        <TextBlock TextWrapping="Wrap" Margin="18,125,-18.4,-125.6">If you want to help us, click HERE. You will find a file called crash.log . Copy that file and send us on facebook
-        or on staff@gorilladevs.com . Thank you for your collaboration</TextBlock>
+        <TextBlock TextWrapping="Wrap" Margin="18,125,-18.4,-125.6">If you want to help us, click HERE. You will find a file called crash.log . Copy that file and send it to us on facebook
+        , on staff@gorilladevs.com or as issue on github. Thank you for your collaboration</TextBlock>
     </Grid>
 </Window>

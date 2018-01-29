@@ -36,6 +36,7 @@
             </StackPanel>
         </DockPanel>
         <Button Name="closeDialog" Width="100" Margin="10,458,290,10" Click="closeDialog_Click" Style="{StaticResource MaterialDesignFlatButton}">Close</Button>
+        <Label Name="version" Width="60" Height="30" Margin="330,458,10,12">1.9.2</Label>
         <materialDesign:Snackbar DockPanel.Dock="Bottom" Margin="0 0 0 0" Name="snackbarSave">
         </materialDesign:Snackbar>
     </Grid>

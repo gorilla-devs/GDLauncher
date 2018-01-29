@@ -37,6 +37,7 @@ namespace GDLauncher.Dialogs
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            version.Content = "v. " + Properties.Settings.Default.version;
             for (int i = 1; i <= 30; i++)
             {
                 downloadThreads.Items.Add(i.ToString());
