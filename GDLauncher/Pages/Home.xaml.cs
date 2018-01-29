@@ -234,6 +234,7 @@ namespace GDLauncher.Pages
                     manageBtn.Style = btnStyle;
                     manageBtn.Click += new RoutedEventHandler(async (sender, e) => {
                         await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack(dir), "RootDialog");
+                        await ModpacksUpdate();
                     });
 
                     var deletebutton = new Button();

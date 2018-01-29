@@ -21,19 +21,34 @@ namespace GDLauncher.Dialogs
     /// </summary>
     public partial class ManagePack : UserControl
     {
+        public string dir;
         public ManagePack(string dir)
         {
             InitializeComponent();
             instanceName.Text = new DirectoryInfo(dir).Name;
+            this.dir = dir;
         }
 
-        private void changeInstanceName_Click(object sender, RoutedEventArgs e)
+        private async void changeInstanceName_Click(object sender, RoutedEventArgs e)
         {
-            string json = File.ReadAllText("settings.json");
+            changeInstanceName.IsEnabled = false;
+            string json = File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
             dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-            jsonObj["Bots"][0]["Password"] = "new password";
+            jsonObj["instanceName"] = instanceName.Text;
             string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText("settings.json", output);
+            File.WriteAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json", output);
+
+            await Task.Delay(300);
+
+            Directory.Move(dir, config.M_F_P + "Packs\\" + instanceName.Text);
+
+            await Task.Delay(300);
+
+
+            Directory.Move(config.M_F_P + "Packs\\" + instanceName.Text + "\\" + new DirectoryInfo(dir).Name + ".json",
+                config.M_F_P + "Packs\\" + instanceName.Text + "\\" + instanceName.Text + ".json");
+
+            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
         }
 
         private void Card_DragEnter(object sender, DragEventArgs e)
@@ -69,6 +84,18 @@ namespace GDLauncher.Dialogs
                 // Assuming you have one file that you care about, pass it off to whatever
                 // handling code you have defined.
                 //HandleFileOpen(files[0]);
+        }
+
+        private void instanceName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                if (instanceName.Text != "" && instanceName.Text != new DirectoryInfo(dir).Name)
+                    changeInstanceName.IsEnabled = true;
+                else
+                    changeInstanceName.IsEnabled = false;
+            }
+            catch { }
         }
     }
 }

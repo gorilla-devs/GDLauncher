@@ -76,7 +76,7 @@
                         <Label Name="whatDoing" VerticalAlignment="Center">Analysing</Label>
                         <StackPanel Visibility="Visible">
                             <ProgressBar Name="forgeProgression" Margin="30 40 30 0"></ProgressBar>
-                            <Label Name="forgeTextProgression" HorizontalAlignment="Center" FontSize="12">Forge download percentage</Label>
+                            <Label Name="forgeTextProgression" HorizontalAlignment="Center" FontSize="12"></Label>
                         </StackPanel>
                     </DockPanel>
                 </materialDesign:Card>

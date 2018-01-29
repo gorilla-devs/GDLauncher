@@ -40,7 +40,7 @@ namespace GDLauncher.Classes
 
             foreach(var lib in decoded.libs)
             {
-                launch += config.M_F_P + lib.path + ";";
+                launch += config.M_F_P + "Packs\\" + new DirectoryInfo(dir).Name + "\\" + lib.path + ";";
             }
             
             if (forge != "false")

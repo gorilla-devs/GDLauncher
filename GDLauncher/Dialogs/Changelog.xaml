@@ -14,16 +14,11 @@ Sample license text.
         <materialDesign:Card Height="510" Width="450" Margin="0 20 0 0" materialDesign:ShadowAssist.ShadowDepth="Depth3">
             <ScrollViewer>
                 <StackPanel Name="container" Margin="20">
-                    <Label FontSize="30" Margin="0 0 0 25">Launcher Versions</Label>
+                    <Label FontSize="30" Margin="0 0 0 25">Welcome to GDLauncher</Label>
                     <TextBlock TextWrapping="Wrap" FontSize="20" TextAlignment="Justify" LineHeight="32">Hello there.
-                    Before you continue we would like to inform you
-                    of a few things. When we release a new version, usually we just fix bugs and do some improvements, but it
-                    may happen that we do some breaking-changes. If you experience any issue after an update, consider deleting
-                    the launcher folder in appdata (GorillaDevs). You can access it from the launcher, but if it won't start
-                    you can just type %appdata% in windows file explorer. Remember that by deleting that folder you delete any
-                    game save you had, so consider moving that first and then, after reinstalling minecraft, move it back.<LineBreak></LineBreak>
-                    We really hope you like our work! If you have any suggestion remember to tell us! You can find more
-                    informations on our website, including the complete changelog: https://gorilladevs.com.<LineBreak></LineBreak> Happy Gaming!</TextBlock>
+                        Hello there, thank you for using our launcher! Keep in mind it's still in open beta so you could still find some bugs. If you do, just reach us on
+                        our facebook page and tell us so we can fix them. <LineBreak></LineBreak>Happy Gaming :)
+                    </TextBlock>
                 </StackPanel>
             </ScrollViewer>
         </materialDesign:Card>

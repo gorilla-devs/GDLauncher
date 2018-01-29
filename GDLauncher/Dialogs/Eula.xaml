@@ -12,10 +12,11 @@
             <materialDesign:Card Height="500" Margin="10">
                 <ScrollViewer Name="scrollBar" ScrollChanged="ScrollViewer_ScrollChanged">
                     <StackPanel Margin="20">
-                        <Label FontSize="25" HorizontalAlignment="Center">Terms of Service v1.3 - 24/01/2018</Label>
+                        <Label FontSize="25" HorizontalAlignment="Center">Terms of Service v1.4 - 29/01/2018</Label>
                         <Label FontSize="20">About Us</Label>
                         <TextBlock TextWrapping="Wrap" FontSize="13">
-                            GorillaDevs is a global multimedia and technology trademark focused on, but not limited to, creating services to enhance the users gaming experience and their daily use computer experience <LineBreak /><LineBreak />
+                            GorillaDevs is a global multimedia and technology trademark focused on, but not limited to, creating services to improve the overall gaming experience and to enhance technologies.
+                             <LineBreak /><LineBreak />
                             To contact GorillaDevs, please email staff@gorilladevs.com.<LineBreak /><LineBreak />
                         </TextBlock>
                         <Label FontSize="20">Terms</Label>
