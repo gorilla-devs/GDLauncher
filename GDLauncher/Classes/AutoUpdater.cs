@@ -122,9 +122,15 @@ namespace GDLauncher.Classes
                 {
                     MessageBox.Show("Could not verify version");
                 }
-                catch(Exception)
+                catch (IOException)
                 {
-                    MessageBox.Show("Unknown error downloading new version");
+                    await webClient.DownloadFileTaskAsync(new Uri(url), Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename.Replace(".exe", new Random().Next(0, 1000) + ".exe"));
+                    Properties.Settings.Default["version"] = SessionData.latestVersion;
+                    Properties.Settings.Default.Save();
+                }
+                catch(Exception eex)
+                {
+                    MessageBox.Show("Unknown error downloading new version: " + eex.InnerException);
                     return;
                 }
                 Pages.SplashScreen.singleton.postUpdate.Visibility = Visibility.Visible;
