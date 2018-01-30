@@ -84,6 +84,7 @@ namespace GDLauncher.Pages
                     transition.SelectedIndex = 1;
                     await Task.Delay(450);
                     Window1.singleton.settings.IsEnabled = true;
+                    Window1.singleton.server.IsEnabled = true;
                     Window1.singleton.logout.IsEnabled = true;
                     if (Properties.Settings.Default["RememberUsername"].ToString() != "")
                     {

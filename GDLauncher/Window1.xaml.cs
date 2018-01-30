@@ -16,6 +16,9 @@ using System.Windows.Threading;
 using System.Timers;
 using System.Net;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.IO;
+using System.Collections.Generic;
 
 namespace GDLauncher
 {
@@ -159,6 +162,22 @@ namespace GDLauncher
         {
             debugconsole.Show();
 
+        }
+
+        private async void parse_Click(object sender, RoutedEventArgs e)
+        {
+             await Task.Run(() => {
+                var file = File.ReadAllText("complete.json");
+                 List<string> lista = new List<string>();
+                dynamic x = JsonConvert.DeserializeObject(file);
+                 foreach(var y in x["data"])
+                 {
+                     lista.Add(y["Name"].ToString());
+                 }
+                 x = null;
+                 foreach(var aa in lista)
+                    Console.WriteLine(aa);
+            });
         }
     }
 }
