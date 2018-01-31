@@ -33,7 +33,7 @@ Sample license text.
                         <Label x:Name="kbps" Foreground="White" Content="kbps" HorizontalAlignment="Left" Margin="420,-30,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
                         <StackPanel>
                             <Label x:Name="downloadingForgeJSON" Foreground="White" Content="Downloading Additional Files" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
-                            <ProgressBar x:Name="downloadingForgeJSONProgress" Foreground="White" HorizontalAlignment="Left" Height="32" Margin="10,10,0,10" VerticalAlignment="Top" Width="550" Visibility="Hidden"/>
+                            <ProgressBar x:Name="downloadingForgeJSONProgress" Background="White" HorizontalAlignment="Left" Height="32" Margin="10,10,0,10" VerticalAlignment="Top" Width="550" Visibility="Hidden"/>
                             <Label x:Name="forgeJSONMbToDownload" Foreground="White" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
                             <Label x:Name="forgeJSONSpeed" Foreground="White" Content="kbps" HorizontalAlignment="Left" Margin="420,-35,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
                         </StackPanel>

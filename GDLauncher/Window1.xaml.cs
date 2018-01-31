@@ -103,13 +103,12 @@ namespace GDLauncher
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             Window1.singleton.offlineMode.Visibility = Visibility.Hidden;
-            Properties.Settings.Default.premiumaAccessToken = "";
-            Properties.Settings.Default.RememberUsername = "";
-            Properties.Settings.Default.premiumUUID = "";
-            Properties.Settings.Default.premiumUsername = "";
+            Properties.Settings.Default.premiumaAccessToken = "//--//";
+            Properties.Settings.Default.RememberUsername = "//--//";
+            Properties.Settings.Default.premiumUUID = "//--//";
+            Properties.Settings.Default.premiumUsername = "//--//";
             Properties.Settings.Default.Save();
             settings.IsEnabled = false;
-            server.IsEnabled = false;
             logout.IsEnabled = false;
 
             MainPage.Navigate(new Pages.Login());
@@ -152,11 +151,6 @@ namespace GDLauncher
             MainPage.RemoveBackEntry();
         }
 
-        private async void server_Click(object sender, RoutedEventArgs e)
-        {
-            await MaterialDesignThemes.Wpf.DialogHost.Show(Pages.Home.singleton.serverList, "RootDialog");
-
-        }
 
         private void consoleBtn_Click(object sender, RoutedEventArgs e)
         {

@@ -12,7 +12,13 @@
             <StackPanel Margin="10">
                 <StackPanel Orientation="Horizontal" Height="40" VerticalAlignment="Top" HorizontalAlignment="Center">
                     <materialDesign:PackIcon Kind="Server" Margin="0 6 0 0" Height="30" Width="30"/>
-                    <TextBox Name="serverName" Margin="10 0 0 0" Width="200" Text=""  materialDesign:HintAssist.Hint="Server Name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center"/>
+                    <TextBox Name="serverName" Margin="10 0 0 0" Width="200"  materialDesign:HintAssist.Hint="Server Name" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center" TextChanged="serverName_TextChanged">
+                        <Binding Path="Name" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain1:NotEmptyValidationRule xmlns:domain1="clr-namespace:GDLauncher.Classes" ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox>
                 </StackPanel>
                 <Label Name="error" HorizontalAlignment="Center" Foreground="Red" Visibility="Hidden">Error:</Label>
                 <ComboBox Name="MCversions" HorizontalAlignment="Center"  Width="240" Margin="0 10 0 0">
@@ -23,7 +29,7 @@
         </materialDesign:Card>
         <StackPanel Orientation="Horizontal" Margin="10">
             <Button Name="backBtn" Width="140" Style="{StaticResource MaterialDesignFlatButton}" Click="backBtn_Click">Back</Button>
-            <Button Name="createServerBtn" Width="140" Margin="200 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="Create" Click="createServerBtn_Click"/>
+            <Button Name="createServerBtn" Width="140" IsEnabled="False" Margin="200 0 0 0" Style="{StaticResource MaterialDesignFlatButton}" Content="Create" Click="createServerBtn_Click"/>
         </StackPanel>
 </StackPanel>
 </UserControl>

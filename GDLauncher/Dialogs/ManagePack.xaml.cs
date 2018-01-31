@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,28 +26,49 @@ namespace GDLauncher.Dialogs
         public ManagePack(string dir)
         {
             InitializeComponent();
-            instanceName.Text = new DirectoryInfo(dir).Name;
             this.dir = dir;
+            DataContext = new Classes.TextFieldsViewModel();
+
+
         }
 
         private async void changeInstanceName_Click(object sender, RoutedEventArgs e)
         {
-            changeInstanceName.IsEnabled = false;
-            string json = File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
-            dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-            jsonObj["instanceName"] = instanceName.Text;
-            string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json", output);
+            try
+            {
+                Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
+                if (!rg.IsMatch(instanceName.Text) || (instanceName.Text.Contains(" ")))
+                {
+                    MessageBox.Show("Solo lettere e numero ammessi");
+                    return;
+                }
+                if (Directory.Exists(config.M_F_P + "Packs\\" + instanceName.Text))
+                {
+                    MessageBox.Show("Nome istanza gia' esistente");
+                    return;
+                }
+                changeInstanceName.IsEnabled = false;
+                string json = File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");
+                dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                jsonObj["instanceName"] = instanceName.Text;
+                string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
+                File.WriteAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json", output);
 
-            await Task.Delay(300);
+                await Task.Delay(300);
 
-            Directory.Move(dir, config.M_F_P + "Packs\\" + instanceName.Text);
+                Directory.Move(dir, config.M_F_P + "Packs\\" + instanceName.Text);
 
-            await Task.Delay(300);
+                await Task.Delay(300);
 
 
-            Directory.Move(config.M_F_P + "Packs\\" + instanceName.Text + "\\" + new DirectoryInfo(dir).Name + ".json",
-                config.M_F_P + "Packs\\" + instanceName.Text + "\\" + instanceName.Text + ".json");
+                Directory.Move(config.M_F_P + "Packs\\" + instanceName.Text + "\\" + new DirectoryInfo(dir).Name + ".json",
+                    config.M_F_P + "Packs\\" + instanceName.Text + "\\" + instanceName.Text + ".json");
+            }
+            catch
+            {
+                MessageBox.Show("Cannot change instance name. Maybe you are using it?");
+            }
+
 
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
         }
@@ -90,12 +112,18 @@ namespace GDLauncher.Dialogs
         {
             try
             {
-                if (instanceName.Text != "" && instanceName.Text != new DirectoryInfo(dir).Name)
+                if (instanceName.Text != "" && instanceName.Text != new DirectoryInfo(dir).Name && !instanceName.Text.Contains(" ") && !string.IsNullOrEmpty(instanceName.Text))
                     changeInstanceName.IsEnabled = true;
                 else
                     changeInstanceName.IsEnabled = false;
             }
             catch { }
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            instanceName.Text = new DirectoryInfo(dir).Name;
+
         }
     }
 }

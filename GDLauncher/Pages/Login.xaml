@@ -25,7 +25,7 @@ Sample license text.
                     <materialDesign:Card Margin="0 0 0 0" Panel.ZIndex="10000" UniformCornerRadius="90"  Width="100" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                         <Ellipse Height="100" Width="100">
                             <Ellipse.Fill>
-                                <ImageBrush ImageSource="/Images/logo.png"/>
+                                <ImageBrush ImageSource="/Images/logo.png" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Aliased"/>
                             </Ellipse.Fill>
                         </Ellipse>
                     </materialDesign:Card>

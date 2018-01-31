@@ -2,31 +2,25 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GDLauncher.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="JavaPath" Type="System.String" Scope="User">
+    <Setting Name="JavaPath" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">Empty</Value>
     </Setting>
     <Setting Name="version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">3.1</Value>
+      <Value Profile="(Default)">3.2</Value>
     </Setting>
-    <Setting Name="RAM" Type="System.String" Scope="User">
+    <Setting Name="RAM" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="download_threads" Type="System.String" Scope="User">
+    <Setting Name="download_threads" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">8</Value>
-    </Setting>
-    <Setting Name="startingPage" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Home</Value>
     </Setting>
     <Setting Name="DebugMaxLines" Type="System.String" Scope="User">
       <Value Profile="(Default)">30</Value>
     </Setting>
-    <Setting Name="RememberUsername" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="RememberUsername" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">//--//</Value>
     </Setting>
-    <Setting Name="disableHashCheck" Type="System.String" Scope="User">
-      <Value Profile="(Default)">false</Value>
-    </Setting>
-    <Setting Name="firstTimeHowTo" Type="System.String" Scope="User">
+    <Setting Name="firstTimeHowTo" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">true</Value>
     </Setting>
     <Setting Name="sessiondata" Type="System.String" Scope="User">
@@ -35,32 +29,28 @@
     <Setting Name="justUpdated" Type="System.String" Scope="User">
       <Value Profile="(Default)">true</Value>
     </Setting>
-    <Setting Name="bookmarks" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" /&gt;</Value>
-    </Setting>
-    <Setting Name="eula" Type="System.Boolean" Scope="User">
+    <Setting Name="eula" Provider="crdx.Settings.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="forgeJSONContentLength" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="clientToken" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="clientToken" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">//--//</Value>
     </Setting>
-    <Setting Name="autoHideLauncher" Type="System.Boolean" Scope="User">
+    <Setting Name="autoHideLauncher" Provider="crdx.Settings.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="premiumaAccessToken" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="premiumaAccessToken" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">//--//</Value>
     </Setting>
-    <Setting Name="premiumUUID" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="premiumUUID" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">//--//</Value>
     </Setting>
-    <Setting Name="premiumUsername" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="premiumUsername" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">//--//</Value>
     </Setting>
-    <Setting Name="isLegacy" Type="System.Boolean" Scope="User">
+    <Setting Name="isLegacy" Provider="crdx.Settings.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

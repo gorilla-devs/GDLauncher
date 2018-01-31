@@ -55,7 +55,7 @@ namespace GDLauncher.Pages
             await Task.Delay(50);
             username.Focus();
             transition.SelectedIndex = 1;
-            if (Properties.Settings.Default["RememberUsername"].ToString() != "")
+            if (Properties.Settings.Default["RememberUsername"].ToString() != "//--//")
             {
                 username.Text = Properties.Settings.Default["RememberUsername"].ToString();
                 offlineRemember.IsChecked = true;
@@ -138,7 +138,7 @@ namespace GDLauncher.Pages
             if (premiumRemember.IsChecked == true)
             {
                 Properties.Settings.Default.premiumaAccessToken = accessToken;
-                Properties.Settings.Default.RememberUsername = "";
+                Properties.Settings.Default.RememberUsername = "//--//";
                 Properties.Settings.Default.premiumUUID = Puuid;
                 Properties.Settings.Default.premiumUsername = username;
                 Properties.Settings.Default.isLegacy = isLegacy;
@@ -146,15 +146,14 @@ namespace GDLauncher.Pages
             }
             else
             {
-                Properties.Settings.Default.premiumaAccessToken = "";
-                Properties.Settings.Default.RememberUsername = "";
-                Properties.Settings.Default.premiumUUID = "";
-                Properties.Settings.Default.premiumUsername = "";
+                Properties.Settings.Default.premiumaAccessToken = "//--//";
+                Properties.Settings.Default.RememberUsername = "//--//";
+                Properties.Settings.Default.premiumUUID = "//--//";
+                Properties.Settings.Default.premiumUsername = "//--//";
                 Properties.Settings.Default.isLegacy = true;
                 Properties.Settings.Default.Save();
             }
             Window1.singleton.settings.IsEnabled = true;
-            Window1.singleton.server.IsEnabled = true;
             Window1.singleton.logout.IsEnabled = true;
             transition.SelectedIndex = 2;
             await Task.Delay(500);
@@ -192,24 +191,23 @@ namespace GDLauncher.Pages
             await Task.Delay(500);
             if (offlineRemember.IsChecked == true)
             {
-                Properties.Settings.Default.premiumaAccessToken = "";
+                Properties.Settings.Default.premiumaAccessToken = "//--//";
                 Properties.Settings.Default.RememberUsername = username.Text;
-                Properties.Settings.Default.premiumUUID = "";
-                Properties.Settings.Default.premiumUsername = "";
+                Properties.Settings.Default.premiumUUID = "//--//";
+                Properties.Settings.Default.premiumUsername = "//--//";
                 Properties.Settings.Default.isLegacy = true;
                 Properties.Settings.Default.Save();
             }
             else
             {
-                Properties.Settings.Default.premiumaAccessToken = "";
-                Properties.Settings.Default.RememberUsername = "";
-                Properties.Settings.Default.premiumUUID = "";
-                Properties.Settings.Default.premiumUsername = "";
+                Properties.Settings.Default.premiumaAccessToken = "//--//";
+                Properties.Settings.Default.RememberUsername = "//--//";
+                Properties.Settings.Default.premiumUUID = "//--//";
+                Properties.Settings.Default.premiumUsername = "//--//";
                 Properties.Settings.Default.isLegacy = true;
                 Properties.Settings.Default.Save();
             }
             Window1.singleton.settings.IsEnabled = true;
-            Window1.singleton.server.IsEnabled = true;
             Window1.singleton.logout.IsEnabled = true;
             Window1.singleton.MainPage.Navigate(new Pages.Home());
             loading.Visibility = Visibility.Hidden;

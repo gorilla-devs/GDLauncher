@@ -15,13 +15,27 @@ Sample license text.
             <ScrollViewer>
                 <StackPanel Name="container" Margin="20">
                     <Label FontSize="30" Margin="0 0 0 25">Welcome to GDLauncher</Label>
-                    <TextBlock TextWrapping="Wrap" FontSize="20" TextAlignment="Justify" LineHeight="32">Hello there.
-                        Hello there, thank you for using our launcher! Keep in mind it's still in open beta so you could still find some bugs. If you do, just reach us on
-                        our facebook page and tell us so we can fix them. <LineBreak></LineBreak>Happy Gaming :)
+                    <TextBlock TextWrapping="Wrap" FontSize="20" TextAlignment="Justify" LineHeight="32">
+                        Hello there, thank you for using our launcher! Here are some news about this new version: 
+                        <LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->Added persistent settings. Now they won't reset when updating the launcher.<LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->Fixed some situations where mojang login token expired<LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->Other fixes you won't notice but were required :)<LineBreak />
+                         -------------------------------------------------<LineBreak />
+                        Happy Gaming :)
                     </TextBlock>
                 </StackPanel>
             </ScrollViewer>
         </materialDesign:Card>
-        <Button Name="close" Content="Gotcha" Foreground="White" Height="30" Margin="363,560,10,10" Command="materialDesign:DialogHost.CloseDialogCommand" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+        <Button Name="close" Content="Gotcha" Foreground="White" Height="30" Margin="348,551,25,19" Command="materialDesign:DialogHost.CloseDialogCommand" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+        <StackPanel Height="auto" Width="auto" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10,276,170,-256">
+            <Image Source="/Images/facebook.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp"></Image>
+            <Image Source="/Images/globe.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp_1"></Image>
+            <Image Source="/Images/twitter.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp_2"></Image>
+            <Image Source="/Images/discord.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp_3"></Image>
+        </StackPanel>
     </Grid>
 </UserControl>

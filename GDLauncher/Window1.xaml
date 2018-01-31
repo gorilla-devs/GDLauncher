@@ -54,13 +54,10 @@ Sample license text.
                         <Button Name="settings" ToolTip="Settings" DockPanel.Dock="Right" Width="48" IsEnabled="False" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" Click="Button_Click_7" materialDesign:ShadowAssist.ShadowDepth="Depth0">
                             <materialDesign:PackIcon Kind="Settings" VerticalAlignment="Center"></materialDesign:PackIcon>
                         </Button>
-                        <Button Name="server" ToolTip="Manage Servers" DockPanel.Dock="Right" Width="48" IsEnabled="False" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="server_Click">
-                            <materialDesign:PackIcon Kind="Server" VerticalAlignment="Center"></materialDesign:PackIcon>
-                        </Button>
                         <Button Name="consoleBtn" ToolTip="Show Console" DockPanel.Dock="Right" Width="48" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="consoleBtn_Click">
                             <materialDesign:PackIcon Kind="Console" VerticalAlignment="Center"></materialDesign:PackIcon>
                         </Button>
-                        <Button Name="parse" ToolTip="Show Console" DockPanel.Dock="Right" Width="48" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="parse_Click">
+                        <Button Name="parse" ToolTip="Try Parse" Visibility="Hidden" DockPanel.Dock="Right" Width="48" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="parse_Click">
                             <materialDesign:PackIcon Kind="Console" VerticalAlignment="Center"></materialDesign:PackIcon>
                         </Button>
                         <StackPanel Orientation="Horizontal" Margin="0">

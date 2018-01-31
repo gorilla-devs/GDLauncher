@@ -16,24 +16,19 @@ Sample license text.
                 <Label x:Name="label" Content="Welcome to GDLauncher" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="30"/>
                 <materialDesign:Card Padding="10" Margin="10">
                     <TextBlock x:Name="textBlock" Padding="10" HorizontalAlignment="Left" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Top">
-                        GDLauncher e' un launcher custom di minecraft, sviluppato con l'idea di essere piu' semplice e funzionale
-                        e fornire maggiore personalizzazione e funzioni all'utente
+                        GDLauncher is a custom Minecraft Launcher developed from the ground up with the idea of being simpler and more functional than the official one.
                     </TextBlock>
                 </materialDesign:Card>
             </StackPanel>
             <StackPanel>
                 <materialDesign:Card Padding="10" Margin="10 0 10 10">
                     <TextBlock x:Name="textBlock1" Padding="10" HorizontalAlignment="Left" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Top">
-                        Prima di avviare il launcher abbiamo bisogno che tu decida alcune opzioni.
+                        Before diving directly into the launcher itself, we need some infos from you. Please tell us how much memory you want Minecraft to use.
                         <LineBreak/>
-                        Devi indicarci quanta ram vuoi che il launcher utilizzi e che dia a Minecraft.
+                        Keep in mind how much free memory you have
                         <LineBreak/>
-                        Noi ti consigliamo di dargli almeno 2 o 3 giga.
-                        <LineBreak/>
-                        Tieni anche conto di quanta RAM disponibile hai.
-                        <LineBreak/>
-                        <Label>Ram Attualmente Libera: </Label><Label Name="freeram">Calcolo...</Label>
-                        <Label Name="errorlowram" FontSize="12" Foreground="Red" Visibility="Hidden">Attenzione, la ram disponibile e' scarsa</Label>
+                        <Label>Ram free right now: </Label><Label Name="freeram">Calcolo...</Label>
+                        <Label Name="errorlowram" FontSize="12" Foreground="Red" Visibility="Hidden">Warning! Low available ram</Label>
                         <LineBreak/>
                         <ComboBox x:Name="ram" Width="100" SelectedIndex="2">
                             <ComboBoxItem>1</ComboBoxItem>
@@ -48,7 +43,7 @@ Sample license text.
                     </TextBlock>
                 </materialDesign:Card>
             </StackPanel>
-            <Button x:Name="button" HorizontalAlignment="Right" Margin="0 120 20 0" Content="Procedi" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Width="120" Click="button_Click" />
+            <Button x:Name="button" HorizontalAlignment="Right" Margin="0 150 20 0" Content="Confirm" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Width="120" Click="button_Click" />
         </StackPanel>
     </Grid>
 </UserControl>

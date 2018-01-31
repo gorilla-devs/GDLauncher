@@ -30,6 +30,8 @@ namespace GDLauncher.Dialogs.Server
         {
             InitializeComponent();
             DialogHostExtensions.SetCloseOnClickAway(this, true);
+            DataContext = new Classes.TextFieldsViewModel();
+
         }
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -106,6 +108,18 @@ namespace GDLauncher.Dialogs.Server
                 catch { }
             }
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+        }
+
+        private void serverName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                if (serverName.Text != "" && !serverName.Text.Contains(" ") && !string.IsNullOrEmpty(serverName.Text))
+                    createServerBtn.IsEnabled = true;
+                else
+                    createServerBtn.IsEnabled = false;
+            }
+            catch { }
         }
     }
 }

@@ -23,7 +23,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using GDLauncher.Classes;
-
+using System.Windows.Media.Animation;
 
 namespace GDLauncher.Pages
 {
@@ -53,7 +53,6 @@ namespace GDLauncher.Pages
         private async void Page_Loaded(object senderx, RoutedEventArgs ee)
         {
 
-            System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
             transition.SelectedIndex = 1;
             if (!Directory.Exists(config.M_F_P + "Packs\\"))
             {
@@ -71,7 +70,7 @@ namespace GDLauncher.Pages
                 Properties.Settings.Default.Save();
             }
 
-            if(Properties.Settings.Default.premiumUsername != "")
+            if(Properties.Settings.Default.premiumUsername != "//--//")
             {
                 //use the message queue to send a message.
                 var messageQueue = SnackbarThree.MessageQueue;
@@ -80,6 +79,22 @@ namespace GDLauncher.Pages
                 //the message queue can be called from any thread
                 Task.Factory.StartNew(() => messageQueue.Enqueue(message));
             }
+            //mainLogo.Cursor = Cursors.Hand;
+            mainLogo.MouseEnter += (ss, eee) => {
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 1;
+                da.To = 0.6;
+                da.Duration = new Duration(TimeSpan.FromSeconds(0.125));
+                mainLogo.BeginAnimation(OpacityProperty, da);
+            };
+
+            mainLogo.MouseLeave += (ss, eee) => {
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 0.6;
+                da.To = 1;
+                da.Duration = new Duration(TimeSpan.FromSeconds(0.125));
+                mainLogo.BeginAnimation(OpacityProperty, da);
+            };
         }
 
 
@@ -135,7 +150,10 @@ namespace GDLauncher.Pages
                     card.Margin = new Thickness(0, 3, 10, 10);
                     card.HorizontalAlignment = HorizontalAlignment.Left;
                     var insiderStackPanel = new StackPanel();
-
+                    var topStackPanel = new StackPanel();
+                    topStackPanel.Background = new SolidColorBrush(Colors.Black);
+                    topStackPanel.Height = 130;
+                    topStackPanel.Width = 230;
                     card.Content = insiderStackPanel;
                     //INSIDE STACKPANEL
 
@@ -160,17 +178,55 @@ namespace GDLauncher.Pages
                     image.VerticalAlignment = VerticalAlignment.Top;
                     image.Height = 130;
 
+
+
+                    /*LinearGradientBrush OpacityBrushReset = new LinearGradientBrush();
+                    GradientStop TransparentStopReset = new GradientStop(Colors.Transparent, 0);
+                    OpacityBrushReset.GradientStops.Add(TransparentStopReset);
+                    image.OpacityMask = OpacityBrushReset;*/
+
+
                     var title = new Label();
                     title.Foreground = new SolidColorBrush(Colors.White);
                     title.FontSize = 20;
                     title.FontWeight = FontWeights.ExtraBold;
-                    title.Margin = new Thickness(0, -70, 0, 0);
+                    title.Margin = new Thickness(0, -130, 0, 0);
                     title.HorizontalAlignment = HorizontalAlignment.Center;
+                    title.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    title.VerticalAlignment = VerticalAlignment.Center;
+                    title.VerticalContentAlignment = VerticalAlignment.Center;
                     title.Content = new DirectoryInfo(dir).Name;
+                    title.Cursor = Cursors.Hand;
+                    title.ToolTip = "Manage";
+                    title.Height = 130;
+                    title.Width = 230;
+                    image.Opacity = 1;
+                    title.MouseEnter += (ss, ee) => {
+                        DoubleAnimation da = new DoubleAnimation();
+                        da.From = 1;
+                        da.To = 0.6;
+                        da.Duration = new Duration(TimeSpan.FromSeconds(0.125));
+                        image.BeginAnimation(OpacityProperty, da);
+                    };
+
+                    title.MouseLeave += (ss, ee) => {
+                        DoubleAnimation da = new DoubleAnimation();
+                        da.From = 0.6;
+                        da.To = 1;
+                        da.Duration = new Duration(TimeSpan.FromSeconds(0.125));
+                        image.BeginAnimation(OpacityProperty, da);
+                    };
+                    title.MouseLeftButtonUp += async (ss, ee) =>
+                    {
+                        await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack(dir), "RootDialog");
+                        await ModpacksUpdate();
+                    };
+
 
                     var datastackpanel = new StackPanel();
-                    insiderStackPanel.Children.Add(image);
-                    insiderStackPanel.Children.Add(title);
+                    topStackPanel.Children.Add(image);
+                    topStackPanel.Children.Add(title);
+                    insiderStackPanel.Children.Add(topStackPanel);
                     insiderStackPanel.Children.Add(startBtn);
                     insiderStackPanel.Children.Add(datastackpanel);
 
@@ -256,16 +312,6 @@ namespace GDLauncher.Pages
                         MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIndicatorForeground(startBtn, (SolidColorBrush)(new BrushConverter().ConvertFrom("#183b45")));
                         MaterialDesignThemes.Wpf.Card actual = (MaterialDesignThemes.Wpf.Card)modpacksListContainer.FindName(card.Name);
                         await Task.Delay(500);
-                        System.Collections.Specialized.StringCollection x = (System.Collections.Specialized.StringCollection)Properties.Settings.Default["bookmarks"];
-                        foreach (var i in x)
-                        {
-                            if (i == dir)
-                            {
-                                x.Remove(dir);
-                                break;
-                            }
-                        }
-                        Properties.Settings.Default.Save();
                         try
                         {
                             if (Directory.Exists(dir))
@@ -286,7 +332,7 @@ namespace GDLauncher.Pages
 
 
                     buttonStackPanel.Children.Add(folderButton);
-                    buttonStackPanel.Children.Add(manageBtn);
+                    //buttonStackPanel.Children.Add(manageBtn);
                     buttonStackPanel.Children.Add(deletebutton);
                     modpacksListContainer.Children.Add(card);
                 }
@@ -345,9 +391,24 @@ namespace GDLauncher.Pages
         {
             ScrollViewer scrollviewer = sender as ScrollViewer;
             if (e.Delta > 0)
+            {
                 scrollviewer.LineLeft();
+                scrollviewer.LineLeft();
+                scrollviewer.LineLeft();
+                scrollviewer.LineLeft();
+                scrollviewer.LineLeft();
+                scrollviewer.LineLeft();
+            }
             else
+            {
                 scrollviewer.LineRight();
+                scrollviewer.LineRight();
+                scrollviewer.LineRight();
+                scrollviewer.LineRight();
+                scrollviewer.LineRight();
+                scrollviewer.LineRight();
+
+            }
             e.Handled = true;
         }
 
@@ -355,6 +416,13 @@ namespace GDLauncher.Pages
         {
             await Task.Delay(1200);
             eventArgs.Session.Close();
+        }
+
+
+        private async void server_Click(object sender, RoutedEventArgs e)
+        {
+            await MaterialDesignThemes.Wpf.DialogHost.Show(Pages.Home.singleton.serverList, "RootDialog");
+
         }
     }
 }

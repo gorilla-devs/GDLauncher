@@ -84,14 +84,13 @@ namespace GDLauncher.Pages
                     transition.SelectedIndex = 1;
                     await Task.Delay(450);
                     Window1.singleton.settings.IsEnabled = true;
-                    Window1.singleton.server.IsEnabled = true;
                     Window1.singleton.logout.IsEnabled = true;
-                    if (Properties.Settings.Default["RememberUsername"].ToString() != "")
+                    if (Properties.Settings.Default["RememberUsername"].ToString() != "//--//")
                     {
                         SessionData.username = Properties.Settings.Default["RememberUsername"].ToString();
                         Window1.singleton.MainPage.Navigate(new Home());
                     }
-                    else if (Properties.Settings.Default.premiumUsername != "")
+                    else if (Properties.Settings.Default.premiumUsername != "//--//")
                     {
                         SessionData.username = Properties.Settings.Default.premiumUsername;
                         SessionData.accessToken = Properties.Settings.Default.premiumaAccessToken;
@@ -223,7 +222,7 @@ namespace GDLauncher.Pages
                 await Task.Delay(300);
                 transition.SelectedIndex = 1;
                 await Task.Delay(450);
-                if (Properties.Settings.Default.premiumaAccessToken != "")
+                if (Properties.Settings.Default.premiumaAccessToken != "//--//")
                 {
                     Window1.singleton.offlineMode.Visibility = Visibility.Visible;
                     Window1.singleton.offlineMode.Foreground = (System.Windows.Media.SolidColorBrush)(new System.Windows.Media.BrushConverter().ConvertFrom("#00A843"));
@@ -231,7 +230,6 @@ namespace GDLauncher.Pages
                     Window1.singleton.offlineMode.Kind = MaterialDesignThemes.Wpf.PackIconKind.GoogleController;
 
                     Window1.singleton.settings.IsEnabled = true;
-                    Window1.singleton.server.IsEnabled = true;
                     Window1.singleton.logout.IsEnabled = true;
 
                     SessionData.username = Properties.Settings.Default.premiumUsername;
@@ -240,7 +238,7 @@ namespace GDLauncher.Pages
 
                     Window1.singleton.MainPage.Navigate(new Home());
                 }
-                else if (Properties.Settings.Default["RememberUsername"].ToString() != "")
+                else if (Properties.Settings.Default["RememberUsername"].ToString() != "//--//")
                 {
                     Window1.singleton.offlineMode.Visibility = Visibility.Visible;
                     Window1.singleton.offlineMode.Foreground = (System.Windows.Media.SolidColorBrush)(new System.Windows.Media.BrushConverter().ConvertFrom("#F2DB10"));
@@ -248,7 +246,6 @@ namespace GDLauncher.Pages
                     Window1.singleton.offlineMode.Kind = MaterialDesignThemes.Wpf.PackIconKind.GoogleControllerOff;
 
                     Window1.singleton.settings.IsEnabled = true;
-                    Window1.singleton.server.IsEnabled = true;
                     Window1.singleton.logout.IsEnabled = true;
 
                     SessionData.username = Properties.Settings.Default["RememberUsername"].ToString();
