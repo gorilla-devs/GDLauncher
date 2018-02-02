@@ -8,31 +8,16 @@
              mc:Ignorable="d" 
              Height="600" Width="500" Background="White" Loaded="UserControl_Loaded">
     <Grid>
-
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30">Still working on this...</Label>
         <StackPanel>
-            <materialDesign:Card Width="400" Height="150" Margin="0 10 0 0">
-                <StackPanel>
-                    <DockPanel VerticalAlignment="Top" Margin="0 20 0 0">
-                        <Label VerticalAlignment="Center" Margin="10 0 0 0">Rename Instance</Label>
-                        <TextBox Name="instanceName" materialDesign:HintAssist.IsFloating="True" materialDesign:HintAssist.Hint="Instance Name" Width="200" TextChanged="instanceName_TextChanged">
-                            <Binding Path="Name" UpdateSourceTrigger="PropertyChanged">
-                                <Binding.ValidationRules>
-                                    <domain1:NotEmptyValidationRule xmlns:domain1="clr-namespace:GDLauncher.Classes" ValidatesOnTargetUpdated="True" />
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox>
-                    </DockPanel>
-                    <Button Name="changeInstanceName" IsEnabled="False" Width="200" Margin="0 20 0 0" Click="changeInstanceName_Click" Style="{StaticResource MaterialDesignFlatButton}">Change Instance Name</Button>
-                </StackPanel>
-            </materialDesign:Card>
-            <materialDesign:Card Width="400" Height="370" Margin="0 10 0 0" AllowDrop="True"  DragEnter="Card_DragEnter" DragLeave="Card_DragLeave" Drop="Card_Drop">
+            <materialDesign:Card  Visibility="Hidden" Width="400" Height="370" Margin="0 10 0 0" AllowDrop="True"  DragEnter="Card_DragEnter" DragLeave="Card_DragLeave" Drop="Card_Drop">
                 <StackPanel Name="filesList" Width="400" Height="370">
 
                 </StackPanel>
             </materialDesign:Card>
-            <Button Foreground="White" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 20 0 0" Width="100" Content="Back"/>
+            <Button Style="{StaticResource MaterialDesignFlatButton}" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 180 0 0" Width="100" Content="Back"/>
         </StackPanel>
-        <Label x:Name="dragInfo" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Drag and drop the mod jar to add it" Margin="140,346,160,229"/>
+        <Label x:Name="dragInfo" Visibility="Hidden" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Drag and drop the mod jar to add it" Margin="140,346,160,229"/>
 
     </Grid>
 </UserControl>

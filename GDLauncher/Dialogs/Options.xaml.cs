@@ -58,12 +58,32 @@ namespace GDLauncher.Dialogs
                 ram.Items.Add("8");
             }
 
-            
+            windowSizes.Items.Add("600x700");
+            windowSizes.Items.Add("1000x750");
+
+            instancesFont.Items.Add("Roboto");
+            instancesFont.Items.Add("Roboto Light");
+            instancesFont.Items.Add("Roboto Thin");
+            instancesFont.Items.Add("Roboto Black");
+            instancesFont.Items.Add("Roboto Bold");
+            instancesFont.Items.Add("Roboto Medium");
+            instancesFont.Items.Add("Minecrafter");
+            instancesFont.Items.Add("Minecrafter Alt");
+
+
+
+            windowSizes.SelectedValue = Properties.Settings.Default["windowSize"];
+            instancesFont.SelectedValue = Properties.Settings.Default["instancesFont"];
+
             downloadThreads.SelectedValue = Properties.Settings.Default["download_threads"];
             ram.SelectedValue = Properties.Settings.Default["RAM"];
             JavaPath.Text = Classes.ComputerInfoDetect.GetJavaInstallationPath();
             downloadThreads.SelectionChanged += downloadThreads_SelectionChanged;
             ram.SelectionChanged += ram_SelectionChanged;
+            windowSizes.SelectionChanged += windowSizes_SelectionChanged;
+            instancesFont.SelectionChanged += instancesFont_SelectionChanged;
+
+
             if (Properties.Settings.Default.autoHideLauncher == true) autoHideLauncher.IsChecked = true;
             else autoHideLauncher.IsChecked = false;
             autoHideLauncher.Checked += new RoutedEventHandler(autoHideLauncher_Checked);
@@ -83,7 +103,6 @@ namespace GDLauncher.Dialogs
         {
             snackbarSave.Message = new MaterialDesignThemes.Wpf.SnackbarMessage
             {
-                ActionContent = "Yeeah",
                 Content = message
             };
             snackbarSave.IsActive = true; 
@@ -126,6 +145,32 @@ namespace GDLauncher.Dialogs
             Properties.Settings.Default["RAM"] = ram.SelectedValue;
             Properties.Settings.Default.Save();
             saved("Dedicated RAM Saved: " + Properties.Settings.Default["RAM"]);
+        }
+
+
+        private void instancesFont_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Properties.Settings.Default["instancesFont"] = instancesFont.SelectedValue;
+            Properties.Settings.Default.Save();
+            saved("New Font: " + Properties.Settings.Default["instancesFont"]);
+            Pages.Home.singleton.ModpacksUpdate();
+        }
+
+        private void windowSizes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Properties.Settings.Default["windowSize"] = windowSizes.SelectedValue;
+            Properties.Settings.Default.Save();
+            Window1.singleton.Width = double.Parse(Properties.Settings.Default["windowSize"].ToString().Split('x')[0]);
+            Window1.singleton.Height = double.Parse(Properties.Settings.Default["windowSize"].ToString().Split('x')[1]);
+
+            double screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
+            double screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
+            double windowWidth = Window1.singleton.Width;
+            double windowHeight = Window1.singleton.Height;
+            Window1.singleton.Left = (screenWidth / 2) - (windowWidth / 2);
+            Window1.singleton.Top = (screenHeight / 2) - (windowHeight / 2);
+
+            saved("Window size changed");
         }
 
         private void autoHideLauncher_Checked(object sender, RoutedEventArgs e)

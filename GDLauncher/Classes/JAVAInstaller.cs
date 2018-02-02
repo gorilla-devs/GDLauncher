@@ -71,14 +71,10 @@ namespace GDLauncher.Classes
             if (!Directory.Exists(config.javaLocal + "runtime\\jre"))
                 Directory.CreateDirectory(config.javaLocal + "runtime\\jre");
             Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("pleaseWait");
             Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("downloadingJava");
-            Pages.SplashScreen.singleton.secondLabel.Content = "";
             string url = "";
             //i .exe sono zip in verita'
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)

@@ -5,38 +5,59 @@
 			 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
-             mc:Ignorable="d" Height="500" Width="400" Background="White" Loaded="UserControl_Loaded">
+             mc:Ignorable="d" Height="600" Width="550" Background="White" Loaded="UserControl_Loaded">
     <Grid>
-        <DockPanel>
-            <StackPanel Margin="20">
-                <StackPanel Orientation="Horizontal">
-                    <Label>Dedicated RAM to MC</Label>
-                    <ComboBox x:Name="ram" Margin="150 0 0 0" VerticalAlignment="Top" Height="30" Width="67"/>
+        <StackPanel Margin="20">
+            <Label Foreground="#455A64" FontSize="14" FontWeight="SemiBold" Margin="0 0 0 10">General</Label>
+            <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth1" Padding="20 13 20 10">
+                <StackPanel>
+                    <DockPanel>
+                        <Label>Dedicated RAM to MC</Label>
+                        <ComboBox x:Name="ram" HorizontalAlignment="Right" VerticalAlignment="Top" Width="67"/>
+                    </DockPanel>
+                    <Separator  Margin="0 10 0 10" Height="0.3"/>
+                    <DockPanel>
+                        <Label>Parallel Downloads</Label>
+                        <ComboBox x:Name="downloadThreads" HorizontalAlignment="Right" VerticalAlignment="Top" Width="67"/>
+                    </DockPanel>
                 </StackPanel>
-                <Separator Margin="0 20 0 20"></Separator>
-                <StackPanel Orientation="Horizontal">
-                    <Label VerticalAlignment="Center">Parallel Downloads</Label>
-                    <ComboBox x:Name="downloadThreads" Width="67" Height="30" Margin="155 0 0 0"/>
+            </materialDesign:Card>
+            <Label Foreground="#455A64" FontSize="14" FontWeight="SemiBold" Margin="0 10 0 10">Preferences</Label>
+            <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth1" Padding="20 13 20 10">
+                <StackPanel>
+                    <DockPanel>
+                        <Label>Hide the launcher when game is launched</Label>
+                        <ToggleButton  Name="autoHideLauncher" HorizontalAlignment="Right" Style="{StaticResource MaterialDesignSwitchToggleButton}" />
+                    </DockPanel>
+                    <Separator  Margin="0 10 0 10" Height="0.3"/>
+                    <DockPanel>
+                        <Label>Launcher Window Resolution</Label>
+                        <ComboBox Name="windowSizes" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100"/>
+                    </DockPanel>
+                    <Separator  Margin="0 10 0 10" Height="0.3"/>
+                    <DockPanel>
+                        <Label>Instances Name Font</Label>
+                        <ComboBox Name="instancesFont" HorizontalAlignment="Right" VerticalAlignment="Top" Width="140"/>
+                    </DockPanel>
                 </StackPanel>
-                <Separator Margin="0 20 0 20"></Separator>
-                <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-                    <Label VerticalAlignment="Center">Hide the launcher when game is launched</Label>
-                    <CheckBox Name="autoHideLauncher" Margin="80 0 0 0" VerticalAlignment="Top" Height="30" Width="30"/>
+            </materialDesign:Card>
+            <Label Foreground="#455A64" FontSize="14" FontWeight="SemiBold" Margin="0 10 0 10">Configurations</Label>
+            <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth1" Padding="20 13 20 10">
+                <StackPanel>
+                    <DockPanel>
+                        <Label VerticalAlignment="Center">Java Path</Label>
+                        <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="10 0 5 0" HorizontalScrollBarVisibility="Auto" Width="340">
+                            <TextBox Name="JavaPath" IsEnabled="False" VerticalAlignment="Top" Height="30" MinWidth="340"/>
+                        </ScrollViewer>
+                        <Button Name="JavaPathFolderBrowser" Foreground="White" Click="JavaPathFolderBrowser_Click">
+                            <materialDesign:PackIcon Kind="Folder"></materialDesign:PackIcon>
+                        </Button>
+                    </DockPanel>
                 </StackPanel>
-                <Separator Margin="0 20 0 20"></Separator>
-                <StackPanel Orientation="Horizontal" Margin="0 0 0 0">
-                    <Label VerticalAlignment="Center">Java Path</Label>
-                    <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="10 0 5 0" HorizontalScrollBarVisibility="Auto" Width="220">
-                        <TextBox Name="JavaPath" IsEnabled="False" VerticalAlignment="Top" Height="30" MinWidth="220"/>
-                    </ScrollViewer>
-                    <Button Name="JavaPathFolderBrowser" Foreground="White" Click="JavaPathFolderBrowser_Click">
-                        <materialDesign:PackIcon Kind="Folder"></materialDesign:PackIcon>
-                    </Button>
-                </StackPanel>
-            </StackPanel>
-        </DockPanel>
-        <Button Name="closeDialog" Width="100" Margin="10,458,290,10" Click="closeDialog_Click" Style="{StaticResource MaterialDesignFlatButton}">Close</Button>
-        <Label Name="version" Width="60" Height="30" Margin="330,458,10,12">1.9.2</Label>
+            </materialDesign:Card>
+        </StackPanel>
+        <Button Name="closeDialog" Width="100" Margin="10,558,440.4,10" Click="closeDialog_Click" Style="{StaticResource MaterialDesignFlatButton}">Close</Button>
+        <Label Name="version" Width="60" Height="30" Margin="480,560,10.4,10">1.9.2</Label>
         <materialDesign:Snackbar DockPanel.Dock="Bottom" Margin="0 0 0 0" Name="snackbarSave">
         </materialDesign:Snackbar>
     </Grid>

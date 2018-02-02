@@ -172,6 +172,9 @@
     <Compile Include="Dialogs\Changelog.xaml.cs">
       <DependentUpon>Changelog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DuplicateInstance.xaml.cs">
+      <DependentUpon>DuplicateInstance.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Eula.xaml.cs">
       <DependentUpon>Eula.xaml</DependentUpon>
     </Compile>
@@ -184,8 +187,14 @@
     <Compile Include="Dialogs\ManagePack.xaml.cs">
       <DependentUpon>ManagePack.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Modpacks.xaml.cs">
+      <DependentUpon>Modpacks.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\PostLogin.xaml.cs">
       <DependentUpon>PostLogin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\RenameInstance.xaml.cs">
+      <DependentUpon>RenameInstance.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ServerList.xaml.cs">
       <DependentUpon>ServerList.xaml</DependentUpon>
@@ -273,7 +282,14 @@
     <Compile Include="Windows\ServerManager.xaml.cs">
       <DependentUpon>ServerManager.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\WebBrowser.xaml.cs">
+      <DependentUpon>WebBrowser.xaml</DependentUpon>
+    </Compile>
     <Page Include="Dialogs\Changelog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DuplicateInstance.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -293,7 +309,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\Modpacks.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\PostLogin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\RenameInstance.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -397,6 +421,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\WebBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -424,6 +452,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="Assets\Minecrafter.Alt.ttf" />
+    <Resource Include="Assets\Minecrafter.Reg.ttf" />
+    <Resource Include="Assets\Roboto-Black.ttf" />
+    <Resource Include="Assets\Roboto-Bold.ttf" />
+    <Resource Include="Assets\Roboto-Light.ttf" />
+    <Resource Include="Assets\Roboto-Medium.ttf" />
+    <Resource Include="Assets\Roboto-Regular.ttf" />
+    <Resource Include="Assets\Roboto-Thin.ttf" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

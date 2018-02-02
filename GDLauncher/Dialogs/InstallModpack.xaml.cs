@@ -154,12 +154,6 @@ namespace GDLauncher.Dialogs
         private async void install_Click(object sender, RoutedEventArgs e)
         {
             DialogHostExtensions.SetCloseOnClickAway(this, false);
-            Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
-            if (!rg.IsMatch(instanceTextName.Text) || (instanceTextName.Text.Contains(" ")))
-            {
-                MessageBox.Show("Solo lettere e numero ammessi");
-                return;
-            }
             if (Directory.Exists(config.M_F_P + "Packs\\" + instanceTextName.Text))
             {
                 MessageBox.Show("Nome istanza gia' esistente");
@@ -262,21 +256,30 @@ namespace GDLauncher.Dialogs
 
         private void instanceTextName_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if(instanceTextName.Text.Contains(" ") || string.IsNullOrEmpty(instanceTextName.Text))
+            try
             {
-                install.IsEnabled = false;
+                Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
+
+                if (instanceTextName.Text != "" && !instanceTextName.Text.Contains(" ") && !string.IsNullOrEmpty(instanceTextName.Text) && rg.IsMatch(instanceTextName.Text))
+                    install.IsEnabled = true;
+                else
+                    install.IsEnabled = false;
             }
-            else
-            {
-                install.IsEnabled = true;
-            }
+            catch { }
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://files.minecraftforge.net/");
+            new Windows.WebBrowser("https://files.minecraftforge.net/").Show();
             transition.SelectedIndex = 2;
 
+        }
+
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+
+            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Modpacks());
         }
     }
 }

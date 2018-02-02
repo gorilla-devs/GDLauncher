@@ -235,5 +235,30 @@ namespace GDLauncher.Properties {
                 this["isLegacy"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600x700")]
+        public string windowSize {
+            get {
+                return ((string)(this["windowSize"]));
+            }
+            set {
+                this["windowSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Roboto Light")]
+        public string instancesFont {
+            get {
+                return ((string)(this["instancesFont"]));
+            }
+            set {
+                this["instancesFont"] = value;
+            }
+        }
     }
 }

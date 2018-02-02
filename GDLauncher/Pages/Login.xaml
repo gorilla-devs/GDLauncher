@@ -9,8 +9,7 @@ Sample license text.
             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:GDLauncher.Pages"
-      mc:Ignorable="d" 
-      Height="645" Width="600" Background="White"
+      mc:Ignorable="d" Background="White"
       Title="Login" KeyDown="Page_KeyDown" Loaded="Page_Loaded">
 
     <Grid>

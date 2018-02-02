@@ -66,16 +66,12 @@ namespace GDLauncher.Classes
                         if (result.ToString() == "yes")
                         {
                             Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
-                            Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
-                            Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
                             Window1.versionok = false;
                             Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("updatingLauncher");
-                            Pages.SplashScreen.singleton.secondLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
-                            Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + "...";
                             Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("updateFound"));
                         }
                         else
@@ -133,26 +129,23 @@ namespace GDLauncher.Classes
                     MessageBox.Show("Unknown error downloading new version: " + eex.InnerException);
                     return;
                 }
-                Pages.SplashScreen.singleton.postUpdate.Visibility = Visibility.Visible;
-                Pages.SplashScreen.singleton.postUpdateText.Visibility = Visibility.Visible;
-                Pages.SplashScreen.singleton.postUpdatePreText.Visibility = Visibility.Visible;
-                Pages.SplashScreen.singleton.postUpdatePostText.Visibility = Visibility.Visible;
-                Pages.SplashScreen.singleton.postUpdateText.Content = "5";
+                Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Hidden;
+                Pages.SplashScreen.singleton.firstLabel.Text = "5";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "4";
+                Pages.SplashScreen.singleton.firstLabel.Text = "4";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "3";
+                Pages.SplashScreen.singleton.firstLabel.Text = "3";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "2";
+                Pages.SplashScreen.singleton.firstLabel.Text = "2";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "1";
+                Pages.SplashScreen.singleton.firstLabel.Text = "1";
                 await Task.Delay(1000);
 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "0";
+                Pages.SplashScreen.singleton.firstLabel.Text = "0";
 
                 Properties.Settings.Default["firstTimeHowTo"] = "false";
                 Properties.Settings.Default["justUpdated"] = "true";

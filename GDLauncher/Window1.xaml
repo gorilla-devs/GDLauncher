@@ -10,7 +10,7 @@ Sample license text.
         xmlns:local="clr-namespace:GDLauncher"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         mc:Ignorable="d"
-        Title="GDLauncher" Height="700" Width="600" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="GDLauncher" MinHeight="700" MinWidth="600" Width="600" Height="700" WindowStyle="None" ResizeMode="CanMinimize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <materialDesign:DialogHost Identifier="RootDialog" CloseOnClickAway="{Binding Path=DialogContent.(local:DialogHostExtensions.CloseOnClickAway), RelativeSource={RelativeSource Self}, FallbackValue=True}">
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
             <materialDesign:DrawerHost.LeftDrawerContent >
@@ -20,7 +20,7 @@ Sample license text.
                                   IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
                     <ListBox x:Name="NavigationMenu" Margin="0 16 0 16" PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp" Width="150">
                         <ListBox.ItemTemplate>
-                            <DataTemplate DataType="domain:Page">
+                            <DataTemplate DataType="Page">
                                 <TextBlock Text="{Binding Name}" Margin="32 0 32 0"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -67,7 +67,7 @@ Sample license text.
                         </StackPanel>
                     </DockPanel>
                 </materialDesign:ColorZone>
-                <Frame Name="MainPage" NavigationUIVisibility="Hidden"></Frame>
+                <Frame Name="MainPage" NavigationUIVisibility="Hidden" BorderThickness="2 0 2 2" BorderBrush="#1A5363"></Frame>
             </DockPanel>
 
         </materialDesign:DrawerHost>

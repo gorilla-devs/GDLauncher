@@ -19,6 +19,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
+using System.Windows.Media;
+using GDLauncher.Properties;
 
 namespace GDLauncher
 {
@@ -35,9 +37,16 @@ namespace GDLauncher
         {
             InitializeComponent();
             singleton = this;
+            this.Width = double.Parse(Properties.Settings.Default["windowSize"].ToString().Split('x')[0]);
+            this.Height = double.Parse(Properties.Settings.Default["windowSize"].ToString().Split('x')[1]);
+
             MainPage.JournalOwnership = JournalOwnership.OwnsJournal;
             MainPage.Navigated += new NavigatedEventHandler(NavigationService_Navigated);
             Timer myTimer = new Timer();
+
+            //singleton.FontFamily = new FontFamily(new Uri("pack://application:,,,/Assets/"),
+                //"./#" + Settings.Default["instancesFont"]);
+
             myTimer.Elapsed += new ElapsedEventHandler(DisplayTimeEvent);
             myTimer.Interval = 5000; // 1000 ms is one second
             myTimer.Start();

@@ -144,7 +144,7 @@ namespace GDLauncher.Pages
                 firstLabel.Text = "Checking required data (1/2)";
                 try
                 {
-                    downloadingForgeJSON.Content = "Downloading Additional Data (1/2)";
+                    firstLabel.Text = "Downloading Additional Data (1/2)";
                     //CHECKING FORGE JSON
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
                     request.Method = "HEAD";
@@ -154,9 +154,9 @@ namespace GDLauncher.Pages
                     var client = new WebClient();
                     client.DownloadProgressChanged += (s, ee) =>
                     {
-                        downloadingForgeJSONProgress.Value = ee.ProgressPercentage;
-                        forgeJSONSpeed.Content = string.Format("{0} kb/s", (ee.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
-                        forgeJSONMbToDownload.Content = string.Format("{0} MB / {1} MB",
+                        progressbar.Value = ee.ProgressPercentage;
+                        kbps.Content = string.Format("{0} kb/s", (ee.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                        mbToDownload.Content = string.Format("{0} MB / {1} MB",
                         (ee.BytesReceived / 1024d / 1024d).ToString("0"),
                         (ee.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
                     };
@@ -164,10 +164,10 @@ namespace GDLauncher.Pages
                     if (!File.Exists(config.M_F_P + "forgeVersions.json") || (Properties.Settings.Default.forgeJSONContentLength != disposition && Properties.Settings.Default.forgeJSONContentLength != ""))
                     {
                         waiting.Visibility = Visibility.Hidden;
-                        downloadingForgeJSONProgress.Visibility = Visibility.Visible;
-                        downloadingForgeJSON.Visibility = Visibility.Visible;
-                        forgeJSONSpeed.Visibility = Visibility.Visible;
-                        forgeJSONMbToDownload.Visibility = Visibility.Visible;
+                        progressbar.Visibility = Visibility.Visible;
+                        firstLabel.Visibility = Visibility.Visible;
+                        kbps.Visibility = Visibility.Visible;
+                        mbToDownload.Visibility = Visibility.Visible;
                         await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
                         Properties.Settings.Default.forgeJSONContentLength = disposition;
                         Properties.Settings.Default.Save();
@@ -183,10 +183,10 @@ namespace GDLauncher.Pages
                     catch
                     {
                         waiting.Visibility = Visibility.Hidden;
-                        downloadingForgeJSONProgress.Visibility = Visibility.Visible;
-                        downloadingForgeJSON.Visibility = Visibility.Visible;
-                        forgeJSONSpeed.Visibility = Visibility.Visible;
-                        forgeJSONMbToDownload.Visibility = Visibility.Visible;
+                        progressbar.Visibility = Visibility.Visible;
+                        firstLabel.Visibility = Visibility.Visible;
+                        kbps.Visibility = Visibility.Visible;
+                        mbToDownload.Visibility = Visibility.Visible;
                         await client.DownloadFileTaskAsync("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", config.M_F_P + "forgeVersions.json");
                         Properties.Settings.Default.forgeJSONContentLength = disposition;
                         Properties.Settings.Default.Save();
@@ -195,27 +195,27 @@ namespace GDLauncher.Pages
                 }
                 catch { }
                 firstLabel.Text = "Checking required data (2/2)";
-                downloadingForgeJSON.Content = "Downloading Additional Data (2/2)";
+                firstLabel.Text = "Downloading Additional Data (2/2)";
                 if (!Directory.Exists(config.M_F_P + "items"))
                 {
                     waiting.Visibility = Visibility.Hidden;
                     Directory.CreateDirectory(config.M_F_P + "items");
                     var client1 = new WebClient();
-                    downloadingForgeJSONProgress.Visibility = Visibility.Visible;
-                    downloadingForgeJSON.Visibility = Visibility.Visible;
-                    forgeJSONSpeed.Visibility = Visibility.Visible;
-                    forgeJSONMbToDownload.Visibility = Visibility.Visible;
+                    progressbar.Visibility = Visibility.Visible;
+                    firstLabel.Visibility = Visibility.Visible;
+                    kbps.Visibility = Visibility.Visible;
+                    mbToDownload.Visibility = Visibility.Visible;
                     client1.DownloadProgressChanged += (s, ee) =>
                     {
-                        downloadingForgeJSONProgress.Value = ee.ProgressPercentage;
-                        forgeJSONSpeed.Content = string.Format("{0} kb/s", (ee.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
-                        forgeJSONMbToDownload.Content = string.Format("{0} MB / {1} MB",
+                        progressbar.Value = ee.ProgressPercentage;
+                        kbps.Content = string.Format("{0} kb/s", (ee.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                        mbToDownload.Content = string.Format("{0} MB / {1} MB",
                         (ee.BytesReceived / 1024d / 1024d).ToString("0"),
                         (ee.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
                     };
                     await client1.DownloadFileTaskAsync("http://minecraft-ids.grahamedgecombe.com/items.zip", config.M_F_P + "items.zip");
-                    downloadingForgeJSON.Content = "Extracting Additional Data (2/2)";
-                            
+                    firstLabel.Text = "Extracting Additional Data (2/2)";
+                    firstlabelprogress.Visibility = Visibility.Visible;
                     await Task.Factory.StartNew(() => Classes.ZipSharp.ExtractZipFile(config.M_F_P + "items.zip", null, config.M_F_P + "items")).ContinueWith((ante) => Thread.Sleep(300));
                     File.Delete(config.M_F_P + "items.zip");
                 }

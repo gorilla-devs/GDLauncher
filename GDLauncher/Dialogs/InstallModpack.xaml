@@ -13,21 +13,22 @@
 
 
         <materialDesign:TransitionerSlide>
-                <StackPanel Margin="20 10 20 0">
-                    <DockPanel>
-                        <Button FontSize="40" FontWeight="Bold" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="295" Width="220" Click="Button_Click">
+            <StackPanel Margin="20 0 20 0" VerticalAlignment="Center">
+                <Button FontSize="40" FontWeight="Bold" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="90" Click="Button_Click">
                             Vanilla
                         </Button>
-                        <Button FontSize="40" FontWeight="Bold" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="295" Width="220" Click="Button_Click_1">
+                    <Button FontSize="40" FontWeight="Bold" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="90" Click="Button_Click_1">
                             Forge
                         </Button>
-                    </DockPanel>
+                    <Button FontSize="40" FontWeight="Bold" Style="{StaticResource MaterialDesignFlatButton}" Margin="0 10 0 0" Height="90" Click="Button_Click_3">
+                        Modpacks
+                    </Button>
                 </StackPanel>
         </materialDesign:TransitionerSlide>
         <materialDesign:TransitionerSlide Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
             <StackPanel>
-                <TextBlock TextWrapping="Wrap" Margin="30" FontSize="20">We are going to download forge directly from their servers. Since they have to pay the bills,
-                 we are going to redirect you on their home page. You can just close it right away and keep on using our launcher</TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="30" FontSize="20">We download forge from their server. Since we want to support them,
+                    we will open their website so they get paid for the ad. You can just close it</TextBlock>
                 <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="0 50 0 0" Click="Button_Click_2">Continue</Button>
             </StackPanel>
         </materialDesign:TransitionerSlide>
