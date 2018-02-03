@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using GDLauncher.Classes;
+using GDLauncher.Properties;
 
 namespace GDLauncher.Pages
 {
@@ -34,7 +35,6 @@ namespace GDLauncher.Pages
         public SplashScreen()
         {
             InitializeComponent();
-            firstlabelprogress.Visibility = Visibility.Visible;
             //Window1.singleton.MenuToggleButton.IsEnabled = false;
             singleton = this;
             
@@ -65,7 +65,6 @@ namespace GDLauncher.Pages
         {
             Windows.DebugOutputConsole console = new Windows.DebugOutputConsole();
             firstLabel.Text = "Initializing checkups...";
-            firstlabelprogress.Visibility = Visibility.Hidden;
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://google.com");
@@ -85,15 +84,15 @@ namespace GDLauncher.Pages
                     await Task.Delay(450);
                     Window1.singleton.settings.IsEnabled = true;
                     Window1.singleton.logout.IsEnabled = true;
-                    if (Properties.Settings.Default["RememberUsername"].ToString() != "//--//")
+                    if (Properties.Settings.Default["RememberUsername"].ToString() != "")
                     {
                         SessionData.username = Properties.Settings.Default["RememberUsername"].ToString();
                         Window1.singleton.MainPage.Navigate(new Home());
                     }
-                    else if (Properties.Settings.Default.premiumUsername != "//--//")
+                    else if (Properties.Settings.Default.premiumUsername != "")
                     {
                         SessionData.username = Properties.Settings.Default.premiumUsername;
-                        SessionData.accessToken = Properties.Settings.Default.premiumaAccessToken;
+                        SessionData.accessToken = Properties.Settings.Default.premiumAccessToken;
                         SessionData.uuidPremium = Properties.Settings.Default.premiumUUID;
                         SessionData.isLegacy = Properties.Settings.Default.isLegacy;
 
@@ -215,15 +214,27 @@ namespace GDLauncher.Pages
                     };
                     await client1.DownloadFileTaskAsync("http://minecraft-ids.grahamedgecombe.com/items.zip", config.M_F_P + "items.zip");
                     firstLabel.Text = "Extracting Additional Data (2/2)";
-                    firstlabelprogress.Visibility = Visibility.Visible;
+                    progressbar.Visibility = Visibility.Visible;
+                    progressbar.IsIndeterminate = true;
                     await Task.Factory.StartNew(() => Classes.ZipSharp.ExtractZipFile(config.M_F_P + "items.zip", null, config.M_F_P + "items")).ContinueWith((ante) => Thread.Sleep(300));
                     File.Delete(config.M_F_P + "items.zip");
                 }
+
+                firstLabel.Text = "Checking for Premium Token Validity";
+
+                var isTokenValid = await Classes.MojangAPIs.IsTokenValid(Settings.Default.premiumAccessToken);
+
                 await Task.Delay(300);
                 transition.SelectedIndex = 1;
                 await Task.Delay(450);
-                if (Properties.Settings.Default.premiumaAccessToken != "//--//")
+                if (Properties.Settings.Default.premiumAccessToken != "")
                 {
+                    if (!isTokenValid)
+                    {
+                        Window1.singleton.MainPage.Navigate(new Login("Token expired. You need to log back in"));
+                        return;
+                    }
+
                     Window1.singleton.offlineMode.Visibility = Visibility.Visible;
                     Window1.singleton.offlineMode.Foreground = (System.Windows.Media.SolidColorBrush)(new System.Windows.Media.BrushConverter().ConvertFrom("#00A843"));
                     Window1.singleton.offlineMode.ToolTip = "Playing in Online-Mode";
@@ -232,13 +243,14 @@ namespace GDLauncher.Pages
                     Window1.singleton.settings.IsEnabled = true;
                     Window1.singleton.logout.IsEnabled = true;
 
-                    SessionData.username = Properties.Settings.Default.premiumUsername;
-                    SessionData.accessToken = Properties.Settings.Default.premiumaAccessToken;
-                    SessionData.uuidPremium = Properties.Settings.Default.premiumUUID;
+
+                    SessionData.username = Settings.Default.premiumUsername;
+                    SessionData.accessToken = Settings.Default.premiumAccessToken;
+                    SessionData.uuidPremium = Settings.Default.premiumUUID;
 
                     Window1.singleton.MainPage.Navigate(new Home());
                 }
-                else if (Properties.Settings.Default["RememberUsername"].ToString() != "//--//")
+                else if (Properties.Settings.Default["RememberUsername"].ToString() != "")
                 {
                     Window1.singleton.offlineMode.Visibility = Visibility.Visible;
                     Window1.singleton.offlineMode.Foreground = (System.Windows.Media.SolidColorBrush)(new System.Windows.Media.BrushConverter().ConvertFrom("#F2DB10"));

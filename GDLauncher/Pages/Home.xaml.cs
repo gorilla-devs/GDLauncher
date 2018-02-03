@@ -63,7 +63,7 @@ namespace GDLauncher.Pages
                 Settings.Default.Save();
             }
 
-            if (Settings.Default.premiumUsername != "//--//")
+            if (Settings.Default.premiumUsername != "")
             {
                 //use the message queue to send a message.
                 var messageQueue = SnackbarThree.MessageQueue;
@@ -190,7 +190,7 @@ namespace GDLauncher.Pages
                         FontSize = 26,
                         //title.FontWeight = FontWeights.ExtraBold;
                         FontFamily = new FontFamily(new Uri("pack://application:,,,/Assets/"), "./#" + Settings.Default["instancesFont"]),
-                        Margin = new Thickness(0, -110, 0, 0),
+                        Margin = new Thickness(0, -120, 0, 0),
                         HorizontalAlignment = HorizontalAlignment.Center,
                         HorizontalContentAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Center,
@@ -384,7 +384,12 @@ namespace GDLauncher.Pages
                         //Height = 300
                     };
                     popupbox.PopupContent = popupBoxStackPanel;
-                    var duplicateStackPanel = new DockPanel();
+                    var duplicateStackPanel = new StackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(0, 20, 0, 0)
+                    };
 
                     var duplicatePackIcon = new PackIcon
                     {
@@ -401,7 +406,13 @@ namespace GDLauncher.Pages
                     duplicateStackPanel.Children.Add(duplicatePackIcon);
                     duplicateStackPanel.Children.Add(duplicateLabel);
 
-                    var renameDockPanel = new DockPanel();
+                    var renameDockPanel = new StackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(0, 20, 0, 0)
+
+                    };
 
                     var renamePackIcon = new PackIcon
                     {

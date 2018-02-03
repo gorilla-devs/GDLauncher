@@ -38,7 +38,7 @@ namespace GDLauncher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3.2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.3")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -86,7 +86,7 @@ namespace GDLauncher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("//--//")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string RememberUsername {
             get {
                 return ((string)(this["RememberUsername"]));
@@ -161,7 +161,7 @@ namespace GDLauncher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("//--//")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string clientToken {
             get {
                 return ((string)(this["clientToken"]));
@@ -187,20 +187,20 @@ namespace GDLauncher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("//--//")]
-        public string premiumaAccessToken {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string premiumAccessToken {
             get {
-                return ((string)(this["premiumaAccessToken"]));
+                return ((string)(this["premiumAccessToken"]));
             }
             set {
-                this["premiumaAccessToken"] = value;
+                this["premiumAccessToken"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("//--//")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string premiumUUID {
             get {
                 return ((string)(this["premiumUUID"]));
@@ -213,7 +213,7 @@ namespace GDLauncher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("//--//")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string premiumUsername {
             get {
                 return ((string)(this["premiumUsername"]));

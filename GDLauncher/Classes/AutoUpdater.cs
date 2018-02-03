@@ -130,22 +130,25 @@ namespace GDLauncher.Classes
                     return;
                 }
                 Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Hidden;
-                Pages.SplashScreen.singleton.firstLabel.Text = "5";
+                Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
+                Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Hidden;
+
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 5 seconds";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.firstLabel.Text = "4";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 4 seconds";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.firstLabel.Text = "3";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 3 seconds";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.firstLabel.Text = "2";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 2 seconds";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.firstLabel.Text = "1";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 1 seconds";
                 await Task.Delay(1000);
 
-                Pages.SplashScreen.singleton.firstLabel.Text = "0";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 0 seconds";
 
                 Properties.Settings.Default["firstTimeHowTo"] = "false";
                 Properties.Settings.Default["justUpdated"] = "true";

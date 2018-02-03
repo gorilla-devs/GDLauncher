@@ -21,6 +21,8 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -32,22 +34,28 @@ namespace GDLauncher.Pages
     /// </summary>
     public partial class Login : Page
     {
-        public Login()
+        public string Error = "";
+        public Login(string error = "")
         {
             InitializeComponent();
             //Window1.singleton.MenuToggleButton.IsEnabled = false;
             transition.SelectedIndex = 0;
             //language.Text = Thread.CurrentThread.CurrentUICulture.Name;
-
+            this.Error = error;
         }
 
         
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
+
             if (e.Key.Equals(Key.Return))
             {
-                button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                if (loginKind.SelectedIndex == 0)
+                    premiumLogin.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                else
+                    button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
             }
+
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -55,24 +63,78 @@ namespace GDLauncher.Pages
             await Task.Delay(50);
             username.Focus();
             transition.SelectedIndex = 1;
-            if (Properties.Settings.Default["RememberUsername"].ToString() != "//--//")
+            if (Properties.Settings.Default["RememberUsername"].ToString() != "")
             {
                 username.Text = Properties.Settings.Default["RememberUsername"].ToString();
                 offlineRemember.IsChecked = true;
             }
 
+            premiumError.Content = Error;
+            premiumUsername.Focus();
+
+            mainCard.Effect = new DropShadowEffect
+            {
+                BlurRadius = 0,
+                ShadowDepth = 0,
+                Direction = 270,
+                Opacity = .42,
+                RenderingBias = RenderingBias.Performance,
+            };
+
+            mainCard.MouseEnter += (ss, ee) =>
+            {
+                var da = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1.5,
+                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                };
+                var da1 = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 8,
+                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                };
+                mainCard.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                mainCard.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+
+
+            };
+
+            mainCard.MouseLeave += (ss, ee) =>
+            {
+                var da = new DoubleAnimation
+                {
+                    From = 1.5,
+                    To = 0,
+                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                };
+                var da1 = new DoubleAnimation
+                {
+                    From = 8,
+                    To = 0,
+                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                };
+                mainCard.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                mainCard.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+
+            };
         }
 
-        private void TextBlock_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private async void TextBlock_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             MojangOrOffline.Content = "Offline";
             loginKind.SelectedIndex = 1;
+            username.Focus();
+
         }
 
         private void TextBlock_MouseLeftButtonUp_1(object sender, MouseButtonEventArgs e)
         {
             MojangOrOffline.Content = "Mojang";
             loginKind.SelectedIndex = 0;
+            premiumUsername.Focus();
+
         }
 
         private async void premiumLogin_Click(object sender, RoutedEventArgs e)
@@ -96,7 +158,7 @@ namespace GDLauncher.Pages
                 return;
             }
 
-            string x = await new Classes.MojangAPIs().Authenticate(premiumUsername.Text, premiumPassword.Password);
+            string x = await Classes.MojangAPIs.Authenticate(premiumUsername.Text, premiumPassword.Password);
             dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(x);
             string accessToken = "";
             string username = "";
@@ -137,8 +199,8 @@ namespace GDLauncher.Pages
             SessionData.isLegacy = isLegacy;
             if (premiumRemember.IsChecked == true)
             {
-                Properties.Settings.Default.premiumaAccessToken = accessToken;
-                Properties.Settings.Default.RememberUsername = "//--//";
+                Properties.Settings.Default.premiumAccessToken = accessToken;
+                Properties.Settings.Default.RememberUsername = "";
                 Properties.Settings.Default.premiumUUID = Puuid;
                 Properties.Settings.Default.premiumUsername = username;
                 Properties.Settings.Default.isLegacy = isLegacy;
@@ -146,10 +208,10 @@ namespace GDLauncher.Pages
             }
             else
             {
-                Properties.Settings.Default.premiumaAccessToken = "//--//";
-                Properties.Settings.Default.RememberUsername = "//--//";
-                Properties.Settings.Default.premiumUUID = "//--//";
-                Properties.Settings.Default.premiumUsername = "//--//";
+                Properties.Settings.Default.premiumAccessToken = "";
+                Properties.Settings.Default.RememberUsername = "";
+                Properties.Settings.Default.premiumUUID = "";
+                Properties.Settings.Default.premiumUsername = "";
                 Properties.Settings.Default.isLegacy = true;
                 Properties.Settings.Default.Save();
             }
@@ -191,19 +253,19 @@ namespace GDLauncher.Pages
             await Task.Delay(500);
             if (offlineRemember.IsChecked == true)
             {
-                Properties.Settings.Default.premiumaAccessToken = "//--//";
+                Properties.Settings.Default.premiumAccessToken = "";
                 Properties.Settings.Default.RememberUsername = username.Text;
-                Properties.Settings.Default.premiumUUID = "//--//";
-                Properties.Settings.Default.premiumUsername = "//--//";
+                Properties.Settings.Default.premiumUUID = "";
+                Properties.Settings.Default.premiumUsername = "";
                 Properties.Settings.Default.isLegacy = true;
                 Properties.Settings.Default.Save();
             }
             else
             {
-                Properties.Settings.Default.premiumaAccessToken = "//--//";
-                Properties.Settings.Default.RememberUsername = "//--//";
-                Properties.Settings.Default.premiumUUID = "//--//";
-                Properties.Settings.Default.premiumUsername = "//--//";
+                Properties.Settings.Default.premiumAccessToken = "";
+                Properties.Settings.Default.RememberUsername = "";
+                Properties.Settings.Default.premiumUUID = "";
+                Properties.Settings.Default.premiumUsername = "";
                 Properties.Settings.Default.isLegacy = true;
                 Properties.Settings.Default.Save();
             }

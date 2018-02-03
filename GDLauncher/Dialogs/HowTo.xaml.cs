@@ -36,7 +36,7 @@ namespace GDLauncher.Dialogs
             InitializeComponent();
             try
             {
-                var ramCounter = new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes", true);
+                var ramCounter = new PerformanceCounter("Memory", "Available MBytes", true);
                 Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
                     freeram.Content = Convert.ToInt32(ramCounter.NextValue() / 1024).ToString() + "GB";
@@ -86,11 +86,6 @@ namespace GDLauncher.Dialogs
             Properties.Settings.Default.Save();
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
 
-        }
-
-        private void Hyperlink_Click(object sender, RoutedEventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://twickt.com/our-launcher/");
         }
     }
 }

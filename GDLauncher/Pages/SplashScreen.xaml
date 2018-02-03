@@ -21,10 +21,9 @@ Sample license text.
             <materialDesign:TransitionerSlide Background="#1A5363">
                 <Grid>
                     <ProgressBar Name="waiting" IsIndeterminate="True" Foreground="White" Margin="0 40 0 0" Width="100" Height="100" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
-                    <StackPanel Width="auto" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Margin="0 0 0 20">
-                            <TextBlock x:Name="firstLabel" MaxWidth="570" Foreground="White" TextWrapping="Wrap" Text="Loading..." HorizontalAlignment="Left" Margin="20,0,20,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
-                            <ProgressBar x:Name="firstlabelprogress" HorizontalAlignment="Left" Height="28" Margin="10,0,0,0" Visibility="Hidden" VerticalAlignment="Top" Width="66" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
+                    <StackPanel HorizontalAlignment="Center" Width="600" VerticalAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0 0 0 20">
+                            <TextBlock x:Name="firstLabel" Foreground="White" TextWrapping="Wrap" Text="Loading..." HorizontalAlignment="Center" Margin="20,0,20,0" VerticalAlignment="Top" FontSize="24" Visibility="Visible"/>
                         </StackPanel>
                         <ProgressBar x:Name="progressbar" Height="32" Background="White" Margin="30,70,30,0" VerticalAlignment="Top" Visibility="Hidden"/>
                         <Label x:Name="mbToDownload" Foreground="White" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>

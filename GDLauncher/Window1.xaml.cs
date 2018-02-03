@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows.Media;
+using GDLauncher.Classes;
 using GDLauncher.Properties;
 
 namespace GDLauncher
@@ -109,16 +110,17 @@ namespace GDLauncher
             debugconsole.Show();
         }
 
-        private void Button_Click_3(object sender, RoutedEventArgs e)
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            Window1.singleton.offlineMode.Visibility = Visibility.Hidden;
-            Properties.Settings.Default.premiumaAccessToken = "//--//";
-            Properties.Settings.Default.RememberUsername = "//--//";
-            Properties.Settings.Default.premiumUUID = "//--//";
-            Properties.Settings.Default.premiumUsername = "//--//";
+            singleton.offlineMode.Visibility = Visibility.Hidden;
+            Properties.Settings.Default.premiumAccessToken = "";
+            Properties.Settings.Default.RememberUsername = "";
+            Properties.Settings.Default.premiumUUID = "";
+            Properties.Settings.Default.premiumUsername = "";
             Properties.Settings.Default.Save();
             settings.IsEnabled = false;
             logout.IsEnabled = false;
+            await MojangAPIs.InvalidateToken(Settings.Default.premiumAccessToken);
 
             MainPage.Navigate(new Pages.Login());
         }
