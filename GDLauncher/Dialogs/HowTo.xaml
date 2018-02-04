@@ -43,7 +43,7 @@ Sample license text.
                     </TextBlock>
                 </materialDesign:Card>
             </StackPanel>
-            <Button x:Name="button" HorizontalAlignment="Right" Margin="0 150 20 0" Content="Confirm" Foreground="White" materialDesign:ShadowAssist.ShadowDepth="Depth2" Width="120" Click="button_Click" />
+            <Button x:Name="button" HorizontalAlignment="Right" Margin="0 180 20 0" Content="Confirm" materialDesign:ShadowAssist.ShadowDepth="Depth2" Width="120" Click="button_Click" Style="{StaticResource MaterialDesignFlatButton}"/>
         </StackPanel>
     </Grid>
 </UserControl>

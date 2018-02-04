@@ -26,8 +26,8 @@ Sample license text.
                             <TextBlock x:Name="firstLabel" Foreground="White" TextWrapping="Wrap" Text="Loading..." HorizontalAlignment="Center" Margin="20,0,20,0" VerticalAlignment="Top" FontSize="24" Visibility="Visible"/>
                         </StackPanel>
                         <ProgressBar x:Name="progressbar" Height="32" Background="White" Margin="30,70,30,0" VerticalAlignment="Top" Visibility="Hidden"/>
-                        <Label x:Name="mbToDownload" Foreground="White" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
-                        <Label x:Name="kbps" Foreground="White" Content="kbps" HorizontalAlignment="Right" Margin="0,-30,10,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
+                        <Label x:Name="mbToDownload" Foreground="White" Content="0 MB / 0 MB" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
+                        <Label x:Name="kbps" Foreground="White" Content="0 kb/s" HorizontalAlignment="Right" Margin="0,-30,10,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
                     </StackPanel>
                 </Grid>
             </materialDesign:TransitionerSlide>

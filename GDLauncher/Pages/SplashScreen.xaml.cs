@@ -143,7 +143,6 @@ namespace GDLauncher.Pages
                 firstLabel.Text = "Checking required data (1/2)";
                 try
                 {
-                    firstLabel.Text = "Downloading Additional Data (1/2)";
                     //CHECKING FORGE JSON
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json");
                     request.Method = "HEAD";
@@ -162,6 +161,7 @@ namespace GDLauncher.Pages
                     //VERIFICA SE IL JSON DELLE VERSIONI DI FORGE ESISTE ED E' AGGIORNATO
                     if (!File.Exists(config.M_F_P + "forgeVersions.json") || (Properties.Settings.Default.forgeJSONContentLength != disposition && Properties.Settings.Default.forgeJSONContentLength != ""))
                     {
+                        firstLabel.Text = "Downloading Additional Data (1/2)";
                         waiting.Visibility = Visibility.Hidden;
                         progressbar.Visibility = Visibility.Visible;
                         firstLabel.Visibility = Visibility.Visible;
@@ -181,6 +181,7 @@ namespace GDLauncher.Pages
                     }
                     catch
                     {
+                        firstLabel.Text = "Downloading Additional Data (1/2)";
                         waiting.Visibility = Visibility.Hidden;
                         progressbar.Visibility = Visibility.Visible;
                         firstLabel.Visibility = Visibility.Visible;
@@ -194,9 +195,9 @@ namespace GDLauncher.Pages
                 }
                 catch { }
                 firstLabel.Text = "Checking required data (2/2)";
-                firstLabel.Text = "Downloading Additional Data (2/2)";
                 if (!Directory.Exists(config.M_F_P + "items"))
                 {
+                    firstLabel.Text = "Downloading Additional Data (2/2)";
                     waiting.Visibility = Visibility.Hidden;
                     Directory.CreateDirectory(config.M_F_P + "items");
                     var client1 = new WebClient();
@@ -220,10 +221,14 @@ namespace GDLauncher.Pages
                     File.Delete(config.M_F_P + "items.zip");
                 }
 
-                firstLabel.Text = "Checking for Premium Token Validity";
+                Boolean isTokenValid = false;
+                if (Settings.Default.premiumAccessToken != "")
+                {
+                    firstLabel.Text = "Checking for Premium Token Validity";
 
-                var isTokenValid = await Classes.MojangAPIs.IsTokenValid(Settings.Default.premiumAccessToken);
-
+                    isTokenValid = await Classes.MojangAPIs.IsTokenValid(Settings.Default.premiumAccessToken);
+                }
+                
                 await Task.Delay(300);
                 transition.SelectedIndex = 1;
                 await Task.Delay(450);

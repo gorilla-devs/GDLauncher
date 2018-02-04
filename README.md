@@ -72,6 +72,12 @@ This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) fil
 ## Acknowledgments
 
 * Wish you a happy day :D
-![Login](https://gorilladevs.com/assets/login.gif)
-![Packs](https://gorilladevs.com/assets/packs.gif)
-![Loading](https://gorilladevs.com/assets/loading.gif)
+<img src="https://gorilladevs.com/assets/launcher/splashscreen.png" width="120">
+<img src="https://gorilladevs.com/assets/launcher/login.png" width="120">
+<img src="https://gorilladevs.com/assets/launcher/emptyhomescreen.png" width="120">
+<img src="https://gorilladevs.com/assets/launcher/fullhomescreen.png" width="120">
+<img src="https://gorilladevs.com/assets/launcher/instancetypes.png" width="120">
+<img src="https://gorilladevs.com/assets/launcher/settings.png" width="120">
+<img src="https://gorilladevs.com/assets/launcher/serverlist.png" width="120">
+<img src="https://gorilladevs.com/assets/launcher/servermanager.png" width="120">
+

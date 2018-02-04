@@ -30,7 +30,7 @@ Sample license text.
                 </StackPanel>
             </ScrollViewer>
         </materialDesign:Card>
-        <Button Name="close" Content="Gotcha" Foreground="White" Height="30" Margin="348,551,25,19" Command="materialDesign:DialogHost.CloseDialogCommand" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+        <Button Name="close" Content="Gotcha" Style="{StaticResource MaterialDesignFlatButton}" Height="30" Margin="348,551,25,19" Command="materialDesign:DialogHost.CloseDialogCommand"/>
         <StackPanel Height="auto" Width="auto" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10,276,170,-256">
             <Image Source="/Images/facebook.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp"></Image>
             <Image Source="/Images/globe.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp_1"></Image>
