@@ -38,7 +38,7 @@ namespace GDLauncher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3.3.1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.3.2")]
         public string version {
             get {
                 return ((string)(this["version"]));
@@ -80,19 +80,6 @@ namespace GDLauncher.Properties {
             }
             set {
                 this["DebugMaxLines"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string RememberUsername {
-            get {
-                return ((string)(this["RememberUsername"]));
-            }
-            set {
-                this["RememberUsername"] = value;
             }
         }
         

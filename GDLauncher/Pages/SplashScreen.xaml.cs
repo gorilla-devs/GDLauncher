@@ -78,19 +78,30 @@ namespace GDLauncher.Pages
                 {
                     Window1.singleton.internetDisabled.Visibility = Visibility.Visible;
 
-                    firstLabel.Text = "No internet detected. We will skip every startup check. If this is the first time you start the launcher, it will not work, otherwise happy gaming!";
-                    await Task.Delay(5000);
+                    firstLabel.Text = "No internet detected. Skipping startup checks (5)";
+                    await Task.Delay(1000);
+                    firstLabel.Text = "No internet detected. Skipping startup checks (4)";
+                    await Task.Delay(1000);
+                    firstLabel.Text = "No internet detected. Skipping startup checks (3)";
+                    await Task.Delay(1000);
+                    firstLabel.Text = "No internet detected. Skipping startup checks (2)";
+                    await Task.Delay(1000);
+                    firstLabel.Text = "No internet detected. Skipping startup checks (1)";
+                    await Task.Delay(1000);
                     transition.SelectedIndex = 1;
                     await Task.Delay(450);
                     Window1.singleton.settings.IsEnabled = true;
                     Window1.singleton.logout.IsEnabled = true;
-                    if (Properties.Settings.Default["RememberUsername"].ToString() != "")
+                    if (Properties.Settings.Default.premiumUsername != "")
                     {
-                        SessionData.username = Properties.Settings.Default["RememberUsername"].ToString();
-                        Window1.singleton.MainPage.Navigate(new Home());
-                    }
-                    else if (Properties.Settings.Default.premiumUsername != "")
-                    {
+                        Window1.singleton.offlineMode.Visibility = Visibility.Visible;
+                        Window1.singleton.offlineMode.Foreground = (System.Windows.Media.SolidColorBrush)(new System.Windows.Media.BrushConverter().ConvertFrom("#F2DB10"));
+                        Window1.singleton.offlineMode.ToolTip = "Playing in Offline-Mode";
+                        Window1.singleton.offlineMode.Kind = MaterialDesignThemes.Wpf.PackIconKind.GoogleControllerOff;
+
+                        Window1.singleton.settings.IsEnabled = true;
+                        Window1.singleton.logout.IsEnabled = true;
+
                         SessionData.username = Properties.Settings.Default.premiumUsername;
                         SessionData.accessToken = Properties.Settings.Default.premiumAccessToken;
                         SessionData.uuidPremium = Properties.Settings.Default.premiumUUID;
@@ -253,19 +264,6 @@ namespace GDLauncher.Pages
                     SessionData.accessToken = Settings.Default.premiumAccessToken;
                     SessionData.uuidPremium = Settings.Default.premiumUUID;
 
-                    Window1.singleton.MainPage.Navigate(new Home());
-                }
-                else if (Properties.Settings.Default["RememberUsername"].ToString() != "")
-                {
-                    Window1.singleton.offlineMode.Visibility = Visibility.Visible;
-                    Window1.singleton.offlineMode.Foreground = (System.Windows.Media.SolidColorBrush)(new System.Windows.Media.BrushConverter().ConvertFrom("#F2DB10"));
-                    Window1.singleton.offlineMode.ToolTip = "Playing in Offline-Mode";
-                    Window1.singleton.offlineMode.Kind = MaterialDesignThemes.Wpf.PackIconKind.GoogleControllerOff;
-
-                    Window1.singleton.settings.IsEnabled = true;
-                    Window1.singleton.logout.IsEnabled = true;
-
-                    SessionData.username = Properties.Settings.Default["RememberUsername"].ToString();
                     Window1.singleton.MainPage.Navigate(new Home());
                 }
                 else

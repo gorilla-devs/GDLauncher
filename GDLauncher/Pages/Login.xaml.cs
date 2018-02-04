@@ -47,13 +47,9 @@ namespace GDLauncher.Pages
         
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
-
             if (e.Key.Equals(Key.Return))
             {
-                if (loginKind.SelectedIndex == 0)
-                    premiumLogin.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
-                else
-                    button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+                premiumLogin.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
             }
 
         }
@@ -61,13 +57,7 @@ namespace GDLauncher.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             await Task.Delay(50);
-            username.Focus();
             transition.SelectedIndex = 1;
-            if (Properties.Settings.Default["RememberUsername"].ToString() != "")
-            {
-                username.Text = Properties.Settings.Default["RememberUsername"].ToString();
-                offlineRemember.IsChecked = true;
-            }
 
             premiumError.Content = Error;
             premiumUsername.Focus();
@@ -123,9 +113,9 @@ namespace GDLauncher.Pages
 
         private async void TextBlock_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MojangOrOffline.Content = "Offline";
-            loginKind.SelectedIndex = 1;
-            username.Focus();
+            /*MojangOrOffline.Content = "Offline";
+            loginKind.SelectedIndex = 1;*/
+            System.Diagnostics.Process.Start("https://account.mojang.com/password");
 
         }
 
@@ -200,7 +190,6 @@ namespace GDLauncher.Pages
             if (premiumRemember.IsChecked == true)
             {
                 Properties.Settings.Default.premiumAccessToken = accessToken;
-                Properties.Settings.Default.RememberUsername = "";
                 Properties.Settings.Default.premiumUUID = Puuid;
                 Properties.Settings.Default.premiumUsername = username;
                 Properties.Settings.Default.isLegacy = isLegacy;
@@ -209,7 +198,6 @@ namespace GDLauncher.Pages
             else
             {
                 Properties.Settings.Default.premiumAccessToken = "";
-                Properties.Settings.Default.RememberUsername = "";
                 Properties.Settings.Default.premiumUUID = "";
                 Properties.Settings.Default.premiumUsername = "";
                 Properties.Settings.Default.isLegacy = true;
@@ -224,62 +212,9 @@ namespace GDLauncher.Pages
             premiumLogin.IsEnabled = true;
         }
 
-        private async void offline_login(object sender, RoutedEventArgs e)
-        {
-
-            button.IsEnabled = false;
-            loading.Visibility = Visibility.Visible;
-            if (username.Text == "")
-            {
-                error.Content = "L'username non puo' essere vuoto";
-                error.Visibility = Visibility.Visible;
-                loading.Visibility = Visibility.Hidden;
-                button.IsEnabled = true;
-                return;
-            }
-            //await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.PostLogin());
-
-            Window1.singleton.offlineMode.Visibility = Visibility.Visible;
-            Window1.singleton.offlineMode.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#F2DB10"));
-            Window1.singleton.offlineMode.ToolTip = "Playing in Offline-Mode";
-            Window1.singleton.offlineMode.Kind = MaterialDesignThemes.Wpf.PackIconKind.GoogleControllerOff;
-
-
-            SessionData.username = username.Text;
-
-            //Window1.singleton.MenuToggleButton.IsEnabled = true;
-            //Window1.singleton.loggedinName.Text = "Logged in as " + username.Text;
-            transition.SelectedIndex = 2;
-            await Task.Delay(500);
-            if (offlineRemember.IsChecked == true)
-            {
-                Properties.Settings.Default.premiumAccessToken = "";
-                Properties.Settings.Default.RememberUsername = username.Text;
-                Properties.Settings.Default.premiumUUID = "";
-                Properties.Settings.Default.premiumUsername = "";
-                Properties.Settings.Default.isLegacy = true;
-                Properties.Settings.Default.Save();
-            }
-            else
-            {
-                Properties.Settings.Default.premiumAccessToken = "";
-                Properties.Settings.Default.RememberUsername = "";
-                Properties.Settings.Default.premiumUUID = "";
-                Properties.Settings.Default.premiumUsername = "";
-                Properties.Settings.Default.isLegacy = true;
-                Properties.Settings.Default.Save();
-            }
-            Window1.singleton.settings.IsEnabled = true;
-            Window1.singleton.logout.IsEnabled = true;
-            Window1.singleton.MainPage.Navigate(new Pages.Home());
-            loading.Visibility = Visibility.Hidden;
-            button.IsEnabled = true;
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://help.mojang.com/customer/en/portal/articles/428478-minecraft-java-edition-account-types");
-
         }
     }
 }

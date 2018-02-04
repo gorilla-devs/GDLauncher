@@ -77,11 +77,6 @@ namespace GDLauncher
             }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void UIElement_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //MenuToggleButton.IsChecked = false;
@@ -105,21 +100,16 @@ namespace GDLauncher
             MainPage.Navigate(new Pages.SplashScreen());
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            debugconsole.Show();
-        }
-
         private async void Button_Click_3(object sender, RoutedEventArgs e)
         {
             singleton.offlineMode.Visibility = Visibility.Hidden;
             Properties.Settings.Default.premiumAccessToken = "";
-            Properties.Settings.Default.RememberUsername = "";
             Properties.Settings.Default.premiumUUID = "";
             Properties.Settings.Default.premiumUsername = "";
             Properties.Settings.Default.Save();
             settings.IsEnabled = false;
             logout.IsEnabled = false;
+            
             await MojangAPIs.InvalidateToken(Settings.Default.premiumAccessToken);
 
             MainPage.Navigate(new Pages.Login());

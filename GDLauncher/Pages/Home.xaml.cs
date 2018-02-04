@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -484,7 +485,9 @@ namespace GDLauncher.Pages
             Panel.SetZIndex(addNewBtn, 10);
             addNewBtn.Click += async (sender, e) =>
             {
-                await DialogHost.Show(new InstallModpack(), "RootDialog");
+                var installModpack = new InstallModpack();
+                await DialogHost.Show(installModpack, "RootDialog");
+
                 if (!Directory.Exists(config.M_F_P + "Packs\\")) Directory.CreateDirectory(config.M_F_P + "Packs\\");
                 ModpacksUpdate();
             };
@@ -544,6 +547,7 @@ namespace GDLauncher.Pages
                 addNew.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
 
             };
+
 
             modpacksListContainer.Children.Add(addNew);
         }
