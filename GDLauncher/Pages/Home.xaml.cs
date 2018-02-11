@@ -322,13 +322,13 @@ namespace GDLauncher.Pages
 
                     var manageBtn = new Button();
                     var iconpackwrench = new MaterialDesignThemes.Wpf.PackIcon();
-                    iconpackwrench.Kind = MaterialDesignThemes.Wpf.PackIconKind.Wrench;
+                    iconpackwrench.Kind = MaterialDesignThemes.Wpf.PackIconKind.PlusCircle;
                     manageBtn.Content = iconpackwrench;
                     manageBtn.Width = 30;
                     MaterialDesignThemes.Wpf.RippleAssist.SetIsCentered(manageBtn, true);
                     manageBtn.Margin = new Thickness(0, 0, 0, 0);
                     manageBtn.Padding = new Thickness(2, 0, 2, 0);
-                    manageBtn.ToolTip = "Manage This Pack";
+                    manageBtn.ToolTip = "Add Mods";
                     manageBtn.Style = btnStyle;
                     manageBtn.Click += async (sender, e) => {
                         await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack(dir), "RootDialog");
@@ -554,7 +554,6 @@ namespace GDLauncher.Pages
 
         private void play_click(object sender, RoutedEventArgs e, string card, string dir)
         {
-            var actual = (Card) modpacksListContainer.FindName(card);
             try
             {
                 var json = File.ReadAllText(dir + "\\" + new DirectoryInfo(dir).Name + ".json");

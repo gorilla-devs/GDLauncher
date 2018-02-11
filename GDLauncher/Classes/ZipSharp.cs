@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ICSharpCode.SharpZipLib.BZip2;
 
 namespace GDLauncher.Classes
 {
@@ -61,6 +62,20 @@ namespace GDLauncher.Classes
                     zf.IsStreamOwner = true; // Makes close also shut the underlying stream
                     zf.Close(); // Ensure we release resources
                 }
+            }
+        }
+
+        public static void ExtractBZip2File(string archiveFilenameIn, string outFolder)
+        {
+            try
+            {
+                FileStream fs = File.OpenRead(archiveFilenameIn);
+                Stream outStream = File.Create(outFolder);
+                BZip2.Decompress(fs, outStream, true);
+            }
+            catch (Exception ee)
+            {
+                Console.WriteLine(ee.StackTrace);
             }
         }
     }

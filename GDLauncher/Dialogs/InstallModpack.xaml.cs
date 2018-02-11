@@ -267,8 +267,9 @@ namespace GDLauncher.Dialogs
         private async void Button_Click_3(object sender, RoutedEventArgs e)
         {
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
-
-            await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.Modpacks());
+            var dialog = new Modpacks();
+            await MaterialDesignThemes.Wpf.DialogHost.Show(dialog);
+            GC.Collect();
         }
     }
 }

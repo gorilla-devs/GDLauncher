@@ -53,8 +53,11 @@
     <Setting Name="windowSize" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">600x700</Value>
     </Setting>
-    <Setting Name="instancesFont" Type="System.String" Scope="User">
+    <Setting Name="instancesFont" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">Roboto Light</Value>
+    </Setting>
+    <Setting Name="curseJSONLastUpdated" Provider="crdx.Settings.PortableSettingsProvider" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">1970-01-01</Value>
     </Setting>
   </Settings>
 </SettingsFile>

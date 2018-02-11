@@ -26,7 +26,7 @@ Sample license text.
             PRIMARY-> #1A5363
             GREEN  -> #00A843
             RED    -> #DD4706
-            YELLOW -> #F2E609
+            YELLOW -> #f7cd24
             BLUE   -> #226AC9
             -->
         </ResourceDictionary>

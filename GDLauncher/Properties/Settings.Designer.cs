@@ -237,6 +237,7 @@ namespace GDLauncher.Properties {
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Roboto Light")]
         public string instancesFont {
@@ -245,6 +246,19 @@ namespace GDLauncher.Properties {
             }
             set {
                 this["instancesFont"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1970-01-01")]
+        public global::System.DateTime curseJSONLastUpdated {
+            get {
+                return ((global::System.DateTime)(this["curseJSONLastUpdated"]));
+            }
+            set {
+                this["curseJSONLastUpdated"] = value;
             }
         }
     }

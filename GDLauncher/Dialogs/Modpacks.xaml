@@ -6,11 +6,14 @@
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             Height="640" Width="550" Background="White">
+             Height="640" Width="550" Background="White" Loaded="UserControl_Loaded">
     <Grid>
-        <Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30">Still working on this...</Label>
-
+        <Label HorizontalAlignment="Center" FontSize="33" Margin="0 20 0 0">Add New Instance</Label>
+        <ScrollViewer Name="sv" Height="480">
+            <ItemsControl Name="Packs" Margin="20" VirtualizingStackPanel.IsVirtualizing="True" ScrollViewer.CanContentScroll="False">
+                <ProgressBar HorizontalAlignment="Center" Margin="0 230 0 0" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
+            </ItemsControl>
+        </ScrollViewer>
         <Button Style="{StaticResource MaterialDesignFlatButton}" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 570 0 0" Width="100" Height="50" Content="Back"/>
-
     </Grid>
 </UserControl>

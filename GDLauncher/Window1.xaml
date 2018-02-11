@@ -57,11 +57,8 @@ Sample license text.
                         <Button Name="consoleBtn" ToolTip="Show Console" DockPanel.Dock="Right" Width="48" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="consoleBtn_Click">
                             <materialDesign:PackIcon Kind="Console" VerticalAlignment="Center"></materialDesign:PackIcon>
                         </Button>
-                        <Button Name="parse" ToolTip="Try Parse" Visibility="Hidden" DockPanel.Dock="Right" Width="48" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="parse_Click">
-                            <materialDesign:PackIcon Kind="Console" VerticalAlignment="Center"></materialDesign:PackIcon>
-                        </Button>
                         <StackPanel Orientation="Horizontal" Margin="0">
-                            <materialDesign:PackIcon Name="offlineMode" Margin="0" Visibility="Hidden" Foreground="#F2E609" ToolTip="Playing in Offline-Mode" Width="40" Height="40" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="GoogleControllerOff" />
+                            <materialDesign:PackIcon Name="offlineMode" Margin="0" Visibility="Hidden" Foreground="#f7cd24" ToolTip="Playing in Offline-Mode" Width="40" Height="40" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="GoogleControllerOff" />
                             <materialDesign:PackIcon Name="internetDisabled" Margin="0" Visibility="Hidden" Foreground="#DD4706" ToolTip="Internet not Working" Width="40" Height="40" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
 
                         </StackPanel>
