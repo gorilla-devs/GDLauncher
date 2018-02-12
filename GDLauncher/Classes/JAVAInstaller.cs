@@ -71,14 +71,10 @@ namespace GDLauncher.Classes
             if (!Directory.Exists(config.javaLocal + "runtime\\jre"))
                 Directory.CreateDirectory(config.javaLocal + "runtime\\jre");
             Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("pleaseWait");
             Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("downloadingJava");
-            Pages.SplashScreen.singleton.secondLabel.Content = "";
             string url = "";
             //i .exe sono zip in verita'
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
@@ -103,7 +99,9 @@ namespace GDLauncher.Classes
             {
                 MessageBox.Show("Errore nel download di JAVA. Minecraft potrebbe non avviarsi correttamente" + e.Message);
             }
-            Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Visible;
+            Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
+            Pages.SplashScreen.singleton.progressbar.IsIndeterminate = true;
+
             Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("extractingJava");
             try
             {
@@ -133,7 +131,9 @@ namespace GDLauncher.Classes
                 Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.jre32FileName + "\\";
                 Properties.Settings.Default.Save();
             }
-            Pages.SplashScreen.singleton.firstlabelprogress.Visibility = Visibility.Hidden;
+            Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Hidden;
+            Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
+
             Pages.SplashScreen.singleton.firstLabel.Text = "Java Extraction Completed";
             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
         }

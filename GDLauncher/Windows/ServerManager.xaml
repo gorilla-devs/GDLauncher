@@ -6,12 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GDLauncher.Windows"
         mc:Ignorable="d"
-        Title="ServerManager" Height="600" Width="600" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Closing="Window_Closing" Loaded="Window_Loaded">
+        Title="ServerManager" Height="600" Width="600" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#1A5363" Closing="Window_Closing" Loaded="Window_Loaded">
     <materialDesign:DialogHost Identifier="ServerDialog" CloseOnClickAway="True">
         <StackPanel>
             <DockPanel Name="maincontent">
                 <materialDesign:ColorZone Name="header" Height="40" Padding="0 0 10 0" materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                                              Background="#183b45" DockPanel.Dock="Top" MouseDown="ColorZone_MouseDown">
+                                              Background="#1A5363" DockPanel.Dock="Top" MouseDown="ColorZone_MouseDown">
                     <DockPanel>
                         <Label Name="headerTitle" Foreground="White" FontSize="20" Margin="20 0 0 0"></Label>
                         <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Close" Width="48" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">

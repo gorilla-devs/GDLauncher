@@ -78,12 +78,6 @@ namespace GDLauncher.Windows
             File.WriteAllText(config.logfile, consoleText);
         }
 
-        private void button3_Click(object sender, RoutedEventArgs e)
-        {
-            //Window1.singleton.MainPage.Navigate(new Pages.Admin());
-            //Window1.singleton.MenuToggleButton.IsEnabled = true;
-        }
-
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText(debug.Text);

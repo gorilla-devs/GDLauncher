@@ -85,7 +85,7 @@ namespace GDLauncher.Classes
                         versionURL = Convert.ToString(v.url);
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
             }
@@ -135,7 +135,7 @@ namespace GDLauncher.Classes
                     }
                 }
                 name = "mainjar";
-                matrix.Add(new string[4] { name, hash, ("Packs\\" + instanceName + "\\" + @"\versions\" + version + "\\" + version + ".jar"), url });
+                matrix.Add(new string[4] { name, hash, (@"versions\" + version + "\\" + version + ".jar"), url });
             }
             catch (JsonReaderException)
             {
@@ -200,7 +200,7 @@ namespace GDLauncher.Classes
                     }
                 }
                 catch { }
-                libraries.Add(new string[4] { name, hash, "Packs\\" + instanceName + @"\libraries\" + path.Replace("/", "\\"), url });
+                libraries.Add(new string[4] { name, hash, @"libraries\" + path.Replace("/", "\\"), url });
             }
             return libraries;
         }
@@ -230,7 +230,7 @@ namespace GDLauncher.Classes
                 var url = "http://resources.download.minecraft.net/";
                 var finalurl = "";
                 finalurl = url + hash.Substring(0, 2) + "/" + hash;
-                assets.Add(new string[4] { name, hash, "Packs\\" + instanceName + "\\" + path, finalurl });
+                assets.Add(new string[4] { name, hash, path, finalurl });
                 i++;
             }
             return assets;
@@ -441,7 +441,7 @@ namespace GDLauncher.Classes
                 dir = System.IO.Path.GetDirectoryName(@dir);
                 if (((string)item["clientreq"] != "false") || ((string)item["clientreq"] == ""))
                 {
-                    Libraries.Add(new string[4] { package, "nohash", "Packs\\" + instanceName + @"\libraries\" + dir, finalurl });
+                    Libraries.Add(new string[4] { package, "nohash", @"libraries\" + dir, finalurl });
                 }
             }
             return Libraries;
@@ -491,7 +491,7 @@ namespace GDLauncher.Classes
                         {
                             packjson.libs.Add(new Lib { path = item[2] });
                         }
-                        if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
+                        else if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
                         {
                             packjson.libs.Add(new Lib { path = item[2] });
                         }

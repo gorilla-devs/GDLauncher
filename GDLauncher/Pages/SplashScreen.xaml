@@ -18,31 +18,16 @@ Sample license text.
         <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="0">
 
             <!-- you can use a slide for each page, let's add a touch of fade for our first page  -->
-            <materialDesign:TransitionerSlide Background="#183b45">
+            <materialDesign:TransitionerSlide Background="#1A5363">
                 <Grid>
-                    <ProgressBar Name="waiting" IsIndeterminate="True" Margin="0 100 0 0" Width="200" Height="200" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
-                    <StackPanel>
-                        <Label x:Name="mainContent" Foreground="White" Content="Starting..." HorizontalAlignment="Left" Margin="130,0,0,0" VerticalAlignment="Top" FontSize="64" Visibility="Hidden"/>
-                        <StackPanel Orientation="Horizontal" Margin="0 0 0 20">
-                            <TextBlock x:Name="firstLabel" MaxWidth="570" Foreground="White" TextWrapping="Wrap" Text="Loading..." HorizontalAlignment="Left" Margin="20,0,20,0" VerticalAlignment="Top" FontSize="24" Visibility="Visible"/>
-                            <ProgressBar x:Name="firstlabelprogress" Foreground="White" HorizontalAlignment="Left" Height="28" Margin="10,0,0,0" Visibility="Hidden" VerticalAlignment="Top" Width="66" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
+                    <ProgressBar Name="waiting" IsIndeterminate="True" Foreground="White" Margin="0 40 0 0" Width="100" Height="100" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
+                    <StackPanel HorizontalAlignment="Center" Width="600" VerticalAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0 0 0 20">
+                            <TextBlock x:Name="firstLabel" MaxWidth="600" Foreground="White" TextWrapping="Wrap" Text="Loading..." HorizontalAlignment="Center" Margin="20,0,20,0" VerticalAlignment="Top" FontSize="24" Visibility="Visible"/>
                         </StackPanel>
-                        <Label x:Name="secondLabel" Foreground="White" Content="Label" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
-                        <ProgressBar x:Name="progressbar" Foreground="White" HorizontalAlignment="Left" Height="32" Margin="10,0,0,0" VerticalAlignment="Top" Width="550" Visibility="Hidden"/>
-                        <Label x:Name="mbToDownload" Foreground="White" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
-                        <Label x:Name="kbps" Foreground="White" Content="kbps" HorizontalAlignment="Left" Margin="420,0,-0.4,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
-                        <StackPanel>
-                            <Label x:Name="downloadingForgeJSON" Foreground="White" Content="Downloading Additional Files" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="24" Visibility="Hidden"/>
-                            <ProgressBar x:Name="downloadingForgeJSONProgress" Foreground="White" HorizontalAlignment="Left" Height="32" Margin="10,0,0,0" VerticalAlignment="Top" Width="550" Visibility="Hidden"/>
-                            <Label x:Name="forgeJSONMbToDownload" Foreground="White" Content="mbToDownload" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
-                            <Label x:Name="forgeJSONSpeed" Foreground="White" Content="kbps" HorizontalAlignment="Left" Margin="420,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="-40 0 0 0">
-                            <ProgressBar x:Name="postUpdate" Foreground="White" HorizontalAlignment="Left" Height="28" Margin="10,0,0,0" Visibility="Hidden" VerticalAlignment="Top" Width="66" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"/>
-                            <Label x:Name="postUpdatePreText" Foreground="White" Margin="10 17 0 0" FontSize="20" Visibility="Hidden" Content="New version downloaded. Restarting in"/>
-                            <Label x:Name="postUpdateText" Foreground="White" Margin="0 17 0 0" FontSize="25" FontWeight="Heavy" Visibility="Hidden" Content="5"/>
-                            <Label x:Name="postUpdatePostText" Foreground="White" Margin="0 17 0 0" FontSize="20" Visibility="Hidden" Content="seconds"/>
-                        </StackPanel>
+                        <ProgressBar x:Name="progressbar" Height="32" Background="White" Margin="30,70,30,0" VerticalAlignment="Top" Visibility="Hidden"/>
+                        <Label x:Name="mbToDownload" Foreground="White" Content="0 MB / 0 MB" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
+                        <Label x:Name="kbps" Foreground="White" Content="0 kb/s" HorizontalAlignment="Right" Margin="0,-30,10,0" VerticalAlignment="Top" FontSize="21.333" Visibility="Hidden"/>
                     </StackPanel>
                 </Grid>
             </materialDesign:TransitionerSlide>

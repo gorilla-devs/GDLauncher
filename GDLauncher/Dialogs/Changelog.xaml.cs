@@ -32,5 +32,29 @@ namespace GDLauncher.Dialogs
             InitializeComponent();
             
         }
+
+        private void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.facebook.com/gorilladevs/");
+
+        }
+
+        private void Image_MouseLeftButtonUp_1(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://gorilladevs.com");
+
+        }
+
+        private void Image_MouseLeftButtonUp_2(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://twitter.com/gorilladevs");
+
+        }
+
+        private void Image_MouseLeftButtonUp_3(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://discord.gg/828q4fn");
+
+        }
     }
 }

@@ -10,7 +10,7 @@ Sample license text.
         xmlns:local="clr-namespace:GDLauncher"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         mc:Ignorable="d"
-        Title="GDLauncher" Height="700" Width="600" WindowStyle="None" ResizeMode="NoResize" BorderThickness="3" BorderBrush="#183b45" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="GDLauncher" MinHeight="700" MinWidth="600" Width="600" Height="700" WindowStyle="None" ResizeMode="CanMinimize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <materialDesign:DialogHost Identifier="RootDialog" CloseOnClickAway="{Binding Path=DialogContent.(local:DialogHostExtensions.CloseOnClickAway), RelativeSource={RelativeSource Self}, FallbackValue=True}">
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
             <materialDesign:DrawerHost.LeftDrawerContent >
@@ -20,7 +20,7 @@ Sample license text.
                                   IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
                     <ListBox x:Name="NavigationMenu" Margin="0 16 0 16" PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp" Width="150">
                         <ListBox.ItemTemplate>
-                            <DataTemplate DataType="domain:Page">
+                            <DataTemplate DataType="Page">
                                 <TextBlock Text="{Binding Name}" Margin="32 0 32 0"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -32,48 +32,39 @@ Sample license text.
                         <ListBoxItem Name="Debug" Content="Debug"></ListBoxItem>
                         <ListBoxItem Name="ContactMe" Content="Report a bug"></ListBoxItem>
                     </ListBox>
-                    <Image VerticalAlignment="Bottom" Margin="0 340 0 16" Source="Images/Twickt Logo 200x41px v2.png" Stretch="Fill" Width="146" Height="38"/>
+                    <Image VerticalAlignment="Bottom" Margin="0 340 0 16" Stretch="Fill" Width="146" Height="38"/>
                 </StackPanel>
             </materialDesign:DrawerHost.LeftDrawerContent>
             <DockPanel Name="maincontent">
-                <materialDesign:ColorZone Name="header" Padding="16" materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                                          Background="#183b45" DockPanel.Dock="Top" MouseDown="ColorZone_MouseDown">
+                <materialDesign:ColorZone Name="header" Padding="16"
+                                          Background="#1A5363" DockPanel.Dock="Top" BorderBrush="#1A5363" MouseDown="ColorZone_MouseDown">
                     <DockPanel>
-                        <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Close" Width="48" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                        <Button Foreground="White" Background="#1A5363" Width="48" BorderBrush="#1A5363" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                             <materialDesign:PackIcon Kind="WindowClose" />
                         </Button>
-                        <Button Foreground="White" Style="{StaticResource MaterialDesignFlatAccentButton}" ToolTip="Minimize" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                        <Button Foreground="White" Background="#1A5363" BorderBrush="#1A5363" Width="48" DockPanel.Dock="Right" Click="Button_Click_4" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                             <materialDesign:PackIcon Kind="WindowMinimize" />
                         </Button>
-                        <materialDesign:PopupBox Name="popupbox" DockPanel.Dock="Right" ToolTip="Options" Foreground="White" PlacementMode="BottomAndAlignRightEdges">
-                            <StackPanel>
-                                <Button Click="Button_Click_2">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="Console" VerticalAlignment="Center"></materialDesign:PackIcon>
-                                        <Label>Show Console</Label>
-                                    </StackPanel>
-                                </Button>
-                                <Button Click="Button_Click_5">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="Folder" VerticalAlignment="Center"></materialDesign:PackIcon>
-                                        <Label>Open Game Folder</Label>
-                                    </StackPanel>
-                                </Button>
-                                <Button Click="Button_Click_3">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="Account" VerticalAlignment="Center"></materialDesign:PackIcon>
-                                        <Label>Change Username</Label>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </materialDesign:PopupBox>
-                        <Button DockPanel.Dock="Right" Foreground="White" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click_7">
+                        <Button Name="logout" ToolTip="Logout" DockPanel.Dock="Right" Width="48" IsEnabled="False" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" Click="Button_Click_3" materialDesign:ShadowAssist.ShadowDepth="Depth0">
+                            <materialDesign:PackIcon Kind="LogoutVariant" VerticalAlignment="Center"></materialDesign:PackIcon>
+                        </Button>
+                        <Button Name="openFolder" ToolTip="Open Game Folder" DockPanel.Dock="Right" Width="48" IsEnabled="True" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" Click="Button_Click_5" materialDesign:ShadowAssist.ShadowDepth="Depth0">
+                            <materialDesign:PackIcon Kind="Folder" VerticalAlignment="Center"></materialDesign:PackIcon>
+                        </Button>
+                        <Button Name="settings" ToolTip="Settings" DockPanel.Dock="Right" Width="48" IsEnabled="False" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" Click="Button_Click_7" materialDesign:ShadowAssist.ShadowDepth="Depth0">
                             <materialDesign:PackIcon Kind="Settings" VerticalAlignment="Center"></materialDesign:PackIcon>
                         </Button>
-                        <materialDesign:PackIcon Name="internetDisabled" Visibility="Hidden" Foreground="#F44336" ToolTip="Internet Not Working" Width="30" Height="30" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
+                        <Button Name="consoleBtn" ToolTip="Show Console" DockPanel.Dock="Right" Width="48" Foreground="White" Background="#1A5363" BorderBrush="#1A5363" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="consoleBtn_Click">
+                            <materialDesign:PackIcon Kind="Console" VerticalAlignment="Center"></materialDesign:PackIcon>
+                        </Button>
+                        <StackPanel Orientation="Horizontal" Margin="0">
+                            <materialDesign:PackIcon Name="offlineMode" Margin="0" Visibility="Hidden" Foreground="#f7cd24" ToolTip="Playing in Offline-Mode" Width="40" Height="40" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="GoogleControllerOff" />
+                            <materialDesign:PackIcon Name="internetDisabled" Margin="0" Visibility="Hidden" Foreground="#DD4706" ToolTip="Internet not Working" Width="40" Height="40" DockPanel.Dock="Right" VerticalAlignment="Center" materialDesign:ShadowAssist.ShadowDepth="Depth1" Kind="EthernetCableOff" />
+
+                        </StackPanel>
                     </DockPanel>
                 </materialDesign:ColorZone>
-                <Frame Name="MainPage" NavigationUIVisibility="Hidden"></Frame>
+                <Frame Name="MainPage" NavigationUIVisibility="Hidden" BorderThickness="2 0 2 2" BorderBrush="#1A5363"></Frame>
             </DockPanel>
 
         </materialDesign:DrawerHost>

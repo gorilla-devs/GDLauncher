@@ -15,6 +15,13 @@ using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Timers;
 using System.Net;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.IO;
+using System.Collections.Generic;
+using System.Windows.Media;
+using GDLauncher.Classes;
+using GDLauncher.Properties;
 
 namespace GDLauncher
 {
@@ -31,9 +38,16 @@ namespace GDLauncher
         {
             InitializeComponent();
             singleton = this;
+            this.Width = double.Parse(Properties.Settings.Default["windowSize"].ToString().Split('x')[0]);
+            this.Height = double.Parse(Properties.Settings.Default["windowSize"].ToString().Split('x')[1]);
+
             MainPage.JournalOwnership = JournalOwnership.OwnsJournal;
             MainPage.Navigated += new NavigatedEventHandler(NavigationService_Navigated);
             Timer myTimer = new Timer();
+
+            //singleton.FontFamily = new FontFamily(new Uri("pack://application:,,,/Assets/"),
+                //"./#" + Settings.Default["instancesFont"]);
+
             myTimer.Elapsed += new ElapsedEventHandler(DisplayTimeEvent);
             myTimer.Interval = 5000; // 1000 ms is one second
             myTimer.Start();
@@ -63,11 +77,6 @@ namespace GDLauncher
             }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void UIElement_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //MenuToggleButton.IsChecked = false;
@@ -91,17 +100,19 @@ namespace GDLauncher
             MainPage.Navigate(new Pages.SplashScreen());
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            debugconsole.Show();
-        }
-
-        private void Button_Click_3(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default["Sessiondata"] = "";
+            singleton.offlineMode.Visibility = Visibility.Hidden;
+            Properties.Settings.Default.premiumAccessToken = "";
+            Properties.Settings.Default.premiumUUID = "";
+            Properties.Settings.Default.premiumUsername = "";
             Properties.Settings.Default.Save();
+            settings.IsEnabled = false;
+            logout.IsEnabled = false;
+            
+            await MojangAPIs.InvalidateToken(Settings.Default.premiumAccessToken);
+
             MainPage.Navigate(new Pages.Login());
-            //loggedinName.Text = "";
         }
 
         private void Button_Click_4(object sender, RoutedEventArgs e)
@@ -109,15 +120,16 @@ namespace GDLauncher
             WindowState = WindowState.Minimized;
         }
 
-        private void Button_Click_5(object sender, RoutedEventArgs e)
+        private async void Button_Click_5(object sender, RoutedEventArgs e)
         {
             string filePath = config.M_F_P;
 
             // combine the arguments together
             // it doesn't matter if there is a space after ','
             string argument = "/select, \"" + filePath + "\"";
-
-            System.Diagnostics.Process.Start("explorer.exe", argument);
+            await Task.Run(() => {
+                System.Diagnostics.Process.Start("explorer.exe", argument);
+            });
         }
 
         private void Button_Click_6(object sender, RoutedEventArgs e)
@@ -138,6 +150,29 @@ namespace GDLauncher
         private void NavigationService_Navigated(object sender, NavigationEventArgs e)
         {
             MainPage.RemoveBackEntry();
+        }
+
+
+        private void consoleBtn_Click(object sender, RoutedEventArgs e)
+        {
+            debugconsole.Show();
+
+        }
+
+        private async void parse_Click(object sender, RoutedEventArgs e)
+        {
+             await Task.Run(() => {
+                var file = File.ReadAllText("complete.json");
+                 List<string> lista = new List<string>();
+                dynamic x = JsonConvert.DeserializeObject(file);
+                 foreach(var y in x["data"])
+                 {
+                     lista.Add(y["Name"].ToString());
+                 }
+                 x = null;
+                 foreach(var aa in lista)
+                    Console.WriteLine(aa);
+            });
         }
     }
 }

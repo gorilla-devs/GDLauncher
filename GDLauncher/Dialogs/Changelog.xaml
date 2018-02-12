@@ -14,19 +14,28 @@ Sample license text.
         <materialDesign:Card Height="510" Width="450" Margin="0 20 0 0" materialDesign:ShadowAssist.ShadowDepth="Depth3">
             <ScrollViewer>
                 <StackPanel Name="container" Margin="20">
-                    <Label FontSize="30" Margin="0 0 0 25">Launcher Versions</Label>
-                    <TextBlock TextWrapping="Wrap" FontSize="20" TextAlignment="Justify" LineHeight="32">Hello there.
-                    Before you continue we would like to inform you
-                    of a few things. When we release a new version, usually we just fix bugs and do some improvements, but it
-                    may happen that we do some breaking-changes. If you experience any issue after an update, consider deleting
-                    the launcher folder in appdata (GorillaDevs). You can access it from the launcher, but if it won't start
-                    you can just type %appdata% in windows file explorer. Remember that by deleting that folder you delete any
-                    game save you had, so consider moving that first and then, after reinstalling minecraft, move it back.<LineBreak></LineBreak>
-                    We really hope you like our work! If you have any suggestion remember to tell us! You can find more
-                    informations on our website, including the complete changelog: https://gorilladevs.com.<LineBreak></LineBreak> Happy Gaming!</TextBlock>
+                    <Label FontSize="30" Margin="0 0 0 25">Welcome to GDLauncher</Label>
+                    <TextBlock TextWrapping="Wrap" FontSize="20" TextAlignment="Justify" LineHeight="32">
+                        Hello there, thank you for using our launcher! Here are some news about this new version: 
+                        <LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->Added persistent settings. Now they won't reset when updating the launcher.<LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->Fixed some situations where mojang login token expired<LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->Other fixes you won't notice but were required :)<LineBreak />
+                         -------------------------------------------------<LineBreak />
+                        Happy Gaming :)
+                    </TextBlock>
                 </StackPanel>
             </ScrollViewer>
         </materialDesign:Card>
-        <Button Name="close" Content="Gotcha" Foreground="White" Height="30" Margin="363,560,10,10" Command="materialDesign:DialogHost.CloseDialogCommand" Style="{DynamicResource MaterialDesignRaisedButton}"/>
+        <Button Name="close" Content="Gotcha" Style="{StaticResource MaterialDesignFlatButton}" Height="30" Margin="348,551,25,19" Command="materialDesign:DialogHost.CloseDialogCommand"/>
+        <StackPanel Height="auto" Width="auto" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10,276,170,-256">
+            <Image Source="/Images/facebook.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp"></Image>
+            <Image Source="/Images/globe.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp_1"></Image>
+            <Image Source="/Images/twitter.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp_2"></Image>
+            <Image Source="/Images/discord.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="40" Width="40" Margin="20" Cursor="Hand" MouseLeftButtonUp="Image_MouseLeftButtonUp_3"></Image>
+        </StackPanel>
     </Grid>
 </UserControl>

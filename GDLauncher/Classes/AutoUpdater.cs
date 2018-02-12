@@ -66,16 +66,12 @@ namespace GDLauncher.Classes
                         if (result.ToString() == "yes")
                         {
                             Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
-                            Pages.SplashScreen.singleton.secondLabel.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
-                            Pages.SplashScreen.singleton.mainContent.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
                             Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
                             Window1.versionok = false;
                             Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("updatingLauncher");
-                            Pages.SplashScreen.singleton.secondLabel.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + " " + Properties.Settings.Default["version"].ToString() + " -> " + version;
-                            Pages.SplashScreen.singleton.mainContent.Content = Pages.SplashScreen.singleton.manager.GetString("updating") + "...";
                             Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("updateFound"));
                         }
                         else
@@ -92,7 +88,7 @@ namespace GDLauncher.Classes
             catch (JsonReaderException)
             {
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 MessageBox.Show("Unknown error parsing updates"); ;
             }
@@ -122,31 +118,37 @@ namespace GDLauncher.Classes
                 {
                     MessageBox.Show("Could not verify version");
                 }
-                catch(Exception e)
+                catch (IOException)
                 {
-                    MessageBox.Show("Unknown error downloading new version");
+                    await webClient.DownloadFileTaskAsync(new Uri(url), Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename.Replace(".exe", new Random().Next(0, 1000) + ".exe"));
+                    Properties.Settings.Default["version"] = SessionData.latestVersion;
+                    Properties.Settings.Default.Save();
+                }
+                catch(Exception eex)
+                {
+                    MessageBox.Show("Unknown error downloading new version: " + eex.InnerException);
                     return;
                 }
-                Pages.SplashScreen.singleton.postUpdate.Visibility = Visibility.Visible;
-                Pages.SplashScreen.singleton.postUpdateText.Visibility = Visibility.Visible;
-                Pages.SplashScreen.singleton.postUpdatePreText.Visibility = Visibility.Visible;
-                Pages.SplashScreen.singleton.postUpdatePostText.Visibility = Visibility.Visible;
-                Pages.SplashScreen.singleton.postUpdateText.Content = "5";
+                Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Hidden;
+                Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
+                Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Hidden;
+
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 5 seconds";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "4";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 4 seconds";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "3";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 3 seconds";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "2";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 2 seconds";
                 await Task.Delay(1000);
                 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "1";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 1 seconds";
                 await Task.Delay(1000);
 
-                Pages.SplashScreen.singleton.postUpdateText.Content = "0";
+                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 0 seconds";
 
                 Properties.Settings.Default["firstTimeHowTo"] = "false";
                 Properties.Settings.Default["justUpdated"] = "true";

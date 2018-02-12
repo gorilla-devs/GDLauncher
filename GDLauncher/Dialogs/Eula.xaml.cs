@@ -32,7 +32,7 @@ namespace GDLauncher.Dialogs
         //ACCEPTED
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.eula = true;
+            Properties.Settings.Default["eula"] = true;
             Properties.Settings.Default.Save();
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
         }

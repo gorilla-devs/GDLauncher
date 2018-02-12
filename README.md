@@ -72,7 +72,12 @@ This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) fil
 ## Acknowledgments
 
 * Wish you a happy day :D
+<img src="https://github.com/gorilla-devs/GDLauncher/blob/master/docs/assets/launcher/splashscreen.png" width="300">
+<img src="https://github.com/gorilla-devs/GDLauncher/blob/master/docs/assets/launcher/login.png" width="300">
+<img src="https://github.com/gorilla-devs/GDLauncher/blob/master/docs/assets/launcher/emptyhomescreen.png" width="300">
+<img src="https://github.com/gorilla-devs/GDLauncher/blob/master/docs/assets/launcher/fullhomescreen.png" width="300">
+<img src="https://github.com/gorilla-devs/GDLauncher/blob/master/docs/assets/launcher/instancetypes.png" width="300">
+<img src="https://github.com/gorilla-devs/GDLauncher/blob/master/docs/assets/launcher/settings.png" width="300">
+<img src="https://github.com/gorilla-devs/GDLauncher/blob/master/docs/assets/launcher/serverlist.png" width="300">
+<img src="https://github.com/gorilla-devs/GDLauncher/blob/master/docs/assets/launcher/servermanager.png" width="300">
 
-![Login](https://github.com/gorilla-devs/GDLauncher/blob/master/login.gif)
-![Packs](https://github.com/gorilla-devs/GDLauncher/blob/master/packs.gif)
-![Loading](https://github.com/gorilla-devs/GDLauncher/raw/master/loading.gif)

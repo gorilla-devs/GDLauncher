@@ -40,7 +40,7 @@ namespace GDLauncher.Classes
 
             foreach(var lib in decoded.libs)
             {
-                launch += config.M_F_P + lib.path + ";";
+                launch += config.M_F_P + "Packs\\" + new DirectoryInfo(dir).Name + "\\" + lib.path + ";";
             }
             
             if (forge != "false")
@@ -59,9 +59,9 @@ namespace GDLauncher.Classes
                         ).Replace(
                         "${assets_index_name}", (string)decoded.mc_version
                         ).Replace(
-                        "${auth_uuid}", "0"
+                        "${auth_uuid}", SessionData.uuidPremium
                         ).Replace(
-                        "${auth_access_token}", "0"
+                        "${auth_access_token}", SessionData.accessToken
                         ).Replace(
                         "${user_properties}", "{}"
                         ).Replace(
@@ -86,9 +86,9 @@ namespace GDLauncher.Classes
                         ).Replace(
                         "${assets_index_name}", (string)decoded.mc_version
                         ).Replace(
-                        "${auth_uuid}", "0"
+                        "${auth_uuid}", SessionData.uuidPremium
                         ).Replace(
-                        "${auth_access_token}", "0"
+                        "${auth_access_token}", SessionData.accessToken
                         ).Replace(
                         "${user_properties}", "{}"
                         ).Replace(

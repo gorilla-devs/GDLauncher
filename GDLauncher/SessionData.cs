@@ -15,11 +15,13 @@ namespace GDLauncher
 {
     class SessionData
     {
-        public static string changelog = "";
         public static string latestVersion = "";
         public static long AverageDownloadSpeed;
         //DATI utente
         public static string username = "";
-        public static string email = "";
+        public static bool premium = false;
+        public static string uuidPremium = "0";
+        public static string accessToken = "0";
+        public static bool isLegacy = false;
     }
 }

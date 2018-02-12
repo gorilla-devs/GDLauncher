@@ -24,13 +24,20 @@ namespace GDLauncher
         //private static readonly System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
         void App_Startup(object sender, StartupEventArgs e)
         {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+
+            }
+            else
+            {
+
+            }
             string screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth.ToString();
             string screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight.ToString();
             CultureInfo ci = CultureInfo.InstalledUICulture;
-            Console.WriteLine(GDLauncher.Properties.Settings.Default["uuid"].ToString());
-            if (GDLauncher.Properties.Settings.Default["uuid"].ToString() == "")
+            if (GDLauncher.Properties.Settings.Default["clientToken"].ToString() == "")
             {
-                GDLauncher.Properties.Settings.Default["uuid"] = Guid.NewGuid().ToString();
+                GDLauncher.Properties.Settings.Default.clientToken = Guid.NewGuid().ToString();
                 GDLauncher.Properties.Settings.Default.Save();
             }
 
@@ -46,7 +53,7 @@ namespace GDLauncher
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            MessageBox.Show("We are truly sorry for this. Some big and unhandled errors happened. The application will now shut down but we will fix this! We promise! Wait a second while we collect some informations");
+            /*MessageBox.Show("We are truly sorry for this. Some big and unhandled errors happened. The application will now shut down but we will fix this! We promise! Wait a second while we collect some informations");
             var client = new WebClient();
             var values = new NameValueCollection();
             values["username"] = SessionData.username;
@@ -65,7 +72,9 @@ namespace GDLauncher
             {
                 MessageBox.Show("We could not collect any information for some unknown reasons. Please contact davide.ceschia@gmail.com and ask for assistence" + ez.InnerException);
             }
-            Application.Current.Shutdown();
+            Application.Current.Shutdown();*/
+            var crash = new Windows.Crashed();
+            crash.ShowDialog();
         }
     }
 }

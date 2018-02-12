@@ -2,31 +2,22 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GDLauncher.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="JavaPath" Type="System.String" Scope="User">
+    <Setting Name="JavaPath" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">Empty</Value>
     </Setting>
     <Setting Name="version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">2.9.4.0</Value>
+      <Value Profile="(Default)">3.3.2</Value>
     </Setting>
-    <Setting Name="RAM" Type="System.String" Scope="User">
+    <Setting Name="RAM" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="download_threads" Type="System.String" Scope="User">
+    <Setting Name="download_threads" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">8</Value>
-    </Setting>
-    <Setting Name="startingPage" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Home</Value>
     </Setting>
     <Setting Name="DebugMaxLines" Type="System.String" Scope="User">
       <Value Profile="(Default)">30</Value>
     </Setting>
-    <Setting Name="RememberUsername" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="disableHashCheck" Type="System.String" Scope="User">
-      <Value Profile="(Default)">false</Value>
-    </Setting>
-    <Setting Name="firstTimeHowTo" Type="System.String" Scope="User">
+    <Setting Name="firstTimeHowTo" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)">true</Value>
     </Setting>
     <Setting Name="sessiondata" Type="System.String" Scope="User">
@@ -35,21 +26,38 @@
     <Setting Name="justUpdated" Type="System.String" Scope="User">
       <Value Profile="(Default)">true</Value>
     </Setting>
-    <Setting Name="bookmarks" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" /&gt;</Value>
-    </Setting>
-    <Setting Name="eula" Type="System.Boolean" Scope="User">
+    <Setting Name="eula" Provider="crdx.Settings.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="forgeJSONContentLength" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="uuid" Type="System.String" Scope="User">
+    <Setting Name="clientToken" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="autoHideLauncher" Type="System.Boolean" Scope="User">
+    <Setting Name="autoHideLauncher" Provider="crdx.Settings.PortableSettingsProvider" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="premiumAccessToken" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="premiumUUID" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="premiumUsername" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="isLegacy" Provider="crdx.Settings.PortableSettingsProvider" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="windowSize" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">600x700</Value>
+    </Setting>
+    <Setting Name="instancesFont" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Roboto Light</Value>
+    </Setting>
+    <Setting Name="curseJSONLastUpdated" Provider="crdx.Settings.PortableSettingsProvider" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">1970-01-01</Value>
     </Setting>
   </Settings>
 </SettingsFile>

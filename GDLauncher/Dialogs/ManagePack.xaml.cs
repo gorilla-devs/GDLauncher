@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,14 +22,13 @@ namespace GDLauncher.Dialogs
     /// </summary>
     public partial class ManagePack : UserControl
     {
+        public string dir;
         public ManagePack(string dir)
         {
             InitializeComponent();
-            instanceName.Text = new DirectoryInfo(dir).Name;
-        }
+            this.dir = dir;
+            DataContext = new Classes.TextFieldsViewModel();
 
-        private void changeInstanceName_Click(object sender, RoutedEventArgs e)
-        {
 
         }
 
@@ -65,6 +65,12 @@ namespace GDLauncher.Dialogs
                 // Assuming you have one file that you care about, pass it off to whatever
                 // handling code you have defined.
                 //HandleFileOpen(files[0]);
+        }
+
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

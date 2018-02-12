@@ -17,7 +17,7 @@
             <Button Name="addNewServer" Width="180" Margin="0 10 0 0" Style="{StaticResource MaterialDesignFlatButton}" Click="addNewServer_Click">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Width="24" Height="24" Kind="Plus" />
-                    <Label Foreground="#43A047" Margin="0 -2 0 0">Create New Server</Label>
+                    <Label Foreground="{DynamicResource PrimaryHueLightBrush}" Margin="0 -2 0 0">Create New Server</Label>
                 </StackPanel>
             </Button>
         </StackPanel>

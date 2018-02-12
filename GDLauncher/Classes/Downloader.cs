@@ -131,7 +131,7 @@ namespace GDLauncher.Classes
 
             if (!Directory.Exists(Path.GetDirectoryName(config.M_F_P + url[2])))
             {
-                await Task.Run(() => Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + url[2])));
+                await Task.Run(() => Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + url[2])));
             }
             await Task.Run(async () =>
             {
@@ -150,7 +150,7 @@ namespace GDLauncher.Classes
 
                     };
                     token.Register(() => client.CancelAsync());
-                    await client.DownloadFileTaskAsync(url[3], config.M_F_P + url[2]);
+                    await client.DownloadFileTaskAsync(url[3], config.M_F_P + "Packs\\" + instanceName + "\\" + url[2]);
                 }
             }, token);
 
@@ -173,7 +173,7 @@ namespace GDLauncher.Classes
         public async Task ExtractNatives(string file, string instanceName)
         {
             var token = _cts.Token;
-            string dir = config.M_F_P + file;
+            string dir = config.M_F_P + "Packs\\" + instanceName + "\\" + file;
             string natives = config.M_F_P + "Packs\\" + instanceName + "\\" + @"natives-win\";
 
             var temp = config.M_F_P + "Packs\\" + instanceName + "\\" + @"temp\";

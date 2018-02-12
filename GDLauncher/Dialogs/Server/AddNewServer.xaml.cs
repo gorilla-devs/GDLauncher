@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MaterialDesignThemes.Wpf;
 
 namespace GDLauncher.Dialogs.Server
 {
@@ -30,13 +31,14 @@ namespace GDLauncher.Dialogs.Server
         {
             InitializeComponent();
             DialogHostExtensions.SetCloseOnClickAway(this, true);
+            DataContext = new Classes.TextFieldsViewModel();
+
         }
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             var client = new WebClient();
-            string versionsJson;
-            versionsJson = await client.DownloadStringTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+            string versionsJson = await client.DownloadStringTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
             dynamic parsed = JsonConvert.DeserializeObject(versionsJson);
             var versions = parsed.versions;
             foreach (var item in versions)
@@ -51,19 +53,6 @@ namespace GDLauncher.Dialogs.Server
 
         private async void createServerBtn_Click(object sender, RoutedEventArgs e)
         {
-            Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
-            if (String.IsNullOrEmpty(serverName.Text))
-            {
-                error.Visibility = Visibility.Visible;
-                error.Content = "Nome istanza vuoto";
-                return;
-            }
-            if (!rg.IsMatch(serverName.Text) || (serverName.Text.Contains(" ")))
-            {
-                error.Visibility = Visibility.Visible;
-                error.Content = "Solo lettere e numero ammessi";
-                return;
-            }
             if (Directory.Exists(config.M_F_P + "Servers\\" + serverName.Text + "\\"))
             {
                 error.Visibility = Visibility.Visible;
@@ -88,9 +77,12 @@ namespace GDLauncher.Dialogs.Server
             }
             catch (WebException) { }
 
-            Dialogs.ServerList.singleton.addNew(config.M_F_P + "Servers\\" + serverName.Text);
+            ServerList.singleton.addNew(config.M_F_P + "Servers\\" + serverName.Text);
 
-            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+            DialogHost.CloseDialogCommand.Execute(this, this);
+
+            await DialogHost.Show(Pages.Home.singleton.serverList, "RootDialog");
+
         }
 
         private async void backBtn_Click(object sender, RoutedEventArgs e)
@@ -105,7 +97,21 @@ namespace GDLauncher.Dialogs.Server
                 }
                 catch { }
             }
-            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+            DialogHost.CloseDialogCommand.Execute(this, this);
+        }
+
+        private void serverName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
+                
+                if (serverName.Text != "" && !serverName.Text.Contains(" ") && !string.IsNullOrEmpty(serverName.Text) && rg.IsMatch(serverName.Text))
+                    createServerBtn.IsEnabled = true;
+                else
+                    createServerBtn.IsEnabled = false;
+            }
+            catch { }
         }
     }
 }
