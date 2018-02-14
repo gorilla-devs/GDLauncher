@@ -5,10 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GDLauncher.Windows"
         mc:Ignorable="d"
-        Title="Crashed" Height="400" Width="400" WindowStartupLocation="CenterScreen">
+        Title="Crashed" Height="400" Width="600" WindowStartupLocation="CenterScreen">
     <Grid>
-        <Label FontSize="25" HorizontalAlignment="Center">Opps, the launcher just crashed</Label>
-        <TextBlock TextWrapping="Wrap" Margin="18,125,-18.4,-125.6">If you want to help us, click HERE. You will find a file called crash.log . Copy that file and send it to us on facebook
-        , on staff@gorilladevs.com or as issue on github. Thank you for your collaboration</TextBlock>
+        <StackPanel>
+            <Label FontSize="25" HorizontalAlignment="Center">Opps, the launcher just crashed</Label>
+            <TextBlock TextWrapping="Wrap" Margin="10">Our launcher is still in an early state so this can happen.
+                <LineBreak></LineBreak> 
+                If you want to help, follow the instructions below:</TextBlock>
+            <StackPanel Margin="10">
+                <TextBlock FontSize="24" FontWeight="ExtraBold" TextWrapping="Wrap">1) Click on "Save Log"</TextBlock>
+                <TextBlock FontSize="24" Margin="0 20 0 0" FontWeight="ExtraBold" TextWrapping="Wrap">2) Go to your Desktop</TextBlock>
+                <TextBlock FontSize="24" Margin="0 20 0 0" FontWeight="ExtraBold" TextWrapping="Wrap">3) Copy the file "GDLauncher_logs.txt"</TextBlock>
+                <TextBlock FontSize="24" Margin="0 20 0 0" FontWeight="ExtraBold" TextWrapping="Wrap">4) Send it to us on email or facebook</TextBlock>
+            </StackPanel>
+            <Button Width="200" Margin="0 10 0 0">Save Logs</Button>
+        </StackPanel>
     </Grid>
 </Window>

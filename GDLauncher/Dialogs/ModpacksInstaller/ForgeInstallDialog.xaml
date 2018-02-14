@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="GDLauncher.Dialogs.ForgeInstallDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GDLauncher.Dialogs"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             Width="350" Height="210" Background="White" Loaded="UserControl_Loaded">
+    <Grid>
+        <StackPanel Margin="20 10 20 0">
+            <DockPanel>
+                <Label VerticalAlignment="Center">Pack Name:</Label>
+                <TextBox Name="instanceTextName" HorizontalAlignment="Right" Width="200" materialDesign:HintAssist.Hint="Instance Name" materialDesign:HintAssist.IsFloating="True" TextChanged="instanceTextName_TextChanged">
+                    <TextBox.Text>
+                        <Binding Path="Name" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain1:NotEmptyValidationRule xmlns:domain1="clr-namespace:GDLauncher.Classes" ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </DockPanel>
+            <DockPanel Margin="0 10 0 0">
+                <Label VerticalAlignment="Center">Versions:</Label>
+                <ComboBox Name="versionsList" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged"/>
+            </DockPanel>
+            <DockPanel Margin="0 10 0 0">
+                <CheckBox Name="forgeAllVersions" Visibility="Visible" Content="Show All Versions" Width="200" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignCheckBox}" Checked="forgeAllVersions_Checked" Unchecked="forgeAllVersions_Unchecked"/>
+            </DockPanel>
+            <DockPanel Margin="0 10 0 0">
+                <Label Name="forgeVersionsText" VerticalAlignment="Center" Visibility="Visible">Forge Versions:</Label>
+                <ComboBox Name="forgeVersions" Width="200" Visibility="Visible" HorizontalAlignment="Right" SelectedIndex="0"/>
+            </DockPanel>
+            <DockPanel HorizontalAlignment="Center" Margin="0 20 0 0">
+                <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
+                <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="35 0 0 0" IsEnabled="False" Click="install_Click">Install</Button>
+            </DockPanel>
+            <ProgressBar Name="loading" Background="#4CAF50" Width="400" Margin="0 10 0 0" IsIndeterminate="True" Visibility="Hidden"></ProgressBar>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

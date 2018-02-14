@@ -22,7 +22,7 @@ namespace GDLauncher.Dialogs
         static string name;
         public static InstallModpack singleton;
         public static string vanillajson;
-        private static Classes.Downloader downloader;
+        private static Classes.MinecraftDownloader downloader;
         public static CancellationTokenSource ctoken;
         public static string whatToInstall = null;
         public static List<string> forgeAllVersionsList = new List<string>();
@@ -33,7 +33,6 @@ namespace GDLauncher.Dialogs
             name = whatToInstall;
             DialogHostExtensions.SetCloseOnClickAway(this, true);
             DataContext = new Classes.TextFieldsViewModel();
-
         }
 
         public async Task LoadPackData()
@@ -157,10 +156,11 @@ namespace GDLauncher.Dialogs
                 forgeVersion = forgeVersions.SelectedValue.ToString();
             }
             catch { }
-            var files = await Classes.JSON.GetFiles(name, instanceTextName.Text, versionsList.SelectedValue.ToString(), forgeVersion, versionsList.Text);
+            //var files = await Classes.JSON.GetFiles(name, instanceTextName.Text, versionsList.SelectedValue.ToString(), forgeVersion, versionsList.Text);
+            var files = new List<string[]>();
             cancelButton.IsEnabled = true;
-            downloader = new Classes.Downloader();
-            await downloader.MCDownload(files, instanceTextName.Text, ctoken.Token);
+            downloader = new Classes.MinecraftDownloader();
+            //await downloader.MCDownload(files, instanceTextName.Text, ctoken.Token);
             cancelButton.Visibility = Visibility.Hidden;
             continueButton.Visibility = Visibility.Visible;
             installationEndedIcon.Visibility = Visibility.Visible;

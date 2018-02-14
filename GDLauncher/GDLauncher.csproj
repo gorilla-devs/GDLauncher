@@ -154,18 +154,18 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\AntiSpam.cs" />
     <Compile Include="Classes\AutoUpdater.cs" />
     <Compile Include="Classes\ComputerInfoDetect.cs" />
     <Compile Include="Classes\ConfigProvider.cs" />
-    <Compile Include="Classes\Downloader.cs" />
+    <Compile Include="Classes\MinecraftDownloader.cs" />
     <Compile Include="Classes\JAVAInstaller.cs" />
     <Compile Include="Classes\JSON.cs" />
     <Compile Include="Classes\MinecraftStarter.cs" />
     <Compile Include="Classes\MojangAPIs.cs" />
-    <Compile Include="Classes\NotEmptyValidationRule.cs" />
-    <Compile Include="Classes\NotifyPropertyChangedExtension.cs" />
-    <Compile Include="Classes\TextFieldsViewModel.cs" />
+    <Compile Include="Models\NotEmptyValidationRule.cs" />
+    <Compile Include="Models\NotifyPropertyChangedExtension.cs" />
+    <Compile Include="Models\StructJson.cs" />
+    <Compile Include="ViewModels\TextFieldsViewModel.cs" />
     <Compile Include="Classes\ZipSharp.cs" />
     <Compile Include="config.cs" />
     <Compile Include="DialogHostExtensions.cs" />
@@ -178,14 +178,23 @@
     <Compile Include="Dialogs\Eula.xaml.cs">
       <DependentUpon>Eula.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ModpacksInstaller\ForgeInstallDialog.xaml.cs">
+      <DependentUpon>ForgeInstallDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\HowTo.xaml.cs">
       <DependentUpon>HowTo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ModpacksInstaller\InstallDialog.xaml.cs">
+      <DependentUpon>InstallDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\InstallModpack.xaml.cs">
       <DependentUpon>InstallModpack.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ManagePack.xaml.cs">
       <DependentUpon>ManagePack.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ModpacksInstaller\ModpackInstallDialog.xaml.cs">
+      <DependentUpon>ModpackInstallDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Modpacks.xaml.cs">
       <DependentUpon>Modpacks.xaml</DependentUpon>
@@ -247,6 +256,9 @@
     <Compile Include="Dialogs\UpdateAvailable.xaml.cs">
       <DependentUpon>UpdateAvailable.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ModpacksInstaller\VanillaInstallDialog.xaml.cs">
+      <DependentUpon>VanillaInstallDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="lang\lang.Designer.cs">
       <DependentUpon>lang.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -294,7 +306,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\ModpacksInstaller\ForgeInstallDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\HowTo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ModpacksInstaller\InstallDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -303,6 +323,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ManagePack.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ModpacksInstaller\ModpackInstallDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -383,6 +407,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\UpdateAvailable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ModpacksInstaller\VanillaInstallDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -502,6 +530,7 @@
   <ItemGroup>
     <Resource Include="Images\discord.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

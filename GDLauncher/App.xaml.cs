@@ -13,6 +13,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using GDLauncher.Windows;
 
 namespace GDLauncher
 {
@@ -33,7 +34,7 @@ namespace GDLauncher
 
             }
             string screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth.ToString();
-            string screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight.ToString();
+            string screenHeight = SystemParameters.PrimaryScreenHeight.ToString();
             CultureInfo ci = CultureInfo.InstalledUICulture;
             if (GDLauncher.Properties.Settings.Default["clientToken"].ToString() == "")
             {
@@ -41,14 +42,20 @@ namespace GDLauncher
                 GDLauncher.Properties.Settings.Default.Save();
             }
 
-
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-
-            AppDomain.CurrentDomain.ProcessExit += (s, ex) =>
+            Application.Current.DispatcherUnhandledException += (ss, ee) =>
             {
-
+                if(Window1.singleton != null)
+                    Window1.singleton.Hide();
+                if(ServerManager.singleton != null)
+                    ServerManager.singleton.Hide();
+                if(DebugOutputConsole.singleton != null)
+                    DebugOutputConsole.singleton.Hide();
+                var crash = new Windows.Crashed();
+                crash.ShowDialog();
+                ee.Handled = true;
+                Current.Shutdown();
             };
-
         }
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -73,6 +80,12 @@ namespace GDLauncher
                 MessageBox.Show("We could not collect any information for some unknown reasons. Please contact davide.ceschia@gmail.com and ask for assistence" + ez.InnerException);
             }
             Application.Current.Shutdown();*/
+            if (Window1.singleton != null)
+                Window1.singleton.Hide();
+            if (ServerManager.singleton != null)
+                ServerManager.singleton.Hide();
+            if (DebugOutputConsole.singleton != null)
+                DebugOutputConsole.singleton.Hide();
             var crash = new Windows.Crashed();
             crash.ShowDialog();
         }

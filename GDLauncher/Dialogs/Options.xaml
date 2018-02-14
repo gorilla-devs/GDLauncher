@@ -49,9 +49,9 @@
                         <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="10 0 5 0" HorizontalScrollBarVisibility="Auto" Width="340">
                             <TextBox Name="JavaPath" IsEnabled="False" VerticalAlignment="Top" Height="30" MinWidth="340"/>
                         </ScrollViewer>
-                        <Button Name="JavaPathFolderBrowser" Foreground="White" Click="JavaPathFolderBrowser_Click">
-                            <materialDesign:PackIcon Kind="Folder"></materialDesign:PackIcon>
-                        </Button>
+                        <ToggleButton Name="JavaPathFolderBrowser" Style="{StaticResource MaterialDesignFlatToggleButton}" ToolTip="Browse" Click="JavaPathFolderBrowser_Click">
+                            <materialDesign:PackIcon Kind="Folder" Height="21" Width="21" />
+                        </ToggleButton>
                     </DockPanel>
                 </StackPanel>
             </materialDesign:Card>

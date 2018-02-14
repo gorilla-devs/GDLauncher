@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="GDLauncher.Dialogs.InstallDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GDLauncher.Dialogs"
+             mc:Ignorable="d" 
+             Width="350" Height="130" Background="White" Loaded="UserControl_Loaded">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <ProgressBar IsIndeterminate="True" Grid.Column="0" Style="{StaticResource MaterialDesignCircularProgressBar}" VerticalAlignment="Center" Width="40" Margin="0 -40 0 0"></ProgressBar>
+        <Button Grid.Column="0" Height="30" VerticalAlignment="Bottom" Margin="5" Style="{StaticResource MaterialDesignFlatButton}">Cancel</Button>
+        <Polygon
+            Grid.Column="1"
+            Points="50 0, 250 80, 250 0"  
+            Stroke="#00A843"
+            >
+            <Polygon.Effect>
+                <DropShadowEffect BlurRadius="8" ShadowDepth="1.5" Direction="270" Opacity=".42" RenderingBias="Performance">
+                </DropShadowEffect>
+            </Polygon.Effect>
+            <Polygon.Fill>
+                <SolidColorBrush Color="#00A843" Opacity="1"/>
+            </Polygon.Fill>
+        </Polygon>
+        <Label Grid.Column="1" HorizontalAlignment="Right" FontSize="17" Margin="0 7 0 0" Foreground="White">Installing...</Label>
+        <StackPanel HorizontalAlignment="Center" Grid.Column="1" Margin="-40 20 0 0" VerticalAlignment="Center">
+            <Label HorizontalAlignment="Center">
+                <Binding Path="Files" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay"></Binding>
+            </Label>
+            <Label HorizontalAlignment="Center">
+                <Binding Path="Mb" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay"></Binding>
+            </Label>
+            <Label HorizontalAlignment="Center">
+                <Binding Path="Percentage" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay"></Binding>
+            </Label>
+        </StackPanel>
+    </Grid>
+</UserControl>

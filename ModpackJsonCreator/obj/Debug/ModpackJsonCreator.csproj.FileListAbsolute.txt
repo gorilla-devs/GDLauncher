@@ -73,3 +73,16 @@ C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\Mo
 C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.csproj.GenerateResource.Cache
 C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.exe
 C:\Users\Davide\Documents\GitHub\Twickt-Launcher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.pdb
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.csprojResolveAssemblyReference.cache
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\MainWindow.g.cs
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\App.g.cs
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator_MarkupCompile.cache
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator_MarkupCompile.lref
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\App.baml
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\MainWindow.baml
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.g.resources
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.Properties.Resources.resources
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.csproj.GenerateResource.Cache
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.csproj.CoreCompileInputs.cache
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.exe
+C:\Users\david\Documents\GitHub\GDLauncher\ModpackJsonCreator\obj\Debug\ModpackJsonCreator.pdb

@@ -7,6 +7,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace GDLauncher.Classes
 {
@@ -55,23 +57,30 @@ namespace GDLauncher.Classes
         [JsonProperty("id")]
         public long id { get; set; }
     }
+
     class JSON
     {
         //FORMATO ARRAY:  name, sha1, path, url
-        public static List<string[]> urls = new List<string[]>();
+        public List<StructJson> urls = new List<StructJson>();
         static int arch = ComputerInfoDetect.GetComputerArchitecture();
         //public static RemoteModpacks remotemodpacks = new RemoteModpacks();
                                                        
-        public static JSONModpack packjson = new JSONModpack();
-        public static Stopwatch sw = new Stopwatch();
-        public static string forgeName = "";
+        public JSONModpack packjson = new JSONModpack();
+        public Stopwatch sw = new Stopwatch();
+        public string forgeName = "";
 
         //L'URL viene preso nella funzione mainjar(), poiche' il link si trova nel json
-        public static string assetsurl;
-        
-        public static async Task<List<string[]>> AnalyzeMainJar(string version, string instanceName)
+        public string assetsurl;
+
+        public event Action<string> updateStatus;
+
+
+
+
+
+        public async Task<StructJson> AnalyzeMainJar(string version, string instanceName)
         {
-            List<string[]> matrix = new List<string[]>();
+            StructJson matrix = new StructJson();
             string data = "";
             WebClient c = new WebClient();
             string versionURL = "";
@@ -87,7 +96,7 @@ namespace GDLauncher.Classes
             }
             catch(Exception)
             {
-                Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
+                //Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
             }
 
 
@@ -134,8 +143,9 @@ namespace GDLauncher.Classes
                         assetsurl = param.Replace("\"", "");
                     }
                 }
-                name = "mainjar";
-                matrix.Add(new string[4] { name, hash, (@"versions\" + version + "\\" + version + ".jar"), url });
+                matrix.URL = url;
+                matrix.fileName = version + "\\" + version + ".jar";
+                matrix.path = @"versions\" + version + "\\" + version + ".jar";
             }
             catch (JsonReaderException)
             {
@@ -144,7 +154,7 @@ namespace GDLauncher.Classes
             return matrix;
         }
 
-        public static async Task<List<string[]>> AnalyzeStdLibraries(string version, string instanceName)
+        public async Task<List<StructJson>> AnalyzeStdLibraries(string version, string instanceName)
         {
             WebClient c = new WebClient();
             string data = "";
@@ -153,7 +163,7 @@ namespace GDLauncher.Classes
                 data = e.Result;
             };
             await c.DownloadStringTaskAsync(new Uri("https://s3.amazonaws.com/Minecraft.Download/versions/" + version + "/" + version + ".json"));
-            List<string[]> libraries = new List<string[]>();
+            var libraries = new List<StructJson>();
             dynamic json = await Task.Run( () => JsonConvert.DeserializeObject(data));
             var hash = "";
             var url = "";
@@ -182,7 +192,7 @@ namespace GDLauncher.Classes
                         }
                         catch
                         {
-                            Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
+                            //Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
                         }
                     }
                     else if (item["natives"]["windows"] == "natives-windows-${arch}")
@@ -195,17 +205,22 @@ namespace GDLauncher.Classes
                         }
                         catch
                         {
-                            Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
+                            //Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
                         }
                     }
                 }
                 catch { }
-                libraries.Add(new string[4] { name, hash, @"libraries\" + path.Replace("/", "\\"), url });
+                libraries.Add(new StructJson
+                {
+                    fileName = name,
+                    path = @"libraries\" + path.Replace("/", "\\"),
+                    URL = url
+                });
             }
             return libraries;
         }
 
-        public static async Task<List<string[]>> AnalyzeAssets(string version, string instanceName)
+        public async Task<List<StructJson>> AnalyzeAssets(string version, string instanceName)
         {
             WebClient c = new WebClient();
             string data = "";
@@ -218,7 +233,7 @@ namespace GDLauncher.Classes
                 Directory.CreateDirectory(config.M_F_P + "Packs\\" + instanceName + "\\assets\\indexes\\");
             await c.DownloadFileTaskAsync(new Uri(assetsurl), config.M_F_P + "Packs\\" + instanceName + "\\assets\\indexes\\" + version + ".json");
 
-            List<string[]> assets = new List<string[]>();
+            var assets = new List<StructJson>();
             MyClass json = await Task.Run( () => JsonConvert.DeserializeObject<MyClass>(data));
             var names = json.Objects.Keys.ToList();
             int i = 0;
@@ -230,7 +245,12 @@ namespace GDLauncher.Classes
                 var url = "http://resources.download.minecraft.net/";
                 var finalurl = "";
                 finalurl = url + hash.Substring(0, 2) + "/" + hash;
-                assets.Add(new string[4] { name, hash, path, finalurl });
+                assets.Add(new StructJson
+                {
+                    fileName = name,
+                    path = path,
+                    URL = finalurl
+                });
                 i++;
             }
             return assets;
@@ -246,12 +266,12 @@ namespace GDLauncher.Classes
             return BitConverter.ToString(data).Replace("-", "").ToLower();
         }
 
-        public static async Task<List<string[]>> AnalyzeForgeLibraries(string modpackname, string version, string instanceName, string forgeVersion)
+        public async Task<List<StructJson>> AnalyzeForgeLibraries(string version, string instanceName, string forgeVersion)
         {
             ///////////////////////
             //DEFINIZIONE VARIABILI
             ///////////////////////
-            List<string[]> Libraries = new List<string[]>();
+            var Libraries = new List<StructJson>();
             string urlforge = "";
             WebClient c = new WebClient();
             string data = "";
@@ -265,7 +285,6 @@ namespace GDLauncher.Classes
                 data = await r.ReadToEndAsync();
             }
             //READING FORGE VERSION JSON FILE AND PARSING IT
-            List<string> modpacks = new List<string>();
             dynamic json = JsonConvert.DeserializeObject(data);
             foreach (var entry in json["number"])
             {
@@ -279,7 +298,7 @@ namespace GDLauncher.Classes
                     WebResponse webResponse;
                     try
                     {
-                        webResponse = webRequest.GetResponse();
+                        webRequest.GetResponse();
 
                     }
                     catch //If exception thrown then couldn't get response from address
@@ -309,17 +328,14 @@ namespace GDLauncher.Classes
                     webClient.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                     webClient.DownloadProgressChanged += (s, e) =>
                     {
-                        Application.Current.Dispatcher.Invoke(new Action(() =>
-                        {
-                            Dialogs.InstallModpack.singleton.forgeProgression.Value = e.ProgressPercentage;
-                            Dialogs.InstallModpack.singleton.forgeTextProgression.Content = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
-                        }));
+                        updateStatus("Downloading Forge Installer (" + e.ProgressPercentage + "%)");
+
                     };
                     webClient.DownloadFileCompleted += (s, e) =>
                     {
                         Application.Current.Dispatcher.Invoke(new Action(() =>
                         {
-                            Dialogs.InstallModpack.singleton.forgeTextProgression.Content = "Download Completed";
+                            //Dialogs.InstallModpack.singleton.forgeTextProgression.Content = "Download Completed";
                         }));
                     };
                     sw.Start();
@@ -441,13 +457,18 @@ namespace GDLauncher.Classes
                 dir = System.IO.Path.GetDirectoryName(@dir);
                 if (((string)item["clientreq"] != "false") || ((string)item["clientreq"] == ""))
                 {
-                    Libraries.Add(new string[4] { package, "nohash", @"libraries\" + dir, finalurl });
+                    Libraries.Add(new StructJson
+                    {
+                        fileName = package,
+                        path = @"libraries\" + dir,
+                        URL = finalurl
+                    });
                 }
             }
             return Libraries;
         }
 
-        public static async Task<List<string[]>> GetFiles(string modpackname, string instanceName, string version, string forgeVersion, string modpackVersion,  bool justlibraries = false)
+        public async Task<List<StructJson>> GetFiles(string modpackname, string instanceName, string version, string forgeVersion, string modpackVersion,  bool justlibraries = false)
         {
 
             //SCRITTURA JSON MODPACK
@@ -461,55 +482,56 @@ namespace GDLauncher.Classes
             try
             {
 
-                List<string[]> list = new List<string[]>();
-                List<string[]> forge = new List<string[]>();
+                var list = new List<StructJson>();
+                var forge = new List<StructJson>();
 
-                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Main Jar";
-                List<string[]> mainjar = await Task.Run(() => AnalyzeMainJar(version, instanceName));
-                list.AddRange(mainjar);
-                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Libs";
-                List<string[]> libraries = await Task.Run(() => AnalyzeStdLibraries(version, instanceName));
+                updateStatus("Getting Main Jar");
+                var mainjar = await Task.Run(() => AnalyzeMainJar(version, instanceName));
+                list.Add(mainjar);
+                updateStatus("Getting Libraries");
+                var libraries = await Task.Run(() => AnalyzeStdLibraries(version, instanceName));
                 list.AddRange(libraries);
-                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Assets";
-                List<string[]> assets = await Task.Run(() => AnalyzeAssets(version, instanceName));
+                updateStatus("Getting Assets");
+                var assets = await Task.Run(() => AnalyzeAssets(version, instanceName));
                 list.AddRange(assets);
-                if (forgeVersion != "false")
+                updateStatus("Downloading Forge Installer");
+                if (forgeVersion != null)
                 {
-                    Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Forge";
-                    forge = await Task.Run(() => AnalyzeForgeLibraries(modpackname, version, instanceName, forgeVersion));
+                    //Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysing Forge";
+                    forge = await Task.Run(() => AnalyzeForgeLibraries(version, instanceName, forgeVersion));
                     list.AddRange(forge);
-                    Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Mods";
+                    //Dialogs.InstallModpack.singleton.whatDoing.Content = "Analyzing Mods";
                 }
                 //AGGIUNGE LE LIBRERIE AL JSON
-                if (forgeVersion != "false")
+                if (forgeVersion != null)
                 {
                     foreach (var item in forge)
                     {
-                        if (item[3].Contains("platform"))
+                        if (item.URL.Contains("platform"))
                             continue;
-                        if (item[3].Contains("https://libraries.minecraft.net"))
+                        if (item.URL.Contains("https://libraries.minecraft.net"))
                         {
-                            packjson.libs.Add(new Lib { path = item[2] });
+                            packjson.libs.Add(new Lib { path = item.path });
                         }
-                        else if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
+                        else if (item.URL.Contains("http://search.maven.org/remotecontent?filepath="))
                         {
-                            packjson.libs.Add(new Lib { path = item[2] });
+                            packjson.libs.Add(new Lib { path = item.path });
                         }
                     }
                 }
                 foreach (var item in libraries)
                 {
-                    if (item[3].Contains("platform"))
+                    if (item.URL.Contains("platform"))
                         continue;
-                    if (item[3].Contains("https://libraries.minecraft.net"))
+                    if (item.URL.Contains("https://libraries.minecraft.net"))
                     {
-                        packjson.libs.Add(new Lib { path = item[2] });
+                        packjson.libs.Add(new Lib { path = item.path });
                     }
                     if (forgeVersion != "false")
                     {
-                        if (item[3].Contains("http://search.maven.org/remotecontent?filepath="))
+                        if (item.URL.Contains("http://search.maven.org/remotecontent?filepath="))
                         {
-                            packjson.libs.Add(new Lib { path = item[2] });
+                            packjson.libs.Add(new Lib { path = item.path });
                         }
                     }
                 }
@@ -522,14 +544,7 @@ namespace GDLauncher.Classes
                 }
                 await Task.Run(() => System.IO.File.WriteAllText(config.M_F_P + "Packs\\" + instanceName + "\\" + instanceName + ".json", json));
 
-                Dialogs.InstallModpack.singleton.whatDoing.Content = "Analysis Finished";
-                Dialogs.InstallModpack.singleton.analysisprogress.Visibility = Visibility.Hidden;
-                Dialogs.InstallModpack.singleton.analysisprogress.Width = 0;
-                Dialogs.InstallModpack.singleton.analysisprogress.Margin = new Thickness(0);
-                Dialogs.InstallModpack.singleton.analysisended.Margin = new Thickness(20, 10, 10, 0);
-                Dialogs.InstallModpack.singleton.analysisended.Width = 50;
-                Dialogs.InstallModpack.singleton.analysisended.Height = 50;
-                List<string[]> newList = new List<string[]>();
+                var newList = new List<StructJson>();
                 await Task.Run(() =>
                 {
                     foreach (var x in list)
@@ -537,7 +552,7 @@ namespace GDLauncher.Classes
                         var found = false;
                         foreach (var n in newList)
                         {
-                            if (n[3] == x[3])
+                            if (n.URL == x.URL)
                                 found = true;
                         }
                         if (!found)
@@ -546,12 +561,11 @@ namespace GDLauncher.Classes
                         }
                     }
                 });
-
                 return newList;
             }
             catch(Exception e)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show("---------------------------------------------" + e.Message + e.StackTrace);
             }
             return null;
 

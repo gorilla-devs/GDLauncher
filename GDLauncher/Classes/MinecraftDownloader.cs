@@ -3,6 +3,7 @@ using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,20 +17,78 @@ using System.Windows;
 
 namespace GDLauncher.Classes
 {
-    class Downloader
+    class MinecraftDownloader : INotifyPropertyChanged
     {
         public CancellationTokenSource _cts;
+
+        private string files { get; set; }
+        private string mb { get; set; }
+        private string percentage { get; set; }
+
         public static Stopwatch sw = new Stopwatch();
         public float totalMB;
-        public List<string[]> urlsList = new List<string[]>();
-        public async Task MCDownload(List<string[]> urls, string instanceName, CancellationToken _ctsblock)
+        public List<StructJson> urlsList = new List<StructJson>();
+
+
+
+        //GETTERS AND SETTERS
+        public String Files
         {
+            get => files;
+            set
+            {
+                files = value;
+                OnPropertyChanged("Files");
+            }
+        }
+        public String Mb
+        {
+            get => mb;
+            set
+            {
+                mb = value;
+                OnPropertyChanged("Mb");
+            }
+        }
+        public String Percentage
+        {
+            get => percentage;
+            set
+            {
+                percentage = value;
+                OnPropertyChanged("Percentage");
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string info)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+        }
+
+        public MinecraftDownloader()
+        {
+            Files = "";
+            Mb = "Calculating...";
+            Percentage = "";
+        }
+
+        public async Task MCDownload(string instanceName, string MCVersion, string forgeVersion, CancellationToken _ctsblock)
+        {
+
+            var urls = new List<StructJson>();
+            var json = new JSON();
+            json.updateStatus += (s) => { Percentage = s; };
+            urls = await json.GetFiles("", instanceName, MCVersion, forgeVersion, "");
+            
+
             totalMB = 0;
             _cts = new CancellationTokenSource();
             sw.Start();
             int count = urls.Count;
             urlsList = urls;
-            Dialogs.InstallModpack.singleton.filesToDownload.Content = "0" + "/" + urls.Count;
+            Files = "0" + "/" + urls.Count;
             if (urls != null && urls.Count != 0)
             {
                 System.Timers.Timer myTimer = new System.Timers.Timer();
@@ -37,14 +96,13 @@ namespace GDLauncher.Classes
                 {
                     Application.Current.Dispatcher.Invoke(new Action(() =>
                     {
-                        Dialogs.InstallModpack.singleton.downloadedMB.Content = string.Format("{0} MB", ((totalMB / 1024f) / 1024f).ToString("0.00"));
-
+                        Mb = string.Format("{0} MB", ((totalMB / 1024f) / 1024f).ToString("0.00"));
                     }));
                 };
                 myTimer.Interval = 100; // 1000 ms is one second
                 myTimer.Start();
                 System.Net.ServicePointManager.DefaultConnectionLimit = Int32.Parse(Properties.Settings.Default["download_threads"].ToString());
-                var block = new System.Threading.Tasks.Dataflow.ActionBlock<string[]>(async url =>
+                var block = new System.Threading.Tasks.Dataflow.ActionBlock<StructJson>(async url =>
                 {
                     try
                     {
@@ -54,11 +112,11 @@ namespace GDLauncher.Classes
                     catch (OperationCanceledException) { }
                     catch (Exception e)
                     {
-                        Application.Current.Dispatcher.Invoke(new Action(() =>
+                        /*Application.Current.Dispatcher.Invoke(new Action(() =>
                         {
                             Dialogs.InstallModpack.singleton.isError.Visibility = Visibility.Visible;
-                        }));
-                        Console.WriteLine("ERRORE IN" + url[3] + "\r\n" + e);
+                        }));*/
+                        Console.WriteLine("ERRORE IN" + url.URL + "\r\n" + e);
 
                     }
                 }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = Int32.Parse(Properties.Settings.Default["download_threads"].ToString()), CancellationToken = _ctsblock });
@@ -78,18 +136,12 @@ namespace GDLauncher.Classes
                 }
 
                 myTimer.Stop();
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    Dialogs.InstallModpack.singleton.downloadedMB.Content = null;
-                }));
-                Dialogs.InstallModpack.singleton.filesToDownload.Content = urls.Count + "/" + urls.Count;
-                Dialogs.InstallModpack.singleton.totalPercentage.Content = "100%";
-                Dialogs.InstallModpack.singleton.progressBarDownload.Value = 100;
-                return;
+                Files = urls.Count + "/" + urls.Count;
+                Percentage = "100%";
             }
         }
 
-        public async Task DownloadLibraries(string[] url, string instanceName, IProgress<int> progress = null)
+        public async Task DownloadLibraries(StructJson url, string instanceName, IProgress<int> progress = null)
         {
             var token = _cts.Token;
 
@@ -129,14 +181,14 @@ namespace GDLauncher.Classes
                 }
             }*/
 
-            if (!Directory.Exists(Path.GetDirectoryName(config.M_F_P + url[2])))
+            if (!Directory.Exists(Path.GetDirectoryName(config.M_F_P + url.path)))
             {
-                await Task.Run(() => Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + url[2])));
+                await Task.Run(() => Directory.CreateDirectory(Path.GetDirectoryName(config.M_F_P + "Packs\\" + instanceName + "\\" + url.path)));
             }
             await Task.Run(async () =>
             {
                 token.ThrowIfCancellationRequested();
-                using (WebClient client = new WebClient())
+                using (var client = new WebClient())
                 {
                     float prevDownloaded = 0;
                     client.DownloadProgressChanged += (s, e) =>
@@ -150,23 +202,22 @@ namespace GDLauncher.Classes
 
                     };
                     token.Register(() => client.CancelAsync());
-                    await client.DownloadFileTaskAsync(url[3], config.M_F_P + "Packs\\" + instanceName + "\\" + url[2]);
+                    await client.DownloadFileTaskAsync(url.URL, config.M_F_P + "Packs\\" + instanceName + "\\" + url.path);
                 }
             }, token);
 
             //actual++;
-            if (url[3].Contains("platform"))
+            if (url.URL.Contains("platform"))
             {
-                await ExtractNatives(url[2], instanceName);
+                await ExtractNatives(url.path, instanceName);
             }
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                string urlnum = Dialogs.InstallModpack.singleton.filesToDownload.Content.ToString().Split('/')[0];
+                string urlnum = Files.Split('/')[0];
 
-                Dialogs.InstallModpack.singleton.filesToDownload.Content = (int.Parse(urlnum) + 1).ToString() + "/" + urlsList.Count.ToString();
+                Files = (int.Parse(urlnum) + 1).ToString() + "/" + urlsList.Count.ToString();
 
-                Dialogs.InstallModpack.singleton.progressBarDownload.Value = (int.Parse(urlnum) * 100) / urlsList.Count;
-                Dialogs.InstallModpack.singleton.totalPercentage.Content = (int.Parse(urlnum) * 100) / urlsList.Count + "%";
+                Percentage = (int.Parse(urlnum) * 100) / urlsList.Count + "%";
             }));
         }
 

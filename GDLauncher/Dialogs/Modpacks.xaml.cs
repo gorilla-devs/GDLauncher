@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using GDLauncher.Pages;
+using GDLauncher.Properties;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 
@@ -59,9 +62,8 @@ namespace GDLauncher.Dialogs
 
     public partial class Modpacks
     {
-        public static int numberOfObjectsPerPage = 10;
+        public static int numberOfObjectsPerPage = 3;
         public static int actualPage;
-        public CurseRoot o = new CurseRoot();
 
 
         public Modpacks()
@@ -73,98 +75,128 @@ namespace GDLauncher.Dialogs
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            o = await Task.Run(() =>
-                JsonConvert.DeserializeObject<CurseRoot>(File.ReadAllText(config.M_F_P + "complete.json")));
-            sv.ScrollChanged += ScrollViewer_ScrollChanged;
-            Packs.Items.Clear();
-
-            var DefaultStackPanel = new StackPanel
+            var vanillaBtn = new Button
             {
-                Orientation = Orientation.Horizontal
+                Content = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Children =
+                    {
+                        new PackIcon
+                        {
+                            Width = 70,
+                            Height = 70,
+                            Kind = PackIconKind.CubeOutline
+                        },
+                        new Label
+                        {
+                            Content = "Vanilla",
+                            FontSize = 32,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            Foreground = (SolidColorBrush) new BrushConverter().ConvertFrom("#00A843")
+                        }
+                    }
+                },
+                FontSize = 24,
+                Width = 255,
+                Height = 140,
+                Style = Application.Current.FindResource("MaterialDesignFlatButton") as Style
+
+            };
+            vanillaBtn.Click += async (ss, ee) =>
+            {
+                var x = await DialogHost.Show(new VanillaInstallDialog(), "ModpacksDialog");
+                if (x != null)
+                {
+                    dynamic result = x;
+                    await DialogHost.Show(new InstallDialog(result.instanceName, result.MCVersion, null), "ModpacksDialog");
+                    //use the message queue to send a message.
+                    var messageQueue = SnackbarThree.MessageQueue;
+                    var message = "Installed. Enjoy :)";
+
+                    //the message queue can be called from any thread
+                    Task.Factory.StartNew(() => messageQueue.Enqueue(message));
+                }
             };
             var vanilla = new Card
             {
                 Height = 140,
-                Width = 240,
+                Width = 255,
                 Margin = new Thickness(0, 0, 10, 10),
-                Content = new Button
+                Content = vanillaBtn
+            };
+            var forgeBtn = new Button
+            {
+                Content = new StackPanel
                 {
-                    Content = new StackPanel
+                    Orientation = Orientation.Horizontal,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Children =
                     {
-                        Orientation = Orientation.Horizontal,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Children =
+                        new PackIcon
                         {
-                            new PackIcon
-                            {
-                                Width = 70,
-                                Height = 70,
-                                Kind = PackIconKind.CubeOutline
-                            },
-                            new Label
-                            {
-                                Content = "Vanilla",
-                                FontSize = 32,
-                                VerticalAlignment = VerticalAlignment.Center,
-                                Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#00A843")
-                            }
+                            Width = 70,
+                            Height = 70,
+                            Kind = PackIconKind.Minecraft
+                        },
+                        new Label
+                        {
+                            Content = "Forge",
+                            FontSize = 32,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            Foreground = (SolidColorBrush) new BrushConverter().ConvertFrom("#00A843")
                         }
-                    },
-                    FontSize = 24,
-                    Width = 240,
-                    Height = 140,
-                    Style = Application.Current.FindResource("MaterialDesignFlatButton") as Style
+                    }
+                },
+                FontSize = 24,
+                Width = 255,
+                Height = 140,
+                Style = Application.Current.FindResource("MaterialDesignFlatButton") as Style
 
+            };
+            forgeBtn.Click += async (ss, ee) =>
+            {
+                var x = await DialogHost.Show(new ForgeInstallDialog(), "ModpacksDialog");
+                if (x != null)
+                {
+                    dynamic result = x;
+                    await DialogHost.Show(new InstallDialog(result.instanceName, result.MCVersion, result.forgeVersion), "ModpacksDialog");
+                    //use the message queue to send a message.
+                    var messageQueue = SnackbarThree.MessageQueue;
+                    var message = "Installed. Enjoy :)";
+
+                    //the message queue can be called from any thread
+                    Task.Factory.StartNew(() => messageQueue.Enqueue(message));
                 }
             };
             var forge = new Card
             {
                 Height = 140,
-                Width = 240,
+                Width = 255,
                 Margin = new Thickness(0, 0, 0, 11),
-                Content = new Button
-                {
-                    Content = new StackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Children =
-                        {
-                            new PackIcon
-                            {
-                                Width = 70,
-                                Height = 70,
-                                Kind = PackIconKind.Minecraft
-                            },
-                            new Label
-                            {
-                                Content = "Forge",
-                                FontSize = 32,
-                                VerticalAlignment = VerticalAlignment.Center,
-                                Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#00A843")
-                            }
-                        }
-                    },
-                    FontSize = 24,
-                    Width = 240,
-                    Height = 140,
-                    Style = Application.Current.FindResource("MaterialDesignFlatButton") as Style
-
-                }
+                Content = forgeBtn
             };
-            DefaultStackPanel.Children.Add(vanilla);
-            DefaultStackPanel.Children.Add(forge);
-            Packs.Items.Add(DefaultStackPanel);
+            defaultStackPanel.Children.Add(vanilla);
+            defaultStackPanel.Children.Add(forge);
 
-
+            if (Home.singleton.CurseData == null)
+            {
+                Home.singleton.CurseData = new CurseRoot();
+                Home.singleton.CurseData.Data = await Task.Run(() =>
+                    JsonConvert.DeserializeObject<CurseRoot>(File.ReadAllText(config.M_F_P + "complete.json"))
+                        .Data.Where(s => s.CategorySection.Name == "Modpacks").ToList());
+            }
+            Packs.Items.Clear();
+            sv.ScrollChanged += ScrollViewer_ScrollChanged;
 
             addPacks(0);
             GC.Collect();
         }
 
-        private void addPacks(int from)
+        private void addPacks(int from, string search = "")
         {
-            foreach (var loc in o.Data.Where(s => s.CategorySection.Name == "Modpacks")
+            foreach (var loc in Home.singleton.CurseData.Data.Where(s => s.CategorySection.Name == "Modpacks" && s.Name.ToLower().Contains(search.ToLower()))
                 .OrderByDescending(p => p.PopularityScore).Skip(numberOfObjectsPerPage * from)
                 .Take(numberOfObjectsPerPage))
             {
@@ -179,8 +211,7 @@ namespace GDLauncher.Dialogs
                                 new ProgressBar
                                 {
                                     IsIndeterminate = true,
-                                    Style =
-                                        Application.Current.FindResource("MaterialDesignCircularProgressBar") as Style
+                                    Style = Application.Current.FindResource("MaterialDesignCircularProgressBar") as Style
                                 },
                                 new Image
                                 {
@@ -224,7 +255,7 @@ namespace GDLauncher.Dialogs
 
                 var card = new Card
                 {
-                    Height = 145,
+                    MinHeight = 160,
                     Margin = new Thickness(0, 3, 0, 0),
                     Effect = new DropShadowEffect
                     {
@@ -278,9 +309,20 @@ namespace GDLauncher.Dialogs
                     str => str.Substring(0, str.Length - 2));
 
 
+                var installBtn = new Button
+                {
+                    Style = Application.Current.FindResource("MaterialDesignRaisedButton") as Style,
+                    Content = "Install",
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Margin = new Thickness(0, 20, 0, 10)
+                };
+                ButtonProgressAssist.SetValue(installBtn, 30);
+                //installBtn.Click += async (ss, ee) => { await DialogHost.Show(new Dialogs.InstallDialog(), "ModpacksDialog"); };
                 var contentStackPanel = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
+                    Width = 370,
                     Children =
                     {
                         new Label
@@ -293,7 +335,15 @@ namespace GDLauncher.Dialogs
                         {
                             HorizontalAlignment = HorizontalAlignment.Left,
                             Content = authors
-                        }
+                        },
+                        new TextBlock
+                        {
+                            Text = loc.Summary,
+                            TextWrapping = TextWrapping.Wrap,
+                            Margin = new Thickness(10, 0, 10, 0),
+                            MinHeight = 70
+                        },
+                        installBtn
                     }
                 };
 
@@ -319,7 +369,21 @@ namespace GDLauncher.Dialogs
             {
                 // Scrolled to bottom
                 actualPage++;
-                addPacks(actualPage);
+                addPacks(actualPage, search.Text);
+            }
+        }
+
+        private async void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox tb = (TextBox)sender;
+            int startLength = tb.Text.Length;
+
+            await Task.Delay(400);
+            if (startLength == tb.Text.Length)
+            {
+                sv.ScrollToTop();
+                Packs.Items.Clear();
+                addPacks(0, search.Text);
             }
         }
     }

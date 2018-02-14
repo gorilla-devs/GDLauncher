@@ -5,15 +5,47 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:gdLauncher="clr-namespace:GDLauncher"
              mc:Ignorable="d" 
-             Height="640" Width="550" Background="White" Loaded="UserControl_Loaded">
-    <Grid>
-        <Label HorizontalAlignment="Center" FontSize="33" Margin="0 20 0 0">Add New Instance</Label>
-        <ScrollViewer Name="sv" Height="480">
-            <ItemsControl Name="Packs" Margin="20" VirtualizingStackPanel.IsVirtualizing="True" ScrollViewer.CanContentScroll="False">
-                <ProgressBar HorizontalAlignment="Center" Margin="0 230 0 0" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
-            </ItemsControl>
-        </ScrollViewer>
-        <Button Style="{StaticResource MaterialDesignFlatButton}" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10 570 0 0" Width="100" Height="50" Content="Back"/>
-    </Grid>
+             Width="580" Height="680" Background="White" Loaded="UserControl_Loaded">
+    <materialDesign:DialogHost Identifier="ModpacksDialog" CloseOnClickAway="{Binding Path=DialogContent.(gdLauncher:DialogHostExtensions.CloseOnClickAway), RelativeSource={RelativeSource Self}, FallbackValue=True}">
+        <Grid>
+            <materialDesign:ColorZone Background="#1A5363">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:ColorZone Mode="Standard" Padding="8 4 8 4" CornerRadius="2" Panel.ZIndex="1"
+                                              Margin="10 20 10 20"
+                                              materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <materialDesign:PackIcon Kind="Magnify" Opacity=".56" VerticalAlignment="Center"/>
+                                <TextBox Name="search" Grid.Column="1" Margin="8 0 0 0" materialDesign:HintAssist.Hint="Search Modpacks" 
+                                     materialDesign:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0"
+                                     MinWidth="200" VerticalAlignment="Center" TextChanged="TextBox_TextChanged"/>
+                            <Button Style="{DynamicResource MaterialDesignToolButton}" Grid.Column="2">
+                                <materialDesign:PackIcon Kind="Send" Opacity=".56" Margin="8 0 0 0" />
+                            </Button>
+                        </Grid>
+                    </materialDesign:ColorZone>
+                    <Label HorizontalAlignment="Center" FontSize="33" Margin="0 15 0 0" Foreground="White">Add New Instance</Label>
+                </StackPanel>
+            </materialDesign:ColorZone>
+            <ScrollViewer Name="sv" Height="510">
+                <StackPanel>
+                    <StackPanel Name="defaultStackPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 20 0 0">
+
+                    </StackPanel>
+                    <ItemsControl Name="Packs" Margin="20" VirtualizingStackPanel.IsVirtualizing="True" ScrollViewer.CanContentScroll="False">
+                        <ProgressBar HorizontalAlignment="Center" Margin="0 160 0 0" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+            <Button Style="{StaticResource MaterialDesignFlatButton}" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10,620,0,10" Width="100" Height="50" Content="Back"/>
+            <materialDesign:Snackbar MessageQueue="{materialDesign:MessageQueue}" VerticalAlignment="Bottom" HorizontalAlignment="Center" x:Name="SnackbarThree" />
+
+        </Grid>
+    </materialDesign:DialogHost>
 </UserControl>

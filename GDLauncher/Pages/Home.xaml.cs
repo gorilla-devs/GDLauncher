@@ -36,7 +36,7 @@ namespace GDLauncher.Pages
         public static ModpackLoading loading = new ModpackLoading();
         public static Home singleton;
         public ServerList serverList = new ServerList();
-
+        public CurseRoot CurseData { get; set; }
 
         public Home()
         {
@@ -271,7 +271,7 @@ namespace GDLauncher.Pages
                         Margin = new Thickness(0, 8, 0, 0),
                         Cursor = Cursors.Arrow
                     };
-                    if (forge != "false")
+                    if (forge != null)
                     {
                         forgeVersion.Icon = "F";
                         forgeVersion.Content = forge;
@@ -289,7 +289,7 @@ namespace GDLauncher.Pages
                     var separator = new Separator
                     {
                         Height = 0.6,
-                        Margin = (forge == "false") ? new Thickness(0, 50, 0, 7) : new Thickness(0, 10, 0, 7)
+                        Margin = (forge == null) ? new Thickness(0, 50, 0, 7) : new Thickness(0, 10, 0, 7)
                     };
                     insiderStackPanel.Children.Add(separator);
                     insiderStackPanel.Children.Add(buttonStackPanel);
@@ -334,8 +334,6 @@ namespace GDLauncher.Pages
                         await MaterialDesignThemes.Wpf.DialogHost.Show(new Dialogs.ManagePack(dir), "RootDialog");
                         ModpacksUpdate();
                     };
-
-
 
                     var deletebutton = new Button();
                     var iconpackdelete = new PackIcon
@@ -485,8 +483,9 @@ namespace GDLauncher.Pages
             Panel.SetZIndex(addNewBtn, 10);
             addNewBtn.Click += async (sender, e) =>
             {
-                var installModpack = new InstallModpack();
+                var installModpack = new Modpacks();
                 await DialogHost.Show(installModpack, "RootDialog");
+                GC.Collect();
 
                 if (!Directory.Exists(config.M_F_P + "Packs\\")) Directory.CreateDirectory(config.M_F_P + "Packs\\");
                 ModpacksUpdate();

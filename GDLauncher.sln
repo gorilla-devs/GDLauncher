@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDLauncher", "GDLauncher\GD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModpackJsonCreator", "ModpackJsonCreator\ModpackJsonCreator.csproj", "{F5EB8719-82DB-43D8-A160-5D7FF27A7426}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDLauncherLibrary", "GDLauncherLibrary\GDLauncherLibrary.csproj", "{304E08B5-F1E6-44D3-8AA3-AA08571334EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,10 @@ Global
 		{F5EB8719-82DB-43D8-A160-5D7FF27A7426}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{F5EB8719-82DB-43D8-A160-5D7FF27A7426}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5EB8719-82DB-43D8-A160-5D7FF27A7426}.Release|Any CPU.Build.0 = Release|Any CPU
+		{304E08B5-F1E6-44D3-8AA3-AA08571334EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{304E08B5-F1E6-44D3-8AA3-AA08571334EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{304E08B5-F1E6-44D3-8AA3-AA08571334EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{304E08B5-F1E6-44D3-8AA3-AA08571334EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
