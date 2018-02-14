@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using Newtonsoft.Json.Linq;
 
 namespace GDLauncher.Classes
 {
@@ -84,6 +85,7 @@ namespace GDLauncher.Classes
             string data = "";
             WebClient c = new WebClient();
             string versionURL = "";
+            DateTime actualReleaseTime = new DateTime();
             var downloadedJSON = await c.DownloadDataTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
             dynamic versionsJSON = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(downloadedJSON));
             try
@@ -91,7 +93,14 @@ namespace GDLauncher.Classes
                 foreach (var v in versionsJSON["versions"])
                 {
                     if (version == Convert.ToString(v.id))
+                    {
                         versionURL = Convert.ToString(v.url);
+                        string tempReleaseTime = v.releaseTime;
+                        int index = tempReleaseTime.LastIndexOf("+");
+                        if (index > 0)
+                            tempReleaseTime = tempReleaseTime.Substring(0, index);
+                        actualReleaseTime = DateTime.Parse(tempReleaseTime.Replace("T", " "));
+                    }
                 }
             }
             catch(Exception)
@@ -117,8 +126,18 @@ namespace GDLauncher.Classes
                 var url = "";
                 var name = "";
                 packjson.mainClass = json.mainClass;
-                
-                packjson.arguments = json.minecraftArguments;
+                if (actualReleaseTime <= DateTime.Parse("2017-10-26 13:36:22"))
+                {
+                    packjson.arguments = json.minecraftArguments;
+                }
+                else
+                {
+                    foreach (var arg in json["arguments"]["game"])
+                    {
+                        if (arg is JValue)
+                            packjson.arguments += arg + " ";
+                    }
+                }
                 packjson.version_type = json.type;
                 foreach (var item in json["downloads"]["client"])
                 {

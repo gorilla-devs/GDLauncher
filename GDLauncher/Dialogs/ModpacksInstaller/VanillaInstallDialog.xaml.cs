@@ -46,7 +46,7 @@ namespace GDLauncher.Dialogs
             var versions = parsed.versions;
             foreach (var item in versions)
             {
-                if (!Regex.IsMatch((string)item.id, "[a-z]"))
+                if (item.type == "release" || item.type == "snapshot")
                 {
                     versionsList.Items.Add((string)item.id);
                 }
