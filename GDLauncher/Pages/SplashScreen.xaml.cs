@@ -316,7 +316,7 @@ namespace GDLauncher.Pages
 
         async Task CheckCurseJson(string totalChecks)
         {
-            string curseURL = "http://clientupdate-v6.cursecdn.com/feed/addons/432/v10/complete.json.bz2";
+            string curseURL = "https://cursemeta.nikky.moe/api/addon?modpacks=1&property=name&property=id&property=summary&property=authors&property=attachments&property=categorysection&property=PopularityScore&property=downloadcount&property=PrimaryCategoryAvatarUrl&property=IsFeatured&property=PrimaryCategoryName";
             firstLabel.Text = "Checking required data (3/" + totalChecks + ")";
             try
             {
@@ -345,7 +345,7 @@ namespace GDLauncher.Pages
                     firstLabel.Visibility = Visibility.Visible;
                     kbps.Visibility = Visibility.Visible;
                     mbToDownload.Visibility = Visibility.Visible;
-                    await client.DownloadFileTaskAsync(curseURL, config.M_F_P + "complete.json.bz2");
+                    await client.DownloadFileTaskAsync(curseURL, config.M_F_P + "complete.json");
                     Settings.Default.curseJSONLastUpdated = DateTime.Now;
                     Settings.Default.Save();
 
@@ -353,10 +353,10 @@ namespace GDLauncher.Pages
                     progressbar.Visibility = Visibility.Visible;
                     progressbar.IsIndeterminate = true;
 
-                    await Task.Factory
+                    /*await Task.Factory
                         .StartNew(() =>
                             ZipSharp.ExtractBZip2File(config.M_F_P + "complete.json.bz2", config.M_F_P + "complete.json"))
-                        .ContinueWith((ante) => Thread.Sleep(300));
+                        .ContinueWith((ante) => Thread.Sleep(300));*/
 
                     File.Delete(config.M_F_P + "complete.json.bz2");
                 }

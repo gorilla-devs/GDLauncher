@@ -1,19 +1,15 @@
 ﻿/*Questa classe scarica tutti i files che le vengono dati, serve in pratica per scaricare i pacchetti*/
-using ICSharpCode.SharpZipLib.Core;
-using ICSharpCode.SharpZipLib.Zip;
+using Microsoft.WindowsAPICodePack.Taskbar;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 //using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using System.Windows;
 
 namespace GDLauncher.Classes
 {
@@ -31,8 +27,9 @@ namespace GDLauncher.Classes
 
 
 
-        //GETTERS AND SETTERS
-        public String Files
+
+    //GETTERS AND SETTERS
+    public String Files
         {
             get => files;
             set
@@ -74,14 +71,14 @@ namespace GDLauncher.Classes
             Percentage = "";
         }
 
-        public async Task MCDownload(string instanceName, string MCVersion, string forgeVersion, CancellationToken _ctsblock)
+        public async Task MCDownload(string instanceName, string MCVersion, string forgeVersion, CancellationToken _ctsblock, string modpackName, string modpackVersion, List<string> additionalMods)
         {
 
             var urls = new List<StructJson>();
             var json = new JSON();
             json.updateStatus += (s) => { Percentage = s; };
-            urls = await json.GetFiles("", instanceName, MCVersion, forgeVersion, "");
-            
+            urls = await json.GetFiles(modpackName, instanceName, MCVersion, forgeVersion, modpackVersion, additionalMods);
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
 
             totalMB = 0;
             _cts = new CancellationTokenSource();
@@ -94,10 +91,7 @@ namespace GDLauncher.Classes
                 System.Timers.Timer myTimer = new System.Timers.Timer();
                 myTimer.Elapsed += (s, e) =>
                 {
-                    Application.Current.Dispatcher.Invoke(new Action(() =>
-                    {
-                        Mb = string.Format("{0} MB", ((totalMB / 1024f) / 1024f).ToString("0.00"));
-                    }));
+                     Mb = string.Format("{0} MB", ((totalMB / 1024f) / 1024f).ToString("0.00"));
                 };
                 myTimer.Interval = 100; // 1000 ms is one second
                 myTimer.Start();
@@ -108,8 +102,6 @@ namespace GDLauncher.Classes
                     {
                         await DownloadLibraries(url, instanceName);
                     }
-                    catch (WebException) { }
-                    catch (OperationCanceledException) { }
                     catch (Exception e)
                     {
                         /*Application.Current.Dispatcher.Invoke(new Action(() =>
@@ -138,6 +130,9 @@ namespace GDLauncher.Classes
                 myTimer.Stop();
                 Files = urls.Count + "/" + urls.Count;
                 Percentage = "100%";
+
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress);
+
             }
         }
 
@@ -196,6 +191,7 @@ namespace GDLauncher.Classes
                         totalMB -= prevDownloaded;
                         prevDownloaded = e.BytesReceived;
                         totalMB += (e.BytesReceived);
+
                     };
                     client.DownloadFileCompleted += (s, e) =>
                     {
@@ -211,14 +207,13 @@ namespace GDLauncher.Classes
             {
                 await ExtractNatives(url.path, instanceName);
             }
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                string urlnum = Files.Split('/')[0];
+            string urlnum = Files.Split('/')[0];
 
-                Files = (int.Parse(urlnum) + 1).ToString() + "/" + urlsList.Count.ToString();
+            Files = (int.Parse(urlnum) + 1).ToString() + "/" + urlsList.Count.ToString();
 
-                Percentage = (int.Parse(urlnum) * 100) / urlsList.Count + "%";
-            }));
+            TaskbarManager.Instance.SetProgressValue((int.Parse(urlnum) * 100) / urlsList.Count, 100);
+
+            Percentage = (int.Parse(urlnum) * 100) / urlsList.Count + "%";
         }
 
         public async Task ExtractNatives(string file, string instanceName)

@@ -4,9 +4,31 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             Height="200" Width="300" Background="White">
+             Width="350" Height="150"  Background="White" Loaded="UserControl_Loaded">
     <Grid>
-            
+        <StackPanel>
+            <DockPanel HorizontalAlignment="Center" Margin="0 10 0 0">
+                <Label VerticalAlignment="Center" Margin="0 0 30 0">Pack Name:</Label>
+                <TextBox Name="instanceTextName" HorizontalAlignment="Right" Width="200" materialDesign:HintAssist.Hint="Instance Name" materialDesign:HintAssist.IsFloating="True" TextChanged="instanceTextName_TextChanged">
+                    <TextBox.Text>
+                        <Binding Path="Name" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <domain1:NotEmptyValidationRule xmlns:domain1="clr-namespace:GDLauncher.Classes" ValidatesOnTargetUpdated="True" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </DockPanel>
+            <DockPanel Margin="0 10 0 0" HorizontalAlignment="Center">
+                <Label VerticalAlignment="Center" Margin="0 0 40 0">Versions:</Label>
+                <ComboBox Name="versionsList" Margin="0 0 -5 0" Width="200" HorizontalAlignment="Right" SelectedIndex="0"/>
+            </DockPanel>
+            <DockPanel HorizontalAlignment="Center" Margin="0 20 0 0">
+                <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
+                <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="35 0 0 0" IsEnabled="False" Click="install_Click">Install</Button>
+            </DockPanel>
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -48,7 +48,7 @@ namespace GDLauncher.Dialogs
                     MessageBox.Show("Nome istanza gia' esistente");
                     return;
                 }
-
+                DialogHostExtensions.SetCloseOnClickAway(this, false);
                 rename.IsEnabled = false;
                 instanceTextName.IsEnabled = false;
                 progress.Visibility = Visibility.Visible;
@@ -75,6 +75,7 @@ namespace GDLauncher.Dialogs
             {
                 MessageBox.Show("Cannot change instance name. Maybe you are using it?");
             }
+            DialogHostExtensions.SetCloseOnClickAway(this, true);
 
 
             MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
@@ -87,7 +88,7 @@ namespace GDLauncher.Dialogs
             {
                 Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
 
-                if (instanceTextName.Text != "" && !instanceTextName.Text.Contains(" ") && !string.IsNullOrEmpty(instanceTextName.Text) && rg.IsMatch(instanceTextName.Text))
+                if (instanceTextName.Text != "" && !instanceTextName.Text.Contains(" ") && !string.IsNullOrEmpty(instanceTextName.Text) && rg.IsMatch(instanceTextName.Text) && instanceTextName.Text != new DirectoryInfo(Dir).Name)
                     rename.IsEnabled = true;
                 else
                     rename.IsEnabled = false;

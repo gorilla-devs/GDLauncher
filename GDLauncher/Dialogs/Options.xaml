@@ -39,6 +39,12 @@
                         <Label>Instances Name Font</Label>
                         <ComboBox Name="instancesFont" HorizontalAlignment="Right" VerticalAlignment="Top" Width="140"/>
                     </DockPanel>
+                    <Separator  Margin="0 10 0 10" Height="0.3"/>
+                    <DockPanel>
+                        <Label>Graphics Performance</Label>
+                        <ComboBox Name="graphicsPerformance" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100">
+                        </ComboBox>
+                    </DockPanel>
                 </StackPanel>
             </materialDesign:Card>
             <Label Foreground="#455A64" FontSize="14" FontWeight="SemiBold" Margin="0 10 0 10">Configurations</Label>
@@ -46,9 +52,7 @@
                 <StackPanel>
                     <DockPanel>
                         <Label VerticalAlignment="Center">Java Path</Label>
-                        <ScrollViewer VerticalScrollBarVisibility="Hidden" Margin="10 0 5 0" HorizontalScrollBarVisibility="Auto" Width="340">
-                            <TextBox Name="JavaPath" IsEnabled="False" VerticalAlignment="Top" Height="30" MinWidth="340"/>
-                        </ScrollViewer>
+                        <TextBlock Name="JavaPath" Margin="10 0 5 0" VerticalAlignment="Center" Height="30" Width="340"/>
                         <ToggleButton Name="JavaPathFolderBrowser" Style="{StaticResource MaterialDesignFlatToggleButton}" ToolTip="Browse" Click="JavaPathFolderBrowser_Click">
                             <materialDesign:PackIcon Kind="Folder" Height="21" Width="21" />
                         </ToggleButton>

@@ -19,12 +19,20 @@ Sample license text.
                         Hello there, thank you for using our launcher! Here are some news about this new version: 
                         <LineBreak />
                         -------------------------------------------------<LineBreak />
-                        ->Added persistent settings. Now they won't reset when updating the launcher.<LineBreak />
+                        ->Added support for CurseForge modpacks and mods. Worlds and other addons will be added in the next release.<LineBreak />
                         -------------------------------------------------<LineBreak />
-                        ->Fixed some situations where mojang login token expired<LineBreak />
+                        ->Fixed some bugs while downloading forge<LineBreak />
                         -------------------------------------------------<LineBreak />
-                        ->Other fixes you won't notice but were required :)<LineBreak />
+                        ->Improved general stability and a lot of bug fixed<LineBreak />
                          -------------------------------------------------<LineBreak />
+                        ->Added 2 performance mode in the settings<LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->Fixed some bugs in duplication and rename of instances<LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->Added support for snapshots<LineBreak />
+                        -------------------------------------------------<LineBreak />
+                        ->A lot of other things under the hood :)<LineBreak />
+                        -------------------------------------------------<LineBreak />
                         Happy Gaming :)
                     </TextBlock>
                 </StackPanel>

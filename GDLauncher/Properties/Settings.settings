@@ -59,5 +59,8 @@
     <Setting Name="curseJSONLastUpdated" Provider="crdx.Settings.PortableSettingsProvider" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)">1970-01-01</Value>
     </Setting>
+    <Setting Name="graphicsPerformance" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">High</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -33,13 +33,12 @@
                     <Label HorizontalAlignment="Center" FontSize="33" Margin="0 15 0 0" Foreground="White">Add New Instance</Label>
                 </StackPanel>
             </materialDesign:ColorZone>
-            <ScrollViewer Name="sv" Height="510">
+            <ScrollViewer Name="sv" Height="510" >
                 <StackPanel>
                     <StackPanel Name="defaultStackPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 20 0 0">
-
                     </StackPanel>
-                    <ItemsControl Name="Packs" Margin="20" VirtualizingStackPanel.IsVirtualizing="True" ScrollViewer.CanContentScroll="False">
-                        <ProgressBar HorizontalAlignment="Center" Margin="0 160 0 0" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
+                    <ProgressBar Name="loading" HorizontalAlignment="Center" Margin="0 160 0 0" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
+                    <ItemsControl Margin="20" ItemsSource="{Binding _packs}" VirtualizingStackPanel.IsVirtualizing="True">
                     </ItemsControl>
                 </StackPanel>
             </ScrollViewer>

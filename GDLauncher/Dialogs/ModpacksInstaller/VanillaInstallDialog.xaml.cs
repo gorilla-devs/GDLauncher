@@ -67,7 +67,6 @@ namespace GDLauncher.Dialogs
         private async void versionsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             await Task.Delay(100);
-            dynamic parsed = JsonConvert.DeserializeObject(vanillajson);
         }
 
         private void instanceTextName_TextChanged(object sender, TextChangedEventArgs e)

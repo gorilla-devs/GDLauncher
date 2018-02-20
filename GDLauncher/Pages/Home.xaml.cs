@@ -36,8 +36,6 @@ namespace GDLauncher.Pages
         public static ModpackLoading loading = new ModpackLoading();
         public static Home singleton;
         public ServerList serverList = new ServerList();
-        public CurseRoot CurseData { get; set; }
-
         public Home()
         {
             InitializeComponent();

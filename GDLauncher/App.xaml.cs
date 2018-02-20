@@ -31,7 +31,21 @@ namespace GDLauncher
             }
             else
             {
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
 
+                Current.DispatcherUnhandledException += (ss, ee) =>
+                {
+                    if (Window1.singleton != null)
+                        Window1.singleton.Hide();
+                    if (ServerManager.singleton != null)
+                        ServerManager.singleton.Hide();
+                    if (DebugOutputConsole.singleton != null)
+                        DebugOutputConsole.singleton.Hide();
+                    var crash = new Windows.Crashed();
+                    crash.ShowDialog();
+                    ee.Handled = true;
+                    Current.Shutdown();
+                };
             }
             string screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth.ToString();
             string screenHeight = SystemParameters.PrimaryScreenHeight.ToString();
@@ -42,20 +56,6 @@ namespace GDLauncher
                 GDLauncher.Properties.Settings.Default.Save();
             }
 
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-            Application.Current.DispatcherUnhandledException += (ss, ee) =>
-            {
-                if(Window1.singleton != null)
-                    Window1.singleton.Hide();
-                if(ServerManager.singleton != null)
-                    ServerManager.singleton.Hide();
-                if(DebugOutputConsole.singleton != null)
-                    DebugOutputConsole.singleton.Hide();
-                var crash = new Windows.Crashed();
-                crash.ShowDialog();
-                ee.Handled = true;
-                Current.Shutdown();
-            };
         }
 
         private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)

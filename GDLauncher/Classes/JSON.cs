@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using GDLauncher.Dialogs;
 using Newtonsoft.Json.Linq;
 
 namespace GDLauncher.Classes
@@ -191,6 +192,24 @@ namespace GDLauncher.Classes
             foreach (var item in json["libraries"])
             {
                 var name = (string)item["name"];
+
+                bool toSkip = false;
+                if (item["rules"] != null)
+                {
+                    foreach (var x in item["rules"])
+                    {
+                        if (x["os"] != null)
+                        {
+                            if (x["action"] == "allow" && x["os"]["name"] != "windows")
+                            {
+                                toSkip = true;
+                            }
+                        }
+                    }
+                }
+
+                if (toSkip)
+                    continue;
                 try
                 {
                     hash = item["downloads"]["artifact"]["sha1"].ToString();
@@ -420,40 +439,37 @@ namespace GDLauncher.Classes
                     var url = "";
                     String.IsNullOrEmpty((string)item["url"]);
                     //VERIFICA SE ESISTE NEL FILE JSON
-                    try
-                    {
-                        url = (string)item["url"];
-                    }
-                    catch (JsonReaderException)
-                    {
-                    }
-                    catch (Exception) //some other exception
-                    {
-                        throw;
-                    }
                     //SE L'URL NON C'E' SETTA UN URL
-                    if (String.IsNullOrWhiteSpace(url))
+                    if (item["url"] == null)
                     {
                         url = "https://libraries.minecraft.net/";
                         string[] lines = package.Split(':');
                         finalurl = url + lines[0].Replace('.', '/') + "/" + lines[1] + "/" + lines[2] + "/" + lines[1] + "-" + lines[2];
                         finalurl = finalurl + ".jar";
-                        dir = finalurl.Replace("https://libraries.minecraft.net/", "")  + "\\" + lines[1] + "-" + lines[2] + ".jar";
+                        dir = finalurl.Replace("https://libraries.minecraft.net/", "") + "\\" + lines[1] + "-" + lines[2] + ".jar";
                     }
                     //SE L'ATTUALE ELEMENTO JSON E' IL JAR DI FORGE SALTA, VIENE INFATTI SCARICATO DOPO A PARTE in downloadforge()
                     else if (package.Contains("net.minecraftforge:forge"))
                     {
                         continue;
                     }
-                    //ALTRIMENTI SE L'URL ESISTE USA QUELLO
+                    //ALTRIMENTI SE L'URL ESISTE USA MAVEN
                     else
                     {
                         url = (string)item["url"];
                         string[] lines = package.Split(':');
-                        finalurl = "http://search.maven.org/remotecontent?filepath=" + lines[0].Replace('.', '/') + "/" + lines[1] + "/" + lines[2] + "/" + lines[1] + "-" + lines[2];
-                        //SI AGGIUNGE L'ESTENSIONE .pack.xz PER I FILE DI FORGE
-                        finalurl = finalurl + ".jar";
-                        dir = finalurl.Replace("http://search.maven.org/remotecontent?filepath=", "") + "\\" + lines[1] + "-" + lines[2] + ".jar";
+                        string urlTry1 = "http://central.maven.org/maven2/" + lines[0].Replace('.', '/') + "/modules/" +
+                                         lines[1] + "/" + lines[2] + "/" + lines[1] + "-" + lines[2] + ".jar";
+
+                        string urlTry2 = "http://central.maven.org/maven2/" + lines[0].Replace('.', '/') + "/" +
+                                         lines[1] + "/" + lines[2] + "/" + lines[1] + "-" + lines[2] + ".jar";
+
+                        if (RemoteFileExists(urlTry1))
+                            finalurl = urlTry1;
+                        else
+                            finalurl = urlTry2;
+
+                        dir = finalurl.Replace("http://central.maven.org/maven2/", "").Replace("modules/", "") + "\\" + lines[1] + "-" + lines[2] + ".jar";
                     }
 
                 }
@@ -468,10 +484,6 @@ namespace GDLauncher.Classes
                 string[] lines1 = package.Split(':');
                 name = lines1[1] + "-" + lines1[2];
                     
-                if(finalurl.Contains("http://files.minecraftforge.net/maven/"))
-                    dir =  dir.Replace("http://files.minecraftforge.net/maven/", "");
-                if (finalurl.Contains("http://search.maven.org/remotecontent?filepath="))
-                    dir = dir.Replace("http://search.maven.org/remotecontent?filepath=", "");
 
                 dir = System.IO.Path.GetDirectoryName(@dir);
                 if (((string)item["clientreq"] != "false") || ((string)item["clientreq"] == ""))
@@ -487,7 +499,8 @@ namespace GDLauncher.Classes
             return Libraries;
         }
 
-        public async Task<List<StructJson>> GetFiles(string modpackname, string instanceName, string version, string forgeVersion, string modpackVersion,  bool justlibraries = false)
+
+        public async Task<List<StructJson>> GetFiles(string modpackname, string instanceName, string version, string forgeVersion, string modpackVersion, List<string> additionalMods = null)
         {
 
             //SCRITTURA JSON MODPACK
@@ -532,7 +545,7 @@ namespace GDLauncher.Classes
                         {
                             packjson.libs.Add(new Lib { path = item.path });
                         }
-                        else if (item.URL.Contains("http://search.maven.org/remotecontent?filepath="))
+                        else if (item.URL.Contains("http://central.maven.org/maven2/"))
                         {
                             packjson.libs.Add(new Lib { path = item.path });
                         }
@@ -548,7 +561,7 @@ namespace GDLauncher.Classes
                     }
                     if (forgeVersion != "false")
                     {
-                        if (item.URL.Contains("http://search.maven.org/remotecontent?filepath="))
+                        if (item.URL.Contains("http://central.maven.org/maven2/"))
                         {
                             packjson.libs.Add(new Lib { path = item.path });
                         }
@@ -580,6 +593,18 @@ namespace GDLauncher.Classes
                         }
                     }
                 });
+                if (additionalMods != null)
+                {
+                    foreach (var loc in additionalMods)
+                    {
+                        newList.Add(new StructJson
+                        {
+                            URL = loc,
+                            fileName = Path.GetFileName(new Uri(loc).LocalPath),
+                            path = @"mods/" + Path.GetFileName(new Uri(loc).LocalPath)
+                        });
+                    }
+                }
                 return newList;
             }
             catch(Exception e)
@@ -590,6 +615,29 @@ namespace GDLauncher.Classes
 
         }
 
+
+
+
+        private bool RemoteFileExists(string url)
+        {
+            try
+            {
+                //Creating the HttpWebRequest
+                HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+                //Setting the Request method HEAD, you can also use GET too.
+                request.Method = "HEAD";
+                //Getting the Web Response.
+                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+                //Returns TRUE if the Status code == 200
+                response.Close();
+                return (response.StatusCode == HttpStatusCode.OK);
+            }
+            catch
+            {
+                //Any exception will returns false.
+                return false;
+            }
+        }
 
     }
 }

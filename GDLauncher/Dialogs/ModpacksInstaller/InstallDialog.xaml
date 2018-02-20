@@ -12,7 +12,7 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <ProgressBar IsIndeterminate="True" Grid.Column="0" Style="{StaticResource MaterialDesignCircularProgressBar}" VerticalAlignment="Center" Width="40" Margin="0 -40 0 0"></ProgressBar>
-        <Button Grid.Column="0" Height="30" VerticalAlignment="Bottom" Margin="5" Style="{StaticResource MaterialDesignFlatButton}">Cancel</Button>
+        <Button Grid.Column="0" Height="30" VerticalAlignment="Bottom" Margin="5" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click">Cancel</Button>
         <Polygon
             Grid.Column="1"
             Points="50 0, 250 80, 250 0"  

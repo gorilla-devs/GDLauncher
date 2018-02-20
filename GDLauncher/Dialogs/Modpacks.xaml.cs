@@ -1,19 +1,28 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using GDLauncher.Classes;
 using GDLauncher.Pages;
 using GDLauncher.Properties;
+using Ionic.Zip;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
+using ComboBoxItem = System.Windows.Controls.ComboBoxItem;
 
 namespace GDLauncher.Dialogs
 {
@@ -27,6 +36,7 @@ namespace GDLauncher.Dialogs
 
     public class data
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public CategorySection CategorySection { get; set; }
         public Attachments[] Attachments { get; set; }
@@ -60,18 +70,61 @@ namespace GDLauncher.Dialogs
         public string Name { get; set; }
     }
 
-    public partial class Modpacks
+    public class Fileino
     {
-        public static int numberOfObjectsPerPage = 3;
+        public int fileID { get; set; }
+        public int projectID { get; set; }
+        public bool required { get; set; }
+    }
+
+    public class ModLoader
+    {
+        public string id { get; set; }
+        public bool primary { get; set; }
+    }
+
+    public class Minecraft
+    {
+        public List<ModLoader> modLoaders { get; set; }
+        public string version { get; set; }
+    }
+
+    public class ModpackManifest
+    {
+        public string author { get; set; }
+        public List<Fileino> files { get; set; }
+        public string manifestType { get; set; }
+        public int manifestVersion { get; set; }
+        public Minecraft minecraft { get; set; }
+        public string name { get; set; }
+        public string overrides { get; set; }
+        public int projectID { get; set; }
+        public string version { get; set; }
+    }
+
+    public partial class Modpacks : INotifyPropertyChanged
+    {
+        public static int numberOfObjectsPerPage = 5;
         public static int actualPage;
+        public CurseRoot CurseData { get; set; }
+
+        public ObservableCollection<Card> _packs { get; set; }
 
 
         public Modpacks()
         {
+            DataContext = this;
+            _packs = new ObservableCollection<Card>();
             InitializeComponent();
             DialogHostExtensions.SetCloseOnClickAway(this, true);
-            DataContext = this;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -180,23 +233,19 @@ namespace GDLauncher.Dialogs
             defaultStackPanel.Children.Add(vanilla);
             defaultStackPanel.Children.Add(forge);
 
-            if (Home.singleton.CurseData == null)
-            {
-                Home.singleton.CurseData = new CurseRoot();
-                Home.singleton.CurseData.Data = await Task.Run(() =>
-                    JsonConvert.DeserializeObject<CurseRoot>(File.ReadAllText(config.M_F_P + "complete.json"))
-                        .Data.Where(s => s.CategorySection.Name == "Modpacks").ToList());
-            }
-            Packs.Items.Clear();
+                CurseData = new CurseRoot();
+                CurseData.Data = await Task.Run(async () =>
+                JsonConvert.DeserializeObject<List<data>>(File.ReadAllText(config.M_F_P + "complete.json"))
+                    .ToList());
+            loading.Visibility = Visibility.Collapsed;
+            //Packs.Items.Clear();
             sv.ScrollChanged += ScrollViewer_ScrollChanged;
-
             addPacks(0);
-            GC.Collect();
         }
 
         private void addPacks(int from, string search = "")
         {
-            foreach (var loc in Home.singleton.CurseData.Data.Where(s => s.CategorySection.Name == "Modpacks" && s.Name.ToLower().Contains(search.ToLower()))
+            foreach (var loc in CurseData.Data.Where(s => s.CategorySection.Name == "Modpacks" && s.Name.ToLower().Contains(search.ToLower()))
                 .OrderByDescending(p => p.PopularityScore).Skip(numberOfObjectsPerPage * from)
                 .Take(numberOfObjectsPerPage))
             {
@@ -257,16 +306,16 @@ namespace GDLauncher.Dialogs
                 {
                     MinHeight = 160,
                     Margin = new Thickness(0, 3, 0, 0),
-                    Effect = new DropShadowEffect
+                    /*Effect = new DropShadowEffect
                     {
                         BlurRadius = 0,
                         ShadowDepth = 0,
                         Direction = 270,
                         Opacity = .42,
                         RenderingBias = RenderingBias.Performance
-                    }
+                    }*/
                 };
-                card.MouseEnter += (ss, ee) =>
+                /*card.MouseEnter += (ss, ee) =>
                 {
                     var da = new DoubleAnimation
                     {
@@ -300,7 +349,7 @@ namespace GDLauncher.Dialogs
                     };
                     card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
                     card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
-                };
+                };*/
 
                 //MAIN CONTENT
 
@@ -317,8 +366,113 @@ namespace GDLauncher.Dialogs
                     VerticalAlignment = VerticalAlignment.Bottom,
                     Margin = new Thickness(0, 20, 0, 10)
                 };
-                ButtonProgressAssist.SetValue(installBtn, 30);
-                //installBtn.Click += async (ss, ee) => { await DialogHost.Show(new Dialogs.InstallDialog(), "ModpacksDialog"); };
+                installBtn.Click += async (ss, ee) =>
+                {
+                    var x = await DialogHost.Show(new ModpackInstallDialog(loc.Id), "ModpacksDialog");
+                    if (x != null)
+                    {
+                        dynamic y = x;
+                        string url = "";
+                        foreach (var locx in await CurseApis.getVersions(loc.Id))
+                        {
+                            if (locx.Name == y.version)
+                            {
+                                url = locx.URL;
+                                break;
+                            }
+                        }
+                        installBtn.Content = "Downloading..";
+
+                        var webClient = new WebClient();
+                        webClient.DownloadProgressChanged += (sss, eee) =>
+                        {
+                            ButtonProgressAssist.SetValue(installBtn, eee.ProgressPercentage);
+                        };
+
+                        var tempZip = await webClient.DownloadDataTaskAsync(url);
+                        Stream stream = new MemoryStream(tempZip);
+
+                        MemoryStream data = new MemoryStream();
+
+                        var zipq = await Task.Factory.StartNew(() => ZipFile.Read(stream));
+
+                        zipq["manifest.json"].Extract(data);
+                        data.Seek(0, SeekOrigin.Begin);
+                        var parsedManifest = await Task.Run(() => JsonConvert.DeserializeObject<ModpackManifest>(new StreamReader(data).ReadToEnd()));
+
+                        ButtonProgressAssist.SetValue(installBtn, 0);
+                        installBtn.Content = "Computing..";
+
+                        var additionalMods = new List<string>();
+
+                        /*foreach (var z in loc.LatestFiles.FirstOrDefault(s => s.FileName == y.version).Dependencies)
+                        {
+                            Console.WriteLine(z.AddOnId);
+                        }*/
+                        ServicePointManager.DefaultConnectionLimit = 30;
+                        var block = new ActionBlock<Fileino>(async file =>
+                        {
+                            var modurl = await CurseApis.getDownloadURL(file.projectID, file.fileID);
+                            foreach (var mod in modurl)
+                            {
+                                additionalMods.Add(mod);
+                            }
+                        }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 30 });
+
+                        foreach (var file in parsedManifest.files)
+                        {
+                            block.Post(file);
+                        }
+                        block.Complete();
+                        try
+                        {
+                            await block.Completion;
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            return;
+                        }
+                        installBtn.Content = "Install";
+
+                        var install = await DialogHost.Show(new InstallDialog(y.instanceName, parsedManifest.minecraft.version, parsedManifest.minecraft.modLoaders[0].id.Replace("forge-", ""), loc.Name, y.version, additionalMods), "ModpacksDialog");
+                        if (install == "Cancelled")
+                            return;
+                        Stream stream1 = new MemoryStream(tempZip);
+                        string instanceDir = config.M_F_P + "Packs\\" + y.instanceName;
+
+                        using (ZipFile zip = ZipFile.Read(stream1))
+                        {
+                            zip.ExtractAll(instanceDir,
+                                ExtractExistingFileAction.OverwriteSilently);
+                        }
+
+                        await Task.Run(() =>
+                        {
+                            //Now Create all of the directories
+                            foreach (string dirPath in Directory.GetDirectories(
+                                instanceDir + "\\" + parsedManifest.overrides, "*",
+                                SearchOption.AllDirectories))
+                                Directory.CreateDirectory(dirPath.Replace(instanceDir + "\\" + parsedManifest.overrides,
+                                    instanceDir));
+
+                            //Copy all the files & Replaces any files with the same name
+                            foreach (string newPath in Directory.GetFiles(instanceDir + "\\" + parsedManifest.overrides,
+                                "*.*",
+                                SearchOption.AllDirectories))
+                                File.Move(newPath,
+                                    newPath.Replace(instanceDir + "\\" + parsedManifest.overrides, instanceDir));
+
+                            Directory.Delete(instanceDir + "\\" + parsedManifest.overrides, true);
+                        });
+                        //use the message queue to send a message.
+                        var messageQueue = SnackbarThree.MessageQueue;
+                        var message = "Installed. Enjoy :)";
+
+                        //the message queue can be called from any thread
+                        Task.Factory.StartNew(() => messageQueue.Enqueue(message));
+
+                    }
+                };
                 var contentStackPanel = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
@@ -355,7 +509,7 @@ namespace GDLauncher.Dialogs
                 mainStackPanel.Children.Add(leftStackPanel);
                 mainStackPanel.Children.Add(contentStackPanel);
                 card.Content = mainStackPanel;
-                Packs.Items.Add(card);
+                _packs.Add(card);
             }
         }
 
@@ -382,7 +536,8 @@ namespace GDLauncher.Dialogs
             if (startLength == tb.Text.Length)
             {
                 sv.ScrollToTop();
-                Packs.Items.Clear();
+                
+                _packs.Clear();
                 addPacks(0, search.Text);
             }
         }

@@ -261,5 +261,18 @@ namespace GDLauncher.Properties {
                 this["curseJSONLastUpdated"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("High")]
+        public string graphicsPerformance {
+            get {
+                return ((string)(this["graphicsPerformance"]));
+            }
+            set {
+                this["graphicsPerformance"] = value;
+            }
+        }
     }
 }

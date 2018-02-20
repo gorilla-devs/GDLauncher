@@ -49,7 +49,6 @@ namespace GDLauncher.Dialogs
 
         private async void install_Click(object sender, RoutedEventArgs e)
         {
-            DialogHostExtensions.SetCloseOnClickAway(this, false);
             try
             {
                 Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
@@ -63,6 +62,7 @@ namespace GDLauncher.Dialogs
                     MessageBox.Show("Nome istanza gia' esistente");
                     return;
                 }
+                DialogHostExtensions.SetCloseOnClickAway(this, false);
                 install.IsEnabled = false;
                 instanceTextName.IsEnabled = false;
                 progress.Visibility = Visibility.Visible;
