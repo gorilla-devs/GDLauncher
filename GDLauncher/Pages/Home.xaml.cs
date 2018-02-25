@@ -46,21 +46,35 @@ namespace GDLauncher.Pages
                 if (navWindow != null) navWindow.ShowsNavigationUI = false;
             }));
             transition.SelectedIndex = 0;
+            Random rnd = new Random();
+            tip.Text = Assets.Tips.tips[rnd.Next(Assets.Tips.tips.Count)];
+            tip.FontFamily = new FontFamily(new Uri("pack://application:,,,/Assets/"),
+                "./#Roboto Thin");
+
         }
 
         private async void Page_Loaded(object senderx, RoutedEventArgs ee)
         {
             transition.SelectedIndex = 1;
             if (!Directory.Exists(config.M_F_P + "Packs\\")) Directory.CreateDirectory(config.M_F_P + "Packs\\");
-            ModpacksUpdate();
+            bool firstTime = false;
             if (Settings.Default["firstTimeHowTo"].ToString() == "true")
+            {
+                firstTime = true;
                 await DialogHost.Show(new HowTo(), "RootDialog");
+            }
             if (Settings.Default["justUpdated"].ToString() == "true")
             {
                 await DialogHost.Show(new Changelog(), "RootDialog");
                 Settings.Default["justUpdated"] = "false";
                 Settings.Default.Save();
             }
+
+            await Task.Delay(300);
+            await Task.Run(() =>
+                {
+                    Application.Current.Dispatcher.Invoke((Action) async delegate { ModpacksUpdate(); });
+                });
 
             if (Settings.Default.premiumUsername != "")
             {
@@ -72,29 +86,68 @@ namespace GDLauncher.Pages
                 Task.Factory.StartNew(() => messageQueue.Enqueue(message));
             }
 
-            //mainLogo.Cursor = Cursors.Hand;
-            mainLogo.MouseEnter += (ss, eee) =>
+            mainLogo.Cursor = Cursors.Hand;
+            tipCard.Cursor = Cursors.Hand;
+
+            mainLogo.MouseLeftButtonDown += async (ss, eee) =>
             {
                 var da = new DoubleAnimation();
-                da.From = 1;
-                da.To = 0.6;
-                da.Duration = new Duration(TimeSpan.FromSeconds(0.125));
-                mainLogo.BeginAnimation(OpacityProperty, da);
+                da.From = 0;
+                da.To = 340;
+                da.EasingFunction = new SineEase();
+                da.Duration = new Duration(TimeSpan.FromSeconds(0.180));
+                var da1 = new DoubleAnimation();
+                da1.From = 0;
+                da1.To = 200;
+                da1.EasingFunction = new SineEase();
+                da1.Duration = new Duration(TimeSpan.FromSeconds(0.180));
+                tipCard.BeginAnimation(HeightProperty, da1);
+                tipCard.BeginAnimation(WidthProperty, da);
+                await Task.Delay(180);
+                tipContent.Opacity = 1;
             };
 
-            mainLogo.MouseLeave += (ss, eee) =>
+            tipCard.MouseLeftButtonDown += (ss, eee) =>
             {
+                tipContent.Opacity = 0;
                 var da = new DoubleAnimation();
-                da.From = 0.6;
-                da.To = 1;
-                da.Duration = new Duration(TimeSpan.FromSeconds(0.125));
-                mainLogo.BeginAnimation(OpacityProperty, da);
+                da.From = 340;
+                da.To = -60;
+                da.Duration = new Duration(TimeSpan.FromSeconds(0.180));
+                var da1 = new DoubleAnimation();
+                da1.From = 200;
+                da1.To = 0;
+                da1.EasingFunction = new SineEase();
+                da1.Duration = new Duration(TimeSpan.FromSeconds(0.180));
+                tipCard.BeginAnimation(HeightProperty, da1);
+                tipCard.BeginAnimation(WidthProperty, da);
             };
+            if (firstTime)
+            {
+                await Task.Delay(1350);
+                var da = new DoubleAnimation();
+                da.From = 0;
+                da.To = 340;
+                da.EasingFunction = new SineEase();
+                da.Duration = new Duration(TimeSpan.FromSeconds(0.180));
+                var da1 = new DoubleAnimation();
+                da1.From = 0;
+                da1.To = 200;
+                da1.EasingFunction = new SineEase();
+                da1.Duration = new Duration(TimeSpan.FromSeconds(0.180));
+                tipCard.BeginAnimation(HeightProperty, da1);
+                tipCard.BeginAnimation(WidthProperty, da);
+            }
         }
 
 
         public void ModpacksUpdate()
         {
+            if(Settings.Default.graphicsPerformance == "Material Design")
+                homeTransitioner.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffffff");
+            else
+                homeTransitioner.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#eeeeee");
+
             modpacksListContainer.Children.Clear();
             var dirlist = Directory.GetDirectories(config.M_F_P + "Packs\\");
             if (dirlist.Count() != 0)
@@ -126,7 +179,14 @@ namespace GDLauncher.Pages
                         Width = 270,
                         Margin = new Thickness(0, 3, 10, 10),
                         HorizontalAlignment = HorizontalAlignment.Left,
-                        Effect = new DropShadowEffect
+                        Effect = Settings.Default.graphicsPerformance == "Flat" ? new DropShadowEffect
+                        {
+                            BlurRadius = 0,
+                            ShadowDepth = 0,
+                            Direction = 0,
+                            Opacity = 0,
+                            RenderingBias = RenderingBias.Performance,
+                        } : new DropShadowEffect
                         {
                             BlurRadius = 0,
                             ShadowDepth = 0,
@@ -199,44 +259,7 @@ namespace GDLauncher.Pages
                         Width = 270
                     };
                     image.Opacity = 1;
-                    card.MouseEnter += (ss, ee) =>
-                    {
-                        var da = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 1.5,
-                            Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                        };
-                        var da1 = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 8,
-                            Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                        };
-                        card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
-                        card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
-
-
-                    };
-
-                    card.MouseLeave += (ss, ee) =>
-                    {
-                        var da = new DoubleAnimation
-                        {
-                            From = 1.5,
-                            To = 0,
-                            Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                        };
-                        var da1 = new DoubleAnimation
-                        {
-                            From = 8,
-                            To = 0,
-                            Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                        };
-                        card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
-                        card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
-
-                    };
+                    
                     /*card.MouseLeftButtonUp += async (ss, ee) =>
                     {
                         await DialogHost.Show(new ManagePack(dir), "RootDialog");
@@ -456,7 +479,74 @@ namespace GDLauncher.Pages
 
                     Panel.SetZIndex(popupBoxStackPanel, 100);
                     RippleAssist.SetIsCentered(popupbox, false);
+                    if (Settings.Default.graphicsPerformance != "Flat")
+                    {
+                        if (Settings.Default.graphicsPerformance == "GorillaDevs's Style")
+                        {
+                            ShadowAssist.SetShadowDepth(card, ShadowDepth.Depth0);
+                            ShadowAssist.SetShadowDepth(startBtn, ShadowDepth.Depth0);
+                            startBtn.Effect = new DropShadowEffect
+                            {
+                                BlurRadius = 0,
+                                ShadowDepth = 0,
+                                Direction = 0,
+                                Opacity = 0,
+                                RenderingBias = RenderingBias.Performance,
+                            };
+                        }
 
+                        card.MouseEnter += (ss, ee) =>
+                        {
+                            var da = new DoubleAnimation
+                            {
+                                From = 0,
+                                To = 1.5,
+                                Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                            };
+                            var da1 = new DoubleAnimation
+                            {
+                                From = 0,
+                                To = 8,
+                                Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                            };
+                            card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                            card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+
+
+                        };
+
+                        card.MouseLeave += (ss, ee) =>
+                        {
+                            var da = new DoubleAnimation
+                            {
+                                From = 1.5,
+                                To = 0,
+                                Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                            };
+                            var da1 = new DoubleAnimation
+                            {
+                                From = 8,
+                                To = 0,
+                                Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                            };
+                            card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                            card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+
+                        };
+                    }
+                    else
+                    {
+                        ShadowAssist.SetShadowDepth(card, ShadowDepth.Depth0);
+                        ShadowAssist.SetShadowDepth(startBtn, ShadowDepth.Depth0);
+                        startBtn.Effect = new DropShadowEffect
+                        {
+                            BlurRadius = 0,
+                            ShadowDepth = 0,
+                            Direction = 0,
+                            Opacity = 0,
+                            RenderingBias = RenderingBias.Performance,
+                        };
+                    }
 
                     buttonStackPanel.Children.Add(folderButton);
                     buttonStackPanel.Children.Add(manageBtn);
@@ -497,7 +587,14 @@ namespace GDLauncher.Pages
                 Margin = new Thickness(0, 3, 10, 10),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Content = addNewBtn,
-                Effect = new DropShadowEffect
+                Effect = Settings.Default.graphicsPerformance == "Flat" ? new DropShadowEffect
+                {
+                    BlurRadius = 0,
+                    ShadowDepth = 0,
+                    Direction = 0,
+                    Opacity = 0,
+                    RenderingBias = RenderingBias.Performance,
+                } : new DropShadowEffect
                 {
                     BlurRadius = 0,
                     ShadowDepth = 0,
@@ -506,45 +603,59 @@ namespace GDLauncher.Pages
                     RenderingBias = RenderingBias.Performance,
                 }
             };
-            addNew.MouseEnter += (ss, ee) =>
+
+            if (Settings.Default.graphicsPerformance != "Flat")
             {
-                var da = new DoubleAnimation
+                if (Settings.Default.graphicsPerformance == "GorillaDevs's Style")
                 {
-                    From = 0,
-                    To = 1.5,
-                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                };
-                var da1 = new DoubleAnimation
+                    ShadowAssist.SetShadowDepth(addNew, ShadowDepth.Depth0);
+                    ShadowAssist.SetShadowDepth(addNewBtn, ShadowDepth.Depth0);
+                }
+
+                addNew.MouseEnter += (ss, ee) =>
                 {
-                    From = 0,
-                    To = 8,
-                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    var da = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1.5,
+                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    };
+                    var da1 = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 8,
+                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    };
+                    addNew.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                    addNew.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+
+
                 };
-                addNew.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
-                addNew.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
 
+                addNew.MouseLeave += (ss, ee) =>
+                {
+                    var da = new DoubleAnimation
+                    {
+                        From = 1.5,
+                        To = 0,
+                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    };
+                    var da1 = new DoubleAnimation
+                    {
+                        From = 8,
+                        To = 0,
+                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    };
+                    addNew.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                    addNew.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
 
-            };
-
-            addNew.MouseLeave += (ss, ee) =>
+                };
+            }
+            else
             {
-                var da = new DoubleAnimation
-                {
-                    From = 1.5,
-                    To = 0,
-                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                };
-                var da1 = new DoubleAnimation
-                {
-                    From = 8,
-                    To = 0,
-                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                };
-                addNew.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
-                addNew.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
-
-            };
-
+                ShadowAssist.SetShadowDepth(addNew, ShadowDepth.Depth0);
+                ShadowAssist.SetShadowDepth(addNewBtn, ShadowDepth.Depth0);
+            }
 
             modpacksListContainer.Children.Add(addNew);
         }

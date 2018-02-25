@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
@@ -16,13 +15,11 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using GDLauncher.Classes;
-using GDLauncher.Pages;
 using GDLauncher.Properties;
-using Ionic.Zip;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
-using ComboBoxItem = System.Windows.Controls.ComboBoxItem;
 
 namespace GDLauncher.Dialogs
 {
@@ -110,13 +107,27 @@ namespace GDLauncher.Dialogs
 
         public ObservableCollection<Card> _packs { get; set; }
 
+        public bool isInstalling = false;
+        public static CancellationTokenSource cancelToken;
+        public CancellationToken cToken;
+
 
         public Modpacks()
         {
             DataContext = this;
             _packs = new ObservableCollection<Card>();
             InitializeComponent();
-            DialogHostExtensions.SetCloseOnClickAway(this, true);
+            DialogHostExtensions.SetCloseOnClickAway(this, false);
+            cancelToken = new CancellationTokenSource();
+            cToken = cancelToken.Token;
+            if (Settings.Default.graphicsPerformance == "Material Design")
+                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffffff");
+            else
+                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#eeeeee");
+
+            Width = Window1.singleton.Width - 20;
+            Height = Window1.singleton.Height - 30;
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -159,6 +170,16 @@ namespace GDLauncher.Dialogs
             };
             vanillaBtn.Click += async (ss, ee) =>
             {
+                if (isInstalling)
+                {
+                    //use the message queue to send a message.
+                    var messageQueue = SnackbarThree.MessageQueue;
+                    var message = "Already installing another modpack. Wait for it to finish first";
+
+                    //the message queue can be called from any thread
+                    Task.Factory.StartNew(() => messageQueue.Enqueue(message));
+                    return;
+                }
                 var x = await DialogHost.Show(new VanillaInstallDialog(), "ModpacksDialog");
                 if (x != null)
                 {
@@ -176,9 +197,10 @@ namespace GDLauncher.Dialogs
             {
                 Height = 140,
                 Width = 255,
-                Margin = new Thickness(0, 0, 10, 10),
+                Margin = new Thickness(0, 0, Window1.singleton.Width / 60, 0),
                 Content = vanillaBtn
             };
+
             var forgeBtn = new Button
             {
                 Content = new StackPanel
@@ -210,6 +232,16 @@ namespace GDLauncher.Dialogs
             };
             forgeBtn.Click += async (ss, ee) =>
             {
+                if (isInstalling)
+                {
+                    //use the message queue to send a message.
+                    var messageQueue = SnackbarThree.MessageQueue;
+                    var message = "Already installing another modpack. Wait for it to finish first";
+
+                    //the message queue can be called from any thread
+                    Task.Factory.StartNew(() => messageQueue.Enqueue(message));
+                    return;
+                }
                 var x = await DialogHost.Show(new ForgeInstallDialog(), "ModpacksDialog");
                 if (x != null)
                 {
@@ -227,9 +259,15 @@ namespace GDLauncher.Dialogs
             {
                 Height = 140,
                 Width = 255,
-                Margin = new Thickness(0, 0, 0, 11),
+                Margin = new Thickness(0, 0, 0, 0),
                 Content = forgeBtn
             };
+            if (Settings.Default.graphicsPerformance == "GorillaDevs's Style" ||
+                Settings.Default.graphicsPerformance == "Flat")
+            {
+                ShadowAssist.SetShadowDepth(vanilla, ShadowDepth.Depth0);
+                ShadowAssist.SetShadowDepth(forge, ShadowDepth.Depth0);
+            }
             defaultStackPanel.Children.Add(vanilla);
             defaultStackPanel.Children.Add(forge);
 
@@ -306,50 +344,22 @@ namespace GDLauncher.Dialogs
                 {
                     MinHeight = 160,
                     Margin = new Thickness(0, 3, 0, 0),
-                    /*Effect = new DropShadowEffect
+                    Effect = Settings.Default.graphicsPerformance == "Flat" ? new DropShadowEffect
+                    {
+                        BlurRadius = 0,
+                        ShadowDepth = 0,
+                        Direction = 0,
+                        Opacity = 0,
+                        RenderingBias = RenderingBias.Performance,
+                    } : new DropShadowEffect
                     {
                         BlurRadius = 0,
                         ShadowDepth = 0,
                         Direction = 270,
                         Opacity = .42,
-                        RenderingBias = RenderingBias.Performance
-                    }*/
+                        RenderingBias = RenderingBias.Performance,
+                    }
                 };
-                /*card.MouseEnter += (ss, ee) =>
-                {
-                    var da = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1.5,
-                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                    };
-                    var da1 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 8,
-                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                    };
-                    card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
-                    card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
-                };
-
-                card.MouseLeave += (ss, ee) =>
-                {
-                    var da = new DoubleAnimation
-                    {
-                        From = 1.5,
-                        To = 0,
-                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                    };
-                    var da1 = new DoubleAnimation
-                    {
-                        From = 8,
-                        To = 0,
-                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                    };
-                    card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
-                    card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
-                };*/
 
                 //MAIN CONTENT
 
@@ -368,115 +378,151 @@ namespace GDLauncher.Dialogs
                 };
                 installBtn.Click += async (ss, ee) =>
                 {
-                    var x = await DialogHost.Show(new ModpackInstallDialog(loc.Id), "ModpacksDialog");
-                    if (x != null)
+                    if (isInstalling)
                     {
-                        dynamic y = x;
-                        string url = "";
-                        foreach (var locx in await CurseApis.getVersions(loc.Id))
-                        {
-                            if (locx.Name == y.version)
-                            {
-                                url = locx.URL;
-                                break;
-                            }
-                        }
-                        installBtn.Content = "Downloading..";
-
-                        var webClient = new WebClient();
-                        webClient.DownloadProgressChanged += (sss, eee) =>
-                        {
-                            ButtonProgressAssist.SetValue(installBtn, eee.ProgressPercentage);
-                        };
-
-                        var tempZip = await webClient.DownloadDataTaskAsync(url);
-                        Stream stream = new MemoryStream(tempZip);
-
-                        MemoryStream data = new MemoryStream();
-
-                        var zipq = await Task.Factory.StartNew(() => ZipFile.Read(stream));
-
-                        zipq["manifest.json"].Extract(data);
-                        data.Seek(0, SeekOrigin.Begin);
-                        var parsedManifest = await Task.Run(() => JsonConvert.DeserializeObject<ModpackManifest>(new StreamReader(data).ReadToEnd()));
-
-                        ButtonProgressAssist.SetValue(installBtn, 0);
-                        installBtn.Content = "Computing..";
-
-                        var additionalMods = new List<string>();
-
-                        /*foreach (var z in loc.LatestFiles.FirstOrDefault(s => s.FileName == y.version).Dependencies)
-                        {
-                            Console.WriteLine(z.AddOnId);
-                        }*/
-                        ServicePointManager.DefaultConnectionLimit = 30;
-                        var block = new ActionBlock<Fileino>(async file =>
-                        {
-                            var modurl = await CurseApis.getDownloadURL(file.projectID, file.fileID);
-                            foreach (var mod in modurl)
-                            {
-                                additionalMods.Add(mod);
-                            }
-                        }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 30 });
-
-                        foreach (var file in parsedManifest.files)
-                        {
-                            block.Post(file);
-                        }
-                        block.Complete();
-                        try
-                        {
-                            await block.Completion;
-                        }
-                        catch (TaskCanceledException)
-                        {
-                            return;
-                        }
-                        installBtn.Content = "Install";
-
-                        var install = await DialogHost.Show(new InstallDialog(y.instanceName, parsedManifest.minecraft.version, parsedManifest.minecraft.modLoaders[0].id.Replace("forge-", ""), loc.Name, y.version, additionalMods), "ModpacksDialog");
-                        if (install == "Cancelled")
-                            return;
-                        Stream stream1 = new MemoryStream(tempZip);
-                        string instanceDir = config.M_F_P + "Packs\\" + y.instanceName;
-
-                        using (ZipFile zip = ZipFile.Read(stream1))
-                        {
-                            zip.ExtractAll(instanceDir,
-                                ExtractExistingFileAction.OverwriteSilently);
-                        }
-
-                        await Task.Run(() =>
-                        {
-                            //Now Create all of the directories
-                            foreach (string dirPath in Directory.GetDirectories(
-                                instanceDir + "\\" + parsedManifest.overrides, "*",
-                                SearchOption.AllDirectories))
-                                Directory.CreateDirectory(dirPath.Replace(instanceDir + "\\" + parsedManifest.overrides,
-                                    instanceDir));
-
-                            //Copy all the files & Replaces any files with the same name
-                            foreach (string newPath in Directory.GetFiles(instanceDir + "\\" + parsedManifest.overrides,
-                                "*.*",
-                                SearchOption.AllDirectories))
-                                File.Move(newPath,
-                                    newPath.Replace(instanceDir + "\\" + parsedManifest.overrides, instanceDir));
-
-                            Directory.Delete(instanceDir + "\\" + parsedManifest.overrides, true);
-                        });
                         //use the message queue to send a message.
                         var messageQueue = SnackbarThree.MessageQueue;
-                        var message = "Installed. Enjoy :)";
+                        var message = "Already installing another modpack. Wait for it to finish first";
 
                         //the message queue can be called from any thread
                         Task.Factory.StartNew(() => messageQueue.Enqueue(message));
-
+                        return;
                     }
+
+                    await Task.Run(async () =>
+                    {
+                        Application.Current.Dispatcher.Invoke((Action)async delegate {
+                            isInstalling = true;
+
+                            var webClient = new WebClient();
+
+                            var x = await DialogHost.Show(new ModpackInstallDialog(loc.Id), "ModpacksDialog");
+
+                            if (x == null)
+                                isInstalling = false;
+                            else
+                            {
+                                dynamic y = x;
+                                string instanceDir = config.M_F_P + "Packs\\" + y.instanceName;
+                                string url = "";
+                                foreach (var locx in await CurseApis.getVersions(loc.Id))
+                                {
+                                    if (locx.Name == y.version)
+                                    {
+                                        url = locx.URL;
+                                        break;
+                                    }
+                                }
+                                cToken.Register(async () =>
+                                {
+                                    isInstalling = false;
+                                    ButtonProgressAssist.SetValue(installBtn, 0);
+                                    installBtn.Content = "Install";
+                                    webClient.CancelAsync();
+                                    await Task.Delay(300);
+                                    try
+                                    {
+                                        if (Directory.Exists(instanceDir))
+                                            Directory.Delete(instanceDir, true);
+                                    }catch(Exception) { }
+
+
+                                });
+
+                                installBtn.Content = "Downloading..";
+
+                                webClient.DownloadProgressChanged += (sss, eee) =>
+                                {
+                                    ButtonProgressAssist.SetValue(installBtn, eee.ProgressPercentage);
+                                };
+                                if (!Directory.Exists(instanceDir))
+                                    Directory.CreateDirectory(instanceDir);
+
+                                try
+                                {
+                                    await webClient.DownloadFileTaskAsync(url,
+                                        instanceDir + "\\" + System.IO.Path.GetFileName(url));
+                                }
+                                catch (WebException) { }
+
+                                if (cancelToken.IsCancellationRequested)
+                                    return;
+                                ZipSharp.ExtractZipFile(instanceDir + "\\" + System.IO.Path.GetFileName(url), null, instanceDir);
+
+                                var parsedManifest = JsonConvert.DeserializeObject<ModpackManifest>(File.ReadAllText(instanceDir + "\\manifest.json"));
+
+                                ButtonProgressAssist.SetValue(installBtn, 0);
+                                installBtn.Content = "Computing..";
+                                var additionalMods = new List<string>();
+
+                                ServicePointManager.DefaultConnectionLimit = 30;
+                                var block = new ActionBlock<Fileino>(async file =>
+                                {
+                                    var modurl = await CurseApis.getDownloadURL(file.projectID, file.fileID);
+                                    foreach (var mod in modurl)
+                                    {
+                                        additionalMods.Add(mod);
+                                    }
+                                }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 30 });
+
+                                foreach (var file in parsedManifest.files)
+                                {
+                                    block.Post(file);
+                                }
+                                block.Complete();
+                                try
+                                {
+                                    await block.Completion;
+                                }
+                                catch (TaskCanceledException)
+                                {
+                                    isInstalling = false;
+                                    return;
+                                }
+                                installBtn.Content = "Install";
+                                if(cancelToken.IsCancellationRequested)
+                                    return;
+                                var install = await DialogHost.Show(new InstallDialog(y.instanceName, parsedManifest.minecraft.version, parsedManifest.minecraft.modLoaders[0].id.Replace("forge-", ""), loc.Name, y.version, additionalMods), "ModpacksDialog");
+                                if (install == "Cancelled")
+                                {
+                                    isInstalling = false;
+                                    return;
+                                }
+
+
+                                //Now Create all of the directories
+                                foreach (string dirPath in Directory.GetDirectories(
+                                    instanceDir + "\\" + parsedManifest.overrides, "*",
+                                    SearchOption.AllDirectories))
+                                    Directory.CreateDirectory(dirPath.Replace(instanceDir + "\\" + parsedManifest.overrides,
+                                        instanceDir));
+
+                                //Copy all the files & Replaces any files with the same name
+                                foreach (string newPath in Directory.GetFiles(instanceDir + "\\" + parsedManifest.overrides,
+                                    "*.*",
+                                    SearchOption.AllDirectories))
+                                    File.Move(newPath,
+                                        newPath.Replace(instanceDir + "\\" + parsedManifest.overrides, instanceDir));
+
+                                Directory.Delete(instanceDir + "\\" + parsedManifest.overrides, true);
+                                File.Delete(instanceDir + "\\" + System.IO.Path.GetFileName(url));
+                                //use the message queue to send a message.
+                                var messageQueue = SnackbarThree.MessageQueue;
+                                var message = "Installed. Enjoy :)";
+
+                                //the message queue can be called from any thread
+                                Task.Factory.StartNew(() => messageQueue.Enqueue(message));
+                                isInstalling = false;
+
+                            }
+
+                        }, DispatcherPriority.Normal, cToken);
+                    }, cToken);
                 };
                 var contentStackPanel = new StackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Width = 370,
+                    Width = Window1.singleton.Width - 200,
                     Children =
                     {
                         new Label
@@ -506,6 +552,57 @@ namespace GDLauncher.Dialogs
                 {
                     Orientation = Orientation.Horizontal
                 };
+
+                if (Settings.Default.graphicsPerformance != "Flat")
+                {
+                    if (Settings.Default.graphicsPerformance == "GorillaDevs's Style")
+                    {
+                        ShadowAssist.SetShadowDepth(card, ShadowDepth.Depth0);
+                        ShadowAssist.SetShadowDepth(installBtn, ShadowDepth.Depth0);
+                    }
+
+                    card.MouseEnter += (ss, ee) =>
+                    {
+                        var da = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1.5,
+                            Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                        };
+                        var da1 = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 8,
+                            Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                        };
+                        card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                        card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+                    };
+
+                    card.MouseLeave += (ss, ee) =>
+                    {
+                        var da = new DoubleAnimation
+                        {
+                            From = 1.5,
+                            To = 0,
+                            Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                        };
+                        var da1 = new DoubleAnimation
+                        {
+                            From = 8,
+                            To = 0,
+                            Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                        };
+                        card.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                        card.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+                    };
+                }
+                else
+                {
+                    ShadowAssist.SetShadowDepth(card, ShadowDepth.Depth0);
+                    ShadowAssist.SetShadowDepth(installBtn, ShadowDepth.Depth0);
+                }
+
                 mainStackPanel.Children.Add(leftStackPanel);
                 mainStackPanel.Children.Add(contentStackPanel);
                 card.Content = mainStackPanel;
@@ -540,6 +637,26 @@ namespace GDLauncher.Dialogs
                 _packs.Clear();
                 addPacks(0, search.Text);
             }
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (isInstalling)
+            {
+                back.Content = "Cancelling...";
+                await Task.Delay(200);
+                if (!cancelToken.IsCancellationRequested)
+                    cancelToken.Token.ThrowIfCancellationRequested();
+                cancelToken.Cancel(true);
+                cancelToken.Dispose();
+            }
+            DialogHost.CloseDialogCommand.Execute(this, this);
+
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            search.Text = "";
         }
     }
 }

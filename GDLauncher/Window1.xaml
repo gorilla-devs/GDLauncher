@@ -10,33 +10,10 @@ Sample license text.
         xmlns:local="clr-namespace:GDLauncher"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         mc:Ignorable="d"
-        Title="GDLauncher" MinHeight="700" MinWidth="600" Width="600" Height="700" WindowStyle="None" ResizeMode="CanMinimize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="GDLauncher" Width="600" Height="700" WindowStyle="None" ResizeMode="CanMinimize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <materialDesign:DialogHost Identifier="RootDialog" CloseOnClickAway="{Binding Path=DialogContent.(local:DialogHostExtensions.CloseOnClickAway), RelativeSource={RelativeSource Self}, FallbackValue=True}">
-        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
-            <materialDesign:DrawerHost.LeftDrawerContent >
-                <StackPanel Orientation="Vertical">
-                    <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
-                                  HorizontalAlignment="Right" Margin="16"
-                                  IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
-                    <ListBox x:Name="NavigationMenu" Margin="0 16 0 16" PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp" Width="150">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="Page">
-                                <TextBlock Text="{Binding Name}" Margin="32 0 32 0"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBoxItem Name="Home" Content="Home"></ListBoxItem>
-                        <ListBoxItem Name="Options" Content="Options"></ListBoxItem>
-                        <ListBoxItem Name="Modpacks" Content="Modpacks Market"></ListBoxItem>
-                        <ListBoxItem Name="installedModpacks" Content="Installed Modpacks"></ListBoxItem>
-                        <ListBoxItem Name="Commands" Content="Commands"></ListBoxItem>
-                        <ListBoxItem Name="Debug" Content="Debug"></ListBoxItem>
-                        <ListBoxItem Name="ContactMe" Content="Report a bug"></ListBoxItem>
-                    </ListBox>
-                    <Image VerticalAlignment="Bottom" Margin="0 340 0 16" Stretch="Fill" Width="146" Height="38"/>
-                </StackPanel>
-            </materialDesign:DrawerHost.LeftDrawerContent>
             <DockPanel Name="maincontent">
-                <materialDesign:ColorZone Name="header" Padding="16"
+                <materialDesign:ColorZone Name="header" Padding="13"
                                           Background="#1A5363" DockPanel.Dock="Top" BorderBrush="#1A5363" MouseDown="ColorZone_MouseDown">
                     <DockPanel>
                         <Button Foreground="White" Background="#1A5363" Width="48" BorderBrush="#1A5363" DockPanel.Dock="Right" Click="Button_Click_1" Margin="15,0,0,0" materialDesign:ShadowAssist.ShadowDepth="Depth1">
@@ -66,8 +43,6 @@ Sample license text.
                 </materialDesign:ColorZone>
                 <Frame Name="MainPage" NavigationUIVisibility="Hidden" BorderThickness="2 0 2 2" BorderBrush="#1A5363"></Frame>
             </DockPanel>
-
-        </materialDesign:DrawerHost>
     </materialDesign:DialogHost>
 
 </Window>

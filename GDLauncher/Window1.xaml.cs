@@ -155,7 +155,8 @@ namespace GDLauncher
 
         private void consoleBtn_Click(object sender, RoutedEventArgs e)
         {
-            debugconsole.Show();
+            //debugconsole.Show();
+            new Windows.Splashscreen().Show();
 
         }
 

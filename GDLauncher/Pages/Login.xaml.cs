@@ -5,6 +5,8 @@
 
 /*Pagina di login*/
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,13 +15,15 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using GDLauncher.Properties;
+using MaterialDesignThemes.Wpf;
 
 namespace GDLauncher.Pages
 {
     /// <summary>
     /// Logica di interazione per Login.xaml
     /// </summary>
-    public partial class Login : Page
+    public partial class Login
     {
         public string Error = "";
         public Login(string error = "")
@@ -29,9 +33,80 @@ namespace GDLauncher.Pages
             transition.SelectedIndex = 0;
             //language.Text = Thread.CurrentThread.CurrentUICulture.Name;
             this.Error = error;
+
+            if (Settings.Default.graphicsPerformance == "Material Design")
+                loginTransitioner.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffffff");
+            else
+                loginTransitioner.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#eeeeee");
+
+            mainCard.Effect = Settings.Default.graphicsPerformance == "Flat"
+                ? new DropShadowEffect
+                {
+                    BlurRadius = 0,
+                    ShadowDepth = 0,
+                    Direction = 0,
+                    Opacity = 0,
+                    RenderingBias = RenderingBias.Performance,
+                }
+                : new DropShadowEffect
+                {
+                    BlurRadius = 0,
+                    ShadowDepth = 0,
+                    Direction = 270,
+                    Opacity = .42,
+                    RenderingBias = RenderingBias.Performance,
+                };
+
+
+            if (Settings.Default.graphicsPerformance == "Flat")
+                ShadowAssist.SetShadowDepth(mainCard, ShadowDepth.Depth0);
+            else
+            {
+                if (Settings.Default.graphicsPerformance == "GorillaDevs's Style")
+                    ShadowAssist.SetShadowDepth(mainCard, ShadowDepth.Depth0);
+                else
+                    ShadowAssist.SetShadowDepth(mainCard, ShadowDepth.Depth1);
+                mainCard.MouseEnter += (ss, ee) =>
+                {
+                    var da = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1.5,
+                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    };
+                    var da1 = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 8,
+                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    };
+                    mainCard.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                    mainCard.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+
+
+                };
+
+                mainCard.MouseLeave += (ss, ee) =>
+                {
+                    var da = new DoubleAnimation
+                    {
+                        From = 1.5,
+                        To = 0,
+                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    };
+                    var da1 = new DoubleAnimation
+                    {
+                        From = 8,
+                        To = 0,
+                        Duration = new Duration(TimeSpan.FromSeconds(0.125))
+                    };
+                    mainCard.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
+                    mainCard.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
+
+                };
+            }
         }
 
-        
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key.Equals(Key.Return))
@@ -49,53 +124,6 @@ namespace GDLauncher.Pages
             premiumError.Content = Error;
             premiumUsername.Focus();
 
-            mainCard.Effect = new DropShadowEffect
-            {
-                BlurRadius = 0,
-                ShadowDepth = 0,
-                Direction = 270,
-                Opacity = .42,
-                RenderingBias = RenderingBias.Performance,
-            };
-
-            mainCard.MouseEnter += (ss, ee) =>
-            {
-                var da = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1.5,
-                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                };
-                var da1 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 8,
-                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                };
-                mainCard.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
-                mainCard.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
-
-
-            };
-
-            mainCard.MouseLeave += (ss, ee) =>
-            {
-                var da = new DoubleAnimation
-                {
-                    From = 1.5,
-                    To = 0,
-                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                };
-                var da1 = new DoubleAnimation
-                {
-                    From = 8,
-                    To = 0,
-                    Duration = new Duration(TimeSpan.FromSeconds(0.125))
-                };
-                mainCard.Effect.BeginAnimation(DropShadowEffect.ShadowDepthProperty, da);
-                mainCard.Effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, da1);
-
-            };
         }
 
         private async void TextBlock_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

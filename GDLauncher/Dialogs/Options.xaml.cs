@@ -1,8 +1,10 @@
 ﻿using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,28 +13,59 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GDLauncher;
+using GDLauncher.Pages;
+using GDLauncher.Properties;
 
 namespace GDLauncher.Dialogs
 {
     /// <summary>
     /// Logica di interazione per Options.xaml
     /// </summary>
-    public partial class Options : UserControl
+    public partial class Options : INotifyPropertyChanged
     {
+        private ShadowDepth _cardShadowDepth;
+        public ShadowDepth CardShadowDepth
+        {
+            get => _cardShadowDepth;
+            set
+            {
+                _cardShadowDepth = value;
+                OnPropertyChanged("CardShadowDepth");
+            }
+        }
+
+
         public Options()
         {
             InitializeComponent();
+            DataContext = this;
             DialogHostExtensions.SetCloseOnClickAway(this, true);
+            if (Settings.Default.graphicsPerformance == "Material Design")
+                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffffff");
+            else
+                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#eeeeee");
 
+            if (Settings.Default.graphicsPerformance == "Flat" ||
+                Settings.Default.graphicsPerformance == "GorillaDevs's Style")
+                CardShadowDepth = ShadowDepth.Depth0;
+            else
+                CardShadowDepth = ShadowDepth.Depth1;
+        }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void closeDialog_Click(object sender, RoutedEventArgs e)
         {
-            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(this, this);
+            DialogHost.CloseDialogCommand.Execute(this, this);
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -59,30 +92,28 @@ namespace GDLauncher.Dialogs
             }
 
             windowSizes.Items.Add("600x700");
-            windowSizes.Items.Add("1000x750");
+            windowSizes.Items.Add("1000x700");
 
             instancesFont.Items.Add("Roboto");
-            instancesFont.Items.Add("Roboto Light");
             instancesFont.Items.Add("Roboto Thin");
-            instancesFont.Items.Add("Roboto Black");
             instancesFont.Items.Add("Roboto Bold");
-            instancesFont.Items.Add("Roboto Medium");
             instancesFont.Items.Add("Minecrafter");
             instancesFont.Items.Add("Minecrafter Alt");
 
 
-            graphicsPerformance.Items.Add("High");
-            graphicsPerformance.Items.Add("Low");
+            graphicsPerformance.Items.Add("Flat");
+            graphicsPerformance.Items.Add("Material Design");
+            graphicsPerformance.Items.Add("GorillaDevs's Style");
 
 
 
-            windowSizes.SelectedValue = Properties.Settings.Default["windowSize"];
-            instancesFont.SelectedValue = Properties.Settings.Default["instancesFont"];
+            windowSizes.SelectedValue = Settings.Default["windowSize"];
+            instancesFont.SelectedValue = Settings.Default["instancesFont"];
 
-            downloadThreads.SelectedValue = Properties.Settings.Default["download_threads"];
-            ram.SelectedValue = Properties.Settings.Default["RAM"];
+            downloadThreads.SelectedValue = Settings.Default["download_threads"];
+            ram.SelectedValue = Settings.Default["RAM"];
             JavaPath.Text = ShortenPath(Classes.ComputerInfoDetect.GetJavaInstallationPath(), 60);
-            graphicsPerformance.SelectedItem = Properties.Settings.Default.graphicsPerformance;
+            graphicsPerformance.SelectedItem = Settings.Default.graphicsPerformance;
             downloadThreads.SelectionChanged += downloadThreads_SelectionChanged;
             ram.SelectionChanged += ram_SelectionChanged;
             windowSizes.SelectionChanged += windowSizes_SelectionChanged;
@@ -109,6 +140,17 @@ namespace GDLauncher.Dialogs
         {
             Properties.Settings.Default.graphicsPerformance = graphicsPerformance.SelectedValue.ToString();
             Properties.Settings.Default.Save();
+            if (Settings.Default.graphicsPerformance == "Material Design")
+                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffffff");
+            else
+                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#eeeeee");
+
+            if (Settings.Default.graphicsPerformance == "Flat" ||
+                Settings.Default.graphicsPerformance == "GorillaDevs's Style")
+                CardShadowDepth = ShadowDepth.Depth0;
+            else
+                CardShadowDepth = ShadowDepth.Depth1;
+            Home.singleton.ModpacksUpdate();
             saved("Saved");
         }
 

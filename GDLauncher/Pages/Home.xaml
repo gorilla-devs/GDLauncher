@@ -11,7 +11,7 @@ Sample license text.
       mc:Ignorable="d" 
       FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
       d:DesignHeight="625" d:DesignWidth="694" WindowHeight="625" WindowWidth="694"
-      Title="Home" ShowsNavigationUI="False" Background="White" Loaded="Page_Loaded">
+      Title="Home" ShowsNavigationUI="False" Loaded="Page_Loaded">
 
     <Grid>
         <ScrollViewer Width="674" Margin="10,0,10,192" Visibility="Hidden">
@@ -21,11 +21,23 @@ Sample license text.
             <materialDesign:TransitionerSlide Background="#4CAF50">
                 <TextBlock FontSize="20" HorizontalAlignment="Center" Foreground="White" VerticalAlignment="Center">Loading</TextBlock>
             </materialDesign:TransitionerSlide>
-            <materialDesign:TransitionerSlide Background="White" OpeningEffect="{materialDesign:TransitionEffect Kind=FadeIn}">
+            <materialDesign:TransitionerSlide Name="homeTransitioner" Background="#ffffff" OpeningEffect="{materialDesign:TransitionEffect Kind=FadeIn}">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
-                    <Image Name="mainLogo" Source="/Images/homeLogo.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Height="170" Margin="0 40 0 0">
-                    </Image>
+                    <StackPanel Orientation="Horizontal"  Height="170" Margin="0 40 0 0" HorizontalAlignment="Center">
+                        <Grid>
+                            <Image Name="mainLogo" ToolTip="Tip of the day" Source="/Images/homeLogo.png" RenderOptions.BitmapScalingMode="HighQuality" UseLayoutRounding="True" RenderOptions.EdgeMode="Aliased" Margin="0 0 0 0"></Image>
+                            <materialDesign:Card Name="tipCard" Width="0" Height="0" VerticalAlignment="Center">
+                                <DockPanel Name="tipContent" Opacity="0">
+                                    <StackPanel DockPanel.Dock="Top" Name="tipCardContent">
+                                        <TextBlock HorizontalAlignment="Center" FontWeight="Bold" Margin="0 30 0 20">Tip of the day</TextBlock>
+                                        <TextBlock Name="tip" Width="300" HorizontalAlignment="Center" TextWrapping="Wrap" FontSize="20"></TextBlock>
+                                    </StackPanel>
+                                    <Label FontSize="10" HorizontalAlignment="Right" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Margin="0 0 10 20">(Click to dismiss)</Label>
+                                </DockPanel>
+                            </materialDesign:Card>
+                        </Grid>
+                    </StackPanel>
                     <Button Name="server" Margin="0 10 0 0" Width="170" Height="50" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="server_Click" Style="{StaticResource MaterialDesignFlatButton}">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Server" VerticalAlignment="Center"></materialDesign:PackIcon>
@@ -34,7 +46,8 @@ Sample license text.
                     </Button>
                     <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 15" >
                         <ScrollViewer PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto">
-                            <StackPanel Margin="15 15 0 0" Orientation="Horizontal" Name="modpacksListContainer">
+                            <StackPanel Margin="15 15 0 0" Height="300" Orientation="Horizontal" Name="modpacksListContainer">
+                                <ProgressBar VerticalAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Center" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
                             </StackPanel>
                         </ScrollViewer>
                     </WrapPanel>

@@ -5,7 +5,8 @@ Sample license text.
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:GDLauncher"
-             StartupUri="Window1.xaml" Startup="App_Startup">
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             StartupUri="Windows/Splashscreen.xaml" Startup="App_Startup">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -21,7 +22,14 @@ Sample license text.
             <SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1B7C42"/>
             <SolidColorBrush x:Key="PrimaryHueDarkForegroundBrush" Color="#ffffff"/>
             
-            
+            <!--Flat-->
+
+            <!--Material Design-->
+
+
+            <!--GorillaDevs's Style-->
+
+
             <!--
             PRIMARY-> #1A5363
             GREEN  -> #00A843

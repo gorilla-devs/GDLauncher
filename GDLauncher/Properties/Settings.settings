@@ -51,16 +51,16 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="windowSize" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
-      <Value Profile="(Default)">600x700</Value>
+      <Value Profile="(Default)">1000x700</Value>
     </Setting>
     <Setting Name="instancesFont" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Roboto Light</Value>
+      <Value Profile="(Default)">Minecrafter</Value>
     </Setting>
     <Setting Name="curseJSONLastUpdated" Provider="crdx.Settings.PortableSettingsProvider" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)">1970-01-01</Value>
     </Setting>
     <Setting Name="graphicsPerformance" Provider="crdx.Settings.PortableSettingsProvider" Type="System.String" Scope="User">
-      <Value Profile="(Default)">High</Value>
+      <Value Profile="(Default)">GorillaDevs's Style</Value>
     </Setting>
   </Settings>
 </SettingsFile>

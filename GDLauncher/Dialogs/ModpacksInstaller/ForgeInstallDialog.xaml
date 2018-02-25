@@ -33,10 +33,10 @@
                 <ComboBox Name="forgeVersions" Width="200" Visibility="Visible" HorizontalAlignment="Right" SelectedIndex="0"/>
             </DockPanel>
             <DockPanel HorizontalAlignment="Center" Margin="0 20 0 0">
-                <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
-                <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="35 0 0 0" IsEnabled="False" Click="install_Click">Install</Button>
+                <Button Style="{StaticResource MaterialDesignFlatButton}" Width="120" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
+                <ProgressBar Name="loading" Style="{StaticResource MaterialDesignCircularProgressBar}" Width="30" Height="30" IsIndeterminate="True"></ProgressBar>
+                <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="120" Margin="0 0 0 0" IsEnabled="False" Click="install_Click">Install</Button>
             </DockPanel>
-            <ProgressBar Name="loading" Background="#4CAF50" Width="400" Margin="0 10 0 0" IsIndeterminate="True" Visibility="Hidden"></ProgressBar>
 
         </StackPanel>
     </Grid>

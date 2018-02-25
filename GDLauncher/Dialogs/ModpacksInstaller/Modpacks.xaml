@@ -25,8 +25,8 @@
                                 <TextBox Name="search" Grid.Column="1" Margin="8 0 0 0" materialDesign:HintAssist.Hint="Search Modpacks" 
                                      materialDesign:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0"
                                      MinWidth="200" VerticalAlignment="Center" TextChanged="TextBox_TextChanged"/>
-                            <Button Style="{DynamicResource MaterialDesignToolButton}" Grid.Column="2">
-                                <materialDesign:PackIcon Kind="Send" Opacity=".56" Margin="8 0 0 0" />
+                            <Button Style="{DynamicResource MaterialDesignToolButton}" Grid.Column="2" Click="Button_Click_1">
+                                <materialDesign:PackIcon Kind="Close" Opacity=".56" Margin="8 0 0 0" />
                             </Button>
                         </Grid>
                     </materialDesign:ColorZone>
@@ -35,14 +35,14 @@
             </materialDesign:ColorZone>
             <ScrollViewer Name="sv" Height="510" >
                 <StackPanel>
-                    <StackPanel Name="defaultStackPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 20 0 0">
+                    <StackPanel Name="defaultStackPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 30 0 0">
                     </StackPanel>
                     <ProgressBar Name="loading" HorizontalAlignment="Center" Margin="0 160 0 0" IsIndeterminate="True" Style="{StaticResource MaterialDesignCircularProgressBar}"></ProgressBar>
                     <ItemsControl Margin="20" ItemsSource="{Binding _packs}" VirtualizingStackPanel.IsVirtualizing="True">
                     </ItemsControl>
                 </StackPanel>
             </ScrollViewer>
-            <Button Style="{StaticResource MaterialDesignFlatButton}" Command="materialDesign:DialogHost.CloseDialogCommand" HorizontalAlignment="Left" Margin="10,620,0,10" Width="100" Height="50" Content="Back"/>
+            <Button Name="back" Style="{StaticResource MaterialDesignFlatButton}" HorizontalAlignment="Left" Margin="10,610,0,10" Width="100" Height="50" Content="Back" Click="Button_Click"/>
             <materialDesign:Snackbar MessageQueue="{materialDesign:MessageQueue}" VerticalAlignment="Bottom" HorizontalAlignment="Center" x:Name="SnackbarThree" />
 
         </Grid>

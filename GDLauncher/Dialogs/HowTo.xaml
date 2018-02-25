@@ -8,27 +8,25 @@ Sample license text.
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:GDLauncher.Dialogs"
-      mc:Ignorable="d" Height="600" Width="500" Background="White">
+      mc:Ignorable="d" Height="620" Width="800" Background="White">
 
     <Grid>
         <StackPanel>
-            <StackPanel>
+            <StackPanel Margin="0 20 0 0">
                 <Label x:Name="label" Content="Welcome to GDLauncher" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="30"/>
-                <materialDesign:Card Padding="10" Margin="10">
+                <materialDesign:Card Padding="10" MouseEnter="card_onMouseEnter" MouseLeave="card_onMouseLeave" Effect="{Binding CardEffect}" Margin="10" materialDesign:ShadowAssist.ShadowDepth="{Binding ShadowDepth}">
                     <TextBlock x:Name="textBlock" Padding="10" HorizontalAlignment="Left" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Top">
                         GDLauncher is a custom Minecraft Launcher developed from the ground up with the idea of being simpler and more functional than the official one.
                     </TextBlock>
                 </materialDesign:Card>
             </StackPanel>
             <StackPanel>
-                <materialDesign:Card Padding="10" Margin="10 0 10 10">
+                <materialDesign:Card Padding="10" MouseEnter="card_onMouseEnter" MouseLeave="card_onMouseLeave" Effect="{Binding CardEffect}" Margin="10 0 10 10" materialDesign:ShadowAssist.ShadowDepth="{Binding ShadowDepth}">
                     <TextBlock x:Name="textBlock1" Padding="10" HorizontalAlignment="Left" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Top">
-                        Before diving directly into the launcher itself, we need some infos from you. Please tell us how much memory you want Minecraft to use.
+                        How much RAM memory would you like the Minecraft to use?
                         <LineBreak/>
-                        Keep in mind how much free memory you have
-                        <LineBreak/>
-                        <Label>Ram free right now: </Label><Label Name="freeram">Calcolo...</Label>
-                        <Label Name="errorlowram" FontSize="12" Foreground="Red" Visibility="Hidden">Warning! Low available ram</Label>
+                        <Label>Free RAM right now: </Label><Label Name="freeram">Computing...</Label>
+                        <Label Name="errorlowram" FontSize="12" Foreground="Red" Visibility="Hidden">Warning! Low RAM available</Label>
                         <LineBreak/>
                         <ComboBox x:Name="ram" Width="100" SelectedIndex="2">
                             <ComboBoxItem>1</ComboBoxItem>
@@ -42,8 +40,61 @@ Sample license text.
                         </ComboBox> GB
                     </TextBlock>
                 </materialDesign:Card>
+                <materialDesign:Card Padding="10" MouseEnter="card_onMouseEnter" MouseLeave="card_onMouseLeave" Effect="{Binding CardEffect}" Margin="10 0 10 0" materialDesign:ShadowAssist.ShadowDepth="{Binding ShadowDepth}">
+                    <StackPanel>
+                        <TextBlock TextWrapping="Wrap">
+                            Choose your favourite style. Remember you can change this anytime from the settings.
+                        </TextBlock>
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="10">
+                                <CheckBox Name="gorilladevs" IsChecked="True" HorizontalAlignment="Center" Margin="0 5 0 5"  Click="chk_Click">GorillaDevs's Style</CheckBox>
+                                <StackPanel Orientation="Horizontal" MouseLeftButtonDown="gorilladevs_OnMouseLeftButtonDown">
+                                    <StackPanel>
+                                        <Image Width="110" Source="../Images/howTo/flat.png"></Image>
+                                        <Label HorizontalAlignment="Center" FontSize="10">Normal</Label>
+                                    </StackPanel>
+                                    <StackPanel>
+                                    <Image Width="110" Source="../Images/howTo/md_hover.png"></Image>
+                                        <Label HorizontalAlignment="Center" FontSize="10">Hover Effect</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="10">
+                                <CheckBox Name="md" HorizontalAlignment="Center"  Margin="0 5 0 5" Click="chk_Click">Material Design</CheckBox>
+                                <StackPanel Orientation="Horizontal" MouseLeftButtonDown="md_OnMouseLeftButtonDown">
+                                    <StackPanel>
+                                        <Image Width="110" Source="../Images/howTo/md.png"></Image>
+                                        <Label HorizontalAlignment="Center" FontSize="10">Normal</Label>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <Image Width="110" Source="../Images/howTo/md_hover.png"></Image>
+                                        <Label HorizontalAlignment="Center" FontSize="10">Hover Effect</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Margin="10">
+                                <CheckBox Name="flat" HorizontalAlignment="Center" Margin="0 5 0 5" Click="chk_Click">Flat</CheckBox>
+                                <StackPanel Orientation="Horizontal" MouseLeftButtonDown="flat_OnMouseLeftButtonDown">
+                                    <StackPanel>
+                                        <Image Width="110" Source="../Images/howTo/flat.png"></Image>
+                                        <Label HorizontalAlignment="Center" FontSize="10">Normal</Label>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <Image Width="110" Source="../Images/howTo/flat_hover.png"></Image>
+                                        <Label HorizontalAlignment="Center" FontSize="10">Hover Effect</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </materialDesign:Card>
             </StackPanel>
-            <Button x:Name="button" HorizontalAlignment="Right" Margin="0 180 20 0" Content="Confirm" materialDesign:ShadowAssist.ShadowDepth="Depth2" Width="120" Click="button_Click" Style="{StaticResource MaterialDesignFlatButton}"/>
+            <Button x:Name="button" HorizontalAlignment="Right" Margin="0 10 20 0" Height="50" Content="Confirm" materialDesign:ShadowAssist.ShadowDepth="Depth2" Width="120" Click="button_Click" Style="{StaticResource MaterialDesignFlatButton}"/>
         </StackPanel>
     </Grid>
 </UserControl>

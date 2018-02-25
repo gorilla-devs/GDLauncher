@@ -23,6 +23,7 @@ namespace GDLauncher
     public partial class App : Application
     {
         //private static readonly System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
+        [STAThread]
         void App_Startup(object sender, StartupEventArgs e)
         {
             if (System.Diagnostics.Debugger.IsAttached)
@@ -55,6 +56,8 @@ namespace GDLauncher
                 GDLauncher.Properties.Settings.Default.clientToken = Guid.NewGuid().ToString();
                 GDLauncher.Properties.Settings.Default.Save();
             }
+            
+
 
         }
 

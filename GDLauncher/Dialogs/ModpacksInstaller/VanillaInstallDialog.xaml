@@ -26,8 +26,9 @@
                     <ComboBox Name="versionsList" Margin="0 0 -5 0" Width="200" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="versionsList_SelectionChanged"/>
                 </DockPanel>
                 <DockPanel HorizontalAlignment="Center" Margin="0 20 0 0">
-                    <Button Style="{StaticResource MaterialDesignFlatButton}" Width="150" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
-                    <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="150" Margin="35 0 0 0" IsEnabled="False" Click="install_Click">Install</Button>
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" Width="120" Command="materialDesign:DialogHost.CloseDialogCommand">Back</Button>
+                    <ProgressBar Name="loading" Style="{StaticResource MaterialDesignCircularProgressBar}" Width="30" Height="30" IsIndeterminate="True"></ProgressBar>
+                    <Button Name="install" Style="{StaticResource MaterialDesignFlatButton}" Width="120" Margin="0 0 0 0" IsEnabled="False" Click="install_Click">Install</Button>
                 </DockPanel>
         </StackPanel>
     </Grid>

@@ -117,8 +117,8 @@
     <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack.1.1.0\lib\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -140,6 +140,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WpfAnimatedGif, Version=1.4.15.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.1.4.15\lib\net\WpfAnimatedGif.dll</HintPath>
+    </Reference>
     <Reference Include="WPFFolderBrowser, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WPFFolderBrowser.1.0.2\lib\WPFFolderBrowser.dll</HintPath>
       <Private>True</Private>
@@ -172,6 +175,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Assets\Tips.cs" />
     <Compile Include="Classes\AutoUpdater.cs" />
     <Compile Include="Classes\ComputerInfoDetect.cs" />
     <Compile Include="Classes\ConfigProvider.cs" />
@@ -181,11 +185,13 @@
     <Compile Include="Classes\JSON.cs" />
     <Compile Include="Classes\MinecraftStarter.cs" />
     <Compile Include="Classes\MojangAPIs.cs" />
+    <Compile Include="Classes\StartSTATasks.cs" />
     <Compile Include="Models\CombItem.cs" />
     <Compile Include="Models\ModpackVersions.cs" />
     <Compile Include="Models\NotEmptyValidationRule.cs" />
     <Compile Include="Models\NotifyPropertyChangedExtension.cs" />
     <Compile Include="Models\StructJson.cs" />
+    <Compile Include="Models\TriggeredQueue.cs" />
     <Compile Include="ViewModels\TextFieldsViewModel.cs" />
     <Compile Include="Classes\ZipSharp.cs" />
     <Compile Include="config.cs" />
@@ -193,7 +199,7 @@
     <Compile Include="Dialogs\Changelog.xaml.cs">
       <DependentUpon>Changelog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DuplicateInstance.xaml.cs">
+    <Compile Include="Dialogs\Instances\DuplicateInstance.xaml.cs">
       <DependentUpon>DuplicateInstance.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Eula.xaml.cs">
@@ -211,32 +217,26 @@
     <Compile Include="Dialogs\InstallModpack.xaml.cs">
       <DependentUpon>InstallModpack.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ManagePack.xaml.cs">
+    <Compile Include="Dialogs\Instances\ManagePack.xaml.cs">
       <DependentUpon>ManagePack.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ModpacksInstaller\ModpackInstallDialog.xaml.cs">
       <DependentUpon>ModpackInstallDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Modpacks.xaml.cs">
+    <Compile Include="Dialogs\ModpacksInstaller\Modpacks.xaml.cs">
       <DependentUpon>Modpacks.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\PostLogin.xaml.cs">
-      <DependentUpon>PostLogin.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\RenameInstance.xaml.cs">
+    <Compile Include="Dialogs\Instances\RenameInstance.xaml.cs">
       <DependentUpon>RenameInstance.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ServerList.xaml.cs">
+    <Compile Include="Dialogs\Server\ServerList.xaml.cs">
       <DependentUpon>ServerList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ModpackLoading.xaml.cs">
+    <Compile Include="Dialogs\Instances\ModpackLoading.xaml.cs">
       <DependentUpon>ModpackLoading.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Options.xaml.cs">
       <DependentUpon>Options.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\OptionsUpdates.xaml.cs">
-      <DependentUpon>OptionsUpdates.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Server\AddNewServer.xaml.cs">
       <DependentUpon>AddNewServer.xaml</DependentUpon>
@@ -312,6 +312,9 @@
     <Compile Include="Windows\ServerManager.xaml.cs">
       <DependentUpon>ServerManager.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\Splashscreen.xaml.cs">
+      <DependentUpon>Splashscreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\WebBrowser.xaml.cs">
       <DependentUpon>WebBrowser.xaml</DependentUpon>
     </Compile>
@@ -319,7 +322,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\DuplicateInstance.xaml">
+    <Page Include="Dialogs\Instances\DuplicateInstance.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -343,7 +346,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ManagePack.xaml">
+    <Page Include="Dialogs\Instances\ManagePack.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -351,31 +354,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\Modpacks.xaml">
+    <Page Include="Dialogs\ModpacksInstaller\Modpacks.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\PostLogin.xaml">
+    <Page Include="Dialogs\Instances\RenameInstance.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\RenameInstance.xaml">
+    <Page Include="Dialogs\Server\ServerList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\ServerList.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\ModpackLoading.xaml">
+    <Page Include="Dialogs\Instances\ModpackLoading.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Options.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\OptionsUpdates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -463,6 +458,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\Splashscreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\WebBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -496,10 +495,7 @@
     </EmbeddedResource>
     <Resource Include="Assets\Minecrafter.Alt.ttf" />
     <Resource Include="Assets\Minecrafter.Reg.ttf" />
-    <Resource Include="Assets\Roboto-Black.ttf" />
     <Resource Include="Assets\Roboto-Bold.ttf" />
-    <Resource Include="Assets\Roboto-Light.ttf" />
-    <Resource Include="Assets\Roboto-Medium.ttf" />
     <Resource Include="Assets\Roboto-Regular.ttf" />
     <Resource Include="Assets\Roboto-Thin.ttf" />
     <None Include="packages.config">
@@ -551,17 +547,27 @@
   <ItemGroup>
     <Resource Include="Images\discord.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\howTo\flat.png" />
+    <Resource Include="Images\howTo\flat_hover.png" />
+    <Resource Include="Images\howTo\md_hover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\howTo\md.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\spinner.gif" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\Fody.2.3.22\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.3.22\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Fody.2.4.1\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.4.1\build\Fody.targets'))" />
   </Target>
   <Import Project="..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" />
-  <Import Project="..\packages\Fody.2.3.22\build\Fody.targets" Condition="Exists('..\packages\Fody.2.3.22\build\Fody.targets')" />
+  <Import Project="..\packages\Fody.2.4.1\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.1\build\Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -29,6 +29,8 @@ namespace GDLauncher.Dialogs
         {
             InitializeComponent();
             DialogHostExtensions.SetCloseOnClickAway(this, true);
+            instanceTextName.Text = "";
+
         }
 
         public async Task LoadPackData()
@@ -86,6 +88,7 @@ namespace GDLauncher.Dialogs
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             await LoadPackData();
+            loading.Visibility = Visibility.Hidden;
         }
     }
 }

@@ -226,7 +226,7 @@ namespace GDLauncher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("600x700")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000x700")]
         public string windowSize {
             get {
                 return ((string)(this["windowSize"]));
@@ -239,7 +239,7 @@ namespace GDLauncher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Roboto Light")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Minecrafter")]
         public string instancesFont {
             get {
                 return ((string)(this["instancesFont"]));
@@ -265,7 +265,7 @@ namespace GDLauncher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(crdx.Settings.PortableSettingsProvider))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("High")]
+        [global::System.Configuration.DefaultSettingValueAttribute("GorillaDevs\'s Style")]
         public string graphicsPerformance {
             get {
                 return ((string)(this["graphicsPerformance"]));

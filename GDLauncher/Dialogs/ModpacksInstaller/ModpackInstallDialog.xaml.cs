@@ -28,6 +28,9 @@ namespace GDLauncher.Dialogs
         {
             InitializeComponent();
             projectId = ProjectId;
+            DialogHostExtensions.SetCloseOnClickAway(this, true);
+            instanceTextName.Text = "";
+
         }
 
         private void install_Click(object sender, RoutedEventArgs e)
@@ -63,6 +66,8 @@ namespace GDLauncher.Dialogs
                     Text = act.Name.Replace(".zip", "")
                 });
             }
+
+            loading.Visibility = Visibility.Hidden;
         }
     }
 }

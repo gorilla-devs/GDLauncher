@@ -9,7 +9,7 @@ Sample license text.
             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:GDLauncher.Pages"
-      mc:Ignorable="d" Background="White"
+      mc:Ignorable="d"
       Title="Login" KeyDown="Page_KeyDown" Loaded="Page_Loaded">
 
     <Grid>
@@ -19,7 +19,7 @@ Sample license text.
             <materialDesign:TransitionerSlide Background="White">
 
             </materialDesign:TransitionerSlide>
-            <materialDesign:TransitionerSlide Background="White" OpeningEffect="{materialDesign:TransitionEffect Kind=SlideInFromTop}">
+            <materialDesign:TransitionerSlide Name="loginTransitioner" OpeningEffect="{materialDesign:TransitionEffect Kind=SlideInFromTop}">
                 <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
                     <materialDesign:Card Name="SmallCard" Margin="0 0 0 0" Panel.ZIndex="10000" UniformCornerRadius="90"  Width="100" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                         <Ellipse Height="100" Width="100">
@@ -30,7 +30,7 @@ Sample license text.
                     </materialDesign:Card>
                     <Label Name="MojangOrOffline" Margin="-160, -210, 0, 0" FontSize="20" Panel.ZIndex="20000" Width="100" Height="50">Mojang</Label>
                     <Label Margin="210, -210, 0, 0" FontSize="20" Panel.ZIndex="20000" Width="100" Height="50">Login</Label>
-                    <materialDesign:Card Name="mainCard" materialDesign:ShadowAssist.ShadowDepth="Depth1" Width="300" Height="350" Margin="0 25 0 0">
+                    <materialDesign:Card Name="mainCard" materialDesign:ShadowAssist.ShadowDepth="{Binding CardShadowDepth}" Width="300" Height="350" Margin="0 25 0 0">
                         <materialDesign:Transitioner Name="loginKind" SelectedIndex="0" Margin="0 30 0 0">
                             <materialDesign:TransitionerSlide>
                                 <materialDesign:TransitionerSlide.BackwardWipe>

@@ -54,12 +54,12 @@ namespace GDLauncher.Dialogs
                 Regex rg = new Regex(@"^[a-zA-Z0-9\s,]*$");
                 if (!rg.IsMatch(instanceTextName.Text) || (instanceTextName.Text.Contains(" ")))
                 {
-                    MessageBox.Show("Solo lettere e numero ammessi");
+                    MessageBox.Show("Just alphanumeric characters are permitted");
                     return;
                 }
                 if (Directory.Exists(config.M_F_P + "Packs\\" + instanceTextName.Text))
                 {
-                    MessageBox.Show("Nome istanza gia' esistente");
+                    MessageBox.Show("This instance already exists");
                     return;
                 }
                 DialogHostExtensions.SetCloseOnClickAway(this, false);
