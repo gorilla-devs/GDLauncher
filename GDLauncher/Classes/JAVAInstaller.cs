@@ -70,11 +70,11 @@ namespace GDLauncher.Classes
         {
             if (!Directory.Exists(config.javaLocal + "runtime\\jre"))
                 Directory.CreateDirectory(config.javaLocal + "runtime\\jre");
-            Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
+            /*Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
             Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("downloadingJava");
+            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;*/
+            Windows.Splashscreen.singleton.actualActivity.Text = "Downloading Java";
             string url = "";
             //i .exe sono zip in verita'
             if (Classes.ComputerInfoDetect.GetComputerArchitecture() == 64)
@@ -94,15 +94,16 @@ namespace GDLauncher.Classes
             try
             {
                 await webClient.DownloadFileTaskAsync(new Uri(url), config.javaLocal + "runtime\\java.zip");
+                Windows.Splashscreen.singleton.percentage.Text = "";
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show("Errore nel download di JAVA. Minecraft potrebbe non avviarsi correttamente" + e.Message);
             }
-            Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
-            Pages.SplashScreen.singleton.progressbar.IsIndeterminate = true;
+            /*Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
+            Pages.SplashScreen.singleton.progressbar.IsIndeterminate = true;*/
 
-            Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("extractingJava");
+            Windows.Splashscreen.singleton.actualActivity.Text = "Extracting Java";
             try
             {
                 using (Stream targetStream = new GZipInputStream(File.OpenRead(config.javaLocal + "runtime\\java.zip")))
@@ -131,28 +132,29 @@ namespace GDLauncher.Classes
                 Properties.Settings.Default["JavaPath"] = config.javaLocal + "runtime\\jre\\" + config.jre32FileName + "\\";
                 Properties.Settings.Default.Save();
             }
-            Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Hidden;
+            /*Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Hidden;
             Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
 
             Pages.SplashScreen.singleton.firstLabel.Text = "Java Extraction Completed";
-            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
+            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;*/
         }
 
         public static void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            
             try
             {
-                Pages.SplashScreen.singleton.progressbar.Value = e.ProgressPercentage;
-                Pages.SplashScreen.singleton.kbps.Content = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+                Windows.Splashscreen.singleton.percentage.Text = e.ProgressPercentage.ToString() + "%";
+                /*Pages.SplashScreen.singleton.kbps.Content = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
                 Pages.SplashScreen.singleton.mbToDownload.Content = string.Format("{0} MB / {1} MB",
                 (e.BytesReceived / 1024d / 1024d).ToString("0"),
-                (e.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
+                (e.TotalBytesToReceive / 1024d / 1024d).ToString("0"));*/
             }
             catch
             {
                 MessageBox.Show("Unknown error calculating download speed. Could be DivideByZeroException");
             }
-
+            
         }
 
         private static void Completed(object sender, AsyncCompletedEventArgs e)

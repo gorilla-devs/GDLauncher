@@ -32,7 +32,7 @@ namespace GDLauncher.Classes
         public static async Task<string> CheckVersion()
         {
             string update = "";
-            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("checkingForUpdates"));
+            //Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("checkingForUpdates"));
             string data = "";
             var client = new WebClient();
             var values = new System.Collections.Specialized.NameValueCollection();
@@ -62,17 +62,11 @@ namespace GDLauncher.Classes
                     if (String.Compare(Properties.Settings.Default["version"].ToString(), version) < 0 || Properties.Settings.Default["version"].ToString() == "")
                     {
                         var test = new Dialogs.UpdateAvailable(Properties.Settings.Default["version"].ToString(), version);
-                        var result = await MaterialDesignThemes.Wpf.DialogHost.Show(test, "RootDialog");
+                        var result = await DialogHost.Show(test, "Splashscreen");
                         if (result.ToString() == "yes")
                         {
-                            Pages.SplashScreen.singleton.firstLabel.Visibility = Visibility.Visible;
-                            Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Visible;
-                            Pages.SplashScreen.singleton.progressbar.IsIndeterminate = false;
-                            Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Visible;
-                            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Visible;
                             Window1.versionok = false;
-                            Pages.SplashScreen.singleton.firstLabel.Text = Pages.SplashScreen.singleton.manager.GetString("updatingLauncher");
-                            Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("updateFound"));
+                            Windows.Splashscreen.singleton.actualActivity.Text = "Downloading New Version...";
                         }
                         else
                         {
@@ -81,16 +75,16 @@ namespace GDLauncher.Classes
                     }
                     else
                     {
-                        Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
+                        //Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("noUpdatesAvailable"));
                     }
                 }
             }
             catch (JsonReaderException)
             {
             }
-            catch (Exception)
+            catch (Exception eeee)
             {
-                MessageBox.Show("Unknown error parsing updates"); ;
+                MessageBox.Show("Unknown error parsing updates " + eeee.StackTrace);
             }
             return update;
         }
@@ -100,7 +94,6 @@ namespace GDLauncher.Classes
         {
             if (Window1.versionok == false)
             {
-                Pages.SplashScreen.singleton.waiting.Visibility = Visibility.Hidden;
                 string filename = "";
                 Uri uri = new Uri(url);
                 filename = System.IO.Path.GetFileName(uri.LocalPath);
@@ -110,6 +103,7 @@ namespace GDLauncher.Classes
                 try
                 {
                     await webClient.DownloadFileTaskAsync(new Uri(url), Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename);
+                    Windows.Splashscreen.singleton.percentage.Text = "";
                     Properties.Settings.Default["version"] = SessionData.latestVersion;
                     Properties.Settings.Default.Save();
                     
@@ -121,6 +115,7 @@ namespace GDLauncher.Classes
                 catch (IOException)
                 {
                     await webClient.DownloadFileTaskAsync(new Uri(url), Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\" + filename.Replace(".exe", new Random().Next(0, 1000) + ".exe"));
+                    Windows.Splashscreen.singleton.percentage.Text = "";
                     Properties.Settings.Default["version"] = SessionData.latestVersion;
                     Properties.Settings.Default.Save();
                 }
@@ -129,26 +124,23 @@ namespace GDLauncher.Classes
                     MessageBox.Show("Unknown error downloading new version: " + eex.InnerException);
                     return;
                 }
-                Pages.SplashScreen.singleton.progressbar.Visibility = Visibility.Hidden;
-                Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
-                Pages.SplashScreen.singleton.mbToDownload.Visibility = Visibility.Hidden;
 
-                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 5 seconds";
-                await Task.Delay(1000);
-                
-                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 4 seconds";
-                await Task.Delay(1000);
-                
-                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 3 seconds";
-                await Task.Delay(1000);
-                
-                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 2 seconds";
-                await Task.Delay(1000);
-                
-                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 1 seconds";
+                Windows.Splashscreen.singleton.actualActivity.Text = "Done. Restarting in 5 seconds";
                 await Task.Delay(1000);
 
-                Pages.SplashScreen.singleton.firstLabel.Text = "Done. Restarting in 0 seconds";
+                Windows.Splashscreen.singleton.actualActivity.Text = "Done. Restarting in 4 seconds";
+                await Task.Delay(1000);
+
+                Windows.Splashscreen.singleton.actualActivity.Text = "Done. Restarting in 3 seconds";
+                await Task.Delay(1000);
+
+                Windows.Splashscreen.singleton.actualActivity.Text = "Done. Restarting in 2 seconds";
+                await Task.Delay(1000);
+
+                Windows.Splashscreen.singleton.actualActivity.Text = "Done. Restarting in 1 seconds";
+                await Task.Delay(1000);
+
+                Windows.Splashscreen.singleton.actualActivity.Text = "Done. Restarting in 0 seconds";
 
                 Properties.Settings.Default["firstTimeHowTo"] = "false";
                 Properties.Settings.Default["justUpdated"] = "true";
@@ -168,8 +160,8 @@ namespace GDLauncher.Classes
 
         public static void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            /*MainWindow.singleton.splash.progressbar.Value = e.ProgressPercentage;
-
+            Windows.Splashscreen.singleton.percentage.Text = e.ProgressPercentage + "%";
+            /*
             //Form1.singleton.progressBar.Value = e.ProgressPercentage;
             MainWindow.singleton.splash.kbps.Content = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
             MainWindow.singleton.splash.todownload.Content = string.Format("{0} MB / {1} MB",
@@ -181,17 +173,17 @@ namespace GDLauncher.Classes
             timeremaining.Text = string.Format("{0} s", seconds.ToString("0"));
             //timeremaining = string.Format("{0} s", seconds.ToString("0"));*/
 
-            Pages.SplashScreen.singleton.progressbar.Value = e.ProgressPercentage;
+            /*Pages.SplashScreen.singleton.progressbar.Value = e.ProgressPercentage;
             Pages.SplashScreen.singleton.kbps.Content = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
             Pages.SplashScreen.singleton.mbToDownload.Content = string.Format("{0} MB / {1} MB",
             (e.BytesReceived / 1024d / 1024d).ToString("0"),
-            (e.TotalBytesToReceive / 1024d / 1024d).ToString("0"));
+            (e.TotalBytesToReceive / 1024d / 1024d).ToString("0"));*/
 
         }
 
         private static void Completed(object sender, AsyncCompletedEventArgs e)
         {
-            Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
+            //Pages.SplashScreen.singleton.kbps.Visibility = Visibility.Hidden;
             sw.Reset();
             if (e.Cancelled == true)
             {
@@ -203,19 +195,6 @@ namespace GDLauncher.Classes
                 //await DialogHost.Show(new Dialogs.OptionsUpdates("In a few moments we will open the new version"), "RootDialog", ExtendedOpenedEventHandler);
             }
 
-        }
-
-        private static async void ExtendedOpenedEventHandler(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
-        {
-            try
-            {
-                await Task.Delay(1200);
-                eventArgs.Session.Close();
-            }
-            catch
-            {
-                /*cancelled by user...tidy up and dont close as will have already closed */
-            }
         }
         public static void DownloadStop()
         {

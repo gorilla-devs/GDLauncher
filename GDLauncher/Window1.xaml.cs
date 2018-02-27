@@ -38,8 +38,8 @@ namespace GDLauncher
         {
             InitializeComponent();
             singleton = this;
-            this.Width = double.Parse(Properties.Settings.Default["windowSize"].ToString().Split('x')[0]);
-            this.Height = double.Parse(Properties.Settings.Default["windowSize"].ToString().Split('x')[1]);
+            this.Width = double.Parse(Settings.Default["windowSize"].ToString().Split('x')[0]);
+            this.Height = double.Parse(Settings.Default["windowSize"].ToString().Split('x')[1]);
 
             MainPage.JournalOwnership = JournalOwnership.OwnsJournal;
             MainPage.Navigated += new NavigatedEventHandler(NavigationService_Navigated);
@@ -97,7 +97,6 @@ namespace GDLauncher
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            MainPage.Navigate(new Pages.SplashScreen());
         }
 
         private async void Button_Click_3(object sender, RoutedEventArgs e)
@@ -155,8 +154,7 @@ namespace GDLauncher
 
         private void consoleBtn_Click(object sender, RoutedEventArgs e)
         {
-            //debugconsole.Show();
-            new Windows.Splashscreen().Show();
+            debugconsole.Show();
 
         }
 

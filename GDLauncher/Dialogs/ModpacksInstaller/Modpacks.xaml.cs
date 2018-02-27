@@ -101,15 +101,12 @@ namespace GDLauncher.Dialogs
 
     public partial class Modpacks : INotifyPropertyChanged
     {
-        public static int numberOfObjectsPerPage = 5;
+        public static int numberOfObjectsPerPage = 9;
         public static int actualPage;
-        public CurseRoot CurseData { get; set; }
-
-        public ObservableCollection<Card> _packs { get; set; }
-
-        public bool isInstalling = false;
         public static CancellationTokenSource cancelToken;
         public CancellationToken cToken;
+
+        public bool isInstalling;
 
 
         public Modpacks()
@@ -121,16 +118,20 @@ namespace GDLauncher.Dialogs
             cancelToken = new CancellationTokenSource();
             cToken = cancelToken.Token;
             if (Settings.Default.graphicsPerformance == "Material Design")
-                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffffff");
+                Background = (SolidColorBrush) new BrushConverter().ConvertFrom("#ffffff");
             else
-                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#eeeeee");
+                Background = (SolidColorBrush) new BrushConverter().ConvertFrom("#eeeeee");
 
             Width = Window1.singleton.Width - 20;
             Height = Window1.singleton.Height - 30;
-
         }
 
+        public CurseRoot CurseData { get; set; }
+
+        public ObservableCollection<Card> _packs { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
+
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -166,7 +167,6 @@ namespace GDLauncher.Dialogs
                 Width = 255,
                 Height = 140,
                 Style = Application.Current.FindResource("MaterialDesignFlatButton") as Style
-
             };
             vanillaBtn.Click += async (ss, ee) =>
             {
@@ -180,11 +180,13 @@ namespace GDLauncher.Dialogs
                     Task.Factory.StartNew(() => messageQueue.Enqueue(message));
                     return;
                 }
+
                 var x = await DialogHost.Show(new VanillaInstallDialog(), "ModpacksDialog");
                 if (x != null)
                 {
                     dynamic result = x;
-                    await DialogHost.Show(new InstallDialog(result.instanceName, result.MCVersion, null), "ModpacksDialog");
+                    await DialogHost.Show(new InstallDialog(result.instanceName, result.MCVersion, null),
+                        "ModpacksDialog");
                     //use the message queue to send a message.
                     var messageQueue = SnackbarThree.MessageQueue;
                     var message = "Installed. Enjoy :)";
@@ -228,7 +230,6 @@ namespace GDLauncher.Dialogs
                 Width = 255,
                 Height = 140,
                 Style = Application.Current.FindResource("MaterialDesignFlatButton") as Style
-
             };
             forgeBtn.Click += async (ss, ee) =>
             {
@@ -242,11 +243,13 @@ namespace GDLauncher.Dialogs
                     Task.Factory.StartNew(() => messageQueue.Enqueue(message));
                     return;
                 }
+
                 var x = await DialogHost.Show(new ForgeInstallDialog(), "ModpacksDialog");
                 if (x != null)
                 {
                     dynamic result = x;
-                    await DialogHost.Show(new InstallDialog(result.instanceName, result.MCVersion, result.forgeVersion), "ModpacksDialog");
+                    await DialogHost.Show(new InstallDialog(result.instanceName, result.MCVersion, result.forgeVersion),
+                        "ModpacksDialog");
                     //use the message queue to send a message.
                     var messageQueue = SnackbarThree.MessageQueue;
                     var message = "Installed. Enjoy :)";
@@ -268,11 +271,12 @@ namespace GDLauncher.Dialogs
                 ShadowAssist.SetShadowDepth(vanilla, ShadowDepth.Depth0);
                 ShadowAssist.SetShadowDepth(forge, ShadowDepth.Depth0);
             }
+
             defaultStackPanel.Children.Add(vanilla);
             defaultStackPanel.Children.Add(forge);
 
-                CurseData = new CurseRoot();
-                CurseData.Data = await Task.Run(async () =>
+            CurseData = new CurseRoot();
+            CurseData.Data = await Task.Run(async () =>
                 JsonConvert.DeserializeObject<List<data>>(File.ReadAllText(config.M_F_P + "complete.json"))
                     .ToList());
             loading.Visibility = Visibility.Collapsed;
@@ -283,7 +287,8 @@ namespace GDLauncher.Dialogs
 
         private void addPacks(int from, string search = "")
         {
-            foreach (var loc in CurseData.Data.Where(s => s.CategorySection.Name == "Modpacks" && s.Name.ToLower().Contains(search.ToLower()))
+            foreach (var loc in CurseData.Data.Where(s =>
+                    s.CategorySection.Name == "Modpacks" && s.Name.ToLower().Contains(search.ToLower()))
                 .OrderByDescending(p => p.PopularityScore).Skip(numberOfObjectsPerPage * from)
                 .Take(numberOfObjectsPerPage))
             {
@@ -298,7 +303,8 @@ namespace GDLauncher.Dialogs
                                 new ProgressBar
                                 {
                                     IsIndeterminate = true,
-                                    Style = Application.Current.FindResource("MaterialDesignCircularProgressBar") as Style
+                                    Style =
+                                        Application.Current.FindResource("MaterialDesignCircularProgressBar") as Style
                                 },
                                 new Image
                                 {
@@ -325,7 +331,7 @@ namespace GDLauncher.Dialogs
                                     Margin = new Thickness(10, 10, 0, 10),
                                     ToolTip = loc.PrimaryCategoryName
                                 },
-                                new PackIcon()
+                                new PackIcon
                                 {
                                     Visibility = loc.IsFeatured == 1 ? Visibility.Visible : Visibility.Hidden,
                                     Kind = PackIconKind.Star,
@@ -333,7 +339,7 @@ namespace GDLauncher.Dialogs
                                     Width = 17,
                                     Height = 17,
                                     ToolTip = "Featured",
-                                    Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#f7cd24")
+                                    Foreground = (SolidColorBrush) new BrushConverter().ConvertFrom("#f7cd24")
                                 }
                             }
                         }
@@ -344,21 +350,23 @@ namespace GDLauncher.Dialogs
                 {
                     MinHeight = 160,
                     Margin = new Thickness(0, 3, 0, 0),
-                    Effect = Settings.Default.graphicsPerformance == "Flat" ? new DropShadowEffect
-                    {
-                        BlurRadius = 0,
-                        ShadowDepth = 0,
-                        Direction = 0,
-                        Opacity = 0,
-                        RenderingBias = RenderingBias.Performance,
-                    } : new DropShadowEffect
-                    {
-                        BlurRadius = 0,
-                        ShadowDepth = 0,
-                        Direction = 270,
-                        Opacity = .42,
-                        RenderingBias = RenderingBias.Performance,
-                    }
+                    Effect = Settings.Default.graphicsPerformance == "Flat"
+                        ? new DropShadowEffect
+                        {
+                            BlurRadius = 0,
+                            ShadowDepth = 0,
+                            Direction = 0,
+                            Opacity = 0,
+                            RenderingBias = RenderingBias.Performance
+                        }
+                        : new DropShadowEffect
+                        {
+                            BlurRadius = 0,
+                            ShadowDepth = 0,
+                            Direction = 270,
+                            Opacity = .42,
+                            RenderingBias = RenderingBias.Performance
+                        }
                 };
 
                 //MAIN CONTENT
@@ -391,7 +399,8 @@ namespace GDLauncher.Dialogs
 
                     await Task.Run(async () =>
                     {
-                        Application.Current.Dispatcher.Invoke((Action)async delegate {
+                        Application.Current.Dispatcher.Invoke((Action) async delegate
+                        {
                             isInstalling = true;
 
                             var webClient = new WebClient();
@@ -399,20 +408,21 @@ namespace GDLauncher.Dialogs
                             var x = await DialogHost.Show(new ModpackInstallDialog(loc.Id), "ModpacksDialog");
 
                             if (x == null)
+                            {
                                 isInstalling = false;
+                            }
                             else
                             {
                                 dynamic y = x;
                                 string instanceDir = config.M_F_P + "Packs\\" + y.instanceName;
-                                string url = "";
+                                var url = "";
                                 foreach (var locx in await CurseApis.getVersions(loc.Id))
-                                {
                                     if (locx.Name == y.version)
                                     {
                                         url = locx.URL;
                                         break;
                                     }
-                                }
+
                                 cToken.Register(async () =>
                                 {
                                     isInstalling = false;
@@ -424,9 +434,10 @@ namespace GDLauncher.Dialogs
                                     {
                                         if (Directory.Exists(instanceDir))
                                             Directory.Delete(instanceDir, true);
-                                    }catch(Exception) { }
-
-
+                                    }
+                                    catch (Exception)
+                                    {
+                                    }
                                 });
 
                                 installBtn.Content = "Downloading..";
@@ -441,15 +452,19 @@ namespace GDLauncher.Dialogs
                                 try
                                 {
                                     await webClient.DownloadFileTaskAsync(url,
-                                        instanceDir + "\\" + System.IO.Path.GetFileName(url));
+                                        instanceDir + "\\" + Path.GetFileName(url));
                                 }
-                                catch (WebException) { }
+                                catch (WebException)
+                                {
+                                }
 
                                 if (cancelToken.IsCancellationRequested)
                                     return;
-                                ZipSharp.ExtractZipFile(instanceDir + "\\" + System.IO.Path.GetFileName(url), null, instanceDir);
+                                ZipSharp.ExtractZipFile(instanceDir + "\\" + Path.GetFileName(url), null, instanceDir);
 
-                                var parsedManifest = JsonConvert.DeserializeObject<ModpackManifest>(File.ReadAllText(instanceDir + "\\manifest.json"));
+                                var parsedManifest =
+                                    JsonConvert.DeserializeObject<ModpackManifest>(
+                                        File.ReadAllText(instanceDir + "\\manifest.json"));
 
                                 ButtonProgressAssist.SetValue(installBtn, 0);
                                 installBtn.Content = "Computing..";
@@ -459,16 +474,10 @@ namespace GDLauncher.Dialogs
                                 var block = new ActionBlock<Fileino>(async file =>
                                 {
                                     var modurl = await CurseApis.getDownloadURL(file.projectID, file.fileID);
-                                    foreach (var mod in modurl)
-                                    {
-                                        additionalMods.Add(mod);
-                                    }
-                                }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 30 });
+                                    foreach (var mod in modurl) additionalMods.Add(mod);
+                                }, new ExecutionDataflowBlockOptions {MaxDegreeOfParallelism = 30});
 
-                                foreach (var file in parsedManifest.files)
-                                {
-                                    block.Post(file);
-                                }
+                                foreach (var file in parsedManifest.files) block.Post(file);
                                 block.Complete();
                                 try
                                 {
@@ -479,10 +488,14 @@ namespace GDLauncher.Dialogs
                                     isInstalling = false;
                                     return;
                                 }
+
                                 installBtn.Content = "Install";
-                                if(cancelToken.IsCancellationRequested)
+                                if (cancelToken.IsCancellationRequested)
                                     return;
-                                var install = await DialogHost.Show(new InstallDialog(y.instanceName, parsedManifest.minecraft.version, parsedManifest.minecraft.modLoaders[0].id.Replace("forge-", ""), loc.Name, y.version, additionalMods), "ModpacksDialog");
+                                var install = await DialogHost.Show(
+                                    new InstallDialog(y.instanceName, parsedManifest.minecraft.version,
+                                        parsedManifest.minecraft.modLoaders[0].id.Replace("forge-", ""), loc.Name,
+                                        y.version, additionalMods), "ModpacksDialog");
                                 if (install == "Cancelled")
                                 {
                                     isInstalling = false;
@@ -491,21 +504,23 @@ namespace GDLauncher.Dialogs
 
 
                                 //Now Create all of the directories
-                                foreach (string dirPath in Directory.GetDirectories(
+                                foreach (var dirPath in Directory.GetDirectories(
                                     instanceDir + "\\" + parsedManifest.overrides, "*",
                                     SearchOption.AllDirectories))
-                                    Directory.CreateDirectory(dirPath.Replace(instanceDir + "\\" + parsedManifest.overrides,
+                                    Directory.CreateDirectory(dirPath.Replace(
+                                        instanceDir + "\\" + parsedManifest.overrides,
                                         instanceDir));
 
                                 //Copy all the files & Replaces any files with the same name
-                                foreach (string newPath in Directory.GetFiles(instanceDir + "\\" + parsedManifest.overrides,
+                                foreach (var newPath in Directory.GetFiles(
+                                    instanceDir + "\\" + parsedManifest.overrides,
                                     "*.*",
                                     SearchOption.AllDirectories))
                                     File.Move(newPath,
                                         newPath.Replace(instanceDir + "\\" + parsedManifest.overrides, instanceDir));
 
                                 Directory.Delete(instanceDir + "\\" + parsedManifest.overrides, true);
-                                File.Delete(instanceDir + "\\" + System.IO.Path.GetFileName(url));
+                                File.Delete(instanceDir + "\\" + Path.GetFileName(url));
                                 //use the message queue to send a message.
                                 var messageQueue = SnackbarThree.MessageQueue;
                                 var message = "Installed. Enjoy :)";
@@ -513,9 +528,7 @@ namespace GDLauncher.Dialogs
                                 //the message queue can be called from any thread
                                 Task.Factory.StartNew(() => messageQueue.Enqueue(message));
                                 isInstalling = false;
-
                             }
-
                         }, DispatcherPriority.Normal, cToken);
                     }, cToken);
                 };
@@ -626,14 +639,14 @@ namespace GDLauncher.Dialogs
 
         private async void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox tb = (TextBox)sender;
-            int startLength = tb.Text.Length;
+            var tb = (TextBox) sender;
+            var startLength = tb.Text.Length;
 
             await Task.Delay(400);
             if (startLength == tb.Text.Length)
             {
                 sv.ScrollToTop();
-                
+
                 _packs.Clear();
                 addPacks(0, search.Text);
             }
@@ -650,8 +663,8 @@ namespace GDLauncher.Dialogs
                 cancelToken.Cancel(true);
                 cancelToken.Dispose();
             }
-            DialogHost.CloseDialogCommand.Execute(this, this);
 
+            DialogHost.CloseDialogCommand.Execute(this, this);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

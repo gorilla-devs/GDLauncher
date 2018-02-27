@@ -137,6 +137,8 @@ namespace GDLauncher.Pages
                 da1.Duration = new Duration(TimeSpan.FromSeconds(0.180));
                 tipCard.BeginAnimation(HeightProperty, da1);
                 tipCard.BeginAnimation(WidthProperty, da);
+                await Task.Delay(180);
+                tipContent.Opacity = 1;
             }
         }
 
@@ -458,7 +460,7 @@ namespace GDLauncher.Pages
                     };
                     duplicateButton.Click += async (sender, args) =>
                     {
-                        await DialogHost.Show(new Dialogs.DuplicateInstance(dir));
+                        await DialogHost.Show(new Dialogs.DuplicateInstance(dir), "RootDialog");
                         ModpacksUpdate();
                     };
                     popupBoxStackPanel.Children.Add(duplicateButton);
@@ -471,7 +473,7 @@ namespace GDLauncher.Pages
                     };
                     renameButton.Click += async (sender, args) =>
                     {
-                        await DialogHost.Show(new Dialogs.RenameInstance(dir));
+                        await DialogHost.Show(new Dialogs.RenameInstance(dir), "RootDialog");
                         ModpacksUpdate();
                     };
                     popupBoxStackPanel.Children.Add(renameButton);

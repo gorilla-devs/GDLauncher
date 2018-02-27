@@ -62,7 +62,7 @@ namespace GDLauncher.Dialogs
             }
             else
             {
-                dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
+                dynamic json = JsonConvert.DeserializeObject(Windows.Splashscreen.singleton.forgeJson);
                 foreach (var x in json["promos"])
                 {
                     if(!versionsList.Items.Contains(json["number"][x.Value.ToString()]["mcversion"]))
@@ -91,7 +91,7 @@ namespace GDLauncher.Dialogs
                 //TUTTE LE VERSIONI
                 if (forgeAllVersions.IsChecked.Value)
                 {
-                    dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
+                    dynamic json = JsonConvert.DeserializeObject(Windows.Splashscreen.singleton.forgeJson);
                     try
                     {
                         forgeVersions.Items.Clear();
@@ -110,7 +110,7 @@ namespace GDLauncher.Dialogs
                 //SOLO QUELLE PROMOS
                 else
                 {
-                    dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
+                    dynamic json = JsonConvert.DeserializeObject(Windows.Splashscreen.singleton.forgeJson);
                     try
                     {
                         List<string> promos = new List<string>();
@@ -209,7 +209,7 @@ namespace GDLauncher.Dialogs
             versionsList.IsEnabled = false;
             transition.SelectedIndex = 1;
             loading.Visibility = Visibility.Visible;
-            dynamic json = JsonConvert.DeserializeObject(Pages.SplashScreen.singleton.forgeJson);
+            dynamic json = JsonConvert.DeserializeObject(Windows.Splashscreen.singleton.forgeJson);
             foreach (var x in json["number"])
             {
                 forgeAllVersionsList.Add(Convert.ToString(x.Value.mcversion));

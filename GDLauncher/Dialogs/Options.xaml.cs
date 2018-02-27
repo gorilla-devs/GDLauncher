@@ -28,6 +28,8 @@ namespace GDLauncher.Dialogs
     /// </summary>
     public partial class Options : INotifyPropertyChanged
     {
+        CheckBox lastChecked;
+        CheckBox actualChecked;
         private ShadowDepth _cardShadowDepth;
         public ShadowDepth CardShadowDepth
         {
@@ -99,12 +101,7 @@ namespace GDLauncher.Dialogs
             instancesFont.Items.Add("Roboto Bold");
             instancesFont.Items.Add("Minecrafter");
             instancesFont.Items.Add("Minecrafter Alt");
-
-
-            graphicsPerformance.Items.Add("Flat");
-            graphicsPerformance.Items.Add("Material Design");
-            graphicsPerformance.Items.Add("GorillaDevs's Style");
-
+            
 
 
             windowSizes.SelectedValue = Settings.Default["windowSize"];
@@ -113,11 +110,32 @@ namespace GDLauncher.Dialogs
             downloadThreads.SelectedValue = Settings.Default["download_threads"];
             ram.SelectedValue = Settings.Default["RAM"];
             JavaPath.Text = ShortenPath(Classes.ComputerInfoDetect.GetJavaInstallationPath(), 60);
-            graphicsPerformance.SelectedItem = Settings.Default.graphicsPerformance;
+            switch (Settings.Default.graphicsPerformance)
+            {
+                case "GorillaDevs's Style":
+                    gorilladevs.IsChecked = true;
+                    lastChecked = gorilladevs;
+                    actualChecked = gorilladevs;
+                    break;
+                case "Flat":
+                    flat.IsChecked = true;
+                    lastChecked = flat;
+                    actualChecked = flat;
+                    break;
+                case "Material Design":
+                    md.IsChecked = true;
+                    lastChecked = md;
+                    actualChecked = md;
+                    break;
+                default:
+                    gorilladevs.IsChecked = true;
+                    lastChecked = gorilladevs;
+                    actualChecked = gorilladevs;
+                    break;
+            }
             downloadThreads.SelectionChanged += downloadThreads_SelectionChanged;
             ram.SelectionChanged += ram_SelectionChanged;
             windowSizes.SelectionChanged += windowSizes_SelectionChanged;
-            graphicsPerformance.SelectionChanged += graphicsPerformance_SelectionChanged;
             instancesFont.SelectionChanged += instancesFont_SelectionChanged;
 
 
@@ -134,24 +152,6 @@ namespace GDLauncher.Dialogs
             Properties.Settings.Default["download_threads"] = downloadThreads.SelectedValue;
             Properties.Settings.Default.Save();
             saved("Parallel Downloads Saved: " + Properties.Settings.Default["download_threads"]);
-        }
-
-        private void graphicsPerformance_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Properties.Settings.Default.graphicsPerformance = graphicsPerformance.SelectedValue.ToString();
-            Properties.Settings.Default.Save();
-            if (Settings.Default.graphicsPerformance == "Material Design")
-                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffffff");
-            else
-                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#eeeeee");
-
-            if (Settings.Default.graphicsPerformance == "Flat" ||
-                Settings.Default.graphicsPerformance == "GorillaDevs's Style")
-                CardShadowDepth = ShadowDepth.Depth0;
-            else
-                CardShadowDepth = ShadowDepth.Depth1;
-            Home.singleton.ModpacksUpdate();
-            saved("Saved");
         }
 
         private async void saved(string message)
@@ -325,6 +325,71 @@ namespace GDLauncher.Dialogs
             }
 
             return firstPart + ellipsisChars + lastPart;
+        }
+
+        private void chk_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox activeCheckBox = sender as CheckBox;
+            if (activeCheckBox != lastChecked && lastChecked != null)
+            {
+                lastChecked.IsChecked = false;
+                actualChecked = activeCheckBox;
+            }
+            else if (activeCheckBox == lastChecked)
+                activeCheckBox.IsChecked = true;
+            lastChecked = (bool)activeCheckBox.IsChecked ? activeCheckBox : null;
+
+            if (activeCheckBox.Name == "gorilladevs" ||
+                activeCheckBox.Name == "flat")
+            {
+                /*CardEffect = activeCheckBox.Name == "flat"
+                    ? new DropShadowEffect
+                    {
+                        BlurRadius = 0,
+                        ShadowDepth = 0,
+                        Direction = 0,
+                        Opacity = 0,
+                        RenderingBias = RenderingBias.Performance,
+                    }
+                    : new DropShadowEffect
+                    {
+                        BlurRadius = 0,
+                        ShadowDepth = 0,
+                        Direction = 270,
+                        Opacity = .42,
+                        RenderingBias = RenderingBias.Performance,
+                    };*/
+                CardShadowDepth = ShadowDepth.Depth0;
+                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#eeeeee");
+            }
+            else
+            {
+                CardShadowDepth = ShadowDepth.Depth1;
+                Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffffff");
+            }
+            Settings.Default.graphicsPerformance = actualChecked.Name == "gorilladevs"
+                ? "GorillaDevs's Style"
+                : (actualChecked.Name == "md" ? "Material Design" : "Flat");
+            Home.singleton.ModpacksUpdate();
+            saved("Saved");
+        }
+
+        private void gorilladevs_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            gorilladevs.IsChecked = true;
+            chk_Click(gorilladevs, null);
+        }
+
+        private void flat_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            flat.IsChecked = true;
+            chk_Click(flat, null);
+        }
+
+        private void md_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            md.IsChecked = true;
+            chk_Click(md, null);
         }
     }
 }

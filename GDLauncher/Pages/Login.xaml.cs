@@ -119,6 +119,13 @@ namespace GDLauncher.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             await Task.Delay(50);
+
+            if (Settings.Default.eula == false)
+            {
+                await DialogHost.Show(new Dialogs.Eula(), "RootDialog");
+            }
+            await Task.Delay(50);
+
             transition.SelectedIndex = 1;
 
             premiumError.Content = Error;

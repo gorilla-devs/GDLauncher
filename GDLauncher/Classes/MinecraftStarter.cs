@@ -21,7 +21,7 @@ namespace GDLauncher.Classes
         public static Dialogs.ModpackLoading loading;
         public static async void Minecraft_Start(string dir)
         {
-            loading = new Dialogs.ModpackLoading(true, Pages.SplashScreen.singleton.manager.GetString("starting") + "...");
+            loading = new Dialogs.ModpackLoading(true, Windows.Splashscreen.singleton.manager.GetString("starting") + "...");
                         MaterialDesignThemes.Wpf.DialogHost.Show(loading, "RootDialog", OpenEvent);
             loading.forgeProgress.Value = 15;
             await Task.Delay(1000);
@@ -165,7 +165,7 @@ namespace GDLauncher.Classes
             }
             catch(Exception e)
             {
-                Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("fatalError") + " "  + e);
+                Windows.DebugOutputConsole.singleton.Write(Windows.Splashscreen.singleton.manager.GetString("fatalError") + " "  + e);
             }
         }
 

@@ -5,12 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GDLauncher.Windows"
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        xmlns:gdLauncher="clr-namespace:GDLauncher"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Splashscreen" Width="400" Height="400" AllowsTransparency="True" WindowStyle="None" Background="#00005555" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
-    <StackPanel>
+        Title="Splashscreen" Width="400" Height="150" WindowStyle="None" Background="#1A5363" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <materialDesign:DialogHost Identifier="Splashscreen" CloseOnClickAway="False">
 
-        <Image gif:ImageBehavior.AnimatedSource="../Assets/spinner.gif" Width="300" gif:ImageBehavior.RepeatBehavior="Forever"/>
-        <Label FontSize="35" Foreground="White" HorizontalAlignment="Center">Loading GDLauncher...</Label>
-
-    </StackPanel>
+        <StackPanel VerticalAlignment="Center">
+            <Label Name="loading" FontSize="35" Foreground="White"
+                    HorizontalAlignment="Center"
+                    FontFamily="pack://application:,,,/Assets/#Roboto Thin"
+            >Loading GDLauncher...</Label>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 20 0 0">
+                <TextBlock Name="actualActivity" Foreground="White">Initializing Checkups...</TextBlock>
+                <TextBlock Name="percentage" Foreground="White" Margin="20 0 0 0"></TextBlock>
+            </StackPanel>
+        </StackPanel>
+    </materialDesign:DialogHost>
 </Window>

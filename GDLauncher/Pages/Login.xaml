@@ -12,7 +12,7 @@ Sample license text.
       mc:Ignorable="d"
       Title="Login" KeyDown="Page_KeyDown" Loaded="Page_Loaded">
 
-    <Grid>
+    <Grid RenderOptions.ClearTypeHint="Enabled">
         <materialDesign:Transitioner Name="transition" Grid.Row="1" SelectedIndex="1">
 
             <!-- you can use a slide for each page, let's add a touch of fade for our first page  -->
@@ -30,7 +30,7 @@ Sample license text.
                     </materialDesign:Card>
                     <Label Name="MojangOrOffline" Margin="-160, -210, 0, 0" FontSize="20" Panel.ZIndex="20000" Width="100" Height="50">Mojang</Label>
                     <Label Margin="210, -210, 0, 0" FontSize="20" Panel.ZIndex="20000" Width="100" Height="50">Login</Label>
-                    <materialDesign:Card Name="mainCard" materialDesign:ShadowAssist.ShadowDepth="{Binding CardShadowDepth}" Width="300" Height="350" Margin="0 25 0 0">
+                    <materialDesign:Card Name="mainCard" materialDesign:ShadowAssist.ShadowDepth="Depth0" Width="300" Height="350" Margin="0 25 0 0">
                         <materialDesign:Transitioner Name="loginKind" SelectedIndex="0" Margin="0 30 0 0">
                             <materialDesign:TransitionerSlide>
                                 <materialDesign:TransitionerSlide.BackwardWipe>
@@ -51,7 +51,7 @@ Sample license text.
                                     <Label Name="premiumError" HorizontalAlignment="Center" Foreground="Red" Visibility="Visible" FontSize="10" Content=" "></Label>
                                     <Button Name="premiumLogin" HorizontalAlignment="Center" Margin="0 10" VerticalAlignment="Top" Foreground="White" Width="240" Style="{StaticResource MaterialDesignRaisedButton}" materialDesign:ShadowAssist.ShadowDepth="Depth0" Click="premiumLogin_Click">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Padding="15,0,10,0">Login</TextBlock>
+                                            <TextBlock RenderOptions.ClearTypeHint="Enabled" FontWeight="Medium" Padding="15,0,10,0">Login</TextBlock>
                                             <materialDesign:PackIcon Kind="ArrowRight"/>
                                         </StackPanel>
                                     </Button>
@@ -59,12 +59,12 @@ Sample license text.
                                         <ProgressBar Name="loading" HorizontalAlignment="Left" VerticalAlignment="Top" Width="219" IsIndeterminate="True" Visibility="Hidden"/>
                                     </StackPanel>
                                     <DockPanel Margin="0 10 0 0">
-                                        <CheckBox Name="premiumRemember" IsChecked="True" Content="Remember Me"></CheckBox>
+                                        <CheckBox RenderOptions.ClearTypeHint="Enabled" FontWeight="Light" materialDesign:ShadowAssist.ShadowDepth="Depth0" Name="premiumRemember" IsChecked="True" Content="Remember Me"></CheckBox>
                                         <Button HorizontalAlignment="Right" ToolTip="Help, i cannot login" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click">
                                             <materialDesign:PackIcon Kind="Help"/>
                                         </Button>
                                     </DockPanel>
-                                    <TextBlock Cursor="Hand" Margin="0 31 0 0" HorizontalAlignment="Center" Visibility="Visible" MouseLeftButtonUp="TextBlock_MouseLeftButtonUp">Forgot your password?</TextBlock>
+                                    <TextBlock RenderOptions.ClearTypeHint="Enabled" FontWeight="Light" materialDesign:ShadowAssist.ShadowDepth="Depth0" Cursor="Hand" Margin="0 31 0 0" HorizontalAlignment="Center" Visibility="Visible" MouseLeftButtonUp="TextBlock_MouseLeftButtonUp">Forgot your password?</TextBlock>
                                 </StackPanel>
                             </materialDesign:TransitionerSlide>
                             <materialDesign:TransitionerSlide>

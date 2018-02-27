@@ -59,7 +59,7 @@ namespace GDLauncher.Classes
                             {
                                 if (e.Data != null)
                                 {
-                                    Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("javaPathError"));
+                                    //Windows.DebugOutputConsole.singleton.Write(Pages.SplashScreen.singleton.manager.GetString("javaPathError"));
                                 }
                             });
 

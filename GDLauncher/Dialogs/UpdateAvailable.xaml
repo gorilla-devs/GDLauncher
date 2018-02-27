@@ -9,13 +9,13 @@ Sample license text.
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:GDLauncher.Dialogs"
              FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-             mc:Ignorable="d" Height="134" Background="#FFFFFF" Width="275">
+             mc:Ignorable="d" Width="320" Height="110" Background="White">
     <Grid>
-        <Label x:Name="label" Content="An update is available" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="140"/>
-        <Label x:Name="updateVersion" Content="version -> version" HorizontalAlignment="Left" Margin="155,10,0,0" VerticalAlignment="Top" Width="113"/>
-        <Separator HorizontalAlignment="Left" Height="9" Margin="10,36,0,0" VerticalAlignment="Top" Width="258"/>
-        <Label x:Name="label1" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <Button x:Name="yes" Content="Yes" HorizontalAlignment="Left" Foreground="White" Margin="190,95,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="yes" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ShadowAssist.ShadowDepth="Depth0"/>
-        <Button x:Name="no" Content="No" HorizontalAlignment="Left" Foreground="White" Margin="10,95,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="no" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ShadowAssist.ShadowDepth="Depth0"/>
+        <Label x:Name="label" FontSize="10" Content="An update is available" HorizontalAlignment="Left" Margin="32,9,0,0" VerticalAlignment="Top" Width="140"/>
+        <Label x:Name="updateVersion" FontWeight="ExtraBold"  FontSize="10" Content="version -> version" HorizontalAlignment="Left" Margin="177,9,0,0" VerticalAlignment="Top" Width="113"/>
+        <Separator HorizontalAlignment="Left" Height="9" Margin="32,31,0,0" VerticalAlignment="Top" Width="258"/>
+        <Label x:Name="label1" HorizontalAlignment="Left" Margin="32,40,0,0" VerticalAlignment="Top" FontSize="13" Content="Update?"/>
+        <Button x:Name="yes" Content="Yes" HorizontalAlignment="Left" Margin="235,68,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="yes" Style="{DynamicResource MaterialDesignFlatButton}" materialDesign:ShadowAssist.ShadowDepth="Depth0"/>
+        <Button x:Name="no" Content="No" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="no" Style="{DynamicResource MaterialDesignFlatButton}" materialDesign:ShadowAssist.ShadowDepth="Depth0"/>
     </Grid>
 </UserControl>

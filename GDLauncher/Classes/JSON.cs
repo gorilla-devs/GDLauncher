@@ -333,7 +333,6 @@ namespace GDLauncher.Classes
                     forgefilename = version + "-" + forgeVersion + "-" + entry.Value.branch;
                     forgeName = version + "-" + forgeVersion + "-" + entry.Value.branch;
                     WebRequest webRequest = WebRequest.Create("http://files.minecraftforge.net/maven/net/minecraftforge/forge/" + forgefilename + "/forge-" + forgefilename + "-installer.jar");
-                    WebResponse webResponse;
                     try
                     {
                         webRequest.GetResponse();
@@ -408,12 +407,12 @@ namespace GDLauncher.Classes
                     }
                     catch
                     {
-                        MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("extractedForgeNotFound"));
+                        MessageBox.Show(Windows.Splashscreen.singleton.manager.GetString("extractedForgeNotFound"));
                     }
                     }
                 else
                 {
-                    MessageBox.Show(Pages.SplashScreen.singleton.manager.GetString("forgeInstallerNotExist"));
+                    MessageBox.Show(Windows.Splashscreen.singleton.manager.GetString("forgeInstallerNotExist"));
                 }
             }
 
@@ -597,12 +596,20 @@ namespace GDLauncher.Classes
                 {
                     foreach (var loc in additionalMods)
                     {
-                        newList.Add(new StructJson
+                        try
                         {
-                            URL = loc,
-                            fileName = Path.GetFileName(new Uri(loc).LocalPath),
-                            path = @"mods/" + Path.GetFileName(new Uri(loc).LocalPath)
-                        });
+                            newList.Add(new StructJson
+                            {
+                                URL = loc,
+                                fileName = Path.GetFileName(new Uri(loc).LocalPath),
+                                path = @"mods/" + Path.GetFileName(new Uri(loc).LocalPath)
+                            });
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Could not download " + loc);
+                            await Task.Delay(1000);
+                        }
                     }
                 }
                 return newList;

@@ -62,20 +62,10 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>929253AF3BA32D2AEE7CFC034EB749DFC81D4BEB</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>test.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
@@ -177,6 +167,7 @@
     </Compile>
     <Compile Include="Assets\Tips.cs" />
     <Compile Include="Classes\AutoUpdater.cs" />
+    <Compile Include="Classes\Bootstrapper.cs" />
     <Compile Include="Classes\ComputerInfoDetect.cs" />
     <Compile Include="Classes\ConfigProvider.cs" />
     <Compile Include="Classes\CurseApis.cs" />
@@ -295,9 +286,6 @@
     </Compile>
     <Compile Include="Pages\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\SplashScreen.xaml.cs">
-      <DependentUpon>SplashScreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="SessionData.cs" />
     <Compile Include="Window1.xaml.cs">
@@ -438,10 +426,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\SplashScreen.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Window1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -555,19 +539,16 @@
   <ItemGroup>
     <Resource Include="Images\howTo\md.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\spinner.gif" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\Fody.2.4.1\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.4.1\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Fody.2.4.4\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.4.4\build\Fody.targets'))" />
   </Target>
   <Import Project="..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" />
-  <Import Project="..\packages\Fody.2.4.1\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.1\build\Fody.targets')" />
+  <Import Project="..\packages\Fody.2.4.4\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.4\build\Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

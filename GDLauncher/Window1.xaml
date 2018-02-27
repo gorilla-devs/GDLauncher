@@ -10,7 +10,11 @@ Sample license text.
         xmlns:local="clr-namespace:GDLauncher"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         mc:Ignorable="d"
-        Title="GDLauncher" Width="600" Height="700" WindowStyle="None" ResizeMode="CanMinimize" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="GDLauncher" Width="600"
+        Height="700" WindowStyle="None"
+        ResizeMode="CanMinimize" Loaded="Window_Loaded"
+        WindowStartupLocation="CenterScreen"
+        Closed="Window_Closed">
     <materialDesign:DialogHost Identifier="RootDialog" CloseOnClickAway="{Binding Path=DialogContent.(local:DialogHostExtensions.CloseOnClickAway), RelativeSource={RelativeSource Self}, FallbackValue=True}">
             <DockPanel Name="maincontent">
                 <materialDesign:ColorZone Name="header" Padding="13"
