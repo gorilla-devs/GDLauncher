@@ -3,17 +3,20 @@ const https = require('http');
 const fs = require('fs');
 const async = require('async');
 
-console.log(process);
+// VANILLA COMMONS
+
+// EXTRACT MC LIBS
+
 
 async.eachLimit([
   "http://ovh.net/files/1Gio.dat"
 ], 3, (url, callback) => {
   const filename = url.split('/').pop().split('#')[0].split('?')[0];
-  var file = fs.createWriteStream(`dl/${filename}`);
+  const file = fs.createWriteStream(`dl/${filename}`);
   https.get(url, (res) => {
-    res.on('data', function (data) {
+    res.on('data', (data) => {
       file.write(data);
-    }).on('end', function () {
+    }).on('end', () => {
       file.end();
       console.log(url + ' downloaded');
     });
@@ -23,6 +26,6 @@ async.eachLimit([
   if (err) {
     console.log('A file failed to process');
   } else {
-    console.log("COMPLETED")
+    console.log('COMPLETED')
   }
 });

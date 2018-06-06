@@ -3,16 +3,14 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 
-
-
 class Downloader extends Component {
   constructor() {
-    super()
+    super();
 
-    this.intervalId = null
-    this.startClock = this.startClock.bind(this)
-    this.stopClock = this.stopClock.bind(this)
-    this.getCurrentTime = this.getCurrentTime.bind(this)
+    this.intervalId = null;
+    this.startClock = this.startClock.bind(this);
+    this.stopClock = this.stopClock.bind(this);
+    this.getCurrentTime = this.getCurrentTime.bind(this);
   }
 
   componentDidMount() {

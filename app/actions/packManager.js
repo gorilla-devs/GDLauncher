@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../constants';
 
 export const GET_MC_VANILLA_VERSIONS = 'GET_MC_VANILLA_VERSIONS';
@@ -20,7 +21,7 @@ export function createPack(url, packName) {
   const versionData = axios.get(url).then((response) => {
     // CREA LA CARTELLA DEL PACCHETTO SE NON ESISTE
     if (!fs.existsSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/`)) {
-      fs.mkdirSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/`);
+      mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/`);
       fs.writeFileSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/vnl.json`, JSON.stringify(response.data));
     }
   });
