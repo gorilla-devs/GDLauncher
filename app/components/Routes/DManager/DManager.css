@@ -1,0 +1,59 @@
+.background_image {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: block;
+  background-image: url("../../../assets/images/background2.jpg");
+  background-position: center;
+  width: 100%;
+  height: 100%;
+}
+
+.background_overlay{
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: block;
+  background: rgba(44, 62, 80, 0.77);
+  width: 100%;
+  height: 100%;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 200px;
+  grid-gap: 10px;
+  grid-template-rows: 400px auto;
+  grid-template-areas: 
+  "subtitle subtitle subtitle sidebar"
+  "actions actions actions sidebar";
+  align-items: center;
+  color: #fff;
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 1000;
+  margin-left: 10px;
+}
+
+.mainText{
+  grid-area: subtitle;
+  color: #bdc3c7;
+  height: 400px;
+  padding: 40px;
+  background-color: #34495e;
+  margin-top: 20px;
+
+}
+
+
+.actions{
+  display: inline-flex;
+  justify-self: center;
+  margin-top: 5vh;
+  align-self: start;
+  grid-area: actions;
+}

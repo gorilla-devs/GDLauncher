@@ -1,0 +1,17 @@
+.sidenav{
+  clear: none; 
+  height: 100vh;
+  grid-area: sidebar;
+  background-color: #34495e;
+}
+
+.accountDiv{
+  transition: all 0.2s;
+  border-radius: 7px;
+  padding: 10px;
+}
+
+.accountDiv:hover{
+  background-color: rgba(255, 255, 255, .2);
+  transition: all 0.2s;
+}

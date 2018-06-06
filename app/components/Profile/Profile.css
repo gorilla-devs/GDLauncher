@@ -1,0 +1,65 @@
+.background_image {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: block;
+  background-image: url("../../assets/images/profile.jpg");
+  background-position: center;
+  width: 100%;
+  height: 100%;
+}
+
+.background_overlay{
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: block;
+  background: rgba(44, 62, 80, 0.77);
+  width: 100%;
+  height: 100%;
+
+
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 200px;
+  grid-gap: 10px;
+  grid-template-rows: 70px auto;
+  grid-template-areas: 
+  "presentation presentation . sidebar"
+  "hours . . sidebar"
+  "skin skin skin sidebar";
+  align-items: center;
+  color: #fff;
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 1000;
+  margin-left: 10px;
+}
+
+.mainText{
+  grid-area: presentation;
+  color: #bdc3c7;
+  height: 70px;
+  padding: 40px;
+  margin-top: 20px;
+}
+
+.hours{
+  grid-area: hours;
+  padding-left: 40px;
+  color: #bdc3c7;
+}
+
+.skin{
+  display: inline-flex;
+  justify-self: center;
+  margin-top: 5vh;
+  align-self: start;
+  grid-area: skin;
+}

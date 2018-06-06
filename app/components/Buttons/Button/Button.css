@@ -1,0 +1,44 @@
+.button{
+  display: block;
+  background: #2980b9;
+  border: 0;
+  padding: 10px 30px 10px 30px;
+  color: white;
+  font-size: 17px;
+  float: right;
+  transition: background-color .25s;
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+}
+
+.button:hover{
+  background: #60abdd;
+  transition: all .25s;
+  cursor:pointer;
+}
+.button:focus, .button:active{
+  border-style: outset;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+  outline: none;
+  border: none;
+  cursor:pointer;
+}
+
+.ripple{
+  position:absolute;
+  background:#fff;
+  border-radius:50%;
+  width:5px;
+  height:5px;
+  animation:rippleEffect .88s 1;
+  opacity:0;
+  cursor:pointer;
+
+}
+
+@keyframes rippleEffect {
+  0% {transform:scale(1); opacity:0.4;}
+  100% {transform:scale(100); opacity:0;}
+}

@@ -1,0 +1,44 @@
+.background_image {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: block;
+  background-image: url("../../../assets/images/login_background.jpg");
+  background-position: center;
+  width: 100%;
+  height: 100%;
+}
+
+.background_overlay{
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: block;
+  background: rgba(44, 62, 80, 0.77);
+  width: 100%;
+  height: 100%;
+
+
+}
+
+.content {
+  color: #fff;
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 1000;
+  margin-left: 20px;
+}
+
+.login_form {
+  width: 300px;
+  margin: auto;
+  padding-top: 26vh;
+}
+
+.login_form_button{
+  left: 78px;
+}

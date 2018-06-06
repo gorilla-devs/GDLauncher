@@ -1,0 +1,12 @@
+.container{
+    display: inline-grid;
+    grid-template-columns: 170px 326px auto;
+    margin: 0;
+    width: 100%;
+    height: 100x;
+    align-items: center;
+    padding-left: 10px;
+    background: rgb(44, 62, 80);
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+}
