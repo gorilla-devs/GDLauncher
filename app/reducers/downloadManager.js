@@ -2,7 +2,6 @@ import update from 'immutability-helper';
 import {
   ADD_TO_ACTUAL_DOWNLOAD,
   ADD_TO_QUEUE,
-  EXTRACT_LIBS,
   DOWNLOAD_COMPLETED
 } from '../actions/downloadManager';
 
@@ -20,7 +19,8 @@ export default function profile(state = initialState, action) {
           ...state.downloadQueue,
           [action.payload]: {
             name: action.payload,
-            libs: []
+            totalToDownload: 0,
+            packType: action.packType
           }
         }
       };
@@ -28,14 +28,6 @@ export default function profile(state = initialState, action) {
       return {
         ...state
       };
-    case EXTRACT_LIBS:
-      return update(state, {
-        downloadQueue: {
-          [action.packName]: {
-            libs: { $set: action.payload }
-          }
-        }
-      });
     case DOWNLOAD_COMPLETED:
       return state;
     default:

@@ -2,14 +2,13 @@ import {
   GET_MC_VANILLA_VERSIONS,
   GET_MC_VANILLA_VERSION_DATA,
   RESET_MODAL_STATUS
-} from '../actions/VanillaMC';
+} from '../actions/packManager';
 
 const initialState = {
   fetchingVersions: false,
   versionsManifest: [],
   fetchingSelectedVersionData: false,
-  fetchedSelectedVersionData: false,
-  selectedVersionDataManifest: []
+  fetchedSelectedVersionData: false
 };
 
 export default function vanilla(state = initialState, action) {
@@ -40,7 +39,6 @@ export default function vanilla(state = initialState, action) {
     case `${GET_MC_VANILLA_VERSION_DATA}_FULFILLED`:
       return {
         ...state,
-        selectedVersionDataManifest: action.payload.data,
         fetchingSelectedVersionData: false,
         fetchedSelectedVersionData: true,
       };

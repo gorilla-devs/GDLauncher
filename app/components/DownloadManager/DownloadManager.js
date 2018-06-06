@@ -37,7 +37,7 @@ export default class DownloadManager extends Component<Props> {
                   <List.Item>
                     <List.Item.Meta
                       title={
-                        <span style={{ color: 'black' }}>{item.name} 0 / {item.libs.length} </span>
+                        <span style={{ color: 'black' }}>{item.name} <span style={{ float: 'right' }}>0 / {item.totalToDownload}</span> </span>
                       }
                       description={<Progress percent={50} status="active" />}
                     />

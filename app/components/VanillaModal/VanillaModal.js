@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Select, Form, Input, Icon, Button, Modal } from 'antd';
 import styles from './VanillaModal.css';
-import { resetModalStatus } from '../../actions/VanillaMC';
+import { resetModalStatus } from '../../actions/packManager';
 
 type Props = {};
 const FormItem = Form.Item;
@@ -21,10 +21,11 @@ class VanillaModal extends Component<Props> {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         this.pack = values.packName;
-        this.props.getVanillaMCVersionData(
+        this.props.createPack(
           this.props.versionsManifest.find(
             (version) =>
-              version.id === values.version).url, values.packName);
+              version.id === values.version).url,
+          values.packName);
       }
     });
   }

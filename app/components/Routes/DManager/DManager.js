@@ -1,12 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Card, Select, Modal, Icon, Form } from 'antd';
+import { Button, Icon } from 'antd';
 import styles from './DManager.css';
-import Dot from '../../Others/Dot/Dot';
 import SideBar from '../../Layout/SideBar/SideBar';
 import VanillaModal from '../../../containers/VanillaModal';
-import { extractLibsList } from '../../../utils/manifestUtils';
 
 type Props = {};
 
@@ -29,8 +26,8 @@ export default class DManager extends Component<Props> {
   closeVanillaModal(download = null, packName) {
     this.setState({ vanillaModalIsOpen: false });
     if (download === true) {
-      this.props.addToQueue(packName);
-      this.props.downloadPack(packName);
+      this.props.addToQueue(packName, 'vanilla');
+      // this.props.downloadPack(packName);
     }
   }
   /* eslint-disable */
