@@ -4,7 +4,7 @@
   right: 0;
   z-index: 1;
   display: block;
-  background-image: url("../../assets/images/profile.jpg");
+  background-image: url("../../assets/images/background2.jpg");
   background-position: center;
   width: 80%;
   height: 100%;
@@ -19,11 +19,4 @@
   background: rgba(44, 62, 80, 0.77);
   width: 80%;
   height: 100%;
-}
-
-.main{
-  overflow-y: auto;
-  max-height: 94%;
-  position: fixed;
-  z-index: 4;
 }

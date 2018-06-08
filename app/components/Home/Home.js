@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, Select, Modal } from 'antd';
 import styles from './Home.css';
-import Dot from '../../Others/Dot/Dot';
-import Navigation from '../../../containers/Navigation';
-import SideBar from '../../Layout/SideBar/SideBar';
+import Dot from '../Common/Dot/Dot';
+import Navigation from '../../containers/Navigation';
+import SideBar from '../Common/SideBar/SideBar';
 
 type Props = {};
 
@@ -50,7 +50,6 @@ export default class Home extends Component<Props> {
         <div className={styles.background_image} />
         <div className={styles.background_overlay} />
         <main className={styles.content}>
-          <SideBar />
           <div className={styles.socialsContainer}>
             { /* eslint-disable */}
             <img

@@ -6,10 +6,11 @@ import { AnimatedSwitch } from 'react-router-transition';
 import { Form } from 'antd';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
+import SideBar from './components/Common/SideBar/SideBar';
 import DManager from './containers/DManagerPage';
 import Profile from './containers/ProfilePage';
 import Navigation from './containers/Navigation';
-import Login from './components/Routes/Login/Login';
+import Login from './components/Login/Login';
 import Settings from './components/Settings/Settings';
 
 
@@ -47,11 +48,8 @@ class RouteDef extends Component<Props> {
     return (
       <App>
         <Navigation />
-        <AnimatedSwitch
-          atEnter={{ opacity: 0 }}
-          atLeave={{ opacity: 0 }}
-          atActive={{ opacity: 1 }}
-        >
+        <SideBar />
+        <Switch>
           <Route exact path="/" component={Form.create()(Login)} />
           <Route path="/dmanager" component={DManager} />
           <Route path="/profile" component={Profile} />
@@ -62,7 +60,7 @@ class RouteDef extends Component<Props> {
             path="/settings"
             component={Settings}
           /> : <Redirect to={this.previousLocation.pathname} />}
-        </AnimatedSwitch>
+        </Switch>
 
       </App>
     );

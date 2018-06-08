@@ -4,9 +4,9 @@
   right: 0;
   z-index: 1;
   display: block;
-  background-image: url("../../../assets/images/background.jpg");
+  background-image: url("../../assets/images/background.jpg");
   background-position: center;
-  width: 100%;
+  width: 80%;
   height: 100%;
 }
 
@@ -17,7 +17,7 @@
   z-index: 2;
   display: block;
   background: rgba(44, 62, 80, 0.77);
-  width: 3fr;
+  width: 80%;
   height: 100%;
 
 

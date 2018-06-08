@@ -1,2 +1,4 @@
-export const LAUNCHER_FOLDER = `dl`;
-export const PACKS_FOLDER_NAME = `packs`;
+module.exports = {
+  LAUNCHER_FOLDER: 'dl',
+  PACKS_FOLDER_NAME: 'packs'
+}

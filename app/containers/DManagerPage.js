@@ -1,6 +1,6 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import DManager from '../components/Routes/DManager/DManager';
+import DManager from '../components/DManager/DManager';
 import * as downloadManagerActions from '../actions/downloadManager';
 
 function mapStateToProps(state) {

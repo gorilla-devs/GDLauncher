@@ -38,8 +38,19 @@ export function downloadPack(pack) {
     const { fork } = require('child_process');
     const forked = fork(`${__dirname}/workers/downloadPackage.js`, {
       env: {
-        PACKINFO: downloadManager.downloadQueue[pack]
+        name: downloadManager.downloadQueue[pack].name
       }
+    });
+    forked.on('message', (data) => {
+      const { downloaded, total } = data;
+      dispatch({
+        type: DOWNLOAD_FILE_COMPLETED,
+        payload: {
+          pack,
+          downloaded,
+          total
+        }
+      })
     });
 
 

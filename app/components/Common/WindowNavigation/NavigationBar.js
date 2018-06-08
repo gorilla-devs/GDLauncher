@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 import styles from './NavigationBar.css';
-import WindowCloseBtn from '../../Buttons/WindowCloseButton/WindowCloseButton';
+import WindowCloseBtn from '../WindowCloseButton/WindowCloseButton';
 
 const { SubMenu, MenuItemGroup } = Menu;
 

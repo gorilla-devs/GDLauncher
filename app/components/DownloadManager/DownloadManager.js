@@ -34,12 +34,18 @@ export default class DownloadManager extends Component<Props> {
                   Object.values(this.props.downloadQueue)
                 }
                 renderItem={item => (
-                  <List.Item>
+                  <List.Item style={{ overflowX: 'hidden' }}>
                     <List.Item.Meta
                       title={
-                        <span style={{ color: 'black' }}>{item.name} <span style={{ float: 'right' }}>0 / {item.totalToDownload}</span> </span>
+                        <span style={{ color: 'black' }}>
+                          {item.name} <span style={{ float: 'right' }}>
+                            {item.downloaded} / {item.totalToDownload}
+                          </span>
+                        </span>
                       }
-                      description={<Progress percent={50} status="active" />}
+                      description={
+                        <Progress percent={item.totalToDownload !== 0 ? (item.downloaded * 100) / item.totalToDownload : 0} status="active" />
+                      }
                     />
                   </List.Item>
                 )}

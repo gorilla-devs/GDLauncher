@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip, Modal } from 'antd';
 import styles from './Login.css';
-import * as AuthActions from '../../../actions/auth';
+import * as AuthActions from '../../actions/auth';
 
 type Props = {};
 

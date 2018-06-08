@@ -1,7 +1,8 @@
 .sidenav{
+  width: 200px;
   clear: none; 
+  float: right;
   height: 100vh;
-  grid-area: sidebar;
   background-color: #34495e;
 }
 

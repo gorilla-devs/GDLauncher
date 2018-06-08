@@ -43,7 +43,8 @@
       "splash.html",
       "main.prod.js",
       "main.prod.js.map",
-      "package.json"
+      "package.json",
+      "workers/downloadPackage.js"
     ],
     "dmg": {
       "contents": [
