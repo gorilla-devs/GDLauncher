@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 import {
-  ADD_TO_ACTUAL_DOWNLOAD,
+  START_DOWNLOAD,
   ADD_TO_QUEUE,
   DOWNLOAD_COMPLETED,
   DOWNLOAD_FILE_COMPLETED
@@ -11,7 +11,7 @@ const initialState = {
   actualDownload: null,
 };
 
-export default function profile(state = initialState, action) {
+export default function downloadManager(state = initialState, action) {
   switch (action.type) {
     case ADD_TO_QUEUE:
       return {
@@ -22,16 +22,37 @@ export default function profile(state = initialState, action) {
             name: action.payload,
             totalToDownload: 0,
             downloaded: 0,
-            packType: action.packType
+            packType: action.packType,
+            downloadCompleted: false,
+            status: 'Queued'
           }
         }
       };
-    case ADD_TO_ACTUAL_DOWNLOAD:
+    case START_DOWNLOAD:
       return {
-        ...state
+        ...state,
+        actualDownload: action.payload,
+        downloadQueue: {
+          ...state.downloadQueue,
+          [action.payload]: {
+            ...state.downloadQueue[action.payload],
+            status: 'Downloading'
+          }
+        }
       };
     case DOWNLOAD_COMPLETED:
-      return state;
+      return {
+        ...state,
+        actualDownload: null,
+        downloadQueue: {
+          ...state.downloadQueue,
+          [action.payload]: {
+            ...state.downloadQueue[action.payload],
+            downloadCompleted: true,
+            status: 'Completed'
+          }
+        }
+      };
     case DOWNLOAD_FILE_COMPLETED:
       return {
         ...state,

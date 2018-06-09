@@ -2,31 +2,28 @@ import axios from 'axios';
 import * as https from 'https';
 import * as fs from 'fs';
 import async from 'async-es';
-import { LAUNCHER_FOLDER } from '../constants';
 
 
-export const ADD_TO_ACTUAL_DOWNLOAD = 'ADD_TO_ACTUAL_DOWNLOAD';
+export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const ADD_TO_QUEUE = 'ADD_TO_QUEUE';
 export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
 export const DOWNLOAD_FILE_COMPLETED = 'DOWNLOAD_FILE_COMPLETED';
 
-export function addToActualDownload(pack) {
-  return (dispatch) => {
-    dispatch({
-      type: ADD_TO_ACTUAL_DOWNLOAD,
-      payload: pack
-    });
-  };
-}
-
 export function addToQueue(pack, packType) {
   return (dispatch, getState) => {
-    const { vanilla } = getState();
+    const { downloadManager } = getState();
     dispatch({
       type: ADD_TO_QUEUE,
       payload: pack,
       packType
     });
+    if (downloadManager.actualDownload === null) {
+      dispatch({
+        type: START_DOWNLOAD,
+        payload: pack
+      });
+      dispatch(downloadPack(pack));
+    }
   };
 }
 
@@ -42,17 +39,46 @@ export function downloadPack(pack) {
       }
     });
     forked.on('message', (data) => {
-      const { downloaded, total } = data;
-      dispatch({
-        type: DOWNLOAD_FILE_COMPLETED,
-        payload: {
-          pack,
-          downloaded,
-          total
-        }
-      })
+      const { downloaded, total, action } = data;
+      switch (action) {
+        case 'UPDATE__FILES':
+          dispatch({
+            type: DOWNLOAD_FILE_COMPLETED,
+            payload: {
+              pack,
+              downloaded,
+              total
+            }
+          });
+          break;
+        case 'DOWNLOAD__COMPLETED':
+          dispatch({
+            type: DOWNLOAD_COMPLETED,
+            payload: pack
+          });
+          // CHECK IF ANY ITEM EXISTS IN THE QUEUE YET TO BE DOWNLOADED.
+          // IF YES, ADD IT TO THE ACTUALDOWNLOAD
+          dispatch(addNextPackToActualDownload(pack));
+          break;
+        default:
+          break;
+      }
     });
+  };
+}
 
-
+function addNextPackToActualDownload(previousPack) {
+  return (dispatch, getState) => {
+    const { downloadManager } = getState();
+    const queueArr = Object.keys(downloadManager.downloadQueue);
+    const actualPackIndex = queueArr.indexOf(previousPack);
+    const nextPackName = queueArr[actualPackIndex + 1];
+    if (actualPackIndex + 1 < queueArr.length) {
+      dispatch({
+        type: START_DOWNLOAD,
+        payload: nextPackName
+      });
+      dispatch(downloadPack(nextPackName));
+    }
   };
 }

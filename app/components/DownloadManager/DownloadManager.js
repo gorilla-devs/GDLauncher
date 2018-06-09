@@ -6,19 +6,13 @@ import styles from './DownloadManager.css';
 
 type Props = {
   downloadQueue: Object,
+  actualDownload: string,
   open: boolean,
   handleOpen: () => void
 };
 
 export default class DownloadManager extends Component<Props> {
   props: Props;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      actualDownload: null
-    }
-  }
 
   render() {
 
@@ -38,13 +32,18 @@ export default class DownloadManager extends Component<Props> {
                     <List.Item.Meta
                       title={
                         <span style={{ color: 'black' }}>
-                          {item.name} <span style={{ float: 'right' }}>
+                          {item.name} {item.status}
+
+                          <span style={{ float: 'right' }}>
                             {item.downloaded} / {item.totalToDownload}
                           </span>
                         </span>
                       }
                       description={
-                        <Progress percent={item.totalToDownload !== 0 ? (item.downloaded * 100) / item.totalToDownload : 0} status="active" />
+                        <Progress
+                          percent={item.totalToDownload !== 0 ? Math.floor((item.downloaded * 100) / item.totalToDownload) : 0}
+                          status={((item.downloaded !== item.totalToDownload) || (item.totalToDownload === 0)) ? 'active' : 'success'}
+                        />
                       }
                     />
                   </List.Item>

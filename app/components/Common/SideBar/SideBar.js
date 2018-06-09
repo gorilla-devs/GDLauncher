@@ -93,11 +93,12 @@ class SideBar extends Component<Props> {
             >
               <Icon
                 type="setting"
-                style={{ fontSize: 22 }}
+                style={{ fontSize: 22, color: 'rgba(255, 255, 255, 0.65)' }}
               />
             </Link>,
             <DownloadManager
               downloadQueue={this.props.downloadQueue}
+              actualDownload={this.props.actualDownload}
               open={this.state.downloadPopoverOpen}
               handleOpen={this.handleVisibleChange}
             />
@@ -172,7 +173,8 @@ function mapStateToProps(state) {
     disconnected: !state.auth.isAuthValid,
     profileState: state.profile.profileState,
     stateColor: state.profile.stateColor,
-    downloadQueue: state.downloadManager.downloadQueue
+    downloadQueue: state.downloadManager.downloadQueue,
+    actualDownload: state.downloadManager.actualDownload
   };
 }
 

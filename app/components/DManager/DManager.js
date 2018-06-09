@@ -26,9 +26,6 @@ export default class DManager extends Component<Props> {
     this.setState({ vanillaModalIsOpen: false });
     if (download === true) {
       this.props.addToQueue(packName, 'vanilla');
-      setTimeout(() => {
-        this.props.downloadPack(packName);
-      }, 2000);
     }
   }
   /* eslint-disable */

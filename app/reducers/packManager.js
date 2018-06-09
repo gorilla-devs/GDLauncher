@@ -11,7 +11,7 @@ const initialState = {
   fetchedSelectedVersionData: false
 };
 
-export default function vanilla(state = initialState, action) {
+export default function packManager(state = initialState, action) {
   switch (action.type) {
     case `${GET_MC_VANILLA_VERSIONS}_PENDING`:
       return {

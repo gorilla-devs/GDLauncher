@@ -41,10 +41,10 @@
 @code-family            : Consolas, Menlo, Courier, monospace;
 @heading-color          : fade(#fff, 85%);
 @text-color             : fade(#fff, 65%);
-@text-color-secondary   : fade(#fff, 45%);
+@text-color-secondary   : fade(rgb(255, 255, 255), 45%);
 @heading-color-dark     : fade(#fff, 100%);
-@text-color-dark        : fade(#fff,85%);
-@text-color-secondary-dark: fade(#fff, 65%);
+@text-color-dark        : fade(rgb(0, 0, 0),85%);
+@text-color-secondary-dark: fade(rgb(0, 0, 0), 65%);
 @font-size-base         : 14px;
 @font-size-lg           : @font-size-base + 2px;
 @font-size-sm           : 12px;
@@ -107,9 +107,9 @@
 @background-color-base  : hsv(0, 0, 96%);  // Default grey background color
 
 // Disabled states
-@disabled-color         : fade(#000, 25%);
+@disabled-color         : fade(rgb(255, 255, 255), 30%);
 @disabled-bg            : @background-color-base;
-@disabled-color-dark    : fade(#fff, 35%);
+@disabled-color-dark    : fade(#fff, 10%);
 
 // Shadow
 @shadow-color           : rgba(0, 0, 0, .15);
@@ -128,7 +128,7 @@
 @btn-primary-color      : #fff;
 @btn-primary-bg         : @primary-color;
 
-@btn-default-color      : @text-color;
+@btn-default-color      : @text-color-dark;
 @btn-default-bg         : #fff;
 @btn-default-border     : @border-color-base;
 
@@ -208,14 +208,14 @@
 
 // Layout
 @layout-body-background      : #34495e;
-@layout-header-background    : #001529;
+@layout-header-background    : @midnight;
 @layout-footer-background    : @layout-body-background;
 @layout-header-height        : 64px;
 @layout-header-padding       : 0 50px;
 @layout-footer-padding       : 24px 50px;
 @layout-sider-background     : @layout-header-background;
 @layout-trigger-height       : 48px;
-@layout-trigger-background   : #002140;
+@layout-trigger-background   : #24323f;
 @layout-trigger-color        : #fff;
 @layout-zero-trigger-width   : 36px;
 @layout-zero-trigger-height  : 42px;
@@ -319,8 +319,8 @@
 @menu-item-active-bg: @item-active-bg;
 @menu-item-group-title-color: @text-color-secondary;
 // dark theme
-@menu-dark-color: @text-color-secondary-dark;
-@menu-dark-bg: @layout-header-background;
+@menu-dark-color: @text-color;
+@menu-dark-bg: @midnight;
 @menu-dark-arrow-color: #fff;
 @menu-dark-submenu-bg: #000c17;
 @menu-dark-highlight-color: #fff;

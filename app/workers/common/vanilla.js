@@ -11,16 +11,6 @@ function extractLibs(json) {
       libs.push(lib.downloads.artifact.url);
       libs.push(lib.downloads.artifact.url);
       libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
-      libs.push(lib.downloads.artifact.url);
     }
   });
   return libs;
