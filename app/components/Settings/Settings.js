@@ -43,11 +43,12 @@ class VanillaModal extends Component<Props> {
         ]}
         style={{
           minWidth: '100%',
+          height: '100%',
           top: 0,
           padding: 0,
           margin: 0
         }}
-        bodyStyle={{ maxHeight: '85vh', minHeight: '85vh', overflowY: 'scroll', }}
+        bodyStyle={{ maxHeight: 'calc(92.8vh - 54.6px)', minHeight: 'calc(92.8vh - 54.6px)', overflowY: 'scroll', }}
         onCancel={() => {
           this.props.history.goBack();
         }}

@@ -1,0 +1,143 @@
+.icon {
+  margin: 10px;
+  width: 90px;
+}
+
+.icon__upContainer {
+  width: 90px;
+  height: 90px;
+}
+
+
+/* UP TRIANGLE PLAY */
+
+.icon__up {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  border-style: inset;
+  transition: border-width .2s;
+  border-width: 0 45px 45px 45px;
+  border-color: #2ecc71 transparent transparent transparent;
+  float: left;
+  margin: auto;
+}
+
+.icon:hover .icon__up {
+  transition: border-width .2s;
+  border-width: 45px 45px 0 45px;
+}
+
+.icon__up span {
+  text-align: center;
+  top: -40px;
+  cursor: pointer;
+  left: -12px;
+  visibility: hidden;
+  position: relative;
+  margin: 0px;
+  z-index: 5;
+}
+
+.icon:hover .icon__up span {
+  visibility: visible;
+  transition-delay: 0.13s;
+}
+.icon__up span i {
+  font-size: 24px;
+}
+
+/* RIGHT TRIANGLE MOVE */
+
+.icon__right {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  border-style: inset;
+  transition: border-width .2s;
+  border-width: 45px 0 45px 90px;
+  border-color: transparent #2ecc71 transparent transparent;
+  margin: auto;
+}
+
+.icon:hover .icon__right {
+  transition: border-width .2s;
+  border-width: 45px 45px 45px 45px;
+}
+
+.icon__right span {
+  text-align: center;
+  top: -13px;
+  cursor: pointer;
+  left: 17px;
+  visibility: hidden;
+  position: relative;
+  margin: 0px;
+}
+
+.icon:hover .icon__right span {
+  visibility: visible;
+  transition-delay: 0.13s;
+}
+.icon__right span i {
+  z-index: 5;
+  font-size: 24px;
+}
+
+/* BOTTOM TRIANGLE PLAY */
+
+.icon__bottom {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  border-style: inset;
+  transition: border-width .2s;
+  border-width: 90px 45px 0px 45px;
+  border-color:  transparent transparent #2ecc71  transparent;
+  margin: auto;
+}
+
+.icon:hover .icon__bottom {
+  transition: border-width .2s;
+  border-width: 45px 45px 45px 45px;
+}
+
+.icon__bottom span {
+  text-align: center;
+  top: 16px;
+  cursor: pointer;
+  left: -12px;
+  visibility: hidden;
+  position: relative;
+  margin: 0px;
+  z-index: 5;
+}
+
+.icon:hover .icon__bottom span {
+  visibility: visible;
+  transition-delay: 0.13s;
+}
+.icon__bottom span i {
+  font-size: 24px;
+}
+
+/* ALL THE REST */
+
+.icon__image {
+  width: 90px;
+  height: 90px;
+  transition: all .2s;
+  border-radius: 18px;
+  background: url(http://www.mc-mod.net/wp-content/uploads/2017/05/All-The-Mods-modpack-for-minecraft-logo-1-750x422.png) center no-repeat;
+}
+
+.icon:hover .icon__image {
+  transition: all .2s;
+  border-radius: 0;
+}
+
+.icon__text {
+  text-align: center;
+  margin-top: 5px;
+  cursor: move;
+}

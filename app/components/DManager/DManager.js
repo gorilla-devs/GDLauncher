@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Button, Icon } from 'antd';
 import styles from './DManager.css';
 import VanillaModal from '../../containers/VanillaModal';
+import DIcon from '../DIcon/DIcon';
 
 type Props = {};
 
@@ -42,7 +43,9 @@ export default class DManager extends Component<Props> {
         <div className={styles.background_image} />
         <div className={styles.background_overlay} />
         <main className={styles.main}>
-          <button onClick={this.openVanillaModal}>Open</button>
+          <DIcon name="My Pack" />
+          <DIcon name="My Pack" />
+          <DIcon name="My Pack" />
         </main>
         {this.state.vanillaModalIsOpen && <VanillaModal
           visible={this.state.vanillaModalIsOpen}
