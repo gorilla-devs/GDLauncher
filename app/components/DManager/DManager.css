@@ -1,12 +1,14 @@
 .background_image {
   position: fixed;
-  left: 0;
-  right: 0;
+  left: 50%;
+  margin-left: calc(((100%) / 2) * -1); /* Negative half of width. */
   z-index: 1;
   display: block;
   background-image: url("../../assets/images/background2.jpg");
-  background-position: center;
-  width: 80%;
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: calc(100% - 200px);
   height: 100%;
 }
 
@@ -17,6 +19,12 @@
   z-index: 2;
   display: block;
   background: rgba(44, 62, 80, 0.77);
-  width: 80%;
+  width: calc(100% - 200px);
   height: 100%;
+}
+
+.main{
+  height: calc(100% - 47.6px);
+  position: fixed;
+  z-index: 4;
 }

@@ -39,7 +39,9 @@ export default class DManager extends Component<Props> {
   render() {
     return (
       <div>
-        <main>
+        <div className={styles.background_image} />
+        <div className={styles.background_overlay} />
+        <main className={styles.main}>
           <button onClick={this.openVanillaModal}>Open</button>
         </main>
         {this.state.vanillaModalIsOpen && <VanillaModal

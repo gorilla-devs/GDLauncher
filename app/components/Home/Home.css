@@ -6,7 +6,8 @@
   display: block;
   background-image: url("../../assets/images/background.jpg");
   background-position: center;
-  width: 80%;
+  background-repeat: no-repeat;
+  width: calc(100% - 200px);
   height: 100%;
 }
 
@@ -17,7 +18,7 @@
   z-index: 2;
   display: block;
   background: rgba(44, 62, 80, 0.77);
-  width: 80%;
+  width: calc(100% - 200px);
   height: 100%;
 
 
@@ -25,9 +26,9 @@
 
 .content {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 200px;
+  grid-template-columns: 1fr .5fr 1fr 200px;
   grid-gap: 10px;
-  grid-template-rows: 70px 70px auto;
+  grid-template-rows: 50px 50px auto;
   grid-template-areas: 
   "title title title sidebar"
   "subtitle subtitle subtitle sidebar"
@@ -39,8 +40,9 @@
   left: 0;
   right: 0;
   height: 100vh;
-  z-index: 1000;
-  margin-left: 20px;
+  width: calc(100% - 200px);
+  z-index: 3;
+  padding-left: 100px;
 }
 
 .title{
@@ -51,7 +53,8 @@
 }
 .socialsContainer{
   position: absolute;
-  right: 220px;
+  display: inline;
+  right: 30px;
   top: 15px;
 }
 .socialBtn{
@@ -86,7 +89,7 @@
 .botDots{
   justify-self: start;
   grid-area: botdots;
-  padding-bottom: 30px;
+  padding-bottom: 10%;
 }
 
 .botBtn{

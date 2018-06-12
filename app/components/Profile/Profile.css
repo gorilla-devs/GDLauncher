@@ -6,7 +6,8 @@
   display: block;
   background-image: url("../../assets/images/profile.jpg");
   background-position: center;
-  width: 80%;
+  background-repeat: no-repeat;
+  width: calc(100% - 200px);
   height: 100%;
 }
 
@@ -17,13 +18,13 @@
   z-index: 2;
   display: block;
   background: rgba(44, 62, 80, 0.77);
-  width: 80%;
+  width: calc(100% - 200px);
   height: 100%;
 }
 
 .main{
-  overflow-y: auto;
-  max-height: 94%;
-  position: fixed;
+  height: calc(100% - 47.6px);
+  width: calc(100% - 200px);
+  position: relative;
   z-index: 4;
 }
