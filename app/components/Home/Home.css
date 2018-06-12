@@ -26,7 +26,7 @@
 
 .content {
   display: grid;
-  grid-template-columns: 1fr .5fr 1fr 200px;
+  grid-template-columns: 1fr .5fr 1fr;
   grid-gap: 10px;
   grid-template-rows: 50px 50px auto;
   grid-template-areas: 
@@ -39,10 +39,9 @@
   position: fixed;
   left: 0;
   right: 0;
-  height: 100vh;
+  height: calc(100% - 47.6px);
   width: calc(100% - 200px);
   z-index: 3;
-  padding-left: 100px;
 }
 
 .title{
@@ -50,6 +49,7 @@
   margin-top: 50px;
   color: #fff;
   text-align: center;
+  font-size: 2.2vw
 }
 .socialsContainer{
   position: absolute;
@@ -70,6 +70,7 @@
   grid-area: subtitle;
   color: #bdc3c7;
   text-align: center;
+  font-size: 1.4vw;
 }
 
 .dotContainer{
