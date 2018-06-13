@@ -1,11 +1,13 @@
 // @flow
 import React, { Component } from 'react';
-import { Button, Icon } from 'antd';
+import { Button, Icon, Progress } from 'antd';
 import Draggable from 'react-draggable';
 import styles from './DIcon.css';
 
 type Props = {
-  name: string
+  name: string,
+  installing: boolean,
+  percentage: number
 };
 const classes = `${styles.icon__text} handle`
 
@@ -26,16 +28,29 @@ export default class DIcon extends Component<Props> {
       >
         <div className={styles.icon}>
           <div className={styles.icon__upContainer}>
-            <div className={styles.icon__up}>
-              <span><Icon type="play-circle" /></span>
-            </div>
-            <div className={styles.icon__right}>
-              <span><Icon type="appstore" /></span>
-            </div>
-            <div className={styles.icon__bottom}>
-              <span><Icon type="appstore" /></span>
-            </div>
-            <div className={styles.icon__image} />
+            {!this.props.installing &&
+              <div>
+                <div className={styles.icon__up}>
+                  <span><Icon type="play-circle" /></span>
+                </div>
+                <div className={styles.icon__right}>
+                  <span><Icon type="appstore" /></span>
+                </div>
+                <div className={styles.icon__bottom}>
+                  <span><Icon type="appstore" /></span>
+                </div>
+                <div className={styles.icon__left}>
+                  <span><Icon type="appstore" /></span>
+                </div>
+              </div>}
+            {this.props.installing &&
+              <div className={styles.icon__installing}>
+                <Progress type="circle" percent={this.props.percentage} width={80} />
+              </div>}
+            <div
+              className={styles.icon__image}
+              style={{ filter: this.props.installing ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
+            />
           </div>
           <div className={classes}>
             {this.props.name}

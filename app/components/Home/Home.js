@@ -92,9 +92,9 @@ export default class Home extends Component<Props> {
             </div>
           </div>
           <div className={styles.topBtn}>
-            <Button type="primary" size="large" style={{ width: 250, margin: 15 }}>Find Friends</Button>
+            <Button type="primary" size="large" style={{ width: '25vw', margin: 15 }}>Find Friends</Button>
             <Link to="/dmanager" draggable="false">
-              <Button type="primary" size="large" style={{ width: 250, margin: 15 }}>
+              <Button type="primary" size="large" style={{ width: '25vw', margin: 15 }}>
                 Play
               </Button>
             </Link>
@@ -102,7 +102,7 @@ export default class Home extends Component<Props> {
           <div className={styles.botBtn}>
             <Button
               type="primary"
-              style={{ width: 250, margin: 15, height: 90 }}
+              style={{ width: '25vw', margin: 15, height: '10vw' }}
               size="large"
               onClick={this.openModal}
             >
