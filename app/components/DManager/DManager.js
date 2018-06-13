@@ -43,9 +43,27 @@ export default class DManager extends Component<Props> {
         <div className={styles.background_image} />
         <div className={styles.background_overlay} />
         <main className={styles.main}>
-          <DIcon name="My Pack" />
-          <DIcon name="My Pack" />
-          <DIcon name="My Pack" />
+          <button onClick={this.openVanillaModal}>Open</button>
+          {Object.values(this.props.installingQueue).map((element) => {
+            return (<DIcon
+              name={element.name}
+              installing={
+                (() => {
+                  switch (element.status) {
+                    case 'Queued':
+                      return true;
+                    case 'Downloading':
+                      return true;
+                    case 'Completed':
+                      return false;
+                    default:
+                      return true;
+                  }
+                })()
+              }
+              percentage={element.totalToDownload !== 0 ? Math.floor((element.downloaded * 100) / element.totalToDownload) : 0}
+            />);
+          })}
         </main>
         {this.state.vanillaModalIsOpen && <VanillaModal
           visible={this.state.vanillaModalIsOpen}

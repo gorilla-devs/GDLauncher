@@ -3814,7 +3814,7 @@ a.ant-btn-sm {
   transition: all .3s;
 }
 .ant-fullcalendar-value:hover {
-  background: #f0fbff;
+  background: #2c3e50;
   cursor: pointer;
 }
 .ant-fullcalendar-value:active {
@@ -3882,7 +3882,7 @@ a.ant-btn-sm {
 }
 .ant-fullcalendar-fullscreen .ant-fullcalendar-month:hover,
 .ant-fullcalendar-fullscreen .ant-fullcalendar-date:hover {
-  background: #f0fbff;
+  background: #2c3e50;
   cursor: pointer;
 }
 .ant-fullcalendar-fullscreen .ant-fullcalendar-month:active,
@@ -4617,7 +4617,7 @@ a.ant-btn-sm {
   transition: all 0.3s;
 }
 .ant-cascader-menu-item:hover {
-  background: #f0fbff;
+  background: #2c3e50;
 }
 .ant-cascader-menu-item-disabled {
   cursor: not-allowed;
@@ -5220,7 +5220,7 @@ a.ant-btn-sm {
   position: relative;
 }
 .ant-calendar-date:hover {
-  background: #f0fbff;
+  background: #2c3e50;
   cursor: pointer;
 }
 .ant-calendar-date:active {
@@ -5718,7 +5718,7 @@ textarea.ant-calendar-range .ant-calendar-time-picker-input {
 .ant-calendar-range .ant-calendar-in-range-cell:before {
   content: '';
   display: block;
-  background: #f0fbff;
+  background: #2c3e50;
   border-radius: 0;
   border: 0;
   position: absolute;
@@ -5875,7 +5875,7 @@ div.ant-calendar-range-quick-selector > a {
   display: block;
 }
 .ant-calendar-time-picker-select li:hover {
-  background: #f0fbff;
+  background: #2c3e50;
 }
 li.ant-calendar-time-picker-select-option-selected {
   background: #f5f5f5;
@@ -6044,7 +6044,7 @@ li.ant-calendar-time-picker-select-option-disabled:hover {
   transition: background 0.3s ease;
 }
 .ant-calendar-month-panel-month:hover {
-  background: #f0fbff;
+  background: #2c3e50;
   cursor: pointer;
 }
 .ant-calendar-year-panel {
@@ -6164,7 +6164,7 @@ li.ant-calendar-time-picker-select-option-disabled:hover {
   transition: background 0.3s ease;
 }
 .ant-calendar-year-panel-year:hover {
-  background: #f0fbff;
+  background: #2c3e50;
   cursor: pointer;
 }
 .ant-calendar-year-panel-selected-cell .ant-calendar-year-panel-year {
@@ -6295,7 +6295,7 @@ li.ant-calendar-time-picker-select-option-disabled:hover {
   transition: background 0.3s ease;
 }
 .ant-calendar-decade-panel-decade:hover {
-  background: #f0fbff;
+  background: #2c3e50;
   cursor: pointer;
 }
 .ant-calendar-decade-panel-selected-cell .ant-calendar-decade-panel-decade {
@@ -6554,11 +6554,11 @@ li.ant-calendar-time-picker-select-option-disabled:hover {
 .ant-dropdown-menu-item-selected > a,
 .ant-dropdown-menu-submenu-title-selected > a {
   color: #3498db;
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-dropdown-menu-item:hover,
 .ant-dropdown-menu-submenu-title:hover {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-dropdown-menu-item-disabled,
 .ant-dropdown-menu-submenu-title-disabled {
@@ -11597,11 +11597,11 @@ textarea.ant-mention-wrapper .ant-mention-editor {
   transition: background 0.3s;
 }
 .ant-mention-dropdown-item:hover {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-mention-dropdown-item.focus,
 .ant-mention-dropdown-item-active {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-mention-dropdown-item-disabled {
   color: rgba(255, 255, 255, 0.3);
@@ -11687,7 +11687,7 @@ textarea.ant-mention-wrapper .ant-mention-editor {
 }
 .ant-menu-item:active,
 .ant-menu-submenu-title:active {
-  background: #f0fbff;
+  background: #2c3e50;
 }
 .ant-menu-submenu .ant-menu-sub {
   cursor: initial;
@@ -11742,7 +11742,7 @@ textarea.ant-mention-wrapper .ant-mention-editor {
   color: #3498db;
 }
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-menu-inline,
 .ant-menu-vertical,
@@ -14180,7 +14180,7 @@ span.ant-radio + * {
   transition: background 0.3s ease;
 }
 .ant-select-dropdown-menu-item:hover {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-select-dropdown-menu-item:first-child {
   border-radius: 4px 4px 0 0;
@@ -14204,7 +14204,7 @@ span.ant-radio + * {
   color: rgba(255, 255, 255, 0.65);
 }
 .ant-select-dropdown-menu-item-active {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-select-dropdown-menu-item-divider {
   height: 1px;
@@ -14234,6 +14234,9 @@ span.ant-radio + * {
 }
 :root .ant-select-dropdown.ant-select-dropdown--multiple .ant-select-dropdown-menu-item:after {
   font-size: 12px;
+}
+.ant-select-dropdown.ant-select-dropdown--multiple .ant-select-dropdown-menu-item:hover {
+  color: black;
 }
 .ant-select-dropdown.ant-select-dropdown--multiple .ant-select-dropdown-menu-item:hover:after {
   color: #ddd;
@@ -16716,7 +16719,7 @@ tr.ant-table-expanded-row:hover {
   transition: background 0.3s;
 }
 .ant-time-picker-panel-select li:hover {
-  background: #f0fbff;
+  background: #2c3e50;
 }
 li.ant-time-picker-panel-select-option-selected {
   background: #f5f5f5;
@@ -17200,7 +17203,7 @@ span.ant-transfer-list-search-action {
 }
 .ant-transfer-list-content-item:not(.ant-transfer-list-content-item-disabled):hover {
   cursor: pointer;
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-transfer-list-content-item-disabled {
   cursor: not-allowed;
@@ -17486,7 +17489,7 @@ span.ant-transfer-list-search-action {
   line-height: 24px;
 }
 .ant-tree li .ant-tree-node-content-wrapper:hover {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
   background-color: #e0f7ff;
@@ -17870,7 +17873,7 @@ li.ant-tree-treenode-disabled > .ant-tree-node-content-wrapper:hover {
   width: calc(100% - 24px);
 }
 .ant-select-tree li .ant-select-tree-node-content-wrapper:hover {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-select-tree li .ant-select-tree-node-content-wrapper.ant-select-tree-node-selected {
   background-color: #e0f7ff;
@@ -18188,7 +18191,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
   color: rgba(255, 255, 255, 0.65);
 }
 .ant-upload-list-item:hover .ant-upload-list-item-info {
-  background-color: #f0fbff;
+  background-color: #2c3e50;
 }
 .ant-upload-list-item:hover .anticon-cross {
   opacity: 1;
