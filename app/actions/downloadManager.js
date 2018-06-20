@@ -8,6 +8,7 @@ export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const ADD_TO_QUEUE = 'ADD_TO_QUEUE';
 export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
 export const DOWNLOAD_FILE_COMPLETED = 'DOWNLOAD_FILE_COMPLETED';
+export const UPDATE_TOTAL_FILES_TO_DOWNLOAD = 'UPDATE_TOTAL_FILES_TO_DOWNLOAD';
 
 export function addToQueue(pack, packType) {
   return (dispatch, getState) => {
@@ -39,14 +40,21 @@ export function downloadPack(pack) {
       }
     });
     forked.on('message', (data) => {
-      const { downloaded, total, action } = data;
+      const { total, action } = data;
       switch (action) {
         case 'UPDATE__FILES':
           dispatch({
             type: DOWNLOAD_FILE_COMPLETED,
             payload: {
+              pack
+            }
+          });
+          break;
+        case 'UPDATE__TOTAL':
+          dispatch({
+            type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
+            payload: {
               pack,
-              downloaded,
               total
             }
           });

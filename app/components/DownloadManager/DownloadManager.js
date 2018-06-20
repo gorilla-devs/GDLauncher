@@ -6,7 +6,6 @@ import styles from './DownloadManager.css';
 
 type Props = {
   downloadQueue: Object,
-  actualDownload: string,
   open: boolean,
   handleOpen: () => void
 };
@@ -15,7 +14,6 @@ export default class DownloadManager extends Component<Props> {
   props: Props;
 
   render() {
-
     return (
       <div>
         <Popover
@@ -41,8 +39,21 @@ export default class DownloadManager extends Component<Props> {
                       }
                       description={
                         <Progress
-                          percent={item.totalToDownload !== 0 ? Math.floor((item.downloaded * 100) / item.totalToDownload) : 0}
-                          status={((item.downloaded !== item.totalToDownload) || (item.totalToDownload === 0)) ? 'active' : 'success'}
+                          percent={
+                            (() => {
+                              switch (item.status) {
+                                case 'Queued':
+                                  return 0;
+                                case 'Downloading':
+                                  return Math.floor((item.downloaded * 100) / item.totalToDownload);
+                                case 'Completed':
+                                  return 100;
+                                default:
+                                  return 0;
+                              }
+                            })()
+                          }
+                          status={((item.downloaded !== item.totalToDownload) || (item.totalToDownload === 0 && item.status !== 'Completed')) ? 'active' : 'success'}
                         />
                       }
                     />

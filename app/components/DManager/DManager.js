@@ -61,7 +61,20 @@ export default class DManager extends Component<Props> {
                   }
                 })()
               }
-              percentage={element.totalToDownload !== 0 ? Math.floor((element.downloaded * 100) / element.totalToDownload) : 0}
+              percentage={
+                (() => {
+                  switch (element.status) {
+                    case 'Queued':
+                      return 0;
+                    case 'Downloading':
+                      return Math.floor((element.downloaded * 100) / element.totalToDownload);
+                    case 'Completed':
+                      return 100;
+                    default:
+                      return 0;
+                  }
+                })()
+          }
             />);
           })}
         </main>

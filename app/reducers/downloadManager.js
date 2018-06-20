@@ -3,7 +3,8 @@ import {
   START_DOWNLOAD,
   ADD_TO_QUEUE,
   DOWNLOAD_COMPLETED,
-  DOWNLOAD_FILE_COMPLETED
+  DOWNLOAD_FILE_COMPLETED,
+  UPDATE_TOTAL_FILES_TO_DOWNLOAD
 } from '../actions/downloadManager';
 
 const initialState = {
@@ -60,11 +61,21 @@ export default function downloadManager(state = initialState, action) {
           ...state.downloadQueue,
           [action.payload.pack]: {
             ...state.downloadQueue[action.payload.pack],
-            totalToDownload: action.payload.total,
-            downloaded: action.payload.downloaded
+            downloaded: state.downloadQueue[action.payload.pack].downloaded + 1
           }
         }
-      }
+      };
+    case UPDATE_TOTAL_FILES_TO_DOWNLOAD:
+      return {
+        ...state,
+        downloadQueue: {
+          ...state.downloadQueue,
+          [action.payload.pack]: {
+            ...state.downloadQueue[action.payload.pack],
+            totalToDownload: action.payload.total
+          }
+        }
+      };
     default:
       return state;
   }

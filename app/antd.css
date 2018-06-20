@@ -14235,9 +14235,6 @@ span.ant-radio + * {
 :root .ant-select-dropdown.ant-select-dropdown--multiple .ant-select-dropdown-menu-item:after {
   font-size: 12px;
 }
-.ant-select-dropdown.ant-select-dropdown--multiple .ant-select-dropdown-menu-item:hover {
-  color: black;
-}
 .ant-select-dropdown.ant-select-dropdown--multiple .ant-select-dropdown-menu-item:hover:after {
   color: #ddd;
 }

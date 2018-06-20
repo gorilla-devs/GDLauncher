@@ -92,9 +92,9 @@ export default class Home extends Component<Props> {
             </div>
           </div>
           <div className={styles.topBtn}>
-            <Button type="primary" size="large" style={{ width: '25vw', margin: 15 }}>Find Friends</Button>
+            <Button type="primary" size="large" style={{ width: '25vw', margin: 15, height: '4vw' }}>Find Friends</Button>
             <Link to="/dmanager" draggable="false">
-              <Button type="primary" size="large" style={{ width: '25vw', margin: 15 }}>
+              <Button type="primary" size="large" style={{ width: '25vw', margin: 15, height: '4vw' }}>
                 Play
               </Button>
             </Link>
@@ -139,7 +139,6 @@ export default class Home extends Component<Props> {
             src="https://discordapp.com/widget?id=398091532881756161&theme=dark"
             width="520"
             height="500"
-            allowTransparency="true"
             frameBorder="0"
           />}
         </Modal>

@@ -98,7 +98,6 @@ class SideBar extends Component<Props> {
             </Link>,
             <DownloadManager
               downloadQueue={this.props.downloadQueue}
-              actualDownload={this.props.actualDownload}
               open={this.state.downloadPopoverOpen}
               handleOpen={this.handleVisibleChange}
             />
@@ -173,8 +172,7 @@ function mapStateToProps(state) {
     disconnected: !state.auth.isAuthValid,
     profileState: state.profile.profileState,
     stateColor: state.profile.stateColor,
-    downloadQueue: state.downloadManager.downloadQueue,
-    actualDownload: state.downloadManager.actualDownload
+    downloadQueue: state.downloadManager.downloadQueue
   };
 }
 
