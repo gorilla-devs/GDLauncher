@@ -1,6 +1,6 @@
 {
   "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
+  "productName": "GDLauncher",
   "version": "0.13.2",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "scripts": {
@@ -35,7 +35,7 @@
   },
   "browserslist": "electron 1.6",
   "build": {
-    "productName": "ElectronReact",
+    "productName": "GDLauncher",
     "appId": "org.develar.ElectronReact",
     "files": [
       "dist/",
@@ -44,8 +44,7 @@
       "splash.html",
       "main.prod.js",
       "main.prod.js.map",
-      "package.json",
-      "workers/downloadPackage.js"
+      "package.json"
     ],
     "dmg": {
       "contents": [
@@ -88,9 +87,9 @@
     "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
   },
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "GorillaDevs",
+    "email": "us@gdevs.io",
+    "url": "https://gdevs.io"
   },
   "license": "MIT",
   "bugs": {

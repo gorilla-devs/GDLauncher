@@ -26,16 +26,20 @@ async function main() {
 
   // EXTRACT MC MAIN JAR
 
+  const mainJar = vnlHelpers.extractMainJar(vnlJSON);
+
   // ///////////////////
   // //MAIN DOWNLOADER//
   // ///////////////////
 
   // UPDATES THE TOTAL FILES TO DOWNLOAD
-  process.send({ downloaded: 0, total: vnlLibs.length + vnlAssets.length, action: 'UPDATE__TOTAL' });
+  process.send({ downloaded: 0, total: vnlLibs.length + vnlAssets.length + 1, action: 'UPDATE__TOTAL' });
 
   await downloader.downloadArr(vnlLibs, process, `${constants.LAUNCHER_FOLDER}/libraries/`);
   // For some urls it will say they are not string-buffer chunks. It's kinda ok I guess
   await downloader.downloadArr(vnlAssets, process, `${constants.LAUNCHER_FOLDER}/assets/`);
+
+  await downloader.downloadArr(mainJar, process, `${constants.LAUNCHER_FOLDER}/versions/`);
 
   process.send({ action: 'DOWNLOAD__COMPLETED' });
 }

@@ -8,6 +8,7 @@ import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
+import * as path from 'path';
 
 CheckNodeEnv('production');
 
@@ -16,11 +17,14 @@ export default merge.smart(baseConfig, {
 
   target: 'electron-main',
 
-  entry: './app/main.dev',
+  entry: {
+    'main.prod': path.join(__dirname, 'app/main.dev'),
+    'dist/downloadPackage': path.join(__dirname, 'app/workers/downloadPackage.js')
+  },
 
   output: {
-    path: __dirname,
-    filename: './app/main.prod.js'
+    filename: '[name].js',
+    path: path.join(__dirname, '/app')
   },
 
   plugins: [

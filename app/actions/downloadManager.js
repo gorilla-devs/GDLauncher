@@ -2,6 +2,8 @@ import axios from 'axios';
 import * as https from 'https';
 import * as fs from 'fs';
 import async from 'async-es';
+import * as path from 'path';
+import { remote } from 'electron';
 
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
@@ -34,11 +36,15 @@ export function downloadPack(pack) {
     // L' idea e' di salvare su disco un file di config e poi far fare tutto il lavoro alla fork.
     // La fork manterra' aggiornata l' UI sullo stato del lavoro ma nodejs non si occupera' di nulla
     const { fork } = require('child_process');
-    const forked = fork(`${__dirname}/workers/downloadPackage.js`, {
-      env: {
-        name: downloadManager.downloadQueue[pack].name
-      }
-    });
+    const forked = fork(
+      process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ?
+        `${__dirname}/workers/downloadPackage.js` :
+        path.join(remote.app.getAppPath(), 'dist/downloadPackage.js'
+        ), {
+        env: {
+          name: downloadManager.downloadQueue[pack].name
+        }
+      });
     forked.on('message', (data) => {
       const { total, action } = data;
       switch (action) {
