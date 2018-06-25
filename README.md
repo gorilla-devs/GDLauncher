@@ -1,9 +1,12 @@
 # GDLauncher
 
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/contains-cat-gifs.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com) 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![GitHub issues](https://img.shields.io/github/issues-raw/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/issues) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/213eb618fa59424fba7ccfcd4f1b6a09)](https://www.codacy.com/app/gorilla-devs/GDLauncher?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gorilla-devs/GDLauncher&amp;utm_campaign=Badge_Grade)  [![GitHub pull requests](https://img.shields.io/github/issues-pr/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/pulls) [![PRs Welcome](https://img.shields.io/github/license/gorilla-devs/GDLauncher.svg)](http://makeapullrequest.com) [![Travis](https://img.shields.io/travis/gorilla-devs/GDLauncher.svg)](https://travis-ci.org/gorilla-devs/GDLauncher)
 
-![Discord](https://img.shields.io/discord/398091532881756161.svg) ![David](https://img.shields.io/david/gorilla-devs/GDLauncher.svg) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/gorilla-devs/GDLauncher.svg) [![GitHub package version](https://img.shields.io/github/package-json/v/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/blob/master/package.json) ![Github All Releases](https://img.shields.io/github/downloads/gorilla-devs/GDLauncher/total.svg) [![Read the Docs (version)](https://img.shields.io/readthedocs/gdlauncher/master.svg)](https://gdlauncher.readthedocs.io/en/master/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![GitHub issues](https://img.shields.io/github/issues-raw/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/issues) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/213eb618fa59424fba7ccfcd4f1b6a09)](https://www.codacy.com/app/gorilla-devs/GDLauncher?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gorilla-devs/GDLauncher&amp;utm_campaign=Badge_Grade)  [![GitHub pull requests](https://img.shields.io/github/issues-pr/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/pulls) 
+
+[![PRs Welcome](https://img.shields.io/github/license/gorilla-devs/GDLauncher.svg)](http://makeapullrequest.com) [![Travis](https://img.shields.io/travis/gorilla-devs/GDLauncher.svg)](https://travis-ci.org/gorilla-devs/GDLauncher) ![Discord](https://img.shields.io/discord/398091532881756161.svg) ![David](https://img.shields.io/david/gorilla-devs/GDLauncher.svg) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/gorilla-devs/GDLauncher.svg)
+
+[![GitHub package version](https://img.shields.io/github/package-json/v/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/blob/master/package.json) ![Github All Releases](https://img.shields.io/github/downloads/gorilla-devs/GDLauncher/total.svg) [![Read the Docs (version)](https://img.shields.io/readthedocs/gdlauncher/master.svg)](https://gdlauncher.readthedocs.io/en/master/)
 
 <p align="center">
     <img width="800" height="auto" src="https://i.imgur.com/6IZ2kjC.png" alt="GDLauncher" />
@@ -13,7 +16,7 @@
  <summary><strong>Table of Contents</strong> (click to expand)</summary>
 
 * [Getting Started](#-getting-started)
-* [Features](#️-features-(working-on))
+* [Features](#️-features-working-on)
 * [Compilation](#️-compilation)
 * [Compilation Requirements](#-requirements)
 * [Compilation Steps](#-steps)
