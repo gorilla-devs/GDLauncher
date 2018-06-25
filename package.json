@@ -232,7 +232,7 @@
     "threads": "^0.11.0"
   },
   "devEngines": {
-    "node": ">=7.x",
+    "node": ">=8.x",
     "npm": ">=4.x",
     "yarn": ">=0.21.3"
   }

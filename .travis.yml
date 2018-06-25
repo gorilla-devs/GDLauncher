@@ -3,6 +3,8 @@ sudo: true
 language: node_js
 
 node_js:
+  - 10
+  - 9
   - 8
   - 7
 
@@ -36,7 +38,6 @@ before_script:
 
 script:
   - node --version
-  - yarn lint
+  - yarn dev
+  - yarn start
   - yarn package
-  - yarn test
-  - yarn test-e2e
