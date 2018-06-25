@@ -38,6 +38,4 @@ before_script:
 
 script:
   - node --version
-  - yarn dev
-  - yarn start
   - yarn package
