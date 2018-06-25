@@ -30,7 +30,7 @@
 </details>
 
 
-GDLauncher is a custom open source Minecraft launcher written from the ground up in C# WPF. It's main goal is to make it easy and enjoyable to manage different Minecraft versions and servers, bringing the playing and modding experience to the next level!
+GDLauncher is a custom open source Minecraft launcher written from the ground up in electron/react. It's main goal is to make it easy and enjoyable to manage different Minecraft versions and servers, bringing the playing and modding experience to the next level!
 
 ## 🚀 Getting Started
 Below you will find anything you need to know about the launcher. If you want to download a stable release you can do it from our official website: https://gorilladevs.com, if you want the latest testing features you can clone the repo and compile it yourself.
