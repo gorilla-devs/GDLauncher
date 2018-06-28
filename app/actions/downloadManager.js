@@ -33,8 +33,8 @@ export function addToQueue(pack, packType) {
 export function downloadPack(pack) {
   return (dispatch, getState) => {
     const { downloadManager } = getState();
-    // L' idea e' di salvare su disco un file di config e poi far fare tutto il lavoro alla fork.
-    // La fork manterra' aggiornata l' UI sullo stato del lavoro ma nodejs non si occupera' di nulla
+    // The idea is saving a config file on disk and then letting the fork do all the work
+    // The fork will keep the ui updated through forked.on.
     const { fork } = require('child_process');
     const forked = fork(
       process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ?

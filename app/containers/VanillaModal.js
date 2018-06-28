@@ -1,7 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import VanillaModal from '../components/VanillaModal/VanillaModal';
-import * as packManagerActions from '../actions/packManager';
+import * as packManagerActions from '../actions/packCreator';
 import * as downloadManagerActions from '../actions/downloadManager';
 
 function mapStateToProps(state) {

@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Select, Form, Input, Icon, Button, Modal } from 'antd';
 import styles from './VanillaModal.css';
-import { resetModalStatus } from '../../actions/packManager';
+import { resetModalStatus } from '../../actions/packCreator';
 
 type Props = {};
 const FormItem = Form.Item;

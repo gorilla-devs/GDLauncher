@@ -6,6 +6,7 @@ import {
   AUTH_SUCCESS
 } from '../actions/auth';
 
+
 const initialState = {
   loading: false,
   username: 'killpowa',

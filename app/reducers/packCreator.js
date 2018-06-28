@@ -2,7 +2,7 @@ import {
   GET_MC_VANILLA_VERSIONS,
   GET_MC_VANILLA_VERSION_DATA,
   RESET_MODAL_STATUS
-} from '../actions/packManager';
+} from '../actions/packCreator';
 
 const initialState = {
   fetchingVersions: false,
