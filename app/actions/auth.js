@@ -1,20 +1,41 @@
 import axios from 'axios';
+import { LOGIN_PROXY_API } from '../constants';
 
-export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
+export const START_AUTH_LOADING = 'START_AUTH_LOADING';
+export const STOP_AUTH_LOADING = 'STOP_AUTH_LOADING';
+export const AUTH_SUCCESS = 'AUTH_SUCCESS';
+export const AUTH_FAILED = 'AUTH_FAILED';
 
-export function login(username, password) {
-  const authData = axios.post(
-    'https://n7x0m4zh4f.execute-api.eu-west-1.amazonaws.com/Staging/login',
-    {
-      username,
-      password
-    }
-  );
-  return (dispatch) => {
+export function login(username, password, remember = false) {
+  return async (dispatch) => {
     dispatch({
-      type: LOGIN,
-      payload: authData
+      type: START_AUTH_LOADING
+    });
+    await axios.post(
+      LOGIN_PROXY_API,
+      {
+        username,
+        password
+      }
+    ).then(res => {
+      if (res.data !== undefined &&
+        res.data !== null &&
+        Object.prototype.hasOwnProperty.call(res.data, 'authenticated')) {
+        dispatch({
+          type: AUTH_SUCCESS,
+          payload: res.data
+        });
+      } else {
+        dispatch({
+          type: AUTH_FAILED,
+          payload: res.data
+        });
+      }
+      return res;
+    });
+    dispatch({
+      type: STOP_AUTH_LOADING
     });
   };
 }

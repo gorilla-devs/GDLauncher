@@ -25,7 +25,6 @@ class RouteDef extends Component<Props> {
   }
 
   componentWillMount() {
-    console.log(this.props);
     // set the initial previousLocation value on mount
     this.previousLocation = this.props.location
   }
