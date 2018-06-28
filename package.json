@@ -204,7 +204,7 @@
     "classnames": "^2.2.5",
     "devtron": "^1.4.0",
     "electron-debug": "^1.5.0",
-    "electron-json-storage": "^4.1.0",
+    "electron-store": "^2.0.0",
     "font-awesome": "^4.7.0",
     "glamor": "^2.20.40",
     "glamorous": "^4.12.1",

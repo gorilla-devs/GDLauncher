@@ -9,11 +9,11 @@ import {
 
 const initialState = {
   loading: false,
-  username: 'killpowa',
-  accessToken: 'null',
-  clientToken: 'null',
-  uuid: 'null',
-  isAuthValid: true
+  username: null,
+  accessToken: null,
+  clientToken: null,
+  uuid: null,
+  isAuthValid: false
 };
 
 export default function auth(state = initialState, action) {

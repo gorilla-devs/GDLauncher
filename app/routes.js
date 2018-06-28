@@ -53,7 +53,6 @@ class RouteDef extends Component<Props> {
           <Route path="/dmanager" component={DManager} />
           <Route path="/profile" component={Profile} />
           <Route path="/home" component={HomePage} />
-          <Route path="/login" component={Form.create()(Login)} />
           { /* I really don't know how this works. A better solution should be found */ }
           {isModal ? <Route
             path="/settings"
