@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import async from 'async-es';
 import * as path from 'path';
 import { remote } from 'electron';
+import store from '../localStore';
 
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';

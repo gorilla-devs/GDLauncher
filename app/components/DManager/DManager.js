@@ -4,6 +4,7 @@ import { Button, Icon } from 'antd';
 import styles from './DManager.css';
 import VanillaModal from '../../containers/VanillaModal';
 import DIcon from '../DIcon/DIcon';
+import store from '../../localStore';
 
 type Props = {};
 
@@ -44,37 +45,45 @@ export default class DManager extends Component<Props> {
         <div className={styles.background_overlay} />
         <main className={styles.main}>
           <button onClick={this.openVanillaModal}>Open</button>
-          {Object.values(this.props.installingQueue).map((element) => {
+          {store.get('instances') && Object.values(store.get('instances')).map((element) => {
             return (<DIcon
               name={element.name}
               installing={
                 (() => {
-                  switch (element.status) {
-                    case 'Queued':
-                      return true;
-                    case 'Downloading':
-                      return true;
-                    case 'Completed':
-                      return false;
-                    default:
-                      return true;
+                  if (this.props.installingQueue[element.name]) {
+                    switch (this.props.installingQueue[element.name].status) {
+                      case 'Queued':
+                        return true;
+                      case 'Downloading':
+                        return true;
+                      case 'Completed':
+                        return false;
+                      default:
+                        return true;
+                    }
+                  } else {
+                    return false;
                   }
                 })()
               }
               percentage={
                 (() => {
-                  switch (element.status) {
-                    case 'Queued':
-                      return 0;
-                    case 'Downloading':
-                      return Math.floor((element.downloaded * 100) / element.totalToDownload);
-                    case 'Completed':
-                      return 100;
-                    default:
-                      return 0;
+                  if (this.props.installingQueue[element.name]) {
+                    switch (this.props.installingQueue[element.name].status) {
+                      case 'Queued':
+                        return 0;
+                      case 'Downloading':
+                        return Math.floor((this.props.installingQueue[element.name].downloaded * 100) / this.props.installingQueue[element.name].totalToDownload);
+                      case 'Completed':
+                        return 100;
+                      default:
+                        return 0;
+                    }
+                  } else {
+                    return 0;
                   }
                 })()
-          }
+              }
             />);
           })}
         </main>

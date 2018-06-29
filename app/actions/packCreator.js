@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, GAME_VERSIONS_URL } from '../constants';
+import store from '../localStore';
 
 export const GET_MC_VANILLA_VERSIONS = 'GET_MC_VANILLA_VERSIONS';
 export const GET_MC_VANILLA_VERSION_DATA = 'GET_MC_VANILLA_VERSION_DATA';
@@ -27,6 +28,9 @@ export function createPack(url, packName) {
     return response;
   });
   return (dispatch) => {
+    store.set(`instances.${packName}`, {
+      name: packName
+    });
     dispatch({
       type: GET_MC_VANILLA_VERSION_DATA,
       payload: versionData
