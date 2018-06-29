@@ -1,7 +1,7 @@
 {
   "name": "electron-react-boilerplate",
   "productName": "GDLauncher",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
@@ -84,7 +84,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/gorilla-devs/GDLauncher.git"
   },
   "author": {
     "name": "GorillaDevs",
@@ -93,7 +93,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
+    "url": "https://github.com/gorilla-devs/GDLauncher/issues"
   },
   "keywords": [
     "electron",
@@ -106,7 +106,7 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/gorilla-devs/GDLauncher",
   "jest": {
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
