@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { push } from 'react-router-redux';
 import store from '../localStore';
-import { LOGIN_PROXY_API } from '../constants';
+import { LOGIN_PROXY_API, ACCESS_TOKEN_VALIDATION_URL } from '../constants';
 
 export const LOGOUT = 'LOGOUT';
 export const START_AUTH_LOADING = 'START_AUTH_LOADING';
@@ -57,14 +58,28 @@ export function logout() {
     dispatch({
       type: LOGOUT
     });
+    dispatch(push('/'));
   };
 }
 
 export function checkAccessTokenValidity(token) {
-  return (dispatch) => {
-    dispatch({
-      type: AUTH_SUCCESS,
-      payload: store.get('user')
+  return async (dispatch) => {
+    await axios.post(
+      ACCESS_TOKEN_VALIDATION_URL,
+      { accessToken: token },
+      { 'Content-Type': 'application/json;charset=UTF-8' }
+    ).then(res => {
+      if (res.status === 204) {
+        dispatch({
+          type: AUTH_SUCCESS,
+          payload: store.get('user')
+        });
+      }
+      return res;
+    }).catch((error) => {
+      dispatch({
+        type: AUTH_FAILED
+      });
     });
-  }
+  };
 }
