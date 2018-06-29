@@ -25,12 +25,13 @@ export function createPack(url, packName) {
       mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/`);
       fs.writeFileSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/vnl.json`, JSON.stringify(response.data));
     }
+    store.set(`instances.${packName}`, {
+      name: packName,
+      version: response.data.id
+    });
     return response;
   });
   return (dispatch) => {
-    store.set(`instances.${packName}`, {
-      name: packName
-    });
     dispatch({
       type: GET_MC_VANILLA_VERSION_DATA,
       payload: versionData

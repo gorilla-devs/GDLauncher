@@ -73,7 +73,9 @@ export default class DManager extends Component<Props> {
                       case 'Queued':
                         return 0;
                       case 'Downloading':
-                        return Math.floor((this.props.installingQueue[element.name].downloaded * 100) / this.props.installingQueue[element.name].totalToDownload);
+                        return Math.floor(
+                          (this.props.installingQueue[element.name].downloaded * 100)
+                          / this.props.installingQueue[element.name].totalToDownload);
                       case 'Completed':
                         return 100;
                       default:

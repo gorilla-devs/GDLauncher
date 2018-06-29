@@ -2,6 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const path = require('path');
+const os = require('os');
 const constants = require('../../constants');
 
 module.exports = {
@@ -10,10 +11,40 @@ module.exports = {
   extractMainJar
 };
 
+function isSameOS(ElectronFormat, MCFormat) {
+  switch (ElectronFormat) {
+    case 'Windows_NT':
+      if (MCFormat === 'windows') {
+        return true;
+      }
+      break;
+    case 'Darwin':
+      if (MCFormat === 'osx') {
+        return true;
+      }
+      break;
+    case 'Linux':
+      if (MCFormat === 'linux') {
+        return true;
+      }
+      break;
+    default:
+      return false;
+  }
+}
+
 function extractLibs(json) {
   const libs = [];
   json.libraries.map((lib) => {
-    if (Object.prototype.hasOwnProperty.call(lib.downloads, 'artifact')) {
+    // Check for [rules] (allowed, disallowed)
+    if ('rules' in lib) {
+      lib.rules.map(rule => {
+        if (rule.action === 'allow' && (!('os' in rule) || isSameOS(os.type, rule.os.name))) {
+          // THIS IS TO DOWNLOAD
+        }
+      });
+    }
+    if ('artifact' in lib.downloads) {
       const filePath = `${constants.LAUNCHER_FOLDER}/libraries/${lib.downloads.artifact.path}`;
       if (!fs.existsSync(filePath)) {
         libs.push({

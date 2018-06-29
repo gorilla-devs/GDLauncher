@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Button, Icon, Progress } from 'antd';
 import Draggable from 'react-draggable';
 import styles from './DIcon.css';
+import startCommand from '../../utils/startCommand';
 
 type Props = {
   name: string,
@@ -13,6 +14,13 @@ const classes = `${styles.icon__text} handle`
 
 export default class DIcon extends Component<Props> {
   props: Props;
+
+  handleClickPlay = async () => {
+    const util = require('util');
+    const exec = util.promisify(require('child_process').exec);
+    const name = await exec(startCommand());
+    console.log(name);
+  }
   render() {
     return (
       <Draggable
@@ -30,7 +38,7 @@ export default class DIcon extends Component<Props> {
           <div className={styles.icon__upContainer}>
             {!this.props.installing &&
               <div>
-                <div className={styles.icon__up}>
+                <div className={styles.icon__up} onClick={this.handleClickPlay}>
                   <span><Icon type="play-circle" /></span>
                 </div>
                 <div className={styles.icon__right}>
