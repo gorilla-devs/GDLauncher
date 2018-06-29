@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip, Modal } from 'antd';
 import styles from './Login.css';
+import store from '../../localStore';
 import * as AuthActions from '../../actions/auth';
 
 type Props = {};
@@ -38,7 +39,7 @@ class Login extends Component<Props> {
     this.props.form.validateFields((err, values) => {
       console.log(values);
       if (!err) {
-        this.props.login(values.username, values.password);
+        this.props.login(values.username, values.password, values.remember);
       } else {
         console.log(err);
       }
@@ -53,6 +54,10 @@ class Login extends Component<Props> {
 
     if (this.props.isAuthValid) {
       return <Redirect to="/home" />;
+    }
+
+    if (store.has('user')) {
+      this.props.checkAccessTokenValidity(store.get('user.accessToken'));
     }
 
     return (
