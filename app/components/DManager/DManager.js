@@ -1,9 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import { Button, Icon } from 'antd';
+import { lstatSync, readdirSync, watch } from 'fs';
+import { join, basename } from 'path';
 import styles from './DManager.css';
 import VanillaModal from '../../containers/VanillaModal';
 import DIcon from '../DIcon/DIcon';
+import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
 import store from '../../localStore';
 
 type Props = {};
@@ -13,8 +16,16 @@ export default class DManager extends Component<Props> {
   constructor() {
     super();
     this.state = {
-      vanillaModalIsOpen: false
+      vanillaModalIsOpen: false,
+      instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
     };
+
+    // Watches for any changes in the packs dir. TODO: Optimize
+    watch(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`, () => {
+      this.setState({
+        instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
+      });
+    });
 
     this.openVanillaModal = this.openVanillaModal.bind(this);
     this.closeVanillaModal = this.closeVanillaModal.bind(this);
@@ -35,6 +46,12 @@ export default class DManager extends Component<Props> {
     require('electron').shell.openExternal(url)
   }
 
+  isDirectory = source => lstatSync(source).isDirectory();
+  getDirectories = source => readdirSync(source)
+    .map(name => join(source, name))
+    .filter(this.isDirectory)
+    .map(dir => basename(dir));
+
 
   /* eslint-enable */
 
@@ -45,13 +62,13 @@ export default class DManager extends Component<Props> {
         <div className={styles.background_overlay} />
         <main className={styles.main}>
           <button onClick={this.openVanillaModal}>Open</button>
-          {store.get('instances') && Object.values(store.get('instances')).map((element) => {
+          {this.state.instances.map((element) => {
             return (<DIcon
-              name={element.name}
+              name={element}
               installing={
                 (() => {
-                  if (this.props.installingQueue[element.name]) {
-                    switch (this.props.installingQueue[element.name].status) {
+                  if (this.props.installingQueue[element]) {
+                    switch (this.props.installingQueue[element].status) {
                       case 'Queued':
                         return true;
                       case 'Downloading':
@@ -68,14 +85,15 @@ export default class DManager extends Component<Props> {
               }
               percentage={
                 (() => {
-                  if (this.props.installingQueue[element.name]) {
-                    switch (this.props.installingQueue[element.name].status) {
+                  if (this.props.installingQueue[element]) {
+                    switch (this.props.installingQueue[element].status) {
                       case 'Queued':
                         return 0;
                       case 'Downloading':
+                      /* TODO: Fix NaN. It is caused by 0 / 0 division while waiting for usable data from the worker */
                         return Math.floor(
-                          (this.props.installingQueue[element.name].downloaded * 100)
-                          / this.props.installingQueue[element.name].totalToDownload);
+                          (this.props.installingQueue[element].downloaded * 100)
+                          / this.props.installingQueue[element].totalToDownload);
                       case 'Completed':
                         return 100;
                       default:
