@@ -26,7 +26,6 @@ async function downloadArr(arr, process, folderPath, threads = 5) {
       }).then((response) => {
         process.send({ action: 'UPDATE__FILES' });
         file.write(response.data, () => file.end());
-        return 0;
       });
     } catch (e) {
       console.log(e);
