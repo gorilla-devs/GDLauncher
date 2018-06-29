@@ -229,6 +229,8 @@
     "redux": "^3.7.2",
     "redux-promise-middleware": "^5.1.1",
     "redux-thunk": "^2.2.0",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.5",
     "source-map-support": "^0.5.4",
     "threads": "^0.11.0"
   },

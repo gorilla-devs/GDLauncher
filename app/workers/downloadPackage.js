@@ -33,7 +33,7 @@ async function main() {
   // ///////////////////
 
   // UPDATES THE TOTAL FILES TO DOWNLOAD
-  process.send({ downloaded: 0, total: vnlLibs.length, action: 'UPDATE__TOTAL' });
+  process.send({ downloaded: 0, total: vnlLibs.length + vnlAssets.length + mainJar.length, action: 'UPDATE__TOTAL' });
 
   await downloader.downloadArr(vnlLibs, process, `${constants.LAUNCHER_FOLDER}/libraries/`);
   // For some urls it will say they are not string-buffer chunks. It's kinda ok I guess

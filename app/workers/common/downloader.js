@@ -3,7 +3,7 @@ const async = require('async');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const Promise = require('bluebird');
-const axios = require('axios');
+const request = require('request-promise-native');
 
 
 module.exports = {
@@ -17,18 +17,10 @@ async function downloadArr(arr, process, folderPath, threads = 5) {
     if (!fs.existsSync(filePath)) {
       mkdirp.sync(filePath);
     }
-    const file = fs.createWriteStream(`${folderPath}${lib.path}`);
-    try {
-      await axios({
-        method: 'get',
-        url: lib.url,
-        responseType: 'blob'
-      }).then((response) => {
-        process.send({ action: 'UPDATE__FILES' });
-        file.write(response.data, () => file.end());
-      });
-    } catch (e) {
-      console.log(e);
-    }
+    const file = await request(lib.url, { encoding: 'binary' });
+    fs.writeFileSync(`${folderPath}${lib.path}`, file, 'binary');
+
+    process.send({ action: 'UPDATE__FILES' });
+
   };
 }

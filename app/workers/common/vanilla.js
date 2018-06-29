@@ -11,23 +11,14 @@ module.exports = {
   extractMainJar
 };
 
-function isSameOS(ElectronFormat, MCFormat) {
+function convertOSToMCFormat(ElectronFormat) {
   switch (ElectronFormat) {
     case 'Windows_NT':
-      if (MCFormat === 'windows') {
-        return true;
-      }
-      break;
+      return 'windows';
     case 'Darwin':
-      if (MCFormat === 'osx') {
-        return true;
-      }
-      break;
+      return 'osx';
     case 'Linux':
-      if (MCFormat === 'linux') {
-        return true;
-      }
-      break;
+      return 'linux';
     default:
       return false;
   }
@@ -35,21 +26,34 @@ function isSameOS(ElectronFormat, MCFormat) {
 
 function extractLibs(json) {
   const libs = [];
-  json.libraries.map((lib) => {
+  json.libraries.filter((lib) => {
+    let isValid = true;
     // Check for [rules] (allowed, disallowed)
     if ('rules' in lib) {
       lib.rules.map(rule => {
-        if (rule.action === 'allow' && (!('os' in rule) || isSameOS(os.type, rule.os.name))) {
-          // THIS IS TO DOWNLOAD
+        if (rule.action === 'disallow' && (!('os' in rule) || convertOSToMCFormat(os.type()) === rule.os.name)) {
+          // THIS IS NOT TO DOWNLOAD
+          isValid = false;
         }
       });
     }
+    return isValid;
+  }).map((lib) => {
     if ('artifact' in lib.downloads) {
       const filePath = `${constants.LAUNCHER_FOLDER}/libraries/${lib.downloads.artifact.path}`;
       if (!fs.existsSync(filePath)) {
         libs.push({
           url: lib.downloads.artifact.url,
           path: lib.downloads.artifact.path
+        });
+      }
+    }
+    if ('classifiers' in lib.downloads) {
+      if (`natives-${convertOSToMCFormat(os.type())}` in lib.downloads.classifiers) {
+        // THESE ARE THE NATIVES LWJGL. WE MUST SAVE THEM IN THE CFG FILE
+        libs.push({
+          url: lib.downloads.classifiers[`natives-${convertOSToMCFormat(os.type())}`].url,
+          path: lib.downloads.classifiers[`natives-${convertOSToMCFormat(os.type())}`].path
         });
       }
     }
