@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Button, Icon, Progress } from 'antd';
 import Draggable from 'react-draggable';
 import styles from './DIcon.css';
-import startCommand from '../../utils/startCommand';
+import launchCommand from '../../utils/MCLaunchCommand';
 
 type Props = {
   name: string,
@@ -18,7 +18,7 @@ export default class DIcon extends Component<Props> {
   handleClickPlay = async () => {
     const util = require('util');
     const exec = util.promisify(require('child_process').exec);
-    const name = await exec(startCommand());
+    const name = await exec(launchCommand());
     console.log(name);
   }
   render() {

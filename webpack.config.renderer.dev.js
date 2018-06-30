@@ -11,6 +11,7 @@ import path from 'path';
 import fs from 'fs';
 import webpack from 'webpack';
 import chalk from 'chalk';
+import { say } from 'cfonts';
 import merge from 'webpack-merge';
 import { spawn, execSync } from 'child_process';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
@@ -23,6 +24,24 @@ const port = process.env.PORT || 1212;
 const publicPath = `http://localhost:${port}/dist`;
 const dll = path.resolve(process.cwd(), 'dll');
 const manifest = path.resolve(dll, 'renderer.json');
+
+function greeting() {
+  const cols = process.stdout.columns
+  let text = ''
+
+  if (cols > 90) text = 'GDLauncher';
+  else text = false;
+
+  if (text) {
+    say(text, {
+      colors: ['blueBright'],
+      font: 'block',
+      space: false,
+    });
+  }
+}
+
+greeting();
 
 /**
  * Warn if the DLL is not built
@@ -261,7 +280,7 @@ export default merge.smart(baseConfig, {
     },
     before() {
       if (process.env.START_HOT) {
-        console.log('Starting Main Process...');
+        console.log(`${chalk.blue('Starting Main Process...')}\n`)
         spawn(
           'npm',
           ['run', 'start-main-dev'],

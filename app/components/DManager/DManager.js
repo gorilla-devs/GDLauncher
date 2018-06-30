@@ -1,8 +1,9 @@
 // @flow
 import React, { Component } from 'react';
 import { Button, Icon } from 'antd';
-import { lstatSync, readdirSync, watch } from 'fs';
+import { lstatSync, readdirSync, watch, existsSync } from 'fs';
 import { join, basename } from 'path';
+import mkdirp from 'mkdirp';
 import styles from './DManager.css';
 import VanillaModal from '../../containers/VanillaModal';
 import DIcon from '../DIcon/DIcon';
@@ -10,18 +11,24 @@ import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
 import store from '../../localStore';
 
 type Props = {};
+let watcher;
 
 export default class DManager extends Component<Props> {
   props: Props;
   constructor() {
     super();
+    if (!existsSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)) {
+      mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`);
+    }
     this.state = {
       vanillaModalIsOpen: false,
       instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
     };
-
     // Watches for any changes in the packs dir. TODO: Optimize
-    watch(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`, () => {
+    watcher = watch(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`, () => {
+      if (!existsSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)) {
+        mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`);
+      }
       this.setState({
         instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
       });
@@ -29,6 +36,11 @@ export default class DManager extends Component<Props> {
 
     this.openVanillaModal = this.openVanillaModal.bind(this);
     this.closeVanillaModal = this.closeVanillaModal.bind(this);
+  }
+
+  componentWillUnmount() {
+    // Stop watching for changes when this component will unmount
+    watcher.close();
   }
 
   openVanillaModal() {
@@ -65,6 +77,7 @@ export default class DManager extends Component<Props> {
           {this.state.instances.map((element) => {
             return (<DIcon
               name={element}
+              key={element}
               installing={
                 (() => {
                   if (this.props.installingQueue[element]) {
@@ -90,7 +103,7 @@ export default class DManager extends Component<Props> {
                       case 'Queued':
                         return 0;
                       case 'Downloading':
-                      /* TODO: Fix NaN. It is caused by 0 / 0 division while waiting for usable data from the worker */
+                        /* TODO: Fix NaN. It is caused by 0 / 0 division while waiting for usable data from the worker */
                         return Math.floor(
                           (this.props.installingQueue[element].downloaded * 100)
                           / this.props.installingQueue[element].totalToDownload);

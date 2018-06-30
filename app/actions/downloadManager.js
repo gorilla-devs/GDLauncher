@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as https from 'https';
 import * as fs from 'fs';
 import async from 'async-es';
+import chalk from 'chalk';
 import * as path from 'path';
 import { remote } from 'electron';
 import store from '../localStore';
@@ -37,6 +38,7 @@ export function downloadPack(pack) {
     // The idea is saving a config file on disk and then letting the fork do all the work
     // The fork will keep the ui updated through forked.on.
     const { fork } = require('child_process');
+    console.log(`%cDownloading ${pack}`, 'color: #3498db');
     const forked = fork(
       process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ?
         `${__dirname}/workers/downloadPackage.js` :
