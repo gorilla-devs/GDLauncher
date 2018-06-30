@@ -39,7 +39,7 @@ export default class DManager extends Component<Props> {
   }
 
   componentWillUnmount() {
-    // Stop watching for changes when this component will unmount
+    // Stop watching for changes when this component is unmounted
     watcher.close();
   }
 

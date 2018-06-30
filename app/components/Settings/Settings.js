@@ -35,12 +35,7 @@ class VanillaModal extends Component<Props> {
     return (
       <Modal
         visible={true}
-        footer={[
-          <Button key="back">Back</Button>,
-          <Button key="submit" type="primary">
-            Save
-          </Button>,
-        ]}
+        footer={null}
         style={{
           minWidth: '100%',
           height: '100%',
@@ -48,7 +43,7 @@ class VanillaModal extends Component<Props> {
           padding: 0,
           margin: 0
         }}
-        bodyStyle={{ maxHeight: 'calc(92.6vh - 54.6px)', minHeight: 'calc(92.6vh - 54.6px)', overflowY: 'scroll', }}
+        bodyStyle={{ maxHeight: 'calc(100vh - 54.6px)', minHeight: 'calc(100vh - 54.6px)', overflowY: 'scroll', }}
         onCancel={() => {
           this.props.history.goBack();
         }}
@@ -59,7 +54,7 @@ class VanillaModal extends Component<Props> {
           <Sider
             style={{
               overflow: 'auto',
-              height: '85vh',
+              height: 'calc(100vh - 54.6px)',
               position: 'fixed',
               left: 0,
               top: 54.6,
@@ -135,8 +130,12 @@ class VanillaModal extends Component<Props> {
             </Content>
             <Footer style={{ textAlign: 'center' }}>
               Ant Design ©2016 Created by Ant UED
-      </Footer>
+            </Footer>
           </Layout>
+          <Button key="back">Back</Button>
+          <Button key="submit" type="primary">
+            Save
+          </Button>
         </Layout>
       </Modal>
     );

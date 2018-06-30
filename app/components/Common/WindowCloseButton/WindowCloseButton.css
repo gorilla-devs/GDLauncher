@@ -1,5 +1,6 @@
 .CloseBtn{
-    display: block;
+    display: inline-block;
+    position: absolute;
     background: rgb(44, 62, 80);
     border: 0;
     padding: 0;
@@ -7,8 +8,8 @@
     -webkit-app-region: no-drag;
     height: 47.6px;
     width: 47.6px;
-    justify-self: end;
-    float: right;
+    right: 0;
+    top: 0;
 }
 
 .CloseBtn:hover{
