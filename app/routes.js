@@ -14,26 +14,18 @@ import Login from './components/Login/Login';
 import Settings from './components/Settings/Settings';
 
 
-class RouteDef extends Component<Props> {
-  props: Props;
+class RouteDef extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      SettingsModalisOpen: true
-    };
-  }
-
-  componentWillMount() {
-    // set the initial previousLocation value on mount
-    this.previousLocation = this.props.location
-  }
+  previousLocation = this.props.location;
 
   componentWillUpdate(nextProps) {
-    const { location } = this.props
+    const { location } = this.props;
     // set previousLocation if props.location is not modal
-    if (nextProps.history.action !== 'POP' && (!location.state || !location.state.modal)) {
-      this.previousLocation = this.props.location
+    if (
+      nextProps.history.action !== "POP" &&
+      (!location.state || !location.state.modal)
+    ) {
+      this.previousLocation = this.props.location;
     }
   }
 
@@ -43,22 +35,19 @@ class RouteDef extends Component<Props> {
       location.state &&
       location.state.modal &&
       this.previousLocation !== location
-    );
+    ); // not initial render
     return (
       <App>
         <Navigation />
         <SideBar />
-        <Switch>
+        <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
           <Route path="/dmanager" component={DManager} />
           <Route path="/profile" component={Profile} />
           <Route path="/home" component={HomePage} />
-          { /* I really don't know how this works. A better solution should be found */}
-          {isModal ? <Route
-            path="/settings"
-            component={Settings}
-          /> : <Redirect to={this.previousLocation.pathname} />}
         </Switch>
+        { /* I really don't know how this works. A better solution should be found */}
+        {isModal ? <Route path="/settings" component={Settings} /> : null}
       </App>
     );
   }

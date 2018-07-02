@@ -18,7 +18,7 @@ export default class NavigationBar extends Component<Props> {
         <div className={styles.logoText}>
           GorillaDevs
         </div>
-        <HorizontalMenu location={this.props.location} />
+        {this.props.location !== '/' && <HorizontalMenu location={this.props.location} />} 
         <WindowCloseBtn />
       </div>
     );
