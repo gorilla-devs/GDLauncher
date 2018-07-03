@@ -42,6 +42,7 @@ class RouteDef extends React.Component {
         <SideBar />
         <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
+          {!this.props.isAuthValid && <Redirect to="/" />}
           <Route path="/dmanager" component={DManager} />
           <Route path="/profile" component={Profile} />
           <Route path="/home" component={HomePage} />
@@ -55,7 +56,8 @@ class RouteDef extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    location: state.router.location
+    location: state.router.location,
+    isAuthValid: state.auth.isAuthValid
   };
 }
 
