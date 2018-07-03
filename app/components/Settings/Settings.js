@@ -5,10 +5,6 @@ import Modal from '../Common/Modal/Modal';
 import styles from './Settings.css';
 
 const Settings = ({ match, history }) => {
-  const back = e => {
-    e.stopPropagation();
-    history.goBack();
-  };
   return (
     <Modal history={history}>
       Contenuto
