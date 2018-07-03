@@ -64,8 +64,8 @@ export default class Modal extends Component<Props> {
 
   render() {
     return (
-      <div className={styles.overlay}>
-        <div className={styles.modal} style={this.state.style}>
+      <div className={styles.overlay} onClick={this.back}>
+        <div className={styles.modal} style={this.state.style} onClick={(e) => e.stopPropagation()}>
           <h3 style={{ display: 'inline-block' }}>Settings</h3>
           <Button shape="circle" icon="close" size="large" className={styles.closeBtn} onClick={this.back} />
           <div className={styles.modalContent}>

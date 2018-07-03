@@ -15,7 +15,9 @@ export default class WindowCloseButton extends Component<Props> {
   render() {
     return (
       <div>
-        <button className={styles.CloseBtn} onClick={this.closeWindow}>X</button>
+        <button className={styles.CloseBtn} onClick={this.closeWindow}>
+          <i className="fas fa-window-close" style={{ width: '20px', height: '20px' }} />
+        </button>
       </div>
     );
   }

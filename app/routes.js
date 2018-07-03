@@ -42,7 +42,7 @@ class RouteDef extends React.Component {
         <SideBar />
         <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
-          {!this.props.isAuthValid && <Redirect to="/" />}
+          {!this.props.isAuthValid && <Redirect push to="/" />}
           <Route path="/dmanager" component={DManager} />
           <Route path="/profile" component={Profile} />
           <Route path="/home" component={HomePage} />

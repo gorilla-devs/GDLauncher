@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 import styles from './NavigationBar.css';
 import HorizontalMenu from '../HorizontalMenu/HorizontalMenu';
 import WindowCloseBtn from '../WindowCloseButton/WindowCloseButton';
+import WindowMinimizeBtn from '../WindowMinimizeButton/WindowMinimizeButton';
+import WindowHideBtn from '../WindowHideButton/WindowHideButton';
 
-const { SubMenu, MenuItemGroup } = Menu;
 
 type Props = {};
 export default class NavigationBar extends Component<Props> {
@@ -18,8 +19,10 @@ export default class NavigationBar extends Component<Props> {
         <div className={styles.logoText}>
           GorillaDevs
         </div>
-        {this.props.location !== '/' && <HorizontalMenu location={this.props.location} />} 
+        {this.props.location !== '/' && <HorizontalMenu location={this.props.location} />}
         <WindowCloseBtn />
+        <WindowMinimizeBtn />
+        <WindowHideBtn />
       </div>
     );
   }

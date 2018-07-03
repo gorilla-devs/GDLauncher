@@ -8,7 +8,7 @@
     -webkit-app-region: no-drag;
     height: 47.6px;
     width: 47.6px;
-    right: 0;
+    right: 47.6px;
     top: 0;
     transition: background-color .25s;
 }
