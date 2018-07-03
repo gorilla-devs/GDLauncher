@@ -70,55 +70,58 @@ export default class DManager extends Component<Props> {
   render() {
     return (
       <div>
-        <div className={styles.background_image} />
-        <div className={styles.background_overlay} />
         <main className={styles.main}>
-          <button onClick={this.openVanillaModal}>Open</button>
-          {this.state.instances.map((element) => {
-            return (<DIcon
-              name={element}
-              key={element}
-              installing={
-                (() => {
-                  if (this.props.installingQueue[element]) {
-                    switch (this.props.installingQueue[element].status) {
-                      case 'Queued':
-                        return true;
-                      case 'Downloading':
-                        return true;
-                      case 'Completed':
-                        return false;
-                      default:
-                        return true;
+          <div className={styles.header}>
+            <button onClick={this.openVanillaModal}>Open</button>
+
+          </div>
+          <div className={styles.content}>
+            {this.state.instances.map((element) => {
+              return (<DIcon
+                name={element}
+                key={element}
+                installing={
+                  (() => {
+                    if (this.props.installingQueue[element]) {
+                      switch (this.props.installingQueue[element].status) {
+                        case 'Queued':
+                          return true;
+                        case 'Downloading':
+                          return true;
+                        case 'Completed':
+                          return false;
+                        default:
+                          return true;
+                      }
+                    } else {
+                      return false;
                     }
-                  } else {
-                    return false;
-                  }
-                })()
-              }
-              percentage={
-                (() => {
-                  if (this.props.installingQueue[element]) {
-                    switch (this.props.installingQueue[element].status) {
-                      case 'Queued':
-                        return 0;
-                      case 'Downloading':
-                        /* TODO: Fix NaN. It is caused by 0 / 0 division while waiting for usable data from the worker */
-                        return Math.floor(
-                          (this.props.installingQueue[element].downloaded * 100)
-                          / this.props.installingQueue[element].totalToDownload);
-                      case 'Completed':
-                        return 100;
-                      default:
-                        return 0;
+                  })()
+                }
+                percentage={
+                  (() => {
+                    if (this.props.installingQueue[element]) {
+                      switch (this.props.installingQueue[element].status) {
+                        case 'Queued':
+                          return 0;
+                        case 'Downloading':
+                          /* TODO: Fix NaN. It is caused by 0 / 0 division while waiting for usable data from the worker */
+                          return Math.floor(
+                            (this.props.installingQueue[element].downloaded * 100)
+                            / this.props.installingQueue[element].totalToDownload);
+                        case 'Completed':
+                          return 100;
+                        default:
+                          return 0;
+                      }
+                    } else {
+                      return 0;
                     }
-                  } else {
-                    return 0;
-                  }
-                })()
-              }
-            />);
-          })}
+                  })()
+                }
+              />);
+            })}
+          </div>
         </main>
         {this.state.vanillaModalIsOpen && <VanillaModal
           visible={this.state.vanillaModalIsOpen}

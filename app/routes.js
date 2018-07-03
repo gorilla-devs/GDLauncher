@@ -50,8 +50,10 @@ class RouteDef extends React.Component {
           <Route path="/profile" component={Profile} />
           <Route path="/home" component={HomePage} />
         </Switch>
-        {isModal ? <Route path="/settings" component={Settings} /> : null}
-        {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
+        <Switch>
+          {isModal ? <Route path="/settings" component={Settings} /> : null}
+          {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
+        </Switch>
       </App>
     );
   }
