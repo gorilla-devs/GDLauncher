@@ -4,7 +4,6 @@
     height: 47.6px;
     padding-left: 10px;
     background: rgb(44, 62, 80);
-    -webkit-app-region: drag;
     -webkit-user-select: none;
 }
 

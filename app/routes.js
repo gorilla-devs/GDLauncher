@@ -10,8 +10,10 @@ import SideBar from './components/Common/SideBar/SideBar';
 import DManager from './containers/DManagerPage';
 import Profile from './containers/ProfilePage';
 import Navigation from './containers/Navigation';
+import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import Login from './components/Login/Login';
 import Settings from './components/Settings/Settings';
+import DiscordModal from './components/DiscordModal/DiscordModal';
 
 
 class RouteDef extends React.Component {
@@ -38,6 +40,7 @@ class RouteDef extends React.Component {
     ); // not initial render
     return (
       <App>
+        <SysNavBar />
         <Navigation />
         <SideBar />
         <Switch location={isModal ? this.previousLocation : location}>
@@ -47,8 +50,8 @@ class RouteDef extends React.Component {
           <Route path="/profile" component={Profile} />
           <Route path="/home" component={HomePage} />
         </Switch>
-        { /* I really don't know how this works. A better solution should be found */}
         {isModal ? <Route path="/settings" component={Settings} /> : null}
+        {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
       </App>
     );
   }

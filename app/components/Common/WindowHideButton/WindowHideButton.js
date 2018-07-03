@@ -16,7 +16,7 @@ export default class WindowHideButton extends Component<Props> {
     return (
       <div>
         <button className={styles.CloseBtn} onClick={this.MinMaxWindow}>
-          <i className="fas fa-window-minimize" style={{ width: '20px', height: '20px' }} />
+          <i className="far fa-window-minimize" style={{ width: '20px', height: '20px' }} />
         </button>
       </div>
     );

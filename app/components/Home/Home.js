@@ -19,23 +19,6 @@ const discordModalStyle = {
 
 export default class Home extends Component<Props> {
   props: Props;
-  constructor() {
-    super();
-    this.state = {
-      modalIsOpen: false
-    };
-
-    this.openModal = this.openModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-  }
-
-  openModal() {
-    this.setState({ modalIsOpen: true });
-  }
-
-  closeModal() {
-    this.setState({ modalIsOpen: false });
-  }
   /* eslint-disable */
   openLink(url) {
     require('electron').shell.openExternal(url)
@@ -104,14 +87,15 @@ export default class Home extends Component<Props> {
               type="primary"
               style={{ width: '25vw', margin: 15, height: '10vw' }}
               size="large"
-              onClick={this.openModal}
             >
-              <img
-                src="https://discordapp.com/assets/35d75407bd75d70e84e945c9f879bab8.svg"
-                draggable="false"
-                alt="discord"
-                style={{ cursor: 'pointer', marginTop: 10 }}
-              />
+              <Link to={{ pathname: '/discord', state: { modal: true } }}>
+                <img
+                  src="https://discordapp.com/assets/35d75407bd75d70e84e945c9f879bab8.svg"
+                  draggable="false"
+                  alt="discord"
+                  style={{ cursor: 'pointer', marginTop: 10 }}
+                />
+              </Link>
             </Button>
           </div>
           <div className={styles.botDots}>
@@ -126,22 +110,6 @@ export default class Home extends Component<Props> {
             </div>
           </div>
         </main>
-        <Modal
-          bodyStyle={discordModalStyle}
-          visible={this.state.modalIsOpen}
-          footer={null}
-          onCancel={this.closeModal}
-          title="Our Discord"
-          destroyOnClose="true"
-        >
-          {!this.state.waitForDiscord && <iframe
-            title="discordwidget"
-            src="https://discordapp.com/widget?id=398091532881756161&theme=dark"
-            width="520"
-            height="500"
-            frameBorder="0"
-          />}
-        </Modal>
       </div>
     );
   }

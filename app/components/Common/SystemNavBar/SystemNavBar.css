@@ -1,0 +1,17 @@
+.container {
+  margin: 0;
+  width: 100%;
+  height: 30px;
+  padding-left: 10px;
+  background: rgb(35, 48, 61);
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+}
+
+.logoText {
+  display: inline-block;
+  font-size: 23px;
+  padding: 7px 0;
+  color: #bdc3c7;
+  font-family: geometria-light, EB Garamond, Georgia, serif;
+}

@@ -16,17 +16,24 @@
   z-index: inherit;
   top: 5%;
   background: #34495e;
-  padding: 10px;
   border-radius: 4px;
 }
 
 .modalContent {
-  margin-top: 20px;
+  padding: 10px;
+}
+
+.header{
+  position: relative;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  margin-left: 10px;
 }
 
 .closeBtn {
-  display: inline-block;
   float: right;
-  margin-right: 20px;
-  margin-top: 20px;
+  position: relative;
+  top: 4px;
+  right: 20px;
 }
