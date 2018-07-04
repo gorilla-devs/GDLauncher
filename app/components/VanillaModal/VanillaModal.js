@@ -1,8 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import { Select, Form, Input, Icon, Button, Modal } from 'antd';
+import { Select, Form, Input, Icon, Button } from 'antd';
 import styles from './VanillaModal.css';
 import { resetModalStatus } from '../../actions/packCreator';
+import Modal from '../Common/Modal/Modal';
 
 type Props = {};
 const FormItem = Form.Item;
@@ -34,18 +35,13 @@ class VanillaModal extends Component<Props> {
     const { getFieldDecorator } = this.props.form;
 
     if (this.props.fetchedData) {
+      this.props.addToQueue(packName, 'vanilla');
       this.props.closeModal(true, this.pack);
       this.props.resetModalStatus();
     }
 
     return (
-      <Modal
-        visible={this.props.visible}
-        footer={null}
-        onCancel={this.props.closeModal}
-        title="Install Vanilla Minecraft"
-        destroyOnClose="true"
-      >
+      <Modal>
         <Form onSubmit={this.handleSubmit}>
           <FormItem>
             {getFieldDecorator('packName', {

@@ -1,7 +1,7 @@
 .header {
   position: relative;
-  background: linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("../../assets/images/background2.jpg");
-  background-position: right;
+  background: linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("../../assets/images/dmanagerBG.jpg");
+  background-position: center left;
   background-repeat: no-repeat;
   background-size: cover;
   height: 180px;
@@ -19,4 +19,27 @@
   position: fixed;
   z-index: 4;
   background: #2c3e50;
+}
+
+.headerButtons {
+  width: 39vw;
+  text-align: center;
+  position: relative;
+  top: 40px;
+}
+
+.browseModpacks {
+  display: block;
+  margin: 10px;
+  width: 280px;
+}
+
+.addVanilla {
+  display: inline-block;
+  margin: 10px;
+}
+
+.addForge {
+  display: inline-block;
+  margin: 10px;
 }

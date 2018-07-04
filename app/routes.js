@@ -14,6 +14,7 @@ import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import Login from './components/Login/Login';
 import Settings from './components/Settings/Settings';
 import DiscordModal from './components/DiscordModal/DiscordModal';
+import VanillaModal from './containers/VanillaModal';
 
 
 class RouteDef extends React.Component {
@@ -53,6 +54,7 @@ class RouteDef extends React.Component {
         <Switch>
           {isModal ? <Route path="/settings" component={Settings} /> : null}
           {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
+          {isModal ? <Route path="/vanillaModal" component={VanillaModal} /> : null}
         </Switch>
       </App>
     );

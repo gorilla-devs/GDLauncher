@@ -4,6 +4,7 @@ import { Button, Icon } from 'antd';
 import { lstatSync, readdirSync, watch, existsSync } from 'fs';
 import { join, basename } from 'path';
 import mkdirp from 'mkdirp';
+import Link from 'react-router-dom/Link';
 import styles from './DManager.css';
 import VanillaModal from '../../containers/VanillaModal';
 import DIcon from '../DIcon/DIcon';
@@ -21,7 +22,6 @@ export default class DManager extends Component<Props> {
       mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`);
     }
     this.state = {
-      vanillaModalIsOpen: false,
       instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
     };
     // Watches for any changes in the packs dir. TODO: Optimize
@@ -33,9 +33,6 @@ export default class DManager extends Component<Props> {
         instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
       });
     });
-
-    this.openVanillaModal = this.openVanillaModal.bind(this);
-    this.closeVanillaModal = this.closeVanillaModal.bind(this);
   }
 
   componentWillUnmount() {
@@ -43,16 +40,6 @@ export default class DManager extends Component<Props> {
     watcher.close();
   }
 
-  openVanillaModal() {
-    this.setState({ vanillaModalIsOpen: true });
-  }
-
-  closeVanillaModal(download = null, packName) {
-    this.setState({ vanillaModalIsOpen: false });
-    if (download === true) {
-      this.props.addToQueue(packName, 'vanilla');
-    }
-  }
   /* eslint-disable */
   openLink(url) {
     require('electron').shell.openExternal(url)
@@ -72,8 +59,17 @@ export default class DManager extends Component<Props> {
       <div>
         <main className={styles.main}>
           <div className={styles.header}>
-            <button onClick={this.openVanillaModal}>Open</button>
-
+            <div className={styles.headerButtons}>
+              <div>
+                <Button type="primary" disabled className={styles.browseModpacks}>Browse Curse Modpacks</Button>
+              </div>
+              <div>
+                <Link to={{ pathname: '/vanillaModal', state: { modal: true } }} >
+                  <Button type="primary" className={styles.addVanilla}>Add New Vanilla</Button>
+                </Link>
+                <Button type="primary" disabled className={styles.addForge}>Add New Forge</Button>
+              </div>
+            </div>
           </div>
           <div className={styles.content}>
             {this.state.instances.map((element) => {
