@@ -119,10 +119,6 @@ export default class DManager extends Component<Props> {
             })}
           </div>
         </main>
-        {this.state.vanillaModalIsOpen && <VanillaModal
-          visible={this.state.vanillaModalIsOpen}
-          closeModal={this.closeVanillaModal}
-        />}
       </div>
     );
   }

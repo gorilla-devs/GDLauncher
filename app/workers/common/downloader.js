@@ -2,6 +2,7 @@ const path = require('path');
 const async = require('async');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
+const assert = require('assert');
 const Promise = require('bluebird');
 const request = require('request-promise-native');
 
@@ -23,4 +24,11 @@ async function downloadArr(arr, process, folderPath, threads = 5) {
     process.send({ action: 'UPDATE__FILES' });
 
   };
+}
+
+function checkFile(lpath, size, sha1) {
+  return fs.stat(lpath).then(stats => assert.equal(stats.size, size, 'wrong size for ' + lpath))
+    .then(() => fs.readFile(lpath))
+    .then(data => assert.equal(crypto.createHash('sha1').update(data).digest('hex'), sha1, `wrong sha1 for ${lpath}`))
+    .then(() => lpath);
 }

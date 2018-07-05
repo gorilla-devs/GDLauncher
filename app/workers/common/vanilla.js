@@ -3,14 +3,18 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const path = require('path');
 const os = require('os');
+const { promisify } = require('es6-promisify');
+const extract = promisify(require('extract-zip'));
 const constants = require('../../constants');
 
 module.exports = {
   extractLibs,
   extractAssets,
-  extractMainJar
+  extractMainJar,
+  extractNatives
 };
 
+// This is needed since the os names on the mc json and nodejs os lib do not match
 function convertOSToMCFormat(ElectronFormat) {
   switch (ElectronFormat) {
     case 'Windows_NT':
@@ -24,21 +28,22 @@ function convertOSToMCFormat(ElectronFormat) {
   }
 }
 
+// Returns whether the rules allow the file to be downloaded or not
+function parseLibRules(rules) {
+  let skip = false;
+  if (rules) {
+    skip = true;
+    rules.forEach(({ action, los }) => {
+      if (action === 'allow' && ((los && os.name === convertOSToMCFormat(os.type())) || !los)) { skip = false }
+      if (action === 'disallow' && ((los && os.name === convertOSToMCFormat(os.type())) || !los)) { skip = true }
+    });
+  }
+  return skip;
+}
+
 function extractLibs(json) {
   const libs = [];
-  json.libraries.filter((lib) => {
-    let isValid = true;
-    // Check for [rules] (allowed, disallowed)
-    if ('rules' in lib) {
-      lib.rules.map(rule => {
-        if (rule.action === 'disallow' && (!('os' in rule) || convertOSToMCFormat(os.type()) === rule.os.name)) {
-          // THIS IS NOT TO DOWNLOAD
-          isValid = false;
-        }
-      });
-    }
-    return isValid;
-  }).map((lib) => {
+  json.libraries.filter(lib => !parseLibRules(lib.rules)).map((lib) => {
     if ('artifact' in lib.downloads) {
       const filePath = `${constants.LAUNCHER_FOLDER}/libraries/${lib.downloads.artifact.path}`;
       if (!fs.existsSync(filePath)) {
@@ -48,14 +53,12 @@ function extractLibs(json) {
         });
       }
     }
-    if ('classifiers' in lib.downloads) {
-      if (`natives-${convertOSToMCFormat(os.type())}` in lib.downloads.classifiers) {
-        // THESE ARE THE NATIVES LWJGL. WE MUST SAVE THEM IN THE CFG FILE
-        libs.push({
-          url: lib.downloads.classifiers[`natives-${convertOSToMCFormat(os.type())}`].url,
-          path: lib.downloads.classifiers[`natives-${convertOSToMCFormat(os.type())}`].path
-        });
-      }
+    if ('classifiers' in lib.downloads && `natives-${convertOSToMCFormat(os.type())}` in lib.downloads.classifiers) {
+      libs.push({
+        url: lib.downloads.classifiers[`natives-${convertOSToMCFormat(os.type())}`].url,
+        path: lib.downloads.classifiers[`natives-${convertOSToMCFormat(os.type())}`].path,
+        natives: true
+      });
     }
   });
   return libs;
@@ -98,4 +101,13 @@ async function extractAssets(json) {
     });
   });
   return assets;
+}
+
+async function extractNatives(libs) {
+  const nativesPath = `${constants.LAUNCHER_FOLDER}/natives/`;
+  if (!fs.existsSync(nativesPath)) {
+    mkdirp.sync(nativesPath);
+  }
+  await Promise.all(libs.map(lib =>
+    extract(`${constants.LAUNCHER_FOLDER}/libraries/${lib.path}`, { dir: `${process.cwd()}/${nativesPath}` })));
 }
