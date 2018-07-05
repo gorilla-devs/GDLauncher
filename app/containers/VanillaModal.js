@@ -7,8 +7,7 @@ import * as downloadManagerActions from '../actions/downloadManager';
 function mapStateToProps(state) {
   return {
     versionsManifest: state.packCreator.versionsManifest,
-    loadingData: state.packCreator.fetchingSelectedVersionData,
-    fetchedData: state.packCreator.fetchedSelectedVersionData
+    modalState: state.packCreator.modalState,
   };
 }
 

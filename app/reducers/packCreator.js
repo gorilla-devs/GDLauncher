@@ -1,57 +1,30 @@
 import {
   GET_MC_VANILLA_VERSIONS,
-  GET_MC_VANILLA_VERSION_DATA,
-  RESET_MODAL_STATUS
+  CREATION_COMPLETE,
+  RESET_MODAL_STATE
 } from '../actions/packCreator';
 
 const initialState = {
-  fetchingVersions: false,
   versionsManifest: [],
-  fetchingSelectedVersionData: false,
-  fetchedSelectedVersionData: false
+  modalState: true
 };
 
 export default function packManager(state = initialState, action) {
   switch (action.type) {
-    case `${GET_MC_VANILLA_VERSIONS}_PENDING`:
+    case `${GET_MC_VANILLA_VERSIONS}`:
       return {
         ...state,
-        fetchingVersions: true
+        versionsManifest: action.payload.data.versions
       };
-    case `${GET_MC_VANILLA_VERSIONS}_FULFILLED`:
+    case `${CREATION_COMPLETE}`:
       return {
         ...state,
-        versionsManifest: action.payload.data.versions,
-        fetchingVersions: false,
+        modalState: false
       };
-    case `${GET_MC_VANILLA_VERSIONS}_REJECTED`:
+    case `${RESET_MODAL_STATE}`:
       return {
         ...state,
-        fetchingVersions: false
-      };
-    // Specific version data
-    case `${GET_MC_VANILLA_VERSION_DATA}_PENDING`:
-      return {
-        ...state,
-        fetchingSelectedVersionData: true,
-        fetchedSelectedVersionData: false
-      };
-    case `${GET_MC_VANILLA_VERSION_DATA}_FULFILLED`:
-      return {
-        ...state,
-        fetchingSelectedVersionData: false,
-        fetchedSelectedVersionData: true,
-      };
-    case `${GET_MC_VANILLA_VERSION_DATA}_REJECTED`:
-      return {
-        ...state,
-        fetchingSelectedVersionData: false,
-        fetchedSelectedVersionData: false
-      };
-    case `${RESET_MODAL_STATUS}`:
-      return {
-        ...state,
-        fetchedSelectedVersionData: false
+        modalState: true
       };
     default:
       return state;
