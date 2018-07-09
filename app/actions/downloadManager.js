@@ -88,14 +88,15 @@ function addNextPackToActualDownload(previousPack) {
   return (dispatch, getState) => {
     const { downloadManager } = getState();
     const queueArr = Object.keys(downloadManager.downloadQueue);
-    const actualPackIndex = queueArr.indexOf(previousPack);
-    const nextPackName = queueArr[actualPackIndex + 1];
-    if (actualPackIndex + 1 < queueArr.length) {
-      dispatch({
-        type: START_DOWNLOAD,
-        payload: nextPackName
-      });
-      dispatch(downloadPack(nextPackName));
-    }
+    queueArr.some(pack => {
+      if (!downloadManager.downloadQueue[pack].downloadCompleted) {
+        dispatch({
+          type: START_DOWNLOAD,
+          payload: pack
+        });
+        dispatch(downloadPack(pack));
+        return true;
+      }
+    });
   };
 }

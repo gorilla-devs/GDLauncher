@@ -53,7 +53,7 @@ export default class Modal extends Component<Props> {
         willChange: 'transform',
         transitionTimingFunction: 'cubic-bezier(.62,.28,.23,.99) 0.7s'
       }
-    })
+    });
   }
 
   back = e => {
