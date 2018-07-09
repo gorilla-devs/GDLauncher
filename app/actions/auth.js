@@ -6,6 +6,8 @@ import { LOGIN_PROXY_API, ACCESS_TOKEN_VALIDATION_URL } from '../constants';
 export const LOGOUT = 'LOGOUT';
 export const START_AUTH_LOADING = 'START_AUTH_LOADING';
 export const STOP_AUTH_LOADING = 'STOP_AUTH_LOADING';
+export const START_TOKEN_CHECK_LOADING = 'START_TOKEN_CHECK_LOADING';
+export const STOP_TOKEN_CHECK_LOADING = 'STOP_TOKEN_CHECK_LOADING';
 export const AUTH_SUCCESS = 'AUTH_SUCCESS';
 export const AUTH_FAILED = 'AUTH_FAILED';
 
@@ -38,6 +40,8 @@ export function login(username, password, remember) {
           type: AUTH_SUCCESS,
           payload: res.data
         });
+
+        dispatch(push('/home'));
       } else {
         dispatch({
           type: AUTH_FAILED,
@@ -62,24 +66,40 @@ export function logout() {
   };
 }
 
-export function checkAccessTokenValidity(token) {
+export function checkLocalDataValidity(redirectToHome = false) {
   return async (dispatch) => {
-    await axios.post(
-      ACCESS_TOKEN_VALIDATION_URL,
-      { accessToken: token },
-      { 'Content-Type': 'application/json;charset=UTF-8' }
-    ).then(res => {
-      if (res.status === 204) {
-        dispatch({
-          type: AUTH_SUCCESS,
-          payload: store.get('user')
-        });
-      }
-      return res;
-    }).catch((error) => {
+    if (store.has('user')) {
       dispatch({
-        type: AUTH_FAILED
+        type: START_TOKEN_CHECK_LOADING
       });
-    });
+      const data = store.get('user');
+      await axios.post(
+        ACCESS_TOKEN_VALIDATION_URL,
+        { accessToken: data.accessToken },
+        { 'Content-Type': 'application/json;charset=UTF-8' }
+      ).then(res => {
+        if (res.status === 204) {
+          dispatch({
+            type: AUTH_SUCCESS,
+            payload: data
+          });
+          dispatch({
+            type: STOP_TOKEN_CHECK_LOADING
+          });
+          if (redirectToHome) {
+            dispatch(push('/home'));
+          }
+        }
+        return res;
+      }).catch((error) => {
+        store.delete('user');
+        dispatch({
+          type: AUTH_FAILED
+        });
+        dispatch({
+          type: STOP_TOKEN_CHECK_LOADING
+        });
+      });
+    }
   };
 }

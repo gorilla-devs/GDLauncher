@@ -35,9 +35,9 @@ async function main() {
   process.send({ downloaded: 0, total: vnlLibs.length + vnlAssets.length + mainJar.length, action: 'UPDATE__TOTAL' });
   await downloader.downloadArr(vnlLibs, process, `${constants.LAUNCHER_FOLDER}/libraries/`);
   // For some urls it will say they are not string-buffer chunks. It's kinda ok I guess
-  // await downloader.downloadArr(vnlAssets, process, `${constants.LAUNCHER_FOLDER}/assets/`);
+  await downloader.downloadArr(vnlAssets, process, `${constants.LAUNCHER_FOLDER}/assets/`);
 
-  // await downloader.downloadArr(mainJar, process, `${constants.LAUNCHER_FOLDER}/versions/`);
+  await downloader.downloadArr(mainJar, process, `${constants.LAUNCHER_FOLDER}/versions/`);
 
   await vnlHelpers.extractNatives(vnlLibs.filter(lib => 'natives' in lib));
 

@@ -2,8 +2,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Switch, Route, withRouter, Redirect } from 'react-router';
-import { AnimatedSwitch } from 'react-router-transition';
 import { Form } from 'antd';
+import { bindActionCreators } from 'redux';
+import * as AuthActions from './actions/auth';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
@@ -20,6 +21,11 @@ import VanillaModal from './containers/VanillaModal';
 class RouteDef extends React.Component {
 
   previousLocation = this.props.location;
+
+  componentDidMount = () => {
+    this.props.checkLocalDataValidity(true);
+  }
+
 
   componentWillUpdate(nextProps) {
     const { location } = this.props;
@@ -43,7 +49,7 @@ class RouteDef extends React.Component {
       <App>
         <SysNavBar />
         <Navigation />
-        <SideBar />
+        {location.pathname !== '/' ? <SideBar /> : null}
         <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
           {!this.props.isAuthValid && <Redirect push to="/" />}
@@ -51,6 +57,8 @@ class RouteDef extends React.Component {
           <Route path="/profile" component={Profile} />
           <Route path="/home" component={HomePage} />
         </Switch>
+
+        { /* ALL MODALS */}
         <Switch>
           {isModal ? <Route path="/settings" component={Settings} /> : null}
           {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
@@ -68,4 +76,8 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(RouteDef);
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(AuthActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RouteDef);
