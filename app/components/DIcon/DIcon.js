@@ -37,19 +37,8 @@ export default class DIcon extends Component<Props> {
         <div className={styles.icon}>
           <div className={styles.icon__upContainer}>
             {!this.props.installing &&
-              <div>
-                <div className={styles.icon__up} onClick={this.handleClickPlay}>
-                  <span><Icon type="play-circle" /></span>
-                </div>
-                <div className={styles.icon__right}>
-                  <span><Icon type="appstore" /></span>
-                </div>
-                <div className={styles.icon__bottom}>
-                  <span><Icon type="appstore" /></span>
-                </div>
-                <div className={styles.icon__left}>
-                  <span><Icon type="appstore" /></span>
-                </div>
+              <div className={styles.icon_playText} onClick={this.handleClickPlay}>
+                Play
               </div>}
             {this.props.installing &&
               <div className={styles.icon__installing}>
