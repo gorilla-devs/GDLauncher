@@ -39,7 +39,7 @@ async function main() {
 
   await downloader.downloadArr(mainJar, process, `${constants.LAUNCHER_FOLDER}/versions/`);
 
-  await vnlHelpers.extractNatives(vnlLibs.filter(lib => 'natives' in lib));
+  await vnlHelpers.extractNatives(vnlLibs.filter(lib => 'natives' in lib), process.env.name);
 
   process.send({ action: 'DOWNLOAD__COMPLETED' });
 }

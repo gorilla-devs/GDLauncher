@@ -37,7 +37,6 @@ class Login extends Component<Props> {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      console.log(values);
       if (!err) {
         this.props.login(values.username, values.password, values.remember);
       } else {

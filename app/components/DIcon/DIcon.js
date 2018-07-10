@@ -16,10 +16,11 @@ export default class DIcon extends Component<Props> {
   props: Props;
 
   handleClickPlay = async () => {
-    /* const util = require('util');
+    const util = require('util');
     const exec = util.promisify(require('child_process').exec);
-    const name = await exec(launchCommand()); */
-    launchCommand();
+    console.log(await launchCommand(this.props.name, this.props.userData));
+    const name = await exec(await launchCommand(this.props.name, this.props.userData));
+    console.log(name);
   }
   render() {
     return (

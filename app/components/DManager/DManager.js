@@ -74,6 +74,7 @@ export default class DManager extends Component<Props> {
           <div className={styles.content}>
             {this.state.instances.map((element) => {
               return (<DIcon
+                userData={this.props.userData}
                 name={element}
                 key={element}
                 installing={

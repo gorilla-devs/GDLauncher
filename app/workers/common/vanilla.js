@@ -41,12 +41,19 @@ function parseLibRules(rules) {
   return skip;
 }
 
-function extractLibs(json) {
+function extractLibs(json, CheckForExists = true) {
   const libs = [];
   json.libraries.filter(lib => !parseLibRules(lib.rules)).map((lib) => {
     if ('artifact' in lib.downloads) {
       const filePath = `${constants.LAUNCHER_FOLDER}/libraries/${lib.downloads.artifact.path}`;
-      if (!fs.existsSync(filePath)) {
+      if (CheckForExists) {
+        if (!fs.existsSync(filePath)) {
+          libs.push({
+            url: lib.downloads.artifact.url,
+            path: lib.downloads.artifact.path
+          });
+        }
+      } else {
         libs.push({
           url: lib.downloads.artifact.url,
           path: lib.downloads.artifact.path
@@ -64,10 +71,17 @@ function extractLibs(json) {
   return libs;
 }
 
-function extractMainJar(json) {
+function extractMainJar(json, CheckForExists = true) {
   const libs = [];
   const filePath = `${constants.LAUNCHER_FOLDER}/versions/${json.id}/${json.id}.jar`;
-  if (!fs.existsSync(filePath)) {
+  if (CheckForExists) {
+    if (!fs.existsSync(filePath)) {
+      libs.push({
+        url: json.downloads.client.url,
+        path: `${json.id}/${json.id}.jar`
+      });
+    }
+  } else {
     libs.push({
       url: json.downloads.client.url,
       path: `${json.id}/${json.id}.jar`
@@ -103,8 +117,8 @@ async function extractAssets(json) {
   return assets;
 }
 
-async function extractNatives(libs) {
-  const nativesPath = `${constants.LAUNCHER_FOLDER}/natives/`;
+async function extractNatives(libs, packName) {
+  const nativesPath = `${constants.LAUNCHER_FOLDER}/${constants.PACKS_FOLDER_NAME}/${packName}/natives/`;
   if (!fs.existsSync(nativesPath)) {
     mkdirp.sync(nativesPath);
   }

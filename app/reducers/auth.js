@@ -15,6 +15,7 @@ const initialState = {
   username: null,
   accessToken: null,
   clientToken: null,
+  legacy: null,
   uuid: null,
   isAuthValid: false
 };
@@ -35,6 +36,7 @@ export default function auth(state = initialState, action) {
         username: action.payload.username,
         accessToken: action.payload.accessToken,
         clientToken: action.payload.clientToken,
+        legacy: action.payload.legacy,
         uuid: action.payload.uuid,
         isAuthValid: true
       };
@@ -49,6 +51,7 @@ export default function auth(state = initialState, action) {
         username: null,
         accessToken: null,
         clientToken: null,
+        legacy: null,
         uuid: null,
         isAuthValid: false
       };

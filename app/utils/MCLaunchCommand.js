@@ -1,23 +1,56 @@
 import { promisify } from 'es6-promisify';
 import findJavaHome from 'find-java-home';
 import os from 'os';
+import fs from 'fs';
+import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../constants';
+import { extractLibs, extractMainJar } from '../workers/common/vanilla';
+import store from '../localStore';
 
-const getStartCommand = async (packName) => {
+const getStartCommand = async (packName, userData) => {
   const FJH_Promise = promisify(findJavaHome);
 
-
-  const javaPath = await FJH_Promise({ allowJre: true }) + '\\javapath';
-  const dosName = os.release().substr(0, 2) === 10 ? '"-Dos.name=Windows 10" ' : '';
-
-
+  const packJson = JSON.parse(fs.readFileSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/vnl.json`));
+  const javaPath = `${await FJH_Promise({ allowJre: true })}\\javapath\\java.exe`;
+  const dosName = os.release().substr(0, 2) === 10 ? '"-Dos.name=Windows 10" -Dos.version=10.0 ' : '';
+  const version = packJson.id;
+  const libs = extractLibs(packJson, false);
+  const mainJar = extractMainJar(packJson, false);
+  const Arguments = getMCArguments(packJson, packName, userData);
 
   const completeCMD = `
-    "${javaPath}" ${dosName}
-    -XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump 
-    -Djava.library.path=""
+"${javaPath}" ${dosName}
+-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump 
+-Djava.library.path="${process.cwd()}\\${LAUNCHER_FOLDER}\\${PACKS_FOLDER_NAME}\\${packName}\\natives" 
+-Dminecraft.client.jar="${process.cwd()}\\${LAUNCHER_FOLDER}\\versions\\${version}\\${version}.jar" 
+-cp ${libs
+      .filter(lib => !lib.natives)
+      .map(lib => `"${process.cwd()}\\${LAUNCHER_FOLDER}\\libraries\\${lib.path}"`)
+      .join(';')};${`"${process.cwd()}\\${LAUNCHER_FOLDER}\\versions\\${mainJar[0].path}"`} 
+${packJson.mainClass} ${Arguments}
   `;
 
-  // `\"C:\\Program Files (x86)\\Minecraft\\runtime\\jre-x64\\1.8.0_51\\bin\\javaw.exe\" \"-Dos.name=Windows 10\" -Dos.version=10.0 -XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Djava.library.path=C:\\Users\\david\\AppData\\Local\\Temp\\libs -Dminecraft.launcher.brand=minecraft-launcher -Dminecraft.launcher.version=2.1.1216 -Dminecraft.client.jar=C:\\Users\\david\\AppData\\Roaming\\.minecraft\\versions\\1.7.10\\1.7.10.jar -cp C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\mojang\\netty\\1.6\\netty-1.6.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\mojang\\realms\\1.3.5\\realms-1.3.5.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\org\\apache\\commons\\commons-compress\\1.8.1\\commons-compress-1.8.1.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\org\\apache\\httpcomponents\\httpclient\\4.3.3\\httpclient-4.3.3.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\commons-logging\\commons-logging\\1.1.3\\commons-logging-1.1.3.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\org\\apache\\httpcomponents\\httpcore\\4.3.2\\httpcore-4.3.2.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\java3d\\vecmath\\1.3.1\\vecmath-1.3.1.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\net\\sf\\trove4j\\trove4j\\3.0.3\\trove4j-3.0.3.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\ibm\\icu\\icu4j-core-mojang\\51.2\\icu4j-core-mojang-51.2.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\net\\sf\\jopt-simple\\jopt-simple\\4.5\\jopt-simple-4.5.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\paulscode\\codecjorbis\\20101023\\codecjorbis-20101023.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\paulscode\\codecwav\\20101023\\codecwav-20101023.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\paulscode\\libraryjavasound\\20101123\\libraryjavasound-20101123.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\paulscode\\librarylwjglopenal\\20100824\\librarylwjglopenal-20100824.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\paulscode\\soundsystem\\20120107\\soundsystem-20120107.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\io\\netty\\netty-all\\4.0.10.Final\\netty-all-4.0.10.Final.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\google\\guava\\guava\\15.0\\guava-15.0.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\org\\apache\\commons\\commons-lang3\\3.1\\commons-lang3-3.1.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\commons-io\\commons-io\\2.4\\commons-io-2.4.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\commons-codec\\commons-codec\\1.9\\commons-codec-1.9.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\net\\java\\jinput\\jinput\\2.0.5\\jinput-2.0.5.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\net\\java\\jutils\\jutils\\1.0.0\\jutils-1.0.0.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\google\\code\\gson\\gson\\2.2.4\\gson-2.2.4.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\com\\mojang\\authlib\\1.5.21\\authlib-1.5.21.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\org\\apache\\logging\\log4j\\log4j-api\\2.0-beta9\\log4j-api-2.0-beta9.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\org\\apache\\logging\\log4j\\log4j-core\\2.0-beta9\\log4j-core-2.0-beta9.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\org\\lwjgl\\lwjgl\\lwjgl\\2.9.1\\lwjgl-2.9.1.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\org\\lwjgl\\lwjgl\\lwjgl_util\\2.9.1\\lwjgl_util-2.9.1.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\libraries\\tv\\twitch\\twitch\\5.16\\twitch-5.16.jar;C:\\Users\\david\\AppData\\Roaming\\.minecraft\\versions\\1.7.10\\1.7.10.jar -Xmx1G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=16M -Dlog4j.configurationFile=C:/Users\\david\\AppData\\Roaming\\.minecraft\\assets\\log_configs\\client-1.7.xml net.minecraft.client.main.Main --username killpowa --version 1.7.10 --gameDir C:/Users\\david\\AppData\\Roaming\\.minecraft --assetsDir C:/Users\\david\\AppData\\Roaming\\.minecraft/assets --assetIndex 1.7.10 --uuid 3b40f99969e64dbcabd01f87cddcb1fd --accessToken b58ca22ee0cf43f19de5b3f21dd3e223 --userProperties {} --userType mojang`;
+  return completeCMD.replace(/\n|\r/g, '');
+  //  --username killpowa --version 1.7.10 --gameDir C:/Users\\david\\AppData\\Roaming\\.minecraft --assetsDir C:/Users\\david\\AppData\\Roaming\\.minecraft/assets --assetIndex 1.7.10 --uuid 3b40f99969e64dbcabd01f87cddcb1fd --accessToken b58ca22ee0cf43f19de5b3f21dd3e223 --userProperties {} --userType mojang`;
 };
+
+const getMCArguments = (json, packName, userData) => {
+  let Arguments = '';
+  if (json.minecraftArguments) {
+    Arguments = json.minecraftArguments
+      .replace('${auth_player_name}', userData.username)
+      .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
+      .replace('${game_directory}', `${process.cwd()}/${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}`)
+      .replace('${game_assets}', `${process.cwd()}/${LAUNCHER_FOLDER}/assets`) // Another check for really old versions
+      .replace('${version_name}', json.id)
+      .replace('${assets_root}', `${process.cwd()}/${LAUNCHER_FOLDER}/assets`)
+      .replace('${assets_index_name}', json.assets)
+      .replace('${auth_uuid}', userData.uuid)
+      .replace('${auth_access_token}', userData.accessToken)
+      .replace('${user_properties}', "{}")
+      .replace('${user_type}', userData.legacy ? 'legacy' : 'mojang')
+      .replace('${version_type}', json.id);
+  }
+  return Arguments;
+}
 
 export default getStartCommand;
