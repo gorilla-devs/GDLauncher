@@ -40,15 +40,15 @@ const getMCArguments = (json, packName, userData) => {
       .replace('${auth_player_name}', userData.username)
       .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
       .replace('${game_directory}', `${process.cwd()}/${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}`)
-      .replace('${game_assets}', `${process.cwd()}/${LAUNCHER_FOLDER}/assets`) // Another check for really old versions
+      .replace('${game_assets}', `${process.cwd()}/${LAUNCHER_FOLDER}/assets${json.assets === 'legacy' ? '/virtual/legacy' : ''}`) // Another check for really old versions
       .replace('${version_name}', json.id)
-      .replace('${assets_root}', `${process.cwd()}/${LAUNCHER_FOLDER}/assets`)
+      .replace('${assets_root}', `${process.cwd()}/${LAUNCHER_FOLDER}/assets${json.assets === 'legacy' ? '/virtual/legacy' : ''}`)
       .replace('${assets_index_name}', json.assets)
       .replace('${auth_uuid}', userData.uuid)
       .replace('${auth_access_token}', userData.accessToken)
       .replace('${user_properties}', "{}")
       .replace('${user_type}', userData.legacy ? 'legacy' : 'mojang')
-      .replace('${version_type}', json.id);
+      .replace('${version_type}', json.type);
   }
   return Arguments;
 }

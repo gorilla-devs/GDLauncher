@@ -20,6 +20,13 @@ async function downloadArr(arr, process, folderPath, threads = 5) {
     }
     const file = await request(lib.url, { encoding: 'binary' });
     fs.writeFileSync(`${folderPath}${lib.path}`, file, 'binary');
+    if (lib.legacyPath && !fs.existsSync(lib.legacyPath)) {
+      const legacyPath = `${folderPath}${path.dirname(lib.legacyPath)}`;
+      if (!fs.existsSync(legacyPath)) {
+        mkdirp.sync(legacyPath);
+      }
+      fs.writeFileSync(`${folderPath}${lib.legacyPath}`, file, 'binary');
+    }
 
     process.send({ action: 'UPDATE__FILES' });
 
