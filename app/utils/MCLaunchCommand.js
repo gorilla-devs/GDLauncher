@@ -30,7 +30,6 @@ ${packJson.mainClass} ${Arguments}
   `;
 
   return completeCMD.replace(/\n|\r/g, '');
-  //  --username killpowa --version 1.7.10 --gameDir C:/Users\\david\\AppData\\Roaming\\.minecraft --assetsDir C:/Users\\david\\AppData\\Roaming\\.minecraft/assets --assetIndex 1.7.10 --uuid 3b40f99969e64dbcabd01f87cddcb1fd --accessToken b58ca22ee0cf43f19de5b3f21dd3e223 --userProperties {} --userType mojang`;
 };
 
 const getMCArguments = (json, packName, userData) => {
