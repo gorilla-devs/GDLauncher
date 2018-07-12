@@ -16,9 +16,9 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 100%;
+  height: 69%;
   width: 100%;
-  padding-top: 35vh;
+  padding-top: 22vh;
 }
 
 .title {
@@ -52,19 +52,16 @@
 
 .status {
   width: 100%;
-  height: 220px;
+  height: 30%;
   margin-top: 15px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
 }
 
 .header_status {
   display: flex;
   justify-content: space-between;
-}
-
-.status {
-  position: relative;
-  display: inline-block;
-  text-align: center;
 }
 
 .flexbox1 {
@@ -74,7 +71,7 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 500px;
+  height: 150px;
   width: 100%;
 }
 

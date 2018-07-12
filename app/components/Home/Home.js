@@ -67,37 +67,32 @@ export default class Home extends Component<Props> {
                 Play Now!
               </Button>
             </Link>
-            <div style={{ textAlign: 'center', paddingTop: '23vh' }}>
-              Scroll Down <br />
-              <i className="fas fa-angle-double-down" />
-            </div>
           </div>
           <div className={styles.status}>
-            <span style={{ color: '#bdc3c7', fontSize: '25px' }}>Status</span>
+            <span style={{ color: '#bdc3c7', fontSize: '25px' }}>Quick Launch</span>
             <div className={styles.header_status}>
               <div className={styles.status}>
-                Auth <br /><br />
+                Instance 1 <br /><br />
                 <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
               </div>
               <div className={styles.status}>
-                Session <br /><br />
+                Server 1 <br /><br />
                 <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
               </div>
               <div className={styles.status}>
-                Skin <br /><br />
+                Instance 2 <br /><br />
                 <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
               </div>
               <div className={styles.status}>
-                APIs <br /><br />
+                Server 2 <br /><br />
                 <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
               </div>
             </div>
           </div>
           <div className={styles.flexbox1}>
-
+            <h3 className={styles.subTitle} style={{ padding: '55px' }}>One Launcher To Rule Them All</h3>
           </div>
           <br />
-          <h3 className={styles.subTitle}>One Launcher To Rule Them All</h3>
           <div className={styles.topDots}>
             <div className={styles.dotContainer}>
               <Dot Color="#27ae60"> Connect with Friends and Join Them </Dot>

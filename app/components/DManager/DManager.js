@@ -7,7 +7,7 @@ import mkdirp from 'mkdirp';
 import Link from 'react-router-dom/Link';
 import styles from './DManager.css';
 import VanillaModal from '../../containers/VanillaModal';
-import DIcon from '../DIcon/DIcon';
+import DInstance from '../../containers/DInstance';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
 import store from '../../localStore';
 
@@ -72,52 +72,7 @@ export default class DManager extends Component<Props> {
             </div>
           </div>
           <div className={styles.content}>
-            {this.state.instances.map((element) => {
-              return (<DIcon
-                userData={this.props.userData}
-                name={element}
-                key={element}
-                installing={
-                  (() => {
-                    if (this.props.installingQueue[element]) {
-                      switch (this.props.installingQueue[element].status) {
-                        case 'Queued':
-                          return true;
-                        case 'Downloading':
-                          return true;
-                        case 'Completed':
-                          return false;
-                        default:
-                          return true;
-                      }
-                    } else {
-                      return false;
-                    }
-                  })()
-                }
-                percentage={
-                  (() => {
-                    if (this.props.installingQueue[element]) {
-                      switch (this.props.installingQueue[element].status) {
-                        case 'Queued':
-                          return 0;
-                        case 'Downloading':
-                          /* TODO: Fix NaN. It is caused by 0 / 0 division while waiting for usable data from the worker */
-                          return Math.floor(
-                            (this.props.installingQueue[element].downloaded * 100)
-                            / this.props.installingQueue[element].totalToDownload);
-                        case 'Completed':
-                          return 100;
-                        default:
-                          return 0;
-                      }
-                    } else {
-                      return 0;
-                    }
-                  })()
-                }
-              />);
-            })}
+            {this.state.instances.map(element => <DInstance name={element} key={element} />)}
           </div>
         </main>
       </div>
