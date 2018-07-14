@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, Select, Modal } from 'antd';
+import { Button, Select, Modal } from 'antd';
+import Card from '../Common/Card/Card';
 import styles from './Home.css';
 import Dot from '../Common/Dot/Dot';
 import Navigation from '../../containers/Navigation';
@@ -60,12 +61,18 @@ export default class Home extends Component<Props> {
               />
               { /* eslint-enable */}
             </div>
-            <h1 className={styles.title}>Welcome to GDLauncher!</h1>
+            {/* <h1 className={styles.title}>Welcome to GDLauncher!</h1>
             <h3 className={styles.subTitle}>Minecraft Made Easy</h3>
             <Link to="/dmanager" draggable="false">
               <Button type="primary" size="large" style={{ width: '300px', display: 'block', margin: '0 auto', height: '50px' }}>
                 Play Now!
               </Button>
+            </Link> */}
+            <Link to="/dmanager" draggable="false">
+              <Card style={{ width: '250px', height: '200px', textAlign: 'center', padding: '30px' }}>
+                <i className="fas fa-play" style={{ fontSize: '70px' }} />
+                <h1>Play Now!</h1>
+              </Card>
             </Link>
           </div>
           <div className={styles.status}>
