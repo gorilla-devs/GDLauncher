@@ -17,7 +17,8 @@ class Login extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      helpModalisOpen: false
+      helpModalisOpen: false,
+      checkingToken: false
     };
 
     this.openHelpModal = this.openHelpModal.bind(this);
@@ -36,9 +37,8 @@ class Login extends Component<Props> {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      console.log(values);
       if (!err) {
-        this.props.login(values.username, values.password);
+        this.props.login(values.username, values.password, values.remember);
       } else {
         console.log(err);
       }
@@ -46,13 +46,18 @@ class Login extends Component<Props> {
   }
 
 
+
   /* eslint-enable */
 
   render() {
     const { getFieldDecorator } = this.props.form;
 
-    if (this.props.isAuthValid) {
-      return <Redirect to="/home" />;
+    if (this.props.tokenLoading) {
+      return (
+        <div>
+          <h1 style={{ textAlign: 'center', position: 'relative', top: '20vw' }}>Checking Access Token...</h1>
+        </div>
+      );
     }
 
     return (
@@ -148,7 +153,8 @@ class Login extends Component<Props> {
 function mapStateToProps(state) {
   return {
     authLoading: state.auth.loading,
-    isAuthValid: state.auth.isAuthValid
+    isAuthValid: state.auth.isAuthValid,
+    tokenLoading: state.auth.tokenLoading
   };
 }
 

@@ -1,8 +1,8 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "gorilladevs-gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.13.2",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "version": "0.4.0",
+  "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --colors",
@@ -36,7 +36,7 @@
   "browserslist": "electron 1.6",
   "build": {
     "productName": "GDLauncher",
-    "appId": "org.develar.ElectronReact",
+    "appId": "org.gorilladevs.GDLauncher",
     "files": [
       "dist/",
       "node_modules/",
@@ -84,7 +84,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/gorilla-devs/GDLauncher.git"
   },
   "author": {
     "name": "GorillaDevs",
@@ -93,7 +93,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
+    "url": "https://github.com/gorilla-devs/GDLauncher/issues"
   },
   "keywords": [
     "electron",
@@ -106,7 +106,7 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/gorilla-devs/GDLauncher",
   "jest": {
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
@@ -143,6 +143,7 @@
     "babel-preset-react-optimize": "^1.0.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
+    "cfonts": "^2.1.3",
     "chalk": "^2.3.2",
     "concurrently": "^3.5.1",
     "cross-env": "^5.1.4",
@@ -199,11 +200,16 @@
   },
   "dependencies": {
     "antd": "^3.4.1",
+    "assert": "^1.4.1",
     "async-es": "^2.6.1",
     "axios": "^0.18.0",
     "classnames": "^2.2.5",
     "devtron": "^1.4.0",
     "electron-debug": "^1.5.0",
+    "electron-store": "^2.0.0",
+    "es6-promisify": "^6.0.0",
+    "extract-zip": "^1.6.7",
+    "find-java-home": "^0.2.0",
     "font-awesome": "^4.7.0",
     "glamor": "^2.20.40",
     "glamorous": "^4.12.1",
@@ -212,6 +218,8 @@
     "less": "^3.0.1",
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
+    "mz": "^2.7.0",
+    "p-queue": "^2.4.2",
     "postcss-html": "^0.21.0",
     "prop-types": "^15.6.1",
     "react": "^16.3.1",
@@ -228,6 +236,8 @@
     "redux": "^3.7.2",
     "redux-promise-middleware": "^5.1.1",
     "redux-thunk": "^2.2.0",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.5",
     "source-map-support": "^0.5.4",
     "threads": "^0.11.0"
   },

@@ -28,7 +28,7 @@ class SideBar extends Component<Props> {
     this.state = {
       AccountIconsModalisOpen: false,
       downloadPopoverOpen: false,
-    }
+    };
 
     this.logout = this.logout.bind(this);
     this.openAccountIconsModal = this.openAccountIconsModal.bind(this);
@@ -76,11 +76,6 @@ class SideBar extends Component<Props> {
   }
 
   render() {
-
-    if (this.props.disconnected) {
-      return <Redirect to="/login" />;
-    }
-
     return (
       <aside className={styles.sidenav}>
         <Card
@@ -169,7 +164,6 @@ class SideBar extends Component<Props> {
 function mapStateToProps(state) {
   return {
     username: state.auth.username,
-    disconnected: !state.auth.isAuthValid,
     profileState: state.profile.profileState,
     stateColor: state.profile.stateColor,
     downloadQueue: state.downloadManager.downloadQueue

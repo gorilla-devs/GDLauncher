@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import { Select, Form, Input, Icon, Button, Modal } from 'antd';
+import { Select, Form, Input, Icon, Button } from 'antd';
 import styles from './VanillaModal.css';
-import { resetModalStatus } from '../../actions/packManager';
+import Modal from '../Common/Modal/Modal';
 
 type Props = {};
 const FormItem = Form.Item;
@@ -10,21 +10,33 @@ let pack;
 
 class VanillaModal extends Component<Props> {
   props: Props;
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false
+    };
+  }
+
+  componentWillMount() {
+    this.props.resetModalState();
+  }
+
   componentDidMount = () => {
     // Downloads the versions list just the first time
-    if (this.props.versionsManifest.length === 0)
+    if (this.props.versionsManifest.length === 0) {
       this.props.getVanillaMCVersions();
+    }
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        this.pack = values.packName;
+        this.setState({ loading: true });
         this.props.createPack(
           this.props.versionsManifest.find(
-            (version) =>
-              version.id === values.version).url,
+            (version) => version.id === values.version).url,
           values.packName);
       }
     });
@@ -33,19 +45,8 @@ class VanillaModal extends Component<Props> {
   render() {
     const { getFieldDecorator } = this.props.form;
 
-    if (this.props.fetchedData) {
-      this.props.closeModal(true, this.pack);
-      this.props.resetModalStatus();
-    }
-
     return (
-      <Modal
-        visible={this.props.visible}
-        footer={null}
-        onCancel={this.props.closeModal}
-        title="Install Vanilla Minecraft"
-        destroyOnClose="true"
-      >
+      <Modal history={this.props.history} mounted={this.props.modalState}>
         <Form onSubmit={this.handleSubmit}>
           <FormItem>
             {getFieldDecorator('packName', {
@@ -78,7 +79,7 @@ class VanillaModal extends Component<Props> {
               </Select>
             )}
           </FormItem>
-          <Button loading={this.props.loadingData} icon="plus" size="large" type="primary" htmlType="submit" >
+          <Button loading={this.state.loading} icon="plus" size="large" type="primary" htmlType="submit" >
             Create Instance
           </Button>
         </Form>

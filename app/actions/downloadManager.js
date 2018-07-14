@@ -2,8 +2,10 @@ import axios from 'axios';
 import * as https from 'https';
 import * as fs from 'fs';
 import async from 'async-es';
+import chalk from 'chalk';
 import * as path from 'path';
 import { remote } from 'electron';
+import store from '../localStore';
 
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
@@ -33,9 +35,10 @@ export function addToQueue(pack, packType) {
 export function downloadPack(pack) {
   return (dispatch, getState) => {
     const { downloadManager } = getState();
-    // L' idea e' di salvare su disco un file di config e poi far fare tutto il lavoro alla fork.
-    // La fork manterra' aggiornata l' UI sullo stato del lavoro ma nodejs non si occupera' di nulla
+    // The idea is saving a config file on disk and then letting the fork do all the work
+    // The fork will keep the ui updated through forked.on.
     const { fork } = require('child_process');
+    console.log(`%cDownloading ${pack}`, 'color: #3498db');
     const forked = fork(
       process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ?
         `${__dirname}/workers/downloadPackage.js` :
@@ -44,7 +47,11 @@ export function downloadPack(pack) {
         env: {
           name: downloadManager.downloadQueue[pack].name
         }
+      }, {
+        silent: true
       });
+
+
     forked.on('message', (data) => {
       const { total, action } = data;
       switch (action) {
@@ -72,7 +79,13 @@ export function downloadPack(pack) {
           });
           // CHECK IF ANY ITEM EXISTS IN THE QUEUE YET TO BE DOWNLOADED.
           // IF YES, ADD IT TO THE ACTUALDOWNLOAD
-          dispatch(addNextPackToActualDownload(pack));
+          dispatch(addNextPackToActualDownload());
+          break;
+        case 'CLG_PIPE':
+          console.log(data.msg);
+          break;
+        case 'CER_PIPE':
+          console.error(data.msg);
           break;
         default:
           break;
@@ -81,18 +94,19 @@ export function downloadPack(pack) {
   };
 }
 
-function addNextPackToActualDownload(previousPack) {
+function addNextPackToActualDownload() {
   return (dispatch, getState) => {
     const { downloadManager } = getState();
     const queueArr = Object.keys(downloadManager.downloadQueue);
-    const actualPackIndex = queueArr.indexOf(previousPack);
-    const nextPackName = queueArr[actualPackIndex + 1];
-    if (actualPackIndex + 1 < queueArr.length) {
-      dispatch({
-        type: START_DOWNLOAD,
-        payload: nextPackName
-      });
-      dispatch(downloadPack(nextPackName));
-    }
+    queueArr.some(pack => {
+      if (!downloadManager.downloadQueue[pack].downloadCompleted) {
+        dispatch({
+          type: START_DOWNLOAD,
+          payload: pack
+        });
+        dispatch(downloadPack(pack));
+        return true;
+      }
+    });
   };
 }

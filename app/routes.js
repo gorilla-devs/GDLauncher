@@ -2,39 +2,39 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Switch, Route, withRouter, Redirect } from 'react-router';
-import { AnimatedSwitch } from 'react-router-transition';
 import { Form } from 'antd';
+import { bindActionCreators } from 'redux';
+import * as AuthActions from './actions/auth';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
 import DManager from './containers/DManagerPage';
 import Profile from './containers/ProfilePage';
 import Navigation from './containers/Navigation';
+import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import Login from './components/Login/Login';
 import Settings from './components/Settings/Settings';
+import DiscordModal from './components/DiscordModal/DiscordModal';
+import VanillaModal from './containers/VanillaModal';
 
 
-class RouteDef extends Component<Props> {
-  props: Props;
+class RouteDef extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      SettingsModalisOpen: true
-    };
+  previousLocation = this.props.location;
+
+  componentDidMount = () => {
+    this.props.checkLocalDataValidity(true);
   }
 
-  componentWillMount() {
-    console.log(this.props);
-    // set the initial previousLocation value on mount
-    this.previousLocation = this.props.location
-  }
 
   componentWillUpdate(nextProps) {
-    const { location } = this.props
+    const { location } = this.props;
     // set previousLocation if props.location is not modal
-    if (nextProps.history.action !== 'POP' && (!location.state || !location.state.modal)) {
-      this.previousLocation = this.props.location
+    if (
+      nextProps.history.action !== "POP" &&
+      (!location.state || !location.state.modal)
+    ) {
+      this.previousLocation = this.props.location;
     }
   }
 
@@ -44,24 +44,26 @@ class RouteDef extends Component<Props> {
       location.state &&
       location.state.modal &&
       this.previousLocation !== location
-    );
+    ); // not initial render
     return (
       <App>
+        <SysNavBar />
         <Navigation />
-        <SideBar />
-        <Switch>
+        {location.pathname !== '/' ? <SideBar /> : null}
+        <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
+          {!this.props.isAuthValid && <Redirect push to="/" />}
           <Route path="/dmanager" component={DManager} />
           <Route path="/profile" component={Profile} />
           <Route path="/home" component={HomePage} />
-          <Route path="/login" component={Form.create()(Login)} />
-          { /* I really don't know how this works. A better solution should be found */ }
-          {isModal ? <Route
-            path="/settings"
-            component={Settings}
-          /> : <Redirect to={this.previousLocation.pathname} />}
         </Switch>
 
+        { /* ALL MODALS */}
+        <Switch>
+          {isModal ? <Route path="/settings" component={Settings} /> : null}
+          {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
+          {isModal ? <Route path="/vanillaModal" component={VanillaModal} /> : null}
+        </Switch>
       </App>
     );
   }
@@ -69,8 +71,13 @@ class RouteDef extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    location: state.router.location
+    location: state.router.location,
+    isAuthValid: state.auth.isAuthValid
   };
 }
 
-export default connect(mapStateToProps)(RouteDef);
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(AuthActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RouteDef);

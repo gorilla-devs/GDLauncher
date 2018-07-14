@@ -1,18 +1,21 @@
 .CloseBtn{
-    display: block;
-    background: rgb(44, 62, 80);
+    display: inline-block;
+    position: absolute;
+    background: rgb(35, 48, 61);
     border: 0;
     padding: 0;
     color: white;
     -webkit-app-region: no-drag;
-    height: 47.6px;
-    width: 47.6px;
-    justify-self: end;
-    float: right;
+    height: 30px;
+    width: 50px;
+    right: 0;
+    top: 0;
+    transition: background-color .25s;
 }
 
 .CloseBtn:hover{
-    background: rgb(122, 143, 165);
+    transition: background-color .25s;
+    background-color: rgba(0, 0, 0, 0.3);
 }
 .CloseBtn:focus, .CloseBtn:active{
     border-style: outset;

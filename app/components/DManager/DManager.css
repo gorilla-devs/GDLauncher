@@ -1,31 +1,45 @@
-.background_image {
-  position: fixed;
-  left: 50%;
-  margin-left: calc(((100%) / 2) * -1); /* Negative half of width. */
-  z-index: 1;
-  display: block;
-  background-image: url("../../assets/images/background2.jpg");
-  background-position: right;
+.header {
+  position: relative;
+  background: linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("../../assets/images/dmanagerBG.jpg");
+  background-position: center left;
   background-repeat: no-repeat;
   background-size: cover;
-  width: calc(100% - 200px);
-  height: 100%;
+  height: 180px;
+  width: 100%;
 }
 
-.background_overlay{
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 2;
-  display: block;
-  background: rgba(44, 62, 80, 0.77);
-  width: calc(100% - 200px);
-  height: 100%;
+.content {
+  position: relative;
+  height: calc(100vh - (47.6px + 30px + 180px));
 }
 
-.main{
-  height: calc(100% - 47.6px);
+.main {
+  height: calc(100% - 47.6px - 30px);
   width: calc(100% - 200px);
   position: fixed;
   z-index: 4;
+  background: #2c3e50;
+}
+
+.headerButtons {
+  width: 39vw;
+  text-align: center;
+  position: relative;
+  top: 40px;
+}
+
+.browseModpacks {
+  display: block;
+  margin: 10px;
+  width: 280px;
+}
+
+.addVanilla {
+  display: inline-block;
+  margin: 10px;
+}
+
+.addForge {
+  display: inline-block;
+  margin: 10px;
 }

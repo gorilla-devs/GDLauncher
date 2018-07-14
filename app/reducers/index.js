@@ -4,7 +4,7 @@ import { routerReducer as router } from 'react-router-redux';
 import counter from './counter';
 import profile from './profile';
 import auth from './auth';
-import packManager from './packManager';
+import packCreator from './packCreator';
 import downloadManager from './downloadManager';
 
 const rootReducer = combineReducers({
@@ -12,7 +12,7 @@ const rootReducer = combineReducers({
   profile,
   router,
   auth,
-  packManager,
+  packCreator,
   downloadManager
 });
 

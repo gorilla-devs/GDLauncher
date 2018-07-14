@@ -1,0 +1,39 @@
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 900;
+  background: rgba(0, 0, 0, 0.40);
+}
+
+.modal {
+  position: absolute;
+  height: 90vh;
+  width: 60vw;
+  left: 20%;
+  z-index: inherit;
+  top: 5%;
+  background: #34495e;
+  border-radius: 4px;
+}
+
+.modalContent {
+  padding: 10px;
+}
+
+.header{
+  position: relative;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  margin-left: 10px;
+}
+
+.closeBtn {
+  float: right;
+  position: relative;
+  top: 4px;
+  right: 20px;
+}

@@ -5,7 +5,8 @@ import * as downloadManagerActions from '../actions/downloadManager';
 
 function mapStateToProps(state) {
   return {
-    installingQueue: state.downloadManager.downloadQueue
+    installingQueue: state.downloadManager.downloadQueue,
+    userData: state.auth
   };
 }
 
