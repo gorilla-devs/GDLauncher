@@ -47,7 +47,11 @@ export function downloadPack(pack) {
         env: {
           name: downloadManager.downloadQueue[pack].name
         }
+      }, {
+        silent: true
       });
+
+
     forked.on('message', (data) => {
       const { total, action } = data;
       switch (action) {
@@ -75,7 +79,13 @@ export function downloadPack(pack) {
           });
           // CHECK IF ANY ITEM EXISTS IN THE QUEUE YET TO BE DOWNLOADED.
           // IF YES, ADD IT TO THE ACTUALDOWNLOAD
-          dispatch(addNextPackToActualDownload(pack));
+          dispatch(addNextPackToActualDownload());
+          break;
+        case 'CLG_PIPE':
+          console.log(data.msg);
+          break;
+        case 'CER_PIPE':
+          console.error(data.msg);
           break;
         default:
           break;
@@ -84,7 +94,7 @@ export function downloadPack(pack) {
   };
 }
 
-function addNextPackToActualDownload(previousPack) {
+function addNextPackToActualDownload() {
   return (dispatch, getState) => {
     const { downloadManager } = getState();
     const queueArr = Object.keys(downloadManager.downloadQueue);

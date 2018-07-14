@@ -6,8 +6,8 @@ import styles from './DInstance.css';
 import launchCommand from '../../utils/MCLaunchCommand';
 
 type Props = {
-  name: String,
-  installingQueue: Array,
+  name: string,
+  installingQueue: Object,
   userData: Object
 };
 const classes = `${styles.icon__text} handle`;
