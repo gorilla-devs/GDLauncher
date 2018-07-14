@@ -1,8 +1,8 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "gorilladevs-gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.3.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "version": "0.4.0",
+  "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --colors",
@@ -36,7 +36,7 @@
   "browserslist": "electron 1.6",
   "build": {
     "productName": "GDLauncher",
-    "appId": "org.develar.ElectronReact",
+    "appId": "org.gorilladevs.GDLauncher",
     "files": [
       "dist/",
       "node_modules/",
