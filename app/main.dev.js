@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, crashReporter } from 'electron';
 import MenuBuilder from './menu';
 
 let mainWindow = null;
@@ -96,6 +96,13 @@ app.on('ready', async () => {
     splash.destroy();
     mainWindow.show();
     mainWindow.focus();
+    const { crashReporter } = require('electron')
+
+    crashReporter.start({
+      productName: 'GDLauncher',
+      companyName: 'GorillaDevs',
+      submitURL: 'https://gdevs.io'
+    });
   });
 
   mainWindow.on('closed', () => {

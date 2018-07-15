@@ -17,12 +17,10 @@ export default class DIcon extends Component<Props> {
 
   constructor(props) {
     super(props);
-    this.installing = this.updateInstallingStatus();
     this.percentage = this.updatePercentage();
   }
 
   componentDidUpdate = (prevProps, prevState) => {
-    this.installing = this.updateInstallingStatus();
     this.percentage = this.updatePercentage();
   }
 
@@ -86,17 +84,17 @@ export default class DIcon extends Component<Props> {
       >
         <div className={styles.icon}>
           <div className={styles.icon__upContainer}>
-            {!this.installing &&
+            {!this.updateInstallingStatus() &&
               <div className={styles.icon_playText} onClick={this.handleClickPlay}>
                 Play
               </div>}
-            {this.installing &&
+            {this.updateInstallingStatus() &&
               <div className={styles.icon__installing}>
                 <Progress type="circle" percent={this.percentage} width={80} />
               </div>}
             <div
               className={styles.icon__image}
-              style={{ filter: this.installing ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
+              style={{ filter: this.updateInstallingStatus() ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
             />
           </div>
           <div className={classes}>

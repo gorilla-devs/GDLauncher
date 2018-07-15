@@ -108,9 +108,6 @@ class Login extends Component<Props> {
                 </Button>
               </FormItem>
             </Form>
-            <Link to="/home">
-              SKIP
-            </Link>
           </div>
         </main>
         <Modal

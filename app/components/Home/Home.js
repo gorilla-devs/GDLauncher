@@ -117,7 +117,8 @@ export default class Home extends Component<Props> {
             >
               <Card style={{
                 background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("https://improvephotography.com/wp-content/uploads/2014/08/Cemetery-Star-Trails_no-watermark.jpg")'
-              }}>
+              }}
+              >
                 <i className="far fa-life-ring" style={{ fontSize: '70px' }} />
                 <h2>Support</h2>
                 <div style={{ position: 'absolute', top: 0, right: 0 }}>
