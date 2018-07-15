@@ -2,41 +2,41 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
-@import "./antd.css";
 
-body{
+@import "./antd.css";
+body {
     font-family: 'Roboto', sans-serif;
     padding: 0;
     margin: 0;
     overflow-y: hidden;
 }
 
-:not(input):not(textarea):not(button):not(a):not(i):not(span),
-:not(input):not(textarea):not(button):not(a):not(i):not(span)::after,
-:not(input):not(textarea):not(button):not(a):not(i):not(span)::before {
+:not(input):not(textarea):not(button):not(a):not(i):not(span), :not(input):not(textarea):not(button):not(a):not(i):not(span)::after, :not(input):not(textarea):not(button):not(a):not(i):not(span)::before {
     -webkit-user-select: none;
     user-select: none;
     cursor: default;
 }
+
 input, button, textarea, :focus {
     outline: none;
 }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
     width: 8px;
-    background-color: #bdc3c7;
+    background-color: #ecf0f1;
 }
 
-::-webkit-scrollbar-thumb{
-    background-color: #7f8c8d;
+::-webkit-scrollbar-thumb {
+    background-color: rgb(35, 48, 61);
 }
 
 ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    background-color: #bdc3c7;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #ecf0f1;
 }
 
 /* ANTD OVERRIDE */
-.ant-layout-sider-trigger{
+
+.ant-layout-sider-trigger {
     position: absolute !important;
-  }
+}

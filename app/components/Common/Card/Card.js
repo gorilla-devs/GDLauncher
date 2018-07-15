@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styles from './Card.css';
+import styles from './Card.scss';
 
 type Props = {
   children: object

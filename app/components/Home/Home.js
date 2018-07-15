@@ -1,14 +1,16 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Select, Modal } from 'antd';
+import { Button, Select, Modal, Avatar } from 'antd';
 import Card from '../Common/Card/Card';
-import styles from './Home.css';
+import styles from './Home.scss';
 import Dot from '../Common/Dot/Dot';
 import Navigation from '../../containers/Navigation';
 import SideBar from '../Common/SideBar/SideBar';
 
-type Props = {};
+type Props = {
+  +username: string
+};
 
 const discordModalStyle = {
   height: 500,
@@ -33,6 +35,7 @@ export default class Home extends Component<Props> {
       <div>
         <main className={styles.content}>
           <div className={styles.header}>
+            <span className={styles.title}>Welcome to GDLauncher!</span>
             <div className={styles.socialsContainer}>
               { /* eslint-disable */}
               <img
@@ -61,133 +64,70 @@ export default class Home extends Component<Props> {
               />
               { /* eslint-enable */}
             </div>
-            {/* <h1 className={styles.title}>Welcome to GDLauncher!</h1>
-            <h3 className={styles.subTitle}>Minecraft Made Easy</h3>
-            <Link to="/dmanager" draggable="false">
-              <Button type="primary" size="large" style={{ width: '300px', display: 'block', margin: '0 auto', height: '50px' }}>
-                Play Now!
-              </Button>
-            </Link> */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', flexWrap: 'wrap' }}>
-              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+            <div className={styles.header__tiles}>
+              <Link to="/dmanager" draggable="false" style={{ width: '60%' }}>
                 <Card style={{
-                  width: '200px',
-                  height: '200px',
-                  textAlign: 'center',
-                  background: 'rgb(46, 134, 222)'
+                  background: '#2980b9'
                 }}>
                   <i className="fas fa-play" style={{ fontSize: '70px' }} />
-                  <h1>Play Now!</h1>
+                  <h2>Play Now!</h2>
                 </Card>
               </Link>
-              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+              <Link to="/dmanager" draggable="false" style={{ width: '20%' }}>
                 <Card style={{
-                  width: '200px',
-                  height: '200px',
-                  textAlign: 'center',
-                  background: 'rgb(255, 159, 67)'
+                  background: '#8e44ad'
                 }}>
-                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
-                  <h1>Play Now!</h1>
+                  <i className="fas fa-user-friends" style={{ fontSize: '70px' }} />
+                  <h2>Find Friends!</h2>
                 </Card>
               </Link>
-              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+              <Link to="/profile" draggable="false" style={{ width: '20%' }}>
                 <Card style={{
-                  width: '200px',
-                  height: '200px',
-                  textAlign: 'center',
-                  background: 'rgb(238, 82, 83)'
+                  background: '#c0392b'
                 }}>
-                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
-                  <h1>Play Now!</h1>
+                  <Avatar style={{ height: '70px', width: '70px' }} src="https://orig00.deviantart.net/9ffa/f/2015/212/e/e/avatar_srshiropro_minecraft_by_srshiropro-d93jxg2.png" />
+                  <h2>{this.props.username}</h2>
                 </Card>
               </Link>
-              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+              <a onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=feature_request.md")} draggable="false" style={{ width: '100%' }}>
                 <Card style={{
-                  width: '420px',
-                  height: '200px',
-                  textAlign: 'center',
-                  background: 'rgb(16, 172, 132)'
+                  background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("http://2.bp.blogspot.com/-eZE8WKQt-4I/UBe7ih5E58I/AAAAAAAAAMA/s5NMaq2qcMI/s1600/1300767397-video-game-unicorn-minecraft-wallpaper-902057-wallpaper.jpg") center top'
                 }}>
-                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
-                  <h1>Play Now!</h1>
+                  <div style={{ marginTop: '30px' }}>
+                    <span style={{
+                      background: '#27ae60',
+                      borderRadius: '5px',
+                      padding: '10px',
+                      fontSize: '20px',
+                    }}>WE LOVE YOUR FEEDBACKS. SHARE YOUR IDEAS WITH US!
+                  </span>
+                  </div>
                 </Card>
-              </Link>
-              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
-                <Card style={{
-                  width: '200px',
-                  height: '200px',
-                  textAlign: 'center',
-                  background: 'rgba(155, 89, 182, 1)'
-                }}>
-                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
-                  <h1>Play Now!</h1>
-                </Card>
-              </Link>
-            </div>
-          </div>
-          <div className={styles.status}>
-            <span style={{ color: '#bdc3c7', fontSize: '25px' }}>Quick Launch</span>
-            <div className={styles.header_status}>
-              <div className={styles.status}>
-                Instance 1 <br /><br />
-                <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
-              </div>
-              <div className={styles.status}>
-                Server 1 <br /><br />
-                <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
-              </div>
-              <div className={styles.status}>
-                Instance 2 <br /><br />
-                <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
-              </div>
-              <div className={styles.status}>
-                Server 2 <br /><br />
-                <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
-              </div>
-            </div>
-          </div>
-          <div className={styles.flexbox1}>
-            <h3 className={styles.subTitle} style={{ padding: '55px' }}>One Launcher To Rule Them All</h3>
-          </div>
-          <br />
-          <div className={styles.topDots}>
-            <div className={styles.dotContainer}>
-              <Dot Color="#27ae60"> Connect with Friends and Join Them </Dot>
-            </div>
-            <div className={styles.dotContainer}>
-              <Dot Color="#2980b9"> Manage Your Game Instances </Dot>
-            </div>
-            <div className={styles.dotContainer}>
-              <Dot Color="#f39c12"> Create and Manage Local Servers </Dot>
-            </div>
-          </div>
-          <div className={styles.botDots}>
-            <div className={styles.dotContainer}>
-              <Dot Color="#d35400"> Join Our Community </Dot>
-            </div>
-            <div className={styles.dotContainer}>
-              <Dot Color="#16a085"> Find New Friends </Dot>
-            </div>
-            <div className={styles.dotContainer}>
-              <Dot Color="#8e44ad"> Get in Touch with Us </Dot>
-            </div>
-          </div>
-
-          <Button
-            type="primary"
-            style={{ width: '300px', margin: '200px auto 70px auto', height: '100px', display: 'block', clear: 'both' }}
-            size="large"
-          >
-            <Link to={{ pathname: '/discord', state: { modal: true } }}>
-              <img
-                src="https://discordapp.com/assets/35d75407bd75d70e84e945c9f879bab8.svg"
+              </a>
+              <a
+                onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=bug_report.md")}
                 draggable="false"
-                alt="discord"
-                style={{ cursor: 'pointer', marginTop: 10 }}
-              />
-            </Link>
-          </Button>
+                style={{
+                  width: '60%'
+                }}
+              >
+                <Card style={{
+                  background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("https://improvephotography.com/wp-content/uploads/2014/08/Cemetery-Star-Trails_no-watermark.jpg")'
+                }}>
+                  <i className="far fa-life-ring" style={{ fontSize: '70px' }} />
+                  <h2>Support</h2>
+                </Card>
+              </a>
+              <Link to={{ pathname: '/discord', state: { modal: true } }} draggable="false" style={{ width: '40%' }}>
+                <Card style={{
+                  background: '#7289da'
+                }}>
+                  <i className="fab fa-discord" style={{ fontSize: '70px' }} />
+                  <h2>Discover our Discord</h2>
+                </Card>
+              </Link>
+            </div>
+          </div>
         </main>
       </div>
     );
