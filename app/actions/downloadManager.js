@@ -79,6 +79,8 @@ export function downloadPack(pack) {
             payload: pack
           });
           message.success(`${pack} has been downloaded!`);
+
+          forked.kill();
           // CHECK IF ANY ITEM EXISTS IN THE QUEUE YET TO BE DOWNLOADED.
           // IF YES, ADD IT TO THE ACTUALDOWNLOAD
           dispatch(addNextPackToActualDownload());
