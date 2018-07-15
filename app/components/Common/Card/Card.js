@@ -11,7 +11,10 @@ export default class Card extends Component<Props> {
   render() {
     return (
       <div className={styles.container} style={this.props.style}>
-        {this.props.children}
+        <div className={styles.overlay} />
+        <div className={styles.container__content}>
+          {this.props.children}
+        </div>
       </div>
     );
   }

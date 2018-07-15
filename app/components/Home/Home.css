@@ -16,9 +16,10 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 69%;
+  height: calc(100vh - (47.6 + 30));
   width: 100%;
-  padding-top: 22vh;
+  padding-top: 10vh;
+  padding-bottom: 10vh;
 }
 
 .title {

@@ -68,12 +68,63 @@ export default class Home extends Component<Props> {
                 Play Now!
               </Button>
             </Link> */}
-            <Link to="/dmanager" draggable="false">
-              <Card style={{ width: '250px', height: '200px', textAlign: 'center', padding: '30px' }}>
-                <i className="fas fa-play" style={{ fontSize: '70px' }} />
-                <h1>Play Now!</h1>
-              </Card>
-            </Link>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', flexWrap: 'wrap' }}>
+              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+                <Card style={{
+                  width: '200px',
+                  height: '200px',
+                  textAlign: 'center',
+                  background: 'rgb(46, 134, 222)'
+                }}>
+                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
+                  <h1>Play Now!</h1>
+                </Card>
+              </Link>
+              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+                <Card style={{
+                  width: '200px',
+                  height: '200px',
+                  textAlign: 'center',
+                  background: 'rgb(255, 159, 67)'
+                }}>
+                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
+                  <h1>Play Now!</h1>
+                </Card>
+              </Link>
+              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+                <Card style={{
+                  width: '200px',
+                  height: '200px',
+                  textAlign: 'center',
+                  background: 'rgb(238, 82, 83)'
+                }}>
+                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
+                  <h1>Play Now!</h1>
+                </Card>
+              </Link>
+              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+                <Card style={{
+                  width: '420px',
+                  height: '200px',
+                  textAlign: 'center',
+                  background: 'rgb(16, 172, 132)'
+                }}>
+                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
+                  <h1>Play Now!</h1>
+                </Card>
+              </Link>
+              <Link to="/dmanager" draggable="false" style={{ margin: '10px' }}>
+                <Card style={{
+                  width: '200px',
+                  height: '200px',
+                  textAlign: 'center',
+                  background: 'rgba(155, 89, 182, 1)'
+                }}>
+                  <i className="fas fa-play" style={{ fontSize: '70px' }} />
+                  <h1>Play Now!</h1>
+                </Card>
+              </Link>
+            </div>
           </div>
           <div className={styles.status}>
             <span style={{ color: '#bdc3c7', fontSize: '25px' }}>Quick Launch</span>

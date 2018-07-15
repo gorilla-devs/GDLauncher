@@ -5,6 +5,7 @@ import async from 'async-es';
 import chalk from 'chalk';
 import * as path from 'path';
 import { remote } from 'electron';
+import { message } from 'antd';
 import store from '../localStore';
 
 
@@ -77,6 +78,7 @@ export function downloadPack(pack) {
             type: DOWNLOAD_COMPLETED,
             payload: pack
           });
+          message.success(`${pack} has been downloaded!`);
           // CHECK IF ANY ITEM EXISTS IN THE QUEUE YET TO BE DOWNLOADED.
           // IF YES, ADD IT TO THE ACTUALDOWNLOAD
           dispatch(addNextPackToActualDownload());
