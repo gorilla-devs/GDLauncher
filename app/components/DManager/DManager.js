@@ -21,7 +21,7 @@ const SortableItem = SortableElement(({ value }) =>
 
 const SortableList = SortableContainer(({ items }) => {
   return (
-    <div>
+    <div style={{ height: '100%' }}>
       {items.map((value, index) => (
         <SortableItem key={`item-${index}`} index={index} value={value} />
       ))}

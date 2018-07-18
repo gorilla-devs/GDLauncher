@@ -10,7 +10,6 @@ type Props = {
   installingQueue: Object,
   userData: Object
 };
-const classes = `${styles.icon__text} handle`;
 
 export default class DIcon extends Component<Props> {
   props: Props;
@@ -89,7 +88,7 @@ export default class DIcon extends Component<Props> {
             style={{ filter: this.updateInstallingStatus() ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
           />
         </div>
-        <div className={classes}>
+        <div className={styles.icon__text}>
           {this.props.name}
         </div>
       </div>
