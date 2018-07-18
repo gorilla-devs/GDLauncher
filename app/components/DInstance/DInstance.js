@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { Button, Icon, Progress, message } from 'antd';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styles from './DInstance.css';
 import launchCommand from '../../utils/MCLaunchCommand';
 

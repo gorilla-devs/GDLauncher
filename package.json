@@ -223,9 +223,7 @@
     "postcss-html": "^0.21.0",
     "prop-types": "^15.6.1",
     "react": "^16.3.1",
-    "react-beautiful-dnd": "^8.0.4",
     "react-dom": "^16.3.1",
-    "react-draggable": "^3.0.5",
     "react-hot-loader": "^4.0.1",
     "react-interactive": "^0.8.1",
     "react-modal": "^3.3.2",
@@ -240,8 +238,7 @@
     "redux-thunk": "^2.2.0",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "source-map-support": "^0.5.4",
-    "threads": "^0.11.0"
+    "source-map-support": "^0.5.4"
   },
   "devEngines": {
     "node": ">=7.x",

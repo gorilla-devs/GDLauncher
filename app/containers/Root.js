@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
-import { DragDropContext } from 'react-beautiful-dnd';
 import RouteDef from '../routes';
 
 
