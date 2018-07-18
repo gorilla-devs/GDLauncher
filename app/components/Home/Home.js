@@ -64,20 +64,20 @@ export default class Home extends Component<Props> {
             { /* eslint-enable */}
           </div>
           <div className={styles.header__tiles}>
-            <Link to="/dmanager" draggable="false" style={{ width: '60%' }}>
+            <Link to="/dmanager" draggable="false" style={{ width: '55%' }}>
               <Card style={{
                 background: '#2980b9'
               }}>
                 <i className="fas fa-play" style={{ fontSize: '70px' }} />
-                <h2>Play Now!</h2>
+                <h2>PLAY NOW!</h2>
               </Card>
             </Link>
-            <Link to="/dmanager" draggable="false" style={{ width: '20%' }}>
+            <Link to="/dmanager" draggable="false" style={{ width: '25%' }}>
               <Card style={{
                 background: '#8e44ad'
               }}>
                 <i className="fas fa-user-friends" style={{ fontSize: '70px' }} />
-                <h2>Find Friends!</h2>
+                <h2>FIND FRIENDS!</h2>
               </Card>
             </Link>
             <Link to="/profile" draggable="false" style={{ width: '20%' }}>
@@ -89,9 +89,12 @@ export default class Home extends Component<Props> {
               </Card>
             </Link>
             <a onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=feature_request.md")} draggable="false" style={{ width: '100%' }}>
-              <Card style={{
-                background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("http://2.bp.blogspot.com/-eZE8WKQt-4I/UBe7ih5E58I/AAAAAAAAAMA/s5NMaq2qcMI/s1600/1300767397-video-game-unicorn-minecraft-wallpaper-902057-wallpaper.jpg") center top'
-              }}>
+              <Card
+                style={{
+                  background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("http://2.bp.blogspot.com/-eZE8WKQt-4I/UBe7ih5E58I/AAAAAAAAAMA/s5NMaq2qcMI/s1600/1300767397-video-game-unicorn-minecraft-wallpaper-902057-wallpaper.jpg") center top'
+                }}
+                externalLink
+              >
                 <div style={{ marginTop: '30px' }}>
                   <span style={{
                     background: '#27ae60',
@@ -103,9 +106,6 @@ export default class Home extends Component<Props> {
                     WE LOVE YOUR FEEDBACKS. SHARE YOUR IDEAS WITH US!
                   </span>
                 </div>
-                <div style={{ position: 'absolute', top: 0, right: 0 }}>
-                  <i className="fas fa-external-link-alt" />
-                </div>
               </Card>
             </a>
             <a
@@ -115,15 +115,14 @@ export default class Home extends Component<Props> {
                 width: '60%'
               }}
             >
-              <Card style={{
-                background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("https://improvephotography.com/wp-content/uploads/2014/08/Cemetery-Star-Trails_no-watermark.jpg")'
-              }}
+              <Card
+                style={{
+                  background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("https://improvephotography.com/wp-content/uploads/2014/08/Cemetery-Star-Trails_no-watermark.jpg")'
+                }}
+                externalLink
               >
                 <i className="far fa-life-ring" style={{ fontSize: '70px' }} />
-                <h2>Support</h2>
-                <div style={{ position: 'absolute', top: 0, right: 0 }}>
-                  <i className="fas fa-external-link-alt" />
-                </div>
+                <h2>SUPPORT</h2>
               </Card>
             </a>
             <Link to={{ pathname: '/discord', state: { modal: true } }} draggable="false" style={{ width: '40%' }}>
@@ -131,7 +130,7 @@ export default class Home extends Component<Props> {
                 background: '#7289da'
               }}>
                 <i className="fab fa-discord" style={{ fontSize: '70px' }} />
-                <h2>Discover our Discord</h2>
+                <h2>DISCOVER OUR DISCORD</h2>
               </Card>
             </Link>
           </div>

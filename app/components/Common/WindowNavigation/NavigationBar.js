@@ -19,7 +19,7 @@ export default class NavigationBar extends Component<Props> {
         <div className={styles.logoText}>
           <i className="fab fa-gofore" />
         </div>
-        {this.props.location !== '/' && <HorizontalMenu location={this.props.location} />}
+        {(this.props.location !== '/' && this.props.location !== '/loginHelperModal') && <HorizontalMenu location={this.props.location} />}
       </div>
     );
   }

@@ -16,8 +16,7 @@
 .main {
   height: calc(100% - 47.6px - 30px);
   width: calc(100% - 200px);
-  position: fixed;
-  z-index: 4;
+  position: absolute;
   background: #2c3e50;
 }
 

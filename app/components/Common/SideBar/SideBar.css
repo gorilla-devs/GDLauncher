@@ -2,7 +2,7 @@
   width: 200px;
   clear: none; 
   float: right;
-  height: 100vh;
+  height: calc(100% - 47.6px - 30px);
   background-color: #34495e;
 }
 

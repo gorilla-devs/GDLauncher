@@ -81,34 +81,34 @@ export function checkLocalDataValidity(redirectToHome = false) {
       dispatch({
         type: START_TOKEN_CHECK_LOADING
       });
-      const data = store.get('user');
-      await axios.post(
-        ACCESS_TOKEN_VALIDATION_URL,
-        { accessToken: data.accessToken },
-        { 'Content-Type': 'application/json;charset=UTF-8' }
-      ).then(res => {
+      try {
+        const data = store.get('user');
+        const res = await axios.post(
+          ACCESS_TOKEN_VALIDATION_URL,
+          { accessToken: data.accessToken },
+          { 'Content-Type': 'application/json;charset=UTF-8' }
+        );
         if (res.status === 204) {
           dispatch({
             type: AUTH_SUCCESS,
             payload: data
-          });
-          dispatch({
-            type: STOP_TOKEN_CHECK_LOADING
           });
           if (redirectToHome) {
             dispatch(push('/home'));
           }
         }
         return res;
-      }).catch((error) => {
+      } catch (error) {
+        message.error('Token expired. You need to log-in again :(');
         store.delete('user');
         dispatch({
           type: AUTH_FAILED
         });
+      } finally {
         dispatch({
           type: STOP_TOKEN_CHECK_LOADING
         });
-      });
+      }
     }
   };
 }

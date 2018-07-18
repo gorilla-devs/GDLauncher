@@ -4,11 +4,11 @@
  */
 
 @import "./antd.css";
-body {
-    font-family: 'Roboto', sans-serif;
+
+html, body {
+    font-family: 'Roboto Light', sans-serif;
     padding: 0;
     margin: 0;
-    overflow-y: hidden;
 }
 
 :not(input):not(textarea):not(button):not(a):not(i):not(span), :not(input):not(textarea):not(button):not(a):not(i):not(span)::after, :not(input):not(textarea):not(button):not(a):not(i):not(span)::before {
@@ -35,8 +35,3 @@ input, button, textarea, :focus {
     background-color: #ecf0f1;
 }
 
-/* ANTD OVERRIDE */
-
-.ant-layout-sider-trigger {
-    position: absolute !important;
-}

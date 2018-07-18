@@ -69,6 +69,13 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
+"@babel/runtime@7.0.0-beta.52":
+  version "7.0.0-beta.52"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.52.tgz#3f3b42b82b92b4e1a283fc78df1bb2fd4ba8d0c7"
+  dependencies:
+    core-js "^2.5.7"
+    regenerator-runtime "^0.12.0"
+
 "@babel/template@7.0.0-beta.44":
   version "7.0.0-beta.44"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.0.0-beta.44.tgz#f8832f4fdcee5d59bf515e595fc5106c529b394f"
@@ -1454,7 +1461,7 @@ babel-register@^6.26.0:
     mkdirp "^0.5.1"
     source-map-support "^0.4.15"
 
-babel-runtime@6.x, babel-runtime@^6.18.0, babel-runtime@^6.22.0, babel-runtime@^6.23.0, babel-runtime@^6.26.0:
+babel-runtime@6.x, babel-runtime@^6.11.6, babel-runtime@^6.18.0, babel-runtime@^6.22.0, babel-runtime@^6.23.0, babel-runtime@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
   dependencies:
@@ -2580,6 +2587,10 @@ core-js@^2.4.0, core-js@^2.4.1, core-js@^2.5.0:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.3.tgz#8acc38345824f16d8365b7c9b4259168e8ed603e"
 
+core-js@^2.5.7:
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
+
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
@@ -2735,6 +2746,10 @@ css-animation@1.x, css-animation@^1.2.5, css-animation@^1.3.2:
   dependencies:
     babel-runtime "6.x"
     component-classes "^1.2.5"
+
+css-box-model@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/css-box-model/-/css-box-model-1.0.0.tgz#60142814f2b25be00c4aac65ea1a55a531b18922"
 
 css-color-list@^0.0.1:
   version "0.0.1"
@@ -6890,6 +6905,10 @@ mem@^1.1.0:
   dependencies:
     mimic-fn "^1.0.0"
 
+memoize-one@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-4.0.0.tgz#fc5e2f1427a216676a62ec652cf7398cfad123db"
+
 memory-fs@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.2.0.tgz#f2bb25368bc121e391c2520de92969caee0a0290"
@@ -8528,6 +8547,10 @@ quick-lru@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-1.1.0.tgz#4360b17c61136ad38078397ff11416e186dcfbb8"
 
+raf-schd@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/raf-schd/-/raf-schd-4.0.0.tgz#9855756c5045ff4ed4516e14a47719387c3c907b"
+
 raf@^3.1.0, raf@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/raf/-/raf-3.4.0.tgz#a28876881b4bc2ca9117d4138163ddb80f781575"
@@ -8914,6 +8937,20 @@ rc@^1.0.1, rc@^1.1.2, rc@^1.1.6, rc@^1.1.7, rc@^1.2.1:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-beautiful-dnd@^8.0.4:
+  version "8.0.4"
+  resolved "https://registry.yarnpkg.com/react-beautiful-dnd/-/react-beautiful-dnd-8.0.4.tgz#d7572913065261d69d6de5b87573ff7ecb9548dd"
+  dependencies:
+    "@babel/runtime" "7.0.0-beta.52"
+    css-box-model "^1.0.0"
+    memoize-one "^4.0.0"
+    prop-types "^15.6.1"
+    raf-schd "^4.0.0"
+    react-motion "^0.5.2"
+    react-redux "^5.0.7"
+    redux "^4.0.0"
+    tiny-invariant "^0.0.3"
+
 react-deep-force-update@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-1.1.1.tgz#bcd31478027b64b3339f108921ab520b4313dc2c"
@@ -8983,7 +9020,7 @@ react-modal@^3.3.2:
     prop-types "^15.5.10"
     warning "^3.0.0"
 
-react-motion@^0.5.0:
+react-motion@^0.5.0, react-motion@^0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/react-motion/-/react-motion-0.5.2.tgz#0dd3a69e411316567927917c6626551ba0607316"
   dependencies:
@@ -9067,6 +9104,14 @@ react-slick@~0.22.3:
     enquire.js "^2.1.6"
     json2mq "^0.2.0"
     resize-observer-polyfill "^1.5.0"
+
+react-sortable-hoc@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/react-sortable-hoc/-/react-sortable-hoc-0.8.3.tgz#8537e8ab8d6bad6829885755a0f847817ed78648"
+  dependencies:
+    babel-runtime "^6.11.6"
+    invariant "^2.2.1"
+    prop-types "^15.5.7"
 
 react-test-renderer@^16.0.0-0:
   version "16.2.0"
@@ -9287,6 +9332,13 @@ redux@^3.7.2:
     loose-envify "^1.1.0"
     symbol-observable "^1.0.3"
 
+redux@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-4.0.0.tgz#aa698a92b729315d22b34a0553d7e6533555cc03"
+  dependencies:
+    loose-envify "^1.1.0"
+    symbol-observable "^1.2.0"
+
 regenerate@^1.2.1:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.3.3.tgz#0c336d3980553d755c39b586ae3b20aa49c82b7f"
@@ -9298,6 +9350,10 @@ regenerator-runtime@^0.10.5:
 regenerator-runtime@^0.11.0:
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
+
+regenerator-runtime@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.12.0.tgz#8052ac952d85b10f3425192cd0c53f45cf65c6cb"
 
 regenerator-transform@^0.10.0:
   version "0.10.1"
@@ -10691,7 +10747,7 @@ symbol-observable@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.0.1.tgz#8340fc4702c3122df5d22288f88283f513d3fdd4"
 
-symbol-observable@^1.0.3:
+symbol-observable@^1.0.3, symbol-observable@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
 
@@ -10860,6 +10916,10 @@ timers-browserify@^2.0.4:
   resolved "https://registry.yarnpkg.com/timers-browserify/-/timers-browserify-2.0.6.tgz#241e76927d9ca05f4d959819022f5b3664b64bae"
   dependencies:
     setimmediate "^1.0.4"
+
+tiny-invariant@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-0.0.3.tgz#4c7283c950e290889e9e94f64d3586ec9156cf44"
 
 title-case@^2.1.0:
   version "2.1.1"
