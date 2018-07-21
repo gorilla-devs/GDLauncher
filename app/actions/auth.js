@@ -88,6 +88,7 @@ export function checkLocalDataValidity(redirectToHome = false) {
           { accessToken: data.accessToken },
           { 'Content-Type': 'application/json;charset=UTF-8' }
         );
+        console.log("RES: " + res);
         if (res.status === 204) {
           dispatch({
             type: AUTH_SUCCESS,
@@ -99,11 +100,25 @@ export function checkLocalDataValidity(redirectToHome = false) {
         }
         return res;
       } catch (error) {
-        message.error('Token expired. You need to log-in again :(');
-        store.delete('user');
-        dispatch({
-          type: AUTH_FAILED
-        });
+        if (error.response && error.response.status === 403) {
+          message.error('Token expired. You need to log-in again :(');
+          store.delete('user');
+          dispatch({
+            type: AUTH_FAILED
+          });
+        }
+        else if (error.message === 'Network Error') {
+          message.info('You are offline. Logging in in offline-mode');
+          const data = store.get('user');
+          dispatch({
+            type: AUTH_SUCCESS,
+            payload: data
+          });
+          if (redirectToHome) {
+            dispatch(push('/home'));
+          }
+        }
+
       } finally {
         dispatch({
           type: STOP_TOKEN_CHECK_LOADING
