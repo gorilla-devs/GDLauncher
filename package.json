@@ -223,6 +223,7 @@
     "postcss-html": "^0.21.0",
     "prop-types": "^15.6.1",
     "react": "^16.3.1",
+    "react-contextmenu": "^2.9.2",
     "react-dom": "^16.3.1",
     "react-hot-loader": "^4.0.1",
     "react-interactive": "^0.8.1",

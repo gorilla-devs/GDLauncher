@@ -1,0 +1,153 @@
+.main {
+  display: inline-block;
+  position: relative;
+  width: 130px;
+  height: 130px;
+  padding: 10px 20px;
+  overflow: hidden;
+}
+
+.icon {
+  display: inline-block;
+  text-align: center;
+  width: 90px;
+  height: 90px;
+}
+
+@keyframes textAnimOut {
+  /* You could think of as "step 1" */
+  from {
+    transform: translateY(-60px)
+  }
+  /* You could think of as "step 2" */
+  to {
+    transform: translateY(0);
+  }
+}
+
+.icon_instanceName {
+  display: inline-block;
+  white-space: nowrap;
+  position: absolute;
+  left: 0;
+  overflow: hidden !important;
+  width: 130px;
+  animation: textAnimOut .2s forwards;
+  text-overflow: ellipsis;
+}
+
+@keyframes btnIn {
+  /* You could think of as "step 1" */
+  from {
+    transform: translateY(-30px)
+  }
+  /* You could think of as "step 2" */
+  to {
+    transform: translateY(40px);
+  }
+}
+
+.icon__playBtn {
+  position: absolute;
+  width: 90px;
+  animation: btnIn .2s forwards;
+  font-family: 'Roboto';
+  font-weight: 1000;
+}
+
+@keyframes scaleOut {
+  /* You could think of as "step 1" */
+  0% {
+    transform: scale(.3) translateY(-100px)
+  }
+  /* You could think of as "step 2" */
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+.icon__image {
+  width: 90px;
+  height: 90px;
+  animation: scaleOut .2s forwards;
+  border-radius: 18px;
+  background: url(https://i.imgur.com/xyzzOiW.png) center no-repeat;
+  background-size: cover;
+}
+
+@keyframes scaleIn {
+  /* You could think of as "step 1" */
+  0% {
+    transform: scale(1) translateY(0)
+  }
+  50% {
+    transform: scale(.4) translateY(0)
+  }
+  /* You could think of as "step 2" */
+  100% {
+    transform: scale(0.3) translateY(-100px);
+  }
+}
+
+.main:hover .icon__image {
+  animation: scaleIn .2s forwards;
+}
+
+@keyframes textAnimIn {
+  /* You could think of as "step 1" */
+  from {
+    transform: translateY(0)
+  }
+  /* You could think of as "step 2" */
+  to {
+    transform: translateY(-60px);
+  }
+}
+
+.main:hover .icon_instanceName {
+  animation: textAnimIn .2s forwards;
+  animation-delay: 40ms;
+  height: 44px;
+  white-space: pre-line;
+}
+
+@keyframes btnOut {
+  /* You could think of as "step 1" */
+  from {
+    transform: translateY(40px)
+  }
+  /* You could think of as "step 2" */
+  to {
+    transform: translateY(-16px);
+  }
+}
+
+.main:hover .icon__playBtn {
+  animation: btnOut .2s forwards;
+}
+
+.main:hover {
+  transition: background-color .25s;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+.selectedItem {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  animation: none;
+  .icon__image {
+    animation: unset;
+    transform: scale(0.3) translateY(-100px);
+  }
+  .icon_instanceName {
+    animation: none;
+    transform: translateY(-60px);
+    height: 44px;
+    white-space: pre-line;
+  }
+  .icon__playBtn {
+    animation: none;
+    transform: translateY(-16px);
+  }
+}

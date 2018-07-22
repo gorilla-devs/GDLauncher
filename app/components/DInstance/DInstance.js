@@ -1,16 +1,18 @@
 // @flow
 import React, { Component } from 'react';
 import { Button, Icon, Progress, message } from 'antd';
-import styles from './DInstance.css';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
+import styles from './DInstance.scss';
 import launchCommand from '../../utils/MCLaunchCommand';
 
 type Props = {
   name: string,
   installingQueue: Object,
-  userData: Object
+  userData: Object,
+  selectedInstance: string
 };
 
-export default class DIcon extends Component<Props> {
+export default class DInstance extends Component<Props> {
   props: Props;
 
   constructor(props) {
@@ -65,31 +67,48 @@ export default class DIcon extends Component<Props> {
     const exec = util.promisify(require('child_process').exec);
     try {
       const name = await exec(await launchCommand(this.props.name, this.props.userData));
-    } catch(error) {
+    } catch (error) {
       message.error("There was an error while starting the instance");
       console.error(error);
     }
   }
+
+  handleClick = (e, data) => {
+    console.log(data.foo);
+  }
+
   render() {
     return (
-      <div className={styles.icon}>
-        <div className={styles.icon__upContainer}>
-          {!this.updateInstallingStatus() &&
-            <div className={styles.icon_playText} onClick={this.handleClickPlay}>
-              Play
-              </div>}
-          {this.updateInstallingStatus() &&
-            <div className={styles.icon__installing}>
-              <Progress type="circle" percent={this.percentage} width={80} />
-            </div>}
-          <div
-            className={styles.icon__image}
-            style={{ filter: this.updateInstallingStatus() ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
-          />
-        </div>
-        <div className={styles.icon__text}>
-          {this.props.name}
-        </div>
+      <div
+        className={`${this.props.selectedInstance === this.props.name ? styles.selectedItem : ''} ${styles.main}`}
+        onMouseEnter={() =>
+          document.documentElement.style.setProperty('--instanceName', `"${this.props.name}"`)
+        }
+        onClick={() => this.props.selectInstance(this.props.name)}
+      >
+        <ContextMenuTrigger id={`contextMenu-${this.props.name}`}>
+          <div>
+            <div className={styles.icon}>
+              <div
+                className={styles.icon__image}
+                style={{ filter: this.updateInstallingStatus() ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
+              />
+              <span className={styles.icon_instanceName}>{this.props.name}</span>
+              <Button className={styles.icon__playBtn} type="primary" onClick={this.handleClickPlay}>Play</Button>
+            </div>
+          </div >
+        </ContextMenuTrigger>
+        <ContextMenu id={`contextMenu-${this.props.name}`} onShow={() => this.props.selectInstance(this.props.name)}>
+          <span>{this.props.name}</span>
+          <MenuItem data={{ foo: 'bar' }} onClick={() => message.info('Managed')}>
+            <i className="fas fa-wrench" style={{ marginRight: '8px' }} />
+            Manage
+          </MenuItem>
+          <MenuItem data={{ foo: 'bar' }} onClick={() => message.info('Deleted')}>
+            <i className="fas fa-trash-alt" style={{ marginRight: '8px' }} />
+            Delete
+          </MenuItem>
+        </ContextMenu>
       </div>
     );
   }

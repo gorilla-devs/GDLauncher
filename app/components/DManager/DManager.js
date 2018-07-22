@@ -21,7 +21,7 @@ const SortableItem = SortableElement(({ value }) =>
 
 const SortableList = SortableContainer(({ items }) => {
   return (
-    <div style={{ height: '100%' }}>
+    <div style={{ height: '100%', overflowY: 'auto' }}>
       {items.map((value, index) => (
         <SortableItem key={`item-${index}`} index={index} value={value} />
       ))}
@@ -97,7 +97,6 @@ export default class DManager extends Component<Props> {
             items={this.state.instances}
             onSortEnd={this.onSortEnd}
             axis="xy"
-            lockToContainerEdges
             distance={5}
           />
         </div>

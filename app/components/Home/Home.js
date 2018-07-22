@@ -7,6 +7,9 @@ import styles from './Home.scss';
 import Dot from '../Common/Dot/Dot';
 import Navigation from '../../containers/Navigation';
 import SideBar from '../Common/SideBar/SideBar';
+import supportBG from './images/Cemetery-Star-Trails_no-watermark.jpg';
+import feedbacksBG from './images/1300767397-video-game-unicorn-minecraft-wallpaper-902057-wallpaper.jpg';
+import avatarBG from './images/avatar_srshiropro_minecraft_by_srshiropro-d93jxg2.png';
 
 type Props = {
   +username: string
@@ -84,14 +87,14 @@ export default class Home extends Component<Props> {
               <Card style={{
                 background: '#c0392b'
               }}>
-                <Avatar style={{ height: '70px', width: '70px' }} src="https://orig00.deviantart.net/9ffa/f/2015/212/e/e/avatar_srshiropro_minecraft_by_srshiropro-d93jxg2.png" />
+                <Avatar style={{ height: '70px', width: '70px' }} src={avatarBG} />
                 <h2>{this.props.username}</h2>
               </Card>
             </Link>
             <a onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=feature_request.md")} draggable="false" style={{ width: '100%' }}>
               <Card
                 style={{
-                  background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("http://2.bp.blogspot.com/-eZE8WKQt-4I/UBe7ih5E58I/AAAAAAAAAMA/s5NMaq2qcMI/s1600/1300767397-video-game-unicorn-minecraft-wallpaper-902057-wallpaper.jpg") center top'
+                  background: `linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url(${feedbacksBG}) center top`
                 }}
                 externalLink
               >
@@ -117,7 +120,7 @@ export default class Home extends Component<Props> {
             >
               <Card
                 style={{
-                  background: 'linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("https://improvephotography.com/wp-content/uploads/2014/08/Cemetery-Star-Trails_no-watermark.jpg")'
+                  background: `linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url(${supportBG})`
                 }}
                 externalLink
               >

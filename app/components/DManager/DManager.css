@@ -11,6 +11,7 @@
 .content {
   position: relative;
   height: calc(100vh - (47.6px + 30px + 180px));
+  padding: 5px;
 }
 
 .main {
