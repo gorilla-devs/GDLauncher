@@ -1,7 +1,7 @@
 {
   "name": "gorilladevs-gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",

@@ -4,6 +4,7 @@ import { Button, Icon, Progress, message } from 'antd';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import { hideMenu } from 'react-contextmenu/src/actions';
+import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
 import styles from './DInstance.scss';
 
 type Props = {
@@ -75,14 +76,13 @@ export default class DInstance extends Component<Props> {
 
   deleteInstance = async () => {
     try {
-      await fsa.remove(`${__dirname}/dl`);
+      await fsa.remove(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${this.props.name}`);
       hideMenu();
       message.success('Instance deleted');
     } catch (err) {
       hideMenu();
       message.error('Error deleting instance');
       console.error(err);
-    } finally {
     }
   }
 
