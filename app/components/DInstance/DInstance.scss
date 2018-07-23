@@ -14,101 +14,29 @@
   height: 90px;
 }
 
-@keyframes textAnimOut {
-  /* You could think of as "step 1" */
-  from {
-    transform: translateY(-60px)
-  }
-  /* You could think of as "step 2" */
-  to {
-    transform: translateY(0);
-  }
-}
-
 .icon_instanceName {
   display: inline-block;
   white-space: nowrap;
   position: absolute;
-  transform: translateY(0);
   left: 0;
   overflow: hidden !important;
   width: 130px;
   text-overflow: ellipsis;
 }
 
-@keyframes btnOut {
-  /* You could think of as "step 1" */
-  from {
-    transform: translateY(-30px)
-  }
-  /* You could think of as "step 2" */
-  to {
-    transform: translateY(40px);
-  }
-}
-
 .icon__playBtn {
   position: absolute;
-  transform: translateY(40px);
   width: 90px;
   font-family: 'Roboto';
   font-weight: 1000;
 }
 
-@keyframes scaleOut {
-  /* You could think of as "step 1" */
-  0% {
-    transform: scale(.3) translateY(-100px)
-  }
-  /* You could think of as "step 2" */
-  100% {
-    transform: scale(1) translateY(0);
-  }
-}
-
 .icon__image {
   width: 90px;
-  transform: scale(1) translateY(0);
   height: 90px;
   border-radius: 18px;
   background: url(https://i.imgur.com/xyzzOiW.png) center no-repeat;
   background-size: cover;
-}
-
-@keyframes scaleIn {
-  /* You could think of as "step 1" */
-  0% {
-    transform: scale(1) translateY(0)
-  }
-  50% {
-    transform: scale(.4) translateY(0)
-  }
-  /* You could think of as "step 2" */
-  100% {
-    transform: scale(0.3) translateY(-100px);
-  }
-}
-
-@keyframes textAnimIn {
-  /* You could think of as "step 1" */
-  from {
-    transform: translateY(0)
-  }
-  /* You could think of as "step 2" */
-  to {
-    transform: translateY(-60px);
-  }
-}
-
-@keyframes btnIn {
-  /* You could think of as "step 1" */
-  from {
-    transform: translateY(40px)
-  }
-  /* You could think of as "step 2" */
-  to {
-    transform: translateY(-16px);
-  }
 }
 
 .main:hover {
@@ -120,17 +48,4 @@
 .selectedItem {
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 5px;
-  transition: background-color .25s;
-  .icon__image {
-    animation: scaleIn .2s forwards;
-  }
-  .icon_instanceName {
-    animation: textAnimIn .2s forwards;
-    animation-delay: 40ms;
-    height: 44px;
-    white-space: pre-line;
-  }
-  .icon__playBtn {
-    animation: btnIn .2s forwards;
-  }
 }

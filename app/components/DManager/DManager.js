@@ -6,6 +6,7 @@ import { join, basename } from 'path';
 import mkdirp from 'mkdirp';
 import Link from 'react-router-dom/Link';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
+import { hideMenu } from 'react-contextmenu/src/actions';
 import styles from './DManager.css';
 import VanillaModal from '../../containers/VanillaModal';
 import DInstance from '../../containers/DInstance';
@@ -51,9 +52,16 @@ export default class DManager extends Component<Props> {
     });
   }
 
+  componentDidMount() {
+  }
+
   componentWillUnmount() {
     // Stop watching for changes when this component is unmounted
     watcher.close();
+  }
+
+  handleScroll = () => {
+    hideMenu();
   }
 
   /* eslint-disable */
@@ -78,7 +86,7 @@ export default class DManager extends Component<Props> {
 
   render() {
     return (
-      <main className={styles.main}>
+      <main className={styles.main} onClick={(e) => { e.stopPropagation(); this.props.selectInstance(null)}}>
         <div className={styles.header}>
           <div className={styles.headerButtons}>
             <div>
@@ -92,7 +100,7 @@ export default class DManager extends Component<Props> {
             </div>
           </div>
         </div>
-        <div className={styles.content}>
+        <div className={styles.content} onScroll={this.handleScroll}>
           <SortableList
             items={this.state.instances}
             onSortEnd={this.onSortEnd}

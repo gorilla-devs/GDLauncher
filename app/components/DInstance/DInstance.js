@@ -85,7 +85,7 @@ export default class DInstance extends Component<Props> {
         onMouseEnter={() =>
           document.documentElement.style.setProperty('--instanceName', `"${this.props.name}"`)
         }
-        onClick={() => this.props.selectInstanceNullable(this.props.name)}
+        onClick={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name) }}
       >
         <ContextMenuTrigger id={`contextMenu-${this.props.name}`}>
           <div>
@@ -95,12 +95,15 @@ export default class DInstance extends Component<Props> {
                 style={{ filter: this.updateInstallingStatus() ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
               />
               <span className={styles.icon_instanceName}>{this.props.name}</span>
-              <Button className={styles.icon__playBtn} type="primary" onClick={this.handleClickPlay}>Play</Button>
             </div>
           </div >
         </ContextMenuTrigger>
-        <ContextMenu id={`contextMenu-${this.props.name}`} onShow={() => this.props.selectInstance(this.props.name)}>
+        <ContextMenu id={`contextMenu-${this.props.name}`} onShow={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name) }}>
           <span>{this.props.name}</span>
+          <MenuItem data={{ foo: 'bar' }} onClick={this.handleClickPlay}>
+            <i className="fas fa-play" style={{ marginRight: '8px' }} />
+            Play
+          </MenuItem>
           <MenuItem data={{ foo: 'bar' }} onClick={() => message.info('Managed')}>
             <i className="fas fa-wrench" style={{ marginRight: '8px' }} />
             Manage

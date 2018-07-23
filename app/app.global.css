@@ -36,7 +36,11 @@ input, button, textarea, :focus {
 }
 
 
-
+/* 
+ * Had to remove scale animation because of how the menu position is calculated. 
+ * If it starts with a scale of 0, it's initial position is always from the pointer, direction bottom.
+ * If the menu is opened at the end of the page it will overflow because it cannot calculate the overflowY.
+*/
 .react-contextmenu {
     background: rgb(35, 48, 61);
     background-clip: padding-box;
@@ -47,8 +51,6 @@ input, button, textarea, :focus {
     margin: 2px 0 0;
     min-width: 160px;
     outline: none;
-    transform: scale(0);
-    transform-origin: top left;
     padding: 5px 0;
     pointer-events: none;
     text-align: center;
@@ -63,10 +65,6 @@ input, button, textarea, :focus {
 }
 
 .react-contextmenu.react-contextmenu--visible {
-    transform: scale(1);
-    transition: transform 200ms !important;
-    transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
-    transform-origin: top left;
     pointer-events: auto;
     z-index: 9999;
 }
