@@ -1,0 +1,87 @@
+.main {
+  display: inline-block;
+  position: relative;
+  width: 130px;
+  height: 130px;
+  padding: 10px 20px;
+  overflow: hidden;
+}
+
+.icon {
+  display: inline-block;
+  text-align: center;
+  width: 90px;
+  height: 90px;
+}
+
+.icon__instanceNameContainer {
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  width: 130px;
+}
+
+.icon__instanceName {
+  display: inline-block;
+  white-space: nowrap;
+  position: absolute;
+  text-align: center;
+  left: 0;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+
+.icon__instancePercentage {
+  position: absolute;
+  right: 10px;
+  color: #27ae60;
+}
+
+.icon__playBtn {
+  position: absolute;
+  width: 90px;
+  font-family: 'Roboto';
+  font-weight: 1000;
+}
+
+.icon__image {
+  width: 90px;
+  height: 90px;
+  border-radius: 18px;
+  background: url(https://i.imgur.com/xyzzOiW.png) center no-repeat;
+  background-size: cover;
+}
+
+.main:hover {
+  transition: background-color .25s;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+.selectedItem {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+.icon__iconState {
+  position: absolute;
+  right: 8px;
+}
+
+.playingIcon {
+  @extend .icon__iconState;
+}
+
+@keyframes downloading {
+  from {
+    opacity: .3;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.downloadingIcon {
+  @extend .icon__iconState;
+  animation: downloading .5s infinite alternate-reverse;
+}

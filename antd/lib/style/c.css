@@ -145,35 +145,6 @@ sub {
 sup {
   top: -0.5em;
 }
-a {
-  color: #3498db;
-  background-color: transparent;
-  text-decoration: none;
-  outline: none;
-  cursor: pointer;
-  transition: color .3s;
-  -webkit-text-decoration-skip: objects;
-}
-a:focus {
-  text-decoration: underline;
-  text-decoration-skip: ink;
-}
-a:hover {
-  color: #5db5e8;
-}
-a:active {
-  color: #2276b5;
-}
-a:active,
-a:hover {
-  outline: 0;
-  text-decoration: none;
-}
-a[disabled] {
-  color: rgba(0, 0, 0, 0.25);
-  cursor: not-allowed;
-  pointer-events: none;
-}
 pre,
 code,
 kbd,

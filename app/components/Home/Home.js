@@ -1,13 +1,19 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, Select, Modal } from 'antd';
-import styles from './Home.css';
+import { Button, Select, Modal, Avatar } from 'antd';
+import Card from '../Common/Card/Card';
+import styles from './Home.scss';
 import Dot from '../Common/Dot/Dot';
 import Navigation from '../../containers/Navigation';
 import SideBar from '../Common/SideBar/SideBar';
+import supportBG from './images/Cemetery-Star-Trails_no-watermark.jpg';
+import feedbacksBG from './images/1300767397-video-game-unicorn-minecraft-wallpaper-902057-wallpaper.jpg';
+import avatarBG from './images/avatar_srshiropro_minecraft_by_srshiropro-d93jxg2.png';
 
-type Props = {};
+type Props = {
+  +username: string
+};
 
 const discordModalStyle = {
   height: 500,
@@ -31,105 +37,106 @@ export default class Home extends Component<Props> {
     return (
       <div>
         <main className={styles.content}>
-          <div className={styles.header}>
-            <div className={styles.socialsContainer}>
-              { /* eslint-disable */}
-              <img
-                alt="socials"
-                draggable="false"
-                style={{ padding: 10 }}
-                className={styles.socialBtn}
-                src="https://discordapp.com/assets/a39ef972d8ec7966a6a25b1853b14f38.svg"
-                onClick={() => this.openLink("https://twitter.com/gorilladevs")}
-              />
-              <img
-                alt="socials"
-                draggable="false"
-                style={{ padding: 10 }}
-                className={styles.socialBtn}
-                src="https://discordapp.com/assets/47ee7342b7e2986c314fd77f4331df63.svg"
-                onClick={() => this.openLink("https://facebook.com/gorilladevs")}
-              />
-              <img
-                alt="socials"
-                draggable="false"
-                style={{ padding: 10 }}
-                className={styles.socialBtn}
-                src="https://discordapp.com/assets/97e19ce71e9c9273e01d64da1948912b.svg"
-                onClick={() => this.openLink("https://instagram.com/gorilladevs")}
-              />
-              { /* eslint-enable */}
-            </div>
-            <h1 className={styles.title}>Welcome to GDLauncher!</h1>
-            <h3 className={styles.subTitle}>Minecraft Made Easy</h3>
-            <Link to="/dmanager" draggable="false">
-              <Button type="primary" size="large" style={{ width: '300px', display: 'block', margin: '0 auto', height: '50px' }}>
-                Play Now!
-              </Button>
+          <span className={styles.title}>Welcome to GDLauncher!</span>
+          <div className={styles.socialsContainer}>
+            { /* eslint-disable */}
+            <img
+              alt="socials"
+              draggable="false"
+              style={{ padding: 10 }}
+              className={styles.socialBtn}
+              src="https://discordapp.com/assets/a39ef972d8ec7966a6a25b1853b14f38.svg"
+              onClick={() => this.openLink("https://twitter.com/gorilladevs")}
+            />
+            <img
+              alt="socials"
+              draggable="false"
+              style={{ padding: 10 }}
+              className={styles.socialBtn}
+              src="https://discordapp.com/assets/47ee7342b7e2986c314fd77f4331df63.svg"
+              onClick={() => this.openLink("https://facebook.com/gorilladevs")}
+            />
+            <img
+              alt="socials"
+              draggable="false"
+              style={{ padding: 10 }}
+              className={styles.socialBtn}
+              src="https://discordapp.com/assets/97e19ce71e9c9273e01d64da1948912b.svg"
+              onClick={() => this.openLink("https://instagram.com/gorilladevs")}
+            />
+            { /* eslint-enable */}
+          </div>
+          <div className={styles.header__tiles}>
+            <Link to="/dmanager" draggable="false" style={{ width: '55%' }}>
+              <Card style={{
+                background: '#2980b9'
+              }}>
+                <i className="fas fa-play" style={{ fontSize: '70px' }} />
+                <h2>PLAY NOW!</h2>
+              </Card>
+            </Link>
+            <Link to="/dmanager" draggable="false" style={{ width: '25%' }}>
+              <Card style={{
+                background: '#8e44ad'
+              }}>
+                <i className="fas fa-user-friends" style={{ fontSize: '70px' }} />
+                <h2>FIND FRIENDS!</h2>
+              </Card>
+            </Link>
+            <Link to="/profile" draggable="false" style={{ width: '20%' }}>
+              <Card style={{
+                background: '#c0392b'
+              }}>
+                <Avatar style={{ height: '70px', width: '70px' }} src={avatarBG} />
+                <h2>{this.props.username}</h2>
+              </Card>
+            </Link>
+            <a onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=feature_request.md")} draggable="false" style={{ width: '100%' }}>
+              <Card
+                style={{
+                  background: `linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url(${feedbacksBG}) center top`
+                }}
+                externalLink
+              >
+                <div style={{ marginTop: '30px' }}>
+                  <span style={{
+                    background: '#27ae60',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    fontSize: '20px',
+                  }}
+                  >
+                    WE LOVE YOUR FEEDBACKS. SHARE YOUR IDEAS WITH US!
+                  </span>
+                </div>
+              </Card>
+            </a>
+            <a
+              onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=bug_report.md")}
+              draggable="false"
+              style={{
+                width: '60%'
+              }}
+            >
+              <Card
+                style={{
+                  background: `linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url(${supportBG})`
+                }}
+                externalLink
+              >
+                <i className="far fa-life-ring" style={{ fontSize: '70px' }} />
+                <h2>SUPPORT</h2>
+              </Card>
+            </a>
+            <Link to={{ pathname: '/discord', state: { modal: true } }} draggable="false" style={{ width: '40%' }}>
+              <Card style={{
+                background: '#7289da'
+              }}>
+                <i className="fab fa-discord" style={{ fontSize: '70px' }} />
+                <h2>DISCOVER OUR DISCORD</h2>
+              </Card>
             </Link>
           </div>
-          <div className={styles.status}>
-            <span style={{ color: '#bdc3c7', fontSize: '25px' }}>Quick Launch</span>
-            <div className={styles.header_status}>
-              <div className={styles.status}>
-                Instance 1 <br /><br />
-                <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
-              </div>
-              <div className={styles.status}>
-                Server 1 <br /><br />
-                <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
-              </div>
-              <div className={styles.status}>
-                Instance 2 <br /><br />
-                <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
-              </div>
-              <div className={styles.status}>
-                Server 2 <br /><br />
-                <i className="far fa-check-circle" style={{ color: '#27ae60', fontSize: '90px' }} />
-              </div>
-            </div>
-          </div>
-          <div className={styles.flexbox1}>
-            <h3 className={styles.subTitle} style={{ padding: '55px' }}>One Launcher To Rule Them All</h3>
-          </div>
-          <br />
-          <div className={styles.topDots}>
-            <div className={styles.dotContainer}>
-              <Dot Color="#27ae60"> Connect with Friends and Join Them </Dot>
-            </div>
-            <div className={styles.dotContainer}>
-              <Dot Color="#2980b9"> Manage Your Game Instances </Dot>
-            </div>
-            <div className={styles.dotContainer}>
-              <Dot Color="#f39c12"> Create and Manage Local Servers </Dot>
-            </div>
-          </div>
-          <div className={styles.botDots}>
-            <div className={styles.dotContainer}>
-              <Dot Color="#d35400"> Join Our Community </Dot>
-            </div>
-            <div className={styles.dotContainer}>
-              <Dot Color="#16a085"> Find New Friends </Dot>
-            </div>
-            <div className={styles.dotContainer}>
-              <Dot Color="#8e44ad"> Get in Touch with Us </Dot>
-            </div>
-          </div>
-
-          <Button
-            type="primary"
-            style={{ width: '300px', margin: '200px auto 70px auto', height: '100px', display: 'block', clear: 'both' }}
-            size="large"
-          >
-            <Link to={{ pathname: '/discord', state: { modal: true } }}>
-              <img
-                src="https://discordapp.com/assets/35d75407bd75d70e84e945c9f879bab8.svg"
-                draggable="false"
-                alt="discord"
-                style={{ cursor: 'pointer', marginTop: 10 }}
-              />
-            </Link>
-          </Button>
         </main>
       </div>
     );

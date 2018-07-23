@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { push } from 'react-router-redux';
+import { message } from 'antd';
 import store from '../localStore';
 import { LOGIN_PROXY_API, ACCESS_TOKEN_VALIDATION_URL } from '../constants';
 
@@ -16,45 +17,51 @@ export function login(username, password, remember) {
     dispatch({
       type: START_AUTH_LOADING
     });
-    await axios.post(
-      LOGIN_PROXY_API,
-      {
-        username,
-        password
-      }
-    ).then(res => {
-      console.log(res)
-      if (res.data !== undefined &&
-        res.data !== null &&
-        Object.prototype.hasOwnProperty.call(res.data, 'authenticated')) {
-        if (remember) {
-          store.set({
-            user: {
-              username: res.data.username,
-              accessToken: res.data.accessToken,
-              clientToken: res.data.clientToken,
-              legacy: res.data.legacy,
-              uuid: res.data.uuid
-            }
+    try {
+      await axios.post(
+        LOGIN_PROXY_API,
+        {
+          username,
+          password
+        }
+      ).then(res => {
+        console.log(res)
+        if (res.data !== undefined &&
+          res.data !== null &&
+          Object.prototype.hasOwnProperty.call(res.data, 'authenticated')) {
+          if (remember) {
+            store.set({
+              user: {
+                username: res.data.username,
+                accessToken: res.data.accessToken,
+                clientToken: res.data.clientToken,
+                legacy: res.data.legacy,
+                uuid: res.data.uuid
+              }
+            });
+          }
+          dispatch({
+            type: AUTH_SUCCESS,
+            payload: res.data
+          });
+
+          dispatch(push('/home'));
+        } else {
+          message.error('Wrong username or password');
+          dispatch({
+            type: AUTH_FAILED,
+            payload: res.data
           });
         }
-        dispatch({
-          type: AUTH_SUCCESS,
-          payload: res.data
-        });
-
-        dispatch(push('/home'));
-      } else {
-        dispatch({
-          type: AUTH_FAILED,
-          payload: res.data
-        });
-      }
-      return res;
-    });
-    dispatch({
-      type: STOP_AUTH_LOADING
-    });
+        return res;
+      });
+    } catch (err) {
+      message.error(`Auth failed: ${err}`);
+    } finally {
+      dispatch({
+        type: STOP_AUTH_LOADING
+      });
+    }
   };
 }
 
@@ -74,34 +81,49 @@ export function checkLocalDataValidity(redirectToHome = false) {
       dispatch({
         type: START_TOKEN_CHECK_LOADING
       });
-      const data = store.get('user');
-      await axios.post(
-        ACCESS_TOKEN_VALIDATION_URL,
-        { accessToken: data.accessToken },
-        { 'Content-Type': 'application/json;charset=UTF-8' }
-      ).then(res => {
+      try {
+        const data = store.get('user');
+        const res = await axios.post(
+          ACCESS_TOKEN_VALIDATION_URL,
+          { accessToken: data.accessToken },
+          { 'Content-Type': 'application/json;charset=UTF-8' }
+        );
+        console.log("RES: " + res);
         if (res.status === 204) {
           dispatch({
             type: AUTH_SUCCESS,
             payload: data
-          });
-          dispatch({
-            type: STOP_TOKEN_CHECK_LOADING
           });
           if (redirectToHome) {
             dispatch(push('/home'));
           }
         }
         return res;
-      }).catch((error) => {
-        store.delete('user');
-        dispatch({
-          type: AUTH_FAILED
-        });
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          message.error('Token expired. You need to log-in again :(');
+          store.delete('user');
+          dispatch({
+            type: AUTH_FAILED
+          });
+        }
+        else if (error.message === 'Network Error') {
+          message.info('You are offline. Logging in in offline-mode');
+          const data = store.get('user');
+          dispatch({
+            type: AUTH_SUCCESS,
+            payload: data
+          });
+          if (redirectToHome) {
+            dispatch(push('/home'));
+          }
+        }
+
+      } finally {
         dispatch({
           type: STOP_TOKEN_CHECK_LOADING
         });
-      });
+      }
     }
   };
 }

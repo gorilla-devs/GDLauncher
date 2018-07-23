@@ -1,7 +1,7 @@
 {
   "name": "gorilladevs-gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.4.0",
+  "version": "0.5.1",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
@@ -211,6 +211,7 @@
     "extract-zip": "^1.6.7",
     "find-java-home": "^0.2.0",
     "font-awesome": "^4.7.0",
+    "fs-extra": "^7.0.0",
     "glamor": "^2.20.40",
     "glamorous": "^4.12.1",
     "history": "^4.7.2",
@@ -223,8 +224,8 @@
     "postcss-html": "^0.21.0",
     "prop-types": "^15.6.1",
     "react": "^16.3.1",
+    "react-contextmenu": "^2.9.2",
     "react-dom": "^16.3.1",
-    "react-draggable": "^3.0.5",
     "react-hot-loader": "^4.0.1",
     "react-interactive": "^0.8.1",
     "react-modal": "^3.3.2",
@@ -233,16 +234,16 @@
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.6",
     "react-router-transition": "^1.2.1",
+    "react-sortable-hoc": "^0.8.3",
     "redux": "^3.7.2",
     "redux-promise-middleware": "^5.1.1",
     "redux-thunk": "^2.2.0",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "source-map-support": "^0.5.4",
-    "threads": "^0.11.0"
+    "source-map-support": "^0.5.4"
   },
   "devEngines": {
-    "node": ">=7.x",
+    "node": ">=8.x",
     "npm": ">=4.x",
     "yarn": ">=0.21.3"
   }

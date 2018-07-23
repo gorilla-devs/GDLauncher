@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, crashReporter } from 'electron';
 import MenuBuilder from './menu';
 
 let mainWindow = null;
@@ -72,10 +72,10 @@ app.on('ready', async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 800,
+    width: 900,
     height: 720,
     minHeight: 720,
-    minWidth: 800,
+    minWidth: 900,
     frame: false,
     backgroundColor: '#34495e'
   });
@@ -96,6 +96,13 @@ app.on('ready', async () => {
     splash.destroy();
     mainWindow.show();
     mainWindow.focus();
+    const { crashReporter } = require('electron')
+
+    crashReporter.start({
+      productName: 'GDLauncher',
+      companyName: 'GorillaDevs',
+      submitURL: 'https://gdevs.io'
+    });
   });
 
   mainWindow.on('closed', () => {

@@ -27,19 +27,19 @@ export default class NavigationBar extends Component<Props> {
           <li className={styles.li}>
             <Link to="/home" draggable="false" className={styles.a} style={this.isLocation('/home') ? this.activeItem : null}>
               <Icon type="home" className={styles.i} />
-              Home
+              HOME
             </Link>
           </li>
           <li className={styles.li}>
             <Link to="/profile" draggable="false" className={styles.a} style={this.isLocation('/profile') ? this.activeItem : null}>
               <Icon type="profile" className={styles.i} />
-              My Profile
+              PROFILE
             </Link>
           </li>
           <li className={styles.li}>
             <Link to="/dmanager" draggable="false" className={styles.a} style={this.isLocation('/dmanager') ? this.activeItem : null}>
               <Icon type="play-circle" className={styles.i} />
-              Instances
+              INSTANCES
             </Link>
           </li>
         </ul>

@@ -6,6 +6,7 @@ import profile from './profile';
 import auth from './auth';
 import packCreator from './packCreator';
 import downloadManager from './downloadManager';
+import instancesManager from './instancesManager';
 
 const rootReducer = combineReducers({
   counter,
@@ -13,7 +14,8 @@ const rootReducer = combineReducers({
   router,
   auth,
   packCreator,
-  downloadManager
+  downloadManager,
+  instancesManager
 });
 
 export default rootReducer;

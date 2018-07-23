@@ -4,7 +4,7 @@
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 900;
+  z-index: 10000;
   background: rgba(0, 0, 0, 0.40);
 }
 

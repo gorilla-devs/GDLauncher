@@ -16,6 +16,7 @@ import Login from './components/Login/Login';
 import Settings from './components/Settings/Settings';
 import DiscordModal from './components/DiscordModal/DiscordModal';
 import VanillaModal from './containers/VanillaModal';
+import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
 
 class RouteDef extends React.Component {
@@ -63,6 +64,7 @@ class RouteDef extends React.Component {
           {isModal ? <Route path="/settings" component={Settings} /> : null}
           {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
           {isModal ? <Route path="/vanillaModal" component={VanillaModal} /> : null}
+          {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
         </Switch>
       </App>
     );

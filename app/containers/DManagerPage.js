@@ -2,6 +2,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import DManager from '../components/DManager/DManager';
 import * as downloadManagerActions from '../actions/downloadManager';
+import * as instancesManagerActions from '../actions/instancesManager';
 
 function mapStateToProps(state) {
   return {
@@ -11,7 +12,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(downloadManagerActions, dispatch);
+  return bindActionCreators({ ...downloadManagerActions, ...instancesManagerActions }, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DManager);
