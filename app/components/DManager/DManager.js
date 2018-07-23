@@ -52,9 +52,6 @@ export default class DManager extends Component<Props> {
     });
   }
 
-  componentDidMount() {
-  }
-
   componentWillUnmount() {
     // Stop watching for changes when this component is unmounted
     watcher.close();
@@ -86,7 +83,7 @@ export default class DManager extends Component<Props> {
 
   render() {
     return (
-      <main className={styles.main} onClick={(e) => { e.stopPropagation(); this.props.selectInstance(null)}}>
+      <main className={styles.main} onClick={(e) => { e.stopPropagation(); this.props.selectInstance(null) }}>
         <div className={styles.header}>
           <div className={styles.headerButtons}>
             <div>
@@ -101,12 +98,23 @@ export default class DManager extends Component<Props> {
           </div>
         </div>
         <div className={styles.content} onScroll={this.handleScroll}>
-          <SortableList
-            items={this.state.instances}
-            onSortEnd={this.onSortEnd}
-            axis="xy"
-            distance={5}
-          />
+          {this.state.instances.length !== 0 ?
+            <SortableList
+              items={this.state.instances}
+              onSortEnd={this.onSortEnd}
+              lockToContainerEdges
+              axis="xy"
+              distance={5}
+            /> :
+            <h1 style={{
+              textAlign: 'center',
+              marginTop: '25vh',
+              fontFamily: 'Roboto',
+              fontSize: '20px',
+              fontWeight: '600',
+              color: '#bdc3c7'
+            }}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1>
+          }
         </div>
       </main>
     );

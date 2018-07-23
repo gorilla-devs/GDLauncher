@@ -1,9 +1,12 @@
 import {
-  SELECT_INSTANCE
+  SELECT_INSTANCE,
+  START_INSTANCE,
+  STOP_INSTANCE
 } from '../actions/instancesManager';
 
 const initialState = {
-  selectedInstance: null
+  selectedInstance: null,
+  startedInstances: []
 };
 
 export default function instancesManager(state = initialState, action) {
@@ -12,6 +15,16 @@ export default function instancesManager(state = initialState, action) {
       return {
         ...state,
         selectedInstance: action.payload
+      };
+    case `${START_INSTANCE}`:
+      return {
+        ...state,
+        startedInstances: [...state.startedInstances, action.payload]
+      };
+    case `${STOP_INSTANCE}`:
+      return {
+        ...state,
+        startedInstances: state.startedInstances.filter(el => el !== action.payload)
       };
     default:
       return state;
