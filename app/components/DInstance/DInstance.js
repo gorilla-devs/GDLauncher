@@ -62,7 +62,8 @@ export default class DInstance extends Component<Props> {
   }
 
 
-  handleClickPlay = async () => {
+  handleClickPlay = async (e) => {
+    e.stopPropagation();
     const util = require('util');
     const exec = util.promisify(require('child_process').exec);
     try {
@@ -84,7 +85,7 @@ export default class DInstance extends Component<Props> {
         onMouseEnter={() =>
           document.documentElement.style.setProperty('--instanceName', `"${this.props.name}"`)
         }
-        onClick={() => this.props.selectInstance(this.props.name)}
+        onClick={() => this.props.selectInstanceNullable(this.props.name)}
       >
         <ContextMenuTrigger id={`contextMenu-${this.props.name}`}>
           <div>

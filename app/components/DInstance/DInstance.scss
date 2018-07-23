@@ -29,14 +29,14 @@
   display: inline-block;
   white-space: nowrap;
   position: absolute;
+  transform: translateY(0);
   left: 0;
   overflow: hidden !important;
   width: 130px;
-  animation: textAnimOut .2s forwards;
   text-overflow: ellipsis;
 }
 
-@keyframes btnIn {
+@keyframes btnOut {
   /* You could think of as "step 1" */
   from {
     transform: translateY(-30px)
@@ -49,8 +49,8 @@
 
 .icon__playBtn {
   position: absolute;
+  transform: translateY(40px);
   width: 90px;
-  animation: btnIn .2s forwards;
   font-family: 'Roboto';
   font-weight: 1000;
 }
@@ -68,8 +68,8 @@
 
 .icon__image {
   width: 90px;
+  transform: scale(1) translateY(0);
   height: 90px;
-  animation: scaleOut .2s forwards;
   border-radius: 18px;
   background: url(https://i.imgur.com/xyzzOiW.png) center no-repeat;
   background-size: cover;
@@ -89,10 +89,6 @@
   }
 }
 
-.main:hover .icon__image {
-  animation: scaleIn .2s forwards;
-}
-
 @keyframes textAnimIn {
   /* You could think of as "step 1" */
   from {
@@ -104,14 +100,7 @@
   }
 }
 
-.main:hover .icon_instanceName {
-  animation: textAnimIn .2s forwards;
-  animation-delay: 40ms;
-  height: 44px;
-  white-space: pre-line;
-}
-
-@keyframes btnOut {
+@keyframes btnIn {
   /* You could think of as "step 1" */
   from {
     transform: translateY(40px)
@@ -120,10 +109,6 @@
   to {
     transform: translateY(-16px);
   }
-}
-
-.main:hover .icon__playBtn {
-  animation: btnOut .2s forwards;
 }
 
 .main:hover {
@@ -135,19 +120,17 @@
 .selectedItem {
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 5px;
-  animation: none;
+  transition: background-color .25s;
   .icon__image {
-    animation: unset;
-    transform: scale(0.3) translateY(-100px);
+    animation: scaleIn .2s forwards;
   }
   .icon_instanceName {
-    animation: none;
-    transform: translateY(-60px);
+    animation: textAnimIn .2s forwards;
+    animation-delay: 40ms;
     height: 44px;
     white-space: pre-line;
   }
   .icon__playBtn {
-    animation: none;
-    transform: translateY(-16px);
+    animation: btnIn .2s forwards;
   }
 }
