@@ -209,7 +209,6 @@
     "electron-store": "^2.0.0",
     "es6-promisify": "^6.0.0",
     "extract-zip": "^1.6.7",
-    "find-java-home": "^0.2.0",
     "font-awesome": "^4.7.0",
     "fs-extra": "^7.0.0",
     "glamor": "^2.20.40",

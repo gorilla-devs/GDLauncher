@@ -1,16 +1,15 @@
 import { promisify } from 'es6-promisify';
-import findJavaHome from 'find-java-home';
 import os from 'os';
 import fs from 'fs';
+import findJavaHome from './javaLocationFinder';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../constants';
 import { extractLibs, extractMainJar } from '../workers/common/vanilla';
 import store from '../localStore';
 
 const getStartCommand = async (packName, userData) => {
-  const FJH_Promise = promisify(findJavaHome);
 
   const packJson = JSON.parse(fs.readFileSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/vnl.json`));
-  const javaPath = `${await FJH_Promise({ allowJre: true })}\\javapath\\java.exe`;
+  const javaPath = await findJavaHome();
   const dosName = os.release().substr(0, 2) === 10 ? '"-Dos.name=Windows 10" -Dos.version=10.0 ' : '';
   const version = packJson.id;
   const libs = extractLibs(packJson, false);

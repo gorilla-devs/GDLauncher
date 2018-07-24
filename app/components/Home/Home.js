@@ -10,6 +10,7 @@ import SideBar from '../Common/SideBar/SideBar';
 import supportBG from './images/Cemetery-Star-Trails_no-watermark.jpg';
 import feedbacksBG from './images/1300767397-video-game-unicorn-minecraft-wallpaper-902057-wallpaper.jpg';
 import avatarBG from './images/avatar_srshiropro_minecraft_by_srshiropro-d93jxg2.png';
+import findJava from '../../utils/javaLocationFinder';
 
 type Props = {
   +username: string
