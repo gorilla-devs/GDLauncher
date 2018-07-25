@@ -37,4 +37,4 @@ before_script:
 
 script:
   - node --version
-  - yarn package
+  - yarn package-all
