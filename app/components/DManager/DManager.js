@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Button, Icon } from 'antd';
+import { Button, Icon, message } from 'antd';
 import { lstatSync, readdirSync, watch, existsSync } from 'fs';
 import { join, basename } from 'path';
 import mkdirp from 'mkdirp';
@@ -54,8 +54,9 @@ export default class DManager extends Component<Props> {
         });
       });
     } catch (error) {
-      if (error.message === 'Error: watch dl/packs ENOSPC') {
-        
+      console.error(error);
+      if (error.message === `Error: watch ${watchPath} ENOSPC`) {
+        message.error('There was an error with inotify limit. see <a href="https://github.com/facebook/jest/issues/3254#issuecomment-297214395">here</a>');
       }
     }
 
@@ -63,7 +64,11 @@ export default class DManager extends Component<Props> {
 
   componentWillUnmount() {
     // Stop watching for changes when this component is unmounted
-    watcher.close();
+    try {
+      watcher.close();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   handleScroll = () => {
