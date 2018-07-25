@@ -1,7 +1,13 @@
 import { promisify } from 'es6-promisify';
 import os from 'os';
 import fs from 'fs';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../constants';
+import {
+  LAUNCHER_FOLDER,
+  PACKS_FOLDER_NAME,
+  LINUX,
+  WINDOWS,
+  DARWIN
+} from '../constants';
 import { extractLibs, extractMainJar } from '../workers/common/vanilla';
 import store from '../localStore';
 
@@ -10,14 +16,12 @@ const findJavaHome = async () => {
   const exec = util.promisify(require('child_process').exec);
   let command = null;
   switch (os.platform()) {
-    case 'linux':
+    case LINUX:
+    case DARWIN:
       command = 'which java';
       break;
-    case 'win32':
+    case WINDOWS:
       command = 'where java';
-      break;
-    case 'darwin':
-      command = 'which java';
       break;
     default:
       break;

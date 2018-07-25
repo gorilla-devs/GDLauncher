@@ -25,6 +25,9 @@ addons:
       - graphicsmagick
       - xz-utils
       - xorriso
+      - ib32-gst-plugins-base
+      - lib32-gst-plugins-good
+      - lib32-gst-plugins-base-libs
       - wine1.8
 
 install:
@@ -41,3 +44,6 @@ before_script:
 script:
   - node --version
   - yarn package-all
+
+after_script:
+  - ls
