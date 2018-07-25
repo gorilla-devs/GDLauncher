@@ -15,6 +15,7 @@ cache:
 
 addons:
   apt:
+    update: true
     sources:
       - ubuntu-toolchain-r-test
     packages:
@@ -23,6 +24,11 @@ addons:
       - graphicsmagick
       - xz-utils
       - xorriso
+
+before_install:
+  - add-apt-repository ppa:ubuntu-wine/ppa -y
+  - apt-get update -q
+  - apt-get install wine1.7 -y
 
 install:
   - export CXX="g++-4.8"

@@ -70,12 +70,12 @@ class Login extends Component<Props> {
             <Form onSubmit={this.handleSubmit}>
               <FormItem>
                 {getFieldDecorator('username', {
-                  rules: [{ required: true, message: 'Please input your username!' }],
+                  rules: [{ required: true, message: 'Please input your email!' }],
                 })(
                   <Input
                     size="large"
                     prefix={<Icon type="user" style={{ color: 'rgba(255,255,255,.8)' }} />}
-                    placeholder="Username"
+                    placeholder="Email"
                   />
                 )}
               </FormItem>
