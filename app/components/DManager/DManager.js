@@ -14,6 +14,8 @@ import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
 import store from '../../localStore';
 
 type Props = {};
+
+const watchPath = `${process.cwd()}/${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
 let watcher;
 
 const SortableItem = SortableElement(({ value }) =>
@@ -35,21 +37,28 @@ export default class DManager extends Component<Props> {
   props: Props;
   constructor() {
     super();
-    if (!existsSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)) {
-      mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`);
+    if (!existsSync(watchPath)) {
+      mkdirp.sync(watchPath);
     }
     this.state = {
-      instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
+      instances: this.getDirectories(watchPath)
     };
     // Watches for any changes in the packs dir. TODO: Optimize
-    watcher = watch(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`, () => {
-      if (!existsSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)) {
-        mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`);
-      }
-      this.setState({
-        instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
+    try {
+      watcher = watch(watchPath, () => {
+        if (!existsSync(watchPath)) {
+          mkdirp.sync(watchPath);
+        }
+        this.setState({
+          instances: this.getDirectories(watchPath)
+        });
       });
-    });
+    } catch (error) {
+      if (error.message === 'Error: watch dl/packs ENOSPC') {
+        
+      }
+    }
+
   }
 
   componentWillUnmount() {

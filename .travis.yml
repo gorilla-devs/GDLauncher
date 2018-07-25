@@ -18,17 +18,14 @@ addons:
     update: true
     sources:
       - ubuntu-toolchain-r-test
+      - ubuntu-wine-ppa
     packages:
       - g++-4.8
       - icnsutils
       - graphicsmagick
       - xz-utils
       - xorriso
-
-before_install:
-  - add-apt-repository ppa:ubuntu-wine/ppa -y
-  - apt-get update -q
-  - apt-get install wine1.7 -y
+      - wine1.7
 
 install:
   - export CXX="g++-4.8"
