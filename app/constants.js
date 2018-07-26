@@ -1,3 +1,5 @@
+import getAppPath from './utils/getAppPath';
+
 module.exports = {
   LAUNCHER_FOLDER: 'dl',
   PACKS_FOLDER_NAME: 'packs',
@@ -6,5 +8,6 @@ module.exports = {
   LOGIN_PROXY_API: 'https://n7x0m4zh4f.execute-api.eu-west-1.amazonaws.com/Staging/login',
   WINDOWS: 'win32',
   LINUX: 'linux',
-  DARWIN: 'darwin'
-}
+  DARWIN: 'darwin',
+  APPPATH: getAppPath
+};

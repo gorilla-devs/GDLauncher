@@ -10,12 +10,12 @@ import { hideMenu } from 'react-contextmenu/src/actions';
 import styles from './DManager.css';
 import VanillaModal from '../../containers/VanillaModal';
 import DInstance from '../../containers/DInstance';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
+import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
 import store from '../../localStore';
 
 type Props = {};
 
-const watchPath = `${process.cwd()}/${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
+const watchPath = `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
 let watcher;
 
 const SortableItem = SortableElement(({ value }) =>

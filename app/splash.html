@@ -1,10 +1,71 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>GDLauncher</title>
-  </head>
-  <body>
-    <h1>Loading</h1>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <title>GDLauncher</title>
+  <style>
+    body {
+      background: #34495e
+    }
+
+    .loader {
+      width: 250px;
+      height: 50px;
+      line-height: 50px;
+      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: helvetica, arial, sans-serif;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #3498db;
+      letter-spacing: 0.2em;
+    }
+
+    .loader::before,
+    .loader::after {
+      content: "";
+      display: block;
+      width: 15px;
+      height: 15px;
+      background: #3498db;
+      position: absolute;
+      animation: load .6s infinite alternate cubic-bezier(0.4, 0.0, 0.2, 1);
+      animation-delay: 150ms;
+    }
+
+    .loader::before {
+      top: 0;
+    }
+
+    .loader::after {
+      bottom: 0;
+    }
+
+    @keyframes load {
+      0% {
+        left: 0;
+        height: 30px;
+        width: 15px;
+      }
+      50% {
+        height: 8px;
+        width: 40px;
+      }
+      100% {
+        left: 235px;
+        height: 30px;
+        width: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loader">Loading...</div>
+</body>
+
 </html>

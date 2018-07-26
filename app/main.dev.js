@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-  require('electron-debug')();
+  require('electron-debug')({ enabled: true });
   const path = require('path');
   const p = path.join(__dirname, '..', 'app', 'node_modules');
   require('module').globalPaths.push(p);
@@ -60,8 +60,8 @@ app.on('ready', async () => {
 
   // create a new `splash`-WindowF
   splash = new BrowserWindow({
-    width: 810,
-    height: 610,
+    width: 280,
+    height: 80,
     frame: false,
     show: true
   });
@@ -92,6 +92,7 @@ app.on('ready', async () => {
       throw new Error('"mainWindow" is not defined');
     }
     splash.destroy();
+    mainWindow.webContents.openDevTools({ mode: 'undocked' });
     mainWindow.show();
     mainWindow.focus();
     const { crashReporter } = require('electron')
