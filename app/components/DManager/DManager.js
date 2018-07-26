@@ -56,10 +56,11 @@ export default class DManager extends Component<Props> {
     } catch (error) {
       console.error(error);
       if (error.message === `Error: watch ${watchPath} ENOSPC`) {
-        message.error('There was an error with inotify limit. see <a href="https://github.com/facebook/jest/issues/3254#issuecomment-297214395">here</a>');
+        message.error('There was an error with inotify limit. see <a href="https://github.com/guard/listen/wiki/Increasing-the-amount-of-inotify-watchers">here</a>');
+      } else {
+        message.error('Cannot update instances in real time');
       }
     }
-
   }
 
   componentWillUnmount() {

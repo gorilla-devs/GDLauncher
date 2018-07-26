@@ -33,7 +33,6 @@ async function downloadArr(arr, process, folderPath, threads = 5) {
     } catch (e) {
       process.send({ action: 'CER_PIPE', msg: `Error downloading ${lib.url}: ${e}` });
     }
-
   };
 }
 

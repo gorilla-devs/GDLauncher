@@ -19,12 +19,12 @@ const getStartCommand = async (packName, userData) => {
   const completeCMD = `
 "${javaPath}" ${dosName}
 -XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump 
--Djava.library.path="${process.cwd()}\\${LAUNCHER_FOLDER}\\${PACKS_FOLDER_NAME}\\${packName}\\natives" 
--Dminecraft.client.jar="${process.cwd()}\\${LAUNCHER_FOLDER}\\versions\\${version}\\${version}.jar" 
+-Djava.library.path="${process.cwd()}/${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/natives" 
+-Dminecraft.client.jar="${process.cwd()}/${LAUNCHER_FOLDER}/versions/${version}/${version}.jar" 
 -cp ${libs
       .filter(lib => !lib.natives)
-      .map(lib => `"${process.cwd()}\\${LAUNCHER_FOLDER}\\libraries\\${lib.path}"`)
-      .join(';')};${`"${process.cwd()}\\${LAUNCHER_FOLDER}\\versions\\${mainJar[0].path}"`} 
+      .map(lib => `"${process.cwd()}/${LAUNCHER_FOLDER}/libraries/${lib.path}"`)
+      .join(';')};${`"${process.cwd()}/${LAUNCHER_FOLDER}/versions/${mainJar[0].path}"`} 
 ${packJson.mainClass} ${Arguments}
   `;
 
