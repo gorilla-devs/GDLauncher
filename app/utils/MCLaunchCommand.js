@@ -2,7 +2,7 @@ import { promisify } from 'es6-promisify';
 import os from 'os';
 import fs from 'fs';
 import findJavaHome from './javaLocationFinder';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../constants';
+import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, WINDOWS} from '../constants';
 import { extractLibs, extractMainJar } from '../workers/common/vanilla';
 import store from '../localStore';
 
@@ -15,16 +15,17 @@ const getStartCommand = async (packName, userData) => {
   const libs = extractLibs(packJson, false);
   const mainJar = extractMainJar(packJson, false);
   const Arguments = getMCArguments(packJson, packName, userData);
+  const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 
   const completeCMD = `
 "${javaPath}" ${dosName}
--XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump 
+${os.platform() === WINDOWS ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump' : ''} 
 -Djava.library.path="${process.cwd()}/${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/natives" 
 -Dminecraft.client.jar="${process.cwd()}/${LAUNCHER_FOLDER}/versions/${version}/${version}.jar" 
 -cp ${libs
       .filter(lib => !lib.natives)
       .map(lib => `"${process.cwd()}/${LAUNCHER_FOLDER}/libraries/${lib.path}"`)
-      .join(';')};${`"${process.cwd()}/${LAUNCHER_FOLDER}/versions/${mainJar[0].path}"`} 
+      .join(dividerChar)}${dividerChar}${`"${process.cwd()}/${LAUNCHER_FOLDER}/versions/${mainJar[0].path}"`} 
 ${packJson.mainClass} ${Arguments}
   `;
 
