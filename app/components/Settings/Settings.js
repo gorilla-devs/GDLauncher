@@ -7,7 +7,7 @@ import styles from './Settings.css';
 const Settings = ({ match, history }) => {
   return (
     <Modal history={history}>
-      Contenuto
+      Settings
     </Modal>
   );
 };

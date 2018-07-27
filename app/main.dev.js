@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow, crashReporter } from 'electron';
+import { app, BrowserWindow, crashReporter, ipcMain } from 'electron';
 import MenuBuilder from './menu';
 
 let mainWindow = null;
@@ -70,10 +70,10 @@ app.on('ready', async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 900,
-    height: 720,
-    minHeight: 720,
-    minWidth: 900,
+    width: 780,
+    height: 600,
+    minHeight: 600,
+    minWidth: 780,
     frame: false,
     backgroundColor: '#34495e'
   });
@@ -92,7 +92,6 @@ app.on('ready', async () => {
       throw new Error('"mainWindow" is not defined');
     }
     splash.destroy();
-    mainWindow.webContents.openDevTools({ mode: 'undocked' });
     mainWindow.show();
     mainWindow.focus();
     const { crashReporter } = require('electron')
@@ -102,6 +101,10 @@ app.on('ready', async () => {
       companyName: 'GorillaDevs',
       submitURL: 'https://gdevs.io'
     });
+  });
+
+  ipcMain.on('open-devTools', () => {
+    mainWindow.webContents.openDevTools({ mode: 'undocked' });
   });
 
   mainWindow.on('closed', () => {

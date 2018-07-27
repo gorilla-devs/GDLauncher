@@ -4,9 +4,6 @@ import { Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 import styles from './NavigationBar.css';
 import HorizontalMenu from '../HorizontalMenu/HorizontalMenu';
-import WindowCloseBtn from '../WindowCloseButton/WindowCloseButton';
-import WindowMinimizeBtn from '../WindowMinimizeButton/WindowMinimizeButton';
-import WindowHideBtn from '../WindowHideButton/WindowHideButton';
 
 
 type Props = {};

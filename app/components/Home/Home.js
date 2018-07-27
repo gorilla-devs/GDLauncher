@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Select, Modal, Avatar } from 'antd';
+import { Button, Select, Modal, Avatar, message } from 'antd';
 import Card from '../Common/Card/Card';
 import styles from './Home.scss';
 import Dot from '../Common/Dot/Dot';
@@ -68,28 +68,28 @@ export default class Home extends Component<Props> {
             { /* eslint-enable */}
           </div>
           <div className={styles.header__tiles}>
-            <Link to="/dmanager" draggable="false" style={{ width: '55%' }}>
+            <Link to="/dmanager" draggable="false" style={{ width: '40%' }}>
               <Card style={{
                 background: '#2980b9'
               }}>
                 <i className="fas fa-play" style={{ fontSize: '70px' }} />
-                <h2>PLAY NOW!</h2>
+                <h3>PLAY NOW!</h3>
               </Card>
             </Link>
-            <Link to="/dmanager" draggable="false" style={{ width: '25%' }}>
+            <a onClick={() => message.info(<span>This page does not yet exist <i style={{ fontSize: '20px' }} class="fas fa-sad-tear"></i></span>)} draggable="false" style={{ width: '30%' }}>
               <Card style={{
                 background: '#8e44ad'
               }}>
                 <i className="fas fa-user-friends" style={{ fontSize: '70px' }} />
-                <h2>FIND FRIENDS!</h2>
+                <h3>FIND FRIENDS!</h3>
               </Card>
-            </Link>
-            <Link to="/profile" draggable="false" style={{ width: '20%' }}>
+            </a>
+            <Link to="/profile" draggable="false" style={{ width: '30%' }}>
               <Card style={{
                 background: '#c0392b'
               }}>
                 <Avatar style={{ height: '70px', width: '70px' }} src={avatarBG} />
-                <h2>{this.props.username}</h2>
+                <h3>{this.props.username}</h3>
               </Card>
             </Link>
             <a onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=feature_request.md")} draggable="false" style={{ width: '100%' }}>
@@ -126,7 +126,7 @@ export default class Home extends Component<Props> {
                 externalLink
               >
                 <i className="far fa-life-ring" style={{ fontSize: '70px' }} />
-                <h2>SUPPORT</h2>
+                <h3>SUPPORT</h3>
               </Card>
             </a>
             <Link to={{ pathname: '/discord', state: { modal: true } }} draggable="false" style={{ width: '40%' }}>
@@ -134,7 +134,7 @@ export default class Home extends Component<Props> {
                 background: '#7289da'
               }}>
                 <i className="fab fa-discord" style={{ fontSize: '70px' }} />
-                <h2>DISCOVER OUR DISCORD</h2>
+                <h3>DISCOVER OUR DISCORD</h3>
               </Card>
             </Link>
           </div>

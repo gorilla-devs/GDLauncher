@@ -1,12 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import { Menu, Icon } from 'antd';
-import { Link } from 'react-router-dom';
 import styles from './SystemNavBar.css';
-import HorizontalMenu from '../HorizontalMenu/HorizontalMenu';
-import WindowCloseBtn from '../WindowCloseButton/WindowCloseButton';
-import WindowMinimizeBtn from '../WindowMinimizeButton/WindowMinimizeButton';
-import WindowHideBtn from '../WindowHideButton/WindowHideButton';
+import WindowCloseBtn from './components/WindowCloseButton/WindowCloseButton';
+import WindowMinimizeBtn from './components/WindowMinimizeButton/WindowMinimizeButton';
+import WindowHideBtn from './components/WindowHideButton/WindowHideButton';
+import OpenDevTools from './components/OpenDevTools/OpenDevTools';
 
 
 type Props = {};
@@ -16,6 +14,7 @@ export default class SystemNavBar extends Component<Props> {
   render() {
     return (
       <div className={styles.container}>
+        <OpenDevTools />
         <WindowCloseBtn />
         <WindowMinimizeBtn />
         <WindowHideBtn />

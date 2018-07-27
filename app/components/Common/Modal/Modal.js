@@ -65,7 +65,7 @@ export default class Modal extends Component<Props> {
         transitionTimingFunction: 'ease-in-out'
       },
       bgStyle: {
-        background: 'rgba(0, 0, 0, 0.4)',
+        background: 'rgba(0, 0, 0, 0.6)',
         transition: 'all 200ms ease-in-out'
       }
     });
