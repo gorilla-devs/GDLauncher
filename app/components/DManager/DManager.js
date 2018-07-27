@@ -8,7 +8,7 @@ import Link from 'react-router-dom/Link';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 import { hideMenu } from 'react-contextmenu/src/actions';
 import styles from './DManager.css';
-import VanillaModal from '../../containers/VanillaModal';
+import VanillaModal from '../VanillaModal/containers/VanillaModal';
 import DInstance from '../../containers/DInstance';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
 import store from '../../localStore';

@@ -1,7 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Home from '../components/Home/Home';
-import * as downloadManagerActions from '../actions/downloadManager';
+import Home from '../../Home/Home';
+import * as downloadManagerActions from '../../../actions/downloadManager';
 
 function mapStateToProps(state) {
   return {

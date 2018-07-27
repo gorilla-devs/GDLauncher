@@ -94,7 +94,7 @@ async function extractAssets(json) {
   const assets = [];
   await axios.get(json.assetIndex.url).then((res) => {
     // It saves the json into a file on /assets/indexes/${version}.json
-    const assetsFile = `${constants.LAUNCHER_FOLDER}/assets/indexes/${json.assets}.json`;
+    const assetsFile = `${constants.APPPATH}${constants.LAUNCHER_FOLDER}/assets/indexes/${json.assets}.json`;
     if (!fs.existsSync(assetsFile)) {
       // Checks whether the dir exists. If not, it creates it
       if (!fs.existsSync(path.dirname(assetsFile))) {
@@ -105,7 +105,7 @@ async function extractAssets(json) {
     // Returns the list of assets if they don't already exist
     return Object.keys(res.data.objects).map(asset => {
       const assetCont = res.data.objects[asset];
-      const filePath = `${constants.LAUNCHER_FOLDER}/assets/objects/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`;
+      const filePath = `${constants.APPPATH}${constants.LAUNCHER_FOLDER}/assets/objects/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`;
       if (!fs.existsSync(filePath)) {
         assets.push({
           url: `http://resources.download.minecraft.net/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`,
@@ -119,10 +119,10 @@ async function extractAssets(json) {
 }
 
 async function extractNatives(libs, packName) {
-  const nativesPath = `${constants.LAUNCHER_FOLDER}/${constants.PACKS_FOLDER_NAME}/${packName}/natives/`;
+  const nativesPath = `${constants.APPPATH}${constants.LAUNCHER_FOLDER}/${constants.PACKS_FOLDER_NAME}/${packName}/natives/`;
   if (!fs.existsSync(nativesPath)) {
     mkdirp.sync(nativesPath);
   }
   await Promise.all(libs.map(lib =>
-    extract(`${constants.LAUNCHER_FOLDER}/libraries/${lib.path}`, { dir: `${constants.APPPATH}${nativesPath}` })));
+    extract(`${constants.APPPATH}${constants.LAUNCHER_FOLDER}/libraries/${lib.path}`, { dir: `${constants.APPPATH}${nativesPath}` })));
 }

@@ -6,7 +6,7 @@ import { Form } from 'antd';
 import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
 import App from './containers/App';
-import HomePage from './containers/HomePage';
+import HomePage from './components/Home/containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
 import DManager from './containers/DManagerPage';
 import Profile from './containers/ProfilePage';
@@ -15,7 +15,7 @@ import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import Login from './components/Login/Login';
 import Settings from './components/Settings/Settings';
 import DiscordModal from './components/DiscordModal/DiscordModal';
-import VanillaModal from './containers/VanillaModal';
+import VanillaModal from './components/VanillaModal/containers/VanillaModal';
 import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
 

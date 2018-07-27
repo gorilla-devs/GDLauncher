@@ -13,10 +13,15 @@ export default class Modal extends Component<Props> {
     this.state = { // base css
       style: {
         display: 'block',
-        transform: 'scale3d(0, 1, 1)',
-        transition: 'all 300ms',
+        transform: 'scale(1.3)',
+        opacity: 0,
+        transition: 'all 200ms',
         willChange: 'transform',
-        transitionTimingFunction: 'cubic-bezier(0.4, 0, 0, 1.5)'
+        transitionTimingFunction: 'ease-in-out'
+      },
+      bgStyle: {
+        background: 'rgba(0, 0, 0, 0)',
+        transition: 'all 200ms ease-in-out'
       }
     };
   }
@@ -36,22 +41,32 @@ export default class Modal extends Component<Props> {
     this.setState({
       style: {
         display: 'block',
-        transform: 'scale3d(0, 1, 0.1)',
-        transition: 'all 180ms',
+        transform: 'scale(1.3)',
+        opacity: 0,
+        transition: 'all 200ms',
         willChange: 'transform',
-        transitionTimingFunction: 'cubic-bezier(.62,.28,.23,.99) 0.7s'
+        transitionTimingFunction: 'ease-in-out'
+      },
+      bgStyle: {
+        background: 'rgba(0, 0, 0, 0)',
+        transition: 'all 200ms ease-in-out'
       }
-    })
+    });
   }
 
   mountStyle() { // css for mount animation
     this.setState({
       style: {
         display: 'block',
-        transform: 'scale3d(1, 1, 1)',
-        transition: 'all 300ms',
+        transform: 'scale(1)',
+        opacity: 1,
+        transition: 'all 200ms',
         willChange: 'transform',
-        transitionTimingFunction: 'cubic-bezier(.62,.28,.23,.99) 0.7s'
+        transitionTimingFunction: 'ease-in-out'
+      },
+      bgStyle: {
+        background: 'rgba(0, 0, 0, 0.4)',
+        transition: 'all 200ms ease-in-out'
       }
     });
   }
@@ -59,12 +74,12 @@ export default class Modal extends Component<Props> {
   back = e => {
     e.stopPropagation();
     setTimeout(this.unMountStyle, 10); // call the into animiation
-    setTimeout(this.props.history.goBack, 160);
+    setTimeout(this.props.history.goBack, 200);
   };
 
   render() {
     return (
-      <div className={styles.overlay} onClick={this.back}>
+      <div className={styles.overlay} onClick={this.back} style={this.state.bgStyle}>
         <div className={styles.modal} style={this.state.style} onClick={(e) => e.stopPropagation()}>
           <div className={styles.header}>
             <h3 style={{ display: 'inline-block' }}>Modal</h3>

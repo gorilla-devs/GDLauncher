@@ -4,7 +4,7 @@ import { Button, Icon, Progress, message } from 'antd';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import { hideMenu } from 'react-contextmenu/src/actions';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
+import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
 import styles from './DInstance.scss';
 
 type Props = {
@@ -68,15 +68,12 @@ export default class DInstance extends Component<Props> {
   handleClickPlay = async (e) => {
     e.stopPropagation();
     this.props.startInstance(this.props.name);
-  }
-
-  handleClick = (e, data) => {
-    console.log(data.foo);
+    this.props.selectInstance(this.props.name);
   }
 
   deleteInstance = async () => {
     try {
-      await fsa.remove(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${this.props.name}`);
+      await fsa.remove(`${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${this.props.name}`);
       hideMenu();
       message.success('Instance deleted');
     } catch (err) {
@@ -94,6 +91,7 @@ export default class DInstance extends Component<Props> {
           document.documentElement.style.setProperty('--instanceName', `"${this.props.name}"`)
         }
         onClick={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name) }}
+        onDoubleClick={this.handleClickPlay}
       >
         <ContextMenuTrigger id={`contextMenu-${this.props.name}`}>
           {this.props.playing.find(el => el === this.props.name) &&

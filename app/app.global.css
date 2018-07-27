@@ -23,6 +23,7 @@ html, body {
   font-family: 'Roboto Light', sans-serif;
   padding: 0;
   margin: 0;
+  overflow: hidden;
 }
 
 :not(input):not(textarea):not(button):not(a):not(i):not(span), :not(input):not(textarea):not(button):not(a):not(i):not(span)::after, :not(input):not(textarea):not(button):not(a):not(i):not(span)::before {
