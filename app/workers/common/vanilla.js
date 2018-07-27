@@ -45,7 +45,7 @@ function extractLibs(json, CheckForExists = true) {
   const libs = [];
   json.libraries.filter(lib => !parseLibRules(lib.rules)).map((lib) => {
     if ('artifact' in lib.downloads) {
-      const filePath = `${constants.LAUNCHER_FOLDER}/libraries/${lib.downloads.artifact.path}`;
+      const filePath = `${constants.APPPATH}${constants.LAUNCHER_FOLDER}/libraries/${lib.downloads.artifact.path}`;
       if (CheckForExists) {
         if (!fs.existsSync(filePath)) {
           libs.push({

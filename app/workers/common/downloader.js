@@ -5,6 +5,7 @@ const fs = require('fs');
 const assert = require('assert');
 const Promise = require('bluebird');
 const request = require('request-promise-native');
+const constants = require('../../constants');
 
 
 module.exports = {
@@ -15,7 +16,7 @@ Promise.promisifyAll(async);
 async function downloadArr(arr, process, folderPath, threads = 5) {
   for (const lib of arr) {
     try {
-      const filePath = `${folderPath}${path.dirname(lib.path)}`;
+      const filePath = `${constants.APPPATH}${folderPath}${path.dirname(lib.path)}`;
       if (!fs.existsSync(filePath)) {
         mkdirp.sync(filePath);
       }

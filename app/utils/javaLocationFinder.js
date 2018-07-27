@@ -2,8 +2,6 @@ import { promisify } from 'es6-promisify';
 import os from 'os';
 import fs from 'fs';
 import {
-  LAUNCHER_FOLDER,
-  PACKS_FOLDER_NAME,
   LINUX,
   WINDOWS,
   DARWIN

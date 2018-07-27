@@ -1,13 +1,13 @@
 {
-  "name": "gorilladevs-gdlauncher",
+  "name": "gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "main": "./main.prod.js",
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "GorillaDevs",
+    "email": "us@gdevs.io",
+    "url": "https://gdevs.io"
   },
   "scripts": {
     "electron-rebuild": "node -r babel-register ../internals/scripts/ElectronRebuild.js",

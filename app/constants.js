@@ -1,4 +1,4 @@
-import getAppPath from './utils/getAppPath';
+const getAppPath = require('./utils/getAppPath');
 
 module.exports = {
   LAUNCHER_FOLDER: 'dl',
@@ -9,5 +9,5 @@ module.exports = {
   WINDOWS: 'win32',
   LINUX: 'linux',
   DARWIN: 'darwin',
-  APPPATH: getAppPath
+  APPPATH: getAppPath.getAppPath()
 };

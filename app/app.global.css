@@ -4,6 +4,21 @@
  */
 
 @import "./antd.css";
+@font-face {
+  font-family: 'Roboto';
+  src: url('./assets/fonts/Roboto-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Roboto Black';
+  src: url('./assets/fonts/Roboto-Black.ttf');
+}
+
+@font-face {
+  font-family: 'Roboto Thin';
+  src: url('./assets/fonts/Roboto-Thin.ttf');
+}
+
 html, body {
   font-family: 'Roboto Light', sans-serif;
   padding: 0;
@@ -80,9 +95,7 @@ input, button, textarea, :focus {
   text-align: left;
 }
 
-.react-contextmenu-item.react-contextmenu-item--active,
-.react-contextmenu-item.react-contextmenu-item--selected,
-.react-contextmenu-item:hover {
+.react-contextmenu-item.react-contextmenu-item--active, .react-contextmenu-item.react-contextmenu-item--selected, .react-contextmenu-item:hover {
   color: #fff;
   background-color: #20a0ff;
   border-color: #20a0ff;

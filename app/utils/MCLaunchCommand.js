@@ -8,7 +8,7 @@ import store from '../localStore';
 
 const getStartCommand = async (packName, userData) => {
 
-  const packJson = JSON.parse(fs.readFileSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/vnl.json`));
+  const packJson = JSON.parse(fs.readFileSync(`${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/vnl.json`));
   const javaPath = await findJavaHome();
   const dosName = os.release().substr(0, 2) === 10 ? '"-Dos.name=Windows 10" -Dos.version=10.0 ' : '';
   const version = packJson.id;
