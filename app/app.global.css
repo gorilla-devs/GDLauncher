@@ -4,20 +4,6 @@
  */
 
 @import "./antd.css";
-@font-face {
-  font-family: 'Roboto';
-  src: url('./assets/fonts/Roboto-Regular.ttf');
-}
-
-@font-face {
-  font-family: 'Roboto Black';
-  src: url('./assets/fonts/Roboto-Black.ttf');
-}
-
-@font-face {
-  font-family: 'Roboto Thin';
-  src: url('./assets/fonts/Roboto-Thin.ttf');
-}
 
 html, body {
   font-family: 'Roboto Light', sans-serif;

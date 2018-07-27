@@ -242,7 +242,8 @@
     "redux-thunk": "^2.2.0",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "source-map-support": "^0.5.4"
+    "source-map-support": "^0.5.4",
+    "typeface-roboto": "^0.0.54"
   },
   "devEngines": {
     "node": ">=8.x",
