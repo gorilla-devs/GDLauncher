@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Select, Form, Input, Icon, Button } from 'antd';
+import { Select, Form, Input, Icon, Button, Checkbox } from 'antd';
 import styles from './VanillaModal.css';
 import Modal from '../Common/Modal/Modal';
 
@@ -47,41 +47,55 @@ class VanillaModal extends Component<Props> {
 
     return (
       <Modal history={this.props.history} mounted={this.props.modalState}>
-        <Form onSubmit={this.handleSubmit}>
+        <Form layout="inline" className={styles.container} onSubmit={this.handleSubmit}>
           <FormItem>
             {getFieldDecorator('packName', {
               rules: [{ required: true, message: 'Please input a name' }],
             })(
               <Input
                 size="large"
+                style={{ width: '40vw', display: 'inline-block', height: '60px', marginBottom: '30px' }}
                 prefix={<Icon type="play-circle-o" style={{ color: 'rgba(255,255,255,.8)' }} />}
                 placeholder="Instance Name"
               />
             )}
           </FormItem>
-          <FormItem>
-            {getFieldDecorator('version', {
-              rules: [{ required: true, message: 'Please select a version' }],
-            })(
-              <Select
-                showSearch
-                style={{ width: 200 }}
-                placeholder="Select a version"
-                optionFilterProp="children"
-                filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-              >
-                <Select.OptGroup label="Snapshots">
-                  {this.props.versionsManifest.map((version) => version.type === 'snapshot' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
-                </Select.OptGroup>
-                <Select.OptGroup label="Releases">
-                  {this.props.versionsManifest.map((version) => version.type === 'release' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
-                </Select.OptGroup>
-              </Select>
-            )}
-          </FormItem>
-          <Button loading={this.state.loading} icon="plus" size="large" type="primary" htmlType="submit" >
-            Create Instance
+          <div>
+            <FormItem>
+              {getFieldDecorator('version', {
+                rules: [{ required: true, message: 'Please select a version' }],
+              })(
+                <Select
+                  showSearch
+                  size="large"
+                  style={{ width: 200, display: 'inline-block' }}
+                  placeholder="Select a version"
+                  optionFilterProp="children"
+                  filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                >
+                  <Select.OptGroup label="Releases">
+                    {this.props.versionsManifest.map((version) => version.type === 'release' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
+                  </Select.OptGroup>
+                  <Select.OptGroup label="Snapshots">
+                    {this.props.versionsManifest.map((version) => version.type === 'snapshot' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
+                  </Select.OptGroup>
+                </Select>
+              )}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator('remember', {
+                valuePropName: 'checked',
+                initialValue: true,
+              })(
+                <Checkbox>Show Snapshots</Checkbox>
+              )}
+            </FormItem>
+          </div>
+          <div className={styles.createInstance}>
+            <Button loading={this.state.loading} icon="plus" size="large" type="primary" htmlType="submit" >
+              Create Instance
           </Button>
+          </div>
         </Form>
       </Modal>
     );

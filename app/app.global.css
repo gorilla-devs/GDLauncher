@@ -4,9 +4,10 @@
  */
 
 @import "./antd.css";
+@import "./fonts.css";
 
 html, body {
-  font-family: 'Roboto Light', sans-serif;
+  font-family: 'Roboto';
   padding: 0;
   margin: 0;
   overflow: hidden;
