@@ -22,6 +22,10 @@ input, button, textarea, :focus {
   outline: none;
 }
 
+a:hover {
+  text-decoration: underline;
+}
+
 ::-webkit-scrollbar {
   background-color: rgb(35, 48, 61);
   width: 8px;

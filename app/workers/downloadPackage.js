@@ -12,7 +12,6 @@ async function main() {
   // //////////////////
   // //VANILLA STUFF///
   // //////////////////
-
   try {
     const vnlPath = `${constants.APPPATH}${constants.LAUNCHER_FOLDER}/${constants.PACKS_FOLDER_NAME}/${process.env.name}`;
     const vnlRead = fs.readFileSync(`${vnlPath}/vnl.json`);

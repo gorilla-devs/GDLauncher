@@ -49,8 +49,12 @@ class RouteDef extends React.Component {
     return (
       <App>
         <SysNavBar />
-        <Navigation />
-        {location.pathname !== '/' ? <SideBar /> : null}
+        {location.pathname !== '/' && location.pathname !== '/loginHelperModal' ?
+          <div>
+            <Navigation />
+            <SideBar />
+          </div>
+          : null}
         <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
           {!this.props.isAuthValid && <Redirect push to="/" />}

@@ -25,7 +25,6 @@ export function login(username, password, remember) {
           password
         }
       ).then(res => {
-        console.log(res)
         if (res.data !== undefined &&
           res.data !== null &&
           Object.prototype.hasOwnProperty.call(res.data, 'authenticated')) {
@@ -37,7 +36,8 @@ export function login(username, password, remember) {
                 clientToken: res.data.clientToken,
                 legacy: res.data.legacy,
                 uuid: res.data.uuid
-              }
+              },
+              lastEmail: username
             });
           }
           dispatch({
@@ -56,7 +56,7 @@ export function login(username, password, remember) {
         return res;
       });
     } catch (err) {
-      message.error(`Auth failed: ${err}`);
+      message.error(`Auth failed: ${err.message}`);
     } finally {
       dispatch({
         type: STOP_AUTH_LOADING

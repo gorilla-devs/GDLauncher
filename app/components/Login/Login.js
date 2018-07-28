@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip, Modal } from 'antd';
 import styles from './Login.css';
+import store from '../../localStore';
 import * as AuthActions from '../../actions/auth';
 
 type Props = {};
@@ -16,11 +17,6 @@ class Login extends Component<Props> {
 
   constructor(props) {
     super(props);
-    this.state = {
-      helpModalisOpen: false,
-      checkingToken: false
-    };
-
     this.openHelpModal = this.openHelpModal.bind(this);
     this.closeHelpModal = this.closeHelpModal.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -71,6 +67,7 @@ class Login extends Component<Props> {
               <FormItem>
                 {getFieldDecorator('username', {
                   rules: [{ required: true, message: 'Please input your email!' }],
+                  initialValue: store.has('lastEmail') ? store.get('lastEmail') : ''
                 })(
                   <Input
                     size="large"

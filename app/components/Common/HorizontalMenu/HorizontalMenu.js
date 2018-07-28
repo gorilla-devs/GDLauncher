@@ -20,7 +20,6 @@ export default class NavigationBar extends Component<Props> {
   };
 
   render() {
-    console.log(this.props.location)
     return (
       <div className={styles.main}>
         <ul className={styles.ul}>
