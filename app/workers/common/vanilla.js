@@ -124,5 +124,5 @@ async function extractNatives(libs, packName) {
     mkdirp.sync(nativesPath);
   }
   await Promise.all(libs.map(lib =>
-    extract(`${constants.APPPATH}${constants.LAUNCHER_FOLDER}/libraries/${lib.path}`, { dir: `${constants.APPPATH}${nativesPath}` })));
+    extract(`${constants.APPPATH}${constants.LAUNCHER_FOLDER}/libraries/${lib.path}`, { dir: `${nativesPath}` })));
 }
