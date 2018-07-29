@@ -6,10 +6,12 @@ import { join, basename } from 'path';
 import mkdirp from 'mkdirp';
 import Link from 'react-router-dom/Link';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { hideMenu } from 'react-contextmenu/src/actions';
 import styles from './DManager.css';
 import VanillaModal from '../VanillaModal/containers/VanillaModal';
 import DInstance from '../../containers/DInstance';
+import { history } from '../../store/configureStore';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
 import store from '../../localStore';
 
@@ -57,10 +59,10 @@ export default class DManager extends Component<Props> {
       console.error(error);
       if (error.message === `watch ${watchPath} ENOSPC`) {
         message.error(
-        <span>
-          There was an error with inotify limit. see 
+          <span>
+            There was an error with inotify limit. see
           <a target="_blank" href="https://github.com/guard/listen/wiki/Increasing-the-amount-of-inotify-watchers"> here</a>
-        </span>
+          </span>
         );
       } else {
         message.error('Cannot update instances in real time');
@@ -117,26 +119,34 @@ export default class DManager extends Component<Props> {
             </div>
           </div>
         </div>
-        <div className={styles.content} onScroll={this.handleScroll}>
-          {this.state.instances.length !== 0 ?
-            <SortableList
-              items={this.state.instances}
-              onSortEnd={this.onSortEnd}
-              lockToContainerEdges
-              axis="xy"
-              distance={5}
-            /> :
-            <h1 style={{
-              textAlign: 'center',
-              marginTop: '25vh',
-              fontFamily: 'Roboto',
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#bdc3c7'
-            }}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1>
-          }
-        </div>
-      </main>
+        <ContextMenuTrigger id="contextMenu-dmanager">
+          <div className={styles.content} onScroll={this.handleScroll}>
+            {this.state.instances.length !== 0 ?
+              <SortableList
+                items={this.state.instances}
+                onSortEnd={this.onSortEnd}
+                lockToContainerEdges
+                axis="xy"
+                distance={5}
+              /> :
+              <h1 style={{
+                textAlign: 'center',
+                marginTop: '25vh',
+                fontFamily: 'Roboto',
+                fontSize: '20px',
+                fontWeight: '600',
+                color: '#bdc3c7'
+              }}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1>
+            }
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenu id="contextMenu-dmanager" onShow={(e) => { e.stopPropagation(); this.props.selectInstance(null); }}>
+          <MenuItem data={{ foo: 'bar' }} onClick={() => history.push({ pathname: '/vanillaModal', state: { modal: true } })}>
+            <i className="fas fa-play" style={{ marginRight: '8px' }} />
+          Add New Vanilla
+          </MenuItem>
+        </ContextMenu>
+      </main >
     );
   }
 }

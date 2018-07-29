@@ -1,8 +1,8 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import DManager from '../components/DManager/DManager';
-import * as downloadManagerActions from '../actions/downloadManager';
-import * as instancesManagerActions from '../actions/instancesManager';
+import DManager from '../DManager';
+import * as downloadManagerActions from '../../../actions/downloadManager';
+import * as instancesManagerActions from '../../../actions/instancesManager';
 
 function mapStateToProps(state) {
   return {
