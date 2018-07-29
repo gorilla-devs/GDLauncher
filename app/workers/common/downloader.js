@@ -3,6 +3,7 @@ const async = require('async');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const assert = require('assert');
+const os = require('os');
 const Promise = require('bluebird');
 const request = require('request-promise-native');
 const constants = require('../../constants');
@@ -11,30 +12,30 @@ const constants = require('../../constants');
 module.exports = {
   downloadArr
 };
-Promise.promisifyAll(async);
+const parallel = Promise.promisify(async.eachLimit);
 
 async function downloadArr(arr, process, folderPath, threads = 5) {
-  for (const lib of arr) {
+  await parallel(arr, os.cpus().length, async (item) => {
     try {
-      const filePath = `${constants.APPPATH}${folderPath}${path.dirname(lib.path)}`;
+      const filePath = `${folderPath}${path.dirname(item.path)}`;
       if (!fs.existsSync(filePath)) {
         mkdirp.sync(filePath);
       }
-      const file = await request(lib.url, { encoding: 'binary' });
-      fs.writeFileSync(`${folderPath}${lib.path}`, file, 'binary');
-      if (lib.legacyPath && !fs.existsSync(lib.legacyPath)) {
-        const legacyPath = `${folderPath}${path.dirname(lib.legacyPath)}`;
+      const file = await request(item.url, { encoding: 'binary' });
+      fs.writeFileSync(`${folderPath}${item.path}`, file, 'binary');
+      if (item.legacyPath && !fs.existsSync(item.legacyPath)) {
+        const legacyPath = `${folderPath}${path.dirname(item.legacyPath)}`;
         if (!fs.existsSync(legacyPath)) {
           mkdirp.sync(legacyPath);
         }
-        fs.writeFileSync(`${folderPath}${lib.legacyPath}`, file, 'binary');
+        fs.writeFileSync(`${folderPath}${item.legacyPath}`, file, 'binary');
       }
 
       process.send({ action: 'UPDATE__FILES' });
     } catch (e) {
-      process.send({ action: 'CER_PIPE', msg: `Error downloading ${lib.url}: ${e}` });
+      process.send({ action: 'CER_PIPE', msg: `Error downloading ${item.url}: ${e}` });
     }
-  };
+  });
 }
 
 function checkFile(lpath, size, sha1) {
