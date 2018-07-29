@@ -75,7 +75,10 @@ app.on('ready', async () => {
     minHeight: 600,
     minWidth: 780,
     frame: false,
-    backgroundColor: '#34495e'
+    backgroundColor: '#34495e',
+    webPreferences: {
+      experimentalFeatures: true
+    }
   });
 
   mainWindow.webContents.on('new-window', (e, url) => {

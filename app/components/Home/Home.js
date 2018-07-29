@@ -76,7 +76,7 @@ export default class Home extends Component<Props> {
                 <h3>PLAY NOW!</h3>
               </Card>
             </Link>
-            <a onClick={() => message.info(<span>This page does not yet exist <i style={{ fontSize: '20px' }} class="fas fa-sad-tear"></i></span>)} draggable="false" style={{ width: '30%' }}>
+            <a onClick={() => message.warning(<span>This page does not yet exist <i style={{ fontSize: '20px' }} class="fas fa-sad-tear"></i></span>)} draggable="false" style={{ width: '30%' }}>
               <Card style={{
                 background: '#8e44ad'
               }}>
@@ -92,7 +92,7 @@ export default class Home extends Component<Props> {
                 <h3>{this.props.username}</h3>
               </Card>
             </Link>
-            <a onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=feature_request.md")} draggable="false" style={{ width: '100%' }}>
+            <a target="_blank" rel="noopener noreferrer" href="https://github.com/gorilla-devs/GDLauncher/issues/new?template=feature_request.md" draggable="false" style={{ width: '100%' }}>
               <Card
                 style={{
                   background: `linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url(${feedbacksBG}) center top`
@@ -113,7 +113,9 @@ export default class Home extends Component<Props> {
               </Card>
             </a>
             <a
-              onClick={() => this.openLink("https://github.com/gorilla-devs/GDLauncher/issues/new?template=bug_report.md")}
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/gorilla-devs/GDLauncher/issues/new?template=bug_report.md"
               draggable="false"
               style={{
                 width: '60%'

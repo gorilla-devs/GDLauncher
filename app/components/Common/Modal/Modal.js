@@ -17,7 +17,8 @@ export default class Modal extends Component<Props> {
         opacity: 0,
         transition: 'all 200ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out'
+        transitionTimingFunction: 'ease-in-out',
+        ...this.props.style
       },
       bgStyle: {
         background: 'rgba(0, 0, 0, 0)',
@@ -45,7 +46,8 @@ export default class Modal extends Component<Props> {
         opacity: 0,
         transition: 'all 200ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out'
+        transitionTimingFunction: 'ease-in-out',
+        ...this.props.style
       },
       bgStyle: {
         background: 'rgba(0, 0, 0, 0)',
@@ -62,11 +64,13 @@ export default class Modal extends Component<Props> {
         opacity: 1,
         transition: 'all 200ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out'
+        transitionTimingFunction: 'ease-in-out',
+        ...this.props.style
       },
       bgStyle: {
         background: 'rgba(0, 0, 0, 0.6)',
         transition: 'all 200ms ease-in-out'
+
       }
     });
   }
@@ -83,7 +87,7 @@ export default class Modal extends Component<Props> {
         <div className={styles.modal} style={this.state.style} onClick={(e) => e.stopPropagation()}>
           <div className={styles.header}>
             <h3 style={{ display: 'inline-block' }}>Modal</h3>
-            <Button shape="circle" icon="close" size="large" className={styles.closeBtn} onClick={this.back} />
+            <Button icon="close" size="small" type="ghost" className={styles.closeBtn} onClick={this.back} />
           </div>
           <div className={styles.modalContent}>
             {this.props.children}

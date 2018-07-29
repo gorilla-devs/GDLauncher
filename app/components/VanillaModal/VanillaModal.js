@@ -14,7 +14,8 @@ class VanillaModal extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false
+      loading: false,
+      checked: false
     };
   }
 
@@ -46,21 +47,23 @@ class VanillaModal extends Component<Props> {
     const { getFieldDecorator } = this.props.form;
 
     return (
-      <Modal history={this.props.history} mounted={this.props.modalState}>
+      <Modal history={this.props.history} mounted={this.props.modalState} style={{ height: '60vh' }}>
         <Form layout="inline" className={styles.container} onSubmit={this.handleSubmit}>
-          <FormItem>
-            {getFieldDecorator('packName', {
-              rules: [{ required: true, message: 'Please input a name' }],
-            })(
-              <Input
-                size="large"
-                style={{ width: '40vw', display: 'inline-block', height: '60px', marginBottom: '30px' }}
-                prefix={<Icon type="play-circle-o" style={{ color: 'rgba(255,255,255,.8)' }} />}
-                placeholder="Instance Name"
-              />
-            )}
-          </FormItem>
           <div>
+            <FormItem>
+              {getFieldDecorator('packName', {
+                rules: [{ required: true, message: 'Please input a name' }],
+              })(
+                <Input
+                  size="large"
+                  style={{ width: '40vw', display: 'inline-block', height: '60px' }}
+                  prefix={<Icon type="play-circle-o" style={{ color: 'rgba(255,255,255,.8)' }} />}
+                  placeholder="Instance Name"
+                />
+              )}
+            </FormItem>
+          </div>
+          <div style={{ marginTop: '20px' }}>
             <FormItem>
               {getFieldDecorator('version', {
                 rules: [{ required: true, message: 'Please select a version' }],
@@ -76,25 +79,27 @@ class VanillaModal extends Component<Props> {
                   <Select.OptGroup label="Releases">
                     {this.props.versionsManifest.map((version) => version.type === 'release' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
                   </Select.OptGroup>
-                  <Select.OptGroup label="Snapshots">
-                    {this.props.versionsManifest.map((version) => version.type === 'snapshot' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
-                  </Select.OptGroup>
+                  {this.state.checked &&
+                    <Select.OptGroup label="Snapshots">
+                      {this.props.versionsManifest.map((version) => version.type === 'snapshot' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
+                    </Select.OptGroup>
+                  }
                 </Select>
               )}
             </FormItem>
             <FormItem>
-              {getFieldDecorator('remember', {
+              {getFieldDecorator('snapshots', {
                 valuePropName: 'checked',
-                initialValue: true,
+                initialValue: false,
               })(
-                <Checkbox>Show Snapshots</Checkbox>
+                <Checkbox onChange={(checked) => this.setState({ checked: checked.target.checked })}>Show Snapshots</Checkbox>
               )}
             </FormItem>
           </div>
           <div className={styles.createInstance}>
             <Button loading={this.state.loading} icon="plus" size="large" type="primary" htmlType="submit" >
               Create Instance
-          </Button>
+            </Button>
           </div>
         </Form>
       </Modal>

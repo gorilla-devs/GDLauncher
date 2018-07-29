@@ -5,14 +5,12 @@
   right: 0;
   height: calc(100vh - (47.6px + 30px));
   width: calc(100% - 200px);
-  z-index: 3;
-  padding-top: 10vh;
-  padding-bottom: 10vh;
+  overflow: auto;
   .socialsContainer {
-    position: absolute;
-    display: inline;
-    right: 30px;
-    top: 20px;
+    position: relative;
+    float: right;
+    right: 6px;
+    top: 6px;
     .socialBtn {
       cursor: pointer;
       &:hover {
@@ -26,9 +24,9 @@
     color: #fff;
     text-align: center;
     font-size: 30px;
-    position: absolute;
+    position: relative;
     display: inline;
-    top: 15px;
+    top: 3px;
     left: 3px;
   }
   .header__tiles {
@@ -37,6 +35,7 @@
     align-items: center;
     font-family: 'Roboto';
     width: 100%;
+    height: calc(100vh - (47.6px + 30px + 60px));
     flex-wrap: wrap;
     a {
       display: inline-block;
