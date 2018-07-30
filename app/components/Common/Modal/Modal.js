@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
+import { goBack } from 'react-router-redux';
+import { configureStore } from '../../../store/configureStore';
 import styles from './Modal.css';
 
 export default class Modal extends Component<Props> {
@@ -78,7 +80,7 @@ export default class Modal extends Component<Props> {
   back = e => {
     e.stopPropagation();
     setTimeout(this.unMountStyle, 10); // call the into animiation
-    setTimeout(this.props.history.goBack, 200);
+    setTimeout(configureStore().dispatch(goBack()), 200);
   };
 
   render() {

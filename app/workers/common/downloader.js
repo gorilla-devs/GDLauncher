@@ -14,8 +14,8 @@ module.exports = {
 };
 const parallel = Promise.promisify(async.eachLimit);
 
-async function downloadArr(arr, process, folderPath, threads = 5) {
-  await parallel(arr, os.cpus().length, async (item) => {
+async function downloadArr(arr, process, folderPath, threads = os.cpus().length) {
+  await parallel(arr, threads, async (item) => {
     try {
       const filePath = `${folderPath}${path.dirname(item.path)}`;
       if (!fs.existsSync(filePath)) {

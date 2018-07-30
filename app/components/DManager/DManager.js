@@ -143,7 +143,7 @@ export default class DManager extends Component<Props> {
         <ContextMenu id="contextMenu-dmanager" onShow={(e) => { e.stopPropagation(); this.props.selectInstance(null); }}>
           <MenuItem data={{ foo: 'bar' }} onClick={() => history.push({ pathname: '/vanillaModal', state: { modal: true } })}>
             <i className="fas fa-play" style={{ marginRight: '8px' }} />
-          Add New Vanilla
+            Add New Vanilla
           </MenuItem>
         </ContextMenu>
       </main >
