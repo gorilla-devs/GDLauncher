@@ -4,12 +4,15 @@ import { Button } from 'antd';
 import Modal from '../Common/Modal/Modal';
 import styles from './Settings.css';
 import SideMenu from './components/SideMenu/SideMenu';
+import Content from './components/Content/Content';
 
 const Settings = ({ match, history }) => {
   return (
     <Modal history={history}>
-      <SideMenu />
-      Settings
+      <div className={styles.container}>
+        <SideMenu />
+        <Content />
+      </div>
     </Modal>
   );
 };
