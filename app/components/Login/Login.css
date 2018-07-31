@@ -22,6 +22,16 @@
 
 .fastLoginIcon {
   cursor: pointer;
+  animation: fastLoginIconScale .4s infinite both;
+}
+
+@keyframes fastLoginIconScale {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
 }
 
 .fastLoginIcon path {
