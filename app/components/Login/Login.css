@@ -4,7 +4,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   color: #fff;
-  position: fixed;
+  position: absolute;
   left: 0;
   right: 0;
   height: 100vh;
@@ -18,4 +18,22 @@
 
 .login_form_button {
   left: 78px;
+}
+
+.nativeProfilesContainer {
+  background: #34495e;
+  position: absolute;
+  z-index: 10;
+  border-radius: 4px;
+  text-align: center;
+  padding: 10px;
+  top: 24vh;
+  left: 0;
+  right: 0;
+  width: 350px;
+  margin: auto;
+  height: 300px;
+  transition: transform .3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform: scale(0);
+  transform-origin: 85% 8%;
 }

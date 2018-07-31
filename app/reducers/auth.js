@@ -5,7 +5,8 @@ import {
   START_TOKEN_CHECK_LOADING,
   STOP_TOKEN_CHECK_LOADING,
   AUTH_FAILED,
-  AUTH_SUCCESS
+  AUTH_SUCCESS,
+  OPEN_NATIVE_PROFILES_MODAL
 } from '../actions/auth';
 
 
@@ -17,11 +18,14 @@ const initialState = {
   clientToken: null,
   legacy: null,
   uuid: null,
-  isAuthValid: false
+  isAuthValid: false,
+  nativeProfilesModalOpened: false
 };
 
 export default function auth(state = initialState, action) {
   switch (action.type) {
+    case `${OPEN_NATIVE_PROFILES_MODAL}`:
+      return { ...state, nativeProfilesModalOpened: true };
     case `${START_AUTH_LOADING}`:
       return { ...state, loading: true };
     case `${STOP_AUTH_LOADING}`:

@@ -14,6 +14,7 @@ export const START_TOKEN_CHECK_LOADING = 'START_TOKEN_CHECK_LOADING';
 export const STOP_TOKEN_CHECK_LOADING = 'STOP_TOKEN_CHECK_LOADING';
 export const AUTH_SUCCESS = 'AUTH_SUCCESS';
 export const AUTH_FAILED = 'AUTH_FAILED';
+export const OPEN_NATIVE_PROFILES_MODAL = 'OPEN_NATIVE_PROFILES_MODAL';
 
 export function login(username, password, remember) {
   return async (dispatch) => {
@@ -85,6 +86,7 @@ export function checkAccessToken(userData = store.get('user')) {
         type: START_TOKEN_CHECK_LOADING
       });
       try {
+        message.loading('Checking AccessToken Validity...');
         const res = await axios.post(
           ACCESS_TOKEN_VALIDATION_URL,
           { accessToken: userData.accessToken },
@@ -99,6 +101,8 @@ export function checkAccessToken(userData = store.get('user')) {
         }
         return res;
       } catch (error) {
+        // This clears the loader just if the token is not valid.
+        message.destroy();
         if (error.response && error.response.status === 403) {
           message.error('Token Not Valid. You Need To Log-In Again :(');
           store.delete('user');

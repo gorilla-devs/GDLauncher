@@ -3,9 +3,11 @@ import React, { Component } from 'react';
 import { Redirect, Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Form, Input, Icon, Checkbox, Tooltip, Modal } from 'antd';
+import { Button, Form, Input, Icon, Checkbox, Tooltip, Modal, message } from 'antd';
+import { history } from '../../store/configureStore';
 import styles from './Login.css';
 import store from '../../localStore';
+import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
 import * as AuthActions from '../../actions/auth';
 
 type Props = {};
@@ -17,18 +19,15 @@ class Login extends Component<Props> {
 
   constructor(props) {
     super(props);
-    this.openHelpModal = this.openHelpModal.bind(this);
-    this.closeHelpModal = this.closeHelpModal.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = {
+      fastLogin: true
+    }
   }
 
-  openHelpModal = () => {
-    this.setState({ helpModalisOpen: true });
+  componentDidMount = () => {
+    this.props.checkAccessToken();
   }
 
-  closeHelpModal = () => {
-    this.setState({ helpModalisOpen: false });
-  }
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -48,21 +47,45 @@ class Login extends Component<Props> {
   render() {
     const { getFieldDecorator } = this.props.form;
 
-    if (this.props.tokenLoading) {
-      return (
-        <div>
-          <h1 style={{ textAlign: 'center', position: 'relative', top: '20vw' }}>Checking Access Token...</h1>
-        </div>
-      );
-    }
-
     return (
       <div>
-        <div className={styles.background_image} />
-        <div className={styles.background_overlay} />
         <main className={styles.content}>
+          <div
+            className={styles.nativeProfilesContainer}
+            style={{
+              transform: OfficialLancherProfilesExists() && this.state.fastLogin ? 'scale(1)' : 'scale(0)'
+            }}>
+            <h2>Fast Login Available</h2>
+            <p>Do you want us to use the user data you entered in the official Minecraft launcher to log you in?.</p>
+            <Button
+              size="large"
+              style={{ display: 'block', margin: 'auto', marginBottom: '20px', marginTop: '30px' }}
+              onClick={() => this.props.tryNativeLauncherProfiles()}
+              loading={this.props.tokenLoading}
+            >
+              Yes, skip log-in and use that data
+            </Button>
+            <Button
+              size="large"
+              style={{ display: 'block', margin: 'auto' }}
+              onClick={() => this.setState({ fastLogin: false })}
+              disabled={this.props.tokenLoading}
+            >
+              No, take me to manual log-in instead
+            </Button>
+
+          </div>
           <div className={styles.login_form}>
-            <h1 style={{ textAlign: 'center', fontSize: 30 }}>GorillaDevs Login</h1>
+            <h1 style={{ textAlign: 'center', fontSize: 30 }}>
+              GorillaDevs Login
+              {OfficialLancherProfilesExists() &&
+                <div
+                  style={{ margin: '0 0 0 10px', cursor: 'pointer', display: 'inline-block' }}
+                  onClick={() => this.setState({ fastLogin: true })}
+                >
+                  <i className="fas fa-forward" />
+                </div>}
+            </h1>
             <Form onSubmit={this.handleSubmit}>
               <FormItem>
                 {getFieldDecorator('username', {
@@ -102,7 +125,7 @@ class Login extends Component<Props> {
                 })(
                   <Checkbox>Remember me</Checkbox>
                 )}
-                <Button icon="login" loading={this.props.authLoading} size="large" type="primary" htmlType="submit" className={styles.login_form_button}>
+                <Button icon="login" loading={this.props.authLoading} disabled={this.props.tokenLoading} size="large" type="primary" htmlType="submit" className={styles.login_form_button}>
                   Log in
                 </Button>
               </FormItem>
@@ -118,7 +141,8 @@ function mapStateToProps(state) {
   return {
     authLoading: state.auth.loading,
     isAuthValid: state.auth.isAuthValid,
-    tokenLoading: state.auth.tokenLoading
+    tokenLoading: state.auth.tokenLoading,
+    nativeModalOpened: state.auth.nativeProfilesModalOpened
   };
 }
 

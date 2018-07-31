@@ -20,13 +20,7 @@ import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
 
 class RouteDef extends React.Component {
-
   previousLocation = this.props.location;
-
-  componentDidMount = () => {
-    this.props.checkLocalDataValidity(true);
-  }
-
 
   componentWillUpdate(nextProps) {
     const { location } = this.props;
