@@ -15,6 +15,7 @@ export const STOP_TOKEN_CHECK_LOADING = 'STOP_TOKEN_CHECK_LOADING';
 export const AUTH_SUCCESS = 'AUTH_SUCCESS';
 export const AUTH_FAILED = 'AUTH_FAILED';
 export const OPEN_NATIVE_PROFILES_MODAL = 'OPEN_NATIVE_PROFILES_MODAL';
+export const CLOSE_NATIVE_PROFILES_MODAL = 'CLOSE_NATIVE_PROFILES_MODAL';
 
 export function login(username, password, remember) {
   return async (dispatch) => {
@@ -148,4 +149,12 @@ export function tryNativeLauncherProfiles() {
       dispatch(checkAccessToken(userData));
     } catch (err) { console.log(err); }
   };
+}
+
+export function openNativeProfiles() {
+  return dispatch => dispatch({ type: OPEN_NATIVE_PROFILES_MODAL });
+}
+
+export function closeNativeProfiles() {
+  return dispatch => dispatch({ type: CLOSE_NATIVE_PROFILES_MODAL });
 }

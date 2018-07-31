@@ -20,6 +20,14 @@
   left: 78px;
 }
 
+.fastLoginIcon {
+  cursor: pointer;
+}
+
+.fastLoginIcon path {
+  cursor: pointer;
+}
+
 .nativeProfilesContainer {
   background: #34495e;
   position: absolute;

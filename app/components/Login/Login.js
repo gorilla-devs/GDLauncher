@@ -53,7 +53,7 @@ class Login extends Component<Props> {
           <div
             className={styles.nativeProfilesContainer}
             style={{
-              transform: OfficialLancherProfilesExists() && this.state.fastLogin ? 'scale(1)' : 'scale(0)'
+              transform: (OfficialLancherProfilesExists() && this.state.fastLogin && !this.props.nativeModalOpened) ? 'scale(1)' : 'scale(0)'
             }}>
             <h2>Fast Login Available</h2>
             <p>Do you want us to use the user data you entered in the official Minecraft launcher to log you in?.</p>
@@ -68,7 +68,7 @@ class Login extends Component<Props> {
             <Button
               size="large"
               style={{ display: 'block', margin: 'auto' }}
-              onClick={() => this.setState({ fastLogin: false })}
+              onClick={() => { this.setState({ fastLogin: false });; this.props.closeNativeProfiles(); }}
               disabled={this.props.tokenLoading}
             >
               No, take me to manual log-in instead
@@ -81,9 +81,9 @@ class Login extends Component<Props> {
               {OfficialLancherProfilesExists() &&
                 <div
                   style={{ margin: '0 0 0 10px', cursor: 'pointer', display: 'inline-block' }}
-                  onClick={() => this.setState({ fastLogin: true })}
+                  onClick={() => { this.setState({ fastLogin: true }); this.props.openNativeProfiles(); }}
                 >
-                  <i className="fas fa-forward" />
+                  <i className={`${styles.fastLoginIcon} fas fa-forward`} />
                 </div>}
             </h1>
             <Form onSubmit={this.handleSubmit}>
