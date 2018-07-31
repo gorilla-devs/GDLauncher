@@ -70,7 +70,7 @@ app.on('ready', async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 780,
+    width: 850,
     height: 600,
     minHeight: 600,
     minWidth: 780,

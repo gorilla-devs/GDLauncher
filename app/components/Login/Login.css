@@ -22,7 +22,7 @@
 
 .fastLoginIcon {
   cursor: pointer;
-  animation: fastLoginIconScale .4s infinite both;
+  animation: fastLoginIconScale .6s infinite both;
 }
 
 @keyframes fastLoginIconScale {
