@@ -6,16 +6,20 @@
     padding: 0;
     color: white;
     -webkit-app-region: no-drag;
-    height: 30px;
-    width: 50px;
+    height: 20px;
+    width: 35px;
     right: 0;
     top: 0;
     transition: background-color .25s;
 }
 
+.CloseBtn, .CloseBtn path, .CloseBtn svg {
+    cursor: pointer;
+  }
+
 .CloseBtn:hover{
     transition: background-color .25s;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(231, 76, 60, 0.8);
 }
 .CloseBtn:focus, .CloseBtn:active{
     border-style: outset;

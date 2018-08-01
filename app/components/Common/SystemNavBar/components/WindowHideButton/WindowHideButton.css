@@ -6,12 +6,16 @@
     padding: 0;
     color: white;
     -webkit-app-region: no-drag;
-    height: 30px;
-    width: 50px;
-    right: calc(50px * 2);
+    height: 20px;
+    width: 35px;
+    right: calc(35px * 2);
     top: 0;
     transition: background-color .25s;
 }
+
+.CloseBtn, .CloseBtn path, .CloseBtn svg {
+    cursor: pointer;
+  }
 
 .CloseBtn:hover{
     transition: background-color .25s;

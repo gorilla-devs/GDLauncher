@@ -85,11 +85,21 @@ export default class Modal extends Component<Props> {
     return (
       <div className={styles.overlay} onClick={this.back} style={this.state.bgStyle}>
         <div className={styles.modal} style={this.state.style} onClick={(e) => e.stopPropagation()}>
-          <div className={styles.header}>
-            <h3 style={{ display: 'inline-block' }}>Modal</h3>
-            <Button icon="close" size="small" type="ghost" className={styles.closeBtn} onClick={this.back} />
-          </div>
-          <div className={styles.modalContent}>
+          {(this.props.header === undefined || this.props.header === true) &&
+            <div className={styles.header}>
+              <h3 style={{ display: 'inline-block' }}>Modal</h3>
+              <Button icon="close" size="small" type="ghost" className={styles.closeBtn} onClick={this.back} />
+            </div>
+          }
+          <div
+            className={styles.modalContent}
+            style={{
+              height: (this.props.header === undefined || this.props.header === true) ? 'calc(100% - 40px)' : '100%'
+            }}
+          >
+            {(this.props.backBtn !== undefined) &&
+              <span onClick={this.back}>{this.props.backBtn}</span>
+            }
             {this.props.children}
           </div>
         </div>

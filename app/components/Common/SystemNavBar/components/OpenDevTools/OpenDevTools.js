@@ -15,7 +15,7 @@ export default class WindowCloseButton extends Component<Props> {
     return (
       <div>
         <button className={styles.OpenDevTools} onClick={this.OpenDevTools}>
-          <i className="fas fa-terminal" style={{ width: '20px', height: '20px' }} />
+          <i className="fas fa-terminal" style={{ width: '15px', height: '15px' }} />
         </button>
       </div>
     );

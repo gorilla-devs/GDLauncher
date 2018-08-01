@@ -3,7 +3,7 @@
   position: relative;
   left: 0;
   right: 0;
-  height: calc(100vh - (47.6px + 30px));
+  height: calc(100vh - (47.6px + 20px));
   width: calc(100% - 200px);
   overflow: auto;
   .socialsContainer {
@@ -35,7 +35,7 @@
     align-items: center;
     font-family: 'Roboto';
     width: 100%;
-    height: calc(100vh - (47.6px + 30px + 60px));
+    height: calc(100vh - (47.6px + 20px + 60px));
     flex-wrap: wrap;
     a {
       display: inline-block;

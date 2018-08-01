@@ -1,6 +1,6 @@
 .overlay {
   position: absolute;
-  top: 0;
+  top: 20px;
   left: 0;
   bottom: 0;
   display: flex;
@@ -20,8 +20,7 @@
 }
 
 .modalContent {
-  height: calc(100% - 50px);
-  padding: 10px;
+  height: calc(100% - 40px);
 }
 
 .header{

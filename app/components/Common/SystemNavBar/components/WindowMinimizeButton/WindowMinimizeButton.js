@@ -20,7 +20,7 @@ export default class WindowMinimizeButton extends Component<Props> {
     return (
       <div>
         <button className={styles.CloseBtn} onClick={this.MinMaxWindow}>
-          <i className="far fa-window-maximize" style={{ width: '20px', height: '20px' }} />
+          <i className="far fa-window-maximize" style={{ width: '15px', height: '15px' }} />
         </button>
       </div>
     );
