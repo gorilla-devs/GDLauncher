@@ -4,8 +4,10 @@ import styles from './Card.scss';
 
 type Props = {
   children: object,
-  externalLink: boolean
+  externalLink?: boolean,
+  style?: object
 };
+
 export default class Card extends Component<Props> {
   props: Props;
 

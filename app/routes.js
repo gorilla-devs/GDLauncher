@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Switch, Route, withRouter, Redirect } from 'react-router';
-import { Form } from 'antd';
+import { Form, notification, Button } from 'antd';
 import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
 import App from './containers/App';
@@ -13,25 +13,45 @@ import Profile from './containers/ProfilePage';
 import Navigation from './containers/Navigation';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import Login from './components/Login/Login';
+import findJava from './utils/javaLocationFinder';
 import Settings from './components/Settings/Settings';
 import DiscordModal from './components/DiscordModal/DiscordModal';
 import VanillaModal from './components/VanillaModal/containers/VanillaModal';
 import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
+type Props = {
+  location: object,
+  checkAccessToken: () => void,
+  isAuthValid: boolean
+};
 
-class RouteDef extends React.Component {
-  previousLocation = this.props.location;
+class RouteDef extends Component<Props> {
+  componentDidMount = async () => {
+    this.props.checkAccessToken();
+    try {
+      await findJava();
+    } catch (err) {
+      notification.warning({
+        duration: 0,
+        message: 'JAVA NOT FOUND',
+        description: <div>Java has not been found. Click <Button type="primary" size="small">here</Button> to download it</div>
+      });
+    }
+  }
+
 
   componentWillUpdate(nextProps) {
     const { location } = this.props;
     // set previousLocation if props.location is not modal
     if (
-      nextProps.history.action !== "POP" &&
+      nextProps.history.action !== 'POP' &&
       (!location.state || !location.state.modal)
     ) {
       this.previousLocation = this.props.location;
     }
   }
+
+  previousLocation = this.props.location;
 
   render() {
     const { location } = this.props;
