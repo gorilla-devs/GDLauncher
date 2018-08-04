@@ -5,7 +5,7 @@ import * as downloadManagerActions from '../../../actions/downloadManager';
 
 function mapStateToProps(state) {
   return {
-    username: state.auth.username
+    username: state.auth.displayName
   };
 }
 

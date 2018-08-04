@@ -163,7 +163,7 @@ class SideBar extends Component<Props> {
 
 function mapStateToProps(state) {
   return {
-    username: state.auth.username,
+    username: state.auth.displayName,
     profileState: state.profile.profileState,
     stateColor: state.profile.stateColor,
     downloadQueue: state.downloadManager.downloadQueue

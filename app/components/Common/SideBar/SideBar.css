@@ -2,8 +2,9 @@
   width: 200px;
   clear: none; 
   float: right;
-  height: calc(100% - 47.6px - 30px);
-  background-color: #34495e;
+  height: calc(100vh - 47.6px - 20px);
+  background: black;
+  font-family: 'Product Sans';
 }
 
 .accountDiv{
@@ -13,6 +14,6 @@
 }
 
 .accountDiv:hover{
-  background-color: rgba(255, 255, 255, .2);
+  background-color: black;
   transition: all 0.2s;
 }

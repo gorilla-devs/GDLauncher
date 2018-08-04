@@ -15,7 +15,9 @@ import { history } from '../../store/configureStore';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
 import store from '../../localStore';
 
-type Props = {};
+type Props = {
+  selectInstance: () => void
+};
 
 const watchPath = `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
 let watcher;
@@ -105,7 +107,10 @@ export default class DManager extends Component<Props> {
 
   render() {
     return (
-      <main className={styles.main} onClick={(e) => { e.stopPropagation(); this.props.selectInstance(null) }}>
+      <main
+        className={styles.main}
+        onClick={(e) => { e.stopPropagation(); this.props.selectInstance(null) }}
+      >
         <div className={styles.header}>
           <div className={styles.headerButtons}>
             <div>
@@ -132,7 +137,7 @@ export default class DManager extends Component<Props> {
               <h1 style={{
                 textAlign: 'center',
                 marginTop: '25vh',
-                fontFamily: 'Roboto',
+                fontFamily: 'Product Sans',
                 fontSize: '20px',
                 fontWeight: '600',
                 color: '#bdc3c7'

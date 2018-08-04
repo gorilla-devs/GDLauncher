@@ -36,7 +36,7 @@ const getMCArguments = (json, packName, userData) => {
   let Arguments = '';
   if (json.minecraftArguments) {
     Arguments = json.minecraftArguments
-      .replace('${auth_player_name}', userData.username)
+      .replace('${auth_player_name}', userData.displayName)
       .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
       .replace('${game_directory}', `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}`)
       .replace('${game_assets}', `${APPPATH}${LAUNCHER_FOLDER}/assets${json.assets === 'legacy' ? '/virtual/legacy' : ''}`) // Another check for really old versions

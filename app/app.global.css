@@ -6,7 +6,7 @@
 @import "./antd.css";
 @import "./fonts.css";
 html, body {
-  font-family: 'Roboto';
+  font-family: 'Product Sans';
   padding: 0;
   margin: 0;
   overflow: hidden;

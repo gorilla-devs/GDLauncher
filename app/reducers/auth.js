@@ -14,7 +14,8 @@ import {
 const initialState = {
   loading: false,
   tokenLoading: false,
-  username: null,
+  email: null,
+  displayName: null,
   accessToken: null,
   clientToken: null,
   legacy: null,
@@ -40,7 +41,8 @@ export default function auth(state = initialState, action) {
     case `${AUTH_SUCCESS}`:
       return {
         ...state,
-        username: action.payload.username,
+        email: action.payload.email,
+        displayName: action.payload.displayName,
         accessToken: action.payload.accessToken,
         clientToken: action.payload.clientToken,
         legacy: action.payload.legacy,
@@ -55,7 +57,8 @@ export default function auth(state = initialState, action) {
     case LOGOUT:
       return {
         ...state,
-        username: null,
+        email: null,
+        displayName: null,
         accessToken: null,
         clientToken: null,
         legacy: null,

@@ -16,7 +16,8 @@ type Props = {
   tokenLoading: boolean,
   nativeModalOpened: boolean,
   closeNativeProfiles: () => void,
-  authLoading: boolean
+  authLoading: boolean,
+  openNativeProfiles: () => void
 };
 
 const FormItem = Form.Item;
@@ -65,45 +66,9 @@ class Login extends Component<Props> {
     return (
       <div>
         <main className={styles.content}>
-          <div
-            className={styles.nativeProfilesContainer}
-            style={{
-              transform: (this.state.nativeLauncherProfiles && this.state.fastLogin && !this.props.nativeModalOpened) ? 'scale(1)' : 'scale(0)'
-            }}
-          >
-            <h2>Fast Login Available</h2>
-            <p>We detected that you already logged in the official launcher.</p>
-            <p>We can skip the log-in and let you through.</p>
-            <Button
-              size="large"
-              style={{ display: 'block', margin: 'auto', marginBottom: '20px', marginTop: '30px' }}
-              onClick={() => this.props.tryNativeLauncherProfiles()}
-              loading={this.props.tokenLoading}
-            >
-              Yes, skip log-in
-            </Button>
-            <Button
-              size="large"
-              style={{ display: 'block', margin: 'auto' }}
-              onClick={() => { this.setState({ fastLogin: false }); this.props.closeNativeProfiles(); }}
-              disabled={this.props.tokenLoading}
-            >
-              No, let me log-in
-            </Button>
-          </div>
           <div className={styles.login_form}>
             <h1 style={{ textAlign: 'center', fontSize: 30 }}>
               GorillaDevs Login
-              {this.state.nativeLauncherProfiles &&
-                <div
-                  style={{ margin: '0 0 0 10px', cursor: 'pointer', display: 'inline-block' }}
-                  onClick={() => { this.setState({ fastLogin: true }); this.props.openNativeProfiles(); }}
-                  onKeyPress={this.handleKeyPress}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <i className={`${styles.fastLoginIcon} fas fa-forward`} />
-                </div>}
             </h1>
             <Form onSubmit={this.handleSubmit}>
               <FormItem>
@@ -141,6 +106,19 @@ class Login extends Component<Props> {
                 <Button icon="login" loading={this.props.authLoading} disabled={this.props.tokenLoading} size="large" type="primary" htmlType="submit" className={styles.login_form_button}>
                   Log in
                 </Button>
+                {this.state.nativeLauncherProfiles &&
+                  <Button
+                    icon="forward"
+                    loading={this.props.tokenLoading}
+                    size="large"
+                    type="primary"
+                    className={styles.login_form_button}
+                    style={{ marginTop: '30px' }}
+                    onClick={() => this.props.tryNativeLauncherProfiles()}
+                  >
+                    Skip login
+                  </Button>
+                }
               </FormItem>
             </Form>
           </div>

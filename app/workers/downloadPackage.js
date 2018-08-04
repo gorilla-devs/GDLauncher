@@ -34,7 +34,7 @@ async function main() {
     // UPDATES THE TOTAL FILES TO DOWNLOAD
     process.send({ downloaded: 0, total: vnlLibs.length + vnlAssets.length + mainJar.length, action: 'UPDATE__TOTAL' });
     await downloader.downloadArr(vnlLibs, process, `${constants.LAUNCHER_FOLDER}/libraries/`);
-    // For some urls it will say they are not string-buffer chunks. It's kinda ok I guess
+    
     await downloader.downloadArr(vnlAssets, process, `${constants.LAUNCHER_FOLDER}/assets/`, 10);
 
     await downloader.downloadArr(mainJar, process, `${constants.LAUNCHER_FOLDER}/versions/`);
@@ -43,7 +43,7 @@ async function main() {
 
     process.send({ action: 'DOWNLOAD__COMPLETED' });
   } catch (err) {
-    // Handle any error
+    // Handles any error
     process.send({ action: 'CER_PIPE', msg: `FATAL ERROR DOWNLOADING ${process.env.name}: ${err}` });
   }
 }

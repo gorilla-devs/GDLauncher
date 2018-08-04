@@ -5,7 +5,7 @@ import path from 'path';
 import fsa from 'fs-extra';
 import os from 'os';
 import store from '../localStore';
-import { LOGIN_PROXY_API, ACCESS_TOKEN_VALIDATION_URL, WINDOWS, LINUX, DARWIN } from '../constants';
+import { LOGIN_PROXY_API, ACCESS_TOKEN_VALIDATION_URL, ACCESS_TOKEN_REFRESH_URL } from '../constants';
 
 export const LOGOUT = 'LOGOUT';
 export const START_AUTH_LOADING = 'START_AUTH_LOADING';
@@ -34,15 +34,17 @@ export function login(username, password, remember) {
           res.data !== null &&
           Object.prototype.hasOwnProperty.call(res.data, 'authenticated')) {
           if (remember) {
+            const { data } = res;
             store.set({
               user: {
-                username: res.data.username,
-                accessToken: res.data.accessToken,
-                clientToken: res.data.clientToken,
-                legacy: res.data.legacy,
-                uuid: res.data.uuid
+                email: data.userData.email,
+                displayName: data.username,
+                accessToken: data.accessToken,
+                clientToken: data.clientToken,
+                legacy: data.legacy,
+                uuid: data.uuid
               },
-              lastEmail: username
+              lastEmail: data.userData.email
             });
           }
           dispatch({
@@ -80,8 +82,9 @@ export function logout() {
   };
 }
 
-export function checkAccessToken(userData = store.get('user')) {
+export function checkAccessToken() {
   return async (dispatch) => {
+    const userData = store.get('user');
     if (userData) {
       dispatch({
         type: START_TOKEN_CHECK_LOADING
@@ -130,20 +133,34 @@ export function tryNativeLauncherProfiles() {
     const vanillaMCPath = path.join(homedir, '.minecraft');
     try {
       const vnlJson = await fsa.readJson(path.join(vanillaMCPath, 'launcher_profiles.json'));
-      const { clientToken } = vnlJson;
-      const { account, profile } = vnlJson.selectedUser;
-      const { accessToken, username, profiles } = vnlJson.authenticationDatabase[account];
-      const { displayName } = profiles[profile];
-      const uuid = `${profile.slice(0, 8)}-${profile.slice(8, 12)}-${profile.slice(12, 16)}-${profile.slice(16, 20)}-${profile.slice(20)}`;
-      const userData = {
-        uuid,
-        username: displayName,
-        accessToken,
-        clientToken,
-        lastEmail: username,
-        legacy: false
-      };
-      dispatch(checkAccessToken(userData));
+      const { account } = vnlJson.selectedUser;
+      const { accessToken } = vnlJson.authenticationDatabase[account];
+      const res = await axios.post(
+        LOGIN_PROXY_API,
+        { accessToken },
+        { 'Content-Type': 'application/json;charset=UTF-8' }
+      );
+      if (res.status === 200) {
+        // We need to update the accessToken in launcher_profiles.json
+        const userData = {
+          email: res.data.user.email,
+          displayName: res.data.selectedProfile.name,
+          accessToken: res.data.accessToken,
+          clientToken: res.data.clientToken,
+          legacy: res.data.user.legacyUser,
+          uuid: res.data.selectedProfile.id
+        };
+        store.set({
+          user: { ...userData },
+          lastEmail: res.data.user.email
+        });
+        dispatch({
+          type: AUTH_SUCCESS,
+          payload: userData
+        });
+        dispatch(push('/home'));
+      }
+      // dispatch(checkAccessToken(userData));
     } catch (err) { console.log(err); }
   };
 }
