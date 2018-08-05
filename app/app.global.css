@@ -6,10 +6,14 @@
 @import "./antd.css";
 @import "./fonts.css";
 html, body {
-  font-family: 'Product Sans';
+  font-family: 'GlacialIndifferenceRegular';
   padding: 0;
   margin: 0;
   overflow: hidden;
+}
+
+a {
+  -webkit-user-drag: none;
 }
 
 :not(input):not(textarea):not(button):not(a):not(i):not(span), :not(input):not(textarea):not(button):not(a):not(i):not(span)::after, :not(input):not(textarea):not(button):not(a):not(i):not(span)::before {

@@ -3,23 +3,9 @@
   position: relative;
   left: 0;
   right: 0;
-  height: calc(100vh - (47.6px + 20px));
+  height: calc(100vh - (40px + 20px));
   width: calc(100% - 200px);
   overflow: auto;
-  .socialsContainer {
-    position: relative;
-    float: right;
-    right: 6px;
-    top: 6px;
-    .socialBtn {
-      cursor: pointer;
-      &:hover {
-        transition: background-color .25s;
-        background-color: rgba(0, 0, 0, 0.3);
-        border-radius: 5px;
-      }
-    }
-  }
   .title {
     color: #fff;
     text-align: center;
@@ -33,9 +19,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Product Sans';
+    font-family: 'GlacialIndifferenceRegular';
     width: 100%;
-    height: calc(100vh - (47.6px + 20px + 60px));
+    height: calc(100vh - (47.6px + 20px + 40px));
     flex-wrap: wrap;
     a {
       display: inline-block;

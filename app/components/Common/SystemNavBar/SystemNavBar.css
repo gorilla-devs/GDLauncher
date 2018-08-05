@@ -3,7 +3,7 @@
   width: 100%;
   height: 20px;
   padding-left: 10px;
-  background: rgb(35, 48, 61);
+  background: #23303d;
   -webkit-app-region: drag;
   -webkit-user-select: none;
   z-index: 100000;

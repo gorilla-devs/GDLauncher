@@ -6,6 +6,7 @@
   flex-wrap: wrap;
   align-content: flex-start;
   align-items: flex-start;
+  font-family: 'GlacialIndifferenceRegular';
 }
 
 .createInstance {

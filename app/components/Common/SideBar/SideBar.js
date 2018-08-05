@@ -5,57 +5,17 @@ import { Redirect, Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import styles from './SideBar.css';
+import styles from './SideBar.scss';
 
 import * as AuthActions from '../../../actions/auth';
 import * as ProfileActions from '../../../actions/profile';
-import * as downloadManagerActions from '../../../actions/downloadManager';
-
-import DownloadManager from '../../DownloadManager/DownloadManager';
-import Settings from '../../Settings/Settings';
 
 
 type Props = {
 };
 
-const { Meta } = Card;
-
 class SideBar extends Component<Props> {
   props: Props;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      AccountIconsModalisOpen: false,
-      downloadPopoverOpen: false,
-    };
-
-    this.logout = this.logout.bind(this);
-    this.openAccountIconsModal = this.openAccountIconsModal.bind(this);
-    this.closeAccountIconsModal = this.closeAccountIconsModal.bind(this);
-
-  }
-
-  hide = () => {
-    this.setState({
-      downloadPopoverOpen: false,
-    });
-  }
-  handleVisibleChange = (downloadPopoverOpen) => {
-    this.setState({ downloadPopoverOpen });
-  }
-
-  logout() {
-    this.props.logout();
-  }
-
-  openAccountIconsModal() {
-    this.setState({ AccountIconsModalisOpen: true });
-  }
-
-  closeAccountIconsModal() {
-    this.setState({ AccountIconsModalisOpen: false });
-  }
 
   handleClick = (e) => {
     console.log(e);
@@ -78,84 +38,73 @@ class SideBar extends Component<Props> {
   render() {
     return (
       <aside className={styles.sidenav}>
-        <Card
-          style={{ color: '#34495e', border: 0, width: 200 }}
-          actions={[
+        <div className={styles.header}>
+          <Tooltip placement="topLeft" title="Change Account Icon">
+            <Avatar size="normal" onClick={this.openAccountIconsModal}>P</Avatar>
+          </Tooltip>
+          <span>{this.props.username}</span>
+          <div className={styles.headerButtons}>
             <Link to={{
               pathname: '/settings',
               state: { modal: true }
             }}
             >
-              <Icon
-                type="setting"
-                style={{ fontSize: 22, color: 'rgba(255, 255, 255, 0.65)' }}
+              <i
+                className={`fas fa-cog ${styles.settings}`}
+                draggable="false"
               />
-            </Link>,
-            <DownloadManager
-              downloadQueue={this.props.downloadQueue}
-              open={this.state.downloadPopoverOpen}
-              handleOpen={this.handleVisibleChange}
-            />
-          ]}
-        >
-          <Meta
-            avatar={
-              <Tooltip placement="topLeft" title="Change Account Icon">
-                <Avatar style={{ cursor: 'pointer' }} size="large" onClick={this.openAccountIconsModal}>P</Avatar>
-              </Tooltip>
-            }
-            title={
-              <span>
-                {this.props.username}
-              </span>
-            }
-            description={
-              <div>
-                <Dropdown overlay={
-                  <Menu selectedKeys={[this.props.profileState]} onClick={this.handleClick}>
-                    <Menu.Item key="Online" style={{ color: '#2ecc71' }}>
-                      Online
+            </Link>
+            <Tooltip placement="topLeft" title="Logout">
+              <i className={`fas fa-sign-out-alt ${styles.logout}`} onClick={this.props.logout} />
+            </Tooltip>
+          </div>
+        </div>
+        <div>
+          <Dropdown overlay={
+            <Menu selectedKeys={[this.props.profileState]} onClick={this.handleClick}>
+              <Menu.Item key="Online" style={{ color: '#2ecc71' }}>
+                Online
                     </Menu.Item>
-                    <Menu.Item key="Away" style={{ color: '#faad14' }}>
-                      Away
+              <Menu.Item key="Away" style={{ color: '#faad14' }}>
+                Away
                     </Menu.Item>
-                    <Menu.Item key="Busy" style={{ color: '#f5222d' }}>
-                      Busy
+              <Menu.Item key="Busy" style={{ color: '#f5222d' }}>
+                Busy
                     </Menu.Item>
-                  </Menu>
-                }>
-                  <span style={{ color: this.props.stateColor, cursor: 'pointer' }}>{this.props.profileState} <Icon type="down" /></span>
-                </Dropdown>
-                <Tooltip placement="topLeft" title="Logout">
-                  <Icon type="logout" style={{ cursor: 'pointer', float: 'right', marginTop: '4px', color: 'white' }} onClick={this.logout} />
-                </Tooltip>
-              </div>
-            }
+            </Menu>
+          }>
+            <span style={{ color: this.props.stateColor, cursor: 'pointer' }}>{this.props.profileState} <Icon type="down" /></span>
+          </Dropdown>
+        </div>
+        <div className={styles.socialsContainer}>
+          { /* eslint-disable */}
+          <img
+            alt="socials"
+            draggable="false"
+            style={{ padding: 10 }}
+            className={styles.socialBtn}
+            src="https://discordapp.com/assets/a39ef972d8ec7966a6a25b1853b14f38.svg"
+            onClick={() => this.openLink("https://twitter.com/gorilladevs")}
           />
-        </Card>
-        <Modal
-          visible={this.state.AccountIconsModalisOpen}
-          footer={null}
-          title="Account Icon"
-          onCancel={this.closeAccountIconsModal}
-          destroyOnClose="true"
-        >
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-          <Avatar size="large" style={{ cursor: 'pointer', margin: 15 }}>P</Avatar>
-        </Modal>
+          <img
+            alt="socials"
+            draggable="false"
+            style={{ padding: 10 }}
+            className={styles.socialBtn}
+            src="https://discordapp.com/assets/47ee7342b7e2986c314fd77f4331df63.svg"
+            onClick={() => this.openLink("https://facebook.com/gorilladevs")}
+          />
+          <img
+            alt="socials"
+            draggable="false"
+            style={{ padding: 10 }}
+            className={styles.socialBtn}
+            src="https://discordapp.com/assets/97e19ce71e9c9273e01d64da1948912b.svg"
+            onClick={() => this.openLink("https://instagram.com/gorilladevs")}
+          />
+          <span className={styles.version}>v{require('../../../package.json').version}</span>
+          { /* eslint-enable */}
+        </div>
       </aside>
     );
   }

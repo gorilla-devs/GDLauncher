@@ -33,23 +33,26 @@ export function login(username, password, remember) {
         if (res.data !== undefined &&
           res.data !== null &&
           Object.prototype.hasOwnProperty.call(res.data, 'authenticated')) {
+          const { data } = res;
+          const payload = {
+            email: data.userData.email,
+            displayName: data.username,
+            accessToken: data.accessToken,
+            clientToken: data.clientToken,
+            legacy: data.legacy,
+            uuid: data.uuid
+          };
           if (remember) {
-            const { data } = res;
             store.set({
               user: {
-                email: data.userData.email,
-                displayName: data.username,
-                accessToken: data.accessToken,
-                clientToken: data.clientToken,
-                legacy: data.legacy,
-                uuid: data.uuid
+                ...payload
               },
               lastEmail: data.userData.email
             });
           }
           dispatch({
             type: AUTH_SUCCESS,
-            payload: res.data
+            payload
           });
 
           dispatch(push('/home'));

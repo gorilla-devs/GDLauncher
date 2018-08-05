@@ -122,6 +122,9 @@ class Login extends Component<Props> {
               </FormItem>
             </Form>
           </div>
+          <div style={{ position: 'absolute', bottom: 30, right: 30, color: '#bdc3c7' }}>
+            v{require('../../package.json').version}
+          </div>
         </main>
       </div>
     );

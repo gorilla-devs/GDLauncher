@@ -3,8 +3,9 @@
   -webkit-app-region: no-drag;
   display: inline-block;
   margin-left: 20px;
-  font-family: 'Product Sans';
+  font-family: 'GlacialIndifferenceRegular';
   font-weight: 700;
+  height: 40px;
 }
 
 .ul {
@@ -23,7 +24,8 @@
   display: inline-block;
   color: #bdc3c7;
   text-align: center;
-  padding: 14px 16px;
+  /* padding: 9px 16px 10px 16px; */
+  padding: 9px 20px 10px 20px;
   text-decoration: none;
 }
 
@@ -36,6 +38,7 @@
 .a:hover {
   transition: background-color .25s;
   background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }
 
 .a:hover, .a:active, .a:focus {

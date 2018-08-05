@@ -15,7 +15,7 @@ export default class DownloadManager extends Component<Props> {
 
   render() {
     return (
-      <div>
+      <div className={styles.container}>
         <Popover
           title={<span style={{ color: 'black' }}>Download Manager</span>}
           content={

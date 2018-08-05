@@ -137,7 +137,7 @@ export default class DManager extends Component<Props> {
               <h1 style={{
                 textAlign: 'center',
                 marginTop: '25vh',
-                fontFamily: 'Product Sans',
+                fontFamily: 'GlacialIndifferenceRegular',
                 fontSize: '20px',
                 fontWeight: '600',
                 color: '#bdc3c7'

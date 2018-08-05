@@ -9,7 +9,8 @@ export default class NavigationBar extends Component<Props> {
   props: Props;
 
   activeItem = {
-    background: '#2980b9'
+    background: '#2980b9',
+    borderRadius: '4px'
   }
 
   isLocation = (loc) => {
