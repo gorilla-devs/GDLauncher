@@ -3,9 +3,7 @@ import React, { Component } from 'react';
 import styles from './Home.scss';
 import News from './components/News/News';
 
-type Props = {
-  +username: string
-};
+type Props = {};
 
 export default class Home extends Component<Props> {
   props: Props;
@@ -14,6 +12,10 @@ export default class Home extends Component<Props> {
     require('electron').shell.openExternal(url)
   }
 
+  componentDidMount = () => {
+    this.props.getNews();
+  }
+  
 
   /* eslint-enable */
 
@@ -21,7 +23,7 @@ export default class Home extends Component<Props> {
     return (
       <div>
         <main className={styles.content}>
-          <News />
+          <News news={this.props.news} />
         </main>
       </div>
     );

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import styles from './NavigationBar.css';
+import styles from './NavigationBar.scss';
 import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
 import DownloadManager from '../../DownloadManager/DownloadManager';
 import logo from '../../../assets/images/logo.png';
@@ -38,6 +38,16 @@ class NavigationBar extends Component<Props> {
           <img src={logo} height="40px" alt="logo" />
         </div>
         <HorizontalMenu location={this.props.location} />
+        <Link to={{
+          pathname: '/settings',
+          state: { modal: true }
+        }}
+        >
+          <i
+            className={`fas fa-cog ${styles.settings}`}
+            draggable="false"
+          />
+        </Link>
         <DownloadManager
           downloadQueue={this.props.downloadQueue}
           open={this.state.downloadPopoverOpen}

@@ -3,7 +3,16 @@
   max-width: 1050px;
   display: block;
   position: relative;
-  margin: 0 auto;
-  background: #27ae60;
+  margin: 30px auto;
   border-radius: 4px;
+  div:first-child {
+    div:first-child {
+      div:first-child {
+        height: 178px !important;
+        div:first-child {
+          height: 178px;
+        }
+      }
+    }
+  }
 }

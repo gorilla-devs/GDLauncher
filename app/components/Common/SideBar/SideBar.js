@@ -39,43 +39,16 @@ class SideBar extends Component<Props> {
     return (
       <aside className={styles.sidenav}>
         <div className={styles.header}>
-          <Tooltip placement="topLeft" title="Change Account Icon">
-            <Avatar size="normal" onClick={this.openAccountIconsModal}>P</Avatar>
-          </Tooltip>
+          <Avatar size="normal">P</Avatar>
           <span>{this.props.username}</span>
-          <div className={styles.headerButtons}>
-            <Link to={{
-              pathname: '/settings',
-              state: { modal: true }
-            }}
-            >
-              <i
-                className={`fas fa-cog ${styles.settings}`}
-                draggable="false"
-              />
-            </Link>
-            <Tooltip placement="topLeft" title="Logout">
-              <i className={`fas fa-sign-out-alt ${styles.logout}`} onClick={this.props.logout} />
-            </Tooltip>
-          </div>
+          <Tooltip placement="topLeft" title="Logout">
+            <i className={`fas fa-sign-out-alt ${styles.logout}`} onClick={this.props.logout} />
+          </Tooltip>
         </div>
-        <div>
-          <Dropdown overlay={
-            <Menu selectedKeys={[this.props.profileState]} onClick={this.handleClick}>
-              <Menu.Item key="Online" style={{ color: '#2ecc71' }}>
-                Online
-                    </Menu.Item>
-              <Menu.Item key="Away" style={{ color: '#faad14' }}>
-                Away
-                    </Menu.Item>
-              <Menu.Item key="Busy" style={{ color: '#f5222d' }}>
-                Busy
-                    </Menu.Item>
-            </Menu>
-          }>
-            <span style={{ color: this.props.stateColor, cursor: 'pointer' }}>{this.props.profileState} <Icon type="down" /></span>
-          </Dropdown>
+        <div style={{ textAlign: 'center', fontWeight: 'italic', fontSize: 12 }}>
+          <span>Playing on</span> <b style={{ fontStyle: 'italic', fontWeight: '900', fontSize: 13, color: '#2ecc71', cursor: 'pointer' }}>AnonymousCraft</b>
         </div>
+        <hr />
         <div className={styles.socialsContainer}>
           { /* eslint-disable */}
           <img
@@ -104,6 +77,11 @@ class SideBar extends Component<Props> {
           />
           <span className={styles.version}>v{require('../../../package.json').version}</span>
           { /* eslint-enable */}
+        </div>
+        <div className={styles.scroller}>
+          <div style={{ height: 1000 }}>
+            Socials
+          </div>
         </div>
       </aside>
     );

@@ -33,15 +33,22 @@ a:hover {
 ::-webkit-scrollbar {
   background-color: rgb(35, 48, 61);
   width: 8px;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #ecf0f1;
+  background-color: #bdc3c7;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgb(35, 48, 61);
   background-color: rgb(35, 48, 61);
+  border-radius: 8px;
+}
+
+.slick-dots{
+  margin-top: -150px;
 }
 
 /* 

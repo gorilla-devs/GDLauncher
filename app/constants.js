@@ -1,3 +1,4 @@
+// This needs vanilla JS since it's used in the workers (not transpiled by babel)
 const getAppPath = require('./utils/getAppPath');
 
 module.exports = {
@@ -10,5 +11,6 @@ module.exports = {
   WINDOWS: 'win32',
   LINUX: 'linux',
   DARWIN: 'darwin',
-  APPPATH: getAppPath.getAppPath()
+  APPPATH: getAppPath.getAppPath(),
+  NEWS_URL: 'http://launchermeta.mojang.com/mc/news.json'
 };
