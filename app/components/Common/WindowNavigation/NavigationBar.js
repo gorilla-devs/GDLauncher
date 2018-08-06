@@ -3,9 +3,11 @@ import React, { Component } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import styles from './NavigationBar.scss';
 import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
 import DownloadManager from '../../DownloadManager/DownloadManager';
+import * as downloadManagerActions from '../../../actions/downloadManager';
 import logo from '../../../assets/images/logo.png';
 
 
@@ -37,7 +39,11 @@ class NavigationBar extends Component<Props> {
         <div className={styles.logoText}>
           <img src={logo} height="40px" alt="logo" />
         </div>
-        <HorizontalMenu location={this.props.location} />
+        <HorizontalMenu
+          location={this.props.location}
+          downloadedCount={Object.keys(this.props.downloadQueue).filter(inst => this.props.downloadQueue[inst].downloadCompleted).length}
+          clearQueue={() => this.props.clearQueue()}
+        />
         <Link to={{
           pathname: '/settings',
           state: { modal: true }
@@ -48,11 +54,6 @@ class NavigationBar extends Component<Props> {
             draggable="false"
           />
         </Link>
-        <DownloadManager
-          downloadQueue={this.props.downloadQueue}
-          open={this.state.downloadPopoverOpen}
-          handleOpen={this.handleVisibleChange}
-        />
       </div>
     );
   }
@@ -64,4 +65,8 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(NavigationBar);
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(downloadManagerActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar);

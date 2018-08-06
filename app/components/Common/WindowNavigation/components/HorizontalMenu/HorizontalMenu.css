@@ -18,6 +18,7 @@
 
 .li {
   display: inline;
+  cursor: pointer;
 }
 
 .a {
@@ -27,6 +28,7 @@
   /* padding: 9px 16px 10px 16px; */
   padding: 9px 20px 10px 20px;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .i {
@@ -36,12 +38,11 @@
 /* Change the link color to #111 (black) on hover */
 
 .a:hover {
-  transition: background-color .25s;
+  transition: all .25s;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 4px;
 }
 
 .a:hover, .a:active, .a:focus {
   text-decoration: none !important;
-  color: #bdc3c7 !important;
 }

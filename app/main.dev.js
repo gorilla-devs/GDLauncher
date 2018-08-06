@@ -110,6 +110,10 @@ app.on('ready', async () => {
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
   });
 
+  ipcMain.on('setProgressTaskBar', (p) => {
+    mainWindow.setProgressBar(p);
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });

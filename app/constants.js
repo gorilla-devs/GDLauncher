@@ -12,5 +12,6 @@ module.exports = {
   LINUX: 'linux',
   DARWIN: 'darwin',
   APPPATH: getAppPath.getAppPath(),
-  NEWS_URL: 'http://launchermeta.mojang.com/mc/news.json'
+  NEWS_URL: 'http://launchermeta.mojang.com/mc/news.json',
+  JAVA_URL: 'https://java.com/download'
 };

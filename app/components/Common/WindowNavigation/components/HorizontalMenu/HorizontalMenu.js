@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
+import Badge from '../../../Badge/Badge';
 import styles from './HorizontalMenu.css';
 
 type Props = {};
@@ -9,8 +10,9 @@ export default class NavigationBar extends Component<Props> {
   props: Props;
 
   activeItem = {
-    background: '#2980b9',
-    borderRadius: '4px'
+    background: '#3498db',
+    borderRadius: '4px',
+    color: 'white'
   }
 
   isLocation = (loc) => {
@@ -37,9 +39,11 @@ export default class NavigationBar extends Component<Props> {
             </Link>
           </li>
           <li className={styles.li}>
-            <Link to="/dmanager" draggable="false" className={styles.a} style={this.isLocation('/dmanager') ? this.activeItem : null}>
-              <Icon type="play-circle" className={styles.i} />
-              INSTANCES
+            <Link to="/dmanager" draggable="false" className={styles.a} onClick={() => this.props.clearQueue()} style={this.isLocation('/dmanager') ? this.activeItem : null}>
+              <Badge count={this.props.downloadedCount} invisible={this.props.downloadedCount === 0}>
+                <Icon type="play-circle" className={styles.i} />
+                INSTANCES
+              </Badge>
             </Link>
           </li>
         </ul>

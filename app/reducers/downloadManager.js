@@ -1,10 +1,12 @@
 import update from 'immutability-helper';
+import _ from 'lodash';
 import {
   START_DOWNLOAD,
   ADD_TO_QUEUE,
   DOWNLOAD_COMPLETED,
   DOWNLOAD_FILE_COMPLETED,
-  UPDATE_TOTAL_FILES_TO_DOWNLOAD
+  UPDATE_TOTAL_FILES_TO_DOWNLOAD,
+  CLEAR_QUEUE
 } from '../actions/downloadManager';
 
 const initialState = {
@@ -27,6 +29,13 @@ export default function downloadManager(state = initialState, action) {
             downloadCompleted: false,
             status: 'Queued'
           }
+        }
+      };
+    case CLEAR_QUEUE:
+      return {
+        ...state,
+        downloadQueue: {
+          ..._.omit(state.downloadQueue, action.payload)
         }
       };
     case START_DOWNLOAD:

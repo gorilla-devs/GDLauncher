@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Menu, Card, Dropdown, Avatar, Icon, Tooltip, Modal, Button, Badge, Popover, List, Progress } from 'antd';
-import { Redirect, Link } from 'react-router-dom';
+import { Avatar } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -41,9 +40,9 @@ class SideBar extends Component<Props> {
         <div className={styles.header}>
           <Avatar size="normal">P</Avatar>
           <span>{this.props.username}</span>
-          <Tooltip placement="topLeft" title="Logout">
-            <i className={`fas fa-sign-out-alt ${styles.logout}`} onClick={this.props.logout} />
-          </Tooltip>
+          <div onClick={() => this.props.logout()}>
+            <i className={`fas fa-sign-out-alt ${styles.logout}`} />
+          </div>
         </div>
         <div style={{ textAlign: 'center', fontWeight: 'italic', fontSize: 12 }}>
           <span>Playing on</span> <b style={{ fontStyle: 'italic', fontWeight: '900', fontSize: 13, color: '#2ecc71', cursor: 'pointer' }}>AnonymousCraft</b>

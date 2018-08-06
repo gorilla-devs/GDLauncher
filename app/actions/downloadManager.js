@@ -1,15 +1,10 @@
-import axios from 'axios';
-import * as https from 'https';
-import * as fs from 'fs';
-import async from 'async-es';
-import chalk from 'chalk';
 import * as path from 'path';
-import { remote } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 import { message } from 'antd';
-import store from '../localStore';
 
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
+export const CLEAR_QUEUE = 'CLEAR_QUEUE';
 export const ADD_TO_QUEUE = 'ADD_TO_QUEUE';
 export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
 export const DOWNLOAD_FILE_COMPLETED = 'DOWNLOAD_FILE_COMPLETED';
@@ -33,11 +28,34 @@ export function addToQueue(pack, packType) {
   };
 }
 
+export function clearQueue() {
+  // This needs to clear any instance that is already installed
+  return (dispatch, getState) => {
+    const { downloadManager } = getState();
+    const completed = Object.keys(downloadManager.downloadQueue).filter(act => downloadManager.downloadQueue[act].downloadCompleted);
+    // It makes no sense to dispatch if no instance is to remove
+    if (completed.length !== 0) {
+      dispatch({
+        type: CLEAR_QUEUE,
+        payload: completed
+      });
+    }
+  };
+}
+
 export function downloadPack(pack) {
   return (dispatch, getState) => {
     const { downloadManager } = getState();
-    // The idea is saving a config file on disk and then letting the fork do all the work
+    /*
+    // We pass the name of the instance to the worker and then let the fork do all the work
     // The fork will keep the ui updated through forked.on.
+    // UPDATE__FILES -> Adds 1 to the actual downloaded files
+    // UPDATE__TOTAL -> Updates the total files to download
+    // DOWNLOAD__COMPLETED -> Updates the actual state and sets it to downloaded
+    // CLG_PIPE -> Sends a console.log command
+    // CER_PIPE -> Sends a console.err command
+    */
+
     const { fork } = require('child_process');
     console.log(`%cDownloading ${pack}`, 'color: #3498db');
     const forked = fork(
@@ -57,6 +75,7 @@ export function downloadPack(pack) {
       const { total, action } = data;
       switch (action) {
         case 'UPDATE__FILES':
+
           dispatch({
             type: DOWNLOAD_FILE_COMPLETED,
             payload: {

@@ -5,6 +5,7 @@ import { Switch, Route, withRouter, Redirect } from 'react-router';
 import { Form, notification, Button } from 'antd';
 import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
+import { JAVA_URL } from './constants';
 import App from './containers/App';
 import HomePage from './components/Home/containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
@@ -34,7 +35,7 @@ class RouteDef extends Component<Props> {
       notification.warning({
         duration: 0,
         message: 'JAVA NOT FOUND',
-        description: <div>Java has not been found. Click <Button type="primary" size="small">here</Button> to download it</div>
+        description: <div>Java has not been found. Click <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">here</a> to download it</div>
       });
     }
   }

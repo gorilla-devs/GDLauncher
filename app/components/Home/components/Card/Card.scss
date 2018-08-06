@@ -5,7 +5,7 @@
   cursor: pointer;
   background: #000;
   opacity: 0;
-  transition: all .3s;
+  transition: all 0.3s;
   z-index: 100;
 }
 
@@ -16,21 +16,25 @@
   height: 26vh;
   width: 100%;
   transition: width 2s;
-  &:hover>.overlay {
-    opacity: .1;
-    transition: all .3s;
+
+  &:hover > .overlay {
+    opacity: 0.1;
+    transition: all 0.3s;
   }
-  &:hover .externalLink {
-    opacity: 1;
-    transition: all .3s;
-  }
+
   .externalLink {
     position: absolute;
     top: 0;
     right: 0;
     opacity: 0;
-    transition: all .3s;
+    transition: all 0.3s;
   }
+
+  &:hover .externalLink {
+    opacity: 1;
+    transition: all 0.3s;
+  }
+
   .container__content {
     padding-top: 6vh;
   }

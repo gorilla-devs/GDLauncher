@@ -40,7 +40,7 @@
     }
   }
   .scroller {
-    height: calc(100% - 60px - 75px);
+    height: calc(100% - 60px - 120px);
     width: 200px;
     overflow: auto;
   }
@@ -51,7 +51,7 @@
   position: absolute;
   display: flex;
   width: 200px;
-  bottom: 20px;
+  bottom: 60px;
   padding-right: 10px;
   align-items: center;
   align-content: center;

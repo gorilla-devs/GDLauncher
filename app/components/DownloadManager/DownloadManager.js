@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import { Badge, Progress, Icon, List, Popover } from 'antd';
-import styles from './DownloadManager.css';
+import styles from './DownloadManager.scss';
 
 type Props = {
   downloadQueue: Object,
@@ -31,10 +31,6 @@ export default class DownloadManager extends Component<Props> {
                       title={
                         <span style={{ color: 'black' }}>
                           {item.name} {item.status}
-
-                          <span style={{ float: 'right' }}>
-                            {item.downloaded} / {item.totalToDownload}
-                          </span>
                         </span>
                       }
                       description={
@@ -69,7 +65,7 @@ export default class DownloadManager extends Component<Props> {
           onVisibleChange={this.props.handleOpen}
         >
           <Badge count={Object.values(this.props.downloadQueue).length} style={{ backgroundColor: '#fff', color: '#999', boxShadow: '0 0 0 1px #d9d9d9 inset', cursor: 'pointer' }}>
-            <Icon type="download" style={{ fontSize: 22, cursor: 'pointer' }} />
+            <i className={`fas fa-download ${styles.downloadIcon}`}/>
           </Badge>
         </Popover>
       </div>

@@ -5,8 +5,10 @@
 
 @import "./antd.css";
 @import "./fonts.css";
-html, body {
-  font-family: 'GlacialIndifferenceRegular';
+
+html,
+body {
+  font-family: 'GlacialIndifferenceRegular', sans-serif;
   padding: 0;
   margin: 0;
   overflow: hidden;
@@ -14,20 +16,6 @@ html, body {
 
 a {
   -webkit-user-drag: none;
-}
-
-:not(input):not(textarea):not(button):not(a):not(i):not(span), :not(input):not(textarea):not(button):not(a):not(i):not(span)::after, :not(input):not(textarea):not(button):not(a):not(i):not(span)::before {
-  -webkit-user-select: none;
-  user-select: none;
-  cursor: default;
-}
-
-input, button, textarea, :focus {
-  outline: none;
-}
-
-a:hover {
-  text-decoration: underline;
 }
 
 ::-webkit-scrollbar {
@@ -47,11 +35,30 @@ a:hover {
   border-radius: 8px;
 }
 
-.slick-dots{
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span),
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span)::after,
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span)::before {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+input,
+button,
+textarea,
+:focus {
+  outline: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.slick-dots {
   margin-top: -150px;
 }
 
-/* 
+/*
  * Had to remove scale animation because of how the menu position is calculated. 
  * If it starts with a scale of 0, it's initial position is always from the pointer, direction bottom.
  * If the menu is opened at the end of the page it will overflow because it cannot calculate the overflowY.
@@ -60,8 +67,8 @@ a:hover {
 .react-contextmenu {
   background: rgb(35, 48, 61);
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, .15);
-  border-radius: .25rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
   color: #fff;
   font-size: 16px;
   margin: 2px 0 0;
@@ -72,7 +79,7 @@ a:hover {
   text-align: center;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   transition: transform 200ms !important;
-  transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .react-contextmenu span {
@@ -94,24 +101,26 @@ a:hover {
   padding: 8px 10px;
   text-align: inherit;
   white-space: nowrap;
-  text-align: left;
 }
 
-.react-contextmenu-item.react-contextmenu-item--active, .react-contextmenu-item.react-contextmenu-item--selected, .react-contextmenu-item:hover {
+.react-contextmenu-item.react-contextmenu-item--active,
+.react-contextmenu-item.react-contextmenu-item--selected,
+.react-contextmenu-item:hover {
   color: #fff;
   background-color: #20a0ff;
   border-color: #20a0ff;
   text-decoration: none;
 }
 
-.react-contextmenu-item.react-contextmenu-item--disabled, .react-contextmenu-item.react-contextmenu-item--disabled:hover {
+.react-contextmenu-item.react-contextmenu-item--disabled,
+.react-contextmenu-item.react-contextmenu-item--disabled:hover {
   background-color: transparent;
-  border-color: rgba(0, 0, 0, .15);
+  border-color: rgba(0, 0, 0, 0.15);
   color: #878a8c;
 }
 
 .react-contextmenu-item--divider {
-  border-bottom: 1px solid rgba(0, 0, 0, .15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   cursor: inherit;
   margin-bottom: 3px;
   padding: 2px 0;
@@ -119,16 +128,14 @@ a:hover {
 
 .react-contextmenu-item--divider:hover {
   background-color: transparent;
-  border-color: rgba(0, 0, 0, .15);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 .react-contextmenu-item.react-contextmenu-submenu {
   padding: 0;
 }
 
-.react-contextmenu-item.react-contextmenu-submenu>.react-contextmenu-item {}
-
-.react-contextmenu-item.react-contextmenu-submenu>.react-contextmenu-item:after {
+.react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item::after {
   content: "▶";
   display: inline-block;
   position: absolute;
