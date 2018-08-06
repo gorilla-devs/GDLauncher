@@ -5,7 +5,7 @@ import styles from './News.scss';
 const News = props =>
   (
     <div className={styles.container}> {console.log(props)}
-      <Carousel vertical effect="fade" style={{ height: '180px' }}>
+      <Carousel autoplay vertical effect="fade" style={{ height: '180px' }}>
         {props.news.news.filter(inf => !inf.tags.includes('demo')).map(inf => {
           return (
             <div
