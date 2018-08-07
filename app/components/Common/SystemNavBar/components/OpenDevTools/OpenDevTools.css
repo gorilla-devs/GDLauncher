@@ -1,7 +1,7 @@
-.OpenDevTools{
+.OpenDevTools {
   display: inline-block;
   position: absolute;
-  background: rgb(35, 48, 61);
+  background: #212b36;
   border: 0;
   padding: 0;
   color: white;
@@ -10,21 +10,25 @@
   width: 35px;
   left: 0;
   top: 0;
-  transition: background-color .25s;
+  transition: background-color 0.25s;
 }
 
-.OpenDevTools, .OpenDevTools path, .OpenDevTools svg {
+.OpenDevTools,
+.OpenDevTools path,
+.OpenDevTools svg {
   cursor: pointer;
 }
 
-.OpenDevTools:hover{
-  transition: background-color .25s;
+.OpenDevTools:hover {
+  transition: background-color 0.25s;
   background-color: rgba(0, 0, 0, 0.3);
 }
-.OpenDevTools:focus, .OpenDevTools:active{
+
+.OpenDevTools:focus,
+.OpenDevTools:active {
   border-style: outset;
-  -webkit-border-radius: 0px;
-  border-radius: 0px;
+  -webkit-border-radius: 0;
+  border-radius: 0;
   outline: none;
   border: none;
 }

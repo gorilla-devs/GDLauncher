@@ -23,9 +23,9 @@ ${os.platform() === WINDOWS ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerfo
 -Djava.library.path="${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}/natives" 
 -Dminecraft.client.jar="${APPPATH}${LAUNCHER_FOLDER}/versions/${version}/${version}.jar" 
 -cp ${libs
-      .filter(lib => !lib.natives)
-      .map(lib => `"${APPPATH}${LAUNCHER_FOLDER}/libraries/${lib.path}"`)
-      .join(dividerChar)}${dividerChar}${`"${APPPATH}${LAUNCHER_FOLDER}/versions/${mainJar[0].path}"`} 
+    .filter(lib => !lib.natives)
+    .map(lib => `"${APPPATH}${LAUNCHER_FOLDER}/libraries/${lib.path}"`)
+    .join(dividerChar)}${dividerChar}${`"${APPPATH}${LAUNCHER_FOLDER}/versions/${mainJar[0].path}"`} 
 ${packJson.mainClass} ${Arguments}
   `;
 
@@ -35,21 +35,26 @@ ${packJson.mainClass} ${Arguments}
 const getMCArguments = (json, packName, userData) => {
   let Arguments = '';
   if (json.minecraftArguments) {
-    Arguments = json.minecraftArguments
-      .replace('${auth_player_name}', userData.displayName)
-      .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
-      .replace('${game_directory}', `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}`)
-      .replace('${game_assets}', `${APPPATH}${LAUNCHER_FOLDER}/assets${json.assets === 'legacy' ? '/virtual/legacy' : ''}`) // Another check for really old versions
-      .replace('${version_name}', json.id)
-      .replace('${assets_root}', `${APPPATH}${LAUNCHER_FOLDER}/assets${json.assets === 'legacy' ? '/virtual/legacy' : ''}`)
-      .replace('${assets_index_name}', json.assets)
-      .replace('${auth_uuid}', userData.uuid)
-      .replace('${auth_access_token}', userData.accessToken)
-      .replace('${user_properties}', "{}")
-      .replace('${user_type}', userData.legacy ? 'legacy' : 'mojang')
-      .replace('${version_type}', json.type);
+    // Up to 1.13
+    Arguments = json.minecraftArguments;
+  } else if (json.arguments) {
+    // From 1.13
+    Arguments = json.arguments.game.filter(arg => typeof arg === 'string').join(' ');
   }
-  return Arguments;
+  // Replaces the arguments and returns the result
+  return Arguments
+    .replace('${auth_player_name}', userData.displayName)
+    .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
+    .replace('${game_directory}', `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${packName}`)
+    .replace('${game_assets}', `${APPPATH}${LAUNCHER_FOLDER}/assets${json.assets === 'legacy' ? '/virtual/legacy' : ''}`) // Another check for really old versions
+    .replace('${version_name}', json.id)
+    .replace('${assets_root}', `${APPPATH}${LAUNCHER_FOLDER}/assets${json.assets === 'legacy' ? '/virtual/legacy' : ''}`)
+    .replace('${assets_index_name}', json.assets)
+    .replace('${auth_uuid}', userData.uuid)
+    .replace('${auth_access_token}', userData.accessToken)
+    .replace('${user_properties}', "{}")
+    .replace('${user_type}', userData.legacy ? 'legacy' : 'mojang')
+    .replace('${version_type}', json.type);
 }
 
 export default getStartCommand;

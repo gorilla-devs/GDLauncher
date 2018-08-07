@@ -12,6 +12,6 @@ module.exports = {
   LINUX: 'linux',
   DARWIN: 'darwin',
   APPPATH: getAppPath.getAppPath(),
-  NEWS_URL: 'http://launchermeta.mojang.com/mc/news.json',
+  NEWS_URL: 'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1',
   JAVA_URL: 'https://java.com/download'
 };

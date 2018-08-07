@@ -35,7 +35,12 @@ class RouteDef extends Component<Props> {
       notification.warning({
         duration: 0,
         message: 'JAVA NOT FOUND',
-        description: <div>Java has not been found. Click <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">here</a> to download it</div>
+        description: (
+          <div>
+            Java has not been found. Click <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">here</a>
+            to download it. After installing you will need to restart your PC.
+          </div>
+        )
       });
     }
   }

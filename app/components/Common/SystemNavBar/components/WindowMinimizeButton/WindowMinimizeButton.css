@@ -1,7 +1,7 @@
 .CloseBtn{
     display: inline-block;
     position: absolute;
-    background: rgb(35, 48, 61);
+    background: #212b36;
     border: 0;
     padding: 0;
     color: white;
@@ -19,7 +19,7 @@
 
 .CloseBtn:hover{
     transition: background-color .25s;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.302);
 }
 .CloseBtn:focus, .CloseBtn:active{
     border-style: outset;
