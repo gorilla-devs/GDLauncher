@@ -9,10 +9,10 @@ const SideMenu = () => {
     <div className={styles.container}>
       <div className={styles.sideMenuContainer}>
         <div className={styles.sideMenu}>
-          <MenuItem>Link 1</MenuItem>
-          <MenuItem>Link 1</MenuItem>
-          <MenuItem>Link 1</MenuItem>
-          <MenuItem>Link 1</MenuItem>
+          <MenuItem>General</MenuItem>
+          <MenuItem>Java</MenuItem>
+          <MenuItem>Instances</MenuItem>
+          <MenuItem>User Interface</MenuItem>
         </div>
       </div>
     </div>

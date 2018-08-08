@@ -3,7 +3,7 @@ import os from 'os';
 import fs from 'fs';
 import findJavaHome from './javaLocationFinder';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH, WINDOWS } from '../constants';
-import { extractLibs, extractMainJar } from '../workers/common/vanilla';
+import { extractLibs, extractMainJar } from './getMCFilesList';
 import store from '../localStore';
 
 const getStartCommand = async (packName, userData) => {
@@ -12,8 +12,8 @@ const getStartCommand = async (packName, userData) => {
   const javaPath = await findJavaHome();
   const dosName = os.release().substr(0, 2) === 10 ? '"-Dos.name=Windows 10" -Dos.version=10.0 ' : '';
   const version = packJson.id;
-  const libs = extractLibs(packJson, false);
-  const mainJar = extractMainJar(packJson, false);
+  const libs = await extractLibs(packJson, false);
+  const mainJar = await extractMainJar(packJson, false);
   const Arguments = getMCArguments(packJson, packName, userData);
   const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 

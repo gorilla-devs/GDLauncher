@@ -1,7 +1,7 @@
 {
   "presets": [
     ["env", {
-      "targets": { "node": 8 },
+      "targets": { "node": 7 },
       "useBuiltIns": true
     }],
     "stage-0",

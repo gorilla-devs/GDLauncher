@@ -1,13 +1,9 @@
-import { promisify } from 'es6-promisify';
 import os from 'os';
-import fs from 'fs';
 import {
   LINUX,
   WINDOWS,
   DARWIN
 } from '../constants';
-import { extractLibs, extractMainJar } from '../workers/common/vanilla';
-import store from '../localStore';
 
 const findJavaHome = async () => {
   const util = require('util');

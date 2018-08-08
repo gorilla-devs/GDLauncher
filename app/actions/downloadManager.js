@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { remote, ipcRenderer } from 'electron';
 import { message } from 'antd';
+import { APPPATH } from '../constants';
 
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
@@ -64,7 +65,8 @@ export function downloadPack(pack) {
         path.join(remote.app.getAppPath(), 'dist/downloadPackage.js'
         ), {
         env: {
-          name: downloadManager.downloadQueue[pack].name
+          name: downloadManager.downloadQueue[pack].name,
+          appPath: APPPATH
         }
       }, {
         silent: true
