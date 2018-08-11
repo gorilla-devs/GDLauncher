@@ -31,7 +31,8 @@
     "test-watch": "yarn test --watch",
     "dev-web": "cross-env START_HOT=1 node -r babel-register ./internals/scripts/CheckPortInUse.js && cross-env START_HOT=1 yarn start-web-dev",
     "start-web-dev": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack-dev-server/bin/webpack-dev-server --content-base --config webpack.config.web.dev.js",
-    "build-antd": "lessc --js ./antd/index.less ./app/antd.css"
+    "build-antd": "lessc --js ./antd/index.less ./app/antd.css",
+    "pre-commit": "yarn version --patch"
   },
   "browserslist": "electron 1.6",
   "lint-staged": {
