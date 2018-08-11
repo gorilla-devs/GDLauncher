@@ -1,3 +1,5 @@
+/* eslint global-require: 0, import/no-dynamic-require: 0 */
+
 /**
  * Builds the DLL for development electron renderer process
  */
@@ -45,7 +47,7 @@ export default merge.smart(baseConfig, {
   plugins: [
     new webpack.DllPlugin({
       path: path.join(dist, '[name].json'),
-      name: '[name]',
+      name: '[name]'
     }),
 
     /**
@@ -66,9 +68,9 @@ export default merge.smart(baseConfig, {
       options: {
         context: path.resolve(process.cwd(), 'app'),
         output: {
-          path: path.resolve(process.cwd(), 'dll'),
-        },
-      },
+          path: path.resolve(process.cwd(), 'dll')
+        }
+      }
     })
-  ],
+  ]
 });
