@@ -68,10 +68,10 @@ before_script:
 
 script:
   - yarn package
-  - yarn lint
-  - yarn flow
-  - yarn test
-  - yarn test-e2e
+#  - yarn lint
+#  - yarn flow
+#  - yarn test
+#  - yarn test-e2e
   # On Linux, check if packaging to windows works
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -87,6 +87,7 @@ script:
     fi
 
 after_script:
+- cd release
 - ls
 
 # deploy:
