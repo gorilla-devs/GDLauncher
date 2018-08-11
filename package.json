@@ -1,7 +1,7 @@
 {
   "name": "gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.5.13",
+  "version": "0.5.17",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -31,8 +31,7 @@
     "test-watch": "yarn test --watch",
     "dev-web": "cross-env START_HOT=1 node -r babel-register ./internals/scripts/CheckPortInUse.js && cross-env START_HOT=1 yarn start-web-dev",
     "start-web-dev": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack-dev-server/bin/webpack-dev-server --content-base --config webpack.config.web.dev.js",
-    "build-antd": "lessc --js ./antd/index.less ./app/antd.css",
-    "pre-commit": "yarn version --patch"
+    "build-antd": "lessc --js ./antd/index.less ./app/antd.css"
   },
   "browserslist": "electron 1.6",
   "lint-staged": {
@@ -77,12 +76,14 @@
         "nsis-web",
         "portable",
         "zip"
-      ]
+      ],
+      "artifactName": "${productName}.${ext}"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "runAfterFinish": false
+      "runAfterFinish": false,
+      "artifactName": "${productName}-installer.${ext}"
     },
     "linux": {
       "target": [

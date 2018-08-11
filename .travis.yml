@@ -30,6 +30,14 @@ matrix:
             - graphicsmagick
             - xz-utils
             - xorriso
+      deploy:
+          provider: releases
+          skip_cleanup: true
+          api_key:
+            secure: hF5RKP28CK3zGjqK++zNxMOjXNvGhq51kcbwV2hiMiBs8JSRVzLWgbemQ0qExVzvn5OxH+3GDlZLCeAfeZBjuC8cRqccWQyQ7OAT27PqW1ZvPCSsG6Xz53z6AC06A3j3DkcougqVSVbRBr6JLDZBlNxeVRle+KUM1f0CdmQJtBH71lYYiafmV/xu1rBG0zJJL60nhln84jiorKSekhVnLzyWH+W2H+a3Shl0/TcGvQAJ1oTCypYjmp7+/4vvRTX2wt016UVeW9UYPowBoJWvia3/5ptMJthoYdibQc0NrCvlx1E4L6HlNnrCSZwnxmP9d0mt5kekpmOu+QijS0OrwGSMADzwxfx34cwcLMoX/4Q/E4X4C6fgTSe8s3NODtfKtiiovgX6tNiTu+eLkV/UuRA3qxQGM9vlbbGv37CNY/VLSNbRsEQQsofTzKXjUZ09WcBrHrML2ZZ1j1TkPlkZBf8ZwyqF2Y4Zou+bRDuER1oAHzsptjap2GIa2F8mZ/im6p6DhlU0MvGo4LSbuJwdj5Gc0G/Yq296OUkvH7ue6LgzTceILygt7q2pwz2TJuEK8Sgs+/3wQ2wmjT3m3h4KMt0T1l/DPyZQbQDTUX/7jwI1ObvEbRLH5C+x5B163rN75MvWCDwPuBkErvRQTLE96h+GuGQZvxz34R84aB4zK0Y=
+          file:
+            - "release/GDLauncher.exe"
+            - "release/GDLauncher.zip"
 
 cache:
   yarn: true
