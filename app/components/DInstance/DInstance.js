@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Button, Icon, Progress, message } from 'antd';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
-import { hideMenu } from 'react-contextmenu/src/actions';
+import { hideMenu } from 'react-contextmenu/es6/actions';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
 import styles from './DInstance.scss';
 

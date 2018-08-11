@@ -7,7 +7,7 @@ import mkdirp from 'mkdirp';
 import Link from 'react-router-dom/Link';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
-import { hideMenu } from 'react-contextmenu/src/actions';
+import { hideMenu } from 'react-contextmenu/es6/actions';
 import styles from './DManager.css';
 import VanillaModal from '../VanillaModal/containers/VanillaModal';
 import DInstance from '../../containers/DInstance';

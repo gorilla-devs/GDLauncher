@@ -56,7 +56,7 @@ module.exports = {
     return libs;
   },
   extractNatives: async (libs, packName, appPath) => {
-    const nativesPath = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, constants.PACKS_FOLDER_NAME, packName, 'natives');
+    const nativesPath = path.join(appPath, constants.LAUNCHER_FOLDER, constants.PACKS_FOLDER_NAME, packName, 'natives');
     if (!(await fs.exists(nativesPath))) {
       await mkdirp(nativesPath);
     }

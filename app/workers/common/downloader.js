@@ -6,7 +6,6 @@ const assert = require('assert');
 const os = require('os');
 const Promise = require('bluebird');
 const request = require('request-promise-native');
-const constants = require('../../constants');
 
 module.exports = {
   downloadArr

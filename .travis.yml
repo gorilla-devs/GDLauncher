@@ -1,14 +1,19 @@
 sudo: true
 language: node_js
 node_js:
-- 10
-- 9
-- 8
+  - 10
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
 cache:
   yarn: true
   directories:
-  - node_modules
-  - app/node_modules
+    - node_modules
+    - app/node_modules
+    - $(npm config get prefix)/lib/node_modules
+    - flow-typed
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder
+    - $HOME/docker
 addons:
   apt:
     update: true
@@ -29,9 +34,10 @@ install:
 - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile
   --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 before_script:
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start &
-- sleep 3
+  # On Linux, create a "virtual display". This allows browsers to work properly
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 script:
 - node --version
 - yarn package-all

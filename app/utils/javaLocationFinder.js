@@ -20,8 +20,8 @@ const findJavaHome = async () => {
     default:
       break;
   }
-  const path = await exec(command);
-  return path;
+  const { stdout } = await exec(command);
+  return stdout;
 };
 
 export default findJavaHome;

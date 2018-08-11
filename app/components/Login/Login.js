@@ -106,21 +106,21 @@ class Login extends Component<Props> {
                 <Button icon="login" loading={this.props.authLoading} disabled={this.props.tokenLoading} size="large" type="primary" htmlType="submit" className={styles.login_form_button}>
                   Log in
                 </Button>
-                {this.state.nativeLauncherProfiles &&
-                  <Button
-                    icon="forward"
-                    loading={this.props.tokenLoading}
-                    size="large"
-                    type="primary"
-                    className={styles.login_form_button}
-                    style={{ marginTop: '30px' }}
-                    onClick={() => this.props.tryNativeLauncherProfiles()}
-                  >
-                    Skip login
-                  </Button>
-                }
               </FormItem>
             </Form>
+            {this.state.nativeLauncherProfiles &&
+              <Button
+                icon="forward"
+                loading={this.props.tokenLoading}
+                size="large"
+                type="primary"
+                className={styles.login_form_button}
+                style={{ marginTop: '30px' }}
+                onClick={() => this.props.tryNativeLauncherProfiles()}
+              >
+                Skip login
+              </Button>
+            }
           </div>
           <div style={{ position: 'absolute', bottom: 30, right: 30, color: '#bdc3c7' }}>
             v{require('../../package.json').version}

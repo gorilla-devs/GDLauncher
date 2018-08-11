@@ -5,8 +5,8 @@ import styles from './News.scss';
 const News = props =>
   (
     <div className={styles.container}>
-      <Carousel infinite autoplay style={{ height: '180px' }}>
-        {props.news.news.map(inf => {
+      <Carousel infinite autoplay style={{ height: '180px', }}>
+        {props.news.news.length !== 0 ? props.news.news.map(inf => {
           return (
             <a href={inf.url} target="_blank" rel="noopener noreferrer" style={{ height: 140 }}>
               <div
@@ -16,7 +16,7 @@ const News = props =>
                   height: '180px',
                   backgroundPosition: 'center',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s ease-in-out'
+                  transition: 'transform 0.2s ease-in-out',
                 }}
                 className={styles.imgBg}
               />
@@ -27,7 +27,7 @@ const News = props =>
               <div style={{ position: 'absolute', top: 140, height: 40, width: '100%' }} />
             </a>
           );
-        })}
+        }) : <div style={{ textAlign: 'center' }}>Loading News</div>}
       </Carousel>
     </div>
   );
