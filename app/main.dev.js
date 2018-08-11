@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow, crashReporter } from 'electron';
+import { app, BrowserWindow, crashReporter, ipcMain } from 'electron';
 import MenuBuilder from './menu';
 
 let mainWindow = null;
@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-  require('electron-debug')();
+  require('electron-debug')({ enabled: true });
   const path = require('path');
   const p = path.join(__dirname, '..', 'app', 'node_modules');
   require('module').globalPaths.push(p);
@@ -49,9 +49,7 @@ const installExtensions = async () => {
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
 
 
@@ -62,8 +60,8 @@ app.on('ready', async () => {
 
   // create a new `splash`-WindowF
   splash = new BrowserWindow({
-    width: 810,
-    height: 610,
+    width: 280,
+    height: 80,
     frame: false,
     show: true
   });
@@ -72,12 +70,15 @@ app.on('ready', async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 900,
-    height: 720,
-    minHeight: 720,
-    minWidth: 900,
+    width: 850,
+    height: 600,
+    minHeight: 600,
+    minWidth: 780,
     frame: false,
-    backgroundColor: '#34495e'
+    backgroundColor: '#34495e',
+    webPreferences: {
+      experimentalFeatures: true
+    }
   });
 
   mainWindow.webContents.on('new-window', (e, url) => {
@@ -103,6 +104,14 @@ app.on('ready', async () => {
       companyName: 'GorillaDevs',
       submitURL: 'https://gdevs.io'
     });
+  });
+
+  ipcMain.on('open-devTools', () => {
+    mainWindow.webContents.openDevTools({ mode: 'undocked' });
+  });
+
+  ipcMain.on('setProgressTaskBar', (p) => {
+    mainWindow.setProgressBar(p);
   });
 
   mainWindow.on('closed', () => {

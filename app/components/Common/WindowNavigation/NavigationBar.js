@@ -2,25 +2,71 @@
 import React, { Component } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
-import styles from './NavigationBar.css';
-import HorizontalMenu from '../HorizontalMenu/HorizontalMenu';
-import WindowCloseBtn from '../WindowCloseButton/WindowCloseButton';
-import WindowMinimizeBtn from '../WindowMinimizeButton/WindowMinimizeButton';
-import WindowHideBtn from '../WindowHideButton/WindowHideButton';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import styles from './NavigationBar.scss';
+import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
+import DownloadManager from '../../DownloadManager/DownloadManager';
+import * as downloadManagerActions from '../../../actions/downloadManager';
+import logo from '../../../assets/images/logo.png';
 
 
-type Props = {};
-export default class NavigationBar extends Component<Props> {
+type Props = {
+  downloadQueue: array,
+  location: string
+};
+class NavigationBar extends Component<Props> {
   props: Props;
+  constructor(props) {
+    super(props);
+    this.state = {
+      downloadPopoverOpen: false
+    }
+  }
+
+  hide = () => {
+    this.setState({
+      downloadPopoverOpen: false,
+    });
+  }
+  handleVisibleChange = (downloadPopoverOpen) => {
+    this.setState({ downloadPopoverOpen });
+  }
 
   render() {
     return (
       <div className={styles.container}>
         <div className={styles.logoText}>
-          <i className="fab fa-gofore" />
+          <img src={logo} height="40px" alt="logo" />
         </div>
-        {(this.props.location !== '/' && this.props.location !== '/loginHelperModal') && <HorizontalMenu location={this.props.location} />}
+        <HorizontalMenu
+          location={this.props.location}
+          downloadedCount={Object.keys(this.props.downloadQueue).filter(inst => this.props.downloadQueue[inst].downloadCompleted).length}
+          clearQueue={() => this.props.clearQueue()}
+        />
+        <Link to={{
+          pathname: '/settings',
+          state: { modal: true }
+        }}
+        >
+          <i
+            className={`fas fa-cog ${styles.settings}`}
+            draggable="false"
+          />
+        </Link>
       </div>
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    downloadQueue: state.downloadManager.downloadQueue
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(downloadManagerActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar);

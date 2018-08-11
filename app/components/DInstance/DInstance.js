@@ -3,14 +3,17 @@ import React, { Component } from 'react';
 import { Button, Icon, Progress, message } from 'antd';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
-import { hideMenu } from 'react-contextmenu/src/actions';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
+import { hideMenu } from 'react-contextmenu/es6/actions';
+import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
 import styles from './DInstance.scss';
 
 type Props = {
   name: string,
   installingQueue: Object,
-  selectedInstance: string
+  selectedInstance: string,
+  startInstance: () => void,
+  selectInstance: () => void,
+  playing: array
 };
 
 export default class DInstance extends Component<Props> {
@@ -24,7 +27,7 @@ export default class DInstance extends Component<Props> {
     this.percentage = this.updatePercentage();
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
+  componentDidUpdate = () => {
     this.percentage = this.updatePercentage();
   }
 
@@ -46,15 +49,14 @@ export default class DInstance extends Component<Props> {
   }
 
   updatePercentage() {
+    const { totalToDownload, downloaded } = this.props.installingQueue[this.props.name] || 0;
     if (this.props.installingQueue[this.props.name]) {
       switch (this.props.installingQueue[this.props.name].status) {
         case 'Queued':
           return 0;
         case 'Downloading':
-          /* TODO: Fix NaN. It is caused by 0 / 0 division while waiting for usable data from the worker */
-          return Math.floor(
-            (this.props.installingQueue[this.props.name].downloaded * 100)
-            / this.props.installingQueue[this.props.name].totalToDownload);
+          // If the total file to download is equal to 0 (not yet sent from the worker) then show 0 to avoid NaN from 0 / 0
+          return totalToDownload === 0 ? 0 : Math.floor((downloaded * 100) / totalToDownload);
         case 'Completed':
           return 100;
         default:
@@ -68,19 +70,16 @@ export default class DInstance extends Component<Props> {
   handleClickPlay = async (e) => {
     e.stopPropagation();
     this.props.startInstance(this.props.name);
-  }
-
-  handleClick = (e, data) => {
-    console.log(data.foo);
+    this.props.selectInstance(this.props.name);
   }
 
   deleteInstance = async () => {
     try {
-      await fsa.remove(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${this.props.name}`);
-      hideMenu();
+      await fsa.remove(`${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/${this.props.name}`);
+      this.props.selectInstance(null);
       message.success('Instance deleted');
     } catch (err) {
-      hideMenu();
+      hideMenu(`contextMenu-${this.props.name}`);
       message.error('Error deleting instance');
       console.error(err);
     }
@@ -93,7 +92,11 @@ export default class DInstance extends Component<Props> {
         onMouseEnter={() =>
           document.documentElement.style.setProperty('--instanceName', `"${this.props.name}"`)
         }
-        onClick={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name) }}
+        onClick={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name); }}
+        onDoubleClick={this.handleClickPlay}
+        onKeyPress={this.handleKeyPress}
+        role="button"
+        tabIndex={0}
       >
         <ContextMenuTrigger id={`contextMenu-${this.props.name}`}>
           {this.props.playing.find(el => el === this.props.name) &&
@@ -115,7 +118,7 @@ export default class DInstance extends Component<Props> {
             </span>
           </div>
         </ContextMenuTrigger>
-        <ContextMenu id={`contextMenu-${this.props.name}`} onShow={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name) }}>
+        <ContextMenu id={`contextMenu-${this.props.name}`} onShow={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name); }}>
           <span>{this.props.name}</span>
           <MenuItem data={{ foo: 'bar' }} onClick={this.handleClickPlay}>
             <i className="fas fa-play" style={{ marginRight: '8px' }} />
@@ -125,7 +128,7 @@ export default class DInstance extends Component<Props> {
             <i className="fas fa-wrench" style={{ marginRight: '8px' }} />
             Manage
           </MenuItem>
-          <MenuItem data={{ foo: 'bar' }} onClick={this.deleteInstance} preventClose>
+          <MenuItem data={{ foo: 'bar' }} onClick={this.deleteInstance}>
             <i className="fas fa-trash-alt" style={{ marginRight: '8px' }} />
             {this.state.deleting ? 'Deleting...' : 'Delete'}
           </MenuItem>

@@ -1,0 +1,26 @@
+.container {
+  width: 90%;
+  max-width: 1050px;
+  display: block;
+  position: relative;
+  margin: 30px auto;
+
+  .imgBg:hover {
+    transition: transform 0.2s ease-in-out;
+    transform: scale(1.06);
+  }
+
+  div:first-child {
+    border-radius: 4px;
+
+    div:first-child {
+      div:first-child {
+        height: 178px !important;
+
+        div:first-child {
+          height: 180px !important;
+        }
+      }
+    }
+  }
+}

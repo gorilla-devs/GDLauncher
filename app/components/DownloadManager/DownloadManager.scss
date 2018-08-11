@@ -1,0 +1,27 @@
+.container {
+  position: absolute;
+  display: inline-block;
+  right: 210px;
+  margin-top: 9px;
+}
+
+.downloadIcon {
+  display: inline-block;
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  right: 0;
+  position: relative;
+  transition: all .2s ease-in-out;
+  &:hover, &:active {
+    color: white;
+    transition: all .2s ease-in-out;
+  }
+  path {
+    cursor: pointer;
+  }
+  path:hover, path:active {
+    color: white;
+    transition: all .2s ease-in-out;
+  }
+}

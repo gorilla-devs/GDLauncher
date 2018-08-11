@@ -1,0 +1,16 @@
+.container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+  font-family: 'GlacialIndifferenceRegular';
+}
+
+.createInstance {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+}

@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { push } from 'react-router-redux';
 import { message } from 'antd';
+import path from 'path';
+import fsa from 'fs-extra';
+import os from 'os';
 import store from '../localStore';
-import { LOGIN_PROXY_API, ACCESS_TOKEN_VALIDATION_URL } from '../constants';
+import { LOGIN_PROXY_API, ACCESS_TOKEN_VALIDATION_URL, ACCESS_TOKEN_REFRESH_URL } from '../constants';
 
 export const LOGOUT = 'LOGOUT';
 export const START_AUTH_LOADING = 'START_AUTH_LOADING';
@@ -11,6 +14,8 @@ export const START_TOKEN_CHECK_LOADING = 'START_TOKEN_CHECK_LOADING';
 export const STOP_TOKEN_CHECK_LOADING = 'STOP_TOKEN_CHECK_LOADING';
 export const AUTH_SUCCESS = 'AUTH_SUCCESS';
 export const AUTH_FAILED = 'AUTH_FAILED';
+export const OPEN_NATIVE_PROFILES_MODAL = 'OPEN_NATIVE_PROFILES_MODAL';
+export const CLOSE_NATIVE_PROFILES_MODAL = 'CLOSE_NATIVE_PROFILES_MODAL';
 
 export function login(username, password, remember) {
   return async (dispatch) => {
@@ -25,24 +30,29 @@ export function login(username, password, remember) {
           password
         }
       ).then(res => {
-        console.log(res)
         if (res.data !== undefined &&
           res.data !== null &&
           Object.prototype.hasOwnProperty.call(res.data, 'authenticated')) {
+          const { data } = res;
+          const payload = {
+            email: data.userData.email,
+            displayName: data.username,
+            accessToken: data.accessToken,
+            clientToken: data.clientToken,
+            legacy: data.legacy,
+            uuid: data.uuid
+          };
           if (remember) {
             store.set({
               user: {
-                username: res.data.username,
-                accessToken: res.data.accessToken,
-                clientToken: res.data.clientToken,
-                legacy: res.data.legacy,
-                uuid: res.data.uuid
-              }
+                ...payload
+              },
+              lastEmail: data.userData.email
             });
           }
           dispatch({
             type: AUTH_SUCCESS,
-            payload: res.data
+            payload
           });
 
           dispatch(push('/home'));
@@ -56,7 +66,7 @@ export function login(username, password, remember) {
         return res;
       });
     } catch (err) {
-      message.error(`Auth failed: ${err}`);
+      message.error(`Auth failed: ${err.message}`);
     } finally {
       dispatch({
         type: STOP_AUTH_LOADING
@@ -75,50 +85,42 @@ export function logout() {
   };
 }
 
-export function checkLocalDataValidity(redirectToHome = false) {
+export function checkAccessToken() {
   return async (dispatch) => {
-    if (store.has('user')) {
+    const userData = store.get('user');
+    if (userData) {
       dispatch({
         type: START_TOKEN_CHECK_LOADING
       });
       try {
-        const data = store.get('user');
         const res = await axios.post(
           ACCESS_TOKEN_VALIDATION_URL,
-          { accessToken: data.accessToken },
+          { accessToken: userData.accessToken },
           { 'Content-Type': 'application/json;charset=UTF-8' }
         );
-        console.log("RES: " + res);
         if (res.status === 204) {
           dispatch({
             type: AUTH_SUCCESS,
-            payload: data
+            payload: userData
           });
-          if (redirectToHome) {
-            dispatch(push('/home'));
-          }
+          dispatch(push('/home'));
         }
         return res;
       } catch (error) {
         if (error.response && error.response.status === 403) {
-          message.error('Token expired. You need to log-in again :(');
+          message.error('Token Not Valid. You Need To Log-In Again :(');
           store.delete('user');
           dispatch({
             type: AUTH_FAILED
           });
-        }
-        else if (error.message === 'Network Error') {
+        } else if (error.message === 'Network Error') {
           message.info('You are offline. Logging in in offline-mode');
-          const data = store.get('user');
           dispatch({
             type: AUTH_SUCCESS,
-            payload: data
+            payload: userData
           });
-          if (redirectToHome) {
-            dispatch(push('/home'));
-          }
+          dispatch(push('/home'));
         }
-
       } finally {
         dispatch({
           type: STOP_TOKEN_CHECK_LOADING
@@ -126,4 +128,50 @@ export function checkLocalDataValidity(redirectToHome = false) {
       }
     }
   };
+}
+
+export function tryNativeLauncherProfiles() {
+  return async (dispatch) => {
+    const homedir = process.env.APPDATA || os.homedir();
+    const vanillaMCPath = path.join(homedir, '.minecraft');
+    try {
+      const vnlJson = await fsa.readJson(path.join(vanillaMCPath, 'launcher_profiles.json'));
+      const { account } = vnlJson.selectedUser;
+      const { accessToken } = vnlJson.authenticationDatabase[account];
+      const res = await axios.post(
+        LOGIN_PROXY_API,
+        { accessToken },
+        { 'Content-Type': 'application/json;charset=UTF-8' }
+      );
+      if (res.status === 200) {
+        // We need to update the accessToken in launcher_profiles.json
+        const userData = {
+          email: res.data.user.email,
+          displayName: res.data.selectedProfile.name,
+          accessToken: res.data.accessToken,
+          clientToken: res.data.clientToken,
+          legacy: res.data.user.legacyUser,
+          uuid: res.data.selectedProfile.id
+        };
+        store.set({
+          user: { ...userData },
+          lastEmail: res.data.user.email
+        });
+        dispatch({
+          type: AUTH_SUCCESS,
+          payload: userData
+        });
+        dispatch(push('/home'));
+      }
+      // dispatch(checkAccessToken(userData));
+    } catch (err) { console.log(err); }
+  };
+}
+
+export function openNativeProfiles() {
+  return dispatch => dispatch({ type: OPEN_NATIVE_PROFILES_MODAL });
+}
+
+export function closeNativeProfiles() {
+  return dispatch => dispatch({ type: CLOSE_NATIVE_PROFILES_MODAL });
 }

@@ -2,29 +2,47 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Switch, Route, withRouter, Redirect } from 'react-router';
-import { Form } from 'antd';
+import { Form, notification, Button } from 'antd';
 import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
+import { JAVA_URL } from './constants';
 import App from './containers/App';
-import HomePage from './containers/HomePage';
+import HomePage from './components/Home/containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
-import DManager from './containers/DManagerPage';
+import DManager from './components/DManager/containers/DManagerPage';
 import Profile from './containers/ProfilePage';
 import Navigation from './containers/Navigation';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import Login from './components/Login/Login';
+import findJava from './utils/javaLocationFinder';
 import Settings from './components/Settings/Settings';
 import DiscordModal from './components/DiscordModal/DiscordModal';
-import VanillaModal from './containers/VanillaModal';
+import VanillaModal from './components/VanillaModal/containers/VanillaModal';
 import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
+type Props = {
+  location: object,
+  checkAccessToken: () => void,
+  isAuthValid: boolean
+};
 
-class RouteDef extends React.Component {
-
-  previousLocation = this.props.location;
-
-  componentDidMount = () => {
-    this.props.checkLocalDataValidity(true);
+class RouteDef extends Component<Props> {
+  componentDidMount = async () => {
+    this.props.checkAccessToken();
+    try {
+      await findJava();
+    } catch (err) {
+      notification.warning({
+        duration: 0,
+        message: 'JAVA NOT FOUND',
+        description: (
+          <div>
+            Java has not been found. Click <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">here</a>
+            to download it. After installing you will need to restart your PC.
+          </div>
+        )
+      });
+    }
   }
 
 
@@ -32,12 +50,14 @@ class RouteDef extends React.Component {
     const { location } = this.props;
     // set previousLocation if props.location is not modal
     if (
-      nextProps.history.action !== "POP" &&
+      nextProps.history.action !== 'POP' &&
       (!location.state || !location.state.modal)
     ) {
       this.previousLocation = this.props.location;
     }
   }
+
+  previousLocation = this.props.location;
 
   render() {
     const { location } = this.props;
@@ -49,8 +69,12 @@ class RouteDef extends React.Component {
     return (
       <App>
         <SysNavBar />
-        <Navigation />
-        {location.pathname !== '/' ? <SideBar /> : null}
+        {location.pathname !== '/' && location.pathname !== '/loginHelperModal' ?
+          <div>
+            <Navigation />
+            <SideBar />
+          </div>
+          : null}
         <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
           {!this.props.isAuthValid && <Redirect push to="/" />}

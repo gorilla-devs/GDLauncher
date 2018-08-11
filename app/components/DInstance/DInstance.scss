@@ -40,7 +40,7 @@
 .icon__playBtn {
   position: absolute;
   width: 90px;
-  font-family: 'Roboto';
+  font-family: 'GlacialIndifferenceRegular';
   font-weight: 1000;
 }
 
@@ -73,6 +73,7 @@
 }
 
 @keyframes downloading {
+  
   from {
     opacity: .3;
   }

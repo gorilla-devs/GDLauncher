@@ -1,17 +1,17 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "electron-react-boilerplate",
-  "version": "1.0.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "name": "gdlauncher",
+  "productName": "GDLauncher",
+  "version": "0.5.20",
+  "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "main": "./main.prod.js",
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "GorillaDevs",
+    "email": "us@gdevs.io",
+    "url": "https://gdevs.io"
   },
   "scripts": {
     "electron-rebuild": "node -r babel-register ../internals/scripts/ElectronRebuild.js",
-    "postinstall": "npm run electron-rebuild"
+    "postinstall": "yarn electron-rebuild"
   },
   "license": "MIT",
   "dependencies": {}

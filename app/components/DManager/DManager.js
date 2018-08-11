@@ -1,19 +1,25 @@
 // @flow
 import React, { Component } from 'react';
-import { Button, Icon } from 'antd';
+import { Button, Icon, message } from 'antd';
 import { lstatSync, readdirSync, watch, existsSync } from 'fs';
 import { join, basename } from 'path';
 import mkdirp from 'mkdirp';
 import Link from 'react-router-dom/Link';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
-import { hideMenu } from 'react-contextmenu/src/actions';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
+import { hideMenu } from 'react-contextmenu/es6/actions';
 import styles from './DManager.css';
-import VanillaModal from '../../containers/VanillaModal';
+import VanillaModal from '../VanillaModal/containers/VanillaModal';
 import DInstance from '../../containers/DInstance';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME } from '../../constants';
+import { history } from '../../store/configureStore';
+import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
 import store from '../../localStore';
 
-type Props = {};
+type Props = {
+  selectInstance: () => void
+};
+
+const watchPath = `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
 let watcher;
 
 const SortableItem = SortableElement(({ value }) =>
@@ -35,26 +41,44 @@ export default class DManager extends Component<Props> {
   props: Props;
   constructor() {
     super();
-    if (!existsSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)) {
-      mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`);
+    if (!existsSync(watchPath)) {
+      mkdirp.sync(watchPath);
     }
     this.state = {
-      instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
+      instances: this.getDirectories(watchPath)
     };
     // Watches for any changes in the packs dir. TODO: Optimize
-    watcher = watch(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`, () => {
-      if (!existsSync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)) {
-        mkdirp.sync(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`);
-      }
-      this.setState({
-        instances: this.getDirectories(`${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`)
+    try {
+      watcher = watch(watchPath, () => {
+        if (!existsSync(watchPath)) {
+          mkdirp.sync(watchPath);
+        }
+        this.setState({
+          instances: this.getDirectories(watchPath)
+        });
       });
-    });
+    } catch (error) {
+      console.error(error);
+      if (error.message === `watch ${watchPath} ENOSPC`) {
+        message.error(
+          <span>
+            There was an error with inotify limit. see
+          <a target="_blank" href="https://github.com/guard/listen/wiki/Increasing-the-amount-of-inotify-watchers"> here</a>
+          </span>
+        );
+      } else {
+        message.error('Cannot update instances in real time');
+      }
+    }
   }
 
   componentWillUnmount() {
     // Stop watching for changes when this component is unmounted
-    watcher.close();
+    try {
+      watcher.close();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   handleScroll = () => {
@@ -83,7 +107,10 @@ export default class DManager extends Component<Props> {
 
   render() {
     return (
-      <main className={styles.main} onClick={(e) => { e.stopPropagation(); this.props.selectInstance(null) }}>
+      <main
+        className={styles.main}
+        onClick={(e) => { e.stopPropagation(); this.props.selectInstance(null) }}
+      >
         <div className={styles.header}>
           <div className={styles.headerButtons}>
             <div>
@@ -97,26 +124,34 @@ export default class DManager extends Component<Props> {
             </div>
           </div>
         </div>
-        <div className={styles.content} onScroll={this.handleScroll}>
-          {this.state.instances.length !== 0 ?
-            <SortableList
-              items={this.state.instances}
-              onSortEnd={this.onSortEnd}
-              lockToContainerEdges
-              axis="xy"
-              distance={5}
-            /> :
-            <h1 style={{
-              textAlign: 'center',
-              marginTop: '25vh',
-              fontFamily: 'Roboto',
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#bdc3c7'
-            }}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1>
-          }
-        </div>
-      </main>
+        <ContextMenuTrigger id="contextMenu-dmanager">
+          <div className={styles.content} onScroll={this.handleScroll}>
+            {this.state.instances.length !== 0 ?
+              <SortableList
+                items={this.state.instances}
+                onSortEnd={this.onSortEnd}
+                lockToContainerEdges
+                axis="xy"
+                distance={5}
+              /> :
+              <h1 style={{
+                textAlign: 'center',
+                marginTop: '25vh',
+                fontFamily: 'GlacialIndifferenceRegular',
+                fontSize: '20px',
+                fontWeight: '600',
+                color: '#bdc3c7'
+              }}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1>
+            }
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenu id="contextMenu-dmanager" onShow={(e) => { e.stopPropagation(); this.props.selectInstance(null); }}>
+          <MenuItem data={{ foo: 'bar' }} onClick={() => history.push({ pathname: '/vanillaModal', state: { modal: true } })}>
+            <i className="fas fa-play" style={{ marginRight: '8px' }} />
+            Add New Vanilla
+          </MenuItem>
+        </ContextMenu>
+      </main >
     );
   }
 }

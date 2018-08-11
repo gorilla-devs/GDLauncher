@@ -1,13 +1,24 @@
 // @flow
 import React, { Component } from 'react';
-import { Redirect, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Form, Input, Icon, Checkbox, Tooltip, Modal } from 'antd';
+import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
 import styles from './Login.css';
+import store from '../../localStore';
+import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
 import * as AuthActions from '../../actions/auth';
 
-type Props = {};
+type Props = {
+  form: any,
+  login: () => void,
+  tryNativeLauncherProfiles: () => void,
+  tokenLoading: boolean,
+  nativeModalOpened: boolean,
+  closeNativeProfiles: () => void,
+  authLoading: boolean,
+  openNativeProfiles: () => void
+};
 
 const FormItem = Form.Item;
 
@@ -17,21 +28,23 @@ class Login extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      helpModalisOpen: false,
-      checkingToken: false
+      fastLogin: true,
+      nativeLauncherProfiles: false
     };
-
-    this.openHelpModal = this.openHelpModal.bind(this);
-    this.closeHelpModal = this.closeHelpModal.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  openHelpModal = () => {
-    this.setState({ helpModalisOpen: true });
+  componentDidMount = async () => {
+    this.ismounted = true;
+    const nativeLauncherProfiles = await OfficialLancherProfilesExists();
+    // Since this is an async lifecycle method we need to check
+    // if the component is still mounted before updating the state
+    if (this.ismounted) {
+      this.setState({ nativeLauncherProfiles });
+    }
   }
 
-  closeHelpModal = () => {
-    this.setState({ helpModalisOpen: false });
+  componentWillUnmount = () => {
+    this.ismounted = false;
   }
 
   handleSubmit = (e) => {
@@ -45,71 +58,72 @@ class Login extends Component<Props> {
     });
   }
 
-
-
   /* eslint-enable */
 
   render() {
     const { getFieldDecorator } = this.props.form;
 
-    if (this.props.tokenLoading) {
-      return (
-        <div>
-          <h1 style={{ textAlign: 'center', position: 'relative', top: '20vw' }}>Checking Access Token...</h1>
-        </div>
-      );
-    }
-
     return (
       <div>
-        <div className={styles.background_image} />
-        <div className={styles.background_overlay} />
         <main className={styles.content}>
           <div className={styles.login_form}>
-            <h1 style={{ textAlign: 'center', fontSize: 30 }}>GorillaDevs Login</h1>
+            <h1 style={{ textAlign: 'center', fontSize: 30 }}>
+              GorillaDevs Login
+            </h1>
             <Form onSubmit={this.handleSubmit}>
               <FormItem>
                 {getFieldDecorator('username', {
-                  rules: [{ required: true, message: 'Please input your username!' }],
-                })(
-                  <Input
-                    size="large"
-                    prefix={<Icon type="user" style={{ color: 'rgba(255,255,255,.8)' }} />}
-                    placeholder="Username"
-                  />
-                )}
+                  rules: [{ required: true, message: 'Please input your email!' }],
+                  initialValue: store.has('lastEmail') ? store.get('lastEmail') : ''
+                })(<Input
+                  size="large"
+                  prefix={<Icon type="user" style={{ color: 'rgba(255,255,255,.8)' }} />}
+                  placeholder="Email"
+                />)}
               </FormItem>
               <FormItem>
                 {getFieldDecorator('password', {
                   rules: [{ required: true, message: 'Please input your Password!' }],
-                })(
-                  <Input
-                    size="large"
-                    prefix={<Icon type="lock" style={{ color: 'rgba(255,255,255,.8)' }} />}
-                    addonAfter={
-                      <Link to={{ pathname: '/loginHelperModal', state: { modal: true } }} draggable="false">
-                        <Tooltip title="Need Help?">
-                          <Icon type="question" onClick={this.openHelpModal} />
-                        </Tooltip>
-                      </Link>
-                    }
-                    type="password"
-                    placeholder="Password"
-                  />
-                )}
+                })(<Input
+                  size="large"
+                  prefix={<Icon type="lock" style={{ color: 'rgba(255,255,255,.8)' }} />}
+                  addonAfter={
+                    <Link to={{ pathname: '/loginHelperModal', state: { modal: true } }} draggable="false">
+                      <Tooltip title="Need Help?">
+                        <Icon type="question" onClick={this.openHelpModal} />
+                      </Tooltip>
+                    </Link>
+                  }
+                  type="password"
+                  placeholder="Password"
+                />)}
               </FormItem>
               <FormItem>
                 {getFieldDecorator('remember', {
                   valuePropName: 'checked',
                   initialValue: true,
-                })(
-                  <Checkbox>Remember me</Checkbox>
-                )}
-                <Button icon="login" loading={this.props.authLoading} size="large" type="primary" htmlType="submit" className={styles.login_form_button}>
+                })(<Checkbox>Remember me</Checkbox>)}
+                <Button icon="login" loading={this.props.authLoading} disabled={this.props.tokenLoading} size="large" type="primary" htmlType="submit" className={styles.login_form_button}>
                   Log in
                 </Button>
               </FormItem>
             </Form>
+            {this.state.nativeLauncherProfiles &&
+              <Button
+                icon="forward"
+                loading={this.props.tokenLoading}
+                size="large"
+                type="primary"
+                className={styles.login_form_button}
+                style={{ marginTop: '30px' }}
+                onClick={() => this.props.tryNativeLauncherProfiles()}
+              >
+                Skip login
+              </Button>
+            }
+          </div>
+          <div style={{ position: 'absolute', bottom: 30, right: 30, color: '#bdc3c7' }}>
+            v{require('../../package.json').version}
           </div>
         </main>
       </div>
@@ -121,7 +135,8 @@ function mapStateToProps(state) {
   return {
     authLoading: state.auth.loading,
     isAuthValid: state.auth.isAuthValid,
-    tokenLoading: state.auth.tokenLoading
+    tokenLoading: state.auth.tokenLoading,
+    nativeModalOpened: state.auth.nativeProfilesModalOpened
   };
 }
 

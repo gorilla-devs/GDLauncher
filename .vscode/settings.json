@@ -1,6 +1,5 @@
 {
   "javascript.validate.enable": false,
-  "flow.useNPMPackagedFlow": true,
   "search.exclude": {
     ".git": true,
     ".eslintcache": true,
@@ -16,5 +15,13 @@
     "test/**/__snapshots__": true,
     "yarn.lock": true
   },
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "files.associations": {
+    ".eslintrc": "jsonc",
+    ".babelrc": "jsonc",
+    ".prettierrc": "jsonc"
+  },
+  "javascript.format.enable": true,
+  "typescript.validate.enable": false,
+  "typescript.format.enable": false,
 }

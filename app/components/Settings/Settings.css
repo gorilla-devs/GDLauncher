@@ -1,0 +1,10 @@
+.gridContainer {
+  width: 100%;
+}
+
+.container{
+  display: grid;
+  grid-template-columns: 1.1fr 3fr;
+  height: 100%;
+  width: 100%;
+}

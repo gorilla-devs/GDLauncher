@@ -1,0 +1,13 @@
+.menuItem {
+  width: 180px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 5px;
+  padding-left: 9px;
+  margin: 2px 0px;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: rgba(0, 0, 0, .3);
+}

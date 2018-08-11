@@ -3,38 +3,38 @@ const async = require('async');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const assert = require('assert');
+const os = require('os');
 const Promise = require('bluebird');
 const request = require('request-promise-native');
-
 
 module.exports = {
   downloadArr
 };
-Promise.promisifyAll(async);
 
-async function downloadArr(arr, process, folderPath, threads = 5) {
-  for (const lib of arr) {
-    try {
-      const filePath = `${folderPath}${path.dirname(lib.path)}`;
-      if (!fs.existsSync(filePath)) {
-        mkdirp.sync(filePath);
-      }
-      const file = await request(lib.url, { encoding: 'binary' });
-      fs.writeFileSync(`${folderPath}${lib.path}`, file, 'binary');
-      if (lib.legacyPath && !fs.existsSync(lib.legacyPath)) {
-        const legacyPath = `${folderPath}${path.dirname(lib.legacyPath)}`;
-        if (!fs.existsSync(legacyPath)) {
-          mkdirp.sync(legacyPath);
-        }
-        fs.writeFileSync(`${folderPath}${lib.legacyPath}`, file, 'binary');
-      }
+async function downloadArr(arr, process, folderPath, threads = os.cpus().length) {
+  await Promise.map(arr, item => downloadFile(item, folderPath), { concurrency: threads });
+}
 
-      process.send({ action: 'UPDATE__FILES' });
-    } catch (e) {
-      process.send({ action: 'CER_PIPE', msg: `Error downloading ${lib.url}: ${e}` });
+async function downloadFile(item, folderPath) {
+  try {
+    const filePath = path.join(folderPath, path.dirname(item.path));
+    if (!fs.existsSync(filePath)) {
+      mkdirp.sync(filePath);
+    }
+    const file = await request(item.url, { encoding: 'binary' });
+    fs.writeFileSync(path.join(folderPath, item.path), file, 'binary');
+    if (item.legacyPath && !fs.existsSync(item.legacyPath)) {
+      const legacyPath = path.join(folderPath, path.dirname(item.legacyPath));
+      if (!fs.existsSync(legacyPath)) {
+        mkdirp.sync(legacyPath);
+      }
+      fs.writeFileSync(path.join(folderPath, item.legacyPath), file, 'binary');
     }
 
-  };
+    process.send({ action: 'UPDATE__FILES' });
+  } catch (e) {
+    process.send({ action: 'CER_PIPE', msg: `Error downloading ${item.url}: ${e}` });
+  }
 }
 
 function checkFile(lpath, size, sha1) {
