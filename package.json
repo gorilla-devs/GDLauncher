@@ -1,7 +1,7 @@
 {
   "name": "gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.5.19",
+  "version": "0.5.20",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -77,7 +77,7 @@
         "portable",
         "zip"
       ],
-      "artifactName": "${productName}.${ext}"
+      "artifactName": "${productName}-win.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -91,7 +91,8 @@
         "AppImage",
         "zip"
       ],
-      "category": "Development"
+      "category": "Development",
+      "artifactName": "${productName}-linux.${ext}"
     },
     "directories": {
       "buildResources": "resources",
