@@ -30,7 +30,6 @@ matrix:
             - graphicsmagick
             - xz-utils
             - xorriso
-            - wine1.8
 
 cache:
   yarn: true
