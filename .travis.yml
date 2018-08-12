@@ -37,6 +37,8 @@ matrix:
           file:
             - "release/GDLauncher-win.exe"
             - "release/GDLauncher-win.zip"
+            - "release/GDLauncher-linux.AppImage"
+            - "release/GDLauncher-linux.zip"
           on:
             tags: true
 
