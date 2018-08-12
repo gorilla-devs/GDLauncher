@@ -97,13 +97,7 @@ app.on('ready', async () => {
     splash.destroy();
     mainWindow.show();
     mainWindow.focus();
-    const { crashReporter } = require('electron')
-
-    crashReporter.start({
-      productName: 'GDLauncher',
-      companyName: 'GorillaDevs',
-      submitURL: 'https://gdevs.io'
-    });
+    
   });
 
   ipcMain.on('open-devTools', () => {

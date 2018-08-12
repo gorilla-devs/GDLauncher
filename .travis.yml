@@ -20,18 +20,16 @@ matrix:
             - xz-utils
             - xorriso
       deploy:
-          provider: releases
+          provider: s3
           skip_cleanup: true
-          prerelease: true
-          api_key:
-            secure: hF5RKP28CK3zGjqK++zNxMOjXNvGhq51kcbwV2hiMiBs8JSRVzLWgbemQ0qExVzvn5OxH+3GDlZLCeAfeZBjuC8cRqccWQyQ7OAT27PqW1ZvPCSsG6Xz53z6AC06A3j3DkcougqVSVbRBr6JLDZBlNxeVRle+KUM1f0CdmQJtBH71lYYiafmV/xu1rBG0zJJL60nhln84jiorKSekhVnLzyWH+W2H+a3Shl0/TcGvQAJ1oTCypYjmp7+/4vvRTX2wt016UVeW9UYPowBoJWvia3/5ptMJthoYdibQc0NrCvlx1E4L6HlNnrCSZwnxmP9d0mt5kekpmOu+QijS0OrwGSMADzwxfx34cwcLMoX/4Q/E4X4C6fgTSe8s3NODtfKtiiovgX6tNiTu+eLkV/UuRA3qxQGM9vlbbGv37CNY/VLSNbRsEQQsofTzKXjUZ09WcBrHrML2ZZ1j1TkPlkZBf8ZwyqF2Y4Zou+bRDuER1oAHzsptjap2GIa2F8mZ/im6p6DhlU0MvGo4LSbuJwdj5Gc0G/Yq296OUkvH7ue6LgzTceILygt7q2pwz2TJuEK8Sgs+/3wQ2wmjT3m3h4KMt0T1l/DPyZQbQDTUX/7jwI1ObvEbRLH5C+x5B163rN75MvWCDwPuBkErvRQTLE96h+GuGQZvxz34R84aB4zK0Y=
-          file:
-            - "release/GDLauncher-win.exe"
-            - "release/GDLauncher-win.zip"
-            - "release/GDLauncher-linux.AppImage"
-            - "release/GDLauncher-linux.zip"
+          access_key_id: "AKIAIZDWZOG26BAQ6J7A"
+          secret_access_key: "qlKWMePl3yEzLoCHyMRAtAh2+tLGLm4+rXsH+WvcDASPKw0JRqZqJVJL7Sryafj5pgm2oALToVkXFf/8Ym10CNaJu1xarasYrad8BZgtIX0ByFy+2Q5lIXJb4aWzqsrnStq8B3nisgbEO5pUBpGMuObP6UpnpsfkwqugWa8+WwjVQySxSPPle/Ll7m29yTjO/qV4cohWWSBbMjHCZ3J9EEbKGUvw1J+RyuiHIQ2MYzGWfNqlqOgZblPKJoUNLPXqE0Lmpv4Ovyy+sqmaIxzXLDQeR4upQVbzQUgoGteChbs/iBmXOXgx8a/dQIRdtt7Lyr/dK/bF1idYOj7NSQX+iK0O1vMCCf+J2bIRpxSr23JIcfdINjWaEkjXrXFHB5WAqkuNDO58NVP5bQ0J0Jv1mQpouPOGtu98k6VlyoyL5UTCnlfjf93Xpaz16cETuIuGWvGqP98USDr4w1cEB7H4Grzco4PWazkNnuFqIbcSwsLIP8BhX9jE8jXFuKL3HkI4FGhpdTtj/7z8wsIGixkdphXsfyymm1ShHYksuQ5ZkyMhR6pLIajLgvRZlj41ZY4h1S4TfKvUP7PBTdlIzrTIHBxnD/bBODjMuW1d4Cq3mcpBs5EI0gMSedi+YYKCmXQDg0k8nRHxkCFuX6lcTQURdVXBZ0WUSiLQ8HV0E6XJdjM="
+          bucket: "dl.gorilladevs.com"
+          region: eu-central-1
+          local_dir: release
+          upload-dir: releases
           on:
-            tags: true
+            branch: master
     - os: osx
       osx_image: xcode9.4
       language: node_js

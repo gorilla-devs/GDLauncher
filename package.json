@@ -1,7 +1,7 @@
 {
   "name": "gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.5.22",
+  "version": "0.5.23",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -73,15 +73,13 @@
     },
     "win": {
       "target": [
-        "nsis-web",
         "portable",
         "zip"
       ],
       "artifactName": "${productName}-win.${ext}"
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
+      "oneClick": true,
       "runAfterFinish": false,
       "artifactName": "${productName}-installer.${ext}"
     },
@@ -170,6 +168,7 @@
     "electron-builder": "^20.27.1",
     "electron-devtools-installer": "^2.2.4",
     "electron-rebuild": "^1.7.3",
+    "electron-updater": "^3.1.1",
     "enzyme": "^3.4.1",
     "enzyme-adapter-react-16": "^1.2.0",
     "enzyme-to-json": "^3.3.4",
