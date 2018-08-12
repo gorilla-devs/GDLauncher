@@ -38,6 +38,8 @@ matrix:
           file:
             - "release/GDLauncher-win.exe"
             - "release/GDLauncher-win.zip"
+          on
+            tags: true
 
 cache:
   yarn: true
