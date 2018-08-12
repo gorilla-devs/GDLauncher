@@ -40,6 +40,21 @@ matrix:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
+before_cache:
+  # This should fix https://github.com/travis-ci/travis-ci/issues/9630
+  - sudo chown -R travis:travis $HOME/.cache
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+    - app/node_modules
+    - $(npm config get prefix)/lib/node_modules
+    - flow-typed
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder
+    - $HOME/docker
+
 install:
   - export CXX="g++-4.8"
   - yarn
