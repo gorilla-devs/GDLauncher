@@ -22,7 +22,6 @@ matrix:
         apt:
           update: true
           sources:
-            - sourceline: ppa:ubuntu-wine/ppa
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.8
