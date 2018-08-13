@@ -5,12 +5,19 @@
   <meta charset="utf-8">
   <title>GDLauncher</title>
   <style>
+    @font-face {
+      font-family: 'GlacialIndifferenceRegular';
+      src: url('./assets/fonts/GlacialIndifferenceRegular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     body {
       background: #34495e;
     }
 
     .loader {
-      width: 250px;
+      width: 350px;
       height: 50px;
       line-height: 50px;
       text-align: center;
@@ -18,7 +25,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-family: 'GlacialIndifferenceRegular';
+      font-family: 'GlacialIndifferenceRegular', sans-serif;
       text-transform: uppercase;
       font-weight: 900;
       color: #3498db;
@@ -56,7 +63,7 @@
         width: 40px;
       }
       100% {
-        left: 235px;
+        left: 335px;
         height: 30px;
         width: 15px;
       }
@@ -65,7 +72,7 @@
 </head>
 
 <body>
-  <div class="loader">Loading...</div>
+  <div class="loader">Loading Awesome Stuff</div>
 </body>
 
 </html>

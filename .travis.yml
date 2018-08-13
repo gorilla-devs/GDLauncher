@@ -25,8 +25,8 @@ matrix:
         - sudo chown -R travis:travis $TRAVIS_BUILD_DIR/node_modules
       before_deploy:
         # Removing unpacked builds before deploy
-        - rm -rf $TRAVIS_BUILD_DIR/release/win-unpacked
-        - rm -rf $TRAVIS_BUILD_DIR/release/linux-unpacked
+        - sudo rm -rf $TRAVIS_BUILD_DIR/release/win-unpacked
+        - sudo rm -rf $TRAVIS_BUILD_DIR/release/linux-unpacked
       deploy:
           provider: s3
           skip_cleanup: true

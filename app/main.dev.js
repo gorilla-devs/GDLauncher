@@ -60,7 +60,7 @@ app.on('ready', async () => {
 
   // create a new `splash`-WindowF
   splash = new BrowserWindow({
-    width: 280,
+    width: 380,
     height: 80,
     frame: false,
     show: true
@@ -75,10 +75,7 @@ app.on('ready', async () => {
     minHeight: 600,
     minWidth: 780,
     frame: false,
-    backgroundColor: '#34495e',
-    webPreferences: {
-      experimentalFeatures: true
-    }
+    backgroundColor: '#34495e'
   });
 
   mainWindow.webContents.on('new-window', (e, url) => {
