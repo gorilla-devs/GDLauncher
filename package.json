@@ -73,8 +73,7 @@
     },
     "win": {
       "target": [
-        "portable",
-        "zip"
+        "portable"
       ],
       "artifactName": "${productName}-win.${ext}"
     },
@@ -85,9 +84,7 @@
     },
     "linux": {
       "target": [
-        "deb",
-        "AppImage",
-        "zip"
+        "AppImage"
       ],
       "category": "Development",
       "artifactName": "${productName}-linux.${ext}"
