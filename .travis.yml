@@ -19,6 +19,10 @@ matrix:
             - graphicsmagick
             - xz-utils
             - xorriso
+      before_install:
+        # This should fix https://github.com/travis-ci/travis-ci/issues/9630
+        - sudo chown -R travis:travis $HOME/.cache
+        - sudo chown -R travis:travis $HOME/node_modules
       deploy:
           provider: s3
           skip_cleanup: true
@@ -39,11 +43,6 @@ matrix:
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-
-before_install:
-  # This should fix https://github.com/travis-ci/travis-ci/issues/9630
-  - sudo chown -R travis:travis $HOME/.cache
-  - sudo chown -R travis:travis $HOME/node_modules
 
 cache:
   yarn: true
