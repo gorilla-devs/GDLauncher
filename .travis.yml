@@ -22,7 +22,7 @@ matrix:
       before_install:
         # This should fix https://github.com/travis-ci/travis-ci/issues/9630
         - sudo chown -R travis:travis $HOME/.cache
-        - sudo chown -R travis:travis $HOME/node_modules
+        - sudo chown -R travis:travis $TRAVIS_BUILD_DIR/node_modules
       deploy:
           provider: s3
           skip_cleanup: true
