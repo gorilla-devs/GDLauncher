@@ -40,9 +40,10 @@ matrix:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
-before_cache:
+before_install:
   # This should fix https://github.com/travis-ci/travis-ci/issues/9630
   - sudo chown -R travis:travis $HOME/.cache
+  - sudo chown -R travis:travis $HOME/node_modules
 
 cache:
   yarn: true
