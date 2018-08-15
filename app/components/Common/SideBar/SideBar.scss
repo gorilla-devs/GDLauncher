@@ -3,11 +3,18 @@
   height: 100vh;
   position: absolute;
   right: 0;
-  top: 60px;
+  top: 20px;
   background-color: #2c3e50;
   font-family: 'GlacialIndifferenceRegular';
+  .updateAvailable {
+    position: absolute;
+    line-height: 40px;
+    width: 100%;
+    text-align: center;
+  }
   .header {
     display: flex;
+    margin-top: 40px;
     line-height: 40px;
     span:first-child {
       position: relative;
@@ -51,7 +58,7 @@
   position: absolute;
   display: flex;
   width: 200px;
-  bottom: 60px;
+  bottom: 20px;
   padding-right: 10px;
   align-items: center;
   align-content: center;

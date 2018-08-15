@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Avatar } from 'antd';
+import { Avatar, Button } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -8,6 +8,7 @@ import styles from './SideBar.scss';
 
 import * as AuthActions from '../../../actions/auth';
 import * as ProfileActions from '../../../actions/profile';
+import * as autoUpdater from '../../../actions/autoUpdater';
 
 
 type Props = {
@@ -15,6 +16,14 @@ type Props = {
 
 class SideBar extends Component<Props> {
   props: Props;
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      updateTextVisible: true
+    }
+    this.props.checkForUpdates();
+  }
 
   handleClick = (e) => {
     console.log(e);
@@ -34,9 +43,13 @@ class SideBar extends Component<Props> {
     }
   }
 
+
   render() {
     return (
       <aside className={styles.sidenav}>
+        {this.props.updateAvailable && <div className={styles.updateAvailable}>
+          <Button loading={this.props.updating} onClick={this.props.checkForUpdates} type="primary" size="small" style={{ marginLeft: 5 }}>Update Available</Button>
+        </div>}
         <div className={styles.header}>
           <Avatar size="normal">P</Avatar>
           <span>{this.props.username}</span>
@@ -92,12 +105,14 @@ function mapStateToProps(state) {
     username: state.auth.displayName,
     profileState: state.profile.profileState,
     stateColor: state.profile.stateColor,
-    downloadQueue: state.downloadManager.downloadQueue
+    downloadQueue: state.downloadManager.downloadQueue,
+    updateAvailable: state.autoUpdater.updateAvailable,
+    updating: state.autoUpdater.checkingForUpdates,
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...AuthActions, ...ProfileActions }, dispatch);
+  return bindActionCreators({ ...AuthActions, ...ProfileActions, ...autoUpdater }, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SideBar);

@@ -13,5 +13,6 @@ module.exports = {
   DARWIN: 'darwin',
   APPPATH: getAppPath.getAppPath(),
   NEWS_URL: 'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1',
-  JAVA_URL: 'https://java.com/download'
+  JAVA_URL: 'https://java.com/download',
+  UPDATE_URL: 'https://dl.gorilladevs.com/releases/latest.json'
 };

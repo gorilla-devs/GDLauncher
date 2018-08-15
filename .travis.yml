@@ -27,6 +27,7 @@ matrix:
         # Removing unpacked builds before deploy
         - sudo rm -rf $TRAVIS_BUILD_DIR/release/win-unpacked
         - sudo rm -rf $TRAVIS_BUILD_DIR/release/linux-unpacked
+        - sudo node $TRAVIS_BUILD_DIR/scripts/preDeploy.js
       deploy:
           provider: s3
           skip_cleanup: true

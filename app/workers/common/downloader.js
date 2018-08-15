@@ -1,5 +1,4 @@
 const path = require('path');
-const async = require('async');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const assert = require('assert');

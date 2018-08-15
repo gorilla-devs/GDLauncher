@@ -73,7 +73,8 @@
     },
     "win": {
       "target": [
-        "portable"
+        "portable",
+        "zip"
       ],
       "artifactName": "${productName}-win.${ext}"
     },
@@ -84,7 +85,8 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "AppImage",
+        "zip"
       ],
       "category": "Development",
       "artifactName": "${productName}-linux.${ext}"
@@ -139,6 +141,7 @@
     ]
   },
   "devDependencies": {
+    "asar": "^0.14.3",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
     "babel-jest": "^23.4.2",
