@@ -5,34 +5,34 @@ const assert = require('assert');
 const os = require('os');
 const Promise = require('bluebird');
 const request = require('request-promise-native');
+const { promisify } = require('util');
 
 module.exports = {
   downloadArr
 };
 
-async function downloadArr(arr, process, folderPath, threads = os.cpus().length) {
+async function downloadArr(arrda, folderPath, threads = os.cpus().length) {
   await Promise.map(arr, item => downloadFile(item, folderPath), { concurrency: threads });
 }
 
 async function downloadFile(item, folderPath) {
   try {
     const filePath = path.join(folderPath, path.dirname(item.path));
-    if (!fs.existsSync(filePath)) {
+    if (!await promisify(fs.exists)(filePath)) {
       mkdirp.sync(filePath);
     }
     const file = await request(item.url, { encoding: 'binary' });
-    fs.writeFileSync(path.join(folderPath, item.path), file, 'binary');
-    if (item.legacyPath && !fs.existsSync(item.legacyPath)) {
+    await promisify(fs.writeFile)(path.join(folderPath, item.path), file, 'binary');
+    if (item.legacyPath && !await promisify(fs.exists)(item.legacyPath)) {
       const legacyPath = path.join(folderPath, path.dirname(item.legacyPath));
-      if (!fs.existsSync(legacyPath)) {
+      if (!await promisify(fs.exists)(legacyPath)) {
         mkdirp.sync(legacyPath);
       }
-      fs.writeFileSync(path.join(folderPath, item.legacyPath), file, 'binary');
+      await promisify(fs.writeFile)(path.join(folderPath, item.legacyPath), file, 'binary');
     }
 
-    process.send({ action: 'UPDATE__FILES' });
   } catch (e) {
-    process.send({ action: 'CER_PIPE', msg: `Error downloading ${item.url}: ${e}` });
+    
   }
 }
 

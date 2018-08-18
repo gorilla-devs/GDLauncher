@@ -48,7 +48,7 @@ class SideBar extends Component<Props> {
     return (
       <aside className={styles.sidenav}>
         {this.props.updateAvailable && <div className={styles.updateAvailable}>
-          <Button loading={this.props.updating} onClick={this.props.checkForUpdates} type="primary" size="small" style={{ marginLeft: 5 }}>Update Available</Button>
+          <Button loading={this.props.updating} onClick={this.props.update} type="primary" size="small" style={{ marginLeft: 5 }}>Update Available</Button>
         </div>}
         <div className={styles.header}>
           <Avatar size="normal">P</Avatar>

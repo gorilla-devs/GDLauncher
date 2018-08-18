@@ -73,19 +73,12 @@
     },
     "win": {
       "target": [
-        "portable",
         "zip"
       ],
       "artifactName": "${productName}-win.${ext}"
     },
-    "nsis": {
-      "oneClick": true,
-      "runAfterFinish": false,
-      "artifactName": "${productName}-installer.${ext}"
-    },
     "linux": {
       "target": [
-        "AppImage",
         "zip"
       ],
       "category": "Development",
@@ -233,6 +226,7 @@
     "es6-promisify": "^6.0.0",
     "extract-zip": "^1.6.7",
     "fs-extra": "^7.0.0",
+    "fstream": "^1.0.11",
     "glamor": "^2.20.40",
     "glamorous": "^4.13.1",
     "history": "^4.7.2",
@@ -241,6 +235,7 @@
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
     "mz": "^2.7.0",
+    "node-7z": "^0.4.0",
     "p-queue": "^2.4.2",
     "postcss-html": "^0.32.0",
     "prop-types": "^15.6.2",
@@ -262,6 +257,7 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "source-map-support": "^0.5.8",
+    "tar": "^4.4.6",
     "x2js": "^3.2.1"
   },
   "devEngines": {

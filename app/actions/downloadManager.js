@@ -2,6 +2,7 @@ import * as path from 'path';
 import { remote, ipcRenderer } from 'electron';
 import { message } from 'antd';
 import { APPPATH } from '../constants';
+import { promisify } from 'util';
 
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
@@ -45,7 +46,7 @@ export function clearQueue() {
 }
 
 export function downloadPack(pack) {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const { downloadManager } = getState();
     /*
     // We pass the name of the instance to the worker and then let the fork do all the work
@@ -57,65 +58,97 @@ export function downloadPack(pack) {
     // CER_PIPE -> Sends a console.err command
     */
 
-    const { fork } = require('child_process');
-    console.log(`%cDownloading ${pack}`, 'color: #3498db');
-    const forked = fork(
-      process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ?
-        `${__dirname}/workers/downloadPackage.js` :
-        path.join(remote.app.getAppPath(), 'dist/downloadPackage.js'
-        ), {
-        env: {
-          name: downloadManager.downloadQueue[pack].name,
-          appPath: APPPATH
-        }
-      }, {
-        silent: true
-      });
+    // const { fork } = require('child_process');
+    // console.log(`%cDownloading ${pack}`, 'color: #3498db');
+    // const forked = fork(
+    //   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ?
+    //     `${__dirname}/workers/downloadPackage.js` :
+    //     path.join(remote.app.getAppPath(), 'dist/downloadPackage.js'
+    //     ), {
+    //     env: {
+    //       name: downloadManager.downloadQueue[pack].name,
+    //       appPath: APPPATH
+    //     }
+    //   }, {
+    //     silent: true
+    //   });
 
 
-    forked.on('message', (data) => {
-      const { total, action } = data;
-      switch (action) {
-        case 'UPDATE__FILES':
+    // forked.on('message', (data) => {
+    //   const { total, action } = data;
+    //   switch (action) {
+    //     case 'UPDATE__FILES':
 
-          dispatch({
-            type: DOWNLOAD_FILE_COMPLETED,
-            payload: {
-              pack
-            }
-          });
-          break;
-        case 'UPDATE__TOTAL':
-          dispatch({
-            type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
-            payload: {
-              pack,
-              total
-            }
-          });
-          break;
-        case 'DOWNLOAD__COMPLETED':
-          dispatch({
-            type: DOWNLOAD_COMPLETED,
-            payload: pack
-          });
-          message.success(`${pack} has been downloaded!`);
+    //       dispatch({
+    //         type: DOWNLOAD_FILE_COMPLETED,
+    //         payload: {
+    //           pack
+    //         }
+    //       });
+    //       break;
+    //     case 'UPDATE__TOTAL':
+    //       dispatch({
+    //         type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
+    //         payload: {
+    //           pack,
+    //           total
+    //         }
+    //       });
+    //       break;
+    //     case 'DOWNLOAD__COMPLETED':
+    //       dispatch({
+    //         type: DOWNLOAD_COMPLETED,
+    //         payload: pack
+    //       });
+    //       message.success(`${pack} has been downloaded!`);
 
-          forked.kill();
-          // CHECK IF ANY ITEM EXISTS IN THE QUEUE YET TO BE DOWNLOADED.
-          // IF YES, ADD IT TO THE ACTUALDOWNLOAD
-          dispatch(addNextPackToActualDownload());
-          break;
-        case 'CLG_PIPE':
-          console.log(data.msg);
-          break;
-        case 'CER_PIPE':
-          console.error(data.msg);
-          break;
-        default:
-          break;
+    //       forked.kill();
+    //       // CHECK IF ANY ITEM EXISTS IN THE QUEUE YET TO BE DOWNLOADED.
+    //       // IF YES, ADD IT TO THE ACTUALDOWNLOAD
+    //       dispatch(addNextPackToActualDownload());
+    //       break;
+    //     case 'CLG_PIPE':
+    //       console.log(data.msg);
+    //       break;
+    //     case 'CER_PIPE':
+    //       console.error(data.msg);
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // });
+
+    const fs = require('fs');
+    const constants = require('../constants');
+    const vnlHelpers = require('../utils/getMCFilesList');
+    const downloader = require('../workers/common/downloader');
+
+    const vnlPath = path.join(APPPATH, constants.LAUNCHER_FOLDER, constants.PACKS_FOLDER_NAME, pack);
+    const vnlRead = await promisify(fs.readFile)(`${vnlPath}/vnl.json`);
+    const vnlJSON = JSON.parse(vnlRead);
+
+    const vnlLibs = await vnlHelpers.extractLibs(vnlJSON);
+
+    const vnlAssets = await vnlHelpers.extractAssets(vnlJSON);
+
+    const mainJar = await vnlHelpers.extractMainJar(vnlJSON);
+
+    dispatch({
+      type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
+      payload: {
+        pack,
+        total: vnlLibs.length + vnlAssets.length + mainJar.length
       }
     });
+
+    await downloader.downloadArr(vnlLibs, path.join(APPPATH, constants.LAUNCHER_FOLDER, 'libraries'));
+
+    await downloader.downloadArr(vnlAssets, path.join(APPPATH, constants.LAUNCHER_FOLDER, 'assets'), 10);
+
+    await downloader.downloadArr(mainJar, path.join(APPPATH, constants.LAUNCHER_FOLDER, 'versions'));
+
+    await vnlHelpers.extractNatives(vnlLibs.filter(lib => 'natives' in lib), pack, APPPATH);
+
   };
 }
 

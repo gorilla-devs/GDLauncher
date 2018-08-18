@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import { goBack } from 'react-router-redux';
+import { promisify } from 'util';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, GAME_VERSIONS_URL, APPPATH } from '../constants';
 import { addToQueue } from './downloadManager';
 
@@ -28,19 +29,17 @@ export function resetModalState() {
 }
 
 export function createPack(url, packName) {
-  return (dispatch) => {
+  return async (dispatch) => {
     const packsPath = `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
-    return axios.get(url).then((response) => {
-      // CREATE PACK FOLDER IF iT DOES NOT EXISt
-      if (!fs.existsSync(`${packsPath}/${packName}/`)) {
-        mkdirp.sync(`${packsPath}/${packName}/`);
-        fs.writeFileSync(`${packsPath}/${packName}/vnl.json`, JSON.stringify(response.data));
-      }
-      return response;
-    })
-      .then(dispatch(addToQueue(packName, 'vanilla')))
-      .then(dispatch({ type: CREATION_COMPLETE }))
-      .then(setTimeout(dispatch(goBack()), 160));
+    const response = await axios.get(url);
+    // CREATE PACK FOLDER IF iT DOES NOT EXISt
+    if (!await promisify(fs.exists)(`${packsPath}/${packName}/`)) {
+      mkdirp.sync(`${packsPath}/${packName}/`);
+      await promisify(fs.writeFile)(`${packsPath}/${packName}/vnl.json`, JSON.stringify(response.data));
+    }
+    dispatch(addToQueue(packName, 'vanilla'))
+    dispatch({ type: CREATION_COMPLETE })
+    setTimeout(dispatch(goBack()), 160);
   };
 }
 
