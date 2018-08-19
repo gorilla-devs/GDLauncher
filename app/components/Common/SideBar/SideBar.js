@@ -63,30 +63,33 @@ class SideBar extends Component<Props> {
         <hr />
         <div className={styles.socialsContainer}>
           { /* eslint-disable */}
-          <img
-            alt="socials"
-            draggable="false"
-            style={{ padding: 10 }}
-            className={styles.socialBtn}
-            src="https://discordapp.com/assets/a39ef972d8ec7966a6a25b1853b14f38.svg"
-            onClick={() => this.openLink("https://twitter.com/gorilladevs")}
-          />
-          <img
-            alt="socials"
-            draggable="false"
-            style={{ padding: 10 }}
-            className={styles.socialBtn}
-            src="https://discordapp.com/assets/47ee7342b7e2986c314fd77f4331df63.svg"
-            onClick={() => this.openLink("https://facebook.com/gorilladevs")}
-          />
-          <img
-            alt="socials"
-            draggable="false"
-            style={{ padding: 10 }}
-            className={styles.socialBtn}
-            src="https://discordapp.com/assets/97e19ce71e9c9273e01d64da1948912b.svg"
-            onClick={() => this.openLink("https://instagram.com/gorilladevs")}
-          />
+          <a href="https://twitter.com/gorilladevs" target="_blank" rel="noopener noreferrer">
+            <img
+              alt="socials"
+              draggable="false"
+              style={{ padding: 10 }}
+              className={styles.socialBtn}
+              src="https://discordapp.com/assets/a39ef972d8ec7966a6a25b1853b14f38.svg"
+            />
+          </a>
+          <a href="https://facebook.com/gorilladevs" target="_blank" rel="noopener noreferrer">
+            <img
+              alt="socials"
+              draggable="false"
+              style={{ padding: 10 }}
+              className={styles.socialBtn}
+              src="https://discordapp.com/assets/47ee7342b7e2986c314fd77f4331df63.svg"
+            />
+          </a>
+          <a href="https://instagram.com/gorilladevs" target="_blank" rel="noopener noreferrer">
+            <img
+              alt="socials"
+              draggable="false"
+              style={{ padding: 10 }}
+              className={styles.socialBtn}
+              src="https://discordapp.com/assets/97e19ce71e9c9273e01d64da1948912b.svg"
+            />
+          </a>
           <span className={styles.version}>v{require('../../../package.json').version}</span>
           { /* eslint-enable */}
         </div>
