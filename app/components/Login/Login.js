@@ -14,7 +14,6 @@ type Props = {
   login: () => void,
   tryNativeLauncherProfiles: () => void,
   tokenLoading: boolean,
-  nativeModalOpened: boolean,
   closeNativeProfiles: () => void,
   authLoading: boolean,
   openNativeProfiles: () => void
@@ -74,7 +73,7 @@ class Login extends Component<Props> {
               <FormItem>
                 {getFieldDecorator('username', {
                   rules: [{ required: true, message: 'Please input your email!' }],
-                  initialValue: store.has('lastEmail') ? store.get('lastEmail') : ''
+                  initialValue: store.has('lastUsername') ? store.get('lastUsername') : ''
                 })(<Input
                   size="large"
                   prefix={<Icon type="user" style={{ color: 'rgba(255,255,255,.8)' }} />}
