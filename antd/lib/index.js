@@ -58,15 +58,6 @@ Object.defineProperty(exports, 'BackTop', {
     }
 });
 
-var _badge = require('./badge');
-
-Object.defineProperty(exports, 'Badge', {
-    enumerable: true,
-    get: function get() {
-        return _interopRequireDefault(_badge)['default'];
-    }
-});
-
 var _breadcrumb = require('./breadcrumb');
 
 Object.defineProperty(exports, 'Breadcrumb', {
@@ -82,24 +73,6 @@ Object.defineProperty(exports, 'Button', {
     enumerable: true,
     get: function get() {
         return _interopRequireDefault(_button)['default'];
-    }
-});
-
-var _calendar = require('./calendar');
-
-Object.defineProperty(exports, 'Calendar', {
-    enumerable: true,
-    get: function get() {
-        return _interopRequireDefault(_calendar)['default'];
-    }
-});
-
-var _card = require('./card');
-
-Object.defineProperty(exports, 'Card', {
-    enumerable: true,
-    get: function get() {
-        return _interopRequireDefault(_card)['default'];
     }
 });
 
@@ -253,15 +226,6 @@ Object.defineProperty(exports, 'Menu', {
     enumerable: true,
     get: function get() {
         return _interopRequireDefault(_menu)['default'];
-    }
-});
-
-var _modal = require('./modal');
-
-Object.defineProperty(exports, 'Modal', {
-    enumerable: true,
-    get: function get() {
-        return _interopRequireDefault(_modal)['default'];
     }
 });
 
