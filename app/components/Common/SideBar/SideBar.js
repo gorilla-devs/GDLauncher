@@ -88,7 +88,7 @@ class SideBar extends Component<Props> {
               style={{ padding: 10 }}
               className={styles.socialBtn}
               src="https://discordapp.com/assets/97e19ce71e9c9273e01d64da1948912b.svg"
-            />
+            />        
           </a>
           <span className={styles.version}>v{require('../../../package.json').version}</span>
           { /* eslint-enable */}

@@ -20,8 +20,7 @@ export default merge.smart(baseConfig, {
   target: 'electron-main',
 
   entry: {
-    'main.prod': path.join(__dirname, 'app/main.dev'),
-    'dist/downloadPackage': path.join(__dirname, 'app/workers/downloadPackage.js')
+    'main.prod': path.join(__dirname, 'app/main.dev')
   },
 
   output: {

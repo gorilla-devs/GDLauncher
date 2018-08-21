@@ -17,8 +17,8 @@ const Settings = ({ match, history }) => {
       }
     >
       <div className={styles.container}>
-        <SideMenu />
-        <Content />
+        <SideMenu match={match} />
+        <Content match={match} />
       </div>
     </Modal>
   );

@@ -32,9 +32,9 @@ export default class Modal extends Component<Props> {
   }
 
   componentWillReceiveProps(newProps) { // check for the mounted props
-    if (!newProps.mounted) {
-      return this.unMountStyle(); // call outro animation when mounted prop is false
-    }
+    // if (!newProps.mounted) {
+    //   return this.unMountStyle(); // call outro animation when mounted prop is false
+    // }
     setTimeout(this.mountStyle, 10); // call the into animiation
   }
 

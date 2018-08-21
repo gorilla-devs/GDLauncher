@@ -5,9 +5,15 @@ import styles from './MenuItem.scss';
 
 const MenuItem = (props) => {
   return (
-    <div className={styles.menuItem}>
-      {props.children}
-    </div>
+    <Link to={{
+      pathname: `/settings/${props.to}`,
+      state: { modal: true }
+    }}
+    replace>
+      <div className={styles.menuItem} style={{ background: props.active ? '#2980b9' : '' }}>
+        {props.children}
+      </div>
+    </Link>
   );
 };
 

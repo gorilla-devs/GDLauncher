@@ -75,6 +75,8 @@ class RouteDef extends Component<Props> {
             <SideBar />
           </div>
           : null}
+
+
         <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
           {!this.props.isAuthValid && <Redirect push to="/" />}
@@ -84,12 +86,10 @@ class RouteDef extends Component<Props> {
         </Switch>
 
         { /* ALL MODALS */}
-        <Switch>
-          {isModal ? <Route path="/settings" component={Settings} /> : null}
-          {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
-          {isModal ? <Route path="/vanillaModal" component={VanillaModal} /> : null}
-          {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
-        </Switch>
+        {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
+        {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
+        {isModal ? <Route path="/vanillaModal" component={VanillaModal} /> : null}
+        {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
       </App>
     );
   }
