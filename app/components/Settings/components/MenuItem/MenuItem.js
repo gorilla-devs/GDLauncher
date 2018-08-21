@@ -9,7 +9,10 @@ const MenuItem = (props) => {
       pathname: `/settings/${props.to}`,
       state: { modal: true }
     }}
-    replace>
+    replace
+    style={{
+      textDecoration: 'none'
+    }}>
       <div className={styles.menuItem} style={{ background: props.active ? '#2980b9' : '' }}>
         {props.children}
       </div>

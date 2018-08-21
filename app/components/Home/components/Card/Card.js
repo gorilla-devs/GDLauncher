@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import styles from './Card.scss';
 
 type Props = {
-  children: object,
+  children: Object,
   externalLink?: boolean,
-  style?: object
+  style?: Object
 };
 
 export default class Card extends Component<Props> {

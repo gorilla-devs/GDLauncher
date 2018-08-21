@@ -21,7 +21,7 @@ import VanillaModal from './components/VanillaModal/containers/VanillaModal';
 import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
 type Props = {
-  location: object,
+  location: Object,
   checkAccessToken: () => void,
   isAuthValid: boolean
 };

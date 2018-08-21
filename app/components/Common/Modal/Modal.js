@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
 import styles from './Modal.css';
 
+type Props = {};
+
 export default class Modal extends Component<Props> {
   props: Props;
 

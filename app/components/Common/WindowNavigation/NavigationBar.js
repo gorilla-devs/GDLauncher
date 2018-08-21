@@ -12,7 +12,7 @@ import logo from '../../../assets/images/logo.png';
 
 
 type Props = {
-  downloadQueue: array,
+  downloadQueue: Object,
   location: string
 };
 class NavigationBar extends Component<Props> {

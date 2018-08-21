@@ -39,8 +39,8 @@ const SortableList = SortableContainer(({ items }) => {
 
 export default class DManager extends Component<Props> {
   props: Props;
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     if (!existsSync(watchPath)) {
       mkdirp.sync(watchPath);
     }

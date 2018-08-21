@@ -5,7 +5,7 @@ import styles from './Dot.css';
 
 type Props = {
   Color: string,
-  children: object
+  children: Object
 };
 export default class Dot extends Component<Props> {
   props: Props;

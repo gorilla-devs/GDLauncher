@@ -14,9 +14,7 @@ type Props = {
   login: () => void,
   tryNativeLauncherProfiles: () => void,
   tokenLoading: boolean,
-  closeNativeProfiles: () => void,
   authLoading: boolean,
-  openNativeProfiles: () => void
 };
 
 const FormItem = Form.Item;

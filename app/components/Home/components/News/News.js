@@ -1,14 +1,15 @@
 import React from 'react';
 import { Carousel } from 'antd';
+import ContentLoader from "react-content-loader"
 import styles from './News.scss';
 
 const News = props =>
   (
     <div className={styles.container}>
-      <Carousel infinite autoplay style={{ height: '180px', }}>
-        {props.news.news.length !== 0 ? props.news.news.map(inf => {
+      {props.news.news.length !== 0 ? <Carousel infinite autoplay style={{ height: '180px', }}>
+        {props.news.news.map(inf => {
           return (
-            <a href={inf.url} target="_blank" rel="noopener noreferrer" style={{ height: 140 }}>
+            <a href={inf.url} target="_blank" rel="noopener noreferrer" style={{ height: 140 }} key={`news-${inf.title}`}>
               <div
                 style={{
                   background: `linear-gradient(rgba(44, 62, 80, 0), rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 1)), url(${inf.image})`,
@@ -27,8 +28,23 @@ const News = props =>
               <div style={{ position: 'absolute', top: 140, height: 40, width: '100%' }} />
             </a>
           );
-        }) : <div style={{ textAlign: 'center' }}>Loading News</div>}
-      </Carousel>
+        })}
+      </Carousel> : <ContentLoader
+        height={180}
+        speed={0.8}
+        primaryColor="#212b36"
+        secondaryColor="#2c3e50"
+        style={{
+          height: '180px',
+          maxWidth: '1050px',
+          background: '#2c3e50',
+          width: '100%',
+        }}
+      >
+          <rect x="16" y="100" rx="0" ry="0" width="200" height="20" />
+          <rect x="16" y="130" rx="0" ry="0" width="400" height="20" />
+
+        </ContentLoader>}
     </div>
   );
 

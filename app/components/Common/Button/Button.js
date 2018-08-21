@@ -5,10 +5,10 @@ import Interactive from 'react-interactive';
 import styles from './Button.css';
 
 type Props = {
-  style: object,
-  hover: object,
-  children: object,
-  onClick: func
+  style: Object,
+  hover: Object,
+  children: Object,
+  onClick: () => void
 };
 
 export default class Button extends Component<Props> {

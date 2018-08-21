@@ -10,10 +10,10 @@ import styles from './DInstance.scss';
 type Props = {
   name: string,
   installingQueue: Object,
-  selectedInstance: string,
+  selectedInstance: ?string,
   startInstance: () => void,
   selectInstance: () => void,
-  playing: array
+  playing: Array
 };
 
 export default class DInstance extends Component<Props> {
