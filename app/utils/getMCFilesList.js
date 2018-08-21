@@ -12,7 +12,9 @@ module.exports = {
     const libs = [];
     const filePath = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, 'versions', json.id, `${json.id}.jar`);
     if (CheckForExists) {
-      if (!(await fs.exists(filePath))) {
+      try {
+        await promisify(fs.access)(filePath);
+      } catch (e) {
         libs.push({
           url: json.downloads.client.url,
           path: `${json.id}/${json.id}.jar`
@@ -32,7 +34,9 @@ module.exports = {
       if ('artifact' in lib.downloads) {
         const filePath = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, 'libraries', lib.downloads.artifact.path);
         if (CheckForExists) {
-          if (!(await fs.exists(filePath))) {
+          try {
+            await promisify(fs.access)(filePath);
+          } catch (e) {
             libs.push({
               url: lib.downloads.artifact.url,
               path: lib.downloads.artifact.path
@@ -57,9 +61,12 @@ module.exports = {
   },
   extractNatives: async (libs, packName, appPath) => {
     const nativesPath = path.join(appPath, constants.LAUNCHER_FOLDER, constants.PACKS_FOLDER_NAME, packName, 'natives');
-    if (!(await fs.exists(nativesPath))) {
+    try {
+      await promisify(fs.access)(nativesPath);
+    } catch (e) {
       await mkdirp(nativesPath);
     }
+
     await Promise.all(libs.map(lib =>
       extract(path.join(appPath, constants.LAUNCHER_FOLDER, 'libraries', lib.path), { dir: `${nativesPath}` })));
   },
@@ -68,18 +75,27 @@ module.exports = {
     await axios.get(json.assetIndex.url).then(async (res) => {
       // It saves the json into a file on /assets/indexes/${version}.json
       const assetsFile = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, 'assets', 'indexes', `${json.assets}.json`);
-      if (!(await fs.exists(assetsFile))) {
+      try {
         // Checks whether the dir exists. If not, it creates it
-        if (!(await fs.exists(path.dirname(assetsFile)))) {
-          await mkdirp(path.dirname(assetsFile));
-        }
-        await fs.writeFile(assetsFile, JSON.stringify(res.data));
+        await promisify(fs.access)(path.dirname(assetsFile));
+      } catch (e) {
+        await mkdirp(path.dirname(assetsFile));
       }
+      finally {
+        try {
+          await promisify(fs.access)(assetsFile);
+        } catch (e) {
+          await promisify(fs.writeFile)(assetsFile, JSON.stringify(res.data));
+        }
+      }
+
       // Returns the list of assets if they don't already exist
       return Object.keys(res.data.objects).map(async (asset) => {
         const assetCont = res.data.objects[asset];
         const filePath = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, 'assets', 'objects', assetCont.hash.substring(0, 2), assetCont.hash);
-        if (!(await fs.exists(filePath))) {
+        try {
+          await promisify(fs.access)(filePath);
+        } catch (e) {
           assets.push({
             url: `http://resources.download.minecraft.net/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`,
             path: `objects/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`,

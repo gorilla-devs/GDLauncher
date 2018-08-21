@@ -43,6 +43,8 @@ export default function auth(state = initialState, action) {
         clientToken: action.payload.clientToken,
         legacy: action.payload.legacy,
         uuid: action.payload.uuid,
+        userID: action.payload.userID,
+        username: action.payload.username,
         isAuthValid: true
       };
     case `${AUTH_FAILED}`:
@@ -59,6 +61,8 @@ export default function auth(state = initialState, action) {
         clientToken: null,
         legacy: null,
         uuid: null,
+        userID: null,
+        username: null,
         isAuthValid: false
       };
     default:

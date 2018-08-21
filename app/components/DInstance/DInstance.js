@@ -31,7 +31,7 @@ export default class DInstance extends Component<Props> {
     this.percentage = this.updatePercentage();
   }
 
-  updateInstallingStatus() {
+  isInstalling() {
     if (this.props.installingQueue[this.props.name]) {
       switch (this.props.installingQueue[this.props.name].status) {
         case 'Queued':
@@ -101,34 +101,34 @@ export default class DInstance extends Component<Props> {
         <ContextMenuTrigger id={`contextMenu-${this.props.name}`}>
           {this.props.playing.find(el => el === this.props.name) &&
             <span className={styles.playingIcon}><i className="fas fa-play" style={{ fontSize: '17px' }} /></span>}
-          {this.updateInstallingStatus() &&
+          {this.isInstalling() &&
             <span className={styles.downloadingIcon}><i className="fas fa-download" style={{ fontSize: '17px' }} /></span>}
           <div className={styles.icon}>
             <div
               className={styles.icon__image}
-              style={{ filter: this.updateInstallingStatus() ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
+              style={{ filter: this.isInstalling() ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
             />
             <span className={styles.icon__instanceNameContainer}>
-              <span className={styles.icon__instanceName} style={{ width: this.updateInstallingStatus() ? '76px' : '130px' }}>
+              <span className={styles.icon__instanceName} style={{ width: this.isInstalling() ? '76px' : '130px' }}>
                 {this.props.name}
               </span>
               <span className={styles.icon__instancePercentage}>
-                {this.updateInstallingStatus() && ` (${this.updatePercentage()}%)`}
+                {this.isInstalling() && ` (${this.updatePercentage()}%)`}
               </span>
             </span>
           </div>
         </ContextMenuTrigger>
         <ContextMenu id={`contextMenu-${this.props.name}`} onShow={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name); }}>
           <span>{this.props.name}</span>
-          <MenuItem data={{ foo: 'bar' }} onClick={this.handleClickPlay}>
+          <MenuItem disabled={this.isInstalling()} data={{ foo: 'bar' }} onClick={this.handleClickPlay}>
             <i className="fas fa-play" style={{ marginRight: '8px' }} />
             Play
           </MenuItem>
-          <MenuItem data={{ foo: 'bar' }} onClick={() => message.info('Managed')}>
+          <MenuItem disabled={this.isInstalling()} data={{ foo: 'bar' }} onClick={() => message.info('Managed')}>
             <i className="fas fa-wrench" style={{ marginRight: '8px' }} />
             Manage
           </MenuItem>
-          <MenuItem data={{ foo: 'bar' }} onClick={this.deleteInstance}>
+          <MenuItem disabled={this.isInstalling()} data={{ foo: 'bar' }} onClick={this.deleteInstance}>
             <i className="fas fa-trash-alt" style={{ marginRight: '8px' }} />
             {this.state.deleting ? 'Deleting...' : 'Delete'}
           </MenuItem>

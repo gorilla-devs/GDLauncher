@@ -14,8 +14,8 @@ export default class Profile extends Component<Props> {
         <div className={styles.background_overlay} />
         <main className={styles.main}>
           <div>
-            <span style={{ fontFamily: 'Gotham', fontSize: 50 }}>
-              {this.props.username}
+            <span style={{ fontSize: 50 }}>
+              {this.props.displayName}
             </span>
             <span style={{ fontSize: 30, marginLeft: 60 }}>
               <Progress type="circle" percent={78} format={percent => `LV. 39`} />

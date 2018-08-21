@@ -72,7 +72,7 @@ export function downloadPack(pack) {
         total: vnlLibs.length + vnlAssets.length + mainJar.length
       }
     });
-
+    
     await downloader.downloadArr(vnlLibs, path.join(APPPATH, constants.LAUNCHER_FOLDER, 'libraries'), dispatch, pack);
 
     await downloader.downloadArr(vnlAssets, path.join(APPPATH, constants.LAUNCHER_FOLDER, 'assets'), dispatch, pack, 10);
