@@ -19,6 +19,8 @@ export const START_TOKEN_CHECK_LOADING = 'START_TOKEN_CHECK_LOADING';
 export const STOP_TOKEN_CHECK_LOADING = 'STOP_TOKEN_CHECK_LOADING';
 export const AUTH_SUCCESS = 'AUTH_SUCCESS';
 export const AUTH_FAILED = 'AUTH_FAILED';
+export const START_NATIVE_LOADING = 'START_NATIVE_LOADING';
+export const STOP_NATIVE_LOADING = 'STOP_NATIVE_LOADING';
 
 export function login(username, password, remember) {
   return async (dispatch) => {
@@ -149,6 +151,7 @@ export function tryNativeLauncherProfiles() {
     const homedir = process.env.APPDATA || os.homedir();
     const vanillaMCPath = path.join(homedir, '.minecraft');
     try {
+      dispatch({ type: START_NATIVE_LOADING });
       const vnlJson = await fsa.readJson(path.join(vanillaMCPath, 'launcher_profiles.json'));
       const { account } = vnlJson.selectedUser;
       const { accessToken } = vnlJson.authenticationDatabase[account];
@@ -161,7 +164,6 @@ export function tryNativeLauncherProfiles() {
         res.data !== undefined &&
         res.data !== null &&
         Object.prototype.hasOwnProperty.call(res.data, 'accessToken')) {
-        console.log(res);
         const { data } = res;
         const payload = {
           email: data.userData.email,
@@ -193,6 +195,8 @@ export function tryNativeLauncherProfiles() {
         type: AUTH_FAILED
       });
       console.log(err);
+    } finally {
+      dispatch({ type: STOP_NATIVE_LOADING });
     }
   };
 }

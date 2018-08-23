@@ -6,12 +6,15 @@ import {
   STOP_TOKEN_CHECK_LOADING,
   AUTH_FAILED,
   AUTH_SUCCESS,
+  START_NATIVE_LOADING,
+  STOP_NATIVE_LOADING,
 } from '../actions/auth';
 
 
 const initialState = {
   loading: false,
   tokenLoading: false,
+  nativeLoading: false,
   email: null,
   username: null,
   displayName: null,
@@ -34,6 +37,10 @@ export default function auth(state = initialState, action) {
       return { ...state, tokenLoading: true };
     case `${STOP_TOKEN_CHECK_LOADING}`:
       return { ...state, tokenLoading: false };
+    case `${START_NATIVE_LOADING}`:
+      return { ...state, nativeLoading: true };
+    case `${STOP_NATIVE_LOADING}`:
+      return { ...state, nativeLoading: false };
     case `${AUTH_SUCCESS}`:
       return {
         ...state,
