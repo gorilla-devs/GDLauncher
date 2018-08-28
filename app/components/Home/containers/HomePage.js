@@ -9,7 +9,8 @@ function mapStateToProps(state) {
   return {
     username: state.auth.displayName,
     news: state.news,
-    packCreationLoading: state.packCreator.loading
+    packCreationLoading: state.packCreator.loading,
+    versionsManifest: state.packCreator.versionsManifest,
   };
 }
 
