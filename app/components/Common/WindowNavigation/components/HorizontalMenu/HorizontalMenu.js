@@ -46,6 +46,12 @@ export default class NavigationBar extends Component<Props> {
               </Badge>
             </Link>
           </li>
+          <li className={styles.li}>
+            <Link to="/serverManager" draggable="false" className={styles.a} style={this.isLocation('/serverManager') ? this.activeItem : null}>
+              <Icon type="database" className={styles.i} />
+              SERVERS
+            </Link>
+          </li>
         </ul>
       </div>
     );

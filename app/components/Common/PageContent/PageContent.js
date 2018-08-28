@@ -13,6 +13,7 @@ import Settings from '../../..//components/Settings/Settings';
 import DiscordModal from '../../..//components/DiscordModal/DiscordModal';
 import VanillaModal from '../../..//components/VanillaModal/containers/VanillaModal';
 import loginHelperModal from '../../..//components/LoginHelperModal/LoginHelperModal';
+import ServerManager from '../../ServerManager/ServerManager';
 import styles from './PageContent.scss';
 
 const Container = props =>
@@ -21,6 +22,7 @@ const Container = props =>
       <Route path="/dmanager" component={DManager} />
       <Route path="/profile" component={Profile} />
       <Route path="/home" component={HomePage} />
+      <Route path="/serverManager" component={ServerManager} />
     </div>
   );
 
