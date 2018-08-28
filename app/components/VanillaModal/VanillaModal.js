@@ -29,14 +29,6 @@ class VanillaModal extends Component<Props> {
         },
       ]
     };
-    console.log(this.state.versions);
-  }
-
-  componentDidMount = () => {
-    // Downloads the versions list just the first time
-    if (this.props.versionsManifest.length === 0) {
-      this.props.getVanillaMCVersions();
-    }
   }
 
   handleSubmit = (e) => {

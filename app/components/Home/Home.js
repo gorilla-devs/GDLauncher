@@ -33,6 +33,10 @@ export default class Home extends Component<Props> {
     } catch (e) {
       this.setState({ latestInstalled: false });
     }
+    // Downloads the versions list just the first time
+    if (this.props.versionsManifest.length === 0) {
+      this.props.getVanillaMCVersions();
+    }
   }
 
 
