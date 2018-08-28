@@ -16,13 +16,13 @@
 
 .main {
   height: calc(100% - 47.6px - 20px);
-  width: calc(100% - 200px);
+  width: 100%;
   position: absolute;
   background: #34495e;
 }
 
 .headerButtons {
-  width: 39vw;
+  width: 44vw;
   text-align: center;
   position: relative;
   top: 40px;

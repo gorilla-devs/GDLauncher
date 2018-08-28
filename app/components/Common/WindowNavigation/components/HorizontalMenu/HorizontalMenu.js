@@ -40,7 +40,7 @@ export default class NavigationBar extends Component<Props> {
           </li>
           <li className={styles.li}>
             <Link to="/dmanager" draggable="false" className={styles.a} onClick={() => this.props.clearQueue()} style={this.isLocation('/dmanager') ? this.activeItem : null}>
-              <Badge count={this.props.downloadedCount} invisible={this.props.downloadedCount === 0}>
+              <Badge count={this.props.downloadingCount} invisible={this.props.downloadingCount === 0}>
                 <Icon type="play-circle" className={styles.i} />
                 INSTANCES
               </Badge>

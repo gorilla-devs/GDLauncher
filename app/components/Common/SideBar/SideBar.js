@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Avatar, Button } from 'antd';
+import { Avatar, Button, Popover } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -58,7 +58,9 @@ class SideBar extends Component<Props> {
           </div>
         </div>
         <div style={{ textAlign: 'center', fontWeight: 'italic', fontSize: 12 }}>
-          <span>Playing on</span> <b style={{ fontStyle: 'italic', fontWeight: '900', fontSize: 13, color: '#2ecc71', cursor: 'pointer' }}>AnonymousCraft</b>
+          <span>Playing on</span>   <Popover placement="left" title="Title">
+            <b style={{ fontStyle: 'italic', fontWeight: '900', fontSize: 13, color: '#2ecc71', cursor: 'pointer' }}>AnonymousCraft</b>
+          </Popover>
         </div>
         <hr />
         <div className={styles.socialsContainer}>
@@ -88,7 +90,7 @@ class SideBar extends Component<Props> {
               style={{ padding: 10 }}
               className={styles.socialBtn}
               src="https://discordapp.com/assets/97e19ce71e9c9273e01d64da1948912b.svg"
-            />        
+            />
           </a>
           <span className={styles.version}>v{require('../../../package.json').version}</span>
           { /* eslint-enable */}

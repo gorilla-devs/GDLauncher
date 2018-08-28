@@ -220,15 +220,6 @@ Object.defineProperty(exports, 'message', {
     }
 });
 
-var _menu = require('./menu');
-
-Object.defineProperty(exports, 'Menu', {
-    enumerable: true,
-    get: function get() {
-        return _interopRequireDefault(_menu)['default'];
-    }
-});
-
 var _notification = require('./notification');
 
 Object.defineProperty(exports, 'notification', {

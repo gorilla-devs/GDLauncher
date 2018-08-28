@@ -17,14 +17,14 @@ async function downloadArr(arr, folderPath, dispatch, pack, threads = os.cpus().
     try {
       const filePath = path.join(folderPath, path.dirname(item.path));
       if (!await promisify(fs.exists)(filePath)) {
-        mkdirp.sync(filePath);
+        await mkdirp(filePath);
       }
       const file = await request(item.url, { encoding: 'binary' });
       await promisify(fs.writeFile)(path.join(folderPath, item.path), file, 'binary');
       if (item.legacyPath && !await promisify(fs.exists)(item.legacyPath)) {
         const legacyPath = path.join(folderPath, path.dirname(item.legacyPath));
         if (!await promisify(fs.exists)(legacyPath)) {
-          mkdirp.sync(legacyPath);
+          await mkdirp(legacyPath);
         }
         await promisify(fs.writeFile)(path.join(folderPath, item.legacyPath), file, 'binary');
       }
@@ -35,7 +35,7 @@ async function downloadArr(arr, folderPath, dispatch, pack, threads = os.cpus().
     } catch (e) {
       console.log(e);
     }
-  }, { concurrency: threads });
+  }, { concurrency: 3 });
 }
 
 

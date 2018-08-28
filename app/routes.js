@@ -7,6 +7,7 @@ import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
 import { JAVA_URL } from './constants';
 import App from './containers/App';
+import PageContent from './components/Common/PageContent/PageContent';
 import HomePage from './components/Home/containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
 import DManager from './components/DManager/containers/DManagerPage';
@@ -18,6 +19,7 @@ import findJava from './utils/javaLocationFinder';
 import Settings from './components/Settings/Settings';
 import DiscordModal from './components/DiscordModal/DiscordModal';
 import VanillaModal from './components/VanillaModal/containers/VanillaModal';
+import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
 type Props = {
@@ -80,15 +82,14 @@ class RouteDef extends Component<Props> {
         <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
           {!this.props.isAuthValid && <Redirect push to="/" />}
-          <Route path="/dmanager" component={DManager} />
-          <Route path="/profile" component={Profile} />
-          <Route path="/home" component={HomePage} />
+          <Route component={PageContent} />
         </Switch>
 
         { /* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
         {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
         {isModal ? <Route path="/vanillaModal" component={VanillaModal} /> : null}
+        {isModal ? <Route path="/editInstance/:instance" component={InstanceManagerModal} /> : null}
         {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
       </App>
     );

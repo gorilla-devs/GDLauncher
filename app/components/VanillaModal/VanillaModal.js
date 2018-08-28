@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { Select, Form, Input, Icon, Button, Checkbox } from 'antd';
+import { Select, Form, Input, Icon, Button, Checkbox, Cascader } from 'antd';
 import styles from './VanillaModal.css';
 import Modal from '../Common/Modal/Modal';
 
@@ -15,12 +15,21 @@ class VanillaModal extends Component<Props> {
     super(props);
     this.state = {
       loading: false,
-      checked: false
+      checked: false,
+      versions: [
+        {
+          value: 'releases',
+          label: 'Releases',
+          children: this.props.versionsManifest.filter(v => v.type === 'release').map((v) => { return { value: v.id, label: v.id } }),
+        },
+        {
+          value: 'snapshots',
+          label: 'Snapshots',
+          children: this.props.versionsManifest.filter(v => v.type === 'snapshot').map((v) => { return { value: v.id, label: v.id } }),
+        },
+      ]
     };
-  }
-
-  componentWillMount() {
-    this.props.resetModalState();
+    console.log(this.state.versions);
   }
 
   componentDidMount = () => {
@@ -35,10 +44,7 @@ class VanillaModal extends Component<Props> {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         this.setState({ loading: true });
-        this.props.createPack(
-          this.props.versionsManifest.find(
-            (version) => version.id === values.version).url,
-          values.packName);
+        this.props.createPack(values.version, values.packName);
       }
     });
   }
@@ -47,16 +53,16 @@ class VanillaModal extends Component<Props> {
     const { getFieldDecorator } = this.props.form;
 
     return (
-      <Modal history={this.props.history} mounted={this.props.modalState} style={{ height: '60vh' }}>
+      <Modal history={this.props.history} mounted={this.props.modalState} title="Create New Instance" style={{ height: '80vh' }}>
         <Form layout="inline" className={styles.container} onSubmit={this.handleSubmit}>
           <div>
-            <FormItem>
+            <FormItem style={{ margin: 0 }}>
               {getFieldDecorator('packName', {
                 rules: [{ required: true, message: 'Please input a name' }],
               })(
                 <Input
                   size="large"
-                  style={{ width: '40vw', display: 'inline-block', height: '60px' }}
+                  style={{ width: '50vw', display: 'inline-block', height: '60px' }}
                   prefix={<Icon type="play-circle-o" style={{ color: 'rgba(255,255,255,.8)' }} />}
                   placeholder="Instance Name"
                 />
@@ -68,23 +74,12 @@ class VanillaModal extends Component<Props> {
               {getFieldDecorator('version', {
                 rules: [{ required: true, message: 'Please select a version' }],
               })(
-                <Select
-                  showSearch
+                <Cascader
+                  options={this.state.versions}
                   size="large"
                   style={{ width: 200, display: 'inline-block' }}
                   placeholder="Select a version"
-                  optionFilterProp="children"
-                  filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                >
-                  <Select.OptGroup label="Releases">
-                    {this.props.versionsManifest.map((version) => version.type === 'release' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
-                  </Select.OptGroup>
-                  {this.state.checked &&
-                    <Select.OptGroup label="Snapshots">
-                      {this.props.versionsManifest.map((version) => version.type === 'snapshot' && <Select.Option key={version.id}>{version.id}</Select.Option>)}
-                    </Select.OptGroup>
-                  }
-                </Select>
+                />
               )}
             </FormItem>
             <FormItem>

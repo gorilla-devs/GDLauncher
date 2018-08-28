@@ -1,10 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import { Button, Icon, Progress, message } from 'antd';
+import { Link } from 'react-router-dom';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
+import { history } from '../../store/configureStore';
 import styles from './DInstance.scss';
 
 type Props = {
@@ -124,7 +126,10 @@ export default class DInstance extends Component<Props> {
             <i className="fas fa-play" style={{ marginRight: '8px' }} />
             Play
           </MenuItem>
-          <MenuItem disabled={this.isInstalling()} data={{ foo: 'bar' }} onClick={() => message.info('Managed')}>
+          <MenuItem
+            disabled={this.isInstalling()}
+            data={{ foo: 'bar' }}
+            onClick={() => history.push({ pathname: `/editInstance/${this.props.name}`, state: { modal: true } })}>
             <i className="fas fa-wrench" style={{ marginRight: '8px' }} />
             Manage
           </MenuItem>

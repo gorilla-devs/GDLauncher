@@ -89,7 +89,7 @@ export default class Modal extends Component<Props> {
         <div className={styles.modal} style={this.state.style} onClick={(e) => e.stopPropagation()}>
           {(this.props.header === undefined || this.props.header === true) &&
             <div className={styles.header}>
-              <h3 style={{ display: 'inline-block' }}>Modal</h3>
+              <h3 style={{ display: 'inline-block' }}>{this.props.title || 'Modal'}</h3>
               <Button icon="close" size="small" type="ghost" className={styles.closeBtn} onClick={this.back} />
             </div>
           }

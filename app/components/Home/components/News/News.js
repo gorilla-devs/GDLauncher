@@ -29,22 +29,26 @@ const News = props =>
             </a>
           );
         })}
-      </Carousel> : <ContentLoader
-        height={180}
-        speed={0.8}
-        primaryColor="#212b36"
-        secondaryColor="#2c3e50"
+      </Carousel> : <div
         style={{
-          height: '180px',
-          maxWidth: '1050px',
-          background: '#2c3e50',
           width: '100%',
-        }}
-      >
-          <rect x="16" y="100" rx="0" ry="0" width="200" height="20" />
-          <rect x="16" y="130" rx="0" ry="0" width="400" height="20" />
+          background: '#2c3e50'
+        }}>
+          <ContentLoader
+            height={180}
+            speed={0.8}
+            primaryColor="#212b36"
+            secondaryColor="#2c3e50"
+            style={{
+              height: '180px',
+              maxWidth: '1050px',
+            }}
+          >
+            <rect x="16" y="100" rx="0" ry="0" width="200" height="20" />
+            <rect x="16" y="130" rx="0" ry="0" width="400" height="20" />
 
-        </ContentLoader>}
+          </ContentLoader>
+        </div>}
     </div>
   );
 
