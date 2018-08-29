@@ -45,7 +45,7 @@ class NavigationBar extends Component<Props> {
           clearQueue={() => this.props.clearQueue()}
         />
         <Link to={{
-          pathname: '/settings/myAccount',
+          pathname: '/settings/myAccount_Preferences',
           state: { modal: true }
         }}
         >

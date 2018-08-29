@@ -33,12 +33,6 @@ export default class NavigationBar extends Component<Props> {
             </Link>
           </li>
           <li className={styles.li}>
-            <Link to="/profile" draggable="false" className={styles.a} style={this.isLocation('/profile') ? this.activeItem : null}>
-              <Icon type="profile" className={styles.i} />
-              PROFILE
-            </Link>
-          </li>
-          <li className={styles.li}>
             <Link to="/dmanager" draggable="false" className={styles.a} onClick={() => this.props.clearQueue()} style={this.isLocation('/dmanager') ? this.activeItem : null}>
               <Badge count={this.props.downloadingCount} invisible={this.props.downloadingCount === 0}>
                 <Icon type="play-circle" className={styles.i} />

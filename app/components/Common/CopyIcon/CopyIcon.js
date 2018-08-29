@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { Button, Icon, Tooltip } from 'antd';
 import { clipboard } from 'electron';
 import styles from './CopyIcon.scss';
+import { playCopySound } from '../../../utils/sounds';
 
 type Props = {
   text: string
@@ -21,8 +22,7 @@ export default class CopyIcon extends Component<Props> {
   copy = () => {
     this.setState({ copied: true });
     clipboard.writeText(this.props.text);
-    const audio = new Audio('./copy.wav');
-    audio.play();
+    playCopySound();
     setTimeout(() => {
       this.setState({ copied: false });
     }, 600);

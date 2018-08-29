@@ -54,7 +54,7 @@ class SideBar extends Component<Props> {
         <div className={styles.header}>
           <span>
             <CIcon size={32}>
-              {this.props.username.charAt(0).toUpperCase()}
+              {this.props.username && this.props.username.charAt(0).toUpperCase()}
             </CIcon>
           </span>
           <span>{this.props.username}</span>

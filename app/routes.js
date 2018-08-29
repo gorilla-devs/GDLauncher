@@ -11,7 +11,6 @@ import PageContent from './components/Common/PageContent/PageContent';
 import HomePage from './components/Home/containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
 import DManager from './components/DManager/containers/DManagerPage';
-import Profile from './containers/ProfilePage';
 import Navigation from './containers/Navigation';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import Login from './components/Login/Login';

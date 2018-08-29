@@ -1,0 +1,19 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.action {
+  align-self: center;
+}
+
+.mainText {
+  font-size: 18px;
+}
+
+.description {
+  font-size: 14px;
+  color: #8b99a7;
+}

@@ -4,11 +4,15 @@ import { Button, Icon, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import CIcon from '../../../Common/Icon/Icon';
 import CopyIcon from '../../../Common/CopyIcon/CopyIcon';
-import styles from './MyAccount.scss';
+import styles from './MyAccount_Preferences.scss';
+import SettingCard from '../SettingCard/SettingCard';
+import Title from '../Title/Title';
+import SwitchSetting from '../SwitchSetting/SwitchSetting';
 
 const MyAccount = (props) => {
   return (
     <div>
+      <Title>My Account</Title>
       <div className={styles.accountInfo}>
         <div>
           <CIcon size={70}>
@@ -23,6 +27,10 @@ const MyAccount = (props) => {
           <span className={styles.info}>{props.email}</span> <CopyIcon text={'davide.ceschia@gmail.com'} />
         </div>
       </div>
+      <Title>Preferences</Title>
+      <SettingCard>
+        <SwitchSetting mainText="Enable Sounds" description="Enable sounds to be played when specific actions are triggered" />
+      </SettingCard>
     </div>
   );
 };
