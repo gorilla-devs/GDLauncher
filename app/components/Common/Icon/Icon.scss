@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  background: #4A6075;
+  border-radius: 50%;
+  justify-content: center;
+  transition: border-radius .2s;
+  cursor: pointer;
+  .content {
+    align-self: center;
+    justify-self: center;
+    font-size: 2em;
+  }
+  &:hover {
+    border-radius: 30%;
+    transition: border-radius .2s;
+  }
+}

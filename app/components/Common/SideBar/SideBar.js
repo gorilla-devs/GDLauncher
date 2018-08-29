@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Avatar, Button, Popover } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import CIcon from '../../Common/Icon/Icon';
 
 import styles from './SideBar.scss';
 
@@ -51,7 +52,11 @@ class SideBar extends Component<Props> {
           <Button loading={this.props.updating} onClick={this.props.update} type="primary" size="small" style={{ marginLeft: 5 }}>Update Available</Button>
         </div>}
         <div className={styles.header}>
-          <Avatar size="normal">P</Avatar>
+          <span>
+            <CIcon size={32}>
+              {this.props.username.charAt(0).toUpperCase()}
+            </CIcon>
+          </span>
           <span>{this.props.username}</span>
           <div onClick={() => this.props.logout()}>
             <i className={`fas fa-sign-out-alt ${styles.logout}`} />

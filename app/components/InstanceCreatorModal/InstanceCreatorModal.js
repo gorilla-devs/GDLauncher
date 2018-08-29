@@ -1,14 +1,14 @@
 // @flow
 import React, { Component } from 'react';
-import { Select, Form, Input, Icon, Button, Checkbox, Cascader } from 'antd';
-import styles from './VanillaModal.css';
+import { Select, Form, Input, Icon, Button, Checkbox, Cascader, Switch } from 'antd';
+import styles from './InstanceCreatorModal.css';
 import Modal from '../Common/Modal/Modal';
 
 type Props = {};
 const FormItem = Form.Item;
 let pack;
 
-class VanillaModal extends Component<Props> {
+class InstanceCreatorModal extends Component<Props> {
   props: Props;
 
   constructor(props) {
@@ -36,7 +36,7 @@ class VanillaModal extends Component<Props> {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         this.setState({ loading: true });
-        this.props.createPack(values.version, values.packName);
+        this.props.createPack(values.version[values.version.length - 1], values.packName);
       }
     });
   }
@@ -53,6 +53,7 @@ class VanillaModal extends Component<Props> {
                 rules: [{ required: true, message: 'Please input a name' }],
               })(
                 <Input
+                  autoFocus
                   size="large"
                   style={{ width: '50vw', display: 'inline-block', height: '60px' }}
                   prefix={<Icon type="play-circle-o" style={{ color: 'rgba(255,255,255,.8)' }} />}
@@ -67,6 +68,8 @@ class VanillaModal extends Component<Props> {
                 rules: [{ required: true, message: 'Please select a version' }],
               })(
                 <Cascader
+                  changeOnSelect
+                  showSearch
                   options={this.state.versions}
                   size="large"
                   style={{ width: 200, display: 'inline-block' }}
@@ -79,7 +82,7 @@ class VanillaModal extends Component<Props> {
                 valuePropName: 'checked',
                 initialValue: false,
               })(
-                <Checkbox onChange={(checked) => this.setState({ checked: checked.target.checked })}>Show Snapshots</Checkbox>
+                <div>Add Forge <Switch /></div>
               )}
             </FormItem>
           </div>
@@ -94,4 +97,4 @@ class VanillaModal extends Component<Props> {
   }
 }
 
-export default Form.create()(VanillaModal);
+export default Form.create()(InstanceCreatorModal);

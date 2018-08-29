@@ -9,7 +9,6 @@ import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-ho
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import styles from './DManager.css';
-import VanillaModal from '../VanillaModal/containers/VanillaModal';
 import DInstance from '../../containers/DInstance';
 import { history } from '../../store/configureStore';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
@@ -117,8 +116,8 @@ export default class DManager extends Component<Props> {
               <Button type="primary" disabled className={styles.browseModpacks}>Browse Curse Modpacks</Button>
             </div>
             <div>
-              <Link to={{ pathname: '/vanillaModal', state: { modal: true } }} >
-                <Button type="primary" className={styles.addVanilla}>Add New Vanilla</Button>
+              <Link to={{ pathname: '/InstanceCreatorModal', state: { modal: true } }} >
+                <Button type="primary" className={styles.addVanilla}>Add New Instance</Button>
               </Link>
               <Button type="primary" disabled className={styles.addForge}>Add New Forge</Button>
             </div>
@@ -146,9 +145,9 @@ export default class DManager extends Component<Props> {
           </div>
         </ContextMenuTrigger>
         <ContextMenu id="contextMenu-dmanager" onShow={(e) => { e.stopPropagation(); this.props.selectInstance(null); }}>
-          <MenuItem data={{ foo: 'bar' }} onClick={() => history.push({ pathname: '/vanillaModal', state: { modal: true } })}>
+          <MenuItem data={{ foo: 'bar' }} onClick={() => history.push({ pathname: '/InstanceCreatorModal', state: { modal: true } })}>
             <i className="fas fa-play" style={{ marginRight: '8px' }} />
-            Add New Vanilla
+            Add New Instance
           </MenuItem>
         </ContextMenu>
       </main >

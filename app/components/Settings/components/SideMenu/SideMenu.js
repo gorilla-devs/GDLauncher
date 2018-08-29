@@ -9,7 +9,7 @@ const SideMenu = ({ match }) => {
     <div className={styles.container}>
       <div className={styles.sideMenuContainer}>
         <div className={styles.sideMenu}>
-          <MenuItem active={match.params.page === 'general'} to="general">General</MenuItem>
+          <MenuItem active={match.params.page === 'myAccount'} to="myAccount">My Account</MenuItem>
           <MenuItem active={match.params.page === 'java'} to="java">Java</MenuItem>
           <MenuItem active={match.params.page === 'instances'} to="instances">Instances</MenuItem>
           <MenuItem active={match.params.page === 'ui'} to="ui">User Interface</MenuItem>

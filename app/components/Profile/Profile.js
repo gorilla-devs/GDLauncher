@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Card, Select, Modal, Icon, Progress } from 'antd';
 import styles from './Profile.css';
-
 type Props = {};
 
 export default class Profile extends Component<Props> {

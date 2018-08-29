@@ -1,0 +1,33 @@
+.container {
+
+}
+
+.accountInfo {
+  display: grid;
+  grid-template-columns: 100px auto;
+  background: #23303d;
+  height: 120px;
+  width: 100%;
+  div:first-child {
+    align-self: center;
+    justify-self: center;
+  }
+  div:nth-child(2) {
+    display: block;
+    color: #6C7E8F;
+    margin: 10px;
+    *:not(i) {
+      display: block;
+    }
+    .divider {
+      height: 10px;
+    }
+    .info {
+      display: inline-block;
+      color: #bdc3c7;
+      -webkit-user-select: text;
+      user-select: text;
+      cursor: text;
+    }
+  }
+}

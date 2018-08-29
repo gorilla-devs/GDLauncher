@@ -18,7 +18,7 @@ import Login from './components/Login/Login';
 import findJava from './utils/javaLocationFinder';
 import Settings from './components/Settings/Settings';
 import DiscordModal from './components/DiscordModal/DiscordModal';
-import VanillaModal from './components/VanillaModal/containers/VanillaModal';
+import InstanceCreatorModal from './components/InstanceCreatorModal/containers/InstanceCreatorModal';
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
@@ -88,7 +88,7 @@ class RouteDef extends Component<Props> {
         { /* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
         {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
-        {isModal ? <Route path="/vanillaModal" component={VanillaModal} /> : null}
+        {isModal ? <Route path="/InstanceCreatorModal" component={InstanceCreatorModal} /> : null}
         {isModal ? <Route path="/editInstance/:instance" component={InstanceManagerModal} /> : null}
         {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
       </App>
