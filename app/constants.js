@@ -2,7 +2,8 @@
 const getAppPath = require('./utils/getAppPath');
 
 module.exports = {
-  LAUNCHER_FOLDER: 'dl',
+  LAUNCHER_FOLDER: 'launcherData',
+  SERVERS_FOLDER_NAME: 'servers',
   PACKS_FOLDER_NAME: 'packs',
   GAME_VERSIONS_URL: 'https://launchermeta.mojang.com/mc/game/version_manifest.json',
   ACCESS_TOKEN_VALIDATION_URL: 'https://authserver.mojang.com/validate',

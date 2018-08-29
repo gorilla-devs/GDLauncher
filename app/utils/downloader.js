@@ -9,35 +9,41 @@ const { promisify } = require('util');
 import { DOWNLOAD_FILE_COMPLETED } from '../actions/downloadManager';
 
 module.exports = {
-  downloadArr
+  downloadArr,
+  downloadFile
 };
 
 async function downloadArr(arr, folderPath, dispatch, pack, threads = os.cpus().length) {
   await Promise.map(arr, async item => {
-    try {
-      const filePath = path.join(folderPath, path.dirname(item.path));
-      if (!await promisify(fs.exists)(filePath)) {
-        await mkdirp(filePath);
-      }
-      const file = await request(item.url, { encoding: 'binary' });
-      await promisify(fs.writeFile)(path.join(folderPath, item.path), file, 'binary');
-      if (item.legacyPath && !await promisify(fs.exists)(item.legacyPath)) {
-        const legacyPath = path.join(folderPath, path.dirname(item.legacyPath));
-        if (!await promisify(fs.exists)(legacyPath)) {
-          await mkdirp(legacyPath);
-        }
-        await promisify(fs.writeFile)(path.join(folderPath, item.legacyPath), file, 'binary');
-      }
-      dispatch({
-        type: DOWNLOAD_FILE_COMPLETED,
-        payload: { pack }
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }, { concurrency: 3 });
+    // TODO: item.legacyPath ? path.join(folderPath, item.legacyPath) : null
+    // Handle legacyPaths better (own function)
+    await downloadFile(path.join(folderPath, item.path), item.url);
+    dispatch({
+      type: DOWNLOAD_FILE_COMPLETED,
+      payload: { pack }
+    });
+  }, { concurrency: threads });
 }
 
+async function downloadFile(filename, url, legacyPath = null) {
+  try {
+    const filePath = path.dirname(filename);
+    if (!await promisify(fs.exists)(filePath)) {
+      await mkdirp(filePath);
+    }
+    const file = await request(url, { encoding: 'binary' });
+    await promisify(fs.writeFile)(filename, file, 'binary');
+    // This handles legacy assets.
+    if (legacyPath !== null && legacyPath !== undefined && !await promisify(fs.exists)(legacyPath)) {
+      if (!await promisify(fs.exists)(path.dirname(legacyPath))) {
+        await mkdirp(path.dirname(legacyPath));
+      }
+      await promisify(fs.writeFile)(legacyPath, file, 'binary');
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 function checkFile(lpath, size, sha1) {
   return fs.stat(lpath).then(stats => assert.equal(stats.size, size, 'wrong size for ' + lpath))

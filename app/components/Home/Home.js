@@ -57,8 +57,8 @@ export default class Home extends Component<Props> {
                 display: 'block',
                 marginTop: 15,
                 textAlign: 'center'
-              }} title="Try out the new v1.13">
-                V1.13 has just been released. Wanna try it out?
+              }} title="Try out the new v1.13.1">
+                V1.13.1 has just been released. Wanna try it out?
                 {this.state.latestBtnClicked || this.state.latestInstalled ?
                   <Link to="/dmanager" style={{ display: 'block', margin: '35px auto' }}>Go to your instances</Link> :
                   <Button
@@ -67,7 +67,7 @@ export default class Home extends Component<Props> {
                     style={{ display: 'block', margin: '35px auto' }}
                     onClick={() => { this.props.createPack('1.13.1', '1.13.1'); this.setState({ latestBtnClicked: true }) }}
                   >
-                    Install and Start v1.13
+                    Install and Start v1.13.1
                   </Button>}
               </Card>
             </div>

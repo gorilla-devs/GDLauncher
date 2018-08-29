@@ -25,12 +25,12 @@ export default class CopyIcon extends Component<Props> {
     audio.play();
     setTimeout(() => {
       this.setState({ copied: false });
-    }, 1000);
+    }, 600);
   }
 
   render() {
     return (
-      <Tooltip title={this.state.copied ? 'Copied' : 'Copy'} mouseLeaveDelay={this.state.copied ? 0.5 : 0.1} >
+      <Tooltip title={this.state.copied ? 'Copied' : 'Copy'} mouseLeaveDelay={this.state.copied ? 0.3 : 0.1} >
         <Icon className={styles.copyBtn} type="copy" onClick={this.copy} />
       </Tooltip>
     );
