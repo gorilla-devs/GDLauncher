@@ -13,6 +13,9 @@
 import { app, BrowserWindow, crashReporter, ipcMain } from 'electron';
 import MenuBuilder from './menu';
 
+// This gets rid of this: https://github.com/electron/electron/issues/13186
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+
 let mainWindow = null;
 let splash = null;
 
@@ -75,7 +78,7 @@ app.on('ready', async () => {
     minHeight: 600,
     minWidth: 780,
     frame: false,
-    backgroundColor: '#34495e'
+    backgroundColor: '#34495e',
   });
 
   mainWindow.webContents.on('new-window', (e, url) => {
