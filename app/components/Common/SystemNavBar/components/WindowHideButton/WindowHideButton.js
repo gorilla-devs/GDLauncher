@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { remote } from 'electron';
-import styles from './WindowHideButton.css';
+import styles from './WindowHideButton.scss';
 
 type Props = {};
 export default class WindowHideButton extends Component<Props> {

@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Select, Form, Input, Icon, Button, Checkbox, Cascader, Switch } from 'antd';
-import styles from './InstanceCreatorModal.css';
+import styles from './InstanceCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
 
 type Props = {};

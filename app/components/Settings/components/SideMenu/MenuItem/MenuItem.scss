@@ -1,3 +1,5 @@
+@import '../../../../../style/theme/index';
+
 .menuItem {
   width: 180px;
   height: 40px;
@@ -8,6 +10,10 @@
   cursor: pointer;
 }
 
-.menuItem:hover {
+.menuItem:hover:not(.active) {
   background: rgba(0, 0, 0, .3);
+}
+
+.active {
+  background: $primary-color;
 }

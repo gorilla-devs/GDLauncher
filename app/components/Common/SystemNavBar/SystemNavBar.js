@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styles from './SystemNavBar.css';
+import styles from './SystemNavBar.scss';
 import WindowCloseBtn from './components/WindowCloseButton/WindowCloseButton';
 import WindowMinimizeBtn from './components/WindowMinimizeButton/WindowMinimizeButton';
 import WindowHideBtn from './components/WindowHideButton/WindowHideButton';

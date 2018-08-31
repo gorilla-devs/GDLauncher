@@ -1,3 +1,5 @@
+@import '../../style/theme/index';
+
 .header {
   position: relative;
   background: linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("../../assets/images/dmanagerBG.jpg");
@@ -18,7 +20,7 @@
   height: calc(100% - 47.6px - 20px);
   width: 100%;
   position: absolute;
-  background: #34495e;
+  background: $secondary-color-1;
 }
 
 .headerButtons {
@@ -42,4 +44,13 @@
 .addForge {
   display: inline-block;
   margin: 10px;
+}
+
+.NoServerCreated {
+  text-align: center;
+  margin-top: 25vh;
+  font-family: GlacialIndifferenceRegular;
+  font-size: 20px;
+  font-weight: 600;
+  color: $text-main-color;
 }

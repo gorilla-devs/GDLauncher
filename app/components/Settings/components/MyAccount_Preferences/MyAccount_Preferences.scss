@@ -1,3 +1,6 @@
+@import '../../../../style/theme/index';
+
+
 .container {
 
 }
@@ -5,7 +8,7 @@
 .accountInfo {
   display: grid;
   grid-template-columns: 100px auto;
-  background: #23303d;
+  background: $secondary-color-3;
   height: 120px;
   width: 100%;
   div:first-child {
@@ -14,7 +17,7 @@
   }
   div:nth-child(2) {
     display: block;
-    color: #6C7E8F;
+    color: $text-dark;
     margin: 10px;
     *:not(i) {
       display: block;
@@ -24,7 +27,7 @@
     }
     .info {
       display: inline-block;
-      color: #bdc3c7;
+      color: $text-main-color;
       -webkit-user-select: text;
       user-select: text;
       cursor: text;

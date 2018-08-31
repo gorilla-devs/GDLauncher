@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
-import './app.global.css';
+import './app.global.scss';
 
 const store = configureStore();
 console.log('%cWelcome to GDLauncher', 'background: #2c3e50; color: white; display: block; font-size:50px;');

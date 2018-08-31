@@ -1,6 +1,8 @@
+@import '../../../../style/theme/index';
+
 .container {
   grid-column: 1;
-  background: #2c3e50;
+  background: $secondary-color-2;
   height: 100%;
   padding-top: 50px;
 }

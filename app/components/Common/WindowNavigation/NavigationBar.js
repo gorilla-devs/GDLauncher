@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import styles from './NavigationBar.scss';
 import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
-import DownloadManager from '../../DownloadManager/DownloadManager';
 import * as downloadManagerActions from '../../../actions/downloadManager';
 import logo from '../../../assets/images/logo.png';
 

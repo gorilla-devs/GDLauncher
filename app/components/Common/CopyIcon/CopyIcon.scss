@@ -1,5 +1,7 @@
+@import '../../../style/theme/index';
+
 .copyBtn {
   display: inline-block;
-  color: #bdc3c7;
+  color: $text-main-color;
   cursor: pointer;
 }

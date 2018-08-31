@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
-import styles from './Login.css';
+import styles from './Login.scss';
 import store from '../../localStore';
 import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
 import * as AuthActions from '../../actions/auth';

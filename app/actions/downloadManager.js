@@ -3,6 +3,8 @@ import { remote, ipcRenderer } from 'electron';
 import { message } from 'antd';
 import { APPPATH } from '../constants';
 import { promisify } from 'util';
+//Getting colors from scss theme file
+import colors from '../style/theme/index.scss';
 
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
@@ -48,7 +50,7 @@ export function clearQueue() {
 export function downloadPack(pack) {
   return async (dispatch, getState) => {
     const { downloadManager } = getState();
-    console.log(`%cDownloading ${pack}`, 'color: #3498db');
+    console.log(`%cDownloading ${pack}`, `color: ${colors.primary}`);
 
     const fs = require('fs');
     const constants = require('../constants');

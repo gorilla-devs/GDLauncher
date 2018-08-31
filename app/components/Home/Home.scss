@@ -1,8 +1,11 @@
+@import '../../style/theme/index';
+
 .content {
-  color: #fff;
+  color: $text-main-color;
   right: 200px;
   display: block;
   height: calc(100vh - (40px + 20px));
+  background: $secondary-color-1;
   width: 100%;
   overflow: auto;
   margin: 10px 0;

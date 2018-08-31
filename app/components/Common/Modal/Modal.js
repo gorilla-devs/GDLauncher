@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
-import styles from './Modal.css';
+import styles from './Modal.scss';
 
 type Props = {};
 

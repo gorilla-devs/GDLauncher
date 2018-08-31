@@ -1,8 +1,10 @@
+@import '../../../style/theme/index';
+
 .container {
   display: flex;
   width: 40px;
   height: 40px;
-  background: #4A6075;
+  background: $secondary-color-light;
   border-radius: 50%;
   justify-content: center;
   transition: border-radius .2s;

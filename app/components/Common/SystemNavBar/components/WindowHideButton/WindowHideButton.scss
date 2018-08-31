@@ -1,14 +1,16 @@
+@import '../../../../../style/theme/index';
+
 .CloseBtn{
     display: inline-block;
     position: absolute;
-    background: #212b36;
+    background: $secondary-color-3;
     border: 0;
     padding: 0;
-    color: white;
+    color: $text-main-color;
     -webkit-app-region: no-drag;
     height: 20px;
     width: 35px;
-    right: 35px;
+    right: calc(35px * 2);
     top: 0;
     transition: background-color .25s;
 }
@@ -19,7 +21,7 @@
 
 .CloseBtn:hover{
     transition: background-color .25s;
-    background-color: rgba(0, 0, 0, 0.302);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 .CloseBtn:focus, .CloseBtn:active{
     border-style: outset;

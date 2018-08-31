@@ -13,7 +13,7 @@ const MenuItem = (props) => {
     style={{
       textDecoration: 'none'
     }}>
-      <div className={styles.menuItem} style={{ background: props.active ? '#2980b9' : '' }}>
+      <div className={`${styles.menuItem} ${props.active ? styles.active : null}`}>
         {props.children}
       </div>
     </Link>

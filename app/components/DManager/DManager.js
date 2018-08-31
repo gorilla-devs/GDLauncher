@@ -8,7 +8,7 @@ import Link from 'react-router-dom/Link';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { hideMenu } from 'react-contextmenu/es6/actions';
-import styles from './DManager.css';
+import styles from './DManager.scss';
 import DInstance from '../../containers/DInstance';
 import { history } from '../../store/configureStore';
 import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
@@ -133,14 +133,7 @@ export default class DManager extends Component<Props> {
                 axis="xy"
                 distance={5}
               /> :
-              <h1 style={{
-                textAlign: 'center',
-                marginTop: '25vh',
-                fontFamily: 'GlacialIndifferenceRegular',
-                fontSize: '20px',
-                fontWeight: '600',
-                color: '#bdc3c7'
-              }}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1>
+              <h1 className={styles.NoServerCreated}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1>
             }
           </div>
         </ContextMenuTrigger>

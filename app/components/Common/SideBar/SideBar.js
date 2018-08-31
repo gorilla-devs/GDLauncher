@@ -64,7 +64,7 @@ class SideBar extends Component<Props> {
         </div>
         <div style={{ textAlign: 'center', fontWeight: 'italic', fontSize: 12 }}>
           <span>Playing on</span>   <Popover placement="left" title="Title">
-            <b style={{ fontStyle: 'italic', fontWeight: '900', fontSize: 13, color: '#2ecc71', cursor: 'pointer' }}>AnonymousCraft</b>
+            <b className={styles.playingServer} style={{ fontStyle: 'italic', fontWeight: '900', fontSize: 13, cursor: 'pointer' }}>AnonymousCraft</b>
           </Popover>
         </div>
         <hr />

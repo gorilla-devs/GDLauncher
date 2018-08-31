@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { remote } from 'electron';
-import styles from './WindowCloseButton.css';
+import styles from './WindowCloseButton.scss';
 
 type Props = {};
 export default class WindowCloseButton extends Component<Props> {
