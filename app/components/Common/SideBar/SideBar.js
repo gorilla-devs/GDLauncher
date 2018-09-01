@@ -70,31 +70,15 @@ class SideBar extends Component<Props> {
         <hr />
         <div className={styles.socialsContainer}>
           { /* eslint-disable */}
-          <a href="https://twitter.com/gorilladevs" target="_blank" rel="noopener noreferrer">
-            <img
-              alt="socials"
-              draggable="false"
-              style={{ padding: 10 }}
-              className={styles.socialBtn}
-              src="https://discordapp.com/assets/a39ef972d8ec7966a6a25b1853b14f38.svg"
+          <a href="https://twitter.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
+            <i class="fab fa-twitter"/>
+          </a>
+          <a href="https://facebook.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
+            <i class="fab fa-facebook"
             />
           </a>
-          <a href="https://facebook.com/gorilladevs" target="_blank" rel="noopener noreferrer">
-            <img
-              alt="socials"
-              draggable="false"
-              style={{ padding: 10 }}
-              className={styles.socialBtn}
-              src="https://discordapp.com/assets/47ee7342b7e2986c314fd77f4331df63.svg"
-            />
-          </a>
-          <a href="https://instagram.com/gorilladevs" target="_blank" rel="noopener noreferrer">
-            <img
-              alt="socials"
-              draggable="false"
-              style={{ padding: 10 }}
-              className={styles.socialBtn}
-              src="https://discordapp.com/assets/97e19ce71e9c9273e01d64da1948912b.svg"
+          <a href="https://instagram.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
+            <i class="fab fa-instagram"
             />
           </a>
           <span className={styles.version}>v{require('../../../package.json').version}</span>

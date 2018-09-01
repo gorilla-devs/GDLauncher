@@ -186,3 +186,12 @@ a:hover {
   background-color: darken($primary-color, 10);
   border-color: darken($primary-color, 10);
 }
+
+.ant-switch-checked {
+  background-color: $primary-color;
+}
+
+.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled), .ant-input:focus, .ant-input:hover, .ant-cascader-picker:focus .ant-cascader-input {
+  border-color: $primary-color;
+}
+

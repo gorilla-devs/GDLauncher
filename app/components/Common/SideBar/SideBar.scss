@@ -64,13 +64,23 @@
   display: flex;
   width: 200px;
   bottom: 20px;
-  padding-right: 10px;
+  padding-right: 5px;
   align-items: center;
   align-content: center;
   justify-content: center;
   .socialBtn {
     cursor: pointer;
     margin: 0 5px 5px;
+    line-height: 50px;
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    svg {
+      cursor: pointer;
+      path {
+        cursor: pointer;
+      }
+    }
     &:hover {
       transition: background-color .25s;
       background-color: rgba(0, 0, 0, 0.3);

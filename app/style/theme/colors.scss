@@ -30,6 +30,10 @@ $link-button-bg: $primary-color;
 //Badge
 $badge-bg-color: #e74c3c;
 
+// Button
+$btn-bg-color: $primary-color;
+
+// This is needed to import these variables in JS
 :export {
   primary: $primary-color;
 }
