@@ -1,9 +1,10 @@
 import axios from 'axios';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
+import makeDir from 'make-dir';
+import path from 'path';
 import { goBack } from 'react-router-redux';
 import { promisify } from 'util';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, GAME_VERSIONS_URL, APPPATH } from '../constants';
+import { PACKS_PATH, GAME_VERSIONS_URL } from '../constants';
 import { addToQueue } from './downloadManager';
 
 export const GET_MC_VANILLA_VERSIONS = 'GET_MC_VANILLA_VERSIONS';
@@ -26,12 +27,14 @@ export function createPack(version, packName) {
     dispatch({ type: START_PACK_CREATION });
     const versions = await axios.get(GAME_VERSIONS_URL);
     const versionURL = versions.data.versions.find((v) => v.id === version).url;
-    const packsPath = `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
     const response = await axios.get(versionURL);
     // CREATE PACK FOLDER IF iT DOES NOT EXISt
-    if (!await promisify(fs.exists)(`${packsPath}/${packName}/`)) {
-      mkdirp.sync(`${packsPath}/${packName}/`);
-      await promisify(fs.writeFile)(`${packsPath}/${packName}/vnl.json`, JSON.stringify(response.data));
+    try {
+      await promisify(fs.access)(path.join(PACKS_PATH, packName));
+    } catch (e) {
+      await makeDir(path.join(PACKS_PATH, packName));
+    } finally {
+      await promisify(fs.writeFile)(path.join(PACKS_PATH, packName, 'vnl.json'), JSON.stringify(response.data));
     }
     dispatch(addToQueue(packName, 'vanilla'));
     dispatch({ type: CREATION_COMPLETE });

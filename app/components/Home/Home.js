@@ -4,7 +4,8 @@ import { Input, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { promisify } from 'util';
 import fs from 'fs';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, GAME_VERSIONS_URL, APPPATH } from '../../constants';
+import path from 'path';
+import { PACKS_PATH, GAME_VERSIONS_URL } from '../../constants';
 import styles from './Home.scss';
 import News from './components/News/News';
 import Card from '../Common/Card/Card';
@@ -28,7 +29,7 @@ export default class Home extends Component<Props> {
   componentDidMount = async () => {
     this.props.getNews();
     try {
-      await promisify(fs.access)(`${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}/1.13.1/`);
+      await promisify(fs.access)(path.join(PACKS_PATH, '1.13.1'));
       this.setState({ latestInstalled: true });
     } catch (e) {
       this.setState({ latestInstalled: false });

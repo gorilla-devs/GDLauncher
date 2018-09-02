@@ -11,7 +11,7 @@ const ButtonSetting = (props) => {
           <div className={styles.description}>{props.description}</div>
         </div>
         <div className={styles.action}>
-          <Button type="primary">{props.btnText}</Button>
+          <Button type="primary" onClick={props.onClick || null}>{props.btnText}</Button>
         </div>
       </div>
       <Divider />

@@ -187,11 +187,16 @@ a:hover {
   border-color: darken($primary-color, 10);
 }
 
-.ant-switch-checked {
+.ant-switch-checked,
+.ant-checkbox-checked .ant-checkbox-inner,
+.ant-checkbox-indeterminate .ant-checkbox-inner {
   background-color: $primary-color;
 }
 
-.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled), .ant-input:focus, .ant-input:hover, .ant-cascader-picker:focus .ant-cascader-input {
+.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled),
+.ant-input:focus,
+.ant-input:hover,
+.ant-cascader-picker:focus .ant-cascader-input,
+.ant-checkbox-checked .ant-checkbox-inner, .ant-checkbox-indeterminate .ant-checkbox-inner {
   border-color: $primary-color;
 }
-

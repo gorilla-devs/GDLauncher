@@ -1,111 +1,115 @@
-const path = require('path');
-const constants = require('../constants');
-const fs = require('fs');
-const axios = require('axios');
-const SysOS = require('os');
-const { promisify } = require('es6-promisify');
-const mkdirp = promisify(require('mkdirp'));
+import { INSTANCES_PATH, PACKS_PATH } from '../constants';
+import path from 'path';
+import fs from 'fs';
+import axios from 'axios';
+import makeDir from 'make-dir';
+import es6promisify from 'es6-promisify';
+import SysOS from 'os';
+import { promisify } from 'util';
+
 const extract = promisify(require('extract-zip'));
 
-module.exports = {
-  extractMainJar: async (json, CheckForExists = true) => {
-    const libs = [];
-    const filePath = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, 'versions', json.id, `${json.id}.jar`);
-    if (CheckForExists) {
-      try {
-        await promisify(fs.access)(filePath);
-      } catch (e) {
-        libs.push({
-          url: json.downloads.client.url,
-          path: `${json.id}/${json.id}.jar`
-        });
-      }
-    } else {
+export const extractMainJar = async (json, CheckForExists = true) => {
+  const libs = [];
+  const filePath = path.join(INSTANCES_PATH, 'versions', json.id, `${json.id}.jar`);
+  console.log(filePath)
+  if (CheckForExists) {
+    try {
+      await promisify(fs.access)(filePath);
+    } catch (e) {
       libs.push({
         url: json.downloads.client.url,
         path: `${json.id}/${json.id}.jar`
       });
     }
-    return libs;
-  },
-  extractLibs: async (json, CheckForExists = true) => {
-    const libs = [];
-    await json.libraries.filter(lib => !parseLibRules(lib.rules)).map(async (lib) => {
-      if ('artifact' in lib.downloads) {
-        const filePath = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, 'libraries', lib.downloads.artifact.path);
-        if (CheckForExists) {
-          try {
-            await promisify(fs.access)(filePath);
-          } catch (e) {
-            libs.push({
-              url: lib.downloads.artifact.url,
-              path: lib.downloads.artifact.path
-            });
-          }
-        } else {
+  } else {
+    libs.push({
+      url: json.downloads.client.url,
+      path: `${json.id}/${json.id}.jar`
+    });
+  }
+  return libs;
+};
+
+export const extractLibs = async (json, CheckForExists = true) => {
+  const libs = [];
+  await json.libraries.filter(lib => !parseLibRules(lib.rules)).map(async (lib) => {
+    if ('artifact' in lib.downloads) {
+      const filePath = path.join(INSTANCES_PATH, 'libraries', lib.downloads.artifact.path);
+      if (CheckForExists) {
+        try {
+          await promisify(fs.access)(filePath);
+        } catch (e) {
           libs.push({
             url: lib.downloads.artifact.url,
             path: lib.downloads.artifact.path
           });
         }
-      }
-      if ('classifiers' in lib.downloads && `natives-${convertOSToMCFormat(SysOS.type())}` in lib.downloads.classifiers) {
+      } else {
         libs.push({
-          url: lib.downloads.classifiers[`natives-${convertOSToMCFormat(SysOS.type())}`].url,
-          path: lib.downloads.classifiers[`natives-${convertOSToMCFormat(SysOS.type())}`].path,
-          natives: true
+          url: lib.downloads.artifact.url,
+          path: lib.downloads.artifact.path
+        });
+      }
+    }
+    if ('classifiers' in lib.downloads && `natives-${convertOSToMCFormat(SysOS.type())}` in lib.downloads.classifiers) {
+      libs.push({
+        url: lib.downloads.classifiers[`natives-${convertOSToMCFormat(SysOS.type())}`].url,
+        path: lib.downloads.classifiers[`natives-${convertOSToMCFormat(SysOS.type())}`].path,
+        natives: true
+      });
+    }
+  });
+  return libs;
+};
+
+export const extractNatives = async (libs, packName) => {
+  const nativesPath = path.join(PACKS_PATH, packName, 'natives');
+  try {
+    await promisify(fs.access)(nativesPath);
+  } catch (e) {
+    await makeDir(nativesPath);
+  }
+
+  await Promise.all(libs.map(lib =>
+    extract(path.join(INSTANCES_PATH, 'libraries', lib.path), { dir: `${nativesPath}` })));
+};
+
+export const extractAssets = async (json) => {
+  const assets = [];
+  await axios.get(json.assetIndex.url).then(async (res) => {
+    // It saves the json into a file on /assets/indexes/${version}.json
+    const assetsFile = path.join(INSTANCES_PATH, 'assets', 'indexes', `${json.assets}.json`);
+    try {
+      // Checks whether the dir exists. If not, it creates it
+      await promisify(fs.access)(path.dirname(assetsFile));
+    } catch (e) {
+      await makeDir(path.dirname(assetsFile));
+    }
+    finally {
+      try {
+        await promisify(fs.access)(assetsFile);
+      } catch (e) {
+        await promisify(fs.writeFile)(assetsFile, JSON.stringify(res.data));
+      }
+    }
+
+    // Returns the list of assets if they don't already exist
+    return Object.keys(res.data.objects).map(async (asset) => {
+      const assetCont = res.data.objects[asset];
+      const filePath = path.join(INSTANCES_PATH, 'assets', 'objects', assetCont.hash.substring(0, 2), assetCont.hash);
+      try {
+        await promisify(fs.access)(filePath);
+      } catch (e) {
+        assets.push({
+          url: `http://resources.download.minecraft.net/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`,
+          path: `objects/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`,
+          legacyPath: `virtual/legacy/${asset}`
         });
       }
     });
-    return libs;
-  },
-  extractNatives: async (libs, packName, appPath) => {
-    const nativesPath = path.join(appPath, constants.LAUNCHER_FOLDER, constants.PACKS_FOLDER_NAME, packName, 'natives');
-    try {
-      await promisify(fs.access)(nativesPath);
-    } catch (e) {
-      await mkdirp(nativesPath);
-    }
-
-    await Promise.all(libs.map(lib =>
-      extract(path.join(appPath, constants.LAUNCHER_FOLDER, 'libraries', lib.path), { dir: `${nativesPath}` })));
-  },
-  extractAssets: async (json) => {
-    const assets = [];
-    await axios.get(json.assetIndex.url).then(async (res) => {
-      // It saves the json into a file on /assets/indexes/${version}.json
-      const assetsFile = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, 'assets', 'indexes', `${json.assets}.json`);
-      try {
-        // Checks whether the dir exists. If not, it creates it
-        await promisify(fs.access)(path.dirname(assetsFile));
-      } catch (e) {
-        await mkdirp(path.dirname(assetsFile));
-      }
-      finally {
-        try {
-          await promisify(fs.access)(assetsFile);
-        } catch (e) {
-          await promisify(fs.writeFile)(assetsFile, JSON.stringify(res.data));
-        }
-      }
-
-      // Returns the list of assets if they don't already exist
-      return Object.keys(res.data.objects).map(async (asset) => {
-        const assetCont = res.data.objects[asset];
-        const filePath = path.join(constants.APPPATH, constants.LAUNCHER_FOLDER, 'assets', 'objects', assetCont.hash.substring(0, 2), assetCont.hash);
-        try {
-          await promisify(fs.access)(filePath);
-        } catch (e) {
-          assets.push({
-            url: `http://resources.download.minecraft.net/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`,
-            path: `objects/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`,
-            legacyPath: `virtual/legacy/${asset}`
-          });
-        }
-      });
-    });
-    return assets;
-  }
+  });
+  return assets;
 };
 
 

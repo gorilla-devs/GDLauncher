@@ -1,21 +1,21 @@
-// This needs vanilla JS since it's used in the workers (not transpiled by babel)
-const getAppPath = require('./utils/getAppPath');
+import path from 'path';
+import getAppPath from './utils/getAppPath';
 
-module.exports = {
-  LAUNCHER_FOLDER: 'launcherData',
-  SERVERS_FOLDER_NAME: 'servers',
-  PACKS_FOLDER_NAME: 'packs',
-  GAME_VERSIONS_URL: 'https://launchermeta.mojang.com/mc/game/version_manifest.json',
-  ACCESS_TOKEN_VALIDATION_URL: 'https://authserver.mojang.com/validate',
-  ACCESS_TOKEN_REFRESH_URL: 'https://authserver.mojang.com/refresh',
-  LOGIN_PROXY_API: 'https://api.gdevs.io/auth',
-  LOGIN_TOKEN_PROXY_API: 'https://api.gdevs.io/authToken',
-  WINDOWS: 'win32',
-  LINUX: 'linux',
-  DARWIN: 'darwin',
-  APPPATH: getAppPath.getAppPath(),
-  NEWS_URL: 'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1',
-  JAVA_URL: 'https://java.com/download',
-  UPDATE_URL: 'https://dl.gorilladevs.com/releases/latest.json',
-  UPDATE_URL_CHECKSUMS: 'https://dl.gorilladevs.com/releases/latestChecksums.json',
-};
+export const APPPATH = getAppPath.getAppPath();
+export const LAUNCHER_FOLDER = 'launcherData';
+export const INSTANCES_FOLDER = 'instances';
+export const SERVERS_PATH = path.join(APPPATH, LAUNCHER_FOLDER, 'servers');
+export const INSTANCES_PATH = path.join(APPPATH, LAUNCHER_FOLDER, INSTANCES_FOLDER);
+export const PACKS_PATH = path.join(APPPATH, LAUNCHER_FOLDER, INSTANCES_FOLDER, 'packs');
+export const GAME_VERSIONS_URL = 'https://launchermeta.mojang.com/mc/game/version_manifest.json';
+export const ACCESS_TOKEN_VALIDATION_URL = 'https://authserver.mojang.com/validate';
+export const ACCESS_TOKEN_REFRESH_URL = 'https://authserver.mojang.com/refresh';
+export const LOGIN_PROXY_API = 'https://api.gdevs.io/auth';
+export const LOGIN_TOKEN_PROXY_API = 'https://api.gdevs.io/authToken';
+export const WINDOWS = 'win32';
+export const LINUX = 'linux';
+export const DARWIN = 'darwin';
+export const NEWS_URL = 'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1';
+export const JAVA_URL = 'https://java.com/download';
+export const UPDATE_URL = 'https://dl.gorilladevs.com/releases/latest.json';
+export const UPDATE_URL_CHECKSUMS = 'https://dl.gorilladevs.com/releases/latestChecksums.json';

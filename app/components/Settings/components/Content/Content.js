@@ -6,7 +6,6 @@ import MyAccount_Preferences from '../MyAccount_Preferences/MyAccount_Preference
 import Instances from '../Instances/Instances';
 
 const Content = ({ match }) => {
-  console.log(match);
   return (
     <div className={styles.Content}>
       <Route path={`/settings/myAccount_Preferences`} component={MyAccount_Preferences} />

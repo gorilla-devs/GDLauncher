@@ -1,6 +1,6 @@
+import makeDir from 'make-dir';
+import fss from 'fs';
 const path = require('path');
-const mkdirp = require('mkdirp');
-const fs = require('fs');
 const assert = require('assert');
 const os = require('os');
 const Promise = require('bluebird');
@@ -12,6 +12,8 @@ module.exports = {
   downloadArr,
   downloadFile
 };
+
+const fs = Promise.promisifyAll(fss);
 
 async function downloadArr(arr, folderPath, dispatch, pack, threads = os.cpus().length) {
   await Promise.map(arr, async item => {
@@ -28,26 +30,35 @@ async function downloadArr(arr, folderPath, dispatch, pack, threads = os.cpus().
 async function downloadFile(filename, url, legacyPath = null) {
   try {
     const filePath = path.dirname(filename);
-    if (!await promisify(fs.exists)(filePath)) {
-      await mkdirp(filePath);
+    try {
+      await fs.accessAsync(filePath);
+    } catch (e) {
+      await makeDir(filePath);
     }
     const file = await request(url, { encoding: 'binary' });
-    await promisify(fs.writeFile)(filename, file, 'binary');
+    await fs.writeFileAsync(filename, file, 'binary');
     // This handles legacy assets.
-    if (legacyPath !== null && legacyPath !== undefined && !await promisify(fs.exists)(legacyPath)) {
-      if (!await promisify(fs.exists)(path.dirname(legacyPath))) {
-        await mkdirp(path.dirname(legacyPath));
+    if (legacyPath !== null && legacyPath !== undefined) {
+      try {
+        await fs.accessAsync(legacyPath);
+      } catch (e) {
+        try {
+          await fs.accessAsync(path.dirname(legacyPath));
+        } catch (e) {
+          await makeDir(path.dirname(legacyPath));
+        } finally {
+          await fs.writeFileAsync(legacyPath, file, 'binary');
+        }
       }
-      await promisify(fs.writeFile)(legacyPath, file, 'binary');
     }
   } catch (e) {
     console.error(e);
   }
 }
 
-function checkFile(lpath, size, sha1) {
-  return fs.stat(lpath).then(stats => assert.equal(stats.size, size, 'wrong size for ' + lpath))
-    .then(() => fs.readFile(lpath))
-    .then(data => assert.equal(crypto.createHash('sha1').update(data).digest('hex'), sha1, `wrong sha1 for ${lpath}`))
-    .then(() => lpath);
-}
+// function checkFile(lpath, size, sha1) {
+//   return fs.stat(lpath).then(stats => assert.equal(stats.size, size, 'wrong size for ' + lpath))
+//     .then(() => fs.readFile(lpath))
+//     .then(data => assert.equal(crypto.createHash('sha1').update(data).digest('hex'), sha1, `wrong sha1 for ${lpath}`))
+//     .then(() => lpath);
+// }

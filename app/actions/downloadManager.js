@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { remote, ipcRenderer } from 'electron';
 import { message } from 'antd';
-import { APPPATH } from '../constants';
+import { APPPATH, PACKS_PATH, INSTANCES_PATH } from '../constants';
 import { promisify } from 'util';
 //Getting colors from scss theme file
 import colors from '../style/theme/index.scss';
@@ -53,12 +53,11 @@ export function downloadPack(pack) {
     console.log(`%cDownloading ${pack}`, `color: ${colors.primary}`);
 
     const fs = require('fs');
-    const constants = require('../constants');
     const vnlHelpers = require('../utils/getMCFilesList');
     const downloader = require('../utils/downloader');
 
-    const vnlPath = path.join(APPPATH, constants.LAUNCHER_FOLDER, constants.PACKS_FOLDER_NAME, pack);
-    const vnlRead = await promisify(fs.readFile)(`${vnlPath}/vnl.json`);
+    const vnlPath = path.join(PACKS_PATH, pack, 'vnl.json');
+    const vnlRead = await promisify(fs.readFile)(vnlPath);
     const vnlJSON = JSON.parse(vnlRead);
 
     const vnlLibs = await vnlHelpers.extractLibs(vnlJSON);
@@ -75,13 +74,13 @@ export function downloadPack(pack) {
       }
     });
     
-    await downloader.downloadArr(vnlLibs, path.join(APPPATH, constants.LAUNCHER_FOLDER, 'libraries'), dispatch, pack);
+    await downloader.downloadArr(vnlLibs, path.join(INSTANCES_PATH, 'libraries'), dispatch, pack);
 
-    await downloader.downloadArr(vnlAssets, path.join(APPPATH, constants.LAUNCHER_FOLDER, 'assets'), dispatch, pack, 10);
+    await downloader.downloadArr(vnlAssets, path.join(INSTANCES_PATH, 'assets'), dispatch, pack, 10);
 
-    await downloader.downloadArr(mainJar, path.join(APPPATH, constants.LAUNCHER_FOLDER, 'versions'), dispatch, pack);
+    await downloader.downloadArr(mainJar, path.join(INSTANCES_PATH, 'versions'), dispatch, pack);
 
-    await vnlHelpers.extractNatives(vnlLibs.filter(lib => 'natives' in lib), pack, APPPATH);
+    await vnlHelpers.extractNatives(vnlLibs.filter(lib => 'natives' in lib), pack);
 
     dispatch({
       type: DOWNLOAD_COMPLETED,

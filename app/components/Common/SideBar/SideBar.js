@@ -71,14 +71,14 @@ class SideBar extends Component<Props> {
         <div className={styles.socialsContainer}>
           { /* eslint-disable */}
           <a href="https://twitter.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
-            <i class="fab fa-twitter"/>
+            <i className="fab fa-twitter"/>
           </a>
           <a href="https://facebook.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
-            <i class="fab fa-facebook"
+            <i className="fab fa-facebook"
             />
           </a>
           <a href="https://instagram.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
-            <i class="fab fa-instagram"
+            <i className="fab fa-instagram"
             />
           </a>
           <span className={styles.version}>v{require('../../../package.json').version}</span>

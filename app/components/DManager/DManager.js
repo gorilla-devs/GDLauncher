@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import { Button, Icon, message } from 'antd';
-import { lstatSync, readdirSync, watch, existsSync } from 'fs';
+import fss from 'fs';
 import { join, basename } from 'path';
-import mkdirp from 'mkdirp';
+import makeDir from 'make-dir';
+import { Promise } from 'bluebird';
 import Link from 'react-router-dom/Link';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
@@ -11,14 +12,13 @@ import { hideMenu } from 'react-contextmenu/es6/actions';
 import styles from './DManager.scss';
 import DInstance from '../../containers/DInstance';
 import { history } from '../../store/configureStore';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, APPPATH } from '../../constants';
+import { PACKS_PATH } from '../../constants';
 import store from '../../localStore';
 
 type Props = {
   selectInstance: () => void
 };
 
-const watchPath = `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
 let watcher;
 
 const SortableItem = SortableElement(({ value }) =>
@@ -35,30 +35,43 @@ const SortableList = SortableContainer(({ items }) => {
   );
 });
 
+const fs = Promise.promisifyAll(fss);
+
 
 export default class DManager extends Component<Props> {
   props: Props;
   constructor(props) {
     super(props);
-    if (!existsSync(watchPath)) {
-      mkdirp.sync(watchPath);
-    }
     this.state = {
-      instances: this.getDirectories(watchPath)
-    };
+      instances: []
+    }
+    this.watchRoutine();
+  }
+
+  watchRoutine = async () => {
+    try {
+      await fs.accessAsync(PACKS_PATH);
+    } catch (e) {
+      await makeDir(PACKS_PATH);
+    }
+    this.setState({
+      instances: await this.getDirectories(PACKS_PATH)
+    });
     // Watches for any changes in the packs dir. TODO: Optimize
     try {
-      watcher = watch(watchPath, () => {
-        if (!existsSync(watchPath)) {
-          mkdirp.sync(watchPath);
+      watcher = fss.watch(PACKS_PATH, async () => {
+        try {
+          await fs.accessAsync(PACKS_PATH);
+        } catch (e) {
+          await makeDir(PACKS_PATH);
         }
         this.setState({
-          instances: this.getDirectories(watchPath)
+          instances: await this.getDirectories(PACKS_PATH)
         });
       });
     } catch (error) {
       console.error(error);
-      if (error.message === `watch ${watchPath} ENOSPC`) {
+      if (error.message === `watch ${PACKS_PATH} ENOSPC`) {
         message.error(
           <span>
             There was an error with inotify limit. see
@@ -70,6 +83,7 @@ export default class DManager extends Component<Props> {
       }
     }
   }
+
 
   componentWillUnmount() {
     // Stop watching for changes when this component is unmounted
@@ -95,8 +109,8 @@ export default class DManager extends Component<Props> {
     });
   };
 
-  isDirectory = source => lstatSync(source).isDirectory();
-  getDirectories = source => readdirSync(source)
+  isDirectory = source => fss.lstatSync(source).isDirectory();
+  getDirectories = async source => await fs.readdirAsync(source)
     .map(name => join(source, name))
     .filter(this.isDirectory)
     .map(dir => basename(dir));
