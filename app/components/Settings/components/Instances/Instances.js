@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import fsa from 'fs-extra';
 import path from 'path';
 import styles from './Instances.scss';
@@ -11,7 +11,12 @@ import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import ButtonSetting from '../ButtonSetting/ButtonSetting';
 
 const deleteShareData = async () => {
-  await fsa.emptyDir(INSTANCES_PATH);
+  try {
+    await fsa.emptyDir(INSTANCES_PATH);
+    message.success("Data has been cleared.");
+  } catch (e) {
+    message.error('Error while clearing data.');
+  }
 };
 
 const Instances = (props) => {
