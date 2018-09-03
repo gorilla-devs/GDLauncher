@@ -133,7 +133,6 @@ export default class DManager extends Component<Props> {
               <Link to={{ pathname: '/InstanceCreatorModal', state: { modal: true } }} >
                 <Button type="primary" className={styles.addVanilla}>Add New Instance</Button>
               </Link>
-              <Button type="primary" disabled className={styles.addForge}>Add New Forge</Button>
             </div>
           </div>
         </div>

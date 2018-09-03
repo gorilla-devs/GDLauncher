@@ -36,7 +36,7 @@ const News = props =>
         }}>
           <ContentLoader
             height={180}
-            speed={0.8}
+            speed={0.6}
             primaryColor="#212b36"
             secondaryColor="#2c3e50"
             style={{
