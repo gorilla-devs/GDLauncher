@@ -1,12 +1,12 @@
 import {
   GET_MC_VANILLA_VERSIONS,
   CREATION_COMPLETE,
-  RESET_MODAL_STATE
+  START_PACK_CREATION
 } from '../actions/packCreator';
 
 const initialState = {
   versionsManifest: [],
-  modalState: true
+  loading: false
 };
 
 export default function packManager(state = initialState, action) {
@@ -16,15 +16,15 @@ export default function packManager(state = initialState, action) {
         ...state,
         versionsManifest: action.payload.data.versions
       };
+    case `${START_PACK_CREATION}`:
+      return {
+        ...state,
+        loading: true
+      };
     case `${CREATION_COMPLETE}`:
       return {
         ...state,
-        modalState: false
-      };
-    case `${RESET_MODAL_STATE}`:
-      return {
-        ...state,
-        modalState: true
+        loading: false
       };
     default:
       return state;

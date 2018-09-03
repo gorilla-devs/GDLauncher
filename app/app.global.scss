@@ -1,0 +1,202 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+
+@import "./antd.css";
+@import "./style/theme/index";
+
+@font-face {
+  font-family: 'GlacialIndifferenceBold';
+  src: url('./assets/fonts/GlacialIndifferenceBold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+    }
+
+@font-face {
+  font-family: 'GlacialIndifferenceItalic';
+  src: url('./assets/fonts/GlacialIndifferenceItalic.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+    }
+
+@font-face {
+  font-family: 'GlacialIndifferenceMedium';
+  src: url('./assets/fonts/GlacialIndifferenceMedium.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+    }
+
+@font-face {
+  font-family: 'GlacialIndifferenceRegular';
+  src: url('./assets/fonts/GlacialIndifferenceRegular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+    }
+
+html,
+body {
+  font-family: 'GlacialIndifferenceRegular', sans-serif;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+a {
+  -webkit-user-drag: none;
+}
+
+::-webkit-scrollbar {
+  background-color: $secondary-color-3;
+  width: 8px;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: $text-main-color;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px $secondary-color-3;
+  background-color: rgb(35, 48, 61);
+  border-radius: 8px;
+}
+
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span),
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span)::after,
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span)::before {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+input,
+button,
+textarea,
+:focus {
+  outline: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.slick-dots {
+  margin-top: -150px;
+}
+
+/*
+ * Had to remove scale animation because of how the menu position is calculated. 
+ * If it starts with a scale of 0, it's initial position is always from the pointer, direction bottom.
+ * If the menu is opened at the end of the page it will overflow because it cannot calculate the overflowY.
+*/
+
+.react-contextmenu {
+  background: $secondary-color-2;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  color: $text-main-color;
+  font-size: 16px;
+  margin: 2px 0 0;
+  min-width: 160px;
+  outline: none;
+  /* padding: 5px 0; */
+  pointer-events: none;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: transform 200ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.react-contextmenu span {
+  display: inline-block;
+  padding-bottom: 15px;
+}
+
+.react-contextmenu.react-contextmenu--visible {
+  pointer-events: auto;
+  z-index: 9999;
+}
+
+.react-contextmenu-item {
+  background: 0 0;
+  color: $text-main-color;
+  cursor: pointer;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.react-contextmenu-item.react-contextmenu-item--active,
+.react-contextmenu-item.react-contextmenu-item--selected,
+.react-contextmenu-item:hover {
+  color: $text-hover-color;
+  background-color: $primary-color;
+  border-color: $primary-color;
+  text-decoration: none;
+}
+
+.react-contextmenu-item.react-contextmenu-item--disabled,
+.react-contextmenu-item.react-contextmenu-item--disabled:hover {
+  background-color: transparent;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: $text-dark;
+}
+
+.react-contextmenu-item--divider {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  cursor: inherit;
+  margin-bottom: 3px;
+  padding: 2px 0;
+}
+
+.react-contextmenu-item--divider:hover {
+  background-color: transparent;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.react-contextmenu-item.react-contextmenu-submenu {
+  padding: 0;
+}
+
+.react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item::after {
+  content: "▶";
+  display: inline-block;
+  position: absolute;
+  right: 7px;
+}
+
+.example-multiple-targets::after {
+  content: attr(data-count);
+  display: block;
+}
+
+
+/* Overwrites ANTD CSS */
+.ant-btn-primary {
+  background-color: $primary-color;
+  border-color: $primary-color;
+}
+
+.ant-btn-primary:hover, .ant-btn-primary:focus {
+  background-color: darken($primary-color, 10);
+  border-color: darken($primary-color, 10);
+}
+
+.ant-switch-checked,
+.ant-checkbox-checked .ant-checkbox-inner,
+.ant-checkbox-indeterminate .ant-checkbox-inner {
+  background-color: $primary-color;
+}
+
+.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled),
+.ant-input:focus,
+.ant-input:hover,
+.ant-cascader-picker:focus .ant-cascader-input,
+.ant-checkbox-checked .ant-checkbox-inner, .ant-checkbox-indeterminate .ant-checkbox-inner {
+  border-color: $primary-color;
+}

@@ -9,7 +9,7 @@
 [![GitHub package version](https://img.shields.io/github/package-json/v/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/blob/master/package.json) ![Github All Releases](https://img.shields.io/github/downloads/gorilla-devs/GDLauncher/total.svg) [![Read the Docs (version)](https://img.shields.io/readthedocs/gdlauncher/master.svg)](https://gdlauncher.readthedocs.io/en/master/)
 
 <p align="center">
-    <img width="800" height="auto" src="https://i.imgur.com/6IZ2kjC.png" alt="GDLauncher" />
+    <img width="800" height="auto" src="https://imgur.com/mvH7CXv" alt="GDLauncher" />
 </p>
 
 <details>

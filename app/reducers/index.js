@@ -8,6 +8,7 @@ import packCreator from './packCreator';
 import downloadManager from './downloadManager';
 import instancesManager from './instancesManager';
 import news from './news';
+import autoUpdater from './autoUpdater';
 
 const rootReducer = combineReducers({
   counter,
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
   packCreator,
   downloadManager,
   instancesManager,
-  news
+  news,
+  autoUpdater
 });
 
 export default rootReducer;

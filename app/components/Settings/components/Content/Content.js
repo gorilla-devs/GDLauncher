@@ -2,13 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
 import styles from './Content.scss';
+import MyAccount_Preferences from '../MyAccount_Preferences/MyAccount_Preferences';
+import Instances from '../Instances/Instances';
 
-const Content = () => {
+const Content = ({ match }) => {
   return (
     <div className={styles.Content}>
-      <div style={{ width: '100%', height: '100px', background: 'rgb(35, 48, 61)' }}>
-
-      </div>
+      <Route path={`/settings/myAccount_Preferences`} component={MyAccount_Preferences} />
+      <Route path={`/settings/instances`} component={Instances} />
     </div>
   );
 };

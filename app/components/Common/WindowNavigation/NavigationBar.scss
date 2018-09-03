@@ -1,29 +1,32 @@
+@import '../../../style/theme/index';
+
+
 .container {
     margin: 0;
     width: 100%;
     height: 40px;
     padding-left: 10px;
-    background: #2c3e50;
+    background: $secondary-color-2;
     -webkit-user-select: none;
 }
 
 .settings {
     font-size: 22px;
-    color: rgba(255, 255, 255, 0.65);
+    color: $text-main-color;
     cursor: pointer;
     right: 210px;
     position: absolute;
     margin-top: 9px;
     transition: all .2s ease-in-out;
     &:hover {
-      color: white;
+      color: $text-hover-color;
       transition: all .2s ease-in-out;
     }
     path {
       cursor: pointer;
     }
     path:hover {
-      color: white;
+      color: $text-hover-color;
       transition: all .2s ease-in-out;
     }
   }

@@ -1,13 +1,22 @@
+@import '../../../style/theme/index';
+
 .sidenav{
   width: 200px;
   height: 100vh;
   position: absolute;
   right: 0;
-  top: 60px;
-  background-color: #2c3e50;
+  top: 20px;
+  background-color: $secondary-color-2;
   font-family: 'GlacialIndifferenceRegular';
+  .updateAvailable {
+    position: absolute;
+    line-height: 40px;
+    width: 100%;
+    text-align: center;
+  }
   .header {
     display: flex;
+    margin-top: 40px;
     line-height: 40px;
     span:first-child {
       position: relative;
@@ -23,21 +32,24 @@
       right: 10px;
       font-size: 21px;
       margin-top: 10px;
-      color: rgba(255, 255, 255, 0.65);
+      color: $text-main-color;
       cursor: pointer;
       transition: all .2s ease-in-out;
       &:hover {
-        color: white;
+        color: $text-hover-color;
         transition: all .2s ease-in-out;
       }
       path {
         cursor: pointer;
       }
       path:hover {
-        color: white;
+        color: $text-hover-color;
         transition: all .2s ease-in-out;
       }
     }
+  }
+  .playingServer {
+    color: $green;
   }
   .scroller {
     height: calc(100% - 60px - 120px);
@@ -51,14 +63,24 @@
   position: absolute;
   display: flex;
   width: 200px;
-  bottom: 60px;
-  padding-right: 10px;
+  bottom: 20px;
+  padding-right: 5px;
   align-items: center;
   align-content: center;
   justify-content: center;
   .socialBtn {
     cursor: pointer;
     margin: 0 5px 5px;
+    line-height: 50px;
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    svg {
+      cursor: pointer;
+      path {
+        cursor: pointer;
+      }
+    }
     &:hover {
       transition: background-color .25s;
       background-color: rgba(0, 0, 0, 0.3);

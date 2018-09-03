@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
-import styles from './Modal.css';
+import styles from './Modal.scss';
+
+type Props = {};
 
 export default class Modal extends Component<Props> {
   props: Props;
@@ -32,9 +34,9 @@ export default class Modal extends Component<Props> {
   }
 
   componentWillReceiveProps(newProps) { // check for the mounted props
-    if (!newProps.mounted) {
-      return this.unMountStyle(); // call outro animation when mounted prop is false
-    }
+    // if (!newProps.mounted) {
+    //   return this.unMountStyle(); // call outro animation when mounted prop is false
+    // }
     setTimeout(this.mountStyle, 10); // call the into animiation
   }
 
@@ -87,7 +89,7 @@ export default class Modal extends Component<Props> {
         <div className={styles.modal} style={this.state.style} onClick={(e) => e.stopPropagation()}>
           {(this.props.header === undefined || this.props.header === true) &&
             <div className={styles.header}>
-              <h3 style={{ display: 'inline-block' }}>Modal</h3>
+              <h3 style={{ display: 'inline-block' }}>{this.props.title || 'Modal'}</h3>
               <Button icon="close" size="small" type="ghost" className={styles.closeBtn} onClick={this.back} />
             </div>
           }

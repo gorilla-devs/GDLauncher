@@ -1,13 +1,15 @@
 import axios from 'axios';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
+import makeDir from 'make-dir';
+import path from 'path';
 import { goBack } from 'react-router-redux';
-import { LAUNCHER_FOLDER, PACKS_FOLDER_NAME, GAME_VERSIONS_URL, APPPATH } from '../constants';
+import { promisify } from 'util';
+import { PACKS_PATH, GAME_VERSIONS_URL } from '../constants';
 import { addToQueue } from './downloadManager';
 
 export const GET_MC_VANILLA_VERSIONS = 'GET_MC_VANILLA_VERSIONS';
 export const CREATION_COMPLETE = 'CREATION_COMPLETE';
-export const RESET_MODAL_STATE = 'RESET_MODAL_STATE';
+export const START_PACK_CREATION = 'START_PACK_CREATION';
 
 export function getVanillaMCVersions() {
   return async (dispatch) => {
@@ -19,28 +21,26 @@ export function getVanillaMCVersions() {
   };
 }
 
-export function resetModalState() {
-  return dispatch => {
-    dispatch({
-      type: RESET_MODAL_STATE
-    });
-  };
-}
-
-export function createPack(url, packName) {
-  return (dispatch) => {
-    const packsPath = `${APPPATH}${LAUNCHER_FOLDER}/${PACKS_FOLDER_NAME}`;
-    return axios.get(url).then((response) => {
-      // CREATE PACK FOLDER IF iT DOES NOT EXISt
-      if (!fs.existsSync(`${packsPath}/${packName}/`)) {
-        mkdirp.sync(`${packsPath}/${packName}/`);
-        fs.writeFileSync(`${packsPath}/${packName}/vnl.json`, JSON.stringify(response.data));
-      }
-      return response;
-    })
-      .then(dispatch(addToQueue(packName, 'vanilla')))
-      .then(dispatch({ type: CREATION_COMPLETE }))
-      .then(setTimeout(dispatch(goBack()), 160));
+export function createPack(version, packName) {
+  return async (dispatch, getState) => {
+    const { router } = getState();
+    dispatch({ type: START_PACK_CREATION });
+    const versions = await axios.get(GAME_VERSIONS_URL);
+    const versionURL = versions.data.versions.find((v) => v.id === version).url;
+    const response = await axios.get(versionURL);
+    // CREATE PACK FOLDER IF iT DOES NOT EXISt
+    try {
+      await promisify(fs.access)(path.join(PACKS_PATH, packName));
+    } catch (e) {
+      await makeDir(path.join(PACKS_PATH, packName));
+    } finally {
+      await promisify(fs.writeFile)(path.join(PACKS_PATH, packName, 'vnl.json'), JSON.stringify(response.data));
+    }
+    dispatch(addToQueue(packName, 'vanilla'));
+    dispatch({ type: CREATION_COMPLETE });
+    if (router.location.state && router.location.state.modal) {
+      setTimeout(dispatch(goBack()), 160);
+    }
   };
 }
 

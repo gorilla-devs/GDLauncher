@@ -5,7 +5,12 @@ import path from 'path';
 import fsa from 'fs-extra';
 import os from 'os';
 import store from '../localStore';
-import { LOGIN_PROXY_API, ACCESS_TOKEN_VALIDATION_URL, ACCESS_TOKEN_REFRESH_URL } from '../constants';
+import {
+  LOGIN_PROXY_API,
+  ACCESS_TOKEN_VALIDATION_URL,
+  ACCESS_TOKEN_REFRESH_URL,
+  LOGIN_TOKEN_PROXY_API
+} from '../constants';
 
 export const LOGOUT = 'LOGOUT';
 export const START_AUTH_LOADING = 'START_AUTH_LOADING';
@@ -14,8 +19,8 @@ export const START_TOKEN_CHECK_LOADING = 'START_TOKEN_CHECK_LOADING';
 export const STOP_TOKEN_CHECK_LOADING = 'STOP_TOKEN_CHECK_LOADING';
 export const AUTH_SUCCESS = 'AUTH_SUCCESS';
 export const AUTH_FAILED = 'AUTH_FAILED';
-export const OPEN_NATIVE_PROFILES_MODAL = 'OPEN_NATIVE_PROFILES_MODAL';
-export const CLOSE_NATIVE_PROFILES_MODAL = 'CLOSE_NATIVE_PROFILES_MODAL';
+export const START_NATIVE_LOADING = 'START_NATIVE_LOADING';
+export const STOP_NATIVE_LOADING = 'STOP_NATIVE_LOADING';
 
 export function login(username, password, remember) {
   return async (dispatch) => {
@@ -30,24 +35,28 @@ export function login(username, password, remember) {
           password
         }
       ).then(res => {
-        if (res.data !== undefined &&
+        if (res.status === 200 &&
+          res.data !== undefined &&
           res.data !== null &&
-          Object.prototype.hasOwnProperty.call(res.data, 'authenticated')) {
+          Object.prototype.hasOwnProperty.call(res.data, 'accessToken')) {
           const { data } = res;
           const payload = {
             email: data.userData.email,
-            displayName: data.username,
+            username: data.username,
+            displayName: data.displayName,
             accessToken: data.accessToken,
             clientToken: data.clientToken,
             legacy: data.legacy,
-            uuid: data.uuid
+            uuid: data.uuid,
+            userID: data.userID,
+            newUser: data.newUser
           };
           if (remember) {
             store.set({
               user: {
                 ...payload
               },
-              lastEmail: data.userData.email
+              lastUsername: data.userData.username
             });
           }
           dispatch({
@@ -59,8 +68,7 @@ export function login(username, password, remember) {
         } else {
           message.error('Wrong username or password');
           dispatch({
-            type: AUTH_FAILED,
-            payload: res.data
+            type: AUTH_FAILED
           });
         }
         return res;
@@ -131,47 +139,64 @@ export function checkAccessToken() {
 }
 
 export function tryNativeLauncherProfiles() {
+  /*
+  / Since there is no way of checking the validity of an access token
+  / while also getting the user data attached to that access token, the
+  / "hacky" solution is to refresh the access token (it will send the user 
+  / data in the response). After getting a 200 status response, we get the 
+  / user data and the access token but also update it in the native launcher
+  / profiles json.
+  */
   return async (dispatch) => {
     const homedir = process.env.APPDATA || os.homedir();
     const vanillaMCPath = path.join(homedir, '.minecraft');
     try {
+      dispatch({ type: START_NATIVE_LOADING });
       const vnlJson = await fsa.readJson(path.join(vanillaMCPath, 'launcher_profiles.json'));
       const { account } = vnlJson.selectedUser;
       const { accessToken } = vnlJson.authenticationDatabase[account];
       const res = await axios.post(
-        LOGIN_PROXY_API,
+        LOGIN_TOKEN_PROXY_API,
         { accessToken },
         { 'Content-Type': 'application/json;charset=UTF-8' }
       );
-      if (res.status === 200) {
-        // We need to update the accessToken in launcher_profiles.json
-        const userData = {
-          email: res.data.user.email,
-          displayName: res.data.selectedProfile.name,
-          accessToken: res.data.accessToken,
-          clientToken: res.data.clientToken,
-          legacy: res.data.user.legacyUser,
-          uuid: res.data.selectedProfile.id
+      if (res.status === 200 &&
+        res.data !== undefined &&
+        res.data !== null &&
+        Object.prototype.hasOwnProperty.call(res.data, 'accessToken')) {
+        const { data } = res;
+        const payload = {
+          email: data.userData.email,
+          username: data.username,
+          displayName: data.displayName,
+          accessToken: data.accessToken,
+          clientToken: data.clientToken,
+          legacy: data.legacy,
+          uuid: data.uuid,
+          userID: data.userID,
+          newUser: data.newUser
         };
+        // We need to update the accessToken in launcher_profiles.json
+        vnlJson.authenticationDatabase[data.userID].accessToken = data.accessToken;
+        await fsa.writeJson(path.join(vanillaMCPath, 'launcher_profiles.json'), vnlJson);
         store.set({
-          user: { ...userData },
-          lastEmail: res.data.user.email
+          user: { ...payload },
+          lastUsername: data.userData.email
         });
         dispatch({
           type: AUTH_SUCCESS,
-          payload: userData
+          payload
         });
         dispatch(push('/home'));
       }
-      // dispatch(checkAccessToken(userData));
-    } catch (err) { console.log(err); }
+    } catch (err) {
+      message.error('Token is not valid');
+      dispatch({
+        type: AUTH_FAILED
+      });
+      console.log(err);
+    } finally {
+      dispatch({ type: STOP_NATIVE_LOADING });
+    }
   };
-}
-
-export function openNativeProfiles() {
-  return dispatch => dispatch({ type: OPEN_NATIVE_PROFILES_MODAL });
-}
-
-export function closeNativeProfiles() {
-  return dispatch => dispatch({ type: CLOSE_NATIVE_PROFILES_MODAL });
 }

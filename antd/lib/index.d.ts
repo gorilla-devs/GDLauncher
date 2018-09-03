@@ -26,7 +26,6 @@ export { default as List } from './list';
 export { default as LocaleProvider } from './locale-provider';
 export { default as message } from './message';
 export { default as Menu } from './menu';
-export { default as Modal } from './modal';
 export { default as notification } from './notification';
 export { default as Pagination } from './pagination';
 export { default as Popconfirm } from './popconfirm';

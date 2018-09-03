@@ -1,0 +1,23 @@
+@import '../../../style/theme/index';
+
+.container {
+  display: block;
+  width: 100%;
+  height: 200px;
+  background: $secondary-color-light;
+  color: $text-hover-color;
+  border-radius: 4px;
+  flex-grow: 1;
+  .header {
+    width: 100%;
+    border-radius: 4px;
+    background: $primary-color;
+    height: 33px;
+    line-height: 33px;
+    text-align: center;
+  }
+  .content {
+    padding: 10px;
+  }
+}
+

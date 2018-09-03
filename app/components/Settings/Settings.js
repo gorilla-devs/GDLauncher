@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
 import Modal from '../Common/Modal/Modal';
-import styles from './Settings.css';
+import styles from './Settings.scss';
 import SideMenu from './components/SideMenu/SideMenu';
 import Content from './components/Content/Content';
 
@@ -17,8 +17,8 @@ const Settings = ({ match, history }) => {
       }
     >
       <div className={styles.container}>
-        <SideMenu />
-        <Content />
+        <SideMenu match={match} />
+        <Content match={match} />
       </div>
     </Modal>
   );

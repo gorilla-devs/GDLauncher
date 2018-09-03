@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { message } from 'antd';
-import X2JS from 'x2js';
 import cheerio from 'cheerio';
 import { NEWS_URL } from '../constants';
 

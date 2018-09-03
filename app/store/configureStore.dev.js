@@ -3,10 +3,11 @@ import thunk from 'redux-thunk';
 import promise from 'redux-promise-middleware';
 import { createHashHistory } from 'history';
 import { routerMiddleware, routerActions } from 'react-router-redux';
-import { logger } from 'redux-logger';
+import { createLogger } from 'redux-logger';
 import rootReducer from '../reducers';
 import * as counterActions from '../actions/counter';
 import type { counterStateType } from '../reducers/counter';
+import { DOWNLOAD_FILE_COMPLETED } from '../actions/downloadManager';
 
 const history = createHashHistory();
 
@@ -21,6 +22,19 @@ const configureStore = (initialState?: counterStateType) => {
 
   // Skip redux logs in console during the tests
   if (process.env.NODE_ENV !== 'test') {
+    const logger = createLogger({
+      //We need to hide the DOWNLOAD_FILE_COMPLETED dispatches, since they are just too many and they slow down the execution
+      predicate: (getState, action) => action.type !== DOWNLOAD_FILE_COMPLETED,
+      collapsed: true,
+      duration: true,
+      colors: {
+        title: () => '#8e44ad',
+        prevState: () => '#9E9E9E',
+        action: () => '#03A9F4',
+        nextState: () => '#4CAF50',
+        error: () => '#F20404'
+      }
+    });
     middleware.push(logger);
   }
 

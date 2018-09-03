@@ -1,3 +1,6 @@
+@import '../../style/theme/index';
+
+
 .main {
   display: inline-block;
   position: relative;
@@ -5,6 +8,7 @@
   height: 130px;
   padding: 10px 20px;
   overflow: hidden;
+  color: $text-main-color;
 }
 
 .icon {
@@ -34,7 +38,7 @@
 .icon__instancePercentage {
   position: absolute;
   right: 10px;
-  color: #27ae60;
+  color: $primary-color;
 }
 
 .icon__playBtn {
@@ -48,7 +52,7 @@
   width: 90px;
   height: 90px;
   border-radius: 18px;
-  background: url(https://i.imgur.com/xyzzOiW.png) center no-repeat;
+  background: url('../../assets/images/instanceDefault.png') center no-repeat;
   background-size: cover;
 }
 

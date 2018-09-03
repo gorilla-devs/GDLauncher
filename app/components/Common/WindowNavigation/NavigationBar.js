@@ -6,13 +6,12 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import styles from './NavigationBar.scss';
 import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
-import DownloadManager from '../../DownloadManager/DownloadManager';
 import * as downloadManagerActions from '../../../actions/downloadManager';
 import logo from '../../../assets/images/logo.png';
 
 
 type Props = {
-  downloadQueue: array,
+  downloadQueue: Object,
   location: string
 };
 class NavigationBar extends Component<Props> {
@@ -41,11 +40,11 @@ class NavigationBar extends Component<Props> {
         </div>
         <HorizontalMenu
           location={this.props.location}
-          downloadedCount={Object.keys(this.props.downloadQueue).filter(inst => this.props.downloadQueue[inst].downloadCompleted).length}
+          downloadingCount={Object.keys(this.props.downloadQueue).filter(inst => !this.props.downloadQueue[inst].downloadCompleted).length}
           clearQueue={() => this.props.clearQueue()}
         />
         <Link to={{
-          pathname: '/settings',
+          pathname: '/settings/myAccount_Preferences',
           state: { modal: true }
         }}
         >

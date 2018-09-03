@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
-import styles from './Login.css';
+import styles from './Login.scss';
 import store from '../../localStore';
 import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
 import * as AuthActions from '../../actions/auth';
@@ -14,10 +14,8 @@ type Props = {
   login: () => void,
   tryNativeLauncherProfiles: () => void,
   tokenLoading: boolean,
-  nativeModalOpened: boolean,
-  closeNativeProfiles: () => void,
   authLoading: boolean,
-  openNativeProfiles: () => void
+  nativeLoading: boolean,
 };
 
 const FormItem = Form.Item;
@@ -74,8 +72,9 @@ class Login extends Component<Props> {
               <FormItem>
                 {getFieldDecorator('username', {
                   rules: [{ required: true, message: 'Please input your email!' }],
-                  initialValue: store.has('lastEmail') ? store.get('lastEmail') : ''
+                  initialValue: store.has('lastUsername') ? store.get('lastUsername') : ''
                 })(<Input
+                  disabled={this.props.tokenLoading || this.props.nativeLoading || this.props.authLoading}
                   size="large"
                   prefix={<Icon type="user" style={{ color: 'rgba(255,255,255,.8)' }} />}
                   placeholder="Email"
@@ -86,6 +85,7 @@ class Login extends Component<Props> {
                   rules: [{ required: true, message: 'Please input your Password!' }],
                 })(<Input
                   size="large"
+                  disabled={this.props.tokenLoading || this.props.nativeLoading || this.props.authLoading}
                   prefix={<Icon type="lock" style={{ color: 'rgba(255,255,255,.8)' }} />}
                   addonAfter={
                     <Link to={{ pathname: '/loginHelperModal', state: { modal: true } }} draggable="false">
@@ -103,7 +103,15 @@ class Login extends Component<Props> {
                   valuePropName: 'checked',
                   initialValue: true,
                 })(<Checkbox>Remember me</Checkbox>)}
-                <Button icon="login" loading={this.props.authLoading} disabled={this.props.tokenLoading} size="large" type="primary" htmlType="submit" className={styles.login_form_button}>
+                <Button
+                  icon="login"
+                  loading={this.props.authLoading}
+                  disabled={this.props.tokenLoading || this.props.nativeLoading}
+                  size="large"
+                  type="primary"
+                  htmlType="submit"
+                  className={styles.login_form_button}
+                >
                   Log in
                 </Button>
               </FormItem>
@@ -111,7 +119,7 @@ class Login extends Component<Props> {
             {this.state.nativeLauncherProfiles &&
               <Button
                 icon="forward"
-                loading={this.props.tokenLoading}
+                loading={this.props.nativeLoading}
                 size="large"
                 type="primary"
                 className={styles.login_form_button}
@@ -136,7 +144,7 @@ function mapStateToProps(state) {
     authLoading: state.auth.loading,
     isAuthValid: state.auth.isAuthValid,
     tokenLoading: state.auth.tokenLoading,
-    nativeModalOpened: state.auth.nativeProfilesModalOpened
+    nativeLoading: state.auth.nativeLoading
   };
 }
 

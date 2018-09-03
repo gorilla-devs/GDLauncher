@@ -7,21 +7,22 @@ import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
 import { JAVA_URL } from './constants';
 import App from './containers/App';
+import PageContent from './components/Common/PageContent/PageContent';
 import HomePage from './components/Home/containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
 import DManager from './components/DManager/containers/DManagerPage';
-import Profile from './containers/ProfilePage';
 import Navigation from './containers/Navigation';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import Login from './components/Login/Login';
 import findJava from './utils/javaLocationFinder';
 import Settings from './components/Settings/Settings';
 import DiscordModal from './components/DiscordModal/DiscordModal';
-import VanillaModal from './components/VanillaModal/containers/VanillaModal';
+import InstanceCreatorModal from './components/InstanceCreatorModal/containers/InstanceCreatorModal';
+import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
 type Props = {
-  location: object,
+  location: Object,
   checkAccessToken: () => void,
   isAuthValid: boolean
 };
@@ -37,8 +38,8 @@ class RouteDef extends Component<Props> {
         message: 'JAVA NOT FOUND',
         description: (
           <div>
-            Java has not been found. Click <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">here</a>
-            to download it. After installing you will need to restart your PC.
+            Java has not been found. Click <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">here</a> to
+            download it. After installing you will need to restart your PC.
           </div>
         )
       });
@@ -75,21 +76,20 @@ class RouteDef extends Component<Props> {
             <SideBar />
           </div>
           : null}
+
+
         <Switch location={isModal ? this.previousLocation : location}>
           <Route exact path="/" component={Form.create()(Login)} />
           {!this.props.isAuthValid && <Redirect push to="/" />}
-          <Route path="/dmanager" component={DManager} />
-          <Route path="/profile" component={Profile} />
-          <Route path="/home" component={HomePage} />
+          <Route component={PageContent} />
         </Switch>
 
         { /* ALL MODALS */}
-        <Switch>
-          {isModal ? <Route path="/settings" component={Settings} /> : null}
-          {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
-          {isModal ? <Route path="/vanillaModal" component={VanillaModal} /> : null}
-          {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
-        </Switch>
+        {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
+        {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
+        {isModal ? <Route path="/InstanceCreatorModal" component={InstanceCreatorModal} /> : null}
+        {isModal ? <Route path="/editInstance/:instance" component={InstanceManagerModal} /> : null}
+        {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
       </App>
     );
   }

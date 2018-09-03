@@ -6,30 +6,29 @@ import {
   STOP_TOKEN_CHECK_LOADING,
   AUTH_FAILED,
   AUTH_SUCCESS,
-  OPEN_NATIVE_PROFILES_MODAL,
-  CLOSE_NATIVE_PROFILES_MODAL
+  START_NATIVE_LOADING,
+  STOP_NATIVE_LOADING,
 } from '../actions/auth';
 
 
 const initialState = {
   loading: false,
   tokenLoading: false,
+  nativeLoading: false,
   email: null,
+  username: null,
   displayName: null,
   accessToken: null,
   clientToken: null,
+  userID: null,
+  newUser: null,
   legacy: null,
   uuid: null,
   isAuthValid: false,
-  nativeProfilesModalOpened: false
 };
 
 export default function auth(state = initialState, action) {
   switch (action.type) {
-    case `${OPEN_NATIVE_PROFILES_MODAL}`:
-      return { ...state, nativeProfilesModalOpened: false };
-    case `${CLOSE_NATIVE_PROFILES_MODAL}`:
-      return { ...state, nativeProfilesModalOpened: true };
     case `${START_AUTH_LOADING}`:
       return { ...state, loading: true };
     case `${STOP_AUTH_LOADING}`:
@@ -38,6 +37,10 @@ export default function auth(state = initialState, action) {
       return { ...state, tokenLoading: true };
     case `${STOP_TOKEN_CHECK_LOADING}`:
       return { ...state, tokenLoading: false };
+    case `${START_NATIVE_LOADING}`:
+      return { ...state, nativeLoading: true };
+    case `${STOP_NATIVE_LOADING}`:
+      return { ...state, nativeLoading: false };
     case `${AUTH_SUCCESS}`:
       return {
         ...state,
@@ -47,6 +50,8 @@ export default function auth(state = initialState, action) {
         clientToken: action.payload.clientToken,
         legacy: action.payload.legacy,
         uuid: action.payload.uuid,
+        userID: action.payload.userID,
+        username: action.payload.username,
         isAuthValid: true
       };
     case `${AUTH_FAILED}`:
@@ -63,6 +68,8 @@ export default function auth(state = initialState, action) {
         clientToken: null,
         legacy: null,
         uuid: null,
+        userID: null,
+        username: null,
         isAuthValid: false
       };
     default:

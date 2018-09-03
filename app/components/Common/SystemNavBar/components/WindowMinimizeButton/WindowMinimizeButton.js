@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { remote } from 'electron';
-import styles from './WindowMinimizeButton.css';
+import styles from './WindowMinimizeButton.scss';
 
 type Props = {};
 export default class WindowMinimizeButton extends Component<Props> {

@@ -1,7 +1,10 @@
 import * as path from 'path';
 import { remote, ipcRenderer } from 'electron';
 import { message } from 'antd';
-import { APPPATH } from '../constants';
+import { APPPATH, PACKS_PATH, INSTANCES_PATH } from '../constants';
+import { promisify } from 'util';
+//Getting colors from scss theme file
+import colors from '../style/theme/index.scss';
 
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
@@ -45,77 +48,46 @@ export function clearQueue() {
 }
 
 export function downloadPack(pack) {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const { downloadManager } = getState();
-    /*
-    // We pass the name of the instance to the worker and then let the fork do all the work
-    // The fork will keep the ui updated through forked.on.
-    // UPDATE__FILES -> Adds 1 to the actual downloaded files
-    // UPDATE__TOTAL -> Updates the total files to download
-    // DOWNLOAD__COMPLETED -> Updates the actual state and sets it to downloaded
-    // CLG_PIPE -> Sends a console.log command
-    // CER_PIPE -> Sends a console.err command
-    */
+    console.log(`%cDownloading ${pack}`, `color: ${colors.primary}`);
 
-    const { fork } = require('child_process');
-    console.log(`%cDownloading ${pack}`, 'color: #3498db');
-    const forked = fork(
-      process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ?
-        `${__dirname}/workers/downloadPackage.js` :
-        path.join(remote.app.getAppPath(), 'dist/downloadPackage.js'
-        ), {
-        env: {
-          name: downloadManager.downloadQueue[pack].name,
-          appPath: APPPATH
-        }
-      }, {
-        silent: true
-      });
+    const fs = require('fs');
+    const vnlHelpers = require('../utils/getMCFilesList');
+    const downloader = require('../utils/downloader');
 
+    const vnlPath = path.join(PACKS_PATH, pack, 'vnl.json');
+    const vnlRead = await promisify(fs.readFile)(vnlPath);
+    const vnlJSON = JSON.parse(vnlRead);
 
-    forked.on('message', (data) => {
-      const { total, action } = data;
-      switch (action) {
-        case 'UPDATE__FILES':
+    const vnlLibs = await vnlHelpers.extractLibs(vnlJSON);
 
-          dispatch({
-            type: DOWNLOAD_FILE_COMPLETED,
-            payload: {
-              pack
-            }
-          });
-          break;
-        case 'UPDATE__TOTAL':
-          dispatch({
-            type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
-            payload: {
-              pack,
-              total
-            }
-          });
-          break;
-        case 'DOWNLOAD__COMPLETED':
-          dispatch({
-            type: DOWNLOAD_COMPLETED,
-            payload: pack
-          });
-          message.success(`${pack} has been downloaded!`);
+    const vnlAssets = await vnlHelpers.extractAssets(vnlJSON);
 
-          forked.kill();
-          // CHECK IF ANY ITEM EXISTS IN THE QUEUE YET TO BE DOWNLOADED.
-          // IF YES, ADD IT TO THE ACTUALDOWNLOAD
-          dispatch(addNextPackToActualDownload());
-          break;
-        case 'CLG_PIPE':
-          console.log(data.msg);
-          break;
-        case 'CER_PIPE':
-          console.error(data.msg);
-          break;
-        default:
-          break;
+    const mainJar = await vnlHelpers.extractMainJar(vnlJSON);
+
+    dispatch({
+      type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
+      payload: {
+        pack,
+        total: vnlLibs.length + vnlAssets.length + mainJar.length
       }
     });
+    
+    await downloader.downloadArr(vnlLibs, path.join(INSTANCES_PATH, 'libraries'), dispatch, pack);
+
+    await downloader.downloadArr(vnlAssets, path.join(INSTANCES_PATH, 'assets'), dispatch, pack, 10);
+
+    await downloader.downloadArr(mainJar, path.join(INSTANCES_PATH, 'versions'), dispatch, pack);
+
+    await vnlHelpers.extractNatives(vnlLibs.filter(lib => 'natives' in lib), pack);
+
+    dispatch({
+      type: DOWNLOAD_COMPLETED,
+      payload: pack
+    });
+    message.success(`${pack} has been downloaded!`);
+    dispatch(addNextPackToActualDownload());
   };
 }
 

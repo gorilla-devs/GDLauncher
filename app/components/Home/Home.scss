@@ -1,44 +1,22 @@
+@import '../../style/theme/index';
+
 .content {
-  color: #fff;
-  position: relative;
-  left: 0;
-  right: 0;
+  color: $text-main-color;
+  right: 200px;
+  display: block;
   height: calc(100vh - (40px + 20px));
-  width: calc(100% - 200px);
+  background: $secondary-color-1;
+  width: 100%;
   overflow: auto;
-
-  .title {
-    color: #fff;
-    text-align: center;
-    font-size: 30px;
-    position: relative;
-    display: inline;
-    top: 3px;
-    left: 3px;
+  margin: 10px 0;
+  .innerContent {
+    max-width: 1050px;
+    margin: 0 auto;
+    width: 95%
   }
-
-  .header__tiles {
+  .cards {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'GlacialIndifferenceRegular';
-    width: 100%;
-    height: calc(100vh - (47.6px + 20px + 40px));
     flex-wrap: wrap;
-
-    a {
-      display: inline-block;
-      padding: 3px;
-    }
-
-    h2 {
-      margin-top: 25px;
-    }
-  }
-  
-  .subTitle {
-    color: #bdc3c7;
-    text-align: center;
-    font-size: 25px;
+    width: 100%;
   }
 }

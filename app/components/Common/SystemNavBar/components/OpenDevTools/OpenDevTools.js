@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { ipcRenderer } from 'electron';
-import styles from './OpenDevTools.css';
+import styles from './OpenDevTools.scss';
 
 type Props = {};
 export default class WindowCloseButton extends Component<Props> {
