@@ -63,10 +63,12 @@ app.on('ready', async () => {
 
   // create a new `splash`-WindowF
   splash = new BrowserWindow({
-    width: 380,
-    height: 80,
+    show: true,
+    width: 850,
+    height: 600,
     frame: false,
-    show: true
+    backgroundColor: '#34495e',
+    resizable: false
   });
   splash.loadURL(`file://${__dirname}/splash.html`);
 
