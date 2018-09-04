@@ -103,3 +103,6 @@ script:
     else
       :
     fi
+  - ls -l
+  - cd release
+  - ls -l
