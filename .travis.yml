@@ -87,7 +87,7 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
 script:
-  - npm run package
+  - npm run package --linux --win
 #  - yarn lint
 #  - yarn flow
 #  - yarn test
