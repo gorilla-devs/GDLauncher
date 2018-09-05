@@ -88,6 +88,9 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
+deploy:
+  skip_cleanup: true
+
 script:
   - npm run package
 #  - yarn lint
