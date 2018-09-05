@@ -1,4 +1,6 @@
 import React from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, message } from 'antd';
 import fsa from 'fs-extra';
@@ -20,6 +22,7 @@ const deleteShareData = async () => {
 };
 
 const Instances = (props) => {
+  console.log(props);
   return (
     <div>
       <Title>Instances</Title>
@@ -28,10 +31,18 @@ const Instances = (props) => {
           mainText="Clear Shared Data"
           description="Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data"
           onClick={deleteShareData}
+          disabled={props.installing !== null}
           btnText="Clear" />
       </SettingCard>
     </div>
   );
 };
 
-export default Instances;
+function mapStateToProps(state) {
+  return {
+    installing: state.downloadManager.actualDownload,
+  };
+}
+
+
+export default connect(mapStateToProps)(Instances);
