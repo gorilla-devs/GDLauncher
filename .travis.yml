@@ -27,6 +27,7 @@ matrix:
         # Removing unpacked builds before deploy
         - sudo rm -rf $TRAVIS_BUILD_DIR/release/win-unpacked
         - sudo rm -rf $TRAVIS_BUILD_DIR/release/linux-unpacked
+        - sudo chown -R travis:travis $TRAVIS_BUILD_DIR/release
         - sudo ls -l
         - cd release
         - sudo ls -l
