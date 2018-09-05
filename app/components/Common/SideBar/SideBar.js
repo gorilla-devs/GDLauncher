@@ -49,7 +49,11 @@ class SideBar extends Component<Props> {
     return (
       <aside className={styles.sidenav}>
         {this.props.updateAvailable && <div className={styles.updateAvailable}>
-          <Button loading={this.props.updating} onClick={this.props.update} type="primary" size="small" style={{ marginLeft: 5 }}>Update Available</Button>
+          <Button loading={this.props.updating} onClick={this.props.update} type="primary" size="small" style={{ marginLeft: 5 }}>
+            <a href={`https://github.com/gorilla-devs/GDLauncher/releases/tag/v${this.props.latestVersion}`} target="_blank" rel="noopener noreferrer">
+              Update Available ({this.props.latestVersion})
+              </a>
+          </Button>
         </div>}
         <div className={styles.header}>
           <span>
@@ -71,7 +75,7 @@ class SideBar extends Component<Props> {
         <div className={styles.socialsContainer}>
           { /* eslint-disable */}
           <a href="https://twitter.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
-            <i className="fab fa-twitter"/>
+            <i className="fab fa-twitter" />
           </a>
           <a href="https://facebook.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
             <i className="fab fa-facebook"
@@ -102,6 +106,7 @@ function mapStateToProps(state) {
     downloadQueue: state.downloadManager.downloadQueue,
     updateAvailable: state.autoUpdater.updateAvailable,
     updating: state.autoUpdater.checkingForUpdates,
+    latestVersion: state.autoUpdater.latestVersion,
   };
 }
 

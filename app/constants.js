@@ -17,5 +17,5 @@ export const LINUX = 'linux';
 export const DARWIN = 'darwin';
 export const NEWS_URL = 'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1';
 export const JAVA_URL = 'https://java.com/download';
-export const UPDATE_URL = 'https://dl.gorilladevs.com/releases/latest.json';
+export const UPDATE_URL = 'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
 export const UPDATE_URL_CHECKSUMS = 'https://dl.gorilladevs.com/releases/latestChecksums.json';
