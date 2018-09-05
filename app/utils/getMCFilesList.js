@@ -12,7 +12,6 @@ const extract = promisify(require('extract-zip'));
 export const extractMainJar = async (json, CheckForExists = true) => {
   const libs = [];
   const filePath = path.join(INSTANCES_PATH, 'versions', json.id, `${json.id}.jar`);
-  console.log(filePath)
   if (CheckForExists) {
     try {
       await promisify(fs.access)(filePath);

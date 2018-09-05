@@ -6,6 +6,7 @@ import { join, basename } from 'path';
 import makeDir from 'make-dir';
 import { Promise } from 'bluebird';
 import Link from 'react-router-dom/Link';
+import log from 'electron-log';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { hideMenu } from 'react-contextmenu/es6/actions';
@@ -77,7 +78,7 @@ export default class DManager extends Component<Props> {
         }
       });
     } catch (error) {
-      console.error(error);
+      log.error(error);
       if (error.message === `watch ${PACKS_PATH} ENOSPC`) {
         message.error(
           <span>
@@ -97,7 +98,7 @@ export default class DManager extends Component<Props> {
     try {
       watcher.close();
     } catch (err) {
-      console.error(err);
+      log.error(err);
     }
   }
 

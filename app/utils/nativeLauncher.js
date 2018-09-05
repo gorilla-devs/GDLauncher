@@ -1,6 +1,7 @@
 import path from 'path';
 import fsa from 'fs-extra';
 import os from 'os';
+import log from 'electron-log';
 
 export default async function OfficialLancherProfilesExists() {
   const homedir = process.env.APPDATA || os.homedir();
@@ -11,7 +12,7 @@ export default async function OfficialLancherProfilesExists() {
       if (vnlJson.authenticationDatabase && vnlJson.selectedUser && vnlJson.clientToken) {
         return true;
       }
-    } catch (err) { console.log(err); }
+    } catch (err) { log.error(err); }
   }
   return false;
 }

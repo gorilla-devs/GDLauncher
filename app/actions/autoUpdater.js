@@ -4,6 +4,7 @@ import path from 'path';
 import asar from 'asar';
 import { promisify } from 'util';
 import Promise from "bluebird";
+import log from 'electron-log';
 import crypto from 'crypto';
 import * as packageJson from '../package.json';
 import versionsCompare from '../utils/versionsCompare';
@@ -27,7 +28,7 @@ export function checkForUpdates() {
         });
       }
     } catch (err) {
-      console.error(err.message);
+      log.error(err.message);
     }
   }
 }

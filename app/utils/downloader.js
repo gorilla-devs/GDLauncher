@@ -3,6 +3,7 @@ import fss from 'fs';
 const path = require('path');
 const assert = require('assert');
 const os = require('os');
+import log from 'electron-log';
 const Promise = require('bluebird');
 const request = require('request-promise-native');
 const { promisify } = require('util');
@@ -52,7 +53,7 @@ async function downloadFile(filename, url, legacyPath = null) {
       }
     }
   } catch (e) {
-    console.error(e);
+    log.error(e);
   }
 }
 

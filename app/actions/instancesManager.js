@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import log from 'electron-log';
 import launchCommand from '../utils/MCLaunchCommand';
 
 export const SELECT_INSTANCE = 'SELECT_INSTANCE';
@@ -44,7 +45,7 @@ export function startInstance(instanceName) {
       const name = await exec(await launchCommand(instanceName, auth));
     } catch (error) {
       message.error('There was an error while starting the instance');
-      console.error(error);
+      log.error(error);
     } finally {
       dispatch({
         type: STOP_INSTANCE,

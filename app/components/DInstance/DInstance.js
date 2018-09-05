@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import path from 'path';
+import log from 'electron-log';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import { PACKS_PATH } from '../../constants';
 import { history } from '../../store/configureStore';
@@ -84,7 +85,7 @@ export default class DInstance extends Component<Props> {
     } catch (err) {
       hideMenu(`contextMenu-${this.props.name}`);
       message.error('Error deleting instance');
-      console.error(err);
+      log.error(err);
     }
   }
 
