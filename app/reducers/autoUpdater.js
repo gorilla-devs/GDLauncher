@@ -6,7 +6,8 @@ import {
 
 const initialState = {
   checkingForUpdates: false,
-  updateAvailable: false
+  updateAvailable: false,
+  latestVersion: null
 };
 
 export default function instancesManager(state = initialState, action) {
@@ -24,7 +25,8 @@ export default function instancesManager(state = initialState, action) {
     case `${UPDATE_AVAILABLE}`:
       return {
         ...state,
-        updateAvailable: true
+        updateAvailable: true,
+        latestVersion: action.payload
       };
     default:
       return state;

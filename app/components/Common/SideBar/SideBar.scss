@@ -13,6 +13,10 @@
     line-height: 40px;
     width: 100%;
     text-align: center;
+    a {
+      text-decoration: none;
+      display: block;
+    }
   }
   .header {
     display: flex;
@@ -89,6 +93,7 @@
   }
   .version {
     color: #7f8c8d;
+    padding-right: 9px;
   }
 }
 

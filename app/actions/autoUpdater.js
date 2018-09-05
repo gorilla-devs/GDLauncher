@@ -20,8 +20,11 @@ export function checkForUpdates() {
       const res = await axios.get(UPDATE_URL);
       const actualVersion = packageJson.version;
       // versionsCompare returns positive if v1 > v2, negative if v1 < v2, 0 if they're equal
-      if (versionsCompare(res.data.latestVersion, actualVersion) === 1) {
-        dispatch({ type: UPDATE_AVAILABLE });
+      if (versionsCompare(res.data.version, actualVersion) === 1) {
+        dispatch({
+          type: UPDATE_AVAILABLE,
+          payload: res.data.version
+        });
       }
     } catch (err) {
       console.error(err.message);
