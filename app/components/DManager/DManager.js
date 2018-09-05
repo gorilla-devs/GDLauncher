@@ -69,6 +69,13 @@ export default class DManager extends Component<Props> {
           instances: await this.getDirectories(PACKS_PATH)
         });
       });
+      watcher.on('error', async (err) => {
+        try {
+          await fs.accessAsync(PACKS_PATH);
+        } catch (e) {
+          await makeDir(PACKS_PATH);
+        }
+      });
     } catch (error) {
       console.error(error);
       if (error.message === `watch ${PACKS_PATH} ENOSPC`) {
