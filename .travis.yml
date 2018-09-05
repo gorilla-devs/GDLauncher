@@ -40,7 +40,7 @@ matrix:
           bucket: "dl.gorilladevs.com"
           region: $AWS_DEFAULT_REGION
           acl: public_read
-          local_dir: release
+          local_dir: $TRAVIS_BUILD_DIR/release
           upload-dir: releases
           on:
             branch: master
