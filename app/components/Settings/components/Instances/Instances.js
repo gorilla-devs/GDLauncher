@@ -22,7 +22,6 @@ const deleteShareData = async () => {
 };
 
 const Instances = (props) => {
-  console.log(props);
   return (
     <div>
       <Title>Instances</Title>

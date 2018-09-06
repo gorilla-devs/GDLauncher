@@ -5,6 +5,7 @@ import { Switch, Route, withRouter, Redirect } from 'react-router';
 import { Form, notification, Button } from 'antd';
 import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
+import * as SettingsActions from './actions/settings';
 import { JAVA_URL } from './constants';
 import App from './containers/App';
 import PageContent from './components/Common/PageContent/PageContent';
@@ -21,6 +22,7 @@ import InstanceCreatorModal from './components/InstanceCreatorModal/containers/I
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
+
 type Props = {
   location: Object,
   checkAccessToken: () => void,
@@ -29,6 +31,7 @@ type Props = {
 
 class RouteDef extends Component<Props> {
   componentDidMount = async () => {
+    this.props.loadSettings();
     this.props.checkAccessToken();
     try {
       await findJava();
@@ -103,7 +106,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators(AuthActions, dispatch);
+  return bindActionCreators({ ...AuthActions, ...SettingsActions }, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(RouteDef);

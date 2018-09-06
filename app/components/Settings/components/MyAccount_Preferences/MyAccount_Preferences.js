@@ -1,4 +1,5 @@
 import React from 'react';
+import { bindActionCreators } from 'redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, Icon, Tooltip } from 'antd';
 import { connect } from 'react-redux';
@@ -8,6 +9,7 @@ import styles from './MyAccount_Preferences.scss';
 import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
+import * as SettingsActions from '../../../../actions/settings';
 
 const MyAccount = (props) => {
   return (
@@ -29,7 +31,12 @@ const MyAccount = (props) => {
       </div>
       <Title>Preferences</Title>
       <SettingCard>
-        <SwitchSetting mainText="Enable Sounds" description="Enable sounds to be played when specific actions are triggered" />
+        <SwitchSetting
+          mainText="Enable Sounds"
+          description="Enable sounds to be played when specific actions are triggered"
+          checked={props.settings.sounds}
+          onChange={props.setSounds}
+        />
       </SettingCard>
     </div>
   );
@@ -38,8 +45,13 @@ const MyAccount = (props) => {
 function mapStateToProps(state) {
   return {
     username: state.auth.displayName,
-    email: state.auth.email
+    email: state.auth.email,
+    settings: state.settings
   };
 }
 
-export default connect(mapStateToProps)(MyAccount);
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(SettingsActions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MyAccount);
