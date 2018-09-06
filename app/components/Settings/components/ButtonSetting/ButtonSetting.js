@@ -11,7 +11,7 @@ const ButtonSetting = (props) => {
           <div className={styles.description}>{props.description}</div>
         </div>
         <div className={styles.action}>
-          <Button type="primary" disabled={props.disabled || false} onClick={props.onClick || null}>{props.btnText}</Button>
+          <Button type="primary" disabled={props.disabled || false} loading={props.loading || false} onClick={props.onClick || null}>{props.btnText}</Button>
         </div>
       </div>
       <Divider />
