@@ -1,4 +1,5 @@
 import log from 'electron-log';
+import { message } from 'antd';
 import store from '../localStore';
 
 
@@ -16,7 +17,7 @@ export function loadSettings() {
           payload: settings
         })
       } else {
-        dispatch(saveSettings());
+        dispatch(saveSettings(false));
       }
     } catch (err) {
       log.error(err.message);
@@ -24,11 +25,14 @@ export function loadSettings() {
   }
 }
 
-export function saveSettings() {
+export function saveSettings(notification = true) {
   return (dispatch, getState) => {
     try {
       const { settings } = getState();
       store.set('settings', settings);
+      if (notification) {
+        message.success('Settings Saved!');
+      }
     } catch (err) {
       log.error(err.message);
     }
@@ -38,7 +42,8 @@ export function saveSettings() {
 export function setSounds(val) {
   return dispatch => {
     try {
-      dispatch({ type: SET_SOUNDS, payload: val })
+      dispatch({ type: SET_SOUNDS, payload: val });
+      dispatch(saveSettings());
     } catch (err) {
       log.error(err.message);
     }
