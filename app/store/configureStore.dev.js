@@ -1,6 +1,5 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
-import promise from 'redux-promise-middleware';
 import { createHashHistory } from 'history';
 import { routerMiddleware, routerActions } from 'react-router-redux';
 import { createLogger } from 'redux-logger';
@@ -17,7 +16,6 @@ const configureStore = (initialState?: counterStateType) => {
   const enhancers = [];
 
   // Thunk Middleware
-  middleware.push(promise());
   middleware.push(thunk);
 
   // Skip redux logs in console during the tests

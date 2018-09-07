@@ -1,7 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import classNames from 'classnames';
-import Interactive from 'react-interactive';
 import styles from './Button.css';
 
 type Props = {
@@ -20,7 +18,6 @@ export default class Button extends Component<Props> {
     };
   }
 
-  liClasses = classNames(styles.button, 'myRipple');
   clicked = (e) => {
     const X = e.pageX - e.target.getBoundingClientRect().left;
     const Y = e.pageY - e.target.getBoundingClientRect().top;
@@ -41,17 +38,13 @@ export default class Button extends Component<Props> {
   render() {
     return (
       <div>
-        <Interactive
-          as="button"
-          className={this.liClasses}
-
-          hover={this.props.hover}
-          style={this.props.style}
+        <div
+          className={`${styles.button} myRipple`}
           onClick={this.clicked.bind(this)}
         >
           {this.props.children}
           {this.state.rippleElements}
-        </Interactive>
+        </div>
 
       </div>
     );

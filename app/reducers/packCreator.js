@@ -1,11 +1,13 @@
 import {
   GET_MC_VANILLA_VERSIONS,
   CREATION_COMPLETE,
-  START_PACK_CREATION
+  START_PACK_CREATION,
+  GET_FORGE_MANIFEST
 } from '../actions/packCreator';
 
 const initialState = {
   versionsManifest: [],
+  forgeManifest: {},
   loading: false
 };
 
@@ -15,6 +17,11 @@ export default function packManager(state = initialState, action) {
       return {
         ...state,
         versionsManifest: action.payload.data.versions
+      };
+    case `${GET_FORGE_MANIFEST}`:
+      return {
+        ...state,
+        forgeManifest: action.payload
       };
     case `${START_PACK_CREATION}`:
       return {

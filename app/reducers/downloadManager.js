@@ -1,4 +1,3 @@
-import update from 'immutability-helper';
 import _ from 'lodash';
 import {
   START_DOWNLOAD,

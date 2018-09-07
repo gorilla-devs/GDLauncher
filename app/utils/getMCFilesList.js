@@ -3,7 +3,6 @@ import path from 'path';
 import fs from 'fs';
 import axios from 'axios';
 import makeDir from 'make-dir';
-import es6promisify from 'es6-promisify';
 import SysOS from 'os';
 import { promisify } from 'util';
 
