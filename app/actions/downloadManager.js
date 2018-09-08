@@ -3,9 +3,11 @@ import { remote, ipcRenderer } from 'electron';
 import { message } from 'antd';
 import { APPPATH, PACKS_PATH, INSTANCES_PATH } from '../constants';
 import { promisify } from 'util';
+import fs from 'fs';
+import zip from 'adm-zip';
+import { downloadFile } from '../utils/downloader';
 //Getting colors from scss theme file
 import colors from '../style/theme/index.scss';
-
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -14,13 +16,14 @@ export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
 export const DOWNLOAD_FILE_COMPLETED = 'DOWNLOAD_FILE_COMPLETED';
 export const UPDATE_TOTAL_FILES_TO_DOWNLOAD = 'UPDATE_TOTAL_FILES_TO_DOWNLOAD';
 
-export function addToQueue(pack, packType) {
+export function addToQueue(pack, version, forgeVersion = null) {
   return (dispatch, getState) => {
     const { downloadManager } = getState();
     dispatch({
       type: ADD_TO_QUEUE,
       payload: pack,
-      packType
+      version,
+      forgeVersion
     });
     if (downloadManager.actualDownload === null) {
       dispatch({
@@ -52,7 +55,6 @@ export function downloadPack(pack) {
     const { downloadManager } = getState();
     console.log(`%cDownloading ${pack}`, `color: ${colors.primary}`);
 
-    const fs = require('fs');
     const vnlHelpers = require('../utils/getMCFilesList');
     const downloader = require('../utils/downloader');
 
@@ -73,10 +75,21 @@ export function downloadPack(pack) {
         total: vnlLibs.length + vnlAssets.length + mainJar.length
       }
     });
-    
+
     await downloader.downloadArr(vnlLibs, path.join(INSTANCES_PATH, 'libraries'), dispatch, pack);
 
     await downloader.downloadArr(vnlAssets, path.join(INSTANCES_PATH, 'assets'), dispatch, pack, 10);
+
+    if (downloadManager.downloadQueue[pack].forgeVersion !== null) {
+      const forge = downloadManager.downloadQueue[pack].forgeVersion;
+      const version = downloadManager.downloadQueue[pack].version;
+      await downloadFile(
+        path.join(PACKS_PATH, pack, 'forge-installer.jar'),
+        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${version}-${forge}/forge-${version}-${forge}-installer.jar`
+      );
+      const zipFile = new zip(path.join(PACKS_PATH, pack, 'forge-installer.jar'));
+      console.log(zipFile.readAsText("version.json"));
+    }
 
     await downloader.downloadArr(mainJar, path.join(INSTANCES_PATH, 'versions'), dispatch, pack);
 

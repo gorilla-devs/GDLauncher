@@ -58,9 +58,9 @@ class InstanceCreatorModal extends Component<Props> {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         if (values.version[0] === 'vanilla') {
-        this.props.createPack(values.version[values.version.length - 1], values.packName);
-        } else if(values.version[0] === 'forge') {
-
+          this.props.createPack(values.version[2], values.packName);
+        } else if (values.version[0] === 'forge') {
+          this.props.createPack(values.version[1], values.packName, values.version[2]);
         }
         console.log(values)
         this.setState({ loading: true });

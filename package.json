@@ -1,7 +1,7 @@
 {
   "name": "gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
@@ -209,6 +209,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.3.1",
+    "adm-zip": "^0.4.11",
     "antd": "^3.9.1",
     "assert": "^1.4.1",
     "axios": "^0.18.0",

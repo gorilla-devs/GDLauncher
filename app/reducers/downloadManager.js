@@ -24,7 +24,8 @@ export default function downloadManager(state = initialState, action) {
             name: action.payload,
             totalToDownload: 0,
             downloaded: 0,
-            packType: action.packType,
+            version: action.version,
+            forgeVersion: action.forgeVersion,
             downloadCompleted: false,
             status: 'Queued'
           }
