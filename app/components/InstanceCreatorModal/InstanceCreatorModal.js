@@ -57,8 +57,13 @@ class InstanceCreatorModal extends Component<Props> {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        this.setState({ loading: true });
+        if (values.version[0] === 'vanilla') {
         this.props.createPack(values.version[values.version.length - 1], values.packName);
+        } else if(values.version[0] === 'forge') {
+
+        }
+        console.log(values)
+        this.setState({ loading: true });
       }
     });
   }
@@ -78,7 +83,7 @@ class InstanceCreatorModal extends Component<Props> {
                   autoFocus
                   size="large"
                   style={{ width: '50vw', display: 'inline-block', height: '60px' }}
-                  prefix={<Icon type="play-circle-o" style={{ color: 'rgba(255,255,255,.8)' }} />}
+                  prefix={<Icon type="play-circle-o" theme="filled" style={{ color: 'rgba(255,255,255,.8)' }} />}
                   placeholder="Instance Name"
                 />
               )}

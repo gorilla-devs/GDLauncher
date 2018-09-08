@@ -180,11 +180,31 @@ a:hover {
 .ant-btn-primary {
   background-color: $primary-color;
   border-color: $primary-color;
+  border-width: 2px !important;
+  border-right-width: 2px !important;
+}
+
+.ant-btn-ghost {
+  border-width: 2px !important;
+  border-right-width: 2px !important;
+}
+
+.ant-btn-ghost:hover, .ant-btn-ghost:focus, .ant-btn-ghost:active, .ant-btn-ghost.active {
+  color: $primary-color;
+  border-color: $primary-color;
 }
 
 .ant-btn-primary:hover, .ant-btn-primary:focus {
   background-color: darken($primary-color, 10);
   border-color: darken($primary-color, 10);
+}
+
+.ant-cascader-picker {
+  background-color: $secondary-color-2;
+}
+
+.ant-cascader-picker-label:hover ~ .ant-input {
+  border-color: $primary-color;
 }
 
 .ant-switch-checked,
@@ -193,10 +213,43 @@ a:hover {
   background-color: $primary-color;
 }
 
+.ant-switch-loading-icon, .ant-switch:after {
+  background-color: #fff;
+}
+.ant-input, .ant-input-group-addon {
+  border-color: $secondary-color-2;
+  border-width: 2px !important;
+  border-right-width: 2px !important;
+}
+
+.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled) {
+  border-width: 2px !important;
+  border-right-width: 2px !important;
+}
+
+.ant-input:focus, .ant-cascader-picker:focus .ant-cascader-input {
+  box-shadow: none;
+}
+
+.ant-input-group-addon:hover, 
+.ant-input-group-addon:focus, 
+.ant-input-group-addon:active {
+  background-color: $secondary-color-1;
+  cursor: pointer;
+  svg {
+    cursor: pointer;
+    path {
+      cursor: pointer;
+    }
+  }
+}
+
 .ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled),
 .ant-input:focus,
 .ant-input:hover,
 .ant-cascader-picker:focus .ant-cascader-input,
 .ant-checkbox-checked .ant-checkbox-inner, .ant-checkbox-indeterminate .ant-checkbox-inner {
   border-color: $primary-color;
+  border-width: 2px !important;
+  border-right-width: 2px !important;
 }

@@ -34,7 +34,7 @@ class CopyIcon extends Component<Props> {
   render() {
     return (
       <Tooltip title={this.state.copied ? 'Copied' : 'Copy'} mouseLeaveDelay={this.state.copied ? 0.3 : 0.1} >
-        <Icon className={styles.copyBtn} type="copy" onClick={this.copy} />
+        <Icon className={styles.copyBtn} type="copy" theme="filled" onClick={this.copy} />
       </Tooltip>
     );
   }

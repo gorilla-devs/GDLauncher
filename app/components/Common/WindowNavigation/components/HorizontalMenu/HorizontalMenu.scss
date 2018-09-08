@@ -31,6 +31,12 @@
   padding: 9px 20px 10px 20px;
   text-decoration: none;
   cursor: pointer;
+  svg {
+    cursor: pointer;
+    path {
+      cursor: pointer;
+    }
+  }
 }
 
 .i {
