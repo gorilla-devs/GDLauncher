@@ -83,7 +83,7 @@ class InstanceCreatorModal extends Component<Props> {
                   autoFocus
                   size="large"
                   style={{ width: '50vw', display: 'inline-block', height: '60px' }}
-                  prefix={<Icon type="play-circle-o" theme="filled" style={{ color: 'rgba(255,255,255,.8)' }} />}
+                  prefix={<Icon type="play-circle" theme="filled" style={{ color: 'rgba(255,255,255,.8)' }} />}
                   placeholder="Instance Name"
                 />
               )}
@@ -95,7 +95,6 @@ class InstanceCreatorModal extends Component<Props> {
                 rules: [{ required: true, message: 'Please select a version' }],
               })(
                 <Cascader
-                  changeOnSelect
                   options={this.state.versions}
                   size="large"
                   style={{ width: 335, display: 'inline-block' }}

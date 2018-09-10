@@ -53,14 +53,14 @@ export default class DInstance extends Component<Props> {
   }
 
   updatePercentage() {
-    const { totalToDownload, downloaded } = this.props.installingQueue[this.props.name] || 0;
+    const { percentage } = this.props.installingQueue[this.props.name] || 0;
     if (this.props.installingQueue[this.props.name]) {
       switch (this.props.installingQueue[this.props.name].status) {
         case 'Queued':
           return 0;
         case 'Downloading':
           // If the total file to download is equal to 0 (not yet sent from the worker) then show 0 to avoid NaN from 0 / 0
-          return totalToDownload === 0 ? 0 : Math.floor((downloaded * 100) / totalToDownload);
+          return percentage;
         case 'Completed':
           return 100;
         default:

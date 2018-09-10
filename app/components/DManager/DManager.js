@@ -46,7 +46,6 @@ export default class DManager extends Component<Props> {
     this.state = {
       instances: []
     }
-    this.watchRoutine();
   }
 
   watchRoutine = async () => {
@@ -75,6 +74,7 @@ export default class DManager extends Component<Props> {
           await fs.accessAsync(PACKS_PATH);
         } catch (e) {
           await makeDir(PACKS_PATH);
+          this.watchRoutine();
         }
       });
     } catch (error) {
@@ -91,6 +91,11 @@ export default class DManager extends Component<Props> {
       }
     }
   }
+
+  componentDidMount = () => {
+    this.watchRoutine();
+  }
+  
 
 
   componentWillUnmount() {

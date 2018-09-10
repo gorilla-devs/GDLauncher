@@ -1,10 +1,11 @@
-import { INSTANCES_PATH, PACKS_PATH } from '../constants';
 import path from 'path';
 import fs from 'fs';
 import axios from 'axios';
+import _ from 'lodash';
 import makeDir from 'make-dir';
 import SysOS from 'os';
 import { promisify } from 'util';
+import { INSTANCES_PATH, PACKS_PATH, MAVEN_REPO, MC_LIBRARIES_URL } from '../constants';
 
 const extract = promisify(require('extract-zip'));
 
@@ -109,6 +110,41 @@ export const extractAssets = async (json) => {
   });
   return assets;
 };
+
+export const extractForgeLibraries = async (json, CheckForExists = true) => {
+  const libs = [];
+  await json.versionInfo.libraries
+    .filter(lib => (_.has(lib, 'clientreq') && lib.clientreq) || (!_.has(lib, 'clientreq')))
+    .filter(lib => !lib.name.includes('minecraftforge'))
+    .map(async (lib) => {
+      const pathSplit = lib.name.split(':');
+      // If a url property exists, we use the maven repo. Otherwise we use the standard minecraft libraries url
+      const url = _.has(lib, 'url') ? MAVEN_REPO : MC_LIBRARIES_URL;
+      let initPath = pathSplit[0].split('.').concat(pathSplit[1]).concat(pathSplit[2]).concat(`${pathSplit[1]}-${pathSplit[2]}.jar`);
+      const completePath = path.join(...initPath);
+      // The url can have a "modules" path in the middle, but we do not know which ones do. We try a head request without,
+      // if it fails it means it needs the modules path
+      try {
+        await axios.head(`${url}/${path.join(...initPath)}`);
+      } catch (e) {
+        initPath = pathSplit[0].split('.').concat('modules').concat(pathSplit[1]).concat(pathSplit[2]).concat(`${pathSplit[1]}-${pathSplit[2]}.jar`);
+      }
+      let toAdd = true;
+      if (CheckForExists) {
+        try {
+          await promisify(fs.access)(filePath);
+          toAdd = false;
+        } catch (e) { }
+      }
+      if (toAdd) {
+        libs.push({
+          url: `${url}/${path.join(...initPath)}`,
+          path: completePath
+        });
+      }
+    });
+  return libs;
+}
 
 
 // Returns whether the rules allow the file to be downloaded or not

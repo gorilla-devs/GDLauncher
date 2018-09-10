@@ -5,6 +5,7 @@ import {
   DOWNLOAD_COMPLETED,
   DOWNLOAD_FILE_COMPLETED,
   UPDATE_TOTAL_FILES_TO_DOWNLOAD,
+  UPDATE_PROGRESS,
   CLEAR_QUEUE
 } from '../actions/downloadManager';
 
@@ -24,6 +25,7 @@ export default function downloadManager(state = initialState, action) {
             name: action.payload,
             totalToDownload: 0,
             downloaded: 0,
+            percentage: 0,
             version: action.version,
             forgeVersion: action.forgeVersion,
             downloadCompleted: false,
@@ -70,7 +72,20 @@ export default function downloadManager(state = initialState, action) {
           ...state.downloadQueue,
           [action.payload.pack]: {
             ...state.downloadQueue[action.payload.pack],
-            downloaded: state.downloadQueue[action.payload.pack].downloaded + 1
+            downloaded: state.downloadQueue[action.payload.pack].downloaded + 1,
+            percentage: state.downloadQueue[action.payload.pack].totalToDownload === 0 ? 0 :
+              (((state.downloadQueue[action.payload.pack].downloaded * 82) / state.downloadQueue[action.payload.pack].totalToDownload) + 18).toFixed(1)
+          }
+        }
+      };
+    case UPDATE_PROGRESS:
+      return {
+        ...state,
+        downloadQueue: {
+          ...state.downloadQueue,
+          [action.payload.pack]: {
+            ...state.downloadQueue[action.payload.pack],
+            percentage: action.payload.percentage
           }
         }
       };

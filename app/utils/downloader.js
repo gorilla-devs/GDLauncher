@@ -53,7 +53,7 @@ async function downloadFile(filename, url, legacyPath = null) {
       }
     }
   } catch (e) {
-    log.error(e);
+    log.error(`Error while downloading <${url}> to <${filename}> --> ${e.message}`);
   }
 }
 
