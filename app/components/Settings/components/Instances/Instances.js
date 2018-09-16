@@ -25,7 +25,10 @@ class Instances extends Component<Props> {
   deleteShareData = async () => {
     try {
       this.setState({ deletingInstances: true });
-      await fsa.emptyDir(INSTANCES_PATH);
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'libraries'));
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'packs'));
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'assets'));
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'versions'));
       this.setState({ deletingInstances: false });
       message.success("Data has been cleared.");
     } catch (e) {

@@ -10,6 +10,7 @@ import { addToQueue } from './downloadManager';
 
 export const GET_MC_VANILLA_VERSIONS = 'GET_MC_VANILLA_VERSIONS';
 export const CREATION_COMPLETE = 'CREATION_COMPLETE';
+export const DISPATCH_VANILLA_MANIFEST = 'DISPATCH_VANILLA_MANIFEST';
 export const START_PACK_CREATION = 'START_PACK_CREATION';
 export const GET_FORGE_MANIFEST = 'GET_FORGE_MANIFEST';
 
@@ -48,17 +49,14 @@ export function getVanillaMCVersions() {
 export function createPack(version, packName, forgeVersion = null) {
   return async (dispatch, getState) => {
     const { router } = getState();
+
     dispatch({ type: START_PACK_CREATION });
-    const versions = await axios.get(GAME_VERSIONS_URL);
-    const versionURL = versions.data.versions.find((v) => v.id === version).url;
-    const response = await axios.get(versionURL);
+
     // CREATE PACK FOLDER IF iT DOES NOT EXISt
     try {
       await promisify(fs.access)(path.join(PACKS_PATH, packName));
     } catch (e) {
       await makeDir(path.join(PACKS_PATH, packName));
-    } finally {
-      await promisify(fs.writeFile)(path.join(PACKS_PATH, packName, 'vnl.json'), JSON.stringify(response.data));
     }
     dispatch(addToQueue(packName, version, forgeVersion));
     dispatch({ type: CREATION_COMPLETE });
