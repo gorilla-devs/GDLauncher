@@ -121,6 +121,7 @@ app.on('ready', async () => {
 
     mainWindow.show();
     mainWindow.focus();
+    log.log(process.argv);
 
   });
 
