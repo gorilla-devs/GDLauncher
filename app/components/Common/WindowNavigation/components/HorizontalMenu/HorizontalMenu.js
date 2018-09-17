@@ -22,14 +22,14 @@ export default class NavigationBar extends Component<Props> {
         <ul className={styles.ul}>
           <li className={styles.li}>
             <Link to="/home" draggable="false" className={`${styles.a} ${this.isLocation('/home') ? styles.activeLink : null}`}>
-              <Icon type="home" className={styles.i} />
+              <Icon type="home" theme="filled" className={styles.i} />
               HOME
             </Link>
           </li>
           <li className={styles.li}>
             <Link to="/dmanager" draggable="false" className={`${styles.a} ${this.isLocation('/dmanager') ? styles.activeLink : null}`}>
               <Badge count={this.props.downloadingCount} invisible={this.props.downloadingCount === 0}>
-                <Icon type="play-circle" className={styles.i} />
+                <Icon type="play-circle" theme="filled" className={styles.i} />
                 INSTANCES
               </Badge>
             </Link>

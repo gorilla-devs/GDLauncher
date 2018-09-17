@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, message } from 'antd';
 import fsa from 'fs-extra';
@@ -10,28 +12,52 @@ import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import ButtonSetting from '../ButtonSetting/ButtonSetting';
 
-const deleteShareData = async () => {
-  try {
-    await fsa.emptyDir(INSTANCES_PATH);
-    message.success("Data has been cleared.");
-  } catch (e) {
-    message.error('Error while clearing data.');
+type Props = {};
+
+class Instances extends Component<Props> {
+  props: Props;
+  constructor(props) {
+    super(props);
+    this.state = {
+      deletingInstances: false
+    };
   }
-};
+  deleteShareData = async () => {
+    try {
+      this.setState({ deletingInstances: true });
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'libraries'));
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'packs'));
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'assets'));
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'versions'));
+      this.setState({ deletingInstances: false });
+      message.success("Data has been cleared.");
+    } catch (e) {
+      message.error('Error while clearing data.');
+    }
+  };
+  render() {
+    return (
+      <div>
+        <Title>Instances</Title>
+        <SettingCard>
+          <ButtonSetting
+            mainText="Clear Shared Data"
+            description="Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data"
+            onClick={this.deleteShareData}
+            disabled={this.props.installing !== null}
+            loading={this.state.deletingInstances}
+            btnText="Clear" />
+        </SettingCard>
+      </div>
+    )
+  }
+}
 
-const Instances = (props) => {
-  return (
-    <div>
-      <Title>Instances</Title>
-      <SettingCard>
-        <ButtonSetting
-          mainText="Clear Shared Data"
-          description="Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data"
-          onClick={deleteShareData}
-          btnText="Clear" />
-      </SettingCard>
-    </div>
-  );
-};
+function mapStateToProps(state) {
+  return {
+    installing: state.downloadManager.actualDownload,
+  };
+}
 
-export default Instances;
+
+export default connect(mapStateToProps)(Instances);

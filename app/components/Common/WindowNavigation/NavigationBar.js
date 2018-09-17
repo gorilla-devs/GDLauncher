@@ -40,7 +40,7 @@ class NavigationBar extends Component<Props> {
         </div>
         <HorizontalMenu
           location={this.props.location}
-          downloadingCount={Object.keys(this.props.downloadQueue).filter(inst => !this.props.downloadQueue[inst].downloadCompleted).length}
+          downloadingCount={Object.keys(this.props.downloadQueue).filter(inst => !this.props.downloadQueue[inst].status === 'Completed').length}
           clearQueue={() => this.props.clearQueue()}
         />
         <Link to={{

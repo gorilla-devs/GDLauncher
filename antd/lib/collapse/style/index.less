@@ -3,9 +3,6 @@
 
 @collapse-prefix-cls: ~"@{ant-prefix}-collapse";
 
-@collapse-header-bg: @background-color-light;
-@collapse-active-bg: @background-color-base;
-
 .collapse-close() {
   transform: rotate(0);
 }
@@ -32,7 +29,7 @@
 
     > .@{collapse-prefix-cls}-header {
       line-height: 22px;
-      padding: 12px 0 12px 40px;
+      padding: @collapse-header-padding;
       color: @heading-color;
       cursor: pointer;
       position: relative;
@@ -40,18 +37,22 @@
 
       .arrow {
         .iconfont-mixin();
-        .collapse-close();
         font-size: @font-size-sm;
         position: absolute;
         display: inline-block;
         line-height: 46px;
         vertical-align: top;
-        transition: transform 0.24s;
-        top: 0;
+        top: 50%;
+        transform: translateY(-50%);
         left: @padding-md;
-        &:before {
-          content: "\E61F";
+        & svg {
+          .collapse-close();
+          transition: transform 0.24s;
         }
+      }
+
+      &:focus {
+        outline: none;
       }
     }
 
@@ -69,13 +70,11 @@
   &-content {
     overflow: hidden;
     color: @text-color;
-    padding: 0 @padding-md;
-    background-color: @component-background;
+    background-color: @collapse-content-bg;
     border-top: @border-width-base @border-style-base @border-color-base;
 
     & > &-box {
-      padding-top: @padding-md;
-      padding-bottom: @padding-md;
+      padding: @collapse-content-padding;
     }
 
     &-inactive {
@@ -90,7 +89,7 @@
   }
 
   & > &-item > &-header[aria-expanded="true"] {
-    .arrow {
+    .anticon-right svg {
       .collapse-open();
     }
   }

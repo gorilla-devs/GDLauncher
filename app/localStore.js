@@ -1,6 +1,7 @@
 
-const Store = require('electron-store');
+import Store from 'electron-store';
+import log from 'electron-log';
 
 const store = new Store();
-console.log(`Config store: ${store.path}`);
+log.log(`Config store: ${store.path}`);
 export default store;

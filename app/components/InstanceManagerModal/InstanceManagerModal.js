@@ -38,7 +38,7 @@ class InstanceManagerModal extends Component<Props> {
                 <Input
                   size="large"
                   style={{ width: '50vw', display: 'inline-block', height: '60px' }}
-                  prefix={<Icon type="play-circle-o" style={{ color: 'rgba(255,255,255,.8)' }} />}
+                  prefix={<Icon type="play-circle" theme="filled" style={{ color: 'rgba(255,255,255,.8)' }} />}
                   placeholder="Instance Name"
                 />
               )}

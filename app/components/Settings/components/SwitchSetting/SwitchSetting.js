@@ -11,7 +11,7 @@ const SwitchSetting = (props) => {
           <div className={styles.description}>{props.description}</div>
         </div>
         <div className={styles.action}>
-          <Switch />
+          <Switch checked={props.checked} onChange={props.onChange} />
         </div>
       </div>
       <Divider />

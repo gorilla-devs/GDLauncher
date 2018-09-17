@@ -20,12 +20,14 @@
 .active(@color: @outline-color) {
   border-color: ~`colorPalette("@{color}", 5)`;
   outline: 0;
-  box-shadow: 0 0 @outline-blur-size @outline-width fade(@color, 20%);
+  box-shadow: @input-outline-offset @outline-blur-size @outline-width fade(@color, 20%);
+  border-right-width: 1px !important;
 }
 
 // == when hoverd
 .hover(@color: @input-hover-border-color) {
   border-color: ~`colorPalette("@{color}", 5)`;
+  border-right-width: 1px !important;
 }
 
 .disabled() {
@@ -50,7 +52,7 @@
   color: @input-color;
   background-color: @input-bg;
   background-image: none;
-  border: 3px @border-style-base #34495e;
+  border: @border-width-base @border-style-base @input-border-color;
   border-radius: @border-radius-base;
   .placeholder(); // Reset placeholder
   transition: all .3s;
@@ -135,6 +137,11 @@
     margin-bottom: 0;
     &:focus {
       z-index: 1; // Fix https://gw.alipayobjects.com/zos/rmsportal/DHNpoqfMXSfrSnlZvhsJ.png
+      border-right-width: 1px;
+    }
+    &:hover {
+      z-index: 1;
+      border-right-width: 1px;
     }
   }
 
@@ -146,7 +153,7 @@
     color: @input-color;
     text-align: center;
     background-color: @input-addon-bg;
-    border: 3px @border-style-base #34495e;
+    border: @border-width-base @border-style-base @input-border-color;
     border-radius: @border-radius-base;
     position: relative;
     transition: all .3s;
@@ -264,10 +271,14 @@
       display: inline-block;
     }
 
+    // https://github.com/ant-design/ant-design/issues/11863
+    & > span:not(:last-child) > .@{inputClass} {
+      border-right-width: 0;
+    }
+
     // Undo float for .ant-input-group .ant-input
     .@{inputClass} {
       float: none;
-      z-index: auto;
     }
 
     // reset border for Select, DatePicker, AutoComplete, Cascader, Mention, TimePicker
@@ -311,12 +322,12 @@
   display: inline-block;
   width: 100%;
 
-  .@{inputClass} {
-    z-index: 1;
-  }
-
   &:hover .@{inputClass}:not(.@{inputClass}-disabled) {
     .hover();
+  }
+
+  .@{inputClass} {
+    position: static;
   }
 
   .@{inputClass}-prefix,
@@ -324,7 +335,6 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 2;
     line-height: 0;
     color: @input-color;
     :not(.anticon) {

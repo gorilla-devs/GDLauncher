@@ -27,7 +27,6 @@
   transition: color 0.3s ease, opacity 0.15s ease;
   &:before {
     display: block;
-    .iconfont-font("\e62e");
   }
   &:hover {
     color: @text-color-secondary;
@@ -38,6 +37,7 @@
   .reset-component;
   display: inline-block;
   position: relative;
+  outline: 0;
 
   ul,
   ol {
@@ -63,12 +63,7 @@
     color: @disabled-color;
     font-size: @font-size-sm;
 
-    * {
-      display: none;
-    }
-
-    &:before {
-      content: '\e61d';
+    & &-icon svg {
       transition: transform .3s;
     }
   }
@@ -80,11 +75,12 @@
     box-sizing: border-box;
     display: block;
 
-    background-color: @midnight;
+    background-color: @component-background;
     border-radius: @border-radius-base;
-    border: 3px @border-style-base @midnight;
+    border: @border-width-base @border-style-base @border-color-base;
     // strange align fix for chrome but works
     // https://gw.alipayobjects.com/zos/rmsportal/VFTfKXJuogBAXcvfAUWJ.gif
+    border-top-width: @border-width-base + 0.02px;
     transition: all .3s @ease-in-out;
 
     &:hover {
@@ -113,6 +109,10 @@
       max-width: 100%;
       padding-right: 20px;
     }
+  }
+
+  &-no-arrow &-selection-selected-value {
+    padding-right: 0;
   }
 
   &-disabled {
@@ -251,7 +251,7 @@
 
   &-search__field__mirror {
     position: absolute;
-    top: 0;
+    top: -9999px;
     left: -9999px;
     white-space: pre;
     pointer-events: none;
@@ -360,9 +360,6 @@
       &:hover {
         color: #404040;
       }
-      &:before {
-        content: "\e633";
-      }
     }
 
     .@{select-prefix-cls}-selection__clear {
@@ -370,13 +367,19 @@
     }
   }
 
+  &-allow-clear &-selection--single &-selection-selected-value {
+    padding-right: 16px;
+  }
+
   &-allow-clear &-selection--multiple &-selection__rendered {
     margin-right: 20px; // In case that clear button will overlap content
   }
 
   &-open {
-    .@{select-prefix-cls}-arrow:before {
-      transform: rotate(180deg);
+    .@{select-prefix-cls}-arrow {
+      &-icon svg {
+        transform: rotate(180deg);
+      }
     }
     .@{select-prefix-cls}-selection {
       .active();
@@ -471,6 +474,11 @@
       font-size: @font-size-sm;
     }
 
+    &-item-group-list &-item:first-child:not(:last-child),
+    &-item-group:not(:last-child) &-item-group-list &-item:last-child {
+      border-radius: 0;
+    }
+
     &-item {
       position: relative;
       display: block;
@@ -510,7 +518,7 @@
       &-selected {
         &,
         &:hover {
-          background-color: @primary-color;
+          background-color: @background-color-light;
           font-weight: 600;
           color: @text-color;
         }
@@ -533,7 +541,6 @@
   &&--multiple {
     .@{select-prefix-cls}-dropdown-menu-item {
       &:after {
-        .iconfont-font("\e632");
         color: transparent;
         .iconfont-size-under-12px(10px);
         transition: all 0.2s ease;

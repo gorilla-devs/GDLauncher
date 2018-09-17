@@ -7,6 +7,7 @@ import * as downloadManagerActions from '../../../actions/downloadManager';
 function mapStateToProps(state) {
   return {
     versionsManifest: state.packCreator.versionsManifest,
+    forgeManifest: state.packCreator.forgeManifest,
     modalState: state.packCreator.modalState,
   };
 }

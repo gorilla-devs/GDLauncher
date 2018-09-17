@@ -4,6 +4,7 @@ import { message } from 'antd';
 import path from 'path';
 import fsa from 'fs-extra';
 import os from 'os';
+import log from 'electron-log';
 import store from '../localStore';
 import {
   LOGIN_PROXY_API,
@@ -194,7 +195,7 @@ export function tryNativeLauncherProfiles() {
       dispatch({
         type: AUTH_FAILED
       });
-      console.log(err);
+      log.error(err);
     } finally {
       dispatch({ type: STOP_NATIVE_LOADING });
     }

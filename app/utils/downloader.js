@@ -1,25 +1,22 @@
 import makeDir from 'make-dir';
 import fss from 'fs';
-const path = require('path');
-const assert = require('assert');
-const os = require('os');
-const Promise = require('bluebird');
-const request = require('request-promise-native');
-const { promisify } = require('util');
+import reqCall from 'request';
+import path from 'path';
+import assert from 'assert';
+import os from'os';
+import log from 'electron-log';
+import Promise from'bluebird';
+import request from'request-promise-native';
+import { promisify } from 'util';
 import { DOWNLOAD_FILE_COMPLETED } from '../actions/downloadManager';
-
-module.exports = {
-  downloadArr,
-  downloadFile
-};
 
 const fs = Promise.promisifyAll(fss);
 
-async function downloadArr(arr, folderPath, dispatch, pack, threads = os.cpus().length) {
+export const downloadArr = async (arr, folderPath, dispatch, pack, threads = os.cpus().length) => {
   await Promise.map(arr, async item => {
     // TODO: item.legacyPath ? path.join(folderPath, item.legacyPath) : null
     // Handle legacyPaths better (own function)
-    await downloadFile(path.join(folderPath, item.path), item.url);
+    await downloadFileInstance(path.join(folderPath, item.path), item.url);
     dispatch({
       type: DOWNLOAD_FILE_COMPLETED,
       payload: { pack }
@@ -27,7 +24,7 @@ async function downloadArr(arr, folderPath, dispatch, pack, threads = os.cpus().
   }, { concurrency: threads });
 }
 
-async function downloadFile(filename, url, legacyPath = null) {
+const downloadFileInstance = async (filename, url, legacyPath = null) => {
   try {
     const filePath = path.dirname(filename);
     try {
@@ -52,8 +49,43 @@ async function downloadFile(filename, url, legacyPath = null) {
       }
     }
   } catch (e) {
-    console.error(e);
+    log.error(`Error while downloading <${url}> to <${filename}> --> ${e.message}`);
   }
+}
+
+export const downloadFile = (filename, url, onProgress) => {
+  return new Promise((resolve, reject) => {
+    // Save variable to know progress
+    var received_bytes = 0;
+    var total_bytes = 0;
+
+    var req = reqCall({
+      method: 'GET',
+      uri: url,
+    });
+
+    var out = fss.createWriteStream(filename);
+    req.pipe(out);
+
+    req.on('response', (data) => {
+      // Change the total bytes value to get progress later.
+      total_bytes = parseInt(data.headers['content-length']);
+    });
+
+    req.on('data', (chunk) => {
+      // Update the received bytes
+      received_bytes += chunk.length;
+      onProgress(((received_bytes * 18) / total_bytes).toFixed(1));
+    });
+
+    req.on('end', () => {
+      resolve();
+    });
+
+    req.on('error', () => {
+      reject();
+    })
+  });
 }
 
 // function checkFile(lpath, size, sha1) {

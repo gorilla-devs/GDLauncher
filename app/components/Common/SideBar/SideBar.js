@@ -25,26 +25,7 @@ class SideBar extends Component<Props> {
     }
     this.props.checkForUpdates();
   }
-
-  handleClick = (e) => {
-    console.log(e);
-    switch (e.key) {
-      case 'Online':
-        this.props.setStateToOnline();
-        break;
-      case 'Away':
-        this.props.setStateToAway();
-        break;
-      case 'Busy':
-        this.props.setStateToBusy();
-        break;
-      default:
-        this.props.setStateToOnline();
-        break;
-    }
-  }
-
-
+  
   render() {
     return (
       <aside className={styles.sidenav}>

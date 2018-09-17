@@ -6,6 +6,7 @@ import { join, basename } from 'path';
 import makeDir from 'make-dir';
 import { Promise } from 'bluebird';
 import Link from 'react-router-dom/Link';
+import log from 'electron-log';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { hideMenu } from 'react-contextmenu/es6/actions';
@@ -45,7 +46,6 @@ export default class DManager extends Component<Props> {
     this.state = {
       instances: []
     }
-    this.watchRoutine();
   }
 
   watchRoutine = async () => {
@@ -74,10 +74,11 @@ export default class DManager extends Component<Props> {
           await fs.accessAsync(PACKS_PATH);
         } catch (e) {
           await makeDir(PACKS_PATH);
+          this.watchRoutine();
         }
       });
     } catch (error) {
-      console.error(error);
+      log.error(error);
       if (error.message === `watch ${PACKS_PATH} ENOSPC`) {
         message.error(
           <span>
@@ -91,13 +92,18 @@ export default class DManager extends Component<Props> {
     }
   }
 
+  componentDidMount = () => {
+    this.watchRoutine();
+  }
+  
+
 
   componentWillUnmount() {
     // Stop watching for changes when this component is unmounted
     try {
       watcher.close();
     } catch (err) {
-      console.error(err);
+      log.error(err);
     }
   }
 

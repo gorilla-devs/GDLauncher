@@ -1,6 +1,7 @@
 
 // @flow
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Button, Icon, Tooltip } from 'antd';
 import { clipboard } from 'electron';
 import styles from './CopyIcon.scss';
@@ -10,7 +11,7 @@ type Props = {
   text: string
 };
 
-export default class CopyIcon extends Component<Props> {
+class CopyIcon extends Component<Props> {
   props: Props;
   constructor(props) {
     super(props);
@@ -22,7 +23,9 @@ export default class CopyIcon extends Component<Props> {
   copy = () => {
     this.setState({ copied: true });
     clipboard.writeText(this.props.text);
-    playCopySound();
+    if (this.props.soundsEnabled) {
+      playCopySound();
+    }
     setTimeout(() => {
       this.setState({ copied: false });
     }, 600);
@@ -31,8 +34,17 @@ export default class CopyIcon extends Component<Props> {
   render() {
     return (
       <Tooltip title={this.state.copied ? 'Copied' : 'Copy'} mouseLeaveDelay={this.state.copied ? 0.3 : 0.1} >
-        <Icon className={styles.copyBtn} type="copy" onClick={this.copy} />
+        <Icon className={styles.copyBtn} type="copy" theme="filled" onClick={this.copy} />
       </Tooltip>
     );
   }
 }
+
+
+function mapStateToProps(state) {
+  return {
+    soundsEnabled: state.settings.sounds,
+  };
+}
+
+export default connect(mapStateToProps)(CopyIcon);

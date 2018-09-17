@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { message } from 'antd';
 import cheerio from 'cheerio';
+import log from 'electron-log';
 import { NEWS_URL } from '../constants';
 
 export const START_LOADING_NEWS = 'START_LOADING_NEWS';
@@ -28,7 +29,7 @@ export function getNews() {
         }));
         dispatch({ type: UPDATE_NEWS, payload: newsArr.splice(0, 12) });
       } catch (err) {
-        console.error(err.message);
+        log.error(err.message);
         message.warning('There was an error while updating the news.');
       } finally {
         dispatch({

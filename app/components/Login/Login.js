@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
+import log from 'electron-log';
 import styles from './Login.scss';
 import store from '../../localStore';
 import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
@@ -51,7 +52,7 @@ class Login extends Component<Props> {
       if (!err) {
         this.props.login(values.username, values.password, values.remember);
       } else {
-        console.log(err);
+        log.error(err);
       }
     });
   }

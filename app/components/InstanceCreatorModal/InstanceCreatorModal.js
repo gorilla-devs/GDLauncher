@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { Select, Form, Input, Icon, Button, Checkbox, Cascader, Switch } from 'antd';
+import vSort from 'version-sort';
+import _ from 'lodash';
 import styles from './InstanceCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
 
@@ -16,8 +18,10 @@ class InstanceCreatorModal extends Component<Props> {
     this.state = {
       loading: false,
       checked: false,
-      versions: [
-        {
+      versions: [{
+        value: 'vanilla',
+        label: 'Vanilla',
+        children: [{
           value: 'releases',
           label: 'Releases',
           children: this.props.versionsManifest.filter(v => v.type === 'release').map((v) => { return { value: v.id, label: v.id } }),
@@ -26,8 +30,26 @@ class InstanceCreatorModal extends Component<Props> {
           value: 'snapshots',
           label: 'Snapshots',
           children: this.props.versionsManifest.filter(v => v.type === 'snapshot').map((v) => { return { value: v.id, label: v.id } }),
-        },
-      ]
+        }]
+      },
+      {
+        value: 'forge',
+        label: 'Forge',
+        children: _.reverse(vSort(_.without(Object.keys(this.props.forgeManifest), '1.7.10_pre4'))).map(
+          (v) => {
+            return {
+              value: v,
+              label: v,
+              children: _.reverse(this.props.forgeManifest[v]).map(ver => {
+                return {
+                  value: ver,
+                  label: ver,
+                }
+              })
+            }
+          }
+        ),
+      }]
     };
   }
 
@@ -35,8 +57,13 @@ class InstanceCreatorModal extends Component<Props> {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        if (values.version[0] === 'vanilla') {
+          this.props.createPack(values.version[2], values.packName);
+        } else if (values.version[0] === 'forge') {
+          this.props.createPack(values.version[1], values.packName, values.version[2]);
+        }
+        console.log(values)
         this.setState({ loading: true });
-        this.props.createPack(values.version[values.version.length - 1], values.packName);
       }
     });
   }
@@ -56,7 +83,7 @@ class InstanceCreatorModal extends Component<Props> {
                   autoFocus
                   size="large"
                   style={{ width: '50vw', display: 'inline-block', height: '60px' }}
-                  prefix={<Icon type="play-circle-o" style={{ color: 'rgba(255,255,255,.8)' }} />}
+                  prefix={<Icon type="play-circle" theme="filled" style={{ color: 'rgba(255,255,255,.8)' }} />}
                   placeholder="Instance Name"
                 />
               )}
@@ -68,21 +95,11 @@ class InstanceCreatorModal extends Component<Props> {
                 rules: [{ required: true, message: 'Please select a version' }],
               })(
                 <Cascader
-                  changeOnSelect
-                  showSearch
                   options={this.state.versions}
                   size="large"
-                  style={{ width: 200, display: 'inline-block' }}
+                  style={{ width: 335, display: 'inline-block' }}
                   placeholder="Select a version"
                 />
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('snapshots', {
-                valuePropName: 'checked',
-                initialValue: false,
-              })(
-                <div>Add Forge <Switch /></div>
               )}
             </FormItem>
           </div>

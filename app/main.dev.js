@@ -11,6 +11,8 @@
  * @flow
  */
 import { app, BrowserWindow, crashReporter, ipcMain } from 'electron';
+import fs from 'fs';
+import log from 'electron-log';
 import MenuBuilder from './menu';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -41,7 +43,7 @@ const installExtensions = async () => {
 
   return Promise
     .all(extensions.map(name => installer.default(installer[name], forceDownload)))
-    .catch(console.log);
+    .catch(log.error);
 };
 
 
@@ -97,9 +99,30 @@ app.on('ready', async () => {
       throw new Error('"mainWindow" is not defined');
     }
     splash.destroy();
+    // Same as for console transport
+    log.transports.file.level = 'silly';
+    log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
+
+    // Set approximate maximum log size in bytes. When it exceeds,
+    // the archived log will be saved as the log.old.log file
+    log.transports.file.maxSize = 5 * 1024 * 1024;
+
+    // Write to this file, must be set before first logging
+    log.transports.file.file = __dirname + '/log.txt';
+
+    // fs.createWriteStream options, must be set before first logging
+    // you can find more information at
+    // https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options
+    log.transports.file.streamConfig = { flags: 'w' };
+
+    // set existed file stream
+    log.transports.file.stream = fs.createWriteStream('log.txt');
+
+
     mainWindow.show();
     mainWindow.focus();
-    
+    log.log(process.argv);
+
   });
 
   ipcMain.on('open-devTools', () => {
