@@ -37,9 +37,6 @@ matrix:
         - sudo rm -rf $TRAVIS_BUILD_DIR/release/win-unpacked
         - sudo rm -rf $TRAVIS_BUILD_DIR/release/linux-unpacked
         - sudo chown -R travis:travis $TRAVIS_BUILD_DIR/release
-        - sudo ls -l
-        - cd release
-        - sudo ls -l
         # - node $TRAVIS_BUILD_DIR/scripts/preDeploy.js
       deploy:
           provider: releases
@@ -50,6 +47,7 @@ matrix:
           file:
             - "$TRAVIS_BUILD_DIR/release/GDLauncher-win.zip"
             - "$TRAVIS_BUILD_DIR/release/GDLauncher-linux.zip"
+            - "$TRAVIS_BUILD_DIR/release/GDLauncher-mac.zip"
           on:
             tags: true
 cache:
@@ -89,6 +87,3 @@ before_script:
 script:
   - npm run package
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-all; fi
-  - sudo ls -l
-  - cd release
-  - sudo ls -l
