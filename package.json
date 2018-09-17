@@ -69,7 +69,8 @@
           "type": "link",
           "path": "/Applications"
         }
-      ]
+      ],
+      "artifactName": "${productName}-mac.${ext}"
     },
     "win": {
       "target": [
