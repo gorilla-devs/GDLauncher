@@ -23,6 +23,15 @@ matrix:
         # This should fix https://github.com/travis-ci/travis-ci/issues/9630
         - sudo chown -R travis:travis $HOME/.cache
         - sudo chown -R travis:travis $TRAVIS_BUILD_DIR/node_modules
+    - os: osx
+      osx_image: xcode9.4
+      language: node_js
+      node_js:
+        - node
+        - 9
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
       before_deploy:
         # Removing unpacked builds before deploy
         - sudo rm -rf $TRAVIS_BUILD_DIR/release/win-unpacked
@@ -43,16 +52,6 @@ matrix:
             - "$TRAVIS_BUILD_DIR/release/GDLauncher-linux.zip"
           on:
             tags: true
-    - os: osx
-      osx_image: xcode9.4
-      language: node_js
-      node_js:
-        - node
-        - 9
-      env:
-        - ELECTRON_CACHE=$HOME/.cache/electron
-        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-
 cache:
   directories:
     - node_modules
@@ -93,14 +92,3 @@ script:
   - sudo ls -l
   - cd release
   - sudo ls -l
-#  - yarn lint
-#  - yarn flow
-#  - yarn test
-#  - yarn test-e2e
-  # On Linux, check if packaging to windows works
-  # - |
-  #   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-  #     docker run --rm --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') -v ${PWD}:/project -v ~/.cache/electron:/root/.cache/electron -v ~/.cache/electron-builder:/root/.cache/electron-builder electronuserland/builder:wine /bin/bash -c "npm run package-win"
-  #   else
-  #     :
-  #   fi
