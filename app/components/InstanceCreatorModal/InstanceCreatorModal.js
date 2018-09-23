@@ -62,7 +62,6 @@ class InstanceCreatorModal extends Component<Props> {
         } else if (values.version[0] === 'forge') {
           this.props.createPack(values.version[1], values.packName, values.version[2]);
         }
-        console.log(values)
         this.setState({ loading: true });
       }
     });

@@ -55,10 +55,50 @@
   .playingServer {
     color: $green;
   }
+  .socialActions {
+    display: flex;
+    justify-content: space-between;
+    height: 25px;
+    line-height: 25px;
+    div:first-child {
+      position: relative;
+      right: 10px;
+      top: 2px;
+      i {
+        font-size: 20px;
+        color: $text-main-color;
+        cursor: pointer;
+        transition: all .2s ease-in-out;
+        &:hover {
+          color: $text-hover-color;
+          transition: all .2s ease-in-out;
+        }
+        svg {
+          cursor: pointer;
+          path {
+            cursor: pointer;
+          }
+          path:hover {
+            color: $text-hover-color;
+            transition: all .2s ease-in-out;
+          }
+        }
+      }
+    }
+  }
   .scroller {
-    height: calc(100% - 60px - 120px);
+    height: calc(100% - 60px - 140px - 25px);
     width: 200px;
     overflow: auto;
+    .serv {
+      position: relative;
+      padding: 9px 3px;
+      transition: all .3s;
+      &:hover {
+        background: rgba(0, 0, 0, 0.3);
+        transition: all .3s;
+      }
+    }
   }
 }
 

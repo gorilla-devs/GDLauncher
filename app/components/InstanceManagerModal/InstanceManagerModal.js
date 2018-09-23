@@ -1,11 +1,14 @@
 // @flow
 import React, { Component } from 'react';
-import { Select, Form, Input, Icon, Button, Checkbox } from 'antd';
+import { Form } from 'antd';
+import { Route } from 'react-router-dom';
 import styles from './InstanceManagerModal.scss';
 import Modal from '../Common/Modal/Modal';
+import SideMenu from '../Common/SideMenu/SideMenu';
+import MenuItem from '../Common/SideMenu/MenuItem/MenuItem';
+import Settings from './components/Settings/Settings';
 
 type Props = {};
-const FormItem = Form.Item;
 let pack;
 
 class InstanceManagerModal extends Component<Props> {
@@ -25,44 +28,23 @@ class InstanceManagerModal extends Component<Props> {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
     return (
-      <Modal history={this.props.history} title={`Editing ${this.props.match.params.instance}`} style={{ height: '60vh' }}>
-        <Form layout="inline" className={styles.container} onSubmit={this.handleSubmit}>
-          <div>
-            <FormItem style={{ margin: 0 }}>
-              {getFieldDecorator('packName', {
-                rules: [{ required: true, message: 'Please input a name' }],
-                initialValue: this.props.match.params.instance,
-              })(
-                <Input
-                  size="large"
-                  style={{ width: '50vw', display: 'inline-block', height: '60px' }}
-                  prefix={<Icon type="play-circle" theme="filled" style={{ color: 'rgba(255,255,255,.8)' }} />}
-                  placeholder="Instance Name"
-                />
-              )}
-            </FormItem>
+      <Modal history={this.props.history} title={`Instance Editor: Editing "${this.props.match.params.instance}"`} style={{ width: '80%', height: '80%', left: '10%' }}>
+        <div className={styles.container}>
+          <SideMenu match={this.props.match}>
+            <MenuItem active={this.props.match.params.page === 'settings'} to={`/editInstance/${this.props.match.params.instance}/settings`}>Settings</MenuItem>
+            <MenuItem active={this.props.match.params.page === 'java'} to="java">Mods Manager</MenuItem>
+            <MenuItem active={this.props.match.params.page === 'instances'} to="instances">Resource Packs</MenuItem>
+            <MenuItem active={this.props.match.params.page === 'ui'} to="ui">Worlds</MenuItem>
+            <MenuItem active={this.props.match.params.page === 'ui'} to="ui">Screenshots</MenuItem>
+          </SideMenu>
+          <div className={styles.content}>
+            <Route path={`/editInstance/${this.props.match.params.instance}/settings`} component={Settings} />
           </div>
-          <div style={{ marginTop: '20px' }}>
-            <FormItem>
-              {getFieldDecorator('snapshots', {
-                valuePropName: 'checked',
-                initialValue: false,
-              })(
-                <Checkbox>Show Snapshots</Checkbox>
-              )}
-            </FormItem>
-          </div>
-          <div className={styles.createInstance}>
-            <Button icon="plus" size="large" type="primary" htmlType="submit" >
-              Edit
-            </Button>
-          </div>
-        </Form>
+        </div>
       </Modal>
     );
   }
 }
 
-export default Form.create()(InstanceManagerModal);
+export default InstanceManagerModal;

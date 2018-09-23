@@ -1,18 +1,14 @@
 import path from 'path';
-import { remote, ipcRenderer } from 'electron';
 import { message } from 'antd';
-import { APPPATH, PACKS_PATH, INSTANCES_PATH, MAVEN_REPO } from '../constants';
 import { promisify } from 'util';
 import axios from 'axios';
-import request from 'request';
 import makeDir from 'make-dir';
 import fs from 'fs';
 import _ from 'lodash';
 import zip from 'adm-zip';
 import { downloadFile, downloadArr } from '../utils/downloader';
+import { PACKS_PATH, INSTANCES_PATH } from '../constants';
 import { extractAssets, extractMainJar, extractNatives, computeLibraries } from '../utils/getMCFilesList';
-//Getting colors from scss theme file
-import colors from '../style/theme/index.scss';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -62,7 +58,6 @@ export function downloadPack(pack) {
     const currPack = downloadManager.downloadQueue[pack];
 
     const versionURL = packCreator.versionsManifest.find((v) => v.id === currPack.version).url;
-    console.log(versionURL);
 
     const vnlJSON = (await axios.get(versionURL)).data;
     let forgeJSON = null;
@@ -89,8 +84,6 @@ export function downloadPack(pack) {
       const zipFile = new zip(forgePath);
       forgeJSON = JSON.parse(zipFile.readAsText("version.json"));
     }
-    console.log(forgeJSON)
-    console.log(vnlJSON)
 
     const libraries = await computeLibraries(vnlJSON, forgeJSON);
 
@@ -138,7 +131,7 @@ function addNextPackToActualDownload() {
     const { downloadManager } = getState();
     const queueArr = Object.keys(downloadManager.downloadQueue);
     queueArr.some(pack => {
-      if (!downloadManager.downloadQueue[pack].status === 'Completed') {
+      if (downloadManager.downloadQueue[pack].status !== 'Completed') {
         dispatch({
           type: START_DOWNLOAD,
           payload: pack
@@ -146,6 +139,7 @@ function addNextPackToActualDownload() {
         dispatch(downloadPack(pack));
         return true;
       }
+      return false;
     });
   };
 }

@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import { Avatar, Button, Popover } from 'antd';
+import { Icon, Button, Popover } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import CIcon from '../../Common/Icon/Icon';
+import CIcon from '../Icon/Icon';
 
 import styles from './SideBar.scss';
 
@@ -25,7 +25,7 @@ class SideBar extends Component<Props> {
     }
     this.props.checkForUpdates();
   }
-  
+
   render() {
     return (
       <aside className={styles.sidenav}>
@@ -53,6 +53,31 @@ class SideBar extends Component<Props> {
           </Popover>
         </div>
         <hr />
+        <div className={styles.socialActions}>
+          Favourites
+          <div>
+            <Icon type="plus-circle" theme="outlined" />
+            <Icon type="sort-ascending" theme="outlined" />
+            <Icon type="search" theme="outlined" />
+          </div>
+        </div>
+        <div className={styles.scroller}>
+          <div style={{ height: 1000 }}>
+            <div className={styles.serv}>
+              MY SERVER
+            </div>
+            <div className={styles.serv}>
+              MY SERVER
+            </div>
+            <div className={styles.serv}>
+              MY SERVER
+            </div>
+            <div className={styles.serv}>
+              MY SERVER
+            </div>
+          </div>
+        </div>
+        <hr />
         <div className={styles.socialsContainer}>
           { /* eslint-disable */}
           <a href="https://twitter.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
@@ -68,11 +93,6 @@ class SideBar extends Component<Props> {
           </a>
           <span className={styles.version}>v{require('../../../package.json').version}</span>
           { /* eslint-enable */}
-        </div>
-        <div className={styles.scroller}>
-          <div style={{ height: 1000 }}>
-            Socials
-          </div>
         </div>
       </aside>
     );

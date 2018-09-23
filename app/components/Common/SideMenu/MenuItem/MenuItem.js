@@ -6,7 +6,7 @@ import styles from './MenuItem.scss';
 const MenuItem = (props) => {
   return (
     <Link to={{
-      pathname: `/settings/${props.to}`,
+      pathname: props.to,
       state: { modal: true }
     }}
     replace

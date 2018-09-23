@@ -3,10 +3,10 @@ import fss from 'fs';
 import reqCall from 'request';
 import path from 'path';
 import assert from 'assert';
-import os from'os';
+import os from 'os';
 import log from 'electron-log';
-import Promise from'bluebird';
-import request from'request-promise-native';
+import Promise from 'bluebird';
+import request from 'request-promise-native';
 import { promisify } from 'util';
 import { DOWNLOAD_FILE_COMPLETED } from '../actions/downloadManager';
 
@@ -14,9 +14,16 @@ const fs = Promise.promisifyAll(fss);
 
 export const downloadArr = async (arr, folderPath, dispatch, pack, threads = os.cpus().length) => {
   await Promise.map(arr, async item => {
-    // TODO: item.legacyPath ? path.join(folderPath, item.legacyPath) : null
-    // Handle legacyPaths better (own function)
-    await downloadFileInstance(path.join(folderPath, item.path), item.url);
+    let toDownload = true;
+    try {
+      await fs.accessAsync(path.join(folderPath, item.path));
+      toDownload = false;
+    } catch (err) {
+      // It needs to be downloaded
+    }
+    if (toDownload) {
+      await downloadFileInstance(path.join(folderPath, item.path), item.url);
+    }
     dispatch({
       type: DOWNLOAD_FILE_COMPLETED,
       payload: { pack }

@@ -73,12 +73,11 @@ class RouteDef extends Component<Props> {
     return (
       <App>
         <SysNavBar />
-        {location.pathname !== '/' && location.pathname !== '/loginHelperModal' ?
+        {location.pathname !== '/' && location.pathname !== '/loginHelperModal' &&
           <div>
             <Navigation />
             <SideBar />
-          </div>
-          : null}
+          </div>}
 
 
         <Switch location={isModal ? this.previousLocation : location}>
@@ -91,7 +90,7 @@ class RouteDef extends Component<Props> {
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
         {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
         {isModal ? <Route path="/InstanceCreatorModal" component={InstanceCreatorModal} /> : null}
-        {isModal ? <Route path="/editInstance/:instance" component={InstanceManagerModal} /> : null}
+        {isModal ? <Route path="/editInstance/:instance/:page" component={InstanceManagerModal} /> : null}
         {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
       </App>
     );

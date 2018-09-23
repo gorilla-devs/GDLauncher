@@ -44,7 +44,21 @@ export default class DManager extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      instances: []
+      instances: [],
+      checkingInstances: true
+    }
+  }
+
+  componentDidMount = () => {
+    this.watchRoutine();
+  }
+
+  componentWillUnmount() {
+    // Stop watching for changes when this component is unmounted
+    try {
+      watcher.close();
+    } catch (err) {
+      log.error(err);
     }
   }
 
@@ -83,27 +97,16 @@ export default class DManager extends Component<Props> {
         message.error(
           <span>
             There was an error with inotify limit. see
-          <a target="_blank" href="https://github.com/guard/listen/wiki/Increasing-the-amount-of-inotify-watchers"> here</a>
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/guard/listen/wiki/Increasing-the-amount-of-inotify-watchers"> here</a>
           </span>
         );
       } else {
         message.error('Cannot update instances in real time');
       }
-    }
-  }
-
-  componentDidMount = () => {
-    this.watchRoutine();
-  }
-  
-
-
-  componentWillUnmount() {
-    // Stop watching for changes when this component is unmounted
-    try {
-      watcher.close();
-    } catch (err) {
-      log.error(err);
+    } finally {
+      this.setState({
+        checkingInstances: false
+      })
     }
   }
 
@@ -151,15 +154,15 @@ export default class DManager extends Component<Props> {
         </div>
         <ContextMenuTrigger id="contextMenu-dmanager">
           <div className={styles.content} onScroll={this.handleScroll}>
-            {this.state.instances.length !== 0 ?
+            {this.state.instances.length === 0 && !this.state.checkingInstances ?
+              <h1 className={styles.NoServerCreated}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1> :
               <SortableList
                 items={this.state.instances}
                 onSortEnd={this.onSortEnd}
                 lockToContainerEdges
                 axis="xy"
                 distance={5}
-              /> :
-              <h1 className={styles.NoServerCreated}>YOU HAVEN'T ADDED ANY INSTANCE YET</h1>
+              />
             }
           </div>
         </ContextMenuTrigger>

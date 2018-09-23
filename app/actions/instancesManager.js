@@ -1,5 +1,6 @@
 import { message } from 'antd';
 import log from 'electron-log';
+import { exec } from 'child_process';
 import launchCommand from '../utils/MCLaunchCommand';
 
 export const SELECT_INSTANCE = 'SELECT_INSTANCE';
@@ -35,22 +36,21 @@ export function selectInstance(name) {
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const { auth } = getState();
-    const util = require('util');
-    const exec = util.promisify(require('child_process').exec);
-    try {
-      dispatch({
-        type: START_INSTANCE,
-        payload: instanceName
-      });
-      const name = await exec(await launchCommand(instanceName, auth));
-    } catch (error) {
-      message.error('There was an error while starting the instance');
-      log.error(error);
-    } finally {
+    const start = exec(await launchCommand(instanceName, auth));
+    dispatch({
+      type: START_INSTANCE,
+      payload: instanceName,
+      pid: start.pid
+    });
+    start.on('exit', () => {
       dispatch({
         type: STOP_INSTANCE,
         payload: instanceName
       });
-    }
+    });
+    start.on('error', (err) => {
+      message.error('There was an error while starting the instance');
+      log.error(err);
+    });
   };
 }

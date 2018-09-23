@@ -34,6 +34,7 @@ const MyAccount = (props) => {
         <SwitchSetting
           mainText="Enable Sounds"
           description="Enable sounds to be played when specific actions are triggered"
+          icon="sound"
           checked={props.settings.sounds}
           onChange={props.setSounds}
         />
