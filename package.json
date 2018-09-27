@@ -223,6 +223,7 @@
     "react-contextmenu": "^2.9.3",
     "react-dom": "^16.5.0",
     "react-hot-loader": "^4.3.6",
+    "react-infinite-scroller": "^1.2.1",
     "react-redux": "^5.0.7",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",

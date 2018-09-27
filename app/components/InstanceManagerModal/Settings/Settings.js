@@ -13,24 +13,19 @@ type Props = {};
 class Instances extends Component<Props> {
   props: Props;
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      deletingInstances: false
-    };
-  }
-
 
   render() {
+    console.log(this.props)
     const { getFieldDecorator } = this.props.form;
     return (
       <div>
+        <h2>Edit Instance Settings</h2>
         <Form layout="inline" onSubmit={this.handleSubmit}>
           <div>
             <FormItem style={{ margin: 0 }}>
               {getFieldDecorator('packName', {
                 rules: [{ required: true, message: 'Please input a name' }],
-                initialValue: this.props.match.params.instance,
+                initialValue: this.props.instance,
               })(
                 <Input
                   size="large"
@@ -41,21 +36,11 @@ class Instances extends Component<Props> {
               )}
             </FormItem>
           </div>
-          <div style={{ marginTop: '20px' }}>
-            <FormItem>
-              {getFieldDecorator('snapshots', {
-                valuePropName: 'checked',
-                initialValue: false,
-              })(
-                <Checkbox>Show Snapshots</Checkbox>
-              )}
-            </FormItem>
-          </div>
-          {/* <div className={styles.save}>
+          <div className={styles.save}>
             <Button icon="save" size="large" type="primary" htmlType="submit" >
               Save
             </Button>
-          </div> */}
+          </div>
         </Form>
       </div>
     )

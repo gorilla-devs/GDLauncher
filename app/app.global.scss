@@ -248,8 +248,19 @@ a:hover {
 .ant-input:focus,
 .ant-input:hover,
 .ant-cascader-picker:focus .ant-cascader-input,
-.ant-checkbox-checked .ant-checkbox-inner, .ant-checkbox-indeterminate .ant-checkbox-inner {
+.ant-checkbox-checked .ant-checkbox-inner {
   border-color: $primary-color;
   border-width: 2px !important;
   border-right-width: 2px !important;
+}
+
+// Table
+
+.ant-table-thead > tr > th {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.ant-table-thead > tr.ant-table-row-hover > td, .ant-table-tbody > tr.ant-table-row-hover > td, .ant-table-thead > tr:hover > td, .ant-table-tbody > tr:hover > td,
+.ant-table-tbody > tr.ant-table-row-selected td {
+  background: rgba(0,0,0,0.15);
 }

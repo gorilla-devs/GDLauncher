@@ -36,7 +36,14 @@ export function selectInstance(name) {
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const { auth } = getState();
-    const start = exec(await launchCommand(instanceName, auth));
+    const start = exec(await launchCommand(instanceName, auth), (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      console.log(`stderr: ${stderr}`);
+    });
     dispatch({
       type: START_INSTANCE,
       payload: instanceName,

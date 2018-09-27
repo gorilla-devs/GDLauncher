@@ -73,7 +73,6 @@ export const extractAssets = async (json) => {
 export const forgeLibCalculator = async (library) => {
   const baseUrl = _.has(library, 'url') ? MAVEN_REPO : MC_LIBRARIES_URL;
   let completeUrl = `${baseUrl}/${arraify(library.name).join('/')}`;
-  const insert = (n, ins, arr) => [...arr.slice(0, n), ins, ...arr.slice(n + 1)]
 
   // The url can have a "modules" path in the middle, but we do not know which ones do. We try a head request without,
   // if it fails it means it needs the modules path
@@ -81,7 +80,7 @@ export const forgeLibCalculator = async (library) => {
   catch (e) { completeUrl = `${baseUrl}/${arraifyModules(library.name).join('/')}` }
   return {
     url: completeUrl,
-    path: path.join(...arraify(library.name))
+    path: arraify(library.name).join('/')
   };
 }
 
@@ -90,11 +89,11 @@ export const computeLibraries = async (vnl, forge) => {
   if (forge !== null) {
     libraries = await Promise.all(forge.libraries
       .filter(lib => (_.has(lib, 'clientreq') && lib.clientreq) || (!_.has(lib, 'clientreq')))
-      .map(async lib => await forgeLibCalculator(lib)));
+      .map(async lib => forgeLibCalculator(lib)));
   }
   libraries = libraries.concat(await extractVanillaLibs(vnl));
   
-  return _.uniq(libraries);
+  return _.uniqBy(libraries, 'path');
 };
 
 // Returns whether the rules allow the file to be downloaded or not
