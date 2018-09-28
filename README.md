@@ -38,6 +38,9 @@ GDLauncher is a custom open source Minecraft launcher written from the ground up
 ## 🚀 Getting Started
 Below you will find anything you need to know about the launcher. If you want to download a stable release you can do it from our official website: https://gorilladevs.com, if you want the latest testing features you can clone the repo and compile it yourself.
 
+## 🎮 Download
+To download the latest version, you can click [here](https://github.com/gorilla-devs/GDLauncher/releases) and select the appropriate version for your operating system.
+
 ## 🎨 Features (Working on)
 
   - Java Autorunner. (You don't need to have java installed, a suitable version will be downloaded automatically)
