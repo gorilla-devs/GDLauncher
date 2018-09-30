@@ -51,7 +51,6 @@ export default class Home extends Component<Props> {
             <News news={this.props.news} />
             <div className={styles.cards}>
               <Card style={{
-                marginTop: 10,
                 height: 170,
                 width: '100%',
                 minWidth: 420,

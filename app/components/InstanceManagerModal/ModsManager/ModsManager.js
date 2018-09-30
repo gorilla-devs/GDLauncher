@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { promisify } from 'util';
+import path from 'path';
+import fs from 'fs';
+import log from 'electron-log';
 import { List, Icon, Avatar, Radio } from 'antd';
+import { PACKS_PATH } from '../../../constants';
 import ModsBrowser from './ModsBrowser/ModsBrowser';
 import LocalMods from './LocalMods/LocalMods';
 
@@ -16,8 +21,24 @@ class ModsManager extends Component<Props> {
     super(props);
     this.state = {
       page: 'local',
+      isForge: false,
+      checkingForge: true
     };
   }
+
+  componentDidMount = async () => {
+    try {
+      const config = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, this.props.instance, 'config.json')));
+      if (config.forgeVersion !== null) {
+        this.setState({ isForge: true });
+      }
+    } catch (err) {
+      log.error(err.message);
+    } finally {
+      this.setState({ checkingForge: false });
+    }
+  }
+
 
   handleModeChange = (e) => {
     const page = e.target.value;
@@ -25,6 +46,16 @@ class ModsManager extends Component<Props> {
   }
 
   render() {
+    if (this.state.checkingForge) {
+      return null;
+    }
+    if (!this.state.isForge) {
+      return (
+        <div>
+          <h2 style={{ textAlign: 'center', margin: 20 }}>This instance does not allow mods. <br /> Install forge if you want to use them</h2>
+        </div>
+      );
+    }
     return (
       <div>
         <Radio.Group onChange={this.handleModeChange} value={this.state.page} style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}>

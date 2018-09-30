@@ -23,10 +23,10 @@ const MyAccount = (props) => {
         </div>
         <div>
           <span>USERNAME</span>
-          <span className={styles.info}>{props.username}</span> <CopyIcon text={'killpowa'} />
+          <span className={styles.info}>{props.username}</span> <CopyIcon text={props.username} />
           <div className={styles.divider} />
           <span>EMAIL</span>
-          <span className={styles.info}>{props.email}</span> <CopyIcon text={'davide.ceschia@gmail.com'} />
+          <span className={styles.info}>{props.email}</span> <CopyIcon text={props.email} />
         </div>
       </div>
       <Title>Preferences</Title>

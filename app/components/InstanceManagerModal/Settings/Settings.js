@@ -5,7 +5,13 @@ import { Select, Form, Input, Icon, Button, Checkbox } from 'antd';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import fsa from 'fs-extra';
 import path from 'path';
+import { promisify } from 'util';
+import fs from 'fs';
+import log from 'electron-log';
+import Card from '../../Common/Card/Card';
+import { PACKS_PATH } from '../../../constants';
 import styles from './Settings.scss';
+import ForgeManager from './ForgeManager';
 
 const FormItem = Form.Item;
 type Props = {};
@@ -13,9 +19,27 @@ type Props = {};
 class Instances extends Component<Props> {
   props: Props;
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      instanceConfig: null,
+      checkingForge: true
+    };
+  }
+
+  componentDidMount = async () => {
+    try {
+      const config = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, this.props.instance, 'config.json')));
+      this.setState({ instanceConfig: config });
+    } catch (err) {
+      log.error(err.message);
+    } finally {
+      this.setState({ checkingForge: false });
+    }
+  }
+
 
   render() {
-    console.log(this.props)
     const { getFieldDecorator } = this.props.form;
     return (
       <div>
@@ -36,13 +60,16 @@ class Instances extends Component<Props> {
               )}
             </FormItem>
           </div>
+          <Card style={{ marginTop: 15 }} title="Forge Manager">
+            {!this.state.checkingForge ? <ForgeManager data={this.state.instanceConfig} /> : null}
+          </Card>
           <div className={styles.save}>
             <Button icon="save" size="large" type="primary" htmlType="submit" >
               Save
             </Button>
           </div>
         </Form>
-      </div>
+      </div >
     )
   }
 }
