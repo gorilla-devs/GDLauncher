@@ -7,6 +7,7 @@ export const INSTANCES_FOLDER = 'instances';
 export const SERVERS_PATH = path.join(APPPATH, LAUNCHER_FOLDER, 'servers');
 export const INSTANCES_PATH = path.join(APPPATH, LAUNCHER_FOLDER, INSTANCES_FOLDER);
 export const PACKS_PATH = path.join(APPPATH, LAUNCHER_FOLDER, INSTANCES_FOLDER, 'packs');
+export const META_PATH = path.join(APPPATH, LAUNCHER_FOLDER, 'meta');
 export const GAME_VERSIONS_URL = 'https://launchermeta.mojang.com/mc/game/version_manifest.json';
 export const FORGE_PROMOS = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/json';
 export const ACCESS_TOKEN_VALIDATION_URL = 'https://authserver.mojang.com/validate';

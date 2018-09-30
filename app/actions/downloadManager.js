@@ -5,10 +5,10 @@ import axios from 'axios';
 import makeDir from 'make-dir';
 import fs from 'fs';
 import _ from 'lodash';
-import zip from 'adm-zip';
+import Zip from 'adm-zip';
 import { downloadFile, downloadArr } from '../utils/downloader';
-import { PACKS_PATH, INSTANCES_PATH } from '../constants';
-import { extractAssets, extractMainJar, extractNatives, computeLibraries } from '../utils/getMCFilesList';
+import { PACKS_PATH, INSTANCES_PATH, META_PATH } from '../constants';
+import { extractAssets, extractMainJar, extractNatives, computeVanillaAndForgeLibraries } from '../utils/getMCFilesList';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -56,49 +56,52 @@ export function downloadPack(pack) {
   return async (dispatch, getState) => {
     const { downloadManager, packCreator } = getState();
     const currPack = downloadManager.downloadQueue[pack];
+    let vnlJSON = null;
+    try {
+      vnlJSON = JSON.parse(await promisify(fs.readFile)(path.join(META_PATH, 'net.minecraft', currPack.version, `${currPack.version}.json`)));
+    } catch (err) {
+      const versionURL = packCreator.versionsManifest.find((v) => v.id === currPack.version).url;
+      vnlJSON = (await axios.get(versionURL)).data;
+      await makeDir(path.join(META_PATH, 'net.minecraft', currPack.version));
+      await promisify(fs.writeFile)(path.join(META_PATH, 'net.minecraft', currPack.version, `${currPack.version}.json`), JSON.stringify(vnlJSON));
+    }
 
-    const versionURL = packCreator.versionsManifest.find((v) => v.id === currPack.version).url;
-
-    const vnlJSON = (await axios.get(versionURL)).data;
     let forgeJSON = null;
-    let forgeFileName = null;
 
     const assets = await extractAssets(vnlJSON);
     const mainJar = await extractMainJar(vnlJSON);
 
+    let forgeFileName = `${currPack.version}-${currPack.forgeVersion}`;
     if (currPack.forgeVersion !== null) {
-      forgeFileName = `${currPack.version}-${currPack.forgeVersion}`;
       const forgeUrl = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-universal.jar`;
 
       // Checks whether the filename is version-forge or version-forge-version
       try { await axios.head(forgeUrl) }
       catch (err) { forgeFileName = `${currPack.version}-${currPack.forgeVersion}-${currPack.version}-` }
+
       const forgePath = path.join(INSTANCES_PATH, 'libraries', 'net', 'minecraftforge', 'forge', forgeFileName, `forge-${forgeFileName}.jar`);
-      try { await promisify(fs.access)(forgePath); }
-      catch (e) {
+      try {
+        forgeJSON = JSON.parse(await promisify(fs.readFile)(path.join(META_PATH, 'net.minecraftforge', forgeFileName, `${forgeFileName}.json`)));
+        await promisify(fs.access)(forgePath);
+      } catch (err) {
         await makeDir(path.dirname(forgePath));
         await downloadFile(forgePath, forgeUrl, (p) => {
           dispatch({ type: UPDATE_PROGRESS, payload: { pack, percentage: p } });
         });
+        const zipFile = new Zip(forgePath);
+        forgeJSON = JSON.parse(zipFile.readAsText("version.json"));
+        await makeDir(path.join(META_PATH, 'net.minecraftforge', forgeFileName));
+        await promisify(fs.writeFile)(path.join(META_PATH, 'net.minecraftforge', forgeFileName, `${forgeFileName}.json`), JSON.stringify(forgeJSON));
       }
-      const zipFile = new zip(forgePath);
-      forgeJSON = JSON.parse(zipFile.readAsText("version.json"));
     }
 
-    const libraries = await computeLibraries(vnlJSON, forgeJSON);
+    const libraries = await computeVanillaAndForgeLibraries(vnlJSON, forgeJSON);
 
     // This is the main config file for the instance
     await promisify(fs.writeFile)(path.join(PACKS_PATH, pack, 'config.json'), JSON.stringify({
       instanceName: pack,
       version: currPack.version,
-      forgeID: currPack.forgeVersion !== null ? forgeJSON.id : null,
       forgeVersion: currPack.forgeVersion !== null ? forgeFileName : null,
-      minecraftArguments: currPack.forgeVersion !== null ? forgeJSON.minecraftArguments :
-        _.has(vnlJSON, 'arguments') ? vnlJSON.arguments.game.filter(lib => typeof lib === 'string' || lib instanceof String).join(' ') : vnlJSON.minecraftArguments,
-      mainClass: currPack.forgeVersion !== null ? forgeJSON.mainClass : vnlJSON.mainClass,
-      assets: vnlJSON.assets,
-      type: currPack.forgeVersion !== null ? "Forge" : vnlJSON.type,
-      libraries
     }));
 
     dispatch({

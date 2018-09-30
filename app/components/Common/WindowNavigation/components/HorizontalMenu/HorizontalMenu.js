@@ -34,12 +34,12 @@ export default class NavigationBar extends Component<Props> {
               </Badge>
             </Link>
           </li>
-          {/* <li className={styles.li}>
+          <li className={styles.li}>
             <Link to="/serverManager" draggable="false" className={`${styles.a} ${this.isLocation('/serverManager') ? styles.activeLink : null}`}>
               <Icon type="database" className={styles.i} />
               SERVERS
             </Link>
-            </li> */}
+            </li>
         </ul>
       </div>
     );

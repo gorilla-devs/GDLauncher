@@ -64,16 +64,17 @@ class SideBar extends Component<Props> {
         <div className={styles.scroller}>
           <div style={{ height: 1000 }}>
             <div className={styles.serv}>
-              MY SERVER
+              AnonymousCraft
+              <i className='fas fa-play' style={{ marginTop: 3 }} />
             </div>
             <div className={styles.serv}>
-              MY SERVER
+              HyPixel
             </div>
             <div className={styles.serv}>
-              MY SERVER
+              PvPWars
             </div>
             <div className={styles.serv}>
-              MY SERVER
+              Mineplex
             </div>
           </div>
         </div>

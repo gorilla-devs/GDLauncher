@@ -94,6 +94,9 @@
       position: relative;
       padding: 9px 3px;
       transition: all .3s;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
       &:hover {
         background: rgba(0, 0, 0, 0.3);
         transition: all .3s;

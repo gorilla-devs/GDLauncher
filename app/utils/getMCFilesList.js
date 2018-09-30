@@ -70,29 +70,36 @@ export const extractAssets = async (json) => {
   return assets;
 };
 
-export const forgeLibCalculator = async (library) => {
-  const baseUrl = _.has(library, 'url') ? MAVEN_REPO : MC_LIBRARIES_URL;
-  let completeUrl = `${baseUrl}/${arraify(library.name).join('/')}`;
+export const getForgeLibraries = async (forge) => {
 
-  // The url can have a "modules" path in the middle, but we do not know which ones do. We try a head request without,
-  // if it fails it means it needs the modules path
-  try { await axios.head(completeUrl) }
-  catch (e) { completeUrl = `${baseUrl}/${arraifyModules(library.name).join('/')}` }
-  return {
-    url: completeUrl,
-    path: arraify(library.name).join('/')
+  const forgeLibCalculator = async (library) => {
+    const baseUrl = _.has(library, 'url') ? MAVEN_REPO : MC_LIBRARIES_URL;
+    let completeUrl = `${baseUrl}/${arraify(library.name).join('/')}`;
+
+    // The url can have a "modules" path in the middle, but we do not know which ones do. We try a head request without,
+    // if it fails it means it needs the modules path
+    try { await axios.head(completeUrl) }
+    catch (e) { completeUrl = `${baseUrl}/${arraifyModules(library.name).join('/')}` }
+    return {
+      url: completeUrl,
+      path: arraify(library.name).join('/')
+    };
   };
+
+  let libraries = [];
+  libraries = await Promise.all(forge.libraries
+    .filter(lib => (_.has(lib, 'clientreq') && lib.clientreq) || (!_.has(lib, 'clientreq')))
+    .map(async lib => forgeLibCalculator(lib)));
+    return libraries;
 }
 
-export const computeLibraries = async (vnl, forge) => {
+export const computeVanillaAndForgeLibraries = async (vnl, forge) => {
   let libraries = [];
   if (forge !== null) {
-    libraries = await Promise.all(forge.libraries
-      .filter(lib => (_.has(lib, 'clientreq') && lib.clientreq) || (!_.has(lib, 'clientreq')))
-      .map(async lib => forgeLibCalculator(lib)));
+    libraries = await getForgeLibraries(forge);
   }
   libraries = libraries.concat(await extractVanillaLibs(vnl));
-  
+
   return _.uniqBy(libraries, 'path');
 };
 
