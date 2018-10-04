@@ -22,6 +22,7 @@ class ModsManager extends Component<Props> {
     this.state = {
       page: 'local',
       isForge: false,
+      version: null,
       checkingForge: true
     };
   }
@@ -29,6 +30,9 @@ class ModsManager extends Component<Props> {
   componentDidMount = async () => {
     try {
       const config = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, this.props.instance, 'config.json')));
+
+      this.setState({ version: config.version });
+
       if (config.forgeVersion !== null) {
         this.setState({ isForge: true });
       }
@@ -58,11 +62,11 @@ class ModsManager extends Component<Props> {
     }
     return (
       <div>
-        <Radio.Group onChange={this.handleModeChange} value={this.state.page} style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}>
+        <Radio.Group onChange={this.handleModeChange} value={this.state.page} buttonStyle="solid" style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}>
           <Radio.Button value="local">Local</Radio.Button>
           <Radio.Button value="browse">Browse</Radio.Button>
         </Radio.Group>
-        {this.state.page === 'local' ? <LocalMods instance={this.props.instance} /> : <ModsBrowser instance={this.props.instance} />}
+        {this.state.page === 'local' ? <LocalMods instance={this.props.instance} /> : <ModsBrowser version={this.state.version} instance={this.props.instance} />}
       </div>
     )
   }

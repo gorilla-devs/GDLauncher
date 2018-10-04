@@ -25,7 +25,7 @@ export function loadSettings() {
   }
 }
 
-export function saveSettings(notification = true) {
+export function saveSettings(notification = false) {
   return (dispatch, getState) => {
     try {
       const { settings } = getState();

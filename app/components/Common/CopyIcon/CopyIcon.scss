@@ -4,4 +4,10 @@
   display: inline-block;
   color: $text-main-color;
   cursor: pointer;
+  svg {
+    cursor: pointer;
+    path {
+      cursor: pointer;
+    }
+  }
 }

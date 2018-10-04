@@ -3,18 +3,17 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroller';
+import path from 'path';
 import { List, Icon, Avatar, Radio, Button, Skeleton, Transfer } from 'antd';
+import Promise from 'bluebird';
+import { promisify } from 'util';
+import fs from 'fs';
+import { PACKS_PATH } from '../../../../constants';
+import { downloadFile } from '../../../../utils/downloader';
 
 import styles from './ModsBrowser.scss';
 
 type Props = {};
-
-const IconText = ({ type, text }) => (
-  <span>
-    <Icon type={type} style={{ marginRight: 8 }} />
-    {text}
-  </span>
-);
 
 
 class ModsBrowser extends Component<Props> {
@@ -26,11 +25,13 @@ class ModsBrowser extends Component<Props> {
       initLoading: true,
       loading: false,
       list: [],
+      installing: []
     }
   }
 
   componentDidMount = async () => {
     const res = await axios.get(`https://staging_cursemeta.dries007.net/api/v3/direct/addon/search?gameId=432&pageSize=10&index=${this.state.list.length}&sort=Featured&categoryId=0&sectionId=6`);
+    const mods = await promisify(fs.readdir)(path.join(PACKS_PATH, this.props.instance, 'mods'));
     this.setState({
       initLoading: false,
       list: res.data,
@@ -55,6 +56,59 @@ class ModsBrowser extends Component<Props> {
     });
   }
 
+  installMod = async (data, parent = null) => {
+    const { projectFileId, projectFileName } = data.gameVersionLatestFiles.find(n => n.gameVersion === this.props.version);
+    this.setState(prevState => ({
+      installing: {
+        ...prevState.installing,
+        [projectFileName]: {
+          installing: true,
+          completed: false
+        }
+      }
+    }));
+    const url = await axios.get(`https://staging_cursemeta.dries007.net/api/v3/direct/addon/${data.id}/file/${projectFileId}`);
+
+    await downloadFile(path.join(PACKS_PATH, this.props.instance, 'mods', url.data.fileNameOnDisk), url.data.downloadUrl, () => { });
+    if (url.data.dependencies.length !== 0) {
+      url.data.dependencies.forEach(async dep => {
+        const depData = await axios.get(`https://staging_cursemeta.dries007.net/api/v3/direct/addon/${dep.addonId}`);
+        await this.installMod(depData.data, projectFileName);
+      });
+    }
+    if (parent === null) {
+      this.setState(prevState => ({
+        installing: {
+          ...prevState.installing,
+          [projectFileName]: {
+            installing: false,
+            completed: true
+          }
+        }
+      }));
+    } else {
+      this.setState(prevState => ({
+        installing: {
+          ...prevState.installing,
+          [parent]: {
+            installing: false,
+            completed: true
+          }
+        }
+      }));
+    }
+  };
+
+  isDownloadCompleted = (data) => {
+    const mod = Object.keys(this.state.installing).find(n => n === data.gameVersionLatestFiles.find(x => x.gameVersion === this.props.version).projectFileName);
+    return this.state.installing[mod] && this.state.installing[mod].completed;
+  };
+
+  isInstalling = (data) => {
+    const mod = Object.keys(this.state.installing).find(n => n === data.gameVersionLatestFiles.find(x => x.gameVersion === this.props.version).projectFileName);
+    return this.state.installing[mod] && this.state.installing[mod].installing;
+  };
+
   render() {
     const { initLoading, loading, list } = this.state;
     const loadMore = !initLoading && !loading ? (
@@ -71,12 +125,21 @@ class ModsBrowser extends Component<Props> {
           loadMore={loadMore}
           dataSource={list}
           renderItem={item => (
-            <List.Item actions={[<a>edit</a>, <a>more</a>]}>
+            <List.Item actions={[
+              <Button
+                type="primary"
+                loading={this.isInstalling(item)}
+                disabled={this.isDownloadCompleted(item)}
+                onClick={() => this.installMod(item)}
+              >
+                {this.isInstalling(item) ? "Installing" : (this.isDownloadCompleted(item) ? "Installed" : "Install")}
+              </Button>
+            ]}>
               <Skeleton avatar title={false} loading={item.loading} active>
                 <List.Item.Meta
                   avatar={<Avatar src={item.loading ? "" : (item.attachments ? item.attachments[0].thumbnailUrl : "https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png")} />}
                   title={item.name}
-                  description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                  description={item.summary}
                 />
               </Skeleton>
             </List.Item>

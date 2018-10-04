@@ -86,7 +86,7 @@ export function downloadPack(pack) {
       } catch (err) {
         await makeDir(path.dirname(forgePath));
         await downloadFile(forgePath, forgeUrl, (p) => {
-          dispatch({ type: UPDATE_PROGRESS, payload: { pack, percentage: p } });
+          dispatch({ type: UPDATE_PROGRESS, payload: { pack, percentage: ((p * 18) / 100).toFixed(1) } });
         });
         const zipFile = new Zip(forgePath);
         forgeJSON = JSON.parse(zipFile.readAsText("version.json"));

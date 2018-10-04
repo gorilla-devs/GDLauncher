@@ -4,6 +4,7 @@ import { remote } from 'electron';
 import fss from 'fs';
 import path from 'path';
 import Promise from 'bluebird';
+import makeDir from 'make-dir';
 import { connect } from 'react-redux';
 import { List, Icon, Avatar, Upload, Transfer, Button, Table, Switch } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
@@ -24,7 +25,12 @@ class LocalMods extends Component<Props> {
     loading: false,
   }
 
-  componentDidMount() {
+  componentDidMount = async () => {
+    try {
+      await fs.accessAsync(path.join(PACKS_PATH, this.props.instance, 'mods'));
+    } catch (err) {
+      await makeDir(path.join(PACKS_PATH, this.props.instance, 'mods'));
+    }
     this.getMods();
   }
 

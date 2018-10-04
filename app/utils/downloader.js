@@ -82,7 +82,7 @@ export const downloadFile = (filename, url, onProgress) => {
     req.on('data', (chunk) => {
       // Update the received bytes
       received_bytes += chunk.length;
-      onProgress(((received_bytes * 18) / total_bytes).toFixed(1));
+      onProgress(((received_bytes * 100) / total_bytes).toFixed(1));
     });
 
     req.on('end', () => {

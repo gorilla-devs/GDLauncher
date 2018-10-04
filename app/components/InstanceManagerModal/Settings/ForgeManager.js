@@ -22,7 +22,8 @@ class Instances extends Component<Props> {
     if (this.props.data.forgeVersion === null) {
       return (
         <div style={{ textAlign: 'center', color: colors.red }}>
-          Forge is not installed
+          Forge is not installed <br />
+          <Button type="primary" style={{ marginTop: 10 }}>Install Forge</Button>
         </div >
       )
     }
@@ -30,7 +31,7 @@ class Instances extends Component<Props> {
       <div style={{ textAlign: 'center', color: colors.green }}>
         Forge is installed: {this.props.data.forgeVersion} <br />
         <Button type="primary" style={{ marginTop: 10 }}>Remove Forge</Button>
-    </div >
+      </div >
     )
   }
 }
