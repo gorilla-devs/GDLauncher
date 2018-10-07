@@ -5,6 +5,7 @@ import fss from 'fs';
 import path from 'path';
 import Promise from 'bluebird';
 import makeDir from 'make-dir';
+import log from 'electron-log';
 import { connect } from 'react-redux';
 import { List, Icon, Avatar, Upload, Transfer, Button, Table, Switch } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
@@ -15,6 +16,7 @@ const fs = Promise.promisifyAll(fss);
 
 type Props = {};
 
+let watcher;
 
 class LocalMods extends Component<Props> {
   props: Props;
@@ -34,6 +36,15 @@ class LocalMods extends Component<Props> {
     this.getMods();
   }
 
+  componentWillUnmount() {
+    // Stop watching for changes when this component is unmounted
+    try {
+      watcher.close();
+    } catch (err) {
+      log.error(err);
+    }
+  }
+
   columns = [{
     title: 'Name',
     dataIndex: 'name',
@@ -47,8 +58,19 @@ class LocalMods extends Component<Props> {
   }];
 
   getMods = async () => {
-    const mods = await fs.readdirAsync(path.join(PACKS_PATH, this.props.instance, 'mods'));
-    this.setState({ mods: mods.map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } }) });
+    let mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.instance, 'mods')))
+      .map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } });
+    this.setState({
+      mods
+    });
+    // Watches for any changes in the packs dir. TODO: Optimize
+    watcher = fss.watch(path.join(PACKS_PATH, this.props.instance, 'mods'), async () => {
+      mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.instance, 'mods')))
+        .map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } });
+      this.setState({
+        mods
+      });
+    });
   }
 
   modStateChanger = (selectedRowKeys) => {
@@ -62,7 +84,6 @@ class LocalMods extends Component<Props> {
     } else {
       await fs.renameAsync(path.join(PACKS_PATH, this.props.instance, 'mods', record.name), path.join(PACKS_PATH, this.props.instance, 'mods', `${record.name}.disabled`));
     }
-    await this.getMods();
   }
 
   selectFiles = async () => {
@@ -72,7 +93,6 @@ class LocalMods extends Component<Props> {
   delete = async () => {
     this.setState({ loading: true });
     await Promise.each(this.state.selectedRowKeys, async el => fs.unlinkAsync(path.join(PACKS_PATH, this.props.instance, 'mods', el)));
-    await this.getMods();
     this.setState({ loading: false, selectedRowKeys: [] });
   };
 

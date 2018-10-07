@@ -6,7 +6,9 @@ import psTree from 'ps-tree';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import path from 'path';
+import fs from 'fs';
 import log from 'electron-log';
+import { promisify } from 'util';
 import { exec } from 'child_process';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import { PACKS_PATH } from '../../constants';
@@ -28,10 +30,18 @@ export default class DInstance extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      deleting: false
+      deleting: false,
+      version: null
     }
     this.percentage = this.updatePercentage();
   }
+
+  componentDidMount = async () => {
+    this.setState({
+      version: JSON.parse((await promisify(fs.readFile)(path.join(PACKS_PATH, this.props.name, 'config.json')))).version
+    });
+  }
+
 
   componentDidUpdate = () => {
     this.percentage = this.updatePercentage();
@@ -136,7 +146,7 @@ export default class DInstance extends Component<Props> {
           </div>
         </ContextMenuTrigger>
         <ContextMenu id={`contextMenu-${name}`} onShow={(e) => { e.stopPropagation(); this.props.selectInstance(name); }}>
-          <span>{name}</span>
+          <span>{name} ({this.state.version})</span>
           <MenuItem disabled={this.isInstalling()} onClick={this.handleClickPlay}>
             <i className="fas fa-play" style={{ marginRight: '8px' }} />
             {this.props.playing.find(el => el.name === name) ? "Kill" : "Launch"}

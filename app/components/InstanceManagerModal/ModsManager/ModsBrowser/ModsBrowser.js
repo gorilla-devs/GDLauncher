@@ -41,9 +41,11 @@ class ModsBrowser extends Component<Props> {
   onLoadMore = async () => {
     this.setState({
       loading: true,
+      // Adding 10 fakes elements to the list to simulate a loading
       list: this.state.list.concat([...new Array(10)].map(() => ({ loading: true, name: {} }))),
     });
     const res = await axios.get(`https://staging_cursemeta.dries007.net/api/v3/direct/addon/search?gameId=432&pageSize=10&index=${this.state.list.length}&sort=Featured&categoryId=0&sectionId=6`);
+    // We now remove the previous 10 elements and add the real 10
     const data = this.state.list.slice(0, this.state.list.length - 10).concat(res.data);
     this.setState({
       list: data,
@@ -58,45 +60,39 @@ class ModsBrowser extends Component<Props> {
 
   installMod = async (data, parent = null) => {
     const { projectFileId, projectFileName } = data.gameVersionLatestFiles.find(n => n.gameVersion === this.props.version);
-    this.setState(prevState => ({
-      installing: {
-        ...prevState.installing,
-        [projectFileName]: {
-          installing: true,
-          completed: false
-        }
-      }
-    }));
-    const url = await axios.get(`https://staging_cursemeta.dries007.net/api/v3/direct/addon/${data.id}/file/${projectFileId}`);
-
-    await downloadFile(path.join(PACKS_PATH, this.props.instance, 'mods', url.data.fileNameOnDisk), url.data.downloadUrl, () => { });
-    if (url.data.dependencies.length !== 0) {
-      url.data.dependencies.forEach(async dep => {
-        const depData = await axios.get(`https://staging_cursemeta.dries007.net/api/v3/direct/addon/${dep.addonId}`);
-        await this.installMod(depData.data, projectFileName);
-      });
-    }
     if (parent === null) {
       this.setState(prevState => ({
         installing: {
           ...prevState.installing,
           [projectFileName]: {
-            installing: false,
-            completed: true
-          }
-        }
-      }));
-    } else {
-      this.setState(prevState => ({
-        installing: {
-          ...prevState.installing,
-          [parent]: {
-            installing: false,
-            completed: true
+            installing: true,
+            completed: false
           }
         }
       }));
     }
+
+    const url = await axios.get(`https://staging_cursemeta.dries007.net/api/v3/direct/addon/${data.id}/file/${projectFileId}`);
+
+    await downloadFile(path.join(PACKS_PATH, this.props.instance, 'mods', url.data.fileNameOnDisk), url.data.downloadUrl, () => { });
+    if (url.data.dependencies.length !== 0) {
+      url.data.dependencies.forEach(async dep => {
+        // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
+        if (dep.type === 1) {
+          const depData = await axios.get(`https://staging_cursemeta.dries007.net/api/v3/direct/addon/${dep.addonId}`);
+          await this.installMod(depData.data, projectFileName);
+        }
+      });
+    }
+    this.setState(prevState => ({
+      installing: {
+        ...prevState.installing,
+        [parent === null ? projectFileName : parent]: {
+          installing: false,
+          completed: true
+        }
+      }
+    }));
   };
 
   isDownloadCompleted = (data) => {
@@ -126,7 +122,7 @@ class ModsBrowser extends Component<Props> {
           dataSource={list}
           renderItem={item => (
             <List.Item actions={[
-              <Button
+              !item.loading && <Button
                 type="primary"
                 loading={this.isInstalling(item)}
                 disabled={this.isDownloadCompleted(item)}
