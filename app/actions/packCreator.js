@@ -5,6 +5,7 @@ import path from 'path';
 import _ from 'lodash';
 import { goBack } from 'react-router-redux';
 import { promisify } from 'util';
+import { message } from 'antd';
 import { PACKS_PATH, GAME_VERSIONS_URL, FORGE_PROMOS } from '../constants';
 import { addToQueue } from './downloadManager';
 
@@ -55,13 +56,15 @@ export function createPack(version, packName, forgeVersion = null) {
     // CREATE PACK FOLDER IF iT DOES NOT EXISt
     try {
       await promisify(fs.access)(path.join(PACKS_PATH, packName));
+      message.warning("An instance with this name already exists.");
     } catch (e) {
       await makeDir(path.join(PACKS_PATH, packName));
-    }
-    dispatch(addToQueue(packName, version, forgeVersion));
-    dispatch({ type: CREATION_COMPLETE });
-    if (router.location.state && router.location.state.modal) {
-      setTimeout(dispatch(goBack()), 160);
+      dispatch(addToQueue(packName, version, forgeVersion));
+      if (router.location.state && router.location.state.modal) {
+        setTimeout(dispatch(goBack()), 160);
+      }
+    } finally {
+      dispatch({ type: CREATION_COMPLETE });
     }
   };
 }

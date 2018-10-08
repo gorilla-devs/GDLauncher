@@ -63,6 +63,9 @@ class InstanceCreatorModal extends Component<Props> {
           this.props.createPack(values.version[1], values.packName, values.version[2]);
         }
         this.setState({ loading: true });
+        setTimeout(() => {
+          this.setState({ loading: false });
+        }, 500);
       }
     });
   }
