@@ -65,7 +65,7 @@ class InstanceCreatorModal extends Component<Props> {
         this.setState({ loading: true });
         setTimeout(() => {
           this.setState({ loading: false });
-        }, 500);
+        }, 100);
       }
     });
   }

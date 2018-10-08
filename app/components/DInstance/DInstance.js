@@ -37,9 +37,11 @@ export default class DInstance extends Component<Props> {
   }
 
   componentDidMount = async () => {
-    this.setState({
-      version: JSON.parse((await promisify(fs.readFile)(path.join(PACKS_PATH, this.props.name, 'config.json')))).version
-    });
+    if (!this.isInstalling()) {
+      this.setState({
+        version: JSON.parse((await promisify(fs.readFile)(path.join(PACKS_PATH, this.props.name, 'config.json')))).version
+      });
+    }
   }
 
 
