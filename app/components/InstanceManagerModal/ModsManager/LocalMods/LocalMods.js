@@ -59,6 +59,7 @@ class LocalMods extends Component<Props> {
 
   getMods = async () => {
     let mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.instance, 'mods')))
+      .filter(el => el !== 'GDLCompanion.jar')
       .map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } });
     this.setState({
       mods
@@ -66,6 +67,7 @@ class LocalMods extends Component<Props> {
     // Watches for any changes in the packs dir. TODO: Optimize
     watcher = fss.watch(path.join(PACKS_PATH, this.props.instance, 'mods'), async () => {
       mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.instance, 'mods')))
+        .filter(el => el !== 'GDLCompanion.jar')
         .map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } });
       this.setState({
         mods
