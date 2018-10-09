@@ -16,7 +16,7 @@ export const START_PACK_CREATION = 'START_PACK_CREATION';
 export const GET_FORGE_MANIFEST = 'GET_FORGE_MANIFEST';
 
 export function getVanillaMCVersions() {
-  return async (dispatch) => {
+  return async dispatch => {
     const versions = await axios.get(GAME_VERSIONS_URL);
     dispatch({
       type: GET_MC_VANILLA_VERSIONS,
@@ -28,15 +28,17 @@ export function getVanillaMCVersions() {
     // with the correct forge version. It filters numbers which do not have the "installer"
     // file. It then omits empty versions (not even one valid forge version for that mc version)
     Object.keys(promos.mcversion).forEach(v => {
-      forgeVersions[v] = promos.mcversion[v].filter(ver => {
-        const files = promos.number[ver].files;
-        for (let i = 0; i < files.length; i++) {
-          if (files[i].includes("installer")) {
-            return true;
+      forgeVersions[v] = promos.mcversion[v]
+        .filter(ver => {
+          const files = promos.number[ver].files;
+          for (let i = 0; i < files.length; i++) {
+            if (files[i].includes('installer')) {
+              return true;
+            }
           }
-        }
-        return false;
-      }).map(ver => promos.number[ver].version);
+          return false;
+        })
+        .map(ver => promos.number[ver].version);
     });
     dispatch({
       type: GET_FORGE_MANIFEST,
@@ -53,10 +55,9 @@ export function createPack(version, packName, forgeVersion = null) {
 
     dispatch({ type: START_PACK_CREATION });
 
-    // CREATE PACK FOLDER IF iT DOES NOT EXISt
     try {
       await promisify(fs.access)(path.join(PACKS_PATH, packName));
-      message.warning("An instance with this name already exists.");
+      message.warning('An instance with this name already exists.');
     } catch (e) {
       await makeDir(path.join(PACKS_PATH, packName));
       dispatch(addToQueue(packName, version, forgeVersion));
@@ -69,3 +70,26 @@ export function createPack(version, packName, forgeVersion = null) {
   };
 }
 
+export function instanceDownloadOverride(
+  version,
+  packName,
+  forgeVersion = null
+) {
+  return async (dispatch, getState) => {
+    const { router } = getState();
+
+    dispatch({ type: START_PACK_CREATION });
+
+    try {
+      await promisify(fs.access)(path.join(PACKS_PATH, packName));
+    } catch (e) {
+      await makeDir(path.join(PACKS_PATH, packName));
+    } finally {
+      dispatch(addToQueue(packName, version, forgeVersion));
+      if (router.location.state && router.location.state.modal) {
+        setTimeout(dispatch(goBack()), 160);
+      }
+      dispatch({ type: CREATION_COMPLETE });
+    }
+  };
+}

@@ -16,6 +16,8 @@ import ForgeManager from './ForgeManager';
 const FormItem = Form.Item;
 type Props = {};
 
+let watcher = null;
+
 class Instances extends Component<Props> {
   props: Props;
 
@@ -29,15 +31,34 @@ class Instances extends Component<Props> {
 
   componentDidMount = async () => {
     try {
-      const config = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, this.props.instance, 'config.json')));
+      let config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, this.props.instance, 'config.json')
+        )
+      );
       this.setState({ instanceConfig: config });
+      watcher = fs.watch(
+        path.join(PACKS_PATH, this.props.instance, 'config.json'),
+        { encoding: 'utf8' },
+        async (eventType, filename) => {
+          config = JSON.parse(
+            await promisify(fs.readFile)(
+              path.join(PACKS_PATH, this.props.instance, 'config.json')
+            )
+          );
+          this.setState({ instanceConfig: config });
+        }
+      );
     } catch (err) {
       log.error(err.message);
     } finally {
       this.setState({ checkingForge: false });
     }
-  }
+  };
 
+  componentWillUnmount = () => {
+    watcher.close();
+  };
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -49,34 +70,48 @@ class Instances extends Component<Props> {
             <FormItem style={{ margin: 0 }}>
               {getFieldDecorator('packName', {
                 rules: [{ required: true, message: 'Please input a name' }],
-                initialValue: this.props.instance,
+                initialValue: this.props.instance
               })(
                 <Input
                   size="large"
-                  style={{ width: '50vw', display: 'inline-block', height: '60px' }}
-                  prefix={<Icon type="play-circle" theme="filled" style={{ color: 'rgba(255,255,255,.8)' }} />}
+                  style={{
+                    width: '50vw',
+                    display: 'inline-block',
+                    height: '60px'
+                  }}
+                  prefix={
+                    <Icon
+                      type="play-circle"
+                      theme="filled"
+                      style={{ color: 'rgba(255,255,255,.8)' }}
+                    />
+                  }
                   placeholder="Instance Name"
                 />
               )}
             </FormItem>
           </div>
           <Card style={{ marginTop: 15 }} title="Forge Manager">
-            {!this.state.checkingForge ? <ForgeManager data={this.state.instanceConfig} /> : null}
+            {!this.state.checkingForge ? (
+              <ForgeManager
+                name={this.props.instance}
+                data={this.state.instanceConfig}
+              />
+            ) : null}
           </Card>
           <div className={styles.save}>
-            <Button icon="save" size="large" type="primary" htmlType="submit" >
+            <Button icon="save" size="large" type="primary" htmlType="submit">
               Save
             </Button>
           </div>
         </Form>
-      </div >
-    )
+      </div>
+    );
   }
 }
 
 function mapStateToProps(state) {
   return {};
 }
-
 
 export default Form.create()(connect(mapStateToProps)(Instances));
