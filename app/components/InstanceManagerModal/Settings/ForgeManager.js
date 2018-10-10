@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Button, Icon, Tooltip, Select, message } from 'antd';
+import { Button, Icon, Tooltip, Select, message, Switch } from 'antd';
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import _ from 'lodash';
+import makeDir from 'make-dir';
 import { bindActionCreators } from 'redux';
 import * as packCreatorActions from '../../../actions/packCreator';
 import * as downloadManagerActions from '../../../actions/downloadManager';
-import { PACKS_PATH } from '../../../constants';
+import { downloadFile } from '../../../utils/downloader';
+import { PACKS_PATH, GDL_COMPANION_MOD_URL } from '../../../constants';
 import colors from '../../../style/theme/colors.scss';
 import styles from './ForgeManager.scss';
 
@@ -18,7 +20,18 @@ class Instances extends Component<Props> {
   props: Props;
 
   state = {
-    forgeSelectVersion: null
+    forgeSelectVersion: null,
+    loadingCompanionDownload: false,
+    companionModState: false
+  };
+
+  componentDidMount = async () => {
+    try {
+      await promisify(fs.access)(
+        path.join(PACKS_PATH, this.props.name, 'mods', 'GDLCompanion.jar')
+      );
+      this.setState({ companionModState: true });
+    } catch (err) {}
   };
 
   removeForge = async () => {
@@ -34,15 +47,38 @@ class Instances extends Component<Props> {
   };
 
   installForge = () => {
-    if(this.state.forgeSelectVersion === null) {
-      message.warning("You need to select a version.");
-    }else {
-      this.props.instanceDownloadOverride(this.props.data.version, this.props.name, this.state.forgeSelectVersion);
+    if (this.state.forgeSelectVersion === null) {
+      message.warning('You need to select a version.');
+    } else {
+      this.props.instanceDownloadOverride(
+        this.props.data.version,
+        this.props.name,
+        this.state.forgeSelectVersion
+      );
     }
   };
 
   handleForgeVersionChange = value => {
     this.setState({ forgeSelectVersion: value });
+  };
+
+  companionModSwitchChange = async value => {
+    this.setState({ loadingCompanionDownload: true });
+    if (value) {
+      await makeDir(path.join(PACKS_PATH, this.props.name, 'mods'));
+      await downloadFile(
+        path.join(PACKS_PATH, this.props.name, 'mods', 'GDLCompanion.jar'),
+        GDL_COMPANION_MOD_URL,
+        () => {}
+      );
+      this.setState({ companionModState: true });
+    } else {
+      await promisify(fs.unlink)(
+        path.join(PACKS_PATH, this.props.name, 'mods', 'GDLCompanion.jar')
+      );
+      this.setState({ companionModState: false });
+    }
+    this.setState({ loadingCompanionDownload: false });
   };
 
   render() {
@@ -56,13 +92,17 @@ class Instances extends Component<Props> {
             onChange={this.handleForgeVersionChange}
           >
             {_.reverse(this.props.forgeVersions[this.props.data.version]).map(
-              ver => {
-                return <Select.Option value={ver}>{ver}</Select.Option>;
-              }
+              ver => (
+                <Select.Option value={ver}>{ver}</Select.Option>
+              )
             )}
           </Select>
           <br />
-          <Button type="primary" onClick={this.installForge} style={{ marginTop: 10 }}>
+          <Button
+            type="primary"
+            onClick={this.installForge}
+            style={{ marginTop: 10 }}
+          >
             Install Forge
           </Button>
         </div>
@@ -99,9 +139,12 @@ class Instances extends Component<Props> {
             />
           </Tooltip>
           <br />
-          <Button type="primary" style={{ marginTop: 10 }}>
-            Enable Feature
-          </Button>
+          <Switch
+            onChange={this.companionModSwitchChange}
+            defaultdefaultChecked={this.state.companionModState}
+            loading={this.state.loadingCompanionDownload}
+            style={{ marginTop: 10 }}
+          />
         </div>
       </div>
     );

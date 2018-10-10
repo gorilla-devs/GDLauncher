@@ -16,6 +16,7 @@ export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const LOGIN_PROXY_API = 'https://api.gdevs.io/auth';
 export const LOGIN_TOKEN_PROXY_API = 'https://api.gdevs.io/authToken';
+export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
 export const DARWIN = 'darwin';
