@@ -141,7 +141,7 @@ class Instances extends Component<Props> {
           <br />
           <Switch
             onChange={this.companionModSwitchChange}
-            defaultdefaultChecked={this.state.companionModState}
+            checked={this.state.companionModState}
             loading={this.state.loadingCompanionDownload}
             style={{ marginTop: 10 }}
           />

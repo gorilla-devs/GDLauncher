@@ -29,7 +29,11 @@ class ModsManager extends Component<Props> {
 
   componentDidMount = async () => {
     try {
-      const config = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, this.props.instance, 'config.json')));
+      const config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, this.props.instance, 'config.json')
+        )
+      );
 
       this.setState({ version: config.version });
 
@@ -41,13 +45,12 @@ class ModsManager extends Component<Props> {
     } finally {
       this.setState({ checkingForge: false });
     }
-  }
+  };
 
-
-  handleModeChange = (e) => {
+  handleModeChange = e => {
     const page = e.target.value;
     this.setState({ page });
-  }
+  };
 
   render() {
     if (this.state.checkingForge) {
@@ -56,25 +59,39 @@ class ModsManager extends Component<Props> {
     if (!this.state.isForge) {
       return (
         <div>
-          <h2 style={{ textAlign: 'center', margin: 20 }}>This instance does not allow mods. <br /> Install forge if you want to use them</h2>
+          <h2 style={{ textAlign: 'center', margin: 20 }}>
+            This instance does not allow mods. <br /> Install forge if you want
+            to use them
+          </h2>
         </div>
       );
     }
     return (
-      <div>
-        <Radio.Group onChange={this.handleModeChange} value={this.state.page} buttonStyle="solid" style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '800px', margin: 10 }}>
+        <Radio.Group
+          onChange={this.handleModeChange}
+          value={this.state.page}
+          buttonStyle="solid"
+          style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}
+        >
           <Radio.Button value="local">Local</Radio.Button>
           <Radio.Button value="browse">Browse</Radio.Button>
         </Radio.Group>
-        {this.state.page === 'local' ? <LocalMods instance={this.props.instance} /> : <ModsBrowser version={this.state.version} instance={this.props.instance} />}
+        {this.state.page === 'local' ? (
+          <LocalMods instance={this.props.instance} />
+        ) : (
+          <ModsBrowser
+            version={this.state.version}
+            instance={this.props.instance}
+          />
+        )}
       </div>
-    )
+    );
   }
 }
 
 function mapStateToProps(state) {
   return {};
 }
-
 
 export default connect(mapStateToProps)(ModsManager);

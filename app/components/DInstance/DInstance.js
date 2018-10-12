@@ -122,7 +122,6 @@ export default class DInstance extends Component<Props> {
 
   render() {
     const { name } = this.props;
-    console.log(this.updatePercentage());
     return (
       <div
         className={`${
