@@ -15,6 +15,7 @@ import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
@@ -23,8 +24,7 @@ let mainWindow = null;
 let splash = null;
 
 if (minimist(process.argv.slice(1))['i']) {
-  fs.writeFileSync('./prova.txt');
-  app.quit();
+  cli(process.argv, () => app.quit());
 } else {
   if (process.env.NODE_ENV === 'production') {
     const sourceMapSupport = require('source-map-support');

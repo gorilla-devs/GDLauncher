@@ -7,11 +7,12 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import path from 'path';
 import fs from 'fs';
+import { homedir } from 'os';
 import log from 'electron-log';
 import { promisify } from 'util';
 import { exec } from 'child_process';
 import { hideMenu } from 'react-contextmenu/es6/actions';
-import { PACKS_PATH } from '../../constants';
+import { PACKS_PATH, APPPATH } from '../../constants';
 import { history } from '../../store/configureStore';
 import styles from './DInstance.scss';
 
@@ -212,6 +213,45 @@ export default class DInstance extends Component<Props> {
           >
             <i className="fas fa-folder" style={{ marginRight: '8px' }} />
             Open Folder
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              exec(
+                `powershell $s=(New-Object -COM WScript.Shell).CreateShortcut('%userprofile%\\Desktop\\${
+                  this.props.name
+                }.lnk');$s.TargetPath='${path.join(
+                  APPPATH,
+                  'GDLauncher.exe'
+                )}';$s.Arguments='-i ${this.props.name}';$s.Save()`,
+                (error, stdout, stderr) => {
+                  if (error) {
+                    log.error(`Error creating instance symlink: ${error}`);
+                    message.error(
+                      <span>
+                        Error while crerating the shortcut. Click{' '}
+                        <a
+                          href="https://github.com/gorilla-devs/GDLauncher/wiki/Error-while-creating-an-instance's-shortcut"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          here
+                        </a>{' '}
+                        to know more
+                      </span>
+                    );
+                  }
+                }
+              );
+            }}
+          >
+            <i className="fas fa-link" style={{ marginRight: '8px' }} />
+            Create Shortcut
+          </MenuItem>
+          <MenuItem
+            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
+          >
+            <i className="fas fa-file-export" style={{ marginRight: '8px' }} />
+            Export Instance
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling()}
