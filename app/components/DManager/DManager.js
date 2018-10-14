@@ -18,7 +18,6 @@ import styles from './DManager.scss';
 import DInstance from '../../containers/DInstance';
 import { history } from '../../store/configureStore';
 import { PACKS_PATH } from '../../constants';
-import store from '../../localStore';
 
 type Props = {
   selectInstance: () => void
@@ -50,7 +49,7 @@ export default class DManager extends Component<Props> {
     };
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
     this.watchRoutine();
   };
 

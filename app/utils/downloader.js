@@ -61,7 +61,7 @@ const downloadFileInstance = async (filename, url, legacyPath = null) => {
 }
 
 export const downloadFile = (filename, url, onProgress) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     // Save variable to know progress
     var received_bytes = 0;
     var total_bytes = 0;
@@ -70,8 +70,8 @@ export const downloadFile = (filename, url, onProgress) => {
       method: 'GET',
       uri: url,
     });
-
-    var out = fss.createWriteStream(filename);
+    await makeDir(path.dirname(filename));
+    const out = fss.createWriteStream(filename);
     req.pipe(out);
 
     req.on('response', (data) => {

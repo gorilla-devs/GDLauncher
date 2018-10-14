@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { goBack } from 'react-router-redux';
 import { promisify } from 'util';
 import { message } from 'antd';
+import vSort from 'version-sort';
 import { PACKS_PATH, GAME_VERSIONS_URL, FORGE_PROMOS } from '../constants';
 import { addToQueue } from './downloadManager';
 
@@ -28,23 +29,39 @@ export function getVanillaMCVersions() {
     // with the correct forge version. It filters numbers which do not have the "installer"
     // file. It then omits empty versions (not even one valid forge version for that mc version)
     Object.keys(promos.mcversion).forEach(v => {
+      if (v === '1.7.10_pre4') return;
       forgeVersions[v] = promos.mcversion[v]
         .filter(ver => {
-          const files = promos.number[ver].files;
+          const { files } = promos.number[ver];
           for (let i = 0; i < files.length; i++) {
-            if (files[i].includes('installer')) {
+            if (files[i].includes('universal')) {
               return true;
             }
           }
           return false;
         })
-        .map(ver => promos.number[ver].version);
+        .map(ver => {
+          const { files } = promos.number[ver];
+          let md5;
+          let fileFormat;
+          for (let i = 0; i < files.length; i++) {
+            if (files[i].includes('universal')) {
+              [fileFormat , md5] = files[i];
+            }
+          }
+          return {
+            [promos.number[ver].version]: {
+              branch: promos.number[ver].branch,
+              fileFormat,
+              md5
+            }
+          };
+        });
     });
+
     dispatch({
       type: GET_FORGE_MANIFEST,
-      payload: _.omitBy(forgeVersions, (v, k) => {
-        return v.length === 0;
-      })
+      payload: _.omitBy(forgeVersions, v => v.length === 0)
     });
   };
 }

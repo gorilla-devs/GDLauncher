@@ -27,13 +27,15 @@ const getStartCommand = async (packName, userData) => {
 "${javaPath}" ${dosName}
 ${os.platform() === WINDOWS ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump' : ''} 
 -Djava.library.path="${path.join(PACKS_PATH, packName, 'natives')}" 
--Dminecraft.client.jar="${path.join(INSTANCES_PATH, 'versions', version, `${version}.jar`)}" 
+-Dminecraft.client.jar="${path.join(INSTANCES_PATH, 'versions', vanillaJSON.id, `${vanillaJSON.id}.jar`)}" 
 -cp ${libs
       .filter(lib => !lib.natives)
       .map(lib => `"${path.join(INSTANCES_PATH, 'libraries', lib.path)}"`)
       .join(dividerChar)}${dividerChar}${`"${path.join(INSTANCES_PATH, 'versions', vanillaJSON.id, `${vanillaJSON.id}.jar`)}"`} 
 ${mainClass} ${Arguments}
   `;
+
+  console.log(completeCMD.replace(/\n|\r/g, ''))
   return completeCMD.replace(/\n|\r/g, '');
 };
 

@@ -21,7 +21,8 @@ const findJavaHome = async () => {
       break;
   }
   const { stdout } = await exec(command);
-  return stdout;
+  // This returns the first path found
+  return stdout.split('\n')[0];
 };
 
 export default findJavaHome;

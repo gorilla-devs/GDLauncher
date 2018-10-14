@@ -93,7 +93,7 @@ class Instances extends Component<Props> {
           >
             {_.reverse(this.props.forgeVersions[this.props.data.version]).map(
               ver => (
-                <Select.Option value={ver}>{ver}</Select.Option>
+                <Select.Option value={Object.keys(ver)[0]}>{Object.keys(ver)[0]}</Select.Option>
               )
             )}
           </Select>

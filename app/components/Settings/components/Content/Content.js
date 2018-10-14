@@ -4,12 +4,14 @@ import { Button } from 'antd';
 import styles from './Content.scss';
 import MyAccount_Preferences from '../MyAccount_Preferences/MyAccount_Preferences';
 import Instances from '../Instances/Instances';
+import JavaManager from '../JavaManager/JavaManager';
 
 const Content = ({ match }) => {
   return (
     <div className={styles.Content}>
-      <Route path={`/settings/myAccount_Preferences`} component={MyAccount_Preferences} />
-      <Route path={`/settings/instances`} component={Instances} />
+      <Route path="/settings/myAccount_Preferences" component={MyAccount_Preferences} />
+      <Route path="/settings/java" component={JavaManager} />
+      <Route path="/settings/instances" component={Instances} />
     </div>
   );
 };

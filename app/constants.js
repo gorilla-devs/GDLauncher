@@ -28,6 +28,7 @@ export const LOGIN_PROXY_API = 'https://api.gdevs.io/auth';
 export const LOGIN_TOKEN_PROXY_API = 'https://api.gdevs.io/authToken';
 export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
 export const CURSEMETA_API_URL = `https://staging_cursemeta.dries007.net/api/v3`;
+export const CURSEFORGE_MODLOADERS_API = 'https://modloaders.cursecdn.com/647622546/maven';
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
 export const DARWIN = 'darwin';

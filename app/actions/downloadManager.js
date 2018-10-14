@@ -8,7 +8,13 @@ import _ from 'lodash';
 import Zip from 'adm-zip';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import { PACKS_PATH, INSTANCES_PATH, META_PATH } from '../constants';
-import { extractAssets, extractMainJar, extractNatives, computeVanillaAndForgeLibraries } from '../utils/getMCFilesList';
+import {
+  extractAssets,
+  extractMainJar,
+  extractNatives,
+  computeVanillaAndForgeLibraries
+} from '../utils/getMCFilesList';
+import { arraify } from '../utils/strings';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -41,7 +47,9 @@ export function clearQueue() {
   // This needs to clear any instance that is already installed
   return (dispatch, getState) => {
     const { downloadManager } = getState();
-    const completed = Object.keys(downloadManager.downloadQueue).filter(act => downloadManager.downloadQueue[act].status === 'Completed');
+    const completed = Object.keys(downloadManager.downloadQueue).filter(
+      act => downloadManager.downloadQueue[act].status === 'Completed'
+    );
     // It makes no sense to dispatch if no instance is to remove
     if (completed.length !== 0) {
       dispatch({
@@ -58,12 +66,31 @@ export function downloadPack(pack) {
     const currPack = downloadManager.downloadQueue[pack];
     let vnlJSON = null;
     try {
-      vnlJSON = JSON.parse(await promisify(fs.readFile)(path.join(META_PATH, 'net.minecraft', currPack.version, `${currPack.version}.json`)));
+      vnlJSON = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(
+            META_PATH,
+            'net.minecraft',
+            currPack.version,
+            `${currPack.version}.json`
+          )
+        )
+      );
     } catch (err) {
-      const versionURL = packCreator.versionsManifest.find((v) => v.id === currPack.version).url;
+      const versionURL = packCreator.versionsManifest.find(
+        v => v.id === currPack.version
+      ).url;
       vnlJSON = (await axios.get(versionURL)).data;
       await makeDir(path.join(META_PATH, 'net.minecraft', currPack.version));
-      await promisify(fs.writeFile)(path.join(META_PATH, 'net.minecraft', currPack.version, `${currPack.version}.json`), JSON.stringify(vnlJSON));
+      await promisify(fs.writeFile)(
+        path.join(
+          META_PATH,
+          'net.minecraft',
+          currPack.version,
+          `${currPack.version}.json`
+        ),
+        JSON.stringify(vnlJSON)
+      );
     }
 
     let forgeJSON = null;
@@ -71,38 +98,95 @@ export function downloadPack(pack) {
     const assets = await extractAssets(vnlJSON);
     const mainJar = await extractMainJar(vnlJSON);
 
-    let forgeFileName = `${currPack.version}-${currPack.forgeVersion}`;
+    let forgeFileName = null;
+
     if (currPack.forgeVersion !== null) {
-      const forgeUrl = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-universal.jar`;
+      const { branch, fileFormat } = packCreator.forgeManifest[
+        Object.keys(packCreator.forgeManifest).find(v => v === currPack.version)
+      ].find(v => Object.keys(v)[0] === currPack.forgeVersion)[
+        currPack.forgeVersion
+      ];
 
-      // Checks whether the filename is version-forge or version-forge-version
-      try { await axios.head(forgeUrl) }
-      catch (err) { forgeFileName = `${currPack.version}-${currPack.forgeVersion}-${currPack.version}-` }
+      forgeFileName = `${currPack.version}-${currPack.forgeVersion}${
+        branch !== null ? `-${branch}` : ''
+      }`;
 
-      const forgePath = path.join(INSTANCES_PATH, 'libraries', 'net', 'minecraftforge', 'forge', forgeFileName, `forge-${forgeFileName}.jar`);
       try {
-        forgeJSON = JSON.parse(await promisify(fs.readFile)(path.join(META_PATH, 'net.minecraftforge', forgeFileName, `${forgeFileName}.json`)));
-        await promisify(fs.access)(forgePath);
+        forgeJSON = JSON.parse(
+          await promisify(fs.readFile)(
+            path.join(
+              META_PATH,
+              'net.minecraftforge',
+              forgeFileName,
+              `${forgeFileName}.json`
+            )
+          )
+        );
+        await promisify(fs.access)(
+          path.join(
+            INSTANCES_PATH,
+            'libraries',
+            ...arraify(forgeJSON.libraries[0].name)
+          )
+        );
       } catch (err) {
-        await makeDir(path.dirname(forgePath));
-        await downloadFile(forgePath, forgeUrl, (p) => {
-          dispatch({ type: UPDATE_PROGRESS, payload: { pack, percentage: ((p * 18) / 100).toFixed(1) } });
-        });
-        const zipFile = new Zip(forgePath);
-        forgeJSON = JSON.parse(zipFile.readAsText("version.json"));
-        await makeDir(path.join(META_PATH, 'net.minecraftforge', forgeFileName));
-        await promisify(fs.writeFile)(path.join(META_PATH, 'net.minecraftforge', forgeFileName, `${forgeFileName}.json`), JSON.stringify(forgeJSON));
+        await downloadFile(
+          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.${fileFormat}`),
+          `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-universal.${fileFormat}`,
+          p => {
+            dispatch({
+              type: UPDATE_PROGRESS,
+              payload: { pack, percentage: ((p * 18) / 100).toFixed(1) }
+            });
+          }
+        );
+        const zipFile = new Zip(
+          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.${fileFormat}`)
+        );
+        forgeJSON = JSON.parse(zipFile.readAsText('version.json'));
+        await makeDir(
+          path.dirname(
+            path.join(
+              INSTANCES_PATH,
+              'libraries',
+              ...arraify(forgeJSON.libraries[0].name)
+            )
+          )
+        );
+        await promisify(fs.rename)(
+          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.${fileFormat}`),
+          path.join(
+            INSTANCES_PATH,
+            'libraries',
+            ...arraify(forgeJSON.libraries[0].name)
+          )
+        );
+        await makeDir(
+          path.join(META_PATH, 'net.minecraftforge', forgeFileName)
+        );
+        await promisify(fs.writeFile)(
+          path.join(
+            META_PATH,
+            'net.minecraftforge',
+            forgeFileName,
+            `${forgeFileName}.json`
+          ),
+          JSON.stringify(forgeJSON)
+        );
       }
     }
 
     const libraries = await computeVanillaAndForgeLibraries(vnlJSON, forgeJSON);
 
     // This is the main config file for the instance
-    await promisify(fs.writeFile)(path.join(PACKS_PATH, pack, 'config.json'), JSON.stringify({
-      instanceName: pack,
-      version: currPack.version,
-      forgeVersion: currPack.forgeVersion !== null ? forgeFileName : null,
-    }));
+    await promisify(fs.writeFile)(
+      path.join(PACKS_PATH, pack, 'config.json'),
+      JSON.stringify({
+        instanceName: pack,
+        version: currPack.version,
+        forgeVersion: forgeFileName
+      })
+    );
 
     dispatch({
       type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
@@ -112,11 +196,27 @@ export function downloadPack(pack) {
       }
     });
 
-    await downloadArr(libraries.filter(lib => !lib.path.includes('minecraftforge')), path.join(INSTANCES_PATH, 'libraries'), dispatch, pack);
+    await downloadArr(
+      libraries.filter(lib => !lib.path.includes('minecraftforge')),
+      path.join(INSTANCES_PATH, 'libraries'),
+      dispatch,
+      pack
+    );
 
-    await downloadArr(assets, path.join(INSTANCES_PATH, 'assets'), dispatch, pack, 10);
+    await downloadArr(
+      assets,
+      path.join(INSTANCES_PATH, 'assets'),
+      dispatch,
+      pack,
+      10
+    );
 
-    await downloadArr(mainJar, path.join(INSTANCES_PATH, 'versions'), dispatch, pack);
+    await downloadArr(
+      mainJar,
+      path.join(INSTANCES_PATH, 'versions'),
+      dispatch,
+      pack
+    );
 
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
 
