@@ -15,7 +15,7 @@ import * as SettingsActions from '../../../../actions/settings';
 const MyAccount = props => {
   return (
     <div>
-      <Title>Java Manager</Title>
+      {/* <Title>Java Manager</Title>
       <div className={styles.accountInfo}>
         <div>
           <CIcon size={70}>{props.username.charAt(0).toUpperCase()}</CIcon>
@@ -39,7 +39,7 @@ const MyAccount = props => {
           checked={props.settings.sounds}
           onChange={props.setSounds}
         />
-      </SettingCard>
+      </SettingCard> */}
     </div>
   );
 };
