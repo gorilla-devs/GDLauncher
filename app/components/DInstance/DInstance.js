@@ -200,7 +200,7 @@ export default class DInstance extends Component<Props> {
             data={{ foo: 'bar' }}
             onClick={() =>
               history.push({
-                pathname: `/editInstance/${name}/settings`,
+                pathname: `/editInstance/${name}/settings/`,
                 state: { modal: true }
               })
             }

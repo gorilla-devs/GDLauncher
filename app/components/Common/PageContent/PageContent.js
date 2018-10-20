@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router';
-import HomePage from '../../..//components/Home/containers/HomePage';
-import DManager from '../../..//components/DManager/containers/DManagerPage';
+import HomePage from '../../Home/containers/HomePage';
+import DManager from '../../DManager/containers/DManagerPage';
 import ServerManager from '../../ServerManager/ServerManager';
 import styles from './PageContent.scss';
 

@@ -31,7 +31,10 @@ if (minimist(process.argv.slice(1))['i']) {
     sourceMapSupport.install();
   }
 
-  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+  if (
+    process.env.NODE_ENV === 'development' ||
+    process.env.DEBUG_PROD === 'true'
+  ) {
     require('electron-debug')({ enabled: true });
     const path = require('path');
     const p = path.join(__dirname, '..', 'app', 'node_modules');
@@ -41,16 +44,12 @@ if (minimist(process.argv.slice(1))['i']) {
   const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
     const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-    const extensions = [
-      'REACT_DEVELOPER_TOOLS',
-      'REDUX_DEVTOOLS'
-    ];
+    const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
 
-    return Promise
-      .all(extensions.map(name => installer.default(installer[name], forceDownload)))
-      .catch(log.error);
+    return Promise.all(
+      extensions.map(name => installer.default(installer[name], forceDownload))
+    ).catch(log.error);
   };
-
 
   /**
    * Add event listeners...
@@ -62,9 +61,11 @@ if (minimist(process.argv.slice(1))['i']) {
     app.quit();
   });
 
-
   app.on('ready', async () => {
-    if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    if (
+      process.env.NODE_ENV === 'development' ||
+      process.env.DEBUG_PROD === 'true'
+    ) {
       await installExtensions();
     }
 
@@ -79,7 +80,6 @@ if (minimist(process.argv.slice(1))['i']) {
     });
     splash.loadURL(`file://${__dirname}/splash.html`);
 
-
     mainWindow = new BrowserWindow({
       show: false,
       width: 850,
@@ -88,6 +88,9 @@ if (minimist(process.argv.slice(1))['i']) {
       minWidth: 780,
       frame: false,
       backgroundColor: '#34495e',
+      webPreferences: {
+        experimentalFeatures: true
+      }
     });
 
     mainWindow.webContents.on('new-window', (e, url) => {
@@ -123,17 +126,15 @@ if (minimist(process.argv.slice(1))['i']) {
       // set existed file stream
       log.transports.file.stream = fs.createWriteStream('log.txt');
 
-
       mainWindow.show();
       mainWindow.focus();
-
     });
 
     ipcMain.on('open-devTools', () => {
       mainWindow.webContents.openDevTools({ mode: 'undocked' });
     });
 
-    ipcMain.on('setProgressTaskBar', (p) => {
+    ipcMain.on('setProgressTaskBar', p => {
       mainWindow.setProgressBar(p);
     });
 

@@ -101,7 +101,7 @@ export function downloadPack(pack) {
     let forgeFileName = null;
 
     if (currPack.forgeVersion !== null) {
-      const { branch, fileFormat } = packCreator.forgeManifest[
+      const { branch } = packCreator.forgeManifest[
         Object.keys(packCreator.forgeManifest).find(v => v === currPack.version)
       ].find(v => Object.keys(v)[0] === currPack.forgeVersion)[
         currPack.forgeVersion
@@ -110,7 +110,9 @@ export function downloadPack(pack) {
       forgeFileName = `${currPack.version}-${currPack.forgeVersion}${
         branch !== null ? `-${branch}` : ''
       }`;
-
+      console.log(
+        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-installer.jar`
+      );
       try {
         forgeJSON = JSON.parse(
           await promisify(fs.readFile)(
@@ -126,13 +128,13 @@ export function downloadPack(pack) {
           path.join(
             INSTANCES_PATH,
             'libraries',
-            ...arraify(forgeJSON.libraries[0].name)
+            ...arraify(forgeJSON.versionInfo.libraries[0].name)
           )
         );
       } catch (err) {
         await downloadFile(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.${fileFormat}`),
-          `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-universal.${fileFormat}`,
+          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`),
+          `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-installer.jar`,
           p => {
             dispatch({
               type: UPDATE_PROGRESS,
@@ -141,25 +143,20 @@ export function downloadPack(pack) {
           }
         );
         const zipFile = new Zip(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.${fileFormat}`)
+          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`)
         );
-        forgeJSON = JSON.parse(zipFile.readAsText('version.json'));
+        forgeJSON = JSON.parse(zipFile.readAsText('install_profile.json'));
         await makeDir(
           path.dirname(
             path.join(
               INSTANCES_PATH,
               'libraries',
-              ...arraify(forgeJSON.libraries[0].name)
+              ...arraify(forgeJSON.versionInfo.libraries[0].name)
             )
           )
         );
-        await promisify(fs.rename)(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.${fileFormat}`),
-          path.join(
-            INSTANCES_PATH,
-            'libraries',
-            ...arraify(forgeJSON.libraries[0].name)
-          )
+        await promisify(fs.unlink)(
+          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`)
         );
         await makeDir(
           path.join(META_PATH, 'net.minecraftforge', forgeFileName)
@@ -197,7 +194,7 @@ export function downloadPack(pack) {
     });
 
     await downloadArr(
-      libraries.filter(lib => !lib.path.includes('minecraftforge')),
+      libraries,
       path.join(INSTANCES_PATH, 'libraries'),
       dispatch,
       pack

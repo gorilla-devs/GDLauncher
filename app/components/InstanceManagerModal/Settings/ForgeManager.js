@@ -91,7 +91,7 @@ class Instances extends Component<Props> {
             placeholder="Select a version"
             onChange={this.handleForgeVersionChange}
           >
-            {_.reverse(this.props.forgeVersions[this.props.data.version]).map(
+            {this.props.forgeVersions[this.props.data.version] && _.reverse(this.props.forgeVersions[this.props.data.version]).map(
               ver => (
                 <Select.Option value={Object.keys(ver)[0]}>{Object.keys(ver)[0]}</Select.Option>
               )

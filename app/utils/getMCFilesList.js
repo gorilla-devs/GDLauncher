@@ -12,7 +12,7 @@ import {
   CURSEFORGE_MODLOADERS_API,
   MC_LIBRARIES_URL
 } from '../constants';
-import { pathify, arraify, arraifyModules } from '../utils/strings';
+import { pathify, arraify, arraifyModules } from './strings';
 
 const extract = promisify(require('extract-zip'));
 
@@ -117,10 +117,6 @@ export const getForgeLibraries = async forge => {
       completeUrl = `${MC_LIBRARIES_URL}/${arraify(library.name).join('/')}`;
     }
 
-    // The url can have a "modules" path in the middle, but we do not know which ones do. We try a head request without,
-    // if it fails it means it needs the modules path
-    // try { await axios.head(completeUrl) }
-    // catch (e) { completeUrl = `${baseUrl}/${arraifyModules(library.name).join('/')}` }
     return {
       url: completeUrl,
       path: arraify(library.name).join('/')
@@ -129,7 +125,7 @@ export const getForgeLibraries = async forge => {
 
   let libraries = [];
   libraries = await Promise.all(
-    forge.libraries
+    forge.versionInfo.libraries
       .filter(
         lib =>
           (_.has(lib, 'clientreq') && lib.clientreq) || !_.has(lib, 'clientreq')

@@ -29,9 +29,9 @@ class LocalMods extends Component<Props> {
 
   componentDidMount = async () => {
     try {
-      await fs.accessAsync(path.join(PACKS_PATH, this.props.instance, 'mods'));
+      await fs.accessAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods'));
     } catch (err) {
-      await makeDir(path.join(PACKS_PATH, this.props.instance, 'mods'));
+      await makeDir(path.join(PACKS_PATH, this.props.match.params.instance, 'mods'));
     }
     this.getMods();
   }
@@ -58,15 +58,15 @@ class LocalMods extends Component<Props> {
   }];
 
   getMods = async () => {
-    let mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.instance, 'mods')))
+    let mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods')))
       .filter(el => el !== 'GDLCompanion.jar')
       .map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } });
     this.setState({
       mods
     });
     // Watches for any changes in the packs dir. TODO: Optimize
-    watcher = fss.watch(path.join(PACKS_PATH, this.props.instance, 'mods'), async () => {
-      mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.instance, 'mods')))
+    watcher = fss.watch(path.join(PACKS_PATH, this.props.match.params.instance, 'mods'), async () => {
+      mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods')))
         .filter(el => el !== 'GDLCompanion.jar')
         .map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } });
       this.setState({
@@ -82,9 +82,9 @@ class LocalMods extends Component<Props> {
 
   handleChange = async (checked, record) => {
     if (checked) {
-      await fs.renameAsync(path.join(PACKS_PATH, this.props.instance, 'mods', record.name), path.join(PACKS_PATH, this.props.instance, 'mods', record.name.replace('.disabled', '')));
+      await fs.renameAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods', record.name), path.join(PACKS_PATH, this.props.match.params.instance, 'mods', record.name.replace('.disabled', '')));
     } else {
-      await fs.renameAsync(path.join(PACKS_PATH, this.props.instance, 'mods', record.name), path.join(PACKS_PATH, this.props.instance, 'mods', `${record.name}.disabled`));
+      await fs.renameAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods', record.name), path.join(PACKS_PATH, this.props.match.params.instance, 'mods', `${record.name}.disabled`));
     }
   }
 
@@ -94,7 +94,7 @@ class LocalMods extends Component<Props> {
 
   delete = async () => {
     this.setState({ loading: true });
-    await Promise.each(this.state.selectedRowKeys, async el => fs.unlinkAsync(path.join(PACKS_PATH, this.props.instance, 'mods', el)));
+    await Promise.each(this.state.selectedRowKeys, async el => fs.unlinkAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods', el)));
     this.setState({ loading: false, selectedRowKeys: [] });
   };
 

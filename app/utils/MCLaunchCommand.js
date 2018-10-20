@@ -16,11 +16,11 @@ const getStartCommand = async (packName, userData) => {
 
   const javaPath = await findJavaHome();
   const dosName = os.release().substr(0, 2) === 10 ? '"-Dos.name=Windows 10" -Dos.version=10.0 ' : '';
-  const version = forge === null ? vanillaJSON.id : forgeJSON.id;
+  const version = forge === null ? vanillaJSON.id : forgeJSON.versionInfo.id;
   // It concatenates vanilla and forge libraries. If the instance does not contain forge, it concatenates an empty array
   const libs = await computeVanillaAndForgeLibraries(vanillaJSON, forgeJSON);
   const Arguments = getMCArguments(vanillaJSON, forgeJSON, packName, userData);
-  const mainClass = forge === null ? vanillaJSON.mainClass : forgeJSON.mainClass;
+  const mainClass = forge === null ? vanillaJSON.mainClass : forgeJSON.versionInfo.mainClass;
   const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 
   const completeCMD = `
@@ -41,8 +41,8 @@ ${mainClass} ${Arguments}
 
 const getMCArguments = (vanilla, forge, packName, userData) => {
   let Arguments = '';
-  if (forge !== null && forge.minecraftArguments) {
-    Arguments = forge.minecraftArguments;
+  if (forge !== null && forge.versionInfo.minecraftArguments) {
+    Arguments = forge.versionInfo.minecraftArguments;
   }
   else if (vanilla.minecraftArguments) {
     // Up to 1.13
@@ -57,7 +57,7 @@ const getMCArguments = (vanilla, forge, packName, userData) => {
     .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
     .replace('${game_directory}', path.join(PACKS_PATH, packName))
     .replace('${game_assets}', path.join(INSTANCES_PATH, 'assets', vanilla.assets === 'legacy' ? '/virtual/legacy' : '')) // Another check for really old versions
-    .replace('${version_name}', forge !== null ? forge.id : vanilla.id)
+    .replace('${version_name}', forge !== null ? forge.versionInfo.id : vanilla.id)
     .replace('${assets_root}', path.join(INSTANCES_PATH, 'assets', vanilla.assets === 'legacy' ? '/virtual/legacy' : ''))
     .replace('${assets_index_name}', vanilla.assets)
     .replace('${auth_uuid}', userData.uuid)

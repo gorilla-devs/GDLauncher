@@ -1,18 +1,28 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import Link from 'react-router-dom/Link';
 import axios from 'axios';
 import path from 'path';
 import log from 'electron-log';
-import { List, Avatar, Button, Skeleton, Input, Select, Icon } from 'antd';
+import {
+  List,
+  Avatar,
+  Button,
+  Skeleton,
+  Input,
+  Select,
+  Icon,
+  Popover
+} from 'antd';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
 
-import styles from './ModsBrowser.scss';
+import styles from './ModsList.scss';
 
 type Props = {};
 
-class ModsBrowser extends Component<Props> {
+class ModsList extends Component<Props> {
   props: Props;
 
   constructor(props) {
@@ -24,15 +34,15 @@ class ModsBrowser extends Component<Props> {
       data: [],
       installing: [],
       searchText: '',
-      filterType: 'totaldownloads'
+      filterType: 'Featured'
     };
-    this.scroller = React.createRef();
+    console.log(this);
   }
 
   componentDidMount = async () => {
     try {
       await this.getMods();
-    } catch(err) {
+    } catch (err) {
       log.error(err.message);
     }
   };
@@ -47,7 +57,7 @@ class ModsBrowser extends Component<Props> {
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=0&sort=${
         this.state.filterType
       }&searchFilter=${this.state.searchText}&gameVersion=${
-        this.props.version
+        this.props.match.params.version
       }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
         'author' && this.state.filterType !== 'name'}`
     );
@@ -72,7 +82,7 @@ class ModsBrowser extends Component<Props> {
       }&sort=${this.state.filterType}&searchFilter=${
         this.state.searchText
       }&gameVersion=${
-        this.props.version
+        this.props.match.params.version
       }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
         'author' && this.state.filterType !== 'name'}`
     );
@@ -95,7 +105,7 @@ class ModsBrowser extends Component<Props> {
 
   installMod = async (data, parent = null) => {
     const { projectFileId, projectFileName } = data.gameVersionLatestFiles.find(
-      n => n.gameVersion === this.props.version
+      n => n.gameVersion === this.props.match.params.version
     );
     if (parent === null) {
       this.setState(prevState => ({
@@ -116,7 +126,7 @@ class ModsBrowser extends Component<Props> {
     await downloadFile(
       path.join(
         PACKS_PATH,
-        this.props.instance,
+        this.props.match.params.instance,
         'mods',
         url.data.fileNameOnDisk
       ),
@@ -150,7 +160,7 @@ class ModsBrowser extends Component<Props> {
       n =>
         n ===
         data.gameVersionLatestFiles.find(
-          x => x.gameVersion === this.props.version
+          x => x.gameVersion === this.props.match.params.version
         ).projectFileName
     );
     return this.state.installing[mod] && this.state.installing[mod].completed;
@@ -161,7 +171,7 @@ class ModsBrowser extends Component<Props> {
       n =>
         n ===
         data.gameVersionLatestFiles.find(
-          x => x.gameVersion === this.props.version
+          x => x.gameVersion === this.props.match.params.version
         ).projectFileName
     );
     return this.state.installing[mod] && this.state.installing[mod].installing;
@@ -171,7 +181,7 @@ class ModsBrowser extends Component<Props> {
     this.setState({ filterType: value }, async () => {
       try {
         await this.getMods();
-      } catch(err) {
+      } catch (err) {
         log.error(err.message);
       }
     });
@@ -207,7 +217,7 @@ class ModsBrowser extends Component<Props> {
         </div>
       ) : null;
     return (
-      <div style={{ height: '90%', width: '100%' }}>
+      <div style={{ height: '83%' }}>
         <div className={styles.header}>
           <Input
             placeholder="Search Here"
@@ -230,7 +240,7 @@ class ModsBrowser extends Component<Props> {
           <div>
             Sort By{' '}
             <Select
-              defaultValue="Featured"
+              defaultValue="featured"
               onChange={this.filterChanged}
               style={{ width: 150 }}
             >
@@ -283,7 +293,21 @@ class ModsBrowser extends Component<Props> {
                       }
                     />
                   }
-                  title={item.name}
+                  title={
+                    <Link
+                      to={{
+                        pathname: `/editInstance/${
+                          this.props.match.params.instance
+                        }/mods/browse/${this.props.match.params.version}/${
+                          item.id
+                        }`,
+                        state: { modal: true }
+                      }}
+                      replace
+                    >
+                      {item.name}
+                    </Link>
+                  }
                   description={
                     item.loading ? (
                       ''
@@ -322,4 +346,4 @@ function mapStateToProps(state) {
   return {};
 }
 
-export default connect(mapStateToProps)(ModsBrowser);
+export default connect(mapStateToProps)(ModsList);

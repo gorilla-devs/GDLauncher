@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Route, Switch } from 'react-router-dom';
+import Link from 'react-router-dom/Link';
 import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs';
 import log from 'electron-log';
 import { List, Icon, Avatar, Radio } from 'antd';
 import { PACKS_PATH } from '../../../constants';
-import ModsBrowser from './ModsBrowser/ModsBrowser';
+import ModsList from './ModsBrowser/ModsList';
 import LocalMods from './LocalMods/LocalMods';
+import ModPage from './ModsBrowser/ModPage';
 
 import styles from './ModsManager.scss';
 
@@ -20,7 +23,6 @@ class ModsManager extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      page: 'local',
       isForge: false,
       version: null,
       checkingForge: true
@@ -31,7 +33,7 @@ class ModsManager extends Component<Props> {
     try {
       const config = JSON.parse(
         await promisify(fs.readFile)(
-          path.join(PACKS_PATH, this.props.instance, 'config.json')
+          path.join(PACKS_PATH, this.props.match.params.instance, 'config.json')
         )
       );
 
@@ -45,11 +47,6 @@ class ModsManager extends Component<Props> {
     } finally {
       this.setState({ checkingForge: false });
     }
-  };
-
-  handleModeChange = e => {
-    const page = e.target.value;
-    this.setState({ page });
   };
 
   render() {
@@ -69,22 +66,47 @@ class ModsManager extends Component<Props> {
     return (
       <div style={{ width: '100%', maxWidth: '800px', margin: 10 }}>
         <Radio.Group
-          onChange={this.handleModeChange}
-          value={this.state.page}
+          value={this.props.match.params.state}
           buttonStyle="solid"
           style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}
         >
-          <Radio.Button value="local">Local</Radio.Button>
-          <Radio.Button value="browse">Browse</Radio.Button>
+          <Link
+            to={{
+              pathname: `/editInstance/${
+                this.props.match.params.instance
+              }/mods/local`,
+              state: { modal: true }
+            }}
+            replace
+          >
+            <Radio.Button value="local">Local</Radio.Button>
+          </Link>
+          <Link
+            to={{
+              pathname: `/editInstance/${
+                this.props.match.params.instance
+              }/mods/browse/${this.state.version}`,
+              state: { modal: true }
+            }}
+            replace
+          >
+            <Radio.Button value="browse">Browse</Radio.Button>
+          </Link>
         </Radio.Group>
-        {this.state.page === 'local' ? (
-          <LocalMods instance={this.props.instance} />
-        ) : (
-          <ModsBrowser
-            version={this.state.version}
-            instance={this.props.instance}
+        <Switch>
+          <Route
+            path="/editInstance/:instance/mods/local"
+            component={LocalMods}
           />
-        )}
+          <Route
+            path="/editInstance/:instance/mods/browse/:version/:mod"
+            component={ModPage}
+          />
+          <Route
+            path="/editInstance/:instance/mods/browse/:version"
+            component={ModsList}
+          />
+        </Switch>
       </div>
     );
   }

@@ -72,22 +72,43 @@ class Instances extends Component<Props> {
                 rules: [{ required: true, message: 'Please input a name' }],
                 initialValue: this.props.instance
               })(
-                <Input
-                  size="large"
+                <div
                   style={{
                     width: '50vw',
-                    display: 'inline-block',
+                    display: 'flex',
                     height: '60px'
                   }}
-                  prefix={
-                    <Icon
-                      type="play-circle"
-                      theme="filled"
-                      style={{ color: 'rgba(255,255,255,.8)' }}
-                    />
-                  }
-                  placeholder="Instance Name"
-                />
+                >
+                  <Input
+                    size="large"
+                    style={{
+                      width: '70%',
+                      display: 'inline-block',
+                      height: '60px'
+                    }}
+                    prefix={
+                      <Icon
+                        type="play-circle"
+                        theme="filled"
+                        style={{ color: 'rgba(255,255,255,.8)' }}
+                      />
+                    }
+                    placeholder="Instance Name"
+                  />
+                  <Button
+                    icon="save"
+                    size="large"
+                    type="primary"
+                    htmlType="submit"
+                    style={{
+                      width: '30%',
+                      display: 'inline-block',
+                      height: '60px'
+                    }}
+                  >
+                    Rename
+                  </Button>
+                </div>
               )}
             </FormItem>
           </div>
@@ -99,11 +120,6 @@ class Instances extends Component<Props> {
               />
             ) : null}
           </Card>
-          <div className={styles.save}>
-            <Button icon="save" size="large" type="primary" htmlType="submit">
-              Save
-            </Button>
-          </div>
         </Form>
       </div>
     );

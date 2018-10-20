@@ -24,7 +24,7 @@ export function getVanillaMCVersions() {
       payload: versions
     });
     const promos = (await axios.get(FORGE_PROMOS)).data;
-    let forgeVersions = {};
+    const forgeVersions = {};
     // This reads all the numbers for each version. It replaces each number
     // with the correct forge version. It filters numbers which do not have the "installer"
     // file. It then omits empty versions (not even one valid forge version for that mc version)
@@ -34,7 +34,7 @@ export function getVanillaMCVersions() {
         .filter(ver => {
           const { files } = promos.number[ver];
           for (let i = 0; i < files.length; i++) {
-            if (files[i].includes('universal')) {
+            if (files[i][1] === 'installer' && files[i][0] === 'jar') {
               return true;
             }
           }
@@ -43,16 +43,14 @@ export function getVanillaMCVersions() {
         .map(ver => {
           const { files } = promos.number[ver];
           let md5;
-          let fileFormat;
           for (let i = 0; i < files.length; i++) {
-            if (files[i].includes('universal')) {
-              [fileFormat , md5] = files[i];
+            if (files[i].includes('installer')) {
+              [,, md5] = files[i];
             }
           }
           return {
             [promos.number[ver].version]: {
               branch: promos.number[ver].branch,
-              fileFormat,
               md5
             }
           };

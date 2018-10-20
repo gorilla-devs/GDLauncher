@@ -34,14 +34,14 @@ class InstanceManagerModal extends Component<Props> {
         <div className={styles.container}>
           <SideMenu match={this.props.match}>
             <MenuItem active={this.props.match.params.page === 'settings'} to={`/editInstance/${this.props.match.params.instance}/settings`}>Settings</MenuItem>
-            <MenuItem active={this.props.match.params.page === 'mods'} to={`/editInstance/${this.props.match.params.instance}/mods`}>Mods Manager</MenuItem>
+            <MenuItem active={this.props.match.params.page === 'mods'} to={`/editInstance/${this.props.match.params.instance}/mods/local`}>Mods Manager</MenuItem>
             <MenuItem active={this.props.match.params.page === 'resourcePacks'} to={`/editInstance/${this.props.match.params.instance}/resourcePacks`}>Resource Packs</MenuItem>
             <MenuItem active={this.props.match.params.page === 'worlds'} to={`/editInstance/${this.props.match.params.instance}/worlds`}>Worlds</MenuItem>
             <MenuItem active={this.props.match.params.page === 'screenshots'} to={`/editInstance/${this.props.match.params.instance}/screenshots`}>Screenshots</MenuItem>
           </SideMenu>
           <div className={styles.content}>
-            <Route path={`/editInstance/${this.props.match.params.instance}/settings`} render={() => <Settings instance={this.props.match.params.instance} />} />
-            <Route path={`/editInstance/${this.props.match.params.instance}/mods`} render={() => <ModsManager instance={this.props.match.params.instance} />} />
+            <Route path="/editInstance/:instance/settings" render={() => <Settings instance={this.props.match.params.instance} />} />
+            <Route path="/editInstance/:instance/mods/:state/:version?/:mod?" component={ModsManager} />
           </div>
         </div>
       </Modal>

@@ -70,7 +70,7 @@ export default class Modal extends Component<Props> {
         ...this.props.style
       },
       bgStyle: {
-        background: 'rgba(0, 0, 0, 0.6)',
+        background: 'rgba(0, 0, 0, 0.7)',
         transition: 'all 200ms ease-in-out'
 
       }
