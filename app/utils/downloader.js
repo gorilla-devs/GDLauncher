@@ -3,10 +3,10 @@ import fss from 'fs';
 import reqCall from 'request';
 import path from 'path';
 import assert from 'assert';
-import os from'os';
+import os from 'os';
 import log from 'electron-log';
-import Promise from'bluebird';
-import request from'request-promise-native';
+import Promise from 'bluebird';
+import request from 'request-promise-native';
 import { promisify } from 'util';
 import { DOWNLOAD_FILE_COMPLETED } from '../actions/downloadManager';
 
@@ -14,9 +14,16 @@ const fs = Promise.promisifyAll(fss);
 
 export const downloadArr = async (arr, folderPath, dispatch, pack, threads = os.cpus().length) => {
   await Promise.map(arr, async item => {
-    // TODO: item.legacyPath ? path.join(folderPath, item.legacyPath) : null
-    // Handle legacyPaths better (own function)
-    await downloadFileInstance(path.join(folderPath, item.path), item.url);
+    let toDownload = true;
+    try {
+      await fs.accessAsync(path.join(folderPath, item.path));
+      toDownload = false;
+    } catch (err) {
+      // It needs to be downloaded
+    }
+    if (toDownload) {
+      await downloadFileInstance(path.join(folderPath, item.path), item.url);
+    }
     dispatch({
       type: DOWNLOAD_FILE_COMPLETED,
       payload: { pack }
@@ -54,7 +61,7 @@ const downloadFileInstance = async (filename, url, legacyPath = null) => {
 }
 
 export const downloadFile = (filename, url, onProgress) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     // Save variable to know progress
     var received_bytes = 0;
     var total_bytes = 0;
@@ -63,8 +70,8 @@ export const downloadFile = (filename, url, onProgress) => {
       method: 'GET',
       uri: url,
     });
-
-    var out = fss.createWriteStream(filename);
+    await makeDir(path.dirname(filename));
+    const out = fss.createWriteStream(filename);
     req.pipe(out);
 
     req.on('response', (data) => {
@@ -75,7 +82,7 @@ export const downloadFile = (filename, url, onProgress) => {
     req.on('data', (chunk) => {
       // Update the received bytes
       received_bytes += chunk.length;
-      onProgress(((received_bytes * 18) / total_bytes).toFixed(1));
+      onProgress(((received_bytes * 100) / total_bytes).toFixed(1));
     });
 
     req.on('end', () => {

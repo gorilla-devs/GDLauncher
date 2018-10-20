@@ -1,0 +1,19 @@
+.container{
+  display: grid;
+  grid-template-columns: 1.1fr 3fr;
+  height: 100%;
+  width: 100%;
+  font-family: 'GlacialIndifferenceRegular';
+}
+
+.content {
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.createInstance {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+}

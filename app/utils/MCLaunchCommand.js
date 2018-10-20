@@ -3,52 +3,68 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 import findJavaHome from './javaLocationFinder';
-import { PACKS_PATH, INSTANCES_PATH, WINDOWS } from '../constants';
-import { parseConfigLibraries } from './getMCFilesList';
-import store from '../localStore';
+import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH } from '../constants';
+import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
 const getStartCommand = async (packName, userData) => {
 
-  const packJson = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json')));
-  let forge = packJson.forgeID;
+  const instanceConfigJSON = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json')));
+  const vanillaJSON = JSON.parse(await promisify(fs.readFile)(path.join(META_PATH, 'net.minecraft', instanceConfigJSON.version, `${instanceConfigJSON.version}.json`)));
+  const forge = instanceConfigJSON.forgeVersion;
+  const forgeJSON = forge === null ? null : JSON.parse(await promisify(fs.readFile)(path.join(META_PATH, 'net.minecraftforge', forge, `${forge}.json`)));
+
+
   const javaPath = await findJavaHome();
   const dosName = os.release().substr(0, 2) === 10 ? '"-Dos.name=Windows 10" -Dos.version=10.0 ' : '';
-  const version = packJson.forgeID === null ? packJson.version : packJson.version;
+  const version = forge === null ? vanillaJSON.id : forgeJSON.versionInfo.id;
   // It concatenates vanilla and forge libraries. If the instance does not contain forge, it concatenates an empty array
-  const libs = packJson.libraries;
-  const Arguments = getMCArguments(packJson, packName, userData);
+  const libs = await computeVanillaAndForgeLibraries(vanillaJSON, forgeJSON);
+  const Arguments = getMCArguments(vanillaJSON, forgeJSON, packName, userData);
+  const mainClass = forge === null ? vanillaJSON.mainClass : forgeJSON.versionInfo.mainClass;
   const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 
   const completeCMD = `
 "${javaPath}" ${dosName}
 ${os.platform() === WINDOWS ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump' : ''} 
 -Djava.library.path="${path.join(PACKS_PATH, packName, 'natives')}" 
--Dminecraft.client.jar="${path.join(INSTANCES_PATH, 'versions', version, `${version}.jar`)}" 
+-Dminecraft.client.jar="${path.join(INSTANCES_PATH, 'versions', vanillaJSON.id, `${vanillaJSON.id}.jar`)}" 
 -cp ${libs
       .filter(lib => !lib.natives)
       .map(lib => `"${path.join(INSTANCES_PATH, 'libraries', lib.path)}"`)
-      .join(dividerChar)}${dividerChar}${`"${path.join(INSTANCES_PATH, 'versions', packJson.version, `${packJson.version}.jar`)}"`} 
-${packJson.mainClass} ${Arguments}
+      .join(dividerChar)}${dividerChar}${`"${path.join(INSTANCES_PATH, 'versions', vanillaJSON.id, `${vanillaJSON.id}.jar`)}"`} 
+${mainClass} ${Arguments}
   `;
+
+  console.log(completeCMD.replace(/\n|\r/g, ''))
   return completeCMD.replace(/\n|\r/g, '');
 };
 
-const getMCArguments = (json, packName, userData) => {
-  let Arguments = json.minecraftArguments;
+const getMCArguments = (vanilla, forge, packName, userData) => {
+  let Arguments = '';
+  if (forge !== null && forge.versionInfo.minecraftArguments) {
+    Arguments = forge.versionInfo.minecraftArguments;
+  }
+  else if (vanilla.minecraftArguments) {
+    // Up to 1.13
+    Arguments = vanilla.minecraftArguments;
+  } else if (vanilla.arguments) {
+    // From 1.13
+    Arguments = vanilla.arguments.game.filter(arg => typeof arg === 'string').join(' ');
+  }
   // Replaces the arguments and returns the result
   return Arguments
     .replace('${auth_player_name}', userData.displayName)
     .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
     .replace('${game_directory}', path.join(PACKS_PATH, packName))
-    .replace('${game_assets}', path.join(INSTANCES_PATH, 'assets', json.assets === 'legacy' ? '/virtual/legacy' : '')) // Another check for really old versions
-    .replace('${version_name}', json.forgeID !== null ? json.forgeID : json.version)
-    .replace('${assets_root}', path.join(INSTANCES_PATH, 'assets', json.assets === 'legacy' ? '/virtual/legacy' : ''))
-    .replace('${assets_index_name}', json.assets)
+    .replace('${game_assets}', path.join(INSTANCES_PATH, 'assets', vanilla.assets === 'legacy' ? '/virtual/legacy' : '')) // Another check for really old versions
+    .replace('${version_name}', forge !== null ? forge.versionInfo.id : vanilla.id)
+    .replace('${assets_root}', path.join(INSTANCES_PATH, 'assets', vanilla.assets === 'legacy' ? '/virtual/legacy' : ''))
+    .replace('${assets_index_name}', vanilla.assets)
     .replace('${auth_uuid}', userData.uuid)
     .replace('${auth_access_token}', userData.accessToken)
     .replace('${user_properties}', "{}")
     .replace('${user_type}', userData.legacy ? 'legacy' : 'mojang')
-    .replace('${version_type}', json.type);
+    .replace('${version_type}', vanilla.type);
 }
 
 export default getStartCommand;

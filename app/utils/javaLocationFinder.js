@@ -12,16 +12,17 @@ const findJavaHome = async () => {
   switch (os.platform()) {
     case LINUX:
     case DARWIN:
-      command = 'which java';
+      command = 'which javaw';
       break;
     case WINDOWS:
-      command = 'where java';
+      command = 'where javaw';
       break;
     default:
       break;
   }
   const { stdout } = await exec(command);
-  return stdout;
+  // This returns the first path found
+  return stdout.split('\n')[0];
 };
 
 export default findJavaHome;

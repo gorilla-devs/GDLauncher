@@ -16,12 +16,14 @@ type Props = {};
 
 class Instances extends Component<Props> {
   props: Props;
+
   constructor(props) {
     super(props);
     this.state = {
       deletingInstances: false
     };
   }
+
   deleteShareData = async () => {
     try {
       this.setState({ deletingInstances: true });
@@ -35,6 +37,7 @@ class Instances extends Component<Props> {
       message.error('Error while clearing data.');
     }
   };
+  
   render() {
     return (
       <div>
@@ -43,6 +46,7 @@ class Instances extends Component<Props> {
           <ButtonSetting
             mainText="Clear Shared Data"
             description="Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data"
+            icon="delete"
             onClick={this.deleteShareData}
             disabled={this.props.installing !== null}
             loading={this.state.deletingInstances}

@@ -1,13 +1,17 @@
 // @flow
 import React, { Component } from 'react';
-import { Button, Icon, Progress, message } from 'antd';
-import { Link } from 'react-router-dom';
+import { message } from 'antd';
+import psTree from 'ps-tree';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import path from 'path';
+import fs from 'fs';
+import os from 'os';
 import log from 'electron-log';
+import { promisify } from 'util';
+import { exec } from 'child_process';
 import { hideMenu } from 'react-contextmenu/es6/actions';
-import { PACKS_PATH } from '../../constants';
+import { PACKS_PATH, APPPATH } from '../../constants';
 import { history } from '../../store/configureStore';
 import styles from './DInstance.scss';
 
@@ -26,14 +30,27 @@ export default class DInstance extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      deleting: false
-    }
+      deleting: false,
+      version: null
+    };
     this.percentage = this.updatePercentage();
   }
 
+  componentDidMount = async () => {
+    if (!this.isInstalling()) {
+      this.setState({
+        version: JSON.parse(
+          await promisify(fs.readFile)(
+            path.join(PACKS_PATH, this.props.name, 'config.json')
+          )
+        ).version
+      });
+    }
+  };
+
   componentDidUpdate = () => {
     this.percentage = this.updatePercentage();
-  }
+  };
 
   isInstalling() {
     if (this.props.installingQueue[this.props.name]) {
@@ -71,11 +88,25 @@ export default class DInstance extends Component<Props> {
     }
   }
 
-  handleClickPlay = async (e) => {
-    e.stopPropagation();
-    this.props.startInstance(this.props.name);
-    this.props.selectInstance(this.props.name);
-  }
+  handleClickPlay = async e => {
+    if (!this.isInstalling()) {
+      e.stopPropagation();
+      if (this.props.playing.find(el => el.name === this.props.name)) {
+        psTree(
+          this.props.playing.find(el => el.name === this.props.name).pid,
+          (err, children) => {
+            children.forEach(el => {
+              process.kill(el.PID);
+            });
+          }
+        );
+        message.info('Instance terminated');
+      } else {
+        this.props.startInstance(this.props.name);
+        this.props.selectInstance(this.props.name);
+      }
+    }
+  };
 
   deleteInstance = async () => {
     try {
@@ -87,60 +118,157 @@ export default class DInstance extends Component<Props> {
       message.error('Error deleting instance');
       log.error(err);
     }
-  }
+  };
 
   render() {
+    const { name } = this.props;
     return (
       <div
-        className={`${this.props.selectedInstance === this.props.name ? styles.selectedItem : ''} ${styles.main}`}
-        onMouseEnter={() =>
-          document.documentElement.style.setProperty('--instanceName', `"${this.props.name}"`)
-        }
-        onClick={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name); }}
-        onDoubleClick={this.handleClickPlay}
-        onKeyPress={this.handleKeyPress}
-        role="button"
-        tabIndex={0}
+        className={`${
+          this.props.selectedInstance === name ? styles.selectedItem : ''
+        } ${styles.main}`}
       >
-        <ContextMenuTrigger id={`contextMenu-${this.props.name}`}>
-          {this.props.playing.find(el => el === this.props.name) &&
-            <span className={styles.playingIcon}><i className="fas fa-play" style={{ fontSize: '17px' }} /></span>}
-          {this.isInstalling() &&
-            <span className={styles.downloadingIcon}><i className="fas fa-download" style={{ fontSize: '17px' }} /></span>}
-          <div className={styles.icon}>
-            <div
-              className={styles.icon__image}
-              style={{ filter: this.isInstalling() ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale")' : '' }}
-            />
-            <span className={styles.icon__instanceNameContainer}>
-              <span className={styles.icon__instanceName} style={{ width: this.isInstalling() ? '76px' : '130px' }}>
-                {this.props.name}
+        <ContextMenuTrigger id={`contextMenu-${name}`}>
+          <div
+            className={styles.innerMain}
+            onMouseEnter={() =>
+              document.documentElement.style.setProperty(
+                '--instanceName',
+                `"${name}"`
+              )
+            }
+            onClick={e => {
+              e.stopPropagation();
+              this.props.selectInstance(name);
+            }}
+            onDoubleClick={this.handleClickPlay}
+            onKeyPress={this.handleKeyPress}
+            role="button"
+            tabIndex={0}
+          >
+            {this.props.playing.find(el => el.name === name) && (
+              <span className={styles.playingIcon}>
+                <i className="fas fa-play" style={{ fontSize: '17px' }} />
               </span>
-              <span className={styles.icon__instancePercentage}>
-                {this.isInstalling() && ` (${this.updatePercentage()}%)`}
+            )}
+            {this.isInstalling() && (
+              <span className={styles.downloadingIcon}>
+                <i className="fas fa-download" style={{ fontSize: '17px' }} />
               </span>
-            </span>
+            )}
+            <div className={styles.icon}>
+              <div
+                className={styles.icon__image}
+                style={{
+                  filter: this.isInstalling()
+                    ? "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale\")"
+                    : ''
+                }}
+              />
+              <span className={styles.icon__instanceNameContainer}>
+                <span
+                  className={styles.icon__instanceName}
+                  style={{ width: this.isInstalling() ? '76px' : '130px' }}
+                >
+                  {name}
+                </span>
+                <span className={styles.icon__instancePercentage}>
+                  {this.isInstalling() && ` (${this.updatePercentage()}%)`}
+                </span>
+              </span>
+            </div>
           </div>
         </ContextMenuTrigger>
-        <ContextMenu id={`contextMenu-${this.props.name}`} onShow={(e) => { e.stopPropagation(); this.props.selectInstance(this.props.name); }}>
-          <span>{this.props.name}</span>
-          <MenuItem disabled={this.isInstalling()} data={{ foo: 'bar' }} onClick={this.handleClickPlay}>
+        <ContextMenu
+          id={`contextMenu-${name}`}
+          onShow={e => {
+            e.stopPropagation();
+            this.props.selectInstance(name);
+          }}
+        >
+          <span>
+            {name} ({this.state.version})
+          </span>
+          <MenuItem
+            disabled={this.isInstalling()}
+            onClick={this.handleClickPlay}
+          >
             <i className="fas fa-play" style={{ marginRight: '8px' }} />
-            Play
+            {this.props.playing.find(el => el.name === name)
+              ? 'Kill'
+              : 'Launch'}
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling()}
             data={{ foo: 'bar' }}
-            onClick={() => history.push({ pathname: `/editInstance/${this.props.name}`, state: { modal: true } })}>
+            onClick={() =>
+              history.push({
+                pathname: `/editInstance/${name}/settings/`,
+                state: { modal: true }
+              })
+            }
+          >
             <i className="fas fa-wrench" style={{ marginRight: '8px' }} />
             Manage
           </MenuItem>
-          <MenuItem disabled={this.isInstalling()} data={{ foo: 'bar' }} onClick={this.deleteInstance}>
+          <MenuItem
+            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
+          >
+            <i className="fas fa-folder" style={{ marginRight: '8px' }} />
+            Open Folder
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              exec(
+                `powershell $s=(New-Object -COM WScript.Shell).CreateShortcut('%userprofile%\\Desktop\\${
+                  this.props.name
+                }.lnk');$s.TargetPath='${path.join(
+                  APPPATH,
+                  'GDLauncher.exe'
+                )}';$s.Arguments='-i ${this.props.name}';$s.Save()`,
+                (error) => {
+                  if (error) {
+                    log.error(`Error creating instance symlink: ${error}`);
+                    message.error(
+                      <span>
+                        Error while crerating the shortcut. Click{' '}
+                        <a
+                          href="https://github.com/gorilla-devs/GDLauncher/wiki/Error-while-creating-an-instance's-shortcut"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          here
+                        </a>{' '}
+                        to know more
+                      </span>
+                    );
+                  }
+                }
+              );
+            }}
+            disabled={this.isInstalling() || process.platform !== 'win32'}
+          >
+            <i className="fas fa-link" style={{ marginRight: '8px' }} />
+            {console.log(os.type())}
+            Create Shortcut
+          </MenuItem>
+          <MenuItem
+            disabled={this.isInstalling()}
+            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
+          >
+            <i className="fas fa-file-export" style={{ marginRight: '8px' }} />
+            Export Instance
+          </MenuItem>
+          <MenuItem
+            disabled={this.isInstalling()}
+            data={{ foo: 'bar' }}
+            onClick={this.deleteInstance}
+          >
             <i className="fas fa-trash-alt" style={{ marginRight: '8px' }} />
             {this.state.deleting ? 'Deleting...' : 'Delete'}
           </MenuItem>
         </ContextMenu>
-      </div >
+      </div>
     );
   }
 }
