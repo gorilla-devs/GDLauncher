@@ -3,7 +3,6 @@ import {
   START_DOWNLOAD,
   ADD_TO_QUEUE,
   DOWNLOAD_COMPLETED,
-  DOWNLOAD_FILE_COMPLETED,
   UPDATE_TOTAL_FILES_TO_DOWNLOAD,
   UPDATE_PROGRESS,
   CLEAR_QUEUE
@@ -62,19 +61,6 @@ export default function downloadManager(state = initialState, action) {
             ...state.downloadQueue[action.payload],
             downloadCompleted: true,
             status: 'Completed'
-          }
-        }
-      };
-    case DOWNLOAD_FILE_COMPLETED:
-      return {
-        ...state,
-        downloadQueue: {
-          ...state.downloadQueue,
-          [action.payload.pack]: {
-            ...state.downloadQueue[action.payload.pack],
-            downloaded: state.downloadQueue[action.payload.pack].downloaded + 1,
-            percentage: state.downloadQueue[action.payload.pack].totalToDownload === 0 ? 0 :
-              (((state.downloadQueue[action.payload.pack].downloaded * 82) / state.downloadQueue[action.payload.pack].totalToDownload) + 18).toFixed(1)
           }
         }
       };

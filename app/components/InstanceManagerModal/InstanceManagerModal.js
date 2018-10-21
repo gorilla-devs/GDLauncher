@@ -17,20 +17,19 @@ class InstanceManagerModal extends Component<Props> {
 
   constructor(props) {
     super(props);
+    this.state = {
+      unMounting: false
+    };
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
+  closeModal = () => {
+    this.setState({ unMounting: true })
+  };
 
-      }
-    });
-  }
 
   render() {
     return (
-      <Modal history={this.props.history} title={`Instance Editor: Editing "${this.props.match.params.instance}"`} style={{ width: '90%', height: '90%', left: '5%' }}>
+      <Modal history={this.props.history} unMount={this.state.unMounting} title={`Instance Editor: Editing "${this.props.match.params.instance}"`} style={{ width: '90%', height: '90%', left: '5%' }}>
         <div className={styles.container}>
           <SideMenu match={this.props.match}>
             <MenuItem active={this.props.match.params.page === 'settings'} to={`/editInstance/${this.props.match.params.instance}/settings`}>Settings</MenuItem>
@@ -40,7 +39,7 @@ class InstanceManagerModal extends Component<Props> {
             <MenuItem active={this.props.match.params.page === 'screenshots'} to={`/editInstance/${this.props.match.params.instance}/screenshots`}>Screenshots</MenuItem>
           </SideMenu>
           <div className={styles.content}>
-            <Route path="/editInstance/:instance/settings" render={() => <Settings instance={this.props.match.params.instance} />} />
+            <Route path="/editInstance/:instance/settings" render={() => <Settings close={this.closeModal} instance={this.props.match.params.instance} />} />
             <Route path="/editInstance/:instance/mods/:state/:version?/:mod?" component={ModsManager} />
           </div>
         </div>

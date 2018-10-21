@@ -32,13 +32,15 @@ export default class Modal extends Component<Props> {
   componentDidMount() {
     setTimeout(this.mountStyle, 10); // call the into animiation
   }
-
+  
   componentWillReceiveProps(newProps) { // check for the mounted props
-    // if (!newProps.mounted) {
-    //   return this.unMountStyle(); // call outro animation when mounted prop is false
-    // }
+    if (newProps.unMount) {
+      setTimeout(this.props.history.goBack, 200);
+      return this.unMountStyle(); // call the into animiation
+    }
     setTimeout(this.mountStyle, 10); // call the into animiation
   }
+
 
   unMountStyle() { // css for unmount animation
     this.setState({

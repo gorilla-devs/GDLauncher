@@ -45,7 +45,7 @@ export function getVanillaMCVersions() {
           let md5;
           for (let i = 0; i < files.length; i++) {
             if (files[i].includes('installer')) {
-              [,, md5] = files[i];
+              [, , md5] = files[i];
             }
           }
           return {
@@ -70,18 +70,9 @@ export function createPack(version, packName, forgeVersion = null) {
 
     dispatch({ type: START_PACK_CREATION });
 
-    try {
-      await promisify(fs.access)(path.join(PACKS_PATH, packName));
-      message.warning('An instance with this name already exists.');
-    } catch (e) {
-      await makeDir(path.join(PACKS_PATH, packName));
-      dispatch(addToQueue(packName, version, forgeVersion));
-      if (router.location.state && router.location.state.modal) {
-        setTimeout(dispatch(goBack()), 160);
-      }
-    } finally {
-      dispatch({ type: CREATION_COMPLETE });
-    }
+    await makeDir(path.join(PACKS_PATH, packName));
+    dispatch(addToQueue(packName, version, forgeVersion));
+    dispatch({ type: CREATION_COMPLETE });
   };
 }
 

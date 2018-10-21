@@ -16,7 +16,6 @@ const getStartCommand = async (packName, userData) => {
 
   const javaPath = await findJavaHome();
   const dosName = os.release().substr(0, 2) === 10 ? '"-Dos.name=Windows 10" -Dos.version=10.0 ' : '';
-  const version = forge === null ? vanillaJSON.id : forgeJSON.versionInfo.id;
   // It concatenates vanilla and forge libraries. If the instance does not contain forge, it concatenates an empty array
   const libs = await computeVanillaAndForgeLibraries(vanillaJSON, forgeJSON);
   const Arguments = getMCArguments(vanillaJSON, forgeJSON, packName, userData);
@@ -30,7 +29,7 @@ ${os.platform() === WINDOWS ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerfo
 -Dminecraft.client.jar="${path.join(INSTANCES_PATH, 'versions', vanillaJSON.id, `${vanillaJSON.id}.jar`)}" 
 -cp ${libs
       .filter(lib => !lib.natives)
-      .map(lib => `"${path.join(INSTANCES_PATH, 'libraries', lib.path)}"`)
+      .map(lib => `"${lib.path}"`)
       .join(dividerChar)}${dividerChar}${`"${path.join(INSTANCES_PATH, 'versions', vanillaJSON.id, `${vanillaJSON.id}.jar`)}"`} 
 ${mainClass} ${Arguments}
   `;

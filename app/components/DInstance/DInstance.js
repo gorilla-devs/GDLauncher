@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { message } from 'antd';
+import { message, Icon } from 'antd';
 import psTree from 'ps-tree';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
@@ -152,9 +152,7 @@ export default class DInstance extends Component<Props> {
               </span>
             )}
             {this.isInstalling() && (
-              <span className={styles.downloadingIcon}>
-                <i className="fas fa-download" style={{ fontSize: '17px' }} />
-              </span>
+              <Icon className={styles.icon__iconState} type="loading" theme="outlined" />
             )}
             <div className={styles.icon}>
               <div
@@ -249,7 +247,6 @@ export default class DInstance extends Component<Props> {
             disabled={this.isInstalling() || process.platform !== 'win32'}
           >
             <i className="fas fa-link" style={{ marginRight: '8px' }} />
-            {console.log(os.type())}
             Create Shortcut
           </MenuItem>
           <MenuItem

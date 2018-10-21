@@ -8,28 +8,35 @@ import log from 'electron-log';
 import Promise from 'bluebird';
 import request from 'request-promise-native';
 import { promisify } from 'util';
-import { DOWNLOAD_FILE_COMPLETED } from '../actions/downloadManager';
 
 const fs = Promise.promisifyAll(fss);
 
-export const downloadArr = async (arr, folderPath, dispatch, pack, threads = os.cpus().length) => {
-  await Promise.map(arr, async item => {
-    let toDownload = true;
-    try {
-      await fs.accessAsync(path.join(folderPath, item.path));
-      toDownload = false;
-    } catch (err) {
-      // It needs to be downloaded
-    }
-    if (toDownload) {
-      await downloadFileInstance(path.join(folderPath, item.path), item.url);
-    }
-    dispatch({
-      type: DOWNLOAD_FILE_COMPLETED,
-      payload: { pack }
-    });
-  }, { concurrency: threads });
-}
+export const downloadArr = async (
+  arr,
+  updatePercentage,
+  pack,
+  threads = os.cpus().length
+) => {
+  let downloaded = 0;
+  await Promise.map(
+    arr,
+    async item => {
+      let toDownload = true;
+      try {
+        await fs.accessAsync(item.path);
+        toDownload = false;
+      } catch (err) {
+        // It needs to be downloaded
+      }
+      if (toDownload) {
+        await downloadFileInstance(item.path, item.url);
+      }
+      downloaded += 1;
+      if (downloaded % 30 === 0 || downloaded === arr.length) updatePercentage(downloaded);
+    },
+    { concurrency: threads }
+  );
+};
 
 const downloadFileInstance = async (filename, url, legacyPath = null) => {
   try {
@@ -56,9 +63,11 @@ const downloadFileInstance = async (filename, url, legacyPath = null) => {
       }
     }
   } catch (e) {
-    log.error(`Error while downloading <${url}> to <${filename}> --> ${e.message}`);
+    log.error(
+      `Error while downloading <${url}> to <${filename}> --> ${e.message}`
+    );
   }
-}
+};
 
 export const downloadFile = (filename, url, onProgress) => {
   return new Promise(async (resolve, reject) => {
@@ -68,18 +77,18 @@ export const downloadFile = (filename, url, onProgress) => {
 
     var req = reqCall({
       method: 'GET',
-      uri: url,
+      uri: url
     });
     await makeDir(path.dirname(filename));
     const out = fss.createWriteStream(filename);
     req.pipe(out);
 
-    req.on('response', (data) => {
+    req.on('response', data => {
       // Change the total bytes value to get progress later.
       total_bytes = parseInt(data.headers['content-length']);
     });
 
-    req.on('data', (chunk) => {
+    req.on('data', chunk => {
       // Update the received bytes
       received_bytes += chunk.length;
       onProgress(((received_bytes * 100) / total_bytes).toFixed(1));
@@ -91,9 +100,9 @@ export const downloadFile = (filename, url, onProgress) => {
 
     req.on('error', () => {
       reject();
-    })
+    });
   });
-}
+};
 
 // function checkFile(lpath, size, sha1) {
 //   return fs.stat(lpath).then(stats => assert.equal(stats.size, size, 'wrong size for ' + lpath))

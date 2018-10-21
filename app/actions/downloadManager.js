@@ -20,7 +20,6 @@ export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
 export const ADD_TO_QUEUE = 'ADD_TO_QUEUE';
 export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
-export const DOWNLOAD_FILE_COMPLETED = 'DOWNLOAD_FILE_COMPLETED';
 export const UPDATE_TOTAL_FILES_TO_DOWNLOAD = 'UPDATE_TOTAL_FILES_TO_DOWNLOAD';
 export const UPDATE_PROGRESS = 'UPDATE_PROGRESS';
 
@@ -138,7 +137,7 @@ export function downloadPack(pack) {
           p => {
             dispatch({
               type: UPDATE_PROGRESS,
-              payload: { pack, percentage: ((p * 18) / 100).toFixed(1) }
+              payload: { pack, percentage: ((p * 18) / 100).toFixed(0) }
             });
           }
         );
@@ -179,39 +178,36 @@ export function downloadPack(pack) {
     await promisify(fs.writeFile)(
       path.join(PACKS_PATH, pack, 'config.json'),
       JSON.stringify({
-        instanceName: pack,
         version: currPack.version,
         forgeVersion: forgeFileName
       })
     );
 
+    const totalFiles = libraries.length + assets.length + mainJar.length;
+
     dispatch({
       type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
       payload: {
         pack,
-        total: libraries.length + assets.length + mainJar.length
+        total: totalFiles
       }
     });
 
-    await downloadArr(
-      libraries,
-      path.join(INSTANCES_PATH, 'libraries'),
-      dispatch,
-      pack
-    );
+    const updatePercentage = downloaded => {
+      const actPercentage = ((downloaded * 82) / totalFiles + 18).toFixed(0);
+      if (currPack.percentage !== actPercentage)
+        return dispatch({
+          type: UPDATE_PROGRESS,
+          payload: {
+            pack,
+            percentage: actPercentage
+          }
+        });
+    };
 
     await downloadArr(
-      assets,
-      path.join(INSTANCES_PATH, 'assets'),
-      dispatch,
-      pack,
-      10
-    );
-
-    await downloadArr(
-      mainJar,
-      path.join(INSTANCES_PATH, 'versions'),
-      dispatch,
+      [...libraries, ...assets, ...mainJar],
+      updatePercentage,
       pack
     );
 

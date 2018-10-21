@@ -1,17 +1,19 @@
 // @flow
 import React, { Component } from 'react';
 import {
-  Select,
+  message,
   Form,
   Input,
   Icon,
   Button,
-  Checkbox,
   Cascader,
-  Switch
 } from 'antd';
+import path from 'path';
+import { promisify } from 'util';
+import fs from 'fs';
 import vSort from 'version-sort';
 import _ from 'lodash';
+import { PACKS_PATH } from '../../constants';
 import styles from './InstanceCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
 
@@ -26,6 +28,7 @@ class InstanceCreatorModal extends Component<Props> {
     super(props);
     const { forgeManifest, versionsManifest } = this.props;
     this.state = {
+      unMount: false,
       loading: false,
       versions: [
         {
@@ -76,18 +79,24 @@ class InstanceCreatorModal extends Component<Props> {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        if (values.version[0] === 'vanilla') {
-          this.props.createPack(values.version[2], values.packName);
-        } else if (values.version[0] === 'forge') {
-          this.props.createPack(
-            values.version[1],
-            values.packName,
-            values.version[2]
-          );
-        }
         this.setState({ loading: true });
+        try {
+          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
+          message.warning('An instance with this name already exists.');
+        } catch (error) {
+          if (values.version[0] === 'vanilla') {
+            this.props.createPack(values.version[2], values.packName);
+          } else if (values.version[0] === 'forge') {
+            this.props.createPack(
+              values.version[1],
+              values.packName,
+              values.version[2]
+            );
+          }
+          this.setState({ unMount: true });
+        }
         setTimeout(() => {
           this.setState({ loading: false });
         }, 100);
@@ -101,7 +110,7 @@ class InstanceCreatorModal extends Component<Props> {
     return (
       <Modal
         history={this.props.history}
-        mounted={this.props.modalState}
+        unMount={this.state.unMount}
         title="Create New Instance"
         style={{ height: '80vh' }}
       >

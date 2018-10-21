@@ -8,7 +8,6 @@ import { promisify } from 'util';
 import {
   INSTANCES_PATH,
   PACKS_PATH,
-  MAVEN_REPO,
   CURSEFORGE_MODLOADERS_API,
   MC_LIBRARIES_URL
 } from '../constants';
@@ -20,7 +19,7 @@ export const extractMainJar = async json => {
   return [
     {
       url: json.downloads.client.url,
-      path: `${json.id}/${json.id}.jar`
+      path: path.join(INSTANCES_PATH, 'versions', json.id, `${json.id}.jar`)
     }
   ];
 };
@@ -32,7 +31,7 @@ export const extractVanillaLibs = async json => {
       if ('artifact' in lib.downloads) {
         libs.push({
           url: lib.downloads.artifact.url,
-          path: lib.downloads.artifact.path
+          path: path.join(INSTANCES_PATH, 'libraries', lib.downloads.artifact.path)
         });
       }
       if (
@@ -46,9 +45,9 @@ export const extractVanillaLibs = async json => {
               `natives-${convertOSToMCFormat(SysOS.type())}`
             ].url,
           path:
-            lib.downloads.classifiers[
+            path.join(INSTANCES_PATH, 'libraries', lib.downloads.classifiers[
               `natives-${convertOSToMCFormat(SysOS.type())}`
-            ].path,
+            ].path),
           natives: true
         });
       }
@@ -67,7 +66,7 @@ export const extractNatives = async (libs, packName) => {
 
   await Promise.all(
     libs.map(lib =>
-      extract(path.join(INSTANCES_PATH, 'libraries', lib.path), {
+      extract(lib.path, {
         dir: `${nativesPath}`
       })
     )
@@ -99,8 +98,8 @@ export const extractAssets = async json => {
         0,
         2
       )}/${assetCont.hash}`,
-      path: `objects/${assetCont.hash.substring(0, 2)}/${assetCont.hash}`,
-      legacyPath: `virtual/legacy/${asset}`
+      path: path.join(INSTANCES_PATH, 'assets', 'objects', assetCont.hash.substring(0, 2), assetCont.hash),
+      legacyPath: path.join(INSTANCES_PATH, 'assets', 'virtual', 'legacy', asset)
     });
   });
   return assets;
@@ -119,7 +118,7 @@ export const getForgeLibraries = async forge => {
 
     return {
       url: completeUrl,
-      path: arraify(library.name).join('/')
+      path: path.join(INSTANCES_PATH, 'libraries', ...arraify(library.name))
     };
   };
 
