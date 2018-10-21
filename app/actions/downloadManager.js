@@ -109,9 +109,6 @@ export function downloadPack(pack) {
       forgeFileName = `${currPack.version}-${currPack.forgeVersion}${
         branch !== null ? `-${branch}` : ''
       }`;
-      console.log(
-        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-installer.jar`
-      );
       try {
         forgeJSON = JSON.parse(
           await promisify(fs.readFile)(

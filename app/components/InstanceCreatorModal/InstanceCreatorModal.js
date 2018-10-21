@@ -19,7 +19,6 @@ import Modal from '../Common/Modal/Modal';
 
 type Props = {};
 const FormItem = Form.Item;
-let pack;
 
 class InstanceCreatorModal extends Component<Props> {
   props: Props;
@@ -29,7 +28,6 @@ class InstanceCreatorModal extends Component<Props> {
     const { forgeManifest, versionsManifest } = this.props;
     this.state = {
       unMount: false,
-      loading: false,
       versions: [
         {
           value: 'vanilla',
@@ -81,7 +79,6 @@ class InstanceCreatorModal extends Component<Props> {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        this.setState({ loading: true });
         try {
           await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
           message.warning('An instance with this name already exists.');
@@ -97,9 +94,6 @@ class InstanceCreatorModal extends Component<Props> {
           }
           this.setState({ unMount: true });
         }
-        setTimeout(() => {
-          this.setState({ loading: false });
-        }, 100);
       }
     });
   };
@@ -160,7 +154,6 @@ class InstanceCreatorModal extends Component<Props> {
           </div>
           <div className={styles.createInstance}>
             <Button
-              loading={this.state.loading}
               icon="plus"
               size="large"
               type="primary"

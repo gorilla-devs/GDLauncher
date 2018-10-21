@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { routerActions } from 'react-router-redux';
 import { bindActionCreators } from 'redux';
-import { Form, Input, Icon, Button } from 'antd';
+import { Form, Input, Icon, Button, message } from 'antd';
 import path from 'path';
 import { promisify } from 'util';
 import fs from 'fs';
@@ -65,10 +65,15 @@ class Instances extends Component<Props> {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        const packFolder = path.join(PACKS_PATH, this.props.instance);
-        const newPackFolder = path.join(PACKS_PATH, values.packName);
-        await promisify(fs.rename)(packFolder, newPackFolder);
-        this.props.close();
+        try {
+          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
+          message.warning('An instance with this name already exists.');
+        } catch (err) {
+          const packFolder = path.join(PACKS_PATH, this.props.instance);
+          const newPackFolder = path.join(PACKS_PATH, values.packName);
+          await promisify(fs.rename)(packFolder, newPackFolder);
+          this.props.close();
+        }
       }
     });
   };
@@ -147,7 +152,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
-      goBack: routerActions.goBack,
+      goBack: routerActions.goBack
     },
     dispatch
   );

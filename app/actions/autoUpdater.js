@@ -8,7 +8,7 @@ import log from 'electron-log';
 import crypto from 'crypto';
 import * as packageJson from '../package.json';
 import versionsCompare from '../utils/versionsCompare';
-import { UPDATE_URL, UPDATE_URL_CHECKSUMS, APPPATH } from '../constants';
+import { UPDATE_URL, APPPATH } from '../constants';
 
 export const START_UPDATING = "START_CHECK_UPDATES";
 export const STOP_UPDATING = "STOP_CHECK_UPDATES";

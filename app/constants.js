@@ -37,5 +37,3 @@ export const NEWS_URL =
 export const JAVA_URL = 'https://java.com/download';
 export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
-export const UPDATE_URL_CHECKSUMS =
-  'https://dl.gorilladevs.com/releases/latestChecksums.json';

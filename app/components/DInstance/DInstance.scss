@@ -43,7 +43,7 @@
 .icon__instancePercentage {
   position: absolute;
   right: 10px;
-  color: $primary-color;
+  color: var(--primary);
 }
 
 .icon__playBtn {

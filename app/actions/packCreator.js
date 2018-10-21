@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import makeDir from 'make-dir';
 import path from 'path';
 import _ from 'lodash';
-import { goBack } from 'react-router-redux';
 import { promisify } from 'util';
 import { message } from 'antd';
 import vSort from 'version-sort';
@@ -65,8 +64,7 @@ export function getVanillaMCVersions() {
 }
 
 export function createPack(version, packName, forgeVersion = null) {
-  return async (dispatch, getState) => {
-    const { router } = getState();
+  return async (dispatch) => {
 
     dispatch({ type: START_PACK_CREATION });
 
@@ -81,8 +79,7 @@ export function instanceDownloadOverride(
   packName,
   forgeVersion = null
 ) {
-  return async (dispatch, getState) => {
-    const { router } = getState();
+  return async (dispatch) => {
 
     dispatch({ type: START_PACK_CREATION });
 
@@ -92,9 +89,6 @@ export function instanceDownloadOverride(
       await makeDir(path.join(PACKS_PATH, packName));
     } finally {
       dispatch(addToQueue(packName, version, forgeVersion));
-      if (router.location.state && router.location.state.modal) {
-        setTimeout(dispatch(goBack()), 160);
-      }
       dispatch({ type: CREATION_COMPLETE });
     }
   };

@@ -2,7 +2,7 @@
 
 .container {
   grid-column: 1;
-  background: $secondary-color-2;
+  background: var(--secondary-color-2);
   height: 100%;
   padding-top: 50px;
 }

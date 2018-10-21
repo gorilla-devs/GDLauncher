@@ -2,9 +2,9 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
-
 @import './antd.css';
 @import './style/theme/index';
+
 
 @font-face {
   font-family: 'GlacialIndifferenceBold';
@@ -47,7 +47,7 @@ a {
 }
 
 ::-webkit-scrollbar {
-  background-color: $secondary-color-3;
+  background-color: var(--secondary-color-3);
   width: 8px;
   border-radius: 8px;
 }
@@ -58,7 +58,7 @@ a {
 }
 
 ::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px $secondary-color-3;
+  -webkit-box-shadow: inset 0 0 6px var(--secondary-color-3);
   background-color: rgb(35, 48, 61);
   border-radius: 8px;
 }
@@ -93,7 +93,7 @@ a:hover {
 */
 
 .react-contextmenu {
-  background: $secondary-color-2;
+  background: var(--secondary-color-2);
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.25rem;
@@ -148,8 +148,8 @@ a:hover {
 .react-contextmenu-item.react-contextmenu-item--selected,
 .react-contextmenu-item:hover {
   color: $text-hover-color;
-  background-color: $primary-color;
-  border-color: $primary-color;
+  background-color: var(--primary);
+  border-color: var(--primary);
   text-decoration: none;
 }
 
@@ -191,8 +191,8 @@ a:hover {
 
 /* Overwrites ANTD CSS */
 .ant-btn-primary {
-  background-color: $primary-color;
-  border-color: $primary-color;
+  background-color: var(--primary);
+  border-color: var(--primary);
   border-width: 2px !important;
   border-right-width: 2px !important;
 }
@@ -206,28 +206,29 @@ a:hover {
 .ant-btn-ghost:focus,
 .ant-btn-ghost:active,
 .ant-btn-ghost.active {
-  color: $primary-color;
-  border-color: $primary-color;
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
 .ant-btn-primary:hover,
 .ant-btn-primary:focus {
-  background-color: darken($primary-color, 10);
-  border-color: darken($primary-color, 10);
+  background-color: var(--primary);
+  border-color: var(--primary);
+  filter: brightness(85%);
 }
 
 .ant-cascader-picker {
-  background-color: $secondary-color-2;
+  background-color: var(--secondary-color-2);
 }
 
 .ant-cascader-picker-label:hover ~ .ant-input {
-  border-color: $primary-color;
+  border-color: var(--primary);
 }
 
 .ant-switch-checked,
 .ant-checkbox-checked .ant-checkbox-inner,
 .ant-checkbox-indeterminate .ant-checkbox-inner {
-  background-color: $primary-color;
+  background-color: var(--primary);
 }
 
 .ant-switch-loading-icon,
@@ -236,7 +237,7 @@ a:hover {
 }
 .ant-input,
 .ant-input-group-addon {
-  border-color: $secondary-color-2;
+  border-color: var(--secondary-color-2);
   border-width: 2px !important;
   border-right-width: 2px !important;
 }
@@ -254,7 +255,7 @@ a:hover {
 .ant-input-group-addon:hover,
 .ant-input-group-addon:focus,
 .ant-input-group-addon:active {
-  background-color: $secondary-color-1;
+  background-color: var(--secondary-color-1);
   cursor: pointer;
   svg {
     cursor: pointer;
@@ -278,14 +279,14 @@ a:hover {
 .ant-input:hover,
 .ant-cascader-picker:focus .ant-cascader-input,
 .ant-checkbox-checked .ant-checkbox-inner {
-  border-color: $primary-color;
+  border-color: var(--primary);
   border-width: 2px !important;
   border-right-width: 2px !important;
 }
 
 .ant-select-selection {
-  border-color: $secondary-color-2;
-  background-color: $secondary-color-2;
+  border-color: var(--secondary-color-2);
+  background-color: var(--secondary-color-2);
   border-width: 2px !important;
   border-right-width: 2px !important;
 }
@@ -295,14 +296,14 @@ a:hover {
 .ant-select-selection:focus,
 .ant-select-selection:active {
   box-shadow: none;
-  border-color: $primary-color;
+  border-color: var(--primary);
   border-width: 2px !important;
   border-right-width: 2px !important;
 }
 
 .ant-select-dropdown-menu-item-selected,
 .ant-select-dropdown-menu-item-selected:hover {
-  background-color: $secondary-color-3;
+  background-color: var(--secondary-color-3);
 }
 
 // Table
@@ -321,4 +322,12 @@ a:hover {
 
 .ant-popover-title {
   color: $text-dark;
+}
+
+
+.sketch-picker {
+  color: black;
+  input {
+    padding: 0 !important;
+  }
 }

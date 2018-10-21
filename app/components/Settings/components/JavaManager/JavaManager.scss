@@ -8,7 +8,7 @@
 .accountInfo {
   display: grid;
   grid-template-columns: 100px auto;
-  background: $secondary-color-3;
+  background: var(--secondary-color-3);
   height: 120px;
   width: 100%;
   div:first-child {
