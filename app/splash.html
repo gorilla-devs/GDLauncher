@@ -15,7 +15,6 @@
       padding: 30px 15px 15px;
       overflow: hidden;
       margin-bottom: 30px;
-      background-color: #fff;
       border: 1px solid #e6e6e6;
       border-radius: 2px
     }
@@ -40,7 +39,6 @@
       margin-left: -250%;
       -webkit-animation: a .8s linear infinite;
       animation: a .8s linear infinite;
-      background: -webkit-gradient(linear, left top, right top, color-stop(46%, hsla(0, 0%, 100%, 0)), color-stop(50%, hsla(0, 0%, 100%, .35)), color-stop(54%, hsla(0, 0%, 100%, 0))) 50% 50%;
       background: linear-gradient(90deg, hsla(0, 0%, 100%, 0) 46%, hsla(0, 0%, 100%, .35) 50%, hsla(0, 0%, 100%, 0) 54%) 50% 50%
     }
 
@@ -149,6 +147,7 @@
         -webkit-transform: translate3d(-30%, 0, 0);
         transform: translate3d(-30%, 0, 0)
       }
+
       to {
         -webkit-transform: translate3d(30%, 0, 0);
         transform: translate3d(30%, 0, 0)
@@ -160,6 +159,7 @@
         -webkit-transform: translate3d(-30%, 0, 0);
         transform: translate3d(-30%, 0, 0)
       }
+
       to {
         -webkit-transform: translate3d(30%, 0, 0);
         transform: translate3d(30%, 0, 0)
@@ -176,19 +176,20 @@
     }
 
     .ph-item {
-      background-color: #34495e;
-      border-color: #34495e;
+      background-color: var(--secondary);
+      border-color: var(--secondary);
     }
 
     .ph-row div,
     .ph-picture {
-      background-color: #2c3e50;
-      border-color: #2c3e50;
+      filter: brightness(75%);
+      background-color: var(--secondary);
+      border-color: var(--secondary);
     }
   </style>
 </head>
 
-<body>
+<body id="main">
   <div class="loader">
     <div class="ph-item">
       <div class="ph-col-12">
@@ -305,5 +306,13 @@
     </div>
   </div>
 </body>
+
+<script>
+  const electron = require('electron');
+  const currentWindow = electron.remote.getCurrentWindow();
+  const html = document.getElementById('main');
+  html.style.setProperty('--secondary', currentWindow.colors.secondaryColor)
+  html.style.setProperty('--primary', currentWindow.colors.primaryColor)
+</script>
 
 </html>

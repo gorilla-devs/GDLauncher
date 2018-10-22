@@ -333,6 +333,25 @@ a:hover {
   background: rgba(0, 0, 0, 0.15);
 }
 
+.ant-table-placeholder {
+  background-color: var(--secondary-color-1);
+}
+
+.ant-radio-group-solid
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled),
+.ant-radio-group-solid
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.ant-radio-button-wrapper,
+.ant-radio-button-wrapper-focused,
+.ant-radio-button-wrapper:hover,
+.ant-radio-button-wrapper-focused {
+  color: var(--primary);
+}
+
 .ant-popover-title {
   color: $text-dark;
 }
