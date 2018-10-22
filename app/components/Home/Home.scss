@@ -12,11 +12,34 @@
   .innerContent {
     max-width: 1050px;
     margin: 0 auto;
-    width: 95%
+    width: 95%;
   }
   .cards {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    .textWithLines {
+      margin: 20px 0;
+      line-height: 1em;
+    }
+    .textWithLines:after {
+      content: '';
+      display: inline-block;
+      height: .5em;
+      vertical-align: bottom;
+      width: 30%;
+      margin-left: 10px;
+      border-top: 1px solid white;
+    }
+    .textWithLines::before {
+      content: '';
+      display: inline-block;
+      height: .5em;
+      vertical-align: bottom;
+      width: 30%;
+      margin-right: -100%;
+      margin-right: 10px;
+      border-top: 1px solid white;
+    }
   }
 }

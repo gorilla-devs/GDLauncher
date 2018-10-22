@@ -23,6 +23,7 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 
 let mainWindow = null;
 let splash = null;
+log.log(`Config store: ${store.path}`);
 const settings = store.get('settings');
 const primaryColor = settings.theme && settings.theme.primary ? settings.theme.primary : '#2c3e50';
 const secondaryColor = settings.theme && settings.theme['secondary-color-1'] ? settings.theme['secondary-color-1'] : '#34495e';

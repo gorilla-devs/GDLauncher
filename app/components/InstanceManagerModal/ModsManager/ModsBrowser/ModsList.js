@@ -76,31 +76,31 @@ class ModsList extends Component<Props> {
         [...new Array(10)].map(() => ({ loading: true, name: {} }))
       )
     });
-    const res = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=${
-        this.state.list.length
-      }&sort=${this.state.filterType}&searchFilter=${
-        this.state.searchText
-      }&gameVersion=${
-        this.props.match.params.version
-      }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
-        'author' && this.state.filterType !== 'name'}`
-    );
-    // We now remove the previous 10 elements and add the real 10
-    const data = this.state.data.concat(res.data);
-    this.setState(
-      {
-        list: data,
-        data,
-        loading: false
-      },
-      () => {
-        // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-        // In a real scene, you can use the public method of react-virtualized:
-        // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-        window.dispatchEvent(new Event('resize'));
-      }
-    );
+    // const res = await axios.get(
+    //   `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=${
+    //     this.state.list.length
+    //   }&sort=${this.state.filterType}&searchFilter=${
+    //     this.state.searchText
+    //   }&gameVersion=${
+    //     this.props.match.params.version
+    //   }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
+    //     'author' && this.state.filterType !== 'name'}`
+    // );
+    // // We now remove the previous 10 elements and add the real 10
+    // const data = this.state.data.concat(res.data);
+    // this.setState(
+    //   {
+    //     list: data,
+    //     data,
+    //     loading: false
+    //   },
+    //   () => {
+    //     // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
+    //     // In a real scene, you can use the public method of react-virtualized:
+    //     // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
+    //     window.dispatchEvent(new Event('resize'));
+    //   }
+    // );
   };
 
   installMod = async (data, parent = null) => {

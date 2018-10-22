@@ -1,19 +1,12 @@
 import log from 'electron-log';
 import { message } from 'antd';
 import store from '../localStore';
-import colors from '../style/theme/colors.scss';
+import { THEMES } from '../constants';
 
 export const LOAD_SETTINGS = 'LOAD_SETTINGS';
 export const SET_SOUNDS = 'SET_SOUNDS';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
-
-const defaultTheme = {
-  primary: colors.primary,
-  'secondary-color-1': colors.secondarycolor1,
-  'secondary-color-2': colors.secondarycolor2,
-  'secondary-color-3': colors.secondarycolor3
-};
 
 export function loadSettings() {
   return dispatch => {
@@ -21,7 +14,7 @@ export function loadSettings() {
       if (store.has('settings')) {
         let settings = store.get('settings');
         if (!settings.theme || Object.keys(settings.theme).length === 0) {
-          store.set('settings.theme', defaultTheme);
+          store.set('settings.theme', THEMES.default);
         }
         settings = store.get('settings');
         Object.keys(settings.theme).forEach(val => {
@@ -89,13 +82,16 @@ export function saveThemeValue(property, value) {
   };
 }
 
-export function resetStyles() {
+export function applyTheme(theme) {
   return dispatch => {
     try {
-      Object.keys(defaultTheme).forEach(val => {
-        dispatch(setThemeValue(val, defaultTheme[val]));
+      const root = document.getElementsByTagName('html')[0];
+      root.removeAttribute('style');
+      Object.keys(theme).forEach(val => {
+        dispatch(setThemeValue(val, theme[val]));
+        dispatch(saveThemeValue(val, theme[val]));
       });
-      dispatch({ type: RESET_THEME, payload: defaultTheme });
+      dispatch({ type: SET_THEME, payload: theme });
       dispatch(saveSettings());
     } catch (err) {
       log.error(err.message);

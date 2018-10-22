@@ -28,7 +28,8 @@ export const LOGIN_PROXY_API = 'https://api.gdevs.io/auth';
 export const LOGIN_TOKEN_PROXY_API = 'https://api.gdevs.io/authToken';
 export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
 export const CURSEMETA_API_URL = `https://staging_cursemeta.dries007.net/api/v3`;
-export const CURSEFORGE_MODLOADERS_API = 'https://modloaders.cursecdn.com/647622546/maven';
+export const CURSEFORGE_MODLOADERS_API =
+  'https://modloaders.cursecdn.com/647622546/maven';
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
 export const DARWIN = 'darwin';
@@ -37,3 +38,23 @@ export const NEWS_URL =
 export const JAVA_URL = 'https://java.com/download';
 export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
+export const THEMES = {
+  default: {
+    primary: '#2980b9',
+    'secondary-color-1': '#34495e',
+    'secondary-color-2': '#2c3e50',
+    'secondary-color-3': '#212b36'
+  },
+  carrotUniverse: {
+    primary: '#d35400',
+    'secondary-color-1': '#433c8c',
+    'secondary-color-2': '#2f2878',
+    'secondary-color-3': '#1b1464'
+  },
+  concreteLeaf: {
+    primary: '#16a085',
+    'secondary-color-1': '#3b3f42',
+    'secondary-color-2': '#272b2e',
+    'secondary-color-3': '#13171a'
+  }
+};

@@ -8,6 +8,7 @@ import Title from '../Title/Title';
 import SelectSetting from '../SelectSetting/SelectSetting';
 import * as SettingsActions from '../../../../actions/settings';
 import shader from '../../../../utils/colors';
+import { THEMES } from '../../../../constants';
 
 const themes = ['Blue', 'Black', 'Green'];
 const primaryPresets = [
@@ -57,7 +58,7 @@ const UserInterface = props => {
           mainText={
             <span>
               Select Theme{' '}
-              <a onClick={props.resetStyles} style={{ fontSize: 13 }}>
+              <a onClick={() => props.applyTheme(THEMES.default)} style={{ fontSize: 13 }}>
                 Reset Theme
               </a>
             </span>
