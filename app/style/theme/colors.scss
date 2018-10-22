@@ -1,26 +1,28 @@
-$primary-color: #2980b9;
-
-$secondary-color-1: #34495e;
-$secondary-color-2: #2c3e50;
-$secondary-color-3: #212b36;
-$secondary-color-light: #4A6075;
-
-$text-main-color: #c2c2c2;
-$text-hover-color: #fff;
-$text-dark: #8b99a7;
+@import '../mixins/css-vars.scss';
+$css-vars-use-native: true;
 
 $green: #27ae60;
 $teal: #16a085;
 $blue: #2980b9;
 $violet: #8e44ad;
 $madison: #2c3e50;
+$wetasphalt: #34495e;
 $yellow: #f39c12;
 $orange: #d35400;
 $red: #c0392b;
 $white: #bdc3c7;
 $grey: #7f8c8d;
 
+$primary-color: $blue;
 
+$secondary-color-1: $wetasphalt;
+$secondary-color-2: #2c3e50;
+$secondary-color-3: #212b36;
+$secondary-color-light: #4a6075;
+
+$text-main-color: #c2c2c2;
+$text-hover-color: #fff;
+$text-dark: #8b99a7;
 
 //Links
 $link-text-color: $text-main-color;
@@ -33,9 +35,22 @@ $badge-bg-color: #e74c3c;
 // Button
 $btn-bg-color: $primary-color;
 
+@include css-vars(
+  (
+    --primary: $primary-color,
+    --secondary-color-1: $secondary-color-1,
+    --secondary-color-2: $secondary-color-2,
+    --secondary-color-3: $secondary-color-3
+  )
+);
+
 // This is needed to import these variables in JS
 :export {
   primary: $primary-color;
   red: $red;
   green: $green;
+  secondarycolor1: $wetasphalt;
+  secondarycolor2: #2c3e50;
+  secondarycolor3: #212b36;
+  secondarycolorlight: #4a6075;
 }

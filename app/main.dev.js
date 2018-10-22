@@ -15,6 +15,7 @@ import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import store from './localStore';
 import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -22,6 +23,10 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 
 let mainWindow = null;
 let splash = null;
+log.log(`Config store: ${store.path}`);
+const settings = store.get('settings');
+const primaryColor = settings.theme && settings.theme.primary ? settings.theme.primary : '#2c3e50';
+const secondaryColor = settings.theme && settings.theme['secondary-color-1'] ? settings.theme['secondary-color-1'] : '#34495e';
 
 if (minimist(process.argv.slice(1))['i']) {
   cli(process.argv, () => app.quit());
@@ -75,9 +80,13 @@ if (minimist(process.argv.slice(1))['i']) {
       width: 850,
       height: 600,
       frame: false,
-      backgroundColor: '#34495e',
+      backgroundColor: secondaryColor,
       resizable: false
     });
+    splash.colors = {
+      primaryColor,
+      secondaryColor
+    };
     splash.loadURL(`file://${__dirname}/splash.html`);
 
     mainWindow = new BrowserWindow({
@@ -87,10 +96,7 @@ if (minimist(process.argv.slice(1))['i']) {
       minHeight: 600,
       minWidth: 780,
       frame: false,
-      backgroundColor: '#34495e',
-      webPreferences: {
-        experimentalFeatures: true
-      }
+      backgroundColor: secondaryColor,
     });
 
     mainWindow.webContents.on('new-window', (e, url) => {

@@ -44,7 +44,7 @@
 }
 
 .activeLink {
-  background: $primary-color;
+  background: var(--primary);
   border-radius: 4px;
   color: $text-hover-color;
 }
@@ -53,7 +53,7 @@
 
 .a:hover:not(.activeLink) {
   transition: all .25s;
-  background-color: $secondary-color-3;
+  background-color: var(--secondary-color-3);
   border-radius: 4px;
 }
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
 import axios from 'axios';
+import ContentLoader from 'react-content-loader';
 import path from 'path';
 import log from 'electron-log';
 import {
@@ -280,7 +281,22 @@ class ModsList extends Component<Props> {
                 )
               ]}
             >
-              <Skeleton avatar title={false} loading={item.loading} active>
+              {item.loading ? (
+                <ContentLoader
+                  height={100}
+                  speed={0.6}
+                  primaryColor="var(--secondary-color-2)"
+                  secondaryColor="var(--secondary-color-3)"
+                  style={{
+                    height: '100px'
+                  }}
+                >
+                  <circle cx="17" cy="40" r="17" />
+                  <rect x="45" y="0" rx="0" ry="0" width={Math.floor(Math.random() * 80) + 150} height="20" />
+                  <rect x="45" y="30" rx="0" ry="0" width={Math.floor(Math.random() * 150) + 250} height="16" />
+                  <rect x="45" y="50" rx="0" ry="0" width={Math.floor(Math.random() * 150) + 250} height="16" />
+                </ContentLoader>
+              ) : (
                 <List.Item.Meta
                   avatar={
                     <Avatar
@@ -333,7 +349,7 @@ class ModsList extends Component<Props> {
                     )
                   }
                 />
-              </Skeleton>
+              )}
             </List.Item>
           )}
         />

@@ -88,8 +88,8 @@ class SideBar extends Component<Props> {
             <i className="fab fa-facebook"
             />
           </a>
-          <a href="https://instagram.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
-            <i className="fab fa-instagram"
+          <a href="https://discordapp.com/invite/4cGYzen" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
+            <i className="fab fa-discord"
             />
           </a>
           <span className={styles.version}>v{require('../../../package.json').version}</span>

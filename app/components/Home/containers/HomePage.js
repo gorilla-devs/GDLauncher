@@ -4,6 +4,7 @@ import Home from '../../Home/Home';
 import * as downloadManagerActions from '../../../actions/downloadManager';
 import * as newsActions from '../../../actions/news';
 import * as packCreator from '../../../actions/packCreator';
+import * as SettingsActions from '../../../actions/settings';
 
 function mapStateToProps(state) {
   return {
@@ -15,7 +16,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...downloadManagerActions, ...newsActions, ...packCreator }, dispatch);
+  return bindActionCreators({ ...downloadManagerActions, ...newsActions, ...packCreator, ...SettingsActions }, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

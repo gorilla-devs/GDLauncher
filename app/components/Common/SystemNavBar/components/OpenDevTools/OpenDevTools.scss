@@ -3,7 +3,7 @@
 .OpenDevTools {
   display: inline-block;
   position: absolute;
-  background: $secondary-color-3;
+  background: var(--secondary-color-3);
   border: 0;
   padding: 0;
   color: $text-main-color;

@@ -6,7 +6,7 @@
   position: absolute;
   right: 0;
   top: 20px;
-  background-color: $secondary-color-2;
+  background-color: var(--secondary-color-2);
   font-family: 'GlacialIndifferenceRegular';
   .updateAvailable {
     position: absolute;

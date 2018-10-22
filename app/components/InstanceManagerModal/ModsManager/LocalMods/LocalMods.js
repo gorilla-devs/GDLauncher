@@ -125,6 +125,9 @@ class LocalMods extends Component<Props> {
           columns={this.columns}
           dataSource={this.state.mods}
           pagination={false}
+          locale={{
+            emptyText: 'No mods are installed' 
+          }}
         />
       </div>
     )

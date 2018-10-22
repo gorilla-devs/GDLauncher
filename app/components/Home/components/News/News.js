@@ -32,13 +32,13 @@ const News = props =>
       </Carousel> : <div
         style={{
           width: '100%',
-          background: '#2c3e50'
+          background: 'var(--secondary-color-1)'
         }}>
           <ContentLoader
             height={180}
             speed={0.6}
-            primaryColor="#212b36"
-            secondaryColor="#2c3e50"
+            primaryColor="var(--secondary-color-2)"
+            secondaryColor="var(--secondary-color-3)"
             style={{
               height: '180px',
               maxWidth: '1050px',

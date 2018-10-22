@@ -9,7 +9,6 @@ import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
 import * as downloadManagerActions from '../../../actions/downloadManager';
 import logo from '../../../assets/images/logo.png';
 
-
 type Props = {
   downloadQueue: Object,
   location: string
@@ -20,38 +19,40 @@ class NavigationBar extends Component<Props> {
     super(props);
     this.state = {
       downloadPopoverOpen: false
-    }
+    };
   }
 
   hide = () => {
     this.setState({
-      downloadPopoverOpen: false,
+      downloadPopoverOpen: false
     });
-  }
-  handleVisibleChange = (downloadPopoverOpen) => {
+  };
+  handleVisibleChange = downloadPopoverOpen => {
     this.setState({ downloadPopoverOpen });
-  }
+  };
 
   render() {
     return (
       <div className={styles.container}>
         <div className={styles.logoText}>
-          <img src={logo} height="40px" alt="logo" />
+          <img src={logo} height="40px" alt="logo" draggable="false" />
         </div>
         <HorizontalMenu
           location={this.props.location}
-          downloadingCount={Object.keys(this.props.downloadQueue).filter(inst => !this.props.downloadQueue[inst].status === 'Completed').length}
+          downloadingCount={
+            Object.keys(this.props.downloadQueue).filter(
+              inst => !this.props.downloadQueue[inst].status === 'Completed'
+            ).length
+          }
           clearQueue={() => this.props.clearQueue()}
         />
-        <Link to={{
-          pathname: '/settings/myAccount_Preferences',
-          state: { modal: true }
-        }}
+        <Link
+          to={{
+            pathname: '/settings/myAccount_Preferences',
+            state: { modal: true }
+          }}
         >
-          <i
-            className={`fas fa-cog ${styles.settings}`}
-            draggable="false"
-          />
+          <i className={`fas fa-cog ${styles.settings}`} draggable="false" />
         </Link>
       </div>
     );
@@ -68,4 +69,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(downloadManagerActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NavigationBar);

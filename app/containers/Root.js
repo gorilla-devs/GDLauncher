@@ -1,17 +1,20 @@
-// @flow
 import React, { Component } from 'react';
-import { Provider } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { connect, Provider } from 'react-redux';
 import log from 'electron-log';
 import { ConnectedRouter } from 'react-router-redux';
+import * as SettingsActions from '../actions/settings';
 import RouteDef from '../routes';
 
 
 type Props = {
   store: {},
-  history: {}
+  history: {},
+  loadSettings: () => void
 };
 
-export default class Root extends Component<Props> {
+class Root extends Component<Props> {
+
 
   componentDidCatch(error, info) {
     if (error) {
@@ -33,3 +36,9 @@ export default class Root extends Component<Props> {
     );
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(SettingsActions, dispatch);
+}
+
+export default connect(null, mapDispatchToProps)(Root);
