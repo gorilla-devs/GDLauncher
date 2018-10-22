@@ -88,6 +88,7 @@ export function applyTheme(theme) {
       const root = document.getElementsByTagName('html')[0];
       root.removeAttribute('style');
       Object.keys(theme).forEach(val => {
+        if (val === 'name') return;
         dispatch(setThemeValue(val, theme[val]));
         dispatch(saveThemeValue(val, theme[val]));
       });

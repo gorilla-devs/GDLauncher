@@ -11,7 +11,7 @@ const SelectSetting = (props) => {
           <div className={styles.description}>{props.description}</div>
         </div>
         <div className={styles.action}>
-          <Select style={{width: 120}} disabled={props.disabled || false} loading={props.loading || false} onChange={props.onChange || null}>
+          <Select style={{width: 150}} placeholder={props.placeholder || "Select a value"} disabled={props.disabled || false} loading={props.loading || false} onChange={props.onChange || null}>
           {props.options.map(opt => <Select.Option value={opt}>{opt}</Select.Option>)}
           </Select>
         </div>

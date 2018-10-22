@@ -103,7 +103,7 @@ export default class Home extends Component<Props> {
                     </Link>
                   </div>
                   <div style={{ flexBasis: '30%', textAlign: 'center' }}>
-                    <h2>Hey you! Yes, You!</h2>
+                    <h2>Hey you! Yes, you!</h2>
                     <img
                       draggable="false"
                       src="http://www.stickpng.com/assets/images/580b57fcd9996e24bc43c2fb.png"

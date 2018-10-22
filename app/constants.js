@@ -40,18 +40,21 @@ export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
 export const THEMES = {
   default: {
+    name: 'Default',
     primary: '#2980b9',
     'secondary-color-1': '#34495e',
     'secondary-color-2': '#2c3e50',
     'secondary-color-3': '#212b36'
   },
   carrotUniverse: {
+    name: 'Carrot Universe',
     primary: '#d35400',
     'secondary-color-1': '#433c8c',
     'secondary-color-2': '#2f2878',
     'secondary-color-3': '#1b1464'
   },
   concreteLeaf: {
+    name: 'Concrete Leaf',
     primary: '#16a085',
     'secondary-color-1': '#3b3f42',
     'secondary-color-2': '#272b2e',

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
 import axios from 'axios';
+import ContentLoader from 'react-content-loader';
 import path from 'path';
 import log from 'electron-log';
 import {
@@ -76,31 +77,31 @@ class ModsList extends Component<Props> {
         [...new Array(10)].map(() => ({ loading: true, name: {} }))
       )
     });
-    // const res = await axios.get(
-    //   `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=${
-    //     this.state.list.length
-    //   }&sort=${this.state.filterType}&searchFilter=${
-    //     this.state.searchText
-    //   }&gameVersion=${
-    //     this.props.match.params.version
-    //   }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
-    //     'author' && this.state.filterType !== 'name'}`
-    // );
-    // // We now remove the previous 10 elements and add the real 10
-    // const data = this.state.data.concat(res.data);
-    // this.setState(
-    //   {
-    //     list: data,
-    //     data,
-    //     loading: false
-    //   },
-    //   () => {
-    //     // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-    //     // In a real scene, you can use the public method of react-virtualized:
-    //     // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-    //     window.dispatchEvent(new Event('resize'));
-    //   }
-    // );
+    const res = await axios.get(
+      `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=${
+        this.state.list.length
+      }&sort=${this.state.filterType}&searchFilter=${
+        this.state.searchText
+      }&gameVersion=${
+        this.props.match.params.version
+      }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
+        'author' && this.state.filterType !== 'name'}`
+    );
+    // We now remove the previous 10 elements and add the real 10
+    const data = this.state.data.concat(res.data);
+    this.setState(
+      {
+        list: data,
+        data,
+        loading: false
+      },
+      () => {
+        // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
+        // In a real scene, you can use the public method of react-virtualized:
+        // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
+        window.dispatchEvent(new Event('resize'));
+      }
+    );
   };
 
   installMod = async (data, parent = null) => {
@@ -280,7 +281,22 @@ class ModsList extends Component<Props> {
                 )
               ]}
             >
-              <Skeleton avatar title={false} loading={item.loading} active>
+              {item.loading ? (
+                <ContentLoader
+                  height={100}
+                  speed={0.6}
+                  primaryColor="var(--secondary-color-2)"
+                  secondaryColor="var(--secondary-color-3)"
+                  style={{
+                    height: '100px'
+                  }}
+                >
+                  <circle cx="17" cy="40" r="17" />
+                  <rect x="45" y="0" rx="0" ry="0" width={Math.floor(Math.random() * 80) + 150} height="20" />
+                  <rect x="45" y="30" rx="0" ry="0" width={Math.floor(Math.random() * 150) + 250} height="16" />
+                  <rect x="45" y="50" rx="0" ry="0" width={Math.floor(Math.random() * 150) + 250} height="16" />
+                </ContentLoader>
+              ) : (
                 <List.Item.Meta
                   avatar={
                     <Avatar
@@ -333,7 +349,7 @@ class ModsList extends Component<Props> {
                     )
                   }
                 />
-              </Skeleton>
+              )}
             </List.Item>
           )}
         />

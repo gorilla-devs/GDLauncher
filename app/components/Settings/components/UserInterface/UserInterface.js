@@ -49,6 +49,7 @@ const secondaryPresets = [
   '#0a3d62'
 ];
 
+
 const UserInterface = props => {
   return (
     <div>
@@ -65,8 +66,9 @@ const UserInterface = props => {
           }
           description="Adjust these values to fit your taste"
           icon="layout"
-          onChange={props.setTheme}
-          options={themes}
+          placeholder="Select a theme"
+          onChange={v => props.applyTheme(THEMES[Object.keys(THEMES).find(ver => THEMES[ver].name === v)])}
+          options={Object.keys(THEMES).map(t => THEMES[t].name)}
         />
         <div className={styles.pickersContainer}>
           <div>
