@@ -30,7 +30,7 @@ export default function Settings(state = initialState, action) {
     case RESET_THEME:
       return {
         ...state,
-        theme: {}
+        theme: action.payload
       };
     default:
       return state;

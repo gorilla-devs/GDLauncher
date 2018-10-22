@@ -5,7 +5,6 @@
 @import './antd.css';
 @import './style/theme/index';
 
-
 @font-face {
   font-family: 'GlacialIndifferenceBold';
   src: url('./assets/fonts/GlacialIndifferenceBold.otf') format('opentype');
@@ -225,6 +224,19 @@ a:hover {
   border-color: var(--primary);
 }
 
+.ant-cascader-menus {
+  background-color: var(--secondary-color-2);
+}
+
+.ant-cascader-menu-item:hover {
+  background-color: var(--secondary-color-3);
+}
+
+.ant-cascader-menu-item-active:not(.ant-cascader-menu-item-disabled),
+.ant-cascader-menu-item-active:not(.ant-cascader-menu-item-disabled):hover {
+  background-color: var(--secondary-color-3);
+}
+
 .ant-switch-checked,
 .ant-checkbox-checked .ant-checkbox-inner,
 .ant-checkbox-indeterminate .ant-checkbox-inner {
@@ -237,6 +249,7 @@ a:hover {
 }
 .ant-input,
 .ant-input-group-addon {
+  background-color: var(--secondary-color-2);
   border-color: var(--secondary-color-2);
   border-width: 2px !important;
   border-right-width: 2px !important;
@@ -323,7 +336,6 @@ a:hover {
 .ant-popover-title {
   color: $text-dark;
 }
-
 
 .sketch-picker {
   color: black;

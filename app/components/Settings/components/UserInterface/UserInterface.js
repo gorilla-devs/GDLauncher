@@ -10,6 +10,43 @@ import * as SettingsActions from '../../../../actions/settings';
 import shader from '../../../../utils/colors';
 
 const themes = ['Blue', 'Black', 'Green'];
+const primaryPresets = [
+  '#16a085',
+  '#27ae60',
+  '#2980b9',
+  '#8e44ad',
+  '#2c3e50',
+  '#f39c12',
+  '#d35400',
+  '#c0392b',
+  '#f9ca24',
+  '#f0932b',
+  '#eb4d4b',
+  '#6ab04c',
+  '#4834d4',
+  '#0097e6',
+  '#8c7ae6',
+  '#192a56'
+];
+
+const secondaryPresets = [
+  '#34495e',
+  '#2c3e50',
+  '#95a5a6',
+  '#bdc3c7',
+  '#353b48',
+  '#2f3640',
+  '#192a56',
+  '#273c75',
+  '#2c2c54',
+  '#4b6584',
+  '#c23616',
+  '#B2263D',
+  '#D4582F',
+  '#1B1464',
+  '#0c2461',
+  '#0a3d62'
+];
 
 const UserInterface = props => {
   return (
@@ -37,22 +74,26 @@ const UserInterface = props => {
               onChange={v => props.setThemeValue('primary', v.hex)}
               onChangeComplete={v => props.saveThemeValue('primary', v.hex)}
               color={props.settings.theme.primary}
+              presetColors={primaryPresets}
+              disableAlpha
             />
           </div>
           <div>
             Secondary Color{' '}
             <SketchPicker
               onChange={v => {
-                props.setThemeValue('secondary-color-1', v.hex);
-                props.setThemeValue('secondary-color-2', shader(v.hex, 10));
-                props.setThemeValue('secondary-color-3', shader(v.hex, 30));
+                props.setThemeValue('secondary-color-1', shader(v.hex, 40));
+                props.setThemeValue('secondary-color-2', shader(v.hex, 20));
+                props.setThemeValue('secondary-color-3', v.hex);
               }}
               onChangeComplete={v => {
-                props.saveThemeValue('secondary-color-1', v.hex);
-                props.saveThemeValue('secondary-color-2', shader(v.hex, 10));
-                props.saveThemeValue('secondary-color-3', shader(v.hex, 30));
+                props.saveThemeValue('secondary-color-1', shader(v.hex, 40));
+                props.saveThemeValue('secondary-color-2', shader(v.hex, 20));
+                props.saveThemeValue('secondary-color-3', v.hex);
               }}
               color={props.settings.theme['secondary-color-1']}
+              presetColors={secondaryPresets}
+              disableAlpha
             />
           </div>
         </div>
