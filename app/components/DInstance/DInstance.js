@@ -110,6 +110,7 @@ export default class DInstance extends Component<Props> {
 
   deleteInstance = async () => {
     try {
+      this.setState({ deleting: true });
       await fsa.remove(path.join(PACKS_PATH, this.props.name));
       this.props.selectInstance(null);
       message.success('Instance deleted');
@@ -117,6 +118,8 @@ export default class DInstance extends Component<Props> {
       hideMenu(`contextMenu-${this.props.name}`);
       message.error('Error deleting instance');
       log.error(err);
+    } finally {
+      this.setState({ deleting: false });
     }
   };
 
@@ -152,7 +155,11 @@ export default class DInstance extends Component<Props> {
               </span>
             )}
             {this.isInstalling() && (
-              <Icon className={styles.icon__iconState} type="loading" theme="outlined" />
+              <Icon
+                className={styles.icon__iconState}
+                type="loading"
+                theme="outlined"
+              />
             )}
             <div className={styles.icon}>
               <div
@@ -188,16 +195,21 @@ export default class DInstance extends Component<Props> {
             {name} ({this.state.version})
           </span>
           <MenuItem
-            disabled={this.isInstalling()}
+            disabled={this.isInstalling() || this.state.deleting}
             onClick={this.handleClickPlay}
           >
-            <i className="fas fa-play" style={{ marginRight: '8px' }} />
-            {this.props.playing.find(el => el.name === name)
-              ? 'Kill'
-              : 'Launch'}
+            {this.props.playing.find(el => el.name === name) ? (
+              <div>
+                <Icon type="thunderbolt" theme="filled" /> Kill
+              </div>
+            ) : (
+              <div>
+                <Icon type="play-circle" theme="filled" /> Launch
+              </div>
+            )}
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling()}
+            disabled={this.isInstalling() || this.state.deleting}
             data={{ foo: 'bar' }}
             onClick={() =>
               history.push({
@@ -206,14 +218,12 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <i className="fas fa-wrench" style={{ marginRight: '8px' }} />
-            Manage
+            <Icon type="tool" theme="filled" /> Manage
           </MenuItem>
           <MenuItem
             onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
           >
-            <i className="fas fa-folder" style={{ marginRight: '8px' }} />
-            Open Folder
+            <Icon type="folder" theme="filled" /> Open Folder
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -224,7 +234,7 @@ export default class DInstance extends Component<Props> {
                   APPPATH,
                   'GDLauncher.exe'
                 )}';$s.Arguments='-i ${this.props.name}';$s.Save()`,
-                (error) => {
+                error => {
                   if (error) {
                     log.error(`Error creating instance symlink: ${error}`);
                     message.error(
@@ -244,25 +254,31 @@ export default class DInstance extends Component<Props> {
                 }
               );
             }}
-            disabled={this.isInstalling() || process.platform !== 'win32'}
+            disabled={this.isInstalling() || process.platform !== 'win32' || this.state.deleting}
           >
-            <i className="fas fa-link" style={{ marginRight: '8px' }} />
-            Create Shortcut
+            <Icon type="link" theme="outlined" /> Create Shortcut
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling()}
+            disabled={this.isInstalling() || this.state.deleting}
             onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
           >
-            <i className="fas fa-file-export" style={{ marginRight: '8px' }} />
-            Export Instance
+            <Icon type="export" theme="outlined" /> Export Instance
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling()}
+            disabled={this.isInstalling() || this.state.deleting}
             data={{ foo: 'bar' }}
             onClick={this.deleteInstance}
+            preventClose
           >
-            <i className="fas fa-trash-alt" style={{ marginRight: '8px' }} />
-            {this.state.deleting ? 'Deleting...' : 'Delete'}
+            {this.state.deleting ? (
+              <div>
+                <Icon type="loading" theme="outlined" /> Deleting...
+              </div>
+            ) : (
+              <div>
+                <Icon type="delete" theme="filled" /> Delete
+              </div>
+            )}
           </MenuItem>
         </ContextMenu>
       </div>

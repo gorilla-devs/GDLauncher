@@ -101,24 +101,15 @@ a:hover {
   margin: 2px 0 0;
   min-width: 160px;
   outline: none;
+  transform: scale(0);
+  transform-origin: top left;
   /* padding: 5px 0; */
   pointer-events: none;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: transform 2000ms !important;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  // animation: scale-up-tl 1s linear both;
-}
+  transition: transform 200ms !important;
 
-@keyframes scale-up-tl {
-  0% {
-    transform: scale(0);
-    transform-origin: 0% 0%;
-  }
-  100% {
-    transform: scale(1);
-    transform-origin: 0% 0%;
-  }
 }
 
 .react-contextmenu span {
@@ -128,6 +119,8 @@ a:hover {
 }
 
 .react-contextmenu.react-contextmenu--visible {
+  transition: transform 200ms !important;
+  transform: scale(1);
   pointer-events: auto;
   z-index: 9999;
 }
@@ -199,6 +192,15 @@ a:hover {
 .ant-btn-ghost {
   border-width: 2px !important;
   border-right-width: 2px !important;
+}
+
+.ant-btn-group .ant-btn-primary:first-child:not(:last-child) {
+  border-right-color: var(--primary);
+}
+
+.ant-btn-group .ant-btn-primary:last-child:not(:first-child),
+.ant-btn-group .ant-btn-primary + .ant-btn-primary {
+  border-left-color: var(--primary);
 }
 
 .ant-btn-ghost:hover,
