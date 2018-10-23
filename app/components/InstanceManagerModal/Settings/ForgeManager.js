@@ -55,6 +55,7 @@ class Instances extends Component<Props> {
         this.props.name,
         this.state.forgeSelectVersion
       );
+      this.props.closeModal();
     }
   };
 
@@ -89,6 +90,7 @@ class Instances extends Component<Props> {
           <Select
             style={{ width: '140px' }}
             placeholder="Select a version"
+            notFoundContent="No version found"
             onChange={this.handleForgeVersionChange}
           >
             {this.props.forgeVersions[this.props.data.version] && _.reverse(this.props.forgeVersions[this.props.data.version].slice()).map(

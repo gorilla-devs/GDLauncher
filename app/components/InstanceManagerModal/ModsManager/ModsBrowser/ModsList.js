@@ -5,16 +5,7 @@ import axios from 'axios';
 import ContentLoader from 'react-content-loader';
 import path from 'path';
 import log from 'electron-log';
-import {
-  List,
-  Avatar,
-  Button,
-  Skeleton,
-  Input,
-  Select,
-  Icon,
-  Popover
-} from 'antd';
+import { List, Avatar, Button, Input, Select, Icon, Popover } from 'antd';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
@@ -74,7 +65,7 @@ class ModsList extends Component<Props> {
       loading: true,
       // Adding 10 fakes elements to the list to simulate a loading
       list: this.state.data.concat(
-        [...new Array(10)].map(() => ({ loading: true, name: {} }))
+        [...new Array(10)].map(() => ({ loading: true, name: null }))
       )
     });
     const res = await axios.get(
@@ -266,18 +257,23 @@ class ModsList extends Component<Props> {
             <List.Item
               actions={[
                 !item.loading && (
-                  <Button
-                    type="primary"
-                    loading={this.isInstalling(item)}
-                    disabled={this.isDownloadCompleted(item)}
-                    onClick={() => this.installMod(item)}
-                  >
-                    {this.isInstalling(item)
-                      ? 'Installing'
-                      : this.isDownloadCompleted(item)
-                        ? 'Installed'
-                        : 'Install'}
-                  </Button>
+                  <Button.Group>
+                    <Button
+                      type="primary"
+                      loading={this.isInstalling(item)}
+                      disabled={this.isDownloadCompleted(item)}
+                      onClick={() => this.installMod(item)}
+                    >
+                      {this.isInstalling(item)
+                        ? 'Installing'
+                        : this.isDownloadCompleted(item)
+                          ? 'Installed'
+                          : 'Install'}
+                    </Button>
+                    <Popover content={<div style={{width: 200, height: 200}}>Testing</div>} placement="bottomRight" title="Title" trigger="click">
+                      <Button type="primary" icon="caret-down" />
+                    </Popover>
+                  </Button.Group>
                 )
               ]}
             >
@@ -292,9 +288,30 @@ class ModsList extends Component<Props> {
                   }}
                 >
                   <circle cx="17" cy="40" r="17" />
-                  <rect x="45" y="0" rx="0" ry="0" width={Math.floor(Math.random() * 80) + 150} height="20" />
-                  <rect x="45" y="30" rx="0" ry="0" width={Math.floor(Math.random() * 150) + 250} height="16" />
-                  <rect x="45" y="50" rx="0" ry="0" width={Math.floor(Math.random() * 150) + 250} height="16" />
+                  <rect
+                    x="45"
+                    y="0"
+                    rx="0"
+                    ry="0"
+                    width={Math.floor(Math.random() * 80) + 150}
+                    height="20"
+                  />
+                  <rect
+                    x="45"
+                    y="30"
+                    rx="0"
+                    ry="0"
+                    width={Math.floor(Math.random() * 150) + 250}
+                    height="16"
+                  />
+                  <rect
+                    x="45"
+                    y="50"
+                    rx="0"
+                    ry="0"
+                    width={Math.floor(Math.random() * 150) + 250}
+                    height="16"
+                  />
                 </ContentLoader>
               ) : (
                 <List.Item.Meta

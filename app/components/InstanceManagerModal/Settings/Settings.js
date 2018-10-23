@@ -136,6 +136,7 @@ class Instances extends Component<Props> {
               <ForgeManager
                 name={this.props.instance}
                 data={this.state.instanceConfig}
+                closeModal={this.props.close}
               />
             ) : null}
           </Card>
