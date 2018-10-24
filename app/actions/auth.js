@@ -24,58 +24,61 @@ export const START_NATIVE_LOADING = 'START_NATIVE_LOADING';
 export const STOP_NATIVE_LOADING = 'STOP_NATIVE_LOADING';
 
 export function login(username, password, remember) {
-  return async (dispatch) => {
+  return async dispatch => {
     dispatch({
       type: START_AUTH_LOADING
     });
     try {
-      await axios.post(
-        LOGIN_PROXY_API,
-        {
+      await axios
+        .post(LOGIN_PROXY_API, {
           username,
           password
-        }
-      ).then(res => {
-        if (res.status === 200 &&
-          res.data !== undefined &&
-          res.data !== null &&
-          Object.prototype.hasOwnProperty.call(res.data, 'accessToken')) {
-          const { data } = res;
-          const payload = {
-            email: data.userData.email,
-            username: data.username,
-            displayName: data.displayName,
-            accessToken: data.accessToken,
-            clientToken: data.clientToken,
-            legacy: data.legacy,
-            uuid: data.uuid,
-            userID: data.userID,
-            newUser: data.newUser
-          };
-          if (remember) {
-            store.set({
-              user: {
-                ...payload
-              },
-              lastUsername: data.userData.username
+        })
+        .then(res => {
+          if (
+            res.status === 200 &&
+            res.data !== undefined &&
+            res.data !== null &&
+            Object.prototype.hasOwnProperty.call(res.data, 'accessToken')
+          ) {
+            const { data } = res;
+            const payload = {
+              email: data.userData.email,
+              username: data.username,
+              displayName: data.displayName,
+              accessToken: data.accessToken,
+              clientToken: data.clientToken,
+              legacy: data.legacy,
+              uuid: data.uuid,
+              userID: data.userID,
+              newUser: data.newUser
+            };
+            if (remember) {
+              store.set({
+                user: {
+                  ...payload
+                },
+                lastUsername: data.userData.username
+              });
+            }
+            dispatch({
+              type: AUTH_SUCCESS,
+              payload
+            });
+
+            dispatch(push('/home'));
+          } else {
+            message.error('Wrong username or password');
+            dispatch({
+              type: AUTH_FAILED
             });
           }
-          dispatch({
-            type: AUTH_SUCCESS,
-            payload
-          });
-
-          dispatch(push('/home'));
-        } else {
-          message.error('Wrong username or password');
-          dispatch({
-            type: AUTH_FAILED
-          });
-        }
-        return res;
-      });
+          return res;
+        });
     } catch (err) {
-      message.error(`Auth failed: ${err.message}`);
+      if (err.response.status === 502)
+        message.error(`Too many login attempts. Try again in 5 minutes`);
+      else message.error(`${err.response.data.reason}`);
     } finally {
       dispatch({
         type: STOP_AUTH_LOADING
@@ -85,7 +88,7 @@ export function login(username, password, remember) {
 }
 
 export function logout() {
-  return (dispatch) => {
+  return dispatch => {
     store.delete('user');
     dispatch({
       type: LOGOUT
@@ -95,7 +98,7 @@ export function logout() {
 }
 
 export function checkAccessToken() {
-  return async (dispatch) => {
+  return async dispatch => {
     const userData = store.get('user');
     if (userData) {
       dispatch({
@@ -148,12 +151,14 @@ export function tryNativeLauncherProfiles() {
   / user data and the access token but also update it in the native launcher
   / profiles json.
   */
-  return async (dispatch) => {
+  return async dispatch => {
     const homedir = process.env.APPDATA || os.homedir();
     const vanillaMCPath = path.join(homedir, '.minecraft');
     try {
       dispatch({ type: START_NATIVE_LOADING });
-      const vnlJson = await fsa.readJson(path.join(vanillaMCPath, 'launcher_profiles.json'));
+      const vnlJson = await fsa.readJson(
+        path.join(vanillaMCPath, 'launcher_profiles.json')
+      );
       const { account } = vnlJson.selectedUser;
       const { accessToken } = vnlJson.authenticationDatabase[account];
       const res = await axios.post(
@@ -161,10 +166,12 @@ export function tryNativeLauncherProfiles() {
         { accessToken },
         { 'Content-Type': 'application/json;charset=UTF-8' }
       );
-      if (res.status === 200 &&
+      if (
+        res.status === 200 &&
         res.data !== undefined &&
         res.data !== null &&
-        Object.prototype.hasOwnProperty.call(res.data, 'accessToken')) {
+        Object.prototype.hasOwnProperty.call(res.data, 'accessToken')
+      ) {
         const { data } = res;
         const payload = {
           email: data.userData.email,
@@ -178,8 +185,12 @@ export function tryNativeLauncherProfiles() {
           newUser: data.newUser
         };
         // We need to update the accessToken in launcher_profiles.json
-        vnlJson.authenticationDatabase[data.userID].accessToken = data.accessToken;
-        await fsa.writeJson(path.join(vanillaMCPath, 'launcher_profiles.json'), vnlJson);
+        vnlJson.authenticationDatabase[data.userID].accessToken =
+          data.accessToken;
+        await fsa.writeJson(
+          path.join(vanillaMCPath, 'launcher_profiles.json'),
+          vnlJson
+        );
         store.set({
           user: { ...payload },
           lastUsername: data.userData.email

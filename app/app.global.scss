@@ -108,7 +108,7 @@ a:hover {
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 200ms !important;
+  transition: transform 135ms !important;
 
 }
 
@@ -119,7 +119,7 @@ a:hover {
 }
 
 .react-contextmenu.react-contextmenu--visible {
-  transition: transform 200ms !important;
+  transition: transform 135ms !important;
   transform: scale(1);
   pointer-events: auto;
   z-index: 9999;
@@ -387,4 +387,13 @@ a:hover {
   input {
     padding: 0 !important;
   }
+}
+
+.ant-popover-inner {
+  background: var(--secondary-color-1);
+  border: 3px solid var(--primary);
+}
+
+.ant-popover-inner-content {
+  color: white;
 }
