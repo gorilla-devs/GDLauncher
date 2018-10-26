@@ -25,11 +25,9 @@ class ModsList extends Component<Props> {
       loading: false,
       list: [],
       data: [],
-      installing: [],
       searchText: '',
       filterType: 'Featured'
     };
-    console.log(this);
   }
 
   componentDidMount = async () => {
@@ -49,7 +47,7 @@ class ModsList extends Component<Props> {
     const res = await axios.get(
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=0&sort=${
         this.state.filterType
-      }&searchFilter=${this.state.searchText}&gameVersion=${
+      }&searchFilter=${encodeURI(this.state.searchText)}&gameVersion=${
         this.props.match.params.version
       }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
         'author' && this.state.filterType !== 'name'}`
@@ -72,9 +70,9 @@ class ModsList extends Component<Props> {
     const res = await axios.get(
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=${
         this.state.list.length
-      }&sort=${this.state.filterType}&searchFilter=${
+      }&sort=${this.state.filterType}&searchFilter=${encodeURI(
         this.state.searchText
-      }&gameVersion=${
+      )}&gameVersion=${
         this.props.match.params.version
       }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
         'author' && this.state.filterType !== 'name'}`
@@ -96,110 +94,6 @@ class ModsList extends Component<Props> {
     );
   };
 
-  installMod = async (data, parent = null) => {
-    const { projectFileId, projectFileName } = data.gameVersionLatestFiles
-      ? data.gameVersionLatestFiles.find(
-          n => n.gameVersion === this.props.match.params.version
-        )
-      : data;
-    if (parent === null) {
-      this.setState(prevState => ({
-        installing: {
-          ...prevState.installing,
-          [projectFileName]: {
-            installing: true,
-            completed: false
-          }
-        }
-      }));
-    }
-
-    const url = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${data.id}/file/${projectFileId}`
-    );
-
-    await downloadFile(
-      path.join(
-        PACKS_PATH,
-        this.props.match.params.instance,
-        'mods',
-        url.data.fileNameOnDisk
-      ),
-      url.data.downloadUrl,
-      () => {}
-    );
-    if (url.data.dependencies.length !== 0) {
-      url.data.dependencies.forEach(async dep => {
-        // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
-        if (dep.type === 1 && dep.addonId !== data.id) {
-          const depData = await axios.get(
-            `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}`
-          );
-          await this.installMod(depData.data, projectFileName);
-        }
-      });
-    }
-    this.setState(prevState => ({
-      installing: {
-        ...prevState.installing,
-        [parent === null ? projectFileName : parent]: {
-          installing: false,
-          completed: true
-        }
-      }
-    }));
-  };
-
-  getAddonFiles = async addon => {
-    const url = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${addon}/files`
-    );
-    const files = url.data.filter(el =>
-      el.gameVersion.includes(this.props.match.params.version)
-    );
-    this.setState(prevState => ({
-      list: prevState.list.map(
-        el =>
-          el.id === addon
-            ? { ...el, allFiles: _.orderBy(files, ['fileDate'], ['desc']) }
-            : el
-      )
-    }));
-    console.log(this.state.list);
-  };
-
-  isDownloadCompleted = data => {
-    if (typeof data === 'object') {
-      const mod = Object.keys(this.state.installing).find(
-        n =>
-          n ===
-          data.gameVersionLatestFiles.find(
-            x => x.gameVersion === this.props.match.params.version
-          ).projectFileName
-      );
-      return (
-        this.state.installing[mod] && this.state.installing[mod].completed
-      );
-    }
-    return this.state.installing[data] && this.state.installing[data].completed;
-  };
-
-  isInstalling = data => {
-    if (typeof data === 'object') {
-      const mod = Object.keys(this.state.installing).find(
-        n =>
-          n ===
-          data.gameVersionLatestFiles.find(
-            x => x.gameVersion === this.props.match.params.version
-          ).projectFileName
-      );
-      return (
-        this.state.installing[mod] && this.state.installing[mod].installing
-      );
-    }
-    return this.state.installing[data] && this.state.installing[data].installing;
-  };
-
   filterChanged = async value => {
     this.setState({ filterType: value }, async () => {
       try {
@@ -211,7 +105,7 @@ class ModsList extends Component<Props> {
   };
 
   onSearchChange = e => {
-    this.setState({ searchText: encodeURI(e.target.value) });
+    this.setState({ searchText: e.target.value });
   };
 
   onSearchSubmit = async () => {
@@ -288,93 +182,21 @@ class ModsList extends Component<Props> {
             <List.Item
               actions={[
                 !item.loading && (
-                  <Button.Group>
-                    <Button
-                      type="primary"
-                      loading={this.isInstalling(item)}
-                      disabled={this.isDownloadCompleted(item)}
-                      onClick={() => this.installMod(item)}
-                    >
-                      {this.isInstalling(item)
-                        ? 'Installing'
-                        : this.isDownloadCompleted(item)
-                          ? 'Installed'
-                          : 'Install'}
+                  <Link
+                    to={{
+                      pathname: `/editInstance/${
+                        this.props.match.params.instance
+                      }/mods/browse/${this.props.match.params.version}/${
+                        item.id
+                      }`,
+                      state: { modal: true }
+                    }}
+                    replace
+                  >
+                    <Button type="primary">
+                      Explore <Icon type="caret-right" />
                     </Button>
-                    <Popover
-                      content={
-                        <div style={{ width: 500, height: 200 }}>
-                          {item.allFiles ? (
-                            <div style={{ overflowY: 'auto', height: 200 }}>
-                              {item.allFiles.map((el, index) => (
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    margin: '0 10px',
-                                    height: '50px',
-                                    background: `var(--secondary-color-${index % 2 === 0 ? 1 : 2})`
-                                  }}
-                                >
-                                  <span style={{lineHeight: '50px'}}>{el.fileNameOnDisk}</span>
-                                  <Button
-                                    type="primary"
-                                    loading={this.isInstalling(el.fileName)}
-                                    disabled={this.isDownloadCompleted(el.fileName)}
-                                    onClick={() =>
-                                      this.installMod({
-                                        id: item.id,
-                                        projectFileId: el.id,
-                                        projectFileName: el.fileName
-                                      })
-                                    }
-                                  >
-                                    {this.isInstalling(el.fileName)
-                                      ? 'Installing'
-                                      : this.isDownloadCompleted(el.fileName)
-                                        ? 'Installed'
-                                        : 'Install'}
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <ContentLoader
-                              height={200}
-                              width={500}
-                              speed={0.6}
-                              primaryColor="var(--secondary-color-2)"
-                              secondaryColor="var(--secondary-color-3)"
-                              style={{
-                                height: '200px',
-                                width: '500px'
-                              }}
-                            >
-                              {Array.from({ length: 4 }, (item, index) => (
-                                <rect
-                                  x="0"
-                                  y={index * 55}
-                                  rx="0"
-                                  ry="0"
-                                  width="500"
-                                  height="28"
-                                />
-                              ))}
-                            </ContentLoader>
-                          )}
-                        </div>
-                      }
-                      onVisibleChange={visible =>
-                        visible && this.getAddonFiles(item.id)
-                      }
-                      placement="bottomRight"
-                      title={`${item.name} versions`}
-                      trigger="click"
-                    >
-                      <Button type="primary" icon="caret-down" />
-                    </Popover>
-                  </Button.Group>
+                  </Link>
                 )
               ]}
             >

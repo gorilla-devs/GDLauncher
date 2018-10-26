@@ -9,6 +9,8 @@ import styles from './Login.scss';
 import store from '../../localStore';
 import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
 import * as AuthActions from '../../actions/auth';
+import shader from '../../utils/colors';
+import background from '../../assets/images/login_background.jpg';
 
 type Props = {
   form: any,
@@ -16,10 +18,12 @@ type Props = {
   tryNativeLauncherProfiles: () => void,
   tokenLoading: boolean,
   authLoading: boolean,
-  nativeLoading: boolean,
+  nativeLoading: boolean
 };
 
 const FormItem = Form.Item;
+
+// This is awful but it gets the primary color in real time
 
 class Login extends Component<Props> {
   props: Props;
@@ -32,6 +36,11 @@ class Login extends Component<Props> {
     };
   }
 
+  componentWillMount = () => {
+    this.colors = store.get('settings.theme');
+  }
+  
+
   componentDidMount = async () => {
     this.ismounted = true;
     const nativeLauncherProfiles = await OfficialLancherProfilesExists();
@@ -40,13 +49,13 @@ class Login extends Component<Props> {
     if (this.ismounted) {
       this.setState({ nativeLauncherProfiles });
     }
-  }
+  };
 
   componentWillUnmount = () => {
     this.ismounted = false;
-  }
+  };
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -55,7 +64,7 @@ class Login extends Component<Props> {
         log.error(err);
       }
     });
-  }
+  };
 
   /* eslint-enable */
 
@@ -64,7 +73,12 @@ class Login extends Component<Props> {
 
     return (
       <div>
-        <main className={styles.content}>
+        <main
+          className={styles.content}
+          style={{
+            background: `linear-gradient( ${this.colors['secondary-color-2']}8A, ${this.colors['secondary-color-2']}8A), url(${background})`
+          }}
+        >
           <div className={styles.login_form}>
             <h1 style={{ textAlign: 'center', fontSize: 30 }}>
               GorillaDevs Login
@@ -72,37 +86,71 @@ class Login extends Component<Props> {
             <Form onSubmit={this.handleSubmit}>
               <FormItem>
                 {getFieldDecorator('username', {
-                  rules: [{ required: true, message: 'Please input your email!' }],
-                  initialValue: store.has('lastUsername') ? store.get('lastUsername') : ''
-                })(<Input
-                  disabled={this.props.tokenLoading || this.props.nativeLoading || this.props.authLoading}
-                  size="large"
-                  prefix={<Icon type="user" style={{ color: 'rgba(255,255,255,.8)' }} />}
-                  placeholder="Email"
-                />)}
+                  rules: [
+                    { required: true, message: 'Please input your email!' }
+                  ],
+                  initialValue: store.has('lastUsername')
+                    ? store.get('lastUsername')
+                    : ''
+                })(
+                  <Input
+                    disabled={
+                      this.props.tokenLoading ||
+                      this.props.nativeLoading ||
+                      this.props.authLoading
+                    }
+                    size="large"
+                    prefix={
+                      <Icon
+                        type="user"
+                        style={{ color: 'rgba(255,255,255,.8)' }}
+                      />
+                    }
+                    placeholder="Email"
+                  />
+                )}
               </FormItem>
               <FormItem>
                 {getFieldDecorator('password', {
-                  rules: [{ required: true, message: 'Please input your Password!' }],
-                })(<Input
-                  size="large"
-                  disabled={this.props.tokenLoading || this.props.nativeLoading || this.props.authLoading}
-                  prefix={<Icon type="lock" style={{ color: 'rgba(255,255,255,.8)' }} />}
-                  addonAfter={
-                    <Link to={{ pathname: '/loginHelperModal', state: { modal: true } }} draggable="false">
-                      <Tooltip title="Need Help?">
-                        <Icon type="question" onClick={this.openHelpModal} />
-                      </Tooltip>
-                    </Link>
-                  }
-                  type="password"
-                  placeholder="Password"
-                />)}
+                  rules: [
+                    { required: true, message: 'Please input your Password!' }
+                  ]
+                })(
+                  <Input
+                    size="large"
+                    disabled={
+                      this.props.tokenLoading ||
+                      this.props.nativeLoading ||
+                      this.props.authLoading
+                    }
+                    prefix={
+                      <Icon
+                        type="lock"
+                        style={{ color: 'rgba(255,255,255,.8)' }}
+                      />
+                    }
+                    addonAfter={
+                      <Link
+                        to={{
+                          pathname: '/loginHelperModal',
+                          state: { modal: true }
+                        }}
+                        draggable="false"
+                      >
+                        <Tooltip title="Need Help?">
+                          <Icon type="question" onClick={this.openHelpModal} />
+                        </Tooltip>
+                      </Link>
+                    }
+                    type="password"
+                    placeholder="Password"
+                  />
+                )}
               </FormItem>
               <FormItem>
                 {getFieldDecorator('remember', {
                   valuePropName: 'checked',
-                  initialValue: true,
+                  initialValue: true
                 })(<Checkbox>Remember me</Checkbox>)}
                 <Button
                   icon="login"
@@ -117,7 +165,7 @@ class Login extends Component<Props> {
                 </Button>
               </FormItem>
             </Form>
-            {this.state.nativeLauncherProfiles &&
+            {this.state.nativeLauncherProfiles && (
               <Button
                 icon="forward"
                 loading={this.props.nativeLoading}
@@ -129,9 +177,16 @@ class Login extends Component<Props> {
               >
                 Skip login
               </Button>
-            }
+            )}
           </div>
-          <div style={{ position: 'absolute', bottom: 30, right: 30, color: '#bdc3c7' }}>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 30,
+              right: 30,
+              color: '#bdc3c7'
+            }}
+          >
             v{require('../../package.json').version}
           </div>
         </main>
@@ -153,4 +208,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(AuthActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Login);

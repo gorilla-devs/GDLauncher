@@ -7,7 +7,7 @@ import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs';
 import log from 'electron-log';
-import { List, Icon, Avatar, Radio } from 'antd';
+import { List, Icon, Button, Radio } from 'antd';
 import { PACKS_PATH } from '../../../constants';
 import ModsList from './ModsBrowser/ModsList';
 import LocalMods from './LocalMods/LocalMods';
@@ -65,34 +65,56 @@ class ModsManager extends Component<Props> {
     }
     return (
       <div style={{ width: '100%', maxWidth: '800px', margin: 10 }}>
-        <Radio.Group
-          value={this.props.match.params.state}
-          buttonStyle="solid"
-          style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}
-        >
-          <Link
-            to={{
-              pathname: `/editInstance/${
-                this.props.match.params.instance
-              }/mods/local`,
-              state: { modal: true }
-            }}
-            replace
+        <div style={{position: 'relative'}}>
+          <Route
+            path={`/editInstance/${
+              this.props.match.params.instance
+            }/mods/browse/${this.state.version}/:mod`}
+            render={() => (
+              <Link
+                to={{
+                  pathname: `/editInstance/${
+                    this.props.match.params.instance
+                  }/mods/browse/${this.props.match.params.version}`,
+                  state: { modal: true }
+                }}
+                replace
+              >
+                <Button type="primary" icon="caret-left" style={{ position: 'absolute', marginLeft: 10 }}>
+                  Go Back
+                </Button>
+              </Link>
+            )}
+          />
+          <Radio.Group
+            value={this.props.match.params.state}
+            buttonStyle="solid"
+            style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}
           >
-            <Radio.Button value="local">Local</Radio.Button>
-          </Link>
-          <Link
-            to={{
-              pathname: `/editInstance/${
-                this.props.match.params.instance
-              }/mods/browse/${this.state.version}`,
-              state: { modal: true }
-            }}
-            replace
-          >
-            <Radio.Button value="browse">Browse</Radio.Button>
-          </Link>
-        </Radio.Group>
+            <Link
+              to={{
+                pathname: `/editInstance/${
+                  this.props.match.params.instance
+                }/mods/local`,
+                state: { modal: true }
+              }}
+              replace
+            >
+              <Radio.Button value="local">Local</Radio.Button>
+            </Link>
+            <Link
+              to={{
+                pathname: `/editInstance/${
+                  this.props.match.params.instance
+                }/mods/browse/${this.state.version}`,
+                state: { modal: true }
+              }}
+              replace
+            >
+              <Radio.Button value="browse">Browse</Radio.Button>
+            </Link>
+          </Radio.Group>
+        </div>
         <Switch>
           <Route
             path="/editInstance/:instance/mods/local"
