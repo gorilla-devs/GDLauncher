@@ -1,12 +1,14 @@
 import path from 'path';
+import electron from 'electron';
 import getAppPath from './utils/getAppPath';
 
+
+export const WINDOWS = 'win32';
+export const LINUX = 'linux';
+export const DARWIN = 'darwin';
 export const APPPATH = getAppPath.getAppPath();
 export const DATAPATH = path.join(
-  process.env.APPDATA ||
-    (process.platform === DARWIN
-      ? path.join(process.env.HOME, 'Library/Preferences')
-      : '/var/local'),
+  process.env.APPDATA || (electron.app || electron.remote.app).getPath('userData'),
   'GDLauncher'
 );
 export const LAUNCHER_FOLDER = 'launcherData';
@@ -30,9 +32,6 @@ export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
 export const CURSEMETA_API_URL = `https://staging_cursemeta.dries007.net/api/v3`;
 export const CURSEFORGE_MODLOADERS_API =
   'https://modloaders.cursecdn.com/647622546/maven';
-export const WINDOWS = 'win32';
-export const LINUX = 'linux';
-export const DARWIN = 'darwin';
 export const NEWS_URL =
   'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1';
 export const JAVA_URL = 'https://java.com/download';

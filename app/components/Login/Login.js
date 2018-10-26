@@ -9,6 +9,7 @@ import styles from './Login.scss';
 import store from '../../localStore';
 import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
 import * as AuthActions from '../../actions/auth';
+import { THEMES } from '../../constants';
 import shader from '../../utils/colors';
 import background from '../../assets/images/login_background.jpg';
 
@@ -37,7 +38,7 @@ class Login extends Component<Props> {
   }
 
   componentWillMount = () => {
-    this.colors = store.get('settings.theme');
+    this.colors = store.get('settings.theme') || THEMES.default;
   }
   
 
