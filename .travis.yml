@@ -65,6 +65,7 @@ cache:
 install:
   - export CXX="g++-4.8"
   - npm install
+  - npm rebuild node-sass
   # On Linux, initialize "virtual display". See before_script
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then

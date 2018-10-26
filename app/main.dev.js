@@ -16,6 +16,7 @@ import minimist from 'minimist';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import store from './localStore';
+import { THEMES } from './constants';
 import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -24,12 +25,12 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 let mainWindow = null;
 let splash = null;
 log.log(`Config store: ${store.path}`);
-const settings = store.get('settings');
+const settings = store.get('settings') ? store.get('settings').theme : THEMES;
 const primaryColor =
-  settings.theme && settings.theme.primary ? settings.theme.primary : '#2c3e50';
+  settings && settings.primary ? settings.primary : '#2c3e50';
 const secondaryColor =
-  settings.theme && settings.theme['secondary-color-1']
-    ? settings.theme['secondary-color-1']
+  settings && settings['secondary-color-1']
+    ? settings['secondary-color-1']
     : '#34495e';
 
 if (minimist(process.argv.slice(1))['i']) {

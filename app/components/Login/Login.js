@@ -38,7 +38,7 @@ class Login extends Component<Props> {
   }
 
   componentWillMount = () => {
-    this.colors = store.get('settings.theme') || THEMES.default;
+    this.colors = store.get('settings') ? store.get('settings').theme : THEMES.default;
   }
   
 
