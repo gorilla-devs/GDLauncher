@@ -7,7 +7,16 @@ import Promise from 'bluebird';
 import makeDir from 'make-dir';
 import log from 'electron-log';
 import { connect } from 'react-redux';
-import { List, Icon, Avatar, Upload, Transfer, Button, Table, Switch } from 'antd';
+import {
+  List,
+  Icon,
+  Avatar,
+  Upload,
+  Transfer,
+  Button,
+  Table,
+  Switch
+} from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
@@ -24,17 +33,21 @@ class LocalMods extends Component<Props> {
   state = {
     mods: [],
     selectedRowKeys: [], // Check here to configure the default column
-    loading: false,
-  }
+    loading: false
+  };
 
   componentDidMount = async () => {
     try {
-      await fs.accessAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods'));
+      await fs.accessAsync(
+        path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
+      );
     } catch (err) {
-      await makeDir(path.join(PACKS_PATH, this.props.match.params.instance, 'mods'));
+      await makeDir(
+        path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
+      );
     }
     this.getMods();
-  }
+  };
 
   componentWillUnmount() {
     // Stop watching for changes when this component is unmounted
@@ -45,56 +58,110 @@ class LocalMods extends Component<Props> {
     }
   }
 
-  columns = [{
-    title: 'Name',
-    dataIndex: 'name',
-    width: 200,
-    render: (title) => path.parse(title.replace('.disabled', '')).name
-  }, {
-    title: 'State',
-    dataIndex: 'state',
-    width: 200,
-    render: (state, record) => <Switch checked={state} onChange={checked => this.handleChange(checked, record)} />
-  }];
+  columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      width: 200,
+      render: title => path.parse(title.replace('.disabled', '')).name
+    },
+    {
+      title: 'State',
+      dataIndex: 'state',
+      width: 200,
+      render: (state, record) => (
+        <Switch
+          checked={state}
+          onChange={checked => this.handleChange(checked, record)}
+        />
+      )
+    }
+  ];
 
   getMods = async () => {
-    let mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods')))
+    let mods = (await fs.readdirAsync(
+      path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
+    ))
       .filter(el => el !== 'GDLCompanion.jar')
-      .map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } });
+      .map(el => {
+        return { name: el, state: path.extname(el) !== '.disabled', key: el };
+      });
     this.setState({
       mods
     });
     // Watches for any changes in the packs dir. TODO: Optimize
-    watcher = fss.watch(path.join(PACKS_PATH, this.props.match.params.instance, 'mods'), async () => {
-      mods = (await fs.readdirAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods')))
-        .filter(el => el !== 'GDLCompanion.jar')
-        .map(el => { return { name: el, state: path.extname(el) !== '.disabled', key: el } });
-      this.setState({
-        mods
-      });
-    });
-  }
+    watcher = fss.watch(
+      path.join(PACKS_PATH, this.props.match.params.instance, 'mods'),
+      async () => {
+        mods = (await fs.readdirAsync(
+          path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
+        ))
+          .filter(el => el !== 'GDLCompanion.jar')
+          .map(el => {
+            return {
+              name: el,
+              state: path.extname(el) !== '.disabled',
+              key: el
+            };
+          });
+        this.setState({
+          mods
+        });
+      }
+    );
+  };
 
-  modStateChanger = (selectedRowKeys) => {
+  modStateChanger = selectedRowKeys => {
     this.setState({ selectedRowKeys });
-  }
-
+  };
 
   handleChange = async (checked, record) => {
     if (checked) {
-      await fs.renameAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods', record.name), path.join(PACKS_PATH, this.props.match.params.instance, 'mods', record.name.replace('.disabled', '')));
+      await fs.renameAsync(
+        path.join(
+          PACKS_PATH,
+          this.props.match.params.instance,
+          'mods',
+          record.name
+        ),
+        path.join(
+          PACKS_PATH,
+          this.props.match.params.instance,
+          'mods',
+          record.name.replace('.disabled', '')
+        )
+      );
     } else {
-      await fs.renameAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods', record.name), path.join(PACKS_PATH, this.props.match.params.instance, 'mods', `${record.name}.disabled`));
+      await fs.renameAsync(
+        path.join(
+          PACKS_PATH,
+          this.props.match.params.instance,
+          'mods',
+          record.name
+        ),
+        path.join(
+          PACKS_PATH,
+          this.props.match.params.instance,
+          'mods',
+          `${record.name}.disabled`
+        )
+      );
     }
-  }
+  };
 
   selectFiles = async () => {
-    const mods = remote.dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] });
+    const mods = remote.dialog.showOpenDialog({
+      properties: ['openFile', 'multiSelections']
+    });
   };
 
   delete = async () => {
     this.setState({ loading: true });
-    await Promise.each(this.state.selectedRowKeys, async el => fs.unlinkAsync(path.join(PACKS_PATH, this.props.match.params.instance, 'mods', el)));
+    await Promise.each(this.state.selectedRowKeys, async el =>
+      fs.unlinkAsync(
+        path.join(PACKS_PATH, this.props.match.params.instance, 'mods', el)
+      )
+    );
     this.setState({ loading: false, selectedRowKeys: [] });
   };
 
@@ -102,11 +169,11 @@ class LocalMods extends Component<Props> {
     const { loading, selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
-      onChange: this.modStateChanger,
+      onChange: this.modStateChanger
     };
     const hasSelected = selectedRowKeys.length > 0;
     return (
-      <div>
+      <div style={{ marginTop: 10 }}>
         <div style={{ marginBottom: 16 }}>
           <Button
             type="primary"
@@ -117,7 +184,11 @@ class LocalMods extends Component<Props> {
             Delete
           </Button>
           <span style={{ marginLeft: 8 }}>
-            {hasSelected ? `${selectedRowKeys.length} ${selectedRowKeys.length === 1 ? "mod" : "mods"} selected` : ''}
+            {hasSelected
+              ? `${selectedRowKeys.length} ${
+                  selectedRowKeys.length === 1 ? 'mod' : 'mods'
+                } selected`
+              : ''}
           </span>
         </div>
         <Table
@@ -126,17 +197,16 @@ class LocalMods extends Component<Props> {
           dataSource={this.state.mods}
           pagination={false}
           locale={{
-            emptyText: 'No mods are installed' 
+            emptyText: 'No mods are installed'
           }}
         />
       </div>
-    )
+    );
   }
 }
 
 function mapStateToProps(state) {
   return {};
 }
-
 
 export default connect(mapStateToProps)(LocalMods);

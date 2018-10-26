@@ -25,8 +25,12 @@ let mainWindow = null;
 let splash = null;
 log.log(`Config store: ${store.path}`);
 const settings = store.get('settings');
-const primaryColor = settings.theme && settings.theme.primary ? settings.theme.primary : '#2c3e50';
-const secondaryColor = settings.theme && settings.theme['secondary-color-1'] ? settings.theme['secondary-color-1'] : '#34495e';
+const primaryColor =
+  settings.theme && settings.theme.primary ? settings.theme.primary : '#2c3e50';
+const secondaryColor =
+  settings.theme && settings.theme['secondary-color-1']
+    ? settings.theme['secondary-color-1']
+    : '#34495e';
 
 if (minimist(process.argv.slice(1))['i']) {
   cli(process.argv, () => app.quit());
@@ -97,11 +101,22 @@ if (minimist(process.argv.slice(1))['i']) {
       minWidth: 780,
       frame: false,
       backgroundColor: secondaryColor,
+      webPreferences: { experimentalFeatures: true }
     });
 
     mainWindow.webContents.on('new-window', (e, url) => {
       e.preventDefault();
       require('electron').shell.openExternal(url);
+    });
+
+    mainWindow.webContents.on('will-navigate', (e, url) => {
+      if (
+        process.env.NODE_ENV !== 'development' &&
+        process.env.DEBUG_PROD !== 'true'
+      ) {
+        e.preventDefault();
+        require('electron').shell.openExternal(url);
+      }
     });
 
     mainWindow.loadURL(`file://${__dirname}/app.html`);

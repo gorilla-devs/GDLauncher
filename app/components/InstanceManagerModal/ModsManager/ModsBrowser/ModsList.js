@@ -5,6 +5,7 @@ import axios from 'axios';
 import ContentLoader from 'react-content-loader';
 import path from 'path';
 import log from 'electron-log';
+import _ from 'lodash';
 import { List, Avatar, Button, Input, Select, Icon, Popover } from 'antd';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
@@ -24,11 +25,9 @@ class ModsList extends Component<Props> {
       loading: false,
       list: [],
       data: [],
-      installing: [],
       searchText: '',
       filterType: 'Featured'
     };
-    console.log(this);
   }
 
   componentDidMount = async () => {
@@ -48,7 +47,7 @@ class ModsList extends Component<Props> {
     const res = await axios.get(
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=0&sort=${
         this.state.filterType
-      }&searchFilter=${this.state.searchText}&gameVersion=${
+      }&searchFilter=${encodeURI(this.state.searchText)}&gameVersion=${
         this.props.match.params.version
       }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
         'author' && this.state.filterType !== 'name'}`
@@ -71,9 +70,9 @@ class ModsList extends Component<Props> {
     const res = await axios.get(
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=${
         this.state.list.length
-      }&sort=${this.state.filterType}&searchFilter=${
+      }&sort=${this.state.filterType}&searchFilter=${encodeURI(
         this.state.searchText
-      }&gameVersion=${
+      )}&gameVersion=${
         this.props.match.params.version
       }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
         'author' && this.state.filterType !== 'name'}`
@@ -95,80 +94,6 @@ class ModsList extends Component<Props> {
     );
   };
 
-  installMod = async (data, parent = null) => {
-    const { projectFileId, projectFileName } = data.gameVersionLatestFiles.find(
-      n => n.gameVersion === this.props.match.params.version
-    );
-    if (parent === null) {
-      this.setState(prevState => ({
-        installing: {
-          ...prevState.installing,
-          [projectFileName]: {
-            installing: true,
-            completed: false
-          }
-        }
-      }));
-    }
-
-    const url = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${data.id}/file/${projectFileId}`
-    );
-
-    await downloadFile(
-      path.join(
-        PACKS_PATH,
-        this.props.match.params.instance,
-        'mods',
-        url.data.fileNameOnDisk
-      ),
-      url.data.downloadUrl,
-      () => {}
-    );
-    if (url.data.dependencies.length !== 0) {
-      url.data.dependencies.forEach(async dep => {
-        // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
-        if (dep.type === 1) {
-          const depData = await axios.get(
-            `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}`
-          );
-          await this.installMod(depData.data, projectFileName);
-        }
-      });
-    }
-    this.setState(prevState => ({
-      installing: {
-        ...prevState.installing,
-        [parent === null ? projectFileName : parent]: {
-          installing: false,
-          completed: true
-        }
-      }
-    }));
-  };
-
-  isDownloadCompleted = data => {
-    const mod = Object.keys(this.state.installing).find(
-      n =>
-        n ===
-        data.gameVersionLatestFiles.find(
-          x => x.gameVersion === this.props.match.params.version
-        ).projectFileName
-    );
-    return this.state.installing[mod] && this.state.installing[mod].completed;
-  };
-
-  isInstalling = data => {
-    const mod = Object.keys(this.state.installing).find(
-      n =>
-        n ===
-        data.gameVersionLatestFiles.find(
-          x => x.gameVersion === this.props.match.params.version
-        ).projectFileName
-    );
-    return this.state.installing[mod] && this.state.installing[mod].installing;
-  };
-
   filterChanged = async value => {
     this.setState({ filterType: value }, async () => {
       try {
@@ -180,7 +105,7 @@ class ModsList extends Component<Props> {
   };
 
   onSearchChange = e => {
-    this.setState({ searchText: encodeURI(e.target.value) });
+    this.setState({ searchText: e.target.value });
   };
 
   onSearchSubmit = async () => {
@@ -257,23 +182,21 @@ class ModsList extends Component<Props> {
             <List.Item
               actions={[
                 !item.loading && (
-                  <Button.Group>
-                    <Button
-                      type="primary"
-                      loading={this.isInstalling(item)}
-                      disabled={this.isDownloadCompleted(item)}
-                      onClick={() => this.installMod(item)}
-                    >
-                      {this.isInstalling(item)
-                        ? 'Installing'
-                        : this.isDownloadCompleted(item)
-                          ? 'Installed'
-                          : 'Install'}
+                  <Link
+                    to={{
+                      pathname: `/editInstance/${
+                        this.props.match.params.instance
+                      }/mods/browse/${this.props.match.params.version}/${
+                        item.id
+                      }`,
+                      state: { modal: true }
+                    }}
+                    replace
+                  >
+                    <Button type="primary">
+                      Explore <Icon type="caret-right" />
                     </Button>
-                    <Popover content={<div style={{width: 200, height: 200}}>Testing</div>} placement="bottomRight" title="Title" trigger="click">
-                      <Button type="primary" icon="caret-down" />
-                    </Popover>
-                  </Button.Group>
+                  </Link>
                 )
               ]}
             >
