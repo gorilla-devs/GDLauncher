@@ -1,4 +1,7 @@
 sudo: true
+language: node_js
+  node_js:
+    - 9
 
 matrix:
   include:
