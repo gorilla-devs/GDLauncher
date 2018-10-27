@@ -6,7 +6,7 @@ matrix:
       services: docker
       language: node_js
       node_js:
-        - node
+        - 10
         - 9
       addons:
         apt:
@@ -27,7 +27,7 @@ matrix:
       osx_image: xcode9.4
       language: node_js
       node_js:
-        - node
+        - 10
         - 9
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
