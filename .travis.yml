@@ -6,7 +6,7 @@ matrix:
       services: docker
       language: node_js
       node_js:
-        - 10
+        - 8
       addons:
         apt:
           update: true
@@ -29,7 +29,7 @@ matrix:
       osx_image: xcode9.4
       language: node_js
       node_js:
-        - 10
+        - 8
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
@@ -89,5 +89,5 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
 script:
-  - npm run package
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then npm run package; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-all; fi
