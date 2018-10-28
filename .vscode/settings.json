@@ -17,11 +17,15 @@
   },
   "editor.tabSize": 2,
   "files.associations": {
-    ".eslintrc": "jsonc",
     ".babelrc": "jsonc",
-    ".prettierrc": "jsonc"
+    ".eslintrc": "jsonc",
+    ".prettierrc": "jsonc",
+    ".stylelintrc": "json",
+    ".dockerignore": "ignore",
+    ".eslintignore": "ignore",
+    ".flowconfig": "ignore"
   },
   "javascript.format.enable": true,
   "typescript.validate.enable": false,
-  "typescript.format.enable": false,
+  "typescript.format.enable": false
 }

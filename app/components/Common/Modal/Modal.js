@@ -20,7 +20,7 @@ export default class Modal extends Component<Props> {
         transition: 'all 200ms',
         willChange: 'transform',
         transitionTimingFunction: 'ease-in-out',
-        ...this.props.style
+        ...props.style
       },
       bgStyle: {
         background: 'rgba(0, 0, 0, 0)',
@@ -33,7 +33,7 @@ export default class Modal extends Component<Props> {
     setTimeout(this.mountStyle, 10); // call the into animiation
   }
   
-  componentWillReceiveProps(newProps) { // check for the mounted props
+  componentWillReceiveProps = (newProps) => { // check for the mounted props
     if (newProps.unMount) {
       setTimeout(this.props.history.goBack, 200);
       return this.unMountStyle(); // call the into animiation
@@ -42,7 +42,7 @@ export default class Modal extends Component<Props> {
   }
 
 
-  unMountStyle() { // css for unmount animation
+  unMountStyle = () => { // css for unmount animation
     this.setState({
       style: {
         display: 'block',

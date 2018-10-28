@@ -6,19 +6,21 @@ matrix:
       services: docker
       language: node_js
       node_js:
-        - 10
-        - 9
+        - 8
       addons:
         apt:
           update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - gcc-multilib
             - g++-4.8
+            - g++-multilib
             - icnsutils
             - graphicsmagick
             - xz-utils
             - xorriso
+            - rpm
       before_install:
         # This should fix https://github.com/travis-ci/travis-ci/issues/9630
         - sudo chown -R travis:travis $HOME/.cache
@@ -27,8 +29,7 @@ matrix:
       osx_image: xcode9.4
       language: node_js
       node_js:
-        - 10
-        - 9
+        - 8
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
@@ -65,6 +66,7 @@ cache:
 install:
   - export CXX="g++-4.8"
   - npm install
+  - npm rebuild node-sass
   # On Linux, initialize "virtual display". See before_script
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then

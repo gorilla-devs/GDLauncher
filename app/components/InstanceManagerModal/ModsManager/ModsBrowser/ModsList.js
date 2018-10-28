@@ -182,21 +182,24 @@ class ModsList extends Component<Props> {
             <List.Item
               actions={[
                 !item.loading && (
-                  <Link
-                    to={{
-                      pathname: `/editInstance/${
-                        this.props.match.params.instance
-                      }/mods/browse/${this.props.match.params.version}/${
-                        item.id
-                      }`,
-                      state: { modal: true }
-                    }}
-                    replace
-                  >
-                    <Button type="primary">
-                      Explore <Icon type="caret-right" />
-                    </Button>
-                  </Link>
+                  <Button.Group>
+                    <Button type="primary" icon="down-circle" />
+                    <Link
+                      to={{
+                        pathname: `/editInstance/${
+                          this.props.match.params.instance
+                        }/mods/browse/${this.props.match.params.version}/${
+                          item.id
+                        }`,
+                        state: { modal: true }
+                      }}
+                      replace
+                    >
+                      <Button type="primary">
+                        Explore <Icon type="caret-right" />
+                      </Button>
+                    </Link>
+                  </Button.Group>
                 )
               ]}
             >

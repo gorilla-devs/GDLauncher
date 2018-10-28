@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux';
 import log from 'electron-log';
-import { ConnectedRouter } from 'react-router-redux';
+import { ConnectedRouter } from 'connected-react-router';
 import * as SettingsActions from '../actions/settings';
 import RouteDef from '../routes';
 

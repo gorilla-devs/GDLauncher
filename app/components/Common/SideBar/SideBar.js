@@ -11,9 +11,7 @@ import * as AuthActions from '../../../actions/auth';
 import * as ProfileActions from '../../../actions/profile';
 import * as autoUpdater from '../../../actions/autoUpdater';
 
-
-type Props = {
-};
+type Props = {};
 
 class SideBar extends Component<Props> {
   props: Props;
@@ -22,24 +20,42 @@ class SideBar extends Component<Props> {
     super(props);
     this.state = {
       updateTextVisible: true
-    }
-    this.props.checkForUpdates();
+    };
   }
+
+  componentDidMount = () => {
+    this.props.checkForUpdates();
+  };
 
   render() {
     return (
       <aside className={styles.sidenav}>
-        {this.props.updateAvailable && <div className={styles.updateAvailable}>
-          <Button loading={this.props.updating} onClick={this.props.update} type="primary" size="small" style={{ marginLeft: 5 }}>
-            <a href={`https://github.com/gorilla-devs/GDLauncher/releases/tag/v${this.props.latestVersion}`} target="_blank" rel="noopener noreferrer">
-              Update Available ({this.props.latestVersion})
+        {this.props.updateAvailable && (
+          <div className={styles.updateAvailable}>
+            <Button
+              loading={this.props.updating}
+              onClick={this.props.update}
+              type="primary"
+              size="small"
+              style={{ marginLeft: 5 }}
+            >
+              <a
+                href={`https://github.com/gorilla-devs/GDLauncher/releases/tag/v${
+                  this.props.latestVersion
+                }`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Update Available ({this.props.latestVersion})
               </a>
-          </Button>
-        </div>}
+            </Button>
+          </div>
+        )}
         <div className={styles.header}>
           <span>
             <CIcon size={32}>
-              {this.props.username && this.props.username.charAt(0).toUpperCase()}
+              {this.props.username &&
+                this.props.username.charAt(0).toUpperCase()}
             </CIcon>
           </span>
           <span>{this.props.username}</span>
@@ -47,9 +63,22 @@ class SideBar extends Component<Props> {
             <i className={`fas fa-sign-out-alt ${styles.logout}`} />
           </div>
         </div>
-        <div style={{ textAlign: 'center', fontWeight: 'italic', fontSize: 12 }}>
-          <span>Playing on</span>   <Popover placement="left" title="Title">
-            <b className={styles.playingServer} style={{ fontStyle: 'italic', fontWeight: '900', fontSize: 13, cursor: 'pointer' }}>AnonymousCraft</b>
+        <div
+          style={{ textAlign: 'center', fontWeight: 'italic', fontSize: 12 }}
+        >
+          <span>Playing on</span>{' '}
+          <Popover placement="left" title="Title">
+            <b
+              className={styles.playingServer}
+              style={{
+                fontStyle: 'italic',
+                fontWeight: '900',
+                fontSize: 13,
+                cursor: 'pointer'
+              }}
+            >
+              AnonymousCraft
+            </b>
           </Popover>
         </div>
         <hr />
@@ -65,35 +94,44 @@ class SideBar extends Component<Props> {
           <div style={{ height: 1000 }}>
             <div className={styles.serv}>
               AnonymousCraft
-              <i className='fas fa-play' style={{ marginTop: 3 }} />
+              <i className="fas fa-play" style={{ marginTop: 3 }} />
             </div>
-            <div className={styles.serv}>
-              HyPixel
-            </div>
-            <div className={styles.serv}>
-              PvPWars
-            </div>
-            <div className={styles.serv}>
-              Mineplex
-            </div>
+            <div className={styles.serv}>HyPixel</div>
+            <div className={styles.serv}>PvPWars</div>
+            <div className={styles.serv}>Mineplex</div>
           </div>
         </div>
         <hr />
         <div className={styles.socialsContainer}>
-          { /* eslint-disable */}
-          <a href="https://twitter.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
+          {/* eslint-disable */}
+          <a
+            href="https://twitter.com/gorilladevs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.socialBtn}
+          >
             <i className="fab fa-twitter" />
           </a>
-          <a href="https://facebook.com/gorilladevs" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
-            <i className="fab fa-facebook"
-            />
+          <a
+            href="https://facebook.com/gorilladevs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.socialBtn}
+          >
+            <i className="fab fa-facebook" />
           </a>
-          <a href="https://discordapp.com/invite/4cGYzen" target="_blank" rel="noopener noreferrer" className={styles.socialBtn}>
-            <i className="fab fa-discord"
-            />
+          <a
+            href="https://discordapp.com/invite/4cGYzen"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.socialBtn}
+          >
+            <i className="fab fa-discord" />
           </a>
-          <span className={styles.version}>v{require('../../../package.json').version}</span>
-          { /* eslint-enable */}
+          <span className={styles.version}>
+            v{require('../../../package.json').version}
+          </span>
+          {/* eslint-enable */}
         </div>
       </aside>
     );
@@ -108,12 +146,18 @@ function mapStateToProps(state) {
     downloadQueue: state.downloadManager.downloadQueue,
     updateAvailable: state.autoUpdater.updateAvailable,
     updating: state.autoUpdater.checkingForUpdates,
-    latestVersion: state.autoUpdater.latestVersion,
+    latestVersion: state.autoUpdater.latestVersion
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...AuthActions, ...ProfileActions, ...autoUpdater }, dispatch);
+  return bindActionCreators(
+    { ...AuthActions, ...ProfileActions, ...autoUpdater },
+    dispatch
+  );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SideBar);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SideBar);
