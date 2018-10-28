@@ -7,7 +7,7 @@ import { routerMiddleware } from 'connected-react-router';
 import createRootReducer from '../reducers';
 
 const history = createBrowserHistory({
-  basename: window.location.pathname
+  basename: window.location.href
 });
 const rootReducer = createRootReducer(history);
 
