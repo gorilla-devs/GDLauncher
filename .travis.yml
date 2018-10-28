@@ -89,5 +89,5 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
 script:
-  - npm run package
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then npm run package; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm run package-all; fi

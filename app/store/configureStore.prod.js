@@ -1,14 +1,13 @@
 // @flow
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { createBrowserHistory } from 'history';
+import { createHashHistory } from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import createRootReducer from '../reducers';
 
-const history = createBrowserHistory({
-  basename: window.location.pathname
-});
+const history = createHashHistory();
 const rootReducer = createRootReducer(history);
+
 const router = routerMiddleware(history);
 const enhancer = applyMiddleware(thunk, router);
 
