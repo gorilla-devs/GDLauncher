@@ -22,7 +22,7 @@ module.exports = api => {
       [
         require('@babel/preset-env'),
         {
-          targets: { node: 8 },
+          targets: { node: 10 },
           useBuiltIns: 'usage'
         }
       ],
