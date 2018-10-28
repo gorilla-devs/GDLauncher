@@ -1,14 +1,12 @@
 // @flow
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { createBrowserHistory } from 'history';
+import { createHashHistory } from 'history';
 import { createLogger } from 'redux-logger';
 import { routerMiddleware } from 'connected-react-router';
 import createRootReducer from '../reducers';
 
-const history = createBrowserHistory({
-  basename: window.location.href
-});
+const history = createHashHistory();
 const rootReducer = createRootReducer(history);
 
 const logger = createLogger({
