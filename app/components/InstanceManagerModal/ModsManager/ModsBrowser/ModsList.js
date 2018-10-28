@@ -44,19 +44,27 @@ class ModsList extends Component<Props> {
       list: [...new Array(10)].map(() => ({ loading: true, name: {} })),
       data: []
     });
-    const res = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=0&sort=${
-        this.state.filterType
-      }&searchFilter=${encodeURI(this.state.searchText)}&gameVersion=${
-        this.props.match.params.version
-      }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
-        'author' && this.state.filterType !== 'name'}`
-    );
-    this.setState({
-      initLoading: false,
-      list: res.data,
-      data: res.data
-    });
+    try {
+      const res = await axios.get(
+        `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=0&sort=${
+          this.state.filterType
+        }&searchFilter=${encodeURI(this.state.searchText)}&gameVersion=${
+          this.props.match.params.version
+        }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
+          'author' && this.state.filterType !== 'name'}`
+      );
+      this.setState({
+        initLoading: false,
+        list: res.data,
+        data: res.data
+      });
+    } catch (err) {
+      this.setState({
+        initLoading: false,
+        list: [],
+        data: []
+      });
+    }
   };
 
   onLoadMore = async () => {
@@ -133,6 +141,14 @@ class ModsList extends Component<Props> {
           <Button onClick={this.onLoadMore}>Load More</Button>
         </div>
       ) : null;
+
+    if (!initLoading && list.length === 0) {
+      return (
+        <h1 style={{ textAlign: 'center', marginTop: '20%' }}>
+          Servers are not currently available
+        </h1>
+      );
+    }
     return (
       <div style={{ height: '83%' }}>
         <div className={styles.header}>
