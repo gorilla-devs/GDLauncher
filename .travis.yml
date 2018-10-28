@@ -1,4 +1,7 @@
 sudo: true
+language: node_js
+  node_js:
+    - 8
 
 matrix:
   include:
@@ -6,8 +9,7 @@ matrix:
       services: docker
       language: node_js
       node_js:
-        - 10
-        - 9
+        - 8
       addons:
         apt:
           update: true
@@ -30,8 +32,7 @@ matrix:
       osx_image: xcode9.4
       language: node_js
       node_js:
-        - 10
-        - 9
+        - 8
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
