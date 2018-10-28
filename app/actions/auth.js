@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { push } from 'react-router-redux';
+import { push } from 'connected-react-router';
 import { message } from 'antd';
 import path from 'path';
 import fsa from 'fs-extra';

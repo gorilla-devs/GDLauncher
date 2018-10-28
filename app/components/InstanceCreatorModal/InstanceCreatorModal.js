@@ -25,7 +25,7 @@ class InstanceCreatorModal extends Component<Props> {
 
   constructor(props) {
     super(props);
-    const { forgeManifest, versionsManifest } = this.props;
+    const { forgeManifest, versionsManifest } = props;
     this.state = {
       unMount: false,
       versions: [

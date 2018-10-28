@@ -1,7 +1,7 @@
 {
   "name": "gdlauncher",
   "productName": "GDLauncher",
-  "version": "0.7.4",
+  "version": "0.7.7",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "main": "./main.prod.js",
   "author": {
@@ -10,7 +10,7 @@
     "url": "https://gdevs.io"
   },
   "scripts": {
-    "electron-rebuild": "node -r babel-register ../internals/scripts/ElectronRebuild.js",
+    "electron-rebuild": "node -r ./babel-register.js ../internals/scripts/ElectronRebuild.js",
     "postinstall": "npm run electron-rebuild"
   },
   "license": "MIT",

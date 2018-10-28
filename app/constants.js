@@ -6,7 +6,7 @@ import getAppPath from './utils/getAppPath';
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
 export const DARWIN = 'darwin';
-export const APPPATH = getAppPath.getAppPath();
+export const APPPATH = getAppPath();
 export const DATAPATH = path.join(
   process.env.APPDATA || (electron.app || electron.remote.app).getPath('userData'),
   'GDLauncher'

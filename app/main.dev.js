@@ -14,7 +14,6 @@ import { app, BrowserWindow, crashReporter, ipcMain } from 'electron';
 import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
-import MenuBuilder from './menu';
 import store from './localStore';
 import { THEMES } from './constants';
 import cli from './utils/cli';
@@ -164,7 +163,5 @@ if (minimist(process.argv.slice(1))['i']) {
       mainWindow = null;
     });
 
-    const menuBuilder = new MenuBuilder(mainWindow);
-    menuBuilder.buildMenu();
   });
 }

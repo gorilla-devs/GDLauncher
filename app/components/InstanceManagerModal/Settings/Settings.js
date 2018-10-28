@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { routerActions } from 'react-router-redux';
+import { routerActions } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
 import { Form, Input, Icon, Button, message } from 'antd';
 import path from 'path';

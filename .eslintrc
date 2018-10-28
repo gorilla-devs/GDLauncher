@@ -4,21 +4,16 @@
     "sourceType": "module",
     "allowImportExportEverywhere": true
   },
-  "extends": [
-    "airbnb",
-    "prettier",
-    "prettier/flowtype",
-    "prettier/react"
-  ],
+  "extends": ["airbnb", "prettier", "prettier/flowtype", "prettier/react"],
   "env": {
     "browser": true,
     "node": true
   },
   "rules": {
-    "linebreak-style": 0,
-    "arrow-parens": [
-      "off"
-    ],
+    "arrow-parens": ["off"],
+    "compat/compat": "error",
+    "consistent-return": "off",
+    "comma-dangle": "off",
     "flowtype/boolean-style": ["error", "boolean"],
     "flowtype/define-flow-type": "warn",
     "flowtype/delimiter-dangle": ["error", "never"],
@@ -36,9 +31,6 @@
     "flowtype/union-intersection-spacing": ["error", "always"],
     "flowtype/use-flow-type": "error",
     "flowtype/valid-syntax": "error",
-    "compat/compat": "error",
-    "consistent-return": "off",
-    "comma-dangle": "off",
     "generator-star-spacing": "off",
     "import/no-unresolved": "error",
     "import/no-extraneous-dependencies": "off",
@@ -66,21 +58,12 @@
     "react/jsx-filename-extension": [
       "error",
       {
-        "extensions": [
-          ".js",
-          ".jsx"
-        ]
+        "extensions": [".js", ".jsx"]
       }
     ],
     "react/prefer-stateless-function": "off"
   },
-  "plugins": [
-    "flowtype",
-    "import",
-    "promise",
-    "compat",
-    "react"
-  ],
+  "plugins": ["flowtype", "import", "promise", "compat", "react"],
   "settings": {
     "import/resolver": {
       "webpack": {

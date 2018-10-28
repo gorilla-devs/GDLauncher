@@ -33,7 +33,6 @@ export default class DInstance extends Component<Props> {
       deleting: false,
       version: null
     };
-    this.percentage = this.updatePercentage();
   }
 
   componentDidMount = async () => {
@@ -52,7 +51,7 @@ export default class DInstance extends Component<Props> {
     this.percentage = this.updatePercentage();
   };
 
-  isInstalling() {
+  isInstalling = () => {
     if (this.props.installingQueue[this.props.name]) {
       switch (this.props.installingQueue[this.props.name].status) {
         case 'Queued':
@@ -69,7 +68,7 @@ export default class DInstance extends Component<Props> {
     }
   }
 
-  updatePercentage() {
+  updatePercentage = () => {
     const { percentage } = this.props.installingQueue[this.props.name] || 0;
     if (this.props.installingQueue[this.props.name]) {
       switch (this.props.installingQueue[this.props.name].status) {
@@ -123,7 +122,7 @@ export default class DInstance extends Component<Props> {
     }
   };
 
-  render() {
+  render = () => {
     const { name } = this.props;
     return (
       <div
