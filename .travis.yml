@@ -1,6 +1,4 @@
 matrix:
-  allow_failures:
-    - os: windows
   include:
     - os: osx
       language: node_js
@@ -31,15 +29,6 @@ matrix:
         # This should fix https://github.com/travis-ci/travis-ci/issues/9630
         - sudo chown -R travis:travis $HOME/.cache
         - sudo chown -R travis:travis $TRAVIS_BUILD_DIR/node_modules
-
-    - os: windows
-      language: node_js
-      node_js:
-        - 10
-      env:
-        - ELECTRON_CACHE=$HOME/.cache/electron
-        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 

@@ -30,4 +30,4 @@ install:
   - yarn
 
 test_script:
-  - yarn package-all
+  - yarn package-ci
