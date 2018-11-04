@@ -4,10 +4,15 @@ import { promisify } from 'util';
 import axios from 'axios';
 import makeDir from 'make-dir';
 import fs from 'fs';
-import _ from 'lodash';
 import Zip from 'adm-zip';
 import { downloadFile, downloadArr } from '../utils/downloader';
-import { PACKS_PATH, INSTANCES_PATH, META_PATH } from '../constants';
+import {
+  PACKS_PATH,
+  INSTANCES_PATH,
+  META_PATH,
+  GDL_LEGACYJAVAFIXER_MOD_URL
+} from '../constants';
+import vCompare from '../utils/versionsCompare';
 import {
   extractAssets,
   extractMainJar,
@@ -180,7 +185,16 @@ export function downloadPack(pack) {
       })
     );
 
-    const totalFiles = libraries.length + assets.length + mainJar.length;
+    const legacyJavaFixer =
+      vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
+        ? {
+            url: GDL_LEGACYJAVAFIXER_MOD_URL,
+            path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
+          }
+        : null;
+
+    const totalFiles =
+      libraries.length + assets.length + mainJar.length;
 
     dispatch({
       type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
@@ -202,11 +216,12 @@ export function downloadPack(pack) {
         });
     };
 
-    await downloadArr(
-      [...libraries, ...assets, ...mainJar],
-      updatePercentage,
-      pack
-    );
+    const allFiles =
+      legacyJavaFixer !== null
+        ? [...libraries, ...assets, ...mainJar, legacyJavaFixer]
+        : [...libraries, ...assets, ...mainJar];
+
+    await downloadArr(allFiles, updatePercentage, pack);
 
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
 

@@ -67,7 +67,7 @@ class SideBar extends Component<Props> {
           style={{ textAlign: 'center', fontWeight: 'italic', fontSize: 12 }}
         >
           <span>Playing on</span>{' '}
-          <Popover placement="left" title="Title">
+          <Popover placement="left" title="Coming Soon">
             <b
               className={styles.playingServer}
               style={{
@@ -91,7 +91,8 @@ class SideBar extends Component<Props> {
           </div>
         </div>
         <div className={styles.scroller}>
-          <div style={{ height: 1000 }}>
+              <h1>Coming Soon</h1>
+          {/* <div style={{ height: 1000 }}>
             <div className={styles.serv}>
               AnonymousCraft
               <i className="fas fa-play" style={{ marginTop: 3 }} />
@@ -99,7 +100,7 @@ class SideBar extends Component<Props> {
             <div className={styles.serv}>HyPixel</div>
             <div className={styles.serv}>PvPWars</div>
             <div className={styles.serv}>Mineplex</div>
-          </div>
+          </div> */}
         </div>
         <hr />
         <div className={styles.socialsContainer}>
