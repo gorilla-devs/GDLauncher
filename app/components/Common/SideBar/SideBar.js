@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { IpcRenderer, ipcRenderer } from 'electron';
 import { Icon, Button, Popover } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -19,35 +20,53 @@ class SideBar extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      updateTextVisible: true
+      updateAvailable: false,
+      isUpdating: false,
+      updateCompleted: false
     };
   }
 
   componentDidMount = () => {
-    this.props.checkForUpdates();
+    ipcRenderer.send('check-for-updates');
+    ipcRenderer.on('update-available', () => {
+      this.setState({ updateAvailable: true });
+    });
+    ipcRenderer.on('update-downloaded', () => {
+      this.setState({
+        updateAvailable: true,
+        isUpdating: false,
+        updateCompleted: true
+      });
+    });
+  };
+
+  handleUpdateClick = () => {
+    ipcRenderer.send('download-updates');
+    this.setState({ isUpdating: true });
+  };
+
+  handleUpdateCompletedClick = () => {
+    ipcRenderer.send('apply-updates');
   };
 
   render() {
     return (
       <aside className={styles.sidenav}>
-        {this.props.updateAvailable && (
+        {this.state.updateAvailable && (
           <div className={styles.updateAvailable}>
             <Button
-              loading={this.props.updating}
-              onClick={this.props.update}
+              loading={this.state.isUpdating}
+              onClick={
+                this.state.updateCompleted
+                  ? this.handleUpdateCompletedClick
+                  : this.handleUpdateClick
+              }
               type="primary"
               size="small"
               style={{ marginLeft: 5 }}
             >
-              <a
-                href={`https://github.com/gorilla-devs/GDLauncher/releases/tag/v${
-                  this.props.latestVersion
-                }`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Update Available ({this.props.latestVersion})
-              </a>
+              {this.state.isUpdating && "Updating..."}
+              {this.state.updateCompleted ? 'Restart App' : 'Update Available'}
             </Button>
           </div>
         )}
@@ -91,7 +110,7 @@ class SideBar extends Component<Props> {
           </div>
         </div>
         <div className={styles.scroller}>
-              <h1>Coming Soon</h1>
+          <h1>Coming Soon</h1>
           {/* <div style={{ height: 1000 }}>
             <div className={styles.serv}>
               AnonymousCraft

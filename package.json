@@ -2,7 +2,7 @@
   "name": "gdlauncher",
   "productName": "GDLauncher",
   "main": "./app/main.prod.js",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "yarn build-antd && concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -85,28 +85,26 @@
     },
     "mac": {
       "target": [
-        "zip"
+        "dmg",
+        "pkg"
       ],
-      "artifactName": "${productName}-mac.${ext}"
+      "artifactName": "${productName}-mac-setup.${ext}"
     },
     "win": {
       "target": [
-        "zip",
         "nsis",
-        "msi"
+        "nsis-web"
       ],
-      "artifactName": "${productName}-win.${ext}"
+      "artifactName": "${productName}-win-setup.${ext}"
     },
     "linux": {
       "target": [
         "deb",
         "rpm",
-        "snap",
-        "AppImage",
-        "zip"
+        "snap"
       ],
       "category": "Games",
-      "artifactName": "${productName}-linux.${ext}"
+      "artifactName": "${productName}-linux-setup.${ext}"
     },
     "directories": {
       "buildResources": "resources",

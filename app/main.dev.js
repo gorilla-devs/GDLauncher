@@ -15,6 +15,7 @@ import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
+import path from 'path';
 import store from './localStore';
 import { THEMES } from './constants';
 import MenuBuilder from './menu';
@@ -22,14 +23,6 @@ import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
-
-export default class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
 
 let mainWindow = null;
 let splash = null;
@@ -135,6 +128,10 @@ if (minimist(process.argv.slice(1))['i']) {
         throw new Error('"mainWindow" is not defined');
       }
       splash.destroy();
+
+      autoUpdater.logger = log;
+      autoUpdater.autoDownload = false;
+
       // Same as for console transport
       log.transports.file.level = 'silly';
       log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
@@ -144,7 +141,7 @@ if (minimist(process.argv.slice(1))['i']) {
       log.transports.file.maxSize = 5 * 1024 * 1024;
 
       // Write to this file, must be set before first logging
-      log.transports.file.file = __dirname + '/log.txt';
+      log.transports.file.file = path.join(__dirname, '/log.txt');
 
       // fs.createWriteStream options, must be set before first logging
       // you can find more information at
@@ -156,6 +153,26 @@ if (minimist(process.argv.slice(1))['i']) {
 
       mainWindow.show();
       mainWindow.focus();
+    });
+
+    ipcMain.on('check-for-updates', ev => {
+      autoUpdater.checkForUpdates();
+
+      autoUpdater.on('update-available', info => {
+        ev.sender.send('update-available');
+      });
+
+      autoUpdater.on('update-downloaded', info => {
+        ev.sender.send('update-downloaded');
+      });
+    });
+
+    ipcMain.on('download-updates', () => {
+      autoUpdater.downloadUpdate();
+    });
+
+    ipcMain.on('apply-updates', () => {
+      autoUpdater.quitAndInstall();
     });
 
     ipcMain.on('open-devTools', () => {
@@ -172,8 +189,5 @@ if (minimist(process.argv.slice(1))['i']) {
 
     const menuBuilder = new MenuBuilder(mainWindow);
     menuBuilder.buildMenu();
-
-    // eslint-disable-next-line
-    new AppUpdater();
   });
 }

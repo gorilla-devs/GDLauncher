@@ -24,7 +24,7 @@ import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
 
 
 type Props = {
-  location: Object,
+  location: object,
   checkAccessToken: () => void,
   isAuthValid: boolean
 };
