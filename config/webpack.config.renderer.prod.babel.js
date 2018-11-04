@@ -4,16 +4,15 @@
 
 import path from 'path';
 import webpack from 'webpack';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-import merge from 'webpack-merge';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import merge from 'webpack-merge';
 import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from '../internals/scripts/CheckNodeEnv';
 
 CheckNodeEnv('production');
-
 export default merge.smart(baseConfig, {
   devtool: 'source-map',
 
@@ -148,11 +147,6 @@ export default merge.smart(baseConfig, {
       // EOT Font
       {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        use: 'file-loader'
-      },
-      // OTF Font
-      {
-        test: /\.otf(\?v=\d+\.\d+\.\d+)?$/,
         use: 'file-loader'
       },
       // SVG Font

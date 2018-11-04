@@ -129,7 +129,7 @@ class SideBar extends Component<Props> {
             <i className="fab fa-discord" />
           </a>
           <span className={styles.version}>
-            v{require('../../../package.json').version}
+            v{require('../../../../package.json').version}
           </span>
           {/* eslint-enable */}
         </div>

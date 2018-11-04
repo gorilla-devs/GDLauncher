@@ -14,12 +14,22 @@ import { app, BrowserWindow, crashReporter, ipcMain } from 'electron';
 import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
 import store from './localStore';
 import { THEMES } from './constants';
+import MenuBuilder from './menu';
 import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+
+export default class AppUpdater {
+  constructor() {
+    log.transports.file.level = 'info';
+    autoUpdater.logger = log;
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+}
 
 let mainWindow = null;
 let splash = null;
@@ -45,9 +55,6 @@ if (minimist(process.argv.slice(1))['i']) {
     process.env.DEBUG_PROD === 'true'
   ) {
     require('electron-debug')({ enabled: true });
-    const path = require('path');
-    const p = path.join(__dirname, '..', 'app', 'node_modules');
-    require('module').globalPaths.push(p);
   }
 
   const installExtensions = async () => {
@@ -163,5 +170,10 @@ if (minimist(process.argv.slice(1))['i']) {
       mainWindow = null;
     });
 
+    const menuBuilder = new MenuBuilder(mainWindow);
+    menuBuilder.buildMenu();
+
+    // eslint-disable-next-line
+    new AppUpdater();
   });
 }

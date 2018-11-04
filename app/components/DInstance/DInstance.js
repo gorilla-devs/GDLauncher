@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { message, Icon } from 'antd';
+import { message, Icon, Tooltip } from 'antd';
 import psTree from 'ps-tree';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
@@ -17,11 +17,11 @@ import styles from './DInstance.scss';
 
 type Props = {
   name: string,
-  installingQueue: Object,
+  installingQueue: object,
   selectedInstance: ?string,
   startInstance: () => void,
   selectInstance: () => void,
-  playing: Array
+  playing: array
 };
 
 export default class DInstance extends Component<Props> {
@@ -31,19 +31,29 @@ export default class DInstance extends Component<Props> {
     super(props);
     this.state = {
       deleting: false,
-      version: null
+      version: null,
+      isValid: true
     };
   }
 
   componentDidMount = async () => {
+    const { name } = this.props;
     if (!this.isInstalling()) {
-      this.setState({
-        version: JSON.parse(
+      try {
+        const { version } = JSON.parse(
           await promisify(fs.readFile)(
-            path.join(PACKS_PATH, this.props.name, 'config.json')
+            path.join(PACKS_PATH, name, 'config.json')
           )
-        ).version
-      });
+        );
+        this.setState({
+          version
+        });
+      } catch (e) {
+        this.setState({
+          version: 'Error',
+          isValid: false
+        });
+      }
     }
   };
 
@@ -52,8 +62,9 @@ export default class DInstance extends Component<Props> {
   };
 
   isInstalling = () => {
-    if (this.props.installingQueue[this.props.name]) {
-      switch (this.props.installingQueue[this.props.name].status) {
+    const { name, installingQueue } = this.props;
+    if (installingQueue[name]) {
+      switch (installingQueue[name].status) {
         case 'Queued':
           return true;
         case 'Downloading':
@@ -66,12 +77,13 @@ export default class DInstance extends Component<Props> {
     } else {
       return false;
     }
-  }
+  };
 
   updatePercentage = () => {
-    const { percentage } = this.props.installingQueue[this.props.name] || 0;
-    if (this.props.installingQueue[this.props.name]) {
-      switch (this.props.installingQueue[this.props.name].status) {
+    const { name, installingQueue } = this.props;
+    const { percentage } = installingQueue[name] || 0;
+    if (installingQueue[name]) {
+      switch (installingQueue[name].status) {
         case 'Queued':
           return 0;
         case 'Downloading':
@@ -85,36 +97,36 @@ export default class DInstance extends Component<Props> {
     } else {
       return 0;
     }
-  }
+  };
 
   handleClickPlay = async e => {
+    const { startInstance, selectInstance, name, playing } = this.props;
+    const { isValid } = this.state;
     if (!this.isInstalling()) {
       e.stopPropagation();
-      if (this.props.playing.find(el => el.name === this.props.name)) {
-        psTree(
-          this.props.playing.find(el => el.name === this.props.name).pid,
-          (err, children) => {
-            children.forEach(el => {
-              process.kill(el.PID);
-            });
-          }
-        );
+      if (playing.find(el => el.name === name) && isValid) {
+        psTree(playing.find(el => el.name === name).pid, (err, children) => {
+          children.forEach(el => {
+            process.kill(el.PID);
+          });
+        });
         message.info('Instance terminated');
       } else {
-        this.props.startInstance(this.props.name);
-        this.props.selectInstance(this.props.name);
+        startInstance(name);
+        selectInstance(name);
       }
     }
   };
 
   deleteInstance = async () => {
+    const { name, selectInstance } = this.props;
     try {
       this.setState({ deleting: true });
-      await fsa.remove(path.join(PACKS_PATH, this.props.name));
-      this.props.selectInstance(null);
+      await fsa.remove(path.join(PACKS_PATH, name));
+      selectInstance(null);
       message.success('Instance deleted');
     } catch (err) {
-      hideMenu(`contextMenu-${this.props.name}`);
+      hideMenu(`contextMenu-${name}`);
       message.error('Error deleting instance');
       log.error(err);
     } finally {
@@ -123,12 +135,13 @@ export default class DInstance extends Component<Props> {
   };
 
   render = () => {
-    const { name } = this.props;
+    const { name, selectedInstance, selectInstance, playing } = this.props;
+    const { version, isValid, deleting } = this.state;
     return (
       <div
-        className={`${
-          this.props.selectedInstance === name ? styles.selectedItem : ''
-        } ${styles.main}`}
+        className={`${selectedInstance === name ? styles.selectedItem : ''} ${
+          styles.main
+        }`}
       >
         <ContextMenuTrigger id={`contextMenu-${name}`}>
           <div
@@ -141,14 +154,14 @@ export default class DInstance extends Component<Props> {
             }
             onClick={e => {
               e.stopPropagation();
-              this.props.selectInstance(name);
+              selectInstance(name);
             }}
             onDoubleClick={this.handleClickPlay}
             onKeyPress={this.handleKeyPress}
             role="button"
             tabIndex={0}
           >
-            {this.props.playing.find(el => el.name === name) && (
+            {playing.find(el => el.name === name) && (
               <span className={styles.playingIcon}>
                 <i className="fas fa-play" style={{ fontSize: '17px' }} />
               </span>
@@ -159,6 +172,15 @@ export default class DInstance extends Component<Props> {
                 type="loading"
                 theme="outlined"
               />
+            )}
+            {!isValid && (
+              <Tooltip title="Warning: this instance is corrupted.">
+                <Icon
+                  className={styles.warningIcon}
+                  type="warning"
+                  theme="outlined"
+                />
+              </Tooltip>
             )}
             <div className={styles.icon}>
               <div
@@ -187,17 +209,17 @@ export default class DInstance extends Component<Props> {
           id={`contextMenu-${name}`}
           onShow={e => {
             e.stopPropagation();
-            this.props.selectInstance(name);
+            selectInstance(name);
           }}
         >
           <span>
-            {name} ({this.state.version})
+            {name} ({version})
           </span>
           <MenuItem
-            disabled={this.isInstalling() || this.state.deleting}
+            disabled={this.isInstalling() || deleting || !isValid}
             onClick={this.handleClickPlay}
           >
-            {this.props.playing.find(el => el.name === name) ? (
+            {playing.find(el => el.name === name) ? (
               <div>
                 <Icon type="thunderbolt" theme="filled" /> Kill
               </div>
@@ -208,7 +230,7 @@ export default class DInstance extends Component<Props> {
             )}
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling() || this.state.deleting}
+            disabled={this.isInstalling() || deleting || !isValid}
             data={{ foo: 'bar' }}
             onClick={() =>
               history.push({
@@ -227,12 +249,10 @@ export default class DInstance extends Component<Props> {
           <MenuItem
             onClick={() => {
               exec(
-                `powershell $s=(New-Object -COM WScript.Shell).CreateShortcut('%userprofile%\\Desktop\\${
-                  this.props.name
-                }.lnk');$s.TargetPath='${path.join(
+                `powershell $s=(New-Object -COM WScript.Shell).CreateShortcut('%userprofile%\\Desktop\\${name}.lnk');$s.TargetPath='${path.join(
                   APPPATH,
                   'GDLauncher.exe'
-                )}';$s.Arguments='-i ${this.props.name}';$s.Save()`,
+                )}';$s.Arguments='-i ${name}';$s.Save()`,
                 error => {
                   if (error) {
                     log.error(`Error creating instance symlink: ${error}`);
@@ -253,23 +273,28 @@ export default class DInstance extends Component<Props> {
                 }
               );
             }}
-            disabled={this.isInstalling() || process.platform !== 'win32' || this.state.deleting}
+            disabled={
+              this.isInstalling() ||
+              process.platform !== 'win32' ||
+              deleting ||
+              !isValid
+            }
           >
             <Icon type="link" theme="outlined" /> Create Shortcut
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling() || this.state.deleting}
+            disabled={this.isInstalling() || deleting || !isValid}
             onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
           >
             <Icon type="export" theme="outlined" /> Export Instance
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling() || this.state.deleting}
+            disabled={this.isInstalling() || deleting}
             data={{ foo: 'bar' }}
             onClick={this.deleteInstance}
             preventClose
           >
-            {this.state.deleting ? (
+            {deleting ? (
               <div>
                 <Icon type="loading" theme="outlined" /> Deleting...
               </div>
@@ -282,5 +307,5 @@ export default class DInstance extends Component<Props> {
         </ContextMenu>
       </div>
     );
-  }
+  };
 }

@@ -41,6 +41,7 @@ const fs = Promise.promisifyAll(fss);
 
 export default class DManager extends Component<Props> {
   props: Props;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -126,6 +127,8 @@ export default class DManager extends Component<Props> {
     require('electron').shell.openExternal(url);
   }
 
+  /* eslint-enable */
+
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.setState({
       instances: arrayMove(this.state.instances, oldIndex, newIndex)
@@ -137,14 +140,13 @@ export default class DManager extends Component<Props> {
   };
 
   isDirectory = source => fss.lstatSync(source).isDirectory();
+
   getDirectories = async source =>
-    await fs
+    fs
       .readdirAsync(source)
       .map(name => join(source, name))
       .filter(this.isDirectory)
       .map(dir => basename(dir));
-
-  /* eslint-enable */
 
   render() {
     return (

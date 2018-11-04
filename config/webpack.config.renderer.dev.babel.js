@@ -1,4 +1,4 @@
-/* eslint global-require: 0, import/no-dynamic-require: 0 */
+/* eslint global-require: off, import/no-dynamic-require: off */
 
 /**
  * Build config for development electron renderer process that uses
@@ -32,10 +32,10 @@ const requiredByDLLConfig = module.parent.filename.includes(
 if (!requiredByDLLConfig && !(fs.existsSync(dll) && fs.existsSync(manifest))) {
   console.log(
     chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
+      'The DLL files are missing. Sit back while we build them for you with "yarn build-dll"'
     )
   );
-  execSync('npm run build-dll');
+  execSync('yarn build-dll');
 }
 
 export default merge.smart(baseConfig, {
@@ -65,13 +65,7 @@ export default merge.smart(baseConfig, {
         use: {
           loader: 'babel-loader',
           options: {
-            cacheDirectory: true,
-            plugins: [
-              // Here, we include babel plugins that are only required for the
-              // renderer process. The 'transform-*' plugins must be included
-              // before react-hot-loader/babel
-              require('react-hot-loader/babel')
-            ]
+            cacheDirectory: true
           }
         }
       },
@@ -188,6 +182,11 @@ export default merge.smart(baseConfig, {
         test: /\.otf(\?v=\d+\.\d+\.\d+)?$/,
         use: 'file-loader'
       },
+      {
+        test: /\.wav$|\.mp3$/,
+        exclude: /node_modules/,
+        loader: 'file-loader'
+      },
       // SVG Font
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
@@ -270,9 +269,7 @@ export default merge.smart(baseConfig, {
     },
     before() {
       if (process.env.START_HOT) {
-        console.log(
-          chalk.blueBright('Starting Main Process... Get Ready To Party!')
-        );
+        console.log('Starting Main Process...');
         spawn('npm', ['run', 'start-main-dev'], {
           shell: true,
           env: process.env,
