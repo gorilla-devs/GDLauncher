@@ -2,13 +2,20 @@ matrix:
   allow_failures:
     - os: windows
   include:
+    - os: osx
+      language: node_js
+      node_js:
+        - 10
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+
     - os: linux
       language: node_js
       node_js:
         - 10
       addons:
         apt:
-          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
@@ -24,39 +31,7 @@ matrix:
         # This should fix https://github.com/travis-ci/travis-ci/issues/9630
         - sudo chown -R travis:travis $HOME/.cache
         - sudo chown -R travis:travis $TRAVIS_BUILD_DIR/node_modules
-      deploy:
-        provider: releases
-        skip_cleanup: true
-        prerelease: true
-        api_key:
-          secure: hF5RKP28CK3zGjqK++zNxMOjXNvGhq51kcbwV2hiMiBs8JSRVzLWgbemQ0qExVzvn5OxH+3GDlZLCeAfeZBjuC8cRqccWQyQ7OAT27PqW1ZvPCSsG6Xz53z6AC06A3j3DkcougqVSVbRBr6JLDZBlNxeVRle+KUM1f0CdmQJtBH71lYYiafmV/xu1rBG0zJJL60nhln84jiorKSekhVnLzyWH+W2H+a3Shl0/TcGvQAJ1oTCypYjmp7+/4vvRTX2wt016UVeW9UYPowBoJWvia3/5ptMJthoYdibQc0NrCvlx1E4L6HlNnrCSZwnxmP9d0mt5kekpmOu+QijS0OrwGSMADzwxfx34cwcLMoX/4Q/E4X4C6fgTSe8s3NODtfKtiiovgX6tNiTu+eLkV/UuRA3qxQGM9vlbbGv37CNY/VLSNbRsEQQsofTzKXjUZ09WcBrHrML2ZZ1j1TkPlkZBf8ZwyqF2Y4Zou+bRDuER1oAHzsptjap2GIa2F8mZ/im6p6DhlU0MvGo4LSbuJwdj5Gc0G/Yq296OUkvH7ue6LgzTceILygt7q2pwz2TJuEK8Sgs+/3wQ2wmjT3m3h4KMt0T1l/DPyZQbQDTUX/7jwI1ObvEbRLH5C+x5B163rN75MvWCDwPuBkErvRQTLE96h+GuGQZvxz34R84aB4zK0Y=
-        file:
-          - "$TRAVIS_BUILD_DIR/release/GDLauncher-linux.zip"
-        on:
-          tags: true
-    - os: osx
-      language: node_js
-      node_js:
-        - 10
-      env:
-        - ELECTRON_CACHE=$HOME/.cache/electron
-        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-      before_deploy:
-        # Removing unpacked builds before deploy
-        # - sudo rm -rf $TRAVIS_BUILD_DIR/release/win-unpacked
-        # - sudo rm -rf $TRAVIS_BUILD_DIR/release/linux-unpacked
 
-        # - node $TRAVIS_BUILD_DIR/scripts/preDeploy.js
-      deploy:
-          provider: releases
-          skip_cleanup: true
-          prerelease: true
-          api_key:
-            secure: hF5RKP28CK3zGjqK++zNxMOjXNvGhq51kcbwV2hiMiBs8JSRVzLWgbemQ0qExVzvn5OxH+3GDlZLCeAfeZBjuC8cRqccWQyQ7OAT27PqW1ZvPCSsG6Xz53z6AC06A3j3DkcougqVSVbRBr6JLDZBlNxeVRle+KUM1f0CdmQJtBH71lYYiafmV/xu1rBG0zJJL60nhln84jiorKSekhVnLzyWH+W2H+a3Shl0/TcGvQAJ1oTCypYjmp7+/4vvRTX2wt016UVeW9UYPowBoJWvia3/5ptMJthoYdibQc0NrCvlx1E4L6HlNnrCSZwnxmP9d0mt5kekpmOu+QijS0OrwGSMADzwxfx34cwcLMoX/4Q/E4X4C6fgTSe8s3NODtfKtiiovgX6tNiTu+eLkV/UuRA3qxQGM9vlbbGv37CNY/VLSNbRsEQQsofTzKXjUZ09WcBrHrML2ZZ1j1TkPlkZBf8ZwyqF2Y4Zou+bRDuER1oAHzsptjap2GIa2F8mZ/im6p6DhlU0MvGo4LSbuJwdj5Gc0G/Yq296OUkvH7ue6LgzTceILygt7q2pwz2TJuEK8Sgs+/3wQ2wmjT3m3h4KMt0T1l/DPyZQbQDTUX/7jwI1ObvEbRLH5C+x5B163rN75MvWCDwPuBkErvRQTLE96h+GuGQZvxz34R84aB4zK0Y=
-          file:
-            - "$TRAVIS_BUILD_DIR/release/GDLauncher-mac.zip"
-          on:
-            tags: true
     - os: windows
       language: node_js
       node_js:
@@ -64,16 +39,10 @@ matrix:
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-      deploy:
-        provider: releases
-        skip_cleanup: true
-        prerelease: true
-        api_key:
-          secure: hF5RKP28CK3zGjqK++zNxMOjXNvGhq51kcbwV2hiMiBs8JSRVzLWgbemQ0qExVzvn5OxH+3GDlZLCeAfeZBjuC8cRqccWQyQ7OAT27PqW1ZvPCSsG6Xz53z6AC06A3j3DkcougqVSVbRBr6JLDZBlNxeVRle+KUM1f0CdmQJtBH71lYYiafmV/xu1rBG0zJJL60nhln84jiorKSekhVnLzyWH+W2H+a3Shl0/TcGvQAJ1oTCypYjmp7+/4vvRTX2wt016UVeW9UYPowBoJWvia3/5ptMJthoYdibQc0NrCvlx1E4L6HlNnrCSZwnxmP9d0mt5kekpmOu+QijS0OrwGSMADzwxfx34cwcLMoX/4Q/E4X4C6fgTSe8s3NODtfKtiiovgX6tNiTu+eLkV/UuRA3qxQGM9vlbbGv37CNY/VLSNbRsEQQsofTzKXjUZ09WcBrHrML2ZZ1j1TkPlkZBf8ZwyqF2Y4Zou+bRDuER1oAHzsptjap2GIa2F8mZ/im6p6DhlU0MvGo4LSbuJwdj5Gc0G/Yq296OUkvH7ue6LgzTceILygt7q2pwz2TJuEK8Sgs+/3wQ2wmjT3m3h4KMt0T1l/DPyZQbQDTUX/7jwI1ObvEbRLH5C+x5B163rN75MvWCDwPuBkErvRQTLE96h+GuGQZvxz34R84aB4zK0Y=
-        file:
-          - "$TRAVIS_BUILD_DIR/release/GDLauncher-win.zip"
-        on:
-          tags: true
+
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
+
 cache:
   yarn: true
   directories:
@@ -82,10 +51,11 @@ cache:
     - flow-typed
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
-    - $HOME/docker
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX="g++-8"; fi
 
 install:
-  - export CXX="g++-8"
   - yarn
   # On Linux, initialize "virtual display". See before_script
   - |
@@ -108,10 +78,11 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
-before_deploy:
-  - ls
-  - cd release
-  - ls
-
 script:
   - yarn package-ci
+  # - yarn lint
+  # - yarn flow
+  # HACK: Temporarily ignore `yarn test` on linux
+  # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then yarn test; fi
+  # - yarn build-e2e
+  # - yarn test-e2e

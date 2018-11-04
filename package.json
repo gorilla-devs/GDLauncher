@@ -2,7 +2,7 @@
   "name": "gdlauncher",
   "productName": "GDLauncher",
   "main": "./app/main.prod.js",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "yarn build-antd && concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -19,7 +19,7 @@
     "lint-styles-fix": "yarn --silent lint-styles --fix; exit 0",
     "package": "yarn build && electron-builder build --publish never",
     "package-all": "yarn build && electron-builder build -mwl",
-    "package-ci": "yarn postinstall && yarn build && electron-builder --publish always",
+    "package-ci": "yarn postinstall && yarn build && electron-builder --publish onTag",
     "package-linux": "yarn build && electron-builder build --linux",
     "package-win": "yarn build && electron-builder build --win --x64",
     "postinstall": "yarn flow-typed && yarn build-dll && electron-builder install-app-deps package.json",
@@ -297,8 +297,8 @@
     "version-sort": "^0.1.1"
   },
   "devEngines": {
-    "node": ">=10.x",
+    "node": ">=10.x <11",
     "npm": ">=6.x",
-    "yarn": ">=0.21.3"
+    "yarn": ">=1.x"
   }
 }
