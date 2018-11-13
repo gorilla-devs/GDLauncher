@@ -6,7 +6,7 @@ import { promisify } from 'util';
 import Promise from "bluebird";
 import log from 'electron-log';
 import crypto from 'crypto';
-import * as packageJson from '../package.json';
+import * as packageJson from '../../package.json';
 import versionsCompare from '../utils/versionsCompare';
 import { UPDATE_URL, APPPATH } from '../constants';
 

@@ -29,6 +29,7 @@ export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const LOGIN_PROXY_API = 'https://api.gdevs.io/auth';
 export const LOGIN_TOKEN_PROXY_API = 'https://api.gdevs.io/authToken';
 export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
+export const GDL_LEGACYJAVAFIXER_MOD_URL = 'https://gdevs.io/legacyjavafixer-1.0.jar';
 export const CURSEMETA_API_URL = `https://staging_cursemeta.dries007.net/api/v3`;
 export const CURSEFORGE_MODLOADERS_API =
   'https://modloaders.cursecdn.com/647622546/maven';

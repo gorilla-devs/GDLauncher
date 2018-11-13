@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { IpcRenderer, ipcRenderer } from 'electron';
 import { Icon, Button, Popover } from 'antd';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -19,35 +20,55 @@ class SideBar extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      updateTextVisible: true
+      updateAvailable: false,
+      isUpdating: false,
+      updateCompleted: false
     };
   }
 
   componentDidMount = () => {
-    this.props.checkForUpdates();
+    if (process.env.NODE_ENV !== 'development') {
+      ipcRenderer.send('check-for-updates');
+      ipcRenderer.on('update-available', () => {
+        this.setState({ updateAvailable: true });
+      });
+      ipcRenderer.on('update-downloaded', () => {
+        this.setState({
+          updateAvailable: true,
+          isUpdating: false,
+          updateCompleted: true
+        });
+      });
+    }
+  };
+
+  handleUpdateClick = () => {
+    ipcRenderer.send('download-updates');
+    this.setState({ isUpdating: true });
+  };
+
+  handleUpdateCompletedClick = () => {
+    ipcRenderer.send('apply-updates');
   };
 
   render() {
     return (
       <aside className={styles.sidenav}>
-        {this.props.updateAvailable && (
+        {this.state.updateAvailable && (
           <div className={styles.updateAvailable}>
             <Button
-              loading={this.props.updating}
-              onClick={this.props.update}
+              loading={this.state.isUpdating}
+              onClick={
+                this.state.updateCompleted
+                  ? this.handleUpdateCompletedClick
+                  : this.handleUpdateClick
+              }
               type="primary"
               size="small"
               style={{ marginLeft: 5 }}
             >
-              <a
-                href={`https://github.com/gorilla-devs/GDLauncher/releases/tag/v${
-                  this.props.latestVersion
-                }`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Update Available ({this.props.latestVersion})
-              </a>
+              {this.state.isUpdating && 'Updating...'}
+              {this.state.updateCompleted ? 'Restart App' : 'Update Available'}
             </Button>
           </div>
         )}
@@ -67,7 +88,7 @@ class SideBar extends Component<Props> {
           style={{ textAlign: 'center', fontWeight: 'italic', fontSize: 12 }}
         >
           <span>Playing on</span>{' '}
-          <Popover placement="left" title="Title">
+          <Popover placement="left" title="Coming Soon">
             <b
               className={styles.playingServer}
               style={{
@@ -91,7 +112,8 @@ class SideBar extends Component<Props> {
           </div>
         </div>
         <div className={styles.scroller}>
-          <div style={{ height: 1000 }}>
+          <h1>Coming Soon</h1>
+          {/* <div style={{ height: 1000 }}>
             <div className={styles.serv}>
               AnonymousCraft
               <i className="fas fa-play" style={{ marginTop: 3 }} />
@@ -99,7 +121,7 @@ class SideBar extends Component<Props> {
             <div className={styles.serv}>HyPixel</div>
             <div className={styles.serv}>PvPWars</div>
             <div className={styles.serv}>Mineplex</div>
-          </div>
+          </div> */}
         </div>
         <hr />
         <div className={styles.socialsContainer}>
@@ -129,7 +151,7 @@ class SideBar extends Component<Props> {
             <i className="fab fa-discord" />
           </a>
           <span className={styles.version}>
-            v{require('../../../package.json').version}
+            v{require('../../../../package.json').version}
           </span>
           {/* eslint-enable */}
         </div>

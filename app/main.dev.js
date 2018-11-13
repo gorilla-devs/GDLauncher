@@ -14,8 +14,11 @@ import { app, BrowserWindow, crashReporter, ipcMain } from 'electron';
 import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import path from 'path';
 import store from './localStore';
 import { THEMES } from './constants';
+import MenuBuilder from './menu';
 import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -32,7 +35,7 @@ const secondaryColor =
     ? settings['secondary-color-1']
     : '#34495e';
 
-if (minimist(process.argv.slice(1))['i']) {
+if (minimist(process.argv.slice(1)).i) {
   cli(process.argv, () => app.quit());
 } else {
   if (process.env.NODE_ENV === 'production') {
@@ -45,9 +48,6 @@ if (minimist(process.argv.slice(1))['i']) {
     process.env.DEBUG_PROD === 'true'
   ) {
     require('electron-debug')({ enabled: true });
-    const path = require('path');
-    const p = path.join(__dirname, '..', 'app', 'node_modules');
-    require('module').globalPaths.push(p);
   }
 
   const installExtensions = async () => {
@@ -120,6 +120,7 @@ if (minimist(process.argv.slice(1))['i']) {
     });
 
     mainWindow.loadURL(`file://${__dirname}/app.html`);
+    mainWindow.webContents.openDevTools({ mode: 'undocked' });
 
     // @TODO: Use 'ready-to-show' event
     //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -128,6 +129,10 @@ if (minimist(process.argv.slice(1))['i']) {
         throw new Error('"mainWindow" is not defined');
       }
       splash.destroy();
+
+      autoUpdater.logger = log;
+      autoUpdater.autoDownload = false;
+
       // Same as for console transport
       log.transports.file.level = 'silly';
       log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
@@ -137,7 +142,7 @@ if (minimist(process.argv.slice(1))['i']) {
       log.transports.file.maxSize = 5 * 1024 * 1024;
 
       // Write to this file, must be set before first logging
-      log.transports.file.file = __dirname + '/log.txt';
+      log.transports.file.file = path.join(__dirname, '/log.txt');
 
       // fs.createWriteStream options, must be set before first logging
       // you can find more information at
@@ -149,6 +154,26 @@ if (minimist(process.argv.slice(1))['i']) {
 
       mainWindow.show();
       mainWindow.focus();
+    });
+
+    ipcMain.on('check-for-updates', ev => {
+      autoUpdater.checkForUpdates();
+
+      autoUpdater.on('update-available', info => {
+        ev.sender.send('update-available');
+      });
+
+      autoUpdater.on('update-downloaded', info => {
+        ev.sender.send('update-downloaded');
+      });
+    });
+
+    ipcMain.on('download-updates', () => {
+      autoUpdater.downloadUpdate();
+    });
+
+    ipcMain.on('apply-updates', () => {
+      autoUpdater.quitAndInstall();
     });
 
     ipcMain.on('open-devTools', () => {
@@ -163,5 +188,7 @@ if (minimist(process.argv.slice(1))['i']) {
       mainWindow = null;
     });
 
+    const menuBuilder = new MenuBuilder(mainWindow);
+    menuBuilder.buildMenu();
   });
 }

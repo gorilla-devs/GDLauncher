@@ -1,6 +1,5 @@
 @import '../../style/theme/index';
 
-
 .main {
   display: inline-block;
   position: relative;
@@ -62,7 +61,7 @@
 }
 
 .main:hover {
-  transition: background-color .25s;
+  transition: background-color 0.25s;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 5px;
 }
@@ -82,9 +81,8 @@
 }
 
 @keyframes downloading {
-  
   from {
-    opacity: .3;
+    opacity: 0.3;
   }
   to {
     opacity: 1;
@@ -93,5 +91,18 @@
 
 .downloadingIcon {
   @extend .icon__iconState;
-  animation: downloading .5s infinite alternate-reverse;
+  animation: downloading 0.5s infinite alternate-reverse;
+}
+
+.warningIcon {
+  @extend .icon__iconState;
+  color: #e74c3c;
+  font-size: 18px;
+  cursor: pointer;
+  svg {
+    cursor: pointer;
+    path {
+      cursor: pointer;
+    }
+  }
 }

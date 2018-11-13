@@ -1,38 +1,40 @@
 /* eslint flowtype-errors/show-errors: 0 */
-import React, { Component } from 'react';
+import React, { Component, lazy, Suspense } from 'react';
 import { connect } from 'react-redux';
-import { Switch, Route, withRouter, Redirect } from 'react-router';
-import { Form, notification, Button } from 'antd';
+import { Switch, Route,  Redirect } from 'react-router';
+import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
 import * as SettingsActions from './actions/settings';
 import { JAVA_URL } from './constants';
 import App from './containers/App';
-import PageContent from './components/Common/PageContent/PageContent';
-import HomePage from './components/Home/containers/HomePage';
 import SideBar from './components/Common/SideBar/SideBar';
-import DManager from './components/DManager/containers/DManagerPage';
 import Navigation from './containers/Navigation';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
-import Login from './components/Login/Login';
 import findJava from './utils/javaLocationFinder';
-import Settings from './components/Settings/Settings';
-import DiscordModal from './components/DiscordModal/DiscordModal';
-import InstanceCreatorModal from './components/InstanceCreatorModal/containers/InstanceCreatorModal';
+import DManager from './components/DManager/containers/DManagerPage';
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
-import loginHelperModal from './components/LoginHelperModal/LoginHelperModal';
+import Settings from './components/Settings/Settings';
 
+
+
+const Login = lazy(() => import('./components/Login/Login'));
+const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
+const ServerManager = lazy(() => import('./components/ServerManager/ServerManager'));
+const InstanceCreatorModal = lazy(() => import('./components/InstanceCreatorModal/containers/InstanceCreatorModal'));
+const loginHelperModal = lazy(() => import('./components/LoginHelperModal/LoginHelperModal'));
 
 type Props = {
-  location: Object,
+  location: object,
   checkAccessToken: () => void,
   isAuthValid: boolean
 };
 
 class RouteDef extends Component<Props> {
   componentDidMount = async () => {
-    this.props.loadSettings();
-    this.props.checkAccessToken();
+    const { loadSettings, checkAccessToken } = this.props;
+    loadSettings();
+    checkAccessToken();
     try {
       await findJava();
     } catch (err) {
@@ -41,14 +43,16 @@ class RouteDef extends Component<Props> {
         message: 'JAVA NOT FOUND',
         description: (
           <div>
-            Java has not been found. Click <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">here</a> to
-            download it. After installing you will need to restart your PC.
+            Java has not been found. Click{' '}
+            <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">
+              here
+            </a>{' '}
+            to download it. After installing you will need to restart your PC.
           </div>
         )
       });
     }
-  }
-
+  };
 
   componentWillUpdate(nextProps) {
     const { location } = this.props;
@@ -57,14 +61,14 @@ class RouteDef extends Component<Props> {
       nextProps.history.action !== 'POP' &&
       (!location.state || !location.state.modal)
     ) {
-      this.previousLocation = this.props.location;
+      this.previousLocation = location;
     }
   }
 
   previousLocation = this.props.location;
 
   render() {
-    const { location } = this.props;
+    const { location, isAuthValid } = this.props;
     const isModal = !!(
       location.state &&
       location.state.modal &&
@@ -73,29 +77,68 @@ class RouteDef extends Component<Props> {
     return (
       <App>
         <SysNavBar />
-        {location.pathname !== '/' && location.pathname !== '/loginHelperModal' &&
-          <div>
-            <Navigation />
-            <SideBar />
-          </div>}
-
+        {location.pathname !== '/' &&
+          location.pathname !== '/loginHelperModal' && (
+            <div>
+              <Navigation />
+              <SideBar />
+            </div>
+          )}
 
         <Switch location={isModal ? this.previousLocation : location}>
-          <Route exact path="/" component={Form.create()(Login)} />
-          {!this.props.isAuthValid && <Redirect push to="/" />}
-          <Route component={PageContent} />
+          <Route exact path="/" component={WaitingComponent(Form.create()(Login))} />
+          {!isAuthValid && <Redirect push to="/" />}
+          <Route>
+            <div
+              style={{
+                width: 'calc(100% - 200px)',
+                position: 'absolute',
+                top: 60,
+                right: 200
+              }}
+            >
+              <Route
+                path="/dmanager"
+                component={DManager}
+              />
+              <Route path="/home" component={WaitingComponent(HomePage)} />
+              <Route
+                path="/serverManager"
+                component={WaitingComponent(ServerManager)}
+              />
+            </div>
+          </Route>
         </Switch>
 
-        { /* ALL MODALS */}
+        {/* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
-        {isModal ? <Route path="/discord" component={DiscordModal} /> : null}
-        {isModal ? <Route path="/InstanceCreatorModal" component={InstanceCreatorModal} /> : null}
-        {isModal ? <Route path="/editInstance/:instance/:page/:state?/:version?/:mod?" component={InstanceManagerModal} /> : null}
-        {isModal ? <Route path="/loginHelperModal" component={loginHelperModal} /> : null}
+        {isModal ? (
+          <Route
+            path="/InstanceCreatorModal"
+            component={WaitingComponent(InstanceCreatorModal)}
+          />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/editInstance/:instance/:page/:state?/:version?/:mod?"
+            component={InstanceManagerModal}
+          />
+        ) : null}
+        {isModal ? (
+          <Route path="/loginHelperModal" component={WaitingComponent(loginHelperModal)} />
+        ) : null}
       </App>
     );
   }
-};
+}
+
+function WaitingComponent(MyComponent) {
+  return props => (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MyComponent {...props} />
+    </Suspense>
+  );
+}
 
 function mapStateToProps(state) {
   return {
@@ -108,4 +151,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({ ...AuthActions, ...SettingsActions }, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RouteDef);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RouteDef);

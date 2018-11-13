@@ -4,7 +4,7 @@ import launchCommand from './MCLaunchCommand';
 import store from '../localStore';
 
 const parseCLI = async (data, callback) => {
-  const instanceName = minimist(data.slice(1))['i'];
+  const instanceName = (minimist(data.slice(1)).i).toString();
   const auth = store.get('user');
   const start = exec(
     await launchCommand(instanceName, auth),

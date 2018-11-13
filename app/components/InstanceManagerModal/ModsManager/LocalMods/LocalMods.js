@@ -82,7 +82,7 @@ class LocalMods extends Component<Props> {
     let mods = (await fs.readdirAsync(
       path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
     ))
-      .filter(el => el !== 'GDLCompanion.jar')
+      .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
       .map(el => {
         return { name: el, state: path.extname(el) !== '.disabled', key: el };
       });

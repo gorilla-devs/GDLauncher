@@ -33,8 +33,6 @@ ${os.platform() === WINDOWS ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerfo
       .join(dividerChar)}${dividerChar}${`"${path.join(INSTANCES_PATH, 'versions', vanillaJSON.id, `${vanillaJSON.id}.jar`)}"`} 
 ${mainClass} ${Arguments}
   `;
-
-  console.log(completeCMD.replace(/\n|\r/g, ''))
   return completeCMD.replace(/\n|\r/g, '');
 };
 

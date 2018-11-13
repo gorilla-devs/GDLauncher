@@ -11,6 +11,7 @@ import * as packCreatorActions from '../../../actions/packCreator';
 import * as downloadManagerActions from '../../../actions/downloadManager';
 import { downloadFile } from '../../../utils/downloader';
 import { PACKS_PATH, GDL_COMPANION_MOD_URL } from '../../../constants';
+import vCompare from '../../../utils/versionsCompare';
 import colors from '../../../style/theme/colors.scss';
 import styles from './ForgeManager.scss';
 
@@ -22,7 +23,9 @@ class Instances extends Component<Props> {
   state = {
     forgeSelectVersion: null,
     loadingCompanionDownload: false,
-    companionModState: false
+    companionModState: false,
+    legacyJavaFixerState: false,
+    loadingLJFDownload: false
   };
 
   componentDidMount = async () => {
@@ -31,6 +34,12 @@ class Instances extends Component<Props> {
         path.join(PACKS_PATH, this.props.name, 'mods', 'GDLCompanion.jar')
       );
       this.setState({ companionModState: true });
+    } catch (err) {}
+    try {
+      await promisify(fs.access)(
+        path.join(PACKS_PATH, this.props.name, 'mods', 'LJF.jar')
+      );
+      this.setState({ legacyJavaFixerState: true });
     } catch (err) {}
   };
 
@@ -82,6 +91,25 @@ class Instances extends Component<Props> {
     this.setState({ loadingCompanionDownload: false });
   };
 
+  legacyJavaFixerModSwitchChange = async value => {
+    this.setState({ loadingLJFDownload: true });
+    if (value) {
+      await makeDir(path.join(PACKS_PATH, this.props.name, 'mods'));
+      await downloadFile(
+        path.join(PACKS_PATH, this.props.name, 'mods', 'LJF.jar'),
+        GDL_COMPANION_MOD_URL,
+        () => {}
+      );
+      this.setState({ legacyJavaFixerState: true });
+    } else {
+      await promisify(fs.unlink)(
+        path.join(PACKS_PATH, this.props.name, 'mods', 'LJF.jar')
+      );
+      this.setState({ legacyJavaFixerState: false });
+    }
+    this.setState({ loadingLJFDownload: false });
+  };
+
   render() {
     if (this.props.data.forgeVersion === null) {
       return (
@@ -93,11 +121,17 @@ class Instances extends Component<Props> {
             notFoundContent="No version found"
             onChange={this.handleForgeVersionChange}
           >
-            {this.props.forgeVersions[this.props.data.version] && _.reverse(this.props.forgeVersions[this.props.data.version].slice()).map(
-              ver => (
-                <Select.Option key={Object.keys(ver)[0]} value={Object.keys(ver)[0]}>{Object.keys(ver)[0]}</Select.Option>
-              )
-            )}
+            {this.props.forgeVersions[this.props.data.version] &&
+              _.reverse(
+                this.props.forgeVersions[this.props.data.version].slice()
+              ).map(ver => (
+                <Select.Option
+                  key={Object.keys(ver)[0]}
+                  value={Object.keys(ver)[0]}
+                >
+                  {Object.keys(ver)[0]}
+                </Select.Option>
+              ))}
           </Select>
           <br />
           <Button
@@ -129,24 +163,50 @@ class Instances extends Component<Props> {
           </Button>
         </div>
         <div>
-          Companion Mod{' '}
-          <Tooltip
-            title="The Companion Mod is an optional feature that allows us to keep track of actions happening in the game.
+          <div>
+            Companion Mod{' '}
+            <Tooltip
+              title="The Companion Mod is an optional feature that allows us to keep track of actions happening in the game.
             This way we can create more precise stats on the instance."
-          >
-            <Icon
-              type="info-circle"
-              theme="filled"
-              className={styles.companionModInfo}
+            >
+              <Icon
+                type="info-circle"
+                theme="filled"
+                className={styles.companionModInfo}
+              />
+            </Tooltip>
+            <br />
+            <Switch
+              onChange={this.companionModSwitchChange}
+              checked={this.state.companionModState}
+              loading={this.state.loadingCompanionDownload}
+              style={{ marginTop: 10 }}
             />
-          </Tooltip>
-          <br />
-          <Switch
-            onChange={this.companionModSwitchChange}
-            checked={this.state.companionModState}
-            loading={this.state.loadingCompanionDownload}
-            style={{ marginTop: 10 }}
-          />
+          </div>
+          {vCompare(
+            this.props.data.forgeVersion.includes('-')
+              ? this.props.data.forgeVersion.split('-')[1]
+              : this.props.data.forgeVersion,
+            '10.13.1.1217'
+          ) === -1 && (
+            <div style={{ marginTop: 15 }}>
+              Java Legacy Fixer{' '}
+              <Tooltip title="This is a mod to fix compatibility issues between old versions of forge and newest versions of Java.">
+                <Icon
+                  type="info-circle"
+                  theme="filled"
+                  className={styles.companionModInfo}
+                />
+              </Tooltip>
+              <br />
+              <Switch
+                onChange={this.legacyJavaFixerModSwitchChange}
+                checked={this.state.legacyJavaFixerState}
+                loading={this.state.loadingLJFDownload}
+                style={{ marginTop: 10 }}
+              />
+            </div>
+          )}
         </div>
       </div>
     );

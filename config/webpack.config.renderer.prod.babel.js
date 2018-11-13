@@ -4,16 +4,15 @@
 
 import path from 'path';
 import webpack from 'webpack';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-import merge from 'webpack-merge';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import merge from 'webpack-merge';
 import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from '../internals/scripts/CheckNodeEnv';
 
 CheckNodeEnv('production');
-
 export default merge.smart(baseConfig, {
   devtool: 'source-map',
 
@@ -26,7 +25,8 @@ export default merge.smart(baseConfig, {
   output: {
     path: path.join(__dirname, '..', 'app/dist'),
     publicPath: './dist/',
-    filename: 'renderer.prod.js'
+    filename: 'renderer.prod.js',
+    chunkFilename: '[name].js'
   },
 
   module: {
@@ -155,6 +155,11 @@ export default merge.smart(baseConfig, {
         test: /\.otf(\?v=\d+\.\d+\.\d+)?$/,
         use: 'file-loader'
       },
+      {
+        test: /\.wav$|\.mp3$/,
+        exclude: /node_modules/,
+        loader: 'file-loader'
+      },
       // SVG Font
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
@@ -191,7 +196,28 @@ export default merge.smart(baseConfig, {
               }
             }
           })
-        ]
+        ],
+    splitChunks: {
+      cacheGroups: {
+        default: false,
+        vendors: false,
+        vendor: {
+          // sync + async chunks
+          chunks: 'all',
+          name: 'vendor',
+          // import file path containing node_modules
+          test: /node_modules/
+        },
+        common: {
+          name: 'common',
+          minChunks: 2,
+          chunks: 'async',
+          priority: 10,
+          reuseExistingChunk: true,
+          enforce: true
+        }
+      }
+    }
   },
 
   plugins: [

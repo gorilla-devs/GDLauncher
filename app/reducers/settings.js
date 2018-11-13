@@ -2,12 +2,13 @@ import {
   LOAD_SETTINGS,
   SET_SOUNDS,
   SET_THEME,
-  RESET_THEME
+  RESET_THEME,
 } from '../actions/settings';
+import { THEMES } from '../constants';
 
 const initialState = {
   sounds: true,
-  theme: {}
+  theme: THEMES.default
 };
 
 export default function Settings(state = initialState, action) {

@@ -188,7 +188,7 @@ class Login extends Component<Props> {
               color: '#bdc3c7'
             }}
           >
-            v{require('../../package.json').version}
+            v{require('../../../package.json').version}
           </div>
         </main>
       </div>

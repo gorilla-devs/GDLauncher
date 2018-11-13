@@ -60,6 +60,7 @@
     justify-content: space-between;
     height: 25px;
     line-height: 25px;
+    padding-left: 3px;
     div:first-child {
       position: relative;
       right: 10px;
@@ -90,6 +91,7 @@
     height: calc(100% - 60px - 140px - 25px);
     width: 200px;
     overflow: auto;
+    text-align: center;
     .serv {
       position: relative;
       padding: 9px 3px;
