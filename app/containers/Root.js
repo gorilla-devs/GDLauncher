@@ -8,9 +8,8 @@ import RouteDef from '../routes';
 
 
 type Props = {
-  store: {},
-  history: {},
-  loadSettings: () => void
+  store: object,
+  history: object
 };
 
 class Root extends Component<Props> {
@@ -25,11 +24,12 @@ class Root extends Component<Props> {
   }
 
   render() {
+    const { store, history } = this.props;
     return (
-      <Provider store={this.props.store}>
+      <Provider store={store}>
         <div>
-          <ConnectedRouter history={this.props.history}>
-            <RouteDef history={this.props.history} />
+          <ConnectedRouter history={history}>
+            <RouteDef history={history} />
           </ConnectedRouter>
         </div>
       </Provider>

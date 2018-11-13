@@ -35,7 +35,7 @@ const secondaryColor =
     ? settings['secondary-color-1']
     : '#34495e';
 
-if (minimist(process.argv.slice(1))['i']) {
+if (minimist(process.argv.slice(1)).i) {
   cli(process.argv, () => app.quit());
 } else {
   if (process.env.NODE_ENV === 'production') {
@@ -120,6 +120,7 @@ if (minimist(process.argv.slice(1))['i']) {
     });
 
     mainWindow.loadURL(`file://${__dirname}/app.html`);
+    mainWindow.webContents.openDevTools({ mode: 'undocked' });
 
     // @TODO: Use 'ready-to-show' event
     //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event

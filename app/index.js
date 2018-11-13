@@ -6,10 +6,13 @@ import { configureStore, history } from './store/configureStore';
 import './app.global.scss';
 
 const store = configureStore();
-console.log('%cWelcome to GDLauncher', 'background: #2c3e50; color: white; display: block; font-size:50px;');
+console.log(
+  '%cWelcome to GDLauncher',
+  'background: #2c3e50; color: white; display: block; font-size:50px;'
+);
 render(
   <AppContainer>
-    <Root store={store} history={history} />
+      <Root store={store} history={history} />
   </AppContainer>,
   document.getElementById('root')
 );

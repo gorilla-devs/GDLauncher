@@ -6,7 +6,16 @@ import ContentLoader from 'react-content-loader';
 import path from 'path';
 import log from 'electron-log';
 import _ from 'lodash';
-import { List, Avatar, Button, Input, Select, Icon, Popover } from 'antd';
+import {
+  List,
+  Avatar,
+  Button,
+  Input,
+  Select,
+  Icon,
+  Popover,
+  Tooltip
+} from 'antd';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
@@ -25,6 +34,7 @@ class ModsList extends Component<Props> {
       loading: false,
       list: [],
       data: [],
+      installing: [],
       searchText: '',
       filterType: 'Featured'
     };
@@ -102,6 +112,58 @@ class ModsList extends Component<Props> {
     );
   };
 
+  installMod = async (data, parent = null) => {
+    const { projectFileId, projectFileName } = data.gameVersionLatestFiles.find(
+      n => n.gameVersion === this.props.match.params.version
+    );
+    if (parent === null) {
+      this.setState(prevState => ({
+        installing: {
+          ...prevState.installing,
+          [projectFileName]: {
+            installing: true,
+            completed: false
+          }
+        }
+      }));
+    }
+
+    const url = await axios.get(
+      `${CURSEMETA_API_URL}/direct/addon/${data.id}/file/${projectFileId}`
+    );
+
+    await downloadFile(
+      path.join(
+        PACKS_PATH,
+        this.props.match.params.instance,
+        'mods',
+        url.data.fileNameOnDisk
+      ),
+      url.data.downloadUrl,
+      () => {}
+    );
+    if (url.data.dependencies.length !== 0) {
+      url.data.dependencies.forEach(async dep => {
+        // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
+        if (dep.type === 1) {
+          const depData = await axios.get(
+            `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}`
+          );
+          await this.installMod(depData.data, projectFileName);
+        }
+      });
+    }
+    this.setState(prevState => ({
+      installing: {
+        ...prevState.installing,
+        [parent === null ? projectFileName : parent]: {
+          installing: false,
+          completed: true
+        }
+      }
+    }));
+  };
+
   filterChanged = async value => {
     this.setState({ filterType: value }, async () => {
       try {
@@ -126,6 +188,28 @@ class ModsList extends Component<Props> {
     });
   };
 
+  isDownloadCompleted = data => {
+    const mod = Object.keys(this.state.installing).find(
+      n =>
+        n ===
+        data.gameVersionLatestFiles.find(
+          x => x.gameVersion === this.props.match.params.version
+        ).projectFileName
+    );
+    return this.state.installing[mod] && this.state.installing[mod].completed;
+  };
+
+  isInstalling = data => {
+    const mod = Object.keys(this.state.installing).find(
+      n =>
+        n ===
+        data.gameVersionLatestFiles.find(
+          x => x.gameVersion === this.props.match.params.version
+        ).projectFileName
+    );
+    return this.state.installing[mod] && this.state.installing[mod].installing;
+  };
+
   render() {
     const { initLoading, loading, list } = this.state;
     const loadMore =
@@ -145,7 +229,7 @@ class ModsList extends Component<Props> {
     if (!initLoading && list.length === 0) {
       return (
         <h1 style={{ textAlign: 'center', marginTop: '20%' }}>
-          Servers are not currently available
+          Servers are not currently available. Try again later
         </h1>
       );
     }
@@ -199,7 +283,15 @@ class ModsList extends Component<Props> {
               actions={[
                 !item.loading && (
                   <Button.Group>
-                    <Button type="primary" icon="down-circle" />
+                    <Tooltip mouseEnterDelay={0.5} title="Download Latest Version">
+                      <Button
+                        type="primary"
+                        icon="down-circle"
+                        onClick={() => this.installMod(item)}
+                        loading={this.isInstalling(item)}
+                        disabled={this.isDownloadCompleted(item)}
+                      />
+                    </Tooltip>
                     <Link
                       to={{
                         pathname: `/editInstance/${
@@ -263,8 +355,8 @@ class ModsList extends Component<Props> {
                         item.loading
                           ? ''
                           : item.attachments
-                            ? item.attachments[0].thumbnailUrl
-                            : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
+                          ? item.attachments[0].thumbnailUrl
+                          : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
                       }
                     />
                   }

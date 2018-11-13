@@ -27,17 +27,19 @@ class SideBar extends Component<Props> {
   }
 
   componentDidMount = () => {
-    ipcRenderer.send('check-for-updates');
-    ipcRenderer.on('update-available', () => {
-      this.setState({ updateAvailable: true });
-    });
-    ipcRenderer.on('update-downloaded', () => {
-      this.setState({
-        updateAvailable: true,
-        isUpdating: false,
-        updateCompleted: true
+    if (process.env.NODE_ENV !== 'development') {
+      ipcRenderer.send('check-for-updates');
+      ipcRenderer.on('update-available', () => {
+        this.setState({ updateAvailable: true });
       });
-    });
+      ipcRenderer.on('update-downloaded', () => {
+        this.setState({
+          updateAvailable: true,
+          isUpdating: false,
+          updateCompleted: true
+        });
+      });
+    }
   };
 
   handleUpdateClick = () => {
@@ -65,7 +67,7 @@ class SideBar extends Component<Props> {
               size="small"
               style={{ marginLeft: 5 }}
             >
-              {this.state.isUpdating && "Updating..."}
+              {this.state.isUpdating && 'Updating...'}
               {this.state.updateCompleted ? 'Restart App' : 'Update Available'}
             </Button>
           </div>

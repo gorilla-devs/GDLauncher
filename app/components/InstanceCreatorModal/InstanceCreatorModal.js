@@ -1,13 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import {
-  message,
-  Form,
-  Input,
-  Icon,
-  Button,
-  Cascader,
-} from 'antd';
+import { message, Form, Input, Icon, Button, Cascader } from 'antd';
 import path from 'path';
 import { promisify } from 'util';
 import fs from 'fs';
@@ -98,6 +91,8 @@ class InstanceCreatorModal extends Component<Props> {
     });
   };
 
+  filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1
+
   render() {
     const { getFieldDecorator } = this.props.form;
 
@@ -146,6 +141,8 @@ class InstanceCreatorModal extends Component<Props> {
                 <Cascader
                   options={this.state.versions}
                   size="large"
+                  // showSearch={{ filter: this.filter }}
+                  onChange={value => console.log(value)}
                   style={{ width: 335, display: 'inline-block' }}
                   placeholder="Select a version"
                 />
@@ -153,12 +150,7 @@ class InstanceCreatorModal extends Component<Props> {
             </FormItem>
           </div>
           <div className={styles.createInstance}>
-            <Button
-              icon="plus"
-              size="large"
-              type="primary"
-              htmlType="submit"
-            >
+            <Button icon="plus" size="large" type="primary" htmlType="submit">
               Create Instance
             </Button>
           </div>

@@ -25,7 +25,8 @@ export default merge.smart(baseConfig, {
   output: {
     path: path.join(__dirname, '..', 'app/dist'),
     publicPath: './dist/',
-    filename: 'renderer.prod.js'
+    filename: 'renderer.prod.js',
+    chunkFilename: '[name].js'
   },
 
   module: {
@@ -195,7 +196,28 @@ export default merge.smart(baseConfig, {
               }
             }
           })
-        ]
+        ],
+    splitChunks: {
+      cacheGroups: {
+        default: false,
+        vendors: false,
+        vendor: {
+          // sync + async chunks
+          chunks: 'all',
+          name: 'vendor',
+          // import file path containing node_modules
+          test: /node_modules/
+        },
+        common: {
+          name: 'common',
+          minChunks: 2,
+          chunks: 'async',
+          priority: 10,
+          reuseExistingChunk: true,
+          enforce: true
+        }
+      }
+    }
   },
 
   plugins: [
