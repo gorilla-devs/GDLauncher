@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Link from 'react-router-dom/Link';
 import axios from 'axios';
 import ContentLoader from 'react-content-loader';
 import path from 'path';
-import log from 'electron-log';
+import Promise from 'bluebird';
 import _ from 'lodash';
-import { List, Avatar, Button, Input, Select, Icon, Popover } from 'antd';
+import { Button, Select } from 'antd';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
-import { numberToRoundedWord } from '../../../../utils/numbers';
 
 import styles from './ModPage.scss';
 
@@ -86,18 +84,20 @@ class ModPage extends Component<Props> {
   };
 
   getAddonData = async addon => {
-    const { data } = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${addon}`
-    );
+    const [{ data }, files] = await Promise.all([
+      axios.get(`${CURSEMETA_API_URL}/direct/addon/${addon}`),
+      axios.get(`${CURSEMETA_API_URL}/direct/addon/${addon}/files`)
+    ]);
 
-    const files = (await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${addon}/files`
-    )).data.filter(el =>
+    const filteredFiles = files.data.filter(el =>
       el.gameVersion.includes(this.props.match.params.version)
     );
 
     this.setState({
-      data: { ...data, allFiles: _.orderBy(files, ['fileDate'], ['desc']) }
+      data: {
+        ...data,
+        allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc'])
+      }
     });
   };
 
@@ -219,8 +219,8 @@ class ModPage extends Component<Props> {
                   {this.isInstalling(this.state.selectedVersion)
                     ? 'Installing'
                     : this.isDownloadCompleted(this.state.selectedVersion)
-                      ? 'Installed'
-                      : 'Install Selected Mod'}
+                    ? 'Installed'
+                    : 'Install Selected Mod'}
                 </Button>
               </div>
             </div>

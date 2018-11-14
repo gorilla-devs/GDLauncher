@@ -12,10 +12,10 @@ const findJavaHome = async () => {
   switch (os.platform()) {
     case LINUX:
     case DARWIN:
-      command = 'which javaw';
+      command = 'which java';
       break;
     case WINDOWS:
-      command = 'where javaw';
+      command = 'where java';
       break;
     default:
       break;

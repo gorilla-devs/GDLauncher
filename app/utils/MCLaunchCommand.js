@@ -52,7 +52,7 @@ const getMCArguments = (vanilla, forge, packName, userData) => {
   return Arguments
     .replace('${auth_player_name}', userData.displayName)
     .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
-    .replace('${game_directory}', path.join(PACKS_PATH, packName))
+    .replace('${game_directory}', `"${path.join(PACKS_PATH, packName)}"`)
     .replace('${game_assets}', path.join(INSTANCES_PATH, 'assets', vanilla.assets === 'legacy' ? '/virtual/legacy' : '')) // Another check for really old versions
     .replace('${version_name}', forge !== null ? forge.versionInfo.id : vanilla.id)
     .replace('${assets_root}', path.join(INSTANCES_PATH, 'assets', vanilla.assets === 'legacy' ? '/virtual/legacy' : ''))

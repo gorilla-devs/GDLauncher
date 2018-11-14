@@ -121,9 +121,9 @@ export default class Home extends Component<Props> {
                   marginTop: 15,
                   textAlign: 'center'
                 }}
-                title="Try out the new v1.13.1"
+                title="Try out the new v1.13.2"
               >
-                V1.13.1 has just been released. Wanna try it out?
+                V1.13.2 has just been released. Wanna try it out?
                 {this.state.latestBtnClicked || this.state.latestInstalled ? (
                   <Link
                     to="/dmanager"
@@ -137,11 +137,11 @@ export default class Home extends Component<Props> {
                     loading={this.props.packCreationLoading}
                     style={{ display: 'block', margin: '35px auto' }}
                     onClick={() => {
-                      this.props.createPack('1.13.1', '1.13.1');
+                      this.props.createPack('1.13.2', '1.13.2');
                       this.setState({ latestBtnClicked: true });
                     }}
                   >
-                    Install and Start v1.13.1
+                    Install and Start v1.13.2
                   </Button>
                 )}
               </Card>
