@@ -283,7 +283,10 @@ class ModsList extends Component<Props> {
               actions={[
                 !item.loading && (
                   <Button.Group>
-                    <Tooltip mouseEnterDelay={0.5} title="Download Latest Version">
+                    <Tooltip
+                      mouseEnterDelay={0.5}
+                      title="Download Latest Version"
+                    >
                       <Button
                         type="primary"
                         icon="down-circle"

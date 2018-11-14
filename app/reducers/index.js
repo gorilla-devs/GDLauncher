@@ -7,7 +7,6 @@ import packCreator from './packCreator';
 import downloadManager from './downloadManager';
 import instancesManager from './instancesManager';
 import news from './news';
-import autoUpdater from './autoUpdater';
 import settings from './settings';
 
 export default history =>
@@ -19,6 +18,5 @@ export default history =>
     downloadManager,
     instancesManager,
     news,
-    autoUpdater,
     settings
   });

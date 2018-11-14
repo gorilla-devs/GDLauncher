@@ -160,6 +160,11 @@ export default merge.smart(baseConfig, {
         exclude: /node_modules/,
         loader: 'file-loader'
       },
+      {
+        test: /\.wav$|\.mp3$/,
+        exclude: /node_modules/,
+        loader: 'file-loader'
+      },
       // SVG Font
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
