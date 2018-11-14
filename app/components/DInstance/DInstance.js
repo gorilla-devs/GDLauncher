@@ -126,11 +126,11 @@ export default class DInstance extends Component<Props> {
       selectInstance(null);
       message.success('Instance deleted');
     } catch (err) {
-      hideMenu(`contextMenu-${name}`);
       message.error('Error deleting instance');
       log.error(err);
     } finally {
       this.setState({ deleting: false });
+      hideMenu(`contextMenu-${name}`);
     }
   };
 

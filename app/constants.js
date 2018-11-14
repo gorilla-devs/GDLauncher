@@ -35,7 +35,7 @@ export const CURSEFORGE_MODLOADERS_API =
   'https://modloaders.cursecdn.com/647622546/maven';
 export const NEWS_URL =
   'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1';
-export const JAVA_URL = 'https://java.com/download';
+export const JAVA_URL = 'https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html';
 export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
 export const THEMES = {
