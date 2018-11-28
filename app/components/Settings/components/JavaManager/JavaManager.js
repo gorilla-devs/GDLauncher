@@ -35,8 +35,7 @@ class JavaManager extends Component<Props> {
       <div>
         <Title>Java Manager (Global)</Title>
         <div style={{ fontSize: 18 }}>
-          Default Java Path <Icon type="folder" theme="filled" /> (Leave Empty
-          to Autodetect)
+          Default Java Path <Icon type="folder" theme="filled" />
         </div>
         <Input
           size="large"
@@ -54,8 +53,9 @@ class JavaManager extends Component<Props> {
               style={{ color: 'rgba(255,255,255,.8)' }}
             />
           }
-          placeholder={this.state.javaPath}
+          placeholder="(Autodetected if Empty)"
         />
+        {this.state.javaPath}
       </div>
     );
   }

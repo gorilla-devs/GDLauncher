@@ -1,9 +1,10 @@
 /* eslint flowtype-errors/show-errors: 0 */
 import React, { Component, lazy, Suspense } from 'react';
 import { connect } from 'react-redux';
-import { Switch, Route,  Redirect } from 'react-router';
+import { Switch, Route, Redirect } from 'react-router';
 import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import * as AuthActions from './actions/auth';
 import * as SettingsActions from './actions/settings';
 import { JAVA_URL } from './constants';
@@ -16,13 +17,17 @@ import DManager from './components/DManager/containers/DManagerPage';
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
 
-
-
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
-const ServerManager = lazy(() => import('./components/ServerManager/ServerManager'));
-const InstanceCreatorModal = lazy(() => import('./components/InstanceCreatorModal/containers/InstanceCreatorModal'));
-const loginHelperModal = lazy(() => import('./components/LoginHelperModal/LoginHelperModal'));
+const ServerManager = lazy(() =>
+  import('./components/ServerManager/ServerManager')
+);
+const InstanceCreatorModal = lazy(() =>
+  import('./components/InstanceCreatorModal/containers/InstanceCreatorModal')
+);
+const loginHelperModal = lazy(() =>
+  import('./components/LoginHelperModal/LoginHelperModal')
+);
 
 type Props = {
   location: object,
@@ -84,31 +89,35 @@ class RouteDef extends Component<Props> {
               <SideBar />
             </div>
           )}
-
-        <Switch location={isModal ? this.previousLocation : location}>
-          <Route exact path="/" component={WaitingComponent(Form.create()(Login))} />
-          {!isAuthValid && <Redirect push to="/" />}
-          <Route>
-            <div
-              style={{
-                width: 'calc(100% - 200px)',
-                position: 'absolute',
-                top: 60,
-                right: 200
-              }}
-            >
+        <TransitionGroup>
+          <CSSTransition key={location.key} timeout={500} classNames="fade">
+            <Switch location={isModal ? this.previousLocation : location}>
               <Route
-                path="/dmanager"
-                component={DManager}
+                exact
+                path="/"
+                component={WaitingComponent(Form.create()(Login))}
               />
-              <Route path="/home" component={WaitingComponent(HomePage)} />
-              <Route
-                path="/serverManager"
-                component={WaitingComponent(ServerManager)}
-              />
-            </div>
-          </Route>
-        </Switch>
+              {!isAuthValid && <Redirect push to="/" />}
+              <Route>
+                <div
+                  style={{
+                    width: 'calc(100% - 200px)',
+                    position: 'absolute',
+                    top: 60,
+                    right: 200
+                  }}
+                >
+                  <Route path="/dmanager" component={DManager} />
+                  <Route path="/home" component={WaitingComponent(HomePage)} />
+                  <Route
+                    path="/serverManager"
+                    component={WaitingComponent(ServerManager)}
+                  />
+                </div>
+              </Route>
+            </Switch>
+          </CSSTransition>
+        </TransitionGroup>
 
         {/* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
@@ -125,7 +134,10 @@ class RouteDef extends Component<Props> {
           />
         ) : null}
         {isModal ? (
-          <Route path="/loginHelperModal" component={WaitingComponent(loginHelperModal)} />
+          <Route
+            path="/loginHelperModal"
+            component={WaitingComponent(loginHelperModal)}
+          />
         ) : null}
       </App>
     );
