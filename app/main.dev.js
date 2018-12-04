@@ -20,6 +20,7 @@ import store from './localStore';
 import { THEMES } from './constants';
 import MenuBuilder from './menu';
 import cli from './utils/cli';
+import { DATAPATH } from './constants';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
@@ -82,7 +83,7 @@ if (minimist(process.argv.slice(1)).i) {
     splash = new BrowserWindow({
       show: true,
       width: 850,
-      height: 600,
+      height: 730,
       frame: false,
       backgroundColor: secondaryColor,
       resizable: false
@@ -96,7 +97,7 @@ if (minimist(process.argv.slice(1)).i) {
     mainWindow = new BrowserWindow({
       show: false,
       width: 850,
-      height: 600,
+      height: 730,
       minHeight: 600,
       minWidth: 780,
       frame: false,
@@ -150,7 +151,7 @@ if (minimist(process.argv.slice(1)).i) {
       log.transports.file.streamConfig = { flags: 'w' };
 
       // set existed file stream
-      log.transports.file.stream = fs.createWriteStream('log.txt');
+      log.transports.file.stream = fs.createWriteStream(path.join(DATAPATH, 'GDLauncher_logs.txt'));
 
       mainWindow.show();
       mainWindow.focus();

@@ -10,7 +10,6 @@ import styles from './SideBar.scss';
 
 import * as AuthActions from '../../../actions/auth';
 import * as ProfileActions from '../../../actions/profile';
-import * as autoUpdater from '../../../actions/autoUpdater';
 
 type Props = {};
 
@@ -22,7 +21,8 @@ class SideBar extends Component<Props> {
     this.state = {
       updateAvailable: false,
       isUpdating: false,
-      updateCompleted: false
+      updateCompleted: false,
+      textUpdate: "Update Available"
     };
   }
 
@@ -36,7 +36,8 @@ class SideBar extends Component<Props> {
         this.setState({
           updateAvailable: true,
           isUpdating: false,
-          updateCompleted: true
+          updateCompleted: true,
+          textUpdate: "Restart App"
         });
       });
     }
@@ -44,7 +45,7 @@ class SideBar extends Component<Props> {
 
   handleUpdateClick = () => {
     ipcRenderer.send('download-updates');
-    this.setState({ isUpdating: true });
+    this.setState({ isUpdating: true, textUpdate: "Updating..." });
   };
 
   handleUpdateCompletedClick = () => {
@@ -67,8 +68,7 @@ class SideBar extends Component<Props> {
               size="small"
               style={{ marginLeft: 5 }}
             >
-              {this.state.isUpdating && 'Updating...'}
-              {this.state.updateCompleted ? 'Restart App' : 'Update Available'}
+              {this.state.textUpdate}
             </Button>
           </div>
         )}
@@ -166,15 +166,12 @@ function mapStateToProps(state) {
     profileState: state.profile.profileState,
     stateColor: state.profile.stateColor,
     downloadQueue: state.downloadManager.downloadQueue,
-    updateAvailable: state.autoUpdater.updateAvailable,
-    updating: state.autoUpdater.checkingForUpdates,
-    latestVersion: state.autoUpdater.latestVersion
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
-    { ...AuthActions, ...ProfileActions, ...autoUpdater },
+    { ...AuthActions, ...ProfileActions },
     dispatch
   );
 }

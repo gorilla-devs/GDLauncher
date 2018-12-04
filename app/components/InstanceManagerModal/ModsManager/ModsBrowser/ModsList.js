@@ -19,6 +19,7 @@ import {
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
+import { downloadMod } from '../../../../utils/mods';
 
 import styles from './ModsList.scss';
 
@@ -51,17 +52,17 @@ class ModsList extends Component<Props> {
   getMods = async () => {
     this.setState({
       initLoading: true,
-      list: [...new Array(10)].map(() => ({ loading: true, name: {} })),
+      list: [...new Array(15)].map(() => ({ loading: true, name: {} })),
       data: []
     });
     try {
       const res = await axios.get(
-        `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=0&sort=${
-          this.state.filterType
+        `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=15&index=0&sort=${
+        this.state.filterType
         }&searchFilter=${encodeURI(this.state.searchText)}&gameVersion=${
-          this.props.match.params.version
+        this.props.match.params.version
         }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
-          'author' && this.state.filterType !== 'name'}`
+        'author' && this.state.filterType !== 'name'}`
       );
       this.setState({
         initLoading: false,
@@ -86,14 +87,14 @@ class ModsList extends Component<Props> {
       )
     });
     const res = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=10&index=${
-        this.state.list.length
+      `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=15&index=${
+      this.state.list.length
       }&sort=${this.state.filterType}&searchFilter=${encodeURI(
         this.state.searchText
       )}&gameVersion=${
-        this.props.match.params.version
+      this.props.match.params.version
       }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
-        'author' && this.state.filterType !== 'name'}`
+      'author' && this.state.filterType !== 'name'}`
     );
     // We now remove the previous 10 elements and add the real 10
     const data = this.state.data.concat(res.data);
@@ -112,54 +113,23 @@ class ModsList extends Component<Props> {
     );
   };
 
-  installMod = async (data, parent = null) => {
-    const { projectFileId, projectFileName } = data.gameVersionLatestFiles.find(
-      n => n.gameVersion === this.props.match.params.version
-    );
-    if (parent === null) {
-      this.setState(prevState => ({
-        installing: {
-          ...prevState.installing,
-          [projectFileName]: {
-            installing: true,
-            completed: false
-          }
-        }
-      }));
-    }
+  installMod = async (id, files) => {
 
-    const url = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${data.id}/file/${projectFileId}`
-    );
+    const { projectFileId, projectFileName } = files.find(n => n.gameVersion === this.props.match.params.version);
 
-    await downloadFile(
-      path.join(
-        PACKS_PATH,
-        this.props.match.params.instance,
-        'mods',
-        url.data.fileNameOnDisk
-      ),
-      url.data.downloadUrl,
-      () => {}
-    );
-    if (url.data.dependencies.length !== 0) {
-      url.data.dependencies.forEach(async dep => {
-        // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
-        if (dep.type === 1) {
-          const depData = await axios.get(
-            `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}`
-          );
-          await this.installMod(depData.data, projectFileName);
-        }
-      });
-    }
     this.setState(prevState => ({
       installing: {
         ...prevState.installing,
-        [parent === null ? projectFileName : parent]: {
-          installing: false,
-          completed: true
-        }
+        [projectFileName]: { installing: true, completed: false }
+      }
+    }));
+
+    await downloadMod(id, projectFileId, `${projectFileName}.jar`, this.props.match.params.instance);
+
+    this.setState(prevState => ({
+      installing: {
+        ...prevState.installing,
+        [projectFileName]: { installing: false, completed: true }
       }
     }));
   };
@@ -234,7 +204,7 @@ class ModsList extends Component<Props> {
       );
     }
     return (
-      <div style={{ height: '83%' }}>
+      <div style={{ height: 'calc(100% - 77px)' }}>
         <div className={styles.header}>
           <Input
             placeholder="Search Here"
@@ -283,11 +253,14 @@ class ModsList extends Component<Props> {
               actions={[
                 !item.loading && (
                   <Button.Group>
-                    <Tooltip mouseEnterDelay={0.5} title="Download Latest Version">
+                    <Tooltip
+                      mouseEnterDelay={0.5}
+                      title="Download Latest Version"
+                    >
                       <Button
                         type="primary"
                         icon="down-circle"
-                        onClick={() => this.installMod(item)}
+                        onClick={() => this.installMod(item.id, item.gameVersionLatestFiles)}
                         loading={this.isInstalling(item)}
                         disabled={this.isDownloadCompleted(item)}
                       />
@@ -296,9 +269,9 @@ class ModsList extends Component<Props> {
                       to={{
                         pathname: `/editInstance/${
                           this.props.match.params.instance
-                        }/mods/browse/${this.props.match.params.version}/${
+                          }/mods/browse/${this.props.match.params.version}/${
                           item.id
-                        }`,
+                          }`,
                         state: { modal: true }
                       }}
                       replace
@@ -348,59 +321,59 @@ class ModsList extends Component<Props> {
                   />
                 </ContentLoader>
               ) : (
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      src={
-                        item.loading
-                          ? ''
-                          : item.attachments
-                          ? item.attachments[0].thumbnailUrl
-                          : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
-                      }
-                    />
-                  }
-                  title={
-                    <Link
-                      to={{
-                        pathname: `/editInstance/${
-                          this.props.match.params.instance
-                        }/mods/browse/${this.props.match.params.version}/${
-                          item.id
-                        }`,
-                        state: { modal: true }
-                      }}
-                      replace
-                    >
-                      {item.name}
-                    </Link>
-                  }
-                  description={
-                    item.loading ? (
-                      ''
-                    ) : (
-                      <div>
-                        {item.summary}
-                        <div className={styles.modFooter}>
-                          <span>
-                            Downloads: {numberToRoundedWord(item.downloadCount)}
-                          </span>
-                          <span>
-                            Updated:{' '}
-                            {new Date(
-                              item.latestFiles[0].fileDate
-                            ).toLocaleDateString('en-US', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric'
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  }
-                />
-              )}
+                  <List.Item.Meta
+                    avatar={
+                      <Avatar
+                        src={
+                          item.loading
+                            ? ''
+                            : item.attachments
+                              ? item.attachments[0].thumbnailUrl
+                              : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
+                        }
+                      />
+                    }
+                    title={
+                      <Link
+                        to={{
+                          pathname: `/editInstance/${
+                            this.props.match.params.instance
+                            }/mods/browse/${this.props.match.params.version}/${
+                            item.id
+                            }`,
+                          state: { modal: true }
+                        }}
+                        replace
+                      >
+                        {item.name}
+                      </Link>
+                    }
+                    description={
+                      item.loading ? (
+                        ''
+                      ) : (
+                          <div>
+                            {item.summary}
+                            <div className={styles.modFooter}>
+                              <span>
+                                Downloads: {numberToRoundedWord(item.downloadCount)}
+                              </span>
+                              <span>
+                                Updated:{' '}
+                                {new Date(
+                                  item.latestFiles[0].fileDate
+                                ).toLocaleDateString('en-US', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric'
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                    }
+                  />
+                )}
             </List.Item>
           )}
         />
