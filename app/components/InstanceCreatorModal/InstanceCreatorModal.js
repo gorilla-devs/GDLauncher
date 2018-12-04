@@ -141,7 +141,7 @@ class InstanceCreatorModal extends Component<Props> {
                 <Cascader
                   options={this.state.versions}
                   size="large"
-                  // showSearch={{ filter: this.filter }}
+                  showSearch={{ filter: this.filter }}
                   onChange={value => console.log(value)}
                   style={{ width: 335, display: 'inline-block' }}
                   placeholder="Select a version"

@@ -20,7 +20,8 @@ class JavaManager extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      javaPath: 'Loading...'
+      javaPath: 'Loading...',
+      javaInput: null
     };
   }
 
@@ -29,6 +30,16 @@ class JavaManager extends Component<Props> {
       javaPath: await javaPath()
     });
   };
+
+  openFolderDialog = () => {
+    const { dialog } = require('electron').remote;
+    dialog.showOpenDialog({ properties: ['openDirectory'] }, this.folderDialogCallback);
+  };
+
+  folderDialogCallback = paths => {
+    this.setState({ javaInput: paths[0] });
+    console.log(this.state.javaInput);
+  }
 
   render() {
     return (
@@ -40,7 +51,7 @@ class JavaManager extends Component<Props> {
         <Input
           size="large"
           style={{
-            width: '100%',
+            width: '90%',
             display: 'inline-block',
             height: '60px',
             marginBottom: 10,
@@ -54,7 +65,10 @@ class JavaManager extends Component<Props> {
             />
           }
           placeholder="(Autodetected if Empty)"
+          value={this.state.javaInput}
         />
+        <Button type="primary" icon="folder" theme="filled" onClick={() => this.openFolderDialog()} style={{ height: 60, marginLeft: 10 }} />
+        Autodetected Path: <br />
         {this.state.javaPath}
       </div>
     );

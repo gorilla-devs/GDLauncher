@@ -2,7 +2,7 @@
   "name": "gdlauncher",
   "productName": "GDLauncher",
   "main": "./app/main.prod.js",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "yarn build-antd && concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -220,7 +220,7 @@
     "eslint-plugin-react": "^7.11.1",
     "fbjs-scripts": "^1.0.1",
     "file-loader": "^2.0.0",
-    "flow-bin": "^0.86.0",
+    "flow-bin": "^0.87.0",
     "flow-runtime": "^0.17.0",
     "flow-typed": "^2.5.1",
     "identity-obj-proxy": "^3.0.0",
@@ -255,7 +255,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.5.0",
     "adm-zip": "^0.4.13",
-    "antd": "^3.10.9",
+    "antd": "^3.11.0",
     "assert": "^1.4.1",
     "axios": "^0.18.0",
     "bluebird": "^3.5.3",

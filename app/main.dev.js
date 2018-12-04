@@ -83,7 +83,7 @@ if (minimist(process.argv.slice(1)).i) {
     splash = new BrowserWindow({
       show: true,
       width: 850,
-      height: 600,
+      height: 730,
       frame: false,
       backgroundColor: secondaryColor,
       resizable: false
@@ -97,7 +97,7 @@ if (minimist(process.argv.slice(1)).i) {
     mainWindow = new BrowserWindow({
       show: false,
       width: 850,
-      height: 600,
+      height: 730,
       minHeight: 600,
       minWidth: 780,
       frame: false,
