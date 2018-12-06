@@ -10585,15 +10585,15 @@ react-contextmenu@^2.10.0:
     classnames "^2.2.5"
     object-assign "^4.1.0"
 
-react-dom@^16.6.3:
-  version "16.6.3"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.6.3.tgz#8fa7ba6883c85211b8da2d0efeffc9d3825cccc0"
-  integrity sha512-8ugJWRCWLGXy+7PmNh8WJz3g1TaTUt1XyoIcFN+x0Zbkoz+KKdUyx1AQLYJdbFXjuF41Nmjn5+j//rxvhFjgSQ==
+react-dom@^16.7.0-alpha.2:
+  version "16.7.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.7.0-alpha.2.tgz#16632880ed43676315991d8b412cce6975a30282"
+  integrity sha512-o0mMw8jBlwHjGZEy/vvKd/6giAX0+skREMOTs3/QHmgi+yAhUClp4My4Z9lsKy3SXV+03uPdm1l/QM7NTcGuMw==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.2"
-    scheduler "^0.11.2"
+    scheduler "^0.12.0-alpha.2"
 
 react-hot-loader@^4.3.12:
   version "4.3.12"
@@ -10720,15 +10720,15 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react@^16.6.3:
-  version "16.6.3"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.6.3.tgz#25d77c91911d6bbdd23db41e70fb094cc1e0871c"
-  integrity sha512-zCvmH2vbEolgKxtqXL2wmGCUxUyNheYn/C+PD1YAjfxHC54+MhdruyhO7QieQrYsYeTxrn93PM2y0jRH1zEExw==
+react@^16.7.0-alpha.2:
+  version "16.7.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.7.0-alpha.2.tgz#924f2ae843a46ea82d104a8def7a599fbf2c78ce"
+  integrity sha512-Xh1CC8KkqIojhC+LFXd21jxlVtzoVYdGnQAi/I2+dxbmos9ghbx5TQf9/nDxc4WxaFfUQJkya0w1k6rMeyIaxQ==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.2"
-    scheduler "^0.11.2"
+    scheduler "^0.12.0-alpha.2"
 
 reactcss@^1.2.0:
   version "1.2.3"
@@ -11419,6 +11419,14 @@ scheduler@^0.11.2:
   version "0.11.2"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.11.2.tgz#a8db5399d06eba5abac51b705b7151d2319d33d3"
   integrity sha512-+WCP3s3wOaW4S7C1tl3TEXp4l9lJn0ZK8G3W3WKRWmw77Z2cIFUW2MiNTMHn5sCjxN+t7N43HAOOgMjyAg5hlg==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+
+scheduler@^0.12.0-alpha.2:
+  version "0.12.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.12.0-alpha.3.tgz#59afcaba1cb79e3e8bee91de94eb8f42c9152c2b"
+  integrity sha512-KADuBlOWSrT/DCt/oA+NgsNamRCsfz7wj+leaeGjGHipNClsqhjOPogKkJgem6WLAv/QzxW8bE7zlGc9OxiYSQ==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

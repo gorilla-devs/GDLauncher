@@ -1,10 +1,11 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { AppContainer } from 'react-hot-loader';
+import { AppContainer, setConfig } from 'react-hot-loader';
 import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
 import './app.global.scss';
 
+if (module.hot) setConfig({ pureSFC: true })
 const store = configureStore();
 console.log(
   '%cWelcome to GDLauncher',
@@ -12,7 +13,7 @@ console.log(
 );
 render(
   <AppContainer>
-      <Root store={store} history={history} />
+    <Root store={store} history={history} />
   </AppContainer>,
   document.getElementById('root')
 );
