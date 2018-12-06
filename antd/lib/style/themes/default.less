@@ -45,6 +45,7 @@
 @heading-color-dark     : fade(#fff, 100%);
 @text-color-dark        : fade(rgb(0, 0, 0),85%);
 @text-color-secondary-dark: fade(rgb(0, 0, 0), 65%);
+@font-variant-base      : tabular-nums;
 @font-size-base         : 14px;
 @font-size-lg           : @font-size-base + 2px;
 @font-size-sm           : 12px;
@@ -97,7 +98,7 @@
 @border-color-base      : hsv(0, 0, 85%);  // base border outline a component
 @border-color-split     : rgba(114,118,125,.3);  // split border inside a component
 @border-width-base      : 3px;            // width of the border for a component
-@border-style-base      : solid;          // style of a components border
+@border-style-base      : solid;       
 
 // Outline
 @outline-blur-size      : 0;
@@ -115,7 +116,7 @@
 // Shadow
 @shadow-color           : rgba(0, 0, 0, .15);
 @box-shadow-base        : @shadow-1-down;
-@shadow-1-up            : 0 2px 8px @shadow-color;
+@shadow-1-up            : 0 -2px 8px @shadow-color;
 @shadow-1-down          : 0 2px 8px @shadow-color;
 @shadow-1-left          : -2px 0 8px @shadow-color;
 @shadow-1-right         : 2px 0 8px @shadow-color;
@@ -161,6 +162,7 @@
 @checkbox-size          : 16px;
 @checkbox-color         : @primary-color;
 @checkbox-check-color   : #fff;
+@checkbox-border-width  : @border-width-base;
 
 // Radio
 @radio-size             : 16px;
@@ -297,7 +299,7 @@
 //** Popover maximum width
 @popover-min-width: 177px;
 //** Popover arrow width
-@popover-arrow-width: 5px;
+@popover-arrow-width: 6px;
 //** Popover arrow color
 @popover-arrow-color: @popover-bg;
 //** Popover outer arrow width
@@ -308,6 +310,7 @@
 
 // Modal
 // --
+@modal-header-bg: @component-background;
 @modal-mask-bg: rgba(0, 0, 0, 0.65);
 
 // Progress
@@ -322,6 +325,7 @@
 @menu-item-height: 40px;
 @menu-collapsed-width: 80px;
 @menu-bg: @midnight;
+@menu-popup-bg: @component-background;
 @menu-item-color: @text-color;
 @menu-highlight-color: @primary-color;
 @menu-item-active-bg: @item-active-bg;
@@ -346,6 +350,7 @@
 @table-header-bg: @background-color-light;
 @table-header-color: @heading-color;
 @table-header-sort-bg: @background-color-base;
+@table-body-sort-bg: rgba(0, 0, 0, .01);
 @table-row-hover-bg: @primary-1;
 @table-selected-row-bg: #fafafa;
 @table-expanded-row-bg: #fbfbfb;
@@ -393,6 +398,15 @@
 @card-padding-wider: 32px;
 @card-actions-background: #34495e;
 @card-shadow: 0 2px 8px rgba(0, 0, 0, .09);
+
+// Comment
+// ---
+@comment-padding-base: 16px 0;
+@comment-nest-indent: 44px;
+@comment-author-name-color: @text-color-secondary;
+@comment-author-time-color: #ccc;
+@comment-action-color: @text-color-secondary;
+@comment-action-hover-color: #595959;
 
 // Tabs
 // ---
@@ -451,7 +465,7 @@
 @breadcrumb-base-color:        @text-color-secondary;
 @breadcrumb-last-item-color:   @text-color;
 @breadcrumb-font-size:         @font-size-base;
-@breadcrumb-icon-font-size:    @font-size-sm;
+@breadcrumb-icon-font-size:    @font-size-base;
 @breadcrumb-link-color:        @text-color-secondary;
 @breadcrumb-link-color-hover:  @primary-5;
 @breadcrumb-separator-color:   @text-color-secondary;
@@ -492,6 +506,10 @@
 // ---
 @skeleton-color:                      @midnight;
 
+// Transfer
+// ---
+@transfer-disabled-bg:                @disabled-bg;
+
 // Message
 // ---
 @message-notice-content-padding:      10px 16px;
@@ -500,4 +518,26 @@
 // ---
 @wave-animation-width: 6px;
 
-@import "./default.deperated.less";
+// Alert
+// ---
+@alert-success-border-color: ~`colorPalette("@{success-color}", 3)`;
+@alert-success-bg-color: ~`colorPalette("@{success-color}", 1)`;
+@alert-success-icon-color: @success-color;
+@alert-info-border-color: ~`colorPalette("@{info-color}", 3)`;
+@alert-info-bg-color: ~`colorPalette("@{info-color}", 1)`;
+@alert-info-icon-color: @info-color;
+@alert-warning-border-color: ~`colorPalette("@{warning-color}", 3)`;
+@alert-warning-bg-color: ~`colorPalette("@{warning-color}", 1)`;
+@alert-warning-icon-color: @warning-color;
+@alert-error-border-color: ~`colorPalette("@{error-color}", 3)`;
+@alert-error-bg-color: ~`colorPalette("@{error-color}", 1)`;
+@alert-error-icon-color: @error-color;
+
+// List
+// ---
+@list-empty-text-padding:                    @padding-md;
+@list-item-padding:                          @padding-sm 0;
+@list-item-content-margin:                   0 0 @padding-md 0;
+@list-item-meta-margin-bottom:               @padding-md;
+@list-item-meta-avatar-margin-right:         @padding-md;
+@list-item-meta-title-margin-bottom:         @padding-sm;
