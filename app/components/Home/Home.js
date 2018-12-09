@@ -29,7 +29,7 @@ export default class Home extends Component<Props> {
   componentDidMount = async () => {
     this.props.getNews();
     try {
-      await promisify(fs.access)(path.join(PACKS_PATH, '1.13.1'));
+      await promisify(fs.access)(path.join(PACKS_PATH, '1.13.2'));
       this.setState({ latestInstalled: true });
     } catch (e) {
       this.setState({ latestInstalled: false });

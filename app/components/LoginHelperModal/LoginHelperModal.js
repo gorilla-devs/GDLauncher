@@ -6,7 +6,7 @@ import styles from './LoginHelperModal.scss';
 
 const DiscordModal = ({ match, history }) => {
   return (
-    <Modal history={history}>
+    <Modal history={history} style={{ height: 550 }}>
       <div className={styles.container}>
         <h3>What login credentials should I use?</h3>
         <p>Our launcher uses your normal Mojang credentials,
