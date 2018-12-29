@@ -23,9 +23,15 @@ const findJavaHome = async () => {
       default:
         break;
     }
-    const { stdout } = await exec(command);
-    // This returns the first path found
-    return stdout.split('\n')[0];
+    try {
+      const {
+        stdout
+      } = await exec(command);
+      // This returns the first path found
+      return stdout.split('\n')[0];
+    } catch(e) {
+      return null;
+    }
   }
   return javaSettings.path;
 };

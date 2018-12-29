@@ -3,14 +3,18 @@ import { message } from 'antd';
 import { promisify } from 'util';
 import axios from 'axios';
 import makeDir from 'make-dir';
+import fse from 'fs-extra';
+import Promise from 'bluebird';
 import fs from 'fs';
 import Zip from 'adm-zip';
+import compressing from 'compressing';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import {
   PACKS_PATH,
   INSTANCES_PATH,
   META_PATH,
-  GDL_LEGACYJAVAFIXER_MOD_URL
+  GDL_LEGACYJAVAFIXER_MOD_URL,
+  CURSEMETA_API_URL
 } from '../constants';
 import vCompare from '../utils/versionsCompare';
 import {
@@ -19,6 +23,7 @@ import {
   extractNatives,
   computeVanillaAndForgeLibraries
 } from '../utils/getMCFilesList';
+import { downloadMod } from '../utils/mods';
 import { arraify } from '../utils/strings';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
@@ -35,6 +40,39 @@ export function addToQueue(pack, version, forgeVersion = null) {
       type: ADD_TO_QUEUE,
       payload: pack,
       version,
+      forgeVersion
+    });
+    if (downloadManager.actualDownload === null) {
+      dispatch({
+        type: START_DOWNLOAD,
+        payload: pack
+      });
+      dispatch(downloadPack(pack));
+    }
+  };
+}
+
+export function addCursePackToQueue(pack, addonID, fileID) {
+  return async (dispatch, getState) => {
+    const { downloadManager } = getState();
+    const packURL = (await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}/file/${fileID}`)).data.downloadUrl;
+    const tempPackPath = path.join(INSTANCES_PATH, 'temp', path.basename(packURL));
+    await downloadFile(tempPackPath, packURL, () => { });
+    await compressing.zip.uncompress(tempPackPath, path.join(PACKS_PATH, pack));
+    const overrideFiles = await promisify(fs.readdir)(path.join(PACKS_PATH, pack, 'overrides'));
+    overrideFiles.forEach(async item => {
+      await fse.move(path.join(PACKS_PATH, pack, 'overrides', item), path.join(PACKS_PATH, pack, item));
+    });
+    await fse.remove(path.join(PACKS_PATH, pack, 'overrides'));
+    await fse.remove(path.join(PACKS_PATH, pack, 'modlist.html'));
+    const packInfo = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, pack, 'manifest.json')));
+
+    const mcVersion = packInfo.minecraft.version;
+    const forgeVersion = packInfo.minecraft.modLoaders[0].id.replace('forge-', '');
+    dispatch({
+      type: ADD_TO_QUEUE,
+      payload: pack,
+      version: mcVersion,
       forgeVersion
     });
     if (downloadManager.actualDownload === null) {
@@ -113,7 +151,7 @@ export function downloadPack(pack) {
 
       forgeFileName = `${currPack.version}-${currPack.forgeVersion}${
         branch !== null ? `-${branch}` : ''
-      }`;
+        }`;
       try {
         forgeJSON = JSON.parse(
           await promisify(fs.readFile)(
@@ -188,9 +226,9 @@ export function downloadPack(pack) {
     const legacyJavaFixer =
       vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
         ? {
-            url: GDL_LEGACYJAVAFIXER_MOD_URL,
-            path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
-          }
+          url: GDL_LEGACYJAVAFIXER_MOD_URL,
+          path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
+        }
         : null;
 
     const totalFiles =
@@ -224,6 +262,29 @@ export function downloadPack(pack) {
     await downloadArr(allFiles, updatePercentage, pack);
 
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
+
+    try {
+      const manifest = JSON.parse(
+        await promisify(fs.readFile)(path.join(PACKS_PATH, pack, 'manifest.json'))
+      );
+
+      let modDownloaded = 0;
+      await Promise.map(manifest.files, async addon => {
+        await downloadMod(addon.projectID, addon.fileID, null, pack);
+        modDownloaded += 1;
+        const actPercentage = ((modDownloaded * 100) / totalFiles).toFixed(0);
+        if (currPack.percentage !== actPercentage)
+          dispatch({
+            type: UPDATE_PROGRESS,
+            payload: {
+              pack,
+              percentage: actPercentage
+            }
+          });
+      }, { concurrency: 4 });
+    } catch (err) {
+
+    }
 
     dispatch({
       type: DOWNLOAD_COMPLETED,

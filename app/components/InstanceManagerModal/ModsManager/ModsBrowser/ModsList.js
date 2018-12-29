@@ -259,7 +259,7 @@ class ModsList extends Component<Props> {
                     >
                       <Button
                         type="primary"
-                        icon="down-circle"
+                        icon="arrow-down"
                         onClick={() => this.installMod(item.id, item.gameVersionLatestFiles)}
                         loading={this.isInstalling(item)}
                         disabled={this.isDownloadCompleted(item)}

@@ -17,8 +17,6 @@ import * as SettingsActions from '../../../../actions/settings';
 
 function JavaManager(props) {
 
-  console.log(props);
-
   const openFolderDialog = () => {
     const { dialog } = require('electron').remote;
     dialog.showOpenDialog({ properties: ['openFile'] }, paths => {

@@ -2,8 +2,7 @@
 
 .header {
   position: relative;
-  top: 10px;
-  margin-bottom: 10px;
+  padding: 15px 10px 10px 10px;
   display: flex;
   justify-content: space-evenly;
 }
@@ -12,9 +11,10 @@
   position: relative;
   top: 10px;
   overflow-y: scroll;
-  height: 100%;
+  height: calc(100% - 10px);
+  padding: 0 15px 15px 15px !important;
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
   .modFooter {
     display: flex;
     justify-content: space-evenly;
