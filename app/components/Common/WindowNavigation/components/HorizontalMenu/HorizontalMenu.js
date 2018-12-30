@@ -66,7 +66,7 @@ export default class NavigationBar extends Component<Props> {
               </Badge>
             </Link>
           </li>
-          {/* <li className={styles.li}>
+          <li className={styles.li}>
             <Link
               to="/serverManager"
               draggable="false"
@@ -77,7 +77,7 @@ export default class NavigationBar extends Component<Props> {
               <Icon type="database" className={styles.i} />
               SERVERS
             </Link>
-          </li> }
+          </li>
         </ul>
       </div>
     );
