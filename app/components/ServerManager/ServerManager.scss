@@ -63,5 +63,26 @@
   flex: 1;
   background-color: brown;
   background-color: var(--secondary-color-3);
-
+  display: flex;
+  flex-direction: column;
+  
+  overflow-y: auto;
 }
+
+.Serverlist div{
+  margin:2%;
+}
+
+.server1{
+  order: 1;
+  flex: 1;
+  background-color: goldenrod;
+  max-height: 30%;
+  min-height: 30%;
+  
+}
+
+.server1 h1{
+  color: black;
+}
+
