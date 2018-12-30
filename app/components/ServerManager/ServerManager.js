@@ -1,16 +1,21 @@
 // @flow
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { Input, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { promisify } from 'util';
 import fs from 'fs';
 import styles from './ServerManager.scss';
+import { downloadFile } from '../../utils/downloader';
 
-type Props = {};
 
-export default function ServerManager(props) {
-  const [servers, setServers] = useState(["peppe", "peppe", "peppe","peppe"]);
 
+function DownloadServer() {
+  
+}
+
+function ServerManager(props) {
+  const [servers, setServers] = useState(["sergio", "peppe"]);
 
   return (
     <div className={styles.container}>
@@ -20,10 +25,24 @@ export default function ServerManager(props) {
 
         {servers.length > 0 &&
           servers.map(name => (
-            <div className={styles.server1}><h1>{name}</h1></div>
+            <div className={styles.server1}><h1>{name}</h1>
+              <Button type="primary" icon="download" onClick={DownloadServer} ></Button>
+            </div>
           ))}
 
       </div>
     </div>
   );
 }
+
+function mapStateToProps(state) {
+  return {
+    versionsManifest: state.packCreator.versionsManifest
+  };
+}
+
+function mapDispatchToProps() {
+
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ServerManager);
