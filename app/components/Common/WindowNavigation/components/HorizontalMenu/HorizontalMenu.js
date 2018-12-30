@@ -26,7 +26,7 @@ export default class NavigationBar extends Component<Props> {
               draggable="false"
               className={`${styles.a} ${
                 this.isLocation('/home') ? styles.activeLink : null
-              }`}
+                }`}
             >
               <Icon type="home" theme="filled" className={styles.i} />
               HOME
@@ -38,7 +38,7 @@ export default class NavigationBar extends Component<Props> {
               draggable="false"
               className={`${styles.a} ${
                 this.isLocation('/dmanager') ? styles.activeLink : null
-              }`}
+                }`}
             >
               <Badge
                 count={this.props.downloadingCount}
@@ -49,7 +49,24 @@ export default class NavigationBar extends Component<Props> {
               </Badge>
             </Link>
           </li>
-          { <li className={styles.li}>
+          <li className={styles.li}>
+            <Link
+              to="/curseModpacksBrowser"
+              draggable="false"
+              className={`${styles.a} ${
+                this.isLocation('/curseModpacksBrowser') ? styles.activeLink : null
+                }`}
+            >
+              <Badge
+                count={this.props.downloadingCount}
+                invisible={this.props.downloadingCount === 0}
+              >
+                <Icon type="appstore" theme="filled" className={styles.i} />
+                CURSE PACKS
+              </Badge>
+            </Link>
+          </li>
+          {/* <li className={styles.li}>
             <Link
               to="/serverManager"
               draggable="false"

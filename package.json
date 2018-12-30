@@ -2,7 +2,7 @@
   "name": "gdlauncher",
   "productName": "GDLauncher",
   "main": "./app/main.prod.js",
-  "version": "0.8.9",
+  "version": "0.9.0",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "yarn build-antd && concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -27,7 +27,7 @@
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
     "precommit": "lint-staged",
     "prestart": "yarn build",
-    "start": "cross-env NODE_ENV=production electron ./app/",
+    "start": "cross-env NODE_ENV=production electron ./app/main.prod.js",
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r @babel/register ./app/main.dev.js",
     "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config ./config/webpack.config.renderer.dev.babel.js",
     "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 jest",
@@ -83,6 +83,9 @@
           "path": "/Applications"
         }
       ]
+    },
+    "nsisWeb": {
+      "differentialPackage": true
     },
     "mac": {
       "target": [
@@ -260,6 +263,7 @@
     "axios": "^0.18.0",
     "bluebird": "^3.5.3",
     "cheerio": "^1.0.0-rc.2",
+    "compressing": "^1.4.0",
     "connected-react-router": "^5.0.1",
     "css-vars": "^2.2.0",
     "devtron": "^1.4.0",
@@ -273,11 +277,11 @@
     "lodash": "^4.17.11",
     "make-dir": "^1.3.0",
     "ps-tree": "^1.1.0",
-    "react": "^16.6.3",
+    "react": "^16.7.0-alpha.2",
     "react-color": "^2.14.1",
     "react-content-loader": "^3.2.0",
     "react-contextmenu": "^2.10.0",
-    "react-dom": "^16.6.3",
+    "react-dom": "^16.7.0-alpha.2",
     "react-hot-loader": "^4.3.12",
     "react-infinite-scroller": "^1.2.2",
     "react-loadable": "^5.5.0",

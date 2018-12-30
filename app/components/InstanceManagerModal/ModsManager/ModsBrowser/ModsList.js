@@ -83,7 +83,7 @@ class ModsList extends Component<Props> {
       loading: true,
       // Adding 10 fakes elements to the list to simulate a loading
       list: this.state.data.concat(
-        [...new Array(10)].map(() => ({ loading: true, name: null }))
+        [...new Array(15)].map(() => ({ loading: true, name: null }))
       )
     });
     const res = await axios.get(
@@ -259,7 +259,7 @@ class ModsList extends Component<Props> {
                     >
                       <Button
                         type="primary"
-                        icon="down-circle"
+                        icon="arrow-down"
                         onClick={() => this.installMod(item.id, item.gameVersionLatestFiles)}
                         loading={this.isInstalling(item)}
                         disabled={this.isDownloadCompleted(item)}

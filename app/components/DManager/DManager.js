@@ -160,9 +160,11 @@ export default class DManager extends Component<Props> {
         <div className={styles.header}>
           <div className={styles.headerButtons}>
             <div>
-              <Button type="primary" disabled className={styles.browseModpacks}>
-                Browse Curse Modpacks
-              </Button>
+              <Link to='/curseModpacksBrowser'>
+                <Button type="primary" className={styles.browseModpacks}>
+                  Browse Curse Modpacks
+                </Button>
+              </Link>
             </div>
             <div>
               <Link
@@ -181,20 +183,20 @@ export default class DManager extends Component<Props> {
         <ContextMenuTrigger id="contextMenu-dmanager">
           <div className={styles.content} onScroll={this.handleScroll}>
             {this.state.instances.length === 0 &&
-            !this.state.checkingInstances ? (
-              <h1 className={styles.NoServerCreated}>
-                YOU HAVEN'T ADDED ANY INSTANCE YET
+              !this.state.checkingInstances ? (
+                <h1 className={styles.NoServerCreated}>
+                  YOU HAVEN'T ADDED ANY INSTANCE YET
               </h1>
-            ) : (
-              <SortableList
-                items={this.state.instances}
-                onSortEnd={this.onSortEnd}
-                onSortStart={this.onSortStart}
-                lockToContainerEdges
-                axis="xy"
-                distance={5}
-              />
-            )}
+              ) : (
+                <SortableList
+                  items={this.state.instances}
+                  onSortEnd={this.onSortEnd}
+                  onSortStart={this.onSortStart}
+                  lockToContainerEdges
+                  axis="xy"
+                  distance={5}
+                />
+              )}
           </div>
         </ContextMenuTrigger>
         <ContextMenu

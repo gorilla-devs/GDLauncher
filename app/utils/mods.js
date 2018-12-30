@@ -8,20 +8,12 @@ export const downloadMod = async (modId, projectFileId, filename, instanceName) 
   const { data } = await axios.get(
     `${CURSEMETA_API_URL}/direct/addon/${modId}/file/${projectFileId}`
   );
-
-  console.log(path.join(
-    PACKS_PATH,
-    instanceName,
-    'mods',
-    filename
-  ));
-
   await downloadFile(
     path.join(
       PACKS_PATH,
       instanceName,
       'mods',
-      filename
+      filename !== null ? filename : data.fileNameOnDisk
     ),
     data.downloadUrl,
     () => { }
