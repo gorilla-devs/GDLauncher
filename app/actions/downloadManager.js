@@ -23,7 +23,7 @@ import {
   extractNatives,
   computeVanillaAndForgeLibraries
 } from '../utils/getMCFilesList';
-import { downloadMod } from '../utils/mods';
+import { downloadMod, getModsList } from '../utils/mods';
 import { arraify } from '../utils/strings';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
@@ -231,8 +231,18 @@ export function downloadPack(pack) {
         }
         : null;
 
+    let mods = [];
+    try {
+      const manifest = JSON.parse(
+        await promisify(fs.readFile)(path.join(PACKS_PATH, pack, 'manifest.json'))
+      );
+      mods = await getModsList(manifest.files, pack);
+    } catch (err) {
+      console.error(err);
+    }
+
     const totalFiles =
-      libraries.length + assets.length + mainJar.length;
+      libraries.length + assets.length + mainJar.length + mods.length;
 
     dispatch({
       type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
@@ -256,35 +266,12 @@ export function downloadPack(pack) {
 
     const allFiles =
       legacyJavaFixer !== null
-        ? [...libraries, ...assets, ...mainJar, legacyJavaFixer]
-        : [...libraries, ...assets, ...mainJar];
+        ? [...libraries, ...assets, ...mainJar, ...mods, legacyJavaFixer]
+        : [...libraries, ...assets, ...mainJar, ...mods];
 
     await downloadArr(allFiles, updatePercentage, pack);
 
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
-
-    try {
-      const manifest = JSON.parse(
-        await promisify(fs.readFile)(path.join(PACKS_PATH, pack, 'manifest.json'))
-      );
-
-      let modDownloaded = 0;
-      await Promise.map(manifest.files, async addon => {
-        await downloadMod(addon.projectID, addon.fileID, null, pack);
-        modDownloaded += 1;
-        const actPercentage = ((modDownloaded * 100) / totalFiles).toFixed(0);
-        if (currPack.percentage !== actPercentage)
-          dispatch({
-            type: UPDATE_PROGRESS,
-            payload: {
-              pack,
-              percentage: actPercentage
-            }
-          });
-      }, { concurrency: 4 });
-    } catch (err) {
-
-    }
 
     dispatch({
       type: DOWNLOAD_COMPLETED,

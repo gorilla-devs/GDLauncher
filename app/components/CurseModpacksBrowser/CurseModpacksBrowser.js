@@ -139,7 +139,15 @@ function CurseModpacksBrowser(props) {
           renderItem={item => (
             <List.Item
               actions={[
-                !item.loading && <Button type="primary" icon="download" onClick={() => downloadLatest(item)}>Download</Button>,
+                !item.loading &&
+                <Link
+                  to={{
+                    pathname: `/curseModpackBrowserCreatorModal/${item.id}`,
+                    state: { modal: true }
+                  }}
+                >
+                  <Button type="primary" icon="download">Download</Button>
+                </Link>,
                 !item.loading && <Button type="primary">Explore <Icon type="arrow-right" /></Button>
               ]}
             >

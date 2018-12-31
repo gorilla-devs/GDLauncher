@@ -1,7 +1,8 @@
 import axios from 'axios';
 import path from 'path';
 import { downloadFile } from './downloader';
-import { CURSEMETA_API_URL, PACKS_PATH } from '../constants';
+import Promise from 'bluebird';
+import { CURSEMETA_API_URL, PACKS_PATH, INSTANCES_PATH } from '../constants';
 
 export const downloadMod = async (modId, projectFileId, filename, instanceName) => {
 
@@ -27,9 +28,16 @@ export const downloadMod = async (modId, projectFileId, filename, instanceName) 
           `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}/files`
         );
         const { id, fileNameOnDisk } = depData.data.find(n => n.gameVersion[0] === gameVersion);
-
         await downloadMod(dep.addonId, id, fileNameOnDisk, instanceName);
       }
     });
   }
+};
+
+export const getModsList = async (modsArr, packName) => {
+  const mods = await Promise.map(modsArr, async mod => {
+    const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${mod.projectID}/file/${mod.fileID}`);
+    return { path: path.join(PACKS_PATH, packName, 'mods', data.fileNameOnDisk), url: data.downloadUrl };
+  });
+  return mods;
 };
