@@ -73,7 +73,7 @@
   margin:2%;
 }
 
-.server1{
+.server{
   order: 1;
   flex: 1;
   background-color: goldenrod;
@@ -82,13 +82,15 @@
   
 }
 
-.server1 h1{
+.server h1{
   color: black;
 }
 
 .AddButton{
   order: 2;
-  min-height: 10%;
-  margin-top: 4%;
+  min-height: 30%;
+  min-width: 100%;
+  margin-top:3%;
+  margin-bottom: 5%; 
 
 }

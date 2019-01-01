@@ -11,12 +11,16 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 
 
 
+function addServer() {
+
+}
+
 function DownloadServer() {
 
 }
 
 function ServerManager(props) {
-  const [servers, setServers] = useState(["sergio", "peppe", "peppe", "peppe", "peppe"]);
+  const [servers, setServers] = useState(["server1"]);
 
   return (
     <div className={styles.container}>
@@ -26,23 +30,23 @@ function ServerManager(props) {
 
         {servers.length > 0 &&
           servers.map(name => (
-            <div key={name} className={styles.server1}><h1>{name}</h1>
-              <Link
-                to={{
-                  pathname: '/ServerCreatorModal',
-                  state: { modal: true }
-                }}
-              >
-                <Button type="primary" icon="plus" onClick={DownloadServer}>
-                  Download
+            <div key={name} className={styles.server}><h1>{name}</h1>
+              <Button type="primary" icon="play" onClick={DownloadServer}>
+                Download
                 </Button>
-              </Link>
-            </div>
-          ))}
-          
-      <Button icon="plus" className={styles.AddButton}>
-       Add Server
-      </Button>
+            </div>))}
+
+
+        <Link
+          to={{
+            pathname: '/ServerCreatorModal',
+            state: { modal: true }
+          }}
+        >
+          <Button icon="plus" className={styles.AddButton} onClick={addServer}>
+            Add Server
+        </Button>
+        </Link>
       </div>
     </div>
   );
