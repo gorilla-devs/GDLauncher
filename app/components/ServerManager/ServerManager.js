@@ -7,15 +7,16 @@ import { promisify } from 'util';
 import fs from 'fs';
 import styles from './ServerManager.scss';
 import { downloadFile } from '../../utils/downloader';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 
 
 
 function DownloadServer() {
-  
+
 }
 
 function ServerManager(props) {
-  const [servers, setServers] = useState(["sergio", "peppe"]);
+  const [servers, setServers] = useState(["sergio", "peppe", "peppe", "peppe", "peppe"]);
 
   return (
     <div className={styles.container}>
@@ -25,8 +26,17 @@ function ServerManager(props) {
 
         {servers.length > 0 &&
           servers.map(name => (
-            <div className={styles.server1}><h1>{name}</h1>
-              <Button type="primary" icon="download" onClick={DownloadServer} ></Button>
+            <div key={name} className={styles.server1}><h1>{name}</h1>
+              <Link
+                to={{
+                  pathname: '/ServerCreatorModal',
+                  state: { modal: true }
+                }}
+              >
+                <Button type="primary" icon="plus" onClick={DownloadServer}> 
+                  Download
+                </Button>
+              </Link>
             </div>
           ))}
 
@@ -42,7 +52,9 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps() {
+  return ({
 
+  })
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServerManager);

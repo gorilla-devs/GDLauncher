@@ -17,15 +17,22 @@ import DManager from './components/DManager/containers/DManagerPage';
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
+//import ServerCreatorModal from './components/ServerCreatorModal/ServerCreatorModal';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
+
 const ServerManager = lazy(() =>
   import('./components/ServerManager/ServerManager')
 );
 const InstanceCreatorModal = lazy(() =>
   import('./components/InstanceCreatorModal/containers/InstanceCreatorModal')
 );
+
+const ServerCreatorModal = lazy(()=> 
+  import('./components/ServerCreatorModal/ServerCreatorModal')
+);
+
 const loginHelperModal = lazy(() =>
   import('./components/LoginHelperModal/LoginHelperModal')
 );
@@ -139,6 +146,12 @@ class RouteDef extends Component<Props> {
           <Route
             path="/loginHelperModal"
             component={WaitingComponent(loginHelperModal)}
+          />
+        ) : null}
+         {isModal ? (
+          <Route
+            path="/ServerCreatorModal"
+            component={WaitingComponent(ServerCreatorModal)}
           />
         ) : null}
       </App>
