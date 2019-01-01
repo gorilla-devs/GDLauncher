@@ -8,8 +8,12 @@ import vSort from 'version-sort';
 import _ from 'lodash';
 import { PACKS_PATH } from '../../constants';
 import Modal from '../Common/Modal/Modal';
+import axios from 'axios';
+import downloadFile from '../../utils/downloader'
 
 type Props = {};
+
+axios.get 
 
 class ServerCreatorModal extends Component<Props> {
   

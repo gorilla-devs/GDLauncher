@@ -33,13 +33,16 @@ function ServerManager(props) {
                   state: { modal: true }
                 }}
               >
-                <Button type="primary" icon="plus" onClick={DownloadServer}> 
+                <Button type="primary" icon="plus" onClick={DownloadServer}>
                   Download
                 </Button>
               </Link>
             </div>
           ))}
-
+          
+      <Button icon="plus" className={styles.AddButton}>
+       Add Server
+      </Button>
       </div>
     </div>
   );
