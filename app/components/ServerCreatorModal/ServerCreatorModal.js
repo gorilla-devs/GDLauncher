@@ -6,10 +6,10 @@ import { promisify } from 'util';
 import fs from 'fs';
 import vSort from 'version-sort';
 import _ from 'lodash';
-import { PACKS_PATH } from '../../constants';
+import { PACKS_PATH, SERVERS_PATH } from '../../constants';
 import Modal from '../Common/Modal/Modal';
 import axios from 'axios';
-import downloadFile from '../../utils/downloader';
+import { downloadFile } from '../../utils/downloader';
 import styles from './ServerCreatorModal.scss';
 import { connect } from 'react-redux';
 
@@ -25,6 +25,7 @@ class ServerCreatorModal extends Component<Props> {
     const { forgeManifest, versionsManifest } = props;
     this.state = {
       unMount: false,
+      selectedVersion: [],
       versions: [
         {
           value: 'vanilla',
@@ -68,34 +69,34 @@ class ServerCreatorModal extends Component<Props> {
             })
           )
         }
-      ]
+      ],
+      loading: false
     };
   }
 
-  handleSubmit = e => {
+
+  serverDownload = e => {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        try {
-          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
-          message.warning('An instance with this name already exists.');
-        } catch (error) {
-          if (values.version[0] === 'vanilla') {
-            this.props.createPack(values.version[2], values.packName);
-          } else if (values.version[0] === 'forge') {
-            this.props.createPack(
-              values.version[1],
-              values.packName,
-              values.version[2]
-            );
-          }
-          this.setState({ unMount: true });
-        }
+        this.setState({loading: true});
+        const url = this.props.versionsManifest.find(v => v.id === this.state.selectedVersion[2]).url;
+        const { data } = await axios.get(url);
+        await downloadFile(
+          path.join(SERVERS_PATH, values.packName, `${this.state.selectedVersion[2]}.jar`),
+          data.downloads.server.url,
+          () => {}
+          );
+          this.setState({
+            unMount: true,
+            loading: false
+          })
       }
     });
-  };
+  }
 
-  filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1
+
+  filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1;
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -103,15 +104,15 @@ class ServerCreatorModal extends Component<Props> {
     return (
       <Modal
         history={this.props.history}
-
         title="Create New Instance"
         style={{ height: '80vh' }}
+        unMount={this.state.unMount}
       >
 
         <Form
           layout="inline"
           className={styles.container}
-          onSubmit={this.handleSubmit}
+          onSubmit={this.serverDownload}
         >
           <div>
             <FormItem style={{ margin: 0 }}>
@@ -147,7 +148,9 @@ class ServerCreatorModal extends Component<Props> {
                   options={this.state.versions}
                   size="large"
                   showSearch={{ filter: this.filter }}
-                  onChange={value => console.log(value)}
+                  onChange={value => this.setState({
+                    selectedVersion: value
+                  })}
                   style={{ width: 335, display: 'inline-block' }}
                   placeholder="Select a version"
                 />
@@ -155,13 +158,12 @@ class ServerCreatorModal extends Component<Props> {
             </FormItem>
           </div>
           <div className={styles.createInstance}>
-            <Button icon="plus" size="large" type="primary" htmlType="submit">
-              Create Instance
+            <Button icon="plus" size="large" type="primary" loading={this.state.loading} htmlType="submit">
+              Create Server
             </Button>
           </div>
         </Form>
 
-        PEPPE PEPPINO
       </Modal>
     );
   }
