@@ -11,37 +11,8 @@ import { downloadFile } from '../../utils/downloader';
 import { SERVERS_PATH } from '../../constants';
 import { exec } from 'child_process';
 import path from 'path';
-
-
-async function StartServer(packName) {
-  try {
-    const start = exec(
-      `java -Xms1G -Xmx1G -jar ${path.join(SERVERS_PATH, packName, `${packName}.jar nogui`)}`,
-      { cwd: path.join(SERVERS_PATH, packName) },
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(`exec error: ${error}`);
-          return;
-        }
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
-      }
-    );
-    start.on('exit', () => {
-      message.info('Server closed');
-    });
-    start.on('error', err => {
-      message.error('There was an error while starting the server');
-      log.error(err);
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function DeleteServer() {
-
-}
+import psTree from 'ps-tree';
+import { startServer, DeleteServer, Kill } from '../../actions/serverManager';
 
 function ServerManager(props) {
   const [servers, setServers] = useState([]);
@@ -56,6 +27,7 @@ function ServerManager(props) {
     return () => watcher.close();
   }, []);
 
+
   return (
     <div className={styles.container}>
       <div className={styles.serverSettings}>
@@ -65,12 +37,14 @@ function ServerManager(props) {
         {servers.length > 0 &&
           servers.map(name => (
             <div key={name} className={styles.server}><h1>{name}</h1>
-              <Button type="primary" icon="play" onClick={() => StartServer(name)}>
+              <Button type="primary" icon="play" onClick={() => props.startServer(name)}>
                 Start Server
                 </Button>
-              <Button type="primary" icon="cross" onClick={DeleteServer} >
+              <Button type="primary" icon="cross" onClick={() => props.DeleteServer(name)} >
                 Delete Server
                 </Button>
+              <Button type="primary" icon="thunderbolt" onClick={() => props.Kill(name)} >
+              </Button>
 
 
             </div>))}
@@ -97,10 +71,10 @@ function mapStateToProps(state) {
   };
 }
 
-function mapDispatchToProps() {
-  return ({
-
-  })
+const mapDispatchToProps = {
+  startServer,
+  DeleteServer,
+  Kill
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServerManager);
