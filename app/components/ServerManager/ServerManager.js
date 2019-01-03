@@ -2,25 +2,32 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Input, Button } from 'antd';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
 import { promisify } from 'util';
 import fs from 'fs';
 import styles from './ServerManager.scss';
 import { downloadFile } from '../../utils/downloader';
-import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
+import { SERVERS_PATH } from '../../constants';
 
 
 
-function addServer() {
-
-}
-
-function DownloadServer() {
+function StartServer() {
 
 }
 
 function ServerManager(props) {
-  const [servers, setServers] = useState(["server1"]);
+  const [servers, setServers] = useState([]);
+
+  useEffect(async () => {
+    const dirs = await promisify(fs.readdir)(SERVERS_PATH);
+    setServers(dirs);
+    const watcher = fs.watch(SERVERS_PATH, async () => {
+      const dirs = await promisify(fs.readdir)(SERVERS_PATH);
+      setServers(dirs);
+    });
+    return () => watcher.close();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -31,9 +38,11 @@ function ServerManager(props) {
         {servers.length > 0 &&
           servers.map(name => (
             <div key={name} className={styles.server}><h1>{name}</h1>
-              <Button type="primary" icon="play" onClick={DownloadServer}>
-                Download
+              <Button type="primary" icon="play" onClick={StartServer}>
+                Start Server
                 </Button>
+
+
             </div>))}
 
 
@@ -43,7 +52,7 @@ function ServerManager(props) {
             state: { modal: true }
           }}
         >
-          <Button icon="plus" className={styles.AddButton} onClick={addServer}>
+          <Button icon="plus" className={styles.AddButton} >
             Add Server
         </Button>
         </Link>
