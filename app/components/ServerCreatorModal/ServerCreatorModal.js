@@ -79,18 +79,20 @@ class ServerCreatorModal extends Component<Props> {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        this.setState({loading: true});
+        this.setState({ loading: true });
         const url = this.props.versionsManifest.find(v => v.id === this.state.selectedVersion[2]).url;
         const { data } = await axios.get(url);
         await downloadFile(
-          path.join(SERVERS_PATH, values.packName, `${this.state.selectedVersion[2]}.jar`),
+          path.join(SERVERS_PATH, values.packName, `${values.packName}.jar`),
           data.downloads.server.url,
-          () => {}
-          );
-          this.setState({
-            unMount: true,
-            loading: false
-          })
+          () => { }
+        );
+        const eulaFile = "eula=true"
+        await promisify(fs.writeFile)(path.join(SERVERS_PATH, values.packName,"eula.txt"), eulaFile);
+        this.setState({
+          unMount: true,
+          loading: false
+        })
       }
     });
   }

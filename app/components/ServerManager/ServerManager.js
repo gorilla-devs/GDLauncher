@@ -1,7 +1,7 @@
 // @flow
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Input, Button } from 'antd';
+import { message, Input, Button } from 'antd';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
 import { promisify } from 'util';
@@ -9,10 +9,37 @@ import fs from 'fs';
 import styles from './ServerManager.scss';
 import { downloadFile } from '../../utils/downloader';
 import { SERVERS_PATH } from '../../constants';
+import { exec } from 'child_process';
+import path from 'path';
 
 
+async function StartServer(packName) {
+  try {
+    const start = exec(
+      `java -Xms1G -Xmx1G -jar ${path.join(SERVERS_PATH, packName, `${packName}.jar nogui`)}`,
+      { cwd: path.join(SERVERS_PATH, packName) },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`exec error: ${error}`);
+          return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+      }
+    );
+    start.on('exit', () => {
+      message.info('Server closed');
+    });
+    start.on('error', err => {
+      message.error('There was an error while starting the server');
+      log.error(err);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
 
-function StartServer() {
+function DeleteServer() {
 
 }
 
@@ -38,8 +65,11 @@ function ServerManager(props) {
         {servers.length > 0 &&
           servers.map(name => (
             <div key={name} className={styles.server}><h1>{name}</h1>
-              <Button type="primary" icon="play" onClick={StartServer}>
+              <Button type="primary" icon="play" onClick={() => StartServer(name)}>
                 Start Server
+                </Button>
+              <Button type="primary" icon="cross" onClick={DeleteServer} >
+                Delete Server
                 </Button>
 
 
