@@ -38,6 +38,17 @@ export default class DInstance extends Component<Props> {
   }
 
   componentDidMount = async () => {
+    this.updateInstanceConfig();
+  };
+
+  componentDidUpdate = () => {
+    this.percentage = this.updatePercentage();
+    if (this.percentage === 100) {
+      this.updateInstanceConfig();
+    }
+  };
+
+  updateInstanceConfig = async () => {
     const { name } = this.props;
     if (!this.isInstalling()) {
       try {
@@ -48,7 +59,7 @@ export default class DInstance extends Component<Props> {
         );
         this.setState({
           version,
-          forgeVersion: forgeVersion.split('-')[1]
+          forgeVersion: forgeVersion === null ? null : forgeVersion.split('-')[1]
         });
       } catch (e) {
         this.setState({
@@ -59,9 +70,6 @@ export default class DInstance extends Component<Props> {
     }
   };
 
-  componentDidUpdate = () => {
-    this.percentage = this.updatePercentage();
-  };
 
   isInstalling = () => {
     const { name, installingQueue } = this.props;
@@ -223,12 +231,12 @@ export default class DInstance extends Component<Props> {
           >
             {playing.find(el => el.name === name) ? (
               <div>
-                <Icon type="thunderbolt" theme="filled" /> Kill
+                <i className="fas fa-bolt" /> Kill
               </div>
             ) : (
                 <div>
-                  <Icon type="play-circle" theme="filled" /> Launch
-              </div>
+                  <i className="fas fa-play" /> Launch
+                </div>
               )}
           </MenuItem>
           <MenuItem
@@ -241,12 +249,12 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <Icon type="tool" theme="filled" /> Manage
+            <i className="fas fa-pen" /> Manage
           </MenuItem>
           <MenuItem
             onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
           >
-            <Icon type="folder" theme="filled" /> Open Folder
+            <i className="fas fa-folder" /> Open Folder
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -279,33 +287,34 @@ export default class DInstance extends Component<Props> {
               this.isInstalling() ||
               process.platform !== 'win32' ||
               deleting ||
-              !isValid
+              !isValid ||
+              process.env.NODE_ENV === 'development'
             }
           >
-            <Icon type="link" theme="outlined" /> Create Shortcut
+            <i className="fas fa-link" /> Create Shortcut
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
-        >
-            <Icon type="export" theme="outlined" /> Repair
+          >
+            <i className="fas fa-wrench" /> Repair
           </MenuItem>
-        <MenuItem
-          disabled={this.isInstalling() || deleting}
-          data={{ foo: 'bar' }}
-          onClick={this.deleteInstance}
-          preventClose
-        >
-          {deleting ? (
-            <div>
-              <Icon type="loading" theme="outlined" /> Deleting...
-              </div>
-          ) : (
+          <MenuItem
+            disabled={this.isInstalling() || deleting}
+            data={{ foo: 'bar' }}
+            onClick={this.deleteInstance}
+            preventClose
+          >
+            {deleting ? (
               <div>
-                <Icon type="delete" theme="filled" /> Delete
+                <Icon type="loading" theme="outlined" /> Deleting...
               </div>
-            )}
-        </MenuItem>
+            ) : (
+                <div>
+                  <i className="fas fa-trash" /> Delete
+              </div>
+              )}
+          </MenuItem>
         </ContextMenu>
       </div >
     );
