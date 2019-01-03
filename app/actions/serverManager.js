@@ -4,7 +4,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import { SERVERS_PATH } from '../constants';
 import psTree from 'ps-tree';
-
+import fse from 'fs-extra';
 
 export const START_SERVER = 'START_SERVER';
 export const STOP_SERVER = 'STOP_SERVER';
@@ -44,8 +44,14 @@ export const startServer = (packName) => {
   }
 };
 
-export const deleteServer = () => {
-
+export const deleteServer = (packname) => {
+  return async dispatch => {
+    try {
+      await fse.remove(path.join(SERVERS_PATH, packname));
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }
 
 export const kill = () => {
