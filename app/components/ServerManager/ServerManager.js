@@ -12,7 +12,7 @@ import { SERVERS_PATH } from '../../constants';
 import { exec } from 'child_process';
 import path from 'path';
 import psTree from 'ps-tree';
-import { startServer, DeleteServer, Kill } from '../../actions/serverManager';
+import { startServer, deleteServer, kill } from '../../actions/serverManager';
 
 function ServerManager(props) {
   const [servers, setServers] = useState([]);
@@ -37,16 +37,23 @@ function ServerManager(props) {
         {servers.length > 0 &&
           servers.map(name => (
             <div key={name} className={styles.server}><h1>{name}</h1>
-              <Button type="primary" icon="play" onClick={() => props.startServer(name)}>
-                Start Server
+              {props.packName !== null && props.packName === name ?
+                <Button type="primary" icon="thunderbolt" onClick={() => props.kill(name)}>
+                  Kill
                 </Button>
-              <Button type="primary" icon="cross" onClick={() => props.DeleteServer(name)} >
+                :
+                <Button type="primary" icon="play" onClick={() => props.startServer(name)}>
+                  Start Server
+                </Button>
+              }
+              <Button
+                type="primary"
+                disabled={props.packName !== null && props.packName === name}
+                icon="cross"
+                onClick={() => props.deleteServer(name)}
+              >
                 Delete Server
-                </Button>
-              <Button type="primary" icon="thunderbolt" onClick={() => props.Kill(name)} >
               </Button>
-
-
             </div>))}
 
 
@@ -67,14 +74,15 @@ function ServerManager(props) {
 
 function mapStateToProps(state) {
   return {
-    versionsManifest: state.packCreator.versionsManifest
+    versionsManifest: state.packCreator.versionsManifest,
+    packName: state.serverManager.packName
   };
 }
 
 const mapDispatchToProps = {
   startServer,
-  DeleteServer,
-  Kill
+  deleteServer,
+  kill
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServerManager);

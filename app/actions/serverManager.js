@@ -6,7 +6,8 @@ import { SERVERS_PATH } from '../constants';
 import psTree from 'ps-tree';
 
 
-export const START_INSTANCESERVER = 'START_INSTANCESERVER';
+export const START_SERVER = 'START_SERVER';
+export const STOP_SERVER = 'STOP_SERVER';
 
 export const startServer = (packName) => {
   return (dispatch, getState) => {
@@ -27,14 +28,14 @@ export const startServer = (packName) => {
       start.on('exit', () => {
         message.info('Server closed');
       });
-      
+
       start.on('error', err => {
         message.error('There was an error while starting the server');
         log.error(err);
       });
       dispatch({
-        type: START_INSTANCESERVER,
-        payload: packName,
+        type: START_SERVER,
+        packName,
         pid: start.pid
       });
     } catch (err) {
@@ -43,13 +44,16 @@ export const startServer = (packName) => {
   }
 };
 
-export const DeleteServer = () => {
+export const deleteServer = () => {
 
 }
 
-export const Kill = () => {
+export const kill = () => {
   return (dispatch, getState) => {
     const { serverManager } = getState();
+    dispatch({
+      type: STOP_SERVER
+    });
     psTree(serverManager.pid, (err, children) => {
       children.forEach(el => {
         process.kill(el.PID);

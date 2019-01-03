@@ -37,16 +37,16 @@
   order: 1;
   flex: 1;
   background-color: var(--secondary-color-1);
-  max-height: 40%;
-  min-height: 40%;
+  max-height: 30%;
+  min-height: 30%;
   border-radius: 3px;
 }
 
 .server h1{
-  color: black;
   max-width: 100%;
   overflow: hidden !important;
   text-overflow: ellipsis;
+  color: white;
 }
 
 .AddButton{
