@@ -6,7 +6,7 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import log from 'electron-log';
 import { promisify } from 'util';
 import { exec } from 'child_process';
@@ -183,7 +183,7 @@ export default class DInstance extends Component<Props> {
                 theme="outlined"
               />
             )}
-            {!isValid && (
+            {!isValid && !deleting && (
               <Tooltip title="Warning: this instance is corrupted.">
                 <Icon
                   className={styles.warningIcon}
@@ -231,11 +231,11 @@ export default class DInstance extends Component<Props> {
           >
             {playing.find(el => el.name === name) ? (
               <div>
-                <i className="fas fa-bolt" /> Kill
+                <FontAwesomeIcon icon='bolt' /> Kill
               </div>
             ) : (
                 <div>
-                  <i className="fas fa-play" /> Launch
+                  <FontAwesomeIcon icon='play' /> Launch
                 </div>
               )}
           </MenuItem>
@@ -249,12 +249,12 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <i className="fas fa-pen" /> Manage
+            <FontAwesomeIcon icon='pen' /> Manage
           </MenuItem>
           <MenuItem
             onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
           >
-            <i className="fas fa-folder" /> Open Folder
+            <FontAwesomeIcon icon='folder' /> Open Folder
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -291,13 +291,13 @@ export default class DInstance extends Component<Props> {
               process.env.NODE_ENV === 'development'
             }
           >
-            <i className="fas fa-link" /> Create Shortcut
+            <FontAwesomeIcon icon='link' /> Create Shortcut
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
-            <i className="fas fa-wrench" /> Repair
+            <FontAwesomeIcon icon='wrench' /> Repair
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting}
@@ -311,7 +311,7 @@ export default class DInstance extends Component<Props> {
               </div>
             ) : (
                 <div>
-                  <i className="fas fa-trash" /> Delete
+                  <FontAwesomeIcon icon='trash' /> Delete
               </div>
               )}
           </MenuItem>
