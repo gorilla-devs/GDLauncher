@@ -241,6 +241,8 @@ export function downloadPack(pack) {
       console.error(err);
     }
 
+    console.log(mods);
+
     const totalFiles =
       libraries.length + assets.length + mainJar.length + mods.length;
 

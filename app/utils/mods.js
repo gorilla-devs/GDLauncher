@@ -38,6 +38,6 @@ export const getModsList = async (modsArr, packName) => {
   const mods = await Promise.map(modsArr, async mod => {
     const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${mod.projectID}/file/${mod.fileID}`);
     return { path: path.join(PACKS_PATH, packName, 'mods', data.fileNameOnDisk), url: data.downloadUrl };
-  });
+  }, { concurrency: 4 });
   return mods;
 };

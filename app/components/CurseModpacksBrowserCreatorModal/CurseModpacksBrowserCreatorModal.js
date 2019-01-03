@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { message, Form, Input, Icon, Button, Cascader } from 'antd';
-import path from 'path';
-import { promisify } from 'util';
-import fs from 'fs';
-import vSort from 'version-sort';
+import { connect } from 'react-redux';
+import { message, Form, Input, Icon, Button, Select } from 'antd';
 import axios from 'axios';
 import _ from 'lodash';
-import { PACKS_PATH, CURSEMETA_API_URL } from '../../constants';
+import path from 'path';
+import fs from 'fs';
+import { promisify } from 'util';
+import { CURSEMETA_API_URL, PACKS_PATH } from '../../constants';
 import styles from './CurseModpackBrowserCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
+import { addCursePackToQueue } from '../../actions/downloadManager'
 
 type Props = {
   forgeManifest: Array,
@@ -23,10 +24,11 @@ const CurseModpackBrowserCreatorModal = props => {
   const [versions, setVersions] = useState([]);
   const [unMount, setUnMount] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingBtn, setLoadingBtn] = useState(false);
 
   useEffect(async () => {
-    const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}`);
-    setVersions(data.latestFiles);
+    const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}/files`);
+    setVersions(data);
     setLoading(false);
   }, []);
 
@@ -34,22 +36,17 @@ const CurseModpackBrowserCreatorModal = props => {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (!err) {
-        console.log(values);
-        // try {
-        //   await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
-        //   message.warning('An instance with this name already exists.');
-        // } catch (error) {
-        //   if (values.version[0] === 'vanilla') {
-        //     props.createPack(values.version[2], values.packName);
-        //   } else if (values.version[0] === 'forge') {
-        //     props.createPack(
-        //       values.version[1],
-        //       values.packName,
-        //       values.version[2]
-        //     );
-        //   }
-        //   this.setState({ unMount: true });
-        // }
+        try {
+          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
+          message.warning('An instance with this name already exists.');
+        } catch (error) {
+          setLoadingBtn(true);
+          await props.addCursePackToQueue(values.packName, addonID, values.version);
+          setUnMount(true);
+          setTimeout(() => {
+            props.history.push('/dmanager');
+          }, 210);
+        }
       }
     });
   };
@@ -98,18 +95,18 @@ const CurseModpackBrowserCreatorModal = props => {
             {getFieldDecorator('version', {
               rules: [{ required: true, message: 'Please select a version' }]
             })(
-              <Cascader
-                options={versions}
+              <Select
                 size="large"
-                onChange={value => console.log(value)}
                 style={{ width: 335, display: 'inline-block' }}
                 placeholder="Select a version"
-              />
+              >
+                {_.reverse(versions.map(addon => <Select.Option key={addon.id}>{addon.fileName}</Select.Option>).slice())}
+              </Select>
             )}
           </FormItem>
         </div>
         <div className={styles.createInstance}>
-          <Button icon="plus" size="large" type="primary" htmlType="submit">
+          <Button icon="plus" size="large" type="primary" htmlType="submit" loading={loadingBtn}>
             Create Instance
             </Button>
         </div>
@@ -118,4 +115,8 @@ const CurseModpackBrowserCreatorModal = props => {
   );
 }
 
-export default Form.create()(CurseModpackBrowserCreatorModal);
+const mapDispatchToProps = {
+  addCursePackToQueue
+}
+
+export default connect(null, mapDispatchToProps)(Form.create()(CurseModpackBrowserCreatorModal));
