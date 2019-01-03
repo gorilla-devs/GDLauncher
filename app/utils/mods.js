@@ -35,6 +35,8 @@ export const downloadMod = async (modId, projectFileId, filename, instanceName) 
 };
 
 export const getModsList = async (modsArr, packName) => {
+  // Curse metafile already contains all the dependancies so no check for
+  // that is needed.
   const mods = await Promise.map(modsArr, async mod => {
     const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${mod.projectID}/file/${mod.fileID}`);
     return { path: path.join(PACKS_PATH, packName, 'mods', data.fileNameOnDisk), url: data.downloadUrl };

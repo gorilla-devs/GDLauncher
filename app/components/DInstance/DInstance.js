@@ -32,7 +32,8 @@ export default class DInstance extends Component<Props> {
     this.state = {
       deleting: false,
       version: null,
-      isValid: true
+      isValid: true,
+      forgeVersion: null
     };
   }
 
@@ -40,13 +41,14 @@ export default class DInstance extends Component<Props> {
     const { name } = this.props;
     if (!this.isInstalling()) {
       try {
-        const { version } = JSON.parse(
+        const { version, forgeVersion } = JSON.parse(
           await promisify(fs.readFile)(
             path.join(PACKS_PATH, name, 'config.json')
           )
         );
         this.setState({
-          version
+          version,
+          forgeVersion: forgeVersion.split('-')[1]
         });
       } catch (e) {
         this.setState({
@@ -136,12 +138,12 @@ export default class DInstance extends Component<Props> {
 
   render = () => {
     const { name, selectedInstance, selectInstance, playing } = this.props;
-    const { version, isValid, deleting } = this.state;
+    const { version, isValid, deleting, forgeVersion } = this.state;
     return (
       <div
         className={`${selectedInstance === name ? styles.selectedItem : ''} ${
           styles.main
-        }`}
+          }`}
       >
         <ContextMenuTrigger id={`contextMenu-${name}`}>
           <div
@@ -224,10 +226,10 @@ export default class DInstance extends Component<Props> {
                 <Icon type="thunderbolt" theme="filled" /> Kill
               </div>
             ) : (
-              <div>
-                <Icon type="play-circle" theme="filled" /> Launch
+                <div>
+                  <Icon type="play-circle" theme="filled" /> Launch
               </div>
-            )}
+              )}
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
@@ -284,28 +286,28 @@ export default class DInstance extends Component<Props> {
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
-            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
-          >
-            <Icon type="export" theme="outlined" /> Export Instance
+            onClick={() => this.props.addToQueue(name, version, forgeVersion)}
+        >
+            <Icon type="export" theme="outlined" /> Repair
           </MenuItem>
-          <MenuItem
-            disabled={this.isInstalling() || deleting}
-            data={{ foo: 'bar' }}
-            onClick={this.deleteInstance}
-            preventClose
-          >
-            {deleting ? (
-              <div>
-                <Icon type="loading" theme="outlined" /> Deleting...
+        <MenuItem
+          disabled={this.isInstalling() || deleting}
+          data={{ foo: 'bar' }}
+          onClick={this.deleteInstance}
+          preventClose
+        >
+          {deleting ? (
+            <div>
+              <Icon type="loading" theme="outlined" /> Deleting...
               </div>
-            ) : (
+          ) : (
               <div>
                 <Icon type="delete" theme="filled" /> Delete
               </div>
             )}
-          </MenuItem>
+        </MenuItem>
         </ContextMenu>
-      </div>
+      </div >
     );
   };
 }
