@@ -5,6 +5,7 @@ import { THEMES } from '../constants';
 
 export const LOAD_SETTINGS = 'LOAD_SETTINGS';
 export const SET_SOUNDS = 'SET_SOUNDS';
+export const SET_JAVA_PATH = 'SET_JAVA_PATH';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
 
@@ -13,10 +14,18 @@ export function loadSettings() {
     try {
       if (store.has('settings')) {
         let settings = store.get('settings');
+        // THEME
         if (!settings.theme || Object.keys(settings.theme).length === 0) {
           store.set('settings.theme', THEMES.default);
         }
+        // JAVA
+        if (!settings.javaPath || Object.keys(settings.javaPath).length === 0) {
+          store.set('settings.javaPath', { autodetected: true, path: null });
+        }
+        // Reads the settings again after patching
         settings = store.get('settings');
+
+        // Applies all themes
         Object.keys(settings.theme).forEach(val => {
           dispatch(setThemeValue(val, settings.theme[val]));
         });
@@ -55,6 +64,17 @@ export function setSounds(val) {
     } catch (err) {
       log.error(err.message);
     }
+  };
+}
+
+export function setJavaPath(autodetected, path = null) {
+  return dispatch => {
+    dispatch({
+      type: SET_JAVA_PATH,
+      autodetected,
+      path
+    });
+    dispatch(saveSettings());
   };
 }
 

@@ -1,7 +1,8 @@
 // @flow
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
+import { IpcRenderer, ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
 import log from 'electron-log';
@@ -24,176 +25,197 @@ type Props = {
 
 const FormItem = Form.Item;
 
+
 // This is awful but it gets the primary color in real time
 
-class Login extends Component<Props> {
-  props: Props;
+function Login(props) {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      fastLogin: true,
-      nativeLauncherProfiles: false
-    };
-  }
+  const [fastLogin, setFastLogin] = useState(true);
+  const [nativeLauncherProfiles, setNativeLauncherProfiles] = useState(false);
+  const [colors, setColors] = useState(store.get('settings') ? store.get('settings').theme : THEMES.default);
 
-  componentWillMount = () => {
-    this.colors = store.get('settings') ? store.get('settings').theme : THEMES.default;
-  }
-  
+  const [update, setUpdate] = useState({
+    updateAvailable: false,
+    isUpdating: false,
+    updateCompleted: false,
+    textUpdate: "Update Available"
+  });
 
-  componentDidMount = async () => {
-    this.ismounted = true;
-    const nativeLauncherProfiles = await OfficialLancherProfilesExists();
-    // Since this is an async lifecycle method we need to check
-    // if the component is still mounted before updating the state
-    if (this.ismounted) {
-      this.setState({ nativeLauncherProfiles });
+  useEffect(async () => {
+    setNativeLauncherProfiles(await OfficialLancherProfilesExists());
+    if (process.env.NODE_ENV !== 'development') {
+      ipcRenderer.send('check-for-updates');
+      ipcRenderer.on('update-available', () => {
+        setUpdate({ ...update, updateAvailable: true });
+      });
+      ipcRenderer.on('update-downloaded', () => {
+        setUpdate({
+          updateAvailable: true,
+          isUpdating: false,
+          updateCompleted: true,
+          textUpdate: "Restart App"
+        });
+      });
     }
+  }, []);
+
+  const handleUpdateClick = () => {
+    setUpdate({ ...update, isUpdating: true, textUpdate: "Updating..." })
+    ipcRenderer.send('download-updates');
   };
 
-  componentWillUnmount = () => {
-    this.ismounted = false;
+  const handleUpdateCompletedClick = () => {
+    ipcRenderer.send('apply-updates');
   };
 
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    props.form.validateFields((err, values) => {
       if (!err) {
-        this.props.login(values.username, values.password, values.remember);
+        props.login(values.username, values.password, values.remember);
       } else {
         log.error(err);
       }
     });
   };
+  const { getFieldDecorator } = props.form;
 
   /* eslint-enable */
-
-  render() {
-    const { getFieldDecorator } = this.props.form;
-
-    return (
-      <div>
-        <main
-          className={styles.content}
-          style={{
-            background: `linear-gradient( ${this.colors['secondary-color-2']}8A, ${this.colors['secondary-color-2']}8A), url(${background})`
-          }}
-        >
-          <div className={styles.login_form}>
-            <h1 style={{ textAlign: 'center', fontSize: 30 }}>
-              GorillaDevs Login
+  return (
+    <div>
+      <main
+        className={styles.content}
+        style={{
+          background: `linear-gradient( ${colors['secondary-color-2']}8A, ${colors['secondary-color-2']}8A), url(${background})`
+        }}
+      >
+        <div className={styles.login_form}>
+          <h1 style={{ textAlign: 'center', fontSize: 30 }}>
+            GorillaDevs Login
             </h1>
-            <Form onSubmit={this.handleSubmit}>
-              <FormItem>
-                {getFieldDecorator('username', {
-                  rules: [
-                    { required: true, message: 'Please input your email!' }
-                  ],
-                  initialValue: store.has('lastUsername')
-                    ? store.get('lastUsername')
-                    : ''
-                })(
-                  <Input
-                    disabled={
-                      this.props.tokenLoading ||
-                      this.props.nativeLoading ||
-                      this.props.authLoading
-                    }
-                    size="large"
-                    prefix={
-                      <Icon
-                        type="user"
-                        style={{ color: 'rgba(255,255,255,.8)' }}
-                      />
-                    }
-                    placeholder="Email"
-                  />
-                )}
-              </FormItem>
-              <FormItem>
-                {getFieldDecorator('password', {
-                  rules: [
-                    { required: true, message: 'Please input your Password!' }
-                  ]
-                })(
-                  <Input
-                    size="large"
-                    disabled={
-                      this.props.tokenLoading ||
-                      this.props.nativeLoading ||
-                      this.props.authLoading
-                    }
-                    prefix={
-                      <Icon
-                        type="lock"
-                        style={{ color: 'rgba(255,255,255,.8)' }}
-                      />
-                    }
-                    addonAfter={
-                      <Link
-                        to={{
-                          pathname: '/loginHelperModal',
-                          state: { modal: true }
-                        }}
-                        draggable="false"
-                      >
-                        <Tooltip title="Need Help?">
-                          <Icon type="question" onClick={this.openHelpModal} />
-                        </Tooltip>
-                      </Link>
-                    }
-                    type="password"
-                    placeholder="Password"
-                  />
-                )}
-              </FormItem>
-              <FormItem>
-                {getFieldDecorator('remember', {
-                  valuePropName: 'checked',
-                  initialValue: true
-                })(<Checkbox>Remember me</Checkbox>)}
-                <Button
-                  icon="login"
-                  loading={this.props.authLoading}
-                  disabled={this.props.tokenLoading || this.props.nativeLoading}
+          <Form onSubmit={handleSubmit}>
+            <FormItem>
+              {getFieldDecorator('username', {
+                rules: [
+                  { required: true, message: 'Please input your email!' }
+                ],
+                initialValue: store.has('lastUsername')
+                  ? store.get('lastUsername')
+                  : ''
+              })(
+                <Input
+                  disabled={
+                    props.tokenLoading ||
+                    props.nativeLoading ||
+                    props.authLoading
+                  }
                   size="large"
-                  type="primary"
-                  htmlType="submit"
-                  className={styles.login_form_button}
-                >
-                  Log in
-                </Button>
-              </FormItem>
-            </Form>
-            {this.state.nativeLauncherProfiles && (
+                  prefix={
+                    <Icon
+                      type="user"
+                      style={{ color: 'rgba(255,255,255,.8)' }}
+                    />
+                  }
+                  placeholder="Email"
+                />
+              )}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator('password', {
+                rules: [
+                  { required: true, message: 'Please input your Password!' }
+                ]
+              })(
+                <Input
+                  size="large"
+                  disabled={
+                    props.tokenLoading ||
+                    props.nativeLoading ||
+                    props.authLoading
+                  }
+                  prefix={
+                    <Icon
+                      type="lock"
+                      style={{ color: 'rgba(255,255,255,.8)' }}
+                    />
+                  }
+                  addonAfter={
+                    <Link
+                      to={{
+                        pathname: '/loginHelperModal',
+                        state: { modal: true }
+                      }}
+                      draggable="false"
+                    >
+                      <Tooltip title="Need Help?">
+                        <Icon type="question" />
+                      </Tooltip>
+                    </Link>
+                  }
+                  type="password"
+                  placeholder="Password"
+                />
+              )}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator('remember', {
+                valuePropName: 'checked',
+                initialValue: true
+              })(<Checkbox>Remember me</Checkbox>)}
               <Button
-                icon="forward"
-                loading={this.props.nativeLoading}
+                icon="login"
+                loading={props.authLoading}
+                disabled={props.tokenLoading || props.nativeLoading}
                 size="large"
                 type="primary"
+                htmlType="submit"
                 className={styles.login_form_button}
-                style={{ marginTop: '30px' }}
-                onClick={() => this.props.tryNativeLauncherProfiles()}
               >
-                Skip login
+                Log in
+                </Button>
+            </FormItem>
+          </Form>
+          {nativeLauncherProfiles && (
+            <Button
+              icon="forward"
+              loading={props.nativeLoading}
+              size="large"
+              type="primary"
+              className={styles.login_form_button}
+              style={{ marginTop: '30px' }}
+              onClick={() => props.tryNativeLauncherProfiles()}
+            >
+              Skip login
               </Button>
-            )}
-          </div>
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 30,
-              right: 30,
-              color: '#bdc3c7'
-            }}
-          >
-            v{require('../../../package.json').version}
-          </div>
-        </main>
-      </div>
-    );
-  }
+          )}
+        </div>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 40,
+            right: 40,
+            color: '#bdc3c7'
+          }}
+        >
+          {update.updateAvailable && (
+            <Button
+              loading={update.isUpdating}
+              onClick={
+                update.updateCompleted
+                  ? handleUpdateCompletedClick
+                  : handleUpdateClick
+              }
+              type="primary"
+              style={{ marginRight: 10 }}
+            >
+              {update.textUpdate}
+            </Button>
+          )}
+          v{require('../../../package.json').version}
+        </div>
+      </main>
+    </div>
+  );
 }
 
 function mapStateToProps(state) {

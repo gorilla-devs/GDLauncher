@@ -37,7 +37,7 @@ export const extractVanillaLibs = async json => {
       if (
         'classifiers' in lib.downloads &&
         `natives-${convertOSToMCFormat(SysOS.type())}` in
-          lib.downloads.classifiers
+        lib.downloads.classifiers
       ) {
         libs.push({
           url:
@@ -125,10 +125,10 @@ export const getForgeLibraries = async forge => {
   let libraries = [];
   libraries = await Promise.all(
     forge.versionInfo.libraries
-      .filter(
-        lib =>
-          (_.has(lib, 'clientreq') && lib.clientreq) || !_.has(lib, 'clientreq')
-      )
+      // .filter(
+      //   lib =>
+      //     (_.has(lib, 'clientreq') && lib.clientreq) || !_.has(lib, 'clientreq')
+      // )
       .filter(lib => !parseLibRules(lib.rules))
       .map(async lib => forgeLibCalculator(lib))
   );
@@ -136,6 +136,7 @@ export const getForgeLibraries = async forge => {
 };
 
 export const computeVanillaAndForgeLibraries = async (vnl, forge) => {
+  console.log(vnl);
   let libraries = [];
   if (forge !== null) {
     libraries = await getForgeLibraries(forge);

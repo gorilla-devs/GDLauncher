@@ -6,7 +6,7 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import log from 'electron-log';
 import { promisify } from 'util';
 import { exec } from 'child_process';
@@ -32,21 +32,34 @@ export default class DInstance extends Component<Props> {
     this.state = {
       deleting: false,
       version: null,
-      isValid: true
+      isValid: true,
+      forgeVersion: null
     };
   }
 
   componentDidMount = async () => {
+    this.updateInstanceConfig();
+  };
+
+  componentDidUpdate = () => {
+    this.percentage = this.updatePercentage();
+    if (this.percentage === 100) {
+      this.updateInstanceConfig();
+    }
+  };
+
+  updateInstanceConfig = async () => {
     const { name } = this.props;
     if (!this.isInstalling()) {
       try {
-        const { version } = JSON.parse(
+        const { version, forgeVersion } = JSON.parse(
           await promisify(fs.readFile)(
             path.join(PACKS_PATH, name, 'config.json')
           )
         );
         this.setState({
-          version
+          version,
+          forgeVersion: forgeVersion === null ? null : forgeVersion.split('-')[1]
         });
       } catch (e) {
         this.setState({
@@ -57,9 +70,6 @@ export default class DInstance extends Component<Props> {
     }
   };
 
-  componentDidUpdate = () => {
-    this.percentage = this.updatePercentage();
-  };
 
   isInstalling = () => {
     const { name, installingQueue } = this.props;
@@ -136,12 +146,12 @@ export default class DInstance extends Component<Props> {
 
   render = () => {
     const { name, selectedInstance, selectInstance, playing } = this.props;
-    const { version, isValid, deleting } = this.state;
+    const { version, isValid, deleting, forgeVersion } = this.state;
     return (
       <div
         className={`${selectedInstance === name ? styles.selectedItem : ''} ${
           styles.main
-        }`}
+          }`}
       >
         <ContextMenuTrigger id={`contextMenu-${name}`}>
           <div
@@ -173,7 +183,7 @@ export default class DInstance extends Component<Props> {
                 theme="outlined"
               />
             )}
-            {!isValid && (
+            {!isValid && !deleting && (
               <Tooltip title="Warning: this instance is corrupted.">
                 <Icon
                   className={styles.warningIcon}
@@ -221,13 +231,13 @@ export default class DInstance extends Component<Props> {
           >
             {playing.find(el => el.name === name) ? (
               <div>
-                <Icon type="thunderbolt" theme="filled" /> Kill
+                <FontAwesomeIcon icon='bolt' /> Kill
               </div>
             ) : (
-              <div>
-                <Icon type="play-circle" theme="filled" /> Launch
-              </div>
-            )}
+                <div>
+                  <FontAwesomeIcon icon='play' /> Launch
+                </div>
+              )}
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
@@ -239,12 +249,12 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <Icon type="tool" theme="filled" /> Manage
+            <FontAwesomeIcon icon='pen' /> Manage
           </MenuItem>
           <MenuItem
             onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
           >
-            <Icon type="folder" theme="filled" /> Open Folder
+            <FontAwesomeIcon icon='folder' /> Open Folder
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -277,16 +287,17 @@ export default class DInstance extends Component<Props> {
               this.isInstalling() ||
               process.platform !== 'win32' ||
               deleting ||
-              !isValid
+              !isValid ||
+              process.env.NODE_ENV === 'development'
             }
           >
-            <Icon type="link" theme="outlined" /> Create Shortcut
+            <FontAwesomeIcon icon='link' /> Create Shortcut
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
-            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
+            onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
-            <Icon type="export" theme="outlined" /> Export Instance
+            <FontAwesomeIcon icon='wrench' /> Repair
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting}
@@ -299,13 +310,13 @@ export default class DInstance extends Component<Props> {
                 <Icon type="loading" theme="outlined" /> Deleting...
               </div>
             ) : (
-              <div>
-                <Icon type="delete" theme="filled" /> Delete
+                <div>
+                  <FontAwesomeIcon icon='trash' /> Delete
               </div>
-            )}
+              )}
           </MenuItem>
         </ContextMenu>
-      </div>
+      </div >
     );
   };
 }

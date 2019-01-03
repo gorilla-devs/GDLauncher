@@ -16,6 +16,8 @@ import findJava from './utils/javaLocationFinder';
 import DManager from './components/DManager/containers/DManagerPage';
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
+import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
+import CurseModpacksBrowserCreatorModal from './components/CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
@@ -108,6 +110,7 @@ class RouteDef extends Component<Props> {
                   }}
                 >
                   <Route path="/dmanager" component={DManager} />
+                  <Route path="/curseModpacksBrowser" component={CurseModpacksBrowser} />
                   <Route path="/home" component={WaitingComponent(HomePage)} />
                   <Route
                     path="/serverManager"
@@ -125,6 +128,12 @@ class RouteDef extends Component<Props> {
           <Route
             path="/InstanceCreatorModal"
             component={WaitingComponent(InstanceCreatorModal)}
+          />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/curseModpackBrowserCreatorModal/:addonID"
+            component={CurseModpacksBrowserCreatorModal}
           />
         ) : null}
         {isModal ? (

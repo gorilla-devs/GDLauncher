@@ -39,6 +39,7 @@
 
     &-wrapper {
       display: flex;
+      align-items: center;
     }
 
     &-title {
@@ -46,8 +47,8 @@
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
-      display: inline-block;
       flex: 1;
+      display: inline-block;
     }
 
     .@{ant-prefix}-tabs {
@@ -99,7 +100,7 @@
     }
   }
 
-  &-contain-tabs &-head-title {
+  &-contain-tabs > &-head &-head-title {
     padding-bottom: 0;
     min-height: @card-head-height - @card-head-padding;
   }

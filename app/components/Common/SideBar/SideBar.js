@@ -44,8 +44,8 @@ class SideBar extends Component<Props> {
   };
 
   handleUpdateClick = () => {
-    ipcRenderer.send('download-updates');
     this.setState({ isUpdating: true, textUpdate: "Updating..." });
+    ipcRenderer.send('download-updates');
   };
 
   handleUpdateCompletedClick = () => {
