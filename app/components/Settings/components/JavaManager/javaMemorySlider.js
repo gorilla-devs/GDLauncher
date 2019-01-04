@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Icon, Slider } from 'antd';
-import styles from './JavaMemorySlider.scss';
+import styles from './javaMemorySlider.scss';
 
 function javaMemorySlider(props) {
   const { mainText, icon, description, updateMemory, ram } = props;
