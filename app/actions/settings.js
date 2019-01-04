@@ -6,6 +6,7 @@ import { THEMES } from '../constants';
 export const LOAD_SETTINGS = 'LOAD_SETTINGS';
 export const SET_SOUNDS = 'SET_SOUNDS';
 export const SET_JAVA_PATH = 'SET_JAVA_PATH';
+export const SET_JAVA_MEMORY = 'SET_JAVA_MEMORY';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
 
@@ -19,8 +20,8 @@ export function loadSettings() {
           store.set('settings.theme', THEMES.default);
         }
         // JAVA
-        if (!settings.javaPath || Object.keys(settings.javaPath).length === 0) {
-          store.set('settings.javaPath', { autodetected: true, path: null });
+        if (!settings.java || Object.keys(settings.java).length === 0) {
+          store.set('settings.java', { autodetected: true, path: null, memory: 3072 });
         }
         // Reads the settings again after patching
         settings = store.get('settings');
@@ -73,6 +74,16 @@ export function setJavaPath(autodetected, path = null) {
       type: SET_JAVA_PATH,
       autodetected,
       path
+    });
+    dispatch(saveSettings());
+  };
+}
+
+export function setJavaMemory(amount) {
+  return dispatch => {
+    dispatch({
+      type: SET_JAVA_MEMORY,
+      payload: amount,
     });
     dispatch(saveSettings());
   };

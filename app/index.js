@@ -5,7 +5,11 @@ import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
 import './app.global.scss';
 
-if (module.hot) setConfig({ pureSFC: true })
+if (module.hot)
+  setConfig({
+    ignoreSFC: true, // RHL will be __completely__ disabled for SFC
+    pureRender: true, // RHL will not change render method
+  })
 const store = configureStore();
 console.log(
   '%cWelcome to GDLauncher',

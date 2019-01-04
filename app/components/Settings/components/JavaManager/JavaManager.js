@@ -12,6 +12,7 @@ import javaLocator from '../../../../utils/javaLocationFinder';
 import store from '../../../../localStore';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import SettingInput from '../SettingInput/SettingInput';
+import JavaMemorySlider from './javaMemorySlider';
 import * as SettingsActions from '../../../../actions/settings';
 
 
@@ -31,12 +32,12 @@ function JavaManager(props) {
         mainText="Autodetect Java Path"
         description="If enabled, java path will be autodetected"
         icon="folder"
-        checked={props.settings.javaPath.autodetected}
+        checked={props.settings.java.autodetected}
         onChange={async c => props.setJavaPath(c, c ? null : await javaLocator())}
       />
-      {props.settings.javaPath.autodetected ? null :
+      {props.settings.java.autodetected ? null :
         <div>
-          <Title>Java Custom Path</Title>
+          <span style={{ fontSize: 18 }}>Java Custom Path</span>
           <Input
             size="large"
             style={{
@@ -55,11 +56,11 @@ function JavaManager(props) {
             }
             placeholder="(If empty, the game won't start)"
             onChange={e => props.setJavaPath(false, e.target.value)}
-            value={props.settings.javaPath.path}
+            value={props.settings.java.path}
           />
           <Button type="primary" icon="folder" theme="filled" onClick={() => openFolderDialog()} style={{ height: 60, marginLeft: 10 }} />
-        </div>
-      }
+        </div>}
+      <JavaMemorySlider ram={props.settings.java.memory} updateMemory={props.setJavaMemory} />
     </div>
   );
 }

@@ -336,7 +336,7 @@
 @menu-dark-bg: @midnight;
 @menu-dark-arrow-color: #fff;
 @menu-dark-submenu-bg: #000c17;
-@menu-dark-highlight-color: #fff;
+@menu-dark-highlight-color: @primary-1;
 @menu-dark-item-active-bg: @primary-color;
 
 // Spin
@@ -352,8 +352,8 @@
 @table-header-sort-bg: @background-color-base;
 @table-body-sort-bg: rgba(0, 0, 0, .01);
 @table-row-hover-bg: @primary-1;
-@table-selected-row-bg: #fafafa;
-@table-expanded-row-bg: #fbfbfb;
+@table-selected-row-bg: @primary-1;
+@table-expanded-row-bg: @primary-1;
 @table-padding-vertical: 16px;
 @table-padding-horizontal: 16px;
 
@@ -475,16 +475,16 @@
 // ---
 @slider-margin:                       14px 6px 10px;
 @slider-rail-background-color:        @background-color-base;
-@slider-rail-background-color-hover:  #e1e1e1;
-@slider-track-background-color:       @primary-3;
-@slider-track-background-color-hover: @primary-4;
-@slider-handle-color:                 @primary-3;
+@slider-rail-background-color-hover:  @background-color-base;
+@slider-track-background-color:       @primary-color;
+@slider-track-background-color-hover: @primary-color;
+@slider-handle-color:                 @primary-color;
 @slider-handle-color-hover:           @primary-4;
-@slider-handle-color-focus:           tint(@primary-color, 20%);
-@slider-handle-color-focus-shadow:    tint(@primary-color, 50%);
-@slider-handle-color-tooltip-open:    @primary-color;
+@slider-handle-color-focus:           @primary-4;
+@slider-handle-color-focus-shadow:    @primary-4;
+@slider-handle-color-tooltip-open:    @primary-4;
 @slider-dot-border-color:             @border-color-split;
-@slider-dot-border-color-active:      tint(@primary-color, 50%);
+@slider-dot-border-color-active:      @primary-color;
 @slider-disabled-color:               @disabled-color;
 @slider-disabled-background-color:    @component-background;
 
