@@ -46,7 +46,7 @@ a {
 }
 
 hr {
-  border-width: 1px 0px 0px;
+  border-width: 1px 0 0;
   border-top-style: solid;
   border-right-style: initial;
   border-bottom-style: initial;
@@ -56,7 +56,7 @@ hr {
   border-bottom-color: initial;
   border-left-color: initial;
   border-image: initial;
-  margin: 15px 0px;
+  margin: 15px 0;
 }
 
 ::-webkit-scrollbar {
