@@ -1,5 +1,6 @@
 import log from 'electron-log';
 import { message } from 'antd';
+import _ from 'lodash';
 import store from '../localStore';
 import { THEMES } from '../constants';
 
@@ -13,15 +14,21 @@ export const RESET_THEME = 'RESET_THEME';
 export function loadSettings() {
   return dispatch => {
     try {
+      const isLegacy = (obj, settings) =>
+        _.some(Object.keys(obj), key => !_.has(settings, key));
+
       if (store.has('settings')) {
         let settings = store.get('settings');
         // THEME
-        if (!settings.theme || Object.keys(settings.theme).length === 0) {
+        if (!settings.theme || Object.keys(settings.theme).length === 0 || isLegacy(THEMES.default, settings.theme)) {
           store.set('settings.theme', THEMES.default);
         }
         // JAVA
-        if (!settings.java || Object.keys(settings.java).length === 0) {
-          store.set('settings.java', { autodetected: true, path: null, memory: 3072 });
+        const javaSettings = {
+          autodetected: true, path: null, memory: 3072
+        };
+        if (!settings.java || Object.keys(settings.java).length === 0 || isLegacy(javaSettings, settings.java)) {
+          store.set('settings.java', javaSettings);
         }
         // Reads the settings again after patching
         settings = store.get('settings');
