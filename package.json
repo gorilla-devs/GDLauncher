@@ -103,7 +103,7 @@
       "target": [
         "AppImage"
       ],
-      "category": "Games",
+      "category": "Game",
       "artifactName": "${productName}-linux-setup.${ext}"
     },
     "directories": {
