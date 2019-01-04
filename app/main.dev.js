@@ -10,17 +10,16 @@
  *
  * @flow
  */
-import { app, BrowserWindow, crashReporter, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import store from './localStore';
-import { THEMES } from './constants';
+import { THEMES, DATAPATH } from './constants';
 import MenuBuilder from './menu';
 import cli from './utils/cli';
-import { DATAPATH } from './constants';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
@@ -140,16 +139,10 @@ if (minimist(process.argv.slice(1)).i) {
       // the archived log will be saved as the log.old.log file
       log.transports.file.maxSize = 5 * 1024 * 1024;
 
-      // Write to this file, must be set before first logging
-      log.transports.file.file = path.join(__dirname, '/log.txt');
-
       // fs.createWriteStream options, must be set before first logging
       // you can find more information at
       // https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options
       log.transports.file.streamConfig = { flags: 'w' };
-
-      // set existed file stream
-      log.transports.file.stream = fs.createWriteStream(path.join(DATAPATH, 'GDLauncher_logs.txt'));
 
       mainWindow.show();
       mainWindow.focus();
