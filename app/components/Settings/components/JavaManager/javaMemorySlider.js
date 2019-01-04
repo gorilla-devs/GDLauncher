@@ -4,7 +4,7 @@ import styles from './JavaMemorySlider.scss';
 
 function javaMemorySlider(props) {
   const { mainText, icon, description, updateMemory, ram } = props;
-  const [memory, setMemory] = useState(0);
+  const [memory, setMemory] = useState(ram);
 
   const marks = {
     2048: '2048',

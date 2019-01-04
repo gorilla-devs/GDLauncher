@@ -6,7 +6,7 @@ import findJavaHome from './javaLocationFinder';
 import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
-const getStartCommand = async (packName, userData) => {
+const getStartCommand = async (packName, userData, ram) => {
 
   const instanceConfigJSON = JSON.parse(await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json')));
   const vanillaJSON = JSON.parse(await promisify(fs.readFile)(path.join(META_PATH, 'net.minecraft', instanceConfigJSON.version, `${instanceConfigJSON.version}.json`)));
@@ -31,7 +31,7 @@ ${os.platform() === WINDOWS ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerfo
       .filter(lib => !lib.natives)
       .map(lib => `"${lib.path}"`)
       .join(dividerChar)}${dividerChar}${`"${path.join(INSTANCES_PATH, 'versions', vanillaJSON.id, `${vanillaJSON.id}.jar`)}"`} 
-${mainClass} ${Arguments}
+-Xmx${ram}m -Xms256m -XX:PermSize=256m ${mainClass} ${Arguments}
   `;
   return completeCMD.replace(/\n|\r/g, '');
 };
