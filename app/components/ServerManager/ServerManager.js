@@ -42,7 +42,9 @@ function ServerManager(props) {
     let values = {};
     lines.split("\n").forEach(arr => {
       const splitted = arr.split('=');
-      values[splitted[0]] = splitted[1];
+      if(arr.includes('=')) {
+        values[splitted[0]] = splitted[1];
+      }
     });
     setselectedServer(serverName)
     setServerSettings(values);
@@ -50,10 +52,11 @@ function ServerManager(props) {
 
   const updateConfig = async () => {
     let write = '';
+
     Object.keys(serverSettings).forEach(k => {
       write = write.concat(`${k}=${serverSettings[k]}\n`);
     });
-    console.log(write);
+
     await promisify(fs.writeFile)(path.join(SERVERS_PATH, selectedServer, "server.properties"), write, {flag: 'w+'});
   };
 
