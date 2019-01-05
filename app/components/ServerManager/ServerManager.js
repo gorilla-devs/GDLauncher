@@ -16,7 +16,8 @@ import { startServer, deleteServer, kill } from '../../actions/serverManager';
 
 function ServerManager(props) {
   const [servers, setServers] = useState([]);
-  const [serverSettings, setServerSettings] = useState([]);
+  const [serverSettings, setServerSettings] = useState({});
+  const [selectedServer, setselectedServer] = useState(null);
 
   useEffect(async () => {
     const dirs = await promisify(fs.readdir)(SERVERS_PATH);
@@ -29,28 +30,48 @@ function ServerManager(props) {
   }, []);
 
 
-  function changeValue(){
-    
+  function changeValue(e, key) {
+    setServerSettings({
+      ...serverSettings,
+      [key]: e.target.value
+    });
   }
 
-  async function manageServer(packName) {
-    const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, packName, "server.properties"))).toString('utf8');
-    let param = lines.split("\n").map(v => v.split("="));
-    console.log(param);
-    setServerSettings(param.slice(2, param.length - 1));
+  async function manageServer(serverName) {
+    const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "server.properties"))).toString('utf8');
+    let values = {};
+    lines.split("\n").forEach(arr => {
+      const splitted = arr.split('=');
+      values[splitted[0]] = splitted[1];
+    });
+    setselectedServer(serverName)
+    setServerSettings(values);
   }
+
+  const updateConfig = async () => {
+    let write = '';
+    Object.keys(serverSettings).forEach(k => {
+      write = write.concat(`${k}=${serverSettings[k]}\n`);
+    });
+    console.log(write);
+    await promisify(fs.writeFile)(path.join(SERVERS_PATH, selectedServer, "server.properties"), write, {flag: 'w+'});
+  };
 
   return (
     <div className={styles.container}>
 
       <div className={styles.serverSettings}>
-        {serverSettings.length > 0 ?
-          serverSettings.map(p => (
-            <div className={styles.rowSettings}>
+        {Object.keys(serverSettings).length > 0 ?
+          Object.keys(serverSettings).map((p, i) => (
+            <div key={i} className={styles.rowSettings}>
               <div className={styles.FirstSetting} >
-              {p[0]}
+                {p}
               </div>
-              <Input className={styles.SecondSetting} onPressEnter={changeValue} value={p[1]}>
+              <Input className={styles.SecondSetting}
+                value={serverSettings[p]}
+              onChange={(e) => changeValue(e, p)}
+              onPressEnter={updateConfig}
+              >
               </Input>
             </div>
           )) : null

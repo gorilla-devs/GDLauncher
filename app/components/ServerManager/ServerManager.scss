@@ -28,6 +28,8 @@
   display: flex;
   padding: 0;
   margin: 1%;
+  align-items: center;
+  justify-content: center;
 }
 
 .FirstSetting{
@@ -48,6 +50,7 @@
   flex: 1;
   background-color: var(--secondary-color-1);
   max-width: 50%;
+  height: 100%;
   min-height: 100%;
   max-height: 100%;
   border-radius: 3px;
@@ -55,7 +58,8 @@
   margin: 0;
   align-items: stretch;
   text-align: center;
-}
+  justify-content: center;
+}                                                                               
 
 .Serverlist{
   order: 2;
