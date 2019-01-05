@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
+import log from 'electron-log';
 import { AppContainer, setConfig } from 'react-hot-loader';
 import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
@@ -11,7 +12,7 @@ if (module.hot)
     pureRender: true, // RHL will not change render method
   })
 const store = configureStore();
-console.log(
+log.log(
   '%cWelcome to GDLauncher',
   'background: #2c3e50; color: white; display: block; font-size:50px;'
 );

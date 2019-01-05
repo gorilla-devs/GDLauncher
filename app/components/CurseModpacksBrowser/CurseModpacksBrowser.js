@@ -42,7 +42,7 @@ function CurseModpacksBrowser(props) {
     );
     // We now remove the previous 15 elements and add the real 15
     const data = reset === true ? res.data : packs.concat(res.data);
-    setPacks(data); console.log(packs);
+    setPacks(data);
 
     setLoading(false);
   };
@@ -79,7 +79,6 @@ function CurseModpacksBrowser(props) {
   };
 
   const downloadLatest = (modpackData) => {
-    console.log(modpackData);
     props.addCursePackToQueue('test', modpackData.id, modpackData.defaultFileId)
   };
 
