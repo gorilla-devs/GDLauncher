@@ -29,15 +29,15 @@ function CurseModpacksBrowser(props) {
     loadPacks();
   }, [filterType])
 
-  const loadPacks = async (reset = true) => {
+  const loadPacks = async (reset = true, emptySearch = false) => {
     setLoading(true);
     const loadingArr = [...new Array(15)].map(() => ({ loading: true, name: null }));
     if (reset === true) setPacks(loadingArr);
-    else setPacks(packs.concat(loadingArr));
+    else setPacks(packs => packs.concat(loadingArr));
 
     const res = await axios.get(
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=15&index=${
-      packs.length}&sort=${filterType}&searchFilter=${encodeURI(searchQuery)}&categoryId=0&sectionId=4471&sortDescending=${filterType !==
+      reset === true ? 0 : packs.length}&sort=${filterType}&searchFilter=${emptySearch === true ? '' : encodeURI(searchQuery)}&categoryId=0&sectionId=4471&sortDescending=${filterType !==
       'author' && filterType !== 'name'}`
     );
     // We now remove the previous 15 elements and add the real 15
@@ -49,7 +49,7 @@ function CurseModpacksBrowser(props) {
 
 
   const loadMore =
-    !loading && packs.length !== 0 ? (
+    !loading && packs.length !== 0 && packs.length % 15 === 0 ? (
       <div
         style={{
           textAlign: 'center',
@@ -71,11 +71,12 @@ function CurseModpacksBrowser(props) {
   };
 
   const onSearchSubmit = async () => {
-    loadPacks(true);
+    loadPacks();
   };
 
   const emitEmptySearchText = async () => {
     setSearchQuery('');
+    loadPacks(true, true);
   };
 
   const downloadLatest = (modpackData) => {
