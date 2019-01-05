@@ -91,8 +91,8 @@ function Login(props) {
       >
         <div className={styles.login_form}>
           <h1 style={{ textAlign: 'center', fontSize: 30 }}>
-            GorillaDevs Login
-            </h1>
+            Mojang Login
+          </h1>
           <Form onSubmit={handleSubmit}>
             <FormItem>
               {getFieldDecorator('username', {

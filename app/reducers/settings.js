@@ -2,6 +2,7 @@ import {
   LOAD_SETTINGS,
   SET_SOUNDS,
   SET_JAVA_PATH,
+  SET_JAVA_MEMORY,
   SET_THEME,
   RESET_THEME,
 } from '../actions/settings';
@@ -9,9 +10,10 @@ import { THEMES } from '../constants';
 
 const initialState = {
   sounds: true,
-  javaPath: {
+  java: {
     autodetected: true,
-    path: null
+    path: null,
+    memory: 3096
   },
   theme: THEMES.default
 };
@@ -28,9 +30,18 @@ export default function Settings(state = initialState, action) {
     case `${SET_JAVA_PATH}`:
       return {
         ...state,
-        javaPath: {
+        java: {
+          ...state.java,
           autodetected: action.autodetected,
           path: action.path
+        }
+      };
+    case `${SET_JAVA_MEMORY}`:
+      return {
+        ...state,
+        java: {
+          ...state.java,
+          memory: action.payload
         }
       };
     case `${SET_THEME}`:

@@ -14,7 +14,7 @@ const SwitchSetting = (props) => {
           <Switch checked={props.checked} onChange={props.onChange} />
         </div>
       </div>
-      <Divider />
+      <hr />
     </div>
 
   );

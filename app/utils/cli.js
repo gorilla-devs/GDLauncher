@@ -1,5 +1,6 @@
 import minimist from 'minimist';
 import { exec } from 'child_process';
+import log from 'electron-log';
 import launchCommand from './MCLaunchCommand';
 import store from '../localStore';
 
@@ -11,11 +12,11 @@ const parseCLI = async (data, callback) => {
     await launchCommand(instanceName, auth),
     (error, stdout, stderr) => {
       if (error) {
-        console.error(`exec error: ${error}`);
+        log.error(`exec error: ${error}`);
         return;
       }
-      console.log(`stdout: ${stdout}`);
-      console.log(`stderr: ${stderr}`);
+      log.log(`stdout: ${stdout}`);
+      log.log(`stderr: ${stderr}`);
     }
   );
   start.on('exit', () => {

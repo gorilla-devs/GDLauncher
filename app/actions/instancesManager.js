@@ -37,17 +37,17 @@ export function selectInstance(name) {
 
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
-    const { auth } = getState();
+    const { auth, settings } = getState();
     const start = exec(
-      await launchCommand(instanceName, auth),
+      await launchCommand(instanceName, auth, settings.java.memory),
       { cwd: path.join(PACKS_PATH, instanceName) },
       (error, stdout, stderr) => {
         if (error) {
-          console.error(`exec error: ${error}`);
+          log.error(`exec error: ${error}`);
           return;
         }
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
+        log.log(`stdout: ${stdout}`);
+        log.log(`stderr: ${stderr}`);
       }
     );
     dispatch({

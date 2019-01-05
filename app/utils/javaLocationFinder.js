@@ -7,7 +7,7 @@ import {
 import store from '../localStore';
 
 const findJavaHome = async () => {
-  const javaSettings = store.get('settings.javaPath');
+  const javaSettings = store.get('settings.java');
   if (javaSettings.autodetected) {
     const util = require('util');
     const exec = util.promisify(require('child_process').exec);

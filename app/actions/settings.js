@@ -1,26 +1,38 @@
 import log from 'electron-log';
 import { message } from 'antd';
+import _ from 'lodash';
 import store from '../localStore';
 import { THEMES } from '../constants';
 
 export const LOAD_SETTINGS = 'LOAD_SETTINGS';
 export const SET_SOUNDS = 'SET_SOUNDS';
 export const SET_JAVA_PATH = 'SET_JAVA_PATH';
+export const SET_JAVA_MEMORY = 'SET_JAVA_MEMORY';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
 
 export function loadSettings() {
   return dispatch => {
     try {
+      const isLegacy = (obj, settings) =>
+        _.some(Object.keys(obj), key => !_.has(settings, key));
+
       if (store.has('settings')) {
         let settings = store.get('settings');
         // THEME
-        if (!settings.theme || Object.keys(settings.theme).length === 0) {
+        if (!settings.theme || Object.keys(settings.theme).length === 0 || isLegacy(THEMES.default, settings.theme)) {
           store.set('settings.theme', THEMES.default);
         }
         // JAVA
-        if (!settings.javaPath || Object.keys(settings.javaPath).length === 0) {
-          store.set('settings.javaPath', { autodetected: true, path: null });
+        const javaSettings = {
+          autodetected: true, path: null, memory: 3072
+        };
+        if (!settings.java ||
+          Object.keys(settings.java).length === 0 ||
+          isLegacy(javaSettings, settings.java) ||
+          typeof settings.java.memory != 'number'
+        ) {
+          store.set('settings.java', javaSettings);
         }
         // Reads the settings again after patching
         settings = store.get('settings');
@@ -73,6 +85,16 @@ export function setJavaPath(autodetected, path = null) {
       type: SET_JAVA_PATH,
       autodetected,
       path
+    });
+    dispatch(saveSettings());
+  };
+}
+
+export function setJavaMemory(amount) {
+  return dispatch => {
+    dispatch({
+      type: SET_JAVA_MEMORY,
+      payload: amount,
     });
     dispatch(saveSettings());
   };

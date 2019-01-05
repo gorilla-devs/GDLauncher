@@ -45,6 +45,20 @@ a {
   -webkit-user-drag: none;
 }
 
+hr {
+  border-width: 1px 0 0;
+  border-top-style: solid;
+  border-right-style: initial;
+  border-bottom-style: initial;
+  border-left-style: initial;
+  border-top-color: rgba(255, 255, 255, 0.4);
+  border-right-color: initial;
+  border-bottom-color: initial;
+  border-left-color: initial;
+  border-image: initial;
+  margin: 15px 0;
+}
+
 ::-webkit-scrollbar {
   background-color: var(--secondary-color-3);
   width: 8px;
@@ -337,18 +351,16 @@ a:hover {
 }
 
 // Table
-
-.ant-table-thead > tr > th {
-  background: rgba(0, 0, 0, 0.15);
-}
-
 .ant-table-thead > tr.ant-table-row-hover > td,
 .ant-table-tbody > tr.ant-table-row-hover > td,
+.ant-table-thead > tr > th,
+.ant-table-thead > tr, .ant-table-tbody > tr:hover,
 .ant-table-thead > tr:hover > td,
 .ant-table-tbody > tr:hover > td,
 .ant-table-tbody > tr.ant-table-row-selected td {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.15) !important;
 }
+
 
 .ant-table-placeholder {
   background-color: var(--secondary-color-1);
@@ -400,6 +412,19 @@ a:hover {
 
 .ant-message-notice-content {
   background: var(--secondary-color-2);
+}
+
+.ant-slider-track, .ant-slider:hover .ant-slider-track {
+  background-color: var(--primary);
+}
+
+.ant-slider-handle,
+.ant-slider-dot-active,
+.ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open),
+.ant-slider-handle .ant-tooltip-open {
+  background-color: var(--secondary-color-3);
+  border: solid 2px var(--primary);
+  border-color: var(--primary) !important;
 }
 
 .container {

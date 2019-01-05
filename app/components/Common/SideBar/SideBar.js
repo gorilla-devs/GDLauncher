@@ -123,7 +123,7 @@ class SideBar extends Component<Props> {
             <div className={styles.serv}>Mineplex</div>
           </div> */}
         </div>
-        <hr />
+        <hr style={{ margin: 0 }} />
         <div className={styles.socialsContainer}>
           {/* eslint-disable */}
           <a

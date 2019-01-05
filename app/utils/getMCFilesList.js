@@ -136,7 +136,6 @@ export const getForgeLibraries = async forge => {
 };
 
 export const computeVanillaAndForgeLibraries = async (vnl, forge) => {
-  console.log(vnl);
   let libraries = [];
   if (forge !== null) {
     libraries = await getForgeLibraries(forge);
