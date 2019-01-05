@@ -51,8 +51,6 @@ const CurseModpackBrowserCreatorModal = props => {
     });
   };
 
-  if (loading) return <div>Loading...</div>;
-
   return (
     <Modal
       history={props.history}
@@ -99,6 +97,7 @@ const CurseModpackBrowserCreatorModal = props => {
                 size="large"
                 style={{ width: 335, display: 'inline-block' }}
                 placeholder="Select a version"
+                loading={loading}
               >
                 {_.reverse(versions.map(addon => <Select.Option key={addon.id}>{addon.fileName}</Select.Option>).slice())}
               </Select>

@@ -148,7 +148,16 @@ function CurseModpacksBrowser(props) {
                 >
                   <Button type="primary" icon="download">Download</Button>
                 </Link>,
-                !item.loading && <Button type="primary">Explore <Icon type="arrow-right" /></Button>
+                !item.loading &&
+                <Link
+                  to={{
+                    pathname: `/curseModpackExplorerModal/${item.id}`,
+                    state: { modal: true }
+                  }}
+                ><Button type="primary">
+                    Explore <Icon type="arrow-right" />
+                  </Button>
+                </Link>
               ]}
             >
               {item.loading ? (
