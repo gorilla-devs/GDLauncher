@@ -31,6 +31,7 @@ export default function Settings(state = initialState, action) {
       return {
         ...state,
         java: {
+          ...state.java,
           autodetected: action.autodetected,
           path: action.path
         }
