@@ -295,6 +295,12 @@ export default class DInstance extends Component<Props> {
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
+            onClick={() => {}}
+          >
+            <FontAwesomeIcon icon='copy' /> Duplicate
+          </MenuItem>
+          <MenuItem
+            disabled={this.isInstalling() || deleting || !isValid}
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
             <FontAwesomeIcon icon='wrench' /> Repair

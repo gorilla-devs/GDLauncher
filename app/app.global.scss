@@ -421,7 +421,7 @@ a:hover {
 .ant-slider-handle,
 .ant-slider-dot-active,
 .ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open),
-.ant-tooltip-open {
+.ant-slider-handle .ant-tooltip-open {
   background-color: var(--secondary-color-3);
   border: solid 2px var(--primary);
   border-color: var(--primary) !important;

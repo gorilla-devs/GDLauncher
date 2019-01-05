@@ -21,7 +21,7 @@ import styles from './CurseModpacksBrowser.scss';
 function CurseModpacksBrowser(props) {
 
   const [packs, setPacks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('Featured');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -115,16 +115,16 @@ function CurseModpacksBrowser(props) {
         <div>
           Sort By{' '}
           <Select
-            defaultValue="featured"
+            defaultValue="Featured"
             onChange={filterChanged}
             style={{ width: 150 }}
           >
-            <Select.Option value="featured">Featured</Select.Option>
-            <Select.Option value="popularity">Popularity</Select.Option>
-            <Select.Option value="lastupdated">Last Updated</Select.Option>
-            <Select.Option value="name">Name</Select.Option>
-            <Select.Option value="author">Author</Select.Option>
-            <Select.Option value="totaldownloads">
+            <Select.Option value="Featured">Featured</Select.Option>
+            <Select.Option value="Popularity">Popularity</Select.Option>
+            <Select.Option value="LastUpdated">Last Updated</Select.Option>
+            <Select.Option value="Name">Name</Select.Option>
+            <Select.Option value="Author">Author</Select.Option>
+            <Select.Option value="TotalDownloads">
               Total Downloads
               </Select.Option>
           </Select>
