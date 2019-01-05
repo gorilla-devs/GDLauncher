@@ -2,7 +2,7 @@
   "name": "gdlauncher",
   "productName": "GDLauncher",
   "main": "./app/main.prod.js",
-  "version": "0.9.1",
+  "version": "0.9.3",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "scripts": {
     "build": "yarn build-antd && concurrently \"yarn build-main\" \"yarn build-renderer\"",

@@ -60,11 +60,11 @@ export const THEMES = {
     'secondary-color-2': '#272b2e',
     'secondary-color-3': '#13171a'
   },
-  christmas: {
-    name: 'Christmas',
-    primary: '#16A085',
-    "secondary-color-1": "#4f649d",
-    "secondary-color-2": "#3b5089",
-    "secondary-color-3": "#273c75"
+  bloodyMurder: {
+    name: 'Bloody Murder',
+    primary: '#aa1e0f',
+    "secondary-color-1": "#282c2f",
+    "secondary-color-2": "#14181b",
+    "secondary-color-3": "#000407"
   }
 };
