@@ -211,10 +211,9 @@ function CurseModpacksBrowser(props) {
                     }
                     title={<Link
                       to={{
-                        pathname: ``,
+                        pathname: `/curseModpackExplorerModal/${item.id}`,
                         state: { modal: true }
                       }}
-                      replace
                     >
                       {item.name}
                     </Link>}
