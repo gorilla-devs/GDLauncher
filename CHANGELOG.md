@@ -6,6 +6,5 @@
 - Fixed the CurseForge modpacks search. It's now more responsive and should give more consistent results [#126](https://github.com/gorilla-devs/GDLauncher/issues/126) [#115](https://github.com/gorilla-devs/GDLauncher/issues/115)
 - Started updating the changelog :) [#130](https://github.com/gorilla-devs/GDLauncher/issues/130)
 - Added the modpack explorer dialog [#117](https://github.com/gorilla-devs/GDLauncher/issues/117) [#108](https://github.com/gorilla-devs/GDLauncher/issues/108)
-- Added instance duplication
 - Improved lazy loading performance
 - Fixed a bug where clearing the searchbox in the modpacks browser caused the launcher to crash [#125](https://github.com/gorilla-devs/GDLauncher/issues/125) [#116](https://github.com/gorilla-devs/GDLauncher/issues/116)

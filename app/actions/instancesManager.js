@@ -43,7 +43,7 @@ export function startInstance(instanceName) {
       { cwd: path.join(PACKS_PATH, instanceName) },
       (error, stdout, stderr) => {
         if (error) {
-          log.error(`exec error: ${error}`);
+          log.error(`Cannot start this instance. Error: ${error}`);
           return;
         }
         log.log(`stdout: ${stdout}`);
