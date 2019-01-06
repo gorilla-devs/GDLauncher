@@ -8,3 +8,4 @@
 - Added the modpack explorer dialog [#117](https://github.com/gorilla-devs/GDLauncher/issues/117) [#108](https://github.com/gorilla-devs/GDLauncher/issues/108)
 - Improved lazy loading performance
 - Fixed a bug where clearing the searchbox in the modpacks browser caused the launcher to crash [#125](https://github.com/gorilla-devs/GDLauncher/issues/125) [#116](https://github.com/gorilla-devs/GDLauncher/issues/116)
+- Fixed the ram slider color. It now adapts to the themes
