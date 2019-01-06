@@ -16,8 +16,9 @@ const Loader = () => <ContentLoader
     width: '100%'
   }}
 >
-  <rect x="35%" y="40" rx="0" ry="0" width="55%" height="40" />
-  {[...Array(10).map((v, i) => <rect x="15%" y={40 * i} rx="0" ry="0" width="75%" height="20" />)]}
+  <rect x="25%" y="50" rx="0" ry="0" width="55%" height="50" />
+  {[...Array(Math.round(window.innerHeight / 85))].map((v, i) => <rect x="15%" y={(i * 50) + 120} rx="0" ry="0" width="75%" height="30" />)}
+
 </ContentLoader>;
 
 export default props => {
@@ -39,11 +40,13 @@ export default props => {
     >
       {packData !== null ? <div className={styles.container}>
         <h1>{packData.name}</h1>
-        <span
-          dangerouslySetInnerHTML={{
-            __html: packData.fullDescription
-          }}
-        />
+        <div className={styles.description}>
+          <span
+            dangerouslySetInnerHTML={{
+              __html: packData.fullDescription
+            }}
+          />
+        </div>
       </div> : <Loader />}
     </Modal>
   )
