@@ -4,6 +4,7 @@ import { promisify } from 'util';
 import axios from 'axios';
 import makeDir from 'make-dir';
 import fse from 'fs-extra';
+import log from 'electron-log';
 import Promise from 'bluebird';
 import fs from 'fs';
 import Zip from 'adm-zip';
@@ -238,7 +239,7 @@ export function downloadPack(pack) {
       );
       mods = await getModsList(manifest.files, pack);
     } catch (err) {
-      console.error(err);
+      log.error(err);
     }
 
     const totalFiles =

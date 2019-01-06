@@ -21,7 +21,7 @@ import styles from './CurseModpacksBrowser.scss';
 function CurseModpacksBrowser(props) {
 
   const [packs, setPacks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('Featured');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -29,27 +29,27 @@ function CurseModpacksBrowser(props) {
     loadPacks();
   }, [filterType])
 
-  const loadPacks = async (reset = true) => {
+  const loadPacks = async (reset = true, emptySearch = false) => {
     setLoading(true);
     const loadingArr = [...new Array(15)].map(() => ({ loading: true, name: null }));
     if (reset === true) setPacks(loadingArr);
-    else setPacks(packs.concat(loadingArr));
+    else setPacks(packs => packs.concat(loadingArr));
 
     const res = await axios.get(
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=15&index=${
-      packs.length}&sort=${filterType}&searchFilter=${encodeURI(searchQuery)}&categoryId=0&sectionId=4471&sortDescending=${filterType !==
+      reset === true ? 0 : packs.length}&sort=${filterType}&searchFilter=${emptySearch === true ? '' : encodeURI(searchQuery)}&categoryId=0&sectionId=4471&sortDescending=${filterType !==
       'author' && filterType !== 'name'}`
     );
     // We now remove the previous 15 elements and add the real 15
     const data = reset === true ? res.data : packs.concat(res.data);
-    setPacks(data); console.log(packs);
+    setPacks(data);
 
     setLoading(false);
   };
 
 
   const loadMore =
-    !loading && packs.length !== 0 ? (
+    !loading && packs.length !== 0 && packs.length % 15 === 0 ? (
       <div
         style={{
           textAlign: 'center',
@@ -71,15 +71,15 @@ function CurseModpacksBrowser(props) {
   };
 
   const onSearchSubmit = async () => {
-    loadPacks(true);
+    loadPacks();
   };
 
   const emitEmptySearchText = async () => {
     setSearchQuery('');
+    loadPacks(true, true);
   };
 
   const downloadLatest = (modpackData) => {
-    console.log(modpackData);
     props.addCursePackToQueue('test', modpackData.id, modpackData.defaultFileId)
   };
 
@@ -115,16 +115,16 @@ function CurseModpacksBrowser(props) {
         <div>
           Sort By{' '}
           <Select
-            defaultValue="featured"
+            defaultValue="Featured"
             onChange={filterChanged}
             style={{ width: 150 }}
           >
-            <Select.Option value="featured">Featured</Select.Option>
-            <Select.Option value="popularity">Popularity</Select.Option>
-            <Select.Option value="lastupdated">Last Updated</Select.Option>
-            <Select.Option value="name">Name</Select.Option>
-            <Select.Option value="author">Author</Select.Option>
-            <Select.Option value="totaldownloads">
+            <Select.Option value="Featured">Featured</Select.Option>
+            <Select.Option value="Popularity">Popularity</Select.Option>
+            <Select.Option value="LastUpdated">Last Updated</Select.Option>
+            <Select.Option value="Name">Name</Select.Option>
+            <Select.Option value="Author">Author</Select.Option>
+            <Select.Option value="TotalDownloads">
               Total Downloads
               </Select.Option>
           </Select>
@@ -148,7 +148,16 @@ function CurseModpacksBrowser(props) {
                 >
                   <Button type="primary" icon="download">Download</Button>
                 </Link>,
-                !item.loading && <Button type="primary">Explore <Icon type="arrow-right" /></Button>
+                !item.loading &&
+                <Link
+                  to={{
+                    pathname: `/curseModpackExplorerModal/${item.id}`,
+                    state: { modal: true }
+                  }}
+                ><Button type="primary">
+                    Explore <Icon type="arrow-right" />
+                  </Button>
+                </Link>
               ]}
             >
               {item.loading ? (
@@ -202,10 +211,9 @@ function CurseModpacksBrowser(props) {
                     }
                     title={<Link
                       to={{
-                        pathname: ``,
+                        pathname: `/curseModpackExplorerModal/${item.id}`,
                         state: { modal: true }
                       }}
-                      replace
                     >
                       {item.name}
                     </Link>}

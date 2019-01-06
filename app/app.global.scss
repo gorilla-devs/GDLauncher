@@ -414,6 +414,19 @@ a:hover {
   background: var(--secondary-color-2);
 }
 
+.ant-slider-track, .ant-slider:hover .ant-slider-track {
+  background-color: var(--primary);
+}
+
+.ant-slider-handle,
+.ant-slider-dot-active,
+.ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open),
+.ant-slider-handle .ant-tooltip-open {
+  background-color: var(--secondary-color-3);
+  border: solid 2px var(--primary);
+  border-color: var(--primary) !important;
+}
+
 .container {
   max-width: 24rem;
   margin: 1rem auto;

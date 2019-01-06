@@ -43,11 +43,11 @@ export function startInstance(instanceName) {
       { cwd: path.join(PACKS_PATH, instanceName) },
       (error, stdout, stderr) => {
         if (error) {
-          console.error(`exec error: ${error}`);
+          log.error(`Cannot start this instance. Error: ${error}`);
           return;
         }
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
+        log.log(`stdout: ${stdout}`);
+        log.log(`stderr: ${stderr}`);
       }
     );
     dispatch({

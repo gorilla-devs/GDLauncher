@@ -27,7 +27,11 @@ export function loadSettings() {
         const javaSettings = {
           autodetected: true, path: null, memory: 3072
         };
-        if (!settings.java || Object.keys(settings.java).length === 0 || isLegacy(javaSettings, settings.java)) {
+        if (!settings.java ||
+          Object.keys(settings.java).length === 0 ||
+          isLegacy(javaSettings, settings.java) ||
+          typeof settings.java.memory != 'number'
+        ) {
           store.set('settings.java', javaSettings);
         }
         // Reads the settings again after patching
