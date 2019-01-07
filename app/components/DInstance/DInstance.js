@@ -25,6 +25,8 @@ type Props = {
   playing: array
 };
 
+let interval;
+
 export default class DInstance extends Component<Props> {
   props: Props;
 
@@ -40,13 +42,21 @@ export default class DInstance extends Component<Props> {
 
   componentDidMount = async () => {
     this.updateInstanceConfig();
+    // This checks for a valid config every 2 seconds
+    if(this.state.version === null) {
+      interval = setInterval(() => {
+        this.updateInstanceConfig();
+        if(this.state.version !== null) {
+          clearInterval(interval);
+        }
+      }, 2000);
+    }
   };
+
+
 
   componentDidUpdate = () => {
     this.percentage = this.updatePercentage();
-    if (this.percentage === 100) {
-      this.updateInstanceConfig();
-    }
   };
 
   updateInstanceConfig = async () => {
@@ -74,20 +84,9 @@ export default class DInstance extends Component<Props> {
 
   isInstalling = () => {
     const { name, installingQueue } = this.props;
-    if (installingQueue[name]) {
-      switch (installingQueue[name].status) {
-        case 'Queued':
-          return true;
-        case 'Downloading':
-          return true;
-        case 'Completed':
-          return false;
-        default:
-          return true;
-      }
-    } else {
-      return false;
-    }
+    if (installingQueue[name])
+      return true;
+    return false;
   };
 
   updatePercentage = () => {
