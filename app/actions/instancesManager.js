@@ -39,7 +39,7 @@ export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const { auth, settings } = getState();
     const command = await launchCommand(instanceName, auth, settings.java.memory);
-    const start = spawn(command, [], { shell: true });
+    const start = spawn(command, [], { shell: true, cwd: path.join(PACKS_PATH, instanceName) });
 
     start.stdout.on("data", function (data) {
       console.log(data.toString());
