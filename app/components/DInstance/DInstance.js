@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import log from 'electron-log';
 import { promisify } from 'util';
 import { exec } from 'child_process';
+import { shell } from 'electron';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import { PACKS_PATH, APPPATH } from '../../constants';
 import { history } from '../../store/configureStore';
@@ -252,7 +253,7 @@ export default class DInstance extends Component<Props> {
             <FontAwesomeIcon icon='pen' /> Manage
           </MenuItem>
           <MenuItem
-            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
+            onClick={() => shell.openItem(path.join(PACKS_PATH, name))}
           >
             <FontAwesomeIcon icon='folder' /> Open Folder
           </MenuItem>
