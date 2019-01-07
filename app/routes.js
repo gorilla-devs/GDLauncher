@@ -167,7 +167,10 @@ class RouteDef extends Component<Props> {
 
 function WaitingComponent(MyComponent) {
   return props => (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div style={{
+        width: '100vw', height: '100vh', background: 'var(--secondary-color-1)'
+      }}>Loading...</div>}>
       <MyComponent {...props} />
     </Suspense>
   );
