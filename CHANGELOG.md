@@ -1,3 +1,14 @@
+# 0.9.4 (9.1.2019)
+- Minecraft console can now be read opening the developer tools (Button on the top left) [#129](https://github.com/gorilla-devs/GDLauncher/issues/129)
+- Minecraft is now started using `spawn()` instead of `exec()`. It doesn't overflow anymore [#135](https://github.com/gorilla-devs/GDLauncher/issues/135)
+- Fixed shortcuts not working
+- Fixed some visual bugs
+- "Open Folder" is now cross-platform
+- Fixed high CPU usage after installing an instance [#131](https://github.com/gorilla-devs/GDLauncher/issues/131)
+- Changed default window size
+- Various performance improvements
+- Removed aria-label from content-loader
+
 # 0.9.3 (6.1.2019)
 - Fixed ram being reset when toggling java autodetect [#128](https://github.com/gorilla-devs/GDLauncher/issues/128)
 - Updated every console.log to log.log. Now every log is written to the log file

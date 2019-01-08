@@ -288,6 +288,7 @@ class ModsList extends Component<Props> {
                 <ContentLoader
                   height={100}
                   speed={0.6}
+                  ariaLabel={false}
                   primaryColor="var(--secondary-color-2)"
                   secondaryColor="var(--secondary-color-3)"
                   style={{
