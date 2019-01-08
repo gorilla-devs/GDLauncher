@@ -29,44 +29,29 @@ export const downloadArr = async (
         // It needs to be downloaded
       }
       if (toDownload) {
-        await downloadFileInstance(item.path, item.url);
+        try {
+          const filePath = path.dirname(item.path);
+          try {
+            await fs.accessAsync(filePath);
+          } catch (e) {
+            await makeDir(filePath);
+          }
+          await fs.writeFileAsync(
+            item.path,
+            await request(item.url, { encoding: 'binary' }),
+            'binary'
+          );
+        } catch (e) {
+          log.error(
+            `Error while downloading <${item.url}> to <${item.path}> --> ${e.message}`
+          );
+        }
       }
       downloaded += 1;
       if (downloaded % 30 === 0 || downloaded === arr.length) updatePercentage(downloaded);
     },
     { concurrency: threads }
   );
-};
-
-const downloadFileInstance = async (filename, url, legacyPath = null) => {
-  try {
-    const filePath = path.dirname(filename);
-    try {
-      await fs.accessAsync(filePath);
-    } catch (e) {
-      await makeDir(filePath);
-    }
-    const file = await request(url, { encoding: 'binary' });
-    await fs.writeFileAsync(filename, file, 'binary');
-    // This handles legacy assets.
-    if (legacyPath !== null && legacyPath !== undefined) {
-      try {
-        await fs.accessAsync(legacyPath);
-      } catch (e) {
-        try {
-          await fs.accessAsync(path.dirname(legacyPath));
-        } catch (e) {
-          await makeDir(path.dirname(legacyPath));
-        } finally {
-          await fs.writeFileAsync(legacyPath, file, 'binary');
-        }
-      }
-    }
-  } catch (e) {
-    log.error(
-      `Error while downloading <${url}> to <${filename}> --> ${e.message}`
-    );
-  }
 };
 
 export const downloadFile = (filename, url, onProgress) => {

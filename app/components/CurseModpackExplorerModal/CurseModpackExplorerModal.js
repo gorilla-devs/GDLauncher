@@ -17,7 +17,7 @@ const Loader = () => <ContentLoader
   }}
 >
   <rect x="25%" y="50" rx="0" ry="0" width="55%" height="50" />
-  {[...Array(Math.round(window.innerHeight / 85))].map((v, i) => <rect x="15%" y={(i * 50) + 120} rx="0" ry="0" width="75%" height="30" />)}
+  {[...Array(Math.round(window.innerHeight / 95))].map((v, i) => <rect x="15%" y={(i * 50) + 120} rx="0" ry="0" width="75%" height="30" />)}
 
 </ContentLoader>;
 

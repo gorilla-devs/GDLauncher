@@ -42,11 +42,11 @@ export default class DInstance extends Component<Props> {
 
   componentDidMount = async () => {
     this.updateInstanceConfig();
-    // This checks for a valid config every 2 seconds
-    if(this.state.version === null) {
+    // This checks for a valid config every 2 seconds (until it finds one)
+    if (this.state.version === null) {
       interval = setInterval(() => {
         this.updateInstanceConfig();
-        if(this.state.version !== null) {
+        if (this.state.version !== null) {
           clearInterval(interval);
         }
       }, 2000);
@@ -97,7 +97,6 @@ export default class DInstance extends Component<Props> {
         case 'Queued':
           return 0;
         case 'Downloading':
-          // If the total file to download is equal to 0 (not yet sent from the worker) then show 0 to avoid NaN from 0 / 0
           return percentage;
         case 'Completed':
           return 100;
@@ -120,7 +119,7 @@ export default class DInstance extends Component<Props> {
             process.kill(el.PID);
           });
         });
-        message.info('Instance terminated');
+        message.info('Instance terminated from user');
       } else {
         startInstance(name);
         selectInstance(name);
