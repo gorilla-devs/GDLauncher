@@ -4,8 +4,9 @@
   background-size: cover;
   position: absolute;
   left: 0;
-  right: 0;
-  height: 100vh;
+  top: 20px;
+  width: 100vw;
+  height: calc(100vh - 20px);
 }
 
 .login_form {

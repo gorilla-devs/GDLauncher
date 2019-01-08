@@ -6,7 +6,6 @@ import * as instancesManagerActions from '../../../actions/instancesManager';
 
 function mapStateToProps(state) {
   return {
-    installingQueue: state.downloadManager.downloadQueue,
     userData: state.auth
   };
 }

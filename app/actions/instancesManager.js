@@ -41,11 +41,11 @@ export function startInstance(instanceName) {
     const command = await launchCommand(instanceName, auth, settings.java.memory);
     const start = spawn(command, [], { shell: true, cwd: path.join(PACKS_PATH, instanceName) });
 
-    start.stdout.on("data", function (data) {
+    start.stdout.on("data", (data) => {
       console.log(data.toString());
     });
 
-    start.stderr.on("data", function (data) {
+    start.stderr.on("data", (data) => {
       log.error(data.toString());
     });
 

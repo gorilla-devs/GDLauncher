@@ -41,7 +41,17 @@ function CurseModpacksBrowser(props) {
       'author' && filterType !== 'name'}`
     );
     // We now remove the previous 15 elements and add the real 15
-    const data = reset === true ? res.data : packs.concat(res.data);
+    const mappedData = res.data.map(v => ({
+      loading: false,
+      name: v.name,
+      id: v.id,
+      attachments: v.attachments,
+      summary: v.summary,
+      latestFiles: v.latestFiles,
+      downloadCount: v.downloadCount
+    }));
+
+    const data = reset === true ? mappedData : packs.concat(mappedData);
     setPacks(data);
 
     setLoading(false);
@@ -77,10 +87,6 @@ function CurseModpacksBrowser(props) {
   const emitEmptySearchText = async () => {
     setSearchQuery('');
     loadPacks(true, true);
-  };
-
-  const downloadLatest = (modpackData) => {
-    props.addCursePackToQueue('test', modpackData.id, modpackData.defaultFileId)
   };
 
   if (!loading && packs.length === 0 && searchQuery.length === 0) {
