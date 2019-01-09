@@ -6,8 +6,10 @@
 - "Open Folder" is now cross-platform
 - Fixed high CPU usage after installing an instance [#131](https://github.com/gorilla-devs/GDLauncher/issues/131)
 - Changed default window size
-- Various performance improvements
+- Various visual and performance improvements
 - Removed aria-label from content-loader
+- Removed login proxy. Now GDLauncher connects directly with Mojang's APIs
+- Fixed sounds not working for some legacy minecraft version. Sadly under version 1.6.1 there is nothing we can do [#146](https://github.com/gorilla-devs/GDLauncher/issues/146)
 
 # 0.9.3 (6.1.2019)
 - Fixed ram being reset when toggling java autodetect [#128](https://github.com/gorilla-devs/GDLauncher/issues/128)
