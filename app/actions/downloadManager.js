@@ -22,7 +22,8 @@ import {
   extractAssets,
   extractMainJar,
   extractNatives,
-  computeVanillaAndForgeLibraries
+  computeVanillaAndForgeLibraries,
+  isVirtualAssets
 } from '../utils/getMCFilesList';
 import { downloadMod, getModsList } from '../utils/mods';
 import { arraify } from '../utils/strings';
@@ -186,6 +187,7 @@ export function downloadPack(pack) {
           path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`)
         );
         forgeJSON = JSON.parse(zipFile.readAsText('install_profile.json'));
+
         await makeDir(
           path.dirname(
             path.join(
@@ -272,6 +274,20 @@ export function downloadPack(pack) {
 
     await downloadArr(allFiles, updatePercentage, pack);
 
+    const copyAssetsToLegacy = async () => {
+      await Promise.map(assets, async asset => {
+        try {
+          await promisify(fs.access)(asset.legacyPath);
+        } catch {
+          await makeDir(path.dirname(asset.legacyPath));
+          await promisify(fs.copyFile)(asset.path, asset.legacyPath);
+        }
+      });
+    };
+
+    if (vnlJSON.assets === 'legacy') {
+      await copyAssetsToLegacy();
+    }
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
 
     dispatch({

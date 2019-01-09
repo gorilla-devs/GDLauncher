@@ -4,6 +4,7 @@ import reqCall from 'request';
 import path from 'path';
 import assert from 'assert';
 import os from 'os';
+import _ from 'lodash';
 import log from 'electron-log';
 import Promise from 'bluebird';
 import request from 'request-promise-native';
@@ -29,30 +30,31 @@ export const downloadArr = async (
         // It needs to be downloaded
       }
       if (toDownload) {
-        try {
-          const filePath = path.dirname(item.path);
-          try {
-            await fs.accessAsync(filePath);
-          } catch (e) {
-            await makeDir(filePath);
-          }
-          await fs.writeFileAsync(
-            item.path,
-            await request(item.url, { encoding: 'binary' }),
-            'binary'
-          );
-        } catch (e) {
-          log.error(
-            `Error while downloading <${item.url}> to <${item.path}> --> ${e.message}`
-          );
-        }
+        await downloadFileInstance(item.path, item.url);
       }
       downloaded += 1;
-      if (downloaded % 30 === 0 || downloaded === arr.length) updatePercentage(downloaded);
+      if (downloaded % 10 === 0 || downloaded === arr.length) updatePercentage(downloaded);
     },
     { concurrency: threads }
   );
 };
+
+const downloadFileInstance = async (filename, url) => {
+  try {
+    const filePath = path.dirname(filename);
+    try {
+      await fs.accessAsync(filePath);
+    } catch (e) {
+      await makeDir(filePath);
+    }
+    const file = await request(url, { encoding: 'binary' });
+    await fs.writeFileAsync(filename, file, 'binary');
+  } catch (e) {
+    log.error(
+      `Error while downloading <${url}> to <${filename}> --> ${e.message}`
+    );
+  }
+}
 
 export const downloadFile = (filename, url, onProgress) => {
   return new Promise(async (resolve, reject) => {
