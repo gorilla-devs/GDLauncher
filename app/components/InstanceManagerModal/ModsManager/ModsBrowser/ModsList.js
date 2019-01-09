@@ -181,22 +181,25 @@ class ModsList extends Component<Props> {
   };
 
   render() {
-    const { initLoading, loading, list } = this.state;
+    const { initLoading, loading, list, searchText } = this.state;
     const loadMore =
-      !initLoading && !loading ? (
-        <div
-          style={{
-            textAlign: 'center',
-            marginTop: 12,
-            height: 32,
-            lineHeight: '32px'
-          }}
-        >
-          <Button onClick={this.onLoadMore}>Load More</Button>
-        </div>
-      ) : null;
+      !initLoading &&
+        !loading &&
+        list.length !== 0 &&
+        list.length % 15 === 0 ? (
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: 12,
+              height: 32,
+              lineHeight: '32px'
+            }}
+          >
+            <Button onClick={this.onLoadMore}>Load More</Button>
+          </div>
+        ) : null;
 
-    if (!initLoading && list.length === 0) {
+    if (!initLoading && list.length === 0 && searchText.length === 0) {
       return (
         <h1 style={{ textAlign: 'center', marginTop: '20%' }}>
           Servers are not currently available. Try again later
