@@ -185,8 +185,8 @@ function Login(props) {
               style={{ marginTop: '30px' }}
               onClick={() => props.tryNativeLauncherProfiles()}
             >
-              Skip login
-              </Button>
+              <span>Login as <span style={{ fontStyle: 'italic', textDecoration: 'underline' }}>{nativeLauncherProfiles}</span></span>
+            </Button>
           )}
         </div>
         <div
