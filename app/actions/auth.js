@@ -7,10 +7,9 @@ import os from 'os';
 import log from 'electron-log';
 import store from '../localStore';
 import {
-  LOGIN_PROXY_API,
+  LOGIN_API,
   ACCESS_TOKEN_VALIDATION_URL,
   ACCESS_TOKEN_REFRESH_URL,
-  LOGIN_TOKEN_PROXY_API
 } from '../constants';
 
 export const LOGOUT = 'LOGOUT';
@@ -29,56 +28,56 @@ export function login(username, password, remember) {
       type: START_AUTH_LOADING
     });
     try {
-      await axios
-        .post(LOGIN_PROXY_API, {
-          username,
-          password
-        })
-        .then(res => {
-          if (
-            res.status === 200 &&
-            res.data !== undefined &&
-            res.data !== null &&
-            Object.prototype.hasOwnProperty.call(res.data, 'accessToken')
-          ) {
-            const { data } = res;
-            const payload = {
-              email: data.userData.email,
-              username: data.username,
-              displayName: data.displayName,
-              accessToken: data.accessToken,
-              clientToken: data.clientToken,
-              legacy: data.legacy,
-              uuid: data.uuid,
-              userID: data.userID,
-              newUser: data.newUser
-            };
-            if (remember) {
-              store.set({
-                user: {
-                  ...payload
-                },
-                lastUsername: data.userData.username
-              });
-            }
-            dispatch({
-              type: AUTH_SUCCESS,
-              payload
-            });
-
-            dispatch(push('/home'));
-          } else {
-            message.error('Wrong username or password');
-            dispatch({
-              type: AUTH_FAILED
-            });
-          }
-          return res;
+      const { data, status } = await axios.post(LOGIN_API, {
+        agent: {
+          name: "Minecraft",
+          version: 1
+        },
+        username,
+        password,
+        requestUser: true
+      }, { headers: { 'Content-Type': 'application/json' }, });
+      if (
+        status === 200 &&
+        data !== undefined &&
+        data !== null &&
+        Object.prototype.hasOwnProperty.call(data, 'accessToken')
+      ) {
+        console.log(data)
+        const payload = {
+          email: data.user.email,
+          username: data.user.username,
+          displayName: data.selectedProfile.name,
+          accessToken: data.accessToken,
+          clientToken: data.clientToken,
+          legacy: data.selectedProfile.legacyProfile,
+          uuid: data.selectedProfile.id,
+          userID: data.selectedProfile.userId,
+          newUser: true
+        };
+        if (remember) {
+          store.set({
+            user: {
+              ...payload
+            },
+            lastUsername: data.user.username
+          });
+        }
+        dispatch({
+          type: AUTH_SUCCESS,
+          payload
         });
+
+        dispatch(push('/home'));
+      } else {
+        message.error('Wrong username or password');
+        dispatch({
+          type: AUTH_FAILED
+        });
+      }
     } catch (err) {
-      if (err.response.status === 502)
-        message.error(`Too many login attempts. Try again in 5 minutes`);
-      else message.error(`${err.response.data.reason}`);
+      console.error(err);
+      message.error('Wrong username or password');
     } finally {
       dispatch({
         type: STOP_AUTH_LOADING
@@ -162,9 +161,13 @@ export function tryNativeLauncherProfiles() {
       const { account } = vnlJson.selectedUser;
       const { accessToken } = vnlJson.authenticationDatabase[account];
       const res = await axios.post(
-        LOGIN_TOKEN_PROXY_API,
-        { accessToken },
-        { 'Content-Type': 'application/json;charset=UTF-8' }
+        ACCESS_TOKEN_REFRESH_URL,
+        {
+          accessToken,
+          clientToken: vnlJson.clientToken,
+          requestUser: true
+        },
+        { 'Content-Type': 'application/json' }
       );
       if (
         res.status === 200 &&
@@ -174,18 +177,18 @@ export function tryNativeLauncherProfiles() {
       ) {
         const { data } = res;
         const payload = {
-          email: data.userData.email,
-          username: data.username,
-          displayName: data.displayName,
+          email: data.user.email,
+          username: data.user.username,
+          displayName: data.selectedProfile.name,
           accessToken: data.accessToken,
           clientToken: data.clientToken,
-          legacy: data.legacy,
-          uuid: data.uuid,
-          userID: data.userID,
-          newUser: data.newUser
+          legacy: data.selectedProfile.legacyProfile,
+          uuid: data.selectedProfile.id,
+          userID: data.selectedProfile.userId,
+          newUser: true
         };
         // We need to update the accessToken in launcher_profiles.json
-        vnlJson.authenticationDatabase[data.userID].accessToken =
+        vnlJson.authenticationDatabase[data.selectedProfile.userId].accessToken =
           data.accessToken;
         await fsa.writeJson(
           path.join(vanillaMCPath, 'launcher_profiles.json'),
@@ -193,7 +196,7 @@ export function tryNativeLauncherProfiles() {
         );
         store.set({
           user: { ...payload },
-          lastUsername: data.userData.email
+          lastUsername: data.user.username
         });
         dispatch({
           type: AUTH_SUCCESS,
@@ -202,7 +205,7 @@ export function tryNativeLauncherProfiles() {
         dispatch(push('/home'));
       }
     } catch (err) {
-      message.error('Token is not valid');
+      message.error('We could not log you in through Minecraft Launcher. Invalid data.');
       dispatch({
         type: AUTH_FAILED
       });
