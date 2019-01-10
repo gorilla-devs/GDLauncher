@@ -75,7 +75,7 @@ function JavaManager(props) {
           />
           <Button type="primary" icon="folder" theme="filled" onClick={() => openFolderDialog()} style={{ height: 60, marginLeft: 10 }} />
         </div>}
-      <JavaMemorySlider ram={props.settings.java.memory} is64bit={false} updateMemory={props.setJavaMemory} />
+      <JavaMemorySlider ram={props.settings.java.memory} is64bit={is64bit} updateMemory={props.setJavaMemory} />
     </div>
   );
 }
