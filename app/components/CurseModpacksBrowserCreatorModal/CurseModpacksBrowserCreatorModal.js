@@ -25,9 +25,12 @@ const CurseModpackBrowserCreatorModal = props => {
   const [unMount, setUnMount] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingBtn, setLoadingBtn] = useState(false);
+  const [instanceName, setInstanceName] = useState("");
 
   useEffect(async () => {
     const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}/files`);
+    const instanceNameVar = (await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}`)).data.name;
+    setInstanceName(instanceNameVar);
     setVersions(data);
     setLoading(false);
   }, []);
@@ -56,7 +59,7 @@ const CurseModpackBrowserCreatorModal = props => {
       history={props.history}
       unMount={unMount}
       title="Create New Instance"
-      style={{ height: '80vh' }}
+      style={{ height: '55vh' }}
     >
       <Form
         layout="inline"
@@ -83,7 +86,7 @@ const CurseModpackBrowserCreatorModal = props => {
                     style={{ color: 'rgba(255,255,255,.8)' }}
                   />
                 }
-                placeholder="Instance Name"
+                placeholder={instanceName !== '' ? instanceName.replace(/\W/g, '') : 'Loading...'}
               />
             )}
           </FormItem>
