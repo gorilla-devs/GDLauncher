@@ -26,6 +26,7 @@ type Props = {
 };
 
 let interval;
+let intervalDelete;
 
 export default class DInstance extends Component<Props> {
   props: Props;
@@ -36,7 +37,9 @@ export default class DInstance extends Component<Props> {
       deleting: false,
       version: null,
       isValid: true,
-      forgeVersion: null
+      forgeVersion: null,
+      confirmDelete: false,
+      deleteWait: 3
     };
   }
 
@@ -128,18 +131,31 @@ export default class DInstance extends Component<Props> {
   };
 
   deleteInstance = async () => {
-    const { name, selectInstance } = this.props;
-    try {
-      this.setState({ deleting: true });
-      await fsa.remove(path.join(PACKS_PATH, name));
-      selectInstance(null);
-      message.success('Instance deleted');
-    } catch (err) {
-      message.error('Error deleting instance');
-      log.error(err);
-    } finally {
-      this.setState({ deleting: false });
-      hideMenu(`contextMenu-${name}`);
+    if (this.state.confirmDelete) {
+      const { name, selectInstance } = this.props;
+      try {
+        this.setState({ deleting: true });
+        await fsa.remove(path.join(PACKS_PATH, name));
+        selectInstance(null);
+        message.success('Instance deleted');
+      } catch (err) {
+        message.error('Error deleting instance');
+        log.error(err);
+      } finally {
+        this.setState({ deleting: false });
+        hideMenu(`contextMenu-${name}`);
+      }
+    } else {
+      this.setState({
+        confirmDelete: true
+      });
+      intervalDelete = setInterval(() => {
+        this.setState(prev => ({
+          deleteWait: prev.deleteWait - 1
+        }));
+        if (this.state.deleteWait === 0)
+          clearInterval(intervalDelete);
+      }, 1000);
     }
   };
 
@@ -219,6 +235,10 @@ export default class DInstance extends Component<Props> {
           onShow={e => {
             e.stopPropagation();
             selectInstance(name);
+          }}
+          onHide={() => {
+            clearInterval(intervalDelete);
+            this.setState({ confirmDelete: false, deleteWait: 3 });
           }}
         >
           <span>
@@ -305,7 +325,7 @@ export default class DInstance extends Component<Props> {
             <FontAwesomeIcon icon='wrench' /> Repair
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling() || deleting}
+            disabled={this.isInstalling() || deleting || (this.state.confirmDelete && this.state.deleteWait !== 0)}
             data={{ foo: 'bar' }}
             onClick={this.deleteInstance}
             preventClose
@@ -316,8 +336,11 @@ export default class DInstance extends Component<Props> {
               </div>
             ) : (
                 <div>
-                  <FontAwesomeIcon icon='trash' /> Delete
-              </div>
+                  <FontAwesomeIcon icon='trash' />
+                  {!this.state.confirmDelete ? ' Delete' : (
+                    ` Confirm Delete ${this.state.deleteWait !== 0 ? `(${this.state.deleteWait})` : ''}`
+                  )}
+                </div>
               )}
           </MenuItem>
         </ContextMenu>
