@@ -16,3 +16,13 @@
   color: $text-dark;
   padding: 5px;
 }
+
+.iconPointer {
+  cursor: pointer !important;
+  svg {
+    cursor: pointer !important;
+    path {
+      cursor: pointer !important;
+    }
+  }
+}
