@@ -45,6 +45,10 @@ a {
   -webkit-user-drag: none;
 }
 
+a:hover {
+  text-decoration: none;
+}
+
 hr {
   border-width: 1px 0 0;
   border-top-style: solid;
@@ -76,9 +80,9 @@ hr {
   border-radius: 8px;
 }
 
-:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span),
-:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span)::after,
-:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span)::before {
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path),
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path)::after,
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path)::before {
   -webkit-user-select: none;
   user-select: none;
   cursor: default;
@@ -89,10 +93,6 @@ button,
 textarea,
 :focus {
   outline: none;
-}
-
-a:hover {
-  text-decoration: underline;
 }
 
 .slick-dots {
@@ -113,7 +113,7 @@ a:hover {
   color: $text-main-color;
   font-size: 16px;
   margin: 2px 0 0;
-  min-width: 160px;
+  min-width: 180px;
   outline: none;
   transform: scale(0);
   transform-origin: top left;
