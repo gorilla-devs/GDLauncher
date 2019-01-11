@@ -43,7 +43,6 @@ export function login(username, password, remember) {
         data !== null &&
         Object.prototype.hasOwnProperty.call(data, 'accessToken')
       ) {
-        console.log(data)
         const payload = {
           email: data.user.email,
           username: data.user.username,
@@ -68,7 +67,7 @@ export function login(username, password, remember) {
           payload
         });
 
-        dispatch(push('/home'));
+        dispatch(push('/newUserPage'));
       } else {
         message.error('Wrong username or password');
         dispatch({
@@ -202,7 +201,7 @@ export function tryNativeLauncherProfiles() {
           type: AUTH_SUCCESS,
           payload
         });
-        dispatch(push('/home'));
+        dispatch(push('/newUserPage'));
       }
     } catch (err) {
       message.error('We could not log you in through Minecraft Launcher. Invalid data.');

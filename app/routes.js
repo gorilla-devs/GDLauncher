@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { Switch, Route, Redirect } from 'react-router';
 import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import * as AuthActions from './actions/auth';
 import * as SettingsActions from './actions/settings';
 import { JAVA_URL } from './constants';
@@ -17,6 +16,7 @@ import DManager from './components/DManager/containers/DManagerPage';
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
+import NewUserPage from './components/NewUserPage/NewUserPage';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
@@ -97,42 +97,40 @@ class RouteDef extends Component<Props> {
       <App>
         <SysNavBar />
         {location.pathname !== '/' &&
+          location.pathname !== '/newUserPage' &&
           location.pathname !== '/loginHelperModal' && (
             <div>
               <Navigation />
               <SideBar />
             </div>
           )}
-        <TransitionGroup>
-          <CSSTransition key={location.key} timeout={500} classNames="fade">
-            <Switch location={isModal ? this.previousLocation : location}>
+        <Switch location={isModal ? this.previousLocation : location}>
+          <Route
+            exact
+            path="/"
+            component={WaitingComponent(Form.create()(Login))}
+          />
+          {!isAuthValid && <Redirect push to="/" />}
+          <Route path="/newUserPage" component={NewUserPage} />
+          <Route>
+            <div
+              style={{
+                width: 'calc(100% - 200px)',
+                position: 'absolute',
+                top: 60,
+                right: 200
+              }}
+            >
+              <Route path="/dmanager" component={DManager} />
+              <Route path="/curseModpacksBrowser" component={CurseModpacksBrowser} />
+              <Route path="/home" component={WaitingComponent(HomePage)} />
               <Route
-                exact
-                path="/"
-                component={WaitingComponent(Form.create()(Login))}
+                path="/serverManager"
+                component={WaitingComponent(ServerManager)}
               />
-              {!isAuthValid && <Redirect push to="/" />}
-              <Route>
-                <div
-                  style={{
-                    width: 'calc(100% - 200px)',
-                    position: 'absolute',
-                    top: 60,
-                    right: 200
-                  }}
-                >
-                  <Route path="/dmanager" component={DManager} />
-                  <Route path="/curseModpacksBrowser" component={CurseModpacksBrowser} />
-                  <Route path="/home" component={WaitingComponent(HomePage)} />
-                  <Route
-                    path="/serverManager"
-                    component={WaitingComponent(ServerManager)}
-                  />
-                </div>
-              </Route>
-            </Switch>
-          </CSSTransition>
-        </TransitionGroup>
+            </div>
+          </Route>
+        </Switch>
 
         {/* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
