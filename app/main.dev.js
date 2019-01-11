@@ -100,7 +100,10 @@ if (minimist(process.argv.slice(1)).i) {
       minHeight: 600,
       minWidth: 900,
       frame: false,
-      backgroundColor: secondaryColor
+      backgroundColor: secondaryColor,
+      webPreferences: {
+        experimentalFeatures: true
+      }
     });
 
     mainWindow.webContents.on('new-window', (e, url) => {
