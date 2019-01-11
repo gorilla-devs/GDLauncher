@@ -111,7 +111,11 @@ class InstanceCreatorModal extends Component<Props> {
           <div>
             <FormItem style={{ margin: 0 }}>
               {getFieldDecorator('packName', {
-                rules: [{ required: true, message: 'Please input a name' }]
+                rules: [{
+                  required: true,
+                  message: 'Please input a valid name with just numbers and letters',
+                  pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
+                }]
               })(
                 <Input
                   autoFocus

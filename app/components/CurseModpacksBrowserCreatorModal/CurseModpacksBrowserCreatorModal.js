@@ -39,12 +39,13 @@ const CurseModpackBrowserCreatorModal = props => {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (!err) {
+        const name = values.packName !== undefined ? values.packName : instanceName.replace(/\W/g, '');
         try {
-          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
+          await promisify(fs.access)(path.join(PACKS_PATH, name));
           message.warning('An instance with this name already exists.');
         } catch (error) {
           setLoadingBtn(true);
-          await props.addCursePackToQueue(values.packName, addonID, values.version);
+          await props.addCursePackToQueue(name, addonID, values.version);
           setUnMount(true);
           setTimeout(() => {
             props.history.push('/dmanager');
@@ -69,7 +70,10 @@ const CurseModpackBrowserCreatorModal = props => {
         <div>
           <FormItem style={{ margin: 0 }}>
             {getFieldDecorator('packName', {
-              rules: [{ required: true, message: 'Please input a name' }]
+              rules: [{
+                message: 'Please input a valid name with just numbers and letters',
+                pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
+              }]
             })(
               <Input
                 autoFocus
