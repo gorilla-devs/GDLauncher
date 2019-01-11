@@ -58,7 +58,7 @@ export default class Home extends Component<Props> {
                   marginTop: 15,
                   textAlign: 'center'
                 }}
-                title="Hey, did you know about themes?"
+                title={`Welcome ${this.props.username} to GDLauncher`}
               >
                 <div
                   style={{

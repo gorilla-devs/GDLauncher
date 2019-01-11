@@ -95,7 +95,11 @@ class Instances extends Component<Props> {
             >
               <FormItem>
                 {getFieldDecorator('packName', {
-                  rules: [{ required: true, message: 'Please input a name' }],
+                  rules: [{
+                    required: true,
+                    message: 'Please input a valid name',
+                    pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
+                  }],
                   initialValue: this.props.instance
                 })(
                   <Input
