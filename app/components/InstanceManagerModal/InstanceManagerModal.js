@@ -33,7 +33,7 @@ class InstanceManagerModal extends Component<Props> {
 
   render() {
     return (
-      <Modal history={this.props.history} unMount={this.state.unMounting} title={`Instance Editor: Editing "${this.props.match.params.instance}"`} style={{ width: '90%', height: '90%', left: '5%' }}>
+      <Modal history={this.props.history} unMount={this.state.unMounting} title={`Instance Editor: Editing "${this.props.match.params.instance}"`} style={{ width: '90vw', height: '90vh', maxWidth: 1000 }}>
         <div className={styles.container}>
           <SideMenu match={this.props.match}>
             <MenuItem active={this.props.match.params.page === 'settings'} to={`/editInstance/${this.props.match.params.instance}/settings`}>Settings</MenuItem>
