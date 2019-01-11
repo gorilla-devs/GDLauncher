@@ -51,8 +51,7 @@ export function login(username, password, remember) {
           clientToken: data.clientToken,
           legacy: data.selectedProfile.legacyProfile,
           uuid: data.selectedProfile.id,
-          userID: data.selectedProfile.userId,
-          newUser: true
+          userID: data.selectedProfile.userId
         };
         if (remember) {
           store.set({
@@ -67,7 +66,14 @@ export function login(username, password, remember) {
           payload
         });
 
-        dispatch(push('/newUserPage'));
+        const { newUser } = store.get('settings');
+
+        if (newUser === false) {
+          dispatch(push('/home'));
+        } else {
+          store.set('settings.newUser', false);
+          dispatch(push('/newUserPage'));
+        }
       } else {
         message.error('Wrong username or password');
         dispatch({
@@ -183,8 +189,7 @@ export function tryNativeLauncherProfiles() {
           clientToken: data.clientToken,
           legacy: data.selectedProfile.legacyProfile,
           uuid: data.selectedProfile.id,
-          userID: data.selectedProfile.userId,
-          newUser: true
+          userID: data.selectedProfile.userId
         };
         // We need to update the accessToken in launcher_profiles.json
         vnlJson.authenticationDatabase[data.selectedProfile.userId].accessToken =
@@ -201,7 +206,14 @@ export function tryNativeLauncherProfiles() {
           type: AUTH_SUCCESS,
           payload
         });
-        dispatch(push('/newUserPage'));
+        const { newUser } = store.get('settings');
+
+        if (newUser === false) {
+          dispatch(push('/home'));
+        } else {
+          store.set('settings.newUser', false);
+          dispatch(push('/newUserPage'));
+        }
       }
     } catch (err) {
       message.error('We could not log you in through Minecraft Launcher. Invalid data.');

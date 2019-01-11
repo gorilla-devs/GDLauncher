@@ -1,7 +1,7 @@
 # 0.9.4 (9.1.2019)
 - Minecraft console can now be read opening the developer tools (Button on the top left) [#129](https://github.com/gorilla-devs/GDLauncher/issues/129)
 - Minecraft is now started using `spawn()` instead of `exec()`. It doesn't overflow anymore [#135](https://github.com/gorilla-devs/GDLauncher/issues/135)
-- Fixed shortcuts not working
+- Fixed desktop shortcuts not working
 - Fixed some visual bugs
 - "Open Folder" is now cross-platform
 - Fixed high CPU usage after installing an instance [#131](https://github.com/gorilla-devs/GDLauncher/issues/131)
@@ -10,6 +10,14 @@
 - Removed aria-label from content-loader
 - Removed login proxy. Now GDLauncher connects directly with Mojang's APIs
 - Fixed sounds not working for some legacy minecraft version. Sadly under version 1.6.1 there is nothing we can do [#146](https://github.com/gorilla-devs/GDLauncher/issues/146)
+- Fixed mods manager crashing when searching for a mod that doesn't exist 
+- Added confirmation check when deleting an instance to avoid unwanted deletes
+- The RAM slider now adapts to the maximum RAM available in the Computer and the java architecture [#133](https://github.com/gorilla-devs/GDLauncher/issues/133)
+- Added default modpack name when installing. You can leave the name field empty now [#66](https://github.com/gorilla-devs/GDLauncher/issues/66)
+- Added new modal window design proposal: [see here](https://imgur.com/gallery/A8JRrI4)
+- Added validation on instances names. Allowed alphanumeric characters, spaces in between words, dots, dashes and underscores
+- Modals now have a maximum size so they don't have huge blank spaces when maxed out
+- Added welcome page for new users
 
 # 0.9.3 (6.1.2019)
 - Fixed ram being reset when toggling java autodetect [#128](https://github.com/gorilla-devs/GDLauncher/issues/128)

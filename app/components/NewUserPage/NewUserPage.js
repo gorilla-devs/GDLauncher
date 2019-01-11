@@ -48,7 +48,7 @@ const NewUserPage = props => {
             <div style={{
               opacity: 0,
               transition: 'all 400ms ease-in-out',
-              padding: 15,
+              padding: 30,
               ...internalDivStyles[state]
             }}>
               <h1 style={{ fontSize: 37 }}>Welcome to GDLauncher!</h1>
@@ -56,14 +56,13 @@ const NewUserPage = props => {
                 <p style={{ fontSize: 25 }}>
                   Hello {props.username}!<br />
                   GDLauncher is free and open source,
-                  it wouldn't exist without it's community. If you find any bug or have any suggestion, tell us on Discord!<br /><br />
+                  it wouldn't exist without its community. If you find any bug or have any suggestion, tell us on Discord!<br /><br />
                   Happy gaming!
                 </p>
                 <iframe style={{
                   marginTop: '-70px',
-                  right: 15,
-                  position: 'absolute'
-                }} src="https://discordapp.com/widget?id=398091532881756161&theme=dark" width="350" height="400" allowtransparency="true" frameborder="0"></iframe>
+                  paddingLeft: 30
+                }} src="https://discordapp.com/widget?id=398091532881756161&theme=dark" width="350" height="515" allowtransparency="true" frameborder="0"></iframe>
               </div>
               <DelayLink
                 to="home"
@@ -71,11 +70,10 @@ const NewUserPage = props => {
                 onDelayStart={() => setMounted(false)}
                 style={{
                   position: 'absolute',
-                  bottom: 20,
-                  right: 20,
+                  bottom: 30,
                   fontSize: 25,
                 }}>
-                GOT IT.
+                GOT IT
               </DelayLink>
             </div>
           </div>
