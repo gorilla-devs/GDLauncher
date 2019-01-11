@@ -16,7 +16,10 @@
   position: absolute;
   height: 90vh;
   width: 60vw;
-  left: 20%;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
   background: var(--secondary-color-1);
   border-radius: 4px;
 }
