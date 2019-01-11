@@ -1,0 +1,16 @@
+.container {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  overflow-y: auto;
+  padding: 30px;
+}
+
+.description {
+  margin-right: 20px;
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}

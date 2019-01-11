@@ -10,7 +10,8 @@ export default async function OfficialLancherProfilesExists() {
     try {
       const vnlJson = await fsa.readJson(path.join(vanillaMCPath, 'launcher_profiles.json'));
       if (vnlJson.authenticationDatabase && vnlJson.selectedUser && vnlJson.clientToken) {
-        return true;
+        const { account, profile } = vnlJson.selectedUser;
+        return vnlJson.authenticationDatabase[account].profiles[profile].displayName;
       }
     } catch (err) { log.error(err); }
   }

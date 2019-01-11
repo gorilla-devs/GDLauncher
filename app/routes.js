@@ -17,7 +17,6 @@ import DManager from './components/DManager/containers/DManagerPage';
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
-import CurseModpacksBrowserCreatorModal from './components/CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
@@ -36,6 +35,13 @@ const ServerCreatorModal = lazy(()=>
 const loginHelperModal = lazy(() =>
   import('./components/LoginHelperModal/LoginHelperModal')
 );
+const CurseModpacksBrowserCreatorModal = lazy(() =>
+  import('./components/CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal')
+);
+const CurseModpackExplorerModal = lazy(() =>
+  import('./components/CurseModpackExplorerModal/CurseModpackExplorerModal')
+);
+
 
 type Props = {
   location: object,
@@ -139,7 +145,13 @@ class RouteDef extends Component<Props> {
         {isModal ? (
           <Route
             path="/curseModpackBrowserCreatorModal/:addonID"
-            component={CurseModpacksBrowserCreatorModal}
+            component={WaitingComponent(CurseModpacksBrowserCreatorModal)}
+          />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/curseModpackExplorerModal/:addonID"
+            component={WaitingComponent(CurseModpackExplorerModal)}
           />
         ) : null}
         {isModal ? (
@@ -167,7 +179,10 @@ class RouteDef extends Component<Props> {
 
 function WaitingComponent(MyComponent) {
   return props => (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div style={{
+        width: '100vw', height: '100vh', background: 'var(--secondary-color-1)'
+      }}>Loading...</div>}>
       <MyComponent {...props} />
     </Suspense>
   );

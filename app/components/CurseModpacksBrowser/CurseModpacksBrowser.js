@@ -41,7 +41,17 @@ function CurseModpacksBrowser(props) {
       'author' && filterType !== 'name'}`
     );
     // We now remove the previous 15 elements and add the real 15
-    const data = reset === true ? res.data : packs.concat(res.data);
+    const mappedData = res.data.map(v => ({
+      loading: false,
+      name: v.name,
+      id: v.id,
+      attachments: v.attachments,
+      summary: v.summary,
+      latestFiles: v.latestFiles,
+      downloadCount: v.downloadCount
+    }));
+
+    const data = reset === true ? mappedData : packs.concat(mappedData);
     setPacks(data);
 
     setLoading(false);
@@ -77,10 +87,6 @@ function CurseModpacksBrowser(props) {
   const emitEmptySearchText = async () => {
     setSearchQuery('');
     loadPacks(true, true);
-  };
-
-  const downloadLatest = (modpackData) => {
-    props.addCursePackToQueue('test', modpackData.id, modpackData.defaultFileId)
   };
 
   if (!loading && packs.length === 0 && searchQuery.length === 0) {
@@ -148,13 +154,23 @@ function CurseModpacksBrowser(props) {
                 >
                   <Button type="primary" icon="download">Download</Button>
                 </Link>,
-                !item.loading && <Button type="primary">Explore <Icon type="arrow-right" /></Button>
+                !item.loading &&
+                <Link
+                  to={{
+                    pathname: `/curseModpackExplorerModal/${item.id}`,
+                    state: { modal: true }
+                  }}
+                ><Button type="primary">
+                    Explore <Icon type="arrow-right" />
+                  </Button>
+                </Link>
               ]}
             >
               {item.loading ? (
                 <ContentLoader
                   height={100}
                   speed={0.6}
+                  ariaLabel={false}
                   primaryColor="var(--secondary-color-2)"
                   secondaryColor="var(--secondary-color-3)"
                   style={{
@@ -202,10 +218,9 @@ function CurseModpacksBrowser(props) {
                     }
                     title={<Link
                       to={{
-                        pathname: ``,
+                        pathname: `/curseModpackExplorerModal/${item.id}`,
                         state: { modal: true }
                       }}
-                      replace
                     >
                       {item.name}
                     </Link>}

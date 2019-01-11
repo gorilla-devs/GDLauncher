@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { remote } from 'electron';
+import { remote, app } from 'electron';
 import styles from './WindowCloseButton.scss';
 
 type Props = {};
@@ -8,8 +8,7 @@ export default class WindowCloseButton extends Component<Props> {
   props: Props;
 
   closeWindow = () => {
-    const w = remote.getCurrentWindow();
-    w.close();
+    remote.app.quit();
   };
 
   render() {

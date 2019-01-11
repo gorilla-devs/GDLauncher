@@ -4,9 +4,9 @@
   position: absolute;
   -webkit-app-region: no-drag;
   display: inline-block;
-  margin-left: 20px;
   font-family: 'GlacialIndifferenceRegular';
   font-weight: 700;
+  font-size: 16px;
   height: 40px;
 }
 
@@ -20,43 +20,50 @@
 .li {
   display: inline;
   cursor: pointer;
-}
-
-.a {
-  position: relative;
-  display: inline-block;
-  color: $link-text-color;
-  text-align: center;
-  /* padding: 9px 16px 10px 16px; */
-  padding: 9px 20px 10px 20px;
-  text-decoration: none;
-  cursor: pointer;
-  svg {
+  .a {
+    position: relative;
+    display: inline-block;
+    height: 40px;
+    width: 150px;
+    line-height: 40px;
+    color: $link-text-color;
+    text-align: center;
+    /* padding: 9px 16px 10px 16px; */
+    text-decoration: none;
     cursor: pointer;
-    path {
+    svg {
       cursor: pointer;
+      path {
+        cursor: pointer;
+      }
     }
   }
 }
 
+
 .i {
-  padding: 0 5px 0 0;
+  margin: 0 5px 0 0;
 }
 
 .activeLink {
-  background: var(--primary);
-  border-radius: 4px;
-  color: $text-hover-color;
+  .a {
+    background: var(--primary);
+    border-radius: 4px;
+    color: $text-hover-color;
+    transition: all .25s;
+  }
 }
 
 /* Change the link color to #111 (black) on hover */
 
-.a:hover:not(.activeLink) {
+.li:hover:not(.activeLink) .a {
   transition: all .25s;
-  background-color: var(--secondary-color-3);
+  background: var(--secondary-color-3);
   border-radius: 4px;
 }
 
-.a:hover, .a:active, .a:focus {
-  text-decoration: none !important;
+.li:hover, .li:active, .li:focus {
+  .a {
+    text-decoration: none !important;
+  }
 }

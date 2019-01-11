@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import log from 'electron-log';
 import { promisify } from 'util';
 import { exec } from 'child_process';
+import { shell } from 'electron';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import { PACKS_PATH, APPPATH } from '../../constants';
 import { history } from '../../store/configureStore';
@@ -24,6 +25,9 @@ type Props = {
   playing: array
 };
 
+let interval;
+let intervalDelete;
+
 export default class DInstance extends Component<Props> {
   props: Props;
 
@@ -33,19 +37,29 @@ export default class DInstance extends Component<Props> {
       deleting: false,
       version: null,
       isValid: true,
-      forgeVersion: null
+      forgeVersion: null,
+      confirmDelete: false,
+      deleteWait: 3
     };
   }
 
   componentDidMount = async () => {
     this.updateInstanceConfig();
+    // This checks for a valid config every 2 seconds (until it finds one)
+    if (this.state.version === null) {
+      interval = setInterval(() => {
+        this.updateInstanceConfig();
+        if (this.state.version !== null) {
+          clearInterval(interval);
+        }
+      }, 2000);
+    }
   };
+
+
 
   componentDidUpdate = () => {
     this.percentage = this.updatePercentage();
-    if (this.percentage === 100) {
-      this.updateInstanceConfig();
-    }
   };
 
   updateInstanceConfig = async () => {
@@ -73,20 +87,9 @@ export default class DInstance extends Component<Props> {
 
   isInstalling = () => {
     const { name, installingQueue } = this.props;
-    if (installingQueue[name]) {
-      switch (installingQueue[name].status) {
-        case 'Queued':
-          return true;
-        case 'Downloading':
-          return true;
-        case 'Completed':
-          return false;
-        default:
-          return true;
-      }
-    } else {
-      return false;
-    }
+    if (installingQueue[name])
+      return true;
+    return false;
   };
 
   updatePercentage = () => {
@@ -97,7 +100,6 @@ export default class DInstance extends Component<Props> {
         case 'Queued':
           return 0;
         case 'Downloading':
-          // If the total file to download is equal to 0 (not yet sent from the worker) then show 0 to avoid NaN from 0 / 0
           return percentage;
         case 'Completed':
           return 100;
@@ -120,7 +122,7 @@ export default class DInstance extends Component<Props> {
             process.kill(el.PID);
           });
         });
-        message.info('Instance terminated');
+        message.info('Instance terminated from user');
       } else {
         startInstance(name);
         selectInstance(name);
@@ -129,18 +131,31 @@ export default class DInstance extends Component<Props> {
   };
 
   deleteInstance = async () => {
-    const { name, selectInstance } = this.props;
-    try {
-      this.setState({ deleting: true });
-      await fsa.remove(path.join(PACKS_PATH, name));
-      selectInstance(null);
-      message.success('Instance deleted');
-    } catch (err) {
-      message.error('Error deleting instance');
-      log.error(err);
-    } finally {
-      this.setState({ deleting: false });
-      hideMenu(`contextMenu-${name}`);
+    if (this.state.confirmDelete) {
+      const { name, selectInstance } = this.props;
+      try {
+        this.setState({ deleting: true });
+        await fsa.remove(path.join(PACKS_PATH, name));
+        selectInstance(null);
+        message.success('Instance deleted');
+      } catch (err) {
+        message.error('Error deleting instance');
+        log.error(err);
+      } finally {
+        this.setState({ deleting: false });
+        hideMenu(`contextMenu-${name}`);
+      }
+    } else {
+      this.setState({
+        confirmDelete: true
+      });
+      intervalDelete = setInterval(() => {
+        this.setState(prev => ({
+          deleteWait: prev.deleteWait - 1
+        }));
+        if (this.state.deleteWait === 0)
+          clearInterval(intervalDelete);
+      }, 1000);
     }
   };
 
@@ -221,6 +236,10 @@ export default class DInstance extends Component<Props> {
             e.stopPropagation();
             selectInstance(name);
           }}
+          onHide={() => {
+            clearInterval(intervalDelete);
+            this.setState({ confirmDelete: false, deleteWait: 3 });
+          }}
         >
           <span>
             {name} ({version})
@@ -252,7 +271,7 @@ export default class DInstance extends Component<Props> {
             <FontAwesomeIcon icon='pen' /> Manage
           </MenuItem>
           <MenuItem
-            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
+            onClick={() => shell.openItem(path.join(PACKS_PATH, name))}
           >
             <FontAwesomeIcon icon='folder' /> Open Folder
           </MenuItem>
@@ -293,12 +312,12 @@ export default class DInstance extends Component<Props> {
           >
             <FontAwesomeIcon icon='link' /> Create Shortcut
           </MenuItem>
-          <MenuItem
+          {/* <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
             onClick={() => {}}
           >
             <FontAwesomeIcon icon='copy' /> Duplicate
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
@@ -306,7 +325,7 @@ export default class DInstance extends Component<Props> {
             <FontAwesomeIcon icon='wrench' /> Repair
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling() || deleting}
+            disabled={this.isInstalling() || deleting || (this.state.confirmDelete && this.state.deleteWait !== 0)}
             data={{ foo: 'bar' }}
             onClick={this.deleteInstance}
             preventClose
@@ -317,8 +336,11 @@ export default class DInstance extends Component<Props> {
               </div>
             ) : (
                 <div>
-                  <FontAwesomeIcon icon='trash' /> Delete
-              </div>
+                  <FontAwesomeIcon icon='trash' />
+                  {!this.state.confirmDelete ? ' Delete' : (
+                    ` Confirm Delete ${this.state.deleteWait !== 0 ? `(${this.state.deleteWait})` : ''}`
+                  )}
+                </div>
               )}
           </MenuItem>
         </ContextMenu>

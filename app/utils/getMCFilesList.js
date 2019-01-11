@@ -5,6 +5,7 @@ import _ from 'lodash';
 import makeDir from 'make-dir';
 import SysOS from 'os';
 import { promisify } from 'util';
+import compressing from 'compressing';
 import {
   INSTANCES_PATH,
   PACKS_PATH,
@@ -12,8 +13,6 @@ import {
   MC_LIBRARIES_URL
 } from '../constants';
 import { pathify, arraify, arraifyModules } from './strings';
-
-const extract = promisify(require('extract-zip'));
 
 export const extractMainJar = async json => {
   return [
@@ -65,34 +64,33 @@ export const extractNatives = async (libs, packName) => {
   }
 
   await Promise.all(
-    libs.map(lib =>
-      extract(lib.path, {
-        dir: `${nativesPath}`
-      })
-    )
+    libs.map(lib => compressing.zip.uncompress(lib.path, nativesPath))
   );
 };
 
 export const extractAssets = async json => {
+  let res;
   const assets = [];
-  const res = await axios.get(json.assetIndex.url);
-  // It saves the json into a file on /assets/indexes/${version}.json
   const assetsFile = path.join(
     INSTANCES_PATH,
     'assets',
     'indexes',
     `${json.assets}.json`
   );
-  await makeDir(path.dirname(assetsFile));
+  // It saves the json into a file on /assets/indexes/${version}.json
+  // If the file already exists, it reads data from there
   try {
     await promisify(fs.access)(assetsFile);
+    res = await promisify(fs.readFile)(JSON.parse(assetsFile));
   } catch (e) {
-    await promisify(fs.writeFile)(assetsFile, JSON.stringify(res.data));
+    res = (await axios.get(json.assetIndex.url)).data;
+    await makeDir(path.dirname(assetsFile));
+    await promisify(fs.writeFile)(assetsFile, JSON.stringify(res));
   }
 
   // Returns the list of assets if they don't already exist
-  Object.keys(res.data.objects).map(asset => {
-    const assetCont = res.data.objects[asset];
+  Object.keys(res.objects).map(asset => {
+    const assetCont = res.objects[asset];
     assets.push({
       url: `http://resources.download.minecraft.net/${assetCont.hash.substring(
         0,
@@ -104,6 +102,16 @@ export const extractAssets = async json => {
   });
   return assets;
 };
+
+export const isVirtualAssets = async assetsName => {
+  const assetsJSON = await promisify(fs.readFile)(path.join(
+    INSTANCES_PATH,
+    'assets',
+    'indexes',
+    `${assetsName}.json`
+  ));
+  return _.has(assetsJSON, 'virtual') && assetsJSON.virtual === true;
+}
 
 export const getForgeLibraries = async forge => {
   const forgeLibCalculator = async library => {

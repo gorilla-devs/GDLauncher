@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { bindActionCreators } from 'redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, Icon, Tooltip, Input } from 'antd';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import path from 'path';
 import { connect } from 'react-redux';
 import CopyIcon from '../../../Common/CopyIcon/CopyIcon';
@@ -17,10 +19,23 @@ import * as SettingsActions from '../../../../actions/settings';
 
 
 function JavaManager(props) {
+  const [is64bit, setIs64bit] = useState(true);
+  const [javaPath, setJavaPath] = useState("");
+  useEffect(async () => {
+    const javaP = await javaLocator();
+    setJavaPath(javaP);
+    exec(`"${javaP}" -d64 -version`, (err, stdout, stderr) => {
+      if (stderr.includes('Error') || stdout.includes('Error'))
+        setIs64bit(false);
+    });
+  }, []);
 
   const openFolderDialog = () => {
     const { dialog } = require('electron').remote;
-    dialog.showOpenDialog({ properties: ['openFile'] }, paths => {
+    dialog.showOpenDialog({
+      properties: ['openFile'],
+      defaultPath: path.dirname(javaPath)
+    }, paths => {
       props.setJavaPath(false, paths[0])
     });
   };
@@ -60,7 +75,7 @@ function JavaManager(props) {
           />
           <Button type="primary" icon="folder" theme="filled" onClick={() => openFolderDialog()} style={{ height: 60, marginLeft: 10 }} />
         </div>}
-      <JavaMemorySlider ram={props.settings.java.memory} updateMemory={props.setJavaMemory} />
+      <JavaMemorySlider ram={props.settings.java.memory} is64bit={is64bit} updateMemory={props.setJavaMemory} />
     </div>
   );
 }

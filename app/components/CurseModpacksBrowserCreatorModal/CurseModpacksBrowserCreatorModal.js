@@ -25,9 +25,12 @@ const CurseModpackBrowserCreatorModal = props => {
   const [unMount, setUnMount] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingBtn, setLoadingBtn] = useState(false);
+  const [instanceName, setInstanceName] = useState("");
 
   useEffect(async () => {
     const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}/files`);
+    const instanceNameVar = (await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}`)).data.name;
+    setInstanceName(instanceNameVar);
     setVersions(data);
     setLoading(false);
   }, []);
@@ -36,12 +39,13 @@ const CurseModpackBrowserCreatorModal = props => {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (!err) {
+        const name = values.packName !== undefined ? values.packName : instanceName.replace(/\W/g, '');
         try {
-          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
+          await promisify(fs.access)(path.join(PACKS_PATH, name));
           message.warning('An instance with this name already exists.');
         } catch (error) {
           setLoadingBtn(true);
-          await props.addCursePackToQueue(values.packName, addonID, values.version);
+          await props.addCursePackToQueue(name, addonID, values.version);
           setUnMount(true);
           setTimeout(() => {
             props.history.push('/dmanager');
@@ -51,14 +55,12 @@ const CurseModpackBrowserCreatorModal = props => {
     });
   };
 
-  if (loading) return <div>Loading...</div>;
-
   return (
     <Modal
       history={props.history}
       unMount={unMount}
       title="Create New Instance"
-      style={{ height: '80vh' }}
+      style={{ height: '55vh' }}
     >
       <Form
         layout="inline"
@@ -68,7 +70,10 @@ const CurseModpackBrowserCreatorModal = props => {
         <div>
           <FormItem style={{ margin: 0 }}>
             {getFieldDecorator('packName', {
-              rules: [{ required: true, message: 'Please input a name' }]
+              rules: [{
+                message: 'Please input a valid name with just numbers and letters',
+                pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
+              }]
             })(
               <Input
                 autoFocus
@@ -85,7 +90,7 @@ const CurseModpackBrowserCreatorModal = props => {
                     style={{ color: 'rgba(255,255,255,.8)' }}
                   />
                 }
-                placeholder="Instance Name"
+                placeholder={instanceName !== '' ? instanceName.replace(/\W/g, '') : 'Loading...'}
               />
             )}
           </FormItem>
@@ -99,6 +104,7 @@ const CurseModpackBrowserCreatorModal = props => {
                 size="large"
                 style={{ width: 335, display: 'inline-block' }}
                 placeholder="Select a version"
+                loading={loading}
               >
                 {_.reverse(versions.map(addon => <Select.Option key={addon.id}>{addon.fileName}</Select.Option>).slice())}
               </Select>

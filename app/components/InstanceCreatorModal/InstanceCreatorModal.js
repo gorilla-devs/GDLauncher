@@ -101,7 +101,7 @@ class InstanceCreatorModal extends Component<Props> {
         history={this.props.history}
         unMount={this.state.unMount}
         title="Create New Instance"
-        style={{ height: '80vh' }}
+        style={{ height: 330, width: 540 }}
       >
         <Form
           layout="inline"
@@ -111,13 +111,17 @@ class InstanceCreatorModal extends Component<Props> {
           <div>
             <FormItem style={{ margin: 0 }}>
               {getFieldDecorator('packName', {
-                rules: [{ required: true, message: 'Please input a name' }]
+                rules: [{
+                  required: true,
+                  message: 'Please input a valid name with just numbers and letters',
+                  pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
+                }]
               })(
                 <Input
                   autoFocus
                   size="large"
                   style={{
-                    width: '50vw',
+                    width: 450,
                     display: 'inline-block',
                     height: '60px'
                   }}
