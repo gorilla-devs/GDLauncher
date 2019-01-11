@@ -84,7 +84,6 @@ export default class Modal extends Component<Props> {
         transform: 'translateZ(0)',
         background: 'rgba(0, 0, 0, 0.7)',
         transition: 'opacity 200ms ease-in-out',
-        backdropFilter: 'blur(2px)'
       }
     });
   }

@@ -87,7 +87,7 @@ class Instances extends Component<Props> {
           <div>
             <div
               style={{
-                width: '50vw',
+                width: '100%',
                 display: 'flex',
                 height: '60px',
                 margin: 0
@@ -105,7 +105,7 @@ class Instances extends Component<Props> {
                   <Input
                     size="large"
                     style={{
-                      width: 'calc(50vw - 200px)',
+                      width: 250,
                       display: 'inline-block',
                       height: '60px'
                     }}
