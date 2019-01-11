@@ -37,7 +37,7 @@ export default props => {
       history={props.history}
       unMount={unMount}
       title="Modpack Explorer"
-      style={{ height: '80vh', width: '80vw', left: '10%' }}
+      style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}
     >
       {packData !== null ? <div className={styles.container}>
         <h1>{packData.name}</h1>
