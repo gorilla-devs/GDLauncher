@@ -80,11 +80,10 @@
   order: 1;
   flex: 1;
   background-color: var(--secondary-color-1);
-  max-height: 30%;
-  min-height: 30%;
+  max-height: 40%;
+  min-height: 40%;
   border-radius: 3px;
   padding: 4%;
-  text-align: center;
 }
 
 .server h1{
@@ -109,3 +108,16 @@
   padding: 3%;
 }
 
+.rowCommand{
+  background-color: goldenrod;
+  max-width: 100%;
+  min-height: 5%;
+  max-height: 10%;
+  border-radius: 3px;
+  color: white;
+  display: flex;
+  padding: 0;
+  margin: 1%;
+  align-items: center;
+  justify-content: center;
+}

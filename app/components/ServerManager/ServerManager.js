@@ -13,11 +13,16 @@ import { exec } from 'child_process';
 import path from 'path';
 import psTree from 'ps-tree';
 import { startServer, deleteServer, kill } from '../../actions/serverManager';
+import ServerCommand from './serverCommand';
 
 function ServerManager(props) {
   const [servers, setServers] = useState([]);
   const [serverSettings, setServerSettings] = useState({});
   const [selectedServer, setselectedServer] = useState(null);
+  const [serverName, setserverName] = useState("");
+  const [command, setCommand] = useState({
+    view: null
+  });
 
   useEffect(async () => {
     const dirs = await promisify(fs.readdir)(SERVERS_PATH);
@@ -38,15 +43,18 @@ function ServerManager(props) {
   }
 
   async function manageServer(serverName) {
+    setCommand({
+      view: "serverSettings"
+    });
     const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "server.properties"))).toString('utf8');
     let values = {};
     lines.split("\n").forEach(arr => {
       const splitted = arr.split('=');
-      if(arr.includes('=')) {
+      if (arr.includes('=')) {
         values[splitted[0]] = splitted[1];
       }
     });
-    setselectedServer(serverName)
+    setselectedServer(serverName);
     setServerSettings(values);
   }
 
@@ -57,30 +65,22 @@ function ServerManager(props) {
       write = write.concat(`${k}=${serverSettings[k]}\n`);
     });
 
-    await promisify(fs.writeFile)(path.join(SERVERS_PATH, selectedServer, "server.properties"), write, {flag: 'w+'});
+    await promisify(fs.writeFile)(path.join(SERVERS_PATH, selectedServer, "server.properties"), write, { flag: 'w+' });
   };
+
+  function commandManager() {
+    setCommand({
+      view: "command"
+    });
+  }
 
   return (
     <div className={styles.container}>
-
       <div className={styles.serverSettings}>
-        {Object.keys(serverSettings).length > 0 ?
-          Object.keys(serverSettings).map((p, i) => (
-            <div key={i} className={styles.rowSettings}>
-              <div className={styles.FirstSetting} >
-                {p}
-              </div>
-              <Input className={styles.SecondSetting}
-                value={serverSettings[p]}
-              onChange={(e) => changeValue(e, p)}
-              onPressEnter={updateConfig}
-              >
-              </Input>
-            </div>
-          )) : null
-        }
-      </div>
 
+        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer}/>
+
+      </div>
       <div className={styles.Serverlist}>
 
         {servers.length > 0 &&
@@ -105,6 +105,9 @@ function ServerManager(props) {
               </Button>
 
               <Button icon="radar-chart" onClick={() => manageServer(name)}>
+              </Button>
+
+              <Button icon="code" onClick={() => commandManager()}>
               </Button>
 
             </div>))}
