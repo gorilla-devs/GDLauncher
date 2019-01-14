@@ -46,21 +46,24 @@ export default class DInstance extends Component<Props> {
   componentDidMount = async () => {
     this.updateInstanceConfig();
     // This checks for a valid config every 2 seconds (until it finds one)
-    if (this.state.version === null) {
+    if (this.state.version === null || this.state.version === "Error") {
       interval = setInterval(() => {
         this.updateInstanceConfig();
         if (this.state.version !== null) {
           clearInterval(interval);
         }
-      }, 2000);
+      }, 1000);
     }
   };
-
 
 
   componentDidUpdate = () => {
     this.percentage = this.updatePercentage();
   };
+
+  componentWillUnmount = () => {
+    clearInterval(interval);
+  }
 
   updateInstanceConfig = async () => {
     const { name } = this.props;

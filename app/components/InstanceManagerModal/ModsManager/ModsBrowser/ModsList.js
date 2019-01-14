@@ -124,7 +124,7 @@ class ModsList extends Component<Props> {
       }
     }));
 
-    await downloadMod(id, projectFileId, `${projectFileName}.jar`, this.props.match.params.instance);
+    await downloadMod(id, projectFileId, projectFileName, this.props.match.params.instance);
 
     this.setState(prevState => ({
       installing: {
