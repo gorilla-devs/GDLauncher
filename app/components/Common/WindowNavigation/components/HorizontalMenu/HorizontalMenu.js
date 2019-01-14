@@ -2,8 +2,10 @@
 import React, { Component } from 'react';
 import { Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Badge from '../../../Badge/Badge';
 import styles from './HorizontalMenu.scss';
+import logo from '../../../../../assets/images/logo.png';
 
 type Props = {};
 export default class NavigationBar extends Component<Props> {
@@ -20,50 +22,34 @@ export default class NavigationBar extends Component<Props> {
     return (
       <div className={styles.main}>
         <ul className={styles.ul}>
-          <li className={styles.li}>
+          <li className={`${styles.li} ${this.isLocation('/home') ? styles.activeLink : null}`}>
             <Link
               to="/home"
               draggable="false"
-              className={`${styles.a} ${
-                this.isLocation('/home') ? styles.activeLink : null
-                }`}
+              className={styles.a}
             >
-              <Icon type="home" theme="filled" className={styles.i} />
+              <FontAwesomeIcon icon="home" className={styles.i} />
               HOME
             </Link>
           </li>
-          <li className={styles.li}>
+          <li className={`${styles.li} ${this.isLocation('/dmanager') ? styles.activeLink : null}`}>
             <Link
               to="/dmanager"
               draggable="false"
-              className={`${styles.a} ${
-                this.isLocation('/dmanager') ? styles.activeLink : null
-                }`}
+              className={styles.a}
             >
-              <Badge
-                count={this.props.downloadingCount}
-                invisible={this.props.downloadingCount === 0}
-              >
-                <Icon type="play-circle" theme="filled" className={styles.i} />
-                INSTANCES
-              </Badge>
+              <FontAwesomeIcon icon="play" className={styles.i} />
+              INSTANCES
             </Link>
           </li>
-          <li className={styles.li}>
+          <li className={`${styles.li} ${this.isLocation('/curseModpacksBrowser') ? styles.activeLink : null}`}>
             <Link
               to="/curseModpacksBrowser"
               draggable="false"
-              className={`${styles.a} ${
-                this.isLocation('/curseModpacksBrowser') ? styles.activeLink : null
-                }`}
+              className={styles.a}
             >
-              <Badge
-                count={this.props.downloadingCount}
-                invisible={this.props.downloadingCount === 0}
-              >
-                <Icon type="appstore" theme="filled" className={styles.i} />
-                CURSE PACKS
-              </Badge>
+              <FontAwesomeIcon icon="th-list" className={styles.i} />
+              MODPACKS
             </Link>
           </li>
           {/* <li className={styles.li}>

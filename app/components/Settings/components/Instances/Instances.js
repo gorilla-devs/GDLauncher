@@ -6,7 +6,7 @@ import { Button, message } from 'antd';
 import fsa from 'fs-extra';
 import path from 'path';
 import styles from './Instances.scss';
-import { INSTANCES_PATH } from '../../../../constants';
+import { INSTANCES_PATH, META_PATH } from '../../../../constants';
 import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
@@ -31,13 +31,15 @@ class Instances extends Component<Props> {
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'packs'));
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'assets'));
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'versions'));
+      await fsa.emptyDir(path.join(INSTANCES_PATH, 'temp'));
+      await fsa.emptyDir(META_PATH);
       this.setState({ deletingInstances: false });
       message.success("Data has been cleared.");
     } catch (e) {
       message.error('Error while clearing data.');
     }
   };
-  
+
   render() {
     return (
       <div>

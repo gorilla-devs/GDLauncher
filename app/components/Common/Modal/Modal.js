@@ -23,8 +23,9 @@ export default class Modal extends Component<Props> {
         ...props.style
       },
       bgStyle: {
-        background: 'rgba(0, 0, 0, 0)',
-        transition: 'all 200ms ease-in-out'
+        background: 'rgba(0, 0, 0, 0.7)',
+        transition: 'opacity 200ms ease-in-out',
+        opacity: 0
       }
     };
   }
@@ -32,7 +33,7 @@ export default class Modal extends Component<Props> {
   componentDidMount() {
     setTimeout(this.mountStyle, 10); // call the into animiation
   }
-  
+
   componentWillReceiveProps = (newProps) => { // check for the mounted props
     if (newProps.unMount) {
       setTimeout(this.props.history.goBack, 200);
@@ -54,8 +55,13 @@ export default class Modal extends Component<Props> {
         ...this.props.style
       },
       bgStyle: {
-        background: 'rgba(0, 0, 0, 0)',
-        transition: 'all 200ms ease-in-out'
+        backfaceVisibility: 'hidden',
+        perspective: 1000,
+        transform: 'translate3d(0, 0, 0)',
+        transform: 'translateZ(0)',
+        background: 'rgba(0, 0, 0, 0.7)',
+        transition: 'opacity 200ms ease-in-out',
+        opacity: 0
       }
     });
   }
@@ -72,9 +78,12 @@ export default class Modal extends Component<Props> {
         ...this.props.style
       },
       bgStyle: {
+        backfaceVisibility: 'hidden',
+        perspective: 1000,
+        transform: 'translate3d(0, 0, 0)',
+        transform: 'translateZ(0)',
         background: 'rgba(0, 0, 0, 0.7)',
-        transition: 'all 200ms ease-in-out'
-
+        transition: 'opacity 200ms ease-in-out',
       }
     });
   }

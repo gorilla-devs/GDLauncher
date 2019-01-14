@@ -6,10 +6,11 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import fsa from 'fs-extra';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import log from 'electron-log';
 import { promisify } from 'util';
 import { exec } from 'child_process';
+import { shell } from 'electron';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import { PACKS_PATH, APPPATH } from '../../constants';
 import { history } from '../../store/configureStore';
@@ -24,6 +25,9 @@ type Props = {
   playing: array
 };
 
+let interval;
+let intervalDelete;
+
 export default class DInstance extends Component<Props> {
   props: Props;
 
@@ -32,21 +36,47 @@ export default class DInstance extends Component<Props> {
     this.state = {
       deleting: false,
       version: null,
-      isValid: true
+      isValid: true,
+      forgeVersion: null,
+      confirmDelete: false,
+      deleteWait: 3
     };
   }
 
   componentDidMount = async () => {
+    this.updateInstanceConfig();
+    // This checks for a valid config every 2 seconds (until it finds one)
+    if (this.state.version === null || this.state.version === "Error") {
+      interval = setInterval(() => {
+        this.updateInstanceConfig();
+        if (this.state.version !== null) {
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
+  };
+
+
+  componentDidUpdate = () => {
+    this.percentage = this.updatePercentage();
+  };
+
+  componentWillUnmount = () => {
+    clearInterval(interval);
+  }
+
+  updateInstanceConfig = async () => {
     const { name } = this.props;
     if (!this.isInstalling()) {
       try {
-        const { version } = JSON.parse(
+        const { version, forgeVersion } = JSON.parse(
           await promisify(fs.readFile)(
             path.join(PACKS_PATH, name, 'config.json')
           )
         );
         this.setState({
-          version
+          version,
+          forgeVersion: forgeVersion === null ? null : forgeVersion.split('-')[1]
         });
       } catch (e) {
         this.setState({
@@ -57,26 +87,12 @@ export default class DInstance extends Component<Props> {
     }
   };
 
-  componentDidUpdate = () => {
-    this.percentage = this.updatePercentage();
-  };
 
   isInstalling = () => {
     const { name, installingQueue } = this.props;
-    if (installingQueue[name]) {
-      switch (installingQueue[name].status) {
-        case 'Queued':
-          return true;
-        case 'Downloading':
-          return true;
-        case 'Completed':
-          return false;
-        default:
-          return true;
-      }
-    } else {
-      return false;
-    }
+    if (installingQueue[name])
+      return true;
+    return false;
   };
 
   updatePercentage = () => {
@@ -87,7 +103,6 @@ export default class DInstance extends Component<Props> {
         case 'Queued':
           return 0;
         case 'Downloading':
-          // If the total file to download is equal to 0 (not yet sent from the worker) then show 0 to avoid NaN from 0 / 0
           return percentage;
         case 'Completed':
           return 100;
@@ -110,7 +125,7 @@ export default class DInstance extends Component<Props> {
             process.kill(el.PID);
           });
         });
-        message.info('Instance terminated');
+        message.info('Instance terminated from user');
       } else {
         startInstance(name);
         selectInstance(name);
@@ -119,29 +134,42 @@ export default class DInstance extends Component<Props> {
   };
 
   deleteInstance = async () => {
-    const { name, selectInstance } = this.props;
-    try {
-      this.setState({ deleting: true });
-      await fsa.remove(path.join(PACKS_PATH, name));
-      selectInstance(null);
-      message.success('Instance deleted');
-    } catch (err) {
-      message.error('Error deleting instance');
-      log.error(err);
-    } finally {
-      this.setState({ deleting: false });
-      hideMenu(`contextMenu-${name}`);
+    if (this.state.confirmDelete) {
+      const { name, selectInstance } = this.props;
+      try {
+        this.setState({ deleting: true });
+        await fsa.remove(path.join(PACKS_PATH, name));
+        selectInstance(null);
+        message.success('Instance deleted');
+      } catch (err) {
+        message.error('Error deleting instance');
+        log.error(err);
+      } finally {
+        this.setState({ deleting: false });
+        hideMenu(`contextMenu-${name}`);
+      }
+    } else {
+      this.setState({
+        confirmDelete: true
+      });
+      intervalDelete = setInterval(() => {
+        this.setState(prev => ({
+          deleteWait: prev.deleteWait - 1
+        }));
+        if (this.state.deleteWait === 0)
+          clearInterval(intervalDelete);
+      }, 1000);
     }
   };
 
   render = () => {
     const { name, selectedInstance, selectInstance, playing } = this.props;
-    const { version, isValid, deleting } = this.state;
+    const { version, isValid, deleting, forgeVersion } = this.state;
     return (
       <div
         className={`${selectedInstance === name ? styles.selectedItem : ''} ${
           styles.main
-        }`}
+          }`}
       >
         <ContextMenuTrigger id={`contextMenu-${name}`}>
           <div
@@ -173,7 +201,7 @@ export default class DInstance extends Component<Props> {
                 theme="outlined"
               />
             )}
-            {!isValid && (
+            {!isValid && !deleting && (
               <Tooltip title="Warning: this instance is corrupted.">
                 <Icon
                   className={styles.warningIcon}
@@ -211,6 +239,10 @@ export default class DInstance extends Component<Props> {
             e.stopPropagation();
             selectInstance(name);
           }}
+          onHide={() => {
+            clearInterval(intervalDelete);
+            this.setState({ confirmDelete: false, deleteWait: 3 });
+          }}
         >
           <span>
             {name} ({version})
@@ -221,13 +253,13 @@ export default class DInstance extends Component<Props> {
           >
             {playing.find(el => el.name === name) ? (
               <div>
-                <Icon type="thunderbolt" theme="filled" /> Kill
+                <FontAwesomeIcon icon='bolt' /> Kill
               </div>
             ) : (
-              <div>
-                <Icon type="play-circle" theme="filled" /> Launch
-              </div>
-            )}
+                <div>
+                  <FontAwesomeIcon icon='play' /> Launch
+                </div>
+              )}
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
@@ -239,12 +271,12 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <Icon type="tool" theme="filled" /> Manage
+            <FontAwesomeIcon icon='pen' /> Manage
           </MenuItem>
           <MenuItem
-            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
+            onClick={() => shell.openItem(path.join(PACKS_PATH, name))}
           >
-            <Icon type="folder" theme="filled" /> Open Folder
+            <FontAwesomeIcon icon='folder' /> Open Folder
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -277,19 +309,26 @@ export default class DInstance extends Component<Props> {
               this.isInstalling() ||
               process.platform !== 'win32' ||
               deleting ||
-              !isValid
+              !isValid ||
+              process.env.NODE_ENV === 'development'
             }
           >
-            <Icon type="link" theme="outlined" /> Create Shortcut
+            <FontAwesomeIcon icon='link' /> Create Shortcut
           </MenuItem>
+          {/* <MenuItem
+            disabled={this.isInstalling() || deleting || !isValid}
+            onClick={() => {}}
+          >
+            <FontAwesomeIcon icon='copy' /> Duplicate
+          </MenuItem> */}
           <MenuItem
             disabled={this.isInstalling() || deleting || !isValid}
-            onClick={() => exec(`start "" "${path.join(PACKS_PATH, name)}"`)}
+            onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
-            <Icon type="export" theme="outlined" /> Export Instance
+            <FontAwesomeIcon icon='wrench' /> Repair
           </MenuItem>
           <MenuItem
-            disabled={this.isInstalling() || deleting}
+            disabled={this.isInstalling() || deleting || (this.state.confirmDelete && this.state.deleteWait !== 0)}
             data={{ foo: 'bar' }}
             onClick={this.deleteInstance}
             preventClose
@@ -299,13 +338,16 @@ export default class DInstance extends Component<Props> {
                 <Icon type="loading" theme="outlined" /> Deleting...
               </div>
             ) : (
-              <div>
-                <Icon type="delete" theme="filled" /> Delete
-              </div>
-            )}
+                <div>
+                  <FontAwesomeIcon icon='trash' />
+                  {!this.state.confirmDelete ? ' Delete' : (
+                    ` Confirm Delete ${this.state.deleteWait !== 0 ? `(${this.state.deleteWait})` : ''}`
+                  )}
+                </div>
+              )}
           </MenuItem>
         </ContextMenu>
-      </div>
+      </div >
     );
   };
 }

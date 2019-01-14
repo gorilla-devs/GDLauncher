@@ -4,6 +4,7 @@ import reqCall from 'request';
 import path from 'path';
 import assert from 'assert';
 import os from 'os';
+import _ from 'lodash';
 import log from 'electron-log';
 import Promise from 'bluebird';
 import request from 'request-promise-native';
@@ -32,13 +33,13 @@ export const downloadArr = async (
         await downloadFileInstance(item.path, item.url);
       }
       downloaded += 1;
-      if (downloaded % 30 === 0 || downloaded === arr.length) updatePercentage(downloaded);
+      if (downloaded % 10 === 0 || downloaded === arr.length) updatePercentage(downloaded);
     },
     { concurrency: threads }
   );
 };
 
-const downloadFileInstance = async (filename, url, legacyPath = null) => {
+const downloadFileInstance = async (filename, url) => {
   try {
     const filePath = path.dirname(filename);
     try {
@@ -48,26 +49,12 @@ const downloadFileInstance = async (filename, url, legacyPath = null) => {
     }
     const file = await request(url, { encoding: 'binary' });
     await fs.writeFileAsync(filename, file, 'binary');
-    // This handles legacy assets.
-    if (legacyPath !== null && legacyPath !== undefined) {
-      try {
-        await fs.accessAsync(legacyPath);
-      } catch (e) {
-        try {
-          await fs.accessAsync(path.dirname(legacyPath));
-        } catch (e) {
-          await makeDir(path.dirname(legacyPath));
-        } finally {
-          await fs.writeFileAsync(legacyPath, file, 'binary');
-        }
-      }
-    }
   } catch (e) {
     log.error(
       `Error while downloading <${url}> to <${filename}> --> ${e.message}`
     );
   }
-};
+}
 
 export const downloadFile = (filename, url, onProgress) => {
   return new Promise(async (resolve, reject) => {

@@ -45,6 +45,24 @@ a {
   -webkit-user-drag: none;
 }
 
+a:hover {
+  text-decoration: none;
+}
+
+hr {
+  border-width: 1px 0 0;
+  border-top-style: solid;
+  border-right-style: initial;
+  border-bottom-style: initial;
+  border-left-style: initial;
+  border-top-color: rgba(255, 255, 255, 0.4);
+  border-right-color: initial;
+  border-bottom-color: initial;
+  border-left-color: initial;
+  border-image: initial;
+  margin: 15px 0;
+}
+
 ::-webkit-scrollbar {
   background-color: var(--secondary-color-3);
   width: 8px;
@@ -62,9 +80,9 @@ a {
   border-radius: 8px;
 }
 
-:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span),
-:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span)::after,
-:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span)::before {
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path),
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path)::after,
+:not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path)::before {
   -webkit-user-select: none;
   user-select: none;
   cursor: default;
@@ -75,10 +93,6 @@ button,
 textarea,
 :focus {
   outline: none;
-}
-
-a:hover {
-  text-decoration: underline;
 }
 
 .slick-dots {
@@ -99,7 +113,7 @@ a:hover {
   color: $text-main-color;
   font-size: 16px;
   margin: 2px 0 0;
-  min-width: 160px;
+  min-width: 180px;
   outline: none;
   transform: scale(0);
   transform-origin: top left;
@@ -109,6 +123,9 @@ a:hover {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition: transform 135ms !important;
+  span:first-child{
+    padding: 0 10px;
+  }
 }
 
 .react-contextmenu span {
@@ -337,18 +354,16 @@ a:hover {
 }
 
 // Table
-
-.ant-table-thead > tr > th {
-  background: rgba(0, 0, 0, 0.15);
-}
-
 .ant-table-thead > tr.ant-table-row-hover > td,
 .ant-table-tbody > tr.ant-table-row-hover > td,
+.ant-table-thead > tr > th,
+.ant-table-thead > tr, .ant-table-tbody > tr:hover,
 .ant-table-thead > tr:hover > td,
 .ant-table-tbody > tr:hover > td,
 .ant-table-tbody > tr.ant-table-row-selected td {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.15) !important;
 }
+
 
 .ant-table-placeholder {
   background-color: var(--secondary-color-1);
@@ -400,6 +415,19 @@ a:hover {
 
 .ant-message-notice-content {
   background: var(--secondary-color-2);
+}
+
+.ant-slider-track, .ant-slider:hover .ant-slider-track {
+  background-color: var(--primary);
+}
+
+.ant-slider-handle,
+.ant-slider-dot-active,
+.ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open),
+.ant-slider-handle .ant-tooltip-open {
+  background-color: var(--secondary-color-3);
+  border: solid 2px var(--primary);
+  border-color: var(--primary) !important;
 }
 
 .container {

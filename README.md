@@ -68,7 +68,7 @@ These are the steps to compile it yourself.
 ### ⚙️ Requirements
 You need the following softwares installed:
   - Nodejs (> 8)
-  - npm
+  - yarn
 
 ### ▶️ Steps
 
@@ -76,19 +76,19 @@ Install the dependencies and devDependencies.
 
 ```sh
 $ cd GDLauncher
-$ npm install
+$ yarn
 ```
 
 Start the development environment
 
 ```sh
-$ npm run dev
+$ yarn dev
 ```
 
 For production environment...
 
 ```sh
-$ npm run start
+$ yarn start
 ```
 
 ### 🚚 Packaging
@@ -96,7 +96,7 @@ $ npm run start
 To package apps for the local platform:
 
 ```sh
-$ npm run package
+$ yarn package
 ```
 
 To package apps for all platforms:
@@ -105,7 +105,7 @@ First, refer to [Multi Platform Build](https://www.electron.build/multi-platform
 
 Then,
 ```bash
-$ npm run package-all
+$ yarn package-all
 ```
 
 ## 🚀 Built and managed with 

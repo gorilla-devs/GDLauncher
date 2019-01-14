@@ -56,12 +56,7 @@ export default function downloadManager(state = initialState, action) {
         ...state,
         actualDownload: null,
         downloadQueue: {
-          ...state.downloadQueue,
-          [action.payload]: {
-            ...state.downloadQueue[action.payload],
-            downloadCompleted: true,
-            status: 'Completed'
-          }
+          ..._.omit(state.downloadQueue, action.payload)
         }
       };
     case UPDATE_PROGRESS:

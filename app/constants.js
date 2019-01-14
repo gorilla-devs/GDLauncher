@@ -26,8 +26,7 @@ export const ACCESS_TOKEN_VALIDATION_URL =
 export const ACCESS_TOKEN_REFRESH_URL = 'https://authserver.mojang.com/refresh';
 export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
-export const LOGIN_PROXY_API = 'https://api.gdevs.io/auth';
-export const LOGIN_TOKEN_PROXY_API = 'https://api.gdevs.io/authToken';
+export const LOGIN_API = 'https://authserver.mojang.com/authenticate';
 export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
 export const GDL_LEGACYJAVAFIXER_MOD_URL = 'https://gdevs.io/legacyjavafixer-1.0.jar';
 export const CURSEMETA_API_URL = `https://staging_cursemeta.dries007.net/api/v3`;
@@ -60,11 +59,11 @@ export const THEMES = {
     'secondary-color-2': '#272b2e',
     'secondary-color-3': '#13171a'
   },
-  christmas: {
-    name: 'Christmas',
-    primary: '#16A085',
-    "secondary-color-1": "#4f649d",
-    "secondary-color-2": "#3b5089",
-    "secondary-color-3": "#273c75"
+  bloodyMurder: {
+    name: 'Bloody Murder',
+    primary: '#aa1e0f',
+    "secondary-color-1": "#282c2f",
+    "secondary-color-2": "#14181b",
+    "secondary-color-3": "#000407"
   }
 };

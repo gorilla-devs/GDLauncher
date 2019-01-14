@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import log from 'electron-log';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import path from 'path';
 import launchCommand from '../utils/MCLaunchCommand';
 import { PACKS_PATH } from '../constants';
@@ -37,19 +37,18 @@ export function selectInstance(name) {
 
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
-    const { auth } = getState();
-    const start = exec(
-      await launchCommand(instanceName, auth),
-      { cwd: path.join(PACKS_PATH, instanceName) },
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(`exec error: ${error}`);
-          return;
-        }
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
-      }
-    );
+    const { auth, settings } = getState();
+    const command = await launchCommand(instanceName, auth, settings.java.memory);
+    const start = spawn(command, [], { shell: true, cwd: path.join(PACKS_PATH, instanceName) });
+
+    start.stdout.on("data", (data) => {
+      console.log(data.toString());
+    });
+
+    start.stderr.on("data", (data) => {
+      log.error(data.toString());
+    });
+
     dispatch({
       type: START_INSTANCE,
       payload: instanceName,

@@ -124,7 +124,7 @@ class ModsList extends Component<Props> {
       }
     }));
 
-    await downloadMod(id, projectFileId, `${projectFileName}.jar`, this.props.match.params.instance);
+    await downloadMod(id, projectFileId, projectFileName, this.props.match.params.instance);
 
     this.setState(prevState => ({
       installing: {
@@ -181,22 +181,25 @@ class ModsList extends Component<Props> {
   };
 
   render() {
-    const { initLoading, loading, list } = this.state;
+    const { initLoading, loading, list, searchText } = this.state;
     const loadMore =
-      !initLoading && !loading ? (
-        <div
-          style={{
-            textAlign: 'center',
-            marginTop: 12,
-            height: 32,
-            lineHeight: '32px'
-          }}
-        >
-          <Button onClick={this.onLoadMore}>Load More</Button>
-        </div>
-      ) : null;
+      !initLoading &&
+        !loading &&
+        list.length !== 0 &&
+        list.length % 15 === 0 ? (
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: 12,
+              height: 32,
+              lineHeight: '32px'
+            }}
+          >
+            <Button onClick={this.onLoadMore}>Load More</Button>
+          </div>
+        ) : null;
 
-    if (!initLoading && list.length === 0) {
+    if (!initLoading && list.length === 0 && searchText.length === 0) {
       return (
         <h1 style={{ textAlign: 'center', marginTop: '20%' }}>
           Servers are not currently available. Try again later
@@ -259,7 +262,7 @@ class ModsList extends Component<Props> {
                     >
                       <Button
                         type="primary"
-                        icon="down-circle"
+                        icon="arrow-down"
                         onClick={() => this.installMod(item.id, item.gameVersionLatestFiles)}
                         loading={this.isInstalling(item)}
                         disabled={this.isDownloadCompleted(item)}
@@ -288,6 +291,7 @@ class ModsList extends Component<Props> {
                 <ContentLoader
                   height={100}
                   speed={0.6}
+                  ariaLabel={false}
                   primaryColor="var(--secondary-color-2)"
                   secondaryColor="var(--secondary-color-3)"
                   style={{
