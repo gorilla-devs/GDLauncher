@@ -1,11 +1,36 @@
 {
   "name": "gdlauncher",
-  "productName": "GDLauncher",
-  "main": "./app/main.prod.js",
   "version": "0.9.5",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
+  "keywords": [
+    "boilerplate",
+    "electron",
+    "flow",
+    "hot",
+    "react",
+    "redux",
+    "reload",
+    "sass",
+    "webpack"
+  ],
+  "homepage": "https://github.com/gorilla-devs/GDLauncher",
+  "bugs": {
+    "url": "https://github.com/gorilla-devs/GDLauncher/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gorilla-devs/GDLauncher.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "GorillaDevs",
+    "email": "staff@gorilladevs.com",
+    "url": "https://gdevs.io"
+  },
+  "main": "./app/main.prod.js",
   "scripts": {
     "build": "yarn build-antd && concurrently \"yarn build-main\" \"yarn build-renderer\"",
+    "build-antd": "lessc --js ./antd/index.less ./app/antd.css",
     "build-dll": "cross-env NODE_ENV=development webpack --config ./config/webpack.config.renderer.dev.dll.babel.js --colors",
     "build-e2e": "cross-env E2E_BUILD=true yarn build",
     "build-main": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.main.prod.babel.js --colors",
@@ -13,18 +38,18 @@
     "dev": "yarn build-antd && cross-env START_HOT=1 node -r @babel/register ./internals/scripts/CheckPortInUse.js && cross-env START_HOT=1 yarn start-renderer-dev",
     "flow": "flow",
     "flow-typed": "rimraf flow-typed/npm && flow-typed install --overwrite || true",
+    "postinstall": "yarn flow-typed && yarn build-dll && electron-builder install-app-deps package.json",
     "lint": "cross-env NODE_ENV=development eslint --cache --format=pretty .",
     "lint-fix": "yarn --silent lint --fix; exit 0",
+    "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{*{js,jsx,json},babelrc,eslintrc,prettierrc,stylelintrc}'",
     "lint-styles": "stylelint --ignore-path .eslintignore '**/*.*(css|scss)' --syntax scss",
     "lint-styles-fix": "yarn --silent lint-styles --fix; exit 0",
+    "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
     "package": "yarn build && electron-builder build --publish never",
     "package-all": "yarn build && electron-builder build -mwl",
     "package-ci": "yarn postinstall && yarn build && electron-builder --publish onTag",
     "package-linux": "yarn build && electron-builder build --linux",
-    "package-win": "yarn build && electron-builder build --win --x64",
-    "postinstall": "yarn flow-typed && yarn build-dll && electron-builder install-app-deps package.json",
-    "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{*{js,jsx,json},babelrc,eslintrc,prettierrc,stylelintrc}'",
-    "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
+    "package-win": "yarn build && electron-builder build --win --x64 --ia32",
     "precommit": "lint-staged",
     "prestart": "yarn build",
     "start": "cross-env NODE_ENV=production electron ./app/main.prod.js",
@@ -34,134 +59,28 @@
     "test-all": "yarn lint && yarn flow && yarn build && yarn test && yarn build-e2e && yarn test-e2e",
     "test-e2e": "node -r @babel/register ./internals/scripts/CheckBuiltsExist.js && cross-env NODE_ENV=test testcafe electron:./ ./test/e2e/HomePage.e2e.js",
     "test-e2e-live": "node -r @babel/register ./internals/scripts/CheckBuiltsExist.js && cross-env NODE_ENV=test testcafe-live electron:./ ./test/e2e/HomePage.e2e.js",
-    "test-watch": "yarn test --watch",
-    "build-antd": "lessc --js ./antd/index.less ./app/antd.css"
+    "test-watch": "yarn test --watch"
   },
-  "browserslist": "electron 1.6",
-  "lint-staged": {
-    "*.{js,jsx}": [
-      "cross-env NODE_ENV=development eslint --cache --format=pretty",
-      "prettier --ignore-path .eslintignore --single-quote --write",
-      "git add"
-    ],
-    "{*.json,.{babelrc,eslintrc,prettierrc,stylelintrc}}": [
-      "prettier --ignore-path .eslintignore --parser json --write",
-      "git add"
-    ],
-    "*.{css,scss}": [
-      "stylelint --ignore-path .eslintignore --syntax scss --fix",
-      "prettier --ignore-path .eslintignore --single-quote --write",
-      "git add"
-    ],
-    "*.{yml,md}": [
-      "prettier --ignore-path .eslintignore --single-quote --write",
-      "git add"
-    ]
-  },
-  "build": {
-    "productName": "GDLauncher",
-    "appId": "org.gorilladevs.GDLauncher",
-    "files": [
-      "!node_modules",
-      "app/splash.html",
-      "app/dist/",
-      "app/app.html",
-      "app/main.prod.js",
-      "app/main.prod.js.map",
-      "package.json"
-    ],
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "nsisWeb": {
-      "differentialPackage": true
-    },
-    "mac": {
-      "target": [
-        "dmg"
-      ],
-      "artifactName": "${productName}-mac-setup.${ext}"
-    },
-    "win": {
-      "target": [
-        "nsis-web"
-      ],
-      "artifactName": "${productName}-win-setup.${ext}"
-    },
-    "linux": {
-      "target": [
-        "AppImage"
-      ],
-      "category": "Game",
-      "artifactName": "${productName}-linux-setup.${ext}"
-    },
-    "directories": {
-      "buildResources": "resources",
-      "output": "release"
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "gorilla-devs",
-      "repo": "GDLauncher",
-      "private": false
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gorilla-devs/GDLauncher.git"
-  },
-  "author": {
-    "name": "GorillaDevs",
-    "email": "staff@gorilladevs.com",
-    "url": "https://gdevs.io"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/gorilla-devs/GDLauncher/issues"
-  },
-  "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "redux",
-    "flow",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
-  ],
-  "homepage": "https://github.com/gorilla-devs/GDLauncher",
   "jest": {
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
-    },
+    "moduleDirectories": [
+      "node_modules",
+      "app/node_modules"
+    ],
     "moduleFileExtensions": [
       "js",
       "jsx",
       "json"
     ],
-    "moduleDirectories": [
-      "node_modules",
-      "app/node_modules"
-    ],
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest"
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
+      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
     },
     "setupFiles": [
       "./internals/scripts/CheckBuiltsExist.js"
-    ]
+    ],
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
@@ -300,9 +219,90 @@
     "source-map-support": "^0.5.9",
     "version-sort": "^0.1.1"
   },
+  "browserslist": "electron 1.6",
+  "build": {
+    "productName": "GDLauncher",
+    "appId": "org.gorilladevs.GDLauncher",
+    "files": [
+      "!node_modules",
+      "app/splash.html",
+      "app/dist/",
+      "app/app.html",
+      "app/main.prod.js",
+      "app/main.prod.js.map",
+      "package.json"
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "nsisWeb": {
+      "differentialPackage": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "artifactName": "${productName}-mac-setup.${ext}"
+    },
+    "win": {
+      "target": [
+        "nsis-web"
+      ],
+      "artifactName": "${productName}-win-setup.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Game",
+      "artifactName": "${productName}-linux-setup.${ext}"
+    },
+    "directories": {
+      "buildResources": "resources",
+      "output": "release"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "gorilla-devs",
+      "repo": "GDLauncher",
+      "private": false
+    }
+  },
   "devEngines": {
     "node": ">=10.x <11",
     "npm": ">=6.x",
     "yarn": ">=1.x"
-  }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "cross-env NODE_ENV=development eslint --cache --format=pretty",
+      "prettier --ignore-path .eslintignore --single-quote --write",
+      "git add"
+    ],
+    "{*.json,.{babelrc,eslintrc,prettierrc,stylelintrc}}": [
+      "prettier --ignore-path .eslintignore --parser json --write",
+      "git add"
+    ],
+    "*.{css,scss}": [
+      "stylelint --ignore-path .eslintignore --syntax scss --fix",
+      "prettier --ignore-path .eslintignore --single-quote --write",
+      "git add"
+    ],
+    "*.{yml,md}": [
+      "prettier --ignore-path .eslintignore --single-quote --write",
+      "git add"
+    ]
+  },
+  "productName": "GDLauncher"
 }

@@ -41,7 +41,7 @@ const CurseModpacksBrowserCreatorModal = lazy(() =>
 const CurseModpackExplorerModal = lazy(() =>
   import('./components/CurseModpackExplorerModal/CurseModpackExplorerModal')
 );
-
+const ImportPack = lazy(() => import('./components/ImportPack/ImportPack'));
 
 type Props = {
   location: object,
@@ -54,9 +54,7 @@ class RouteDef extends Component<Props> {
     const { loadSettings, checkAccessToken } = this.props;
     loadSettings();
     checkAccessToken();
-    try {
-      await findJava();
-    } catch (err) {
+    if ((await findJava()) === null) {
       notification.warning({
         duration: 0,
         message: 'JAVA NOT FOUND',
@@ -96,42 +94,53 @@ class RouteDef extends Component<Props> {
     return (
       <App>
         <SysNavBar />
-        {location.pathname !== '/' &&
-          location.pathname !== '/newUserPage' &&
-          location.pathname !== '/loginHelperModal' && (
-            <div>
-              <Navigation />
-              <SideBar />
-            </div>
-          )}
-        <Switch location={isModal ? this.previousLocation : location}>
-          <Route
-            exact
-            path="/"
-            component={WaitingComponent(Form.create()(Login))}
-          />
-          {!isAuthValid && <Redirect push to="/" />}
-          <Route path="/newUserPage" component={NewUserPage} />
-          <Route>
-            <div
-              style={{
-                width: 'calc(100% - 200px)',
-                position: 'absolute',
-                top: 60,
-                right: 200
-              }}
-            >
-              <Route path="/dmanager" component={DManager} />
-              <Route path="/curseModpacksBrowser" component={CurseModpacksBrowser} />
-              <Route path="/home" component={WaitingComponent(HomePage)} />
-              <Route
-                path="/serverManager"
-                component={WaitingComponent(ServerManager)}
-              />
-            </div>
-          </Route>
-        </Switch>
-
+        <div
+          // style={{
+          //   margin: 0,
+          //   padding: 0,
+          //   willChange: 'filter',
+          //   filter: isModal ? 'blur(1px)' : 'none',
+          //   transition: 'filter 100ms ease-in-out'
+          // }}
+        >
+          {location.pathname !== '/' &&
+            location.pathname !== '/newUserPage' &&
+            location.pathname !== '/loginHelperModal' && (
+              <div>
+                <Navigation />
+                <SideBar />
+              </div>
+            )}
+          <Switch location={isModal ? this.previousLocation : location}>
+            <Route
+              exact
+              path="/"
+              component={WaitingComponent(Form.create()(Login))}
+            />
+            {!isAuthValid && <Redirect push to="/" />}
+            <Route path="/newUserPage" component={NewUserPage} />
+            <Route>
+              <div
+                style={{
+                  width: 'calc(100% - 200px)',
+                  position: 'absolute',
+                  right: 200
+                }}
+              >
+                <Route path="/dmanager" component={DManager} />
+                <Route
+                  path="/curseModpacksBrowser"
+                  component={CurseModpacksBrowser}
+                />
+                <Route path="/home" component={WaitingComponent(HomePage)} />
+                <Route
+                  path="/serverManager"
+                  component={WaitingComponent(ServerManager)}
+                />
+              </div>
+            </Route>
+          </Switch>
+        </div>
         {/* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
         {isModal ? (
@@ -159,6 +168,9 @@ class RouteDef extends Component<Props> {
           />
         ) : null}
         {isModal ? (
+          <Route path="/importPack" component={WaitingComponent(ImportPack)} />
+        ) : null}
+        {isModal ? (
           <Route
             path="/loginHelperModal"
             component={WaitingComponent(loginHelperModal)}
@@ -177,10 +189,19 @@ class RouteDef extends Component<Props> {
 
 function WaitingComponent(MyComponent) {
   return props => (
-    <Suspense fallback={
-      <div style={{
-        width: '100vw', height: '100vh', background: 'var(--secondary-color-1)'
-      }}>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div
+          style={{
+            width: '100vw',
+            height: '100vh',
+            background: 'var(--secondary-color-1)'
+          }}
+        >
+          Loading...
+        </div>
+      }
+    >
       <MyComponent {...props} />
     </Suspense>
   );
