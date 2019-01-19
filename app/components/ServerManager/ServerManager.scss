@@ -109,7 +109,7 @@
 }
 
 .rowCommand{
-  background-color: goldenrod;
+  background-color: var(--secondary-color-1);
   max-width: 100%;
   min-height: 5%;
   max-height: 10%;
@@ -120,4 +120,10 @@
   margin: 1%;
   align-items: center;
   justify-content: center;
+}
+
+.commandButton{
+  order: 3;
+  flex: 0.3;
+  margin: 0 3% 0 3%;
 }
