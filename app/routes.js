@@ -89,13 +89,13 @@ class RouteDef extends Component<Props> {
       <App>
         <SysNavBar />
         <div
-          style={{
-            // margin: 0,
-            // padding: 0,
-            // willChange: 'filter',
-            // filter: isModal ? 'blur(1px)' : 'none',
-            // transition: 'filter 100ms ease-in-out'
-          }}
+          // style={{
+          //   margin: 0,
+          //   padding: 0,
+          //   willChange: 'filter',
+          //   filter: isModal ? 'blur(1px)' : 'none',
+          //   transition: 'filter 100ms ease-in-out'
+          // }}
         >
           {location.pathname !== '/' &&
             location.pathname !== '/newUserPage' &&

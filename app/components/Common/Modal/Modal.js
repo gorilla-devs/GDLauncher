@@ -23,7 +23,8 @@ export default class Modal extends Component<Props> {
       },
       bgStyle: {
         background: 'rgba(0, 0, 0, 0.7)',
-        transition: 'opacity 150ms ease-in-out',
+        backdropFilter: 'none',
+        transition: 'opacity 150ms ease-in-out, filter 150ms ease-in-out',
         opacity: 0
       }
     };
@@ -80,7 +81,8 @@ export default class Modal extends Component<Props> {
         transform: 'translate3d(0, 0, 0)',
         transform: 'translateZ(0)',
         background: 'rgba(0, 0, 0, 0.7)',
-        transition: 'opacity 150ms ease-in-out',
+        backdropFilter: 'blur(8px)',
+        transition: 'opacity 150ms ease-in-out, filter 150ms ease-in-out',
       }
     });
   }
