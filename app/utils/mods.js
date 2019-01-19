@@ -3,7 +3,6 @@ import path from 'path';
 import { downloadFile } from './downloader';
 import Promise from 'bluebird';
 import { CURSEMETA_API_URL, PACKS_PATH, INSTANCES_PATH } from '../constants';
-import log from 'electron-log';
 
 export const downloadMod = async (modId, projectFileId, filename, instanceName) => {
 
@@ -41,12 +40,8 @@ export const getModsList = async (modsArr, packName) => {
   // Curse metafile already contains all the dependancies so no check for
   // that is needed.
   const mods = await Promise.map(modsArr, async mod => {
-    try {
-      const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${mod.projectID}/file/${mod.fileID}`);
-      return { path: path.join(PACKS_PATH, packName, 'mods', data.fileNameOnDisk), url: data.downloadUrl };
-    } catch(e) {
-      log.error(e);
-    }
+    const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${mod.projectID}/file/${mod.fileID}`);
+    return { path: path.join(PACKS_PATH, packName, 'mods', data.fileNameOnDisk), url: data.downloadUrl };
   }, { concurrency: 4 });
   return mods;
 };

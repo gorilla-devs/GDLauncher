@@ -61,11 +61,11 @@ export const extractNatives = async (libs, packName) => {
     await promisify(fs.access)(nativesPath);
   } catch (e) {
     await makeDir(nativesPath);
-  } finally {
-    await Promise.all(
-      libs.map(lib => compressing.zip.uncompress(lib.path, nativesPath))
-    );
   }
+
+  await Promise.all(
+    libs.map(lib => compressing.zip.uncompress(lib.path, nativesPath))
+  );
 };
 
 export const extractAssets = async json => {

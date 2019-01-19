@@ -5,6 +5,7 @@
   height: 100vh;
   position: absolute;
   right: 0;
+  top: 20px;
   background-color: var(--secondary-color-2);
   font-family: 'GlacialIndifferenceRegular';
   .updateAvailable {
@@ -19,6 +20,7 @@
   }
   .header {
     display: flex;
+    margin-top: 40px;
     line-height: 40px;
     span:first-child {
       position: relative;
@@ -110,7 +112,7 @@
   position: absolute;
   display: flex;
   width: 200px;
-  bottom: 60px;
+  bottom: 20px;
   padding-right: 5px;
   align-items: center;
   align-content: center;

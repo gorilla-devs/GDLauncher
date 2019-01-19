@@ -30,11 +30,7 @@ export const downloadArr = async (
         // It needs to be downloaded
       }
       if (toDownload) {
-        try {
-          await downloadFileInstance(item.path, item.url);
-        } catch(e) {
-          log.error(e);
-        }
+        await downloadFileInstance(item.path, item.url);
       }
       downloaded += 1;
       if (downloaded % 10 === 0 || downloaded === arr.length) updatePercentage(downloaded);

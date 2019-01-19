@@ -10,7 +10,7 @@ import { bindActionCreators } from 'redux';
 import * as packCreatorActions from '../../../actions/packCreator';
 import * as downloadManagerActions from '../../../actions/downloadManager';
 import { downloadFile } from '../../../utils/downloader';
-import { PACKS_PATH, GDL_COMPANION_MOD_URL, GDL_LEGACYJAVAFIXER_MOD_URL } from '../../../constants';
+import { PACKS_PATH, GDL_COMPANION_MOD_URL } from '../../../constants';
 import vCompare from '../../../utils/versionsCompare';
 import colors from '../../../style/theme/colors.scss';
 import styles from './ForgeManager.scss';
@@ -97,7 +97,7 @@ class Instances extends Component<Props> {
       await makeDir(path.join(PACKS_PATH, this.props.name, 'mods'));
       await downloadFile(
         path.join(PACKS_PATH, this.props.name, 'mods', 'LJF.jar'),
-        GDL_LEGACYJAVAFIXER_MOD_URL,
+        GDL_COMPANION_MOD_URL,
         () => {}
       );
       this.setState({ legacyJavaFixerState: true });
