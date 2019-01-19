@@ -15,16 +15,15 @@ export default class Modal extends Component<Props> {
     this.state = { // base css
       style: {
         display: 'block',
-        transform: 'scale(1.3)',
-        opacity: 0,
-        transition: 'all 200ms',
+        transform: 'scale(0)',
+        transition: 'all 150ms',
         willChange: 'transform',
         transitionTimingFunction: 'ease-in-out',
         ...props.style
       },
       bgStyle: {
         background: 'rgba(0, 0, 0, 0.7)',
-        transition: 'opacity 200ms ease-in-out',
+        transition: 'opacity 150ms ease-in-out',
         opacity: 0
       }
     };
@@ -47,9 +46,8 @@ export default class Modal extends Component<Props> {
     this.setState({
       style: {
         display: 'block',
-        transform: 'scale(1.3)',
-        opacity: 0,
-        transition: 'all 200ms',
+        transform: 'scale(0)',
+        transition: 'all 150ms',
         willChange: 'transform',
         transitionTimingFunction: 'ease-in-out',
         ...this.props.style
@@ -60,7 +58,7 @@ export default class Modal extends Component<Props> {
         transform: 'translate3d(0, 0, 0)',
         transform: 'translateZ(0)',
         background: 'rgba(0, 0, 0, 0.7)',
-        transition: 'opacity 200ms ease-in-out',
+        transition: 'opacity 150ms ease-in-out',
         opacity: 0
       }
     });
@@ -71,8 +69,7 @@ export default class Modal extends Component<Props> {
       style: {
         display: 'block',
         transform: 'scale(1)',
-        opacity: 1,
-        transition: 'all 200ms',
+        transition: 'all 150ms',
         willChange: 'transform',
         transitionTimingFunction: 'ease-in-out',
         ...this.props.style
@@ -83,7 +80,7 @@ export default class Modal extends Component<Props> {
         transform: 'translate3d(0, 0, 0)',
         transform: 'translateZ(0)',
         background: 'rgba(0, 0, 0, 0.7)',
-        transition: 'opacity 200ms ease-in-out',
+        transition: 'opacity 150ms ease-in-out',
       }
     });
   }
