@@ -48,7 +48,7 @@ class RouteDef extends Component<Props> {
     const { loadSettings, checkAccessToken } = this.props;
     loadSettings();
     checkAccessToken();
-    try {
+    if ((await findJava()) === null) {
       await findJava();
     } catch (err) {
       notification.warning({
