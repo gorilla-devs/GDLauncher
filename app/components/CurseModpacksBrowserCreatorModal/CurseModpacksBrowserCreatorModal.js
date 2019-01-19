@@ -60,7 +60,7 @@ const CurseModpackBrowserCreatorModal = props => {
       history={props.history}
       unMount={unMount}
       title="Create New Instance"
-      style={{ height: '55vh' }}
+      style={{ height: 330, width: 540 }}
     >
       <Form
         layout="inline"
@@ -79,7 +79,7 @@ const CurseModpackBrowserCreatorModal = props => {
                 autoFocus
                 size="large"
                 style={{
-                  width: '50vw',
+                  width: 450,
                   display: 'inline-block',
                   height: '60px'
                 }}
