@@ -75,8 +75,14 @@ function serverCommand(props) {
     return (
 
       <div className={styles.rowSettings}>
-        command 1
-        </div>
+      <div className={styles.FirstSetting} >
+        Op
+      </div>
+      <Input className={styles.SecondSetting}
+      >
+      </Input>
+      <Button className={styles.commandButton}></Button>
+    </div>
     )
   }
   else {

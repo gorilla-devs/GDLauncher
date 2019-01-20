@@ -52,16 +52,14 @@ export default class NavigationBar extends Component<Props> {
               MODPACKS
             </Link>
           </li>
-          <li className={styles.li}>
+          <li className={`${styles.li} ${this.isLocation('/serverManager') ? styles.activeLink : null}`}>
             <Link
               to="/serverManager"
               draggable="false"
-              className={`${styles.a} ${
-                this.isLocation('/serverManager') ? styles.activeLink : null
-              }`}
+              className={styles.a}
             >
-              <Icon type="database" className={styles.i} />
-              SERVERS
+              <FontAwesomeIcon icon="server" className={styles.i} />
+              SERVER
             </Link>
           </li>
         </ul>

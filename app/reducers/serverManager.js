@@ -4,7 +4,8 @@ import { STOP_SERVER } from "../actions/serverManager";
 
 const initialState = {
   packName: null,
-  pid: null
+  pid: null,
+  process: null
 };
 
 export default function instancesManager(state = initialState, action) {
@@ -13,7 +14,8 @@ export default function instancesManager(state = initialState, action) {
       return {
         ...state,
         packName: action.packName,
-        pid: action.pid
+        pid: action.pid,
+        process: action.process
       };
       case `${STOP_SERVER}`:
       return {
