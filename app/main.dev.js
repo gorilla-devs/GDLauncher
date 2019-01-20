@@ -11,13 +11,11 @@
  * @flow
  */
 import { app, BrowserWindow, ipcMain } from 'electron';
-import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import path from 'path';
 import store from './localStore';
-import { THEMES, DATAPATH } from './constants';
+import { THEMES } from './constants';
 import MenuBuilder from './menu';
 import cli from './utils/cli';
 
