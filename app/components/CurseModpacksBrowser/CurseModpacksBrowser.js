@@ -48,7 +48,8 @@ function CurseModpacksBrowser(props) {
       attachments: v.attachments,
       summary: v.summary,
       latestFiles: v.latestFiles,
-      downloadCount: v.downloadCount
+      downloadCount: v.downloadCount,
+      authors: v.authors.map(author => author.name)
     }));
 
     const data = reset === true ? mappedData : packs.concat(mappedData);
@@ -216,14 +217,14 @@ function CurseModpacksBrowser(props) {
                         }
                       />
                     }
-                    title={<Link
+                    title={<span><Link
                       to={{
                         pathname: `/curseModpackExplorerModal/${item.id}`,
                         state: { modal: true }
                       }}
                     >
                       {item.name}
-                    </Link>}
+                    </Link> by {item.authors.join(', ')}</span>}
                     description={
                       item.loading ? (
                         ''
