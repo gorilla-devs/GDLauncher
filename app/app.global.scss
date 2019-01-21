@@ -123,7 +123,7 @@ textarea,
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition: transform 100ms !important;
-  span:first-child{
+  span:first-child {
     padding: 0 10px;
   }
 }
@@ -217,6 +217,15 @@ textarea,
 .ant-btn-group .ant-btn-primary:last-child:not(:first-child),
 .ant-btn-group .ant-btn-primary + .ant-btn-primary {
   border-left-color: var(--primary);
+}
+
+.ant-btn-group {
+  a:first-child .ant-btn {
+    border-radius: 4px 0 0 4px;
+  }
+  a:last-child .ant-btn {
+    border-radius: 0 4px 4px 0;
+  }
 }
 
 .ant-btn-ghost:hover,
@@ -320,7 +329,6 @@ textarea,
   }
 }
 
-
 .ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled),
 .ant-input:focus,
 .ant-input:hover,
@@ -357,13 +365,13 @@ textarea,
 .ant-table-thead > tr.ant-table-row-hover > td,
 .ant-table-tbody > tr.ant-table-row-hover > td,
 .ant-table-thead > tr > th,
-.ant-table-thead > tr, .ant-table-tbody > tr:hover,
+.ant-table-thead > tr,
+.ant-table-tbody > tr:hover,
 .ant-table-thead > tr:hover > td,
 .ant-table-tbody > tr:hover > td,
 .ant-table-tbody > tr.ant-table-row-selected td {
   background: rgba(0, 0, 0, 0.15) !important;
 }
-
 
 .ant-table-placeholder {
   background-color: var(--secondary-color-1);
@@ -417,7 +425,8 @@ textarea,
   background: var(--secondary-color-2);
 }
 
-.ant-slider-track, .ant-slider:hover .ant-slider-track {
+.ant-slider-track,
+.ant-slider:hover .ant-slider-track {
   background-color: var(--primary);
 }
 
