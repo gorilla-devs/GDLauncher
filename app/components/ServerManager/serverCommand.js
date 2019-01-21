@@ -15,9 +15,9 @@ import psTree from 'ps-tree';
 import { startServer, deleteServer, kill } from '../../actions/serverManager';
 
 
-
 function serverCommand(props) {
   const [serverSettings, setServerSettings] = useState({});
+  const [serverCommandValue, setserverCommandValue] = useState();
 
   const updateConfig = async () => {
     let write = '';
@@ -26,17 +26,19 @@ function serverCommand(props) {
       write = write.concat(`${k}=${props.serverSettings[k]}\n`);
     });
 
-    await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"), write, {flag: 'w+'});
-};
+    await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"), write, { flag: 'w+' });
+  };
 
-
+  function runCommand(name) {
+    props.start.stdin.end(`/op ${name}`);
+  }
 
   async function manageServer(serverName) {
     const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"))).toString('utf8');
     let values = {};
     lines.split("\n").forEach(arr => {
       const splitted = arr.split('=');
-      if(arr.includes('=')) {
+      if (arr.includes('=')) {
         values[splitted[0]] = splitted[1];
       }
     });
@@ -44,6 +46,9 @@ function serverCommand(props) {
     props.setServerSettings(values);
   }
 
+  function ServerCommandsChangeValue(e) {
+    setserverCommandValue(e.target.value);
+  }
 
   function changeValue(e, key) {
     props.setServerSettings({
@@ -75,14 +80,16 @@ function serverCommand(props) {
     return (
 
       <div className={styles.rowSettings}>
-      <div className={styles.FirstSetting} >
-        Op
+        <div className={styles.FirstSetting} >
+          Op
+        </div>
+        <Input className={styles.SecondSetting}
+          value={serverCommandValue}
+          onChange={(e) => ServerCommandsChangeValue(e)}
+          onPressEnter={() => runCommand(serverCommandValue)}
+        />
+        <Button className={styles.commandButton} type="primary" onClick={() => runCommand(serverCommandValue)}>COSE</Button>
       </div>
-      <Input className={styles.SecondSetting}
-      >
-      </Input>
-      <Button className={styles.commandButton}></Button>
-    </div>
     )
   }
   else {
@@ -95,7 +102,8 @@ function serverCommand(props) {
 function mapStateToProps(state) {
   return {
     versionsManifest: state.packCreator.versionsManifest,
-    packName: state.serverManager.packName
+    packName: state.serverManager.packName,
+    start: state.serverManager.process
   };
 }
 

@@ -12,8 +12,15 @@ export const STOP_SERVER = 'STOP_SERVER';
 export const startServer = (packName) => {
   return (dispatch, getState) => {
     try {
-      const start = spawn("java", [`-Xms1G -Xmx1G -jar ${path.join(SERVERS_PATH, packName, `${packName}.jar`)}`]);
-      start.stdin.write("/op infernium2000");
+      const start = spawn(`java -Xms512M -Xmx1024M -jar ${path.join(SERVERS_PATH, packName, `${packName}.jar nogui`)}`,
+        [], { shell: true, cwd: path.join(SERVERS_PATH, packName) });
+      start.stdout.on("data", (data) => {
+        console.log(data.toString());
+      });
+      start.stderr.on("data", (data) => {
+        console.log(data.toString());
+      });
+
       // const start = exec(
       //   `java -Xms1G -Xmx1G -jar ${path.join(SERVERS_PATH, packName, `${packName}.jar`)}`,
       //   { cwd: path.join(SERVERS_PATH, packName) },

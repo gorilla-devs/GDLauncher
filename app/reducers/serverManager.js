@@ -21,7 +21,8 @@ export default function instancesManager(state = initialState, action) {
       return {
         ...state,
         packName: null,
-        pid: null
+        pid: null,
+        process: null
       };
     default:
       return state;
