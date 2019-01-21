@@ -88,7 +88,7 @@ function serverCommand(props) {
           onChange={(e) => ServerCommandsChangeValue(e)}
           onPressEnter={() => runCommand(serverCommandValue)}
         />
-        <Button className={styles.commandButton} type="primary" onClick={() => runCommand(serverCommandValue)}>COSE</Button>
+        <Button className={styles.commandButton} type="primary" onClick={() => runCommand(serverCommandValue)}>run</Button>
       </div>
     )
   }
