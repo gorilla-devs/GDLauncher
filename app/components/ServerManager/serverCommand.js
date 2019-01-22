@@ -13,11 +13,13 @@ import { exec } from 'child_process';
 import path from 'path';
 import psTree from 'ps-tree';
 import { startServer, deleteServer, kill } from '../../actions/serverManager';
+import axios from 'axios';
 
 
 function serverCommand(props) {
   const [serverSettings, setServerSettings] = useState({});
   const [serverCommandValue, setserverCommandValue] = useState();
+  const [Ip, setIp] = useState();
 
   const updateConfig = async () => {
     let write = '';
@@ -32,6 +34,12 @@ function serverCommand(props) {
   function runCommand(name) {
     props.start.stdin.end(`/op ${name}`);
   }
+
+  useEffect(async () => {
+    let { ip } = (await axios.get(`https://api.ipify.org/?format=json`)).data;
+
+    setIp(ip);
+  }, []);
 
   async function manageServer(serverName) {
     const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"))).toString('utf8');
@@ -78,17 +86,21 @@ function serverCommand(props) {
   }
   else if (props.commandState.view == "command") {
     return (
-
-      <div className={styles.rowSettings}>
-        <div className={styles.FirstSetting} >
-          Op
+      <div>
+        <div className={styles.rowSettings}>
+          {`Your ip :  ${Ip}`}
         </div>
-        <Input className={styles.SecondSetting}
-          value={serverCommandValue}
-          onChange={(e) => ServerCommandsChangeValue(e)}
-          onPressEnter={() => runCommand(serverCommandValue)}
-        />
-        <Button className={styles.commandButton} type="primary" onClick={() => runCommand(serverCommandValue)}>run</Button>
+        <div className={styles.rowSettings}>
+          <div className={styles.FirstSetting} >
+            Op
+             </div>
+          <Input className={styles.SecondSetting}
+            value={serverCommandValue}
+            onChange={(e) => ServerCommandsChangeValue(e)}
+            onPressEnter={() => runCommand(serverCommandValue)}
+          />
+          <Button className={styles.commandButton} type="primary" onClick={() => runCommand(serverCommandValue)}>run</Button>
+        </div>
       </div>
     )
   }
