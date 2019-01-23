@@ -58,7 +58,7 @@ export default props => {
       backBtn={
         <Button
           icon="close"
-          size="large"
+          size="small"
           type="ghost"
           style={{ position: 'absolute', right: '2%', top: '2%', zIndex: 100 }}
         />
@@ -100,7 +100,7 @@ export default props => {
               position: isScrolled ? 'absolute' : 'relative',
               top: isScrolled ? 0 : -150,
               fontSize: isScrolled ? 22 : 40,
-              padding: isScrolled ? 15 : 0,
+              padding: isScrolled ? 5 : 0,
               width: '100%',
               textAlign: 'center',
               marginLeft: isScrolled ? -4 : 0,
