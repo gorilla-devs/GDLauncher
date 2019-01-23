@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ContentLoader from 'react-content-loader';
 import axios from 'axios';
 import { Button } from 'antd';
+import ReactHtmlParser from 'react-html-parser';
 import ProgressiveImage from 'react-progressive-image';
 import Modal from '../Common/Modal/Modal';
 import { numberToRoundedWord } from '../../utils/numbers';
@@ -128,11 +129,7 @@ export default props => {
             <span>Last update: yesterday</span>
           </span>
           <div className={styles.description}>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: packData.fullDescription
-              }}
-            />
+          {ReactHtmlParser(packData.fullDescription)}
           </div>
         </div>
       ) : (
