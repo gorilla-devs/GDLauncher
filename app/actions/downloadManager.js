@@ -101,7 +101,7 @@ export function addCursePackToQueue(pack, addonID, fileID) {
         type: START_DOWNLOAD,
         payload: pack
       });
-      dispatch(downloadPack(pack));
+      dispatch(downloadPack(pack, addonID));
     }
   };
 }
@@ -123,7 +123,7 @@ export function clearQueue() {
   };
 }
 
-export function downloadPack(pack) {
+export function downloadPack(pack, addonID = null) {
   return async (dispatch, getState) => {
     const { downloadManager, packCreator } = getState();
     const currPack = downloadManager.downloadQueue[pack];
@@ -242,7 +242,8 @@ export function downloadPack(pack) {
       path.join(PACKS_PATH, pack, 'config.json'),
       JSON.stringify({
         version: currPack.version,
-        forgeVersion: forgeFileName
+        forgeVersion: forgeFileName,
+        addonID
       })
     );
 
