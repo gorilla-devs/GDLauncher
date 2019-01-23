@@ -33,7 +33,6 @@ export default props => {
   const { addonID } = props.match.params;
   const [unMount, setUnMount] = useState(false);
   const [packData, setPackData] = useState(null);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(async () => {
     const { data } = await axios.get(
@@ -42,13 +41,6 @@ export default props => {
     setPackData(data);
   }, []);
 
-  const onScrollHandler = e => {
-    if (e.target.scrollTop >= 335) {
-      setIsScrolled(true);
-    } else {
-      setIsScrolled(false);
-    }
-  };
 
   return (
     <Modal
@@ -67,7 +59,9 @@ export default props => {
       style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}
     >
       {packData !== null ? (
-        <div className={styles.container} onScroll={onScrollHandler}>
+        <div
+          className={styles.container}
+        >
           <div
             style={{
               height: '100%'
@@ -81,7 +75,6 @@ export default props => {
               {(src, loading) => (
                 <img
                   style={{
-                    filter: loading ? 'blur(8px)' : 'none',
                     zIndex: -1,
                     position: 'fixed',
                     left: 0,
@@ -89,7 +82,6 @@ export default props => {
                     objectFit: 'cover',
                     height: '100%',
                     width: '100%'
-
                   }}
                   src={src}
                 />
@@ -98,17 +90,11 @@ export default props => {
           </div>
           <h1
             style={{
-              position: isScrolled ? 'absolute' : 'relative',
-              top: isScrolled ? 0 : -150,
-              fontSize: isScrolled ? 22 : 40,
-              padding: isScrolled ? 5 : 0,
+              position: 'relative',
+              top: -150,
+              fontSize: 40,
               width: '100%',
-              textAlign: 'center',
-              marginLeft: isScrolled ? -4 : 0,
-              backgroundColor: isScrolled ? 'rgba(0, 0, 0, 0.8)' : '',
-              // transform: isScrolled ? 'scale(0.5) translateY(-30px)' : 'none',
-              transition: 'font-size 0.3s ease',
-              borderRadius: '0 0 4px 4px'
+              textAlign: 'center'
             }}
           >
             {packData.name}
@@ -116,10 +102,9 @@ export default props => {
           <span
             style={{
               position: 'relative',
-              marginTop: isScrolled ? -60 : -140,
+              marginTop: -140,
               display: 'flex',
               justifyContent: 'space-around',
-              opacity: isScrolled ? 0 : 1,
             }}
           >
             <span>{numberToRoundedWord(packData.downloadCount)} downloads</span>
@@ -129,7 +114,7 @@ export default props => {
             <span>Last update: yesterday</span>
           </span>
           <div className={styles.description}>
-          {ReactHtmlParser(packData.fullDescription)}
+            {ReactHtmlParser(packData.fullDescription)}
           </div>
         </div>
       ) : (
