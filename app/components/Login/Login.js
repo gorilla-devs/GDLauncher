@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
-import { IpcRenderer, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
 import log from 'electron-log';
