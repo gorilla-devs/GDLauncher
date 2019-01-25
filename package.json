@@ -253,7 +253,8 @@
     },
     "mac": {
       "target": [
-        "dmg"
+        "dmg",
+        "zip"
       ],
       "artifactName": "${productName}-mac-setup.${ext}"
     },
