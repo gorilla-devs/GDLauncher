@@ -37,8 +37,4 @@ class Root extends Component<Props> {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(SettingsActions, dispatch);
-}
-
-export default connect(null, mapDispatchToProps)(Root);
+export default Root;

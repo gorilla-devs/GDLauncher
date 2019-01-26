@@ -219,7 +219,7 @@ export default class DInstance extends Component<Props> {
               <span className={styles.icon__instanceNameContainer}>
                 <span
                   className={styles.icon__instanceName}
-                  style={{ width: this.isInstalling() ? '76px' : '130px' }}
+                  style={{ width: this.isInstalling() ? '76px' : '120px' }}
                 >
                   {name}
                 </span>
@@ -317,7 +317,12 @@ export default class DInstance extends Component<Props> {
             <FontAwesomeIcon icon='copy' /> Duplicate
           </MenuItem> */}
           <MenuItem
-            disabled={this.isInstalling() || deleting || !isValid}
+            disabled={
+              this.isInstalling() ||
+              deleting ||
+              !isValid ||
+              playing.find(el => el.name === name)
+            }
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
             <FontAwesomeIcon icon="wrench" /> Repair
@@ -326,7 +331,8 @@ export default class DInstance extends Component<Props> {
             disabled={
               this.isInstalling() ||
               deleting ||
-              (this.state.confirmDelete && this.state.deleteWait !== 0)
+              (this.state.confirmDelete && this.state.deleteWait !== 0) ||
+              playing.find(el => el.name === name)
             }
             data={{ foo: 'bar' }}
             onClick={this.deleteInstance}
