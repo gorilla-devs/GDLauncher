@@ -41,7 +41,6 @@ export default props => {
     setPackData(data);
   }, []);
 
-
   return (
     <Modal
       history={props.history}
@@ -59,9 +58,7 @@ export default props => {
       style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}
     >
       {packData !== null ? (
-        <div
-          className={styles.container}
-        >
+        <div className={styles.container}>
           <div
             style={{
               height: '100%'
@@ -104,14 +101,24 @@ export default props => {
               position: 'relative',
               marginTop: -140,
               display: 'flex',
-              justifyContent: 'space-around',
+              justifyContent: 'space-around'
             }}
           >
             <span>{numberToRoundedWord(packData.downloadCount)} downloads</span>
             <span>
               by {packData.authors.map(author => author.name).join(', ')}
             </span>
-            <span>Last update: yesterday</span>
+            <span>
+              Updated:{' '}
+              {new Date(packData.latestFiles[0].fileDate).toLocaleDateString(
+                'en-US',
+                {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                }
+              )}
+            </span>
           </span>
           <div className={styles.description}>
             {ReactHtmlParser(packData.fullDescription)}
