@@ -219,7 +219,7 @@ export default class DInstance extends Component<Props> {
               <span className={styles.icon__instanceNameContainer}>
                 <span
                   className={styles.icon__instanceName}
-                  style={{ width: this.isInstalling() ? '76px' : '130px' }}
+                  style={{ width: this.isInstalling() ? '76px' : '120px' }}
                 >
                   {name}
                 </span>
