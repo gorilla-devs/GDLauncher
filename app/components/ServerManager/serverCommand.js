@@ -14,12 +14,17 @@ import path from 'path';
 import psTree from 'ps-tree';
 import { startServer, deleteServer, kill } from '../../actions/serverManager';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 function serverCommand(props) {
   const [serverSettings, setServerSettings] = useState({});
   const [serverCommandValue, setserverCommandValue] = useState();
   const [Ip, setIp] = useState();
+  const [commands, setCommands] = useState({
+    "op": "",
+    "kill": ""
+  });
 
   const updateConfig = async () => {
     let write = '';
@@ -31,8 +36,8 @@ function serverCommand(props) {
     await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"), write, { flag: 'w+' });
   };
 
-  function runCommand(name) {
-    props.start.stdin.end(`/op ${name}`);
+  function runCommand(command, param) {
+    props.start.stdin.end(`/${command} ${param}`);
   }
 
   useEffect(async () => {
@@ -52,6 +57,13 @@ function serverCommand(props) {
     });
     props.setselectedServer(props.selectedServer)
     props.setServerSettings(values);
+  }
+
+  function createCommand(command) {
+    setCommands({
+      ...commands,
+      [command]: ""
+    });
   }
 
   function ServerCommandsChangeValue(e) {
@@ -90,16 +102,36 @@ function serverCommand(props) {
         <div className={styles.rowSettings}>
           {`Your ip :  ${Ip}`}
         </div>
+        {Object.keys(commands).length > 0 ?
+          Object.keys(commands).map(command => (
+            <div className={styles.rowSettings}>
+              <div className={styles.FirstSetting} >
+                {command}
+              </div>
+              <Input className={styles.SecondSetting}
+                value={commands[command]}
+                onChange={(e) => setCommands({
+                  ...commands,
+                  [command]: e.target.value
+                })}
+              />
+              <Button className={styles.commandButton} type="primary" onClick={() => runCommand(command, serverCommandValue)}>run</Button>
+            </div>
+          ))
+          : <div></div>
+        }
+
         <div className={styles.rowSettings}>
           <div className={styles.FirstSetting} >
-            Op
+            Add a Command:
              </div>
           <Input className={styles.SecondSetting}
             value={serverCommandValue}
             onChange={(e) => ServerCommandsChangeValue(e)}
-            onPressEnter={() => runCommand(serverCommandValue)}
           />
-          <Button className={styles.commandButton} type="primary" onClick={() => runCommand(serverCommandValue)}>run</Button>
+          <Button className={styles.commandButton} type="primary" onClick={() => createCommand(serverCommandValue)}>
+            <FontAwesomeIcon icon="plus"></FontAwesomeIcon>
+          </Button>
         </div>
       </div>
     )

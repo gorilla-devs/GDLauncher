@@ -52,7 +52,7 @@ export default props => {
             MODPACKS
           </Link>
         </li>
-        {/* <li className={styles.li}>
+        { <li className={styles.li}>
             <Link
               to="/serverManager"
               draggable="false"
@@ -61,7 +61,7 @@ export default props => {
               <FontAwesomeIcon icon="server" className={styles.i} />
               SERVER
             </Link>
-          </li> */}
+          </li> }
       </ul>
     </div>
   );

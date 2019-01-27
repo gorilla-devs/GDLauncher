@@ -111,17 +111,6 @@ function ServerManager(props) {
               </Button>
 
             </div>))}
-
-        <Link
-          to={{
-            pathname: '/ServerCreatorModal',
-            state: { modal: true }
-          }}
-        >
-          <Button icon="plus" className={styles.AddButton} >
-            Add Server
-        </Button>
-        </Link>
       </div>
     </div>
   );
