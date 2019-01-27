@@ -12,7 +12,6 @@ import psTree from 'ps-tree';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
-import { Tooltip } from 'antd';
 import { startServer, deleteServer, kill } from '../../actions/serverManager';
 import styles from './ServerManager.scss';
 import { downloadFile } from '../../utils/downloader';
@@ -64,7 +63,7 @@ function serverCommand(props) {
 
   function createCommand(command) {
     if (command != "" && command != undefined){
-      setCommands({
+      setCommands({ 
         ...commands,
         [command]: ""
       });
@@ -77,8 +76,6 @@ function serverCommand(props) {
 
   function removeCommand(command){
     setCommands(_.omit(commands, command));
-    console.log(command);
-    console.log(commands);
   }
 
   function changeValue(e, key) {
