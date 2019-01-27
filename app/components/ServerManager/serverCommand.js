@@ -1,20 +1,22 @@
 // @flow
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { message, Input, Button } from 'antd';
+import { message, Input, Button, Tooltip } from 'antd';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
 import { promisify } from 'util';
 import fs from 'fs';
-import styles from './ServerManager.scss';
-import { downloadFile } from '../../utils/downloader';
-import { SERVERS_PATH } from '../../constants';
 import { exec } from 'child_process';
 import path from 'path';
 import psTree from 'ps-tree';
-import { startServer, deleteServer, kill } from '../../actions/serverManager';
-import axios from 'axios';
+import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
+import { Tooltip } from 'antd';
+import { startServer, deleteServer, kill } from '../../actions/serverManager';
+import styles from './ServerManager.scss';
+import { downloadFile } from '../../utils/downloader';
+import { SERVERS_PATH } from '../../constants';
 import ButtonGroup from 'antd/lib/button/button-group';
 
 
@@ -61,14 +63,23 @@ function serverCommand(props) {
   }
 
   function createCommand(command) {
-    setCommands({
-      ...commands,
-      [command]: ""
-    });
+    if (command != "" && command != undefined){
+      setCommands({
+        ...commands,
+        [command]: ""
+      });
+      else 
+    }
   }
 
   function ServerCommandsChangeValue(e) {
     setserverCommandValue(e.target.value);
+  }
+
+  function removeCommand(command){
+    setCommands(_.omit(commands, command));
+    console.log(command);
+    console.log(commands);
   }
 
   function changeValue(e, key) {
@@ -118,7 +129,7 @@ function serverCommand(props) {
               />
               <Button.Group className={styles.ButtonGroup}>
                 <Button  type="primary" onClick={() => runCommand(command, serverCommandValue)}>run</Button>
-                <Button type="primary" onClick={() => runCommand(command, serverCommandValue)}>remove</Button>
+                <Button type="primary" onClick={() => removeCommand(command)}>remove</Button>
               </Button.Group>
             </div>
           ))
