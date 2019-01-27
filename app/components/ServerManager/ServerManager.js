@@ -78,7 +78,7 @@ function ServerManager(props) {
     <div className={styles.container}>
       <div className={styles.serverSettings}>
 
-        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer}/>
+        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer} />
 
       </div>
       <div className={styles.Serverlist}>
@@ -111,6 +111,18 @@ function ServerManager(props) {
               </Button>
 
             </div>))}
+
+            <Link
+              to={{
+                pathname: '/ServerCreatorModal',
+                state: { modal: true }
+              }}
+            >
+            <Button icon="plus" className={styles.AddButton} >
+                Add Server
+            </Button>
+            </Link>
+
       </div>
     </div>
   );
