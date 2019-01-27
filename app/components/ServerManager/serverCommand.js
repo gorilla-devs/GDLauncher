@@ -25,7 +25,15 @@ function serverCommand(props) {
   const [Ip, setIp] = useState();
   const [commands, setCommands] = useState({
     "op": "",
+    "kick": ""
+    "ban": ""
+    "ban-ip": ""
+    "pardon": ""
+    "pardon-ip": ""
     "kill": ""
+    "gamemode": ""
+    "toggledownfall": ""
+    "tell": ""
   });
 
   const updateConfig = async () => {
