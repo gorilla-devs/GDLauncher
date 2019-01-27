@@ -68,7 +68,6 @@ function serverCommand(props) {
         ...commands,
         [command]: ""
       });
-      else 
     }
   }
 
