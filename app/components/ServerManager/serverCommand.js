@@ -15,6 +15,7 @@ import psTree from 'ps-tree';
 import { startServer, deleteServer, kill } from '../../actions/serverManager';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ButtonGroup from 'antd/lib/button/button-group';
 
 
 function serverCommand(props) {
@@ -115,7 +116,10 @@ function serverCommand(props) {
                   [command]: e.target.value
                 })}
               />
-              <Button className={styles.commandButton} type="primary" onClick={() => runCommand(command, serverCommandValue)}>run</Button>
+              <Button.Group className={styles.ButtonGroup}>
+                <Button  type="primary" onClick={() => runCommand(command, serverCommandValue)}>run</Button>
+                <Button type="primary" onClick={() => runCommand(command, serverCommandValue)}>remove</Button>
+              </Button.Group>
             </div>
           ))
           : <div></div>
