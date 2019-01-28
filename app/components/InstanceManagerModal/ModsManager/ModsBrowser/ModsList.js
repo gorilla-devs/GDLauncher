@@ -151,17 +151,16 @@ class ModsList extends Component<Props> {
   };
 
   onSearchChange = e => {
-    this.setState({ searchText: e.target.value });
+    const { value } = e.target;
+    this.setState({ searchText: value }, () => {
+      if (value === '') {
+        this.getMods();
+      }
+    });
   };
 
   onSearchSubmit = async () => {
     this.getMods();
-  };
-
-  emitEmptySearchText = () => {
-    this.setState({ searchText: '' }, () => {
-      this.getMods();
-    });
   };
 
   isDownloadCompleted = data => {
@@ -221,17 +220,7 @@ class ModsList extends Component<Props> {
             onPressEnter={this.onSearchSubmit}
             style={{ width: 200 }}
             value={this.state.searchText}
-            suffix={
-              this.state.searchText !== '' ? (
-                <span onClick={this.emitEmptySearchText}>
-                  <Icon
-                    type="close-circle"
-                    theme="filled"
-                    style={{ cursor: 'pointer', color: '#999' }}
-                  />
-                </span>
-              ) : null
-            }
+            allowClear
           />
           <div>
             Sort By{' '}
@@ -359,7 +348,8 @@ class ModsList extends Component<Props> {
                         replace
                       >
                         {item.name}
-                      </Link> by {item.authors.map(author => author.name).join(', ')}
+                      </Link>{' '}
+                      by {item.authors.map(author => author.name).join(', ')}
                     </span>
                   }
                   description={
