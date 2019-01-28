@@ -14,10 +14,12 @@ export default props => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
   useEffect(() => {
-    ipcRenderer.send('check-for-updates');
-    ipcRenderer.on('update-available', () => {
-      setUpdateAvailable(true);
-    });
+    if (process.env.NODE_ENV !== 'development') {
+      ipcRenderer.send('check-for-updates');
+      ipcRenderer.on('update-available', () => {
+        setUpdateAvailable(true);
+      });
+    }
   }, []);
 
   return (
