@@ -2,6 +2,8 @@ import { message } from 'antd';
 import log from 'electron-log';
 import { spawn } from 'child_process';
 import path from 'path';
+import { promisify } from 'util';
+import fs from 'fs';
 import launchCommand from '../utils/MCLaunchCommand';
 import { PACKS_PATH } from '../constants';
 
@@ -38,14 +40,24 @@ export function selectInstance(name) {
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const { auth, settings } = getState();
-    const command = await launchCommand(instanceName, auth, settings.java.memory);
-    const start = spawn(command, [], { shell: true, cwd: path.join(PACKS_PATH, instanceName) });
-
-    start.stdout.on("data", (data) => {
+    const command = await launchCommand(
+      instanceName,
+      auth,
+      settings.java.memory
+    );
+    const start = spawn(command, [], {
+      shell: true,
+      cwd: path.join(PACKS_PATH, instanceName)
+    });
+    let minutes = 0;
+    const timer = setInterval(() => {
+      minutes = minutes + 1;
+    }, 60000);
+    start.stdout.on('data', data => {
       console.log(data.toString());
     });
 
-    start.stderr.on("data", (data) => {
+    start.stderr.on('data', data => {
       log.error(data.toString());
     });
 
@@ -54,11 +66,27 @@ export function startInstance(instanceName) {
       payload: instanceName,
       pid: start.pid
     });
-    start.on('exit', () => {
+    start.on('exit', async () => {
+      clearInterval(timer);
       dispatch({
         type: STOP_INSTANCE,
         payload: instanceName
       });
+      const config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, instanceName, 'config.json')
+        )
+      );
+      await promisify(fs.writeFile)(
+        path.join(PACKS_PATH, instanceName, 'config.json'),
+        JSON.stringify({
+          ...config,
+          timePlayed:
+            config.timePlayed && config.timePlayed !== null
+              ? config.timePlayed + minutes
+              : minutes
+        })
+      );
     });
     start.on('error', err => {
       message.error('There was an error while starting the instance');

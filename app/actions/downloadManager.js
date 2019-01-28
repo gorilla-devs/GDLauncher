@@ -62,12 +62,14 @@ export function importTwitchProfile(pack, filePath) {
     const packInfo = JSON.parse(await promisify(fs.readFile)(path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')));
     makeDir(path.join(PACKS_PATH, pack))
     const mcVersion = packInfo.minecraft.version;
+    const addonID = packInfo.projectID;
     const forgeVersion = packInfo.minecraft.modLoaders[0].id.replace('forge-', '');
     dispatch({
       type: ADD_TO_QUEUE,
       payload: pack,
       version: mcVersion,
-      forgeVersion
+      forgeVersion,
+      addonID
     });
     if (downloadManager.actualDownload === null) {
       dispatch({
@@ -94,14 +96,15 @@ export function addCursePackToQueue(pack, addonID, fileID) {
       type: ADD_TO_QUEUE,
       payload: pack,
       version: mcVersion,
-      forgeVersion
+      forgeVersion,
+      addonID
     });
     if (downloadManager.actualDownload === null) {
       dispatch({
         type: START_DOWNLOAD,
         payload: pack
       });
-      dispatch(downloadPack(pack, addonID));
+      dispatch(downloadPack(pack));
     }
   };
 }
@@ -123,7 +126,7 @@ export function clearQueue() {
   };
 }
 
-export function downloadPack(pack, addonID = null) {
+export function downloadPack(pack) {
   return async (dispatch, getState) => {
     const { downloadManager, packCreator } = getState();
     const currPack = downloadManager.downloadQueue[pack];
@@ -243,7 +246,8 @@ export function downloadPack(pack, addonID = null) {
       JSON.stringify({
         version: currPack.version,
         forgeVersion: forgeFileName,
-        addonID
+        addonID: currPack.addonID ? currPack.addonID : null,
+        timePlayed: 0
       })
     );
 
