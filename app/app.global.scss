@@ -439,6 +439,18 @@ textarea,
   border-color: var(--primary) !important;
 }
 
+.ant-progress-status-success .ant-progress-bg {
+  background-color: #27ae60;
+}
+
+.ant-progress-status-success .ant-progress-text {
+  color: #27ae60;
+}
+
+.ant-progress-success-bg, .ant-progress-bg {
+  background-color: var(--primary);
+}
+
 .container {
   max-width: 24rem;
   margin: 1rem auto;

@@ -159,6 +159,10 @@ if (minimist(process.argv.slice(1)).i) {
       autoUpdater.on('update-downloaded', info => {
         ev.sender.send('update-downloaded');
       });
+
+      autoUpdater.on('download-progress', data => {
+        ev.sender.send('download-progress', data.percent);
+      });
     });
 
     ipcMain.on('download-updates', () => {

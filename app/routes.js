@@ -20,6 +20,7 @@ import NewUserPage from './components/NewUserPage/NewUserPage';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
+const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
 const ServerManager = lazy(() =>
   import('./components/ServerManager/ServerManager')
 );
@@ -110,6 +111,11 @@ class RouteDef extends Component<Props> {
               exact
               path="/"
               component={WaitingComponent(Form.create()(Login))}
+            />
+            <Route
+              exact
+              path="/autoUpdate"
+              component={WaitingComponent(AutoUpdate)}
             />
             {!isAuthValid && <Redirect push to="/" />}
             <Route path="/newUserPage" component={NewUserPage} />
