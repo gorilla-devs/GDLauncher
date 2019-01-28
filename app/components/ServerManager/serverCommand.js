@@ -24,6 +24,7 @@ function serverCommand(props) {
   const [serverCommandValue, setserverCommandValue] = useState();
   const [Ip, setIp] = useState();
   const [commands, setCommands] = useState({
+   
     "op": "",
     "kick": "",
     "ban": "",
@@ -55,6 +56,10 @@ function serverCommand(props) {
 
     setIp(ip);
   }, []);
+  
+  useEffect(async () => {
+  updateCommands();
+  }, [commands]);
 
   async function manageServer(serverName) {
     const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"))).toString('utf8');
@@ -84,6 +89,11 @@ function serverCommand(props) {
 
   function removeCommand(command){
     setCommands(_.omit(commands, command));
+  }
+
+  async function updateCommands(){
+    let JsonCommands = JSON.stringify(commands);
+    await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "serverCommands.json"), JsonCommands, { flag: 'w+' });
   }
 
   function changeValue(e, key) {

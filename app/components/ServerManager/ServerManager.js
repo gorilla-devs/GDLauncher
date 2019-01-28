@@ -68,10 +68,11 @@ function ServerManager(props) {
     await promisify(fs.writeFile)(path.join(SERVERS_PATH, selectedServer, "server.properties"), write, { flag: 'w+' });
   };
 
-  function commandManager() {
+  function commandManager(serverName) {
     setCommand({
       view: "command"
     });
+    setselectedServer(serverName);
   }
 
   return (
@@ -107,7 +108,7 @@ function ServerManager(props) {
               <Button icon="radar-chart" onClick={() => manageServer(name)}>
               </Button>
 
-              <Button icon="code" onClick={() => commandManager()}>
+              <Button icon="code" onClick={() => commandManager(name)}>
               </Button>
 
             </div>))}
