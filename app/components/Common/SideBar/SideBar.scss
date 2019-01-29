@@ -1,89 +1,55 @@
 @import '../../../style/theme/index';
 
-.sidenav{
+.sidenav {
   width: 200px;
   height: 100vh;
   position: absolute;
   right: 0;
   background-color: var(--secondary-color-2);
   font-family: 'GlacialIndifferenceRegular';
-  .updateAvailable {
-    position: absolute;
-    line-height: 40px;
-    width: 100%;
+
+  .account {
     text-align: center;
-    a {
-      text-decoration: none;
-      display: block;
-    }
-  }
-  .header {
-    display: flex;
-    line-height: 40px;
-    span:first-child {
-      position: relative;
-      top: 3px;
-      left: 6px;
-    }
-    span:nth-child(2) {
-      margin-left: 10px;
-      font-size: 18px;
-    }
-    .logout {
-      position: absolute;
-      right: 10px;
-      font-size: 21px;
-      margin-top: 10px;
-      color: $text-main-color;
-      cursor: pointer;
-      transition: all .2s ease-in-out;
-      &:hover {
-        color: $text-hover-color;
-        transition: all .2s ease-in-out;
+    .header {
+      display: flex;
+      line-height: 40px;
+      span:first-child {
+        position: relative;
+        top: 3px;
+        left: 6px;
       }
-      path {
+      span:nth-child(2) {
+        margin-left: 10px;
+        font-size: 18px;
+      }
+      .logout {
+        position: absolute;
+        right: 10px;
+        font-size: 21px;
+        margin-top: 10px;
+        color: $text-main-color;
         cursor: pointer;
-      }
-      path:hover {
-        color: $text-hover-color;
-        transition: all .2s ease-in-out;
+        transition: all 0.2s ease-in-out;
+        &:hover {
+          color: $text-hover-color;
+          transition: all 0.2s ease-in-out;
+        }
+        path {
+          cursor: pointer;
+        }
+        path:hover {
+          color: $text-hover-color;
+          transition: all 0.2s ease-in-out;
+        }
       }
     }
   }
+
   .playingServer {
     color: $green;
   }
-  .socialActions {
-    display: flex;
-    justify-content: space-between;
-    height: 25px;
-    line-height: 25px;
-    padding-left: 3px;
-    div:first-child {
-      position: relative;
-      right: 10px;
-      top: 2px;
-      i {
-        font-size: 20px;
-        color: $text-main-color;
-        cursor: pointer;
-        transition: all .2s ease-in-out;
-        &:hover {
-          color: $text-hover-color;
-          transition: all .2s ease-in-out;
-        }
-        svg {
-          cursor: pointer;
-          path {
-            cursor: pointer;
-          }
-          path:hover {
-            color: $text-hover-color;
-            transition: all .2s ease-in-out;
-          }
-        }
-      }
-    }
+  .instanceTitle {
+    text-align: center;
   }
   .scroller {
     height: calc(100% - 60px - 140px - 25px);
@@ -93,18 +59,17 @@
     .serv {
       position: relative;
       padding: 9px 3px;
-      transition: all .3s;
+      transition: all 0.3s;
       display: flex;
       justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.3);
       &:hover {
         background: rgba(0, 0, 0, 0.3);
-        transition: all .3s;
+        transition: all 0.3s;
       }
     }
   }
 }
-
 
 .socialsContainer {
   position: absolute;
@@ -115,38 +80,20 @@
   align-items: center;
   align-content: center;
   justify-content: center;
-  .socialBtn {
-    cursor: pointer;
-    margin: 0 5px 5px;
-    line-height: 40px;
-    text-align: center;
-    width: 40px;
-    height: 40px;
-    svg {
-      cursor: pointer;
-      path {
-        cursor: pointer;
-      }
-    }
-    &:hover {
-      transition: background-color .25s;
-      background-color: rgba(0, 0, 0, 0.3);
-      border-radius: 5px;
-    }
-  }
+
   .version {
     color: #7f8c8d;
     padding-right: 9px;
   }
 }
 
-.accountDiv{
+.accountDiv {
   transition: all 0.2s;
   border-radius: 7px;
   padding: 10px;
 }
 
-.accountDiv:hover{
-  background-color: rgba(255, 255, 255, .2);
+.accountDiv:hover {
+  background-color: rgba(255, 255, 255, 0.2);
   transition: all 0.2s;
 }

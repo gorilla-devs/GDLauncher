@@ -63,6 +63,10 @@ hr {
   margin: 15px 0;
 }
 
+img {
+  -webkit-user-drag: none;
+}
+
 ::-webkit-scrollbar {
   background-color: var(--secondary-color-3);
   width: 8px;
