@@ -57,13 +57,25 @@ export function addToQueue(pack, version, forgeVersion = null) {
 export function importTwitchProfile(pack, filePath) {
   return async (dispatch, getState) => {
     const { downloadManager } = getState();
-    await compressing.zip.uncompress(filePath, path.join(INSTANCES_PATH, 'temp', pack));
-    const overrideFiles = await promisify(fs.readdir)(path.join(INSTANCES_PATH, 'temp', pack, 'overrides'));
-    const packInfo = JSON.parse(await promisify(fs.readFile)(path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')));
-    makeDir(path.join(PACKS_PATH, pack))
+    await compressing.zip.uncompress(
+      filePath,
+      path.join(INSTANCES_PATH, 'temp', pack)
+    );
+    const overrideFiles = await promisify(fs.readdir)(
+      path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
+    );
+    const packInfo = JSON.parse(
+      await promisify(fs.readFile)(
+        path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')
+      )
+    );
+    makeDir(path.join(PACKS_PATH, pack));
     const mcVersion = packInfo.minecraft.version;
     const addonID = packInfo.projectID;
-    const forgeVersion = packInfo.minecraft.modLoaders[0].id.replace('forge-', '');
+    const forgeVersion = packInfo.minecraft.modLoaders[0].id.replace(
+      'forge-',
+      ''
+    );
     dispatch({
       type: ADD_TO_QUEUE,
       payload: pack,
@@ -84,14 +96,30 @@ export function importTwitchProfile(pack, filePath) {
 export function addCursePackToQueue(pack, addonID, fileID) {
   return async (dispatch, getState) => {
     const { downloadManager } = getState();
-    const packURL = (await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}/file/${fileID}`)).data.downloadUrl;
-    const tempPackPath = path.join(INSTANCES_PATH, 'temp', path.basename(packURL));
-    await downloadFile(tempPackPath, packURL, () => { });
-    await compressing.zip.uncompress(tempPackPath, path.join(INSTANCES_PATH, 'temp', pack));
-    const packInfo = JSON.parse(await promisify(fs.readFile)(path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')));
-    makeDir(path.join(PACKS_PATH, pack))
+    const packURL = (await axios.get(
+      `${CURSEMETA_API_URL}/direct/addon/${addonID}/file/${fileID}`
+    )).data.downloadUrl;
+    const tempPackPath = path.join(
+      INSTANCES_PATH,
+      'temp',
+      path.basename(packURL)
+    );
+    await downloadFile(tempPackPath, packURL, () => {});
+    await compressing.zip.uncompress(
+      tempPackPath,
+      path.join(INSTANCES_PATH, 'temp', pack)
+    );
+    const packInfo = JSON.parse(
+      await promisify(fs.readFile)(
+        path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')
+      )
+    );
+    makeDir(path.join(PACKS_PATH, pack));
     const mcVersion = packInfo.minecraft.version;
-    const forgeVersion = packInfo.minecraft.modLoaders[0].id.replace('forge-', '');
+    const forgeVersion = packInfo.minecraft.modLoaders[0].id.replace(
+      'forge-',
+      ''
+    );
     dispatch({
       type: ADD_TO_QUEUE,
       payload: pack,
@@ -175,7 +203,7 @@ export function downloadPack(pack) {
 
       forgeFileName = `${currPack.version}-${currPack.forgeVersion}${
         branch !== null ? `-${branch}` : ''
-        }`;
+      }`;
       try {
         forgeJSON = JSON.parse(
           await promisify(fs.readFile)(
@@ -241,6 +269,13 @@ export function downloadPack(pack) {
 
     // This is the main config file for the instance
     await makeDir(path.join(PACKS_PATH, pack));
+
+    const thumbnailURL = currPack.addonID
+      ? (await axios.get(
+          `${CURSEMETA_API_URL}/direct/addon/${currPack.addonID}`
+        )).data.attachments[0].thumbnailUrl
+      : null;
+
     await promisify(fs.writeFile)(
       path.join(PACKS_PATH, pack, 'config.json'),
       JSON.stringify({
@@ -254,22 +289,32 @@ export function downloadPack(pack) {
     const legacyJavaFixer =
       vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
         ? {
-          url: GDL_LEGACYJAVAFIXER_MOD_URL,
-          path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
-        }
+            url: GDL_LEGACYJAVAFIXER_MOD_URL,
+            path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
+          }
         : null;
 
     let mods = [];
     try {
       const manifest = JSON.parse(
-        await promisify(fs.readFile)(path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json'))
+        await promisify(fs.readFile)(
+          path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')
+        )
       );
       mods = await getModsList(manifest.files, pack);
-      const overrideFiles = await promisify(fs.readdir)(path.join(INSTANCES_PATH, 'temp', pack, 'overrides'));
+      const overrideFiles = await promisify(fs.readdir)(
+        path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
+      );
       overrideFiles.forEach(async item => {
-        await fse.move(path.join(INSTANCES_PATH, 'temp', pack, 'overrides', item), path.join(PACKS_PATH, pack, item));
+        await fse.move(
+          path.join(INSTANCES_PATH, 'temp', pack, 'overrides', item),
+          path.join(PACKS_PATH, pack, item)
+        );
       });
-      await fse.move(path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json'), path.join(PACKS_PATH, pack, 'manifest.json'));
+      await fse.move(
+        path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json'),
+        path.join(PACKS_PATH, pack, 'manifest.json')
+      );
       await fse.remove(path.join(INSTANCES_PATH, 'temp', pack));
     } catch (err) {
       log.error(err);
@@ -297,6 +342,12 @@ export function downloadPack(pack) {
           }
         });
     };
+    if (thumbnailURL !== null)
+      await downloadFile(
+        path.join(PACKS_PATH, pack, 'thumbnail.png'),
+        thumbnailURL,
+        () => {}
+      );
 
     const allFiles =
       legacyJavaFixer !== null

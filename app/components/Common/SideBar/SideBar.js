@@ -27,7 +27,7 @@ const SideBar = props => {
   useEffect(
     async () => {
       if (props.selectedInstance !== null) {
-        let data = JSON.parse(
+        const data = JSON.parse(
           await promisify(fs.readFile)(
             path.join(PACKS_PATH, props.selectedInstance, 'config.json')
           )
@@ -41,17 +41,16 @@ const SideBar = props => {
           )).filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar').length;
         } catch {}
 
-        if (data.addonID && data.addonID !== null) {
-          const curseData = await axios.get(
-            `${CURSEMETA_API_URL}/direct/addon/${data.addonID}`
+        try {
+          const thumbnail = await promisify(fs.readFile)(
+            path.join(PACKS_PATH, props.selectedInstance, 'thumbnail.png')
           );
           setInstanceData({
             ...data,
-            thumbnail: curseData.data.attachments[0].thumbnailUrl,
-            instanceName: curseData.data.name,
+            thumbnail: `data:image/png;base64,${thumbnail.toString('base64')}`,
             mods
           });
-        } else {
+        } catch {
           setInstanceData({
             ...data,
             mods,
