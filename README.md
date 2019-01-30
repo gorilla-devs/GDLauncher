@@ -7,7 +7,8 @@
 [![PRs Welcome](https://img.shields.io/github/license/gorilla-devs/GDLauncher.svg)](http://makeapullrequest.com) [![Travis](https://img.shields.io/travis/gorilla-devs/GDLauncher.svg)](https://travis-ci.org/gorilla-devs/GDLauncher) ![Discord](https://img.shields.io/discord/398091532881756161.svg) ![David](https://img.shields.io/david/gorilla-devs/GDLauncher.svg) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/gorilla-devs/GDLauncher.svg)
 
 ![](https://img.shields.io/github/release/gorilla-devs/GDLauncher.svg?style=flat)
-(https://github.com/gorilla-devs/GDLauncher/blob/master/package.json) ![Github All Releases](https://img.shields.io/github/downloads/gorilla-devs/GDLauncher/total.svg) [![Read the Docs (version)](https://img.shields.io/readthedocs/gdlauncher/master.svg)](https://gdlauncher.readthedocs.io/en/master/)
+![Github All Releases](https://img.shields.io/github/downloads/gorilla-devs/GDLauncher/total.svg)
+[![Read the Docs (version)](https://img.shields.io/readthedocs/gdlauncher/master.svg)](https://gdlauncher.readthedocs.io/en/master/)
 
 <p align="center">
     <img width="800" height="auto" src="https://i.imgur.com/kxeGu3f.png" alt="GDLauncher" />
