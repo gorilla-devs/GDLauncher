@@ -63,6 +63,10 @@ hr {
   margin: 15px 0;
 }
 
+img {
+  -webkit-user-drag: none;
+}
+
 ::-webkit-scrollbar {
   background-color: var(--secondary-color-3);
   width: 8px;
@@ -437,6 +441,18 @@ textarea,
   background-color: var(--secondary-color-3);
   border: solid 2px var(--primary);
   border-color: var(--primary) !important;
+}
+
+.ant-progress-status-success .ant-progress-bg {
+  background-color: #27ae60;
+}
+
+.ant-progress-status-success .ant-progress-text {
+  color: #27ae60;
+}
+
+.ant-progress-success-bg, .ant-progress-bg {
+  background-color: var(--primary);
 }
 
 .container {
