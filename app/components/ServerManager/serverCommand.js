@@ -24,7 +24,7 @@ function serverCommand(props) {
   const [serverCommandValue, setserverCommandValue] = useState();
   const [Ip, setIp] = useState();
   const [commands, setCommands] = useState({
-   
+
     "op": "",
     "kick": "",
     "ban": "",
@@ -53,13 +53,10 @@ function serverCommand(props) {
 
   useEffect(async () => {
     let { ip } = (await axios.get(`https://api.ipify.org/?format=json`)).data;
-
     setIp(ip);
+    console.log(props);
+    //setCommands(props.commandFile);
   }, []);
-  
-  useEffect(async () => {
-  updateCommands();
-  }, [commands]);
 
   async function manageServer(serverName) {
     const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"))).toString('utf8');
@@ -72,28 +69,28 @@ function serverCommand(props) {
     });
     props.setselectedServer(props.selectedServer)
     props.setServerSettings(values);
+  
+
   }
 
-  function createCommand(command) {
-    if (command != "" && command != undefined){
-      setCommands({ 
+  async function createCommand(command) {
+    if (command != "" && command != undefined) {
+      setCommands({
         ...commands,
         [command]: ""
       });
-    }else message.error('Enter a valid command');
+    } else message.error('Enter a valid command');
+
+    let JsonCommands = JSON.stringify(commands);
+    await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "serverCommands.json"), JsonCommands, { flag: 'w+' });
   }
 
   function ServerCommandsChangeValue(e) {
     setserverCommandValue(e.target.value);
   }
 
-  function removeCommand(command){
+  function removeCommand(command) {
     setCommands(_.omit(commands, command));
-  }
-
-  async function updateCommands(){
-    let JsonCommands = JSON.stringify(commands);
-    await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "serverCommands.json"), JsonCommands, { flag: 'w+' });
   }
 
   function changeValue(e, key) {
@@ -126,6 +123,9 @@ function serverCommand(props) {
     return (
       <div>
         <div className={styles.rowSettings}>
+          {props.selectedServer}
+        </div>
+        <div className={styles.rowSettings}>
           {`Your ip :  ${Ip}`}
         </div>
         {Object.keys(commands).length > 0 ?
@@ -142,7 +142,7 @@ function serverCommand(props) {
                 })}
               />
               <Button.Group className={styles.ButtonGroup}>
-                <Button  type="primary" onClick={() => runCommand(command, serverCommandValue)}>run</Button>
+                <Button type="primary" onClick={() => runCommand(command, serverCommandValue)}>run</Button>
                 <Button type="primary" onClick={() => removeCommand(command)}>remove</Button>
               </Button.Group>
             </div>
