@@ -58,20 +58,18 @@ function serverCommand(props) {
     //setCommands(props.commandFile);
   }, []);
 
-  async function manageServer(serverName) {
-    const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"))).toString('utf8');
-    let values = {};
-    lines.split("\n").forEach(arr => {
-      const splitted = arr.split('=');
-      if (arr.includes('=')) {
-        values[splitted[0]] = splitted[1];
-      }
-    });
-    props.setselectedServer(props.selectedServer)
-    props.setServerSettings(values);
-  
-
-  }
+  // async function manageServer(serverName) {
+  //   const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"))).toString('utf8');
+  //   let values = {};
+  //   lines.split("\n").forEach(arr => {
+  //     const splitted = arr.split('=');
+  //     if (arr.includes('=')) {
+  //       values[splitted[0]] = splitted[1];
+  //     }
+  //   });
+  //   props.setselectedServer(props.selectedServer)
+  //   props.setServerSettings(values);
+  // }
 
   async function createCommand(command) {
     if (command != "" && command != undefined) {
