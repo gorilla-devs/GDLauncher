@@ -102,8 +102,13 @@ function serverCommand(props) {
 
   if (Object.keys(props.serverSettings).length > 0 && props.commandState.view == "serverSettings") {
     return (
-
-      Object.keys(props.serverSettings).map((p, i) => (
+      <div>
+        <div className={styles.rowSettings}>
+          <div className={styles.FirstSetting} >
+            {props.selectedServer}
+          </div>
+        </div>
+      {Object.keys(props.serverSettings).map((p, i) => (
         <div key={i} className={styles.rowSettings}>
           <div className={styles.FirstSetting} >
             {p}
@@ -115,8 +120,8 @@ function serverCommand(props) {
           >
           </Input>
         </div>
-      ))
-
+      ))}
+    </div>
     )
   }
   else if (props.commandState.view == "command") {

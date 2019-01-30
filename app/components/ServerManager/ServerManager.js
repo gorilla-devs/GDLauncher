@@ -46,6 +46,7 @@ function ServerManager(props) {
     setCommand({
       view: "serverSettings"
     });
+    setselectedServer(serverName);
     const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "server.properties"))).toString('utf8');
     let values = {};
     lines.split("\n").forEach(arr => {
@@ -54,7 +55,6 @@ function ServerManager(props) {
         values[splitted[0]] = splitted[1];
       }
     });
-    setselectedServer(serverName);
     setServerSettings(values);
   }
 
