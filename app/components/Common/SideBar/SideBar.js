@@ -96,7 +96,7 @@ const SideBar = props => {
                 position: 'relative',
                 left:
                   instanceData.forgeVersion === null ||
-                  instanceData.instanceName
+                  instanceData.thumbnail
                     ? 0
                     : 25,
                 height: 100,
@@ -105,7 +105,7 @@ const SideBar = props => {
                 borderRadius: 8
               }}
             />
-            {instanceData.forgeVersion !== null && !instanceData.instanceName && (
+            {instanceData.forgeVersion !== null && !instanceData.thumbnail && (
               <img
                 src={forgeIcon}
                 style={{
