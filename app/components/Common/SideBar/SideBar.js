@@ -10,6 +10,8 @@ import { connect } from 'react-redux';
 import { promisify } from 'util';
 import CIcon from '../Icon/Icon';
 import SocialIcon from './SocialIcon';
+import vanillaCover from '../../../assets/images/minecraft_vanilla_cover.jpg';
+import forgeIcon from '../../../assets/images/forge_icon.jpg';
 
 import styles from './SideBar.scss';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../constants';
@@ -53,8 +55,7 @@ const SideBar = props => {
           setInstanceData({
             ...data,
             mods,
-            thumbnail:
-              'https://i.pinimg.com/originals/74/1e/84/741e84c7bb8fe6bd0bf597fd5d349d6b.jpg'
+            thumbnail: null
           });
         }
       } else {
@@ -91,7 +92,7 @@ const SideBar = props => {
           <div style={{ marginTop: 10 }}>
             <h3 style={{ color: '#c2c2c2' }}>{props.selectedInstance}</h3>
             <img
-              src={instanceData.thumbnail}
+              src={instanceData.thumbnail || vanillaCover}
               style={{
                 position: 'relative',
                 left:
@@ -107,7 +108,7 @@ const SideBar = props => {
             />
             {instanceData.forgeVersion !== null && !instanceData.instanceName && (
               <img
-                src="https://pbs.twimg.com/profile_images/778706890914095109/fhMDH9o6_400x400.jpg"
+                src={forgeIcon}
                 style={{
                   position: 'relative',
                   width: 50,
@@ -180,7 +181,7 @@ const SideBar = props => {
       <hr style={{ margin: 0 }} />
       <div className={styles.socialsContainer}>
         {/* eslint-disable */}
-        <SocialIcon icon="twitter" url="https://twitter.com/gorilladevs" />
+        {/* <SocialIcon icon="twitter" url="https://twitter.com/gorilladevs" /> */}
         <SocialIcon icon="facebook" url="https://facebook.com/gorilladevs" />
         <SocialIcon
           icon="discord"
