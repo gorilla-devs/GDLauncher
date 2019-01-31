@@ -23,6 +23,19 @@ function ServerManager(props) {
   const [command, setCommand] = useState({
     view: null
   });
+  const [commands, setCommands] = useState({
+
+    "op": "",
+    "kick": "",
+    "ban": "",
+    "ban-ip": "",
+    "pardon": "",
+    "pardon-ip": "",
+    "kill": "",
+    "gamemode": "",
+    "toggledownfall": "",
+    "tell": ""
+  });
 
   useEffect(async () => {
     const dirs = await promisify(fs.readdir)(SERVERS_PATH);
@@ -68,18 +81,30 @@ function ServerManager(props) {
     await promisify(fs.writeFile)(path.join(SERVERS_PATH, selectedServer, "server.properties"), write, { flag: 'w+' });
   };
 
-  function commandManager(serverName) {
+  async function commandManager(serverName) {
     setCommand({
       view: "command"
     });
     setselectedServer(serverName);
+    try {
+     // console.log("jsonCOSO", typeof(JSON.stringify(commands)));
+     // console.log("PATH TYPE", typeof(path.join(SERVERS_PATH, selectedServer, "serverCommands.json")));
+      let CommandFile = await promisify(fs.readFile)(path.join(SERVERS_PATH, selectedServer, "serverCommands.json"));
+      setCommands(JSON.parse(CommandFile));
+      
+    } catch(err) {
+      let StringifedCommand = JSON.stringify(commands);
+      let CommandFile = await promisify(fs.writeFile)(path.join(SERVERS_PATH, selectedServer, "serverCommands.json"), StringifedCommand);
+      setCommands(CommandFile);
+      
+    }
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.serverSettings}>
 
-        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer} />
+        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer} commands={commands}/>
 
       </div>
       <div className={styles.Serverlist}>

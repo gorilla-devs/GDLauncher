@@ -54,7 +54,6 @@ function serverCommand(props) {
   useEffect(async () => {
     let { ip } = (await axios.get(`https://api.ipify.org/?format=json`)).data;
     setIp(ip);
-    console.log(props);
     //setCommands(props.commandFile);
   }, []);
 
