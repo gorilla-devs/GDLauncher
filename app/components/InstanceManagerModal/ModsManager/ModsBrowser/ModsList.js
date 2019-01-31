@@ -58,11 +58,11 @@ class ModsList extends Component<Props> {
     try {
       const res = await axios.get(
         `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=15&index=0&sort=${
-        this.state.filterType
+          this.state.filterType
         }&searchFilter=${encodeURI(this.state.searchText)}&gameVersion=${
-        this.props.match.params.version
+          this.props.match.params.version
         }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
-        'author' && this.state.filterType !== 'name'}`
+          'author' && this.state.filterType !== 'name'}`
       );
       this.setState({
         initLoading: false,
@@ -88,13 +88,13 @@ class ModsList extends Component<Props> {
     });
     const res = await axios.get(
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=15&index=${
-      this.state.list.length
+        this.state.list.length
       }&sort=${this.state.filterType}&searchFilter=${encodeURI(
         this.state.searchText
       )}&gameVersion=${
-      this.props.match.params.version
+        this.props.match.params.version
       }&categoryId=0&sectionId=6&sortDescending=${this.state.filterType !==
-      'author' && this.state.filterType !== 'name'}`
+        'author' && this.state.filterType !== 'name'}`
     );
     // We now remove the previous 10 elements and add the real 10
     const data = this.state.data.concat(res.data);
@@ -114,8 +114,9 @@ class ModsList extends Component<Props> {
   };
 
   installMod = async (id, files) => {
-
-    const { projectFileId, projectFileName } = files.find(n => n.gameVersion === this.props.match.params.version);
+    const { projectFileId, projectFileName } = files.find(
+      n => n.gameVersion === this.props.match.params.version
+    );
 
     this.setState(prevState => ({
       installing: {
@@ -124,7 +125,12 @@ class ModsList extends Component<Props> {
       }
     }));
 
-    await downloadMod(id, projectFileId, projectFileName, this.props.match.params.instance);
+    await downloadMod(
+      id,
+      projectFileId,
+      projectFileName,
+      this.props.match.params.instance
+    );
 
     this.setState(prevState => ({
       installing: {
@@ -145,17 +151,16 @@ class ModsList extends Component<Props> {
   };
 
   onSearchChange = e => {
-    this.setState({ searchText: e.target.value });
+    const { value } = e.target;
+    this.setState({ searchText: value }, () => {
+      if (value === '') {
+        this.getMods();
+      }
+    });
   };
 
   onSearchSubmit = async () => {
     this.getMods();
-  };
-
-  emitEmptySearchText = () => {
-    this.setState({ searchText: '' }, () => {
-      this.getMods();
-    });
   };
 
   isDownloadCompleted = data => {
@@ -184,20 +189,20 @@ class ModsList extends Component<Props> {
     const { initLoading, loading, list, searchText } = this.state;
     const loadMore =
       !initLoading &&
-        !loading &&
-        list.length !== 0 &&
-        list.length % 15 === 0 ? (
-          <div
-            style={{
-              textAlign: 'center',
-              marginTop: 12,
-              height: 32,
-              lineHeight: '32px'
-            }}
-          >
-            <Button onClick={this.onLoadMore}>Load More</Button>
-          </div>
-        ) : null;
+      !loading &&
+      list.length !== 0 &&
+      list.length % 15 === 0 ? (
+        <div
+          style={{
+            textAlign: 'center',
+            marginTop: 12,
+            height: 32,
+            lineHeight: '32px'
+          }}
+        >
+          <Button onClick={this.onLoadMore}>Load More</Button>
+        </div>
+      ) : null;
 
     if (!initLoading && list.length === 0 && searchText.length === 0) {
       return (
@@ -215,17 +220,7 @@ class ModsList extends Component<Props> {
             onPressEnter={this.onSearchSubmit}
             style={{ width: 200 }}
             value={this.state.searchText}
-            suffix={
-              this.state.searchText !== '' ? (
-                <span onClick={this.emitEmptySearchText}>
-                  <Icon
-                    type="close-circle"
-                    theme="filled"
-                    style={{ cursor: 'pointer', color: '#999' }}
-                  />
-                </span>
-              ) : null
-            }
+            allowClear
           />
           <div>
             Sort By{' '}
@@ -263,7 +258,9 @@ class ModsList extends Component<Props> {
                       <Button
                         type="primary"
                         icon="arrow-down"
-                        onClick={() => this.installMod(item.id, item.gameVersionLatestFiles)}
+                        onClick={() =>
+                          this.installMod(item.id, item.gameVersionLatestFiles)
+                        }
                         loading={this.isInstalling(item)}
                         disabled={this.isDownloadCompleted(item)}
                       />
@@ -272,9 +269,9 @@ class ModsList extends Component<Props> {
                       to={{
                         pathname: `/editInstance/${
                           this.props.match.params.instance
-                          }/mods/browse/${this.props.match.params.version}/${
+                        }/mods/browse/${this.props.match.params.version}/${
                           item.id
-                          }`,
+                        }`,
                         state: { modal: true }
                       }}
                       replace
@@ -325,59 +322,62 @@ class ModsList extends Component<Props> {
                   />
                 </ContentLoader>
               ) : (
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        src={
-                          item.loading
-                            ? ''
-                            : item.attachments
-                              ? item.attachments[0].thumbnailUrl
-                              : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
-                        }
-                      />
-                    }
-                    title={
+                <List.Item.Meta
+                  avatar={
+                    <Avatar
+                      src={
+                        item.loading
+                          ? ''
+                          : item.attachments
+                          ? item.attachments[0].thumbnailUrl
+                          : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
+                      }
+                    />
+                  }
+                  title={
+                    <span>
                       <Link
                         to={{
                           pathname: `/editInstance/${
                             this.props.match.params.instance
-                            }/mods/browse/${this.props.match.params.version}/${
+                          }/mods/browse/${this.props.match.params.version}/${
                             item.id
-                            }`,
+                          }`,
                           state: { modal: true }
                         }}
                         replace
                       >
                         {item.name}
-                      </Link>
-                    }
-                    description={
-                      item.loading ? (
-                        ''
-                      ) : (
-                          <div>
-                            {item.summary}
-                            <div className={styles.modFooter}>
-                              <span>
-                                Downloads: {numberToRoundedWord(item.downloadCount)}
-                              </span>
-                              <span>
-                                Updated:{' '}
-                                {new Date(
-                                  item.latestFiles[0].fileDate
-                                ).toLocaleDateString('en-US', {
-                                  day: 'numeric',
-                                  month: 'long',
-                                  year: 'numeric'
-                                })}
-                              </span>
-                            </div>
-                          </div>
-                        )
-                    }
-                  />
-                )}
+                      </Link>{' '}
+                      by {item.authors.map(author => author.name).join(', ')}
+                    </span>
+                  }
+                  description={
+                    item.loading ? (
+                      ''
+                    ) : (
+                      <div>
+                        {item.summary}
+                        <div className={styles.modFooter}>
+                          <span>
+                            Downloads: {numberToRoundedWord(item.downloadCount)}
+                          </span>
+                          <span>
+                            Updated:{' '}
+                            {new Date(
+                              item.latestFiles[0].fileDate
+                            ).toLocaleDateString('en-US', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  }
+                />
+              )}
             </List.Item>
           )}
         />

@@ -11,13 +11,11 @@
  * @flow
  */
 import { app, BrowserWindow, ipcMain } from 'electron';
-import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import path from 'path';
 import store from './localStore';
-import { THEMES, DATAPATH } from './constants';
+import { THEMES } from './constants';
 import MenuBuilder from './menu';
 import cli from './utils/cli';
 
@@ -134,6 +132,17 @@ if (minimist(process.argv.slice(1)).i) {
       autoUpdater.logger = log;
       autoUpdater.autoDownload = false;
 
+      const channel =
+        store.get('settings') &&
+        (store.get('settings').releaseChannel === 'latest' ||
+          store.get('settings').releaseChannel === 'beta')
+          ? store.get('settings').releaseChannel
+          : 'latest';
+
+      autoUpdater.channel = channel;
+
+      autoUpdater.allowPrerelease = channel === 'beta';
+
       // Same as for console transport
       log.transports.file.level = 'silly';
       log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
@@ -160,6 +169,10 @@ if (minimist(process.argv.slice(1)).i) {
 
       autoUpdater.on('update-downloaded', info => {
         ev.sender.send('update-downloaded');
+      });
+
+      autoUpdater.on('download-progress', data => {
+        ev.sender.send('download-progress', Math.floor(data.percent));
       });
     });
 

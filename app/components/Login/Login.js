@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
-import { IpcRenderer, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
 import log from 'electron-log';
@@ -25,48 +25,26 @@ type Props = {
 
 const FormItem = Form.Item;
 
-
 // This is awful but it gets the primary color in real time
 
 function Login(props) {
-
   const [fastLogin, setFastLogin] = useState(true);
   const [nativeLauncherProfiles, setNativeLauncherProfiles] = useState(false);
-  const [colors, setColors] = useState(store.get('settings') ? store.get('settings').theme : THEMES.default);
+  const [colors, setColors] = useState(
+    store.get('settings') ? store.get('settings').theme : THEMES.default
+  );
 
-  const [update, setUpdate] = useState({
-    updateAvailable: false,
-    isUpdating: false,
-    updateCompleted: false,
-    textUpdate: "Update Available"
-  });
+  const [update, setUpdate] = useState(false);
 
   useEffect(async () => {
     setNativeLauncherProfiles(await OfficialLancherProfilesExists());
     if (process.env.NODE_ENV !== 'development') {
       ipcRenderer.send('check-for-updates');
       ipcRenderer.on('update-available', () => {
-        setUpdate({ ...update, updateAvailable: true });
-      });
-      ipcRenderer.on('update-downloaded', () => {
-        setUpdate({
-          updateAvailable: true,
-          isUpdating: false,
-          updateCompleted: true,
-          textUpdate: "Restart App"
-        });
+        setUpdate(true);
       });
     }
   }, []);
-
-  const handleUpdateClick = () => {
-    setUpdate({ ...update, isUpdating: true, textUpdate: "Updating..." })
-    ipcRenderer.send('download-updates');
-  };
-
-  const handleUpdateCompletedClick = () => {
-    ipcRenderer.send('apply-updates');
-  };
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -86,13 +64,13 @@ function Login(props) {
       <main
         className={styles.content}
         style={{
-          background: `linear-gradient( ${colors['secondary-color-2']}8A, ${colors['secondary-color-2']}8A), url(${background})`
+          background: `linear-gradient( ${colors['secondary-color-2']}8A, ${
+            colors['secondary-color-2']
+          }8A), url(${background})`
         }}
       >
         <div className={styles.login_form}>
-          <h1 style={{ textAlign: 'center', fontSize: 30 }}>
-            Mojang Login
-          </h1>
+          <h1 style={{ textAlign: 'center', fontSize: 30 }}>Mojang Login</h1>
           <Form onSubmit={handleSubmit}>
             <FormItem>
               {getFieldDecorator('username', {
@@ -172,7 +150,7 @@ function Login(props) {
                 className={styles.login_form_button}
               >
                 Log in
-                </Button>
+              </Button>
             </FormItem>
           </Form>
           {nativeLauncherProfiles && (
@@ -185,7 +163,14 @@ function Login(props) {
               style={{ marginTop: '30px' }}
               onClick={() => props.tryNativeLauncherProfiles()}
             >
-              <span>Login as <span style={{ fontStyle: 'italic', textDecoration: 'underline' }}>{nativeLauncherProfiles}</span></span>
+              <span>
+                Login as{' '}
+                <span
+                  style={{ fontStyle: 'italic', textDecoration: 'underline' }}
+                >
+                  {nativeLauncherProfiles}
+                </span>
+              </span>
             </Button>
           )}
         </div>
@@ -197,19 +182,12 @@ function Login(props) {
             color: '#bdc3c7'
           }}
         >
-          {update.updateAvailable && (
-            <Button
-              loading={update.isUpdating}
-              onClick={
-                update.updateCompleted
-                  ? handleUpdateCompletedClick
-                  : handleUpdateClick
-              }
-              type="primary"
-              style={{ marginRight: 10 }}
-            >
-              {update.textUpdate}
-            </Button>
+          {update && (
+            <Link to="/autoUpdate">
+              <Button type="primary" style={{ marginRight: 10 }}>
+                Update Available
+              </Button>
+            </Link>
           )}
           v{require('../../../package.json').version}
         </div>

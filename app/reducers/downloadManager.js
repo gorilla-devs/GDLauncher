@@ -27,6 +27,7 @@ export default function downloadManager(state = initialState, action) {
             percentage: 0,
             version: action.version,
             forgeVersion: action.forgeVersion,
+            addonID: action.addonID,
             downloadCompleted: false,
             status: 'Queued'
           }
