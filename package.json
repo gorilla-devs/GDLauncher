@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "boilerplate",
@@ -47,7 +47,7 @@
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
     "package": "yarn build && electron-builder build --publish never",
     "package-all": "yarn build && electron-builder build -mwl",
-    "package-ci": "yarn postinstall && yarn build && electron-builder --ia32 --publish onTag",
+    "package-ci": "yarn postinstall && yarn build && electron-builder --publish onTag",
     "package-linux": "yarn build && electron-builder build --linux",
     "package-win": "yarn build && electron-builder build --win --ia32",
     "precommit": "lint-staged",
