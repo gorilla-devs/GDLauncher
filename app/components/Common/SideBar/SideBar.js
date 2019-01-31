@@ -95,8 +95,7 @@ const SideBar = props => {
               style={{
                 position: 'relative',
                 left:
-                  instanceData.forgeVersion === null ||
-                  instanceData.instanceName
+                  instanceData.forgeVersion === null || instanceData.thumbnail
                     ? 0
                     : 25,
                 height: 100,
@@ -105,7 +104,7 @@ const SideBar = props => {
                 borderRadius: 8
               }}
             />
-            {instanceData.forgeVersion !== null && !instanceData.instanceName && (
+            {instanceData.forgeVersion !== null && !instanceData.thumbnail && (
               <img
                 src={forgeIcon}
                 style={{
@@ -134,26 +133,28 @@ const SideBar = props => {
               <span style={{ padding: '0 5px' }}>MC version:</span>
               <span style={{ padding: '0 5px' }}>{instanceData.version}</span>
             </div>
+            {instanceData.forgeVersion !== null && (
+              <div
+                style={{
+                  position: 'relative',
+                  top: 40,
+                  background: '#f39c12',
+                  width: 150,
+                  height: 30,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  left: 25
+                }}
+              >
+                <span style={{ padding: '0 5px' }}>mods:</span>
+                <span style={{ padding: '0 5px' }}>{instanceData.mods}</span>
+              </div>
+            )}
             <div
               style={{
                 position: 'relative',
-                top: 40,
-                background: '#f39c12',
-                width: 150,
-                height: 30,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                left: 25
-              }}
-            >
-              <span style={{ padding: '0 5px' }}>mods:</span>
-              <span style={{ padding: '0 5px' }}>{instanceData.mods}</span>
-            </div>
-            <div
-              style={{
-                position: 'relative',
-                top: 50,
+                top: instanceData.forgeVersion !== null ? 50 : 40,
                 background: '#27ae60',
                 width: 150,
                 height: 30,
