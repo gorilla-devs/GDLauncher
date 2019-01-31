@@ -76,7 +76,7 @@ function serverCommand(props) {
   }
 
   function removeCommand(command) {
-    props.setCommands(_.omit(props.props.commands, command));
+    props.setCommands(_.omit(props.commands, command));
   }
 
   function changeValue(e, key) {
