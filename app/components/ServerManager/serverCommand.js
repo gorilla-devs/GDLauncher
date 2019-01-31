@@ -23,19 +23,6 @@ function serverCommand(props) {
   const [serverSettings, setServerSettings] = useState({});
   const [serverCommandValue, setserverCommandValue] = useState();
   const [Ip, setIp] = useState();
-  const [commands, setCommands] = useState({
-
-    "op": "",
-    "kick": "",
-    "ban": "",
-    "ban-ip": "",
-    "pardon": "",
-    "pardon-ip": "",
-    "kill": "",
-    "gamemode": "",
-    "toggledownfall": "",
-    "tell": ""
-  });
 
   const updateConfig = async () => {
     let write = '';
@@ -72,14 +59,16 @@ function serverCommand(props) {
 
   async function createCommand(command) {
     if (command != "" && command != undefined) {
-      setCommands({
-        ...commands,
+      props.setCommands({
+        ...props.commands,
         [command]: ""
       });
+      let JsonCommands = JSON.stringify(props.commands);
+      await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "serverCommands.json"), JSON.stringify({
+        ...props.commands,
+        [command]: ""
+      }), { flag: 'w+' });
     } else message.error('Enter a valid command');
-
-    let JsonCommands = JSON.stringify(commands);
-    await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "serverCommands.json"), JsonCommands, { flag: 'w+' });
   }
 
   function ServerCommandsChangeValue(e) {
@@ -87,7 +76,7 @@ function serverCommand(props) {
   }
 
   function removeCommand(command) {
-    setCommands(_.omit(commands, command));
+    props.setCommands(_.omit(props.props.commands, command));
   }
 
   function changeValue(e, key) {
@@ -105,23 +94,23 @@ function serverCommand(props) {
             {props.selectedServer}
           </div>
         </div>
-      {Object.keys(props.serverSettings).map((p, i) => (
-        <div key={i} className={styles.rowSettings}>
-          <div className={styles.FirstSetting} >
-            {p}
+        {Object.keys(props.serverSettings).map((p, i) => (
+          <div key={i} className={styles.rowSettings}>
+            <div className={styles.FirstSetting} >
+              {p}
+            </div>
+            <Input className={styles.SecondSetting}
+              value={props.serverSettings[p]}
+              onChange={(e) => changeValue(e, p)}
+              onPressEnter={updateConfig}
+            >
+            </Input>
           </div>
-          <Input className={styles.SecondSetting}
-            value={props.serverSettings[p]}
-            onChange={(e) => changeValue(e, p)}
-            onPressEnter={updateConfig}
-          >
-          </Input>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
     )
   }
-  else if (props.commandState.view == "command") {
+  else if (props.commandState == "command") {
     return (
       <div>
         <div className={styles.rowSettings}>
@@ -130,16 +119,16 @@ function serverCommand(props) {
         <div className={styles.rowSettings}>
           {`Your ip :  ${Ip}`}
         </div>
-        {Object.keys(commands).length > 0 ?
-          Object.keys(commands).map(command => (
+        {Object.keys(props.commands).length > 0 ?
+          Object.keys(props.commands).map(command => (
             <div className={styles.rowSettings}>
               <div className={styles.FirstSetting} >
                 {command}
               </div>
               <Input className={styles.SecondSetting}
-                value={commands[command]}
-                onChange={(e) => setCommands({
-                  ...commands,
+                value={props.commands[command]}
+                onChange={(e) => props.setCommands({
+                  ...props.commands,
                   [command]: e.target.value
                 })}
               />

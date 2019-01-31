@@ -18,13 +18,10 @@ import ServerCommand from './serverCommand';
 function ServerManager(props) {
   const [servers, setServers] = useState([]);
   const [serverSettings, setServerSettings] = useState({});
-  const [selectedServer, setselectedServer] = useState(null);
+  const [selectedServer, setselectedServer] = useState("");
   const [serverName, setserverName] = useState("");
-  const [command, setCommand] = useState({
-    view: null
-  });
+  const [command, setCommand] = useState(null);
   const [commands, setCommands] = useState({
-
     "op": "",
     "kick": "",
     "ban": "",
@@ -56,9 +53,7 @@ function ServerManager(props) {
   }
 
   async function manageServer(serverName) {
-    setCommand({
-      view: "serverSettings"
-    });
+    setCommand("serverSettings");
     setselectedServer(serverName);
     const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "server.properties"))).toString('utf8');
     let values = {};
@@ -82,21 +77,15 @@ function ServerManager(props) {
   };
 
   async function commandManager(serverName) {
-    setCommand({
-      view: "command"
-    });
+    setCommand("command");
     setselectedServer(serverName);
     try {
-     // console.log("jsonCOSO", typeof(JSON.stringify(commands)));
-     // console.log("PATH TYPE", typeof(path.join(SERVERS_PATH, selectedServer, "serverCommands.json")));
-      let CommandFile = await promisify(fs.readFile)(path.join(SERVERS_PATH, selectedServer, "serverCommands.json"));
+      const CommandFile = await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "serverCommands.json"));
       setCommands(JSON.parse(CommandFile));
-      
     } catch(err) {
-      let StringifedCommand = JSON.stringify(commands);
-      let CommandFile = await promisify(fs.writeFile)(path.join(SERVERS_PATH, selectedServer, "serverCommands.json"), StringifedCommand);
-      setCommands(CommandFile);
-      
+      const StringifedCommand = JSON.stringify(commands);
+      const CommandFile = await promisify(fs.writeFile)(path.join(SERVERS_PATH, serverName, "serverCommands.json"), StringifedCommand);
+      setCommands(commands);
     }
   }
 
@@ -104,7 +93,7 @@ function ServerManager(props) {
     <div className={styles.container}>
       <div className={styles.serverSettings}>
 
-        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer} commands={commands}/>
+        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer} commands={commands} setCommands={setCommands}/>
 
       </div>
       <div className={styles.Serverlist}>
