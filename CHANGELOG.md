@@ -1,6 +1,6 @@
 # 0.10.0 (31.1.2019)
 - Fixed missing java warning not showing up
-- Changed context menu animation, not it's faster
+- Changed context menu animation, now it's faster
 - Changed modal animation
 - Added "Import Pack" option for twitch profiles
 - Modal overlay is now blurred
