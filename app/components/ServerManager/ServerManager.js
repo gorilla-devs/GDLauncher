@@ -53,17 +53,23 @@ function ServerManager(props) {
   }
 
   async function manageServer(serverName) {
-    setCommand("serverSettings");
-    setselectedServer(serverName);
-    const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "server.properties"))).toString('utf8');
-    let values = {};
-    lines.split("\n").forEach(arr => {
-      const splitted = arr.split('=');
-      if (arr.includes('=')) {
-        values[splitted[0]] = splitted[1];
-      }
-    });
-    setServerSettings(values);
+    try{
+
+      const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "server.properties"))).toString('utf8');
+      setCommand("serverSettings");
+      setselectedServer(serverName);
+      let values = {};
+      lines.split("\n").forEach(arr => {
+        const splitted = arr.split('=');
+        if (arr.includes('=')) {
+          values[splitted[0]] = splitted[1];
+        }
+      });
+      setServerSettings(values);
+      
+    } catch(err){
+      message.error("You have to run a first time the server!")
+    }
   }
 
   const updateConfig = async () => {
