@@ -80,8 +80,8 @@
   order: 1;
   flex: 1;
   background-color: var(--secondary-color-1);
-  max-height: 40%;
-  min-height: 40%;
+  max-height: 200px !important;
+  min-height: 20%;
   border-radius: 3px;
   padding: 4%;
 }
