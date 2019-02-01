@@ -68,6 +68,7 @@ function serverCommand(props) {
         ...props.commands,
         [command]: ""
       }), { flag: 'w+' });
+      setserverCommandValue("");
     } else message.error('Enter a valid command');
   }
 
