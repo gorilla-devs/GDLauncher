@@ -77,11 +77,24 @@ export default class DInstance extends Component<Props> {
     const { name } = this.props;
     if (!this.isInstalling()) {
       try {
-        const { version, forgeVersion } = JSON.parse(
+        const config = JSON.parse(
           await promisify(fs.readFile)(
             path.join(PACKS_PATH, name, 'config.json')
           )
         );
+        const { version, forgeVersion } = config;
+        if (config.icon) {
+          const icon = await promisify(fs.readFile)(
+            path.join(PACKS_PATH, this.props.name, config.icon)
+          );
+          this.setState({
+            icon: `url("data:image/png;base64,${icon.toString('base64')}")`
+          });
+        } else {
+          this.setState({
+            icon: `url(${InstanceIcon}) center no-repeat`
+          });
+        }
         this.setState({
           version,
           forgeVersion:
