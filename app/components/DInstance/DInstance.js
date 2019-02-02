@@ -173,11 +173,11 @@ export default class DInstance extends Component<Props> {
       this.setState({
         confirmDelete: true
       });
-      intervalDelete = setInterval(() => {
+      this.intervalDelete = setInterval(() => {
         this.setState(prev => ({
           deleteWait: prev.deleteWait - 1
         }));
-        if (this.state.deleteWait === 0) clearInterval(intervalDelete);
+        if (this.state.deleteWait === 0) clearInterval(this.intervalDelete);
       }, 1000);
     }
   };
