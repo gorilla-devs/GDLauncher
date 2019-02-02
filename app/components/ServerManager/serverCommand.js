@@ -87,7 +87,7 @@ function serverCommand(props) {
     });
   }
 
-  if (Object.keys(props.serverSettings).length > 0 && props.commandState.view == "serverSettings") {
+  if (Object.keys(props.serverSettings).length > 0 && props.commandState == "serverSettings") {
     return (
       <div>
         <div className={styles.rowSettings}>
