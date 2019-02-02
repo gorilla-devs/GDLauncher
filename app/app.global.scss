@@ -260,12 +260,12 @@ textarea,
 }
 
 .ant-cascader-menu-item:hover {
-  background-color: var(--secondary-color-3);
+  background-color: var(--primary);
 }
 
 .ant-cascader-menu-item-active:not(.ant-cascader-menu-item-disabled),
 .ant-cascader-menu-item-active:not(.ant-cascader-menu-item-disabled):hover {
-  background-color: var(--secondary-color-3);
+  background-color: var(--primary);
 }
 
 .ant-btn-primary.disabled,
@@ -362,7 +362,7 @@ textarea,
 
 .ant-select-dropdown-menu-item-selected,
 .ant-select-dropdown-menu-item-selected:hover {
-  background-color: var(--secondary-color-3);
+  background-color: var(--primary);
 }
 
 // Table
@@ -400,13 +400,13 @@ textarea,
   color: $text-dark;
 }
 
-.ant-select-dropdown,
-.ant-select-dropdown-menu-item-active {
-  background: var(--secondary-color-2);
+.ant-select-dropdown {
+  background: var(--secondary-color-3);
 }
 
-.ant-select-dropdown-menu-item:hover {
-  background: var(--secondary-color-3);
+.ant-select-dropdown-menu-item:hover,
+.ant-select-dropdown-menu-item-active {
+  background: var(--primary);
 }
 
 .sketch-picker {
@@ -451,7 +451,8 @@ textarea,
   color: #27ae60;
 }
 
-.ant-progress-success-bg, .ant-progress-bg {
+.ant-progress-success-bg,
+.ant-progress-bg {
   background-color: var(--primary);
 }
 
