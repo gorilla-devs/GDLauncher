@@ -261,7 +261,7 @@ export default class DInstance extends Component<Props> {
             selectInstance(name);
           }}
           onHide={() => {
-            clearInterval(intervalDelete);
+            clearInterval(this.intervalDelete);
             this.setState({ confirmDelete: false, deleteWait: 3 });
           }}
         >
