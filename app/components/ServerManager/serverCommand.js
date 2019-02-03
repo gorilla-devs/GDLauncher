@@ -17,6 +17,7 @@ import styles from './ServerManager.scss';
 import { downloadFile } from '../../utils/downloader';
 import { SERVERS_PATH } from '../../constants';
 import ButtonGroup from 'antd/lib/button/button-group';
+import { async } from 'q';
 
 
 function serverCommand(props) {
@@ -34,8 +35,16 @@ function serverCommand(props) {
     await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"), write, { flag: 'w+' });
   };
 
-  function runCommand(command, param) {
-    props.start.stdin.end(`/${command} ${param}`);
+ async function runCommand(command, param) {
+    console.log(command, param);
+    await props.start.stdin.end(`/${command} ${param}`);
+  }
+
+  function ServerCommandsChangeValueTWO(e, command) {
+    props.setCommands({
+      ...props.commands,
+      [command]: e.target.value
+    })
   }
 
   useEffect(async () => {
@@ -90,7 +99,7 @@ function serverCommand(props) {
   if (Object.keys(props.serverSettings).length > 0 && props.commandState == "serverSettings") {
     return (
       <div>
-        <div className={styles.rowSettings}>
+        <div className={styles.rowTitle}>
           <div className={styles.FirstSetting} >
             {props.selectedServer}
           </div>
@@ -114,7 +123,7 @@ function serverCommand(props) {
   else if (props.commandState == "command") {
     return (
       <div>
-        <div className={styles.rowSettings}>
+        <div className={styles.rowTitle}>
           {props.selectedServer}
         </div>
         <div className={styles.rowSettings}>
@@ -128,13 +137,10 @@ function serverCommand(props) {
               </div>
               <Input className={styles.SecondSetting}
                 value={props.commands[command]}
-                onChange={(e) => props.setCommands({
-                  ...props.commands,
-                  [command]: e.target.value
-                })}
+                onChange={(e) => ServerCommandsChangeValueTWO(e, command)}
               />
               <Button.Group className={styles.ButtonGroup}>
-                <Button type="primary" onClick={() => runCommand(command, serverCommandValue)}>run</Button>
+                <Button type="primary" onClick={() => runCommand(command, props.commands[command])}>run</Button>
                 <Button type="primary" onClick={() => removeCommand(command)}>remove</Button>
               </Button.Group>
             </div>

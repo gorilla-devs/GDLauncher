@@ -56,7 +56,6 @@ function ServerManager(props) {
     try{
       
       setCommand("serverSettings");
-      console.log(command);
       setselectedServer(serverName);
       const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "server.properties"))).toString('utf8');
       let values = {};
@@ -100,7 +99,7 @@ function ServerManager(props) {
     <div className={styles.container}>
       <div className={styles.serverSettings}>
 
-        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer} commands={commands} setCommands={setCommands} commandState={command}/>
+        <ServerCommand commandState={command} serverSettings={serverSettings} setServerSettings={setServerSettings} selectedServer={selectedServer} setselectedServer={setselectedServer} commands={commands} setCommands={setCommands} />
 
       </div>
       <div className={styles.Serverlist}>
