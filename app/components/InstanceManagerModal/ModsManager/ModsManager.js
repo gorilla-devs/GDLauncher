@@ -64,60 +64,10 @@ class ModsManager extends Component<Props> {
       );
     }
     return (
-      <div style={{ width: '100%', maxWidth: '800px', margin: 10 }}>
-        <div style={{position: 'relative'}}>
-          <Route
-            path={`/editInstance/${
-              this.props.match.params.instance
-            }/mods/browse/${this.state.version}/:mod`}
-            render={() => (
-              <Link
-                to={{
-                  pathname: `/editInstance/${
-                    this.props.match.params.instance
-                  }/mods/browse/${this.props.match.params.version}`,
-                  state: { modal: true }
-                }}
-                replace
-              >
-                <Button type="primary" icon="caret-left" style={{ position: 'absolute', marginLeft: 10 }}>
-                  Go Back
-                </Button>
-              </Link>
-            )}
-          />
-          <Radio.Group
-            value={this.props.match.params.state}
-            buttonStyle="solid"
-            style={{ display: 'block', margin: '0 auto', textAlign: 'center' }}
-          >
-            <Link
-              to={{
-                pathname: `/editInstance/${
-                  this.props.match.params.instance
-                }/mods/local`,
-                state: { modal: true }
-              }}
-              replace
-            >
-              <Radio.Button value="local">Local</Radio.Button>
-            </Link>
-            <Link
-              to={{
-                pathname: `/editInstance/${
-                  this.props.match.params.instance
-                }/mods/browse/${this.state.version}`,
-                state: { modal: true }
-              }}
-              replace
-            >
-              <Radio.Button value="browse">Browse</Radio.Button>
-            </Link>
-          </Radio.Group>
-        </div>
+      <div style={{ width: '100%', maxWidth: '800px', height: '100%', overflow: 'hidden' }}>
         <Switch>
           <Route
-            path="/editInstance/:instance/mods/local"
+            path="/editInstance/:instance/mods/local/:version"
             component={LocalMods}
           />
           <Route
