@@ -96,7 +96,7 @@ const ModsList = props => {
       <AutoSizer>
         {({ height, width }) => (
           <ModsListWrapper
-            hasNextPage={true}
+            hasNextPage={mods % 21 !== 0}
             isNextPageLoading={areModsLoading}
             items={mods}
             loadNextPage={loadMoreMods}

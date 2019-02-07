@@ -1,5 +1,7 @@
 import React from 'react';
 import { FixedSizeGrid as Grid } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import ContentLoader from 'react-content-loader';
 import InfiniteLoader from 'react-window-infinite-loader';
 
 import styles from './ModsList.scss';
@@ -22,7 +24,7 @@ export default function ModsListWrapper({
   height
 }) {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
-  const itemCount = hasNextPage ? items.length + 1 : items.length;
+  const itemCount = hasNextPage ? items.length + 3 : items.length;
 
   // Only load 1 page of items at a time.
   // Pass an empty callback to InfiniteLoader in case it asks us to load more than once.
@@ -31,10 +33,43 @@ export default function ModsListWrapper({
   // Every row is loaded except for our loading indicator row.
   const isItemLoaded = index => !hasNextPage || index < items.length;
 
-  const Cell = ({ columnIndex, rowIndex, style, isScrolling }) => {
+  const Cell = ({ columnIndex, rowIndex, style }) => {
     const mod = items[3 * rowIndex + columnIndex];
-    if (isItemLoaded(3 * rowIndex + columnIndex)) {
+    let content;
 
+    if (!isItemLoaded(3 * rowIndex + columnIndex)) {
+      content = (
+        <div style={style} className={styles.modIconContainer}>
+          <div className={styles.overlayContainer}>
+            <AutoSizer>
+              {({ height, width }) => (
+                <ContentLoader
+                  height={height}
+                  width={width}
+                  speed={0.6}
+                  ariaLabel={false}
+                  primaryColor="var(--secondary-color-2)"
+                  secondaryColor="var(--secondary-color-3)"
+                  style={{
+                    width,
+                    height
+                  }}
+                >
+                  <rect
+                    x={0}
+                    y={0}
+                    rx="0"
+                    ry="0"
+                    width={width}
+                    height={height}
+                  />
+                </ContentLoader>
+              )}
+            </AutoSizer>
+          </div>
+        </div>
+      );
+    } else {
       // Tries to find a thumbnail. If none is found, it sets a default one
       let attachment;
       try {
@@ -43,8 +78,7 @@ export default function ModsListWrapper({
         attachment =
           'https://www.curseforge.com/Content/2-0-6969-50/Skins/CurseForge/images/background.jpg';
       }
-
-      return (
+      content = (
         <div style={style} className={styles.modIconContainer}>
           <div className={styles.overlayContainer}>
             <div
@@ -64,7 +98,8 @@ export default function ModsListWrapper({
         </div>
       );
     }
-    return <span />;
+
+    return content;
   };
 
   return (
@@ -114,8 +149,7 @@ export default function ModsListWrapper({
           columnWidth={Math.floor(width / 3) - 10}
           height={height}
           rowCount={
-            Math.floor(items.length / 3) +
-            Math.floor(items.length % 3 !== 0 ? 1 : 0)
+            Math.floor(itemCount / 3) + Math.floor(itemCount % 3 !== 0 ? 1 : 0)
           }
           rowHeight={180}
           width={width}
