@@ -27,11 +27,10 @@ export default props => {
         // value={searchQuery}
         allowClear
       />
-      <Button onClick={() => props.loadMoreMods()}>Load more</Button>
       <div style={{ padding: '0 5px', height: 40, marginTop: 3 }}>
         <Select
-          defaultValue="featured"
-          // onChange={this.filterChanged}
+          defaultValue={props.filter}
+          onChange={props.setFilter}
           style={{ width: 150, height: 40 }}
         >
           <Select.Option value="featured">Featured</Select.Option>

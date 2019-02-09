@@ -21,7 +21,8 @@ export default function ModsListWrapper({
   // Callback function responsible for loading the next page of items.
   loadNextPage,
   width,
-  height
+  height,
+  setClick
 }) {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
@@ -91,6 +92,7 @@ export default function ModsListWrapper({
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
+              onClick={() => setClick(mod.id)}
             >
               {mod.name}
             </div>

@@ -13,6 +13,7 @@ import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
 import { downloadMod } from '../../../../utils/mods';
 import ModsListHeader from './ModsListHeader';
+import ModPage from './ModPage';
 
 import styles from './ModsList.scss';
 
@@ -20,24 +21,17 @@ const ModsList = props => {
   const [mods, setMods] = useState([]);
   const [areModsLoading, setAreModsLoading] = useState(true);
   const [filterType, setFilterType] = useState('Featured');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [modOverview, setModOverview] = useState(null);
 
-  useEffect(() => loadMoreMods(), []);
+  useEffect(() => loadMoreMods(null, null, '', true), [filterType]);
 
   // The "e" param is just used for invoking this function without params in events handlers
   const loadMoreMods = async (e, v, searchQueryP, reset) => {
     searchQueryP = searchQueryP ? searchQueryP : '';
     reset = reset ? reset : false;
-    console.log(
-      `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=21&index=${
-        reset === true ? 0 : mods.length
-      }&sort=${filterType}&searchFilter=${encodeURI(
-        searchQueryP
-      )}&gameVersion=${
-        props.match.params.version
-      }&categoryId=0&sectionId=6&sortDescending=${filterType !== 'author' &&
-        filterType !== 'name'}`
-    );
+    if(reset === true) {
+      setMods([]);
+    }
     setAreModsLoading(true);
     const { data } = await axios.get(
       `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=21&index=${
@@ -56,7 +50,11 @@ const ModsList = props => {
   if (mods.length === 0) {
     return (
       <div style={{ width: '100%', height: '100%' }}>
-        <ModsListHeader />
+        <ModsListHeader
+          loadMoreMods={loadMoreMods}
+          filter={filterType}
+          setFilter={setFilterType}
+        />
         <AutoSizer>
           {({ height, width }) => (
             <ContentLoader
@@ -92,7 +90,11 @@ const ModsList = props => {
 
   return (
     <div className={styles.modsContainer}>
-      <ModsListHeader loadMoreMods={loadMoreMods} />
+      <ModsListHeader
+        loadMoreMods={loadMoreMods}
+        filter={filterType}
+        setFilter={setFilterType}
+      />
       <AutoSizer>
         {({ height, width }) => (
           <ModsListWrapper
@@ -102,9 +104,18 @@ const ModsList = props => {
             loadNextPage={loadMoreMods}
             width={width}
             height={height}
+            setClick={setModOverview}
           />
         )}
       </AutoSizer>
+      {modOverview !== null && (
+        <ModPage
+          mod={modOverview}
+          version={props.match.params.version}
+          instance={props.match.params.instance}
+          goBack={() => setModOverview(null)}
+        />
+      )}
     </div>
   );
 };

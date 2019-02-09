@@ -8,6 +8,7 @@ import * as AuthActions from './actions/auth';
 import * as SettingsActions from './actions/settings';
 import { JAVA_URL } from './constants';
 import App from './containers/App';
+import store from './localStore';
 import SideBar from './components/Common/SideBar/SideBar';
 import Navigation from './containers/Navigation';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
@@ -37,6 +38,9 @@ const CurseModpackExplorerModal = lazy(() =>
   import('./components/CurseModpackExplorerModal/CurseModpackExplorerModal')
 );
 const ImportPack = lazy(() => import('./components/ImportPack/ImportPack'));
+const ChangelogsModal = lazy(() =>
+  import('./components/ChangelogModal/ChangelogModal')
+);
 
 type Props = {
   location: object,
@@ -117,7 +121,7 @@ class RouteDef extends Component<Props> {
               path="/autoUpdate"
               component={WaitingComponent(AutoUpdate)}
             />
-            {!isAuthValid && <Redirect push to="/" />}
+            {/* {!isAuthValid && <Redirect push to="/" />} */}
             <Route path="/newUserPage" component={NewUserPage} />
             <Route>
               <div
@@ -141,6 +145,15 @@ class RouteDef extends Component<Props> {
             </Route>
           </Switch>
         </div>
+        {location.pathname === '/home' && store.get('showChangelogs') !== false && (
+          <Redirect
+            push
+            to={{
+              pathname: '/changelogs',
+              state: { modal: true }
+            }}
+          />
+        )}
         {/* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
         {isModal ? (
@@ -174,6 +187,12 @@ class RouteDef extends Component<Props> {
           <Route
             path="/loginHelperModal"
             component={WaitingComponent(loginHelperModal)}
+          />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/changelogs"
+            component={WaitingComponent(ChangelogsModal)}
           />
         ) : null}
       </App>
