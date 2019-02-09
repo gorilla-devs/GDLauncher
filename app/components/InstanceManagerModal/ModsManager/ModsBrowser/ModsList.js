@@ -22,14 +22,17 @@ const ModsList = props => {
   const [areModsLoading, setAreModsLoading] = useState(true);
   const [filterType, setFilterType] = useState('Featured');
   const [modOverview, setModOverview] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hasNextPage, setHasNextPage] = useState(false);
 
   useEffect(() => loadMoreMods(null, null, '', true), [filterType]);
 
   // The "e" param is just used for invoking this function without params in events handlers
   const loadMoreMods = async (e, v, searchQueryP, reset) => {
-    searchQueryP = searchQueryP ? searchQueryP : '';
-    reset = reset ? reset : false;
-    if(reset === true) {
+    console.log("STARTING");
+    searchQueryP = searchQueryP !== undefined ? searchQueryP : searchQuery;
+    reset = reset !== undefined ? reset : false;
+    if (reset === true) {
       setMods([]);
     }
     setAreModsLoading(true);
@@ -38,22 +41,25 @@ const ModsList = props => {
         reset === true ? 0 : mods.length
       }&sort=${filterType}&searchFilter=${encodeURI(
         searchQueryP
-      )}&gameVersion=${
-        props.match.params.version
-      }&categoryId=0&sectionId=6&sortDescending=${filterType !== 'author' &&
-        filterType !== 'name'}`
-    );
-    setAreModsLoading(false);
-    setMods(reset === true ? data : mods.concat(data));
-  };
-
-  if (mods.length === 0) {
-    return (
-      <div style={{ width: '100%', height: '100%' }}>
+        )}&gameVersion=${
+          props.match.params.version
+        }&categoryId=0&sectionId=6&sortDescending=${filterType !== 'Author' &&
+        filterType !== 'Name'}`
+        );
+        setMods(reset === true ? data : mods.concat(data));
+        setHasNextPage(data.length === 21);
+        setAreModsLoading(false);
+        console.log("ENDING");
+      };
+      
+      if (mods.length === 0) {
+        return (
+          <div style={{ width: '100%', height: '100%' }}>
         <ModsListHeader
           loadMoreMods={loadMoreMods}
           filter={filterType}
           setFilter={setFilterType}
+          setSearchQuery={setSearchQuery}
         />
         <AutoSizer>
           {({ height, width }) => (
@@ -72,7 +78,7 @@ const ModsList = props => {
               {[...Array(Math.round(height / 100))].map((v, i) =>
                 [...Array(Math.round(3))].map((v1, k) => (
                   <rect
-                    x={(width / 3) * k + 28}
+                    x={(width / 3) * (k !== 2 ? k : k * 0.97) + (k === 0 ? 38 : 28)}
                     y={i * 180 + 18}
                     rx="0"
                     ry="0"
@@ -94,11 +100,12 @@ const ModsList = props => {
         loadMoreMods={loadMoreMods}
         filter={filterType}
         setFilter={setFilterType}
+        setSearchQuery={setSearchQuery}
       />
       <AutoSizer>
         {({ height, width }) => (
           <ModsListWrapper
-            hasNextPage={mods % 21 !== 0}
+            hasNextPage={hasNextPage}
             isNextPageLoading={areModsLoading}
             items={mods}
             loadNextPage={loadMoreMods}

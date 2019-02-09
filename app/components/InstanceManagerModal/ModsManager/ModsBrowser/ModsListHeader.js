@@ -3,12 +3,16 @@ import { Input, Select, Button } from 'antd';
 import { debounce } from 'lodash';
 
 export default props => {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const onInputChange = debounce(text => {
-    setSearchQuery(text);
+  const loadMoreMods = text => {
+    props.setSearchQuery(text);
     props.loadMoreMods(null, null, text, true);
-  }, 500);
+  };
+
+  const debounced = debounce(loadMoreMods, 500);
+
+  const onInputChange = e => {
+    debounced(e.target.value);
+  };
 
   return (
     <div
@@ -21,7 +25,7 @@ export default props => {
     >
       <Input
         placeholder="Search a mod"
-        onChange={e => onInputChange(e.target.value)}
+        onChange={onInputChange}
         // onPressEnter={onSearchSubmit}
         style={{ height: 40 }}
         // value={searchQuery}
@@ -33,12 +37,12 @@ export default props => {
           onChange={props.setFilter}
           style={{ width: 150, height: 40 }}
         >
-          <Select.Option value="featured">Featured</Select.Option>
-          <Select.Option value="popularity">Popularity</Select.Option>
-          <Select.Option value="lastupdated">Last Updated</Select.Option>
-          <Select.Option value="name">Name</Select.Option>
-          <Select.Option value="author">Author</Select.Option>
-          <Select.Option value="totaldownloads">Total Downloads</Select.Option>
+          <Select.Option value="Featured">Featured</Select.Option>
+          <Select.Option value="Popularity">Popularity</Select.Option>
+          <Select.Option value="LastUpdated">Last Updated</Select.Option>
+          <Select.Option value="Name">Name</Select.Option>
+          <Select.Option value="Author">Author</Select.Option>
+          <Select.Option value="TotalDownloads">Total Downloads</Select.Option>
         </Select>
       </div>
     </div>

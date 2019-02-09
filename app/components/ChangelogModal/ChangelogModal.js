@@ -46,7 +46,7 @@ export default props => {
             </li>
           </ul>
         </div>
-        <h2 className={styles.hrTextRed}>SOME FIXED BUGS</h2>
+        <h2 className={styles.hrTextRed}>SOME BUGFIXES</h2>
         <div className={styles.subHrList}>
           <ul>
             <li>

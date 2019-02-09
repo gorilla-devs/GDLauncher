@@ -29,7 +29,7 @@ export default function ModsListWrapper({
 
   // Only load 1 page of items at a time.
   // Pass an empty callback to InfiniteLoader in case it asks us to load more than once.
-  const loadMoreItems = isNextPageLoading ? () => {} : loadNextPage;
+  const loadMoreItems = loadNextPage;
 
   // Every row is loaded except for our loading indicator row.
   const isItemLoaded = index => !hasNextPage || index < items.length;
@@ -88,7 +88,7 @@ export default function ModsListWrapper({
                 background: `linear-gradient(
                   rgba(0, 0, 0, 0.8), 
                   rgba(0, 0, 0, 0.8)
-                ), url(${attachment})`,
+                  ), url(${attachment})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
@@ -101,6 +101,8 @@ export default function ModsListWrapper({
       );
     }
 
+    if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
+      return <div />;
     return content;
   };
 
@@ -109,6 +111,7 @@ export default function ModsListWrapper({
       isItemLoaded={isItemLoaded}
       itemCount={itemCount}
       loadMoreItems={loadMoreItems}
+      threshold={6}
     >
       {({ onItemsRendered, ref }) => (
         <Grid
