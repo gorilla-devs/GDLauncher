@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "0.10.2-beta",
+  "version": "0.10.3-beta",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "boilerplate",
@@ -24,7 +24,7 @@
   "license": "MIT",
   "author": {
     "name": "GorillaDevs",
-    "email": "staff@gorilladevs.com",
+    "email": "info@gdevs.io",
     "url": "https://gdevs.io"
   },
   "main": "./app/main.prod.js",
