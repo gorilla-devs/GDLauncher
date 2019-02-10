@@ -172,6 +172,7 @@ if (minimist(process.argv.slice(1)).i) {
       });
 
       autoUpdater.on('download-progress', data => {
+        console.log(data);
         ev.sender.send('download-progress', Math.floor(data.percent));
       });
     });
