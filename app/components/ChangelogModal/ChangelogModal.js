@@ -57,9 +57,9 @@ export default props => {
             </li>
             <li>
               <span className={styles.summary}>
-                The scrollbar is now more usable,
+                We fixed autoupdates on linux,
               </span>{' '}
-              it's a little wider and easier to use
+              will you ever forgive us?
             </li>
           </ul>
         </div>

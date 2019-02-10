@@ -23,7 +23,6 @@ const Settings = ({ match, history }) => {
           <MenuItem active={match.params.page === 'java'} to="/settings/java">Java</MenuItem>
           <MenuItem active={match.params.page === 'instances'} to="/settings/instances">Instances</MenuItem>
           <MenuItem active={match.params.page === 'ui'} to="/settings/ui">User Interface</MenuItem>
-          <MenuItem active={false} to="/changelogs">Changelogs</MenuItem>
         </SideMenu>
         <Content match={match} />
       </div>
