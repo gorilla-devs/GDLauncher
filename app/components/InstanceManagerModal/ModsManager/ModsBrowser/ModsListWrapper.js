@@ -35,6 +35,9 @@ export default function ModsListWrapper({
   const isItemLoaded = index => !hasNextPage || index < items.length;
 
   const Cell = ({ columnIndex, rowIndex, style }) => {
+    if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
+      return <div />;
+
     const mod = items[3 * rowIndex + columnIndex];
     let content;
 
@@ -94,15 +97,13 @@ export default function ModsListWrapper({
               }}
               onClick={() => setClick(mod.id)}
             >
-              {mod.name}
+              {mod && mod.name}
             </div>
           </div>
         </div>
       );
     }
 
-    if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
-      return <div />;
     return content;
   };
 
