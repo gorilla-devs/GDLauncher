@@ -38,13 +38,14 @@ export default merge.smart(baseConfig, {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              publicPath: './'
+              publicPath: './',
+              sourceMap: false
             }
           },
           {
             loader: 'css-loader',
             options: {
-              sourceMap: true
+              sourceMap: false
             }
           }
         ]
@@ -54,14 +55,17 @@ export default merge.smart(baseConfig, {
         test: /^((?!\.global).)*\.css$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              sourceMap: false
+            }
           },
           {
             loader: 'css-loader',
             options: {
               modules: true,
               localIdentName: '[name]__[local]__[hash:base64:5]',
-              sourceMap: true
+              sourceMap: false
             }
           }
         ]
@@ -71,19 +75,22 @@ export default merge.smart(baseConfig, {
         test: /\.global\.(scss|sass)$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              sourceMap: false
+            }
           },
           {
             loader: 'css-loader',
             options: {
-              sourceMap: true,
+              sourceMap: false,
               importLoaders: 1
             }
           },
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: true
+              sourceMap: false
             }
           }
         ]
@@ -93,7 +100,10 @@ export default merge.smart(baseConfig, {
         test: /^((?!\.global).)*\.(scss|sass)$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              sourceMap: false
+            }
           },
           {
             loader: 'css-loader',
@@ -101,13 +111,13 @@ export default merge.smart(baseConfig, {
               modules: true,
               importLoaders: 1,
               localIdentName: '[name]__[local]__[hash:base64:5]',
-              sourceMap: true
+              sourceMap: false
             }
           },
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: true
+              sourceMap: false
             }
           }
         ]
@@ -185,15 +195,12 @@ export default merge.smart(baseConfig, {
       : [
           new TerserPlugin({
             parallel: true,
-            sourceMap: true,
+            sourceMap: false,
             cache: true
           }),
           new OptimizeCSSAssetsPlugin({
             cssProcessorOptions: {
-              map: {
-                inline: false,
-                annotation: true
-              }
+              map: false
             }
           })
         ],
