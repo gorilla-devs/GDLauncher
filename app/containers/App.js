@@ -10,6 +10,10 @@ export default class App extends React.Component<Props> {
 
   render() {
     const { children } = this.props;
-    return <React.Fragment>{children}</React.Fragment>;
+    return (
+      <React.StrictMode>
+        <React.Fragment>{children}</React.Fragment>
+      </React.StrictMode>
+    );
   }
 }
