@@ -25,7 +25,7 @@ type Props = {};
 const SideBar = props => {
   const [instanceData, setInstanceData] = useState(null);
 
-  useEffect(async () => {
+  const UpdateSideBar = async () => {
     if (props.selectedInstance !== null) {
       const data = JSON.parse(
         await promisify(fs.readFile)(
@@ -60,6 +60,10 @@ const SideBar = props => {
     } else {
       setInstanceData(null);
     }
+  };
+
+  useEffect(() => {
+    UpdateSideBar();
   }, [props.selectedInstance]);
 
   return (

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ContentLoader from 'react-content-loader';
 import axios from 'axios';
 import { Button } from 'antd';
+import log from 'electron-log';
 import ReactHtmlParser from 'react-html-parser';
 import ProgressiveImage from 'react-progressive-image';
 import Modal from '../Common/Modal/Modal';
@@ -34,11 +35,13 @@ export default props => {
   const [unMount, setUnMount] = useState(false);
   const [packData, setPackData] = useState(null);
 
-  useEffect(async () => {
-    const { data } = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${addonID}`
-    );
-    setPackData(data);
+  useEffect(() => {
+    axios
+      .get(`${CURSEMETA_API_URL}/direct/addon/${addonID}`)
+      .then(({ data }) => {
+        setPackData(data);
+      })
+      .catch(e => log.error(e));
   }, []);
 
   return (
