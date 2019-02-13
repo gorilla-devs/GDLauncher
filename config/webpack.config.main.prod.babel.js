@@ -32,7 +32,7 @@ export default merge.smart(baseConfig, {
       : [
           new TerserPlugin({
             parallel: true,
-            sourceMap: false,
+            sourceMap: true,
             cache: true
           })
         ]
@@ -56,6 +56,19 @@ export default merge.smart(baseConfig, {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: 'false'
+    }),
+    /**
+     * Set NODE_ENV to "production" for external dependencies
+     *
+     * Note: this is required for both main and renderer
+     * separately since the renderer process doesn't inherit
+     * the main process's environment on Linux.
+     */
+    new webpack.BannerPlugin({
+      banner: 'process.env.NODE_ENV="production";',
+      raw: true,
+      entryOnly: true,
+      test: /\.js$/
     })
   ],
 

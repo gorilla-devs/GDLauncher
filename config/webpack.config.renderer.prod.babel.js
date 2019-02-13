@@ -39,13 +39,13 @@ export default merge.smart(baseConfig, {
             loader: MiniCssExtractPlugin.loader,
             options: {
               publicPath: './',
-              sourceMap: false
+              sourceMap: true
             }
           },
           {
             loader: 'css-loader',
             options: {
-              sourceMap: false
+              sourceMap: true
             }
           }
         ]
@@ -57,7 +57,7 @@ export default merge.smart(baseConfig, {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              sourceMap: false
+              sourceMap: true
             }
           },
           {
@@ -65,7 +65,7 @@ export default merge.smart(baseConfig, {
             options: {
               modules: true,
               localIdentName: '[name]__[local]__[hash:base64:5]',
-              sourceMap: false
+              sourceMap: true
             }
           }
         ]
@@ -77,20 +77,20 @@ export default merge.smart(baseConfig, {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              sourceMap: false
+              sourceMap: true
             }
           },
           {
             loader: 'css-loader',
             options: {
-              sourceMap: false,
+              sourceMap: true,
               importLoaders: 1
             }
           },
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: false
+              sourceMap: true
             }
           }
         ]
@@ -102,7 +102,7 @@ export default merge.smart(baseConfig, {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              sourceMap: false
+              sourceMap: true
             }
           },
           {
@@ -111,13 +111,13 @@ export default merge.smart(baseConfig, {
               modules: true,
               importLoaders: 1,
               localIdentName: '[name]__[local]__[hash:base64:5]',
-              sourceMap: false
+              sourceMap: true
             }
           },
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: false
+              sourceMap: true
             }
           }
         ]
@@ -195,7 +195,7 @@ export default merge.smart(baseConfig, {
       : [
           new TerserPlugin({
             parallel: true,
-            sourceMap: false,
+            sourceMap: true,
             cache: true
           }),
           new OptimizeCSSAssetsPlugin({
@@ -249,6 +249,19 @@ export default merge.smart(baseConfig, {
       analyzerMode:
         process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
       openAnalyzer: process.env.OPEN_ANALYZER === 'true'
+    }),
+    /**
+     * Set NODE_ENV to "production" for external dependencies
+     *
+     * Note: this is required for both main and renderer
+     * separately since the renderer process doesn't inherit
+     * the main process's environment on Linux.
+     */
+    new webpack.BannerPlugin({
+      banner: 'process.env.NODE_ENV="production";',
+      raw: true,
+      entryOnly: true,
+      test: /\.js$/
     })
   ]
 });
