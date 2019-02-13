@@ -29,7 +29,6 @@ const ModsList = props => {
 
   // The "e" param is just used for invoking this function without params in events handlers
   const loadMoreMods = async (e, v, searchQueryP, reset) => {
-    console.log("STARTING");
     searchQueryP = searchQueryP !== undefined ? searchQueryP : searchQuery;
     reset = reset !== undefined ? reset : false;
     if (reset === true) {
@@ -49,7 +48,6 @@ const ModsList = props => {
         setMods(reset === true ? data : mods.concat(data));
         setHasNextPage(data.length === 21);
         setAreModsLoading(false);
-        console.log("ENDING");
       };
       
       if (mods.length === 0) {

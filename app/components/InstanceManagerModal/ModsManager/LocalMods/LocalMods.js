@@ -11,34 +11,23 @@ import makeDir from 'make-dir';
 import log from 'electron-log';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Button, Table, Switch, Input, Checkbox } from 'antd';
+import { Button, Input, Checkbox } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
 
-const fs = Promise.promisifyAll(fss);
-
-type Props = {};
-
 const LocalMods = props => {
-  const [mods, setMods] = useState([]);
-  const [filteredMods, setFilteredMods] = useState([]);
+  const [filteredMods, setFilteredMods] = useState(props.localMods);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    setFilteredMods(props.localMods);
+    filterMods(searchQuery);
+  }, [props.localMods]);
 
   const listRef = React.createRef();
 
   const modsFolder = path.join(PACKS_PATH, props.match.params.instance, 'mods');
-  let watcher;
-  console.log(props);
-  useEffect(async () => {
-    try {
-      await fs.accessAsync(modsFolder);
-    } catch (err) {
-      await makeDir(modsFolder);
-    }
-    getMods();
-    // return watcher.close(); // Cleaning up the watcher when the component unmounts
-  }, []);
 
   const Mod = ({ index, style, toggleSize }) => (
     <div
@@ -55,46 +44,23 @@ const LocalMods = props => {
     </div>
   );
 
-  const filterMapMods = mods => {
-    return mods
-      .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
-      .filter(el => path.extname(el) === '.zip' || path.extname(el) === '.jar')
-      .map(el => {
-        return {
-          name: el,
-          state: path.extname(el) !== '.disabled',
-          key: el,
-          height: 50
-        };
-      });
-  };
-
-  const getMods = async () => {
-    let modsList = filterMapMods(await fs.readdirAsync(modsFolder));
-
-    setMods(modsList);
-    setFilteredMods(modsList);
-    // Watches for any changes in the packs dir. TODO: Optimize
-    watcher = fss.watch(modsFolder, async () => {
-      modsList = filterMapMods(await fs.readdirAsync(modsFolder));
-      setMods(modsList);
+  const filterMods = v => {
+    setSearchQuery(v.toLowerCase());
+    if (v === '') {
+      setFilteredMods(props.localMods);
+    } else {
+      const modsList = props.localMods.filter(mod =>
+        mod.name.toLowerCase().includes(v.toLowerCase())
+      );
       setFilteredMods(modsList);
-    });
-  };
-
-  const filterMods = e => {
-    setSearchQuery(e.target.value.toLowerCase());
-    const modsList = mods.filter(mod =>
-      mod.name.toLowerCase().includes(e.target.value.toLowerCase())
-    );
-    setFilteredMods(modsList);
+    }
   };
 
   const getSize = i => {
     return filteredMods[i].height;
   };
 
-  const toggleSize = async i => {
+  const toggleSize = i => {
     if (listRef.current) {
       listRef.current.resetAfterIndex(i);
     }
@@ -102,7 +68,6 @@ const LocalMods = props => {
     if (filteredMods[i].height === 50) {
       const zipFile = new Zip(path.join(modsFolder, filteredMods[i].name));
       const mcmodInfo = JSON.parse(zipFile.readAsText('mcmod.info'));
-    } else {
     }
 
     const newMods = Object.assign([...filteredMods], {
@@ -114,7 +79,7 @@ const LocalMods = props => {
     setFilteredMods(newMods);
   };
 
-  if (mods.length === 0) {
+  if (props.localMods.length === 0) {
     return (
       <div className={styles.noMod}>
         <div>
@@ -141,10 +106,11 @@ const LocalMods = props => {
       <div style={{ height: 60, width: '100%' }}>
         <Input
           allowClear
-          onChange={filterMods}
+          onChange={e => filterMods(e.target.value)}
           size="large"
           placeholder="Filter mods"
           style={{ width: '80%' }}
+          value={searchQuery}
         />
         <Link
           to={{
@@ -177,7 +143,7 @@ const LocalMods = props => {
             itemSize={getSize}
             width={width}
           >
-            {props => <Mod {...props} toggleSize={toggleSize} />}
+            {propss => <Mod {...propss} toggleSize={toggleSize} />}
           </List>
         )}
       </AutoSizer>
