@@ -11,6 +11,7 @@ import { PACKS_PATH } from '../../../constants';
 import ModsList from './ModsBrowser/ModsList';
 import LocalMods from './LocalMods/LocalMods';
 import ModPage from './ModsBrowser/ModPage';
+import { downloadMod, getModMurmurHash2 } from '../../../utils/mods';
 
 import styles from './ModsManager.scss';
 
@@ -69,7 +70,7 @@ class ModsManager extends Component<Props> {
   }
 
   getMods = async () => {
-    let modsList = this.filterMapMods(
+    let modsList = await this.filterMapMods(
       await promisify(fs.readdir)(path.join(this.instanceFolder, 'mods'))
     );
 
@@ -79,7 +80,7 @@ class ModsManager extends Component<Props> {
 
     // Watches for any changes in the packs dir
     watcher = fs.watch(path.join(this.instanceFolder, 'mods'), async () => {
-      modsList = this.filterMapMods(
+      modsList = await this.filterMapMods(
         await promisify(fs.readdir)(path.join(this.instanceFolder, 'mods'))
       );
       this.setState({
@@ -88,18 +89,26 @@ class ModsManager extends Component<Props> {
     });
   };
 
-  filterMapMods = mods => {
-    return mods
-      .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
-      .filter(el => path.extname(el) === '.zip' || path.extname(el) === '.jar')
-      .map(el => {
-        return {
-          name: el,
-          state: path.extname(el) !== '.disabled',
-          key: el,
-          height: 50
-        };
-      });
+  filterMapMods = async mods => {
+    return Promise.all(
+      mods
+        .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
+        .filter(
+          el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
+        )
+        .map(async el => {
+          const murmur = await getModMurmurHash2(
+            path.join(this.instanceFolder, 'mods', el)
+          );
+          return {
+            name: el,
+            state: path.extname(el) !== '.disabled',
+            key: el,
+            height: 50,
+            fingerprint: murmur
+          };
+        })
+    );
   };
 
   render() {
@@ -128,7 +137,9 @@ class ModsManager extends Component<Props> {
         <Switch>
           <Route
             path="/editInstance/:instance/mods/local/:version"
-            render={props => <LocalMods localMods={this.state.localMods} {...props} />}
+            render={props => (
+              <LocalMods localMods={this.state.localMods} {...props} />
+            )}
           />
           <Route
             path="/editInstance/:instance/mods/browse/:version/:mod"
@@ -136,7 +147,9 @@ class ModsManager extends Component<Props> {
           />
           <Route
             path="/editInstance/:instance/mods/browse/:version"
-            render={props => <ModsList {...props} />}
+            render={props => (
+              <ModsList localMods={this.state.localMods} {...props} />
+            )}
           />
         </Switch>
       </div>

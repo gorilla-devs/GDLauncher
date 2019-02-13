@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
+import path from 'path';
 import axios from 'axios';
 import ContentLoader from 'react-content-loader';
 import { FixedSizeGrid as Grid } from 'react-window';
@@ -11,7 +12,7 @@ import ModsListWrapper from './ModsListWrapper';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
-import { downloadMod } from '../../../../utils/mods';
+import { downloadMod, getModMurmurHash2 } from '../../../../utils/mods';
 import ModsListHeader from './ModsListHeader';
 import ModPage from './ModPage';
 
@@ -24,8 +25,12 @@ const ModsList = props => {
   const [modOverview, setModOverview] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [localMods, setLocalMods] = useState([]);
 
-  useEffect(() => loadMoreMods(null, null, '', true), [filterType]);
+
+  useEffect(() => {
+    loadMoreMods(null, null, '', true);
+  }, [filterType]);
 
   // The "e" param is just used for invoking this function without params in events handlers
   const loadMoreMods = async (e, v, searchQueryP, reset) => {
@@ -40,19 +45,19 @@ const ModsList = props => {
         reset === true ? 0 : mods.length
       }&sort=${filterType}&searchFilter=${encodeURI(
         searchQueryP
-        )}&gameVersion=${
-          props.match.params.version
-        }&categoryId=0&sectionId=6&sortDescending=${filterType !== 'Author' &&
+      )}&gameVersion=${
+        props.match.params.version
+      }&categoryId=0&sectionId=6&sortDescending=${filterType !== 'Author' &&
         filterType !== 'Name'}`
-        );
-        setMods(reset === true ? data : mods.concat(data));
-        setHasNextPage(data.length === 21);
-        setAreModsLoading(false);
-      };
-      
-      if (mods.length === 0) {
-        return (
-          <div style={{ width: '100%', height: '100%' }}>
+    );
+    setMods(reset === true ? data : mods.concat(data));
+    setHasNextPage(data.length === 21);
+    setAreModsLoading(false);
+  };
+
+  if (mods.length === 0) {
+    return (
+      <div style={{ width: '100%', height: '100%' }}>
         <ModsListHeader
           loadMoreMods={loadMoreMods}
           filter={filterType}
@@ -76,7 +81,10 @@ const ModsList = props => {
               {[...Array(Math.round(height / 100))].map((v, i) =>
                 [...Array(Math.round(3))].map((v1, k) => (
                   <rect
-                    x={(width / 3) * (k !== 2 ? k : k * 0.97) + (k === 0 ? 38 : 28)}
+                    x={
+                      (width / 3) * (k !== 2 ? k : k * 0.97) +
+                      (k === 0 ? 38 : 28)
+                    }
                     y={i * 180 + 18}
                     rx="0"
                     ry="0"
