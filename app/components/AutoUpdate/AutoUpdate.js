@@ -14,6 +14,7 @@ export default props => {
   const [percentage, setPercentage] = useState(0);
 
   useEffect(() => {
+    store.set('showChangelogs', true);
     ipcRenderer.on('download-progress', (ev, data) => {
       setPercentage(data);
     });

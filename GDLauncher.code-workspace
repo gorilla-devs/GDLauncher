@@ -17,6 +17,14 @@
 		},
 		"javascript.format.enable": true,
 		"typescript.validate.enable": false,
-		"typescript.format.enable": false
+		"typescript.format.enable": false,
+		"workbench.colorTheme": "Atom One Dark",
+		"breadcrumbs.enabled": true,
+		"workbench.editor.highlightModifiedTabs": true,
+    "search.showLineNumbers": true,
+    "eslint.packageManager": "yarn",
+		"terminal.integrated.copyOnSelection": true,
+    "tslint.packageManager": "yarn",
+    "npm.packageManager": "yarn"
 	}
 }

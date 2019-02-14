@@ -16,8 +16,8 @@ const parseCLI = async (data, callback) => {
         log.error(`exec error: ${error}`);
         return;
       }
-      log.log(`stdout: ${stdout}`);
-      log.log(`stderr: ${stderr}`);
+      log.info(`stdout: ${stdout}`);
+      log.info(`stderr: ${stderr}`);
     }
   );
   start.on('exit', () => {

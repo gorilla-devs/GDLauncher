@@ -150,8 +150,8 @@ export function tryNativeLauncherProfiles() {
   /*
   / Since there is no way of checking the validity of an access token
   / while also getting the user data attached to that access token, the
-  / "hacky" solution is to refresh the access token (it will send the user 
-  / data in the response). After getting a 200 status response, we get the 
+  / "hacky" solution is to refresh the access token (it will send the user
+  / data in the response). After getting a 200 status response, we get the
   / user data and the access token but also update it in the native launcher
   / profiles json.
   */

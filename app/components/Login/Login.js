@@ -13,6 +13,7 @@ import * as AuthActions from '../../actions/auth';
 import { THEMES } from '../../constants';
 import shader from '../../utils/colors';
 import background from '../../assets/images/login_background.jpg';
+import { tryNativeLauncherProfiles, login } from '../../actions/auth';
 
 type Props = {
   form: any,
@@ -36,8 +37,12 @@ function Login(props) {
 
   const [update, setUpdate] = useState(false);
 
-  useEffect(async () => {
-    setNativeLauncherProfiles(await OfficialLancherProfilesExists());
+  useEffect(() => {
+    OfficialLancherProfilesExists()
+      .then(v => {
+        return setNativeLauncherProfiles(v);
+      })
+      .catch(e => log.error(e));
     if (process.env.NODE_ENV !== 'development') {
       ipcRenderer.send('check-for-updates');
       ipcRenderer.on('update-available', () => {
@@ -205,9 +210,10 @@ function mapStateToProps(state) {
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(AuthActions, dispatch);
-}
+const mapDispatchToProps = {
+  login,
+  tryNativeLauncherProfiles
+};
 
 export default connect(
   mapStateToProps,

@@ -31,7 +31,8 @@ class InstanceManagerModal extends Component<Props> {
     super(props);
     this.state = {
       unMounting: false,
-      instanceIcon: InstanceIcon
+      instanceIcon: InstanceIcon,
+      version: null
     };
   }
 
@@ -50,11 +51,10 @@ class InstanceManagerModal extends Component<Props> {
 
   componentDidMount = async () => {
     try {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, this.props.match.params.instance, 'config.json')
-        )
-      );
+      const config = await this.readConfig();
+      this.setState({
+        version: config.version
+      })
       if (config.icon) {
         const icon = await promisify(fs.readFile)(
           path.join(PACKS_PATH, this.props.match.params.instance, config.icon)
@@ -181,7 +181,7 @@ class InstanceManagerModal extends Component<Props> {
               active={this.props.match.params.page === 'mods'}
               to={`/editInstance/${
                 this.props.match.params.instance
-              }/mods/local`}
+              }/mods/local/${this.state.version}`}
             >
               Mods Manager
             </MenuItem>
