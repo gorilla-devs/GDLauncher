@@ -12,7 +12,7 @@ export const STOP_SERVER = 'STOP_SERVER';
 export const startServer = (packName) => {
   return (dispatch, getState) => {
     try {
-      const start = spawn(`java -Xms512M -Xmx1024M -jar ${path.join(SERVERS_PATH, packName, `${packName}.jar nogui`)}`,
+      const start = spawn(`java -Xms512M -Xmx1024M -jar ${path.join(SERVERS_PATH, packName, `${packName}.jar`)}`,
         [], { shell: true, cwd: path.join(SERVERS_PATH, packName) });
       start.stdout.on("data", (data) => {
         console.log(data.toString());

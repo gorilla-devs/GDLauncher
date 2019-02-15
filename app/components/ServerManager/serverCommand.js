@@ -37,7 +37,6 @@ function serverCommand(props) {
   };
 
   async function writeToWritable(writable, data) {
-    console.log("WRITABLE", writable);
     console.log("DATA", data);
     //await stringio.streamWrite(writable, data);
     // await streamWrite(writable, 'Second line\n');
@@ -47,9 +46,13 @@ function serverCommand(props) {
   //LAVORARCI SU
  async function runCommand(command, param) {
     console.log(command, param);
-    let paramL = `/${command} ${param}`;
-    await writeToWritable(props.start.stdin, paramL);
-    //await props.start.stdin.write(`/${command} ${param}\\n`);
+    try{
+      let paramL = `/${command} ${param}\n`;
+      await writeToWritable(props.start.stdin, paramL);
+      //await props.start.stdin.write(`/${command} ${param}\\n`);
+    } catch{
+
+    }
   }
 
   function ServerCommandsChangeValueTWO(e, command) {
