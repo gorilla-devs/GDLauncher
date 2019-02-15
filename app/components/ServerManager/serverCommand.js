@@ -10,6 +10,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import psTree from 'ps-tree';
 import _ from 'lodash';
+import  stringio from '@rauschma/stringio';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { startServer, deleteServer, kill } from '../../actions/serverManager';
@@ -35,9 +36,20 @@ function serverCommand(props) {
     await promisify(fs.writeFile)(path.join(SERVERS_PATH, props.selectedServer, "server.properties"), write, { flag: 'w+' });
   };
 
+  async function writeToWritable(writable, data) {
+    console.log("WRITABLE", writable);
+    console.log("DATA", data);
+    //await stringio.streamWrite(writable, data);
+    // await streamWrite(writable, 'Second line\n');
+    //await stringio.streamEnd(writable);
+    await writable.write(data);
+  }
+  //LAVORARCI SU
  async function runCommand(command, param) {
     console.log(command, param);
-    await props.start.stdin.end(`/${command} ${param}`);
+    let paramL = `/${command} ${param}`;
+    await writeToWritable(props.start.stdin, paramL);
+    //await props.start.stdin.write(`/${command} ${param}\\n`);
   }
 
   function ServerCommandsChangeValueTWO(e, command) {
@@ -46,10 +58,13 @@ function serverCommand(props) {
       [command]: e.target.value
     })
   }
-
-  useEffect(async () => {
+  async function GetIp(){
     let { ip } = (await axios.get(`https://api.ipify.org/?format=json`)).data;
     setIp(ip);
+  }
+
+  useEffect(() => {
+    GetIp();
     //setCommands(props.commandFile);
   }, []);
 

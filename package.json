@@ -179,6 +179,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.15",
     "@fortawesome/free-solid-svg-icons": "^5.7.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
+    "@rauschma/stringio": "^1.4.0",
     "adm-zip": "^0.4.13",
     "antd": "^3.13.2",
     "assert": "^1.4.1",

@@ -33,8 +33,7 @@ function ServerManager(props) {
     "toggledownfall": "",
     "tell": ""
   });
-
-  useEffect(async () => {
+  async function WatcherReader(){
     const dirs = await promisify(fs.readdir)(SERVERS_PATH);
     setServers(dirs);
     const watcher = fs.watch(SERVERS_PATH, async () => {
@@ -42,6 +41,10 @@ function ServerManager(props) {
       setServers(dirs);
     });
     return () => watcher.close();
+  }
+
+  useEffect(() => {
+    WatcherReader();
   }, []);
 
 
