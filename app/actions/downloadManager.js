@@ -192,26 +192,15 @@ export function downloadPack(pack) {
     const assets = await extractAssets(vnlJSON);
     const mainJar = await extractMainJar(vnlJSON);
 
-    let forgeFileName = null;
-
     if (currPack.forgeVersion !== null) {
-      const { branch } = packCreator.forgeManifest[
-        Object.keys(packCreator.forgeManifest).find(v => v === currPack.version)
-      ].find(v => Object.keys(v)[0] === currPack.forgeVersion)[
-        currPack.forgeVersion
-      ];
-
-      forgeFileName = `${currPack.version}-${currPack.forgeVersion}${
-        branch !== null ? `-${branch}` : ''
-      }`;
       try {
         forgeJSON = JSON.parse(
           await promisify(fs.readFile)(
             path.join(
               META_PATH,
               'net.minecraftforge',
-              forgeFileName,
-              `${forgeFileName}.json`
+              `forge-${currPack.forgeVersion}`,
+              `forge-${currPack.forgeVersion}.json`
             )
           )
         );
@@ -219,13 +208,25 @@ export function downloadPack(pack) {
           path.join(
             INSTANCES_PATH,
             'libraries',
-            ...arraify(forgeJSON.versionInfo.libraries[0].name)
+            ...arraify(forgeJSON.libraries[0].name)
           )
         );
       } catch (err) {
+        const { data } = await axios.get(
+          `https://addons-ecs.forgesvc.net/api/minecraft/modloader/forge-${
+            currPack.forgeVersion
+          }`
+        );
+
+        forgeJSON = JSON.parse(data.versionJson);
+
         await downloadFile(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`),
-          `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-installer.jar`,
+          path.join(
+            INSTANCES_PATH,
+            'libraries',
+            ...arraify(forgeJSON.libraries[0].name)
+          ),
+          data.downloadUrl,
           p => {
             dispatch({
               type: UPDATE_PROGRESS,
@@ -233,32 +234,25 @@ export function downloadPack(pack) {
             });
           }
         );
-        const zipFile = new Zip(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`)
-        );
-        forgeJSON = JSON.parse(zipFile.readAsText('install_profile.json'));
 
         await makeDir(
           path.dirname(
             path.join(
               INSTANCES_PATH,
               'libraries',
-              ...arraify(forgeJSON.versionInfo.libraries[0].name)
+              ...arraify(forgeJSON.libraries[0].name)
             )
           )
         );
-        await promisify(fs.unlink)(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`)
-        );
         await makeDir(
-          path.join(META_PATH, 'net.minecraftforge', forgeFileName)
+          path.join(META_PATH, 'net.minecraftforge', `forge-${currPack.forgeVersion}`)
         );
         await promisify(fs.writeFile)(
           path.join(
             META_PATH,
             'net.minecraftforge',
-            forgeFileName,
-            `${forgeFileName}.json`
+            `forge-${currPack.forgeVersion}`,
+            `forge-${currPack.forgeVersion}.json`
           ),
           JSON.stringify(forgeJSON)
         );
@@ -280,7 +274,7 @@ export function downloadPack(pack) {
       path.join(PACKS_PATH, pack, 'config.json'),
       JSON.stringify({
         version: currPack.version,
-        forgeVersion: forgeFileName,
+        forgeVersion: `forge-${currPack.forgeVersion}`,
         addonID: currPack.addonID ? currPack.addonID : null,
         timePlayed: 0
       })

@@ -17,43 +17,19 @@ export const GET_FORGE_MANIFEST = 'GET_FORGE_MANIFEST';
 
 export function getVanillaMCVersions() {
   return async dispatch => {
-    const versions = await axios.get(GAME_VERSIONS_URL);
+    const versions = (await axios.get(GAME_VERSIONS_URL)).data;
     dispatch({
       type: GET_MC_VANILLA_VERSIONS,
       payload: versions
     });
     const promos = (await axios.get(FORGE_PROMOS)).data;
     const forgeVersions = {};
-    // This reads all the numbers for each version. It replaces each number
-    // with the correct forge version. It filters numbers which do not have the "installer"
-    // file. It then omits empty versions (not even one valid forge version for that mc version)
-    Object.keys(promos.mcversion).forEach(v => {
-      if (v === '1.7.10_pre4') return;
-      forgeVersions[v] = promos.mcversion[v]
-        .filter(ver => {
-          const { files } = promos.number[ver];
-          for (let i = 0; i < files.length; i++) {
-            if (files[i][1] === 'installer' && files[i][0] === 'jar') {
-              return true;
-            }
-          }
-          return false;
-        })
-        .map(ver => {
-          const { files } = promos.number[ver];
-          let md5;
-          for (let i = 0; i < files.length; i++) {
-            if (files[i].includes('installer')) {
-              [, , md5] = files[i];
-            }
-          }
-          return {
-            [promos.number[ver].version]: {
-              branch: promos.number[ver].branch,
-              md5
-            }
-          };
-        });
+    // Looping over vanilla versions, create a new entry in forge object
+    // and add to it all correct versions
+    versions.versions.forEach(v => {
+      forgeVersions[v.id] = promos.filter(ver => {
+        return ver.gameVersion === v.id;
+      }).map(ver => ver.name.replace('forge-', ''));
     });
 
     dispatch({
@@ -64,8 +40,7 @@ export function getVanillaMCVersions() {
 }
 
 export function createPack(version, packName, forgeVersion = null) {
-  return async (dispatch) => {
-
+  return async dispatch => {
     dispatch({ type: START_PACK_CREATION });
 
     await makeDir(path.join(PACKS_PATH, packName));
@@ -79,8 +54,7 @@ export function instanceDownloadOverride(
   packName,
   forgeVersion = null
 ) {
-  return async (dispatch) => {
-
+  return async dispatch => {
     dispatch({ type: START_PACK_CREATION });
 
     try {
