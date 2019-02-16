@@ -61,9 +61,6 @@ export function importTwitchProfile(pack, filePath) {
       filePath,
       path.join(INSTANCES_PATH, 'temp', pack)
     );
-    const overrideFiles = await promisify(fs.readdir)(
-      path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
-    );
     const packInfo = JSON.parse(
       await promisify(fs.readFile)(
         path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')
@@ -245,7 +242,11 @@ export function downloadPack(pack) {
           )
         );
         await makeDir(
-          path.join(META_PATH, 'net.minecraftforge', `forge-${currPack.forgeVersion}`)
+          path.join(
+            META_PATH,
+            'net.minecraftforge',
+            `forge-${currPack.forgeVersion}`
+          )
         );
         await promisify(fs.writeFile)(
           path.join(
@@ -274,7 +275,10 @@ export function downloadPack(pack) {
       path.join(PACKS_PATH, pack, 'config.json'),
       JSON.stringify({
         version: currPack.version,
-        forgeVersion: `forge-${currPack.forgeVersion}`,
+        forgeVersion:
+          currPack.forgeVersion === null
+            ? null
+            : `forge-${currPack.forgeVersion}`,
         addonID: currPack.addonID ? currPack.addonID : null,
         timePlayed: 0
       })
@@ -287,15 +291,31 @@ export function downloadPack(pack) {
             path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
           }
         : null;
-
-    let mods = [];
     try {
       const manifest = JSON.parse(
         await promisify(fs.readFile)(
           path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')
         )
       );
-      mods = await getModsList(manifest.files, pack);
+      let modsDownloaded = 0;
+      await Promise.map(
+        manifest.files,
+        async mod => {
+          modsDownloaded += 1;
+          await downloadMod(mod.projectID, mod.fileID, null, pack);
+          dispatch({
+            type: UPDATE_PROGRESS,
+            payload: {
+              pack,
+              percentage: (
+                (modsDownloaded * 82) / manifest.files.length +
+                18
+              ).toFixed(0)
+            }
+          });
+        },
+        { concurrency: 4 }
+      );
       const overrideFiles = await promisify(fs.readdir)(
         path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
       );
@@ -314,8 +334,7 @@ export function downloadPack(pack) {
       log.error(err);
     }
 
-    const totalFiles =
-      libraries.length + assets.length + mainJar.length + mods.length;
+    const totalFiles = libraries.length + assets.length + mainJar.length;
 
     dispatch({
       type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
@@ -326,7 +345,7 @@ export function downloadPack(pack) {
     });
 
     const updatePercentage = downloaded => {
-      const actPercentage = ((downloaded * 82) / totalFiles + 18).toFixed(0);
+      const actPercentage = ((downloaded * 70) / totalFiles + 30).toFixed(0);
       if (currPack.percentage !== actPercentage)
         return dispatch({
           type: UPDATE_PROGRESS,
@@ -345,9 +364,10 @@ export function downloadPack(pack) {
 
     const allFiles =
       legacyJavaFixer !== null
-        ? [...libraries, ...assets, ...mainJar, ...mods, legacyJavaFixer]
-        : [...libraries, ...assets, ...mainJar, ...mods];
+        ? [...libraries, ...assets, ...mainJar, legacyJavaFixer]
+        : [...libraries, ...assets, ...mainJar];
 
+    console.log(libraries);
     await downloadArr(allFiles, updatePercentage, pack);
 
     const copyAssetsToLegacy = async () => {
