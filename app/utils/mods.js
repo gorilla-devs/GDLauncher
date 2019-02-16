@@ -79,6 +79,7 @@ export const getModsList = async (
   return mods;
 };
 
+// Create the murmur hash of a mod
 export const getModMurmurHash2 = async modPath => {
   const file = await promisify(fs.readFile)(modPath);
   return murmur.murmur2(bin2string(file), 1);
