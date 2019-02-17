@@ -97,15 +97,11 @@ class ModsManager extends Component<Props> {
           el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
         )
         .map(async el => {
-          const murmur = await getModMurmurHash2(
-            path.join(this.instanceFolder, 'mods', el)
-          );
           return {
             name: el,
             state: path.extname(el) !== '.disabled',
             key: el,
-            height: 50,
-            fingerprint: murmur
+            height: 50
           };
         })
     );
