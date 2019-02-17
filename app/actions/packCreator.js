@@ -8,6 +8,7 @@ import { message } from 'antd';
 import vSort from 'version-sort';
 import { PACKS_PATH, GAME_VERSIONS_URL, FORGE_PROMOS } from '../constants';
 import { addToQueue } from './downloadManager';
+import versionCompare from '../utils/versionsCompare';
 
 export const GET_MC_VANILLA_VERSIONS = 'GET_MC_VANILLA_VERSIONS';
 export const CREATION_COMPLETE = 'CREATION_COMPLETE';
@@ -27,9 +28,13 @@ export function getVanillaMCVersions() {
     // Looping over vanilla versions, create a new entry in forge object
     // and add to it all correct versions
     versions.versions.forEach(v => {
-      forgeVersions[v.id] = promos.filter(ver => {
-        return ver.gameVersion === v.id;
-      }).map(ver => ver.name.replace('forge-', ''));
+      forgeVersions[v.id] = promos
+        .filter(ver => {
+          // Filter out all versions below 1.6.1 until we decide to support them
+          if (versionCompare(v.id, '1.6.1') === -1) return false;
+          return ver.gameVersion === v.id;
+        })
+        .map(ver => ver.name.replace('forge-', ''));
     });
 
     dispatch({
