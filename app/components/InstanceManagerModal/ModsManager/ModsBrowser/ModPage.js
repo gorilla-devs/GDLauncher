@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import ContentLoader from 'react-content-loader';
+import fs from 'fs';
 import path from 'path';
 import Promise from 'bluebird';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { promisify } from 'util';
 import _ from 'lodash';
 import { Button, Select, Icon } from 'antd';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
@@ -26,7 +28,28 @@ function ModPage(props) {
       [filename]: { installing: true, completed: false }
     });
 
-    await downloadMod(id, projectFileId, filename, props.instance);
+    const newMod = await downloadMod(
+      id,
+      projectFileId,
+      filename,
+      props.instance
+    );
+
+    let modsFile = [];
+
+    try {
+      modsFile = JSON.parse(
+        await promisify(fs.readFile)(path.join(PACKS_PATH, props.instance, 'mods.json'))
+      );
+    } catch {}
+
+    await promisify(fs.writeFile)(
+      path.join(PACKS_PATH, props.instance, 'mods.json'),
+      JSON.stringify([
+        ...modsFile,
+        newMod
+      ])
+    );
 
     setModsInstalling({
       ...modsInstalling,

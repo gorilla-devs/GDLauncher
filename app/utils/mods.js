@@ -2,6 +2,7 @@ import axios from 'axios';
 import path from 'path';
 import Promise from 'bluebird';
 import fs from 'fs';
+import makeDir from 'make-dir';
 import { promisify } from 'util';
 import log from 'electron-log';
 import murmur from 'murmurhash-js';
@@ -32,25 +33,30 @@ export const downloadMod = async (
     data.downloadUrl,
     () => {}
   );
-  if (data.dependencies.length !== 0) {
-    const gameVersion = data.gameVersion[0];
-    data.dependencies.forEach(async dep => {
-      // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
-      if (dep.type === 1) {
-        const depData = await axios.get(
-          `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}/files`
-        );
-        const { id, fileNameOnDisk } = depData.data.find(
-          n => n.gameVersion[0] === gameVersion
-        );
-        await downloadMod(dep.addonId, id, fileNameOnDisk, instanceName);
-      }
-    });
-  }
+  // if (data.dependencies.length !== 0) {
+  //   const gameVersion = data.gameVersion[0];
+  //   data.dependencies.forEach(async dep => {
+  //     // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
+  //     if (dep.type === 1) {
+  //       const depData = await axios.get(
+  //         `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}/files`
+  //       );
+  //       const { id, fileNameOnDisk } = depData.data.find(
+  //         n => n.gameVersion[0] === gameVersion
+  //       );
+  //       await downloadMod(dep.addonId, id, fileNameOnDisk, instanceName);
+  //     }
+  //   });
+  // }
+  return {
+    id: modId,
+    packageFingerprint: data.packageFingerprint,
+    fileNameOnDisk: sanitizedFileName
+  };
 };
 
 export const getModsList = async (
-  // An array of the mods to look up. Every value must be an Object containing "projectID" and "fileID"
+  // An array of the mods to look up. Every value must be an Object containing "projectID" and "fileID" keys
   modsArr,
   // The instance name where to eventually save this file to
   packName
@@ -83,4 +89,12 @@ export const getModsList = async (
 export const getModMurmurHash2 = async modPath => {
   const file = await promisify(fs.readFile)(modPath);
   return murmur.murmur2(bin2string(file), 1);
+};
+
+export const createDoNotTouchFile = async instance => {
+  await makeDir(path.join(PACKS_PATH, instance, 'mods'));
+  await promisify(fs.writeFile)(
+    path.join(PACKS_PATH, instance, 'mods', '_DO_NOT_TOUCH_THIS_FOLDER.txt'),
+    'Do not directly edit the files in this folder, if you want to delete a file or add one, use GDLauncher. \r DO NOT RENAME ANYTHING'
+  );
 };

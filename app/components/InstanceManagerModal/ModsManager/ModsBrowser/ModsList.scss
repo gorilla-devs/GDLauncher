@@ -40,6 +40,14 @@
           color: white;
         }
       }
+      .modInstalled {
+        position: absolute;
+        width: 110px;
+        margin: 0 20px;
+        bottom: 30px;
+        text-align: center;
+        background: var(--primary);
+      }
     }
   }
 

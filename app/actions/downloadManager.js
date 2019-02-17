@@ -7,7 +7,6 @@ import fse from 'fs-extra';
 import log from 'electron-log';
 import Promise from 'bluebird';
 import fs from 'fs';
-import Zip from 'adm-zip';
 import compressing from 'compressing';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import {
@@ -22,11 +21,11 @@ import {
   extractAssets,
   extractMainJar,
   extractNatives,
-  computeVanillaAndForgeLibraries,
-  isVirtualAssets
+  computeVanillaAndForgeLibraries
 } from '../utils/getMCFilesList';
-import { downloadMod, getModsList } from '../utils/mods';
+import { downloadMod, getModsList, createDoNotTouchFile } from '../utils/mods';
 import { arraify } from '../utils/strings';
+import { copyAssetsToLegacy } from '../utils/assets';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -215,7 +214,8 @@ export function downloadPack(pack) {
           }`
         );
 
-        forgeJSON = JSON.parse(data.versionJson);
+        forgeJSON =
+          JSON.parse(data.versionJson) || JSON.parse(data.additionalFilesJson);
 
         await downloadFile(
           path.join(
@@ -284,6 +284,7 @@ export function downloadPack(pack) {
       })
     );
 
+    // We download the legacy java fixer if needed
     const legacyJavaFixer =
       vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
         ? {
@@ -291,30 +292,15 @@ export function downloadPack(pack) {
             path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
           }
         : null;
+
+    // Here we work on the mods
+    await createDoNotTouchFile(pack);
+
     try {
       const manifest = JSON.parse(
         await promisify(fs.readFile)(
           path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')
         )
-      );
-      let modsDownloaded = 0;
-      await Promise.map(
-        manifest.files,
-        async mod => {
-          modsDownloaded += 1;
-          await downloadMod(mod.projectID, mod.fileID, null, pack);
-          dispatch({
-            type: UPDATE_PROGRESS,
-            payload: {
-              pack,
-              percentage: (
-                (modsDownloaded * 82) / manifest.files.length +
-                18
-              ).toFixed(0)
-            }
-          });
-        },
-        { concurrency: 4 }
       );
       const overrideFiles = await promisify(fs.readdir)(
         path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
@@ -330,6 +316,39 @@ export function downloadPack(pack) {
         path.join(PACKS_PATH, pack, 'manifest.json')
       );
       await fse.remove(path.join(INSTANCES_PATH, 'temp', pack));
+
+      let modsDownloaded = 0;
+      let modsManifest = [];
+      await Promise.map(
+        manifest.files,
+        async mod => {
+          modsDownloaded += 1;
+          const modManifest = await downloadMod(
+            mod.projectID,
+            mod.fileID,
+            null,
+            pack
+          );
+          modsManifest = modsManifest.concat(modManifest);
+          dispatch({
+            type: UPDATE_PROGRESS,
+            payload: {
+              pack,
+              percentage: (
+                (modsDownloaded * 12) / manifest.files.length +
+                18
+              ).toFixed(0)
+            }
+          });
+        },
+        { concurrency: 4 }
+      );
+
+      // Write the mods list to a file
+      await promisify(fs.writeFile)(
+        path.join(PACKS_PATH, pack, 'mods.json'),
+        JSON.stringify(modsManifest)
+      );
     } catch (err) {
       log.error(err);
     }
@@ -367,22 +386,10 @@ export function downloadPack(pack) {
         ? [...libraries, ...assets, ...mainJar, legacyJavaFixer]
         : [...libraries, ...assets, ...mainJar];
 
-    console.log(libraries);
     await downloadArr(allFiles, updatePercentage, pack);
 
-    const copyAssetsToLegacy = async () => {
-      await Promise.map(assets, async asset => {
-        try {
-          await promisify(fs.access)(asset.legacyPath);
-        } catch {
-          await makeDir(path.dirname(asset.legacyPath));
-          await promisify(fs.copyFile)(asset.path, asset.legacyPath);
-        }
-      });
-    };
-
     if (vnlJSON.assets === 'legacy') {
-      await copyAssetsToLegacy();
+      await copyAssetsToLegacy(assets);
     }
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
 
