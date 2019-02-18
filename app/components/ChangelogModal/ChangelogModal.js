@@ -11,7 +11,7 @@ export default props => {
   }, []);
 
   const openDiscord = () => {
-    require('electron').shell.openExternal("https://discord.gg/ZxRxPqn");
+    require('electron').shell.openExternal('https://discord.gg/ZxRxPqn');
   };
 
   return (
@@ -54,6 +54,12 @@ export default props => {
                 Deleting instances is now safe!
               </span>{' '}
               O o o o u r B a a a d
+            </li>
+            <li>
+              <span className={styles.summary}>
+                Mods dependancies are now correctly downloaded
+              </span>{' '}
+              GGWP
             </li>
             <li>
               <span className={styles.summary}>
