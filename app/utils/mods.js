@@ -33,26 +33,65 @@ export const downloadMod = async (
     data.downloadUrl,
     () => {}
   );
-  // if (data.dependencies.length !== 0) {
-  //   const gameVersion = data.gameVersion[0];
-  //   data.dependencies.forEach(async dep => {
-  //     // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
-  //     if (dep.type === 1) {
-  //       const depData = await axios.get(
-  //         `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}/files`
-  //       );
-  //       const { id, fileNameOnDisk } = depData.data.find(
-  //         n => n.gameVersion[0] === gameVersion
-  //       );
-  //       await downloadMod(dep.addonId, id, fileNameOnDisk, instanceName);
-  //     }
-  //   });
-  // }
   return {
     id: modId,
     packageFingerprint: data.packageFingerprint,
     fileNameOnDisk: sanitizedFileName
   };
+};
+
+export const downloadDependancies = async (
+  // modId: The generic addon ID of the addon
+  modId,
+  // projectFileId: The specific id of the file to download
+  projectFileId,
+  // The name of the instance where to save the dependancies
+  instanceName
+) => {
+  const { data } = await axios.get(
+    `${CURSEMETA_API_URL}/direct/addon/${modId}/file/${projectFileId}`
+  );
+
+  let deps = [];
+  if (data.dependencies.length !== 0) {
+    const gameVersion = data.gameVersion[0];
+    await Promise.all(
+      data.dependencies.map(async dep => {
+        // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
+        if (dep.type === 1) {
+          let toDownload = true;
+          try {
+            // See if the mod already exists in this instance
+            const installedMods = JSON.parse(
+              await promisify(fs.readFile)(
+                path.join(PACKS_PATH, instanceName, 'mods.json')
+              )
+            );
+            if (installedMods.find(v => v.id === dep.addonId))
+              toDownload = false;
+          } catch {
+            toDownload = true;
+          }
+          if (toDownload) {
+            const depData = await axios.get(
+              `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}/files`
+            );
+            const { id, fileNameOnDisk } = depData.data.find(
+              n => n.gameVersion[0] === gameVersion
+            );
+            const downloadedDep = await downloadMod(
+              dep.addonId,
+              id,
+              fileNameOnDisk,
+              instanceName
+            );
+            deps = deps.concat(downloadedDep);
+          }
+        }
+      })
+    );
+  }
+  return deps;
 };
 
 export const getModsList = async (

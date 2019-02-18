@@ -10,7 +10,7 @@ import { promisify } from 'util';
 import _ from 'lodash';
 import { Button, Select, Icon } from 'antd';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
-import { downloadMod } from '../../../../utils/mods';
+import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 
 import styles from './ModPage.scss';
 
@@ -34,21 +34,21 @@ function ModPage(props) {
       filename,
       props.instance
     );
-
+    const dependancies = await downloadDependancies(
+      id,
+      projectFileId,
+      props.instance
+    );
     let modsFile = [];
-
     try {
-      modsFile = JSON.parse(
-        await promisify(fs.readFile)(path.join(PACKS_PATH, props.instance, 'mods.json'))
+      modsFile = await promisify(fs.readFile)(
+        path.join(PACKS_PATH, props.instance, 'mods.json')
       );
     } catch {}
 
     await promisify(fs.writeFile)(
       path.join(PACKS_PATH, props.instance, 'mods.json'),
-      JSON.stringify([
-        ...modsFile,
-        newMod
-      ])
+      JSON.stringify([...modsFile, newMod, ...dependancies])
     );
 
     setModsInstalling({
