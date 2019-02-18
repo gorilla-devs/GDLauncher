@@ -82,8 +82,10 @@
   justify-content: space-between;
 
   .version {
-    color: #7f8c8d;
-    padding-right: 9px;
+    a {
+      color: #7f8c8d;
+      padding-right: 9px;
+    }
   }
 }
 

@@ -24,7 +24,7 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 
 let mainWindow = null;
 let splash = null;
-log.log(`Config store: ${store.path}`);
+log.info(`Config store: ${store.path}`);
 const settings = store.get('settings') ? store.get('settings').theme : THEMES;
 const primaryColor =
   settings && settings.primary ? settings.primary : '#2c3e50';
@@ -159,29 +159,41 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.show();
       mainWindow.focus();
     });
+    let checked = false;
 
     ipcMain.on('check-for-updates', ev => {
+      // Avoid doing this more than 1 time. It breaks everything
+      if(checked === true) return;
       autoUpdater.checkForUpdates();
+      checked = true;
+      log.info("CHECK_FOR_UPDATES");
 
       autoUpdater.on('update-available', info => {
+        log.info("DOWNLOAD_AVAILABLE");
         ev.sender.send('update-available');
       });
 
       autoUpdater.on('update-downloaded', info => {
+        log.info("UPDATE_DOWNLOADED");
         ev.sender.send('update-downloaded');
       });
 
       autoUpdater.on('download-progress', data => {
+        log.info(data);
         ev.sender.send('download-progress', Math.floor(data.percent));
       });
     });
 
     ipcMain.on('download-updates', () => {
+      log.info("DOWNLOAD_UPDATES");
       autoUpdater.downloadUpdate();
     });
 
     ipcMain.on('apply-updates', () => {
-      autoUpdater.quitAndInstall();
+      log.info("APPLY_UPDATES");
+      autoUpdater.quitAndInstall(true, true);
+      // app.relaunch({ args: process.argv.slice(1).concat(['--relaunch']) });
+      // app.exit();
     });
 
     ipcMain.on('open-devTools', () => {

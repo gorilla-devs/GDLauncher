@@ -1,209 +1,185 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { bindActionCreators } from 'redux';
 import { remote } from 'electron';
 import fss from 'fs';
 import path from 'path';
 import Promise from 'bluebird';
+import Zip from 'adm-zip';
+import { VariableSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import makeDir from 'make-dir';
 import log from 'electron-log';
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { connect } from 'react-redux';
-import {
-  List,
-  Icon,
-  Avatar,
-  Upload,
-  Transfer,
-  Button,
-  Table,
-  Switch
-} from 'antd';
+import { promisify } from 'util';
+import { Button, Input, Checkbox } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
 
-const fs = Promise.promisifyAll(fss);
+const LocalMods = props => {
+  const [filteredMods, setFilteredMods] = useState(props.localMods);
+  const [searchQuery, setSearchQuery] = useState('');
 
-type Props = {};
+  useEffect(() => {
+    setFilteredMods(props.localMods);
+    filterMods(searchQuery);
+  }, [props.localMods]);
 
-let watcher;
+  const listRef = React.createRef();
 
-class LocalMods extends Component<Props> {
-  props: Props;
+  const modsFolder = path.join(PACKS_PATH, props.match.params.instance, 'mods');
 
-  state = {
-    mods: [],
-    selectedRowKeys: [], // Check here to configure the default column
-    loading: false
-  };
-
-  componentDidMount = async () => {
-    try {
-      await fs.accessAsync(
-        path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
-      );
-    } catch (err) {
-      await makeDir(
-        path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
-      );
-    }
-    this.getMods();
-  };
-
-  componentWillUnmount() {
-    // Stop watching for changes when this component is unmounted
-    try {
-      watcher.close();
-    } catch (err) {
-      log.error(err);
-    }
-  }
-
-  columns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      width: 200,
-      render: title => path.parse(title.replace('.disabled', '')).name
-    },
-    {
-      title: 'State',
-      dataIndex: 'state',
-      width: 200,
-      render: (state, record) => (
-        <Switch
-          checked={state}
-          onChange={checked => this.handleChange(checked, record)}
-        />
-      )
-    }
-  ];
-
-  getMods = async () => {
-    let mods = (await fs.readdirAsync(
-      path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
-    ))
-      .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
-      .map(el => {
-        return { name: el, state: path.extname(el) !== '.disabled', key: el };
-      });
-    this.setState({
-      mods
-    });
-    // Watches for any changes in the packs dir. TODO: Optimize
-    watcher = fss.watch(
-      path.join(PACKS_PATH, this.props.match.params.instance, 'mods'),
-      async () => {
-        mods = (await fs.readdirAsync(
-          path.join(PACKS_PATH, this.props.match.params.instance, 'mods')
-        ))
-          .filter(el => el !== 'GDLCompanion.jar')
-          .map(el => {
-            return {
-              name: el,
-              state: path.extname(el) !== '.disabled',
-              key: el
-            };
-          });
-        this.setState({
-          mods
-        });
-      }
-    );
-  };
-
-  modStateChanger = selectedRowKeys => {
-    this.setState({ selectedRowKeys });
-  };
-
-  handleChange = async (checked, record) => {
-    if (checked) {
-      await fs.renameAsync(
-        path.join(
-          PACKS_PATH,
-          this.props.match.params.instance,
-          'mods',
-          record.name
-        ),
-        path.join(
-          PACKS_PATH,
-          this.props.match.params.instance,
-          'mods',
-          record.name.replace('.disabled', '')
-        )
-      );
-    } else {
-      await fs.renameAsync(
-        path.join(
-          PACKS_PATH,
-          this.props.match.params.instance,
-          'mods',
-          record.name
-        ),
-        path.join(
-          PACKS_PATH,
-          this.props.match.params.instance,
-          'mods',
-          `${record.name}.disabled`
-        )
-      );
-    }
-  };
-
-  selectFiles = async () => {
-    const mods = remote.dialog.showOpenDialog({
-      properties: ['openFile', 'multiSelections']
-    });
-  };
-
-  delete = async () => {
-    this.setState({ loading: true });
-    await Promise.each(this.state.selectedRowKeys, async el =>
-      fs.unlinkAsync(
-        path.join(PACKS_PATH, this.props.match.params.instance, 'mods', el)
-      )
-    );
-    this.setState({ loading: false, selectedRowKeys: [] });
-  };
-
-  render() {
-    const { loading, selectedRowKeys } = this.state;
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: this.modStateChanger
-    };
-    const hasSelected = selectedRowKeys.length > 0;
-    return (
-      <div style={{ marginTop: 10 }}>
-        <div style={{ marginBottom: 16 }}>
-          <Button
-            type="primary"
-            onClick={this.delete}
-            disabled={!hasSelected}
-            loading={loading}
-          >
-            Delete
+  const Mod = ({ index, style, toggleSize }) => (
+    <div
+      className={index % 2 ? styles.listItemOdd : styles.listItemEven}
+      style={style}
+    >
+      <div className={styles.innerItemMod}>
+        <Checkbox />
+        {filteredMods[index].name}{' '}
+        <div>
+          <Button type="primary" size="small" onClick={() => toggleSize(index)}>
+            Manage
           </Button>
-          <span style={{ marginLeft: 8 }}>
-            {hasSelected
-              ? `${selectedRowKeys.length} ${
-                  selectedRowKeys.length === 1 ? 'mod' : 'mods'
-                } selected`
-              : ''}
-          </span>
+          <Button
+            style={{ marginLeft: 5 }}
+            type="primary"
+            size="small"
+            onClick={() => deleteMod(index)}
+          >
+            <FontAwesomeIcon icon="trash" />
+          </Button>
         </div>
-        <Table
-          rowSelection={rowSelection}
-          columns={this.columns}
-          dataSource={this.state.mods}
-          pagination={false}
-          locale={{
-            emptyText: 'No mods are installed'
-          }}
-        />
+      </div>
+    </div>
+  );
+
+  const filterMods = v => {
+    setSearchQuery(v.toLowerCase());
+    if (v === '') {
+      setFilteredMods(props.localMods);
+    } else {
+      const modsList = props.localMods.filter(mod =>
+        mod.name.toLowerCase().includes(v.toLowerCase())
+      );
+      setFilteredMods(modsList);
+    }
+  };
+
+  const getSize = i => {
+    return filteredMods[i].height;
+  };
+
+  const toggleSize = i => {
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(i);
+    }
+
+    if (filteredMods[i].height === 50) {
+      const zipFile = new Zip(path.join(modsFolder, filteredMods[i].name));
+      const mcmodInfo = JSON.parse(zipFile.readAsText('mcmod.info'));
+    }
+
+    const newMods = Object.assign([...filteredMods], {
+      [i]: {
+        ...filteredMods[i],
+        height: filteredMods[i].height === 50 ? 400 : 50
+      }
+    });
+    setFilteredMods(newMods);
+  };
+
+  const deleteMod = async i => {
+    console.log(filteredMods[i]);
+    // Remove the actual file
+    await promisify(fss.unlink)(path.join(modsFolder, filteredMods[i].name));
+    // Remove the reference in the mods file json
+    const oldMods = JSON.parse(
+      await promisify(fss.readFile)(
+        path.join(PACKS_PATH, props.match.params.instance, 'mods.json')
+      )
+    );
+    await promisify(fss.writeFile)(
+      path.join(PACKS_PATH, props.match.params.instance, 'mods.json'),
+      JSON.stringify(
+        oldMods.filter(v => v.fileNameOnDisk !== filteredMods[i].name)
+      )
+    );
+  };
+
+  if (props.localMods.length === 0) {
+    return (
+      <div className={styles.noMod}>
+        <div>
+          No mod is installed
+          <br />
+          <Link
+            to={{
+              pathname: `/editInstance/${
+                props.match.params.instance
+              }/mods/browse/${props.match.params.version}`,
+              state: { modal: true }
+            }}
+            replace
+          >
+            <Button type="primary">Add Mods</Button>
+          </Link>
+        </div>
       </div>
     );
   }
-}
+
+  return (
+    <div style={{ width: '100%', height: '100%' }}>
+      <div style={{ height: 60, width: '100%' }}>
+        <Input
+          allowClear
+          onChange={e => filterMods(e.target.value)}
+          size="large"
+          placeholder="Filter mods"
+          style={{ width: '80%' }}
+          value={searchQuery}
+        />
+        <Link
+          to={{
+            pathname: `/editInstance/${
+              props.match.params.instance
+            }/mods/browse/${props.match.params.version}`,
+            state: { modal: true }
+          }}
+          replace
+        >
+          <Button
+            type="primary"
+            style={{
+              height: 38,
+              top: -1,
+              position: 'relative',
+              marginLeft: 10
+            }}
+          >
+            Add Mods
+          </Button>
+        </Link>
+      </div>
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            ref={listRef}
+            height={height - 60}
+            itemCount={filteredMods.length}
+            itemSize={getSize}
+            width={width}
+          >
+            {propss => <Mod {...propss} toggleSize={toggleSize} />}
+          </List>
+        )}
+      </AutoSizer>
+    </div>
+  );
+};
 
 function mapStateToProps(state) {
   return {};

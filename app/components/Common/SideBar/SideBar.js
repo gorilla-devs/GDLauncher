@@ -4,6 +4,7 @@ import { Icon, Button, Popover } from 'antd';
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -24,45 +25,46 @@ type Props = {};
 const SideBar = props => {
   const [instanceData, setInstanceData] = useState(null);
 
-  useEffect(
-    async () => {
-      if (props.selectedInstance !== null) {
-        const data = JSON.parse(
-          await promisify(fs.readFile)(
-            path.join(PACKS_PATH, props.selectedInstance, 'config.json')
-          )
+  const UpdateSideBar = async () => {
+    if (props.selectedInstance !== null) {
+      const data = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, props.selectedInstance, 'config.json')
+        )
+      );
+
+      let mods = 0;
+
+      try {
+        mods = (await fs.readdirAsync(
+          path.join(PACKS_PATH, props.selectedInstance, 'mods')
+        )).filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar').length;
+      } catch {}
+
+      try {
+        const thumbnail = await promisify(fs.readFile)(
+          path.join(PACKS_PATH, props.selectedInstance, 'thumbnail.png')
         );
-
-        let mods = 0;
-
-        try {
-          mods = (await fs.readdirAsync(
-            path.join(PACKS_PATH, props.selectedInstance, 'mods')
-          )).filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar').length;
-        } catch {}
-
-        try {
-          const thumbnail = await promisify(fs.readFile)(
-            path.join(PACKS_PATH, props.selectedInstance, 'thumbnail.png')
-          );
-          setInstanceData({
-            ...data,
-            thumbnail: `data:image/png;base64,${thumbnail.toString('base64')}`,
-            mods
-          });
-        } catch {
-          setInstanceData({
-            ...data,
-            mods,
-            thumbnail: null
-          });
-        }
-      } else {
-        setInstanceData(null);
+        setInstanceData({
+          ...data,
+          thumbnail: `data:image/png;base64,${thumbnail.toString('base64')}`,
+          mods
+        });
+      } catch {
+        setInstanceData({
+          ...data,
+          mods,
+          thumbnail: null
+        });
       }
-    },
-    [props.selectedInstance]
-  );
+    } else {
+      setInstanceData(null);
+    }
+  };
+
+  useEffect(() => {
+    UpdateSideBar();
+  }, [props.selectedInstance]);
 
   return (
     <aside className={styles.sidenav}>
@@ -188,7 +190,9 @@ const SideBar = props => {
           url="https://discordapp.com/invite/4cGYzen"
         />
         <span className={styles.version}>
-          v{require('../../../../package.json').version}
+          <Link to={{ pathname: '/changelogs', state: { modal: true } }}>
+            v{require('../../../../package.json').version}
+          </Link>
         </span>
         {/* eslint-enable */}
       </div>

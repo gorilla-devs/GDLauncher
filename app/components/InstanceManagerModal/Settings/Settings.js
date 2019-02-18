@@ -95,19 +95,23 @@ class Instances extends Component<Props> {
             >
               <FormItem>
                 {getFieldDecorator('packName', {
-                  rules: [{
-                    required: true,
-                    message: 'Please input a valid name',
-                    pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
-                  }],
+                  rules: [
+                    {
+                      required: true,
+                      message: 'Please input a valid name',
+                      pattern: new RegExp(
+                        '^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$'
+                      )
+                    }
+                  ],
                   initialValue: this.props.instance
                 })(
                   <Input
                     size="large"
                     style={{
-                      width: 250,
+                      width: 300,
                       display: 'inline-block',
-                      height: '60px'
+                      height: 60
                     }}
                     prefix={
                       <Icon
@@ -126,25 +130,26 @@ class Instances extends Component<Props> {
                 type="primary"
                 htmlType="submit"
                 style={{
-                  width: '200px',
+                  width: 150,
                   display: 'inline-block',
-                  height: '60px'
+                  height: 60
                 }}
               >
                 Rename
               </Button>
             </div>
           </div>
-          <Card style={{ marginTop: 15 }} title="Forge Manager">
-            {!this.state.checkingForge ? (
-              <ForgeManager
-                name={this.props.instance}
-                data={this.state.instanceConfig}
-                closeModal={this.props.close}
-              />
-            ) : null}
-          </Card>
         </Form>
+
+        <Card style={{ marginTop: 15 }} title="Forge Manager">
+          {!this.state.checkingForge ? (
+            <ForgeManager
+              name={this.props.instance}
+              data={this.state.instanceConfig}
+              closeModal={this.props.close}
+            />
+          ) : null}
+        </Card>
       </div>
     );
   }

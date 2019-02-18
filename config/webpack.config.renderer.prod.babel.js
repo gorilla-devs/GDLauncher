@@ -38,7 +38,8 @@ export default merge.smart(baseConfig, {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              publicPath: './'
+              publicPath: './',
+              sourceMap: true
             }
           },
           {
@@ -54,7 +55,10 @@ export default merge.smart(baseConfig, {
         test: /^((?!\.global).)*\.css$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              sourceMap: true
+            }
           },
           {
             loader: 'css-loader',
@@ -71,7 +75,10 @@ export default merge.smart(baseConfig, {
         test: /\.global\.(scss|sass)$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              sourceMap: true
+            }
           },
           {
             loader: 'css-loader',
@@ -93,7 +100,10 @@ export default merge.smart(baseConfig, {
         test: /^((?!\.global).)*\.(scss|sass)$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              sourceMap: true
+            }
           },
           {
             loader: 'css-loader',
@@ -190,10 +200,7 @@ export default merge.smart(baseConfig, {
           }),
           new OptimizeCSSAssetsPlugin({
             cssProcessorOptions: {
-              map: {
-                inline: false,
-                annotation: true
-              }
+              map: false
             }
           })
         ],
@@ -242,6 +249,19 @@ export default merge.smart(baseConfig, {
       analyzerMode:
         process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
       openAnalyzer: process.env.OPEN_ANALYZER === 'true'
+    }),
+    /**
+     * Set NODE_ENV to "production" for external dependencies
+     *
+     * Note: this is required for both main and renderer
+     * separately since the renderer process doesn't inherit
+     * the main process's environment on Linux.
+     */
+    new webpack.BannerPlugin({
+      banner: 'process.env.NODE_ENV="production";',
+      raw: true,
+      entryOnly: true,
+      test: /\.js$/
     })
   ]
 });

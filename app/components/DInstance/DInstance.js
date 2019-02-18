@@ -15,6 +15,7 @@ import { hideMenu } from 'react-contextmenu/es6/actions';
 import { PACKS_PATH, APPPATH } from '../../constants';
 import { history } from '../../store/configureStore';
 import styles from './DInstance.scss';
+import InstanceIcon from '../../assets/images/instanceDefault.png';
 
 type Props = {
   name: string,
@@ -24,9 +25,6 @@ type Props = {
   selectInstance: () => void,
   playing: array
 };
-
-let interval;
-let intervalDelete;
 
 export default class DInstance extends Component<Props> {
   props: Props;
@@ -39,39 +37,64 @@ export default class DInstance extends Component<Props> {
       isValid: true,
       forgeVersion: null,
       confirmDelete: false,
-      deleteWait: 3
+      deleteWait: 3,
+      icon: `url(${InstanceIcon}) center no-repeat`
     };
   }
 
   componentDidMount = async () => {
     this.updateInstanceConfig();
-    // This checks for a valid config every second (until it finds one)
-    // interval = setInterval(() => {
-    //   console.log('checking');
-    //   this.updateInstanceConfig();
-    //   if (this.state.version !== null) {
-    //     clearInterval(interval);
-    //   }
-    // }, 1000);
+
+    // This updates the config data every second
+    this.interval = setInterval(() => {
+      this.updateInstanceConfig();
+    }, 1000);
+
+    const config = JSON.parse(
+      await promisify(fs.readFile)(
+        path.join(PACKS_PATH, this.props.name, 'config.json')
+      )
+    );
+    if (config.icon) {
+      const icon = await promisify(fs.readFile)(
+        path.join(PACKS_PATH, this.props.name, config.icon)
+      );
+      this.setState({
+        icon: `url("data:image/png;base64,${icon.toString('base64')}")`
+      });
+    }
   };
 
   componentDidUpdate = () => {
     this.percentage = this.updatePercentage();
   };
 
-  // componentWillUnmount = () => {
-  //   clearInterval(interval);
-  // };
+  componentWillUnmount = () => {
+    clearInterval(this.interval);
+  };
 
   updateInstanceConfig = async () => {
     const { name } = this.props;
     if (!this.isInstalling()) {
       try {
-        const { version, forgeVersion } = JSON.parse(
+        const config = JSON.parse(
           await promisify(fs.readFile)(
             path.join(PACKS_PATH, name, 'config.json')
           )
         );
+        const { version, forgeVersion } = config;
+        if (config.icon) {
+          const icon = await promisify(fs.readFile)(
+            path.join(PACKS_PATH, this.props.name, config.icon)
+          );
+          this.setState({
+            icon: `url("data:image/png;base64,${icon.toString('base64')}")`
+          });
+        } else {
+          this.setState({
+            icon: `url(${InstanceIcon}) center no-repeat`
+          });
+        }
         this.setState({
           version,
           forgeVersion:
@@ -150,11 +173,11 @@ export default class DInstance extends Component<Props> {
       this.setState({
         confirmDelete: true
       });
-      intervalDelete = setInterval(() => {
+      this.intervalDelete = setInterval(() => {
         this.setState(prev => ({
           deleteWait: prev.deleteWait - 1
         }));
-        if (this.state.deleteWait === 0) clearInterval(intervalDelete);
+        if (this.state.deleteWait === 0) clearInterval(this.intervalDelete);
       }, 1000);
     }
   };
@@ -211,6 +234,7 @@ export default class DInstance extends Component<Props> {
               <div
                 className={styles.icon__image}
                 style={{
+                  background: this.state.icon,
                   filter: this.isInstalling()
                     ? "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale\")"
                     : ''
@@ -237,7 +261,7 @@ export default class DInstance extends Component<Props> {
             selectInstance(name);
           }}
           onHide={() => {
-            clearInterval(intervalDelete);
+            clearInterval(this.intervalDelete);
             this.setState({ confirmDelete: false, deleteWait: 3 });
           }}
         >
