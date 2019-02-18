@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import store from '../../localStore';
 import styles from './ChangelogModal.scss';
 import Modal from '../Common/Modal/Modal';
+import ChangelogRow from './ChangelogRow';
 
 export default props => {
   const [unMount, setUnMount] = useState(false);
@@ -25,48 +26,23 @@ export default props => {
         <h2 className={styles.hrTextGreen}>SOME COOL NEW STUFF</h2>
         <div className={styles.subHrList}>
           <ul>
-            <li>
-              <span className={styles.summary}>
-                Instances can now have custom icons!
-              </span>{' '}
-              Select an instance and click on "manage" to do it!
-            </li>
-            <li>
-              <span className={styles.summary}>
-                There is a new mods manager for instances,
-              </span>{' '}
-              it's now a lot easier to use and the scroll position no longer
-              resets when viewing a specific mod page
-            </li>
-            <li>
-              <span className={styles.summary}>
-                There's now a dedicated page for changelogs
-              </span>{' '}
-              when opening the launcher after an update. Yeeee
-            </li>
+            <ChangelogRow
+              main="Pssssst, we didn't add anything yet"
+              secondary="but don't tell anyone pls"
+            />
           </ul>
         </div>
         <h2 className={styles.hrTextRed}>SOME BUGFIXES</h2>
         <div className={styles.subHrList}>
           <ul>
-            <li>
-              <span className={styles.summary}>
-                Deleting instances is now safe!
-              </span>{' '}
-              O o o o u r B a a a d
-            </li>
-            <li>
-              <span className={styles.summary}>
-                Mods dependancies are now correctly downloaded
-              </span>{' '}
-              GGWP
-            </li>
-            <li>
-              <span className={styles.summary}>
-                We fixed autoupdates on linux,
-              </span>{' '}
-              will you ever forgive us?
-            </li>
+            <ChangelogRow
+              main="Fixed a bug when downloading a mod"
+              secondary="we hope you are proud of us now :)"
+            />
+            <ChangelogRow
+              main="When searching for a mod that doesn't exist"
+              secondary="it now displays an appropriate message"
+            />
           </ul>
         </div>
         <h2 className={styles.hrTextYellow}>WE LOVE YOU</h2>
