@@ -10,7 +10,9 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import makeDir from 'make-dir';
 import log from 'electron-log';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { connect } from 'react-redux';
+import { promisify } from 'util';
 import { Button, Input, Checkbox } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
@@ -37,9 +39,19 @@ const LocalMods = props => {
       <div className={styles.innerItemMod}>
         <Checkbox />
         {filteredMods[index].name}{' '}
-        <Button type="primary" size="small" onClick={() => toggleSize(index)}>
-          Manage
-        </Button>
+        <div>
+          <Button type="primary" size="small" onClick={() => toggleSize(index)}>
+            Manage
+          </Button>
+          <Button
+            style={{ marginLeft: 5 }}
+            type="primary"
+            size="small"
+            onClick={() => deleteMod(index)}
+          >
+            <FontAwesomeIcon icon="trash" />
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -77,6 +89,24 @@ const LocalMods = props => {
       }
     });
     setFilteredMods(newMods);
+  };
+
+  const deleteMod = async i => {
+    console.log(filteredMods[i]);
+    // Remove the actual file
+    await promisify(fss.unlink)(path.join(modsFolder, filteredMods[i].name));
+    // Remove the reference in the mods file json
+    const oldMods = JSON.parse(
+      await promisify(fss.readFile)(
+        path.join(PACKS_PATH, props.match.params.instance, 'mods.json')
+      )
+    );
+    await promisify(fss.writeFile)(
+      path.join(PACKS_PATH, props.match.params.instance, 'mods.json'),
+      JSON.stringify(
+        oldMods.filter(v => v.fileNameOnDisk !== filteredMods[i].name)
+      )
+    );
   };
 
   if (props.localMods.length === 0) {
