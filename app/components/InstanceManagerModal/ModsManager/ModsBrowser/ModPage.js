@@ -41,8 +41,10 @@ function ModPage(props) {
     );
     let modsFile = [];
     try {
-      modsFile = await promisify(fs.readFile)(
-        path.join(PACKS_PATH, props.instance, 'mods.json')
+      modsFile = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, props.instance, 'mods.json')
+        )
       );
     } catch {}
 
