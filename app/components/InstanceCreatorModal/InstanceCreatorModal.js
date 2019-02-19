@@ -52,14 +52,14 @@ class InstanceCreatorModal extends Component<Props> {
           value: 'forge',
           label: 'Forge',
           // _.reverse mutates arrays so we make a copy of it first using .slice() and then we reverse it
-          children: _.reverse(vSort(Object.keys(forgeManifest).slice())).map(
+          children: Object.keys(forgeManifest).map(
             v => ({
               value: v,
               label: v,
               // same as above
-              children: _.reverse(forgeManifest[v].slice()).map(ver => ({
-                value: Object.keys(ver)[0],
-                label: Object.keys(ver)[0]
+              children: _.reverse(vSort(forgeManifest[v]).slice()).map(ver => ({
+                value: ver,
+                label: ver
               }))
             })
           )

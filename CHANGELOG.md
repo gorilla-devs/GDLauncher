@@ -1,4 +1,23 @@
+# 0.11.0
+- Added custom icons for instances [#112](https://github.com/gorilla-devs/GDLauncher/issues/112)
+- Removed user confirmation for appimage installation on linux [#120](https://github.com/gorilla-devs/GDLauncher/issues/120)
+- Fixed dependancies being downloaded multiple times [#153](https://github.com/gorilla-devs/GDLauncher/issues/153)
+- Fixed delete instance button sometimes going in negative infinite countdown
+- Changed (slightly) the style of the scrollbar
+- Mods manager (both local mods and mods browser) are now using a virtualized list for better performance
+- Added a changelog page when updating the launcher
+- Fixed autoupdates on linux
+- Local installed mods are now updated in real time
+- Already installed mods will now be properly showed when browsing
+- Forge versions are now fetched from curse instead of forge
+- Removed duplicate natives being downloaded for forge
+- Removed forge versions below 1.6.1
+- Fixed the scroll position of the mods list when viewing a particular mod description
+
+
+
 # 0.10.0 (31.1.2019)
+
 - Fixed missing java warning not showing up
 - Changed context menu animation, now it's faster
 - Changed modal animation

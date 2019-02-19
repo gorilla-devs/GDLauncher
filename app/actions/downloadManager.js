@@ -7,7 +7,6 @@ import fse from 'fs-extra';
 import log from 'electron-log';
 import Promise from 'bluebird';
 import fs from 'fs';
-import Zip from 'adm-zip';
 import compressing from 'compressing';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import {
@@ -22,11 +21,11 @@ import {
   extractAssets,
   extractMainJar,
   extractNatives,
-  computeVanillaAndForgeLibraries,
-  isVirtualAssets
+  computeVanillaAndForgeLibraries
 } from '../utils/getMCFilesList';
-import { downloadMod, getModsList } from '../utils/mods';
+import { downloadMod, getModsList, createDoNotTouchFile } from '../utils/mods';
 import { arraify } from '../utils/strings';
+import { copyAssetsToLegacy } from '../utils/assets';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -60,9 +59,6 @@ export function importTwitchProfile(pack, filePath) {
     await compressing.zip.uncompress(
       filePath,
       path.join(INSTANCES_PATH, 'temp', pack)
-    );
-    const overrideFiles = await promisify(fs.readdir)(
-      path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
     );
     const packInfo = JSON.parse(
       await promisify(fs.readFile)(
@@ -192,26 +188,15 @@ export function downloadPack(pack) {
     const assets = await extractAssets(vnlJSON);
     const mainJar = await extractMainJar(vnlJSON);
 
-    let forgeFileName = null;
-
     if (currPack.forgeVersion !== null) {
-      const { branch } = packCreator.forgeManifest[
-        Object.keys(packCreator.forgeManifest).find(v => v === currPack.version)
-      ].find(v => Object.keys(v)[0] === currPack.forgeVersion)[
-        currPack.forgeVersion
-      ];
-
-      forgeFileName = `${currPack.version}-${currPack.forgeVersion}${
-        branch !== null ? `-${branch}` : ''
-      }`;
       try {
         forgeJSON = JSON.parse(
           await promisify(fs.readFile)(
             path.join(
               META_PATH,
               'net.minecraftforge',
-              forgeFileName,
-              `${forgeFileName}.json`
+              `forge-${currPack.forgeVersion}`,
+              `forge-${currPack.forgeVersion}.json`
             )
           )
         );
@@ -219,13 +204,26 @@ export function downloadPack(pack) {
           path.join(
             INSTANCES_PATH,
             'libraries',
-            ...arraify(forgeJSON.versionInfo.libraries[0].name)
+            ...arraify(forgeJSON.libraries[0].name)
           )
         );
       } catch (err) {
+        const { data } = await axios.get(
+          `https://addons-ecs.forgesvc.net/api/minecraft/modloader/forge-${
+            currPack.forgeVersion
+          }`
+        );
+
+        forgeJSON =
+          JSON.parse(data.versionJson) || JSON.parse(data.additionalFilesJson);
+
         await downloadFile(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`),
-          `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeFileName}/forge-${forgeFileName}-installer.jar`,
+          path.join(
+            INSTANCES_PATH,
+            'libraries',
+            ...arraify(forgeJSON.libraries[0].name)
+          ),
+          data.downloadUrl,
           p => {
             dispatch({
               type: UPDATE_PROGRESS,
@@ -233,32 +231,29 @@ export function downloadPack(pack) {
             });
           }
         );
-        const zipFile = new Zip(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`)
-        );
-        forgeJSON = JSON.parse(zipFile.readAsText('install_profile.json'));
 
         await makeDir(
           path.dirname(
             path.join(
               INSTANCES_PATH,
               'libraries',
-              ...arraify(forgeJSON.versionInfo.libraries[0].name)
+              ...arraify(forgeJSON.libraries[0].name)
             )
           )
         );
-        await promisify(fs.unlink)(
-          path.join(INSTANCES_PATH, 'temp', `${forgeFileName}.jar`)
-        );
         await makeDir(
-          path.join(META_PATH, 'net.minecraftforge', forgeFileName)
+          path.join(
+            META_PATH,
+            'net.minecraftforge',
+            `forge-${currPack.forgeVersion}`
+          )
         );
         await promisify(fs.writeFile)(
           path.join(
             META_PATH,
             'net.minecraftforge',
-            forgeFileName,
-            `${forgeFileName}.json`
+            `forge-${currPack.forgeVersion}`,
+            `forge-${currPack.forgeVersion}.json`
           ),
           JSON.stringify(forgeJSON)
         );
@@ -280,12 +275,16 @@ export function downloadPack(pack) {
       path.join(PACKS_PATH, pack, 'config.json'),
       JSON.stringify({
         version: currPack.version,
-        forgeVersion: forgeFileName,
+        forgeVersion:
+          currPack.forgeVersion === null
+            ? null
+            : `forge-${currPack.forgeVersion}`,
         addonID: currPack.addonID ? currPack.addonID : null,
         timePlayed: 0
       })
     );
 
+    // We download the legacy java fixer if needed
     const legacyJavaFixer =
       vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
         ? {
@@ -294,14 +293,15 @@ export function downloadPack(pack) {
           }
         : null;
 
-    let mods = [];
+    // Here we work on the mods
+    await createDoNotTouchFile(pack);
+
     try {
       const manifest = JSON.parse(
         await promisify(fs.readFile)(
           path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')
         )
       );
-      mods = await getModsList(manifest.files, pack);
       const overrideFiles = await promisify(fs.readdir)(
         path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
       );
@@ -316,12 +316,44 @@ export function downloadPack(pack) {
         path.join(PACKS_PATH, pack, 'manifest.json')
       );
       await fse.remove(path.join(INSTANCES_PATH, 'temp', pack));
+
+      let modsDownloaded = 0;
+      let modsManifest = [];
+      await Promise.map(
+        manifest.files,
+        async mod => {
+          modsDownloaded += 1;
+          const modManifest = await downloadMod(
+            mod.projectID,
+            mod.fileID,
+            null,
+            pack
+          );
+          modsManifest = modsManifest.concat(modManifest);
+          dispatch({
+            type: UPDATE_PROGRESS,
+            payload: {
+              pack,
+              percentage: (
+                (modsDownloaded * 12) / manifest.files.length +
+                18
+              ).toFixed(0)
+            }
+          });
+        },
+        { concurrency: 4 }
+      );
+
+      // Write the mods list to a file
+      await promisify(fs.writeFile)(
+        path.join(PACKS_PATH, pack, 'mods.json'),
+        JSON.stringify(modsManifest)
+      );
     } catch (err) {
       log.error(err);
     }
 
-    const totalFiles =
-      libraries.length + assets.length + mainJar.length + mods.length;
+    const totalFiles = libraries.length + assets.length + mainJar.length;
 
     dispatch({
       type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
@@ -332,7 +364,7 @@ export function downloadPack(pack) {
     });
 
     const updatePercentage = downloaded => {
-      const actPercentage = ((downloaded * 82) / totalFiles + 18).toFixed(0);
+      const actPercentage = ((downloaded * 70) / totalFiles + 30).toFixed(0);
       if (currPack.percentage !== actPercentage)
         return dispatch({
           type: UPDATE_PROGRESS,
@@ -351,24 +383,13 @@ export function downloadPack(pack) {
 
     const allFiles =
       legacyJavaFixer !== null
-        ? [...libraries, ...assets, ...mainJar, ...mods, legacyJavaFixer]
-        : [...libraries, ...assets, ...mainJar, ...mods];
+        ? [...libraries, ...assets, ...mainJar, legacyJavaFixer]
+        : [...libraries, ...assets, ...mainJar];
 
     await downloadArr(allFiles, updatePercentage, pack);
 
-    const copyAssetsToLegacy = async () => {
-      await Promise.map(assets, async asset => {
-        try {
-          await promisify(fs.access)(asset.legacyPath);
-        } catch {
-          await makeDir(path.dirname(asset.legacyPath));
-          await promisify(fs.copyFile)(asset.path, asset.legacyPath);
-        }
-      });
-    };
-
     if (vnlJSON.assets === 'legacy') {
-      await copyAssetsToLegacy();
+      await copyAssetsToLegacy(assets);
     }
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
 

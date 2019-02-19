@@ -22,7 +22,8 @@ export default function ModsListWrapper({
   loadNextPage,
   width,
   height,
-  setClick
+  setClick,
+  installedMods
 }) {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
@@ -89,7 +90,7 @@ export default function ModsListWrapper({
               className={styles.modIcon}
               style={{
                 background: `linear-gradient(
-                  rgba(0, 0, 0, 0.8), 
+                  rgba(0, 0, 0, 0.8),
                   rgba(0, 0, 0, 0.8)
                   ), url(${attachment})`,
                 backgroundSize: 'cover',
@@ -99,6 +100,9 @@ export default function ModsListWrapper({
             >
               {mod && mod.name}
             </div>
+            {mod && installedMods.find(v => v.id === mod.id) && (
+              <div className={styles.modInstalled}>INSTALLED</div>
+            )}
           </div>
         </div>
       );

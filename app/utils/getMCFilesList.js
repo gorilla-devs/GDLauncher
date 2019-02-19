@@ -132,12 +132,13 @@ export const getForgeLibraries = async forge => {
 
   let libraries = [];
   libraries = await Promise.all(
-    forge.versionInfo.libraries
+    forge.libraries
       // .filter(
       //   lib =>
       //     (_.has(lib, 'clientreq') && lib.clientreq) || !_.has(lib, 'clientreq')
       // )
       .filter(lib => !parseLibRules(lib.rules))
+      .filter(lib => !lib.natives)
       .map(async lib => forgeLibCalculator(lib))
   );
   return libraries;

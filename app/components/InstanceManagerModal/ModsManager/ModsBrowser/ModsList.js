@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
 import path from 'path';
 import axios from 'axios';
+import fs from 'fs';
 import ContentLoader from 'react-content-loader';
 import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -14,6 +15,7 @@ import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
 import { downloadMod, getModMurmurHash2 } from '../../../../utils/mods';
 import ModsListHeader from './ModsListHeader';
+import { promisify } from 'util';
 import ModPage from './ModPage';
 
 import styles from './ModsList.scss';
@@ -26,11 +28,24 @@ const ModsList = props => {
   const [searchQuery, setSearchQuery] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
   const [localMods, setLocalMods] = useState([]);
-
+  const [installedMods, setInstalledMods] = useState([]);
 
   useEffect(() => {
     loadMoreMods(null, null, '', true);
   }, [filterType]);
+
+  useEffect(() => {
+    try {
+      loadInstalledMods();
+    } catch {}
+  }, [props.localMods]);
+
+  const loadInstalledMods = async () => {
+    const Imods = await promisify(fs.readFile)(
+      path.join(PACKS_PATH, props.match.params.instance, 'mods.json')
+    );
+    setInstalledMods(JSON.parse(Imods));
+  };
 
   // The "e" param is just used for invoking this function without params in events handlers
   const loadMoreMods = async (e, v, searchQueryP, reset) => {
@@ -118,6 +133,7 @@ const ModsList = props => {
             width={width}
             height={height}
             setClick={setModOverview}
+            installedMods={installedMods}
           />
         )}
       </AutoSizer>

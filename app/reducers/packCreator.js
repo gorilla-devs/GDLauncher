@@ -16,7 +16,7 @@ export default function packManager(state = initialState, action) {
     case `${GET_MC_VANILLA_VERSIONS}`:
       return {
         ...state,
-        versionsManifest: action.payload.data.versions
+        versionsManifest: action.payload.versions
       };
     case `${GET_FORGE_MANIFEST}`:
       return {
