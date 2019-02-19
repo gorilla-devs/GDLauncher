@@ -78,6 +78,9 @@ const ModsList = props => {
           filter={filterType}
           setFilter={setFilterType}
           setSearchQuery={setSearchQuery}
+          version={props.match.params.version}
+          instance={props.match.params.instance}
+          loading
         />
         <AutoSizer>
           {({ height, width }) => (
@@ -122,6 +125,8 @@ const ModsList = props => {
         filter={filterType}
         setFilter={setFilterType}
         setSearchQuery={setSearchQuery}
+        version={props.match.params.version}
+        instance={props.match.params.instance}
       />
       {mods.length === 0 && !areModsLoading && (
         <div className={styles.modsNotFound}>
