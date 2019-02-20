@@ -45,7 +45,11 @@ export default props => {
         This cannot be undone and you will lose everything you've done
       </div>
       <div className={styles.buttons}>
-        <Button type="primary" disabled={deleting}>
+        <Button
+          type="primary"
+          disabled={deleting}
+          onClick={() => setUnMount(true)}
+        >
           No, Abort
         </Button>
         <span onClick={deleting === false ? deleteInstance : () => {}}>
