@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './NavigationBar.scss';
 import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
 import * as downloadManagerActions from '../../../actions/downloadManager';
@@ -34,7 +35,7 @@ export default props => {
           state: { modal: true }
         }}
       >
-        <i className={`fas fa-cog ${styles.settings}`} draggable="false" />
+        <FontAwesomeIcon icon="cog" className={styles.settings} />
       </Link>
       {updateAvailable && (
         <div className={styles.updateAvailable}>
