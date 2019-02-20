@@ -304,17 +304,20 @@ export function downloadPack(pack) {
       const overrideFiles = await promisify(fs.readdir)(
         path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
       );
-      overrideFiles.forEach(async item => {
-        await fse.move(
-          path.join(INSTANCES_PATH, 'temp', pack, 'overrides', item),
-          path.join(PACKS_PATH, pack, item)
-        );
-      });
+      await Promise.all(
+        overrideFiles.map(async item => {
+          await fse.move(
+            path.join(INSTANCES_PATH, 'temp', pack, 'overrides', item),
+            path.join(PACKS_PATH, pack, item),
+            { overwrite: true }
+          );
+        })
+      );
       await fse.move(
         path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json'),
         path.join(PACKS_PATH, pack, 'manifest.json')
       );
-      await fse.remove(path.join(INSTANCES_PATH, 'temp', pack));
+      // await fse.remove(path.join(INSTANCES_PATH, 'temp', pack));
 
       let modsDownloaded = 0;
       let modsManifest = [];
