@@ -279,7 +279,6 @@ export function downloadPack(pack) {
           currPack.forgeVersion === null
             ? null
             : `forge-${currPack.forgeVersion}`,
-        addonID: currPack.addonID ? currPack.addonID : null,
         timePlayed: 0
       })
     );
