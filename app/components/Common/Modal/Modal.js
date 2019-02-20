@@ -124,7 +124,7 @@ export default class Modal extends Component<Props> {
             style={{
               height:
                 this.props.header === undefined || this.props.header === true
-                  ? 'calc(100% - 40px)'
+                  ? 'calc(100% - 30px)'
                   : '100%'
             }}
           >
