@@ -98,7 +98,11 @@ export default class DInstance extends Component<Props> {
         this.setState({
           version,
           forgeVersion:
-            forgeVersion === null ? null : forgeVersion.split('-')[1]
+            forgeVersion === null
+              ? null
+              : forgeVersion.includes('-')
+              ? forgeVersion.split('-')[1]
+              : forgeVersion
         });
       } catch (e) {
         console.log(e);
