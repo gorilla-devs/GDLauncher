@@ -59,7 +59,7 @@
 .li:hover:not(.activeLink) .a {
   transition: all .25s;
   background: var(--secondary-color-3);
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .li:hover, .li:active, .li:focus {
