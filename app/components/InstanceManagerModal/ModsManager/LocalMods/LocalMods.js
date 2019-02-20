@@ -40,11 +40,16 @@ const LocalMods = props => {
         <Checkbox />
         {filteredMods[index].name}{' '}
         <div>
-          <Button type="primary" size="small" onClick={() => toggleSize(index)}>
+          <Button
+            style={{ height: 30, width: 30 }}
+            type="primary"
+            size="small"
+            onClick={() => toggleSize(index)}
+          >
             <FontAwesomeIcon icon="edit" />
           </Button>
           <Button
-            style={{ marginLeft: 5 }}
+            style={{ marginLeft: 5, height: 30, width: 30 }}
             type="primary"
             size="small"
             onClick={() => deleteMod(index)}

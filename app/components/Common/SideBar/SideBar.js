@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { promisify } from 'util';
 import CIcon from '../Icon/Icon';
 import SocialIcon from './SocialIcon';
@@ -77,7 +78,7 @@ const SideBar = props => {
           </span>
           <span>{props.username}</span>
           <div onClick={() => props.logout()}>
-            <i className={`fas fa-sign-out-alt ${styles.logout}`} />
+            <FontAwesomeIcon icon="sign-out-alt" className={styles.logout} />
           </div>
         </div>
       </div>
