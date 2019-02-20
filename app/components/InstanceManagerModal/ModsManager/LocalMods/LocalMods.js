@@ -41,7 +41,7 @@ const LocalMods = props => {
         {filteredMods[index].name}{' '}
         <div>
           <Button type="primary" size="small" onClick={() => toggleSize(index)}>
-            Manage
+            <FontAwesomeIcon icon="edit" />
           </Button>
           <Button
             style={{ marginLeft: 5 }}
@@ -133,42 +133,82 @@ const LocalMods = props => {
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <div style={{ height: 60, width: '100%' }}>
+      <div
+        style={{
+          height: 40,
+          width: '100%',
+          background: 'var(--secondary-color-2)',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
+        <div
+          style={{
+            width: '15%',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            height: 40
+          }}
+        >
+          <Checkbox />
+          <Button
+            type="primary"
+            size="small"
+            style={{
+              height: 30,
+              width: 30,
+              top: -1
+            }}
+          >
+            <FontAwesomeIcon icon="trash" />
+          </Button>
+        </div>
         <Input
           allowClear
           onChange={e => filterMods(e.target.value)}
           size="large"
           placeholder="Filter mods"
-          style={{ width: '80%' }}
+          style={{ width: '75%' }}
           value={searchQuery}
         />
-        <Link
-          to={{
-            pathname: `/editInstance/${
-              props.match.params.instance
-            }/mods/browse/${props.match.params.version}`,
-            state: { modal: true }
+        <div
+          style={{
+            width: '10%',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            height: 40
           }}
-          replace
         >
-          <Button
-            type="primary"
-            style={{
-              height: 38,
-              top: -1,
-              position: 'relative',
-              marginLeft: 10
+          <Link
+            to={{
+              pathname: `/editInstance/${
+                props.match.params.instance
+              }/mods/browse/${props.match.params.version}`,
+              state: { modal: true }
             }}
+            replace
           >
-            Add Mods
-          </Button>
-        </Link>
+            <Button
+              type="primary"
+              size="small"
+              style={{
+                height: 30,
+                width: 30,
+                top: -1
+              }}
+            >
+              <FontAwesomeIcon icon="plus" />
+            </Button>
+          </Link>
+        </div>
       </div>
       <AutoSizer>
         {({ height, width }) => (
           <List
             ref={listRef}
-            height={height - 60}
+            height={height - 40}
             itemCount={filteredMods.length}
             itemSize={getSize}
             width={width}

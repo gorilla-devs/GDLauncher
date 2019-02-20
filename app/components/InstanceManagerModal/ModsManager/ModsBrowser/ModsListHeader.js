@@ -11,15 +11,10 @@ export default React.memo(props => {
     props.setSearchQuery(text);
     props.loadMoreMods(null, null, text, true);
   };
-  console.log(props);
   const debounced = debounce(loadMoreMods, 500);
 
   const onInputChange = e => {
     debounced(e.target.value);
-  };
-
-  const transitionStyles = {
-    entered: {}
   };
 
   return (
@@ -31,8 +26,7 @@ export default React.memo(props => {
             width: '100%',
             transition: 'transform 0.2s ease-in-out',
             background: 'var(--secondary-color-2)',
-            display: 'flex',
-            ...transitionStyles[state]
+            display: 'flex'
           }}
         >
           <Link
@@ -49,7 +43,8 @@ export default React.memo(props => {
               style={{
                 height: 40,
                 marginLeft: state === 'entered' ? 0 : -50,
-                transition: 'all 0.2s ease-in-out'
+                transition: 'all 0.2s ease-in-out',
+                borderRadius: 0
               }}
             >
               <FontAwesomeIcon icon="chevron-left" />
@@ -76,9 +71,7 @@ export default React.memo(props => {
               <Select.Option value="LastUpdated">Last Updated</Select.Option>
               <Select.Option value="Name">Name</Select.Option>
               <Select.Option value="Author">Author</Select.Option>
-              <Select.Option value="TotalDownloads">
-                Total Downloads
-              </Select.Option>
+              <Select.Option value="TotalDownloads">Downloads</Select.Option>
             </Select>
           </div>
         </div>
