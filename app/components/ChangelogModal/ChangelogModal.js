@@ -27,8 +27,12 @@ export default props => {
         <div className={styles.subHrList}>
           <ul>
             <ChangelogRow
-              main="Pssssst, we didn't add anything yet"
-              secondary="but don't tell anyone pls"
+              main="Added a modal dialog confirmation"
+              secondary="when deleting an instance"
+            />
+            <ChangelogRow
+              main="We are trying to make the UI as consistent as possible"
+              secondary=", so we changed some visual effects. You shouldn't notice it"
             />
           </ul>
         </div>
@@ -36,12 +40,16 @@ export default props => {
         <div className={styles.subHrList}>
           <ul>
             <ChangelogRow
-              main="Fixed a bug when downloading a mod"
+              main="Fixed a bug when downloading mods"
               secondary="we hope you are proud of us now :)"
             />
             <ChangelogRow
               main="When searching for a mod that doesn't exist"
               secondary="it now displays an appropriate message"
+            />
+            <ChangelogRow
+              main="Improved compatibility with older versions of the launcher"
+              secondary={`, if instances won't start, try clicking "repair" and try again`}
             />
           </ul>
         </div>
