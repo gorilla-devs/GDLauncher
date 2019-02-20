@@ -18,15 +18,15 @@ export default class Modal extends Component<Props> {
       style: {
         display: 'block',
         transform: 'scale(0)',
-        transition: 'all 150ms',
+        opacity: 0,
+        transition: 'all 220ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out',
+        transitionTimingFunction: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         ...props.style
       },
       bgStyle: {
-        background: 'rgba(0, 0, 0, 0.7)',
-        backdropFilter: 'none',
-        transition: 'opacity 150ms ease-in-out, filter 150ms ease-in-out',
+        background: 'rgba(0, 0, 0, 0.90)',
+        transition: 'all 220ms cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         opacity: 0
       }
     };
@@ -51,18 +51,18 @@ export default class Modal extends Component<Props> {
       style: {
         display: 'block',
         transform: 'scale(0)',
-        transition: 'all 150ms',
+        opacity: 0,
+        transition: 'all 260ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out',
+        transitionTimingFunction: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         ...this.props.style
       },
       bgStyle: {
         backfaceVisibility: 'hidden',
         perspective: 1000,
-        transform: 'translate3d(0, 0, 0)',
-        transform: 'translateZ(0)',
-        background: 'rgba(0, 0, 0, 0.7)',
-        transition: 'opacity 150ms ease-in-out',
+        transform: 'translate3d(0, 0, 0) translateZ(0)',
+        background: 'rgba(0, 0, 0, 0.90)',
+        transition: 'all 260ms cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         opacity: 0
       }
     });
@@ -74,19 +74,18 @@ export default class Modal extends Component<Props> {
       style: {
         display: 'block',
         transform: 'scale(1)',
-        transition: 'all 150ms',
+        opacity: 1,
+        transition: 'all 220ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out',
+        transitionTimingFunction: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         ...this.props.style
       },
       bgStyle: {
         backfaceVisibility: 'hidden',
         perspective: 1000,
-        transform: 'translate3d(0, 0, 0)',
-        transform: 'translateZ(0)',
-        background: 'rgba(0, 0, 0, 0.7)',
-        backdropFilter: 'blur(8px)',
-        transition: 'opacity 150ms ease-in-out, filter 150ms ease-in-out'
+        transform: 'translate3d(0, 0, 0) translateZ(0)',
+        background: 'rgba(0, 0, 0, 0.90)',
+        transition: 'all 220ms cubic-bezier(0.165, 0.840, 0.440, 1.000)'
       }
     });
   }
@@ -94,7 +93,7 @@ export default class Modal extends Component<Props> {
   back = e => {
     e.stopPropagation();
     setTimeout(this.unMountStyle, 10); // call the into animiation
-    setTimeout(this.props.history.goBack, 200);
+    setTimeout(this.props.history.goBack, 220);
   };
 
   render() {
