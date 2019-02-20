@@ -24,10 +24,10 @@ export default props => {
       await fsa.remove(path.join(PACKS_PATH, instance));
       message.success('Instance deleted');
     } catch (err) {
+      setDeleting(false);
       message.error('Error deleting instance');
       log.error(err);
     } finally {
-      setDeleting(false);
       setUnMount(true);
     }
   };
