@@ -41,6 +41,9 @@ const ImportPack = lazy(() => import('./components/ImportPack/ImportPack'));
 const ChangelogsModal = lazy(() =>
   import('./components/ChangelogModal/ChangelogModal')
 );
+const ConfirmInstanceDelete = lazy(() =>
+  import('./components/ConfirmDeleteInstanceModal/ConfirmDeleteInstanceModal')
+);
 
 type Props = {
   location: object,
@@ -145,15 +148,16 @@ class RouteDef extends Component<Props> {
             </Route>
           </Switch>
         </div>
-        {location.pathname === '/home' && store.get('showChangelogs') !== false && (
-          <Redirect
-            push
-            to={{
-              pathname: '/changelogs',
-              state: { modal: true }
-            }}
-          />
-        )}
+        {location.pathname === '/home' &&
+          store.get('showChangelogs') !== false && (
+            <Redirect
+              push
+              to={{
+                pathname: '/changelogs',
+                state: { modal: true }
+              }}
+            />
+          )}
         {/* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
         {isModal ? (
@@ -193,6 +197,12 @@ class RouteDef extends Component<Props> {
           <Route
             path="/changelogs"
             component={WaitingComponent(ChangelogsModal)}
+          />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/confirmInstanceDelete/:instance"
+            component={WaitingComponent(ConfirmInstanceDelete)}
           />
         ) : null}
       </App>
