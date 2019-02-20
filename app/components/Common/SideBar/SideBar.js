@@ -104,7 +104,7 @@ const SideBar = props => {
                 height: 100,
                 width: 150,
                 objectFit: 'cover',
-                borderRadius: 8
+                borderRadius: 2
               }}
             />
             {instanceData.forgeVersion !== null && !instanceData.thumbnail && (
@@ -116,7 +116,7 @@ const SideBar = props => {
                   height: 50,
                   top: -25,
                   right: 25,
-                  borderRadius: '8px'
+                  borderRadius: '2px'
                 }}
               />
             )}
