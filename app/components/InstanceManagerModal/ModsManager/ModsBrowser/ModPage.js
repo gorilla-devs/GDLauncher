@@ -97,9 +97,9 @@ function ModPage(props) {
         overflow: 'auto'
       }}
     >
-      <Button type="primary" className={styles.backBtn} onClick={props.goBack}>
+      <div className={styles.backBtn} onClick={props.goBack}>
         <FontAwesomeIcon icon="chevron-left" />
-      </Button>
+      </div>
       {!modData ? (
         <AutoSizer>
           {({ height, width }) => (
