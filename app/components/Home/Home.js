@@ -81,16 +81,16 @@ export default class Home extends Component<Props> {
                   <div>
                     You can find us here:
                     <div className={styles.discord}>
-                      <a href="">Discord</a>
+                      <a href="https://discord.gg/ZxRxPqn">Discord</a>
                     </div>
                     <div className={styles.github}>
-                      <a href="">Github</a>
+                      <a href="https://github.com/gorilla-devs/GDLauncher">Github</a>
                     </div>
                     <div className={styles.instagram}>
-                      <a href="">Instagram</a>
+                      <a href="https://instagram.com/gdlauncher">Instagram</a>
                     </div>
                     <div className={styles.facebook}>
-                      <a href="">Facebook</a>
+                      <a href="https://facebook.com/gorilladevs">Facebook</a>
                     </div>
                   </div>
                 </div>
