@@ -62,7 +62,7 @@ export default props => {
             draggable="false"
             className={styles.a}
           >
-            <FontAwesomeIcon icon="th-list" className={styles.i} />
+            <FontAwesomeIcon icon="database" className={styles.i} />
             SERVERS
           </Link>
         </li>
