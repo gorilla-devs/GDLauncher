@@ -31,3 +31,21 @@
     text-align: center;
   }
 }
+
+.editIcon {
+  font-size: 17px;
+  margin: 10px;
+  cursor: pointer;
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.deleteIcon {
+  font-size: 17px;
+  margin: 10px;
+  cursor: pointer;
+  &:hover {
+    color: rgba(231, 76, 60, 0.8);
+  }
+}

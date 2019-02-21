@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { connect } from 'react-redux';
 import { promisify } from 'util';
-import { Button, Input, Checkbox } from 'antd';
+import { Button, Input, Checkbox, Switch } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
@@ -37,25 +37,26 @@ const LocalMods = props => {
       style={style}
     >
       <div className={styles.innerItemMod}>
-        <Checkbox />
+        <div>
+          <Checkbox />
+          <Switch
+            checked={filteredMods[index].state}
+            style={{ marginLeft: 15 }}
+            onChange={e => console.log(e)}
+          />
+        </div>
         {filteredMods[index].name}{' '}
         <div>
-          <Button
-            style={{ height: 30, width: 30 }}
-            type="primary"
-            size="small"
+          <FontAwesomeIcon
+            className={styles.editIcon}
+            icon="edit"
             onClick={() => toggleSize(index)}
-          >
-            <FontAwesomeIcon icon="edit" />
-          </Button>
-          <Button
-            style={{ marginLeft: 5, height: 30, width: 30 }}
-            type="primary"
-            size="small"
+          />
+          <FontAwesomeIcon
+            className={styles.deleteIcon}
+            icon="trash"
             onClick={() => deleteMod(index)}
-          >
-            <FontAwesomeIcon icon="trash" />
-          </Button>
+          />
         </div>
       </div>
     </div>
