@@ -36,6 +36,18 @@
   font-size: 17px;
   margin: 10px;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.plusIcon
+ {
+  font-size: 25px;
+  margin: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
   &:hover {
     color: var(--primary);
   }
@@ -45,6 +57,7 @@
   font-size: 17px;
   margin: 10px;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
   &:hover {
     color: rgba(231, 76, 60, 0.8);
   }

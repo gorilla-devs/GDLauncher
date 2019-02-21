@@ -4,6 +4,7 @@ import { debounce } from 'lodash';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
+import styles from './ModsListHeader.scss';
 
 export default React.memo(props => {
   const [mounted, setMounted] = useState(true);
@@ -37,18 +38,12 @@ export default React.memo(props => {
               state: { modal: true }
             }}
             replace
+            className={styles.backBtn}
+            style={{
+              marginLeft: state === 'entered' ? 0 : -50
+            }}
           >
-            <Button
-              type="primary"
-              style={{
-                height: 40,
-                marginLeft: state === 'entered' ? 0 : -50,
-                transition: 'all 0.2s ease-in-out',
-                borderRadius: 0
-              }}
-            >
-              <FontAwesomeIcon icon="chevron-left" />
-            </Button>
+            <FontAwesomeIcon icon="chevron-left" />
           </Link>
           <Input
             placeholder="Search a mod"

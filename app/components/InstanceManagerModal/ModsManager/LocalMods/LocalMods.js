@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { bindActionCreators } from 'redux';
-import { remote } from 'electron';
 import fss from 'fs';
 import path from 'path';
-import Promise from 'bluebird';
 import Zip from 'adm-zip';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import makeDir from 'make-dir';
-import log from 'electron-log';
+import fs from 'fs';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { connect } from 'react-redux';
@@ -38,14 +34,17 @@ const LocalMods = props => {
     >
       <div className={styles.innerItemMod}>
         <div>
-          <Checkbox />
+          <Checkbox
+            onChange={() => selectMod(index)}
+            checked={filteredMods[index].selected}
+          />
           <Switch
             checked={filteredMods[index].state}
             style={{ marginLeft: 15 }}
-            onChange={e => console.log(e)}
+            onChange={v => toggleDisableMod(v, index)}
           />
         </div>
-        {filteredMods[index].name}{' '}
+        {filteredMods[index].name.replace('.disabled', '')}{' '}
         <div>
           <FontAwesomeIcon
             className={styles.editIcon}
@@ -78,6 +77,16 @@ const LocalMods = props => {
     return filteredMods[i].height;
   };
 
+  const selectMod = i => {
+    const newMods = Object.assign([...filteredMods], {
+      [i]: {
+        ...filteredMods[i],
+        selected: !filteredMods[i].selected
+      }
+    });
+    setFilteredMods(newMods);
+  };
+
   const toggleSize = i => {
     if (listRef.current) {
       listRef.current.resetAfterIndex(i);
@@ -98,7 +107,6 @@ const LocalMods = props => {
   };
 
   const deleteMod = async i => {
-    console.log(filteredMods[i]);
     // Remove the actual file
     await promisify(fss.unlink)(path.join(modsFolder, filteredMods[i].name));
     // Remove the reference in the mods file json
@@ -113,6 +121,20 @@ const LocalMods = props => {
         oldMods.filter(v => v.fileNameOnDisk !== filteredMods[i].name)
       )
     );
+  };
+
+  const toggleDisableMod = async (enabled, index) => {
+    if (enabled) {
+      await promisify(fs.rename)(
+        path.join(modsFolder, filteredMods[index].name),
+        path.join(modsFolder, filteredMods[index].name.replace('.disabled', ''))
+      );
+    } else {
+      await fs.renameAsync(
+        path.join(modsFolder, filteredMods[index].name),
+        path.join(modsFolder, `${filteredMods[index].name}.disabled`)
+      );
+    }
   };
 
   if (props.localMods.length === 0) {
@@ -150,32 +172,41 @@ const LocalMods = props => {
       >
         <div
           style={{
-            width: '15%',
+            width: '35%',
             display: 'flex',
             justifyContent: 'space-around',
             alignItems: 'center',
             height: 40
           }}
         >
-          <Checkbox />
-          <Button
-            type="primary"
-            size="small"
-            style={{
-              height: 30,
-              width: 30,
-              top: -1
+          <Checkbox
+            indeterminate={
+              filteredMods.find(v => v.selected === true) &&
+              filteredMods.find(v => v.selected === false)
+            }
+            checked={filteredMods.every(v => v.selected === true)}
+            onChange={v => {
+              let selected = false;
+              if (filteredMods.find(s => s.selected === false)) {
+                selected = true;
+              }
+              setFilteredMods(
+                filteredMods.map(x => ({
+                  ...x,
+                  selected
+                }))
+              );
             }}
-          >
-            <FontAwesomeIcon icon="trash" />
-          </Button>
+          />
+          {filteredMods.filter(v => v.selected === true).length} mods selected
+          <FontAwesomeIcon className={styles.deleteIcon} icon="trash" />
         </div>
         <Input
           allowClear
           onChange={e => filterMods(e.target.value)}
           size="large"
           placeholder="Filter mods"
-          style={{ width: '75%' }}
+          style={{ width: '55%' }}
           value={searchQuery}
         />
         <div
@@ -196,17 +227,7 @@ const LocalMods = props => {
             }}
             replace
           >
-            <Button
-              type="primary"
-              size="small"
-              style={{
-                height: 30,
-                width: 30,
-                top: -1
-              }}
-            >
-              <FontAwesomeIcon icon="plus" />
-            </Button>
+            <FontAwesomeIcon className={styles.plusIcon} icon="plus" />
           </Link>
         </div>
       </div>
