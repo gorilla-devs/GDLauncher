@@ -46,13 +46,19 @@ export const startServer = (packName) => {
         type: START_SERVER,
         packName,
         pid: start.pid,
-        process: start
+
       });
     } catch (err) {
       console.error(err);
     }
   }
 };
+
+function serverNameCheck(serverName, name) {
+  if (serverName == name) {
+    return name
+  } else return "";
+}
 
 export const deleteServer = (packname) => {
   return async dispatch => {
@@ -64,16 +70,18 @@ export const deleteServer = (packname) => {
   }
 }
 
-export const kill = () => {
+export const kill = (packName) => {
   return (dispatch, getState) => {
     const { serverManager } = getState();
-    dispatch({
-      type: STOP_SERVER
-    });
-    psTree(serverManager.pid, (err, children) => {
+    psTree(serverManager.servers[packName].pid, (err, children) => {
       children.forEach(el => {
         process.kill(el.PID);
       });
+    });
+    dispatch({
+      type: STOP_SERVER,
+      packName,
+      pid: null,
     });
   }
 }

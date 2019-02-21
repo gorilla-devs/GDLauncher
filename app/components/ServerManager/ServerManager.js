@@ -6,6 +6,7 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
 import { promisify } from 'util';
 import fs from 'fs';
+import log from 'electron-log';
 import styles from './ServerManager.scss';
 import { downloadFile } from '../../utils/downloader';
 import { SERVERS_PATH } from '../../constants';
@@ -53,6 +54,10 @@ function ServerManager(props) {
       ...serverSettings,
       [key]: e.target.value
     });
+  }
+
+  function startServerFunc(name){
+    props.startServer(name);   
   }
 
   async function manageServer(serverName) {
@@ -110,12 +115,12 @@ function ServerManager(props) {
         {servers.length > 0 &&
           servers.map(name => (
             <div key={name} className={styles.server}><h1>{name}</h1>
-              {props.packName !== null && props.packName === name ?
+              {props.serversList[name] ?
                 <Button type="primary" icon="thunderbolt" onClick={() => props.kill(name)}>
                   Kill
                 </Button>
                 :
-                <Button type="primary" icon="play" onClick={() => props.startServer(name)}>
+                <Button type="primary" icon="play" onClick={() => startServerFunc(name)}>
                   Start Server
                 </Button>
               }
@@ -155,7 +160,7 @@ function ServerManager(props) {
 function mapStateToProps(state) {
   return {
     versionsManifest: state.packCreator.versionsManifest,
-    packName: state.serverManager.packName
+    serversList: state.serverManager.servers
   };
 }
 
