@@ -48,6 +48,10 @@ export default props => {
               secondary="it now displays an appropriate message"
             />
             <ChangelogRow
+              main="Modals animation should feel smoother now"
+              secondary="let us know if you agree"
+            />
+            <ChangelogRow
               main="Improved compatibility with older versions of the launcher"
               secondary={`, if instances won't start, try clicking "repair" and try again`}
             />
