@@ -104,7 +104,7 @@ textarea,
 }
 
 /*
- * Had to remove scale animation because of how the menu position is calculated. 
+ * Had to remove scale animation because of how the menu position is calculated.
  * If it starts with a scale of 0, it's initial position is always from the pointer, direction bottom.
  * If the menu is opened at the end of the page it will overflow because it cannot calculate the overflowY.
 */
@@ -113,7 +113,7 @@ textarea,
   background: var(--secondary-color-2);
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.25rem;
+  border-radius: 2px;
   color: $text-main-color;
   font-size: 16px;
   margin: 2px 0 0;
@@ -207,6 +207,7 @@ textarea,
   border-color: var(--primary);
   border-width: 2px !important;
   border-right-width: 2px !important;
+  border-radius: 2px;
 }
 
 .ant-btn-ghost {

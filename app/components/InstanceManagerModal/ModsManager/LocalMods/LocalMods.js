@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { bindActionCreators } from 'redux';
-import { remote } from 'electron';
 import fss from 'fs';
 import path from 'path';
-import Promise from 'bluebird';
 import Zip from 'adm-zip';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import makeDir from 'make-dir';
-import log from 'electron-log';
+import fs from 'fs';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { connect } from 'react-redux';
 import { promisify } from 'util';
-import { Button, Input, Checkbox } from 'antd';
+import { Button, Input, Checkbox, Switch } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
@@ -37,20 +33,29 @@ const LocalMods = props => {
       style={style}
     >
       <div className={styles.innerItemMod}>
-        <Checkbox />
-        {filteredMods[index].name}{' '}
         <div>
-          <Button type="primary" size="small" onClick={() => toggleSize(index)}>
-            Manage
-          </Button>
-          <Button
-            style={{ marginLeft: 5 }}
-            type="primary"
-            size="small"
+          <Checkbox
+            onChange={() => selectMod(index)}
+            checked={filteredMods[index].selected}
+          />
+          <Switch
+            checked={filteredMods[index].state}
+            style={{ marginLeft: 15 }}
+            onChange={v => toggleDisableMod(v, index)}
+          />
+        </div>
+        {filteredMods[index].name.replace('.disabled', '')}{' '}
+        <div>
+          <FontAwesomeIcon
+            className={styles.editIcon}
+            icon="edit"
+            onClick={() => toggleSize(index)}
+          />
+          <FontAwesomeIcon
+            className={styles.deleteIcon}
+            icon="trash"
             onClick={() => deleteMod(index)}
-          >
-            <FontAwesomeIcon icon="trash" />
-          </Button>
+          />
         </div>
       </div>
     </div>
@@ -70,6 +75,16 @@ const LocalMods = props => {
 
   const getSize = i => {
     return filteredMods[i].height;
+  };
+
+  const selectMod = i => {
+    const newMods = Object.assign([...filteredMods], {
+      [i]: {
+        ...filteredMods[i],
+        selected: !filteredMods[i].selected
+      }
+    });
+    setFilteredMods(newMods);
   };
 
   const toggleSize = i => {
@@ -92,7 +107,6 @@ const LocalMods = props => {
   };
 
   const deleteMod = async i => {
-    console.log(filteredMods[i]);
     // Remove the actual file
     await promisify(fss.unlink)(path.join(modsFolder, filteredMods[i].name));
     // Remove the reference in the mods file json
@@ -107,6 +121,20 @@ const LocalMods = props => {
         oldMods.filter(v => v.fileNameOnDisk !== filteredMods[i].name)
       )
     );
+  };
+
+  const toggleDisableMod = async (enabled, index) => {
+    if (enabled) {
+      await promisify(fs.rename)(
+        path.join(modsFolder, filteredMods[index].name),
+        path.join(modsFolder, filteredMods[index].name.replace('.disabled', ''))
+      );
+    } else {
+      await fs.renameAsync(
+        path.join(modsFolder, filteredMods[index].name),
+        path.join(modsFolder, `${filteredMods[index].name}.disabled`)
+      );
+    }
   };
 
   if (props.localMods.length === 0) {
@@ -133,42 +161,81 @@ const LocalMods = props => {
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <div style={{ height: 60, width: '100%' }}>
+      <div
+        style={{
+          height: 40,
+          width: '100%',
+          background: 'var(--secondary-color-2)',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
+        <div
+          style={{
+            width: '35%',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            height: 40
+          }}
+        >
+          <Checkbox
+            indeterminate={
+              filteredMods.find(v => v.selected === true) &&
+              filteredMods.find(v => v.selected === false)
+            }
+            checked={filteredMods.every(v => v.selected === true)}
+            onChange={v => {
+              let selected = false;
+              if (filteredMods.find(s => s.selected === false)) {
+                selected = true;
+              }
+              setFilteredMods(
+                filteredMods.map(x => ({
+                  ...x,
+                  selected
+                }))
+              );
+            }}
+          />
+          {filteredMods.filter(v => v.selected === true).length} mods selected
+          <FontAwesomeIcon className={styles.deleteIcon} icon="trash" />
+        </div>
         <Input
           allowClear
           onChange={e => filterMods(e.target.value)}
           size="large"
           placeholder="Filter mods"
-          style={{ width: '80%' }}
+          style={{ width: '55%' }}
           value={searchQuery}
         />
-        <Link
-          to={{
-            pathname: `/editInstance/${
-              props.match.params.instance
-            }/mods/browse/${props.match.params.version}`,
-            state: { modal: true }
+        <div
+          style={{
+            width: '10%',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            height: 40
           }}
-          replace
         >
-          <Button
-            type="primary"
-            style={{
-              height: 38,
-              top: -1,
-              position: 'relative',
-              marginLeft: 10
+          <Link
+            to={{
+              pathname: `/editInstance/${
+                props.match.params.instance
+              }/mods/browse/${props.match.params.version}`,
+              state: { modal: true }
             }}
+            replace
           >
-            Add Mods
-          </Button>
-        </Link>
+            <FontAwesomeIcon className={styles.plusIcon} icon="plus" />
+          </Link>
+        </div>
       </div>
       <AutoSizer>
         {({ height, width }) => (
           <List
             ref={listRef}
-            height={height - 60}
+            height={height - 40}
             itemCount={filteredMods.length}
             itemSize={getSize}
             width={width}

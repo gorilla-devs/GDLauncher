@@ -128,7 +128,7 @@ const CurseModpackBrowserCreatorModal = props => {
                   versions
                     .map(addon => (
                       <Select.Option key={addon.id}>
-                        {addon.fileName}
+                        {addon.fileName.replace('.zip', '')}
                       </Select.Option>
                     ))
                     .slice()

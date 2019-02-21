@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './Modal.scss';
 
 type Props = {};
@@ -12,19 +13,20 @@ export default class Modal extends Component<Props> {
     super(props);
     this.mountStyle = this.mountStyle.bind(this);
     this.unMountStyle = this.unMountStyle.bind(this);
-    this.state = { // base css
+    this.state = {
+      // base css
       style: {
         display: 'block',
         transform: 'scale(0)',
-        transition: 'all 150ms',
+        opacity: 0,
+        transition: 'all 220ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out',
+        transitionTimingFunction: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         ...props.style
       },
       bgStyle: {
-        background: 'rgba(0, 0, 0, 0.7)',
-        backdropFilter: 'none',
-        transition: 'opacity 150ms ease-in-out, filter 150ms ease-in-out',
+        background: 'rgba(0, 0, 0, 0.90)',
+        transition: 'all 220ms cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         opacity: 0
       }
     };
@@ -34,55 +36,56 @@ export default class Modal extends Component<Props> {
     setTimeout(this.mountStyle, 10); // call the into animiation
   }
 
-  componentWillReceiveProps = (newProps) => { // check for the mounted props
+  componentWillReceiveProps = newProps => {
+    // check for the mounted props
     if (newProps.unMount) {
       setTimeout(this.props.history.goBack, 200);
       return this.unMountStyle(); // call the into animiation
     }
     setTimeout(this.mountStyle, 10); // call the into animiation
-  }
+  };
 
-
-  unMountStyle = () => { // css for unmount animation
+  unMountStyle = () => {
+    // css for unmount animation
     this.setState({
       style: {
         display: 'block',
         transform: 'scale(0)',
-        transition: 'all 150ms',
+        opacity: 0,
+        transition: 'all 260ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out',
+        transitionTimingFunction: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         ...this.props.style
       },
       bgStyle: {
         backfaceVisibility: 'hidden',
         perspective: 1000,
-        transform: 'translate3d(0, 0, 0)',
-        transform: 'translateZ(0)',
-        background: 'rgba(0, 0, 0, 0.7)',
-        transition: 'opacity 150ms ease-in-out',
+        transform: 'translate3d(0, 0, 0) translateZ(0)',
+        background: 'rgba(0, 0, 0, 0.90)',
+        transition: 'all 260ms cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         opacity: 0
       }
     });
-  }
+  };
 
-  mountStyle() { // css for mount animation
+  mountStyle() {
+    // css for mount animation
     this.setState({
       style: {
         display: 'block',
         transform: 'scale(1)',
-        transition: 'all 150ms',
+        opacity: 1,
+        transition: 'all 220ms',
         willChange: 'transform',
-        transitionTimingFunction: 'ease-in-out',
+        transitionTimingFunction: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)',
         ...this.props.style
       },
       bgStyle: {
         backfaceVisibility: 'hidden',
         perspective: 1000,
-        transform: 'translate3d(0, 0, 0)',
-        transform: 'translateZ(0)',
-        background: 'rgba(0, 0, 0, 0.7)',
-        backdropFilter: 'blur(8px)',
-        transition: 'opacity 150ms ease-in-out, filter 150ms ease-in-out',
+        transform: 'translate3d(0, 0, 0) translateZ(0)',
+        background: 'rgba(0, 0, 0, 0.90)',
+        transition: 'all 220ms cubic-bezier(0.165, 0.840, 0.440, 1.000)'
       }
     });
   }
@@ -90,28 +93,43 @@ export default class Modal extends Component<Props> {
   back = e => {
     e.stopPropagation();
     setTimeout(this.unMountStyle, 10); // call the into animiation
-    setTimeout(this.props.history.goBack, 200);
+    setTimeout(this.props.history.goBack, 220);
   };
 
   render() {
     return (
-      <div className={styles.overlay} onClick={this.back} style={this.state.bgStyle}>
-        <div className={styles.modal} style={this.state.style} onClick={(e) => e.stopPropagation()}>
-          {(this.props.header === undefined || this.props.header === true) &&
+      <div
+        className={styles.overlay}
+        onClick={this.back}
+        style={this.state.bgStyle}
+      >
+        <div
+          className={styles.modal}
+          style={this.state.style}
+          onClick={e => e.stopPropagation()}
+        >
+          {(this.props.header === undefined || this.props.header === true) && (
             <div className={styles.header}>
-              <h3 style={{ display: 'inline-block' }}>{this.props.title || 'Modal'}</h3>
-              <Button icon="close" size="small" type="ghost" className={styles.closeBtn} onClick={this.back} />
+              <h3 style={{ display: 'inline-block' }}>
+                {this.props.title || 'Modal'}
+              </h3>
+              <div className={styles.closeBtn} onClick={this.back}>
+                <FontAwesomeIcon icon="window-close" />
+              </div>
             </div>
-          }
+          )}
           <div
             className={styles.modalContent}
             style={{
-              height: (this.props.header === undefined || this.props.header === true) ? 'calc(100% - 40px)' : '100%'
+              height:
+                this.props.header === undefined || this.props.header === true
+                  ? 'calc(100% - 30px)'
+                  : '100%'
             }}
           >
-            {(this.props.backBtn !== undefined) &&
+            {this.props.backBtn !== undefined && (
               <span onClick={this.back}>{this.props.backBtn}</span>
-            }
+            )}
             {this.props.children}
           </div>
         </div>

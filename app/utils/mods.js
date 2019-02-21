@@ -76,7 +76,7 @@ export const downloadDependancies = async (
             const depData = await axios.get(
               `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}/files`
             );
-            const { id, fileNameOnDisk } = depData.data.find(
+            const { id, fileNameOnDisk } = depData.data.reverse().find(
               n => n.gameVersion[0] === gameVersion
             );
             const downloadedDep = await downloadMod(
