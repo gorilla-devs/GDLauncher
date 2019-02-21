@@ -44,13 +44,13 @@ const getStartCommand = async (packName, userData, ram) => {
   const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 
   const completeCMD = `
-"${javaPath}" ${dosName}
+"${javaPath}" -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
 ${
   os.platform() === WINDOWS
     ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
     : ''
 }
- -Djava.library.path="${path.join(PACKS_PATH, packName, 'natives')}"
+ -Xms256m -Xmx${ram}m -Djava.library.path="${path.join(PACKS_PATH, packName, 'natives')}"
  -Dminecraft.client.jar="${path.join(
    INSTANCES_PATH,
    'versions',
@@ -66,9 +66,9 @@ ${
     vanillaJSON.id,
     `${vanillaJSON.id}.jar`
   )}"`}
- -Xmx${ram}m -Xms256m -XX:PermSize=256m -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${mainClass} ${Arguments}
+ ${mainClass} ${Arguments}
   `;
-  log.info(completeCMD.replace(/\n|\r/g, ''));
+  log.info(completeCMD.replace(/\n|\r/g, '').replace(userData.accessToken, 'HIDDEN_ACCESS_TOKEN'));
   return completeCMD.replace(/\n|\r/g, '');
 };
 
