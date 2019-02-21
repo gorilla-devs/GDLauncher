@@ -46,7 +46,7 @@ export const startServer = (packName) => {
         type: START_SERVER,
         packName,
         pid: start.pid,
-
+        process: start
       });
     } catch (err) {
       console.error(err);

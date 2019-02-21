@@ -17,12 +17,14 @@ export default function instancesManager(state = initialState, action) {
           [action.packName]: {
             pid: action.pid,
           }
-        }
+        },
+        process: action.process 
       };
     case `${STOP_SERVER}`:
       return {
         ...state,
-        servers:  _.omit(state.servers, action.packName)
+        servers:  _.omit(state.servers, action.packName),
+        process: null
       };
     default:
       return state;

@@ -191,7 +191,7 @@ function serverCommand(props) {
 function mapStateToProps(state) {
   return {
     versionsManifest: state.packCreator.versionsManifest,
-    packName: state.serverManager.packName,
+    packName: state.serverManager.packName, //testare
     start: state.serverManager.process
   };
 }
