@@ -1,7 +1,7 @@
 @import '../../../../style/theme/colors.scss';
 
 .modsContainer {
-  height: calc(100% - 60px);
+  height: calc(100% - 40px);
   width: 100%;
 
   .modIconContainer {
@@ -18,7 +18,7 @@
       .modIcon {
         width: 100%;
         height: 100%;
-        border-radius: 4px;
+        border-radius: 2px;
         transition: color 0.2s ease-in-out;
         display: flex;
         justify-content: space-around;
@@ -48,6 +48,18 @@
         text-align: center;
         background: var(--primary);
       }
+    }
+  }
+  .modsNotFound {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: 21px;
+    text-align: center;
+    span {
+      font-style: italic;
     }
   }
 

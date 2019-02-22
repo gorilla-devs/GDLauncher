@@ -70,7 +70,7 @@ const ModsList = props => {
     setAreModsLoading(false);
   };
 
-  if (mods.length === 0) {
+  if (mods.length === 0 && areModsLoading) {
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <ModsListHeader
@@ -78,6 +78,9 @@ const ModsList = props => {
           filter={filterType}
           setFilter={setFilterType}
           setSearchQuery={setSearchQuery}
+          version={props.match.params.version}
+          instance={props.match.params.instance}
+          loading
         />
         <AutoSizer>
           {({ height, width }) => (
@@ -122,7 +125,20 @@ const ModsList = props => {
         filter={filterType}
         setFilter={setFilterType}
         setSearchQuery={setSearchQuery}
+        version={props.match.params.version}
+        instance={props.match.params.instance}
       />
+      {mods.length === 0 && !areModsLoading && (
+        <div className={styles.modsNotFound}>
+          <div>
+            <h1>Oops :|</h1>
+            <br />
+            We couldn't find any mod matching your criteria: <br />
+            <br />
+            <span>"{searchQuery}"</span>
+          </div>
+        </div>
+      )}
       <AutoSizer>
         {({ height, width }) => (
           <ModsListWrapper

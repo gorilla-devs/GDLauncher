@@ -4,6 +4,7 @@ import axios from 'axios';
 import ContentLoader from 'react-content-loader';
 import fs from 'fs';
 import path from 'path';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Promise from 'bluebird';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { promisify } from 'util';
@@ -96,10 +97,9 @@ function ModPage(props) {
         overflow: 'auto'
       }}
     >
-      <Button type="primary" className={styles.backBtn} onClick={props.goBack}>
-        <Icon type="left" />
-        Go Back
-      </Button>
+      <div className={styles.backBtn} onClick={props.goBack}>
+        <FontAwesomeIcon icon="chevron-left" />
+      </div>
       {!modData ? (
         <AutoSizer>
           {({ height, width }) => (

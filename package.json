@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "0.11.0",
+  "version": "0.11.4",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "boilerplate",
@@ -223,6 +223,7 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "source-map-support": "^0.5.10",
+    "sudo-prompt": "^8.2.5",
     "version-sort": "^0.1.1"
   },
   "browserslist": "electron 1.6",

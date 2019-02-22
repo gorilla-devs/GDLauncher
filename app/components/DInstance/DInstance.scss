@@ -56,19 +56,19 @@
 .icon__image {
   width: 90px;
   height: 90px;
-  border-radius: 18px;
+  border-radius: 2px;
   background-size: 90px !important;
 }
 
 .main:hover {
   transition: background-color 0.25s;
   background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 5px;
+  border-radius: 2px;
 }
 
 .selectedItem {
   background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 5px;
+  border-radius: 2px;
 }
 
 .icon__iconState {

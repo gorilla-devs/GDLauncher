@@ -2,6 +2,7 @@
 import React, { Component, lazy, Suspense } from 'react';
 import { connect } from 'react-redux';
 import { Switch, Route, Redirect } from 'react-router';
+import { history } from './store/configureStore';
 import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import * as AuthActions from './actions/auth';
@@ -12,7 +13,7 @@ import store from './localStore';
 import SideBar from './components/Common/SideBar/SideBar';
 import Navigation from './containers/Navigation';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
-import findJava from './utils/javaLocationFinder';
+import { findJavaHome, isGlobalJavaOptions } from './utils/javaHelpers';
 import DManager from './components/DManager/containers/DManagerPage';
 import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
@@ -41,6 +42,12 @@ const ImportPack = lazy(() => import('./components/ImportPack/ImportPack'));
 const ChangelogsModal = lazy(() =>
   import('./components/ChangelogModal/ChangelogModal')
 );
+const ConfirmInstanceDelete = lazy(() =>
+  import('./components/ConfirmDeleteInstanceModal/ConfirmDeleteInstanceModal')
+);
+const JavaGlobalOptionsFixModal = lazy(() =>
+  import('./components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal')
+);
 
 type Props = {
   location: object,
@@ -49,11 +56,18 @@ type Props = {
 };
 
 class RouteDef extends Component<Props> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      globalJavaOptions: false
+    };
+  }
+
   componentDidMount = async () => {
     const { loadSettings, checkAccessToken } = this.props;
     loadSettings();
     if (!this.props.isAuthValid) checkAccessToken();
-    if ((await findJava()) === null) {
+    if ((await findJavaHome()) === null) {
       notification.warning({
         duration: 0,
         message: 'JAVA NOT FOUND',
@@ -68,6 +82,10 @@ class RouteDef extends Component<Props> {
         )
       });
     }
+    const globalJavaOptions = await isGlobalJavaOptions();
+    this.setState({
+      globalJavaOptions
+    });
   };
 
   componentWillUpdate(nextProps) {
@@ -81,6 +99,20 @@ class RouteDef extends Component<Props> {
     }
   }
 
+  componentDidUpdate = (prevProps, prevState) => {
+    if (
+      this.state.globalJavaOptions &&
+      this.props.location.pathname === '/home' &&
+      store.get('showGlobalOptionsJavaModal') !== false
+    ) {
+      history.push({
+        pathname: `/javaGlobalOptionsFix`,
+        state: { modal: true }
+      });
+      this.setState({ globalJavaOptions: false });
+    }
+  };
+
   previousLocation = this.props.location;
 
   render() {
@@ -93,15 +125,7 @@ class RouteDef extends Component<Props> {
     return (
       <App>
         <SysNavBar />
-        <div
-        // style={{
-        //   margin: 0,
-        //   padding: 0,
-        //   willChange: 'filter',
-        //   filter: isModal ? 'blur(1px)' : 'none',
-        //   transition: 'filter 100ms ease-in-out'
-        // }}
-        >
+        <div>
           {location.pathname !== '/' &&
             location.pathname !== '/newUserPage' &&
             location.pathname !== '/loginHelperModal' && (
@@ -145,15 +169,17 @@ class RouteDef extends Component<Props> {
             </Route>
           </Switch>
         </div>
-        {location.pathname === '/home' && store.get('showChangelogs') !== false && (
-          <Redirect
-            push
-            to={{
-              pathname: '/changelogs',
-              state: { modal: true }
-            }}
-          />
-        )}
+        {/* Show the changelogs after an update */}
+        {location.pathname === '/home' &&
+          store.get('showChangelogs') !== false && (
+            <Redirect
+              push
+              to={{
+                pathname: '/changelogs',
+                state: { modal: true }
+              }}
+            />
+          )}
         {/* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
         {isModal ? (
@@ -193,6 +219,18 @@ class RouteDef extends Component<Props> {
           <Route
             path="/changelogs"
             component={WaitingComponent(ChangelogsModal)}
+          />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/confirmInstanceDelete/:instance"
+            component={WaitingComponent(ConfirmInstanceDelete)}
+          />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/javaGlobalOptionsFix"
+            component={WaitingComponent(JavaGlobalOptionsFixModal)}
           />
         ) : null}
       </App>

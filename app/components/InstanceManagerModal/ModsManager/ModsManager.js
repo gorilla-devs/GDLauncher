@@ -94,14 +94,18 @@ class ModsManager extends Component<Props> {
       mods
         .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
         .filter(
-          el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
+          el =>
+            path.extname(el) === '.zip' ||
+            path.extname(el) === '.jar' ||
+            path.extname(el) === '.disabled'
         )
         .map(async el => {
           return {
             name: el,
             state: path.extname(el) !== '.disabled',
             key: el,
-            height: 50
+            height: 50,
+            selected: false
           };
         })
     );
