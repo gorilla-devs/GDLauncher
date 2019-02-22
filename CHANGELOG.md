@@ -1,4 +1,19 @@
-# 0.11.0
+# 0.11.4 (22.2.2019)
+- Fixed mods dependancies not being downloaded correctly
+- Various UI improvements
+- Added confirmation modal when deleting an instance
+- Removed the sometimes present ".zip" in modpacks versions
+- Fixed forge versions not working
+- Fixed modpacks not being downloaded correctly
+- Changed modal animation
+- Improved mods manager functions
+- Partially restyled homescren
+- Fixed access token being logged to logs
+- Fixed compatibility with older versions of the launcher
+- Implemented a _JAVA_OPTIONS fixer
+
+
+# 0.11.0 (18.2.2019)
 - Added custom icons for instances [#112](https://github.com/gorilla-devs/GDLauncher/issues/112)
 - Removed user confirmation for appimage installation on linux [#120](https://github.com/gorilla-devs/GDLauncher/issues/120)
 - Fixed dependancies being downloaded multiple times [#153](https://github.com/gorilla-devs/GDLauncher/issues/153)
