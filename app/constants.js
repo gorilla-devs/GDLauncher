@@ -34,7 +34,7 @@ export const CURSEMETA_API_URL = `https://staging_cursemeta.dries007.net/api/v3`
 export const CURSEFORGE_MODLOADERS_API =
   'https://modloaders.cursecdn.com/647622546/maven';
 export const NEWS_URL =
-  'https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/culture,minecraft:article/insider,minecraft:article/merch,minecraft:article/news&propResPath=/content/minecraft-net/language-masters/it-it/jcr:content/root/generic-container/par/grid&count=2000&pageSize=20&tag=ALL&lang=/content/minecraft-net/language-masters/it-it';
+  'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1';
 export const JAVA_URL =
   'https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html';
 export const UPDATE_URL =
