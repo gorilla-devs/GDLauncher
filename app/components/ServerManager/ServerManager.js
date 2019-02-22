@@ -48,7 +48,9 @@ function ServerManager(props) {
   useEffect(() => {
     WatcherReader();
     ipcRenderer.once('closing', () => {
-      ipcRenderer.sendSync('started-servers', ['a', 'b', 'c']);
+      ipcRenderer.send('close-started-servers', [
+        ...Object.keys(props.serversList).map(v => props.serversList[v].pid)
+      ]);
       // log.info("CHIUSO");
       // props.killAll();
     });

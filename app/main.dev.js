@@ -14,6 +14,8 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import minimist from 'minimist';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
+import psTree from 'ps-tree';
+import { promisify } from 'util';
 import store from './localStore';
 import { THEMES } from './constants';
 import MenuBuilder from './menu';
@@ -213,13 +215,17 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.setProgressBar(p);
     });
 
-    let startedServers = [];
-    ipcMain.on('started-servers', (...args) => {
-      startedServers = args[1];
+    ipcMain.on('close-started-servers', async (...args) => {
+      await Promise.all(args[1].map(async pid => {
+        const children = await promisify(psTree)(pid);
+        children.forEach(e => {
+          process.kill(e.PID);
+        });
+      }));
+      setTimeout(() => app.exit(0), 2000);
     });
     mainWindow.on('close', e => {
-      mainWindow.webContents.sendSync('closing');
-      console.log(startedServers);
+      mainWindow.webContents.send('closing');
       e.preventDefault();
     });
 
