@@ -120,14 +120,12 @@ if (minimist(process.argv.slice(1)).i) {
     });
 
     mainWindow.loadURL(`file://${__dirname}/app.html`);
-    // window.onbeforeunload = (e) => {
-    //   console.log('I do not want to be closed')
-    
-    //   // Unlike usual browsers that a message box will be prompted to users, returning
-    //   // a non-void value will silently cancel the close.
-    //   // It is recommended to use the dialog API to let the user confirm closing the
-    //   // application.
-    //   e.returnValue = false // equivalent to `return false` but not recommended
+
+    // mainWindow.onbeforeunload = (e) => {
+
+    //   ipcMain.send('closing');
+
+
     // }
 
     // @TODO: Use 'ready-to-show' event
@@ -143,8 +141,8 @@ if (minimist(process.argv.slice(1)).i) {
 
       const channel =
         store.get('settings') &&
-        (store.get('settings').releaseChannel === 'latest' ||
-          store.get('settings').releaseChannel === 'beta')
+          (store.get('settings').releaseChannel === 'latest' ||
+            store.get('settings').releaseChannel === 'beta')
           ? store.get('settings').releaseChannel
           : 'latest';
 
@@ -167,12 +165,14 @@ if (minimist(process.argv.slice(1)).i) {
 
       mainWindow.show();
       mainWindow.focus();
+
+
     });
     let checked = false;
 
     ipcMain.on('check-for-updates', ev => {
       // Avoid doing this more than 1 time. It breaks everything
-      if(checked === true) return;
+      if (checked === true) return;
       autoUpdater.checkForUpdates();
       checked = true;
       log.info("CHECK_FOR_UPDATES");
@@ -213,9 +213,20 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.setProgressBar(p);
     });
 
+    let startedServers = [];
+    ipcMain.on('started-servers', (...args) => {
+      startedServers = args[1];
+    });
+    mainWindow.on('close', e => {
+      mainWindow.webContents.sendSync('closing');
+      console.log(startedServers);
+      e.preventDefault();
+    });
+
     mainWindow.on('closed', () => {
       mainWindow = null;
     });
+
 
     const menuBuilder = new MenuBuilder(mainWindow);
     menuBuilder.buildMenu();

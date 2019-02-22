@@ -85,3 +85,21 @@ export const kill = (packName) => {
     });
   }
 }
+export const killAll = () => {
+  return (dispatch, getState) => {
+    const { serverManager } = getState();
+    log.info(serverManager.servers[el].pid);
+    Object.keys(serverManager.servers).forEach(el =>
+      psTree(serverManager.servers[el].pid, (err, children) => {
+        children.forEach(e => {
+          process.kill(e.PID);
+        });
+      })
+    );
+    dispatch({
+      type: STOP_SERVER,
+      packName,
+      pid: null,
+    });
+  }
+}

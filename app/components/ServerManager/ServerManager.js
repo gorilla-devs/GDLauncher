@@ -13,8 +13,9 @@ import { SERVERS_PATH } from '../../constants';
 import { exec } from 'child_process';
 import path from 'path';
 import psTree from 'ps-tree';
-import { startServer, deleteServer, kill } from '../../actions/serverManager';
+import { startServer, deleteServer, kill, killAll } from '../../actions/serverManager';
 import ServerCommand from './serverCommand';
+import { ipcRenderer } from 'electron';
 
 function ServerManager(props) {
   const [servers, setServers] = useState([]);
@@ -34,7 +35,7 @@ function ServerManager(props) {
     "toggledownfall": "",
     "tell": ""
   });
-  async function WatcherReader(){
+  async function WatcherReader() {
     const dirs = await promisify(fs.readdir)(SERVERS_PATH);
     setServers(dirs);
     const watcher = fs.watch(SERVERS_PATH, async () => {
@@ -46,6 +47,11 @@ function ServerManager(props) {
 
   useEffect(() => {
     WatcherReader();
+    ipcRenderer.once('closing', () => {
+      ipcRenderer.sendSync('started-servers', ['a', 'b', 'c']);
+      // log.info("CHIUSO");
+      // props.killAll();
+    });
   }, []);
 
 
@@ -56,13 +62,13 @@ function ServerManager(props) {
     });
   }
 
-  function startServerFunc(name){
-    props.startServer(name);   
+  function startServerFunc(name) {
+    props.startServer(name);
   }
 
   async function manageServer(serverName) {
-    try{
-      
+    try {
+
       setCommand("serverSettings");
       setselectedServer(serverName);
       const lines = (await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "server.properties"))).toString('utf8');
@@ -74,8 +80,8 @@ function ServerManager(props) {
         }
       });
       setServerSettings(values);
-      
-    } catch(err){
+
+    } catch (err) {
       message.error("You have to run a first time the server!")
     }
   }
@@ -96,7 +102,7 @@ function ServerManager(props) {
     try {
       const CommandFile = await promisify(fs.readFile)(path.join(SERVERS_PATH, serverName, "serverCommands.json"));
       setCommands(JSON.parse(CommandFile));
-    } catch(err) {
+    } catch (err) {
       const StringifedCommand = JSON.stringify(commands);
       const CommandFile = await promisify(fs.writeFile)(path.join(SERVERS_PATH, serverName, "serverCommands.json"), StringifedCommand);
       setCommands(commands);
@@ -141,16 +147,16 @@ function ServerManager(props) {
 
             </div>))}
 
-            <Link
-              to={{
-                pathname: '/ServerCreatorModal',
-                state: { modal: true }
-              }}
-            >
-            <Button icon="plus" className={styles.AddButton} >
-                Add Server
+        <Link
+          to={{
+            pathname: '/ServerCreatorModal',
+            state: { modal: true }
+          }}
+        >
+          <Button icon="plus" className={styles.AddButton} >
+            Add Server
             </Button>
-            </Link>
+        </Link>
 
       </div>
     </div>
@@ -167,7 +173,8 @@ function mapStateToProps(state) {
 const mapDispatchToProps = {
   startServer,
   deleteServer,
-  kill
+  kill,
+  killAll
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServerManager);
