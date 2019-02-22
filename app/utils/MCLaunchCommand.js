@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 import log from 'electron-log';
-import findJavaHome from './javaLocationFinder';
+import { findJavaHome } from './javaHelpers';
 import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
@@ -22,14 +22,33 @@ const getStartCommand = async (packName, userData, ram) => {
     )
   );
   const forge = instanceConfigJSON.forgeVersion;
-  const forgeJSON =
-    forge === null
-      ? null
-      : JSON.parse(
-          await promisify(fs.readFile)(
-            path.join(META_PATH, 'net.minecraftforge', forge, `${forge}.json`)
+  let forgeJSON = null;
+  // Handling legacy GDLauncher instances without the forge- in the name
+  if (forge !== null) {
+    try {
+      forgeJSON = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(
+            META_PATH,
+            'net.minecraftforge',
+            forge,
+            `${forge}.json`
           )
-        );
+        )
+      );
+    } catch {
+      forgeJSON = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(
+            META_PATH,
+            'net.minecraftforge',
+            `forge-${forge}`,
+            `forge-${forge}.json`
+          )
+        )
+      );
+    }
+  }
 
   const javaPath = await findJavaHome();
   const dosName =
@@ -44,13 +63,17 @@ const getStartCommand = async (packName, userData, ram) => {
   const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 
   const completeCMD = `
-"${javaPath}" ${dosName}
+"${javaPath}" -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
 ${
   os.platform() === WINDOWS
     ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
     : ''
 }
- -Djava.library.path="${path.join(PACKS_PATH, packName, 'natives')}"
+ -Xms256m -Xmx${ram}m -Djava.library.path="${path.join(
+    PACKS_PATH,
+    packName,
+    'natives'
+  )}"
  -Dminecraft.client.jar="${path.join(
    INSTANCES_PATH,
    'versions',
@@ -66,9 +89,14 @@ ${
     vanillaJSON.id,
     `${vanillaJSON.id}.jar`
   )}"`}
- -Xmx${ram}m -Xms256m -XX:PermSize=256m -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${mainClass} ${Arguments}
+ ${mainClass} ${Arguments}
   `;
-  log.info(completeCMD.replace(/\n|\r/g, ''));
+  // We need to hide the access token before printing it to the logs
+  log.info(
+    completeCMD
+      .replace(/\n|\r/g, '')
+      .replace(userData.accessToken, 'HIDDEN_ACCESS_TOKEN')
+  );
   return completeCMD.replace(/\n|\r/g, '');
 };
 

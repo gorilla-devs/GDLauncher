@@ -10,7 +10,7 @@ import CopyIcon from '../../../Common/CopyIcon/CopyIcon';
 import styles from './JavaManager.scss';
 import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
-import javaLocator from '../../../../utils/javaLocationFinder';
+import { findJavaHome } from '../../../../utils/javaHelpers';
 import store from '../../../../localStore';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import SettingInput from '../SettingInput/SettingInput';
@@ -22,7 +22,7 @@ function JavaManager(props) {
   const [javaPath, setJavaPath] = useState('');
 
   const checkJavaArch = async () => {
-    const javaP = await javaLocator();
+    const javaP = await findJavaHome();
     setJavaPath(javaP);
     exec(`"${javaP}" -d64 -version`, (err, stdout, stderr) => {
       if (stderr.includes('Error') || stdout.includes('Error'))
@@ -56,7 +56,7 @@ function JavaManager(props) {
         icon="folder"
         checked={props.settings.java.autodetected}
         onChange={async c =>
-          props.setJavaPath(c, c ? null : await javaLocator())
+          props.setJavaPath(c, c ? null : await findJavaHome())
         }
       />
       {props.settings.java.autodetected ? null : (

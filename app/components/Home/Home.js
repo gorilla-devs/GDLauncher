@@ -61,55 +61,37 @@ export default class Home extends Component<Props> {
                 }}
                 title={`Welcome ${this.props.username} to GDLauncher`}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignContent: 'center',
-                    width: '100%',
-                    margin: '0 0 10px 0'
-                  }}
-                >
-                  <div style={{ flexBasis: '70%', textAlign: 'center' }}>
-                    Did you know you can customize the
-                    colors the way you like?
-                    <br />
-                    Isn't it great? Wanna try green and yellow? Red and Purple?
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-evenly',
-                        marginTop: 20
-                      }}
-                    >
-                      <Button type="primary" style={{ width: 130 }} onClick={() => this.props.applyTheme(THEMES.default)}>
-                        Default
-                      </Button>
-                      <Button type="primary" style={{ width: 130 }} onClick={() => this.props.applyTheme(THEMES.carrotUniverse)}>
-                        Carrot Universe
-                      </Button>
-                      <Button type="primary" style={{ width: 130 }} onClick={() => this.props.applyTheme(THEMES.concreteLeaf)}>
-                        Concrete Leaf
-                      </Button>
+                <div className={styles.firstCard}>
+                  <div>
+                    <span className={styles.titleHeader}>
+                      GDLauncher is now on{' '}
+                      <a
+                        href="https://patreon.com/gorilladevs"
+                        className={styles.patreonText}
+                      >
+                        Patreon
+                      </a>
+                    </span>
+                    <div className={styles.patreonContent}>
+                      If you like GDLauncher and you would like it to have even
+                      more features and bug fixes, consider helping us out
+                      supporting the project. Happy Gaming!
                     </div>
-                    <div className={styles.textWithLines}>Or</div>
-                    <Link
-                      to={{
-                        pathname: '/settings/ui',
-                        state: { modal: true }
-                      }}
-                    >
-                      <Button type="primary" style={{ width: 160 }}>
-                        Create Your Own!
-                      </Button>
-                    </Link>
                   </div>
-                  <div style={{ flexBasis: '30%', textAlign: 'center' }}>
-                    <h2>Hey you! Yes, you!</h2>
-                    <img
-                      draggable="false"
-                      src="http://www.stickpng.com/assets/images/580b57fcd9996e24bc43c2fb.png"
-                      width="100%"
-                    />
+                  <div>
+                    You can find us here:
+                    <div className={styles.discord}>
+                      <a href="https://discord.gg/ZxRxPqn">Discord</a>
+                    </div>
+                    <div className={styles.github}>
+                      <a href="https://github.com/gorilla-devs/GDLauncher">Github</a>
+                    </div>
+                    <div className={styles.instagram}>
+                      <a href="https://instagram.com/gdlauncher">Instagram</a>
+                    </div>
+                    <div className={styles.facebook}>
+                      <a href="https://facebook.com/gorilladevs">Facebook</a>
+                    </div>
                   </div>
                 </div>
               </Card>

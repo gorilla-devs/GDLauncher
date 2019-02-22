@@ -31,8 +31,16 @@ export default props => {
               secondary="when deleting an instance"
             />
             <ChangelogRow
+              main="Added a modal to fix _JAVA_OPTIONS"
+              secondary="because it caused a lot of troubles"
+            />
+            <ChangelogRow
               main="We are trying to make the UI as consistent as possible"
               secondary=", so we changed some visual effects. You shouldn't notice it"
+            />
+            <ChangelogRow
+              main="Added our brand new Patreon page link in the Home"
+              secondary=". Wait, what??? Didn't you donate yet! SHAME ON U!11!1"
             />
           </ul>
         </div>
@@ -52,8 +60,12 @@ export default props => {
               secondary="let us know if you agree"
             />
             <ChangelogRow
-              main="Improved compatibility with older versions of the launcher"
-              secondary={`, if instances won't start, try clicking "repair" and try again`}
+              main="Fixed compatibility issues with older versions of the launcher"
+              secondary={`, if instances still won't start, try clicking "repair" and try again`}
+            />
+            <ChangelogRow
+              main="Fixed access token being written to logs"
+              secondary={`, you're safe now!`}
             />
           </ul>
         </div>
