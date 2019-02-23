@@ -21,13 +21,14 @@ import InstanceManagerModal from './components/InstanceManagerModal/containers/I
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
 import NewUserPage from './components/NewUserPage/NewUserPage';
+import ServerManager from './components/ServerManager/ServerManager';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
 const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
-const ServerManager = lazy(() =>
-  import('./components/ServerManager/ServerManager')
-);
+// const ServerManager = lazy(() =>
+//   import('./components/ServerManager/ServerManager')
+// );
 const InstanceCreatorModal = lazy(() =>
   import('./components/InstanceCreatorModal/containers/InstanceCreatorModal')
 );
@@ -178,7 +179,7 @@ class RouteDef extends Component<Props> {
                 <Route path="/home" component={WaitingComponent(HomePage)} />
                 <Route
                   path="/serverManager"
-                  component={WaitingComponent(ServerManager)}
+                  component={(ServerManager)}
                 />
               </div>
             </Route>

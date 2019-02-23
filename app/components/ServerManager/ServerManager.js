@@ -126,13 +126,20 @@ function ServerManager(props) {
                   <FontAwesomeIcon icon="play"></FontAwesomeIcon>
                 </Button>
               }
-              <Button
-                type="primary"
-                disabled={props.packName !== null && props.packName === name}
-                onClick={() => props.deleteServer(name)}
+              <Link
+                to={{
+                  pathname: `/confirmInstanceDelete/${name}`,
+                  state: { modal: true }
+                }}
               >
-                <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
-              </Button>
+                <Button
+                  type="primary"
+                  disabled={props.packName !== null && props.packName === name}
+                  //onClick={() => props.deleteServer(name)}
+                >
+                  <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
+                </Button>
+              </Link>
 
               <Button type="primary" onClick={() => manageServer(name)}>
                 <FontAwesomeIcon icon="wrench"></FontAwesomeIcon>
