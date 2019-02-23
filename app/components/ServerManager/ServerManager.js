@@ -16,6 +16,7 @@ import psTree from 'ps-tree';
 import { startServer, deleteServer, kill, killAll } from '../../actions/serverManager';
 import ServerCommand from './serverCommand';
 import { ipcRenderer } from 'electron';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function ServerManager(props) {
   const [servers, setServers] = useState([]);
@@ -122,22 +123,23 @@ function ServerManager(props) {
                 </Button>
                 :
                 <Button type="primary" icon="play" onClick={() => startServerFunc(name)}>
-                  Start Server
+                  <FontAwesomeIcon icon="play"></FontAwesomeIcon>
                 </Button>
               }
               <Button
                 type="primary"
                 disabled={props.packName !== null && props.packName === name}
-                icon="cross"
                 onClick={() => props.deleteServer(name)}
               >
-                Delete Server
+                <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
               </Button>
 
-              <Button icon="radar-chart" onClick={() => manageServer(name)}>
+              <Button type="primary" onClick={() => manageServer(name)}>
+                <FontAwesomeIcon icon="wrench"></FontAwesomeIcon>
               </Button>
 
-              <Button icon="code" onClick={() => commandManager(name)}>
+              <Button type="primary" onClick={() => commandManager(name)}>
+                <FontAwesomeIcon icon="terminal"></FontAwesomeIcon>
               </Button>
 
             </div>))}
@@ -148,8 +150,8 @@ function ServerManager(props) {
             state: { modal: true }
           }}
         >
-            <Button icon="plus" type="primary" className={styles.AddButton} >
-              Add Server
+          <Button icon="plus" type="primary" className={styles.AddButton} >
+            Add Server
             </Button>
         </Link>
 
