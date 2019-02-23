@@ -21,27 +21,6 @@ export const startServer = (packName) => {
         console.log(data.toString());
       });
 
-      // const start = exec(
-      //   `java -Xms1G -Xmx1G -jar ${path.join(SERVERS_PATH, packName, `${packName}.jar`)}`,
-      //   { cwd: path.join(SERVERS_PATH, packName) },
-      //   (error, stdout, stderr) => {
-      //     if (error) {
-      //       console.error(`exec error: ${error}`);
-      //       return;
-      //     }
-      //     console.log(`stdout: ${stdout}`);
-      //     console.log(`stderr: ${stderr}`);
-      //   }
-      // );
-
-      // start.on('exit', () => {
-      //   message.info('Server closed');
-      // });
-
-      // start.on('error', err => {
-      //   message.error('There was an error while starting the server');
-      //   log.error(err);
-      // });
       dispatch({
         type: START_SERVER,
         packName,
