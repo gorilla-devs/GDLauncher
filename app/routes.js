@@ -1,6 +1,8 @@
 /* eslint flowtype-errors/show-errors: 0 */
 import React, { Component, lazy, Suspense } from 'react';
 import { connect } from 'react-redux';
+import { ipcRenderer } from 'electron';
+import  log from 'electron-log';
 import { Switch, Route, Redirect } from 'react-router';
 import { history } from './store/configureStore';
 import { Form, notification } from 'antd';
@@ -30,7 +32,7 @@ const InstanceCreatorModal = lazy(() =>
   import('./components/InstanceCreatorModal/containers/InstanceCreatorModal')
 );
 
-const ServerCreatorModal = lazy(()=> 
+const ServerCreatorModal = lazy(() =>
   import('./components/ServerCreatorModal/ServerCreatorModal')
 );
 
@@ -91,6 +93,14 @@ class RouteDef extends Component<Props> {
     this.setState({
       globalJavaOptions
     });
+
+    ipcRenderer.once('closing', () => {
+      log.info("CHIUSO");
+      ipcRenderer.send('close-started-servers', [
+        ...Object.keys(this.props.serversList).map(v => this.props.serversList[v].pid)
+      ]);
+    });
+
   };
 
   componentWillUpdate(nextProps) {
@@ -220,7 +230,7 @@ class RouteDef extends Component<Props> {
             component={WaitingComponent(loginHelperModal)}
           />
         ) : null}
-         {isModal ? (
+        {isModal ? (
           <Route
             path="/ServerCreatorModal"
             component={WaitingComponent(ServerCreatorModal)}
@@ -272,7 +282,8 @@ function WaitingComponent(MyComponent) {
 function mapStateToProps(state) {
   return {
     location: state.router.location,
-    isAuthValid: state.auth.isAuthValid
+    isAuthValid: state.auth.isAuthValid,
+    serversList: state.serverManager.servers
   };
 }
 

@@ -123,13 +123,6 @@ if (minimist(process.argv.slice(1)).i) {
 
     mainWindow.loadURL(`file://${__dirname}/app.html`);
 
-    // mainWindow.onbeforeunload = (e) => {
-
-    //   ipcMain.send('closing');
-
-
-    // }
-
     // @TODO: Use 'ready-to-show' event
     //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
     mainWindow.webContents.on('did-finish-load', () => {
@@ -215,6 +208,7 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.setProgressBar(p);
     });
 
+    // mettere in una rout più esterna (ex: routes)
     ipcMain.on('close-started-servers', async (...args) => {
       await Promise.all(args[1].map(async pid => {
         const children = await promisify(psTree)(pid);
@@ -228,6 +222,7 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.webContents.send('closing');
       e.preventDefault();
     });
+    //------------------------->
 
     mainWindow.on('closed', () => {
       mainWindow = null;
