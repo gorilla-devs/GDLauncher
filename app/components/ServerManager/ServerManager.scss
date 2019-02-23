@@ -70,6 +70,7 @@
   overflow-y: auto;
   padding: 1%;
   margin: 2%;
+  text-align: center;
 }
 
 .Serverlist div{
@@ -97,10 +98,10 @@
 .AddButton{
   order: 2;
   min-height: 30%;
-  min-width: 100%;
+  min-width: 96%;
   margin-top:3%;
   margin-bottom: 5%; 
-
+  align-self: center;
 }
 
 .server Button{

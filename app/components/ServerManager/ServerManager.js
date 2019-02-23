@@ -148,8 +148,8 @@ function ServerManager(props) {
             state: { modal: true }
           }}
         >
-          <Button icon="plus" className={styles.AddButton} >
-            Add Server
+            <Button icon="plus" type="primary" className={styles.AddButton} >
+              Add Server
             </Button>
         </Link>
 
