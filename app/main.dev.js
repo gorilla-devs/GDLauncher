@@ -208,7 +208,6 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.setProgressBar(p);
     });
 
-    // mettere in una rout più esterna (ex: routes)
     ipcMain.on('close-started-servers', async (...args) => {
       await Promise.all(args[1].map(async pid => {
         const children = await promisify(psTree)(pid);
@@ -223,7 +222,6 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.webContents.send('closing');
       e.preventDefault();
     });
-    //------------------------->
 
     mainWindow.on('closed', () => {
       mainWindow = null;
