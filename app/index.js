@@ -9,8 +9,8 @@ import './app.global.scss';
 if (module.hot)
   setConfig({
     ignoreSFC: true, // RHL will be __completely__ disabled for SFC
-    pureRender: true, // RHL will not change render method
-  })
+    pureRender: true // RHL will not change render method
+  });
 const store = configureStore();
 log.info('Welcome to GDLauncher');
 render(
