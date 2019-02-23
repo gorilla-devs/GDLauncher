@@ -243,11 +243,17 @@ export default class DInstance extends Component<Props> {
           >
             {playing.find(el => el.name === name) ? (
               <div>
-                <FontAwesomeIcon icon="bolt" /> Kill
+                <span>
+                  <FontAwesomeIcon icon="bolt" />
+                </span>{' '}
+                Kill
               </div>
             ) : (
               <div>
-                <FontAwesomeIcon icon="play" /> Launch
+                <span>
+                  <FontAwesomeIcon icon="play" />
+                </span>{' '}
+                Launch
               </div>
             )}
           </MenuItem>
@@ -261,10 +267,16 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <FontAwesomeIcon icon="pen" /> Manage
+            <span>
+              <FontAwesomeIcon icon="pen" />
+            </span>{' '}
+            Manage
           </MenuItem>
           <MenuItem onClick={() => shell.openItem(path.join(PACKS_PATH, name))}>
-            <FontAwesomeIcon icon="folder" /> Open Folder
+            <span>
+              <FontAwesomeIcon icon="folder" />
+            </span>{' '}
+            Open Folder
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -300,7 +312,10 @@ export default class DInstance extends Component<Props> {
               process.env.NODE_ENV === 'development'
             }
           >
-            <FontAwesomeIcon icon="link" /> Create Shortcut
+            <span>
+              <FontAwesomeIcon icon="link" />
+            </span>{' '}
+            Create Shortcut
           </MenuItem>
           {/* <MenuItem
             disabled={this.isInstalling() || !isValid}
@@ -316,7 +331,10 @@ export default class DInstance extends Component<Props> {
             }
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
-            <FontAwesomeIcon icon="wrench" /> Repair
+            <span>
+              <FontAwesomeIcon icon="wrench" />
+            </span>{' '}
+            Repair
           </MenuItem>
           <MenuItem
             disabled={
@@ -330,7 +348,10 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <FontAwesomeIcon icon="trash" /> Delete
+            <span>
+              <FontAwesomeIcon icon="trash" />
+            </span>{' '}
+            Delete
           </MenuItem>
         </ContextMenu>
       </div>
