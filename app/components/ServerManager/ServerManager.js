@@ -138,7 +138,7 @@ function ServerManager(props) {
                 <FontAwesomeIcon icon="wrench"></FontAwesomeIcon>
               </Button>
 
-              <Button type="primary" onClick={() => commandManager(name)}>
+              <Button className={styles.terminalButton} type="primary" onClick={() => commandManager(name)}>
                 <FontAwesomeIcon icon="terminal"></FontAwesomeIcon>
               </Button>
 

@@ -82,7 +82,7 @@
   flex: 1;
   background-color: var(--secondary-color-1);
   max-height: 200px !important;
-  min-height: 40% !important;
+  min-height: 20% !important;
   border-radius: 3px;
   padding: 4%;
 }
@@ -147,4 +147,8 @@
   justify-content: center;
   font-size: 30px;
   font-weight: 300;
+}
+
+.terminalButton{
+  max-width: 25%;
 }
