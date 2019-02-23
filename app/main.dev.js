@@ -216,7 +216,8 @@ if (minimist(process.argv.slice(1)).i) {
           process.kill(e.PID);
         });
       }));
-      setTimeout(() => app.exit(0), 2000);
+      await app.exit(0);
+      //setTimeout(() => app.exit(0), 2000);
     });
     mainWindow.on('close', e => {
       mainWindow.webContents.send('closing');
