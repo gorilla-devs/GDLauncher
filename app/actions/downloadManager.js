@@ -25,7 +25,7 @@ import {
 } from '../utils/getMCFilesList';
 import { downloadMod, getModsList, createDoNotTouchFile } from '../utils/mods';
 import { arraify } from '../utils/strings';
-import { copyAssetsToLegacy } from '../utils/assets';
+import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -185,7 +185,7 @@ export function downloadPack(pack) {
 
     let forgeJSON = null;
 
-    const assets = await extractAssets(vnlJSON);
+    const assets = await extractAssets(vnlJSON, pack);
     const mainJar = await extractMainJar(vnlJSON);
 
     if (currPack.forgeVersion !== null) {
@@ -392,6 +392,8 @@ export function downloadPack(pack) {
 
     if (vnlJSON.assets === 'legacy') {
       await copyAssetsToLegacy(assets);
+    } else if (vnlJSON.assets === 'pre-1.6') {
+      await copyAssetsToResources(assets);
     }
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
 
