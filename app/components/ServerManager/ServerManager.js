@@ -128,7 +128,7 @@ function ServerManager(props) {
               }
               <Link
                 to={{
-                  pathname: `/confirmInstanceDelete/${name}`,
+                  pathname: `/confirmInstanceDelete/server/${name}`,
                   state: { modal: true }
                 }}
               >
