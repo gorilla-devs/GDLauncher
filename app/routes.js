@@ -50,8 +50,8 @@ const ImportPack = lazy(() => import('./components/ImportPack/ImportPack'));
 const ChangelogsModal = lazy(() =>
   import('./components/ChangelogModal/ChangelogModal')
 );
-const ConfirmInstanceDelete = lazy(() =>
-  import('./components/ConfirmDeleteInstanceModal/ConfirmDeleteInstanceModal')
+const ConfirmDeleteModal = lazy(() =>
+  import('./components/ConfirmDeleteModal/ConfirmDeleteModal')
 );
 const JavaGlobalOptionsFixModal = lazy(() =>
   import('./components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal')
@@ -245,8 +245,8 @@ class RouteDef extends Component<Props> {
         ) : null}
         {isModal ? (
           <Route
-            path="/confirmInstanceDelete/:instance"
-            component={WaitingComponent(ConfirmInstanceDelete)}
+            path="/confirmInstanceDelete/:type/:name"
+            component={WaitingComponent(ConfirmDeleteModal)}
           />
         ) : null}
         {isModal ? (
