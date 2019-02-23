@@ -325,7 +325,7 @@ export default class DInstance extends Component<Props> {
             data={{ foo: 'bar' }}
             onClick={() =>
               history.push({
-                pathname: `/confirmInstanceDelete/${name}`,
+                pathname: `/confirmInstanceDelete/instance/${name}`,
                 state: { modal: true }
               })
             }
