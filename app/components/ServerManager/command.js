@@ -1,25 +1,44 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Input, Button } from 'antd';
+import { Input, Button, Switch } from 'antd';
+import { Link } from 'react-router-dom';
 import styles from './ServerManager.scss';
 
-function Command(props){
-  return(
-    <div className={styles.rowSettings}>
-    <div className={styles.FirstSetting} >
-      {props.command}
-    </div>
-    <Input className={styles.SecondSetting}
-      //value={props.commands[command]}
-      //onChange={(e) => ServerCommandsChangeValueTWO(e, command)}
-    />
-    <Button.Group className={styles.ButtonGroup}>
-      <Button type="primary" >run</Button>
-      <Button type="primary">remove</Button>
-    </Button.Group>
-  </div>
-  );
+function switchFunc() {
+
 }
+
+function Command(props) {
+  if (props.switch == "true") {
+    return (
+      <div className={styles.rowSettings}>
+        <div className={styles.FirstSetting} >
+          {props.command}
+        </div>
+        <Switch className={styles.switch} onChange={switchFunc} />
+      </div>
+    );
+  } else
+
+    return (
+      <div className={styles.rowSettings}>
+        <div className={styles.FirstSetting} >
+          {props.command}
+        </div>
+        <Link
+          to={{
+            pathname: `/ServerCommandsModal`,
+            state: { modal: true }
+          }}
+          className={styles.commandButton}
+        >
+          <Button type="primary" className={styles.commandButton}>run</Button>
+        </Link>
+      </div>
+    );
+
+}
+
 
 function mapStateToProps(state) {
   return {

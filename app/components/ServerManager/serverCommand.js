@@ -158,9 +158,19 @@ function serverCommand(props) {
           {`Your ip :  ${Ip}`}
         </div>
         {
-          <Command command="PROVA"/>
+          <div>
+            <Command command="op" switch="false"/>
+            <Command command="kick" switch="false"/>
+            <Command command="ban" switch="false"/>
+            <Command command="ip-ban" switch="false"/>
+            <Command command="pardon" switch="false"/>
+            <Command command="pardon-ip" switch="false"/>
+            <Command command="kill" switch="false"/>
+            <Command command="gamemode" switch="true" />
+
+          </div>
         }
-            
+
         {/*
         //CANCELLARE
         <div className={styles.rowSettings}>

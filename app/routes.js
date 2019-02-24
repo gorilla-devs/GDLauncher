@@ -2,7 +2,7 @@
 import React, { Component, lazy, Suspense } from 'react';
 import { connect } from 'react-redux';
 import { ipcRenderer } from 'electron';
-import  log from 'electron-log';
+import log from 'electron-log';
 import { Switch, Route, Redirect } from 'react-router';
 import { history } from './store/configureStore';
 import { Form, notification } from 'antd';
@@ -55,6 +55,9 @@ const ConfirmDeleteModal = lazy(() =>
 );
 const JavaGlobalOptionsFixModal = lazy(() =>
   import('./components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal')
+);
+const ServerCommandsModal = lazy(() =>
+  import('./components/ServerCommandsModal/ServerCommandsModal')
 );
 
 type Props = {
@@ -255,44 +258,50 @@ class RouteDef extends Component<Props> {
             component={WaitingComponent(JavaGlobalOptionsFixModal)}
           />
         ) : null}
+        {isModal ? (
+          <Route
+            path="/ServerCommandsModal"
+            component={WaitingComponent(ServerCommandsModal)}
+          />
+        ) : null}
       </App>
-    );
+      );
+    }
   }
-}
-
+  
 function WaitingComponent(MyComponent) {
   return props => (
     <Suspense
-      fallback={
-        <div
-          style={{
-            width: '100vw',
-            height: '100vh',
-            background: 'var(--secondary-color-1)'
-          }}
-        >
-          Loading...
+          fallback={
+            <div
+              style={{
+                width: '100vw',
+                height: '100vh',
+                background: 'var(--secondary-color-1)'
+              }}
+            >
+              Loading...
         </div>
+          }
+        >
+          <MyComponent {...props} />
+        </Suspense>
+        );
       }
-    >
-      <MyComponent {...props} />
-    </Suspense>
-  );
-}
-
+      
 function mapStateToProps(state) {
   return {
-    location: state.router.location,
-    isAuthValid: state.auth.isAuthValid,
-    serversList: state.serverManager.servers
-  };
-}
-
+          location: state.router.location,
+        isAuthValid: state.auth.isAuthValid,
+        serversList: state.serverManager.servers
+      };
+    }
+    
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...AuthActions, ...SettingsActions }, dispatch);
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RouteDef);
+  return bindActionCreators({...AuthActions, ...SettingsActions }, dispatch);
+      }
+      
+      export default connect(
+        mapStateToProps,
+        mapDispatchToProps
+      )(RouteDef);
