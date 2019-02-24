@@ -286,7 +286,7 @@ function mapStateToProps(state) {
   return {
     location: state.router.location,
     isAuthValid: state.auth.isAuthValid,
-    uuid: state.auth.uuid
+    uuid: state.auth.clientToken
   };
 }
 
