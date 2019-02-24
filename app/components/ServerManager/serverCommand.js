@@ -10,7 +10,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import psTree from 'ps-tree';
 import _ from 'lodash';
-import  stringio from '@rauschma/stringio';
+import stringio from '@rauschma/stringio';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { startServer, deleteServer, kill } from '../../actions/serverManager';
@@ -44,9 +44,9 @@ function serverCommand(props) {
     await writable.write(data);
   }
   //LAVORARCI SU
- async function runCommand(command, param) {
+  async function runCommand(command, param) {
     console.log(command, param);
-    try{
+    try {
       let paramL = `/${command} ${param}\n`;
       await writeToWritable(props.start.stdin, paramL);
       //await props.start.stdin.write(`/${command} ${param}\\n`);
@@ -61,7 +61,7 @@ function serverCommand(props) {
       [command]: e.target.value
     })
   }
-  async function GetIp(){
+  async function GetIp() {
     let { ip } = (await axios.get(`https://api.ipify.org/?format=json`)).data;
     setIp(ip);
   }
@@ -174,9 +174,15 @@ function serverCommand(props) {
             value={serverCommandValue}
             onChange={(e) => ServerCommandsChangeValue(e)}
           />
-          <Button className={styles.commandButton} type="primary" onClick={() => createCommand(serverCommandValue)}>
-            <FontAwesomeIcon icon="plus"></FontAwesomeIcon>
-          </Button>
+          <Button.Group className={styles.ButtonGroup}>
+            <Button type="primary" onClick={() => createCommand(serverCommandValue)}>
+              <FontAwesomeIcon icon="play"></FontAwesomeIcon>
+            </Button>
+            <Button type="primary" onClick={() => createCommand(serverCommandValue)}>
+              <FontAwesomeIcon icon="plus"></FontAwesomeIcon>
+            </Button>
+          </Button.Group>
+
         </div>
       </div>
     )
