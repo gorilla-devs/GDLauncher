@@ -5,6 +5,7 @@ import { Switch, Route, Redirect } from 'react-router';
 import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import { screen } from 'electron';
+import { release, arch } from 'os';
 import * as AuthActions from './actions/auth';
 import * as SettingsActions from './actions/settings';
 import { JAVA_URL } from './constants';
@@ -103,15 +104,22 @@ class RouteDef extends Component<Props> {
   }
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (this.props.isAuthValid && process.env.NODE_ENV === 'development') {
+    if (this.props.isAuthValid) {
+      console.log(this.props.uuid);
+      ga(this.props.uuid).set('uid', this.props.uuid);
       ga(this.props.uuid).set('ds', 'app');
+      ga(this.props.uuid).set('ua', `${release()} ${arch()}`);
+      ga(this.props.uuid).set('cd1', `${release()} ${arch()}`);
       ga(this.props.uuid).set(
         'sr',
         `${screen.getPrimaryDisplay().bounds.width}x${
           screen.getPrimaryDisplay().bounds.height
         }`
       );
-      ga(this.props.uuid).set('vp', `${window.innerWidth}x${window.innerHeight}`);
+      ga(this.props.uuid).set(
+        'vp',
+        `${window.innerWidth}x${window.innerHeight}`
+      );
       ga(this.props.uuid)
         .screenview(this.props.location.pathname, 'GDLauncher', this.appVersion)
         .send();

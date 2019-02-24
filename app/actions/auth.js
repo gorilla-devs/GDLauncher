@@ -9,7 +9,7 @@ import store from '../localStore';
 import {
   LOGIN_API,
   ACCESS_TOKEN_VALIDATION_URL,
-  ACCESS_TOKEN_REFRESH_URL,
+  ACCESS_TOKEN_REFRESH_URL
 } from '../constants';
 
 export const LOGOUT = 'LOGOUT';
@@ -28,15 +28,20 @@ export function login(username, password, remember) {
       type: START_AUTH_LOADING
     });
     try {
-      const { data, status } = await axios.post(LOGIN_API, {
-        agent: {
-          name: "Minecraft",
-          version: 1
+      const { data, status } = await axios.post(
+        LOGIN_API,
+        {
+          agent: {
+            name: 'Minecraft',
+            version: 1
+          },
+          username,
+          password,
+          requestUser: true,
+          ...(store.get('clientToken') && { clientToken: getClientToken() })
         },
-        username,
-        password,
-        requestUser: true
-      }, { headers: { 'Content-Type': 'application/json' }, });
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       if (
         status === 200 &&
         data !== undefined &&
@@ -48,7 +53,6 @@ export function login(username, password, remember) {
           username: data.user.username,
           displayName: data.selectedProfile.name,
           accessToken: data.accessToken,
-          clientToken: data.clientToken,
           legacy: data.selectedProfile.legacyProfile,
           uuid: data.selectedProfile.id,
           userID: data.selectedProfile.userId
@@ -58,12 +62,16 @@ export function login(username, password, remember) {
             user: {
               ...payload
             },
+            clientToken: data.clientToken,
             lastUsername: data.user.username
           });
         }
         dispatch({
           type: AUTH_SUCCESS,
-          payload
+          payload: {
+            ...payload,
+            clientToken: data.clientToken
+          }
         });
 
         const { newUser } = store.get('settings');
@@ -111,13 +119,18 @@ export function checkAccessToken() {
       try {
         const res = await axios.post(
           ACCESS_TOKEN_VALIDATION_URL,
-          { accessToken: userData.accessToken },
+          {
+            accessToken: userData.accessToken
+          },
           { 'Content-Type': 'application/json;charset=UTF-8' }
         );
         if (res.status === 204) {
           dispatch({
             type: AUTH_SUCCESS,
-            payload: userData
+            payload: {
+              ...userData,
+              clientToken: getClientToken()
+            }
           });
           dispatch(push('/home'));
         }
@@ -133,7 +146,10 @@ export function checkAccessToken() {
           message.info('You are offline. Logging in in offline-mode');
           dispatch({
             type: AUTH_SUCCESS,
-            payload: userData
+            payload: {
+              ...userData,
+              clientToken: getClientToken()
+            }
           });
           dispatch(push('/home'));
         }
@@ -142,6 +158,8 @@ export function checkAccessToken() {
           type: STOP_TOKEN_CHECK_LOADING
         });
       }
+    } else {
+      dispatch(push('/'));
     }
   };
 }
@@ -169,7 +187,7 @@ export function tryNativeLauncherProfiles() {
         ACCESS_TOKEN_REFRESH_URL,
         {
           accessToken,
-          clientToken: vnlJson.clientToken,
+          clientToken: getClientToken(),
           requestUser: true
         },
         { 'Content-Type': 'application/json' }
@@ -186,25 +204,29 @@ export function tryNativeLauncherProfiles() {
           username: data.user.username,
           displayName: data.selectedProfile.name,
           accessToken: data.accessToken,
-          clientToken: data.clientToken,
           legacy: data.selectedProfile.legacyProfile,
           uuid: data.selectedProfile.id,
           userID: data.selectedProfile.userId
         };
         // We need to update the accessToken in launcher_profiles.json
-        vnlJson.authenticationDatabase[data.selectedProfile.userId].accessToken =
-          data.accessToken;
+        vnlJson.authenticationDatabase[
+          data.selectedProfile.userId
+        ].accessToken = data.accessToken;
         await fsa.writeJson(
           path.join(vanillaMCPath, 'launcher_profiles.json'),
           vnlJson
         );
         store.set({
           user: { ...payload },
+          clientToken: data.clientToken,
           lastUsername: data.user.username
         });
         dispatch({
           type: AUTH_SUCCESS,
-          payload
+          payload: {
+            ...payload,
+            clientToken: data.clientToken,
+          }
         });
         const { newUser } = store.get('settings');
 
@@ -216,7 +238,9 @@ export function tryNativeLauncherProfiles() {
         }
       }
     } catch (err) {
-      message.error('We could not log you in through Minecraft Launcher. Invalid data.');
+      message.error(
+        'We could not log you in through Minecraft Launcher. Invalid data.'
+      );
       dispatch({
         type: AUTH_FAILED
       });
@@ -226,3 +250,26 @@ export function tryNativeLauncherProfiles() {
     }
   };
 }
+
+// Util functions
+
+const uuidv4 = () => {
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16)
+  );
+};
+
+const getClientToken = () => {
+  const clientToken = store.get('clientToken');
+  if (
+    clientToken &&
+    clientToken !== undefined &&
+    typeof clientToken === 'string'
+  ) {
+    return clientToken;
+  }
+  return uuidv4().replace('-', '');
+};
