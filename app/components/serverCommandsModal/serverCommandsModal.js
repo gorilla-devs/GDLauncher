@@ -40,7 +40,7 @@ export default props => {
     <Modal
       history={props.history}
       unMount={unMount}
-      title={`Confirm ${type === 'instance' ? 'Instance' : 'Server'} Deletion`}
+      title={`Users`}
       style={{ height: 210, width: 400 }}
     >
       <div></div>
