@@ -55,6 +55,17 @@ function serverCommand(props) {
     }
   }
 
+  async function runCustomCommand(command) {
+    console.log(command);
+    try {
+      let paramL = `/${command}\n`;
+      await writeToWritable(props.start.stdin, paramL);
+      //await props.start.stdin.write(`/${command} ${param}\\n`);
+    } catch{
+
+    }
+  }
+
   function ServerCommandsChangeValueTWO(e, command) {
     props.setCommands({
       ...props.commands,
@@ -168,14 +179,14 @@ function serverCommand(props) {
 
         <div className={styles.rowSettings}>
           <div className={styles.FirstSetting} >
-            Add a Command:
+            Run/Add a Command
              </div>
           <Input className={styles.SecondSetting}
             value={serverCommandValue}
             onChange={(e) => ServerCommandsChangeValue(e)}
           />
           <Button.Group className={styles.ButtonGroup}>
-            <Button type="primary" onClick={() => createCommand(serverCommandValue)}>
+            <Button type="primary" onClick={() => runCustomCommand(serverCommandValue)}>
               <FontAwesomeIcon icon="play"></FontAwesomeIcon>
             </Button>
             <Button type="primary" onClick={() => createCommand(serverCommandValue)}>
