@@ -9,6 +9,7 @@ import fsa from 'fs-extra';
 import { promisify } from 'util';
 import Modal from '../Common/Modal/Modal';
 import { PACKS_PATH, SERVERS_PATH } from '../../constants';
+import styles from './serverCommandsModal.scss';
 
 type Props = {};
 
@@ -41,9 +42,9 @@ export default props => {
       history={props.history}
       unMount={unMount}
       title={`Users`}
-      style={{ height: 210, width: 400 }}
+      style={{ height: 300, width: 500 }}
     >
-      <div></div>
+      <Button type="primary" className={styles.button}></Button>
     </Modal>
   );
 };
