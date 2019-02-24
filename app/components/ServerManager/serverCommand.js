@@ -18,8 +18,7 @@ import styles from './ServerManager.scss';
 import { downloadFile } from '../../utils/downloader';
 import { SERVERS_PATH } from '../../constants';
 import ButtonGroup from 'antd/lib/button/button-group';
-import { async } from 'q';
-
+import Command from './Command';
 
 function serverCommand(props) {
   const [serverSettings, setServerSettings] = useState({});
@@ -158,30 +157,18 @@ function serverCommand(props) {
         <div className={styles.rowSettings}>
           {`Your ip :  ${Ip}`}
         </div>
-        {Object.keys(props.commands).length > 0 ?
-          Object.keys(props.commands).map(command => (
-            <div className={styles.rowSettings}>
-              <div className={styles.FirstSetting} >
-                {command}
-              </div>
-              <Input className={styles.SecondSetting}
-                value={props.commands[command]}
-                onChange={(e) => ServerCommandsChangeValueTWO(e, command)}
-              />
-              <Button.Group className={styles.ButtonGroup}>
-                <Button type="primary" onClick={() => runCommand(command, props.commands[command])}>run</Button>
-                <Button type="primary" onClick={() => removeCommand(command)}>remove</Button>
-              </Button.Group>
-            </div>
-          ))
-          : <div></div>
+        {
+          <Command command="PROVA"/>
         }
-
+            
+        {/*
+        //CANCELLARE
         <div className={styles.rowSettings}>
           <div className={styles.FirstSetting} >
             Run/Add a Command
              </div>
           <Input className={styles.SecondSetting}
+            //placeholder="/"
             value={serverCommandValue}
             onChange={(e) => ServerCommandsChangeValue(e)}
           />
@@ -194,7 +181,9 @@ function serverCommand(props) {
             </Button>
           </Button.Group>
 
-        </div>
+        </div> */}
+
+
       </div>
     )
   }
