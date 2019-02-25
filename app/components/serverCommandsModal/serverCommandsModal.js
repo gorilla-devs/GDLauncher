@@ -44,7 +44,7 @@ function ServerCommandsModal(props) {
 
 
   useEffect(() => {
-    runCommand(list)
+    runCommand("list")
   }, []);
 
   return (
