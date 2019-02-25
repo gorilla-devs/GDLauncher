@@ -452,6 +452,10 @@ textarea,
   background-color: var(--primary);
 }
 
+.ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
+  background-color: var(--primary);
+}
+
 .container {
   max-width: 24rem;
   margin: 1rem auto;
