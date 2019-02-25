@@ -8,6 +8,7 @@ function switchFunc() {
 
 }
 
+
 function Command(props) {
   if (props.switch == "true") {
     return (
