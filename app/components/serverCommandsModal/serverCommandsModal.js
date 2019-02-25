@@ -16,28 +16,36 @@ type Props = {};
 
 async function writeToWritable(writable, data) {
   console.log("DATA", data);
-  //await stringio.streamWrite(writable, data);
-  // await streamWrite(writable, 'Second line\n');
-  //await stringio.streamEnd(writable);
+
   await writable.write(data);
 }
-//LAVORARCI SU
-async function runCommand(command, param) {
-  console.log(command, param);
+
+async function runCommand(command) {
+  console.log(command);
   try {
-    let paramL = `/${command} ${param}\n`;
+    let paramL = `/${command}\n`;
     await writeToWritable(props.start.stdin, paramL);
-    //await props.start.stdin.write(`/${command} ${param}\\n`);
+    
+    start.stdout.on("data", (data) => {
+      console.log(data.toString());
+    });
+    start.stderr.on("data", (data) => {
+      console.log(data.toString());
+    });
   } catch{
 
   }
 }
 
-function ServerCommandsModal(props){
+function ServerCommandsModal(props) {
   const [unMount, setUnMount] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const { name, type } = props.match.params;
 
+
+  useEffect(() => {
+    runCommand(list)
+  }, []);
 
   return (
     <Modal
@@ -46,9 +54,9 @@ function ServerCommandsModal(props){
       title={`Users`}
       style={{ height: 300, width: 500 }}
     >
-    <div>
+      <div>
 
-    </div>
+      </div>
       <Button type="primary" className={styles.button}></Button>
     </Modal>
   );
