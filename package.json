@@ -138,8 +138,10 @@
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jest": "^22.2.2",
     "eslint-plugin-jsx-a11y": "6.2.1",
+    "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-react": "^7.12.4",
+    "eslint-plugin-testcafe": "^0.2.1",
     "fbjs-scripts": "^1.0.1",
     "file-loader": "^3.0.1",
     "flow-bin": "^0.92.1",
@@ -189,9 +191,11 @@
     "connected-react-router": "^6.3.1",
     "css-vars": "^2.2.0",
     "devtron": "^1.4.0",
+    "directory-tree": "^2.2.1",
     "electron-debug": "^2.1.0",
     "electron-log": "^3.0.1",
     "electron-store": "^2.0.0",
+    "eslint-config-erb": "^0.0.2",
     "extract-zip": "^1.6.7",
     "fs-extra": "^7.0.1",
     "history": "^4.7.2",
@@ -225,7 +229,8 @@
     "source-map-support": "^0.5.10",
     "sudo-prompt": "^8.2.5",
     "universal-analytics": "^0.4.20",
-    "version-sort": "^0.1.1"
+    "version-sort": "^0.1.1",
+    "yazl": "^2.5.1"
   },
   "browserslist": "electron 1.6",
   "build": {
