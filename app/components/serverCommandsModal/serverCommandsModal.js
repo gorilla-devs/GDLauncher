@@ -14,28 +14,9 @@ import styles from './serverCommandsModal.scss';
 
 type Props = {};
 
-async function writeToWritable(writable, data) {
-  console.log("DATA", data);
 
-  await writable.write(data);
-}
 
-async function runCommand(command) {
-  console.log(command);
-  try {
-    let paramL = `/${command}\n`;
-    await writeToWritable(props.start.stdin, paramL);
-    
-    start.stdout.on("data", (data) => {
-      console.log(data.toString());
-    });
-    start.stderr.on("data", (data) => {
-      console.log(data.toString());
-    });
-  } catch{
 
-  }
-}
 
 function ServerCommandsModal(props) {
   const [unMount, setUnMount] = useState(false);
@@ -44,8 +25,44 @@ function ServerCommandsModal(props) {
 
 
   useEffect(() => {
-    runCommand("list")
+    players("list");
+
   }, []);
+
+
+  function dbClick() {
+
+  }
+
+  async function writeToWritable(writable, data) {
+    console.log("DATA", data);
+  
+    await writable.write(data);
+  }
+  
+  async function runCommand(command) {
+    console.log(command);
+    try {
+      let paramL = `/${command}\n`;
+      await writeToWritable(props.start.stdin, paramL);
+  
+      // start.stdout.on("data", (data) => {
+      //   console.log(data.toString());
+      // });
+      // start.stderr.on("data", (data) => {
+      //   console.log(data.toString());
+      // });
+    } catch{
+  
+    }
+  }
+
+  function players(list) {
+    runCommand(list);
+    props.start.stdout.on("data", (data) => {
+      console.log(data.toString());
+    });
+  }
 
   return (
     <Modal
@@ -54,7 +71,13 @@ function ServerCommandsModal(props) {
       title={`Users`}
       style={{ height: 300, width: 500 }}
     >
-      <div>
+      <div className={styles.content}>
+
+        <div className={styles.player}>PROVA</div>
+        <div className={styles.player}>PROVA</div>
+        <div className={styles.player}>PROVA</div>
+        <div className={styles.player}>PROVA</div>
+        <div className={styles.player} onDoubleClick={() => dbClick()} >PROVA</div>
 
       </div>
       <Button type="primary" className={styles.button}></Button>
