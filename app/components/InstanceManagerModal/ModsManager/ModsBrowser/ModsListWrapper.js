@@ -100,7 +100,7 @@ export default function ModsListWrapper({
             >
               {mod && mod.name}
             </div>
-            {mod && installedMods.find(v => v.id === mod.id) && (
+            {mod && installedMods.find(v => v.projectID === mod.id) && (
               <div className={styles.modInstalled}>INSTALLED</div>
             )}
           </div>

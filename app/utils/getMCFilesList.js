@@ -26,31 +26,40 @@ export const extractMainJar = async json => {
 export const extractVanillaLibs = async json => {
   const libs = [];
   await Promise.all(
-    json.libraries.filter(lib => !parseLibRules(lib.rules)).map(async lib => {
-      if ('artifact' in lib.downloads) {
-        libs.push({
-          url: lib.downloads.artifact.url,
-          path: path.join(INSTANCES_PATH, 'libraries', lib.downloads.artifact.path)
-        });
-      }
-      if (
-        'classifiers' in lib.downloads &&
-        `natives-${convertOSToMCFormat(SysOS.type())}` in
-        lib.downloads.classifiers
-      ) {
-        libs.push({
-          url:
-            lib.downloads.classifiers[
-              `natives-${convertOSToMCFormat(SysOS.type())}`
-            ].url,
-          path:
-            path.join(INSTANCES_PATH, 'libraries', lib.downloads.classifiers[
-              `natives-${convertOSToMCFormat(SysOS.type())}`
-            ].path),
-          natives: true
-        });
-      }
-    })
+    json.libraries
+      .filter(lib => !parseLibRules(lib.rules))
+      .map(async lib => {
+        if ('artifact' in lib.downloads) {
+          libs.push({
+            url: lib.downloads.artifact.url,
+            path: path.join(
+              INSTANCES_PATH,
+              'libraries',
+              lib.downloads.artifact.path
+            )
+          });
+        }
+        if (
+          'classifiers' in lib.downloads &&
+          `natives-${convertOSToMCFormat(SysOS.type())}` in
+            lib.downloads.classifiers
+        ) {
+          libs.push({
+            url:
+              lib.downloads.classifiers[
+                `natives-${convertOSToMCFormat(SysOS.type())}`
+              ].url,
+            path: path.join(
+              INSTANCES_PATH,
+              'libraries',
+              lib.downloads.classifiers[
+                `natives-${convertOSToMCFormat(SysOS.type())}`
+              ].path
+            ),
+            natives: true
+          });
+        }
+      })
   );
   return libs;
 };
@@ -68,7 +77,7 @@ export const extractNatives = async (libs, packName) => {
   }
 };
 
-export const extractAssets = async json => {
+export const extractAssets = async (json, instanceName) => {
   let res;
   const assets = [];
   const assetsFile = path.join(
@@ -96,30 +105,50 @@ export const extractAssets = async json => {
         0,
         2
       )}/${assetCont.hash}`,
-      path: path.join(INSTANCES_PATH, 'assets', 'objects', assetCont.hash.substring(0, 2), assetCont.hash),
-      legacyPath: path.join(INSTANCES_PATH, 'assets', 'virtual', 'legacy', asset)
+      path: path.join(
+        INSTANCES_PATH,
+        'assets',
+        'objects',
+        assetCont.hash.substring(0, 2),
+        assetCont.hash
+      ),
+      legacyPath: path.join(
+        INSTANCES_PATH,
+        'assets',
+        'virtual',
+        'legacy',
+        asset
+      ),
+      resourcesPath: path.join(PACKS_PATH, instanceName, 'resources', asset)
     });
   });
   return assets;
 };
 
 export const isVirtualAssets = async assetsName => {
-  const assetsJSON = await promisify(fs.readFile)(path.join(
-    INSTANCES_PATH,
-    'assets',
-    'indexes',
-    `${assetsName}.json`
-  ));
+  const assetsJSON = await promisify(fs.readFile)(
+    path.join(INSTANCES_PATH, 'assets', 'indexes', `${assetsName}.json`)
+  );
   return _.has(assetsJSON, 'virtual') && assetsJSON.virtual === true;
-}
+};
+
+export const isMapToResourcesAssets = async assetsName => {
+  const assetsJSON = await promisify(fs.readFile)(
+    path.join(INSTANCES_PATH, 'assets', 'indexes', `${assetsName}.json`)
+  );
+  return (
+    _.has(assetsJSON, 'map_to_resources') &&
+    assetsJSON.map_to_resources === true
+  );
+};
 
 export const getForgeLibraries = async forge => {
   const forgeLibCalculator = async library => {
     let completeUrl;
     if (_.has(library, 'url')) {
-      completeUrl = `${CURSEFORGE_MODLOADERS_API}/${arraify(
-        library.name
-      ).join('/')}`;
+      completeUrl = `${CURSEFORGE_MODLOADERS_API}/${arraify(library.name).join(
+        '/'
+      )}`;
     } else {
       completeUrl = `${MC_LIBRARIES_URL}/${arraify(library.name).join('/')}`;
     }

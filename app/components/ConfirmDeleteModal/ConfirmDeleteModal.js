@@ -7,25 +7,30 @@ import { go } from 'connected-react-router';
 import fs from 'fs';
 import fsa from 'fs-extra';
 import { promisify } from 'util';
-import styles from './ConfirmDeleteInstanceModal.scss';
+import styles from './ConfirmDeleteModal.scss';
 import Modal from '../Common/Modal/Modal';
-import { PACKS_PATH } from '../../constants';
+import { PACKS_PATH, SERVERS_PATH } from '../../constants';
 
 type Props = {};
 
 export default props => {
   const [unMount, setUnMount] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { name, type } = props.match.params;
 
-  const deleteInstance = async () => {
-    const { instance } = props.match.params;
+  const deleteType = async () => {
+    if (deleting === true) {
+      return;
+    }
     try {
       setDeleting(true);
-      await fsa.remove(path.join(PACKS_PATH, instance));
-      message.success('Instance deleted');
+      await fsa.remove(
+        path.join(type === 'instance' ? PACKS_PATH : SERVERS_PATH, name)
+      );
+      message.success(`${type === 'instance' ? 'Instance' : 'Server'} deleted`);
     } catch (err) {
       setDeleting(false);
-      message.error('Error deleting instance');
+      message.error(`Error deleting ${name}`);
       log.error(err);
     } finally {
       setUnMount(true);
@@ -36,12 +41,12 @@ export default props => {
     <Modal
       history={props.history}
       unMount={unMount}
-      title="Confirm Instance Deletion"
+      title={`Confirm ${type === 'instance' ? 'Instance' : 'Server'} Deletion`}
       style={{ height: 210, width: 400 }}
     >
       <div className={styles.main}>
-        Are you sure you want to delete the following instance? <br />
-        <div className={styles.instanceName}>{props.match.params.instance}</div>
+        Are you sure you want to delete the following? <br />
+        <div className={styles.instanceName}>{props.match.params.name}</div>
         This cannot be undone and you will lose everything you've done
       </div>
       <div className={styles.buttons}>
@@ -52,9 +57,7 @@ export default props => {
         >
           No, Abort
         </Button>
-        <span onClick={deleting === false ? deleteInstance : () => {}}>
-          Yes, Delete
-        </span>
+        <span onClick={() => deleteType()}>Yes, Delete</span>
       </div>
     </Modal>
   );

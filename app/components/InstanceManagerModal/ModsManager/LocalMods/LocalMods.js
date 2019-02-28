@@ -110,16 +110,17 @@ const LocalMods = props => {
     // Remove the actual file
     await promisify(fss.unlink)(path.join(modsFolder, filteredMods[i].name));
     // Remove the reference in the mods file json
-    const oldMods = JSON.parse(
+    const config = JSON.parse(
       await promisify(fss.readFile)(
-        path.join(PACKS_PATH, props.match.params.instance, 'mods.json')
+        path.join(PACKS_PATH, props.match.params.instance, 'config.json')
       )
     );
     await promisify(fss.writeFile)(
-      path.join(PACKS_PATH, props.match.params.instance, 'mods.json'),
-      JSON.stringify(
-        oldMods.filter(v => v.fileNameOnDisk !== filteredMods[i].name)
-      )
+      path.join(PACKS_PATH, props.match.params.instance, 'config.json'),
+      JSON.stringify({
+        ...config,
+        mods: config.mods.filter(v => v.fileNameOnDisk !== filteredMods[i].name)
+      })
     );
   };
 
