@@ -40,19 +40,20 @@ function ModPage(props) {
       projectFileId,
       props.instance
     );
-    let modsFile = [];
     try {
-      modsFile = JSON.parse(
+      const config = JSON.parse(
         await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'mods.json')
+          path.join(PACKS_PATH, props.instance, 'config.json')
         )
       );
+      await promisify(fs.writeFile)(
+        path.join(PACKS_PATH, props.instance, 'config.json'),
+        JSON.stringify({
+          ...config,
+          mods: [...config.mods, newMod, ...dependancies]
+        })
+      );
     } catch {}
-
-    await promisify(fs.writeFile)(
-      path.join(PACKS_PATH, props.instance, 'mods.json'),
-      JSON.stringify([...modsFile, newMod, ...dependancies])
-    );
 
     setModsInstalling({
       ...modsInstalling,

@@ -42,9 +42,9 @@ const ModsList = props => {
 
   const loadInstalledMods = async () => {
     const Imods = await promisify(fs.readFile)(
-      path.join(PACKS_PATH, props.match.params.instance, 'mods.json')
+      path.join(PACKS_PATH, props.match.params.instance, 'config.json')
     );
-    setInstalledMods(JSON.parse(Imods));
+    setInstalledMods(JSON.parse(Imods).mods);
   };
 
   // The "e" param is just used for invoking this function without params in events handlers
