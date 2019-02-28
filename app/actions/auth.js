@@ -187,7 +187,6 @@ export function tryNativeLauncherProfiles() {
         ACCESS_TOKEN_REFRESH_URL,
         {
           accessToken,
-          clientToken: getClientToken(),
           requestUser: true
         },
         { 'Content-Type': 'application/json' }
@@ -218,7 +217,7 @@ export function tryNativeLauncherProfiles() {
         );
         store.set({
           user: { ...payload },
-          clientToken: data.clientToken,
+          clientToken: getClientToken(),
           lastUsername: data.user.username
         });
         dispatch({
