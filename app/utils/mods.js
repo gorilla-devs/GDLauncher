@@ -34,7 +34,8 @@ export const downloadMod = async (
     () => {}
   );
   return {
-    id: modId,
+    projectID: modId,
+    fileID: projectFileId,
     packageFingerprint: data.packageFingerprint,
     fileNameOnDisk: sanitizedFileName
   };
@@ -64,9 +65,9 @@ export const downloadDependancies = async (
             // See if the mod already exists in this instance
             const installedMods = JSON.parse(
               await promisify(fs.readFile)(
-                path.join(PACKS_PATH, instanceName, 'mods.json')
+                path.join(PACKS_PATH, instanceName, 'config.json')
               )
-            );
+            ).mods;
             if (installedMods.find(v => v.id === dep.addonId))
               toDownload = false;
           } catch {
@@ -76,9 +77,9 @@ export const downloadDependancies = async (
             const depData = await axios.get(
               `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}/files`
             );
-            const { id, fileNameOnDisk } = depData.data.reverse().find(
-              n => n.gameVersion[0] === gameVersion
-            );
+            const { id, fileNameOnDisk } = depData.data
+              .reverse()
+              .find(n => n.gameVersion[0] === gameVersion);
             const downloadedDep = await downloadMod(
               dep.addonId,
               id,
@@ -133,7 +134,7 @@ export const getModMurmurHash2 = async modPath => {
 export const createDoNotTouchFile = async instance => {
   await makeDir(path.join(PACKS_PATH, instance, 'mods'));
   await promisify(fs.writeFile)(
-    path.join(PACKS_PATH, instance, 'mods', '_DO_NOT_TOUCH_THIS_FOLDER.txt'),
+    path.join(PACKS_PATH, instance, 'mods', '_README_I_AM_VERY_IMPORTANT.txt'),
     'Do not directly edit the files in this folder, if you want to delete a file or add one, use GDLauncher. \r DO NOT RENAME ANYTHING'
   );
 };
