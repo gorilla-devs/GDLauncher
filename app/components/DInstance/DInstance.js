@@ -329,6 +329,25 @@ export default class DInstance extends Component<Props> {
               !isValid ||
               playing.find(el => el.name === name)
             }
+            data={{ foo: 'bar' }}
+            onClick={() =>
+              history.push({
+                pathname: `/exportPackModal/${name}`,
+                state: { modal: true }
+              })
+            }
+          >
+            <span>
+              <FontAwesomeIcon icon="truck-moving" />
+            </span>{' '}
+            Export
+          </MenuItem>
+          <MenuItem
+            disabled={
+              this.isInstalling() ||
+              !isValid ||
+              playing.find(el => el.name === name)
+            }
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
             <span>

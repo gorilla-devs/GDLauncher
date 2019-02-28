@@ -42,6 +42,9 @@ const CurseModpackExplorerModal = lazy(() =>
   import('./components/CurseModpackExplorerModal/CurseModpackExplorerModal')
 );
 const ImportPack = lazy(() => import('./components/ImportPack/ImportPack'));
+const ExportPackModal = lazy(() =>
+  import('./components/ExportPackModal/ExportPackModal')
+);
 const ChangelogsModal = lazy(() =>
   import('./components/ChangelogModal/ChangelogModal')
 );
@@ -105,7 +108,6 @@ class RouteDef extends Component<Props> {
 
   componentDidUpdate = (prevProps, prevState) => {
     if (this.props.isAuthValid && process.env.NODE_ENV !== 'development') {
-      console.log(this.props.uuid);
       ga(this.props.uuid).set('uid', this.props.uuid);
       ga(this.props.uuid).set('ds', 'app');
       ga(this.props.uuid).set('ua', `${release()} ${arch()}`);
@@ -232,6 +234,12 @@ class RouteDef extends Component<Props> {
         ) : null}
         {isModal ? (
           <Route path="/importPack" component={WaitingComponent(ImportPack)} />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/exportPackModal/:instanceName"
+            component={WaitingComponent(ExportPackModal)}
+          />
         ) : null}
         {isModal ? (
           <Route
