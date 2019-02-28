@@ -5,6 +5,7 @@ import { Button } from 'antd';
 import log from 'electron-log';
 import ReactHtmlParser from 'react-html-parser';
 import ProgressiveImage from 'react-progressive-image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../Common/Modal/Modal';
 import { numberToRoundedWord } from '../../utils/numbers';
 import { CURSEMETA_API_URL } from '../../constants';
@@ -51,12 +52,10 @@ export default props => {
       header="false"
       title="Modpack Explorer"
       backBtn={
-        <Button
-          icon="close"
-          size="small"
-          type="ghost"
-          style={{ position: 'absolute', right: '2%', top: '2%', zIndex: 100 }}
-        />
+        <div className={styles.closeBtn}>
+          <FontAwesomeIcon icon="window-close" />
+        </div>
+
       }
       style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}
     >
@@ -128,8 +127,8 @@ export default props => {
           </div>
         </div>
       ) : (
-        <Loader />
-      )}
+          <Loader />
+        )}
     </Modal>
   );
 };
