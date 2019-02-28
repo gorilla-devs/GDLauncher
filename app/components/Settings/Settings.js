@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../Common/Modal/Modal';
 import styles from './Settings.scss';
 import SideMenu from '../Common/SideMenu/SideMenu';
@@ -8,13 +9,16 @@ import MenuItem from '../Common/SideMenu/MenuItem/MenuItem';
 import Content from './components/Content/Content';
 
 const Settings = ({ match, history }) => {
+
   return (
     <Modal
       history={history}
       header="false"
       style={{ width: '100%', height: '100%', left: '0' }}
       backBtn={
-        <Button icon="close" size="large" type="ghost" style={{ position: 'absolute', right: '5%', top: '5%' }} />
+        <div className={styles.closeBtn}>
+          <FontAwesomeIcon icon="window-close" />
+        </div>
       }
     >
       <div className={styles.container}>
