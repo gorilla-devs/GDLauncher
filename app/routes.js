@@ -104,7 +104,7 @@ class RouteDef extends Component<Props> {
   }
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (this.props.isAuthValid) {
+    if (this.props.isAuthValid && process.env.NODE_ENV !== 'development') {
       console.log(this.props.uuid);
       ga(this.props.uuid).set('uid', this.props.uuid);
       ga(this.props.uuid).set('ds', 'app');
