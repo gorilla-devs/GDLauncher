@@ -44,12 +44,7 @@ const NewUserPage = props => {
         }8A), url(${background})`
       }}
     >
-      <Transition
-        in={mounted}
-        timeout={{ enter: 250, exit: 0 }}
-        appear
-        key="1"
-      >
+      <Transition in={mounted} timeout={{ enter: 250, exit: 0 }} appear key="1">
         {state => (
           <div
             style={{
@@ -84,8 +79,8 @@ const NewUserPage = props => {
                   src="https://discordapp.com/widget?id=398091532881756161&theme=dark"
                   width="350"
                   height="515"
-                  allowtransparency="true"
-                  frameborder="0"
+                  allowTransparency="true"
+                  frameBorder="0"
                 />
               </div>
               <DelayLink

@@ -9,7 +9,6 @@ import MenuItem from '../Common/SideMenu/MenuItem/MenuItem';
 import Content from './components/Content/Content';
 
 const Settings = ({ match, history }) => {
-
   return (
     <Modal
       history={history}
@@ -23,10 +22,24 @@ const Settings = ({ match, history }) => {
     >
       <div className={styles.container}>
         <SideMenu match={match}>
-          <MenuItem active={match.params.page === 'myAccount_Preferences'} to="/settings/myAccount_Preferences">My Account & Preferences</MenuItem>
-          <MenuItem active={match.params.page === 'java'} to="/settings/java">Java</MenuItem>
-          <MenuItem active={match.params.page === 'instances'} to="/settings/instances">Instances</MenuItem>
-          <MenuItem active={match.params.page === 'ui'} to="/settings/ui">User Interface</MenuItem>
+          <MenuItem
+            active={match.params.page === 'myAccount_Preferences'}
+            to="/settings/myAccount_Preferences"
+          >
+            My Account & Preferences
+          </MenuItem>
+          <MenuItem active={match.params.page === 'java'} to="/settings/java">
+            Java
+          </MenuItem>
+          <MenuItem
+            active={match.params.page === 'instances'}
+            to="/settings/instances"
+          >
+            Instances
+          </MenuItem>
+          <MenuItem active={match.params.page === 'ui'} to="/settings/ui">
+            User Interface
+          </MenuItem>
         </SideMenu>
         <Content match={match} />
       </div>

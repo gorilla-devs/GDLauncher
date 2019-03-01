@@ -32,12 +32,13 @@ export const downloadArr = async (
       if (toDownload) {
         try {
           await downloadFileInstance(item.path, item.url);
-        } catch(e) {
+        } catch (e) {
           log.error(e);
         }
       }
       downloaded += 1;
-      if (downloaded % 10 === 0 || downloaded === arr.length) updatePercentage(downloaded);
+      if (downloaded % 10 === 0 || downloaded === arr.length)
+        updatePercentage(downloaded);
     },
     { concurrency: threads }
   );
@@ -58,15 +59,15 @@ const downloadFileInstance = async (filename, url) => {
       `Error while downloading <${url}> to <${filename}> --> ${e.message}`
     );
   }
-}
+};
 
 export const downloadFile = (filename, url, onProgress) => {
   return new Promise(async (resolve, reject) => {
     // Save variable to know progress
-    var received_bytes = 0;
-    var total_bytes = 0;
+    let received_bytes = 0;
+    let total_bytes = 0;
 
-    var req = reqCall({
+    const req = reqCall({
       method: 'GET',
       uri: url
     });

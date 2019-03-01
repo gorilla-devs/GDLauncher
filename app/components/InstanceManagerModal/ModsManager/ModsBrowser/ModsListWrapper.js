@@ -123,7 +123,7 @@ export default function ModsListWrapper({
           ref={ref}
           useIsScrolling
           onItemsRendered={(gridData: Object) => {
-            const useOverscanForLoading = true; //default is true
+            const useOverscanForLoading = true; // default is true
 
             const {
               visibleRowStartIndex,
@@ -150,7 +150,7 @@ export default function ModsListWrapper({
             const visibleStopIndex = endRow * endCol;
 
             onItemsRendered({
-              //call onItemsRendered from InfiniteLoader so it can load more if needed
+              // call onItemsRendered from InfiniteLoader so it can load more if needed
               visibleStartIndex,
               visibleStopIndex
             });

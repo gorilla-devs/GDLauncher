@@ -3,7 +3,7 @@ export const SET_STATE_AWAY = 'SET_STATE_AWAY';
 export const SET_STATE_BUSY = 'SET_STATE_BUSY';
 
 export function setStateToOnline() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch({
       type: SET_STATE_ONLINE
     });
@@ -11,7 +11,7 @@ export function setStateToOnline() {
 }
 
 export function setStateToAway() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch({
       type: SET_STATE_AWAY
     });
@@ -19,7 +19,7 @@ export function setStateToAway() {
 }
 
 export function setStateToBusy() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch({
       type: SET_STATE_BUSY
     });

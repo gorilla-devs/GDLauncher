@@ -54,7 +54,7 @@ class InstanceManagerModal extends Component<Props> {
       const config = await this.readConfig();
       this.setState({
         version: config.version
-      })
+      });
       if (config.icon) {
         const icon = await promisify(fs.readFile)(
           path.join(PACKS_PATH, this.props.match.params.instance, config.icon)

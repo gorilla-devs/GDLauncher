@@ -15,6 +15,7 @@ type Props = {};
 
 export default class Home extends Component<Props> {
   props: Props;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -84,7 +85,9 @@ export default class Home extends Component<Props> {
                       <a href="https://discord.gg/ZxRxPqn">Discord</a>
                     </div>
                     <div className={styles.github}>
-                      <a href="https://github.com/gorilla-devs/GDLauncher">Github</a>
+                      <a href="https://github.com/gorilla-devs/GDLauncher">
+                        Github
+                      </a>
                     </div>
                     <div className={styles.instagram}>
                       <a href="https://instagram.com/gdlauncher">Instagram</a>

@@ -17,12 +17,9 @@ function CurseModpacksBrowser(props) {
   const [filterType, setFilterType] = useState('Featured');
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(
-    () => {
-      loadPacks();
-    },
-    [filterType]
-  );
+  useEffect(() => {
+    loadPacks();
+  }, [filterType]);
 
   const loadPacks = async (reset = true, emptySearch = false) => {
     setLoading(true);
@@ -87,7 +84,6 @@ function CurseModpacksBrowser(props) {
   const onSearchSubmit = async () => {
     loadPacks();
   };
-
 
   if (!loading && packs.length === 0 && searchQuery.length === 0) {
     return (
