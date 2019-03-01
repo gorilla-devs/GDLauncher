@@ -14,7 +14,8 @@ import { findJavaHome } from '../../../../utils/javaHelpers';
 import store from '../../../../localStore';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import SettingInput from '../SettingInput/SettingInput';
-import JavaMemorySlider from './javaMemorySlider';
+import JavaMemorySlider from './JavaMemorySlider';
+import JavaArguments from './JavaArguments';
 import * as SettingsActions from '../../../../actions/settings';
 
 function JavaManager(props) {
@@ -96,6 +97,7 @@ function JavaManager(props) {
         is64bit={is64bit}
         updateMemory={props.setJavaMemory}
       />
+      <JavaArguments/>
     </div>
   );
 }

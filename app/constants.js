@@ -37,6 +37,9 @@ export const NEWS_URL =
   'https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,News/page/1';
 export const JAVA_URL =
   'https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html';
+export const JAVA_WIN = 
+'-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump';
+  
 export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
 export const THEMES = {
