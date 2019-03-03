@@ -9,24 +9,55 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './JavaArguments.scss';
 import Constants from '../../../../constants';
 import { Arg } from '../../../../actions/javaArguments';
-import { DATAPATH } from '../../../../constants';
+import { DATAPATH, WINDOWS } from '../../../../constants';
 
 function JavaArguments(props) {
   const [globalArg, setglobalArg] = useState();
 
+  const dosName =
+  os.release().substr(0, 2) === 10
+    ? '"-Dos.name=Windows 10" -Dos.version=10.0 '
+    : '';
+
+
+  function DefARGFunc(){
+    `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
+    ${
+      os.platform() === WINDOWS
+        ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
+        : ''
+    }
+     -Xms256m -Xmx{_RAM_}m`
+  }
 
   async function readJArgFile() {
     try {
+      //
+      // const StringifedArg = JSON.stringify(props.defaultJArg);
+      // const JArgFile = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), StringifedArg);
+      //
       const JArgFileSec = await promisify(fs.readFile)(path.join(DATAPATH, "java-Arguments.config"));
       setglobalArg(JSON.parse(JArgFileSec));
-      props.Arg(JSON.parse(JArgFileSec));
+      //props.Arg(JSON.parse(JArgFileSec));
     } catch (err) {
-      console.error(err);
+      let defaultARGS = ` -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
+      ${
+        os.platform() === WINDOWS
+          ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
+          : ''
+      }
+       -Xms256m -Xmx{_RAM_}m`;
+       
+      const StringifedArg = JSON.stringify(defaultARGS);
+      const JArgFileTH = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), StringifedArg);
+      const JArgFileSec = await promisify(fs.readFile)(path.join(DATAPATH, "java-Arguments.config"));
+      setglobalArg(JSON.parse(JArgFileSec));
     }
   }
 
   useEffect(() => {
     readJArgFile();
+    
   }, []);
 
   async function submit() {
@@ -36,8 +67,8 @@ function JavaArguments(props) {
       if (globalArg) {
         const StringifedArg = JSON.stringify(globalArg);
         const JArgFile = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), StringifedArg);
+        
       } else message.error("enter valid arguments");
-      setglobalArg(globalArg);
     } catch (err) {
       console.error(err);
     }
@@ -53,6 +84,7 @@ function JavaArguments(props) {
       <div >
         <Input value={globalArg} onChange={(e) => inputFunc(e)} />
         <Button type="primary" onClick={() => submit()}>Set</Button>
+        <Button type="primary">reset</Button>
       </div>
       <hr />
     </div>
@@ -61,7 +93,8 @@ function JavaArguments(props) {
 
 function mapStateToProps(state) {
   return {
-    //arguments: state.javaArguments.arguments
+    //defaultJArg: state.javaArguments.defaultJarguments
+    ram: state.settings.ram
   };
 }
 

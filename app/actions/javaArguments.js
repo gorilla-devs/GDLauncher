@@ -7,13 +7,13 @@ import fs from 'fs';
 import launchCommand from '../utils/MCLaunchCommand';
 import { PACKS_PATH } from '../constants';
 
-export const SET_GLOBALARGUMENTS = 'SET_GLOBALARGUMENTS';
+export const SET_GLOBAL_ARGUMENTS = 'SET_GLOBAL_ARGUMENTS';
 
 export function Arg(args) {
   return dispatch => {
     dispatch({
-      type: SET_GLOBALARGUMENTS,
-      payload: args
+      type: SET_GLOBAL_ARGUMENTS,
+      payload: args,
     });
     console.info("ARGS", args);
   };
