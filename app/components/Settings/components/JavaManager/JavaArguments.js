@@ -61,12 +61,13 @@ function JavaArguments(props) {
   }, []);
 
   async function submit() {
-    props.Arg(globalArg);
+    props.Arg(globalArg.replace('{_RAM_}', props.ram));
     console.log("globalArg", globalArg);
     try {
       if (globalArg) {
         const StringifedArg = JSON.stringify(globalArg);
-        const JArgFile = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), StringifedArg);
+        const JArgFile = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), StringifedArg)
+        
         
       } else message.error("enter valid arguments");
     } catch (err) {
@@ -94,7 +95,7 @@ function JavaArguments(props) {
 function mapStateToProps(state) {
   return {
     //defaultJArg: state.javaArguments.defaultJarguments
-    ram: state.settings.ram
+    ram: state.settings.java.memory
   };
 }
 
