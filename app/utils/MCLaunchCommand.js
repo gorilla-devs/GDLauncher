@@ -3,11 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 import log from 'electron-log';
+import { connect } from 'react-redux';
+import javaArg from '../components/Settings/components/JavaManager/JavaArguments';
 import { findJavaHome } from './javaHelpers';
 import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
-const getStartCommand = async (packName, userData, ram) => {
+const getStartCommand = async (packName, userData, ram, javaArguments) => {
   const instanceConfigJSON = JSON.parse(
     await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
   );
@@ -63,13 +65,8 @@ const getStartCommand = async (packName, userData, ram) => {
   const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 
   const completeCMD = `
-"${javaPath}" -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
-${
-  os.platform() === WINDOWS
-    ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
-    : ''
-}
- -Xms256m -Xmx${ram}m -Djava.library.path="${path.join(
+
+${javaArguments.Jarguments === null && javaArguments.Jarguments === undefined ? javaArguments.Jarguments : javaArguments.defaultJarguments} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
     'natives'
