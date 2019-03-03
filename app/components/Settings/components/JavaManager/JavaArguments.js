@@ -31,15 +31,15 @@ function JavaArguments(props) {
 
   async function submit() {
     props.Arg(globalArg);
-    console.log(globalArg);
+    console.log("globalArg", globalArg);
     try {
-      const JArgFile = await promisify(fs.readFile)(path.join(DATAPATH, "java-Arguments.config"));
-      setglobalArg(globalArg);
-    } catch (err) {
       if (globalArg) {
         const StringifedArg = JSON.stringify(globalArg);
         const JArgFile = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), StringifedArg);
       } else message.error("enter valid arguments");
+      setglobalArg(globalArg);
+    } catch (err) {
+      console.error(err);
     }
 
   }
