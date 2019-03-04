@@ -23,13 +23,11 @@ function JavaArguments(props) {
   async function readJArgFile() {
     console.log("GGGGG", globalArg);
 
-    let defaultARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
-    ${
+    let defaultARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}${
       os.platform() === WINDOWS
         ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
         : ''
-      }
-     -Xms256m -Xmx${props.ram}m`;
+      }-Xms256m -Xmx${props.ram}m`;
 
     if (store.has('settings.settings.javaArg')) {
       const JArgFileSec = store.get('settings.java.javaArg');

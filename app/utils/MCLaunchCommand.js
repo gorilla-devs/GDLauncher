@@ -66,12 +66,12 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
 
   const completeCMD = `
 
-${javaPath} "${javaArguments} -Djava.library.path="${path.join(
+"${javaPath}" ${javaArguments} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
     'natives'
   )}"
- -Dminecraft.client.jar="${path.join(
+  -Dminecraft.client.jar="${path.join(
    INSTANCES_PATH,
    'versions',
    vanillaJSON.id,

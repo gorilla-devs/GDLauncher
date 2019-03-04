@@ -46,7 +46,7 @@ export function startInstance(instanceName) {
       instanceName,
       auth,
       settings.java.memory,
-      settings.java.Jarguments
+      settings.java.javaArg
     );
     const start = spawn(command, [], {
       shell: true,
