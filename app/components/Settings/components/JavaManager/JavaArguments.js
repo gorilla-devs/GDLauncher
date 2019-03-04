@@ -11,6 +11,7 @@ import styles from './JavaArguments.scss';
 import Constants from '../../../../constants';
 import { Arg } from '../../../../actions/settings';
 import { DATAPATH, WINDOWS } from '../../../../constants';
+import ButtonGroup from 'antd/lib/button/button-group';
 
 function JavaArguments(props) {
   const [globalArg, setglobalArg] = useState();
@@ -70,10 +71,13 @@ function JavaArguments(props) {
 
   return (
     <div>
-      <div >
+      <div className={styles.form}>
         <Input value={globalArg} onChange={(e) => inputFunc(e)} />
+        <Button.Group>
         <Button type="primary" onClick={() => submit()}>Set</Button>
         <Button type="primary" onClick={() => reset()}>reset</Button>
+        </Button.Group>
+
       </div>
       <hr />
     </div>
