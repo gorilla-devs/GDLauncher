@@ -16,35 +16,33 @@ function JavaArguments(props) {
   const [globalArg, setglobalArg] = useState();
 
   const dosName =
-  os.release().substr(0, 2) === 10
-    ? '"-Dos.name=Windows 10" -Dos.version=10.0 '
-    : '';
+    os.release().substr(0, 2) === 10
+      ? '"-Dos.name=Windows 10" -Dos.version=10.0 '
+      : '';
 
   async function readJArgFile() {
-    console.log("USEFFECT!!!");
     console.log("GGGGG", globalArg);
 
-    try {
-      const JArgFileSec = store.get('settings.java.javaArg');
-      //const JArgFileSec = await promisify(fs.readFile)(path.join(DATAPATH, "java-Arguments.config"));
-      setglobalArg(JArgFileSec);
-      console.log("JArgFileSec",JArgFileSec);
-      await props.Arg(JArgFileSec.replace('{_RAM_}', props.ram));
-      
-    } catch (err) {
-      let defaultARGS = ` -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
-      ${
-        os.platform() === WINDOWS
-          ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
-          : ''
+    let defaultARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
+    ${
+      os.platform() === WINDOWS
+        ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
+        : ''
       }
-       -Xms256m -Xmx{_RAM_}m`;
-       
-      //const StringifedArg = JSON.stringify(defaultARGS);
-      const JArgFile = await store.set('settings.java.javaArg', defaultARGS);
+     -Xms256m -Xmx${props.ram}m`;
+
+    if (store.has('settings.settings.javaArg')) {
       const JArgFileSec = store.get('settings.java.javaArg');
       setglobalArg(JArgFileSec);
+      props.Arg(JArgFileSec);
+    } else {
+      const JArgFile = store.set('settings.java.javaArg', defaultARGS);
+      const JArgFileSec = store.get('settings.java.javaArg');
+      setglobalArg(JArgFileSec);
+      props.Arg(JArgFileSec);
     }
+
+
   }
 
   useEffect(() => {
@@ -52,16 +50,16 @@ function JavaArguments(props) {
   }, []);
 
   async function submit() {
-    props.Arg(globalArg.replace('{_RAM_}', props.ram));
+    props.Arg(globalArg);
     console.log("globalArg", globalArg);
     try {
-      if (globalArg) {
+      if (store.has('javaArg')) {
         // const StringifedArg = JSON.stringify(globalArg);
         // console.log(typeof(globalArg));
         // console.log(typeof(JSON.stringify(globalArg)));
         const JArgFile = await store.set('settings.java.javaArg', globalArg);
         //const JArgFile = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), globalArg);
-        
+
       } else message.error("enter valid arguments");
     } catch (err) {
       console.error(err);
