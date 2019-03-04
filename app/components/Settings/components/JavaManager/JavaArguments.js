@@ -21,7 +21,6 @@ function JavaArguments(props) {
       : '';
 
   async function readJArgFile() {
-    console.log("GGGGG", globalArg);
 
     let defaultARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}${
       os.platform() === WINDOWS
@@ -29,15 +28,17 @@ function JavaArguments(props) {
         : ''
       }-Xms256m -Xmx${props.ram}m`;
 
-    if (store.has('settings.settings.javaArg')) {
-      const JArgFileSec = store.get('settings.java.javaArg');
-      setglobalArg(JArgFileSec);
-      props.Arg(JArgFileSec);
+    if (store.has('settings.java.javaArg')) {
+        console.log("DIOCAN");
+        const JArgFileSec = store.get('settings.java.javaArg');
+        setglobalArg(JArgFileSec);
+        props.Arg(JArgFileSec);
     } else {
-      const JArgFile = store.set('settings.java.javaArg', defaultARGS);
-      const JArgFileSec = store.get('settings.java.javaArg');
-      setglobalArg(JArgFileSec);
-      props.Arg(JArgFileSec);
+        console.log("DIOPEPPE");
+        const JArgFile = store.set('settings.java.javaArg', defaultARGS);
+        const JArgFileTh = store.get('settings.java.javaArg');
+        setglobalArg(JArgFileTh);
+        props.Arg(JArgFileTh);
     }
 
 
@@ -50,19 +51,9 @@ function JavaArguments(props) {
   async function submit() {
     props.Arg(globalArg);
     console.log("globalArg", globalArg);
-    try {
-      if (store.has('javaArg')) {
-        // const StringifedArg = JSON.stringify(globalArg);
-        // console.log(typeof(globalArg));
-        // console.log(typeof(JSON.stringify(globalArg)));
-        const JArgFile = await store.set('settings.java.javaArg', globalArg);
-        //const JArgFile = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), globalArg);
-
-      } else message.error("enter valid arguments");
-    } catch (err) {
-      console.error(err);
-    }
-
+    if (globalArg) {
+      store.set('settings.java.javaArg', globalArg);
+    } else message.error("enter valid arguments");
   }
 
   function inputFunc(e) {
