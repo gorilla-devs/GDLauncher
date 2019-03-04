@@ -19,6 +19,5 @@ export default history =>
     downloadManager,
     instancesManager,
     news,
-    settings,
-    javaArguments
+    settings
   });

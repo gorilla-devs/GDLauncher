@@ -10,6 +10,7 @@ export const SET_JAVA_PATH = 'SET_JAVA_PATH';
 export const SET_JAVA_MEMORY = 'SET_JAVA_MEMORY';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
+export const SET_GLOBAL_ARGUMENTS = 'SET_GLOBAL_ARGUMENTS';
 
 export function loadSettings() {
   return dispatch => {
@@ -141,3 +142,13 @@ export function applyTheme(theme) {
     }
   };
 }
+
+export function Arg(args) {
+  return dispatch => {
+    dispatch({
+      type: SET_GLOBAL_ARGUMENTS,
+      payload: args,
+    });
+  };
+}
+

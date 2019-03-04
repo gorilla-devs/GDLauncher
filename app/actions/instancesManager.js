@@ -39,14 +39,14 @@ export function selectInstance(name) {
 
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
-    const { auth, settings, javaArguments } = getState();
-    console.log("JAVA-ARGS", javaArguments);
+    const { auth, settings } = getState();
+    console.log("JAVA-ARGS", settings.Jarguments);
 
     const command = await launchCommand(
       instanceName,
       auth,
       settings.java.memory,
-      javaArguments.Jarguments
+      settings.java.Jarguments
     );
     const start = spawn(command, [], {
       shell: true,

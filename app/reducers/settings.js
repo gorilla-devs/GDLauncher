@@ -5,6 +5,7 @@ import {
   SET_JAVA_MEMORY,
   SET_THEME,
   RESET_THEME,
+  SET_GLOBAL_ARGUMENTS
 } from '../actions/settings';
 import { THEMES } from '../constants';
 
@@ -13,7 +14,8 @@ const initialState = {
   java: {
     autodetected: true,
     path: null,
-    memory: 3096
+    memory: 3096,
+    javaArg: null
   },
   theme: THEMES.default
 };
@@ -52,11 +54,19 @@ export default function Settings(state = initialState, action) {
           [action.payload.property]: action.payload.value
         }
       };
-    case RESET_THEME:
+    case `${RESET_THEME}`:
       return {
         ...state,
         theme: action.payload
       };
+    case `${SET_GLOBAL_ARGUMENTS}`:
+    return {
+      ...state,
+      java: {
+        ...state.java,
+        javaArg: action.payload
+      }
+    };
     default:
       return state;
   }
