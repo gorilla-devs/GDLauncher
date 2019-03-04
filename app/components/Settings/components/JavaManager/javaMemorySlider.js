@@ -12,7 +12,7 @@ function javaMemorySlider(props) {
     2048: '2048',
     4096: '4096',
     8192: '8192',
-    16384: '16384',
+    16384: '16384'
   };
 
   return (
@@ -20,22 +20,28 @@ function javaMemorySlider(props) {
       <div className={styles.container}>
         <div>
           <div className={styles.mainText}>
-            Java Memory ({
-              props.is64bit ? '64 bit)' : <span>32 bit)&nbsp;
+            Java Memory (
+            {props.is64bit ? (
+              '64 bit)'
+            ) : (
+              <span>
+                32 bit)&nbsp;
                 <Tooltip
                   placement="right"
                   title="Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used.
-                   If you want more, install or select a 64 bit java executable">
-                  <FontAwesomeIcon className={styles.iconPointer} icon="question-circle" />
+                   If you want more, install or select a 64 bit java executable"
+                >
+                  <FontAwesomeIcon
+                    className={styles.iconPointer}
+                    icon="question-circle"
+                  />
                 </Tooltip>
               </span>
-            }
+            )}
           </div>
           <div className={styles.description}>{description}</div>
         </div>
-        <div className={styles.action}>
-          {memory} MB
-        </div>
+        <div className={styles.action}>{memory} MB</div>
       </div>
       <Slider
         marks={marks}

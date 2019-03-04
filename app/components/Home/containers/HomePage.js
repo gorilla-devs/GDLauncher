@@ -1,6 +1,6 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Home from '../../Home/Home';
+import Home from '../Home';
 import { getNews } from '../../../actions/news';
 import { getVanillaMCVersions, createPack } from '../../../actions/packCreator';
 import { applyTheme } from '../../../actions/settings';
@@ -11,7 +11,7 @@ function mapStateToProps(state) {
     newUser: state.auth.newUser,
     news: state.news,
     packCreationLoading: state.packCreator.loading,
-    versionsManifest: state.packCreator.versionsManifest,
+    versionsManifest: state.packCreator.versionsManifest
   };
 }
 
@@ -20,6 +20,9 @@ const mapDispatchToProps = {
   getNews,
   getVanillaMCVersions,
   createPack
-}
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Home);

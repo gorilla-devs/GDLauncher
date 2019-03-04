@@ -54,7 +54,7 @@ export function startInstance(instanceName) {
     });
     let minutes = 0;
     const timer = setInterval(() => {
-      minutes = minutes + 1;
+      minutes += 1;
     }, 60000);
     start.stdout.on('data', data => {
       console.log(data.toString());

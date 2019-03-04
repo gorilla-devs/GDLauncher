@@ -288,12 +288,14 @@ export function downloadPack(pack) {
     await createDoNotTouchFile(pack);
 
     let modsManifest = [];
+    let modpackVersion = null;
     try {
       const manifest = JSON.parse(
         await promisify(fs.readFile)(
           path.join(INSTANCES_PATH, 'temp', pack, 'manifest.json')
         )
       );
+      modpackVersion = manifest.version;
       const overrideFiles = await promisify(fs.readdir)(
         path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
       );
@@ -347,6 +349,7 @@ export function downloadPack(pack) {
             ? null
             : `forge-${currPack.forgeVersion}`,
         ...(currPack.addonID && { projectID: currPack.addonID }),
+        ...(modpackVersion && { modpackVersion }),
         timePlayed: 0,
         mods: modsManifest
       })

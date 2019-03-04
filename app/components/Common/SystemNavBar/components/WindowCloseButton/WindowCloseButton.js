@@ -15,7 +15,10 @@ export default class WindowCloseButton extends Component<Props> {
     return (
       <div>
         <button className={styles.CloseBtn} onClick={this.closeWindow}>
-          <i className="fas fa-times" style={{ width: '15px', height: '15px' }} />
+          <i
+            className="fas fa-times"
+            style={{ width: '15px', height: '15px' }}
+          />
         </button>
       </div>
     );

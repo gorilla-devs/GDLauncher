@@ -6,12 +6,18 @@ import * as downloadManagerActions from '../../../actions/downloadManager';
 
 function mapStateToProps(state) {
   return {
-    versionsManifest: state.packCreator.versionsManifest,
+    versionsManifest: state.packCreator.versionsManifest
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...packCreatorActions, ...downloadManagerActions }, dispatch);
+  return bindActionCreators(
+    { ...packCreatorActions, ...downloadManagerActions },
+    dispatch
+  );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(InstanceManagerModal);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(InstanceManagerModal);

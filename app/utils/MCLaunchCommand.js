@@ -30,12 +30,7 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
     try {
       forgeJSON = JSON.parse(
         await promisify(fs.readFile)(
-          path.join(
-            META_PATH,
-            'net.minecraftforge',
-            forge,
-            `${forge}.json`
-          )
+          path.join(META_PATH, 'net.minecraftforge', forge, `${forge}.json`)
         )
       );
     } catch {

@@ -9,13 +9,13 @@ import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import _ from 'lodash';
+import { promisify } from 'util';
 import ModsListWrapper from './ModsListWrapper';
 import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
 import { downloadMod, getModMurmurHash2 } from '../../../../utils/mods';
 import ModsListHeader from './ModsListHeader';
-import { promisify } from 'util';
 import ModPage from './ModPage';
 
 import styles from './ModsList.scss';

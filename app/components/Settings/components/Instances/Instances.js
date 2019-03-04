@@ -34,7 +34,7 @@ class Instances extends Component<Props> {
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'temp'));
       await fsa.emptyDir(META_PATH);
       this.setState({ deletingInstances: false });
-      message.success("Data has been cleared.");
+      message.success('Data has been cleared.');
     } catch (e) {
       message.error('Error while clearing data.');
     }
@@ -52,18 +52,18 @@ class Instances extends Component<Props> {
             onClick={this.deleteShareData}
             disabled={this.props.installing !== null}
             loading={this.state.deletingInstances}
-            btnText="Clear" />
+            btnText="Clear"
+          />
         </SettingCard>
       </div>
-    )
+    );
   }
 }
 
 function mapStateToProps(state) {
   return {
-    installing: state.downloadManager.actualDownload,
+    installing: state.downloadManager.actualDownload
   };
 }
-
 
 export default connect(mapStateToProps)(Instances);

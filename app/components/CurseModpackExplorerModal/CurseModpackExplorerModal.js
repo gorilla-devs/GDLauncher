@@ -55,7 +55,6 @@ export default props => {
         <div className={styles.closeBtn}>
           <FontAwesomeIcon icon="window-close" />
         </div>
-
       }
       style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}
     >
@@ -127,8 +126,8 @@ export default props => {
           </div>
         </div>
       ) : (
-          <Loader />
-        )}
+        <Loader />
+      )}
     </Modal>
   );
 };

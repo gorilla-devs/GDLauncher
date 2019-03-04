@@ -11,6 +11,7 @@ type Props = {
 
 export default class Button extends Component<Props> {
   props: Props;
+
   constructor() {
     super();
     this.state = {
@@ -18,13 +19,15 @@ export default class Button extends Component<Props> {
     };
   }
 
-  clicked = (e) => {
+  clicked = e => {
     const X = e.pageX - e.target.getBoundingClientRect().left;
     const Y = e.pageY - e.target.getBoundingClientRect().top;
     const ripplee = [
       <div style={{ top: Y, left: X }} className={styles.ripple} />
     ];
-    this.setState((prevState) => ({ rippleElements: prevState.rippleElements.concat([ripplee]) }));
+    this.setState(prevState => ({
+      rippleElements: prevState.rippleElements.concat([ripplee])
+    }));
     setTimeout(() => {
       // const array = this.state.rippleElements;
       // array.splice(0, 1);
@@ -45,7 +48,6 @@ export default class Button extends Component<Props> {
           {this.props.children}
           {this.state.rippleElements}
         </div>
-
       </div>
     );
   }

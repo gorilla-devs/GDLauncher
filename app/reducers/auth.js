@@ -7,9 +7,8 @@ import {
   AUTH_FAILED,
   AUTH_SUCCESS,
   START_NATIVE_LOADING,
-  STOP_NATIVE_LOADING,
+  STOP_NATIVE_LOADING
 } from '../actions/auth';
-
 
 const initialState = {
   loading: false,
@@ -24,7 +23,7 @@ const initialState = {
   newUser: null,
   legacy: null,
   uuid: null,
-  isAuthValid: false,
+  isAuthValid: false
 };
 
 export default function auth(state = initialState, action) {
