@@ -20,25 +20,26 @@ function JavaArguments(props) {
       ? '"-Dos.name=Windows 10" -Dos.version=10.0 '
       : '';
 
+
+  let defaultARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}${
+    os.platform() === WINDOWS
+      ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
+      : ''
+    }-Xms256m -Xmx${props.ram}m`;
+
   async function readJArgFile() {
 
-    let defaultARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}${
-      os.platform() === WINDOWS
-        ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
-        : ''
-      }-Xms256m -Xmx${props.ram}m`;
-
     if (store.has('settings.java.javaArg')) {
-        console.log("DIOCAN");
-        const JArgFileSec = store.get('settings.java.javaArg');
-        setglobalArg(JArgFileSec);
-        props.Arg(JArgFileSec);
+      console.log("DIOCAN");
+      const JArgFileSec = store.get('settings.java.javaArg');
+      setglobalArg(JArgFileSec);
+      props.Arg(JArgFileSec);
     } else {
-        console.log("DIOPEPPE");
-        const JArgFile = store.set('settings.java.javaArg', defaultARGS);
-        const JArgFileTh = store.get('settings.java.javaArg');
-        setglobalArg(JArgFileTh);
-        props.Arg(JArgFileTh);
+      console.log("DIOPEPPE");
+      const JArgFile = store.set('settings.java.javaArg', defaultARGS);
+      const JArgFileTh = store.get('settings.java.javaArg');
+      setglobalArg(JArgFileTh);
+      props.Arg(JArgFileTh);
     }
 
 
@@ -56,6 +57,13 @@ function JavaArguments(props) {
     } else message.error("enter valid arguments");
   }
 
+  function reset() {
+    const JArgFile = store.set('settings.java.javaArg', defaultARGS);
+    const JArgFileTh = store.get('settings.java.javaArg');
+    setglobalArg(JArgFileTh);
+    props.Arg(JArgFileTh);
+  }
+
   function inputFunc(e) {
     setglobalArg(e.target.value);
   }
@@ -65,7 +73,7 @@ function JavaArguments(props) {
       <div >
         <Input value={globalArg} onChange={(e) => inputFunc(e)} />
         <Button type="primary" onClick={() => submit()}>Set</Button>
-        <Button type="primary">reset</Button>
+        <Button type="primary" onClick={() => reset()}>reset</Button>
       </div>
       <hr />
     </div>
