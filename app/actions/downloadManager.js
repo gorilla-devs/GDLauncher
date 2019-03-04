@@ -13,8 +13,7 @@ import {
   PACKS_PATH,
   INSTANCES_PATH,
   META_PATH,
-  GDL_LEGACYJAVAFIXER_MOD_URL,
-  CURSEMETA_API_URL
+  GDL_LEGACYJAVAFIXER_MOD_URL
 } from '../constants';
 import vCompare from '../utils/versionsCompare';
 import {
@@ -26,6 +25,7 @@ import {
 import { downloadMod, getModsList, createDoNotTouchFile } from '../utils/mods';
 import { arraify } from '../utils/strings';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
+import { getAddonFile, getAddon } from '../utils/cursemeta';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -92,9 +92,7 @@ export function importTwitchProfile(pack, filePath) {
 export function addCursePackToQueue(pack, addonID, fileID) {
   return async (dispatch, getState) => {
     const { downloadManager } = getState();
-    const packURL = (await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${addonID}/file/${fileID}`
-    )).data.downloadUrl;
+    const packURL = (await getAddonFile(addonID, fileID)).downloadUrl;
     const tempPackPath = path.join(
       INSTANCES_PATH,
       'temp',
@@ -268,11 +266,8 @@ export function downloadPack(pack) {
     let thumbnailURL = null;
 
     if (currPack.addonID) {
-      const addonRequest = await axios.get(
-        `${CURSEMETA_API_URL}/direct/addon/${currPack.addonID}`
-      );
-
-      thumbnailURL = addonRequest.data.attachments[0].thumbnailUrl;
+      const addonRequest = await getAddon(currPack.addonID);
+      thumbnailURL = addonRequest.attachments[0].thumbnailUrl;
     }
 
     // We download the legacy java fixer if needed

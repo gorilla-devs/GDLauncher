@@ -16,7 +16,7 @@ import vanillaCover from '../../../assets/images/minecraft_vanilla_cover.jpg';
 import forgeIcon from '../../../assets/images/forge_icon.jpg';
 
 import styles from './SideBar.scss';
-import { PACKS_PATH, CURSEMETA_API_URL } from '../../../constants';
+import { PACKS_PATH } from '../../../constants';
 
 import * as AuthActions from '../../../actions/auth';
 import * as ProfileActions from '../../../actions/profile';

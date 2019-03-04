@@ -11,7 +11,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Promise from 'bluebird';
 import BackButton from './BackButton';
 import styles from './ExportPackModal.scss';
-import { PACKS_PATH, CURSEMETA_API_URL } from '../../constants';
+import { PACKS_PATH } from '../../constants';
+import { getAddon } from '../../utils/cursemeta';
 
 const ThirdStep = props => {
   const [isCompleted, setIsCompleted] = useState(false);
@@ -67,9 +68,7 @@ const ThirdStep = props => {
     let data = null;
 
     if (config.projectID) {
-      data = await axios.get(
-        `${CURSEMETA_API_URL}/direct/addon/${config.projectID}`
-      );
+      data = await getAddon(config.projectID);
     }
 
     return JSON.stringify({

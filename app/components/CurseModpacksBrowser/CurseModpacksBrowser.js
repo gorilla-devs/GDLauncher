@@ -6,10 +6,10 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { List, Avatar, Button, Input, Select, Icon } from 'antd';
-import { CURSEMETA_API_URL } from '../../constants';
 import { numberToRoundedWord } from '../../utils/numbers';
 import * as downloadManagerActions from '../../actions/downloadManager';
 import styles from './CurseModpacksBrowser.scss';
+import { getSearch } from '../../utils/cursemeta';
 
 function CurseModpacksBrowser(props) {
   const [packs, setPacks] = useState([]);
@@ -30,16 +30,16 @@ function CurseModpacksBrowser(props) {
     if (reset === true) setPacks(loadingArr);
     else setPacks(packs => packs.concat(loadingArr));
 
-    const res = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=15&index=${
-        reset === true ? 0 : packs.length
-      }&sort=${filterType}&searchFilter=${
-        emptySearch === true ? '' : encodeURI(searchQuery)
-      }&categoryId=0&sectionId=4471&sortDescending=${filterType !== 'author' &&
-        filterType !== 'name'}`
+    const res = await getSearch(
+      'modpacks',
+      emptySearch === true ? '' : encodeURI(searchQuery),
+      15,
+      reset === true ? 0 : packs.length,
+      filterType,
+      filterType !== 'author' && filterType !== 'name'
     );
     // We now remove the previous 15 elements and add the real 15
-    const mappedData = res.data.map(v => ({
+    const mappedData = res.map(v => ({
       loading: false,
       name: v.name,
       id: v.id,
