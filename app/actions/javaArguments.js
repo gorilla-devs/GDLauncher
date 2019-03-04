@@ -15,7 +15,6 @@ export function Arg(args) {
       type: SET_GLOBAL_ARGUMENTS,
       payload: args,
     });
-    console.info("ARGS", args);
   };
 }
 

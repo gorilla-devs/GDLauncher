@@ -66,8 +66,7 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
 
   const completeCMD = `
 
-  
-${javaPath} "${javaArguments.Jarguments =! null ? javaArguments.Jarguments : javaArguments.defaultJarguments} -Djava.library.path="${path.join(
+${javaPath} "${javaArguments} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
     'natives'

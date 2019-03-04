@@ -32,13 +32,10 @@ function JavaArguments(props) {
 
   async function readJArgFile() {
     try {
-      //
-      // const StringifedArg = JSON.stringify(props.defaultJArg);
-      // const JArgFile = await promisify(fs.writeFile)(path.join(DATAPATH, "java-Arguments.config"), StringifedArg);
-      //
+      props.Arg(globalArg.replace('{_RAM_}', props.ram));
       const JArgFileSec = await promisify(fs.readFile)(path.join(DATAPATH, "java-Arguments.config"));
       setglobalArg(JSON.parse(JArgFileSec));
-      //props.Arg(JSON.parse(JArgFileSec));
+      
     } catch (err) {
       let defaultARGS = ` -Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}
       ${
