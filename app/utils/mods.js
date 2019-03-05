@@ -111,7 +111,7 @@ export const getModsList = async (
         log.error(e);
       }
     },
-    { concurrency: 4 }
+    { concurrency: 20 }
   );
   return mods;
 };
