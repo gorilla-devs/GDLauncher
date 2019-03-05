@@ -7,11 +7,9 @@ import store from '../../../../localStore';
 import { promisify } from 'util';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import styles from './JavaArguments.scss';
 import Constants from '../../../../constants';
 import { Arg } from '../../../../actions/settings';
 import { DATAPATH, WINDOWS } from '../../../../constants';
-import ButtonGroup from 'antd/lib/button/button-group';
 
 function JavaArguments(props) {
   const [globalArg, setglobalArg] = useState();
@@ -31,12 +29,10 @@ function JavaArguments(props) {
   async function readJArgFile() {
 
     if (store.has('settings.java.javaArg')) {
-      console.log("DIOCAN");
       const JArgFileSec = store.get('settings.java.javaArg');
       setglobalArg(JArgFileSec);
       props.Arg(JArgFileSec);
     } else {
-      console.log("DIOPEPPE");
       const JArgFile = store.set('settings.java.javaArg', defaultARGS);
       const JArgFileTh = store.get('settings.java.javaArg');
       setglobalArg(JArgFileTh);
@@ -52,7 +48,6 @@ function JavaArguments(props) {
 
   async function submit() {
     props.Arg(globalArg);
-    console.log("globalArg", globalArg);
     if (globalArg) {
       store.set('settings.java.javaArg', globalArg);
     } else message.error("enter valid arguments");
@@ -71,13 +66,15 @@ function JavaArguments(props) {
 
   return (
     <div>
-      <div className={styles.form}>
-        <Input value={globalArg} onChange={(e) => inputFunc(e)} />
+      <div style={{ display: 'inline' }}>
+        <Input value={globalArg} style={{
+          maxWidth: '75%',
+          marginRight: '15px !important'
+        }} onChange={(e) => inputFunc(e)} />
         <Button.Group>
-        <Button type="primary" onClick={() => submit()}>Set</Button>
-        <Button type="primary" onClick={() => reset()}>reset</Button>
+          <Button type="primary" onClick={() => submit()}>Set</Button>
+          <Button type="primary" onClick={() => reset()}>reset</Button>
         </Button.Group>
-
       </div>
       <hr />
     </div>
@@ -86,7 +83,6 @@ function JavaArguments(props) {
 
 function mapStateToProps(state) {
   return {
-    //defaultJArg: state.javaArguments.defaultJarguments
     ram: state.settings.java.memory
   };
 }

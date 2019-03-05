@@ -1,1 +1,10 @@
 @import '../../../../style/theme/index';
+
+.form{
+  display: inline;
+}
+
+Input{
+  max-width: 75%;
+  margin-right: 15px !important;
+}
