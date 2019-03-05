@@ -14,7 +14,7 @@ import { findJavaHome } from '../../../../utils/javaHelpers';
 import store from '../../../../localStore';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import SettingInput from '../SettingInput/SettingInput';
-import JavaMemorySlider from './JavaMemorySlider';
+import JavaMemorySlider from './javaMemorySlider';
 import JavaArguments from './JavaArguments';
 import * as SettingsActions from '../../../../actions/settings';
 
