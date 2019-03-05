@@ -6,6 +6,7 @@ import log from 'electron-log';
 import ReactHtmlParser from 'react-html-parser';
 import ProgressiveImage from 'react-progressive-image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../Common/Modal/Modal';
 import { numberToRoundedWord } from '../../utils/numbers';
 import { useGetAddon } from '../../hooks/cursemeta';
@@ -44,7 +45,7 @@ export default props => {
       title="Modpack Explorer"
       backBtn={
         <div className={styles.closeBtn}>
-          <FontAwesomeIcon icon="window-close" />
+          <FontAwesomeIcon icon={faWindowClose} />
         </div>
       }
       style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}

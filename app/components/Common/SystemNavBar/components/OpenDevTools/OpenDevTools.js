@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { ipcRenderer } from 'electron';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTerminal } from '@fortawesome/free-solid-svg-icons';
 import styles from './OpenDevTools.scss';
 
 type Props = {};
@@ -15,8 +17,8 @@ export default class WindowCloseButton extends Component<Props> {
     return (
       <div>
         <button className={styles.OpenDevTools} onClick={this.OpenDevTools}>
-          <i
-            className="fas fa-terminal"
+          <FontAwesomeIcon
+            icon={faTerminal}
             style={{ width: '15px', height: '15px' }}
           />
         </button>

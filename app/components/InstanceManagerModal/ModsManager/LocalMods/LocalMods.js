@@ -7,6 +7,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import fs from 'fs';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import { promisify } from 'util';
 import { Button, Input, Checkbox, Switch } from 'antd';
@@ -48,12 +49,12 @@ const LocalMods = props => {
         <div>
           <FontAwesomeIcon
             className={styles.editIcon}
-            icon="edit"
+            icon={faEdit}
             onClick={() => toggleSize(index)}
           />
           <FontAwesomeIcon
             className={styles.deleteIcon}
-            icon="trash"
+            icon={faTrash}
             onClick={() => deleteMod(index)}
           />
         </div>
@@ -200,7 +201,7 @@ const LocalMods = props => {
             }}
           />
           {filteredMods.filter(v => v.selected === true).length} mods selected
-          <FontAwesomeIcon className={styles.deleteIcon} icon="trash" />
+          <FontAwesomeIcon className={styles.deleteIcon} icon={faTrash} />
         </div>
         <Input
           allowClear
@@ -228,7 +229,7 @@ const LocalMods = props => {
             }}
             replace
           >
-            <FontAwesomeIcon className={styles.plusIcon} icon="plus" />
+            <FontAwesomeIcon className={styles.plusIcon} icon={faPlus} />
           </Link>
         </div>
       </div>

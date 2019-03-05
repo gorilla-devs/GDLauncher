@@ -5,10 +5,7 @@ import { CURSEMETA_API_URL } from '../constants';
 
 const makeRequest = async (url, params = null) => {
   const requestPayload = {
-    params,
-    headers: {
-      'User-Agent': 'GDLauncher'
-    }
+    params
   };
   try {
     const response = await axios.get(url, requestPayload);

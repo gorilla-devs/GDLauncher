@@ -9,6 +9,7 @@ import _ from 'lodash';
 import { promisify } from 'util';
 import log from 'electron-log';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import styles from './InstanceManagerModal.scss';
 import { PACKS_PATH } from '../../constants';
 import Modal from '../Common/Modal/Modal';
@@ -166,7 +167,7 @@ class InstanceManagerModal extends Component<Props> {
               {this.state.instanceIcon !== InstanceIcon && (
                 <FontAwesomeIcon
                   onClick={this.removeInstanceIcon}
-                  icon="window-close"
+                  icon={faWindowClose}
                   className={styles.resetIcon}
                 />
               )}

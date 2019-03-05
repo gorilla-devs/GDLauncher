@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { remote } from 'electron';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWindowMaximize } from '@fortawesome/free-solid-svg-icons';
 import styles from './WindowMinimizeButton.scss';
 
 type Props = {};
@@ -20,8 +22,8 @@ export default class WindowMinimizeButton extends Component<Props> {
     return (
       <div>
         <button className={styles.CloseBtn} onClick={this.MinMaxWindow}>
-          <i
-            className="far fa-window-maximize"
+          <FontAwesomeIcon
+            icon={faWindowMaximize}
             style={{ width: '15px', height: '15px' }}
           />
         </button>

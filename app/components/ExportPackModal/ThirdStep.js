@@ -8,6 +8,7 @@ import path from 'path';
 import axios from 'axios';
 import { promisify } from 'util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import Promise from 'bluebird';
 import BackButton from './BackButton';
 import styles from './ExportPackModal.scss';
@@ -101,7 +102,7 @@ const ThirdStep = props => {
           <div>
             <h2>
               All Done!{' '}
-              <FontAwesomeIcon icon="check" style={{ color: '#27ae60' }} />
+              <FontAwesomeIcon icon={faCheck} style={{ color: '#27ae60' }} />
             </h2>
             <Button type="primary" onClick={() => props.setUnMount(true)}>
               Go Back To Instances

@@ -5,6 +5,7 @@ import ContentLoader from 'react-content-loader';
 import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
 import Promise from 'bluebird';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { promisify } from 'util';
@@ -100,7 +101,7 @@ function ModPage(props) {
       }}
     >
       <div className={styles.backBtn} onClick={props.goBack}>
-        <FontAwesomeIcon icon="chevron-left" />
+        <FontAwesomeIcon icon={faChevronLeft} />
       </div>
       {!modData ? (
         <AutoSizer>
