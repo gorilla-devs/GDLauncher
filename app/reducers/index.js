@@ -8,7 +8,6 @@ import downloadManager from './downloadManager';
 import instancesManager from './instancesManager';
 import news from './news';
 import settings from './settings';
-import javaArguments from './javaArguments';
 
 export default history =>
   combineReducers({
