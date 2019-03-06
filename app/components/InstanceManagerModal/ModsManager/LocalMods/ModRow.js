@@ -1,3 +1,5 @@
+// @flow
+
 import React from 'react';
 import fs from 'fs';
 import path from 'path';
@@ -9,6 +11,15 @@ import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
 
+type Props = {
+  index: number,
+  style: {},
+  toggleSize: () => mixed,
+  filteredMods: [],
+  setFilteredMods: () => mixed,
+  instance: string
+};
+
 export default ({
   index,
   style,
@@ -16,7 +27,7 @@ export default ({
   filteredMods,
   setFilteredMods,
   instance
-}) => {
+}: Props) => {
   const modsFolder = path.join(PACKS_PATH, instance, 'mods');
   const selectMod = i => {
     const newMods = Object.assign([...filteredMods], {
@@ -53,7 +64,7 @@ export default ({
         path.join(modsFolder, filteredMods[index].name.replace('.disabled', ''))
       );
     } else {
-      await fs.renameAsync(
+      await promisify(fs.rename)(
         path.join(modsFolder, filteredMods[index].name),
         path.join(modsFolder, `${filteredMods[index].name}.disabled`)
       );
