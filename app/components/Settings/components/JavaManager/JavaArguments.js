@@ -69,7 +69,7 @@ function JavaArguments(props) {
       <div style={{ display: 'inline' }}>
         <Input value={globalArg} style={{
           maxWidth: '75%',
-          marginRight: '15px !important'
+          marginRight: '15px'
         }} onChange={(e) => inputFunc(e)} />
         <Button.Group>
           <Button type="primary" onClick={() => submit()}>Set</Button>
