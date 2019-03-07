@@ -29,14 +29,14 @@ function JavaArguments(props) {
   async function readJArgFile() {
 
     if (store.has('settings.java.javaArg')) {
-      const JArgFileSec = store.get('settings.java.javaArg');
-      setglobalArg(JArgFileSec);
-      props.Arg(JArgFileSec);
+      const JavaArgumentsStoreSec = store.get('settings.java.javaArg');
+      setglobalArg(JavaArgumentsStoreSec);
+      props.Arg(JavaArgumentsStoreSec);
     } else {
-      const JArgFile = store.set('settings.java.javaArg', defaultARGS);
-      const JArgFileTh = store.get('settings.java.javaArg');
-      setglobalArg(JArgFileTh);
-      props.Arg(JArgFileTh);
+      const JavaArgumentsStore = store.set('settings.java.javaArg', defaultARGS);
+      const JavaArgumentsStoreTh = store.get('settings.java.javaArg');
+      setglobalArg(JavaArgumentsStoreTh);
+      props.Arg(JavaArgumentsStoreTh);
     }
 
 
@@ -54,10 +54,10 @@ function JavaArguments(props) {
   }
 
   function reset() {
-    const JArgFile = store.set('settings.java.javaArg', defaultARGS);
-    const JArgFileTh = store.get('settings.java.javaArg');
-    setglobalArg(JArgFileTh);
-    props.Arg(JArgFileTh);
+    const JavaArgumentsStore = store.set('settings.java.javaArg', defaultARGS);
+    const JavaArgumentsStoreTh = store.get('settings.java.javaArg');
+    setglobalArg(JavaArgumentsStoreTh);
+    props.Arg(JavaArgumentsStoreTh);
   }
 
   function inputFunc(e) {
