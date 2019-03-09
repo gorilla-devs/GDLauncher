@@ -21,6 +21,8 @@ function Instances(props) {
   const [instanceConfig, setInstanceConfig] = useState(null);
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
+  const [globalArg, setglobalArg] = useState();
+  const [OverArgs, setOverArgs] = useState();
 
   async function ReadConfig(){
     try {
@@ -77,8 +79,15 @@ function Instances(props) {
   };
 
   function OverrideArgs() {
-
+    setOverArgs(globalArg);
+    console.log(globalArg);
   }
+
+  function inputFunc(e) {
+    setglobalArg(e.target.value);
+    console.log(globalArg);
+  }
+
 
   const { getFieldDecorator } = props.form;
   return (
@@ -153,10 +162,9 @@ function Instances(props) {
       </Card>
 
       <Card style={{ marginTop: 15, maxHeight: 150 }} title="Override global java arguments">
-        <div style={{ display: 'inline' }}>
-          <Input className={styles.JavaArginput} />
-          <Button type="primary" >Set</Button>
-          <Switch className={styles.JavaArgswitch} onChange={() => OverrideArgs()} ></Switch>
+        <div style={{ display: 'inline'}}>
+          <Input className={styles.JavaArginput} onChange={(e) => inputFunc(e)}/>
+          <Switch className={styles.JavaArgswitch} onChange={() => OverrideArgs()}></Switch>
         </div>
       </Card>
 
