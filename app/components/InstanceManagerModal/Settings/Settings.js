@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { routerActions } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import { Form, Input, Icon, Button, message } from 'antd';
+import { Form, Input, Icon, Button, message, Switch } from 'antd';
 import path from 'path';
 import { promisify } from 'util';
 import fs from 'fs';
@@ -154,10 +154,8 @@ class Instances extends Component<Props> {
         <Card style={{ marginTop: 15, maxHeight: 150 }} title="Override global java arguments">
           <div style={{ display: 'inline' }}>
             <Input className={styles.JavaArginput}/>
-            <Button.Group>
               <Button type="primary" >Set</Button>
-              <Button type="primary" >reset</Button>
-            </Button.Group>
+              <Switch className={styles.JavaArgswitch}></Switch>
           </div>
         </Card>
 
