@@ -4,17 +4,17 @@ import { promisify } from 'util';
 import axios from 'axios';
 import makeDir from 'make-dir';
 import fse from 'fs-extra';
+import dirTree from 'directory-tree';
 import log from 'electron-log';
 import Promise from 'bluebird';
-import fs from 'fs';
+import fs, { readdir } from 'fs';
 import compressing from 'compressing';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import {
   PACKS_PATH,
   INSTANCES_PATH,
   META_PATH,
-  GDL_LEGACYJAVAFIXER_MOD_URL,
-  CURSEMETA_API_URL
+  GDL_LEGACYJAVAFIXER_MOD_URL
 } from '../constants';
 import vCompare from '../utils/versionsCompare';
 import {
@@ -26,6 +26,7 @@ import {
 import { downloadMod, getModsList, createDoNotTouchFile } from '../utils/mods';
 import { arraify } from '../utils/strings';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
+import { getAddonFile, getAddon } from '../utils/cursemeta';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -92,9 +93,7 @@ export function importTwitchProfile(pack, filePath) {
 export function addCursePackToQueue(pack, addonID, fileID) {
   return async (dispatch, getState) => {
     const { downloadManager } = getState();
-    const packURL = (await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${addonID}/file/${fileID}`
-    )).data.downloadUrl;
+    const packURL = (await getAddonFile(addonID, fileID)).downloadUrl;
     const tempPackPath = path.join(
       INSTANCES_PATH,
       'temp',
@@ -268,11 +267,8 @@ export function downloadPack(pack) {
     let thumbnailURL = null;
 
     if (currPack.addonID) {
-      const addonRequest = await axios.get(
-        `${CURSEMETA_API_URL}/direct/addon/${currPack.addonID}`
-      );
-
-      thumbnailURL = addonRequest.data.attachments[0].thumbnailUrl;
+      const addonRequest = await getAddon(currPack.addonID);
+      thumbnailURL = addonRequest.attachments[0].thumbnailUrl;
     }
 
     // We download the legacy java fixer if needed
@@ -288,6 +284,7 @@ export function downloadPack(pack) {
     await createDoNotTouchFile(pack);
 
     let modsManifest = [];
+    let overrideFilesList = [];
     let modpackVersion = null;
     try {
       const manifest = JSON.parse(
@@ -296,6 +293,30 @@ export function downloadPack(pack) {
         )
       );
       modpackVersion = manifest.version;
+
+      // Read every single file in the overrides folder
+      const rreaddir = async (dir, allFiles = []) => {
+        const files = (await promisify(readdir)(dir)).map(f =>
+          path.join(dir, f)
+        );
+        allFiles.push(...files);
+        await Promise.all(
+          files.map(
+            async f =>
+              (await promisify(fs.stat)(f)).isDirectory() &&
+              rreaddir(f, allFiles)
+          )
+        );
+        return allFiles;
+      };
+
+      overrideFilesList = (await rreaddir(
+        path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
+      )).map(f =>
+        f.replace(path.join(INSTANCES_PATH, 'temp', pack, 'overrides'), '')
+      );
+
+      // Moves all the files inside the overrides folder to the instance folder
       const overrideFiles = await promisify(fs.readdir)(
         path.join(INSTANCES_PATH, 'temp', pack, 'overrides')
       );
@@ -309,6 +330,7 @@ export function downloadPack(pack) {
         })
       );
 
+      // Finally removes the entire temp folder
       await fse.remove(path.join(INSTANCES_PATH, 'temp'));
 
       let modsDownloaded = 0;
@@ -351,7 +373,8 @@ export function downloadPack(pack) {
         ...(currPack.addonID && { projectID: currPack.addonID }),
         ...(modpackVersion && { modpackVersion }),
         timePlayed: 0,
-        mods: modsManifest
+        mods: modsManifest,
+        overrideFiles: overrideFilesList
       })
     );
 

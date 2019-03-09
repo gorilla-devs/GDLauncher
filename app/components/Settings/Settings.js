@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../Common/Modal/Modal';
 import styles from './Settings.scss';
 import SideMenu from '../Common/SideMenu/SideMenu';
@@ -16,7 +17,7 @@ const Settings = ({ match, history }) => {
       style={{ width: '100%', height: '100%', left: '0' }}
       backBtn={
         <div className={styles.closeBtn}>
-          <FontAwesomeIcon icon="window-close" />
+          <FontAwesomeIcon icon={faWindowClose} />
         </div>
       }
     >

@@ -32,7 +32,6 @@ export function getNews() {
         dispatch({ type: UPDATE_NEWS, payload: newsArr.splice(0, 12) });
       } catch (err) {
         log.error(err.message);
-        message.warning('There was an error while updating the news.');
       } finally {
         dispatch({
           type: STOP_LOADING_NEWS

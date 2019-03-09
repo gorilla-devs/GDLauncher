@@ -1,10 +1,19 @@
+// @flow
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import styles from './Modal.scss';
 
-type Props = {};
+type Props = {
+  history: any,
+  style: {},
+  header: boolean,
+  title: string,
+  backBtn: React.ReactNode,
+  children: React.ReactNode
+};
 
 export default class Modal extends Component<Props> {
   props: Props;
@@ -114,7 +123,7 @@ export default class Modal extends Component<Props> {
                 {this.props.title || 'Modal'}
               </h3>
               <div className={styles.closeBtn} onClick={this.back}>
-                <FontAwesomeIcon icon="window-close" />
+                <FontAwesomeIcon icon={faWindowClose} />
               </div>
             </div>
           )}

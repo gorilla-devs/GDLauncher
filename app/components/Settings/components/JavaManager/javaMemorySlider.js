@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Icon, Slider, Tooltip } from 'antd';
 import os from 'os';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import styles from './javaMemorySlider.scss';
 
 function javaMemorySlider(props) {
@@ -33,7 +34,7 @@ function javaMemorySlider(props) {
                 >
                   <FontAwesomeIcon
                     className={styles.iconPointer}
-                    icon="question-circle"
+                    icon={faQuestionCircle}
                   />
                 </Tooltip>
               </span>

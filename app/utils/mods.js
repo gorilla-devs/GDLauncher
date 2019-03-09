@@ -8,7 +8,8 @@ import log from 'electron-log';
 import murmur from 'murmurhash-js';
 import { downloadFile } from './downloader';
 import { bin2string, isWhitespaceCharacter } from './strings';
-import { CURSEMETA_API_URL, PACKS_PATH } from '../constants';
+import { PACKS_PATH } from '../constants';
+import { getAddonFile, getAddonFiles } from './cursemeta';
 
 // Downloads a specific mod from curse using the addonID and fileID
 export const downloadMod = async (
@@ -21,9 +22,7 @@ export const downloadMod = async (
   // The name of the instance where to save this mod
   instanceName
 ) => {
-  const { data } = await axios.get(
-    `${CURSEMETA_API_URL}/direct/addon/${modId}/file/${projectFileId}`
-  );
+  const data = await getAddonFile(modId, projectFileId);
   const validatedFileName = filename !== null ? filename : data.fileNameOnDisk;
   const sanitizedFileName = validatedFileName.includes('.jar')
     ? validatedFileName
@@ -49,9 +48,7 @@ export const downloadDependancies = async (
   // The name of the instance where to save the dependancies
   instanceName
 ) => {
-  const { data } = await axios.get(
-    `${CURSEMETA_API_URL}/direct/addon/${modId}/file/${projectFileId}`
-  );
+  const data = await getAddonFile(modId, projectFileId);
 
   let deps = [];
   if (data.dependencies.length !== 0) {
@@ -74,9 +71,7 @@ export const downloadDependancies = async (
             toDownload = true;
           }
           if (toDownload) {
-            const depData = await axios.get(
-              `${CURSEMETA_API_URL}/direct/addon/${dep.addonId}/files`
-            );
+            const depData = await getAddonFiles(dep.addonId);
             const { id, fileNameOnDisk } = depData.data
               .reverse()
               .find(n => n.gameVersion[0] === gameVersion);
@@ -107,11 +102,7 @@ export const getModsList = async (
     modsArr,
     async mod => {
       try {
-        const { data } = await axios.get(
-          `${CURSEMETA_API_URL}/direct/addon/${mod.projectID}/file/${
-            mod.fileID
-          }`
-        );
+        const { data } = await getAddonFile(mod.projectID, mod.fileID);
         return {
           path: path.join(PACKS_PATH, packName, 'mods', data.fileNameOnDisk),
           url: data.downloadUrl
@@ -120,7 +111,7 @@ export const getModsList = async (
         log.error(e);
       }
     },
-    { concurrency: 4 }
+    { concurrency: 20 }
   );
   return mods;
 };
