@@ -81,7 +81,7 @@ class Instances extends Component<Props> {
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
-      <div>
+      <div className={styles.container}>
         <h2>Edit Instance Settings</h2>
         <Form layout="inline" onSubmit={this.handleSubmit}>
           <div>
@@ -150,6 +150,17 @@ class Instances extends Component<Props> {
             />
           ) : null}
         </Card>
+
+        <Card style={{ marginTop: 15, maxHeight: 150 }} title="Override global java arguments">
+          <div style={{ display: 'inline' }}>
+            <Input className={styles.JavaArginput}/>
+            <Button.Group>
+              <Button type="primary" >Set</Button>
+              <Button type="primary" >reset</Button>
+            </Button.Group>
+          </div>
+        </Card>
+
       </div>
     );
   }
