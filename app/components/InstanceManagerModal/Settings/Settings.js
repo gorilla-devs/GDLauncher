@@ -81,7 +81,7 @@ class Instances extends Component<Props> {
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
-      <div className={styles.container}>
+      <div>
         <h2>Edit Instance Settings</h2>
         <Form layout="inline" onSubmit={this.handleSubmit}>
           <div>
