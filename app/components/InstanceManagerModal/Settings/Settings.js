@@ -22,7 +22,7 @@ function Instances(props) {
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
   const [globalArg, setglobalArg] = useState();
-  const [OverArgs, setOverArgs] = useState();
+  const [OverArgs, setOverArgs] = useState(true);
 
   async function ReadConfig(){
     try {
@@ -79,8 +79,8 @@ function Instances(props) {
   };
 
   function OverrideArgs() {
-    setOverArgs(globalArg);
-    console.log(globalArg);
+    setOverArgs(!OverArgs);
+    console.log(OverArgs);
   }
 
   function inputFunc(e) {
