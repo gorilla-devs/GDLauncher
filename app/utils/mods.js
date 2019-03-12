@@ -30,7 +30,7 @@ export const downloadMod = async (
   await downloadFile(
     path.join(PACKS_PATH, instanceName, 'mods', sanitizedFileName),
     data.downloadUrl,
-    () => {}
+    () => { }
   );
   return {
     projectID: modId,
@@ -72,16 +72,18 @@ export const downloadDependancies = async (
           }
           if (toDownload) {
             const depData = await getAddonFiles(dep.addonId);
-            const { id, fileNameOnDisk } = depData.data
+            const { id, fileNameOnDisk } = depData
               .reverse()
-              .find(n => n.gameVersion[0] === gameVersion);
+              .find(n => n.gameVersion.includes(gameVersion));
             const downloadedDep = await downloadMod(
               dep.addonId,
               id,
               fileNameOnDisk,
               instanceName
             );
-            deps = deps.concat(downloadedDep);
+            const nestedDeps = await downloadDependancies(dep.addonId, id, instanceName);
+            deps = deps.concat(downloadedDep).concat(nestedDeps);
+
           }
         }
       })
