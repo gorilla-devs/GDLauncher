@@ -18,14 +18,14 @@ export function getNews() {
       try {
         const res = await axios.get(NEWS_URL);
         const newsArr = await Promise.all(
-          res.data.result.map(async item => {
+          res.data.article_grid.map(async item => {
             return {
               title: item.default_tile.title,
               description: item.default_tile.sub_header,
               // We need to get the header image of every article, since
               // the ones present in this json are thumbnails
-              image: await getArticleHeaderImage(item.url),
-              url: `https://minecraft.net${item.url}`
+              image: await getArticleHeaderImage(item.article_url),
+              url: `https://minecraft.net${item.article_url}`
             };
           })
         );
