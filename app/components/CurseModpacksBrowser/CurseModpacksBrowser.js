@@ -32,7 +32,7 @@ function CurseModpacksBrowser(props) {
 
     const res = await getSearch(
       'modpacks',
-      emptySearch === true ? '' : encodeURI(searchQuery),
+      emptySearch === true ? '' : searchQuery,
       15,
       reset === true ? 0 : packs.length,
       filterType,

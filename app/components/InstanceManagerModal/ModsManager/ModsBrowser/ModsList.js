@@ -57,7 +57,7 @@ const ModsList = props => {
     setAreModsLoading(true);
     const data = await getSearch(
       'mods',
-      encodeURI(searchQueryP),
+      searchQueryP,
       21,
       reset === true ? 0 : mods.length,
       filterType,
