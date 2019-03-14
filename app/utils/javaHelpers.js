@@ -27,7 +27,6 @@ export const findJavaHome = async () => {
       return stdout.split('\n')[0];
     } catch (e) {
       log.info(`Could not find java path: ${e.message}`);
-      message.error('Could not find the java path. Unlucky...');
       return null;
     }
   }

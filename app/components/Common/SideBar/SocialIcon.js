@@ -10,7 +10,7 @@ export default props => {
       rel="noopener noreferrer"
       className={styles.socialBtn}
     >
-      <FontAwesomeIcon icon={['fab', props.icon]} />
+      <FontAwesomeIcon icon={props.icon} />
     </a>
   );
 };

@@ -6,10 +6,11 @@ import _ from 'lodash';
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
-import { CURSEMETA_API_URL, PACKS_PATH } from '../../constants';
+import { PACKS_PATH } from '../../constants';
 import styles from './CurseModpackBrowserCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
 import { addCursePackToQueue } from '../../actions/downloadManager';
+import { getAddonFiles, getAddon } from '../../utils/cursemeta';
 
 type Props = {
   forgeManifest: Array,
@@ -28,14 +29,11 @@ const CurseModpackBrowserCreatorModal = props => {
   const [instanceName, setInstanceName] = useState('');
 
   const getModPackData = async () => {
-    const { data } = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${addonID}/files`
-    );
-    const instanceNameVar = (await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/${addonID}`
-    )).data.name;
+    const files = await getAddonFiles(addonID);
+    const instanceNameVar = (await getAddon(addonID)).name;
+
     setInstanceName(instanceNameVar);
-    setVersions(data);
+    setVersions(files);
     setLoading(false);
   };
 
