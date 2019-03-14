@@ -11,7 +11,12 @@ import { setArg } from '../../../../actions/settings';
 import { DATAPATH, WINDOWS } from '../../../../constants';
 
 function JavaArguments(props) {
-  const [globalArg, setGlobalArg] = useState(null);
+  const [globalArgs, setglobalArgssInput] = useState(null);
+
+  const updateJavaArguments = javaArguments => {
+    setglobalArgssInput(javaArguments);
+    props.setArg(javaArguments.replace('{_RAM_}', props.ram));
+  }
 
   const dosName =
     os.release().substr(0, 2) === 10
@@ -23,22 +28,16 @@ function JavaArguments(props) {
     os.platform() === WINDOWS
       ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
       : ''
-    }-Xms256m -Xmx${props.ram}m`;
+    }-Xms256m -Xmx{_RAM_}m`;
 
   async function readStoreJavaArg() {
-
     if (store.has('settings.java.javaArg')) {
       const storeJavaArgumentsSec = store.get('settings.java.javaArg');
-      setGlobalArg(storeJavaArgumentsSec);
-      props.setArg(storeJavaArgumentsSec);
+      updateJavaArguments(storeJavaArgumentsSec);
     } else {
-      const storeJavaArguments = store.set('settings.java.javaArg', defaultArgs);
-      const readStoreJavaArguments = store.get('settings.java.javaArg');
-      setGlobalArg(readStoreJavaArguments);
-      props.setArg(readStoreJavaArguments);
+      store.set('settings.java.javaArg', defaultArgs);
+      updateJavaArguments(defaultArgs);
     }
-
-
   }
 
   useEffect(() => {
@@ -46,26 +45,25 @@ function JavaArguments(props) {
   }, []);
 
   async function submit() {
-    props.setArg(globalArg);
-    if (globalArg) {
-      store.set('settings.java.javaArg', globalArg);
+    props.setArg(globalArgs.replace('{_RAM_}', props.ram));
+    if (globalArgs) {
+      store.set('settings.java.javaArg', globalArgs);
     } else message.error("enter valid arguments");
   }
 
+  //reset the global arguments
   function reset() {
-    const storeJavaArguments = store.set('settings.java.javaArg', defaultArgs);
-    const readStoreJavaArguments = store.get('settings.java.javaArg');
-    setGlobalArg(readStoreJavaArguments);
-    props.setArg(readStoreJavaArguments);
+    store.set('settings.java.javaArg', defaultArgs);
+    updateJavaArguments(defaultArgs);
   }
 
   return (
     <div>
       <div style={{ display: 'inline' }}>
-        <Input value={globalArg} style={{
+        <Input value={globalArgs} style={{
           maxWidth: '75%',
-          marginRight: '15px'
-        }} onChange={(e) => setGlobalArg(e.target.value)} />
+          marginRight: '10px'
+        }} onChange={(e) => setglobalArgssInput(e.target.value)} />
         <Button.Group>
           <Button type="primary" onClick={() => submit()}>Set</Button>
           <Button type="primary" onClick={() => reset()}>Reset</Button>
