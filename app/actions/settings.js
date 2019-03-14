@@ -20,17 +20,24 @@ export function loadSettings() {
       if (store.has('settings')) {
         let settings = store.get('settings');
         // THEME
-        if (!settings.theme || Object.keys(settings.theme).length === 0 || isLegacy(THEMES.default, settings.theme)) {
+        if (
+          !settings.theme ||
+          Object.keys(settings.theme).length === 0 ||
+          isLegacy(THEMES.default, settings.theme)
+        ) {
           store.set('settings.theme', THEMES.default);
         }
         // JAVA
         const javaSettings = {
-          autodetected: true, path: null, memory: 3072
+          autodetected: true,
+          path: null,
+          memory: 3072
         };
-        if (!settings.java ||
+        if (
+          !settings.java ||
           Object.keys(settings.java).length === 0 ||
           isLegacy(javaSettings, settings.java) ||
-          typeof settings.java.memory != 'number'
+          typeof settings.java.memory !== 'number'
         ) {
           store.set('settings.java', javaSettings);
         }
@@ -94,7 +101,7 @@ export function setJavaMemory(amount) {
   return dispatch => {
     dispatch({
       type: SET_JAVA_MEMORY,
-      payload: amount,
+      payload: amount
     });
     dispatch(saveSettings());
   };

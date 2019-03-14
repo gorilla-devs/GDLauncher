@@ -9,6 +9,8 @@ import _ from 'lodash';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import {faDiscord, faFacebook} from '@fortawesome/free-brands-svg-icons';
 import { promisify } from 'util';
 import CIcon from '../Icon/Icon';
 import SocialIcon from './SocialIcon';
@@ -16,7 +18,7 @@ import vanillaCover from '../../../assets/images/minecraft_vanilla_cover.jpg';
 import forgeIcon from '../../../assets/images/forge_icon.jpg';
 
 import styles from './SideBar.scss';
-import { PACKS_PATH, CURSEMETA_API_URL } from '../../../constants';
+import { PACKS_PATH } from '../../../constants';
 
 import * as AuthActions from '../../../actions/auth';
 import * as ProfileActions from '../../../actions/profile';
@@ -78,7 +80,7 @@ const SideBar = props => {
           </span>
           <span>{props.username}</span>
           <div onClick={() => props.logout()}>
-            <FontAwesomeIcon icon="sign-out-alt" className={styles.logout} />
+            <FontAwesomeIcon icon={faSignOutAlt} className={styles.logout} />
           </div>
         </div>
       </div>
@@ -185,9 +187,9 @@ const SideBar = props => {
       <div className={styles.socialsContainer}>
         {/* eslint-disable */}
         {/* <SocialIcon icon="twitter" url="https://twitter.com/gorilladevs" /> */}
-        <SocialIcon icon="facebook" url="https://facebook.com/gorilladevs" />
+        <SocialIcon icon={faFacebook} url="https://facebook.com/gorilladevs" />
         <SocialIcon
-          icon="discord"
+          icon={faDiscord}
           url="https://discordapp.com/invite/4cGYzen"
         />
         <span className={styles.version}>

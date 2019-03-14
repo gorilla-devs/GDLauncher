@@ -10,6 +10,7 @@ import BackButton from './BackButton';
 import ContinueButton from './ContinueButton';
 import styles from './ExportPackModal.scss';
 import ThirdStep from './ThirdStep';
+
 type Props = {};
 
 const ExportPack = props => {

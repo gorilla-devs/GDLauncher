@@ -19,15 +19,20 @@ export default function instancesManager(state = initialState, action) {
     case `${START_INSTANCE}`:
       return {
         ...state,
-        startedInstances: [...state.startedInstances, {
-          name: action.payload,
-          pid: action.pid
-        }],
+        startedInstances: [
+          ...state.startedInstances,
+          {
+            name: action.payload,
+            pid: action.pid
+          }
+        ]
       };
     case `${STOP_INSTANCE}`:
       return {
         ...state,
-        startedInstances: state.startedInstances.filter(el => el.name !== action.payload)
+        startedInstances: state.startedInstances.filter(
+          el => el.name !== action.payload
+        )
       };
     default:
       return state;

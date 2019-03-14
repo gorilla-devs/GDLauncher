@@ -8,12 +8,21 @@ export default async function OfficialLancherProfilesExists() {
   const vanillaMCPath = path.join(homedir, '.minecraft');
   if (await fsa.pathExists(vanillaMCPath)) {
     try {
-      const vnlJson = await fsa.readJson(path.join(vanillaMCPath, 'launcher_profiles.json'));
-      if (vnlJson.authenticationDatabase && vnlJson.selectedUser && vnlJson.clientToken) {
+      const vnlJson = await fsa.readJson(
+        path.join(vanillaMCPath, 'launcher_profiles.json')
+      );
+      if (
+        vnlJson.authenticationDatabase &&
+        vnlJson.selectedUser &&
+        vnlJson.clientToken
+      ) {
         const { account, profile } = vnlJson.selectedUser;
-        return vnlJson.authenticationDatabase[account].profiles[profile].displayName;
+        return vnlJson.authenticationDatabase[account].profiles[profile]
+          .displayName;
       }
-    } catch (err) { log.error(err); }
+    } catch (err) {
+      log.error(err);
+    }
   }
   return false;
 }

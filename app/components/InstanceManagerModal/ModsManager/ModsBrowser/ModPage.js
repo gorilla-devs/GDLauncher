@@ -5,15 +5,17 @@ import ContentLoader from 'react-content-loader';
 import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
 import Promise from 'bluebird';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { promisify } from 'util';
 import _ from 'lodash';
 import { Button, Select, Icon } from 'antd';
-import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
+import { PACKS_PATH } from '../../../../constants';
 import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 
 import styles from './ModPage.scss';
+import { getAddon, getAddonFiles } from '../../../../utils/cursemeta';
 
 function ModPage(props) {
   const [modData, setModData] = useState(null);
@@ -62,12 +64,12 @@ function ModPage(props) {
   };
 
   const getAddonData = async addon => {
-    const [{ data }, files] = await Promise.all([
-      axios.get(`${CURSEMETA_API_URL}/direct/addon/${addon}`),
-      axios.get(`${CURSEMETA_API_URL}/direct/addon/${addon}/files`)
+    const [data, files] = await Promise.all([
+      getAddon(addon),
+      getAddonFiles(addon)
     ]);
 
-    const filteredFiles = files.data.filter(el =>
+    const filteredFiles = files.filter(el =>
       el.gameVersion.includes(props.version)
     );
 
@@ -99,7 +101,7 @@ function ModPage(props) {
       }}
     >
       <div className={styles.backBtn} onClick={props.goBack}>
-        <FontAwesomeIcon icon="chevron-left" />
+        <FontAwesomeIcon icon={faChevronLeft} />
       </div>
       {!modData ? (
         <AutoSizer>

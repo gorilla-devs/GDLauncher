@@ -4,7 +4,7 @@ import {
   SET_JAVA_PATH,
   SET_JAVA_MEMORY,
   SET_THEME,
-  RESET_THEME,
+  RESET_THEME
 } from '../actions/settings';
 import { THEMES } from '../constants';
 

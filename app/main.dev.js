@@ -20,7 +20,7 @@ import MenuBuilder from './menu';
 import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 
 let mainWindow = null;
 let splash = null;
@@ -119,7 +119,9 @@ if (minimist(process.argv.slice(1)).i) {
       }
     });
 
-    mainWindow.loadURL(`file://${__dirname}/app.html`);
+    mainWindow.loadURL(`file://${__dirname}/app.html`, {
+      userAgent: 'GDLauncher'
+    });
 
     // @TODO: Use 'ready-to-show' event
     //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -163,18 +165,18 @@ if (minimist(process.argv.slice(1)).i) {
 
     ipcMain.on('check-for-updates', ev => {
       // Avoid doing this more than 1 time. It breaks everything
-      if(checked === true) return;
+      if (checked === true) return;
       autoUpdater.checkForUpdates();
       checked = true;
-      log.info("CHECK_FOR_UPDATES");
+      log.info('CHECK_FOR_UPDATES');
 
       autoUpdater.on('update-available', info => {
-        log.info("DOWNLOAD_AVAILABLE");
+        log.info('DOWNLOAD_AVAILABLE');
         ev.sender.send('update-available');
       });
 
       autoUpdater.on('update-downloaded', info => {
-        log.info("UPDATE_DOWNLOADED");
+        log.info('UPDATE_DOWNLOADED');
         ev.sender.send('update-downloaded');
       });
 
@@ -185,12 +187,12 @@ if (minimist(process.argv.slice(1)).i) {
     });
 
     ipcMain.on('download-updates', () => {
-      log.info("DOWNLOAD_UPDATES");
+      log.info('DOWNLOAD_UPDATES');
       autoUpdater.downloadUpdate();
     });
 
     ipcMain.on('apply-updates', () => {
-      log.info("APPLY_UPDATES");
+      log.info('APPLY_UPDATES');
       autoUpdater.quitAndInstall(true, true);
       // app.relaunch({ args: process.argv.slice(1).concat(['--relaunch']) });
       // app.exit();

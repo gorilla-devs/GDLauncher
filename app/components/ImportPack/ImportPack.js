@@ -7,7 +7,7 @@ import _ from 'lodash';
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
-import { CURSEMETA_API_URL, PACKS_PATH } from '../../constants';
+import { PACKS_PATH } from '../../constants';
 import styles from './ImportPack.scss';
 import Modal from '../Common/Modal/Modal';
 import { importTwitchProfile } from '../../actions/downloadManager';

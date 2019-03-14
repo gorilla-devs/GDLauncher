@@ -1,4 +1,3 @@
-
 // @flow
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -13,11 +12,12 @@ type Props = {
 
 class CopyIcon extends Component<Props> {
   props: Props;
+
   constructor(props) {
     super(props);
     this.state = {
       copied: false
-    }
+    };
   }
 
   copy = () => {
@@ -29,21 +29,28 @@ class CopyIcon extends Component<Props> {
     setTimeout(() => {
       this.setState({ copied: false });
     }, 600);
-  }
+  };
 
   render() {
     return (
-      <Tooltip title={this.state.copied ? 'Copied' : 'Copy'} mouseLeaveDelay={this.state.copied ? 0.3 : 0.1} >
-        <Icon className={styles.copyBtn} type="copy" theme="filled" onClick={this.copy} />
+      <Tooltip
+        title={this.state.copied ? 'Copied' : 'Copy'}
+        mouseLeaveDelay={this.state.copied ? 0.3 : 0.1}
+      >
+        <Icon
+          className={styles.copyBtn}
+          type="copy"
+          theme="filled"
+          onClick={this.copy}
+        />
       </Tooltip>
     );
   }
 }
 
-
 function mapStateToProps(state) {
   return {
-    soundsEnabled: state.settings.sounds,
+    soundsEnabled: state.settings.sounds
   };
 }
 

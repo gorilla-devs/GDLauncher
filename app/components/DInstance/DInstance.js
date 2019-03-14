@@ -7,6 +7,17 @@ import fsa from 'fs-extra';
 import path from 'path';
 import fs from 'fs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBolt,
+  faPlay,
+  faPen,
+  faFolder,
+  faLink,
+  faCopy,
+  faTruckMoving,
+  faWrench,
+  faTrash
+} from '@fortawesome/free-solid-svg-icons';
 import log from 'electron-log';
 import { promisify } from 'util';
 import { exec } from 'child_process';
@@ -184,7 +195,7 @@ export default class DInstance extends Component<Props> {
           >
             {playing.find(el => el.name === name) && (
               <span className={styles.playingIcon}>
-                <i className="fas fa-play" style={{ fontSize: '17px' }} />
+                <FontAwesomeIcon icon={faPlay} style={{ fontSize: '17px' }} />
               </span>
             )}
             {this.isInstalling() && (
@@ -244,14 +255,14 @@ export default class DInstance extends Component<Props> {
             {playing.find(el => el.name === name) ? (
               <div>
                 <span>
-                  <FontAwesomeIcon icon="bolt" />
+                  <FontAwesomeIcon icon={faBolt} />
                 </span>{' '}
                 Kill
               </div>
             ) : (
               <div>
                 <span>
-                  <FontAwesomeIcon icon="play" />
+                  <FontAwesomeIcon icon={faPlay} />
                 </span>{' '}
                 Launch
               </div>
@@ -268,13 +279,13 @@ export default class DInstance extends Component<Props> {
             }
           >
             <span>
-              <FontAwesomeIcon icon="pen" />
+              <FontAwesomeIcon icon={faPen} />
             </span>{' '}
             Manage
           </MenuItem>
           <MenuItem onClick={() => shell.openItem(path.join(PACKS_PATH, name))}>
             <span>
-              <FontAwesomeIcon icon="folder" />
+              <FontAwesomeIcon icon={faFolder} />
             </span>{' '}
             Open Folder
           </MenuItem>
@@ -313,7 +324,7 @@ export default class DInstance extends Component<Props> {
             }
           >
             <span>
-              <FontAwesomeIcon icon="link" />
+              <FontAwesomeIcon icon={faLink} />
             </span>{' '}
             Create Shortcut
           </MenuItem>
@@ -321,7 +332,7 @@ export default class DInstance extends Component<Props> {
             disabled={this.isInstalling() || !isValid}
             onClick={() => {}}
           >
-            <FontAwesomeIcon icon='copy' /> Duplicate
+            <FontAwesomeIcon icon={faCopy} /> Duplicate
           </MenuItem> */}
           <MenuItem
             disabled={
@@ -338,7 +349,7 @@ export default class DInstance extends Component<Props> {
             }
           >
             <span>
-              <FontAwesomeIcon icon="truck-moving" />
+              <FontAwesomeIcon icon={faTruckMoving} />
             </span>{' '}
             Export
           </MenuItem>
@@ -351,7 +362,7 @@ export default class DInstance extends Component<Props> {
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
             <span>
-              <FontAwesomeIcon icon="wrench" />
+              <FontAwesomeIcon icon={faWrench} />
             </span>{' '}
             Repair
           </MenuItem>
@@ -368,7 +379,7 @@ export default class DInstance extends Component<Props> {
             }
           >
             <span>
-              <FontAwesomeIcon icon="trash" />
+              <FontAwesomeIcon icon={faTrash} />
             </span>{' '}
             Delete
           </MenuItem>

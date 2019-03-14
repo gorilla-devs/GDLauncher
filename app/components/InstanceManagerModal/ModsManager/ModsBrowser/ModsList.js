@@ -9,14 +9,14 @@ import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import _ from 'lodash';
+import { promisify } from 'util';
 import ModsListWrapper from './ModsListWrapper';
-import { PACKS_PATH, CURSEMETA_API_URL } from '../../../../constants';
+import { PACKS_PATH } from '../../../../constants';
 import { downloadFile } from '../../../../utils/downloader';
 import { numberToRoundedWord } from '../../../../utils/numbers';
-import { downloadMod, getModMurmurHash2 } from '../../../../utils/mods';
 import ModsListHeader from './ModsListHeader';
-import { promisify } from 'util';
 import ModPage from './ModPage';
+import { getSearch } from '../../../../utils/cursemeta';
 
 import styles from './ModsList.scss';
 
@@ -55,15 +55,14 @@ const ModsList = props => {
       setMods([]);
     }
     setAreModsLoading(true);
-    const { data } = await axios.get(
-      `${CURSEMETA_API_URL}/direct/addon/search?gameId=432&pageSize=21&index=${
-        reset === true ? 0 : mods.length
-      }&sort=${filterType}&searchFilter=${encodeURI(
-        searchQueryP
-      )}&gameVersion=${
-        props.match.params.version
-      }&categoryId=0&sectionId=6&sortDescending=${filterType !== 'Author' &&
-        filterType !== 'Name'}`
+    const data = await getSearch(
+      'mods',
+      searchQueryP,
+      21,
+      reset === true ? 0 : mods.length,
+      filterType,
+      filterType !== 'Author' && filterType !== 'Name',
+      props.match.params.version
     );
     setMods(reset === true ? data : mods.concat(data));
     setHasNextPage(data.length === 21);

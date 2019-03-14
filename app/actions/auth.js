@@ -224,7 +224,7 @@ export function tryNativeLauncherProfiles() {
           type: AUTH_SUCCESS,
           payload: {
             ...payload,
-            clientToken: data.clientToken,
+            clientToken: data.clientToken
           }
         });
         const { newUser } = store.get('settings');

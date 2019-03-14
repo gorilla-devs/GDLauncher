@@ -8,10 +8,12 @@ import path from 'path';
 import axios from 'axios';
 import { promisify } from 'util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import Promise from 'bluebird';
 import BackButton from './BackButton';
 import styles from './ExportPackModal.scss';
-import { PACKS_PATH, CURSEMETA_API_URL } from '../../constants';
+import { PACKS_PATH } from '../../constants';
+import { getAddon } from '../../utils/cursemeta';
 
 const ThirdStep = props => {
   const [isCompleted, setIsCompleted] = useState(false);
@@ -67,9 +69,7 @@ const ThirdStep = props => {
     let data = null;
 
     if (config.projectID) {
-      data = await axios.get(
-        `${CURSEMETA_API_URL}/direct/addon/${config.projectID}`
-      );
+      data = await getAddon(config.projectID);
     }
 
     return JSON.stringify({
@@ -102,7 +102,7 @@ const ThirdStep = props => {
           <div>
             <h2>
               All Done!{' '}
-              <FontAwesomeIcon icon="check" style={{ color: '#27ae60' }} />
+              <FontAwesomeIcon icon={faCheck} style={{ color: '#27ae60' }} />
             </h2>
             <Button type="primary" onClick={() => props.setUnMount(true)}>
               Go Back To Instances
