@@ -156,7 +156,7 @@ class Instances extends Component<Props> {
             <Input className={styles.javaArginput}/>
             <Button.Group>
               <Button type="primary" >Set</Button>
-              <Button type="primary" >reset</Button>
+              <Button type="primary" >Reset</Button>
             </Button.Group>
           </div>
         </Card>
