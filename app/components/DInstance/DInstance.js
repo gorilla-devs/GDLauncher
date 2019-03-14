@@ -57,20 +57,6 @@ export default class DInstance extends Component<Props> {
     this.interval = setInterval(() => {
       this.updateInstanceConfig();
     }, 1000);
-
-    const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, this.props.name, 'config.json')
-      )
-    );
-    if (config.icon) {
-      const icon = await promisify(fs.readFile)(
-        path.join(PACKS_PATH, this.props.name, config.icon)
-      );
-      this.setState({
-        icon: `url("data:image/png;base64,${icon.toString('base64')}")`
-      });
-    }
   };
 
   componentDidUpdate = () => {
@@ -91,17 +77,19 @@ export default class DInstance extends Component<Props> {
           )
         );
         const { version, forgeVersion } = config;
+
+        // Tries to read the instance config file and updates the icon accordingly
         if (config.icon) {
           const icon = await promisify(fs.readFile)(
             path.join(PACKS_PATH, this.props.name, config.icon)
           );
           this.setState({
-            icon: `url("data:image/png;base64,${icon.toString('base64')}")`
+            icon: `url("data:image/png;base64,${icon.toString('base64')}") center no-repeat`
           });
         } else {
           this.setState({
             icon: `url(${InstanceIcon}) center no-repeat`
-          });
+          })
         }
         this.setState({
           version,
@@ -109,14 +97,14 @@ export default class DInstance extends Component<Props> {
             forgeVersion === null
               ? null
               : forgeVersion.includes('-')
-              ? forgeVersion.split('-')[1]
-              : forgeVersion
+                ? forgeVersion.split('-')[1]
+                : forgeVersion
         });
       } catch (e) {
-        console.log(e);
         this.setState({
           version: 'Error',
-          isValid: false
+          isValid: false,
+          icon: `url(${InstanceIcon}) center no-repeat`
         });
       }
     }
@@ -168,12 +156,12 @@ export default class DInstance extends Component<Props> {
 
   render = () => {
     const { name, selectedInstance, selectInstance, playing } = this.props;
-    const { version, isValid, forgeVersion } = this.state;
+    const { version, isValid, forgeVersion, icon } = this.state;
     return (
       <div
         className={`${selectedInstance === name ? styles.selectedItem : ''} ${
           styles.main
-        }`}
+          }`}
       >
         <ContextMenuTrigger id={`contextMenu-${name}`}>
           <div
@@ -218,7 +206,8 @@ export default class DInstance extends Component<Props> {
               <div
                 className={styles.icon__image}
                 style={{
-                  background: this.state.icon,
+                  background: version !== null || this.isInstalling() ? icon : 'rgba(0, 0, 0, 0)',
+                  opacity: version !== null || this.isInstalling() ? 1 : 0,
                   filter: this.isInstalling()
                     ? "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale\")"
                     : ''
@@ -260,13 +249,13 @@ export default class DInstance extends Component<Props> {
                 Kill
               </div>
             ) : (
-              <div>
-                <span>
-                  <FontAwesomeIcon icon={faPlay} />
-                </span>{' '}
-                Launch
+                <div>
+                  <span>
+                    <FontAwesomeIcon icon={faPlay} />
+                  </span>{' '}
+                  Launch
               </div>
-            )}
+              )}
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || !isValid}

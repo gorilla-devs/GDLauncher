@@ -56,8 +56,9 @@
 .icon__image {
   width: 90px;
   height: 90px;
-  border-radius: 2px;
+  border-radius: 50%;
   background-size: 90px !important;
+  transition: opacity 0.1s ease-in-out;
 }
 
 .main:hover {
