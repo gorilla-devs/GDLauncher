@@ -11,6 +11,7 @@ export const SET_JAVA_MEMORY = 'SET_JAVA_MEMORY';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
 export const SET_GLOBAL_ARGUMENTS = 'SET_GLOBAL_ARGUMENTS';
+export const SET_OVERRIDE_ARGUMENTS = 'SET_OVERRIDE_ARGUMENTS';
 
 export function loadSettings() {
   return dispatch => {
@@ -150,7 +151,7 @@ export function applyTheme(theme) {
   };
 }
 
-export function Arg(args) {
+export function arg(args) {
   return dispatch => {
     dispatch({
       type: SET_GLOBAL_ARGUMENTS,
@@ -159,3 +160,11 @@ export function Arg(args) {
   };
 }
 
+export function overrideArg(args) {
+  return dispatch => {
+    dispatch({
+      type: SET_OVERRIDE_ARGUMENTS,
+      payload: args,
+    });
+  };
+}

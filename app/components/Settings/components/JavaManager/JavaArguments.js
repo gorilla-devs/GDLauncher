@@ -7,8 +7,7 @@ import store from '../../../../localStore';
 import { promisify } from 'util';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Constants from '../../../../constants';
-import { Arg } from '../../../../actions/settings';
+import { arg } from '../../../../actions/settings';
 import { DATAPATH, WINDOWS } from '../../../../constants';
 
 function JavaArguments(props) {
@@ -26,38 +25,38 @@ function JavaArguments(props) {
       : ''
     }-Xms256m -Xmx${props.ram}m`;
 
-  async function readJArgFile() {
+  async function manageJavaArgStore() {
 
     if (store.has('settings.java.javaArg')) {
-      const JavaArgumentsStoreSec = store.get('settings.java.javaArg');
-      setglobalArg(JavaArgumentsStoreSec);
-      props.Arg(JavaArgumentsStoreSec);
+      const tryReadingStoreJavaArg = store.get('settings.java.javaArg');
+      setglobalArg(tryReadingStoreJavaArg);
+      props.arg(tryReadingStoreJavaArg);
     } else {
-      const JavaArgumentsStore = store.set('settings.java.javaArg', defaultARGS);
-      const JavaArgumentsStoreTh = store.get('settings.java.javaArg');
-      setglobalArg(JavaArgumentsStoreTh);
-      props.Arg(JavaArgumentsStoreTh);
+      const storeJavaArgs = store.set('settings.java.javaArg', defaultARGS);
+      const readStoreJavaArgs = store.get('settings.java.javaArg');
+      setglobalArg(readStoreJavaArgs);
+      props.arg(readStoreJavaArgs);
     }
 
 
   }
 
   useEffect(() => {
-    readJArgFile();
+    manageJavaArgStore();
   }, []);
 
   async function submit() {
-    props.Arg(globalArg);
+    props.arg(globalArg);
     if (globalArg) {
       store.set('settings.java.javaArg', globalArg);
     } else message.error("enter valid arguments");
   }
 
   function reset() {
-    const JavaArgumentsStore = store.set('settings.java.javaArg', defaultARGS);
-    const JavaArgumentsStoreTh = store.get('settings.java.javaArg');
-    setglobalArg(JavaArgumentsStoreTh);
-    props.Arg(JavaArgumentsStoreTh);
+    const storeJavaArgs = store.set('settings.java.javaArg', defaultARGS);
+    const readStoreJavaArgs = store.get('settings.java.javaArg');
+    setglobalArg(readStoreJavaArgs);
+    props.arg(readStoreJavaArgs);
   }
 
   function inputFunc(e) {
@@ -88,7 +87,7 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = {
-  Arg
+  arg
 }
 
 export default connect(

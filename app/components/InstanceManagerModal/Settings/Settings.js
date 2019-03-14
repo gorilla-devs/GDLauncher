@@ -7,11 +7,13 @@ import path from 'path';
 import { promisify } from 'util';
 import fs from 'fs';
 import log from 'electron-log';
+import store from '../../../localStore';
 import Card from '../../Common/Card/Card';
 import { PACKS_PATH } from '../../../constants';
 import styles from './Settings.scss';
 import { history } from '../../../store/configureStore';
 import ForgeManager from './ForgeManager';
+import { OverrideArg } from '../../../actions/settings';
 
 const FormItem = Form.Item;
 
@@ -22,9 +24,10 @@ function Instances(props) {
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
   const [globalArg, setglobalArg] = useState();
-  const [OverArgs, setOverArgs] = useState(true);
+  const [overrideArgs, setOverrideArgs] = useState();
+  const [overrideArgsSwitch, setOverrideArgsSwitch] = useState(false);
 
-  async function ReadConfig(){
+  async function readConfig() {
     try {
       let config = JSON.parse(
         await promisify(fs.readFile)(
@@ -50,10 +53,21 @@ function Instances(props) {
       setCheckingForge(false);
     }
 
+    if (store.has('settings.java.javaOverrideArg')) {
+      const javaArgumentsStoreSec = store.get('settings.java.javaOverrideArg');
+      setOverrideArgs(javaArgumentsStoreSec);
+      props.OverrideArg(javaArgumentsStoreSec);
+    } else {
+      const JavaArgumentsStore = store.set('settings.java.javaOverrideArg', overrideArgs);
+      const JavaArgumentsStoreTh = store.get('settings.java.javaOverrideArg');
+      setOverrideArgs(JavaArgumentsStoreTh);
+      props.OverrideArg(JavaArgumentsStoreTh);
+    }
+
   }
 
   useEffect(() => {
-    ReadConfig();
+    readConfig();
     return () => {
       watcher.close();
     }
@@ -78,15 +92,11 @@ function Instances(props) {
     });
   };
 
-  function OverrideArgs() {
-    setOverArgs(!OverArgs);
-    console.log(OverArgs);
+  function overrideArgs(e) {
+    setOverrideArgsSwitch(e);
+    console.log("switch", overrideArgsSwitch, e);
   }
 
-  function inputFunc(e) {
-    setglobalArg(e.target.value);
-    console.log(globalArg);
-  }
 
 
   const { getFieldDecorator } = props.form;
@@ -162,9 +172,9 @@ function Instances(props) {
       </Card>
 
       <Card style={{ marginTop: 15, maxHeight: 150 }} title="Override global java arguments">
-        <div style={{ display: 'inline'}}>
-          <Input className={styles.JavaArginput} onChange={(e) => inputFunc(e)}/>
-          <Switch className={styles.JavaArgswitch} onChange={() => OverrideArgs()}></Switch>
+        <div style={{ display: 'inline' }}>
+          <Input className={styles.javaArginput} onChange={(e) => setOverrideArgs(e.target.value);} />
+          <Switch className={styles.JavaArgswitch} checked={overrideArgsSwitch} onChange={(e) => overrideArgs(e)}></Switch>
         </div>
       </Card>
 
@@ -173,16 +183,13 @@ function Instances(props) {
 }
 
 function mapStateToProps(state) {
-  return {};
+  return {
+
+  };
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(
-    {
-      goBack: routerActions.goBack
-    },
-    dispatch
-  );
+const mapDispatchToProps = {
+  overrideArg
 }
 
 export default Form.create()(
