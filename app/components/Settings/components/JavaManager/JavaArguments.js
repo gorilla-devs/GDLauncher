@@ -7,7 +7,7 @@ import store from '../../../../localStore';
 import { promisify } from 'util';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { arg } from '../../../../actions/settings';
+import { setArg } from '../../../../actions/settings';
 import { DATAPATH, WINDOWS } from '../../../../constants';
 
 function JavaArguments(props) {
@@ -30,12 +30,12 @@ function JavaArguments(props) {
     if (store.has('settings.java.javaArg')) {
       const storeJavaArgumentsSec = store.get('settings.java.javaArg');
       setGlobalArg(storeJavaArgumentsSec);
-      props.arg(storeJavaArgumentsSec);
+      props.setArg(storeJavaArgumentsSec);
     } else {
       const storeJavaArguments = store.set('settings.java.javaArg', defaultArgs);
-      const readstoreJavaArguments = store.get('settings.java.javaArg');
-      setGlobalArg(readstoreJavaArguments);
-      props.arg(readstoreJavaArguments);
+      const readStoreJavaArguments = store.get('settings.java.javaArg');
+      setGlobalArg(readStoreJavaArguments);
+      props.setArg(readStoreJavaArguments);
     }
 
 
@@ -46,7 +46,7 @@ function JavaArguments(props) {
   }, []);
 
   async function submit() {
-    props.arg(globalArg);
+    props.setArg(globalArg);
     if (globalArg) {
       store.set('settings.java.javaArg', globalArg);
     } else message.error("enter valid arguments");
@@ -54,9 +54,9 @@ function JavaArguments(props) {
 
   function reset() {
     const storeJavaArguments = store.set('settings.java.javaArg', defaultArgs);
-    const readstoreJavaArguments = store.get('settings.java.javaArg');
-    setGlobalArg(readstoreJavaArguments);
-    props.arg(readstoreJavaArguments);
+    const readStoreJavaArguments = store.get('settings.java.javaArg');
+    setGlobalArg(readStoreJavaArguments);
+    props.setArg(readStoreJavaArguments);
   }
 
   return (
@@ -83,7 +83,7 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = {
-  arg
+  setArg
 }
 
 export default connect(

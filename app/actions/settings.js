@@ -150,7 +150,7 @@ export function applyTheme(theme) {
   };
 }
 
-export function arg(args) {
+export function setArg(args) {
   return dispatch => {
     dispatch({
       type: SET_GLOBAL_ARGUMENTS,
