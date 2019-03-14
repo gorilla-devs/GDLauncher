@@ -15,7 +15,7 @@ function JavaArguments(props) {
 
   const updateJavaArguments = javaArguments => {
     setglobalArgssInput(javaArguments);
-    props.setArg(javaArguments.replace('{_RAM_}', props.ram));
+    props.setArg(javaArguments);
   }
 
   const dosName =
@@ -45,7 +45,7 @@ function JavaArguments(props) {
   }, []);
 
   async function submit() {
-    props.setArg(globalArgs.replace('{_RAM_}', props.ram));
+    props.setArg(globalArgs);
     if (globalArgs) {
       store.set('settings.java.javaArg', globalArgs);
     } else message.error("enter valid arguments");
