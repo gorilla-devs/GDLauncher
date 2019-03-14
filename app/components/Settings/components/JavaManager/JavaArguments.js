@@ -3,12 +3,14 @@ import { Icon, Slider, Tooltip, Input, Button, message } from 'antd';
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
-import store from '../../../../localStore';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUndo } from '@fortawesome/free-solid-svg-icons';
 import { promisify } from 'util';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import store from '../../../../localStore';
 import { setArg } from '../../../../actions/settings';
 import { DATAPATH, WINDOWS } from '../../../../constants';
+
 
 function JavaArguments(props) {
   const [globalArgs, setglobalArgssInput] = useState(null);
@@ -66,7 +68,7 @@ function JavaArguments(props) {
         }} onChange={(e) => setglobalArgssInput(e.target.value)} />
         <Button.Group>
           <Button type="primary" onClick={() => submit()}>Set</Button>
-          <Button type="primary" onClick={() => reset()}>Reset</Button>
+          <Button type="primary" onClick={() => reset()}><FontAwesomeIcon icon={faUndo} /></Button>
         </Button.Group>
       </div>
       <hr />
