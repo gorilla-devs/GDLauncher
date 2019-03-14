@@ -4,7 +4,6 @@ import path from 'path';
 import { promisify } from 'util';
 import log from 'electron-log';
 import { connect } from 'react-redux';
-import javaArg from '../components/Settings/components/JavaManager/JavaArguments';
 import { findJavaHome } from './javaHelpers';
 import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';

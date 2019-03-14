@@ -10,8 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { arg } from '../../../../actions/settings';
 import { DATAPATH, WINDOWS } from '../../../../constants';
 
-function javaArguments(props) {
-  const [globalArg, setGlobalArg] = useState();
+function JavaArguments(props) {
+  const [globalArg, setGlobalArg] = useState(null);
 
   const dosName =
     os.release().substr(0, 2) === 10
@@ -19,7 +19,7 @@ function javaArguments(props) {
       : '';
 
 
-  let defaultARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}${
+  let defaultArgs = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}${
     os.platform() === WINDOWS
       ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
       : ''
@@ -28,14 +28,14 @@ function javaArguments(props) {
   async function readStoreJavaArg() {
 
     if (store.has('settings.java.javaArg')) {
-      const StorejavaArgumentsSec = store.get('settings.java.javaArg');
-      setGlobalArg(StorejavaArgumentsSec);
-      props.arg(StorejavaArgumentsSec);
+      const storeJavaArgumentsSec = store.get('settings.java.javaArg');
+      setGlobalArg(storeJavaArgumentsSec);
+      props.arg(storeJavaArgumentsSec);
     } else {
-      const StorejavaArguments = store.set('settings.java.javaArg', defaultARGS);
-      const readStorejavaArguments = store.get('settings.java.javaArg');
-      setGlobalArg(readStorejavaArguments);
-      props.arg(readStorejavaArguments);
+      const storeJavaArguments = store.set('settings.java.javaArg', defaultArgs);
+      const readstoreJavaArguments = store.get('settings.java.javaArg');
+      setGlobalArg(readstoreJavaArguments);
+      props.arg(readstoreJavaArguments);
     }
 
 
@@ -53,10 +53,10 @@ function javaArguments(props) {
   }
 
   function reset() {
-    const StorejavaArguments = store.set('settings.java.javaArg', defaultARGS);
-    const readStorejavaArguments = store.get('settings.java.javaArg');
-    setGlobalArg(readStorejavaArguments);
-    props.arg(readStorejavaArguments);
+    const storeJavaArguments = store.set('settings.java.javaArg', defaultArgs);
+    const readstoreJavaArguments = store.get('settings.java.javaArg');
+    setGlobalArg(readstoreJavaArguments);
+    props.arg(readstoreJavaArguments);
   }
 
   return (
@@ -68,7 +68,7 @@ function javaArguments(props) {
         }} onChange={(e) => setGlobalArg(e.target.value)} />
         <Button.Group>
           <Button type="primary" onClick={() => submit()}>Set</Button>
-          <Button type="primary" onClick={() => reset()}>reset</Button>
+          <Button type="primary" onClick={() => reset()}>Reset</Button>
         </Button.Group>
       </div>
       <hr />
@@ -89,4 +89,4 @@ const mapDispatchToProps = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(javaArguments);
+)(JavaArguments);

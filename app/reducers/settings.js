@@ -59,7 +59,7 @@ export default function Settings(state = initialState, action) {
         ...state,
         theme: action.payload
       };
-    case `${SET_GLOBAL_ARGUMENTS}`:
+    case `${SET_GLOBAL_JAVA_ARGUMENTS}`:
     return {
       ...state,
       java: {

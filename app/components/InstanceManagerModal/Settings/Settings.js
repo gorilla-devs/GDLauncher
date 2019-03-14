@@ -151,9 +151,9 @@ class Instances extends Component<Props> {
           ) : null}
         </Card>
 
-        <Card style={{ marginTop: 15, maxHeight: 150 }} title="Override global java arguments">
+        <Card style={{ marginTop: 15, maxHeight: 150 }} title="Override Global Java Arguments">
           <div style={{ display: 'inline' }}>
-            <Input className={styles.JavaArginput}/>
+            <Input className={styles.javaArginput}/>
             <Button.Group>
               <Button type="primary" >Set</Button>
               <Button type="primary" >reset</Button>
