@@ -5,7 +5,7 @@ import {
   SET_JAVA_MEMORY,
   SET_THEME,
   RESET_THEME,
-  SET_GLOBAL_ARGUMENTS
+  SET_GLOBAL_JAVA_ARGUMENTS
 } from '../actions/settings';
 import { THEMES } from '../constants';
 

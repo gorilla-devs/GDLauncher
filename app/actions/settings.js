@@ -153,7 +153,7 @@ export function applyTheme(theme) {
 export function setArg(args) {
   return dispatch => {
     dispatch({
-      type: SET_GLOBAL_ARGUMENTS,
+      type: SET_GLOBAL_JAVA_ARGUMENTS,
       payload: args,
     });
   };
