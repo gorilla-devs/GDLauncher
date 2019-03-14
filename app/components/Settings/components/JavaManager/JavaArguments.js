@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { promisify } from 'util';
 import { connect } from 'react-redux';
 import store from '../../../../localStore';
@@ -67,7 +68,7 @@ function JavaArguments(props) {
           marginRight: '10px'
         }} onChange={(e) => setglobalArgssInput(e.target.value)} />
         <Button.Group>
-          <Button type="primary" onClick={() => submit()}>Set</Button>
+          <Button type="primary" onClick={() => submit()}><FontAwesomeIcon icon={faCheck} /></Button>
           <Button type="primary" onClick={() => reset()}><FontAwesomeIcon icon={faUndo} /></Button>
         </Button.Group>
       </div>
