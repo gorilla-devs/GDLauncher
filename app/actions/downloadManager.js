@@ -4,6 +4,7 @@ import { promisify } from 'util';
 import axios from 'axios';
 import makeDir from 'make-dir';
 import fse from 'fs-extra';
+import { cpus } from 'os';
 import dirTree from 'directory-tree';
 import log from 'electron-log';
 import Promise from 'bluebird';
@@ -356,7 +357,7 @@ export function downloadPack(pack) {
             }
           });
         },
-        { concurrency: 4 }
+        { concurrency: cpus().length + 2 }
       );
     } catch (err) {
       log.error(err);
