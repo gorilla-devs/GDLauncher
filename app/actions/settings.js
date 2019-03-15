@@ -155,9 +155,8 @@ export function setArgs(args) {
   return dispatch => {
     dispatch({
       type: SET_GLOBAL_JAVA_ARGUMENTS,
-      payload: args,
+      payload: args
     });
     dispatch(saveSettings());
   };
 }
-

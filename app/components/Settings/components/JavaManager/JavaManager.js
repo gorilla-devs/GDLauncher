@@ -97,7 +97,7 @@ function JavaManager(props) {
         is64bit={is64bit}
         updateMemory={props.setJavaMemory}
       />
-      <JavaArguments/>
+      <JavaArguments />
     </div>
   );
 }

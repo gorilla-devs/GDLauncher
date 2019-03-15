@@ -60,13 +60,13 @@ export default function Settings(state = initialState, action) {
         theme: action.payload
       };
     case SET_GLOBAL_JAVA_ARGUMENTS:
-    return {
-      ...state,
-      java: {
-        ...state.java,
-        javaArgs: action.payload
-      }
-    };
+      return {
+        ...state,
+        java: {
+          ...state.java,
+          javaArgs: action.payload
+        }
+      };
     default:
       return state;
   }
