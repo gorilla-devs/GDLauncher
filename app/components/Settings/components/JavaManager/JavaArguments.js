@@ -1,27 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Icon, Slider, Tooltip, Input, Button, message } from 'antd';
-import os from 'os';
-import fs from 'fs';
-import path from 'path';
+import { Input, Button, message } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUndo } from '@fortawesome/free-solid-svg-icons';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import { promisify } from 'util';
+import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import store from '../../../../localStore';
 import { setArgs } from '../../../../actions/settings';
 import { DEFAULT_ARGS } from '../../../../constants';
-import styles from './JavaManager.scss';
 
 type Props = {
   setArgs: () => void
 };
 
 function JavaArguments(props: Props) {
-  const [globalArgs, setglobalArgsInput] = useState(null);
+  const [globalArgs, setGlobalArgsInput] = useState(null);
 
   const updateJavaArguments = javaArguments => {
-    setglobalArgsInput(javaArguments);
+    setGlobalArgsInput(javaArguments);
     props.setArgs(javaArguments);
   };
 
@@ -57,7 +51,7 @@ function JavaArguments(props: Props) {
             maxWidth: '80%',
             marginRight: '10px'
           }}
-          onChange={e => setglobalArgsInput(e.target.value)}
+          onChange={e => setGlobalArgsInput(e.target.value)}
         />
         <Button.Group>
           <Button type="primary" onClick={() => submit()}>
