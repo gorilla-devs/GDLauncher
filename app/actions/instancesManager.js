@@ -40,10 +40,12 @@ export function selectInstance(name) {
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const { auth, settings } = getState();
+
     const command = await launchCommand(
       instanceName,
       auth,
-      settings.java.memory
+      settings.java.memory,
+      settings.java.javaArgs
     );
     const start = spawn(command, [], {
       shell: true,

@@ -13,6 +13,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import minimist from 'minimist';
 import log from 'electron-log';
+import DiscordRPC from 'discord-rpc';
 import { autoUpdater } from 'electron-updater';
 import store from './localStore';
 import { THEMES } from './constants';
@@ -131,13 +132,29 @@ if (minimist(process.argv.slice(1)).i) {
       }
       splash.destroy();
 
+
+      // Sets the DISCORD-RPC
+      const clientId = '555898932467597312';
+      let rpc = new DiscordRPC.Client({ transport: 'ipc' });
+      rpc.once('ready', () => {
+        rpc.setActivity({
+          details: `Becoming a Gorilla`,
+          state: 'Grrrrrrrr',
+          startTimestamp: Math.floor(Date.now() / 1000),
+          largeImageKey: 'default_big',
+          largeImageText: 'GDLauncher - A Custom Minecraft Launcher',
+          instance: false,
+        });
+      });
+      rpc.login({ clientId }).catch(log.error);
+
       autoUpdater.logger = log;
       autoUpdater.autoDownload = false;
 
       const channel =
         store.get('settings') &&
-        (store.get('settings').releaseChannel === 'latest' ||
-          store.get('settings').releaseChannel === 'beta')
+          (store.get('settings').releaseChannel === 'latest' ||
+            store.get('settings').releaseChannel === 'beta')
           ? store.get('settings').releaseChannel
           : 'latest';
 

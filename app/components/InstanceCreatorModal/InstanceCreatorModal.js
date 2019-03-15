@@ -75,9 +75,9 @@ class InstanceCreatorModal extends Component<Props> {
           message.warning('An instance with this name already exists.');
         } catch (error) {
           if (values.version[0] === 'vanilla') {
-            this.props.createPack(values.version[2], values.packName);
+            await this.props.createPack(values.version[2], values.packName);
           } else if (values.version[0] === 'forge') {
-            this.props.createPack(
+            await this.props.createPack(
               values.version[1],
               values.packName,
               values.version[2]

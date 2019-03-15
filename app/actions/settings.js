@@ -2,7 +2,7 @@ import log from 'electron-log';
 import { message } from 'antd';
 import _ from 'lodash';
 import store from '../localStore';
-import { THEMES } from '../constants';
+import { THEMES, DEFAULT_ARGS } from '../constants';
 
 export const LOAD_SETTINGS = 'LOAD_SETTINGS';
 export const SET_SOUNDS = 'SET_SOUNDS';
@@ -10,6 +10,7 @@ export const SET_JAVA_PATH = 'SET_JAVA_PATH';
 export const SET_JAVA_MEMORY = 'SET_JAVA_MEMORY';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
+export const SET_GLOBAL_JAVA_ARGUMENTS = 'SET_GLOBAL_JAVA_ARGUMENTS';
 
 export function loadSettings() {
   return dispatch => {
@@ -31,7 +32,8 @@ export function loadSettings() {
         const javaSettings = {
           autodetected: true,
           path: null,
-          memory: 3072
+          memory: 3072,
+          javaArgs: DEFAULT_ARGS
         };
         if (
           !settings.java ||
@@ -146,5 +148,15 @@ export function applyTheme(theme) {
     } catch (err) {
       log.error(err.message);
     }
+  };
+}
+
+export function setJavaArgs(args) {
+  return dispatch => {
+    dispatch({
+      type: SET_GLOBAL_JAVA_ARGUMENTS,
+      payload: args
+    });
+    dispatch(saveSettings());
   };
 }

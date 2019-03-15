@@ -4,10 +4,11 @@ import { promisify } from 'util';
 import axios from 'axios';
 import makeDir from 'make-dir';
 import fse from 'fs-extra';
+import { cpus } from 'os';
 import dirTree from 'directory-tree';
 import log from 'electron-log';
 import Promise from 'bluebird';
-import fs, { readdir } from 'fs';
+import fs, { readdir, copyFile } from 'fs';
 import compressing from 'compressing';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import {
@@ -99,7 +100,7 @@ export function addCursePackToQueue(pack, addonID, fileID) {
       'temp',
       path.basename(packURL)
     );
-    await downloadFile(tempPackPath, packURL, () => {});
+    await downloadFile(tempPackPath, packURL, () => { });
     await compressing.zip.uncompress(
       tempPackPath,
       path.join(INSTANCES_PATH, 'temp', pack)
@@ -209,7 +210,7 @@ export function downloadPack(pack) {
       } catch (err) {
         const { data } = await axios.get(
           `https://addons-ecs.forgesvc.net/api/minecraft/modloader/forge-${
-            currPack.forgeVersion
+          currPack.forgeVersion
           }`
         );
 
@@ -275,9 +276,9 @@ export function downloadPack(pack) {
     const legacyJavaFixer =
       vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
         ? {
-            url: GDL_LEGACYJAVAFIXER_MOD_URL,
-            path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
-          }
+          url: GDL_LEGACYJAVAFIXER_MOD_URL,
+          path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
+        }
         : null;
 
     // Here we work on the mods
@@ -356,10 +357,25 @@ export function downloadPack(pack) {
             }
           });
         },
-        { concurrency: 4 }
+        { concurrency: cpus().length + 2 }
       );
     } catch (err) {
       log.error(err);
+    }
+
+    if (thumbnailURL !== null) {
+      // Download the thumbnail
+      await downloadFile(
+        path.join(PACKS_PATH, pack, 'thumbnail.png'),
+        thumbnailURL,
+        () => { }
+      );
+
+      // Copy the thumbnail as icon
+      await promisify(copyFile)(
+        path.join(PACKS_PATH, pack, 'thumbnail.png'),
+        path.join(PACKS_PATH, pack, 'icon.png')
+      );
     }
 
     await promisify(fs.writeFile)(
@@ -372,6 +388,7 @@ export function downloadPack(pack) {
             : `forge-${currPack.forgeVersion}`,
         ...(currPack.addonID && { projectID: currPack.addonID }),
         ...(modpackVersion && { modpackVersion }),
+        ...(thumbnailURL && { icon: 'icon.png' }),
         timePlayed: 0,
         mods: modsManifest,
         overrideFiles: overrideFilesList
@@ -399,12 +416,6 @@ export function downloadPack(pack) {
           }
         });
     };
-    if (thumbnailURL !== null)
-      await downloadFile(
-        path.join(PACKS_PATH, pack, 'thumbnail.png'),
-        thumbnailURL,
-        () => {}
-      );
 
     const allFiles =
       legacyJavaFixer !== null
