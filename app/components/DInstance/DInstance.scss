@@ -107,3 +107,29 @@
     }
   }
 }
+.progressBarContainer {
+  height: 4px;
+  position: absolute;
+  width: 100%;
+  left: 0px;
+  bottom: 4px;
+  display: flex;
+  justify-content: center;
+  .progressBar {
+    height: 100%;
+    width: 80%;
+    background-color: var(--secondary-color-3);
+  }
+  .actualProgress {
+    position: absolute;
+    height: 100%;
+    width: 80%;
+    span {
+      position: absolute;
+      left: 0;
+      height: 100%;
+      background-color: var(--primary);
+      z-index: 1000000;
+    }
+  }
+}

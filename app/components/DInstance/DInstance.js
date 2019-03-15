@@ -84,12 +84,14 @@ export default class DInstance extends Component<Props> {
             path.join(PACKS_PATH, this.props.name, config.icon)
           );
           this.setState({
-            icon: `url("data:image/png;base64,${icon.toString('base64')}") center no-repeat`
+            icon: `url("data:image/png;base64,${icon.toString(
+              'base64'
+            )}") center no-repeat`
           });
         } else {
           this.setState({
             icon: `url(${InstanceIcon}) center no-repeat`
-          })
+          });
         }
         this.setState({
           version,
@@ -97,8 +99,8 @@ export default class DInstance extends Component<Props> {
             forgeVersion === null
               ? null
               : forgeVersion.includes('-')
-                ? forgeVersion.split('-')[1]
-                : forgeVersion
+              ? forgeVersion.split('-')[1]
+              : forgeVersion
         });
       } catch (e) {
         this.setState({
@@ -161,7 +163,7 @@ export default class DInstance extends Component<Props> {
       <div
         className={`${selectedInstance === name ? styles.selectedItem : ''} ${
           styles.main
-          }`}
+        }`}
       >
         <ContextMenuTrigger id={`contextMenu-${name}`}>
           <div
@@ -206,7 +208,10 @@ export default class DInstance extends Component<Props> {
               <div
                 className={styles.icon__image}
                 style={{
-                  background: version !== null || this.isInstalling() ? icon : 'rgba(0, 0, 0, 0)',
+                  background:
+                    version !== null || this.isInstalling()
+                      ? icon
+                      : 'rgba(0, 0, 0, 0)',
                   opacity: version !== null || this.isInstalling() ? 1 : 0,
                   filter: this.isInstalling()
                     ? "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale\")"
@@ -216,14 +221,19 @@ export default class DInstance extends Component<Props> {
               <span className={styles.icon__instanceNameContainer}>
                 <span
                   className={styles.icon__instanceName}
-                  style={{ width: this.isInstalling() ? '76px' : '120px' }}
+                  style={{ width: 120 }}
                 >
                   {name}
                 </span>
-                <span className={styles.icon__instancePercentage}>
-                  {this.isInstalling() && ` (${this.updatePercentage()}%)`}
-                </span>
               </span>
+              {this.isInstalling() && (
+                <span className={styles.progressBarContainer}>
+                  <span className={styles.progressBar} />
+                  <span className={styles.actualProgress}>
+                    <span style={{ width: `${this.updatePercentage()}%` }} />
+                  </span>
+                </span>
+              )}
             </div>
           </div>
         </ContextMenuTrigger>
@@ -249,13 +259,13 @@ export default class DInstance extends Component<Props> {
                 Kill
               </div>
             ) : (
-                <div>
-                  <span>
-                    <FontAwesomeIcon icon={faPlay} />
-                  </span>{' '}
-                  Launch
+              <div>
+                <span>
+                  <FontAwesomeIcon icon={faPlay} />
+                </span>{' '}
+                Launch
               </div>
-              )}
+            )}
           </MenuItem>
           <MenuItem
             disabled={this.isInstalling() || !isValid}
