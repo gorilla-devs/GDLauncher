@@ -11,22 +11,21 @@
  * @flow
  */
 import { app, BrowserWindow, ipcMain } from 'electron';
-import fs from 'fs';
 import minimist from 'minimist';
 import log from 'electron-log';
+import DiscordRPC from 'discord-rpc';
 import { autoUpdater } from 'electron-updater';
-import path from 'path';
 import store from './localStore';
-import { THEMES, DATAPATH } from './constants';
+import { THEMES } from './constants';
 import MenuBuilder from './menu';
 import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 
 let mainWindow = null;
 let splash = null;
-log.log(`Config store: ${store.path}`);
+log.info(`Config store: ${store.path}`);
 const settings = store.get('settings') ? store.get('settings').theme : THEMES;
 const primaryColor =
   settings && settings.primary ? settings.primary : '#2c3e50';
@@ -121,7 +120,9 @@ if (minimist(process.argv.slice(1)).i) {
       }
     });
 
-    mainWindow.loadURL(`file://${__dirname}/app.html`);
+    mainWindow.loadURL(`file://${__dirname}/app.html`, {
+      userAgent: 'GDLauncher'
+    });
 
     // @TODO: Use 'ready-to-show' event
     //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -131,8 +132,35 @@ if (minimist(process.argv.slice(1)).i) {
       }
       splash.destroy();
 
+
+      // Sets the DISCORD-RPC
+      const clientId = '555898932467597312';
+      let rpc = new DiscordRPC.Client({ transport: 'ipc' });
+      rpc.once('ready', () => {
+        rpc.setActivity({
+          details: `Becoming a Gorilla`,
+          state: 'Grrrrrrrr',
+          startTimestamp: Math.floor(Date.now() / 1000),
+          largeImageKey: 'default_big',
+          largeImageText: 'GDLauncher - A Custom Minecraft Launcher',
+          instance: false,
+        });
+      });
+      rpc.login({ clientId }).catch(log.error);
+
       autoUpdater.logger = log;
       autoUpdater.autoDownload = false;
+
+      const channel =
+        store.get('settings') &&
+          (store.get('settings').releaseChannel === 'latest' ||
+            store.get('settings').releaseChannel === 'beta')
+          ? store.get('settings').releaseChannel
+          : 'latest';
+
+      autoUpdater.channel = channel;
+
+      autoUpdater.allowPrerelease = channel === 'beta';
 
       // Same as for console transport
       log.transports.file.level = 'silly';
@@ -150,25 +178,41 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.show();
       mainWindow.focus();
     });
+    let checked = false;
 
     ipcMain.on('check-for-updates', ev => {
+      // Avoid doing this more than 1 time. It breaks everything
+      if (checked === true) return;
       autoUpdater.checkForUpdates();
+      checked = true;
+      log.info('CHECK_FOR_UPDATES');
 
       autoUpdater.on('update-available', info => {
+        log.info('DOWNLOAD_AVAILABLE');
         ev.sender.send('update-available');
       });
 
       autoUpdater.on('update-downloaded', info => {
+        log.info('UPDATE_DOWNLOADED');
         ev.sender.send('update-downloaded');
+      });
+
+      autoUpdater.on('download-progress', data => {
+        log.info(data);
+        ev.sender.send('download-progress', Math.floor(data.percent));
       });
     });
 
     ipcMain.on('download-updates', () => {
+      log.info('DOWNLOAD_UPDATES');
       autoUpdater.downloadUpdate();
     });
 
     ipcMain.on('apply-updates', () => {
-      autoUpdater.quitAndInstall();
+      log.info('APPLY_UPDATES');
+      autoUpdater.quitAndInstall(true, true);
+      // app.relaunch({ args: process.argv.slice(1).concat(['--relaunch']) });
+      // app.exit();
     });
 
     ipcMain.on('open-devTools', () => {

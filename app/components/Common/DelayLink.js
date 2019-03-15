@@ -10,7 +10,7 @@ export default class DelayLink extends React.Component {
     /**
      * Milliseconds to wait before registering the click.
      */
-    delay:        PropTypes.number,
+    delay: PropTypes.number,
     /**
      * Called after the link is clicked and before the delay timer starts.
      */
@@ -18,13 +18,13 @@ export default class DelayLink extends React.Component {
     /**
      * Called after the delay timer ends.
      */
-    onDelayEnd:   PropTypes.func
+    onDelayEnd: PropTypes.func
   };
 
   static defaultProps = {
-    delay:        0,
+    delay: 0,
     onDelayStart: () => {},
-    onDelayEnd:   () => {}
+    onDelayEnd: () => {}
   };
 
   static contextTypes = Link.contextTypes;
@@ -45,7 +45,7 @@ export default class DelayLink extends React.Component {
    *
    * @param {Event} e
    */
-  handleClick = (e) => {
+  handleClick = e => {
     const { replace, to, delay, onDelayStart, onDelayEnd } = this.props;
     const { history } = this.context.router;
 
@@ -71,8 +71,6 @@ export default class DelayLink extends React.Component {
     delete props.onDelayStart;
     delete props.onDelayEnd;
 
-    return (
-      <Link {...props} onClick={this.handleClick} />
-    );
+    return <Link {...props} onClick={this.handleClick} />;
   }
 }

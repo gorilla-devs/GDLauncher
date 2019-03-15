@@ -63,21 +63,25 @@ hr {
   margin: 15px 0;
 }
 
+img {
+  -webkit-user-drag: none;
+}
+
 ::-webkit-scrollbar {
   background-color: var(--secondary-color-3);
-  width: 8px;
-  border-radius: 8px;
+  width: 10px;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb {
   background-color: $text-main-color;
-  border-radius: 8px;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px var(--secondary-color-3);
   background-color: var(--secondary-color-3);
-  border-radius: 8px;
+  border-radius: 2px;
 }
 
 :not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path),
@@ -100,7 +104,7 @@ textarea,
 }
 
 /*
- * Had to remove scale animation because of how the menu position is calculated. 
+ * Had to remove scale animation because of how the menu position is calculated.
  * If it starts with a scale of 0, it's initial position is always from the pointer, direction bottom.
  * If the menu is opened at the end of the page it will overflow because it cannot calculate the overflowY.
 */
@@ -109,7 +113,7 @@ textarea,
   background: var(--secondary-color-2);
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.25rem;
+  border-radius: 2px;
   color: $text-main-color;
   font-size: 16px;
   margin: 2px 0 0;
@@ -122,10 +126,7 @@ textarea,
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 135ms !important;
-  span:first-child{
-    padding: 0 10px;
-  }
+  transition: transform 100ms !important;
 }
 
 .react-contextmenu span {
@@ -135,7 +136,7 @@ textarea,
 }
 
 .react-contextmenu.react-contextmenu--visible {
-  transition: transform 135ms !important;
+  transition: transform 100ms !important;
   transform: scale(1);
   pointer-events: auto;
   z-index: 9999;
@@ -147,9 +148,14 @@ textarea,
   cursor: pointer;
   font-weight: 400;
   line-height: 1.5;
-  padding: 4px 10px;
+  padding: 2px 10px;
   text-align: left;
   white-space: nowrap;
+  span {
+    color: $text-main-color;
+    width: 25px;
+
+  }
 }
 
 .react-contextmenu-item.react-contextmenu-item--active,
@@ -184,13 +190,6 @@ textarea,
   padding: 0;
 }
 
-.react-contextmenu-item.react-contextmenu-submenu
-  > .react-contextmenu-item::after {
-  content: '▶';
-  display: inline-block;
-  position: absolute;
-  right: 7px;
-}
 
 .example-multiple-targets::after {
   content: attr(data-count);
@@ -203,6 +202,7 @@ textarea,
   border-color: var(--primary);
   border-width: 2px !important;
   border-right-width: 2px !important;
+  border-radius: 2px;
 }
 
 .ant-btn-ghost {
@@ -217,6 +217,15 @@ textarea,
 .ant-btn-group .ant-btn-primary:last-child:not(:first-child),
 .ant-btn-group .ant-btn-primary + .ant-btn-primary {
   border-left-color: var(--primary);
+}
+
+.ant-btn-group {
+  a:first-child .ant-btn {
+    border-radius: 2px 0 0 2px;
+  }
+  a:last-child .ant-btn {
+    border-radius: 0 2px 2px 0;
+  }
 }
 
 .ant-btn-ghost:hover,
@@ -247,12 +256,12 @@ textarea,
 }
 
 .ant-cascader-menu-item:hover {
-  background-color: var(--secondary-color-3);
+  background-color: var(--primary);
 }
 
 .ant-cascader-menu-item-active:not(.ant-cascader-menu-item-disabled),
 .ant-cascader-menu-item-active:not(.ant-cascader-menu-item-disabled):hover {
-  background-color: var(--secondary-color-3);
+  background-color: var(--primary);
 }
 
 .ant-btn-primary.disabled,
@@ -320,7 +329,6 @@ textarea,
   }
 }
 
-
 .ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled),
 .ant-input:focus,
 .ant-input:hover,
@@ -350,20 +358,20 @@ textarea,
 
 .ant-select-dropdown-menu-item-selected,
 .ant-select-dropdown-menu-item-selected:hover {
-  background-color: var(--secondary-color-3);
+  background-color: var(--primary);
 }
 
 // Table
 .ant-table-thead > tr.ant-table-row-hover > td,
 .ant-table-tbody > tr.ant-table-row-hover > td,
 .ant-table-thead > tr > th,
-.ant-table-thead > tr, .ant-table-tbody > tr:hover,
+.ant-table-thead > tr,
+.ant-table-tbody > tr:hover,
 .ant-table-thead > tr:hover > td,
 .ant-table-tbody > tr:hover > td,
 .ant-table-tbody > tr.ant-table-row-selected td {
   background: rgba(0, 0, 0, 0.15) !important;
 }
-
 
 .ant-table-placeholder {
   background-color: var(--secondary-color-1);
@@ -388,13 +396,13 @@ textarea,
   color: $text-dark;
 }
 
-.ant-select-dropdown,
-.ant-select-dropdown-menu-item-active {
-  background: var(--secondary-color-2);
+.ant-select-dropdown {
+  background: var(--secondary-color-3);
 }
 
-.ant-select-dropdown-menu-item:hover {
-  background: var(--secondary-color-3);
+.ant-select-dropdown-menu-item:hover,
+.ant-select-dropdown-menu-item-active {
+  background: var(--primary);
 }
 
 .sketch-picker {
@@ -417,7 +425,8 @@ textarea,
   background: var(--secondary-color-2);
 }
 
-.ant-slider-track, .ant-slider:hover .ant-slider-track {
+.ant-slider-track,
+.ant-slider:hover .ant-slider-track {
   background-color: var(--primary);
 }
 
@@ -428,6 +437,23 @@ textarea,
   background-color: var(--secondary-color-3);
   border: solid 2px var(--primary);
   border-color: var(--primary) !important;
+}
+
+.ant-progress-status-success .ant-progress-bg {
+  background-color: #27ae60;
+}
+
+.ant-progress-status-success .ant-progress-text {
+  color: #27ae60;
+}
+
+.ant-progress-success-bg,
+.ant-progress-bg {
+  background-color: var(--primary);
+}
+
+.ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
+  background-color: var(--primary);
 }
 
 .container {

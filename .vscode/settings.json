@@ -27,5 +27,8 @@
   },
   "javascript.format.enable": true,
   "typescript.validate.enable": false,
-  "typescript.format.enable": false
+  "typescript.format.enable": false,
+  "npm.packageManager": "yarn",
+  "tslint.packageManager": "yarn",
+  "eslint.packageManager": "yarn"
 }

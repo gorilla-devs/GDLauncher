@@ -35,3 +35,15 @@
     color: #bdc3c7;
     font-family: geometria-light, EB Garamond, Georgia, serif;
 }
+
+.updateAvailable {
+  position: absolute;
+  right: 35px;
+  top: 29px;
+  z-index: 10;
+  text-align: center;
+  a {
+    text-decoration: none;
+    display: block;
+  }
+}

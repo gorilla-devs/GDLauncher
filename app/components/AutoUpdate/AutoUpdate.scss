@@ -1,0 +1,18 @@
+.content {
+  background-position: center left;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 100vw;
+  height: calc(100vh - 20px);
+  z-index: 1000;
+}
+
+.inside_content {
+  width: 500px;
+  margin: auto;
+  padding-top: 24vh;
+  text-align: center;
+}

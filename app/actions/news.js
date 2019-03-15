@@ -17,20 +17,21 @@ export function getNews() {
       });
       try {
         const res = await axios.get(NEWS_URL);
-        const newsArr = await Promise.all(res.data.result.map(async item => {
-          return {
-            title: item.default_tile.title,
-            description: item.default_tile.sub_header,
-            // We need to get the header image of every article, since
-            // the ones present in this json are thumbnails
-            image: await getArticleHeaderImage(item.url),
-            url: `https://minecraft.net${item.url}`
-          };
-        }));
+        const newsArr = await Promise.all(
+          res.data.article_grid.map(async item => {
+            return {
+              title: item.default_tile.title,
+              description: item.default_tile.sub_header,
+              // We need to get the header image of every article, since
+              // the ones present in this json are thumbnails
+              image: await getArticleHeaderImage(item.article_url),
+              url: `https://minecraft.net${item.article_url}`
+            };
+          })
+        );
         dispatch({ type: UPDATE_NEWS, payload: newsArr.splice(0, 12) });
       } catch (err) {
         log.error(err.message);
-        message.warning('There was an error while updating the news.');
       } finally {
         dispatch({
           type: STOP_LOADING_NEWS

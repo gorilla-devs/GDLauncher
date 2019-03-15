@@ -5,7 +5,7 @@
 import path from 'path';
 import webpack from 'webpack';
 import merge from 'webpack-merge';
-import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from '../internals/scripts/CheckNodeEnv';
@@ -30,7 +30,7 @@ export default merge.smart(baseConfig, {
     minimizer: process.env.E2E_BUILD
       ? []
       : [
-          new UglifyJSPlugin({
+          new TerserPlugin({
             parallel: true,
             sourceMap: true,
             cache: true
@@ -56,6 +56,19 @@ export default merge.smart(baseConfig, {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: 'false'
+    }),
+    /**
+     * Set NODE_ENV to "production" for external dependencies
+     *
+     * Note: this is required for both main and renderer
+     * separately since the renderer process doesn't inherit
+     * the main process's environment on Linux.
+     */
+    new webpack.BannerPlugin({
+      banner: 'process.env.NODE_ENV="production";',
+      raw: true,
+      entryOnly: true,
+      test: /\.js$/
     })
   ],
 

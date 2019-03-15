@@ -1,56 +1,52 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <title>GDLauncher</title>
+    <link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/glacial-indifference" type="text/css" />
+    <script>
+      (function() {
+        if (!process.env.HOT) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = './dist/style.css';
+          // HACK: Writing the script path should be done with webpack
+          document.getElementsByTagName('head')[0].appendChild(link);
+        }
+      })();
+    </script>
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-  <title>GDLauncher</title>
-  <script>
-    (function () {
-      if (!process.env.HOT) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = './dist/style.css';
-        // HACK: Writing the script path should be done with webpack
-        document.getElementsByTagName('head')[0].appendChild(link);
+  <body>
+    <div id="root"></div>
+    <script>
+      {
+        const scripts = [];
+
+        // Dynamically insert the DLL script in development env in the
+        // renderer process
+        if (process.env.NODE_ENV === 'development') {
+          scripts.push('../dll/renderer.dev.dll.js');
+        }
+
+        // Dynamically insert the bundled app script in the renderer process
+        const port = process.env.PORT || 1212;
+        scripts.push(
+          process.env.HOT
+            ? 'http://localhost:' + port + '/dist/renderer.dev.js'
+            : './dist/renderer.prod.js'
+        );
+
+        if (process.env.NODE_ENV !== 'development') {
+          scripts.push('./dist/vendor.js');
+        }
+
+        document.write(
+          scripts
+            .map(script => '<script defer src="' + script + '"><\/script>')
+            .join('')
+        );
       }
-    })();
-  </script>
-  <link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/glacial-indifference" type="text/css" />
-  <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9"
-    crossorigin="anonymous"></script>
-</head>
-
-<body>
-  <div id="root"></div>
-  <script>
-    {
-      const scripts = [];
-
-      // Dynamically insert the DLL script in development env in the
-      // renderer process
-      if (process.env.NODE_ENV === 'development') {
-        scripts.push('../dll/renderer.dev.dll.js');
-      }
-
-      // Dynamically insert the bundled app script in the renderer process
-      const port = process.env.PORT || 1212;
-      scripts.push(
-        process.env.HOT
-          ? 'http://localhost:' + port + '/dist/renderer.dev.js'
-          : './dist/renderer.prod.js'
-      );
-
-      if (process.env.NODE_ENV !== 'development') {
-        scripts.push('./dist/vendor.js');
-      }
-
-      document.write(
-        scripts
-          .map(script => '<script defer src="' + script + '"><\/script>')
-          .join('')
-      );
-    }
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

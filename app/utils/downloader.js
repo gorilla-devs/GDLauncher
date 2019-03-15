@@ -3,7 +3,7 @@ import fss from 'fs';
 import reqCall from 'request';
 import path from 'path';
 import assert from 'assert';
-import os from 'os';
+import { cpus } from 'os';
 import _ from 'lodash';
 import log from 'electron-log';
 import Promise from 'bluebird';
@@ -16,7 +16,7 @@ export const downloadArr = async (
   arr,
   updatePercentage,
   pack,
-  threads = os.cpus().length
+  threads = cpus().length
 ) => {
   let downloaded = 0;
   await Promise.map(
@@ -30,12 +30,17 @@ export const downloadArr = async (
         // It needs to be downloaded
       }
       if (toDownload) {
-        await downloadFileInstance(item.path, item.url);
+        try {
+          await downloadFileInstance(item.path, item.url);
+        } catch (e) {
+          log.error(e);
+        }
       }
       downloaded += 1;
-      if (downloaded % 10 === 0 || downloaded === arr.length) updatePercentage(downloaded);
+      if (downloaded % 10 === 0 || downloaded === arr.length)
+        updatePercentage(downloaded);
     },
-    { concurrency: threads }
+    { concurrency: threads + 2 }
   );
 };
 
@@ -54,15 +59,15 @@ const downloadFileInstance = async (filename, url) => {
       `Error while downloading <${url}> to <${filename}> --> ${e.message}`
     );
   }
-}
+};
 
 export const downloadFile = (filename, url, onProgress) => {
   return new Promise(async (resolve, reject) => {
     // Save variable to know progress
-    var received_bytes = 0;
-    var total_bytes = 0;
+    let received_bytes = 0;
+    let total_bytes = 0;
 
-    var req = reqCall({
+    const req = reqCall({
       method: 'GET',
       uri: url
     });

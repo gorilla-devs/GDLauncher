@@ -5,6 +5,8 @@ import fss from 'fs';
 import { join, basename } from 'path';
 import makeDir from 'make-dir';
 import { Promise } from 'bluebird';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import Link from 'react-router-dom/Link';
 import log from 'electron-log';
 import {
@@ -160,43 +162,51 @@ export default class DManager extends Component<Props> {
         <div className={styles.header}>
           <div className={styles.headerButtons}>
             <div>
-              <Link to='/curseModpacksBrowser'>
+              <Link to="/curseModpacksBrowser">
                 <Button type="primary" className={styles.browseModpacks}>
                   Browse Curse Modpacks
                 </Button>
               </Link>
             </div>
             <div>
-              <Link
-                to={{
-                  pathname: '/InstanceCreatorModal',
-                  state: { modal: true }
-                }}
-              >
-                <Button type="primary" className={styles.addVanilla}>
-                  Add New Instance
-                </Button>
-              </Link>
+              <Button.Group>
+                <Link
+                  to={{
+                    pathname: '/InstanceCreatorModal',
+                    state: { modal: true }
+                  }}
+                >
+                  <Button type="primary">Add New Instance</Button>
+                </Link>
+                <Link
+                  to={{
+                    pathname: '/importPack',
+                    state: { modal: true }
+                  }}
+                >
+                  <Button type="primary">Import</Button>
+                </Link>
+              </Button.Group>
             </div>
           </div>
         </div>
         <ContextMenuTrigger id="contextMenu-dmanager">
           <div className={styles.content} onScroll={this.handleScroll}>
             {this.state.instances.length === 0 &&
-              !this.state.checkingInstances ? (
-                <h1 className={styles.NoServerCreated}>
-                  YOU HAVEN'T ADDED ANY INSTANCE YET
+            !this.state.checkingInstances ? (
+              <h1 className={styles.NoServerCreated}>
+                YOU HAVEN'T ADDED ANY INSTANCE YET
               </h1>
-              ) : (
-                <SortableList
-                  items={this.state.instances}
-                  onSortEnd={this.onSortEnd}
-                  onSortStart={this.onSortStart}
-                  lockToContainerEdges
-                  axis="xy"
-                  distance={5}
-                />
-              )}
+            ) : (
+              <SortableList
+                items={this.state.instances}
+                onSortEnd={this.onSortEnd}
+                onSortStart={this.onSortStart}
+                lockToContainerEdges
+                axis="xy"
+                distance={5}
+              />
+            )}
           </div>
         </ContextMenuTrigger>
         <ContextMenu
@@ -215,7 +225,7 @@ export default class DManager extends Component<Props> {
               })
             }
           >
-            <i className="fas fa-play" style={{ marginRight: '8px' }} />
+            <FontAwesomeIcon icon={faPlay} style={{ marginRight: '8px' }} />
             Add New Instance
           </MenuItem>
         </ContextMenu>

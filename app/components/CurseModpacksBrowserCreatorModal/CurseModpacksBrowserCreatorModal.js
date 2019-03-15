@@ -6,10 +6,11 @@ import _ from 'lodash';
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
-import { CURSEMETA_API_URL, PACKS_PATH } from '../../constants';
+import { PACKS_PATH } from '../../constants';
 import styles from './CurseModpackBrowserCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
-import { addCursePackToQueue } from '../../actions/downloadManager'
+import { addCursePackToQueue } from '../../actions/downloadManager';
+import { getAddonFiles, getAddon } from '../../utils/cursemeta';
 
 type Props = {
   forgeManifest: Array,
@@ -25,21 +26,29 @@ const CurseModpackBrowserCreatorModal = props => {
   const [unMount, setUnMount] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingBtn, setLoadingBtn] = useState(false);
-  const [instanceName, setInstanceName] = useState("");
+  const [instanceName, setInstanceName] = useState('');
 
-  useEffect(async () => {
-    const { data } = await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}/files`);
-    const instanceNameVar = (await axios.get(`${CURSEMETA_API_URL}/direct/addon/${addonID}`)).data.name;
+  const getModPackData = async () => {
+    const files = await getAddonFiles(addonID);
+    const instanceNameVar = (await getAddon(addonID)).name;
+
     setInstanceName(instanceNameVar);
-    setVersions(data);
+    setVersions(files);
     setLoading(false);
+  };
+
+  useEffect(() => {
+    getModPackData();
   }, []);
 
   const handleSubmit = e => {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (!err) {
-        const name = values.packName !== undefined ? values.packName : instanceName.replace(/\W/g, '');
+        const name =
+          values.packName !== undefined
+            ? values.packName
+            : instanceName.replace(/\W/g, '');
         try {
           await promisify(fs.access)(path.join(PACKS_PATH, name));
           message.warning('An instance with this name already exists.');
@@ -60,7 +69,7 @@ const CurseModpackBrowserCreatorModal = props => {
       history={props.history}
       unMount={unMount}
       title="Create New Instance"
-      style={{ height: '55vh' }}
+      style={{ height: 330, width: 540 }}
     >
       <Form
         layout="inline"
@@ -70,16 +79,19 @@ const CurseModpackBrowserCreatorModal = props => {
         <div>
           <FormItem style={{ margin: 0 }}>
             {getFieldDecorator('packName', {
-              rules: [{
-                message: 'Please input a valid name with just numbers and letters',
-                pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
-              }]
+              rules: [
+                {
+                  message:
+                    'Please input a valid name with just numbers and letters',
+                  pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
+                }
+              ]
             })(
               <Input
                 autoFocus
                 size="large"
                 style={{
-                  width: '50vw',
+                  width: 450,
                   display: 'inline-block',
                   height: '60px'
                 }}
@@ -90,7 +102,11 @@ const CurseModpackBrowserCreatorModal = props => {
                     style={{ color: 'rgba(255,255,255,.8)' }}
                   />
                 }
-                placeholder={instanceName !== '' ? instanceName.replace(/\W/g, '') : 'Loading...'}
+                placeholder={
+                  instanceName !== ''
+                    ? instanceName.replace(/\W/g, '')
+                    : 'Loading...'
+                }
               />
             )}
           </FormItem>
@@ -106,23 +122,40 @@ const CurseModpackBrowserCreatorModal = props => {
                 placeholder="Select a version"
                 loading={loading}
               >
-                {_.reverse(versions.map(addon => <Select.Option key={addon.id}>{addon.fileName}</Select.Option>).slice())}
+                {_.reverse(
+                  versions
+                    .map(addon => (
+                      <Select.Option key={addon.id}>
+                        {addon.fileName.replace('.zip', '')}
+                      </Select.Option>
+                    ))
+                    .slice()
+                )}
               </Select>
             )}
           </FormItem>
         </div>
         <div className={styles.createInstance}>
-          <Button icon="plus" size="large" type="primary" htmlType="submit" loading={loadingBtn}>
+          <Button
+            icon="plus"
+            size="large"
+            type="primary"
+            htmlType="submit"
+            loading={loadingBtn}
+          >
             Create Instance
-            </Button>
+          </Button>
         </div>
       </Form>
     </Modal>
   );
-}
+};
 
 const mapDispatchToProps = {
   addCursePackToQueue
-}
+};
 
-export default connect(null, mapDispatchToProps)(Form.create()(CurseModpackBrowserCreatorModal));
+export default connect(
+  null,
+  mapDispatchToProps
+)(Form.create()(CurseModpackBrowserCreatorModal));

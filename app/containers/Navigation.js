@@ -14,4 +14,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(AuthActions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NavigationBar);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NavigationBar);

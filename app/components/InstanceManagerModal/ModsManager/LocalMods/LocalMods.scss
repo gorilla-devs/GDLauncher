@@ -1,4 +1,64 @@
-.transfer {
+@mixin modItem {
+  padding: 0 10px;
+}
+.listItemOdd {
+  @include modItem;
+  background: var(--secondary-color-2);
+}
+
+.listItemEven {
+  @include modItem;
+  background: var(--secondary-color-1);
+}
+
+.innerItemMod {
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.noMod {
   position: relative;
-  top: 20px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: -50px;
+  font-size: 25px;
+  div {
+    text-align: center;
+  }
+}
+
+.editIcon {
+  font-size: 17px;
+  margin: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.plusIcon
+ {
+  font-size: 25px;
+  margin: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.deleteIcon {
+  font-size: 17px;
+  margin: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    color: rgba(231, 76, 60, 0.8);
+  }
 }

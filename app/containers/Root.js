@@ -6,19 +6,16 @@ import { ConnectedRouter } from 'connected-react-router';
 import * as SettingsActions from '../actions/settings';
 import RouteDef from '../routes';
 
-
 type Props = {
   store: object,
   history: object
 };
 
 class Root extends Component<Props> {
-
-
   componentDidCatch(error, info) {
     if (error) {
       log.error(error);
-    } else if(info) {
+    } else if (info) {
       log.info(info);
     }
   }
@@ -37,8 +34,4 @@ class Root extends Component<Props> {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(SettingsActions, dispatch);
-}
-
-export default connect(null, mapDispatchToProps)(Root);
+export default Root;
