@@ -28,11 +28,13 @@ function JavaArguments(props) {
 
 
   let defaultArgs = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}${
+    //string added only if the os is win
     os.platform() === WINDOWS
       ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
       : ''
     }-Xms256m -Xmx{_RAM_}m`;
 
+  // store is red if it exist and if it doesn't it's create, read and setted to the redux store to be read by the instances launcher (utils/MCLaunchCommand)  
   async function readStoreJavaArg() {
     if (store.has('settings.java.javaArg')) {
       const storeJavaArgumentsSec = store.get('settings.java.javaArg');
@@ -47,6 +49,7 @@ function JavaArguments(props) {
     readStoreJavaArg();
   }, []);
 
+  //set the changed java arguments
   async function submit() {
     props.setArg(globalArgs);
     if (globalArgs) {
@@ -54,7 +57,7 @@ function JavaArguments(props) {
     } else message.error("enter valid arguments");
   }
 
-  //reset the global arguments
+  //reset the global arguments to the defalut one
   function reset() {
     store.set('settings.java.javaArg', defaultArgs);
     updateJavaArguments(defaultArgs);
