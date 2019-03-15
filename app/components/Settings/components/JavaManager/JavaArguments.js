@@ -9,7 +9,7 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { promisify } from 'util';
 import { connect } from 'react-redux';
 import store from '../../../../localStore';
-import { setArgs } from '../../../../actions/settings';
+import { setArgs, saveSettings } from '../../../../actions/settings';
 import { DEFAULT_ARGS } from '../../../../constants';
 import styles from './JavaManager.scss';
 
@@ -35,13 +35,15 @@ function JavaArguments(props) {
   async function submit() {
     props.setArgs(globalArgs);
     if (globalArgs) {
-      store.set('settings.java.javaArg', globalArgs);
+      updateJavaArguments(globalArgs);
+      props.saveSettings();
     } else message.error("enter valid arguments");
   }
 
   //reset the global arguments to the defalut one
   function reset() {
-    store.set('settings.java.javaArg', DEFAULT_ARGS);
+    updateJavaArguments(DEFAULT_ARGS);
+    props.saveSettings();
     updateJavaArguments(DEFAULT_ARGS);
   }
 
@@ -69,7 +71,8 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = {
-  setArgs
+  setArgs,
+  saveSettings
 }
 
 export default connect(
