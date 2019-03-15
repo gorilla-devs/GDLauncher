@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { routerActions } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
 import { Form, Input, Icon, Button, message } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
 import { promisify } from 'util';
 import fs from 'fs';
@@ -149,6 +151,49 @@ class Instances extends Component<Props> {
               closeModal={this.props.close}
             />
           ) : null}
+        </Card>
+
+        <Card style={{ marginTop: 15, height: 200 }} title="Java Manager">
+          <div style={{ display: 'inline', verticalAlign: 'middle' }}>
+            <Input
+              style={{
+                display: 'inline-block',
+                maxWidth: '76%',
+                marginRight: '10px',
+                marginBottom: 10,
+                marginTop: 4,
+                backgroundColor: 'var(--secondary-color-1)'
+              }}
+            />
+            <Button.Group
+              style={{
+                maxWidth: '60%',
+                marginBottom: 10,
+                marginTop: 4
+              }}
+            >
+              <Button
+                style={{
+                  maxWidth: '60%',
+                  marginBottom: 10,
+                  marginTop: 4
+                }}
+                type="primary"
+              >
+                <FontAwesomeIcon icon={faCheck} />
+              </Button>
+              <Button
+                style={{
+                  maxWidth: '60%',
+                  marginBottom: 10,
+                  marginTop: 4
+                }}
+                type="primary"
+              >
+                <FontAwesomeIcon icon={faUndo} />
+              </Button>
+            </Button.Group>
+          </div>
         </Card>
       </div>
     );
