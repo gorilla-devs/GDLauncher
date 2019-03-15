@@ -151,7 +151,7 @@ export function applyTheme(theme) {
   };
 }
 
-export function setArg(args) {
+export function setArgs(args) {
   return dispatch => {
     dispatch({
       type: SET_GLOBAL_JAVA_ARGUMENTS,

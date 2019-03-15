@@ -9,7 +9,7 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { promisify } from 'util';
 import { connect } from 'react-redux';
 import store from '../../../../localStore';
-import { setArg } from '../../../../actions/settings';
+import { setArgs } from '../../../../actions/settings';
 import { DEFAULT_ARGS } from '../../../../constants';
 import styles from './JavaManager.scss';
 
@@ -18,18 +18,13 @@ function JavaArguments(props) {
 
   const updateJavaArguments = javaArguments => {
     setglobalArgssInput(javaArguments);
-    props.setArg(javaArguments);
+    props.setArgs(javaArguments);
   }
 
   // store is red if it exist and if it doesn't it's create, read and setted to the redux store to be read by the instances launcher (utils/MCLaunchCommand)  
   async function readStoreJavaArg() {
-    if (store.has('settings.java.javaArg')) {
-      const storeJavaArgumentsSec = store.get('settings.java.javaArg');
-      updateJavaArguments(storeJavaArgumentsSec);
-    } else {
-      store.set('settings.java.javaArg', DEFAULT_ARGS);
-      updateJavaArguments(DEFAULT_ARGS);
-    }
+    const storeJavaArgumentsSec = store.get('settings.java.javaArg');
+    updateJavaArguments(storeJavaArgumentsSec);
   }
 
   useEffect(() => {
@@ -38,7 +33,7 @@ function JavaArguments(props) {
 
   //set the changed java arguments
   async function submit() {
-    props.setArg(globalArgs);
+    props.setArgs(globalArgs);
     if (globalArgs) {
       store.set('settings.java.javaArg', globalArgs);
     } else message.error("enter valid arguments");
@@ -74,7 +69,7 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = {
-  setArg
+  setArgs
 }
 
 export default connect(
