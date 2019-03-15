@@ -39,6 +39,22 @@ export default props => {
               secondary=""
             />
             <ChangelogRow
+              main="Modpacks downloads should now be 4x faster"
+              secondary="depending on your connection"
+            />
+            <ChangelogRow
+              main="We now show the 'Playing on GDLauncher' presence on discord"
+              secondary="hurraah!"
+            />
+            <ChangelogRow
+              main="Updated the download progress style when downloading instances"
+              secondary="do you like it??"
+            />
+            <ChangelogRow
+              main="You can now change the java arguments from the launcher settings!"
+              secondary="It will apply to all the instances"
+            />
+            <ChangelogRow
               main="Instances now have an animation when appearing."
               secondary="This will fix icons 'flashing' for a split second"
             />
