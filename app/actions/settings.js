@@ -157,6 +157,7 @@ export function setArgs(args) {
       type: SET_GLOBAL_JAVA_ARGUMENTS,
       payload: args,
     });
+    dispatch(saveSettings());
   };
 }
 

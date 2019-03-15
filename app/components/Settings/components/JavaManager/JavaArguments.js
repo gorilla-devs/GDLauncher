@@ -36,14 +36,11 @@ function JavaArguments(props) {
     props.setArgs(globalArgs);
     if (globalArgs) {
       updateJavaArguments(globalArgs);
-      props.saveSettings();
     } else message.error("enter valid arguments");
   }
 
   //reset the global arguments to the defalut one
   function reset() {
-    updateJavaArguments(DEFAULT_ARGS);
-    props.saveSettings();
     updateJavaArguments(DEFAULT_ARGS);
   }
 
