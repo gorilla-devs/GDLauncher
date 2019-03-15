@@ -1,11 +1,12 @@
 import path from 'path';
 import electron from 'electron';
-import { platform } from 'os';
+import { platform, homedir } from 'os';
 import getAppPath from './utils/getAppPath';
 
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
 export const DARWIN = 'darwin';
+export const DESKTOP_PATH = path.join(homedir(), 'Desktop');
 export const APPPATH = getAppPath();
 export const DATAPATH = path.join(
   process.env.APPDATA ||
@@ -42,7 +43,7 @@ export const DEFAULT_ARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInv
   platform() === WINDOWS
     ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
     : ''
-}-Xms256m -Xmx{_RAM_}m`;
+} -Xms256m -Xmx{_RAM_}m`;
 export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
 export const THEMES = {
