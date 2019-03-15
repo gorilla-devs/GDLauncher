@@ -21,7 +21,7 @@ function JavaArguments(props) {
     props.setArgs(javaArguments);
   }
 
-  // store is red if it exist and if it doesn't it's create, read and setted to the redux store to be read by the instances launcher (utils/MCLaunchCommand)  
+  // Store is red if it exists and if it doesn't it's created, read and set to the redux store to be read by the instances launcher (utils/MCLaunchCommand)    
   async function readStoreJavaArgs() {
     const storeJavaArguments = store.get('settings.java.javaArg');
     updateJavaArguments(storeJavaArguments);

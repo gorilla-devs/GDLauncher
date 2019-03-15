@@ -33,7 +33,7 @@ export function loadSettings() {
           autodetected: true,
           path: null,
           memory: 3072,
-          javaArg: DEFAULT_ARGS
+          javaArgs: DEFAULT_ARGS
         };
         if (
           !settings.java ||
