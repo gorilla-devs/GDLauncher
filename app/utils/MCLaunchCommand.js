@@ -60,17 +60,20 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
 
   const completeCMD = `
 
-"${javaPath}" ${javaArguments.replace('{_RAM_}', ram)} ${dosName} -Djava.library.path="${path.join(
+"${javaPath}" ${javaArguments.replace(
+    '{_RAM_}',
+    ram
+  )} ${dosName} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
     'natives'
   )}"
   -Dminecraft.client.jar="${path.join(
-   INSTANCES_PATH,
-   'versions',
-   vanillaJSON.id,
-   `${vanillaJSON.id}.jar`
- )}"
+    INSTANCES_PATH,
+    'versions',
+    vanillaJSON.id,
+    `${vanillaJSON.id}.jar`
+  )}"
  -cp ${libs
    .filter(lib => !lib.natives)
    .map(lib => `"${lib.path}"`)

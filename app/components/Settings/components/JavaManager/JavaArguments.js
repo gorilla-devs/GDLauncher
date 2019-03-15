@@ -4,34 +4,26 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import store from '../../../../localStore';
-import { setArgs } from '../../../../actions/settings';
+import { setJavaArgs } from '../../../../actions/settings';
 import { DEFAULT_ARGS } from '../../../../constants';
 
 type Props = {
-  setArgs: () => void
+  setJavaArgs: () => void,
+  javaArgs: string
 };
 
 function JavaArguments(props: Props) {
-  const [globalArgs, setGlobalArgsInput] = useState(null);
+  const { javaArgs } = props;
+  const [globalArgs, setGlobalArgsInput] = useState(javaArgs);
 
   const updateJavaArguments = javaArguments => {
     setGlobalArgsInput(javaArguments);
-    props.setArgs(javaArguments);
+    props.setJavaArgs(javaArguments);
   };
 
-  // Store is red if it exists and if it doesn't it's created, read and set to the redux store to be read by the instances launcher (utils/MCLaunchCommand)
-  async function readStoreJavaArgs() {
-    const storeJavaArguments = store.get('settings.java.javaArg');
-    updateJavaArguments(storeJavaArguments);
-  }
-
-  useEffect(() => {
-    readStoreJavaArgs();
-  }, []);
-
   // Set the changed java arguments
-  async function submit() {
-    props.setArgs(globalArgs);
+  function submit() {
+    props.setJavaArgs(globalArgs);
     if (globalArgs) {
       updateJavaArguments(globalArgs);
     } else message.error('Enter Valid Arguments');
@@ -67,11 +59,17 @@ function JavaArguments(props: Props) {
   );
 }
 
+const mapStateToProps = state => {
+  return {
+    javaArgs: state.settings.java.javaArgs
+  };
+};
+
 const mapDispatchToProps = {
-  setArgs
+  setJavaArgs
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(JavaArguments);
