@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Input, Button, message } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
-import store from '../../../../localStore';
 import { setJavaArgs } from '../../../../actions/settings';
 import { DEFAULT_ARGS } from '../../../../constants';
 
@@ -29,23 +28,35 @@ function JavaArguments(props: Props) {
     } else message.error('Enter Valid Arguments');
   }
 
-  // Reset the global arguments to the defalut one
+  // Reset the global arguments to the default one
   function reset() {
     updateJavaArguments(DEFAULT_ARGS);
   }
 
   return (
     <div>
-      <div style={{ display: 'inline' }}>
+      <div style={{ marginBottom: 10 }}>
+        <span style={{ fontSize: 18 }}>Java Custom Path</span>
+      </div>
+      <div style={{ display: 'inline', verticalAlign: 'middle' }}>
         <Input
           value={globalArgs}
           style={{
+            display: 'inline-block',
             maxWidth: '80%',
-            marginRight: '10px'
+            marginRight: '10px',
+            marginBottom: 10,
+            marginTop: 4
           }}
           onChange={e => setGlobalArgsInput(e.target.value)}
         />
-        <Button.Group>
+        <Button.Group
+          style={{
+            maxWidth: '70%',
+            marginBottom: 10,
+            marginTop: 4
+          }}
+        >
           <Button type="primary" onClick={() => submit()}>
             <FontAwesomeIcon icon={faCheck} />
           </Button>
