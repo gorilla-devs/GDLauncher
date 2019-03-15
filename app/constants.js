@@ -1,5 +1,6 @@
 import path from 'path';
 import electron from 'electron';
+import { platform } from 'os';
 import getAppPath from './utils/getAppPath';
 
 export const WINDOWS = 'win32';
@@ -8,7 +9,7 @@ export const DARWIN = 'darwin';
 export const APPPATH = getAppPath();
 export const DATAPATH = path.join(
   process.env.APPDATA ||
-  (electron.app || electron.remote.app).getPath('userData'),
+    (electron.app || electron.remote.app).getPath('userData'),
   'GDLauncher'
 );
 export const LAUNCHER_FOLDER = 'launcherData';
@@ -37,6 +38,11 @@ export const NEWS_URL =
   'https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/culture,minecraft:article/insider,minecraft:article/merch,minecraft:article/news&propResPath=/content/minecraft-net/language-masters/it-it/jcr:content/root/generic-container/par/grid&count=2000&pageSize=10&tag=ALL';
 export const JAVA_URL =
   'https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html';
+export const DEFAULT_ARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${
+  platform() === WINDOWS
+    ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
+    : ''
+}-Xms256m -Xmx{_RAM_}m`;
 export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
 export const THEMES = {
