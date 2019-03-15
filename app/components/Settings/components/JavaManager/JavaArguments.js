@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 import store from '../../../../localStore';
 import { setArg } from '../../../../actions/settings';
 import { DATAPATH, WINDOWS } from '../../../../constants';
-
+import styles from './JavaManager.scss';
 
 function JavaArguments(props) {
   const [globalArgs, setglobalArgssInput] = useState(null);
@@ -64,7 +64,7 @@ function JavaArguments(props) {
     <div>
       <div style={{ display: 'inline' }}>
         <Input value={globalArgs} style={{
-          maxWidth: '75%',
+          maxWidth: '80%',
           marginRight: '10px'
         }} onChange={(e) => setglobalArgssInput(e.target.value)} />
         <Button.Group>
