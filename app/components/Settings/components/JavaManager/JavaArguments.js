@@ -14,21 +14,21 @@ import { DEFAULT_ARGS } from '../../../../constants';
 import styles from './JavaManager.scss';
 
 function JavaArguments(props) {
-  const [globalArgs, setglobalArgssInput] = useState(null);
+  const [globalArgs, setglobalArgsInput] = useState(null);
 
   const updateJavaArguments = javaArguments => {
-    setglobalArgssInput(javaArguments);
+    setglobalArgsInput(javaArguments);
     props.setArgs(javaArguments);
   }
 
   // store is red if it exist and if it doesn't it's create, read and setted to the redux store to be read by the instances launcher (utils/MCLaunchCommand)  
-  async function readStoreJavaArg() {
-    const storeJavaArgumentsSec = store.get('settings.java.javaArg');
-    updateJavaArguments(storeJavaArgumentsSec);
+  async function readStoreJavaArgs() {
+    const storeJavaArguments = store.get('settings.java.javaArg');
+    updateJavaArguments(storeJavaArguments);
   }
 
   useEffect(() => {
-    readStoreJavaArg();
+    readStoreJavaArgs();
   }, []);
 
   //set the changed java arguments
@@ -36,7 +36,7 @@ function JavaArguments(props) {
     props.setArgs(globalArgs);
     if (globalArgs) {
       updateJavaArguments(globalArgs);
-    } else message.error("enter valid arguments");
+    } else message.error("Enter Valid Arguments");
   }
 
   //reset the global arguments to the defalut one
@@ -50,7 +50,7 @@ function JavaArguments(props) {
         <Input value={globalArgs} style={{
           maxWidth: '80%',
           marginRight: '10px'
-        }} onChange={(e) => setglobalArgssInput(e.target.value)} />
+        }} onChange={(e) => setglobalArgsInput(e.target.value)} />
         <Button.Group>
           <Button type="primary" onClick={() => submit()}><FontAwesomeIcon icon={faCheck} /></Button>
           <Button type="primary" onClick={() => reset()}><FontAwesomeIcon icon={faUndo} /></Button>

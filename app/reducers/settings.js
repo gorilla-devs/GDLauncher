@@ -15,7 +15,7 @@ const initialState = {
     autodetected: true,
     path: null,
     memory: 3096,
-    javaArg: DEFAULT_ARGS
+    javaArgs: DEFAULT_ARGS
   },
   theme: THEMES.default
 };
@@ -64,7 +64,7 @@ export default function Settings(state = initialState, action) {
       ...state,
       java: {
         ...state.java,
-        javaArg: action.payload
+        javaArgs: action.payload
       }
     };
     default:
