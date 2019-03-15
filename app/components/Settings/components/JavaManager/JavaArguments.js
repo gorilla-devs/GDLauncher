@@ -9,9 +9,13 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { promisify } from 'util';
 import { connect } from 'react-redux';
 import store from '../../../../localStore';
-import { setArgs, saveSettings } from '../../../../actions/settings';
+import { setArgs } from '../../../../actions/settings';
 import { DEFAULT_ARGS } from '../../../../constants';
 import styles from './JavaManager.scss';
+
+type Props ={
+  setArgs: () => void
+}
 
 function JavaArguments(props) {
   const [globalArgs, setglobalArgsInput] = useState(null);
@@ -61,18 +65,11 @@ function JavaArguments(props) {
   );
 }
 
-function mapStateToProps(state) {
-  return {
-    ram: state.settings.java.memory
-  };
-}
-
 const mapDispatchToProps = {
-  setArgs,
-  saveSettings
+  setArgs
 }
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(JavaArguments);
