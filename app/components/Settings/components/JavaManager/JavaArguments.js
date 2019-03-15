@@ -10,7 +10,7 @@ import { promisify } from 'util';
 import { connect } from 'react-redux';
 import store from '../../../../localStore';
 import { setArg } from '../../../../actions/settings';
-import { DATAPATH, WINDOWS } from '../../../../constants';
+import { DEFAULT_ARGS } from '../../../../constants';
 import styles from './JavaManager.scss';
 
 function JavaArguments(props) {
@@ -21,27 +21,14 @@ function JavaArguments(props) {
     props.setArg(javaArguments);
   }
 
-  const dosName =
-    os.release().substr(0, 2) === 10
-      ? '"-Dos.name=Windows 10" -Dos.version=10.0 '
-      : '';
-
-
-  let defaultArgs = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${dosName}${
-    //string added only if the os is win
-    os.platform() === WINDOWS
-      ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
-      : ''
-    }-Xms256m -Xmx{_RAM_}m`;
-
   // store is red if it exist and if it doesn't it's create, read and setted to the redux store to be read by the instances launcher (utils/MCLaunchCommand)  
   async function readStoreJavaArg() {
     if (store.has('settings.java.javaArg')) {
       const storeJavaArgumentsSec = store.get('settings.java.javaArg');
       updateJavaArguments(storeJavaArgumentsSec);
     } else {
-      store.set('settings.java.javaArg', defaultArgs);
-      updateJavaArguments(defaultArgs);
+      store.set('settings.java.javaArg', DEFAULT_ARGS);
+      updateJavaArguments(DEFAULT_ARGS);
     }
   }
 
@@ -59,8 +46,8 @@ function JavaArguments(props) {
 
   //reset the global arguments to the defalut one
   function reset() {
-    store.set('settings.java.javaArg', defaultArgs);
-    updateJavaArguments(defaultArgs);
+    store.set('settings.java.javaArg', DEFAULT_ARGS);
+    updateJavaArguments(DEFAULT_ARGS);
   }
 
   return (

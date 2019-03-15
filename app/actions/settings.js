@@ -2,7 +2,7 @@ import log from 'electron-log';
 import { message } from 'antd';
 import _ from 'lodash';
 import store from '../localStore';
-import { THEMES } from '../constants';
+import { THEMES, DEFAULT_ARGS } from '../constants';
 
 export const LOAD_SETTINGS = 'LOAD_SETTINGS';
 export const SET_SOUNDS = 'SET_SOUNDS';
@@ -32,7 +32,8 @@ export function loadSettings() {
         const javaSettings = {
           autodetected: true,
           path: null,
-          memory: 3072
+          memory: 3072,
+          javaArg: DEFAULT_ARGS
         };
         if (
           !settings.java ||
