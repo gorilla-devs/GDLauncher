@@ -352,7 +352,7 @@ export default class DInstance extends Component<Props> {
             </span>{' '}
             Export
           </MenuItem>
-          <MenuItem
+          {/* <MenuItem
             disabled={
               this.isInstalling() ||
               !isValid ||
@@ -364,7 +364,7 @@ export default class DInstance extends Component<Props> {
               <FontAwesomeIcon icon={faWrench} />
             </span>{' '}
             Repair
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem
             disabled={
               this.isInstalling() || playing.find(el => el.name === name)
