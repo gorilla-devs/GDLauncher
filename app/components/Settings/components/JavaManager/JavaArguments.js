@@ -57,10 +57,26 @@ function JavaArguments(props: Props) {
             marginTop: 4
           }}
         >
-          <Button type="primary" onClick={() => submit()}>
+          <Button
+            style={{
+              maxWidth: '70%',
+              marginBottom: 10,
+              marginTop: 4
+            }}
+            type="primary"
+            onClick={() => submit()}
+          >
             <FontAwesomeIcon icon={faCheck} />
           </Button>
-          <Button type="primary" onClick={() => reset()}>
+          <Button
+            style={{
+              maxWidth: '70%',
+              marginBottom: 10,
+              marginTop: 4
+            }}
+            type="primary"
+            onClick={() => reset()}
+          >
             <FontAwesomeIcon icon={faUndo} />
           </Button>
         </Button.Group>
