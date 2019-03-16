@@ -100,7 +100,8 @@ const LocalMods = props => {
             display: 'flex',
             justifyContent: 'space-around',
             alignItems: 'center',
-            height: 40
+            height: 40,
+            marginLeft: 7
           }}
         >
           <Checkbox
@@ -122,7 +123,9 @@ const LocalMods = props => {
               );
             }}
           />
-          {filteredMods.filter(v => v.selected === true).length} mods selected
+          <span style={{ width: 140 }}>
+            {filteredMods.filter(v => v.selected === true).length} mods selected
+          </span>
           <FontAwesomeIcon className={styles.deleteIcon} icon={faTrash} />
         </div>
         <Input
@@ -168,7 +171,7 @@ const LocalMods = props => {
               <ModRow
                 {...propss}
                 toggleSize={toggleSize}
-                filteredMods={filteredMods}
+                  modData={filteredMods[propss.index]}
                 setFilteredMods={setFilteredMods}
                 instance={props.match.params.instance}
               />
