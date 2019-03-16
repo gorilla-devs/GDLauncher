@@ -117,6 +117,7 @@ export function checkAccessToken() {
         type: START_TOKEN_CHECK_LOADING
       });
       try {
+        // First of all we try validating the stored access token
         const res = await axios.post(
           ACCESS_TOKEN_VALIDATION_URL,
           {
@@ -137,7 +138,7 @@ export function checkAccessToken() {
         return res;
       } catch (error) {
         if (error.response && error.response.status === 403) {
-          // Trying again refreshing the access token
+          // Trying refreshing the stored access token
           const newUserData = await refreshAccessToken(
             userData.accessToken,
             true
@@ -213,7 +214,6 @@ export function tryNativeLauncherProfiles() {
       vnlJson.authenticationDatabase[
         newUserData.selectedProfile.userId
       ].accessToken = newUserData.accessToken;
-      console.log(vnlJson);
       await fsa.writeJson(
         path.join(vanillaMCPath, 'launcher_profiles.json'),
         vnlJson
@@ -273,7 +273,11 @@ const getClientToken = () => {
   return uuidv4().replace('-', '');
 };
 
-const refreshAccessToken = async (accessToken, requestUser = false) => {
+// Returns the user data if successful, otherwise returns false
+const refreshAccessToken = async (
+  accessToken: string,
+  requestUser: boolean = false
+): boolean | {} => {
   try {
     const response = await axios.post(
       ACCESS_TOKEN_REFRESH_URL,
