@@ -83,121 +83,127 @@ function Instances(props) {
 
   const { getFieldDecorator } = props.form;
   return (
-    <div>
-      <h2>Edit Instance Settings</h2>
-      <Form layout="inline" onSubmit={e => handleSubmit(e)}>
-        <div>
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              height: '60px',
-              margin: 0
-            }}
-          >
-            <FormItem>
-              {getFieldDecorator('packName', {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please input a valid name',
-                    pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
-                  }
-                ],
-                initialValue: props.instance
-              })(
-                <Input
+    <div className={styles.container}>
+      <div className={styles.innerContainer}>
+        <div className={styles.content}>
+          <h2>Edit Instance Settings</h2>
+          <Form layout="inline" onSubmit={e => handleSubmit(e)}>
+            <div>
+              <div
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  height: '60px',
+                  margin: 0,
+                  overflowY: 'auto'
+                }}
+              >
+                <FormItem>
+                  {getFieldDecorator('packName', {
+                    rules: [
+                      {
+                        required: true,
+                        message: 'Please input a valid name',
+                        pattern: new RegExp(
+                          '^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$'
+                        )
+                      }
+                    ],
+                    initialValue: props.instance
+                  })(
+                    <Input
+                      size="large"
+                      style={{
+                        width: 300,
+                        display: 'inline-block',
+                        height: 60
+                      }}
+                      prefix={
+                        <Icon
+                          type="play-circle"
+                          theme="filled"
+                          style={{ color: 'rgba(255,255,255,.8)' }}
+                        />
+                      }
+                      placeholder="Instance Name"
+                    />
+                  )}
+                </FormItem>
+                <Button
+                  icon="save"
                   size="large"
+                  type="primary"
+                  htmlType="submit"
                   style={{
-                    width: 300,
+                    width: 150,
                     display: 'inline-block',
                     height: 60
                   }}
-                  prefix={
-                    <Icon
-                      type="play-circle"
-                      theme="filled"
-                      style={{ color: 'rgba(255,255,255,.8)' }}
-                    />
-                  }
-                  placeholder="Instance Name"
-                />
-              )}
-            </FormItem>
-            <Button
-              icon="save"
-              size="large"
-              type="primary"
-              htmlType="submit"
-              style={{
-                width: 150,
-                display: 'inline-block',
-                height: 60
-              }}
-            >
-              Rename
-            </Button>
-          </div>
-        </div>
-      </Form>
+                >
+                  Rename
+                </Button>
+              </div>
+            </div>
+          </Form>
+          <Card style={{ marginTop: 15 }} title="Forge Manager">
+            {!checkingForge ? (
+              <ForgeManager
+                name={props.instance}
+                data={instanceConfig}
+                closeModal={props.close}
+              />
+            ) : null}
+          </Card>
 
-      <Card style={{ marginTop: 15 }} title="Forge Manager">
-        {!checkingForge ? (
-          <ForgeManager
-            name={props.instance}
-            data={instanceConfig}
-            closeModal={props.close}
-          />
-        ) : null}
-      </Card>
-
-      <Card style={{ marginTop: 15, height: 200 }} title="Java Manager">
-        <JavaMemorySlider
-          ram={props.settings.java.memory}
-          is64bit={is64bit}
-          updateMemory={props.setJavaMemory}
-        />
-        <div style={{ display: 'inline', verticalAlign: 'middle' }}>
-          <Input
-            style={{
-              display: 'inline-block',
-              maxWidth: '76%',
-              marginRight: '10px',
-              marginBottom: 10,
-              marginTop: 4,
-              backgroundColor: 'var(--secondary-color-1)'
-            }}
-          />
-          <Button.Group
-            style={{
-              maxWidth: '60%',
-              marginBottom: 10,
-              marginTop: 4
-            }}
-          >
-            <Button
-              style={{
-                maxWidth: '60%',
-                marginBottom: 10,
-                marginTop: 4
-              }}
-              type="primary"
-            >
-              <FontAwesomeIcon icon={faCheck} />
-            </Button>
-            <Button
-              style={{
-                maxWidth: '60%',
-                marginBottom: 10,
-                marginTop: 4
-              }}
-              type="primary"
-            >
-              <FontAwesomeIcon icon={faUndo} />
-            </Button>
-          </Button.Group>
+          <Card style={{ marginTop: 15, height: 200 }} title="Java Manager">
+            <JavaMemorySlider
+              ram={props.settings.java.memory}
+              is64bit={is64bit}
+              updateMemory={props.setJavaMemory}
+            />
+            <div style={{ display: 'inline', verticalAlign: 'middle' }}>
+              <Input
+                style={{
+                  display: 'inline-block',
+                  maxWidth: '76%',
+                  marginRight: '10px',
+                  marginBottom: 10,
+                  marginTop: 4,
+                  backgroundColor: 'var(--secondary-color-1)'
+                }}
+              />
+              <Button.Group
+                style={{
+                  maxWidth: '60%',
+                  marginBottom: 10,
+                  marginTop: 4
+                }}
+              >
+                <Button
+                  style={{
+                    maxWidth: '60%',
+                    marginBottom: 10,
+                    marginTop: 4
+                  }}
+                  type="primary"
+                >
+                  <FontAwesomeIcon icon={faCheck} />
+                </Button>
+                <Button
+                  style={{
+                    maxWidth: '60%',
+                    marginBottom: 10,
+                    marginTop: 4
+                  }}
+                  type="primary"
+                >
+                  <FontAwesomeIcon icon={faUndo} />
+                </Button>
+              </Button.Group>
+            </div>
+          </Card>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
