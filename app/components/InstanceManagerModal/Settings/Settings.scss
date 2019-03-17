@@ -5,3 +5,19 @@
   max-width: 69%;
   margin-right: 15px !important;
 }
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.mainText {
+  font-size: 18px;
+}
+
+.description {
+  font-size: 14px;
+  color: $text-dark;
+  padding: 5px;
+}
