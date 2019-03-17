@@ -171,7 +171,7 @@ const LocalMods = props => {
               <ModRow
                 {...propss}
                 toggleSize={toggleSize}
-                  modData={filteredMods[propss.index]}
+                modData={filteredMods[propss.index]}
                 setFilteredMods={setFilteredMods}
                 instance={props.match.params.instance}
               />
