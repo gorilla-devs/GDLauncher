@@ -21,6 +21,7 @@ function javaMemorySlider(props) {
       <div className={styles.container}>
         <div>
           <div className={styles.mainText}>
+            <Switch className={styles.switch} />
             Java Memory (
             {props.is64bit ? (
               '64 bit)'
@@ -39,7 +40,6 @@ function javaMemorySlider(props) {
                 </Tooltip>
               </span>
             )}
-            <Switch className={styles.switch}/>
           </div>
           <div className={styles.description}>{description}</div>
         </div>
