@@ -6,7 +6,7 @@ import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import styles from './JavaMemorySlider.scss';
 
 function javaMemorySlider(props) {
-  const { mainText, icon, description, updateMemory, ram } = props;
+  const { mainText, icon, description, updateMemory, ram, is64bit } = props;
   const [memory, setMemory] = useState(ram);
 
   const marks = {
@@ -16,14 +16,15 @@ function javaMemorySlider(props) {
     16384: '16384'
   };
 
+  const toggleOverrideJavaArguments = () => {};
+
   return (
     <div>
       <div className={styles.container}>
         <div>
           <div className={styles.mainText}>
-            <Switch className={styles.switch} />
             Java Memory (
-            {props.is64bit ? (
+            {is64bit ? (
               '64 bit)'
             ) : (
               <span>
@@ -31,7 +32,7 @@ function javaMemorySlider(props) {
                 <Tooltip
                   placement="right"
                   title="Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used.
-                   If you want more, install or select a 64 bit java executable"
+                  If you want more, install or select a 64 bit java executable"
                 >
                   <FontAwesomeIcon
                     className={styles.iconPointer}
@@ -40,6 +41,10 @@ function javaMemorySlider(props) {
                 </Tooltip>
               </span>
             )}
+            <Switch
+              className={styles.switch}
+              onChange={e => toggleOverrideJavaArguments(e)}
+            />
           </div>
           <div className={styles.description}>{description}</div>
         </div>
@@ -52,7 +57,7 @@ function javaMemorySlider(props) {
         max={
           // If 32 bit, set max 1.5gb memory
           // https://developer.ibm.com/answers/questions/175172/why-can-i-not-set-a-maximum-heap-setting-xmx-over/
-          props.is64bit ? os.totalmem() / 1000000 : 1536
+          is64bit ? os.totalmem() / 1000000 : 1536
         }
         defaultValue={ram}
         onChange={v => setMemory(v)}

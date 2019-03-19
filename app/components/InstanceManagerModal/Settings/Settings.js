@@ -188,6 +188,7 @@ function Instances(props: Props) {
               ram={props.settings.java.memory}
               is64bit={is64bit}
               updateMemory={props.setJavaMemory}
+              javaArguments={overrideArgs}
             />
             <div style={{ display: 'inline', verticalAlign: 'middle' }}>
               <Input
