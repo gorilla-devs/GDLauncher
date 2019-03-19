@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { routerActions } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import { Form, Input, Icon, Button, message, Slider } from 'antd';
+import { Form, Input, Icon, Button, message, Slider, Switch } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
@@ -202,6 +202,7 @@ function Instances(props: Props) {
                 }}
                 onChange={e => setOverrideArgsInput(e.target.value)}
               />
+
               <Button.Group
                 style={{
                   maxWidth: '60%',

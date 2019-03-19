@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon, Slider, Tooltip } from 'antd';
+import { Icon, Slider, Tooltip, Switch } from 'antd';
 import os from 'os';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
@@ -39,6 +39,7 @@ function javaMemorySlider(props) {
                 </Tooltip>
               </span>
             )}
+            <Switch className={styles.switch}/>
           </div>
           <div className={styles.description}>{description}</div>
         </div>
