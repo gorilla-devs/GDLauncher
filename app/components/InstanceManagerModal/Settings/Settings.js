@@ -14,18 +14,46 @@ import { PACKS_PATH } from '../../../constants';
 import styles from './Settings.scss';
 import JavaMemorySlider from './javaMemorySlider';
 import { history } from '../../../store/configureStore';
-import { setJavaMemory } from '../../../actions/settings';
+import { setJavaMemory, setJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
+import { DEFAULT_ARGS } from '../../../constants';
 
 const FormItem = Form.Item;
 
-function Instances(props) {
+type Props = {
+  setJavaArgs: () => void,
+  javaArgs: string
+};
+
+function Instances(props: Props) {
+  const { javaArgs } = props;
+  
   const [is64bit, setIs64bit] = useState(true);
   const [instanceConfig, setInstanceConfig] = useState(null);
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
+  const [overrideArgs, setOverrideArgsInput] = useState(javaArgs);
 
   let watcher = null;
+
+  const updateJavaArguments = javaArguments => {
+    setOverrideArgsInput(javaArguments);
+    props.setJavaArgs(javaArguments);
+  };
+
+  // Reset the global arguments to the default one
+  const reset= () => {
+    updateJavaArguments(DEFAULT_ARGS);
+  }
+
+  // Set the changed java arguments
+  const submit = () => {
+    props.setJavaArgs(overrideArgs);
+    console.log(props.settings.java.memory, 'diopeppe');
+    if (overrideArgs) {
+      updateJavaArguments(overrideArgs);
+    } else message.error('Enter Valid Arguments');
+  };
 
   async function configManagment() {
     try {
@@ -171,6 +199,7 @@ function Instances(props) {
                   marginTop: 4,
                   backgroundColor: 'var(--secondary-color-1)'
                 }}
+                onChange={e => setOverrideArgsInput(e.target.value)}
               />
               <Button.Group
                 style={{
@@ -185,6 +214,7 @@ function Instances(props) {
                     marginBottom: 10,
                     marginTop: 4
                   }}
+                  onClick={() => submit()}
                   type="primary"
                 >
                   <FontAwesomeIcon icon={faCheck} />
@@ -196,6 +226,7 @@ function Instances(props) {
                     marginTop: 4
                   }}
                   type="primary"
+                  onClick={() => reset()}
                 >
                   <FontAwesomeIcon icon={faUndo} />
                 </Button>
@@ -210,12 +241,14 @@ function Instances(props) {
 
 function mapStateToProps(state) {
   return {
-    settings: state.settings
+    settings: state.settings,
+    javaArgs: state.settings.java.javaArgs
   };
 }
 
 const mapDispatchToProps = {
-  setJavaMemory
+  setJavaMemory,
+  setJavaArgs
 };
 
 export default Form.create()(
