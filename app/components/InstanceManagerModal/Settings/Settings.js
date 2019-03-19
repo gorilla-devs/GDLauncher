@@ -27,7 +27,7 @@ type Props = {
 
 function Instances(props: Props) {
   const { javaArgs } = props;
-  
+
   const [is64bit, setIs64bit] = useState(true);
   const [instanceConfig, setInstanceConfig] = useState(null);
   const [checkingForge, setCheckingForge] = useState(true);
@@ -42,9 +42,9 @@ function Instances(props: Props) {
   };
 
   // Reset the global arguments to the default one
-  const reset= () => {
+  const reset = () => {
     updateJavaArguments(DEFAULT_ARGS);
-  }
+  };
 
   // Set the changed java arguments
   const submit = () => {
@@ -191,6 +191,7 @@ function Instances(props: Props) {
             />
             <div style={{ display: 'inline', verticalAlign: 'middle' }}>
               <Input
+                value={overrideArgs}
                 style={{
                   display: 'inline-block',
                   maxWidth: '76%',
