@@ -14,7 +14,7 @@ import { PACKS_PATH } from '../../../constants';
 import styles from './Settings.scss';
 import JavaMemorySlider from './javaMemorySlider';
 import { history } from '../../../store/configureStore';
-import { setJavaMemory, setJavaArgs } from '../../../actions/settings';
+import { setOverrideJavaMemory, setJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
 import { DEFAULT_ARGS } from '../../../constants';
 
@@ -209,9 +209,9 @@ function Instances(props: Props) {
 
           <Card style={{ marginTop: 15, height: 200 }} title="Java Manager">
             <JavaMemorySlider
-              ram={props.settings.java.memory}
+              ram={props.settings.java.overrideMemory}
               is64bit={is64bit}
-              updateMemory={props.setJavaMemory}
+              updateMemory={props.setOverrideJavaMemory}
               javaArguments={overrideArgs}
               instanceName={props.instance}
             />
@@ -270,12 +270,13 @@ function Instances(props: Props) {
 function mapStateToProps(state) {
   return {
     settings: state.settings,
-    javaArgs: state.settings.java.javaArgs
+    javaArgs: state.settings.java.javaArgs,
+    overrideMemory: state.settings.java.overrideMemory
   };
 }
 
 const mapDispatchToProps = {
-  setJavaMemory,
+  setOverrideJavaMemory,
   setJavaArgs
 };
 

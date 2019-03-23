@@ -12,6 +12,7 @@ export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
 export const SET_GLOBAL_JAVA_ARGUMENTS = 'SET_GLOBAL_JAVA_ARGUMENTS';
 export const SET_OVERRIDE_JAVA_ARGUMENTS = 'SET_OVERRIDE_JAVA_ARGUMENTS';
+export const SET_OVERRIDE_JAVA_MEMORY = 'SET_OVERRIDE_JAVA_MEMORY';
 
 export function loadSettings() {
   return dispatch => {
@@ -162,11 +163,11 @@ export function setJavaArgs(args) {
   };
 }
 
-export function toggleOverrideJavaArguments(args) {
+export function setOverrideJavaMemory(amount) {
   return dispatch => {
     dispatch({
-      type: SET_OVERRIDE_JAVA_ARGUMENTS,
-      payload: args
+      type: SET_OVERRIDE_JAVA_MEMORY,
+      payload: amount
     });
     dispatch(saveSettings());
   };

@@ -6,7 +6,8 @@ import {
   SET_THEME,
   RESET_THEME,
   SET_GLOBAL_JAVA_ARGUMENTS,
-  SET_OVERRIDE_JAVA_ARGUMENTS
+  SET_OVERRIDE_JAVA_ARGUMENTS,
+  SET_OVERRIDE_JAVA_MEMORY
 } from '../actions/settings';
 import { THEMES, DEFAULT_ARGS } from '../constants';
 
@@ -17,7 +18,7 @@ const initialState = {
     path: null,
     memory: 3096,
     javaArgs: DEFAULT_ARGS,
-    toggleOverrideJavaArguments: false
+    overrideMemory: 3096
   },
   theme: THEMES.default
 };
@@ -69,12 +70,12 @@ export default function Settings(state = initialState, action) {
           javaArgs: action.payload
         }
       };
-    case SET_OVERRIDE_JAVA_ARGUMENTS:
+    case SET_OVERRIDE_JAVA_MEMORY:
       return {
         ...state,
         java: {
           ...state.java,
-          toggleOverrideJavaArguments: action.payload
+          overrideMemory: action.payload
         }
       };
     default:
