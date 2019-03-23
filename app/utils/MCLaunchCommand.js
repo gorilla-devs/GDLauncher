@@ -58,12 +58,17 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
     forge === null ? vanillaJSON.mainClass : forgeJSON.mainClass;
   const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 
+  const config = JSON.parse(
+    await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
+  );
   const completeCMD = `
 
-"${javaPath}" ${javaArguments.replace(
-    '{_RAM_}',
-    ram
-  )} ${dosName} -Djava.library.path="${path.join(
+"${javaPath}" ${(config.overrideArgs = ''
+    ? javaArguments
+    : config.overrideArgs.replace(
+        '{_RAM_}',
+        ram
+      ))} ${dosName} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
     'natives'

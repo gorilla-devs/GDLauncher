@@ -42,15 +42,39 @@ function Instances(props: Props) {
   };
 
   // Reset the global arguments to the default one
-  const reset = () => {
+  const reset = async () => {
     updateJavaArguments(DEFAULT_ARGS);
+    const config = JSON.parse(
+      await promisify(fs.readFile)(
+        path.join(PACKS_PATH, props.instance, 'config.json')
+      )
+    );
+    config.overrideArgs = DEFAULT_ARGS;
+    const config2 = JSON.stringify(config);
+    console.log(config2);
+    await promisify(fs.writeFile)(
+      path.join(PACKS_PATH, props.instance, 'config.json'),
+      config2
+    );
   };
 
   // Set the changed java arguments
-  const submit = () => {
+  const submit = async () => {
     props.setJavaArgs(overrideArgs);
     console.log(props.settings.java.memory, 'diopeppe');
     if (overrideArgs) {
+      const config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, props.instance, 'config.json')
+        )
+      );
+      config.overrideArgs = overrideArgs;
+      const config2 = JSON.stringify(config);
+      console.log(config2);
+      await promisify(fs.writeFile)(
+        path.join(PACKS_PATH, props.instance, 'config.json'),
+        config2
+      );
       updateJavaArguments(overrideArgs);
     } else message.error('Enter Valid Arguments');
   };

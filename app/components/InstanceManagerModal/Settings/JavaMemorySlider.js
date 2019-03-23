@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Icon, Slider, Tooltip, Switch } from 'antd';
 import os from 'os';
@@ -23,6 +23,7 @@ function javaMemorySlider(props) {
     toggleOverrideJavaArguments
   } = props;
   const [memory, setMemory] = useState(ram);
+  const [switchState, setSwitchState] = useState(false);
 
   const marks = {
     2048: '2048',
@@ -30,6 +31,21 @@ function javaMemorySlider(props) {
     8192: '8192',
     16384: '16384'
   };
+
+  const checkSwitchState = async () => {
+    const config = JSON.parse(
+      await promisify(fs.readFile)(
+        path.join(PACKS_PATH, props.instanceName, 'config.json')
+      )
+    );
+    if (config.overrideArgs != '') {
+      setSwitchState(true);
+    } else setSwitchState(false);
+  };
+
+  useEffect(() => {
+    checkSwitchState();
+  });
 
   async function toggleJavaArguments(e) {
     try {
@@ -55,7 +71,6 @@ function javaMemorySlider(props) {
           config2
         );
       }
-
       toggleOverrideJavaArguments(config.overrideArgs);
     } catch (err) {
       console.error(err);
@@ -88,6 +103,7 @@ function javaMemorySlider(props) {
             <Switch
               className={styles.switch}
               onChange={e => toggleJavaArguments(e)}
+              checked={switchState}
             />
           </div>
           <div className={styles.description}>{description}</div>
