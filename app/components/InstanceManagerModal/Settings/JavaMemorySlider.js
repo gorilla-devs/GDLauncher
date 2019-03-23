@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import { Icon, Slider, Tooltip, Switch } from 'antd';
 import os from 'os';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
+import { func } from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import styles from './JavaMemorySlider.scss';
+import { toggleOverrideJavaArguments } from '../../../actions/settings';
+import { PACKS_PATH } from '../../../constants';
 
 function javaMemorySlider(props) {
-  const { mainText, icon, description, updateMemory, ram, is64bit } = props;
+  const {
+    mainText,
+    icon,
+    description,
+    updateMemory,
+    ram,
+    is64bit,
+    toggleOverrideJavaArguments
+  } = props;
   const [memory, setMemory] = useState(ram);
 
   const marks = {
@@ -16,7 +31,36 @@ function javaMemorySlider(props) {
     16384: '16384'
   };
 
-  const toggleOverrideJavaArguments = () => {};
+  async function toggleJavaArguments(e) {
+    try {
+      const config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, props.instanceName, 'config.json')
+        )
+      );
+      if (config.overrideArgs === '' && e === true) {
+        config.overrideArgs = props.javaArguments;
+        const config2 = JSON.stringify(config);
+        console.log(config2);
+        await promisify(fs.writeFile)(
+          path.join(PACKS_PATH, props.instanceName, 'config.json'),
+          config2
+        );
+      } else if (config.overrideArgs != '' && e === false) {
+        config.overrideArgs = '';
+        const config2 = JSON.stringify(config);
+        console.log(config2);
+        await promisify(fs.writeFile)(
+          path.join(PACKS_PATH, props.instanceName, 'config.json'),
+          config2
+        );
+      }
+
+      toggleOverrideJavaArguments(config.overrideArgs);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <div>
@@ -43,7 +87,7 @@ function javaMemorySlider(props) {
             )}
             <Switch
               className={styles.switch}
-              onChange={e => toggleOverrideJavaArguments(e)}
+              onChange={e => toggleJavaArguments(e)}
             />
           </div>
           <div className={styles.description}>{description}</div>
@@ -67,4 +111,19 @@ function javaMemorySlider(props) {
   );
 }
 
-export default javaMemorySlider;
+function mapStateToProps(state) {
+  return {
+    settings: state.settings,
+    javaArgs: state.settings.java.javaArgs,
+    toggleArgs: state.settings.toggleOverrideJavaArguments
+  };
+}
+
+const mapDispatchToProps = {
+  toggleOverrideJavaArguments
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(javaMemorySlider);

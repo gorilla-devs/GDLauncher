@@ -391,7 +391,8 @@ export function downloadPack(pack) {
         ...(thumbnailURL && { icon: 'icon.png' }),
         timePlayed: 0,
         mods: modsManifest,
-        overrideFiles: overrideFilesList
+        overrideFiles: overrideFilesList,
+        overrideArgs: ""
       })
     );
 
