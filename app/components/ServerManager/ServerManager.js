@@ -7,16 +7,16 @@ import { Link } from 'react-router-dom';
 import { promisify } from 'util';
 import fs from 'fs';
 import log from 'electron-log';
-import styles from './ServerManager.scss';
-import { downloadFile } from '../../utils/downloader';
-import { SERVERS_PATH } from '../../constants';
 import { exec } from 'child_process';
 import path from 'path';
 import psTree from 'ps-tree';
-import { startServer, deleteServer, kill, killAll } from '../../actions/serverManager';
-import ServerCommand from './serverCommand';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import styles from './ServerManager.scss';
+import ServerCommand from './serverCommand';
+import { downloadFile } from '../../utils/downloader';
+import { SERVERS_PATH } from '../../constants';
+import { startServer, deleteServer, kill, killAll } from '../../actions/serverManager';
 
 function ServerManager(props) {
   const [servers, setServers] = useState([]);

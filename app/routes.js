@@ -288,12 +288,12 @@ class RouteDef extends Component<Props> {
             component={WaitingComponent(JavaGlobalOptionsFixModal)}
           />
         ) : null}
-        {isModal ? (
+        {/* {isModal ? (
           <Route
             path="/ServerCommandsModal"
             component={WaitingComponent(ServerCommandsModal)}
           />
-        ) : null}
+        ) : null} */}
       </App>
     );
   }

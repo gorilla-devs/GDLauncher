@@ -18,7 +18,7 @@ import styles from './ServerManager.scss';
 import { downloadFile } from '../../utils/downloader';
 import { SERVERS_PATH } from '../../constants';
 import ButtonGroup from 'antd/lib/button/button-group';
-import Command from './Command';
+import Command from './command';
 
 function serverCommand(props) {
   const [serverSettings, setServerSettings] = useState({});
