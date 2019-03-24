@@ -14,7 +14,7 @@ import { PACKS_PATH } from '../../../constants';
 import styles from './Settings.scss';
 import JavaMemorySlider from './javaMemorySlider';
 import { history } from '../../../store/configureStore';
-import { setOverrideJavaMemory, setJavaArgs } from '../../../actions/settings';
+import { setOverrideJavaMemory, setJavaArgs, setOverrideJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
 import { DEFAULT_ARGS } from '../../../constants';
 
@@ -22,23 +22,25 @@ const FormItem = Form.Item;
 
 type Props = {
   setJavaArgs: () => void,
-  javaArgs: string
+  setOverrideJavaArgs: () => void,
+  javaArgs: string,
+  overrideJavaArgs: string
 };
 
 function Instances(props: Props) {
-  const { javaArgs } = props;
+  const { overrideJavaArgs } = props;
 
   const [is64bit, setIs64bit] = useState(true);
   const [instanceConfig, setInstanceConfig] = useState(null);
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
-  const [overrideArgs, setOverrideArgsInput] = useState(javaArgs);
+  const [overrideArgs, setOverrideArgsInput] = useState(overrideJavaArgs);
 
   let watcher = null;
 
   const updateJavaArguments = javaArguments => {
     setOverrideArgsInput(javaArguments);
-    props.setJavaArgs(javaArguments);
+    props.setOverrideJavaArgs(javaArguments);
   };
 
   // Reset the global arguments to the default one
@@ -60,7 +62,7 @@ function Instances(props: Props) {
 
   // Set the changed java arguments
   const submit = async () => {
-    props.setJavaArgs(overrideArgs);
+    props.setOverrideJavaArgs(overrideArgs);
     console.log(props.settings.java.memory, 'diopeppe');
     if (overrideArgs) {
       const config = JSON.parse(
@@ -271,12 +273,14 @@ function mapStateToProps(state) {
   return {
     settings: state.settings,
     javaArgs: state.settings.java.javaArgs,
+    overrideJavaArgs: state.settings.java.overrideJavaArgs,
     overrideMemory: state.settings.java.overrideMemory
   };
 }
 
 const mapDispatchToProps = {
   setOverrideJavaMemory,
+  setOverrideJavaArgs,
   setJavaArgs
 };
 

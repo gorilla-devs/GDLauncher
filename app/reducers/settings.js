@@ -18,6 +18,7 @@ const initialState = {
     path: null,
     memory: 3096,
     javaArgs: DEFAULT_ARGS,
+    overrideJavaArgs: DEFAULT_ARGS,
     overrideMemory: 3096
   },
   theme: THEMES.default
@@ -68,6 +69,14 @@ export default function Settings(state = initialState, action) {
         java: {
           ...state.java,
           javaArgs: action.payload
+        }
+      };
+    case SET_OVERRIDE_JAVA_ARGUMENTS:
+      return {
+        ...state,
+        java: {
+          ...state.java,
+          overrideJavaArgs: action.payload
         }
       };
     case SET_OVERRIDE_JAVA_MEMORY:

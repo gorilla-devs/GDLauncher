@@ -71,7 +71,6 @@ function javaMemorySlider(props) {
           config2
         );
       }
-      toggleOverrideJavaArguments(config.overrideArgs);
     } catch (err) {
       console.error(err);
     }
