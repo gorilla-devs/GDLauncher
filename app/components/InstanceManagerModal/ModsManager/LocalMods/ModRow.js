@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,33 +15,34 @@ type Props = {
   index: number,
   style: {},
   toggleSize: () => mixed,
-  filteredMods: [],
+  modData: {},
   setFilteredMods: () => mixed,
   instance: string
 };
 
-export default ({
+const ModRow = ({
   index,
   style,
   toggleSize,
-  filteredMods,
+  modData,
   setFilteredMods,
   instance
 }: Props) => {
   const modsFolder = path.join(PACKS_PATH, instance, 'mods');
   const selectMod = i => {
-    const newMods = Object.assign([...filteredMods], {
-      [i]: {
-        ...filteredMods[i],
-        selected: !filteredMods[i].selected
-      }
-    });
-    setFilteredMods(newMods);
+    setFilteredMods(prevMods =>
+      Object.assign([...prevMods], {
+        [i]: {
+          ...prevMods[i],
+          selected: !modData.selected
+        }
+      })
+    );
   };
 
   const deleteMod = async i => {
     // Remove the actual file
-    await promisify(fs.unlink)(path.join(modsFolder, filteredMods[i].name));
+    await promisify(fs.unlink)(path.join(modsFolder, modData.name));
     // Remove the reference in the mods file json
     const config = JSON.parse(
       await promisify(fs.readFile)(
@@ -52,7 +53,7 @@ export default ({
       path.join(PACKS_PATH, instance, 'config.json'),
       JSON.stringify({
         ...config,
-        mods: config.mods.filter(v => v.fileNameOnDisk !== filteredMods[i].name)
+        mods: config.mods.filter(v => v.fileNameOnDisk !== modData.name)
       })
     );
   };
@@ -60,13 +61,13 @@ export default ({
   const toggleDisableMod = async (enabled, index) => {
     if (enabled) {
       await promisify(fs.rename)(
-        path.join(modsFolder, filteredMods[index].name),
-        path.join(modsFolder, filteredMods[index].name.replace('.disabled', ''))
+        path.join(modsFolder, modData.name),
+        path.join(modsFolder, modData.name.replace('.disabled', ''))
       );
     } else {
       await promisify(fs.rename)(
-        path.join(modsFolder, filteredMods[index].name),
-        path.join(modsFolder, `${filteredMods[index].name}.disabled`)
+        path.join(modsFolder, modData.name),
+        path.join(modsFolder, `${modData.name}.disabled`)
       );
     }
   };
@@ -74,28 +75,26 @@ export default ({
     <div
       className={index % 2 ? styles.listItemOdd : styles.listItemEven}
       style={style}
+      onClick={() => toggleSize(index)}
+      role="none"
+      key={modData.name}
     >
       <div className={styles.innerItemMod}>
         <div>
           <Checkbox
             onChange={() => selectMod(index)}
-            checked={filteredMods[index].selected}
+            checked={modData.selected}
           />
           <Switch
-            checked={filteredMods[index].state}
+            checked={modData.state}
             style={{
               marginLeft: 15
             }}
             onChange={v => toggleDisableMod(v, index)}
           />
         </div>
-        {filteredMods[index].name.replace('.disabled', '')}
+        {modData.name.replace('.disabled', '')}
         <div>
-          <FontAwesomeIcon
-            className={styles.editIcon}
-            icon={faEdit}
-            onClick={() => toggleSize(index)}
-          />
           <FontAwesomeIcon
             className={styles.deleteIcon}
             icon={faTrash}
@@ -106,3 +105,5 @@ export default ({
     </div>
   );
 };
+
+export default ModRow;

@@ -24,11 +24,14 @@ export const GAME_VERSIONS_URL =
 export const FORGE_PROMOS =
   'https://staging_cursemeta.dries007.net/api/v3/direct/minecraft/modloader';
 export const ACCESS_TOKEN_VALIDATION_URL =
-  'https://authserver.mojang.com/validate';
+'https://authserver.mojang.com/validate';
+
+// Mojang API Endpoints
+export const LOGIN_API = 'https://authserver.mojang.com/authenticate';
 export const ACCESS_TOKEN_REFRESH_URL = 'https://authserver.mojang.com/refresh';
+
 export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
-export const LOGIN_API = 'https://authserver.mojang.com/authenticate';
 export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
 export const GDL_LEGACYJAVAFIXER_MOD_URL =
   'https://gdevs.io/legacyjavafixer-1.0.jar';

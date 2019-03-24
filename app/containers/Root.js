@@ -4,6 +4,7 @@ import { connect, Provider } from 'react-redux';
 import log from 'electron-log';
 import { ConnectedRouter } from 'connected-react-router';
 import * as SettingsActions from '../actions/settings';
+import CrashHandler from '../components/CrashHandler/CrashHandler';
 import RouteDef from '../routes';
 
 type Props = {
@@ -12,16 +13,23 @@ type Props = {
 };
 
 class Root extends Component<Props> {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
   componentDidCatch(error, info) {
-    if (error) {
-      log.error(error);
-    } else if (info) {
-      log.info(info);
-    }
+    log.error(error, info);
+    this.setState({ hasError: true });
   }
 
   render() {
     const { store, history } = this.props;
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <CrashHandler />;
+    }
+
     return (
       <Provider store={store}>
         <div>
