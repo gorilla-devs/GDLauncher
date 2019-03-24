@@ -56,17 +56,17 @@ function javaMemorySlider(props) {
       );
       if (config.overrideArgs === '' && e === true) {
         config.overrideArgs = props.javaArguments;
-        const config2 = JSON.stringify(config);
+        const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
-          config2
+          modifiedConfig
         );
       } else if (config.overrideArgs != '' && e === false) {
         config.overrideArgs = '';
-        const config2 = JSON.stringify(config);
+        const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
-          config2
+          modifiedConfig
         );
       }
     } catch (err) {

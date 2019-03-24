@@ -118,11 +118,11 @@ function ServerManager(props) {
           servers.map(name => (
             <div key={name} className={styles.server}><h1>{name}</h1>
               {props.serversList[name] ?
-                <Button type="primary" icon="thunderbolt" onClick={() => props.kill(name)}>
+                <Button className={styles.serverButton} type="primary" icon="thunderbolt" onClick={() => props.kill(name)}>
                   Kill
                 </Button>
                 :
-                <Button type="primary" icon="play" onClick={() => startServerFunc(name)}>
+                <Button className={styles.serverButton} type="primary" icon="play" onClick={() => startServerFunc(name)}>
                   <FontAwesomeIcon icon="play"></FontAwesomeIcon>
                 </Button>
               }
@@ -135,13 +135,14 @@ function ServerManager(props) {
                 <Button
                   type="primary"
                   disabled={props.packName !== null && props.packName === name}
+                  className={styles.serverButton}
                   //onClick={() => props.deleteServer(name)}
                 >
                   <FontAwesomeIcon icon="trash"></FontAwesomeIcon>
                 </Button>
               </Link>
 
-              <Button type="primary" onClick={() => manageServer(name)}>
+              <Button type="primary" className={styles.serverButton} onClick={() => manageServer(name)}>
                 <FontAwesomeIcon icon="wrench"></FontAwesomeIcon>
               </Button>
 
