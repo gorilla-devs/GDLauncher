@@ -62,9 +62,9 @@ const ConfirmDeleteModal = lazy(() =>
 const JavaGlobalOptionsFixModal = lazy(() =>
   import('./components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal')
 );
-const ServerCommandsModal = lazy(() =>
-  import('./components/ServerCommandsModal/ServerCommandsModal')
-);
+// const ServerCommandsModal = lazy(() =>
+//   import('./components/ServerCommandsModal/ServerCommandsModal')
+// );
 
 type Props = {
   location: object,
