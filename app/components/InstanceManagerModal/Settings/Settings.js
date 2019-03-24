@@ -145,8 +145,6 @@ function Instances(props: Props) {
   }
 
   async function toggleJavaArguments(e) {
-    console.log(e);
-    console.log('SWITCH', switchState);
     try {
       const config = JSON.parse(
         await promisify(fs.readFile)(
@@ -297,7 +295,7 @@ function Instances(props: Props) {
             ) : null}
           </Card>
 
-          <Card style={{ marginTop: 15, height: 220 }} title="Java Manager">
+          <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
             <JavaMemorySlider
               ram={props.settings.java.overrideMemory}
               is64bit={is64bit}
