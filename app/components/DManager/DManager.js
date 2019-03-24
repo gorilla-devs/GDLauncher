@@ -6,6 +6,7 @@ import { join, basename } from 'path';
 import makeDir from 'make-dir';
 import { Promise } from 'bluebird';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import Link from 'react-router-dom/Link';
 import log from 'electron-log';
 import {
@@ -224,7 +225,7 @@ export default class DManager extends Component<Props> {
               })
             }
           >
-            <i className="fas fa-play" style={{ marginRight: '8px' }} />
+            <FontAwesomeIcon icon={faPlay} style={{ marginRight: '8px' }} />
             Add New Instance
           </MenuItem>
         </ContextMenu>

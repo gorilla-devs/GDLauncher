@@ -1,4 +1,8 @@
-import { SET_STATE_ONLINE, SET_STATE_AWAY, SET_STATE_BUSY } from '../actions/profile';
+import {
+  SET_STATE_ONLINE,
+  SET_STATE_AWAY,
+  SET_STATE_BUSY
+} from '../actions/profile';
 
 const initialState = {
   profileState: 'Online',

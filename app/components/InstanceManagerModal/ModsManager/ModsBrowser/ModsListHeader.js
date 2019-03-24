@@ -3,6 +3,7 @@ import { Input, Select, Button } from 'antd';
 import { debounce } from 'lodash';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import styles from './ModsListHeader.scss';
 
@@ -43,7 +44,7 @@ export default React.memo(props => {
               marginLeft: state === 'entered' ? 0 : -50
             }}
           >
-            <FontAwesomeIcon icon="chevron-left" />
+            <FontAwesomeIcon icon={faChevronLeft} />
           </Link>
           <Input
             placeholder="Search a mod"

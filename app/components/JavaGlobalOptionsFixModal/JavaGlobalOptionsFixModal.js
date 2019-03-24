@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { message, Button } from 'antd';
-import path from 'path';
 import log from 'electron-log';
-import { Link } from 'react-router-dom';
-import { go } from 'connected-react-router';
-import fs from 'fs';
 import { platform } from 'os';
 import { remote } from 'electron';
-import fsa from 'fs-extra';
-import store from '../../localStore';
 import { exec } from 'sudo-prompt';
-import child_process from 'child_process';
+import childProcess from 'child_process';
 import { promisify } from 'util';
+import store from '../../localStore';
 import styles from './JavaGlobalOptionsFixModal.scss';
 import Modal from '../Common/Modal/Modal';
 import { PACKS_PATH, WINDOWS } from '../../constants';
@@ -46,13 +41,12 @@ export default props => {
           setFixing(false);
           log.error(err);
           return;
-        } else {
-          log.error(err.message);
         }
+        log.error(err.message);
       } finally {
         try {
           // Removes the _JAVA_OPTIONS and sets it to empty in the user registry to apply it without rebooting
-          const { stdout, stderr } = await promisify(child_process.exec)(
+          const { stdout, stderr } = await promisify(childProcess.exec)(
             'SETX _JAVA_OPTIONS "" & REG delete HKCU\\Environment /F /V _JAVA_OPTIONS'
           );
         } catch {}
@@ -60,7 +54,7 @@ export default props => {
     } else {
       try {
         // unset _JAVA_OPTIONS should be enough
-        const { stdout, stderr } = await promisify(child_process.exec)(
+        const { stdout, stderr } = await promisify(childProcess.exec)(
           'unset _JAVA_OPTIONS'
         );
       } catch {}

@@ -4,14 +4,17 @@ import { connect } from 'react-redux';
 import { ipcRenderer } from 'electron';
 import log from 'electron-log';
 import { Switch, Route, Redirect } from 'react-router';
-import { history } from './store/configureStore';
 import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
+import { screen } from 'electron';
+import { release, arch } from 'os';
 import * as AuthActions from './actions/auth';
 import * as SettingsActions from './actions/settings';
 import { JAVA_URL } from './constants';
+import ga from './GAnalytics';
 import App from './containers/App';
 import store from './localStore';
+import { history } from './store/configureStore';
 import SideBar from './components/Common/SideBar/SideBar';
 import Navigation from './containers/Navigation';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
@@ -47,6 +50,9 @@ const CurseModpackExplorerModal = lazy(() =>
   import('./components/CurseModpackExplorerModal/CurseModpackExplorerModal')
 );
 const ImportPack = lazy(() => import('./components/ImportPack/ImportPack'));
+const ExportPackModal = lazy(() =>
+  import('./components/ExportPackModal/ExportPackModal')
+);
 const ChangelogsModal = lazy(() =>
   import('./components/ChangelogModal/ChangelogModal')
 );
@@ -72,6 +78,7 @@ class RouteDef extends Component<Props> {
     this.state = {
       globalJavaOptions: false
     };
+    this.appVersion = require('../package.json').version;
   }
 
   componentDidMount = async () => {
@@ -119,6 +126,25 @@ class RouteDef extends Component<Props> {
   }
 
   componentDidUpdate = (prevProps, prevState) => {
+    if (this.props.isAuthValid && process.env.NODE_ENV !== 'development') {
+      ga(this.props.uuid).set('uid', this.props.uuid);
+      ga(this.props.uuid).set('ds', 'app');
+      ga(this.props.uuid).set('ua', `${release()} ${arch()}`);
+      ga(this.props.uuid).set('cd1', `${release()} ${arch()}`);
+      ga(this.props.uuid).set(
+        'sr',
+        `${screen.getPrimaryDisplay().bounds.width}x${
+          screen.getPrimaryDisplay().bounds.height
+        }`
+      );
+      ga(this.props.uuid).set(
+        'vp',
+        `${window.innerWidth}x${window.innerHeight}`
+      );
+      ga(this.props.uuid)
+        .screenview(this.props.location.pathname, 'GDLauncher', this.appVersion)
+        .send();
+    }
     if (
       this.state.globalJavaOptions &&
       this.props.location.pathname === '/home' &&
@@ -129,6 +155,17 @@ class RouteDef extends Component<Props> {
         state: { modal: true }
       });
       this.setState({ globalJavaOptions: false });
+      return;
+    }
+    /* Show the changelogs after an update */
+    if (
+      this.props.location.pathname === '/home' &&
+      store.get('showChangelogs') !== false
+    ) {
+      history.push({
+        pathname: `/changelogs`,
+        state: { modal: true }
+      });
     }
   };
 
@@ -188,17 +225,6 @@ class RouteDef extends Component<Props> {
             </Route>
           </Switch>
         </div>
-        {/* Show the changelogs after an update */}
-        {location.pathname === '/home' &&
-          store.get('showChangelogs') !== false && (
-            <Redirect
-              push
-              to={{
-                pathname: '/changelogs',
-                state: { modal: true }
-              }}
-            />
-          )}
         {/* ALL MODALS */}
         {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
         {isModal ? (
@@ -227,6 +253,12 @@ class RouteDef extends Component<Props> {
         ) : null}
         {isModal ? (
           <Route path="/importPack" component={WaitingComponent(ImportPack)} />
+        ) : null}
+        {isModal ? (
+          <Route
+            path="/exportPackModal/:instanceName"
+            component={WaitingComponent(ExportPackModal)}
+          />
         ) : null}
         {isModal ? (
           <Route
@@ -294,6 +326,7 @@ function mapStateToProps(state) {
           location: state.router.location,
         isAuthValid: state.auth.isAuthValid,
         serversList: state.serverManager.servers
+        uuid: state.auth.clientToken
       };
     }
     

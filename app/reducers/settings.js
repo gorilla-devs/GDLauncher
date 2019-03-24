@@ -5,29 +5,35 @@ import {
   SET_JAVA_MEMORY,
   SET_THEME,
   RESET_THEME,
+  SET_GLOBAL_JAVA_ARGUMENTS,
+  SET_OVERRIDE_JAVA_ARGUMENTS,
+  SET_OVERRIDE_JAVA_MEMORY
 } from '../actions/settings';
-import { THEMES } from '../constants';
+import { THEMES, DEFAULT_ARGS } from '../constants';
 
 const initialState = {
   sounds: true,
   java: {
     autodetected: true,
     path: null,
-    memory: 3096
+    memory: 3096,
+    overrideMemory: 3096,
+    javaArgs: DEFAULT_ARGS,
+    overrideJavaArgs: DEFAULT_ARGS
   },
   theme: THEMES.default
 };
 
 export default function Settings(state = initialState, action) {
   switch (action.type) {
-    case `${LOAD_SETTINGS}`:
+    case LOAD_SETTINGS:
       return action.payload;
-    case `${SET_SOUNDS}`:
+    case SET_SOUNDS:
       return {
         ...state,
         sounds: action.payload
       };
-    case `${SET_JAVA_PATH}`:
+    case SET_JAVA_PATH:
       return {
         ...state,
         java: {
@@ -36,7 +42,7 @@ export default function Settings(state = initialState, action) {
           path: action.path
         }
       };
-    case `${SET_JAVA_MEMORY}`:
+    case SET_JAVA_MEMORY:
       return {
         ...state,
         java: {
@@ -44,7 +50,7 @@ export default function Settings(state = initialState, action) {
           memory: action.payload
         }
       };
-    case `${SET_THEME}`:
+    case SET_THEME:
       return {
         ...state,
         theme: {
@@ -56,6 +62,30 @@ export default function Settings(state = initialState, action) {
       return {
         ...state,
         theme: action.payload
+      };
+    case SET_GLOBAL_JAVA_ARGUMENTS:
+      return {
+        ...state,
+        java: {
+          ...state.java,
+          javaArgs: action.payload
+        }
+      };
+    case SET_OVERRIDE_JAVA_ARGUMENTS:
+      return {
+        ...state,
+        java: {
+          ...state.java,
+          overrideJavaArgs: action.payload
+        }
+      };
+    case SET_OVERRIDE_JAVA_MEMORY:
+      return {
+        ...state,
+        java: {
+          ...state.java,
+          overrideMemory: action.payload
+        }
       };
     default:
       return state;

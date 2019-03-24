@@ -7,6 +7,17 @@ import fsa from 'fs-extra';
 import path from 'path';
 import fs from 'fs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBolt,
+  faPlay,
+  faPen,
+  faFolder,
+  faLink,
+  faCopy,
+  faTruckMoving,
+  faWrench,
+  faTrash
+} from '@fortawesome/free-solid-svg-icons';
 import log from 'electron-log';
 import { promisify } from 'util';
 import { exec } from 'child_process';
@@ -46,20 +57,6 @@ export default class DInstance extends Component<Props> {
     this.interval = setInterval(() => {
       this.updateInstanceConfig();
     }, 1000);
-
-    const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, this.props.name, 'config.json')
-      )
-    );
-    if (config.icon) {
-      const icon = await promisify(fs.readFile)(
-        path.join(PACKS_PATH, this.props.name, config.icon)
-      );
-      this.setState({
-        icon: `url("data:image/png;base64,${icon.toString('base64')}")`
-      });
-    }
   };
 
   componentDidUpdate = () => {
@@ -80,12 +77,16 @@ export default class DInstance extends Component<Props> {
           )
         );
         const { version, forgeVersion } = config;
+
+        // Tries to read the instance config file and updates the icon accordingly
         if (config.icon) {
           const icon = await promisify(fs.readFile)(
             path.join(PACKS_PATH, this.props.name, config.icon)
           );
           this.setState({
-            icon: `url("data:image/png;base64,${icon.toString('base64')}")`
+            icon: `url("data:image/png;base64,${icon.toString(
+              'base64'
+            )}") center no-repeat`
           });
         } else {
           this.setState({
@@ -102,10 +103,10 @@ export default class DInstance extends Component<Props> {
               : forgeVersion
         });
       } catch (e) {
-        console.log(e);
         this.setState({
           version: 'Error',
-          isValid: false
+          isValid: false,
+          icon: `url(${InstanceIcon}) center no-repeat`
         });
       }
     }
@@ -157,7 +158,7 @@ export default class DInstance extends Component<Props> {
 
   render = () => {
     const { name, selectedInstance, selectInstance, playing } = this.props;
-    const { version, isValid, forgeVersion } = this.state;
+    const { version, isValid, forgeVersion, icon } = this.state;
     return (
       <div
         className={`${selectedInstance === name ? styles.selectedItem : ''} ${
@@ -184,7 +185,7 @@ export default class DInstance extends Component<Props> {
           >
             {playing.find(el => el.name === name) && (
               <span className={styles.playingIcon}>
-                <i className="fas fa-play" style={{ fontSize: '17px' }} />
+                <FontAwesomeIcon icon={faPlay} style={{ fontSize: '17px' }} />
               </span>
             )}
             {this.isInstalling() && (
@@ -207,7 +208,11 @@ export default class DInstance extends Component<Props> {
               <div
                 className={styles.icon__image}
                 style={{
-                  background: this.state.icon,
+                  background:
+                    version !== null || this.isInstalling()
+                      ? icon
+                      : 'rgba(0, 0, 0, 0)',
+                  opacity: version !== null || this.isInstalling() ? 1 : 0,
                   filter: this.isInstalling()
                     ? "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale\")"
                     : ''
@@ -216,14 +221,19 @@ export default class DInstance extends Component<Props> {
               <span className={styles.icon__instanceNameContainer}>
                 <span
                   className={styles.icon__instanceName}
-                  style={{ width: this.isInstalling() ? '76px' : '120px' }}
+                  style={{ width: 120 }}
                 >
                   {name}
                 </span>
-                <span className={styles.icon__instancePercentage}>
-                  {this.isInstalling() && ` (${this.updatePercentage()}%)`}
-                </span>
               </span>
+              {this.isInstalling() && (
+                <span className={styles.progressBarContainer}>
+                  <span className={styles.progressBar} />
+                  <span className={styles.actualProgress}>
+                    <span style={{ width: `${this.updatePercentage()}%` }} />
+                  </span>
+                </span>
+              )}
             </div>
           </div>
         </ContextMenuTrigger>
@@ -243,11 +253,17 @@ export default class DInstance extends Component<Props> {
           >
             {playing.find(el => el.name === name) ? (
               <div>
-                <FontAwesomeIcon icon="bolt" /> Kill
+                <span>
+                  <FontAwesomeIcon icon={faBolt} />
+                </span>{' '}
+                Kill
               </div>
             ) : (
               <div>
-                <FontAwesomeIcon icon="play" /> Launch
+                <span>
+                  <FontAwesomeIcon icon={faPlay} />
+                </span>{' '}
+                Launch
               </div>
             )}
           </MenuItem>
@@ -261,10 +277,16 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <FontAwesomeIcon icon="pen" /> Manage
+            <span>
+              <FontAwesomeIcon icon={faPen} />
+            </span>{' '}
+            Manage
           </MenuItem>
           <MenuItem onClick={() => shell.openItem(path.join(PACKS_PATH, name))}>
-            <FontAwesomeIcon icon="folder" /> Open Folder
+            <span>
+              <FontAwesomeIcon icon={faFolder} />
+            </span>{' '}
+            Open Folder
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -300,13 +322,16 @@ export default class DInstance extends Component<Props> {
               process.env.NODE_ENV === 'development'
             }
           >
-            <FontAwesomeIcon icon="link" /> Create Shortcut
+            <span>
+              <FontAwesomeIcon icon={faLink} />
+            </span>{' '}
+            Create Shortcut
           </MenuItem>
           {/* <MenuItem
             disabled={this.isInstalling() || !isValid}
             onClick={() => {}}
           >
-            <FontAwesomeIcon icon='copy' /> Duplicate
+            <FontAwesomeIcon icon={faCopy} /> Duplicate
           </MenuItem> */}
           <MenuItem
             disabled={
@@ -314,10 +339,32 @@ export default class DInstance extends Component<Props> {
               !isValid ||
               playing.find(el => el.name === name)
             }
+            data={{ foo: 'bar' }}
+            onClick={() =>
+              history.push({
+                pathname: `/exportPackModal/${name}`,
+                state: { modal: true }
+              })
+            }
+          >
+            <span>
+              <FontAwesomeIcon icon={faTruckMoving} />
+            </span>{' '}
+            Export
+          </MenuItem>
+          {/* <MenuItem
+            disabled={
+              this.isInstalling() ||
+              !isValid ||
+              playing.find(el => el.name === name)
+            }
             onClick={() => this.props.addToQueue(name, version, forgeVersion)}
           >
-            <FontAwesomeIcon icon="wrench" /> Repair
-          </MenuItem>
+            <span>
+              <FontAwesomeIcon icon={faWrench} />
+            </span>{' '}
+            Repair
+          </MenuItem> */}
           <MenuItem
             disabled={
               this.isInstalling() || playing.find(el => el.name === name)
@@ -330,7 +377,10 @@ export default class DInstance extends Component<Props> {
               })
             }
           >
-            <FontAwesomeIcon icon="trash" /> Delete
+            <span>
+              <FontAwesomeIcon icon={faTrash} />
+            </span>{' '}
+            Delete
           </MenuItem>
         </ContextMenu>
       </div>

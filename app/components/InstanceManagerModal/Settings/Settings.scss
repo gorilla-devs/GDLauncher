@@ -1,0 +1,32 @@
+@import '../../../style/theme/colors.scss';
+
+.container {
+  height: 100%;
+  width: 100%;
+  overflow-y: hidden;
+  .innerContainer {
+    height: 100%;
+    overflow-y: auto;
+    .content {
+      display: block;
+      margin: 0 auto;
+      width: 80%;
+    }
+  }
+}
+
+.javaArgInput {
+  background: var(--secondary-color-1) !important;
+  max-width: 69%;
+  margin-right: 15px !important;
+}
+
+.mainText {
+  font-size: 18px;
+}
+
+.description {
+  font-size: 14px;
+  color: $text-dark;
+  padding: 5px;
+}

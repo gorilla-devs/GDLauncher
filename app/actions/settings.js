@@ -2,7 +2,7 @@ import log from 'electron-log';
 import { message } from 'antd';
 import _ from 'lodash';
 import store from '../localStore';
-import { THEMES } from '../constants';
+import { THEMES, DEFAULT_ARGS } from '../constants';
 
 export const LOAD_SETTINGS = 'LOAD_SETTINGS';
 export const SET_SOUNDS = 'SET_SOUNDS';
@@ -10,6 +10,9 @@ export const SET_JAVA_PATH = 'SET_JAVA_PATH';
 export const SET_JAVA_MEMORY = 'SET_JAVA_MEMORY';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
+export const SET_GLOBAL_JAVA_ARGUMENTS = 'SET_GLOBAL_JAVA_ARGUMENTS';
+export const SET_OVERRIDE_JAVA_MEMORY = 'SET_OVERRIDE_JAVA_MEMORY';
+export const SET_OVERRIDE_JAVA_ARGUMENTS = 'SET_OVERRIDE_JAVA_ARGUMENTS';
 
 export function loadSettings() {
   return dispatch => {
@@ -20,17 +23,25 @@ export function loadSettings() {
       if (store.has('settings')) {
         let settings = store.get('settings');
         // THEME
-        if (!settings.theme || Object.keys(settings.theme).length === 0 || isLegacy(THEMES.default, settings.theme)) {
+        if (
+          !settings.theme ||
+          Object.keys(settings.theme).length === 0 ||
+          isLegacy(THEMES.default, settings.theme)
+        ) {
           store.set('settings.theme', THEMES.default);
         }
         // JAVA
         const javaSettings = {
-          autodetected: true, path: null, memory: 3072
+          autodetected: true,
+          path: null,
+          memory: 3072,
+          javaArgs: DEFAULT_ARGS
         };
-        if (!settings.java ||
+        if (
+          !settings.java ||
           Object.keys(settings.java).length === 0 ||
           isLegacy(javaSettings, settings.java) ||
-          typeof settings.java.memory != 'number'
+          typeof settings.java.memory !== 'number'
         ) {
           store.set('settings.java', javaSettings);
         }
@@ -94,7 +105,7 @@ export function setJavaMemory(amount) {
   return dispatch => {
     dispatch({
       type: SET_JAVA_MEMORY,
-      payload: amount,
+      payload: amount
     });
     dispatch(saveSettings());
   };
@@ -139,5 +150,34 @@ export function applyTheme(theme) {
     } catch (err) {
       log.error(err.message);
     }
+  };
+}
+
+export function setJavaArgs(args) {
+  return dispatch => {
+    dispatch({
+      type: SET_GLOBAL_JAVA_ARGUMENTS,
+      payload: args
+    });
+    dispatch(saveSettings());
+  };
+}
+
+export function setOverrideJavaArgs(args) {
+  return dispatch => {
+    dispatch({
+      type: SET_OVERRIDE_JAVA_ARGUMENTS,
+      payload: args
+    });
+    dispatch(saveSettings());
+  };
+}
+export function setOverrideJavaMemory(amount) {
+  return dispatch => {
+    dispatch({
+      type: SET_OVERRIDE_JAVA_MEMORY,
+      payload: amount
+    });
+    dispatch(saveSettings());
   };
 }

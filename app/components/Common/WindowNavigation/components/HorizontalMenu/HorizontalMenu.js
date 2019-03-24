@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, Icon, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faPlay, faThList } from '@fortawesome/free-solid-svg-icons';
 import Badge from '../../../Badge/Badge';
 import styles from './HorizontalMenu.scss';
 import logo from '../../../../../assets/images/logo.png';
@@ -24,7 +25,7 @@ export default props => {
           }`}
         >
           <Link to="/home" draggable="false" className={styles.a}>
-            <FontAwesomeIcon icon="home" className={styles.i} />
+            <FontAwesomeIcon icon={faHome} className={styles.i} />
             HOME
           </Link>
         </li>
@@ -34,7 +35,7 @@ export default props => {
           }`}
         >
           <Link to="/dmanager" draggable="false" className={styles.a}>
-            <FontAwesomeIcon icon="play" className={styles.i} />
+            <FontAwesomeIcon icon={faPlay} className={styles.i} />
             INSTANCES
           </Link>
         </li>
@@ -48,7 +49,7 @@ export default props => {
             draggable="false"
             className={styles.a}
           >
-            <FontAwesomeIcon icon="th-list" className={styles.i} />
+            <FontAwesomeIcon icon={faThList} className={styles.i} />
             MODPACKS
           </Link>
         </li>

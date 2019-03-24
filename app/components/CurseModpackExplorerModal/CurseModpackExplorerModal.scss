@@ -30,3 +30,16 @@
     height: auto;
   }
 }
+
+.closeBtn{
+  position: absolute;
+  right: 3%;
+  top: 2%;
+  font-size: 19px;
+  z-index: 100;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  &:hover {
+    color: rgba(231, 76, 60, 0.8);
+  }
+}

@@ -13,6 +13,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import minimist from 'minimist';
 import log from 'electron-log';
+import DiscordRPC from 'discord-rpc';
 import { autoUpdater } from 'electron-updater';
 import psTree from 'ps-tree';
 import { promisify } from 'util';
@@ -22,7 +23,7 @@ import MenuBuilder from './menu';
 import cli from './utils/cli';
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 
 let mainWindow = null;
 let splash = null;
@@ -121,7 +122,9 @@ if (minimist(process.argv.slice(1)).i) {
       }
     });
 
-    mainWindow.loadURL(`file://${__dirname}/app.html`);
+    mainWindow.loadURL(`file://${__dirname}/app.html`, {
+      userAgent: 'GDLauncher'
+    });
 
     // @TODO: Use 'ready-to-show' event
     //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -130,6 +133,22 @@ if (minimist(process.argv.slice(1)).i) {
         throw new Error('"mainWindow" is not defined');
       }
       splash.destroy();
+
+
+      // Sets the DISCORD-RPC
+      const clientId = '555898932467597312';
+      let rpc = new DiscordRPC.Client({ transport: 'ipc' });
+      rpc.once('ready', () => {
+        rpc.setActivity({
+          details: `Becoming a Gorilla`,
+          state: 'Grrrrrrrr',
+          startTimestamp: Math.floor(Date.now() / 1000),
+          largeImageKey: 'default_big',
+          largeImageText: 'GDLauncher - A Custom Minecraft Launcher',
+          instance: false,
+        });
+      });
+      rpc.login({ clientId }).catch(log.error);
 
       autoUpdater.logger = log;
       autoUpdater.autoDownload = false;
@@ -170,15 +189,15 @@ if (minimist(process.argv.slice(1)).i) {
       if (checked === true) return;
       autoUpdater.checkForUpdates();
       checked = true;
-      log.info("CHECK_FOR_UPDATES");
+      log.info('CHECK_FOR_UPDATES');
 
       autoUpdater.on('update-available', info => {
-        log.info("DOWNLOAD_AVAILABLE");
+        log.info('DOWNLOAD_AVAILABLE');
         ev.sender.send('update-available');
       });
 
       autoUpdater.on('update-downloaded', info => {
-        log.info("UPDATE_DOWNLOADED");
+        log.info('UPDATE_DOWNLOADED');
         ev.sender.send('update-downloaded');
       });
 
@@ -189,12 +208,12 @@ if (minimist(process.argv.slice(1)).i) {
     });
 
     ipcMain.on('download-updates', () => {
-      log.info("DOWNLOAD_UPDATES");
+      log.info('DOWNLOAD_UPDATES');
       autoUpdater.downloadUpdate();
     });
 
     ipcMain.on('apply-updates', () => {
-      log.info("APPLY_UPDATES");
+      log.info('APPLY_UPDATES');
       autoUpdater.quitAndInstall(true, true);
       // app.relaunch({ args: process.argv.slice(1).concat(['--relaunch']) });
       // app.exit();

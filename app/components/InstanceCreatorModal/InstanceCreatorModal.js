@@ -52,17 +52,15 @@ class InstanceCreatorModal extends Component<Props> {
           value: 'forge',
           label: 'Forge',
           // _.reverse mutates arrays so we make a copy of it first using .slice() and then we reverse it
-          children: Object.keys(forgeManifest).map(
-            v => ({
-              value: v,
-              label: v,
-              // same as above
-              children: _.reverse(vSort(forgeManifest[v]).slice()).map(ver => ({
-                value: ver,
-                label: ver
-              }))
-            })
-          )
+          children: Object.keys(forgeManifest).map(v => ({
+            value: v,
+            label: v,
+            // same as above
+            children: _.reverse(vSort(forgeManifest[v]).slice()).map(ver => ({
+              value: ver,
+              label: ver
+            }))
+          }))
         }
       ]
     };
@@ -77,9 +75,9 @@ class InstanceCreatorModal extends Component<Props> {
           message.warning('An instance with this name already exists.');
         } catch (error) {
           if (values.version[0] === 'vanilla') {
-            this.props.createPack(values.version[2], values.packName);
+            await this.props.createPack(values.version[2], values.packName);
           } else if (values.version[0] === 'forge') {
-            this.props.createPack(
+            await this.props.createPack(
               values.version[1],
               values.packName,
               values.version[2]
@@ -91,7 +89,7 @@ class InstanceCreatorModal extends Component<Props> {
     });
   };
 
-  filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1
+  filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1;
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -111,11 +109,14 @@ class InstanceCreatorModal extends Component<Props> {
           <div>
             <FormItem style={{ margin: 0 }}>
               {getFieldDecorator('packName', {
-                rules: [{
-                  required: true,
-                  message: 'Please input a valid name with just numbers and letters',
-                  pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
-                }]
+                rules: [
+                  {
+                    required: true,
+                    message:
+                      'Please input a valid name with just numbers and letters',
+                    pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
+                  }
+                ]
               })(
                 <Input
                   autoFocus

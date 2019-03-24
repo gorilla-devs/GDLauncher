@@ -40,10 +40,20 @@ export function selectInstance(name) {
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const { auth, settings } = getState();
+
+    const config = JSON.parse(
+      await promisify(fs.readFile)(
+        path.join(PACKS_PATH, instanceName, 'config.json')
+      )
+    );
+
     const command = await launchCommand(
       instanceName,
       auth,
-      settings.java.memory
+      (config.overrideArgs = ''
+        ? settings.java.memory
+        : settings.java.overrideMemory),
+      settings.java.javaArgs
     );
     const start = spawn(command, [], {
       shell: true,
@@ -51,7 +61,7 @@ export function startInstance(instanceName) {
     });
     let minutes = 0;
     const timer = setInterval(() => {
-      minutes = minutes + 1;
+      minutes += 1;
     }, 60000);
     start.stdout.on('data', data => {
       console.log(data.toString());

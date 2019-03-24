@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import fss from 'fs';
 import path from 'path';
 import Zip from 'adm-zip';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import fs from 'fs';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
-import { promisify } from 'util';
 import { Button, Input, Checkbox, Switch } from 'antd';
+import ModRow from './ModRow';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
@@ -26,66 +25,6 @@ const LocalMods = props => {
   const listRef = React.createRef();
 
   const modsFolder = path.join(PACKS_PATH, props.match.params.instance, 'mods');
-
-  const Mod = ({ index, style, toggleSize }) => (
-    <div
-      className={index % 2 ? styles.listItemOdd : styles.listItemEven}
-      style={style}
-    >
-      <div className={styles.innerItemMod}>
-        <div>
-          <Checkbox
-            onChange={() => selectMod(index)}
-            checked={filteredMods[index].selected}
-          />
-          <Switch
-            checked={filteredMods[index].state}
-            style={{ marginLeft: 15 }}
-            onChange={v => toggleDisableMod(v, index)}
-          />
-        </div>
-        {filteredMods[index].name.replace('.disabled', '')}{' '}
-        <div>
-          <FontAwesomeIcon
-            className={styles.editIcon}
-            icon="edit"
-            onClick={() => toggleSize(index)}
-          />
-          <FontAwesomeIcon
-            className={styles.deleteIcon}
-            icon="trash"
-            onClick={() => deleteMod(index)}
-          />
-        </div>
-      </div>
-    </div>
-  );
-
-  const filterMods = v => {
-    setSearchQuery(v.toLowerCase());
-    if (v === '') {
-      setFilteredMods(props.localMods);
-    } else {
-      const modsList = props.localMods.filter(mod =>
-        mod.name.toLowerCase().includes(v.toLowerCase())
-      );
-      setFilteredMods(modsList);
-    }
-  };
-
-  const getSize = i => {
-    return filteredMods[i].height;
-  };
-
-  const selectMod = i => {
-    const newMods = Object.assign([...filteredMods], {
-      [i]: {
-        ...filteredMods[i],
-        selected: !filteredMods[i].selected
-      }
-    });
-    setFilteredMods(newMods);
-  };
 
   const toggleSize = i => {
     if (listRef.current) {
@@ -106,35 +45,20 @@ const LocalMods = props => {
     setFilteredMods(newMods);
   };
 
-  const deleteMod = async i => {
-    // Remove the actual file
-    await promisify(fss.unlink)(path.join(modsFolder, filteredMods[i].name));
-    // Remove the reference in the mods file json
-    const oldMods = JSON.parse(
-      await promisify(fss.readFile)(
-        path.join(PACKS_PATH, props.match.params.instance, 'mods.json')
-      )
-    );
-    await promisify(fss.writeFile)(
-      path.join(PACKS_PATH, props.match.params.instance, 'mods.json'),
-      JSON.stringify(
-        oldMods.filter(v => v.fileNameOnDisk !== filteredMods[i].name)
-      )
-    );
+  const filterMods = v => {
+    setSearchQuery(v.toLowerCase());
+    if (v === '') {
+      setFilteredMods(props.localMods);
+    } else {
+      const modsList = props.localMods.filter(mod =>
+        mod.name.toLowerCase().includes(v.toLowerCase())
+      );
+      setFilteredMods(modsList);
+    }
   };
 
-  const toggleDisableMod = async (enabled, index) => {
-    if (enabled) {
-      await promisify(fs.rename)(
-        path.join(modsFolder, filteredMods[index].name),
-        path.join(modsFolder, filteredMods[index].name.replace('.disabled', ''))
-      );
-    } else {
-      await fs.renameAsync(
-        path.join(modsFolder, filteredMods[index].name),
-        path.join(modsFolder, `${filteredMods[index].name}.disabled`)
-      );
-    }
+  const getSize = i => {
+    return filteredMods[i].height;
   };
 
   if (props.localMods.length === 0) {
@@ -176,7 +100,8 @@ const LocalMods = props => {
             display: 'flex',
             justifyContent: 'space-around',
             alignItems: 'center',
-            height: 40
+            height: 40,
+            marginLeft: 7
           }}
         >
           <Checkbox
@@ -198,8 +123,10 @@ const LocalMods = props => {
               );
             }}
           />
-          {filteredMods.filter(v => v.selected === true).length} mods selected
-          <FontAwesomeIcon className={styles.deleteIcon} icon="trash" />
+          <span style={{ width: 140 }}>
+            {filteredMods.filter(v => v.selected === true).length} mods selected
+          </span>
+          <FontAwesomeIcon className={styles.deleteIcon} icon={faTrash} />
         </div>
         <Input
           allowClear
@@ -227,7 +154,7 @@ const LocalMods = props => {
             }}
             replace
           >
-            <FontAwesomeIcon className={styles.plusIcon} icon="plus" />
+            <FontAwesomeIcon className={styles.plusIcon} icon={faPlus} />
           </Link>
         </div>
       </div>
@@ -240,7 +167,15 @@ const LocalMods = props => {
             itemSize={getSize}
             width={width}
           >
-            {propss => <Mod {...propss} toggleSize={toggleSize} />}
+            {propss => (
+              <ModRow
+                {...propss}
+                toggleSize={toggleSize}
+                modData={filteredMods[propss.index]}
+                setFilteredMods={setFilteredMods}
+                instance={props.match.params.instance}
+              />
+            )}
           </List>
         )}
       </AutoSizer>

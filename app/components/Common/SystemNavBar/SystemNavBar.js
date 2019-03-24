@@ -6,7 +6,6 @@ import WindowMinimizeBtn from './components/WindowMinimizeButton/WindowMinimizeB
 import WindowHideBtn from './components/WindowHideButton/WindowHideButton';
 import OpenDevTools from './components/OpenDevTools/OpenDevTools';
 
-
 type Props = {};
 export default class SystemNavBar extends Component<Props> {
   props: Props;

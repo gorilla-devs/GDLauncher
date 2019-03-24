@@ -10,7 +10,7 @@ import {
 
 const initialState = {
   downloadQueue: {}, // contains libs, assets and mainJar props
-  actualDownload: null,
+  actualDownload: null
 };
 
 export default function downloadManager(state = initialState, action) {

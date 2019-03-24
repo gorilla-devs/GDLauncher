@@ -1,5 +1,12 @@
 @mixin modItem {
   padding: 0 10px;
+  transition: all 0.1s ease-in-out;
+  cursor: pointer;
+  &:hover {
+    background: var(--secondary-color-3);
+    color: white;
+    transition: all 0.1s ease-in-out;
+  }
 }
 .listItemOdd {
   @include modItem;
@@ -42,8 +49,7 @@
   }
 }
 
-.plusIcon
- {
+.plusIcon {
   font-size: 25px;
   margin: 10px;
   cursor: pointer;

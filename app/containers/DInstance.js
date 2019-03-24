@@ -13,7 +13,13 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...downloadManagerActions, ...instancesManagerActions }, dispatch);
+  return bindActionCreators(
+    { ...downloadManagerActions, ...instancesManagerActions },
+    dispatch
+  );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DInstance);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DInstance);

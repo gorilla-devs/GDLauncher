@@ -9,7 +9,7 @@ import store from '../localStore';
 import {
   LOGIN_API,
   ACCESS_TOKEN_VALIDATION_URL,
-  ACCESS_TOKEN_REFRESH_URL,
+  ACCESS_TOKEN_REFRESH_URL
 } from '../constants';
 
 export const LOGOUT = 'LOGOUT';
@@ -28,15 +28,20 @@ export function login(username, password, remember) {
       type: START_AUTH_LOADING
     });
     try {
-      const { data, status } = await axios.post(LOGIN_API, {
-        agent: {
-          name: "Minecraft",
-          version: 1
+      const { data, status } = await axios.post(
+        LOGIN_API,
+        {
+          agent: {
+            name: 'Minecraft',
+            version: 1
+          },
+          username,
+          password,
+          requestUser: true,
+          ...(store.get('clientToken') && { clientToken: getClientToken() })
         },
-        username,
-        password,
-        requestUser: true
-      }, { headers: { 'Content-Type': 'application/json' }, });
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       if (
         status === 200 &&
         data !== undefined &&
@@ -48,7 +53,6 @@ export function login(username, password, remember) {
           username: data.user.username,
           displayName: data.selectedProfile.name,
           accessToken: data.accessToken,
-          clientToken: data.clientToken,
           legacy: data.selectedProfile.legacyProfile,
           uuid: data.selectedProfile.id,
           userID: data.selectedProfile.userId
@@ -58,12 +62,16 @@ export function login(username, password, remember) {
             user: {
               ...payload
             },
+            clientToken: data.clientToken,
             lastUsername: data.user.username
           });
         }
         dispatch({
           type: AUTH_SUCCESS,
-          payload
+          payload: {
+            ...payload,
+            clientToken: data.clientToken
+          }
         });
 
         const { newUser } = store.get('settings');
@@ -109,31 +117,56 @@ export function checkAccessToken() {
         type: START_TOKEN_CHECK_LOADING
       });
       try {
+        // First of all we try validating the stored access token
         const res = await axios.post(
           ACCESS_TOKEN_VALIDATION_URL,
-          { accessToken: userData.accessToken },
+          {
+            accessToken: userData.accessToken
+          },
           { 'Content-Type': 'application/json;charset=UTF-8' }
         );
         if (res.status === 204) {
           dispatch({
             type: AUTH_SUCCESS,
-            payload: userData
+            payload: {
+              ...userData,
+              clientToken: getClientToken()
+            }
           });
           dispatch(push('/home'));
         }
         return res;
       } catch (error) {
         if (error.response && error.response.status === 403) {
-          message.error('Token Not Valid. You Need To Log-In Again :(');
-          store.delete('user');
-          dispatch({
-            type: AUTH_FAILED
-          });
+          // Trying refreshing the stored access token
+          const newUserData = await refreshAccessToken(
+            userData.accessToken,
+            true
+          );
+          if (newUserData) {
+            dispatch({
+              type: AUTH_SUCCESS,
+              payload: {
+                ...userData,
+                clientToken: getClientToken()
+              }
+            });
+            dispatch(push('/home'));
+          } else {
+            message.error('Token Not Valid. You Need To Log-In Again :(');
+            store.delete('user');
+            dispatch({
+              type: AUTH_FAILED
+            });
+          }
         } else if (error.message === 'Network Error') {
           message.info('You are offline. Logging in in offline-mode');
           dispatch({
             type: AUTH_SUCCESS,
-            payload: userData
+            payload: {
+              ...userData,
+              clientToken: getClientToken()
+            }
           });
           dispatch(push('/home'));
         }
@@ -142,6 +175,8 @@ export function checkAccessToken() {
           type: STOP_TOKEN_CHECK_LOADING
         });
       }
+    } else {
+      dispatch(push('/'));
     }
   };
 }
@@ -158,71 +193,110 @@ export function tryNativeLauncherProfiles() {
   return async dispatch => {
     const homedir = process.env.APPDATA || os.homedir();
     const vanillaMCPath = path.join(homedir, '.minecraft');
-    try {
-      dispatch({ type: START_NATIVE_LOADING });
-      const vnlJson = await fsa.readJson(
-        path.join(vanillaMCPath, 'launcher_profiles.json')
+    dispatch({ type: START_NATIVE_LOADING });
+    const vnlJson = await fsa.readJson(
+      path.join(vanillaMCPath, 'launcher_profiles.json')
+    );
+    const { account } = vnlJson.selectedUser;
+    const { accessToken } = vnlJson.authenticationDatabase[account];
+    const newUserData = await refreshAccessToken(accessToken, true);
+    if (newUserData) {
+      const payload = {
+        email: newUserData.user.email,
+        username: newUserData.user.username,
+        displayName: newUserData.selectedProfile.name,
+        accessToken: newUserData.accessToken,
+        legacy: newUserData.selectedProfile.legacyProfile,
+        uuid: newUserData.selectedProfile.id,
+        userID: newUserData.selectedProfile.userId
+      };
+      // We need to update the accessToken in launcher_profiles.json
+      vnlJson.authenticationDatabase[
+        newUserData.selectedProfile.userId
+      ].accessToken = newUserData.accessToken;
+      await fsa.writeJson(
+        path.join(vanillaMCPath, 'launcher_profiles.json'),
+        vnlJson
       );
-      const { account } = vnlJson.selectedUser;
-      const { accessToken } = vnlJson.authenticationDatabase[account];
-      const res = await axios.post(
-        ACCESS_TOKEN_REFRESH_URL,
-        {
-          accessToken,
-          clientToken: vnlJson.clientToken,
-          requestUser: true
-        },
-        { 'Content-Type': 'application/json' }
-      );
-      if (
-        res.status === 200 &&
-        res.data !== undefined &&
-        res.data !== null &&
-        Object.prototype.hasOwnProperty.call(res.data, 'accessToken')
-      ) {
-        const { data } = res;
-        const payload = {
-          email: data.user.email,
-          username: data.user.username,
-          displayName: data.selectedProfile.name,
-          accessToken: data.accessToken,
-          clientToken: data.clientToken,
-          legacy: data.selectedProfile.legacyProfile,
-          uuid: data.selectedProfile.id,
-          userID: data.selectedProfile.userId
-        };
-        // We need to update the accessToken in launcher_profiles.json
-        vnlJson.authenticationDatabase[data.selectedProfile.userId].accessToken =
-          data.accessToken;
-        await fsa.writeJson(
-          path.join(vanillaMCPath, 'launcher_profiles.json'),
-          vnlJson
-        );
-        store.set({
-          user: { ...payload },
-          lastUsername: data.user.username
-        });
-        dispatch({
-          type: AUTH_SUCCESS,
-          payload
-        });
-        const { newUser } = store.get('settings');
-
-        if (newUser === false) {
-          dispatch(push('/home'));
-        } else {
-          store.set('settings.newUser', false);
-          dispatch(push('/newUserPage'));
+      store.set({
+        user: { ...payload },
+        clientToken: getClientToken(),
+        lastUsername: newUserData.user.username
+      });
+      dispatch({
+        type: AUTH_SUCCESS,
+        payload: {
+          ...payload,
+          clientToken: newUserData.clientToken
         }
+      });
+      const { newUser } = store.get('settings');
+
+      if (newUser === false) {
+        dispatch(push('/home'));
+      } else {
+        store.set('settings.newUser', false);
+        dispatch(push('/newUserPage'));
       }
-    } catch (err) {
-      message.error('We could not log you in through Minecraft Launcher. Invalid data.');
+    } else {
+      message.error(
+        'We could not log you in through Minecraft Launcher. Invalid data.'
+      );
       dispatch({
         type: AUTH_FAILED
       });
-      log.error(err);
-    } finally {
-      dispatch({ type: STOP_NATIVE_LOADING });
     }
+    dispatch({ type: STOP_NATIVE_LOADING });
   };
 }
+
+// Util functions
+
+const uuidv4 = () => {
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16)
+  );
+};
+
+const getClientToken = () => {
+  const clientToken = store.get('clientToken');
+  if (
+    clientToken &&
+    clientToken !== undefined &&
+    typeof clientToken === 'string'
+  ) {
+    return clientToken;
+  }
+  return uuidv4().replace('-', '');
+};
+
+// Returns the user data if successful, otherwise returns false
+const refreshAccessToken = async (
+  accessToken: string,
+  requestUser: boolean = false
+): boolean | {} => {
+  try {
+    const response = await axios.post(
+      ACCESS_TOKEN_REFRESH_URL,
+      {
+        accessToken,
+        requestUser
+      },
+      { 'Content-Type': 'application/json' }
+    );
+
+    if (
+      response.status === 200 &&
+      response.data !== undefined &&
+      response.data !== null &&
+      Object.prototype.hasOwnProperty.call(response.data, 'accessToken')
+    ) {
+      return response.data;
+    }
+  } catch (err) {
+    return false;
+  }
+};

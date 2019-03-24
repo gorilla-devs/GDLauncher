@@ -27,7 +27,6 @@ export const findJavaHome = async () => {
       return stdout.split('\n')[0];
     } catch (e) {
       log.info(`Could not find java path: ${e.message}`);
-      message.error('Could not find the java path. Unlucky...');
       return null;
     }
   }
@@ -38,8 +37,10 @@ export const isGlobalJavaOptions = async () => {
   const javaPath = await findJavaHome();
   try {
     const { stdout, stderr } = await promisify(exec)(`"${javaPath}" -version`);
-    const validOutput = stdout === "" ? stderr : stdout;
-    return validOutput.includes('_JAVA_OPTIONS') && validOutput.includes('-Xmx');
+    const validOutput = stdout === '' ? stderr : stdout;
+    return (
+      validOutput.includes('_JAVA_OPTIONS') && validOutput.includes('-Xmx')
+    );
   } catch (e) {
     log.info(`Could not check for global java options: ${e.message}`);
     return false;

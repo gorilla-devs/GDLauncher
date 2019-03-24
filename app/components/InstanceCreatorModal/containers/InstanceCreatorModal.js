@@ -8,12 +8,18 @@ function mapStateToProps(state) {
   return {
     versionsManifest: state.packCreator.versionsManifest,
     forgeManifest: state.packCreator.forgeManifest,
-    modalState: state.packCreator.modalState,
+    modalState: state.packCreator.modalState
   };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...packCreatorActions, ...downloadManagerActions }, dispatch);
+  return bindActionCreators(
+    { ...packCreatorActions, ...downloadManagerActions },
+    dispatch
+  );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(InstanceCreatorModal);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(InstanceCreatorModal);

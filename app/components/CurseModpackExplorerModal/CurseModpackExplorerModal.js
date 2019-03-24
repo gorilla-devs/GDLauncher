@@ -5,9 +5,11 @@ import { Button } from 'antd';
 import log from 'electron-log';
 import ReactHtmlParser from 'react-html-parser';
 import ProgressiveImage from 'react-progressive-image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../Common/Modal/Modal';
 import { numberToRoundedWord } from '../../utils/numbers';
-import { CURSEMETA_API_URL } from '../../constants';
+import { useGetAddon } from '../../hooks/cursemeta';
 import styles from './CurseModpackExplorerModal.scss';
 
 const Loader = () => (
@@ -33,16 +35,7 @@ const Loader = () => (
 export default props => {
   const { addonID } = props.match.params;
   const [unMount, setUnMount] = useState(false);
-  const [packData, setPackData] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get(`${CURSEMETA_API_URL}/direct/addon/${addonID}`)
-      .then(({ data }) => {
-        setPackData(data);
-      })
-      .catch(e => log.error(e));
-  }, []);
+  const response = useGetAddon(addonID);
 
   return (
     <Modal
@@ -51,16 +44,13 @@ export default props => {
       header="false"
       title="Modpack Explorer"
       backBtn={
-        <Button
-          icon="close"
-          size="small"
-          type="ghost"
-          style={{ position: 'absolute', right: '2%', top: '2%', zIndex: 100 }}
-        />
+        <div className={styles.closeBtn}>
+          <FontAwesomeIcon icon={faWindowClose} />
+        </div>
       }
       style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}
     >
-      {packData !== null ? (
+      {response !== null ? (
         <div className={styles.container}>
           <div
             style={{
@@ -69,8 +59,8 @@ export default props => {
             className={styles.overlay}
           >
             <ProgressiveImage
-              src={packData.attachments[0].url}
-              placeholder={packData.attachments[0].thumbnailUrl}
+              src={response.attachments[0].url}
+              placeholder={response.attachments[0].thumbnailUrl}
             >
               {(src, loading) => (
                 <img
@@ -97,7 +87,7 @@ export default props => {
               textAlign: 'center'
             }}
           >
-            {packData.name}
+            {response.name}
           </h1>
           <span
             style={{
@@ -107,13 +97,13 @@ export default props => {
               justifyContent: 'space-around'
             }}
           >
-            <span>{numberToRoundedWord(packData.downloadCount)} downloads</span>
+            <span>{numberToRoundedWord(response.downloadCount)} downloads</span>
             <span>
-              by {packData.authors.map(author => author.name).join(', ')}
+              by {response.authors.map(author => author.name).join(', ')}
             </span>
             <span>
               Updated:{' '}
-              {new Date(packData.latestFiles[0].fileDate).toLocaleDateString(
+              {new Date(response.latestFiles[0].fileDate).toLocaleDateString(
                 'en-US',
                 {
                   day: 'numeric',
@@ -124,7 +114,7 @@ export default props => {
             </span>
           </span>
           <div className={styles.description}>
-            {ReactHtmlParser(packData.fullDescription)}
+            {ReactHtmlParser(response.fullDescription)}
           </div>
         </div>
       ) : (

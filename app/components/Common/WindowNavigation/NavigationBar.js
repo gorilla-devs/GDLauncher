@@ -1,14 +1,12 @@
 // @flow
 import React, { useState, useEffect } from 'react';
-import { Menu, Button } from 'antd';
+import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
 import styles from './NavigationBar.scss';
 import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
-import * as downloadManagerActions from '../../../actions/downloadManager';
 import logo from '../../../assets/images/logo.png';
 
 export default props => {
@@ -35,7 +33,7 @@ export default props => {
           state: { modal: true }
         }}
       >
-        <FontAwesomeIcon icon="cog" className={styles.settings} />
+        <FontAwesomeIcon icon={faCog} className={styles.settings} />
       </Link>
       {updateAvailable && (
         <div className={styles.updateAvailable}>

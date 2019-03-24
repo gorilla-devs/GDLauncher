@@ -1,7 +1,7 @@
-@import "../../style/mixins/index";
+@import '../../style/mixins/index';
 
-.antCheckboxFn(@checkbox-prefix-cls: ~"@{ant-prefix}-checkbox") {
-  @checkbox-inner-prefix-cls: ~"@{checkbox-prefix-cls}-inner";
+.antCheckboxFn(@checkbox-prefix-cls: ~'@{ant-prefix}-checkbox') {
+  @checkbox-inner-prefix-cls: ~'@{checkbox-prefix-cls}-inner';
   // 一般状态
   .@{checkbox-prefix-cls} {
     .reset-component;
@@ -28,7 +28,7 @@
       height: 100%;
       border-radius: @border-radius-sm;
       border: 1px solid @checkbox-color;
-      content: "";
+      content: '';
       animation: antCheckboxEffect 0.36s ease-in-out;
       animation-fill-mode: both;
       visibility: hidden;
@@ -49,7 +49,7 @@
       border: @checkbox-border-width @border-style-base @border-color-base;
       border-radius: @border-radius-sm;
       background-color: @checkbox-check-color;
-      transition: all .3s;
+      transition: all 0.3s;
       // Fix IE checked style
       // https://github.com/ant-design/ant-design/issues/12597
       border-collapse: separate;
@@ -57,10 +57,10 @@
       &:after {
         @check-width: (@checkbox-size / 14) * 5px;
         @check-height: (@checkbox-size / 14) * 8px;
-        transform: rotate(45deg) scale(0);
+        transform: rotate(45deg) scale(0) translate(-50%, -50%);
         position: absolute;
-        left: (@checkbox-size - @check-width) / 2 - 0.5px * (@checkbox-size / 14);
-        top: (@checkbox-size - @check-height) / 2 - 2px * (@checkbox-size / 14);
+        top: 50%;
+        left: 21%;
         display: table;
         width: @check-width;
         height: @check-height;
@@ -68,7 +68,7 @@
         border-top: 0;
         border-left: 0;
         content: ' ';
-        transition: all .1s @ease-in-back, opacity .1s;
+        transition: all 0.1s @ease-in-back, opacity 0.1s;
         opacity: 0;
       }
     }
@@ -89,14 +89,14 @@
 
   // 选中状态
   .@{checkbox-prefix-cls}-checked .@{checkbox-inner-prefix-cls}:after {
-    transform: rotate(45deg) scale(1);
+    transform: rotate(45deg) scale(1) translate(-50%, -50%);
     position: absolute;
     display: table;
     border: 2px solid @checkbox-check-color;
     border-top: 0;
     border-left: 0;
     content: ' ';
-    transition: all .2s @ease-out-back .1s;
+    transition: all 0.2s @ease-out-back 0.1s;
     opacity: 1;
   }
 

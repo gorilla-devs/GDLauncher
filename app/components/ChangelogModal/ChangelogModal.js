@@ -20,27 +20,43 @@ export default props => {
       history={props.history}
       unMount={unMount}
       title="WHAT'S NEW"
-      style={{ height: 390, width: 540 }}
+      style={{ height: '70vh', width: 540 }}
     >
       <div className={styles.container}>
         <h2 className={styles.hrTextGreen}>SOME COOL NEW STUFF</h2>
         <div className={styles.subHrList}>
           <ul>
             <ChangelogRow
-              main="Added a modal dialog confirmation"
-              secondary="when deleting an instance"
+              main="We are refactoring quite a few parts of the code"
+              secondary=", this will allow us to easily add features later on"
             />
             <ChangelogRow
-              main="Added a modal to fix _JAVA_OPTIONS"
-              secondary="because it caused a lot of troubles"
+              main="Drastically improved rendering performance"
+              secondary=", it should now be 2x faster"
             />
             <ChangelogRow
-              main="We are trying to make the UI as consistent as possible"
-              secondary=", so we changed some visual effects. You shouldn't notice it"
+              main="Modpacks icons are automatically set as instance icon when downloading them"
+              secondary=""
             />
             <ChangelogRow
-              main="Added our brand new Patreon page link in the Home"
-              secondary=". Wait, what??? Didn't you donate yet! SHAME ON U!11!1"
+              main="Modpacks downloads should now be 4x faster"
+              secondary="depending on your connection"
+            />
+            <ChangelogRow
+              main="We now show the 'Playing on GDLauncher' presence on discord"
+              secondary="hurraah!"
+            />
+            <ChangelogRow
+              main="Updated the download progress style when downloading instances"
+              secondary="do you like it??"
+            />
+            <ChangelogRow
+              main="You can now change the java arguments from the launcher settings!"
+              secondary="It will apply to all the instances"
+            />
+            <ChangelogRow
+              main="Instances now have an animation when appearing."
+              secondary="This will fix icons 'flashing' for a split second"
             />
           </ul>
         </div>
@@ -48,24 +64,24 @@ export default props => {
         <div className={styles.subHrList}>
           <ul>
             <ChangelogRow
-              main="Fixed a bug when downloading mods"
-              secondary="we hope you are proud of us now :)"
+              main="Fixed the news not working"
+              secondary=", not our fault. Minecraft.net changed it..."
             />
             <ChangelogRow
-              main="When searching for a mod that doesn't exist"
-              secondary="it now displays an appropriate message"
+              main="Removed various errors stacking up"
+              secondary="when java was not found"
             />
             <ChangelogRow
-              main="Modals animation should feel smoother now"
-              secondary="let us know if you agree"
+              main="Fixed mods dependancies not being correctly downloaded"
+              secondary=" yeeeee"
             />
             <ChangelogRow
-              main="Fixed compatibility issues with older versions of the launcher"
-              secondary={`, if instances still won't start, try clicking "repair" and try again`}
+              main="Fixed broken mods and modpacks results"
+              secondary="when the text contained whitespaces"
             />
             <ChangelogRow
-              main="Fixed access token being written to logs"
-              secondary={`, you're safe now!`}
+              main="Fixed closing modal animation not working"
+              secondary="when creating a new instance"
             />
           </ul>
         </div>
