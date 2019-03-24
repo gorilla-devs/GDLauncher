@@ -39,6 +39,7 @@ function Instances(props: Props) {
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
   const [overrideArgs, setOverrideArgsInput] = useState(overrideJavaArgs);
+  const [switchState, setSwitchState] = useState(false);
 
   let watcher = null;
 
@@ -83,6 +84,15 @@ function Instances(props: Props) {
   };
 
   async function configManagment() {
+    const configFile = JSON.parse(
+      await promisify(fs.readFile)(
+        path.join(PACKS_PATH, props.instance, 'config.json')
+      )
+    );
+    if (configFile.overrideArgs !== '') {
+      setSwitchState(true);
+    } else setSwitchState(false);
+
     try {
       let config = JSON.parse(
         await promisify(fs.readFile)(
@@ -133,6 +143,85 @@ function Instances(props: Props) {
       }
     });
   }
+
+  async function toggleJavaArguments(e) {
+    console.log(e);
+    console.log('SWITCH', switchState);
+    try {
+      const config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, props.instance, 'config.json')
+        )
+      );
+      if (config.overrideArgs === '' && e === true) {
+        config.overrideArgs = props.overrideJavaArgs;
+        const modifiedConfig = JSON.stringify(config);
+        await promisify(fs.writeFile)(
+          path.join(PACKS_PATH, props.instance, 'config.json'),
+          modifiedConfig
+        );
+        setSwitchState(true);
+      } else if (config.overrideArgs !== '' && e === false) {
+        config.overrideArgs = '';
+        const modifiedConfig = JSON.stringify(config);
+        await promisify(fs.writeFile)(
+          path.join(PACKS_PATH, props.instance, 'config.json'),
+          modifiedConfig
+        );
+        setSwitchState(false);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const javaArgInput = (
+    <div>
+      <Input
+        value={overrideArgs}
+        style={{
+          display: 'inline-block',
+          maxWidth: '74%',
+          marginRight: '10px',
+          marginBottom: 10,
+          marginTop: 4,
+          backgroundColor: 'var(--secondary-color-1)',
+          marginLeft: '1%'
+        }}
+        onChange={e => setOverrideArgsInput(e.target.value)}
+      />
+      <Button.Group
+        style={{
+          maxWidth: '60%',
+          marginBottom: 10,
+          marginTop: 4
+        }}
+      >
+        <Button
+          style={{
+            maxWidth: '60%',
+            marginBottom: 10,
+            marginTop: 4
+          }}
+          onClick={() => submit()}
+          type="primary"
+        >
+          <FontAwesomeIcon icon={faCheck} />
+        </Button>
+        <Button
+          style={{
+            maxWidth: '60%',
+            marginBottom: 10,
+            marginTop: 4
+          }}
+          type="primary"
+          onClick={() => reset()}
+        >
+          <FontAwesomeIcon icon={faUndo} />
+        </Button>
+      </Button.Group>
+    </div>
+  );
 
   const { getFieldDecorator } = props.form;
   return (
@@ -217,52 +306,15 @@ function Instances(props: Props) {
               instanceName={props.instance}
             />
             <div style={{ display: 'inline', verticalAlign: 'middle' }}>
-              <div className={styles.mainText}>Java Arguments </div>
-              <div>
-                <Input
-                  value={overrideArgs}
-                  style={{
-                    display: 'inline-block',
-                    maxWidth: '74%',
-                    marginRight: '10px',
-                    marginBottom: 10,
-                    marginTop: 4,
-                    backgroundColor: 'var(--secondary-color-1)',
-                    marginLeft: '1%'
-                  }}
-                  onChange={e => setOverrideArgsInput(e.target.value)}
+              <div className={styles.mainText}>
+                Java Arguments
+                <Switch
+                  className={styles.switch}
+                  onChange={e => toggleJavaArguments(e)}
+                  checked={switchState}
                 />
-                <Button.Group
-                  style={{
-                    maxWidth: '60%',
-                    marginBottom: 10,
-                    marginTop: 4
-                  }}
-                >
-                  <Button
-                    style={{
-                      maxWidth: '60%',
-                      marginBottom: 10,
-                      marginTop: 4
-                    }}
-                    onClick={() => submit()}
-                    type="primary"
-                  >
-                    <FontAwesomeIcon icon={faCheck} />
-                  </Button>
-                  <Button
-                    style={{
-                      maxWidth: '60%',
-                      marginBottom: 10,
-                      marginTop: 4
-                    }}
-                    type="primary"
-                    onClick={() => reset()}
-                  >
-                    <FontAwesomeIcon icon={faUndo} />
-                  </Button>
-                </Button.Group>
               </div>
+              {switchState ? javaArgInput : <div />}
             </div>
           </Card>
         </div>
