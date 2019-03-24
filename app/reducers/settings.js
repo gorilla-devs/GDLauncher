@@ -17,9 +17,9 @@ const initialState = {
     autodetected: true,
     path: null,
     memory: 3096,
+    overrideMemory: 3096,
     javaArgs: DEFAULT_ARGS,
-    overrideJavaArgs: DEFAULT_ARGS,
-    overrideMemory: 3096
+    overrideJavaArgs: DEFAULT_ARGS
   },
   theme: THEMES.default
 };

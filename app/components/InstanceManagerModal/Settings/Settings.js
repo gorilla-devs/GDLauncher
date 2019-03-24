@@ -14,7 +14,11 @@ import { PACKS_PATH } from '../../../constants';
 import styles from './Settings.scss';
 import JavaMemorySlider from './javaMemorySlider';
 import { history } from '../../../store/configureStore';
-import { setOverrideJavaMemory, setJavaArgs, setOverrideJavaArgs } from '../../../actions/settings';
+import {
+  setOverrideJavaMemory,
+  setJavaArgs,
+  setOverrideJavaArgs
+} from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
 import { DEFAULT_ARGS } from '../../../constants';
 
@@ -86,7 +90,6 @@ function Instances(props: Props) {
         )
       );
       setOverrideArgsInput(config.overrideArgs);
-      //this.setState({ instanceConfig: config });
       setInstanceConfig(config);
       watcher = fs.watch(
         path.join(PACKS_PATH, props.instance, 'config.json'),

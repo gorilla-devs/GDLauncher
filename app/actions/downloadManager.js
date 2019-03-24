@@ -28,6 +28,7 @@ import { downloadMod, getModsList, createDoNotTouchFile } from '../utils/mods';
 import { arraify } from '../utils/strings';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
 import { getAddonFile, getAddon } from '../utils/cursemeta';
+import { DEFAULT_ARGS } from '../constants';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -392,7 +393,7 @@ export function downloadPack(pack) {
         timePlayed: 0,
         mods: modsManifest,
         overrideFiles: overrideFilesList,
-        overrideArgs: ""
+        overrideArgs: DEFAULT_ARGS
       })
     );
 
