@@ -38,7 +38,7 @@ function javaMemorySlider(props) {
         path.join(PACKS_PATH, props.instanceName, 'config.json')
       )
     );
-    if (configFile.overrideArgs !== '') {
+    if (configFile.overrideMemory !== '') {
       setSwitchState(true);
     } else setSwitchState(false);
   };
@@ -56,16 +56,16 @@ function javaMemorySlider(props) {
           path.join(PACKS_PATH, props.instanceName, 'config.json')
         )
       );
-      if (config.overrideArgs === '' && e === true) {
-        config.overrideArgs = props.overrideJavaArgs;
+      if (config.overrideMemory === '' && e === true) {
+        config.overrideMemory = props.overrideMemory;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
         setSwitchState(true);
-      } else if (config.overrideArgs !== '' && e === false) {
-        config.overrideArgs = '';
+      } else if (config.overrideMemory !== '' && e === false) {
+        config.overrideMemory = '';
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
@@ -134,7 +134,7 @@ function mapStateToProps(state) {
     settings: state.settings,
     javaArgs: state.settings.java.javaArgs,
     overrideJavaArgs: state.settings.java.overrideJavaArgs,
-    toggleArgs: state.settings.toggleOverrideJavaArguments
+    overrideMemory: state.settings.java.overrideMemory
   };
 }
 
