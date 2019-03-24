@@ -49,7 +49,7 @@ function javaMemorySlider(props) {
 
   async function toggleJavaArguments(e) {
     console.log(e);
-    console.log('SWITCH', switchState);
+    console.log('SWITCH', props.overrideMemory);
     try {
       const config = JSON.parse(
         await promisify(fs.readFile)(
