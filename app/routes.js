@@ -106,12 +106,13 @@ class RouteDef extends Component<Props> {
     });
 
     ipcRenderer.once('closing', () => {
-      log.info("CHIUSO");
+      log.info('CHIUSO');
       ipcRenderer.send('close-started-servers', [
-        ...Object.keys(this.props.serversList).map(v => this.props.serversList[v].pid)
+        ...Object.keys(this.props.serversList).map(
+          v => this.props.serversList[v].pid
+        )
       ]);
     });
-
   };
 
   componentWillUpdate(nextProps) {
@@ -217,10 +218,7 @@ class RouteDef extends Component<Props> {
                   component={CurseModpacksBrowser}
                 />
                 <Route path="/home" component={WaitingComponent(HomePage)} />
-                <Route
-                  path="/serverManager"
-                  component={(ServerManager)}
-                />
+                <Route path="/serverManager" component={ServerManager} />
               </div>
             </Route>
           </Switch>
@@ -297,44 +295,44 @@ class RouteDef extends Component<Props> {
           />
         ) : null}
       </App>
-      );
-    }
+    );
   }
-  
+}
+
 function WaitingComponent(MyComponent) {
   return props => (
     <Suspense
-          fallback={
-            <div
-              style={{
-                width: '100vw',
-                height: '100vh',
-                background: 'var(--secondary-color-1)'
-              }}
-            >
-              Loading...
-        </div>
-          }
+      fallback={
+        <div
+          style={{
+            width: '100vw',
+            height: '100vh',
+            background: 'var(--secondary-color-1)'
+          }}
         >
-          <MyComponent {...props} />
-        </Suspense>
-        );
+          Loading...
+        </div>
       }
-      
+    >
+      <MyComponent {...props} />
+    </Suspense>
+  );
+}
+
 function mapStateToProps(state) {
   return {
-          location: state.router.location,
-        isAuthValid: state.auth.isAuthValid,
-        serversList: state.serverManager.servers
-        uuid: state.auth.clientToken
-      };
-    }
-    
+    location: state.router.location,
+    isAuthValid: state.auth.isAuthValid,
+    serversList: state.serverManager.servers,
+    uuid: state.auth.clientToken
+  };
+}
+
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({...AuthActions, ...SettingsActions }, dispatch);
-      }
-      
-      export default connect(
-        mapStateToProps,
-        mapDispatchToProps
-      )(RouteDef);
+  return bindActionCreators({ ...AuthActions, ...SettingsActions }, dispatch);
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RouteDef);

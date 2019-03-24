@@ -53,7 +53,7 @@ export default props => {
             MODPACKS
           </Link>
         </li>
-        <li
+        {/* <li
           className={`${styles.li} ${
             isLocation('/serverManager') ? styles.activeLink : null
           }`}
@@ -66,7 +66,7 @@ export default props => {
             <FontAwesomeIcon icon="database" className={styles.i} />
             SERVERS
           </Link>
-        </li>
+        </li> */}
         
       </ul>
     </div>
