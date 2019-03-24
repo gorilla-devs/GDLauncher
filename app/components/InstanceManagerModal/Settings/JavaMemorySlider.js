@@ -57,7 +57,6 @@ function javaMemorySlider(props) {
       if (config.overrideArgs === '' && e === true) {
         config.overrideArgs = props.javaArguments;
         const config2 = JSON.stringify(config);
-        console.log(config2);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           config2
@@ -65,7 +64,6 @@ function javaMemorySlider(props) {
       } else if (config.overrideArgs != '' && e === false) {
         config.overrideArgs = '';
         const config2 = JSON.stringify(config);
-        console.log(config2);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           config2

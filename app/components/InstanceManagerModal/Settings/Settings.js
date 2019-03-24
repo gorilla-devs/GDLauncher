@@ -56,10 +56,10 @@ function Instances(props: Props) {
       )
     );
     config.overrideArgs = DEFAULT_ARGS;
-    const config2 = JSON.stringify(config);
+    const modifiedConfig = JSON.stringify(config);
     await promisify(fs.writeFile)(
       path.join(PACKS_PATH, props.instance, 'config.json'),
-      config2
+      modifiedConfig
     );
   };
 
@@ -73,10 +73,10 @@ function Instances(props: Props) {
         )
       );
       config.overrideArgs = overrideArgs;
-      const config2 = JSON.stringify(config);
+      const modifiedConfig = JSON.stringify(config);
       await promisify(fs.writeFile)(
         path.join(PACKS_PATH, props.instance, 'config.json'),
-        config2
+        modifiedConfig
       );
       updateJavaArguments(overrideArgs);
     } else message.error('Enter Valid Arguments');
@@ -101,14 +101,12 @@ function Instances(props: Props) {
             )
           );
           setInstanceConfig(config);
-          //this.setState({ instanceConfig: config });
         }
       );
     } catch (err) {
       log.error(err.message);
     } finally {
       setCheckingForge(false);
-      //this.setState({ checkingForge: false });
     }
   }
 
