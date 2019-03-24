@@ -12,7 +12,7 @@ import log from 'electron-log';
 import Card from '../../Common/Card/Card';
 import { PACKS_PATH } from '../../../constants';
 import styles from './Settings.scss';
-import JavaMemorySlider from './javaMemorySlider';
+import JavaMemorySlider from './JavaMemorySlider';
 import { history } from '../../../store/configureStore';
 import {
   setOverrideJavaMemory,
