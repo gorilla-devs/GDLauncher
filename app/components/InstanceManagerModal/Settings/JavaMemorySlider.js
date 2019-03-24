@@ -33,12 +33,12 @@ function javaMemorySlider(props) {
   };
 
   const checkSwitchState = async () => {
-    const config = JSON.parse(
+    const configFile = JSON.parse(
       await promisify(fs.readFile)(
         path.join(PACKS_PATH, props.instanceName, 'config.json')
       )
     );
-    if (config.overrideArgs != '') {
+    if (configFile.overrideArgs !== '') {
       setSwitchState(true);
     } else setSwitchState(false);
   };
@@ -48,6 +48,8 @@ function javaMemorySlider(props) {
   });
 
   async function toggleJavaArguments(e) {
+    console.log(e);
+    console.log('SWITCH', switchState);
     try {
       const config = JSON.parse(
         await promisify(fs.readFile)(
@@ -55,19 +57,21 @@ function javaMemorySlider(props) {
         )
       );
       if (config.overrideArgs === '' && e === true) {
-        config.overrideArgs = props.javaArguments;
+        config.overrideArgs = props.overrideJavaArgs;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
-      } else if (config.overrideArgs != '' && e === false) {
+        setSwitchState(true);
+      } else if (config.overrideArgs !== '' && e === false) {
         config.overrideArgs = '';
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
+        setSwitchState(false);
       }
     } catch (err) {
       console.error(err);
@@ -128,6 +132,7 @@ function mapStateToProps(state) {
   return {
     settings: state.settings,
     javaArgs: state.settings.java.javaArgs,
+    overrideJavaArgs: state.settings.java.overrideJavaArgs,
     toggleArgs: state.settings.toggleOverrideJavaArguments
   };
 }
