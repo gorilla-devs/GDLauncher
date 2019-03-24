@@ -208,7 +208,7 @@ function Instances(props: Props) {
             ) : null}
           </Card>
 
-          <Card style={{ marginTop: 15, height: 200 }} title="Java Manager">
+          <Card style={{ marginTop: 15, height: 220 }} title="Java Manager">
             <JavaMemorySlider
               ram={props.settings.java.overrideMemory}
               is64bit={is64bit}
@@ -217,49 +217,52 @@ function Instances(props: Props) {
               instanceName={props.instance}
             />
             <div style={{ display: 'inline', verticalAlign: 'middle' }}>
-              <Input
-                value={overrideArgs}
-                style={{
-                  display: 'inline-block',
-                  maxWidth: '76%',
-                  marginRight: '10px',
-                  marginBottom: 10,
-                  marginTop: 4,
-                  backgroundColor: 'var(--secondary-color-1)'
-                }}
-                onChange={e => setOverrideArgsInput(e.target.value)}
-              />
-
-              <Button.Group
-                style={{
-                  maxWidth: '60%',
-                  marginBottom: 10,
-                  marginTop: 4
-                }}
-              >
-                <Button
+              <div className={styles.mainText}>Java Arguments </div>
+              <div>
+                <Input
+                  value={overrideArgs}
+                  style={{
+                    display: 'inline-block',
+                    maxWidth: '74%',
+                    marginRight: '10px',
+                    marginBottom: 10,
+                    marginTop: 4,
+                    backgroundColor: 'var(--secondary-color-1)',
+                    marginLeft: '1%'
+                  }}
+                  onChange={e => setOverrideArgsInput(e.target.value)}
+                />
+                <Button.Group
                   style={{
                     maxWidth: '60%',
                     marginBottom: 10,
                     marginTop: 4
                   }}
-                  onClick={() => submit()}
-                  type="primary"
                 >
-                  <FontAwesomeIcon icon={faCheck} />
-                </Button>
-                <Button
-                  style={{
-                    maxWidth: '60%',
-                    marginBottom: 10,
-                    marginTop: 4
-                  }}
-                  type="primary"
-                  onClick={() => reset()}
-                >
-                  <FontAwesomeIcon icon={faUndo} />
-                </Button>
-              </Button.Group>
+                  <Button
+                    style={{
+                      maxWidth: '60%',
+                      marginBottom: 10,
+                      marginTop: 4
+                    }}
+                    onClick={() => submit()}
+                    type="primary"
+                  >
+                    <FontAwesomeIcon icon={faCheck} />
+                  </Button>
+                  <Button
+                    style={{
+                      maxWidth: '60%',
+                      marginBottom: 10,
+                      marginTop: 4
+                    }}
+                    type="primary"
+                    onClick={() => reset()}
+                  >
+                    <FontAwesomeIcon icon={faUndo} />
+                  </Button>
+                </Button.Group>
+              </div>
             </div>
           </Card>
         </div>

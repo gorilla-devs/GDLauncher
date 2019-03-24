@@ -78,39 +78,9 @@ function javaMemorySlider(props) {
     }
   }
 
-  return (
+  const memorySlider = (
     <div>
-      <div className={styles.container}>
-        <div>
-          <div className={styles.mainText}>
-            Java Memory (
-            {is64bit ? (
-              '64 bit)'
-            ) : (
-              <span>
-                32 bit)&nbsp;
-                <Tooltip
-                  placement="right"
-                  title="Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used.
-                  If you want more, install or select a 64 bit java executable"
-                >
-                  <FontAwesomeIcon
-                    className={styles.iconPointer}
-                    icon={faQuestionCircle}
-                  />
-                </Tooltip>
-              </span>
-            )}
-            <Switch
-              className={styles.switch}
-              onChange={e => toggleJavaArguments(e)}
-              checked={switchState}
-            />
-          </div>
-          <div className={styles.description}>{description}</div>
-        </div>
-        <div className={styles.action}>{memory} MB</div>
-      </div>
+      <div className={styles.mainText}>{memory} MB</div>
       <Slider
         marks={marks}
         step={512}
@@ -124,6 +94,37 @@ function javaMemorySlider(props) {
         onChange={v => setMemory(v)}
         onAfterChange={v => updateMemory(v)}
       />
+    </div>
+  );
+
+  return (
+    <div>
+      <div className={styles.mainText}>
+        Java Memory (
+        {is64bit ? (
+          '64 bit)'
+        ) : (
+          <span>
+            32 bit)&nbsp;
+            <Tooltip
+              placement="right"
+              title="Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used.
+                  If you want more, install or select a 64 bit java executable"
+            >
+              <FontAwesomeIcon
+                className={styles.iconPointer}
+                icon={faQuestionCircle}
+              />
+            </Tooltip>
+          </span>
+        )}
+        <Switch
+          className={styles.switch}
+          onChange={e => toggleJavaArguments(e)}
+          checked={switchState}
+        />
+      </div>
+      {switchState ? memorySlider : <div />}
     </div>
   );
 }
