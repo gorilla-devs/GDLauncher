@@ -53,7 +53,6 @@ function Instances(props: Props) {
     );
     config.overrideArgs = DEFAULT_ARGS;
     const config2 = JSON.stringify(config);
-    console.log(config2);
     await promisify(fs.writeFile)(
       path.join(PACKS_PATH, props.instance, 'config.json'),
       config2
@@ -63,7 +62,6 @@ function Instances(props: Props) {
   // Set the changed java arguments
   const submit = async () => {
     props.setOverrideJavaArgs(overrideArgs);
-    console.log(props.settings.java.memory, 'diopeppe');
     if (overrideArgs) {
       const config = JSON.parse(
         await promisify(fs.readFile)(
@@ -72,7 +70,6 @@ function Instances(props: Props) {
       );
       config.overrideArgs = overrideArgs;
       const config2 = JSON.stringify(config);
-      console.log(config2);
       await promisify(fs.writeFile)(
         path.join(PACKS_PATH, props.instance, 'config.json'),
         config2
@@ -88,6 +85,7 @@ function Instances(props: Props) {
           path.join(PACKS_PATH, props.instance, 'config.json')
         )
       );
+      setOverrideArgsInput(config.overrideArgs);
       //this.setState({ instanceConfig: config });
       setInstanceConfig(config);
       watcher = fs.watch(
