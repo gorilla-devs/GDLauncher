@@ -392,9 +392,7 @@ export function downloadPack(pack) {
         ...(thumbnailURL && { icon: 'icon.png' }),
         timePlayed: 0,
         mods: modsManifest,
-        overrideFiles: overrideFilesList,
-        // overrideArgs: DEFAULT_ARGS,
-        // overrideMemory: 3096
+        overrideFiles: overrideFilesList
       })
     );
 
