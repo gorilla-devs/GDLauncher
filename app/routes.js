@@ -1,8 +1,6 @@
 /* eslint flowtype-errors/show-errors: 0 */
 import React, { Component, lazy, Suspense } from 'react';
 import { connect } from 'react-redux';
-import { ipcRenderer } from 'electron';
-import log from 'electron-log';
 import { Switch, Route, Redirect } from 'react-router';
 import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
@@ -24,22 +22,14 @@ import InstanceManagerModal from './components/InstanceManagerModal/containers/I
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
 import NewUserPage from './components/NewUserPage/NewUserPage';
-import ServerManager from './components/ServerManager/ServerManager';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
 const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
-// const ServerManager = lazy(() =>
-//   import('./components/ServerManager/ServerManager')
-// );
+
 const InstanceCreatorModal = lazy(() =>
   import('./components/InstanceCreatorModal/containers/InstanceCreatorModal')
 );
-
-const ServerCreatorModal = lazy(() =>
-  import('./components/ServerCreatorModal/ServerCreatorModal')
-);
-
 const loginHelperModal = lazy(() =>
   import('./components/LoginHelperModal/LoginHelperModal')
 );
@@ -62,9 +52,6 @@ const ConfirmDeleteModal = lazy(() =>
 const JavaGlobalOptionsFixModal = lazy(() =>
   import('./components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal')
 );
-// const ServerCommandsModal = lazy(() =>
-//   import('./components/ServerCommandsModal/ServerCommandsModal')
-// );
 
 type Props = {
   location: object,
@@ -103,15 +90,6 @@ class RouteDef extends Component<Props> {
     const globalJavaOptions = await isGlobalJavaOptions();
     this.setState({
       globalJavaOptions
-    });
-
-    ipcRenderer.once('closing', () => {
-      log.info('CHIUSO');
-      ipcRenderer.send('close-started-servers', [
-        ...Object.keys(this.props.serversList).map(
-          v => this.props.serversList[v].pid
-        )
-      ]);
     });
   };
 
@@ -218,7 +196,6 @@ class RouteDef extends Component<Props> {
                   component={CurseModpacksBrowser}
                 />
                 <Route path="/home" component={WaitingComponent(HomePage)} />
-                <Route path="/serverManager" component={ServerManager} />
               </div>
             </Route>
           </Switch>
@@ -266,12 +243,6 @@ class RouteDef extends Component<Props> {
         ) : null}
         {isModal ? (
           <Route
-            path="/ServerCreatorModal"
-            component={WaitingComponent(ServerCreatorModal)}
-          />
-        ) : null}
-        {isModal ? (
-          <Route
             path="/changelogs"
             component={WaitingComponent(ChangelogsModal)}
           />
@@ -288,12 +259,6 @@ class RouteDef extends Component<Props> {
             component={WaitingComponent(JavaGlobalOptionsFixModal)}
           />
         ) : null}
-        {/* {isModal ? (
-          <Route
-            path="/ServerCommandsModal"
-            component={WaitingComponent(ServerCommandsModal)}
-          />
-        ) : null} */}
       </App>
     );
   }
@@ -323,7 +288,6 @@ function mapStateToProps(state) {
   return {
     location: state.router.location,
     isAuthValid: state.auth.isAuthValid,
-    serversList: state.serverManager.servers,
     uuid: state.auth.clientToken
   };
 }

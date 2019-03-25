@@ -15,8 +15,6 @@ import minimist from 'minimist';
 import log from 'electron-log';
 import DiscordRPC from 'discord-rpc';
 import { autoUpdater } from 'electron-updater';
-import psTree from 'ps-tree';
-import { promisify } from 'util';
 import store from './localStore';
 import { THEMES } from './constants';
 import MenuBuilder from './menu';
@@ -179,8 +177,6 @@ if (minimist(process.argv.slice(1)).i) {
 
       mainWindow.show();
       mainWindow.focus();
-
-
     });
     let checked = false;
 
@@ -227,25 +223,9 @@ if (minimist(process.argv.slice(1)).i) {
       mainWindow.setProgressBar(p);
     });
 
-    ipcMain.on('close-started-servers', async (...args) => {
-      await Promise.all(args[1].map(async pid => {
-        const children = await promisify(psTree)(pid);
-        children.forEach(e => {
-          process.kill(e.PID);
-        });
-      }));
-      await app.exit(0);
-      //setTimeout(() => app.exit(0), 2000);
-    });
-    mainWindow.on('close', e => {
-      mainWindow.webContents.send('closing');
-      e.preventDefault();
-    });
-
     mainWindow.on('closed', () => {
       mainWindow = null;
     });
-
 
     const menuBuilder = new MenuBuilder(mainWindow);
     menuBuilder.buildMenu();
