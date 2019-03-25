@@ -158,6 +158,7 @@ function Instances(props: Props) {
           path.join(PACKS_PATH, props.instance, 'config.json'),
           modifiedConfig
         );
+        setOverrideArgsInput(props.overrideJavaArgs);
         setSwitchState(true);
       } else if (config.overrideArgs !== undefined && e === false) {
         config.overrideArgs = undefined;

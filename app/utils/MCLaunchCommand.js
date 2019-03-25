@@ -66,7 +66,7 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
 
   const completeCMD = `
 
-"${javaPath}" ${(config.overrideArgs === ''
+"${javaPath}" ${(config.overrideArgs === undefined
     ? javaArguments
     : config.overrideArgs
   ).replace('{_RAM_}', ram)} ${dosName} -Djava.library.path="${path.join(
