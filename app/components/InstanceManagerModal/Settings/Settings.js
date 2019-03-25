@@ -89,7 +89,7 @@ function Instances(props: Props) {
         path.join(PACKS_PATH, props.instance, 'config.json')
       )
     );
-    if (configFile.overrideArgs !== '') {
+    if (configFile.overrideArgs !== undefined) {
       setSwitchState(true);
     } else setSwitchState(false);
 
@@ -151,7 +151,7 @@ function Instances(props: Props) {
           path.join(PACKS_PATH, props.instance, 'config.json')
         )
       );
-      if (config.overrideArgs === '' && e === true) {
+      if (config.overrideArgs === undefined && e === true) {
         config.overrideArgs = props.overrideJavaArgs;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
@@ -159,8 +159,8 @@ function Instances(props: Props) {
           modifiedConfig
         );
         setSwitchState(true);
-      } else if (config.overrideArgs !== '' && e === false) {
-        config.overrideArgs = '';
+      } else if (config.overrideArgs !== undefined && e === false) {
+        config.overrideArgs = undefined;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instance, 'config.json'),

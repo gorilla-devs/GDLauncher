@@ -393,8 +393,8 @@ export function downloadPack(pack) {
         timePlayed: 0,
         mods: modsManifest,
         overrideFiles: overrideFilesList,
-        overrideArgs: DEFAULT_ARGS,
-        overrideMemory: 3096
+        // overrideArgs: DEFAULT_ARGS,
+        // overrideMemory: 3096
       })
     );
 

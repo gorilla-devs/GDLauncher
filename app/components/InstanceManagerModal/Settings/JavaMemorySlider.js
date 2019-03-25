@@ -38,7 +38,7 @@ function javaMemorySlider(props) {
         path.join(PACKS_PATH, props.instanceName, 'config.json')
       )
     );
-    if (configFile.overrideMemory !== '') {
+    if (configFile.overrideMemory !== undefined) {
       setSwitchState(true);
     } else setSwitchState(false);
   };
@@ -54,7 +54,7 @@ function javaMemorySlider(props) {
           path.join(PACKS_PATH, props.instanceName, 'config.json')
         )
       );
-      if (config.overrideMemory === '' && e === true) {
+      if (config.overrideMemory === undefined && e === true) {
         config.overrideMemory = props.overrideMemory;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
@@ -62,8 +62,8 @@ function javaMemorySlider(props) {
           modifiedConfig
         );
         setSwitchState(true);
-      } else if (config.overrideMemory !== '' && e === false) {
-        config.overrideMemory = '';
+      } else if (config.overrideMemory !== undefined && e === false) {
+        delete config.overrideMemory;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
