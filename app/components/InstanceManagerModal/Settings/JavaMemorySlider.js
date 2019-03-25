@@ -4,6 +4,7 @@ import { Icon, Slider, Tooltip, Switch } from 'antd';
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
+import _ from 'lodash';
 import { promisify } from 'util';
 import { func } from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,7 +39,7 @@ function JavaMemorySlider(props) {
         path.join(PACKS_PATH, props.instanceName, 'config.json')
       )
     );
-    if (configFile.overrideMemory !== undefined) {
+    if (configFile.overrideMemory) {
       setSwitchState(true);
     } else setSwitchState(false);
   };
@@ -55,16 +56,14 @@ function JavaMemorySlider(props) {
         )
       );
       if (config.overrideMemory === undefined && e) {
-        config.overrideMemory = props.overrideMemory;
-        const modifiedConfig = JSON.stringify(config);
+        const modifiedConfig = JSON.stringify({ ...config, overrideMemory: props.overrideMemory });
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
         setSwitchState(true);
       } else if (config.overrideMemory !== undefined && !e) {
-        delete config.overrideMemory;
-        const modifiedConfig = JSON.stringify(config);
+        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideMemory' ));
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
@@ -122,7 +121,7 @@ function JavaMemorySlider(props) {
           checked={switchState}
         />
       </div>
-      {switchState ? memorySlider : <div />}
+      {switchState ? memorySlider : null}
     </div>
   );
 }

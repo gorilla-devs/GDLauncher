@@ -149,8 +149,8 @@ function Instances(props: Props) {
         )
       );
       if (config.overrideArgs === undefined && e) {
-        config.overrideArgs = props.overrideJavaArgs;
-        const modifiedConfig = JSON.stringify(config);
+        // config.overrideArgs = props.overrideJavaArgs;
+        const modifiedConfig = JSON.stringify({ ...config, overrideArgs: props.overrideJavaArgs });
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instance, 'config.json'),
           modifiedConfig
@@ -158,8 +158,7 @@ function Instances(props: Props) {
         setOverrideArgsInput(props.overrideJavaArgs);
         setSwitchState(true);
       } else if (config.overrideArgs && !e) {
-        config.overrideArgs = undefined;
-        const modifiedConfig = JSON.stringify(config);
+        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideArgs' ));
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instance, 'config.json'),
           modifiedConfig
