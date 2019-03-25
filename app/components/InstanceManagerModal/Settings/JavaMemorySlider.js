@@ -12,7 +12,7 @@ import styles from './JavaMemorySlider.scss';
 import { toggleOverrideJavaArguments } from '../../../actions/settings';
 import { PACKS_PATH } from '../../../constants';
 
-function javaMemorySlider(props) {
+function JavaMemorySlider(props) {
   const {
     mainText,
     icon,
@@ -54,7 +54,7 @@ function javaMemorySlider(props) {
           path.join(PACKS_PATH, props.instanceName, 'config.json')
         )
       );
-      if (config.overrideMemory === undefined && e === true) {
+      if (config.overrideMemory === undefined && e) {
         config.overrideMemory = props.overrideMemory;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
@@ -62,7 +62,7 @@ function javaMemorySlider(props) {
           modifiedConfig
         );
         setSwitchState(true);
-      } else if (config.overrideMemory !== undefined && e === false) {
+      } else if (config.overrideMemory !== undefined && !e) {
         delete config.overrideMemory;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
@@ -131,7 +131,6 @@ function mapStateToProps(state) {
   return {
     settings: state.settings,
     javaArgs: state.settings.java.javaArgs,
-    overrideJavaArgs: state.settings.java.overrideJavaArgs,
     overrideMemory: state.settings.java.overrideMemory
   };
 }
@@ -143,4 +142,4 @@ const mapDispatchToProps = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(javaMemorySlider);
+)(JavaMemorySlider);

@@ -62,13 +62,11 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
     await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
   );
 
-  // const ramMemory = config.overrieMemory === '' ? ram : config.overrieMemory;
-
   const completeCMD = `
 
-"${javaPath}" ${(config.overrideArgs === undefined
-    ? javaArguments
-    : config.overrideArgs
+"${javaPath}" ${(config.overrideArgs
+    ? config.overrideArgs
+    : javaArguments
   ).replace('{_RAM_}', ram)} ${dosName} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,

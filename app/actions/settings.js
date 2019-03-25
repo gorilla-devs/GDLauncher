@@ -163,15 +163,6 @@ export function setJavaArgs(args) {
   };
 }
 
-export function setOverrideJavaArgs(args) {
-  return dispatch => {
-    dispatch({
-      type: SET_OVERRIDE_JAVA_ARGUMENTS,
-      payload: args
-    });
-    dispatch(saveSettings());
-  };
-}
 export function setOverrideJavaMemory(amount) {
   return dispatch => {
     dispatch({

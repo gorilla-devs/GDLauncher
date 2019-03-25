@@ -17,7 +17,6 @@ import { history } from '../../../store/configureStore';
 import {
   setOverrideJavaMemory,
   setJavaArgs,
-  setOverrideJavaArgs
 } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
 import { DEFAULT_ARGS } from '../../../constants';
@@ -26,7 +25,6 @@ const FormItem = Form.Item;
 
 type Props = {
   setJavaArgs: () => void,
-  setOverrideJavaArgs: () => void,
   javaArgs: string,
   overrideJavaArgs: string
 };
@@ -45,19 +43,20 @@ function Instances(props: Props) {
 
   const updateJavaArguments = javaArguments => {
     setOverrideArgsInput(javaArguments);
-    props.setOverrideJavaArgs(javaArguments);
   };
 
-  // Reset the global arguments to the default one
-  const reset = async () => {
+  // resetArgs the global arguments to the default one
+  const resetArgs = async () => {
     updateJavaArguments(DEFAULT_ARGS);
     const config = JSON.parse(
       await promisify(fs.readFile)(
         path.join(PACKS_PATH, props.instance, 'config.json')
       )
     );
-    config.overrideArgs = DEFAULT_ARGS;
-    const modifiedConfig = JSON.stringify(config);
+    const modifiedConfig = JSON.stringify({
+      ...config,
+      overrideArgs: DEFAULT_ARGS
+    });
     await promisify(fs.writeFile)(
       path.join(PACKS_PATH, props.instance, 'config.json'),
       modifiedConfig
@@ -65,16 +64,14 @@ function Instances(props: Props) {
   };
 
   // Set the changed java arguments
-  const submit = async () => {
-    props.setOverrideJavaArgs(overrideArgs);
+  const submitArgs = async () => {
     if (overrideArgs) {
       const config = JSON.parse(
         await promisify(fs.readFile)(
           path.join(PACKS_PATH, props.instance, 'config.json')
         )
       );
-      config.overrideArgs = overrideArgs;
-      const modifiedConfig = JSON.stringify(config);
+      const modifiedConfig = JSON.stringify({ ...config, overrideArgs });
       await promisify(fs.writeFile)(
         path.join(PACKS_PATH, props.instance, 'config.json'),
         modifiedConfig
@@ -83,13 +80,13 @@ function Instances(props: Props) {
     } else message.error('Enter Valid Arguments');
   };
 
-  async function configManagment() {
+  async function configManagement() {
     const configFile = JSON.parse(
       await promisify(fs.readFile)(
         path.join(PACKS_PATH, props.instance, 'config.json')
       )
     );
-    if (configFile.overrideArgs !== undefined) {
+    if (configFile.overrideArgs) {
       setSwitchState(true);
     } else setSwitchState(false);
 
@@ -121,7 +118,7 @@ function Instances(props: Props) {
   }
 
   useEffect(() => {
-    configManagment();
+    configManagement();
     return () => {
       watcher.close();
     };
@@ -151,7 +148,7 @@ function Instances(props: Props) {
           path.join(PACKS_PATH, props.instance, 'config.json')
         )
       );
-      if (config.overrideArgs === undefined && e === true) {
+      if (config.overrideArgs === undefined && e) {
         config.overrideArgs = props.overrideJavaArgs;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
@@ -160,7 +157,7 @@ function Instances(props: Props) {
         );
         setOverrideArgsInput(props.overrideJavaArgs);
         setSwitchState(true);
-      } else if (config.overrideArgs !== undefined && e === false) {
+      } else if (config.overrideArgs && !e) {
         config.overrideArgs = undefined;
         const modifiedConfig = JSON.stringify(config);
         await promisify(fs.writeFile)(
@@ -202,7 +199,7 @@ function Instances(props: Props) {
             marginBottom: 10,
             marginTop: 4
           }}
-          onClick={() => submit()}
+          onClick={() => submitArgs()}
           type="primary"
         >
           <FontAwesomeIcon icon={faCheck} />
@@ -214,7 +211,7 @@ function Instances(props: Props) {
             marginTop: 4
           }}
           type="primary"
-          onClick={() => reset()}
+          onClick={() => resetArgs()}
         >
           <FontAwesomeIcon icon={faUndo} />
         </Button>
@@ -313,7 +310,7 @@ function Instances(props: Props) {
                   checked={switchState}
                 />
               </div>
-              {switchState ? javaArgInput : <div />}
+              {switchState ? javaArgInput : null}
             </div>
           </Card>
         </div>
@@ -333,7 +330,6 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = {
   setOverrideJavaMemory,
-  setOverrideJavaArgs,
   setJavaArgs
 };
 
