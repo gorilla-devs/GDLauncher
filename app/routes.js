@@ -30,6 +30,7 @@ const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
 const InstanceCreatorModal = lazy(() =>
   import('./components/InstanceCreatorModal/containers/InstanceCreatorModal')
 );
+
 const loginHelperModal = lazy(() =>
   import('./components/LoginHelperModal/LoginHelperModal')
 );

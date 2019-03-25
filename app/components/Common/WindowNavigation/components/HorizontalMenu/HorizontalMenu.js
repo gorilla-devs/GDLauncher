@@ -52,7 +52,7 @@ export default props => {
             <FontAwesomeIcon icon={faThList} className={styles.i} />
             MODPACKS
           </Link>
-        </li>
+        </li>   
       </ul>
     </div>
   );
