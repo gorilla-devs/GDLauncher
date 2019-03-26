@@ -10,16 +10,12 @@ import { promisify } from 'util';
 import fs, { stat } from 'fs';
 import log from 'electron-log';
 import Card from '../../Common/Card/Card';
-import { PACKS_PATH } from '../../../constants';
 import styles from './Settings.scss';
 import JavaMemorySlider from './JavaMemorySlider';
+import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { history } from '../../../store/configureStore';
-import {
-  setOverrideJavaMemory,
-  setJavaArgs,
-} from '../../../actions/settings';
+import { setJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
-import { DEFAULT_ARGS } from '../../../constants';
 
 const FormItem = Form.Item;
 
@@ -38,6 +34,7 @@ function Instances(props: Props) {
   const [unMounting, setUnMounting] = useState(false);
   const [overrideArgs, setOverrideArgsInput] = useState(overrideJavaArgs);
   const [switchState, setSwitchState] = useState(false);
+  const [overrideJavaMemory, setOverrideJavaMemory] = useState(7000);
 
   let watcher = null;
 
@@ -64,7 +61,7 @@ function Instances(props: Props) {
   };
 
   // Set the changed java arguments
-  const submitArgs = async () => {
+  const updateArgs = async () => {
     if (overrideArgs) {
       const config = JSON.parse(
         await promisify(fs.readFile)(
@@ -91,18 +88,21 @@ function Instances(props: Props) {
     } else setSwitchState(false);
 
     try {
-      let config = JSON.parse(
+      const config = JSON.parse(
         await promisify(fs.readFile)(
           path.join(PACKS_PATH, props.instance, 'config.json')
         )
       );
       setOverrideArgsInput(config.overrideArgs);
+      setOverrideJavaMemory(config.overrideMemory);
+      console.log(overrideJavaMemory);
       setInstanceConfig(config);
+
       watcher = fs.watch(
         path.join(PACKS_PATH, props.instance, 'config.json'),
         { encoding: 'utf8' },
         async (eventType, filename) => {
-          config = JSON.parse(
+          const config = JSON.parse(
             await promisify(fs.readFile)(
               path.join(PACKS_PATH, props.instance, 'config.json')
             )
@@ -117,10 +117,20 @@ function Instances(props: Props) {
     }
   }
 
+  // async function checkMemorySlider() {
+  //   const config = JSON.parse(
+  //     await promisify(fs.readFile)(
+  //       path.join(PACKS_PATH, props.instance, 'config.json')
+  //     )
+  //   );
+  //   setOverrideJavaMemory(config.overrideMemory);
+  // }
+
   useEffect(() => {
     configManagement();
     return () => {
       watcher.close();
+      // checkMemorySlider();
     };
   }, []);
 
@@ -149,8 +159,10 @@ function Instances(props: Props) {
         )
       );
       if (config.overrideArgs === undefined && e) {
-        // config.overrideArgs = props.overrideJavaArgs;
-        const modifiedConfig = JSON.stringify({ ...config, overrideArgs: props.overrideJavaArgs });
+        const modifiedConfig = JSON.stringify({
+          ...config,
+          overrideArgs: props.overrideJavaArgs
+        });
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instance, 'config.json'),
           modifiedConfig
@@ -158,7 +170,7 @@ function Instances(props: Props) {
         setOverrideArgsInput(props.overrideJavaArgs);
         setSwitchState(true);
       } else if (config.overrideArgs && !e) {
-        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideArgs' ));
+        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideArgs'));
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instance, 'config.json'),
           modifiedConfig
@@ -198,7 +210,7 @@ function Instances(props: Props) {
             marginBottom: 10,
             marginTop: 4
           }}
-          onClick={() => submitArgs()}
+          onClick={() => updateArgs()}
           type="primary"
         >
           <FontAwesomeIcon icon={faCheck} />
@@ -294,9 +306,10 @@ function Instances(props: Props) {
 
           <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
             <JavaMemorySlider
-              ram={props.settings.java.overrideMemory}
+              // ram={props.settings.java.overrideMemory}
+              ram={overrideJavaMemory}
               is64bit={is64bit}
-              updateMemory={props.setOverrideJavaMemory}
+              // updateMemory={() => setOverrideJavaMemoryFunc()}
               javaArguments={overrideArgs}
               instanceName={props.instance}
             />
@@ -322,13 +335,12 @@ function mapStateToProps(state) {
   return {
     settings: state.settings,
     javaArgs: state.settings.java.javaArgs,
-    overrideJavaArgs: state.settings.java.overrideJavaArgs,
-    overrideMemory: state.settings.java.overrideMemory
+    overrideJavaArgs: state.settings.java.overrideJavaArgs
+    // overrideMemory: state.settings.java.overrideMemory
   };
 }
 
 const mapDispatchToProps = {
-  setOverrideJavaMemory,
   setJavaArgs
 };
 

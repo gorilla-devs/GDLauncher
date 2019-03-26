@@ -18,12 +18,12 @@ function JavaMemorySlider(props) {
     mainText,
     icon,
     description,
-    updateMemory,
     ram,
     is64bit,
     toggleOverrideJavaArguments
   } = props;
-  const [memory, setMemory] = useState(ram);
+  const [overrideJavaMemory, setOverrideJavaMemory] = useState(ram);
+  const [memory, setMemory] = useState(overrideJavaMemory);
   const [switchState, setSwitchState] = useState(false);
 
   const marks = {
@@ -42,6 +42,8 @@ function JavaMemorySlider(props) {
     if (configFile.overrideMemory) {
       setSwitchState(true);
     } else setSwitchState(false);
+    setOverrideJavaMemory(configFile.overrideMemory);
+    setMemory(configFile.overrideMemory);
   };
 
   useEffect(() => {
@@ -56,20 +58,44 @@ function JavaMemorySlider(props) {
         )
       );
       if (config.overrideMemory === undefined && e) {
-        const modifiedConfig = JSON.stringify({ ...config, overrideMemory: props.overrideMemory });
+        const modifiedConfig = JSON.stringify({
+          ...config,
+          overrideMemory: props.overrideMemory
+        });
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
         setSwitchState(true);
       } else if (config.overrideMemory !== undefined && !e) {
-        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideMemory' ));
+        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideMemory'));
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
         setSwitchState(false);
       }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function updateMemory(v) {
+    try {
+      const config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, props.instanceName, 'config.json')
+        )
+      );
+      const modifiedConfig = JSON.stringify({
+        ...config,
+        overrideMemory: v
+      });
+      await promisify(fs.writeFile)(
+        path.join(PACKS_PATH, props.instanceName, 'config.json'),
+        modifiedConfig
+      );
+      setOverrideJavaMemory(v);
     } catch (err) {
       console.error(err);
     }
@@ -87,7 +113,7 @@ function JavaMemorySlider(props) {
           // https://developer.ibm.com/answers/questions/175172/why-can-i-not-set-a-maximum-heap-setting-xmx-over/
           is64bit ? os.totalmem() / 1000000 : 1536
         }
-        defaultValue={ram}
+        defaultValue={memory}
         onChange={v => setMemory(v)}
         onAfterChange={v => updateMemory(v)}
       />
