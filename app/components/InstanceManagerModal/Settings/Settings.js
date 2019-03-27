@@ -86,6 +86,7 @@ function Instances(props: Props) {
       );
       if (configFile.overrideArgs) {
         setSwitchState(true);
+        setOverrideJavaMemory(configFile.overrideMemory);
       } else setSwitchState(false);
 
       setOverrideArgsInput(configFile.overrideArgs);
@@ -154,6 +155,7 @@ function Instances(props: Props) {
           path.join(PACKS_PATH, props.instance, 'config.json')
         )
       );
+      // setOverrideJavaMemory(config.overrideArgs);
       if (config.overrideArgs === undefined && e) {
         const modifiedConfig = JSON.stringify({
           ...config,
@@ -163,6 +165,7 @@ function Instances(props: Props) {
           path.join(PACKS_PATH, props.instance, 'config.json'),
           modifiedConfig
         );
+        setOverrideJavaMemory(config.overrideArgs);
         setOverrideArgsInput(props.overrideJavaArgs);
         setSwitchState(true);
       } else if (config.overrideArgs && !e) {
@@ -323,16 +326,14 @@ function Instances(props: Props) {
           </Card>
 
           <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
-            {overrideJavaMemory && (
-              <JavaMemorySlider
-                // ram={props.settings.java.overrideMemory}
-                ram={overrideJavaMemory}
-                is64bit={is64bit}
-                updateMemory={updateMemory}
-                javaArguments={overrideArgs}
-                instanceName={props.instance}
-              />
-            )}
+            <JavaMemorySlider
+              // ram={props.settings.java.overrideMemory}
+              ram={overrideJavaMemory}
+              is64bit={is64bit}
+              updateMemory={updateMemory}
+              javaArguments={overrideArgs}
+              instanceName={props.instance}
+            />
             <div style={{ display: 'inline', verticalAlign: 'middle' }}>
               <div className={styles.mainText}>
                 Java Arguments
