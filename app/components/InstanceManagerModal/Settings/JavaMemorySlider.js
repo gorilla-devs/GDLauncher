@@ -58,7 +58,6 @@ function JavaMemorySlider(props) {
         )
       );
       if (config.overrideMemory === undefined && e) {
-        console.log("DIOBON");
         const modifiedConfig = JSON.stringify({
           ...config,
           overrideMemory: props.overrideMemory
@@ -73,8 +72,6 @@ function JavaMemorySlider(props) {
           )
         );
         setOverrideJavaMemory(configChanged.overrideMemory);
-        console.log('javaMemory-1', configChanged.overrideMemory);
-        console.log('javaMemory', overrideJavaMemory);
         setSwitchState(true);
       } else if (config.overrideMemory !== undefined && !e) {
         const modifiedConfig = JSON.stringify(_.omit(config, 'overrideMemory'));

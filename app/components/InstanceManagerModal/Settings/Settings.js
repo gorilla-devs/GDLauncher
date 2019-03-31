@@ -91,8 +91,6 @@ function Instances(props: Props) {
 
       setOverrideArgsInput(configFile.overrideArgs);
       setOverrideJavaMemory(configFile.overrideMemory);
-      console.log(configFile.overrideMemory);
-      console.log(overrideJavaMemory);
       setInstanceConfig(configFile);
 
       watcher = fs.watch(
@@ -183,7 +181,6 @@ function Instances(props: Props) {
 
   async function updateMemory(v) {
     try {
-      console.log('GESU', v);
       const config = JSON.parse(
         await promisify(fs.readFile)(
           path.join(PACKS_PATH, props.instance, 'config.json')
