@@ -32,7 +32,7 @@ function Instances(props: Props) {
   const [instanceConfig, setInstanceConfig] = useState(null);
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
-  const [overrideArgs, setOverrideArgsInput] = useState(overrideJavaArgs);
+  const [overrideArgs, setOverrideArgsInput] = useState(null);
   const [switchState, setSwitchState] = useState(false);
   const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
 

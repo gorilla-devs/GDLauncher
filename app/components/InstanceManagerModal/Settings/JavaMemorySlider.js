@@ -58,6 +58,7 @@ function JavaMemorySlider(props) {
         )
       );
       if (config.overrideMemory === undefined && e) {
+        console.log("DIOBON");
         const modifiedConfig = JSON.stringify({
           ...config,
           overrideMemory: props.overrideMemory
@@ -66,6 +67,14 @@ function JavaMemorySlider(props) {
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
+        const configChanged = JSON.parse(
+          await promisify(fs.readFile)(
+            path.join(PACKS_PATH, props.instanceName, 'config.json')
+          )
+        );
+        setOverrideJavaMemory(configChanged.overrideMemory);
+        console.log('javaMemory-1', configChanged.overrideMemory);
+        console.log('javaMemory', overrideJavaMemory);
         setSwitchState(true);
       } else if (config.overrideMemory !== undefined && !e) {
         const modifiedConfig = JSON.stringify(_.omit(config, 'overrideMemory'));
@@ -104,7 +113,7 @@ function JavaMemorySlider(props) {
   const memorySlider = (
     <div>
       <div className={styles.mainText}>{memory} MB</div>
-      {ram && (
+      {memory && (
         <Slider
           marks={marks}
           step={512}
