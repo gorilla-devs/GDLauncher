@@ -41,9 +41,9 @@ function JavaMemorySlider(props) {
     );
     if (configFile.overrideMemory) {
       setSwitchState(true);
+      setMemory(configFile.overrideMemory);
     } else setSwitchState(false);
     setOverrideJavaMemory(configFile.overrideMemory);
-    setMemory(configFile.overrideMemory);
   };
 
   useEffect(() => {
@@ -58,6 +58,7 @@ function JavaMemorySlider(props) {
         )
       );
       if (config.overrideMemory === undefined && e) {
+        console.log("TEST");
         const modifiedConfig = JSON.stringify({
           ...config,
           overrideMemory: props.overrideMemory

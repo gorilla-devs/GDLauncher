@@ -86,11 +86,9 @@ function Instances(props: Props) {
       );
       if (configFile.overrideArgs) {
         setSwitchState(true);
-        setOverrideJavaMemory(configFile.overrideMemory);
+        setOverrideArgsInput(configFile.overrideArgs);
       } else setSwitchState(false);
 
-      setOverrideArgsInput(configFile.overrideArgs);
-      setOverrideJavaMemory(configFile.overrideMemory);
       setInstanceConfig(configFile);
 
       watcher = fs.watch(
@@ -112,20 +110,20 @@ function Instances(props: Props) {
     }
   }
 
-  async function checkMemorySlider() {
-    const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, props.instance, 'config.json')
-      )
-    );
-    setOverrideJavaMemory(config.overrideMemory);
-  }
+  // async function checkMemorySlider() {
+  //   const config = JSON.parse(
+  //     await promisify(fs.readFile)(
+  //       path.join(PACKS_PATH, props.instance, 'config.json')
+  //     )
+  //   );
+  //   setOverrideJavaMemory(config.overrideMemory);
+  // }
 
   useEffect(() => {
     configManagement();
     return () => {
       watcher.close();
-      checkMemorySlider();
+      // checkMemorySlider();
     };
   }, []);
 
@@ -155,16 +153,16 @@ function Instances(props: Props) {
       );
       // setOverrideJavaMemory(config.overrideArgs);
       if (config.overrideArgs === undefined && e) {
+        console.log("PEPPE");
         const modifiedConfig = JSON.stringify({
           ...config,
-          overrideArgs: props.overrideJavaArgs
+          overrideArgs: DEFAULT_ARGS
         });
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instance, 'config.json'),
           modifiedConfig
         );
-        setOverrideJavaMemory(config.overrideArgs);
-        setOverrideArgsInput(props.overrideJavaArgs);
+        setOverrideArgsInput(DEFAULT_ARGS);
         setSwitchState(true);
       } else if (config.overrideArgs && !e) {
         const modifiedConfig = JSON.stringify(_.omit(config, 'overrideArgs'));
