@@ -37,21 +37,21 @@ GDLauncher is a custom open source Minecraft launcher written from the ground up
 
 ## 🚀 Getting Started
 
-Below you will find anything you need to know about the launcher. If you want to download a stable release you can do it from our official website: https://gdevs.io, if you want the latest testing features you can clone the repo and compile it yourself.
+Below you will find everything you need to know about the launcher. If you want to download a stable release you can do it from our official website (https://gdevs.io). If you want the latest testing features you can clone the repo and compile it yourself.
 
 ## 🎮 Download
 
-To download the latest version, you can either click [here](https://github.com/gorilla-devs/GDLauncher/releases) and select the appropriate version for your operating system or visit our [website](https://gdevs.io).
+To download the latest version, you can either click [here](https://github.com/gorilla-devs/GDLauncher/releases) and select the appropriate version for your operating system, or visit our [website](https://gdevs.io).
 
 ## 🎨 Features (Working on)
 
-- Java Autorunner. (You don't need to have java installed, a suitable version will be downloaded automatically)
-- Log console. Always know what's happening
-- It's as easy as pie to install either the vanilla game and to install forge. No further action from the user is required.
-- It goes without saying that it has a built-in autoupdater, so you will never need to download a new version manually.
-- Vanilla, Forge and Curse modpacks download and autoupdater
-- Built-in manager for Minecraft servers
-- Cloud sync of game saves. With this you will never lose your saves again!
+- Java Autorunner. You don't need to have java installed, a suitable version will be downloaded automatically.
+- Log console. Always know what's happening.
+- Easy installation. It's as easy as pie to install both the vanilla game and forge. No further action from the user is required.
+- Built-in autoupdater. You will never need to download a new version manually.
+- Vanilla, Forge, and Curse modpacks download and autoupdater.
+- Built-in manager for Minecraft servers.
+- Cloud sync of game saves. You will never lose your saves again!
 
 You can also:
 
