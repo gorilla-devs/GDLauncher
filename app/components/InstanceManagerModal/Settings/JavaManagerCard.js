@@ -9,14 +9,14 @@ import path from 'path';
 import { promisify } from 'util';
 import fs, { stat } from 'fs';
 import log from 'electron-log';
+import _ from 'lodash';
 import Card from '../../Common/Card/Card';
 import styles from './Settings.scss';
-import JavaMemorySlider from './JavaMemorySlider';
+import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { history } from '../../../store/configureStore';
 import { setJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
-import JavaManagerCard from '../Settings/JavaManagerCard';
 
 const FormItem = Form.Item;
 
@@ -26,7 +26,7 @@ type Props = {
   overrideJavaArgs: string
 };
 
-function Instances(props: Props) {
+function JavaManagerCard(props: Props) {
   const { overrideJavaArgs } = props;
 
   const [is64bit, setIs64bit] = useState(true);
@@ -34,8 +34,10 @@ function Instances(props: Props) {
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
   const [overrideArgs, setOverrideArgsInput] = useState(null);
-  const [switchState, setSwitchState] = useState(false);
+  const [javaArgsSwitchState, setJavaArgsSwitchState] = useState(false);
+  const [javaMemorySwitchState, setJavaMemorySwitchState] = useState(false);
   const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
+  const [memory, setMemory] = useState(null);
 
   let watcher = null;
 
@@ -48,7 +50,7 @@ function Instances(props: Props) {
     updateJavaArguments(DEFAULT_ARGS);
     const config = JSON.parse(
       await promisify(fs.readFile)(
-        path.join(PACKS_PATH, props.instance, 'config.json')
+        path.join(PACKS_PATH, props.instanceName, 'config.json')
       )
     );
     const modifiedConfig = JSON.stringify({
@@ -56,7 +58,7 @@ function Instances(props: Props) {
       overrideArgs: DEFAULT_ARGS
     });
     await promisify(fs.writeFile)(
-      path.join(PACKS_PATH, props.instance, 'config.json'),
+      path.join(PACKS_PATH, props.instanceName, 'config.json'),
       modifiedConfig
     );
   };
@@ -66,12 +68,12 @@ function Instances(props: Props) {
     if (overrideArgs) {
       const config = JSON.parse(
         await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json')
+          path.join(PACKS_PATH, props.instanceName, 'config.json')
         )
       );
       const modifiedConfig = JSON.stringify({ ...config, overrideArgs });
       await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, props.instance, 'config.json'),
+        path.join(PACKS_PATH, props.instanceName, 'config.json'),
         modifiedConfig
       );
       updateJavaArguments(overrideArgs);
@@ -82,28 +84,29 @@ function Instances(props: Props) {
     try {
       const configFile = JSON.parse(
         await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json')
+          path.join(PACKS_PATH, props.instanceName, 'config.json')
         )
       );
-
       if (configFile.overrideMemory) {
+        setJavaMemorySwitchState(true);
         setOverrideJavaMemory(configFile.overrideMemory);
-      }
+        setMemory(configFile.overrideMemory);
+      } else setJavaMemorySwitchState(false);
 
       if (configFile.overrideArgs) {
-        setSwitchState(true);
+        setJavaArgsSwitchState(true);
         setOverrideArgsInput(configFile.overrideArgs);
-      } else setSwitchState(false);
+      } else setJavaArgsSwitchState(false);
 
       setInstanceConfig(configFile);
 
       watcher = fs.watch(
-        path.join(PACKS_PATH, props.instance, 'config.json'),
+        path.join(PACKS_PATH, props.instanceName, 'config.json'),
         { encoding: 'utf8' },
         async (eventType, filename) => {
           const config = JSON.parse(
             await promisify(fs.readFile)(
-              path.join(PACKS_PATH, props.instance, 'config.json')
+              path.join(PACKS_PATH, props.instanceName, 'config.json')
             )
           );
           setInstanceConfig(config);
@@ -131,7 +134,7 @@ function Instances(props: Props) {
           await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
           message.warning('An instance with this name already exists.');
         } catch (err) {
-          const packFolder = path.join(PACKS_PATH, props.instance);
+          const packFolder = path.join(PACKS_PATH, props.instanceName);
           const newPackFolder = path.join(PACKS_PATH, values.packName);
           await promisify(fs.rename)(packFolder, newPackFolder);
           props.close();
@@ -144,7 +147,7 @@ function Instances(props: Props) {
     try {
       const config = JSON.parse(
         await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json')
+          path.join(PACKS_PATH, props.instanceName, 'config.json')
         )
       );
       if (config.overrideArgs === undefined && e) {
@@ -154,18 +157,18 @@ function Instances(props: Props) {
           overrideArgs: DEFAULT_ARGS
         });
         await promisify(fs.writeFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json'),
+          path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
         setOverrideArgsInput(DEFAULT_ARGS);
-        setSwitchState(true);
+        setJavaArgsSwitchState(true);
       } else if (config.overrideArgs && !e) {
         const modifiedConfig = JSON.stringify(_.omit(config, 'overrideArgs'));
         await promisify(fs.writeFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json'),
+          path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
-        setSwitchState(false);
+        setJavaArgsSwitchState(false);
       }
     } catch (err) {
       console.error(err);
@@ -176,7 +179,7 @@ function Instances(props: Props) {
     try {
       const config = JSON.parse(
         await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json')
+          path.join(PACKS_PATH, props.instanceName, 'config.json')
         )
       );
       const modifiedConfig = JSON.stringify({
@@ -184,7 +187,7 @@ function Instances(props: Props) {
         overrideMemory: v
       });
       await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, props.instance, 'config.json'),
+        path.join(PACKS_PATH, props.instanceName, 'config.json'),
         modifiedConfig
       );
       setOverrideJavaMemory(v);
@@ -193,118 +196,138 @@ function Instances(props: Props) {
     }
   }
 
+  async function toggleJavaMemory(e) {
+    console.log(memory);
+    try {
+      const config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, props.instanceName, 'config.json')
+        )
+      );
+      if (config.overrideMemory === undefined && e) {
+        const modifiedConfig = JSON.stringify({
+          ...config,
+          overrideMemory: 4096
+        });
+        await promisify(fs.writeFile)(
+          path.join(PACKS_PATH, props.instanceName, 'config.json'),
+          modifiedConfig
+        );
+        setOverrideJavaMemory(4096);
+        setJavaMemorySwitchState(true);
+        const configChanged = JSON.parse(
+          await promisify(fs.readFile)(
+            path.join(PACKS_PATH, props.instanceName, 'config.json')
+          )
+        );
+        setMemory(configChanged.overrideMemory);
+      } else if (config.overrideMemory !== undefined && !e) {
+        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideMemory'));
+        await promisify(fs.writeFile)(
+          path.join(PACKS_PATH, props.instanceName, 'config.json'),
+          modifiedConfig
+        );
+        setJavaMemorySwitchState(false);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const javaArgInput = (
+    <div>
+      <Input
+        value={overrideArgs}
+        style={{
+          display: 'inline-block',
+          maxWidth: '74%',
+          marginRight: '10px',
+          marginBottom: 10,
+          marginTop: 4,
+          backgroundColor: 'var(--secondary-color-1)',
+          marginLeft: '1%'
+        }}
+        onChange={e => setOverrideArgsInput(e.target.value)}
+      />
+      <Button.Group
+        style={{
+          maxWidth: '60%',
+          marginBottom: 10,
+          marginTop: 4
+        }}
+      >
+        <Button
+          style={{
+            maxWidth: '60%',
+            marginBottom: 10,
+            marginTop: 4
+          }}
+          onClick={() => updateArgs()}
+          type="primary"
+        >
+          <FontAwesomeIcon icon={faCheck} />
+        </Button>
+        <Button
+          style={{
+            maxWidth: '60%',
+            marginBottom: 10,
+            marginTop: 4
+          }}
+          type="primary"
+          onClick={() => resetArgs()}
+        >
+          <FontAwesomeIcon icon={faUndo} />
+        </Button>
+      </Button.Group>
+    </div>
+  );
+
+  const memorySlider = (
+    <div>
+      {memory && (
+        <JavaMemorySlider
+          // ram={props.settings.java.overrideMemory}
+          title={null}
+          ram={overrideJavaMemory}
+          is64bit={props.is64bit}
+          updateMemory={updateMemory}
+          javaArguments={overrideArgs}
+          instanceName={props.instanceName}
+        />
+      )}
+    </div>
+  );
+
   const { getFieldDecorator } = props.form;
   return (
-    <div className={styles.container}>
-      <div className={styles.innerContainer}>
-        <div className={styles.content}>
-          <h2>Edit Instance Settings</h2>
-          <Form layout="inline" onSubmit={e => handleSubmit(e)}>
-            <div>
-              <div
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  height: '60px',
-                  margin: 0,
-                  overflowY: 'auto'
-                }}
-              >
-                <FormItem>
-                  {getFieldDecorator('packName', {
-                    rules: [
-                      {
-                        required: true,
-                        message: 'Please input a valid name',
-                        pattern: new RegExp(
-                          '^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$'
-                        )
-                      }
-                    ],
-                    initialValue: props.instance
-                  })(
-                    <Input
-                      size="large"
-                      style={{
-                        width: 300,
-                        display: 'inline-block',
-                        height: 60
-                      }}
-                      prefix={
-                        <Icon
-                          type="play-circle"
-                          theme="filled"
-                          style={{ color: 'rgba(255,255,255,.8)' }}
-                        />
-                      }
-                      placeholder="Instance Name"
-                    />
-                  )}
-                </FormItem>
-                <Button
-                  icon="save"
-                  size="large"
-                  type="primary"
-                  htmlType="submit"
-                  style={{
-                    width: 150,
-                    display: 'inline-block',
-                    height: 60
-                  }}
-                >
-                  Rename
-                </Button>
-              </div>
-            </div>
-          </Form>
-          <Card style={{ marginTop: 15 }} title="Forge Manager">
-            {!checkingForge ? (
-              <ForgeManager
-                name={props.instance}
-                data={instanceConfig}
-                closeModal={props.close}
-              />
-            ) : null}
-          </Card>
-          <JavaManagerCard
-            ram={overrideJavaMemory}
-            is64bit={is64bit}
-            updateMemory={updateMemory}
-            javaArguments={overrideArgs}
-            instanceName={props.instance}
-          />
-          {/* <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
-            <JavaMemorySlider
-              // ram={props.settings.java.overrideMemory}
-              ram={overrideJavaMemory}
-              is64bit={is64bit}
-              updateMemory={updateMemory}
-              javaArguments={overrideArgs}
-              instanceName={props.instance}
-            />
-            <div style={{ display: 'inline', verticalAlign: 'middle' }}>
-              <div className={styles.mainText}>
-                Java Arguments
-                <Switch
-                  className={styles.switch}
-                  onChange={e => toggleJavaArguments(e)}
-                  checked={switchState}
-                />
-              </div>
-              {switchState ? javaArgInput : null}
-            </div>
-          </Card> */}
-        </div>
+    <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
+      <div style={{ display: 'inline', verticalAlign: 'middle' }}>
+        <Switch
+          className={styles.switch}
+          onChange={e => toggleJavaMemory(e)}
+          checked={javaMemorySwitchState}
+        />
+        {javaMemorySwitchState ? memorySlider : null}
       </div>
-    </div>
+      <div style={{ display: 'inline', verticalAlign: 'middle' }}>
+        <div className={styles.mainText}>
+          Java Arguments
+          <Switch
+            className={styles.switch}
+            onChange={e => toggleJavaArguments(e)}
+            checked={javaArgsSwitchState}
+          />
+        </div>
+        {javaArgsSwitchState ? javaArgInput : null}
+      </div>
+    </Card>
   );
 }
 
 function mapStateToProps(state) {
   return {
     settings: state.settings,
-    javaArgs: state.settings.java.javaArgs,
-    overrideJavaArgs: state.settings.java.overrideJavaArgs
+    javaArgs: state.settings.java.javaArgs
   };
 }
 
@@ -316,5 +339,5 @@ export default Form.create()(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(Instances)
+  )(JavaManagerCard)
 );

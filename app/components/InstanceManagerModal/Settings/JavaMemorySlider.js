@@ -18,12 +18,13 @@ function JavaMemorySlider(props) {
     mainText,
     icon,
     description,
+    updateMemory,
     ram,
     is64bit,
     toggleOverrideJavaArguments
   } = props;
-  const [overrideJavaMemory, setOverrideJavaMemory] = useState(ram);
-  const [memory, setMemory] = useState(ram);
+  // const [overrideJavaMemory, setOverrideJavaMemory] = useState(ram);
+  const [memory, setMemory] = useState(null);
   const [switchState, setSwitchState] = useState(false);
 
   const marks = {
@@ -43,14 +44,13 @@ function JavaMemorySlider(props) {
       setSwitchState(true);
       setMemory(configFile.overrideMemory);
     } else setSwitchState(false);
-    setOverrideJavaMemory(configFile.overrideMemory);
   };
 
   useEffect(() => {
     checkSwitchState();
   });
 
-  async function toggleJavaArguments(e) {
+  async function toggleJavaMemory(e) {
     try {
       const config = JSON.parse(
         await promisify(fs.readFile)(
@@ -58,10 +58,9 @@ function JavaMemorySlider(props) {
         )
       );
       if (config.overrideMemory === undefined && e) {
-        console.log("TEST");
         const modifiedConfig = JSON.stringify({
           ...config,
-          overrideMemory: props.overrideMemory
+          overrideMemory: 4096
         });
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
@@ -72,7 +71,7 @@ function JavaMemorySlider(props) {
             path.join(PACKS_PATH, props.instanceName, 'config.json')
           )
         );
-        setOverrideJavaMemory(configChanged.overrideMemory);
+        // setMemory(configChanged.overrideMemory);
         setSwitchState(true);
       } else if (config.overrideMemory !== undefined && !e) {
         const modifiedConfig = JSON.stringify(_.omit(config, 'overrideMemory'));
@@ -82,27 +81,6 @@ function JavaMemorySlider(props) {
         );
         setSwitchState(false);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function updateMemory(v) {
-    try {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json')
-        )
-      );
-      const modifiedConfig = JSON.stringify({
-        ...config,
-        overrideMemory: v
-      });
-      await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, props.instanceName, 'config.json'),
-        modifiedConfig
-      );
-      setOverrideJavaMemory(v);
     } catch (err) {
       console.error(err);
     }

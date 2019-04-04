@@ -53,7 +53,8 @@ function javaMemorySlider(props) {
           // https://developer.ibm.com/answers/questions/175172/why-can-i-not-set-a-maximum-heap-setting-xmx-over/
           props.is64bit ? os.totalmem() / 1000000 : 1536
         }
-        defaultValue={ram}
+        // defaultValue={ram}
+        defaultValue={memory}
         onChange={v => setMemory(v)}
         onAfterChange={v => updateMemory(v)}
       />
