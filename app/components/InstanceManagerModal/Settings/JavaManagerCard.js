@@ -8,15 +8,17 @@ import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
 import { promisify } from 'util';
 import fs, { stat } from 'fs';
+import process from 'process';
 import log from 'electron-log';
 import _ from 'lodash';
 import Card from '../../Common/Card/Card';
-import styles from './Settings.scss';
+import styles from './JavaManagerCard.scss';
 import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { history } from '../../../store/configureStore';
 import { setJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
+import { func } from 'prop-types';
 
 const FormItem = Form.Item;
 
@@ -63,6 +65,12 @@ function JavaManagerCard(props: Props) {
     );
   };
 
+  function isOsWin64() {
+    if (process.arch === 'x64') {
+      return true;
+    } else return false;
+  }
+
   // Set the changed java arguments
   const updateArgs = async () => {
     if (overrideArgs) {
@@ -82,6 +90,7 @@ function JavaManagerCard(props: Props) {
 
   async function configManagement() {
     try {
+      console.log('OS-ARCH', process.arch);
       const configFile = JSON.parse(
         await promisify(fs.readFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json')
@@ -287,7 +296,7 @@ function JavaManagerCard(props: Props) {
       {memory && (
         <JavaMemorySlider
           // ram={props.settings.java.overrideMemory}
-          title={null}
+          overrideJava={true}
           ram={overrideJavaMemory}
           is64bit={props.is64bit}
           updateMemory={updateMemory}
@@ -302,13 +311,34 @@ function JavaManagerCard(props: Props) {
   return (
     <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
-        <Switch
-          className={styles.switch}
-          onChange={e => toggleJavaMemory(e)}
-          checked={javaMemorySwitchState}
-        />
+        <div className={styles.mainText}>
+          Java Memory (
+          {isOsWin64 ? (
+            '64 bit)'
+          ) : (
+            <span>
+              32 bit)&nbsp;
+              <Tooltip
+                placement="right"
+                title="Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used.
+                 If you want more, install or select a 64 bit java executable"
+              >
+                <FontAwesomeIcon
+                  className={styles.iconPointer}
+                  icon={faQuestionCircle}
+                />
+              </Tooltip>
+            </span>
+          )}
+          <Switch
+            className={styles.switch}
+            onChange={e => toggleJavaMemory(e)}
+            checked={javaMemorySwitchState}
+          />
+        </div>
         {javaMemorySwitchState ? memorySlider : null}
       </div>
+
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
         <div className={styles.mainText}>
           Java Arguments
