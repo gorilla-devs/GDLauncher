@@ -64,10 +64,10 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
 
   const completeCMD = `
 
-"${javaPath}" ${(config.overrideArgs
-    ? config.overrideArgs
-    : javaArguments
-  ).replace('{_RAM_}', ram)} ${dosName} -Djava.library.path="${path.join(
+"${javaPath}" ${(config.overrideArgs || javaArguments).replace(
+    '{_RAM_}',
+    ram
+  )} ${dosName} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
     'natives'

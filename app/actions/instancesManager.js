@@ -50,7 +50,7 @@ export function startInstance(instanceName) {
     const command = await launchCommand(
       instanceName,
       auth,
-      config.overrideMemory ? config.overrideMemory : settings.java.memory,
+      config.overrideMemory || settings.java.memory,
       settings.java.javaArgs
     );
     const start = spawn(command, [], {
