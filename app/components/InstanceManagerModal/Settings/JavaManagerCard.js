@@ -295,6 +295,7 @@ function JavaManagerCard(props: Props) {
           // ram={props.settings.java.overrideMemory}
           overrideJava={true}
           ram={overrideJavaMemory}
+          is64bit={props.is64bit}
           updateMemory={updateMemory}
           javaArguments={overrideArgs}
           instanceName={props.instanceName}

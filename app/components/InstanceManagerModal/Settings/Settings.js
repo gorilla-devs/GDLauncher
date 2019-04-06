@@ -266,6 +266,7 @@ function Instances(props: Props) {
           </Card>
           <JavaManagerCard
             ram={overrideJavaMemory}
+            is64bit={is64bit}
             updateMemory={updateMemory}
             javaArguments={overrideArgs}
             instanceName={props.instance}
