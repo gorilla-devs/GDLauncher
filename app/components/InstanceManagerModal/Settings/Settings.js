@@ -148,7 +148,6 @@ function Instances(props: Props) {
         )
       );
       if (config.overrideArgs === undefined && e) {
-        console.log('PEPPE');
         const modifiedConfig = JSON.stringify({
           ...config,
           overrideArgs: DEFAULT_ARGS

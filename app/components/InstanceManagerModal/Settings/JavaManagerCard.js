@@ -90,7 +90,6 @@ function JavaManagerCard(props: Props) {
 
   async function configManagement() {
     try {
-      console.log('OS-ARCH', process.arch);
       const configFile = JSON.parse(
         await promisify(fs.readFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json')
@@ -160,7 +159,6 @@ function JavaManagerCard(props: Props) {
         )
       );
       if (config.overrideArgs === undefined && e) {
-        console.log('PEPPE');
         const modifiedConfig = JSON.stringify({
           ...config,
           overrideArgs: DEFAULT_ARGS
@@ -206,7 +204,6 @@ function JavaManagerCard(props: Props) {
   }
 
   async function toggleJavaMemory(e) {
-    console.log(memory);
     try {
       const config = JSON.parse(
         await promisify(fs.readFile)(
