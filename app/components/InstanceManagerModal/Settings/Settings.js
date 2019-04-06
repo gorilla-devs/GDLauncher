@@ -11,7 +11,6 @@ import fs, { stat } from 'fs';
 import log from 'electron-log';
 import Card from '../../Common/Card/Card';
 import styles from './Settings.scss';
-import JavaMemorySlider from './JavaMemorySlider';
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { history } from '../../../store/configureStore';
 import { setJavaArgs } from '../../../actions/settings';
@@ -272,27 +271,6 @@ function Instances(props: Props) {
             javaArguments={overrideArgs}
             instanceName={props.instance}
           />
-          {/* <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
-            <JavaMemorySlider
-              // ram={props.settings.java.overrideMemory}
-              ram={overrideJavaMemory}
-              is64bit={is64bit}
-              updateMemory={updateMemory}
-              javaArguments={overrideArgs}
-              instanceName={props.instance}
-            />
-            <div style={{ display: 'inline', verticalAlign: 'middle' }}>
-              <div className={styles.mainText}>
-                Java Arguments
-                <Switch
-                  className={styles.switch}
-                  onChange={e => toggleJavaArguments(e)}
-                  checked={switchState}
-                />
-              </div>
-              {switchState ? javaArgInput : null}
-            </div>
-          </Card> */}
         </div>
       </div>
     </div>

@@ -19,7 +19,7 @@ function javaMemorySlider(props) {
   const javaMemorySliderContent = (
     <div>
       <div className={styles.container}>
-        <div className={styles.action}>{memory} MB</div>
+        <div className={styles.memory}>{memory} MB</div>
         <div className={styles.description}>{description}</div>
       </div>
       <Slider
@@ -36,7 +36,6 @@ function javaMemorySlider(props) {
         onChange={v => setMemory(v)}
         onAfterChange={v => updateMemory(v)}
       />
-      <hr />
     </div>
   );
 
@@ -86,7 +85,6 @@ function javaMemorySlider(props) {
             onChange={v => setMemory(v)}
             onAfterChange={v => updateMemory(v)}
           />
-          <hr />
         </div>
       )}
     </div>
