@@ -331,7 +331,7 @@ function JavaManagerCard(props: Props) {
             </span>
           )}
           <Switch
-            className={styles.switch}
+            className={styles.sliderSwitch}
             onChange={e => toggleJavaMemory(e)}
             checked={javaMemorySwitchState}
           />

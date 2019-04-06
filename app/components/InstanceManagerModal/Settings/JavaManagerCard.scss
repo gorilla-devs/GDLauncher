@@ -1,20 +1,17 @@
 .switch {
   //right: -60%;
-  left: 60%;
-  margin-top: 8px;
+  // left: 60%;
+  position: absolute !important;
+  left: 350px !important;
 }
 
 .sliderSwitch {
-  margin: 0;
-  left: 54%;
-  margin-top: 8px;
-}
-
-.javaOverrideMemory {
-  display: inline;
-  background: blue;
+  position: absolute !important;
+  left: 350px !important;
 }
 
 .mainText {
+  margin-top: 8px !important;
   margin-left: 2% !important;
+  position: relative;
 }
