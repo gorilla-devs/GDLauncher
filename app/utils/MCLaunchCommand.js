@@ -5,7 +5,7 @@ import { promisify } from 'util';
 import log from 'electron-log';
 import { connect } from 'react-redux';
 import { findJavaHome } from './javaHelpers';
-import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH } from '../constants';
+import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH, CLASSPATH_DIVIDER_CHAR } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
 const getStartCommand = async (packName, userData, ram, javaArguments) => {
@@ -56,7 +56,6 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
   const Arguments = getMCArguments(vanillaJSON, JSON.parse(forgeJSON.versionJson), packName, userData);
   const mainClass =
     forge === null ? vanillaJSON.mainClass : JSON.parse(forgeJSON.versionJson).mainClass;
-  const dividerChar = os.platform() === WINDOWS ? ';' : ':';
 
   const completeCMD = `
 
@@ -77,7 +76,7 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
  -cp ${libs
       .filter(lib => !lib.natives)
       .map(lib => `"${lib.path}"`)
-      .join(dividerChar)}${dividerChar}${`"${path.join(
+      .join(CLASSPATH_DIVIDER_CHAR)}${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
         INSTANCES_PATH,
         'versions',
         vanillaJSON.id,

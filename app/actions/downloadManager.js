@@ -17,7 +17,8 @@ import {
   PACKS_PATH,
   INSTANCES_PATH,
   META_PATH,
-  GDL_LEGACYJAVAFIXER_MOD_URL
+  GDL_LEGACYJAVAFIXER_MOD_URL,
+  CLASSPATH_DIVIDER_CHAR
 } from '../constants';
 import vCompare from '../utils/versionsCompare';
 import {
@@ -436,7 +437,7 @@ export function downloadPack(pack) {
         const mainClass = jarFile.valueForManifestEntry("Main-Class");
 
         const { stderr, stdout } = await promisify(exec)(
-          `"${javaPath}" -classpath "${filePath};${classPaths.join(';')}" ${mainClass} ${args.join(' ')}`
+          `"${javaPath}" -classpath "${filePath}${CLASSPATH_DIVIDER_CHAR}${classPaths.join(CLASSPATH_DIVIDER_CHAR)}" ${mainClass} ${args.join(' ')}`
           , { maxBuffer: 10000000000 })
 
         console.log(stderr, stdout)
