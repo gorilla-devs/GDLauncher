@@ -2,6 +2,7 @@ import path from 'path';
 import electron from 'electron';
 import { platform, homedir } from 'os';
 import getAppPath from './utils/getAppPath';
+import os from 'os';
 
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
