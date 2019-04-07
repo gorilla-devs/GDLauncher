@@ -2,16 +2,23 @@
   //right: -60%;
   // left: 60%;
   position: absolute !important;
-  left: 350px !important;
+  left: 85% !important;
 }
 
 .sliderSwitch {
   position: absolute !important;
-  left: 350px !important;
+  left: 85% !important;
+}
+
+.mainTextSlider{
+  margin-top: 4px;
+  margin-left: 2% !important;
+  position: relative;
 }
 
 .mainText {
-  margin-top: 8px !important;
+  margin-top: 15px;
+  margin-bottom: 5px;
   margin-left: 2% !important;
   position: relative;
 }

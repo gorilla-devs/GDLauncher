@@ -2,7 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { routerActions } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import { Form, Input, Icon, Button, message, Slider, Switch } from 'antd';
+import {
+  Form,
+  Input,
+  Icon,
+  Button,
+  message,
+  Slider,
+  Switch,
+  Tooltip
+} from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
@@ -293,6 +302,7 @@ function JavaManagerCard(props: Props) {
       {memory && (
         <JavaMemorySlider
           // ram={props.settings.java.overrideMemory}
+          hr={true}
           overrideJava={true}
           ram={overrideJavaMemory}
           is64bit={props.is64bit}
@@ -308,7 +318,7 @@ function JavaManagerCard(props: Props) {
   return (
     <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
-        <div className={styles.mainText}>
+        <div className={styles.mainTextSlider}>
           Java Memory (
           {isOsWin64 ? (
             '64 bit)'
