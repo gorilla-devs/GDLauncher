@@ -18,25 +18,27 @@ function javaMemorySlider(props) {
 
   const javaMemorySliderContent = (
     <div>
-      <div className={styles.container}>
-        <div className={styles.memory}>{memory} MB</div>
-        <div className={styles.description}>{description}</div>
+      <div className={styles.outherContainer}>
+        <div className={styles.container}>
+          <div className={styles.memory}>{memory} MB</div>
+          <div className={styles.description}>{description}</div>
+        </div>
+        <Slider
+          marks={marks}
+          step={512}
+          min={1024}
+          max={
+            // If 32 bit, set max 1.5gb memory
+            // https://developer.ibm.com/answers/questions/175172/why-can-i-not-set-a-maximum-heap-setting-xmx-over/
+            props.is64bit ? os.totalmem() / 1000000 : 1536
+          }
+          // defaultValue={ram}
+          defaultValue={memory}
+          onChange={v => setMemory(v)}
+          onAfterChange={v => updateMemory(v)}
+        />
+        {/* {props.hr && <hr />} */}
       </div>
-      <Slider
-        marks={marks}
-        step={512}
-        min={1024}
-        max={
-          // If 32 bit, set max 1.5gb memory
-          // https://developer.ibm.com/answers/questions/175172/why-can-i-not-set-a-maximum-heap-setting-xmx-over/
-          props.is64bit ? os.totalmem() / 1000000 : 1536
-        }
-        // defaultValue={ram}
-        defaultValue={memory}
-        onChange={v => setMemory(v)}
-        onAfterChange={v => updateMemory(v)}
-      />
-      {props.hr && <hr />}
     </div>
   );
 
