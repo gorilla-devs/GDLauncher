@@ -2,7 +2,6 @@ import path from 'path';
 import electron from 'electron';
 import { platform, homedir } from 'os';
 import getAppPath from './utils/getAppPath';
-import os from 'os';
 
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
@@ -14,7 +13,7 @@ export const DATAPATH = path.join(
     (electron.app || electron.remote.app).getPath('userData'),
   'GDLauncher'
 );
-export const CLASSPATH_DIVIDER_CHAR = os.platform() === WINDOWS ? ';' : ':';
+export const CLASSPATH_DIVIDER_CHAR = platform() === WINDOWS ? ';' : ':';
 export const LAUNCHER_FOLDER = 'launcherData';
 export const INSTANCES_FOLDER = 'instances';
 export const SERVERS_PATH = path.join(DATAPATH, 'servers');
