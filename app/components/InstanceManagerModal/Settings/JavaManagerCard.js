@@ -257,7 +257,7 @@ function JavaManagerCard(props: Props) {
           display: 'inline-block',
           maxWidth: '74%',
           marginRight: '10px',
-          marginBottom: 10,
+          marginBottom: 4,
           marginTop: 4,
           backgroundColor: 'var(--secondary-color-1)',
           marginLeft: '1%'
@@ -267,14 +267,14 @@ function JavaManagerCard(props: Props) {
       <Button.Group
         style={{
           maxWidth: '60%',
-          marginBottom: 10,
+          marginBottom: 4,
           marginTop: 4
         }}
       >
         <Button
           style={{
             maxWidth: '60%',
-            marginBottom: 10,
+            marginBottom: 4,
             marginTop: 4
           }}
           onClick={() => updateArgs()}
@@ -285,7 +285,7 @@ function JavaManagerCard(props: Props) {
         <Button
           style={{
             maxWidth: '60%',
-            marginBottom: 10,
+            marginBottom: 4,
             marginTop: 4
           }}
           type="primary"
