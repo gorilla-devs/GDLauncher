@@ -2,18 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { routerActions } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import {
-  Form,
-  Input,
-  Icon,
-  Button,
-  message,
-  Slider,
-  Switch,
-  Tooltip
-} from 'antd';
+import { Form, Input, Button, message, Switch, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUndo,
+  faCheck,
+  faQuestionCircle
+} from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
 import { promisify } from 'util';
 import fs, { stat } from 'fs';
@@ -27,9 +22,6 @@ import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { history } from '../../../store/configureStore';
 import { setJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
-import { func } from 'prop-types';
-
-const FormItem = Form.Item;
 
 type Props = {
   setJavaArgs: () => void,
@@ -38,19 +30,12 @@ type Props = {
 };
 
 function JavaManagerCard(props: Props) {
-  const { overrideJavaArgs } = props;
-
   const [is64bit, setIs64bit] = useState(true);
-  const [instanceConfig, setInstanceConfig] = useState(null);
-  const [checkingForge, setCheckingForge] = useState(true);
-  const [unMounting, setUnMounting] = useState(false);
   const [overrideArgs, setOverrideArgsInput] = useState(null);
   const [javaArgsSwitchState, setJavaArgsSwitchState] = useState(false);
   const [javaMemorySwitchState, setJavaMemorySwitchState] = useState(false);
   const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
   const [memory, setMemory] = useState(null);
-
-  let watcher = null;
 
   const updateJavaArguments = javaArguments => {
     setOverrideArgsInput(javaArguments);
@@ -114,51 +99,14 @@ function JavaManagerCard(props: Props) {
         setJavaArgsSwitchState(true);
         setOverrideArgsInput(configFile.overrideArgs);
       } else setJavaArgsSwitchState(false);
-
-      setInstanceConfig(configFile);
-
-      watcher = fs.watch(
-        path.join(PACKS_PATH, props.instanceName, 'config.json'),
-        { encoding: 'utf8' },
-        async (eventType, filename) => {
-          const config = JSON.parse(
-            await promisify(fs.readFile)(
-              path.join(PACKS_PATH, props.instanceName, 'config.json')
-            )
-          );
-          setInstanceConfig(config);
-        }
-      );
     } catch (err) {
       log.error(err.message);
-    } finally {
-      setCheckingForge(false);
     }
   }
 
   useEffect(() => {
     configManagement();
-    return () => {
-      watcher.close();
-    };
   }, []);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    props.form.validateFields(async (err, values) => {
-      if (!err) {
-        try {
-          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
-          message.warning('An instance with this name already exists.');
-        } catch (err) {
-          const packFolder = path.join(PACKS_PATH, props.instanceName);
-          const newPackFolder = path.join(PACKS_PATH, values.packName);
-          await promisify(fs.rename)(packFolder, newPackFolder);
-          props.close();
-        }
-      }
-    });
-  }
 
   async function toggleJavaArguments(e) {
     try {
@@ -314,7 +262,6 @@ function JavaManagerCard(props: Props) {
     </div>
   );
 
-  const { getFieldDecorator } = props.form;
   return (
     <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
