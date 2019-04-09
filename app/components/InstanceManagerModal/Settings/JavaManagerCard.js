@@ -54,7 +54,6 @@ function JavaManagerCard(props) {
 
   const checkJavaArch = async () => {
     const javaP = await findJavaHome();
-    setJavaPath(javaP);
     exec(`"${javaP}" -d64 -version`, (err, stdout, stderr) => {
       if (stderr.includes('Error') || stdout.includes('Error'))
         setIs64bit(false);
@@ -210,29 +209,17 @@ function JavaManagerCard(props) {
         onChange={e => setOverrideArgsInput(e.target.value)}
       />
       <Button.Group
-        style={{
-          maxWidth: '60%',
-          marginBottom: 4,
-          marginTop: 4
-        }}
+        className={styles.btnGroup}
       >
         <Button
-          style={{
-            maxWidth: '60%',
-            marginBottom: 4,
-            marginTop: 4
-          }}
+          className={styles.btnGroup}
           onClick={() => updateArgs()}
           type="primary"
         >
           <FontAwesomeIcon icon={faCheck} />
         </Button>
         <Button
-          style={{
-            maxWidth: '60%',
-            marginBottom: 4,
-            marginTop: 4
-          }}
+          className={styles.btnGroup}
           type="primary"
           onClick={() => resetArgs()}
         >
