@@ -12,24 +12,17 @@ import {
 import path from 'path';
 import { promisify } from 'util';
 import fs, { stat } from 'fs';
-import process from 'process';
+import { exec } from 'child_process';
 import log from 'electron-log';
 import _ from 'lodash';
 import Card from '../../Common/Card/Card';
 import styles from './JavaManagerCard.scss';
 import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
-import { history } from '../../../store/configureStore';
 import { setJavaArgs } from '../../../actions/settings';
-import ForgeManager from './ForgeManager';
+import { findJavaHome } from '../../../utils/javaHelpers';
 
-type Props = {
-  setJavaArgs: () => void,
-  javaArgs: string,
-  overrideJavaArgs: string
-};
-
-function JavaManagerCard(props: Props) {
+function JavaManagerCard(props) {
   const [is64bit, setIs64bit] = useState(true);
   const [overrideArgs, setOverrideArgsInput] = useState(null);
   const [javaArgsSwitchState, setJavaArgsSwitchState] = useState(false);
@@ -59,11 +52,14 @@ function JavaManagerCard(props: Props) {
     );
   };
 
-  function isOsWin64() {
-    if (process.arch === 'x64') {
-      return true;
-    } else return false;
-  }
+  const checkJavaArch = async () => {
+    const javaP = await findJavaHome();
+    setJavaPath(javaP);
+    exec(`"${javaP}" -d64 -version`, (err, stdout, stderr) => {
+      if (stderr.includes('Error') || stdout.includes('Error'))
+        setIs64bit(false);
+    });
+  };
 
   // Set the changed java arguments
   const updateArgs = async () => {
@@ -84,6 +80,7 @@ function JavaManagerCard(props: Props) {
 
   async function configManagement() {
     try {
+      checkJavaArch();
       const configFile = JSON.parse(
         await promisify(fs.readFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json')
@@ -267,7 +264,7 @@ function JavaManagerCard(props: Props) {
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
         <div className={styles.mainTextSlider}>
           Java Memory (
-          {isOsWin64 ? (
+          {is64bit ? (
             '64 bit)'
           ) : (
             <span>
