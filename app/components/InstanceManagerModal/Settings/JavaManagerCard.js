@@ -21,6 +21,7 @@ import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySl
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { setJavaArgs } from '../../../actions/settings';
 import { findJavaHome } from '../../../utils/javaHelpers';
+import MemorySlider from './MemorySlider';
 
 function JavaManagerCard(props) {
   const [is64bit, setIs64bit] = useState(true);
@@ -208,9 +209,7 @@ function JavaManagerCard(props) {
         }}
         onChange={e => setOverrideArgsInput(e.target.value)}
       />
-      <Button.Group
-        className={styles.btnGroup}
-      >
+      <Button.Group className={styles.btnGroup}>
         <Button
           className={styles.btnGroup}
           onClick={() => updateArgs()}
@@ -226,23 +225,6 @@ function JavaManagerCard(props) {
           <FontAwesomeIcon icon={faUndo} />
         </Button>
       </Button.Group>
-    </div>
-  );
-
-  const memorySlider = (
-    <div>
-      {memory && (
-        <JavaMemorySlider
-          // ram={props.settings.java.overrideMemory}
-          hr={true}
-          overrideJava={true}
-          ram={overrideJavaMemory}
-          is64bit={props.is64bit}
-          updateMemory={updateMemory}
-          javaArguments={overrideArgs}
-          instanceName={props.instanceName}
-        />
-      )}
     </div>
   );
 
@@ -274,7 +256,18 @@ function JavaManagerCard(props) {
             checked={javaMemorySwitchState}
           />
         </div>
-        {javaMemorySwitchState ? memorySlider : null}
+        {javaMemorySwitchState ? (
+          <MemorySlider
+            hr={true}
+            overrideJava={true}
+            ram={overrideJavaMemory}
+            is64bit={props.is64bit}
+            updateMemory={updateMemory}
+            javaArguments={overrideArgs}
+            instanceName={props.instanceName}
+            memory={memory}
+          />
+        ) : null}
       </div>
 
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
