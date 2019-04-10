@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { routerActions } from 'connected-react-router';
-import { bindActionCreators } from 'redux';
 import { Form, Input, Button, message, Switch, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUndo,
-  faCheck,
-  faQuestionCircle
-} from '@fortawesome/free-solid-svg-icons';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
 import { promisify } from 'util';
 import fs, { stat } from 'fs';
@@ -17,11 +11,11 @@ import log from 'electron-log';
 import _ from 'lodash';
 import Card from '../../Common/Card/Card';
 import styles from './JavaManagerCard.scss';
-import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { setJavaArgs } from '../../../actions/settings';
 import { findJavaHome } from '../../../utils/javaHelpers';
 import MemorySlider from './MemorySlider';
+import JavaArgInput from './JavaArgInput';
 
 function JavaManagerCard(props) {
   const [is64bit, setIs64bit] = useState(true);
@@ -194,40 +188,6 @@ function JavaManagerCard(props) {
     }
   }
 
-  const javaArgInput = (
-    <div>
-      <Input
-        value={overrideArgs}
-        style={{
-          display: 'inline-block',
-          maxWidth: '74%',
-          marginRight: '10px',
-          marginBottom: 4,
-          marginTop: 4,
-          backgroundColor: 'var(--secondary-color-1)',
-          marginLeft: '1%'
-        }}
-        onChange={e => setOverrideArgsInput(e.target.value)}
-      />
-      <Button.Group className={styles.btnGroup}>
-        <Button
-          className={styles.btnGroup}
-          onClick={() => updateArgs()}
-          type="primary"
-        >
-          <FontAwesomeIcon icon={faCheck} />
-        </Button>
-        <Button
-          className={styles.btnGroup}
-          type="primary"
-          onClick={() => resetArgs()}
-        >
-          <FontAwesomeIcon icon={faUndo} />
-        </Button>
-      </Button.Group>
-    </div>
-  );
-
   return (
     <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
@@ -276,10 +236,19 @@ function JavaManagerCard(props) {
           <Switch
             className={styles.switch}
             onChange={e => toggleJavaArguments(e)}
+            updateArgs={updateArgs}
+            resetArgs={resetArgs}
             checked={javaArgsSwitchState}
           />
         </div>
-        {javaArgsSwitchState ? javaArgInput : null}
+        {javaArgsSwitchState ? (
+          <JavaArgInput
+            overrideArgs={overrideArgs}
+            setOverrideArgsInput={setOverrideArgsInput}
+            updateArgs={updateArgs}
+            resetArgs={resetArgs}
+          />
+        ) : null}
       </div>
     </Card>
   );
