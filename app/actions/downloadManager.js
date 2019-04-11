@@ -3,9 +3,11 @@ import { message } from 'antd';
 import { promisify } from 'util';
 import axios from 'axios';
 import makeDir from 'make-dir';
-import fse from 'fs-extra';
+import fse, { outputFile } from 'fs-extra';
 import { cpus } from 'os';
 import dirTree from 'directory-tree';
+import { spawn, exec } from 'child_process';
+import jarAnalyzer from 'jarfile';
 import log from 'electron-log';
 import Promise from 'bluebird';
 import fs, { readdir, copyFile } from 'fs';
@@ -15,7 +17,8 @@ import {
   PACKS_PATH,
   INSTANCES_PATH,
   META_PATH,
-  GDL_LEGACYJAVAFIXER_MOD_URL
+  GDL_LEGACYJAVAFIXER_MOD_URL,
+  CLASSPATH_DIVIDER_CHAR
 } from '../constants';
 import vCompare from '../utils/versionsCompare';
 import {
@@ -25,9 +28,11 @@ import {
   computeVanillaAndForgeLibraries
 } from '../utils/getMCFilesList';
 import { downloadMod, getModsList, createDoNotTouchFile } from '../utils/mods';
+import { findJavaHome } from '../utils/javaHelpers';
 import { arraify } from '../utils/strings';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
 import { getAddonFile, getAddon } from '../utils/cursemeta';
+import { getForgeVersionJSON, checkForgeMeta, checkForgeDownloaded } from '../utils/forgeHelpers';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
@@ -113,6 +118,7 @@ export function addCursePackToQueue(pack, addonID, fileID) {
     makeDir(path.join(PACKS_PATH, pack));
     const mcVersion = packInfo.minecraft.version;
     const forgeVersion = packInfo.minecraft.modLoaders[0].id.replace(
+      // Handle legacy launcher versions
       'forge-',
       ''
     );
@@ -190,40 +196,19 @@ export function downloadPack(pack) {
 
     if (currPack.forgeVersion !== null) {
       try {
-        forgeJSON = JSON.parse(
-          await promisify(fs.readFile)(
-            path.join(
-              META_PATH,
-              'net.minecraftforge',
-              `forge-${currPack.forgeVersion}`,
-              `forge-${currPack.forgeVersion}.json`
-            )
-          )
-        );
-        await promisify(fs.access)(
-          path.join(
-            INSTANCES_PATH,
-            'libraries',
-            ...arraify(forgeJSON.libraries[0].name)
-          )
-        );
+        forgeJSON = await checkForgeMeta(currPack.forgeVersion);
+        await checkForgeDownloaded(forgeJSON.mavenVersionString);
       } catch (err) {
-        const { data } = await axios.get(
-          `https://addons-ecs.forgesvc.net/api/minecraft/modloader/forge-${
-          currPack.forgeVersion
-          }`
+        forgeJSON = await getForgeVersionJSON(currPack.forgeVersion);
+        const forgeBinPath = path.join(
+          INSTANCES_PATH,
+          'libraries',
+          ...arraify(forgeJSON.mavenVersionString)
         );
-
-        forgeJSON =
-          JSON.parse(data.versionJson) || JSON.parse(data.additionalFilesJson);
 
         await downloadFile(
-          path.join(
-            INSTANCES_PATH,
-            'libraries',
-            ...arraify(forgeJSON.libraries[0].name)
-          ),
-          data.downloadUrl,
+          forgeBinPath,
+          forgeJSON.downloadUrl,
           p => {
             dispatch({
               type: UPDATE_PROGRESS,
@@ -232,35 +217,16 @@ export function downloadPack(pack) {
           }
         );
 
-        await makeDir(
-          path.dirname(
-            path.join(
-              INSTANCES_PATH,
-              'libraries',
-              ...arraify(forgeJSON.libraries[0].name)
-            )
-          )
-        );
-        await makeDir(
-          path.join(
-            META_PATH,
-            'net.minecraftforge',
-            `forge-${currPack.forgeVersion}`
-          )
-        );
-        await promisify(fs.writeFile)(
-          path.join(
-            META_PATH,
-            'net.minecraftforge',
-            `forge-${currPack.forgeVersion}`,
-            `forge-${currPack.forgeVersion}.json`
-          ),
-          JSON.stringify(forgeJSON)
-        );
+        await outputFile(path.join(
+          META_PATH,
+          'net.minecraftforge',
+          `forge-${currPack.forgeVersion}`,
+          `forge-${currPack.forgeVersion}.json`
+        ), JSON.stringify(forgeJSON))
       }
     }
 
-    const libraries = await computeVanillaAndForgeLibraries(vnlJSON, forgeJSON);
+    const libraries = await computeVanillaAndForgeLibraries(vnlJSON, forgeJSON, false);
 
     // This is the main config file for the instance
     await makeDir(path.join(PACKS_PATH, pack));
@@ -430,6 +396,53 @@ export function downloadPack(pack) {
       await copyAssetsToResources(assets);
     }
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
+
+    // Finish forge patches >= 1.13
+    const installProfileJson = JSON.parse(forgeJSON.installProfileJson);
+    if (installProfileJson) {
+      const { processors } = installProfileJson;
+      const replaceIfPossible = arg => {
+        const finalArg = arg.replace('{', '').replace('}', '');
+        if (installProfileJson.data[finalArg]) {
+          // Handle special case
+          if (finalArg === 'BINPATCH') {
+            return path.join(
+              INSTANCES_PATH,
+              'libraries',
+              ...arraify(installProfileJson.path)
+            ).replace('.jar', "-clientdata.lzma")
+          }
+          // Return replaced string
+          return installProfileJson.data[finalArg].client;
+        }
+        // Return original string (checking for MINECRAFT_JAR)
+        return arg.replace('{MINECRAFT_JAR}', mainJar[0].path);
+      }
+      const computePathIfPossible = arg => {
+        if (arg[0] === '[') {
+          return path.join(INSTANCES_PATH, 'libraries', arraify(arg.replace('[', '').replace(']', '')).join('/'));
+        }
+        return arg;
+      }
+      const javaPath = await findJavaHome();
+      for (const p in processors) {
+        const filePath = path.join(INSTANCES_PATH, 'libraries', ...arraify(processors[p].jar));
+        const args = processors[p].args
+          .map(arg => replaceIfPossible(arg))
+          .map(arg => computePathIfPossible(arg));
+
+        const classPaths = processors[p].classpath.map(cp => path.join(INSTANCES_PATH, 'libraries', arraify(cp).join('/')));
+
+        const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
+        const mainClass = jarFile.valueForManifestEntry("Main-Class");
+
+        const { stderr, stdout } = await promisify(exec)(
+          `"${javaPath}" -classpath "${filePath}${CLASSPATH_DIVIDER_CHAR}${classPaths.join(CLASSPATH_DIVIDER_CHAR)}" ${mainClass} ${args.join(' ')}`
+          , { maxBuffer: 10000000000 })
+
+        console.log(stderr, stdout)
+      }
+    }
 
     dispatch({
       type: DOWNLOAD_COMPLETED,
