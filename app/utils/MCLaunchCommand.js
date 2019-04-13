@@ -8,7 +8,7 @@ import { findJavaHome } from './javaHelpers';
 import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH, CLASSPATH_DIVIDER_CHAR } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
-const getStartCommand = async (packName, userData, ram, javaArguments) => {
+const getStartCommand = async (packName, userData, settings, javaArguments) => {
   const instanceConfigJSON = JSON.parse(
     await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
   );
@@ -65,7 +65,7 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
 
 "${javaPath}" ${(config.overrideArgs || javaArguments).replace(
     '{_RAM_}',
-    ram
+    instanceConfigJSON.overrideMemory || settings.java.memory,
   )} ${dosName} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
