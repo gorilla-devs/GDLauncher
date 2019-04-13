@@ -24,7 +24,6 @@ function JavaManagerCard(props) {
   const [javaMemorySwitchState, setJavaMemorySwitchState] = useState(false);
   const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
   const [readFile, setReadFile] = useState(null);
-  const [memory, setMemory] = useState(null);
 
   const updateJavaArguments = javaArguments => {
     setOverrideArgsInput(javaArguments);
@@ -68,7 +67,6 @@ function JavaManagerCard(props) {
       if (configFile.overrideMemory) {
         setJavaMemorySwitchState(true);
         setOverrideJavaMemory(configFile.overrideMemory);
-        setMemory(configFile.overrideMemory);
       } else setJavaMemorySwitchState(false);
 
       if (configFile.overrideArgs) {
@@ -139,7 +137,6 @@ function JavaManagerCard(props) {
         );
         setOverrideJavaMemory(4096);
         setJavaMemorySwitchState(true);
-        setMemory(4096);
       } else if (!e) {
         const modifiedConfig = JSON.stringify(_.omit(readFile, 'overrideMemory'));
         await promisify(fs.writeFile)(
@@ -190,7 +187,7 @@ function JavaManagerCard(props) {
             updateMemory={updateMemory}
             javaArguments={overrideArgs}
             instanceName={props.instanceName}
-            memory={memory}
+            memory={overrideJavaMemory}
           />
         ) : null}
       </div>
