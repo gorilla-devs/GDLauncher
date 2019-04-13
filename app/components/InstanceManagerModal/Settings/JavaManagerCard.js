@@ -11,7 +11,7 @@ import log from 'electron-log';
 import _ from 'lodash';
 import Card from '../../Common/Card/Card';
 import styles from './JavaManagerCard.scss';
-import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
+import { PACKS_PATH, DEFAULT_ARGS, DEFAULT_MEMORY } from '../../../constants';
 import { setJavaArgs } from '../../../actions/settings';
 import { findJavaHome, checkJavaArch } from '../../../utils/javaHelpers';
 import MemorySlider from './MemorySlider';
@@ -129,13 +129,13 @@ function JavaManagerCard(props) {
       if (e) {
         const modifiedConfig = JSON.stringify({
           ...readFile,
-          overrideMemory: 4096
+          overrideMemory: DEFAULT_MEMORY
         });
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
         );
-        setOverrideJavaMemory(4096);
+        setOverrideJavaMemory(DEFAULT_MEMORY);
         setJavaMemorySwitchState(true);
       } else if (!e) {
         const modifiedConfig = JSON.stringify(_.omit(readFile, 'overrideMemory'));

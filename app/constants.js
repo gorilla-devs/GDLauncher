@@ -3,6 +3,7 @@ import electron from 'electron';
 import { platform, homedir } from 'os';
 import getAppPath from './utils/getAppPath';
 
+export const DEFAULT_MEMORY = '4096';
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
 export const DARWIN = 'darwin';
