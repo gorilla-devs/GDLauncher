@@ -41,12 +41,6 @@ export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const { auth, settings } = getState();
 
-    const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, instanceName, 'config.json')
-      )
-    );
-
     const command = await launchCommand(
       instanceName,
       auth,
