@@ -139,12 +139,12 @@ function JavaManagerCard(props) {
         );
         setOverrideJavaMemory(4096);
         setJavaMemorySwitchState(true);
-        setMemory(readFile.overrideMemory);
+        setMemory(4096);
       } else if (!e) {
         const modifiedConfig = JSON.stringify(_.omit(readFile, 'overrideMemory'));
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
-          modifiedConfig
+          readFile
         );
         setJavaMemorySwitchState(false);
       }
