@@ -13,6 +13,7 @@ export const DATAPATH = path.join(
     (electron.app || electron.remote.app).getPath('userData'),
   'GDLauncher'
 );
+export const CLASSPATH_DIVIDER_CHAR = platform() === WINDOWS ? ';' : ':';
 export const LAUNCHER_FOLDER = 'launcherData';
 export const INSTANCES_FOLDER = 'instances';
 export const SERVERS_PATH = path.join(DATAPATH, 'servers');
