@@ -178,7 +178,7 @@ function JavaManagerCard(props) {
             checked={javaMemorySwitchState}
           />
         </div>
-        {javaMemorySwitchState ? (
+        {javaMemorySwitchState && (
           <MemorySlider
             hr={true}
             overrideJava={true}
@@ -189,7 +189,7 @@ function JavaManagerCard(props) {
             instanceName={props.instanceName}
             memory={overrideJavaMemory}
           />
-        ) : null}
+        )}
       </div>
 
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
@@ -203,14 +203,14 @@ function JavaManagerCard(props) {
             checked={javaArgsSwitchState}
           />
         </div>
-        {javaArgsSwitchState ? (
+        {javaArgsSwitchState && (
           <JavaArgInput
             overrideArgs={overrideArgs}
             setOverrideArgsInput={setOverrideArgsInput}
             updateArgs={updateArgs}
             resetArgs={resetArgs}
           />
-        ) : null}
+        )}
       </div>
     </Card>
   );

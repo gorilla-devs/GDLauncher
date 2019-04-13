@@ -2,17 +2,19 @@ import React from 'react';
 import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
 
 function MemorySlider(props) {
+  const {memory, hr, overrideJava, ram, is64bit, updateMemory, javaArguments, instanceName} = props;
+
   return (
     <React.Fragment>
-      {props.memory && (
+      {memory && (
         <JavaMemorySlider
-          hr={props.hr}
-          overrideJava={props.overrideJava}
-          ram={props.ram}
-          is64bit={props.is64bit}
-          updateMemory={props.updateMemory}
-          javaArguments={props.javaArguments}
-          instanceName={props.instanceName}
+          hr={hr}
+          overrideJava={overrideJava}
+          ram={ram}
+          is64bit={is64bit}
+          updateMemory={updateMemory}
+          javaArguments={javaArguments}
+          instanceName={instanceName}
         />
       )}
     </React.Fragment>
