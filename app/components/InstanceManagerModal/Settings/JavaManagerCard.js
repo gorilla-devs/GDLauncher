@@ -23,6 +23,7 @@ function JavaManagerCard(props) {
   const [javaArgsSwitchState, setJavaArgsSwitchState] = useState(false);
   const [javaMemorySwitchState, setJavaMemorySwitchState] = useState(false);
   const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
+  const [readFile, setReadFile] = useState(null);
   const [memory, setMemory] = useState(null);
 
   const updateJavaArguments = javaArguments => {
@@ -32,13 +33,8 @@ function JavaManagerCard(props) {
   // resetArgs the global arguments to the default one
   const resetArgs = async () => {
     updateJavaArguments(DEFAULT_ARGS);
-    const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, props.instanceName, 'config.json')
-      )
-    );
     const modifiedConfig = JSON.stringify({
-      ...config,
+      ...readFile,
       overrideArgs: DEFAULT_ARGS
     });
     await promisify(fs.writeFile)(
@@ -50,12 +46,7 @@ function JavaManagerCard(props) {
   // Set the changed java arguments
   const updateArgs = async () => {
     if (overrideArgs) {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json')
-        )
-      );
-      const modifiedConfig = JSON.stringify({ ...config, overrideArgs });
+      const modifiedConfig = JSON.stringify({ ...readFile, overrideArgs });
       await promisify(fs.writeFile)(
         path.join(PACKS_PATH, props.instanceName, 'config.json'),
         modifiedConfig
@@ -73,6 +64,7 @@ function JavaManagerCard(props) {
           path.join(PACKS_PATH, props.instanceName, 'config.json')
         )
       );
+      setReadFile(configFile);
       if (configFile.overrideMemory) {
         setJavaMemorySwitchState(true);
         setOverrideJavaMemory(configFile.overrideMemory);
@@ -94,14 +86,9 @@ function JavaManagerCard(props) {
 
   async function toggleJavaArguments(e) {
     try {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json')
-        )
-      );
-      if (config.overrideArgs === undefined && e) {
+      if (e) {
         const modifiedConfig = JSON.stringify({
-          ...config,
+          ...readFile,
           overrideArgs: DEFAULT_ARGS
         });
         await promisify(fs.writeFile)(
@@ -110,8 +97,8 @@ function JavaManagerCard(props) {
         );
         setOverrideArgsInput(DEFAULT_ARGS);
         setJavaArgsSwitchState(true);
-      } else if (config.overrideArgs && !e) {
-        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideArgs'));
+      } else if (!e) {
+        const modifiedConfig = JSON.stringify(_.omit(readFile, 'overrideArgs'));
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
@@ -125,13 +112,8 @@ function JavaManagerCard(props) {
 
   async function updateMemory(v) {
     try {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json')
-        )
-      );
       const modifiedConfig = JSON.stringify({
-        ...config,
+        ...readFile,
         overrideMemory: v
       });
       await promisify(fs.writeFile)(
@@ -146,14 +128,9 @@ function JavaManagerCard(props) {
 
   async function toggleJavaMemory(e) {
     try {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json')
-        )
-      );
-      if (config.overrideMemory === undefined && e) {
+      if (e) {
         const modifiedConfig = JSON.stringify({
-          ...config,
+          ...readFile,
           overrideMemory: 4096
         });
         await promisify(fs.writeFile)(
@@ -162,14 +139,9 @@ function JavaManagerCard(props) {
         );
         setOverrideJavaMemory(4096);
         setJavaMemorySwitchState(true);
-        const configChanged = JSON.parse(
-          await promisify(fs.readFile)(
-            path.join(PACKS_PATH, props.instanceName, 'config.json')
-          )
-        );
-        setMemory(configChanged.overrideMemory);
-      } else if (config.overrideMemory !== undefined && !e) {
-        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideMemory'));
+        setMemory(readFile.overrideMemory);
+      } else if (!e) {
+        const modifiedConfig = JSON.stringify(_.omit(readFile, 'overrideMemory'));
         await promisify(fs.writeFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json'),
           modifiedConfig
