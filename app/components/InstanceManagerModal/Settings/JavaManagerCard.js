@@ -13,7 +13,7 @@ import Card from '../../Common/Card/Card';
 import styles from './JavaManagerCard.scss';
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { setJavaArgs } from '../../../actions/settings';
-import { findJavaHome } from '../../../utils/javaHelpers';
+import { findJavaHome, checkJavaArch } from '../../../utils/javaHelpers';
 import MemorySlider from './MemorySlider';
 import JavaArgInput from './JavaArgInput';
 
@@ -47,14 +47,6 @@ function JavaManagerCard(props) {
     );
   };
 
-  const checkJavaArch = async () => {
-    const javaP = await findJavaHome();
-    exec(`"${javaP}" -d64 -version`, (err, stdout, stderr) => {
-      if (stderr.includes('Error') || stdout.includes('Error'))
-        setIs64bit(false);
-    });
-  };
-
   // Set the changed java arguments
   const updateArgs = async () => {
     if (overrideArgs) {
@@ -74,7 +66,8 @@ function JavaManagerCard(props) {
 
   async function configManagement() {
     try {
-      checkJavaArch();
+      const javaP = await findJavaHome();
+      setIs64bit(checkJavaArch(javaP));
       const configFile = JSON.parse(
         await promisify(fs.readFile)(
           path.join(PACKS_PATH, props.instanceName, 'config.json')
