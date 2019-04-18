@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, message, Switch, Tooltip } from 'antd';
+import { Form, Input, message, Switch, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
 import { promisify } from 'util';
-import fs, { stat } from 'fs';
-import { exec } from 'child_process';
+import fs from 'fs';
 import log from 'electron-log';
 import _ from 'lodash';
 import Card from '../../Common/Card/Card';
@@ -14,7 +13,7 @@ import styles from './JavaManagerCard.scss';
 import { PACKS_PATH, DEFAULT_ARGS, DEFAULT_MEMORY } from '../../../constants';
 import { setJavaArgs } from '../../../actions/settings';
 import { findJavaHome, checkJavaArch } from '../../../utils/javaHelpers';
-import MemorySlider from './MemorySlider';
+import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
 import JavaArgInput from './JavaArgInput';
 
 function JavaManagerCard(props) {
@@ -150,6 +149,23 @@ function JavaManagerCard(props) {
     }
   }
 
+  const memorySlider = (
+    <div>
+      {overrideJavaMemory && (
+        <JavaMemorySlider
+          // ram={props.settings.java.overrideMemory}
+          hr={true}
+          overrideJava={true}
+          ram={overrideJavaMemory}
+          is64bit={props.is64bit}
+          updateMemory={updateMemory}
+          javaArguments={overrideArgs}
+          instanceName={props.instanceName}
+        />
+      )}
+    </div>
+  );
+
   return (
     <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>
@@ -178,18 +194,7 @@ function JavaManagerCard(props) {
             checked={javaMemorySwitchState}
           />
         </div>
-        {javaMemorySwitchState && (
-          <MemorySlider
-            hr={true}
-            overrideJava={true}
-            ram={overrideJavaMemory}
-            is64bit={props.is64bit}
-            updateMemory={updateMemory}
-            javaArguments={overrideArgs}
-            instanceName={props.instanceName}
-            memory={overrideJavaMemory}
-          />
-        )}
+        {javaMemorySwitchState ? memorySlider : null}
       </div>
 
       <div style={{ display: 'inline', verticalAlign: 'middle' }}>

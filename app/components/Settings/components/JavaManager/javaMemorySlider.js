@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon, Slider, Tooltip } from 'antd';
+import { Slider, Tooltip } from 'antd';
 import os from 'os';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
