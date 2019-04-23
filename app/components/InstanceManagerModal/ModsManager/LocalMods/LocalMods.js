@@ -27,6 +27,7 @@ const LocalMods = props => {
   const modsFolder = path.join(PACKS_PATH, props.match.params.instance, 'mods');
 
   const toggleSize = i => {
+    e.stopPropagation();
     if (listRef.current) {
       listRef.current.resetAfterIndex(i);
     }
