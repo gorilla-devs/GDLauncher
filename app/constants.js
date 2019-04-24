@@ -3,7 +3,6 @@ import electron from 'electron';
 import { platform, homedir } from 'os';
 import getAppPath from './utils/getAppPath';
 
-export const DEFAULT_MEMORY = '4096';
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
 export const DARWIN = 'darwin';
@@ -49,6 +48,7 @@ export const DEFAULT_ARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInv
     ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
     : ''
 } -Xms256m`;
+export const DEFAULT_MEMORY = 4096;
 export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
 export const THEMES = {

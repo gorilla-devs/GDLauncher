@@ -94,7 +94,7 @@ function Instances(props: Props) {
                   justifyContent: 'space-between',
                   height: '60px',
                   margin: 0,
-                  overflowY: 'hidden'
+                  overflow: 'hidden'
                 }}
               >
                 <FormItem>
