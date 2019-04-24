@@ -6,6 +6,7 @@
   overflow-y: hidden;
   .innerContainer {
     height: 100%;
+    padding: 0 0 30px 0;
     overflow-y: auto;
     .content {
       display: block;
@@ -14,42 +15,3 @@
     }
   }
 }
-
-.javaArgInput {
-  background: var(--secondary-color-1) !important;
-  max-width: 69%;
-  margin-right: 15px !important;
-}
-
-.mainText {
-  margin-left: 2% !important;
-}
-.buttonGroup {
-  max-width: 50%;
-  margin-bottom: 10px;
-  margin-top: 4px;
-  margin-left: 2% !important;
-}
-
-.description {
-  font-size: 14px;
-  color: $text-dark;
-  padding: 5px;
-}
-
-.switch {
-  margin-left: 67% !important;
-  margin-top: 8px;
-}
-
-.sliderSwitch{
-  //right: -60%;
-  left: 60%;
-  margin-top: 8px;
-}
-
-// .switch{
-//   //right: -60%;
-//   left: 60%;
-//   margin-top: 8px;
-// }

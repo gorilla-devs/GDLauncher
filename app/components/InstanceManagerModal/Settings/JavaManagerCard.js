@@ -96,11 +96,10 @@ function JavaManagerCard(props) {
     <div>
       {overrideJavaMemory && (
         <JavaMemorySlider
-          // ram={props.settings.java.overrideMemory}
           hr
           overrideJava
           ram={overrideJavaMemory}
-          is64bit={props.is64bit}
+          is64bit={is64bit}
           updateMemory={updateMemory}
           javaArguments={overrideArgs}
           instanceName={props.instanceName}
@@ -111,10 +110,10 @@ function JavaManagerCard(props) {
 
   return (
     <Card
-      style={{ marginTop: 15, padding: 10, height: 'auto' }}
-      title="Java Manager"
+      style={{ marginTop: 15, height: 'auto' }}
+      title="Java Manager Override"
     >
-      <React.Fragment>
+      <div style={{ padding: 10 }}>
         <div className={styles.mainTextSlider}>
           Java Memory (
           {is64bit ? (
@@ -157,7 +156,7 @@ function JavaManagerCard(props) {
             resetArgs={resetArgs}
           />
         )}
-      </React.Fragment>
+      </div>
     </Card>
   );
 }

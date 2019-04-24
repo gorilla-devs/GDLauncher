@@ -10,26 +10,19 @@ import styles from './Settings.scss';
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
 import { setJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
-import JavaManagerCard from '../Settings/JavaManagerCard';
+import JavaManagerCard from './JavaManagerCard';
 
 const FormItem = Form.Item;
 
 type Props = {
   setJavaArgs: () => void,
-  javaArgs: string,
-  overrideJavaArgs: string
+  javaArgs: string
 };
 
 function Instances(props: Props) {
-  const { overrideJavaArgs } = props;
-
-  const [is64bit, setIs64bit] = useState(true);
   const [instanceConfig, setInstanceConfig] = useState(null);
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
-  const [overrideArgs, setOverrideArgsInput] = useState(null);
-  const [switchState, setSwitchState] = useState(false);
-  const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
 
   let watcher = null;
 
@@ -40,15 +33,6 @@ function Instances(props: Props) {
           path.join(PACKS_PATH, props.instance, 'config.json')
         )
       );
-
-      if (configFile.overrideMemory) {
-        setOverrideJavaMemory(configFile.overrideMemory);
-      }
-
-      if (configFile.overrideArgs) {
-        setSwitchState(true);
-        setOverrideArgsInput(configFile.overrideArgs);
-      } else setSwitchState(false);
 
       setInstanceConfig(configFile);
 
@@ -95,58 +79,6 @@ function Instances(props: Props) {
     });
   }
 
-  async function toggleJavaArguments(e) {
-    try {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json')
-        )
-      );
-      if (config.overrideArgs === undefined && e) {
-        const modifiedConfig = JSON.stringify({
-          ...config,
-          overrideArgs: DEFAULT_ARGS
-        });
-        await promisify(fs.writeFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json'),
-          modifiedConfig
-        );
-        setOverrideArgsInput(DEFAULT_ARGS);
-        setSwitchState(true);
-      } else if (config.overrideArgs && !e) {
-        const modifiedConfig = JSON.stringify(_.omit(config, 'overrideArgs'));
-        await promisify(fs.writeFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json'),
-          modifiedConfig
-        );
-        setSwitchState(false);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function updateMemory(v) {
-    try {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json')
-        )
-      );
-      const modifiedConfig = JSON.stringify({
-        ...config,
-        overrideMemory: v
-      });
-      await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, props.instance, 'config.json'),
-        modifiedConfig
-      );
-      setOverrideJavaMemory(v);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
   const { getFieldDecorator } = props.form;
   return (
     <div className={styles.container}>
@@ -159,9 +91,10 @@ function Instances(props: Props) {
                 style={{
                   width: '100%',
                   display: 'flex',
+                  justifyContent: 'space-between',
                   height: '60px',
                   margin: 0,
-                  overflowY: 'auto'
+                  overflowY: 'hidden'
                 }}
               >
                 <FormItem>
@@ -182,7 +115,8 @@ function Instances(props: Props) {
                       style={{
                         width: 300,
                         display: 'inline-block',
-                        height: 60
+                        height: 60,
+                        overflow: 'hidden'
                       }}
                       prefix={
                         <Icon
@@ -220,13 +154,7 @@ function Instances(props: Props) {
               />
             ) : null}
           </Card>
-          <JavaManagerCard
-            ram={overrideJavaMemory}
-            is64bit={is64bit}
-            updateMemory={updateMemory}
-            javaArguments={overrideArgs}
-            instanceName={props.instance}
-          />
+          <JavaManagerCard instanceName={props.instance} />
         </div>
       </div>
     </div>
