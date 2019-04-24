@@ -27,36 +27,20 @@ export default props => {
         <div className={styles.subHrList}>
           <ul>
             <ChangelogRow
-              main="We are refactoring quite a few parts of the code"
-              secondary=", this will allow us to easily add features later on"
+              main="Added a crash handler"
+              secondary=" when things go wrong xD"
             />
             <ChangelogRow
-              main="Drastically improved rendering performance"
-              secondary=", it should now be 2x faster"
+              main="Added java memory override for instances"
+              secondary=" yeeee"
             />
             <ChangelogRow
-              main="Modpacks icons are automatically set as instance icon when downloading them"
-              secondary=""
+              main="Added java arguments override for instances"
+              secondary=" yeeee"
             />
             <ChangelogRow
-              main="Modpacks downloads should now be 4x faster"
-              secondary="depending on your connection"
-            />
-            <ChangelogRow
-              main="We now show the 'Playing on GDLauncher' presence on discord"
-              secondary="hurraah!"
-            />
-            <ChangelogRow
-              main="Updated the download progress style when downloading instances"
-              secondary="do you like it??"
-            />
-            <ChangelogRow
-              main="You can now change the java arguments from the launcher settings!"
-              secondary="It will apply to all the instances"
-            />
-            <ChangelogRow
-              main="Instances now have an animation when appearing."
-              secondary="This will fix icons 'flashing' for a split second"
+              main="Added support for Minecraft Forge 1.13"
+              secondary=". Don't tilt if it looks like it's frozen, it may take a while"
             />
           </ul>
         </div>
@@ -64,24 +48,16 @@ export default props => {
         <div className={styles.subHrList}>
           <ul>
             <ChangelogRow
-              main="Fixed the news not working"
-              secondary=", not our fault. Minecraft.net changed it..."
+              main="Fixed continuous login reset"
+              secondary=" (hopefully)"
             />
             <ChangelogRow
-              main="Removed various errors stacking up"
-              secondary="when java was not found"
+              main="Fixed download progress bar zindex"
+              secondary=" lel"
             />
             <ChangelogRow
-              main="Fixed mods dependancies not being correctly downloaded"
-              secondary=" yeeeee"
-            />
-            <ChangelogRow
-              main="Fixed broken mods and modpacks results"
-              secondary="when the text contained whitespaces"
-            />
-            <ChangelogRow
-              main="Fixed closing modal animation not working"
-              secondary="when creating a new instance"
+              main="Some improvements in the mods manager"
+              secondary=", we're still working on it though"
             />
           </ul>
         </div>

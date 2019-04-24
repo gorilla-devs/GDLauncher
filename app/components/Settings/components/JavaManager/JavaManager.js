@@ -10,7 +10,7 @@ import CopyIcon from '../../../Common/CopyIcon/CopyIcon';
 import styles from './JavaManager.scss';
 import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
-import { findJavaHome } from '../../../../utils/javaHelpers';
+import { findJavaHome, checkJavaArch } from '../../../../utils/javaHelpers';
 import store from '../../../../localStore';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import SettingInput from '../SettingInput/SettingInput';
@@ -22,17 +22,14 @@ function JavaManager(props) {
   const [is64bit, setIs64bit] = useState(true);
   const [javaPath, setJavaPath] = useState('');
 
-  const checkJavaArch = async () => {
+  const checkJava = async () => {
     const javaP = await findJavaHome();
     setJavaPath(javaP);
-    exec(`"${javaP}" -d64 -version`, (err, stdout, stderr) => {
-      if (stderr.includes('Error') || stdout.includes('Error'))
-        setIs64bit(false);
-    });
+    setIs64bit(checkJavaArch(javaP));
   };
 
   useEffect(() => {
-    checkJavaArch();
+    checkJava();
   }, []);
 
   const openFolderDialog = () => {

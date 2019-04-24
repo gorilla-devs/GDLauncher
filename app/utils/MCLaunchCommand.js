@@ -5,10 +5,10 @@ import { promisify } from 'util';
 import log from 'electron-log';
 import { connect } from 'react-redux';
 import { findJavaHome } from './javaHelpers';
-import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH } from '../constants';
+import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH, CLASSPATH_DIVIDER_CHAR } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
-const getStartCommand = async (packName, userData, ram, javaArguments) => {
+const getStartCommand = async (packName, userData, settings, javaArguments) => {
   const instanceConfigJSON = JSON.parse(
     await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
   );
@@ -24,9 +24,9 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
   );
   const forge = instanceConfigJSON.forgeVersion;
   let forgeJSON = null;
-  // Handling legacy GDLauncher instances without the forge- in the name
   if (forge !== null) {
     try {
+      // Handling legacy GDLauncher instances without the forge- in the name
       forgeJSON = JSON.parse(
         await promisify(fs.readFile)(
           path.join(META_PATH, 'net.minecraftforge', forge, `${forge}.json`)
@@ -53,17 +53,17 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
       : '';
   // It concatenates vanilla and forge libraries. If the instance does not contain forge, it concatenates an empty array
   const libs = await computeVanillaAndForgeLibraries(vanillaJSON, forgeJSON);
-  const Arguments = getMCArguments(vanillaJSON, forgeJSON, packName, userData);
+  const Arguments = getMCArguments(vanillaJSON, JSON.parse(forgeJSON.versionJson), packName, userData);
   const mainClass =
-    forge === null ? vanillaJSON.mainClass : forgeJSON.mainClass;
-  const dividerChar = os.platform() === WINDOWS ? ';' : ':';
+    forge === null ? vanillaJSON.mainClass : JSON.parse(forgeJSON.versionJson).mainClass;
+
+  const config = JSON.parse(
+    await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
+  );
 
   const completeCMD = `
 
-"${javaPath}" ${javaArguments.replace(
-    '{_RAM_}',
-    ram
-  )} ${dosName} -Djava.library.path="${path.join(
+"${javaPath}" ${config.overrideArgs || javaArguments} -Xmx${instanceConfigJSON.overrideMemory || settings.java.memory}m ${dosName} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
     'natives'
@@ -75,14 +75,14 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
     `${vanillaJSON.id}.jar`
   )}"
  -cp ${libs
-   .filter(lib => !lib.natives)
-   .map(lib => `"${lib.path}"`)
-   .join(dividerChar)}${dividerChar}${`"${path.join(
-    INSTANCES_PATH,
-    'versions',
-    vanillaJSON.id,
-    `${vanillaJSON.id}.jar`
-  )}"`}
+      .filter(lib => !lib.natives)
+      .map(lib => `"${lib.path}"`)
+      .join(CLASSPATH_DIVIDER_CHAR)}${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
+        INSTANCES_PATH,
+        'versions',
+        vanillaJSON.id,
+        `${vanillaJSON.id}.jar`
+      )}"`}
  ${mainClass} ${Arguments}
   `;
   // We need to hide the access token before printing it to the logs
@@ -103,9 +103,15 @@ const getMCArguments = (vanilla, forge, packName, userData) => {
     Arguments = vanilla.minecraftArguments;
   } else if (vanilla.arguments) {
     // From 1.13
-    Arguments = vanilla.arguments.game
+    const vanillaArguments = vanilla.arguments.game
       .filter(arg => typeof arg === 'string')
       .join(' ');
+
+    const forgeArguments = forge.arguments.game.filter(
+      arg => typeof arg === 'string'
+    ).join(' ')
+
+    Arguments = `${vanillaArguments} ${forgeArguments}`;
   }
   // Replaces the arguments and returns the result
   return Arguments.replace('${auth_player_name}', userData.displayName)

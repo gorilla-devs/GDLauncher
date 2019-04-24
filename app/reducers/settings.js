@@ -5,16 +5,16 @@ import {
   SET_JAVA_MEMORY,
   SET_THEME,
   RESET_THEME,
-  SET_GLOBAL_JAVA_ARGUMENTS
+  SET_GLOBAL_JAVA_ARGUMENTS,
 } from '../actions/settings';
-import { THEMES, DEFAULT_ARGS } from '../constants';
+import { THEMES, DEFAULT_ARGS, DEFAULT_MEMORY } from '../constants';
 
 const initialState = {
   sounds: true,
   java: {
     autodetected: true,
     path: null,
-    memory: 3096,
+    memory: DEFAULT_MEMORY,
     javaArgs: DEFAULT_ARGS
   },
   theme: THEMES.default

@@ -42,7 +42,7 @@ export const extractVanillaLibs = async json => {
         if (
           'classifiers' in lib.downloads &&
           `natives-${convertOSToMCFormat(SysOS.type())}` in
-            lib.downloads.classifiers
+          lib.downloads.classifiers
         ) {
           libs.push({
             url:
@@ -142,41 +142,51 @@ export const isMapToResourcesAssets = async assetsName => {
   );
 };
 
-export const getForgeLibraries = async forge => {
+export const getForgeLibraries = async (forge, skipInstall = true) => {
   const forgeLibCalculator = async library => {
     let completeUrl;
-    if (_.has(library, 'url')) {
-      completeUrl = `${CURSEFORGE_MODLOADERS_API}/${arraify(library.name).join(
-        '/'
-      )}`;
+    // Check if it's >= 1.13
+    if (_.has(library, 'downloads.artifact')) {
+      completeUrl = library.downloads.artifact.url;
     } else {
-      completeUrl = `${MC_LIBRARIES_URL}/${arraify(library.name).join('/')}`;
+      if (_.has(library, 'url')) {
+        completeUrl = `${CURSEFORGE_MODLOADERS_API}/${arraify(library.name).join(
+          '/'
+        )}`;
+      } else {
+        completeUrl = `${MC_LIBRARIES_URL}/${arraify(library.name).join('/')}`;
+      }
     }
+
+    const partialPath = _.has(library, 'downloads.artifact') ? library.downloads.artifact.path : arraify(library.name).join('/');
 
     return {
       url: completeUrl,
-      path: path.join(INSTANCES_PATH, 'libraries', ...arraify(library.name))
+      path: path.join(INSTANCES_PATH, 'libraries', partialPath)
     };
   };
 
-  let libraries = [];
-  libraries = await Promise.all(
-    forge.libraries
-      // .filter(
-      //   lib =>
-      //     (_.has(lib, 'clientreq') && lib.clientreq) || !_.has(lib, 'clientreq')
-      // )
+  const computeLibraries = libraries => Promise.all(
+    libraries
       .filter(lib => !parseLibRules(lib.rules))
       .filter(lib => !lib.natives)
       .map(async lib => forgeLibCalculator(lib))
-  );
+  )
+
+  let libraries = [];
+  libraries = await computeLibraries(JSON.parse(forge.versionJson).libraries);
+  if (forge.installProfileJson !== null && !skipInstall) {
+    // Handle >= 1.13
+    const installForgeJson = (await computeLibraries(JSON.parse(forge.installProfileJson).libraries)).filter(lib => lib.url !== "");
+    libraries = libraries.concat(installForgeJson);
+  }
   return libraries;
 };
 
-export const computeVanillaAndForgeLibraries = async (vnl, forge) => {
+export const computeVanillaAndForgeLibraries = async (vnl, forge, skipInstall = true) => {
   let libraries = [];
   if (forge !== null) {
-    libraries = await getForgeLibraries(forge);
+    libraries = await getForgeLibraries(forge, skipInstall);
   }
   libraries = libraries.concat(await extractVanillaLibs(vnl));
 

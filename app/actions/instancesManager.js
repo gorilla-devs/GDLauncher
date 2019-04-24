@@ -44,7 +44,7 @@ export function startInstance(instanceName) {
     const command = await launchCommand(
       instanceName,
       auth,
-      settings.java.memory,
+      settings,
       settings.java.javaArgs
     );
     const start = spawn(command, [], {

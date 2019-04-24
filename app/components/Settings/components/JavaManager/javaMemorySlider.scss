@@ -5,6 +5,14 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  margin-left: 2% !important;
+}
+
+.mainContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .mainText {
@@ -25,4 +33,8 @@
       cursor: pointer !important;
     }
   }
+}
+
+.outherContainer{
+  margin-bottom: 40px !important;
 }

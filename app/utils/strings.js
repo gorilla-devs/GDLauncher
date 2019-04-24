@@ -2,11 +2,13 @@ import path from 'path';
 
 export const arraify = s => {
   const pathSplit = s.split(':');
+  const fileName = pathSplit[3] ? `${pathSplit[2]}-${pathSplit[3]}` : pathSplit[2];
+  const finalFileName = fileName.includes('@') ? fileName.replace('@', '.') : `${fileName}.jar`;
   const initPath = pathSplit[0]
     .split('.')
     .concat(pathSplit[1])
-    .concat(pathSplit[2])
-    .concat(`${pathSplit[1]}-${pathSplit[2]}.jar`);
+    .concat(pathSplit[2].split('@')[0])
+    .concat(`${pathSplit[1]}-${finalFileName}`);
   return initPath;
 };
 
