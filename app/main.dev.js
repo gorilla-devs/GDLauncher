@@ -84,7 +84,10 @@ if (minimist(process.argv.slice(1)).i) {
       height: 730,
       frame: false,
       backgroundColor: secondaryColor,
-      resizable: false
+      resizable: false,
+      webPreferences: {
+        nodeIntegration: true
+      }
     });
     splash.colors = {
       primaryColor,
@@ -101,7 +104,8 @@ if (minimist(process.argv.slice(1)).i) {
       frame: false,
       backgroundColor: secondaryColor,
       webPreferences: {
-        experimentalFeatures: true
+        experimentalFeatures: true,
+        nodeIntegration: true
       }
     });
 
