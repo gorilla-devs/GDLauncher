@@ -8,7 +8,7 @@ import { findJavaHome } from './javaHelpers';
 import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH, CLASSPATH_DIVIDER_CHAR } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
-const getStartCommand = async (packName, userData, ram, javaArguments) => {
+const getStartCommand = async (packName, userData, settings, javaArguments) => {
   const instanceConfigJSON = JSON.parse(
     await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
   );
@@ -57,12 +57,13 @@ const getStartCommand = async (packName, userData, ram, javaArguments) => {
   const mainClass =
     forge === null ? vanillaJSON.mainClass : JSON.parse(forgeJSON.versionJson).mainClass;
 
+  const config = JSON.parse(
+    await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
+  );
+
   const completeCMD = `
 
-"${javaPath}" ${javaArguments.replace(
-    '{_RAM_}',
-    ram
-  )} ${dosName} -Djava.library.path="${path.join(
+"${javaPath}" ${config.overrideArgs || javaArguments} -Xmx${instanceConfigJSON.overrideMemory || settings.java.memory}m ${dosName} -Djava.library.path="${path.join(
     PACKS_PATH,
     packName,
     'natives'

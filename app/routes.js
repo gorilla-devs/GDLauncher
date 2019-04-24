@@ -26,12 +26,11 @@ import NewUserPage from './components/NewUserPage/NewUserPage';
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
 const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
-const ServerManager = lazy(() =>
-  import('./components/ServerManager/ServerManager')
-);
+
 const InstanceCreatorModal = lazy(() =>
   import('./components/InstanceCreatorModal/containers/InstanceCreatorModal')
 );
+
 const loginHelperModal = lazy(() =>
   import('./components/LoginHelperModal/LoginHelperModal')
 );
@@ -198,10 +197,6 @@ class RouteDef extends Component<Props> {
                   component={CurseModpacksBrowser}
                 />
                 <Route path="/home" component={WaitingComponent(HomePage)} />
-                <Route
-                  path="/serverManager"
-                  component={WaitingComponent(ServerManager)}
-                />
               </div>
             </Route>
           </Switch>

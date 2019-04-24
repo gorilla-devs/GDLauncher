@@ -46,3 +46,9 @@ export const isGlobalJavaOptions = async () => {
     return false;
   }
 };
+
+export const checkJavaArch = async (javaP) => {
+  exec(`"${javaP}" -d64 -version`, (err, stdout, stderr) => {
+    if (stderr.includes('Error') || stdout.includes('Error')) return false;
+  });
+};

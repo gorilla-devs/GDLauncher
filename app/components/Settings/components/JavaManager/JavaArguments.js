@@ -5,6 +5,7 @@ import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import { setJavaArgs } from '../../../../actions/settings';
 import { DEFAULT_ARGS } from '../../../../constants';
+import JavaArgsInput from '../../../Common/JavaArgumentInput';
 
 type Props = {
   setJavaArgs: () => void,
@@ -16,21 +17,13 @@ function JavaArguments(props: Props) {
   const [globalArgs, setGlobalArgsInput] = useState(javaArgs);
 
   const updateJavaArguments = javaArguments => {
-    setGlobalArgsInput(javaArguments);
     props.setJavaArgs(javaArguments);
   };
 
-  // Set the changed java arguments
-  function submit() {
-    props.setJavaArgs(globalArgs);
-    if (globalArgs) {
-      updateJavaArguments(globalArgs);
-    } else message.error('Enter Valid Arguments');
-  }
-
   // Reset the global arguments to the default one
-  function reset() {
-    updateJavaArguments(DEFAULT_ARGS);
+  function resetJavaArguments() {
+    props.setJavaArgs(DEFAULT_ARGS);
+    setGlobalArgsInput(DEFAULT_ARGS);
   }
 
   return (
@@ -38,49 +31,12 @@ function JavaArguments(props: Props) {
       <div style={{ marginBottom: 10 }}>
         <span style={{ fontSize: 18 }}>Java Custom Path</span>
       </div>
-      <div style={{ display: 'inline', verticalAlign: 'middle' }}>
-        <Input
-          value={globalArgs}
-          style={{
-            display: 'inline-block',
-            maxWidth: '80%',
-            marginRight: '10px',
-            marginBottom: 10,
-            marginTop: 4
-          }}
-          onChange={e => setGlobalArgsInput(e.target.value)}
-        />
-        <Button.Group
-          style={{
-            maxWidth: '70%',
-            marginBottom: 10,
-            marginTop: 4
-          }}
-        >
-          <Button
-            style={{
-              maxWidth: '70%',
-              marginBottom: 10,
-              marginTop: 4
-            }}
-            type="primary"
-            onClick={() => submit()}
-          >
-            <FontAwesomeIcon icon={faCheck} />
-          </Button>
-          <Button
-            style={{
-              maxWidth: '70%',
-              marginBottom: 10,
-              marginTop: 4
-            }}
-            type="primary"
-            onClick={() => reset()}
-          >
-            <FontAwesomeIcon icon={faUndo} />
-          </Button>
-        </Button.Group>
-      </div>
+      <JavaArgsInput
+        overrideArgs={globalArgs}
+        onChange={setGlobalArgsInput}
+        updateArgs={updateJavaArguments}
+        resetArgs={resetJavaArguments}
+      />
       <hr />
     </div>
   );

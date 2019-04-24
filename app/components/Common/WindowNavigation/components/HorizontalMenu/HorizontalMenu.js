@@ -52,19 +52,7 @@ export default props => {
             <FontAwesomeIcon icon={faThList} className={styles.i} />
             MODPACKS
           </Link>
-        </li>
-        {/* <li className={styles.li}>
-            <Link
-              to="/serverManager"
-              draggable="false"
-              className={`${styles.a} ${
-                this.isLocation('/serverManager') ? styles.activeLink : null
-              }`}
-            >
-              <Icon type="database" className={styles.i} />
-              SERVERS
-            </Link>
-          </li> */}
+        </li>   
       </ul>
     </div>
   );
