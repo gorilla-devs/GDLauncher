@@ -1,32 +1,13 @@
-.switch {
-  //right: -60%;
-  // left: 60%;
-  position: absolute !important;
-  left: 85% !important;
-}
-
-.sliderSwitch {
-  position: absolute !important;
-  left: 85% !important;
-}
-
 .mainTextSlider{
   margin-top: 4px;
-  margin-left: 2% !important;
-  position: relative;
+  display: flex;
+  justify-content: space-between;
   font-size: 18px;
 }
 
 .mainText {
-  margin-top: 4px;
-  margin-bottom: 5px;
-  margin-left: 2% !important;
-  position: relative;
+  margin-top: 5px 0;
+  display: flex;
+  justify-content: space-between;
   font-size: 18px;
-}
-
-.btnGroup{
-  max-width: 60%;
-  margin-bottom: 4px;
-  margin-top: 4px;
 }

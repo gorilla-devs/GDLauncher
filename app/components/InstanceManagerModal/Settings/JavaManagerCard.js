@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { Form, Input, message, Switch, Tooltip } from 'antd';
+import { Form, Switch, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
-import path from 'path';
-import { promisify } from 'util';
-import fs from 'fs';
 import log from 'electron-log';
-import _ from 'lodash';
 import Card from '../../Common/Card/Card';
 import styles from './JavaManagerCard.scss';
-import { PACKS_PATH, DEFAULT_ARGS, DEFAULT_MEMORY } from '../../../constants';
-import { setJavaArgs } from '../../../actions/settings';
+import { DEFAULT_ARGS, DEFAULT_MEMORY } from '../../../constants';
 import { findJavaHome, checkJavaArch } from '../../../utils/javaHelpers';
+import { updateConfig, readConfig } from '../../../utils/instances';
 import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
-import JavaArgInput from './JavaArgInput';
+import JavaArgInput from '../../Common/JavaArgumentInput';
 
 function JavaManagerCard(props) {
   const [is64bit, setIs64bit] = useState(true);
@@ -22,47 +17,22 @@ function JavaManagerCard(props) {
   const [javaArgsSwitchState, setJavaArgsSwitchState] = useState(false);
   const [javaMemorySwitchState, setJavaMemorySwitchState] = useState(false);
   const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
-  const [readFile, setReadFile] = useState(null);
 
-  const updateJavaArguments = javaArguments => {
-    setOverrideArgsInput(javaArguments);
-  };
-
-  // resetArgs the global arguments to the default one
   const resetArgs = async () => {
-    updateJavaArguments(DEFAULT_ARGS);
-    const modifiedConfig = JSON.stringify({
-      ...readFile,
-      overrideArgs: DEFAULT_ARGS
-    });
-    await promisify(fs.writeFile)(
-      path.join(PACKS_PATH, props.instanceName, 'config.json'),
-      modifiedConfig
-    );
+    await updateConfig(props.instanceName, { overrideArgs: DEFAULT_ARGS });
+    setOverrideArgsInput(DEFAULT_ARGS);
   };
 
   // Set the changed java arguments
-  const updateArgs = async () => {
-    if (overrideArgs) {
-      const modifiedConfig = JSON.stringify({ ...readFile, overrideArgs });
-      await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, props.instanceName, 'config.json'),
-        modifiedConfig
-      );
-      updateJavaArguments(overrideArgs);
-    } else message.error('Enter Valid Arguments');
+  const updateArgs = async val => {
+    await updateConfig(props.instanceName, { overrideArgs: val });
   };
 
   async function configManagement() {
     try {
       const javaP = await findJavaHome();
       setIs64bit(checkJavaArch(javaP));
-      const configFile = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json')
-        )
-      );
-      setReadFile(configFile);
+      const configFile = await readConfig(props.instanceName);
       if (configFile.overrideMemory) {
         setJavaMemorySwitchState(true);
         setOverrideJavaMemory(configFile.overrideMemory);
@@ -84,22 +54,11 @@ function JavaManagerCard(props) {
   async function toggleJavaArguments(e) {
     try {
       if (e) {
-        const modifiedConfig = JSON.stringify({
-          ...readFile,
-          overrideArgs: DEFAULT_ARGS
-        });
-        await promisify(fs.writeFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json'),
-          modifiedConfig
-        );
+        await updateConfig(props.instanceName, { overrideArgs: DEFAULT_ARGS });
         setOverrideArgsInput(DEFAULT_ARGS);
         setJavaArgsSwitchState(true);
       } else if (!e) {
-        const modifiedConfig = JSON.stringify(_.omit(readFile, 'overrideArgs'));
-        await promisify(fs.writeFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json'),
-          modifiedConfig
-        );
+        await updateConfig(props.instanceName, {}, ['overrideArgs']);
         setJavaArgsSwitchState(false);
       }
     } catch (err) {
@@ -107,17 +66,10 @@ function JavaManagerCard(props) {
     }
   }
 
-  async function updateMemory(v) {
+  async function updateMemory(overrideMemory) {
     try {
-      const modifiedConfig = JSON.stringify({
-        ...readFile,
-        overrideMemory: v
-      });
-      await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, props.instanceName, 'config.json'),
-        modifiedConfig
-      );
-      setOverrideJavaMemory(v);
+      await updateConfig(props.instanceName, { overrideMemory });
+      setOverrideJavaMemory(overrideMemory);
     } catch (err) {
       console.error(err);
     }
@@ -126,22 +78,13 @@ function JavaManagerCard(props) {
   async function toggleJavaMemory(e) {
     try {
       if (e) {
-        const modifiedConfig = JSON.stringify({
-          ...readFile,
+        await updateConfig(props.instanceName, {
           overrideMemory: DEFAULT_MEMORY
         });
-        await promisify(fs.writeFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json'),
-          modifiedConfig
-        );
         setOverrideJavaMemory(DEFAULT_MEMORY);
         setJavaMemorySwitchState(true);
       } else if (!e) {
-        const modifiedConfig = JSON.stringify(_.omit(readFile, 'overrideMemory'));
-        await promisify(fs.writeFile)(
-          path.join(PACKS_PATH, props.instanceName, 'config.json'),
-          readFile
-        );
+        await updateConfig(props.instanceName, {}, ['overrideMemory']);
         setJavaMemorySwitchState(false);
       }
     } catch (err) {
@@ -149,13 +92,13 @@ function JavaManagerCard(props) {
     }
   }
 
-  const memorySlider = (
+  const MemorySlider = () => (
     <div>
       {overrideJavaMemory && (
         <JavaMemorySlider
           // ram={props.settings.java.overrideMemory}
-          hr={true}
-          overrideJava={true}
+          hr
+          overrideJava
           ram={overrideJavaMemory}
           is64bit={props.is64bit}
           updateMemory={updateMemory}
@@ -167,26 +110,28 @@ function JavaManagerCard(props) {
   );
 
   return (
-    <Card style={{ marginTop: 15, height: 'auto' }} title="Java Manager">
-      <div style={{ display: 'inline', verticalAlign: 'middle' }}>
+    <Card
+      style={{ marginTop: 15, padding: 10, height: 'auto' }}
+      title="Java Manager"
+    >
+      <React.Fragment>
         <div className={styles.mainTextSlider}>
           Java Memory (
           {is64bit ? (
             '64 bit)'
           ) : (
-            <span>
+            <React.Fragment>
               32 bit)&nbsp;
               <Tooltip
                 placement="right"
-                title="Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used.
-                 If you want more, install or select a 64 bit java executable"
+                title="Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used. If you want more, install or select a 64 bit java executable"
               >
                 <FontAwesomeIcon
                   className={styles.iconPointer}
                   icon={faQuestionCircle}
                 />
               </Tooltip>
-            </span>
+            </React.Fragment>
           )}
           <Switch
             className={styles.sliderSwitch}
@@ -194,47 +139,27 @@ function JavaManagerCard(props) {
             checked={javaMemorySwitchState}
           />
         </div>
-        {javaMemorySwitchState ? memorySlider : null}
-      </div>
+        {javaMemorySwitchState && <MemorySlider />}
 
-      <div style={{ display: 'inline', verticalAlign: 'middle' }}>
         <div className={styles.mainText}>
-          Java Arguments
+          <div>Java Arguments</div>
           <Switch
             className={styles.switch}
             onChange={e => toggleJavaArguments(e)}
-            updateArgs={updateArgs}
-            resetArgs={resetArgs}
             checked={javaArgsSwitchState}
           />
         </div>
         {javaArgsSwitchState && (
           <JavaArgInput
             overrideArgs={overrideArgs}
-            setOverrideArgsInput={setOverrideArgsInput}
+            onChange={setOverrideArgsInput}
             updateArgs={updateArgs}
             resetArgs={resetArgs}
           />
         )}
-      </div>
+      </React.Fragment>
     </Card>
   );
 }
 
-function mapStateToProps(state) {
-  return {
-    settings: state.settings,
-    javaArgs: state.settings.java.javaArgs
-  };
-}
-
-const mapDispatchToProps = {
-  setJavaArgs
-};
-
-export default Form.create()(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(JavaManagerCard)
-);
+export default Form.create()(JavaManagerCard);

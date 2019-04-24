@@ -33,45 +33,6 @@ function Instances(props: Props) {
 
   let watcher = null;
 
-  const updateJavaArguments = javaArguments => {
-    setOverrideArgsInput(javaArguments);
-  };
-
-  // resetArgs the global arguments to the default one
-  const resetArgs = async () => {
-    updateJavaArguments(DEFAULT_ARGS);
-    const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, props.instance, 'config.json')
-      )
-    );
-    const modifiedConfig = JSON.stringify({
-      ...config,
-      overrideArgs: DEFAULT_ARGS
-    });
-    await promisify(fs.writeFile)(
-      path.join(PACKS_PATH, props.instance, 'config.json'),
-      modifiedConfig
-    );
-  };
-
-  // Set the changed java arguments
-  const updateArgs = async () => {
-    if (overrideArgs) {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json')
-        )
-      );
-      const modifiedConfig = JSON.stringify({ ...config, overrideArgs });
-      await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, props.instance, 'config.json'),
-        modifiedConfig
-      );
-      updateJavaArguments(overrideArgs);
-    } else message.error('Enter Valid Arguments');
-  };
-
   async function configManagement() {
     try {
       const configFile = JSON.parse(
