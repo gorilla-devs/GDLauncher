@@ -75,7 +75,9 @@ const ModRow = ({
     <div
       className={index % 2 ? styles.listItemOdd : styles.listItemEven}
       style={style}
-      onClick={() => toggleSize(index)}
+      onClick={() => {
+        toggleSize(index);
+      }}
       role="none"
       key={modData.name}
     >
@@ -84,6 +86,7 @@ const ModRow = ({
           <Checkbox
             onChange={e => {
               e.stopPropagation();
+              e.nativeEvent.stopImmediatePropagation();
               selectMod(index);
             }}
             checked={modData.selected}
