@@ -39,6 +39,15 @@ export const getAddonFile = async (
   return makeRequest(url);
 };
 
+export const getAddonFileIDFromVersion = async (
+  addonID: number | string,
+  modpackVersion: string
+) => {
+  const files = await getAddonFiles(addonID);
+  const foundID = files.find(a => a.fileNameOnDisk.includes(modpackVersion));
+  return foundID ? foundID.id : null;
+};
+
 export const getSearch = (
   type: 'mods' | 'modpacks',
   searchFilter: string,
