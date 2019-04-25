@@ -45,6 +45,7 @@ import { readConfig } from '../utils/instances';
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
 export const ADD_TO_QUEUE = 'ADD_TO_QUEUE';
+export const ADD_NOT_READY_TO_QUEUE = 'ADD_NOT_READY_TO_QUEUE';
 export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
 export const UPDATE_TOTAL_FILES_TO_DOWNLOAD = 'UPDATE_TOTAL_FILES_TO_DOWNLOAD';
 export const UPDATE_PROGRESS = 'UPDATE_PROGRESS';
@@ -52,6 +53,10 @@ export const UPDATE_PROGRESS = 'UPDATE_PROGRESS';
 export function repairInstance(pack) {
   return async (dispatch, getState) => {
     const { packCreator } = getState();
+    dispatch({
+      type: ADD_NOT_READY_TO_QUEUE,
+      payload: pack
+    });
     const config = await readConfig(pack);
     if (config.projectID) {
       const fileID = await getAddonFileIDFromVersion(
@@ -61,6 +66,10 @@ export function repairInstance(pack) {
       if (fileID)
         dispatch(addCursePackToQueue(pack, config.projectID, fileID, true));
       else {
+        dispatch({
+          type: CLEAR_QUEUE,
+          payload: pack
+        });
         message.error('Could not repair');
         log.error(
           'Could not find fileID for',
@@ -170,6 +179,8 @@ export function addCursePackToQueue(pack, addonID, fileID, isRepair = false) {
       'forge-',
       ''
     );
+
+    console.log("DISPATCH")
     dispatch({
       type: ADD_TO_QUEUE,
       payload: pack,
@@ -352,9 +363,6 @@ export function downloadPack(pack, isRepair = false) {
         })
       );
 
-      // Finally removes the entire temp folder
-      await fse.remove(path.join(INSTANCES_PATH, 'temp'));
-
       let modsDownloaded = 0;
       await Promise.map(
         manifest.files,
@@ -532,7 +540,10 @@ function addNextPackToActualDownload() {
     const { downloadManager } = getState();
     const queueArr = Object.keys(downloadManager.downloadQueue);
     queueArr.some(pack => {
-      if (downloadManager.downloadQueue[pack].status !== 'Completed') {
+      if (
+        downloadManager.downloadQueue[pack].status !== 'Completed' &&
+        downloadManager.downloadQueue[pack].status !== 'NotReady'
+      ) {
         dispatch({
           type: START_DOWNLOAD,
           payload: pack
