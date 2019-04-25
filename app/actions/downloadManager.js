@@ -437,16 +437,27 @@ export function downloadPack(pack, isRepair = false) {
       }
     });
 
+    // Check if needs 1.13 forge patching
+    const installProfileJson =
+      forgeJSON && JSON.parse(forgeJSON.installProfileJson);
+
+    let totalPercentage = 100;
+
+    if (currPack.forgeVersion) totalPercentage = 70;
+    if (installProfileJson) totalPercentage = 58;
+
     const updatePercentage = downloaded => {
-      const actPercentage = ((downloaded * 70) / totalFiles + 30).toFixed(0);
-      if (currPack.percentage !== actPercentage)
-        return dispatch({
-          type: UPDATE_PROGRESS,
-          payload: {
-            pack,
-            percentage: actPercentage
-          }
-        });
+      const actPercentage = (
+        (downloaded * totalPercentage) / totalFiles +
+        (100 - totalPercentage)
+      ).toFixed(0);
+      return dispatch({
+        type: UPDATE_PROGRESS,
+        payload: {
+          pack,
+          percentage: actPercentage
+        }
+      });
     };
 
     const allFiles =
@@ -464,8 +475,6 @@ export function downloadPack(pack, isRepair = false) {
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
 
     // Finish forge patches >= 1.13
-    const installProfileJson =
-      forgeJSON && JSON.parse(forgeJSON.installProfileJson);
     if (installProfileJson) {
       const { processors } = installProfileJson;
       const replaceIfPossible = arg => {
@@ -498,7 +507,9 @@ export function downloadPack(pack, isRepair = false) {
         return arg;
       };
       const javaPath = await findJavaHome();
+      let i = 0;
       for (const p in processors) {
+        i += 1;
         const filePath = path.join(
           INSTANCES_PATH,
           'libraries',
@@ -523,9 +534,24 @@ export function downloadPack(pack, isRepair = false) {
         );
 
         console.log(stderr, stdout);
+        const actPercentage = ((i * 12) / processors.length).toFixed(0);
+        console.log(actPercentage);
+        dispatch({
+          type: UPDATE_PROGRESS,
+          payload: {
+            pack,
+            percentage: 88 + Number(actPercentage)
+          }
+        });
       }
     }
-
+    dispatch({
+      type: UPDATE_PROGRESS,
+      payload: {
+        pack,
+        percentage: 100
+      }
+    });
     dispatch({
       type: DOWNLOAD_COMPLETED,
       payload: pack
