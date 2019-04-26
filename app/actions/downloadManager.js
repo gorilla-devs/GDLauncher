@@ -162,7 +162,7 @@ export function addCursePackToQueue(pack, addonID, fileID, isRepair = false) {
       'temp',
       path.basename(packURL)
     );
-    await downloadFile(tempPackPath, packURL, () => {});
+    await downloadFile(tempPackPath, packURL, () => { });
     await compressing.zip.uncompress(
       tempPackPath,
       path.join(INSTANCES_PATH, 'temp', pack)
@@ -180,7 +180,6 @@ export function addCursePackToQueue(pack, addonID, fileID, isRepair = false) {
       ''
     );
 
-    console.log("DISPATCH")
     dispatch({
       type: ADD_TO_QUEUE,
       payload: pack,
@@ -308,9 +307,9 @@ export function downloadPack(pack, isRepair = false) {
     const legacyJavaFixer =
       vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
         ? {
-            url: GDL_LEGACYJAVAFIXER_MOD_URL,
-            path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
-          }
+          url: GDL_LEGACYJAVAFIXER_MOD_URL,
+          path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
+        }
         : null;
 
     // Here we work on the mods
@@ -397,7 +396,7 @@ export function downloadPack(pack, isRepair = false) {
       await downloadFile(
         path.join(PACKS_PATH, pack, 'thumbnail.png'),
         thumbnailURL,
-        () => {}
+        () => { }
       );
 
       // Copy the thumbnail as icon
