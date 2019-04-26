@@ -49,22 +49,22 @@ const ModsList = props => {
 
   // The "e" param is just used for invoking this function without params in events handlers
   const loadMoreMods = async (e, v, searchQueryP, reset) => {
-    searchQueryP = searchQueryP !== undefined ? searchQueryP : searchQuery;
-    reset = reset !== undefined ? reset : false;
-    if (reset === true) {
+    const search = searchQueryP || searchQuery;
+    const isReset = reset !== undefined ? reset : false;
+    if (reset) {
       setMods([]);
     }
     setAreModsLoading(true);
     const data = await getSearch(
       'mods',
-      searchQueryP,
+      search,
       21,
-      reset === true ? 0 : mods.length,
+      isReset ? 0 : mods.length,
       filterType,
       filterType !== 'Author' && filterType !== 'Name',
       props.match.params.version
     );
-    setMods(reset === true ? data : mods.concat(data));
+    setMods(reset ? data : mods.concat(data));
     setHasNextPage(data.length === 21);
     setAreModsLoading(false);
   };

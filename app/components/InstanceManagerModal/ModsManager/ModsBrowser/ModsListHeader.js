@@ -48,12 +48,11 @@ export default React.memo(props => {
           </Link>
           <Input
             placeholder="Search a mod"
-            onChange={onInputChange}
+            onPressEnter={e => loadMoreMods(e.target.value)}
             // onPressEnter={onSearchSubmit}
             style={{ height: 40 }}
             // value={searchQuery}
             allowClear
-            disabled={props.loading === true}
           />
           <div style={{ padding: '0 5px', height: 40, marginTop: 3 }}>
             <Select
