@@ -42,7 +42,7 @@ export const CURSEFORGE_MODLOADERS_API =
 export const NEWS_URL =
   'https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/culture,minecraft:article/insider,minecraft:article/merch,minecraft:article/news&propResPath=/content/minecraft-net/language-masters/it-it/jcr:content/root/generic-container/par/grid&count=2000&pageSize=10&tag=ALL';
 export const JAVA_URL =
-  'https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html';
+  'https://java.com/en/download/manual.jsp';
 export const DEFAULT_ARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${
   platform() === WINDOWS
     ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
