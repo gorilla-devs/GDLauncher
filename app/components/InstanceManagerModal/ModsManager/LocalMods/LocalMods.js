@@ -61,7 +61,6 @@ const LocalMods = props => {
 
   const deleteMod = async instancesPath => {
     // Remove the actual file
-    console.log('PEPPE', modsFolder, filteredMods[1]);
     await Promise.all(
       filteredMods
         .filter(m => m.selected === true)
@@ -73,14 +72,19 @@ const LocalMods = props => {
         path.join(PACKS_PATH, instancesPath, 'config.json')
       )
     );
+ 
     await promisify(fs.writeFile)(
       path.join(PACKS_PATH, instancesPath, 'config.json'),
-      JSON.stringify({
-        ...config,
-        mods: config.mods.filter(
-          (i, v) => v.fileNameOnDisk !== filteredMods[i].name
-        )
-      })
+      JSON.stringify(
+        {
+          ...config,
+          mods: filteredMods
+            .filter(m => m.selected === false)
+            .map(m => config.mods.find(mm => mm.fileNameOnDisk === m.name))
+        },
+        null,
+        2
+      )
     );
   };
 
