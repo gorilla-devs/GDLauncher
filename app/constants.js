@@ -2,6 +2,7 @@ import path from 'path';
 import electron from 'electron';
 import { platform, homedir } from 'os';
 import getAppPath from './utils/getAppPath';
+import store from './localStore';
 
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
@@ -17,8 +18,8 @@ export const CLASSPATH_DIVIDER_CHAR = platform() === WINDOWS ? ';' : ':';
 export const LAUNCHER_FOLDER = 'launcherData';
 export const INSTANCES_FOLDER = 'instances';
 export const SERVERS_PATH = path.join(DATAPATH, 'servers');
-export const INSTANCES_PATH = path.join(DATAPATH, INSTANCES_FOLDER);
-export const PACKS_PATH = path.join(DATAPATH, INSTANCES_FOLDER, 'packs');
+export const INSTANCES_PATH = store.has('settings.instancesPath') ? store.get('settings.instancesPath') : path.join(DATAPATH, INSTANCES_FOLDER);
+export const PACKS_PATH = path.join(INSTANCES_PATH, 'packs');
 export const META_PATH = path.join(DATAPATH, 'meta');
 export const GAME_VERSIONS_URL =
   'https://launchermeta.mojang.com/mc/game/version_manifest.json';
