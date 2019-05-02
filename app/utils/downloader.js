@@ -16,6 +16,7 @@ export const downloadArr = async (
   arr,
   updatePercentage,
   pack,
+  forceDownload = false,
   threads = cpus().length
 ) => {
   let downloaded = 0;
@@ -23,12 +24,15 @@ export const downloadArr = async (
     arr,
     async item => {
       let toDownload = true;
-      try {
-        await fs.accessAsync(item.path);
-        toDownload = false;
-      } catch (err) {
-        // It needs to be downloaded
+      if (!forceDownload) {
+        try {
+          await fs.accessAsync(item.path);
+          toDownload = false;
+        } catch (err) {
+          // It needs to be downloaded
+        }
       }
+
       if (toDownload) {
         try {
           await downloadFileInstance(item.path, item.url);
