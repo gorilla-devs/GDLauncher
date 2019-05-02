@@ -464,7 +464,7 @@ export function downloadPack(pack, isRepair = false) {
         ? [...libraries, ...assets, ...mainJar, legacyJavaFixer]
         : [...libraries, ...assets, ...mainJar];
 
-    await downloadArr(allFiles, updatePercentage, pack);
+    await downloadArr(allFiles, updatePercentage, pack, isRepair);
 
     if (vnlJSON.assets === 'legacy') {
       await copyAssetsToLegacy(assets);
