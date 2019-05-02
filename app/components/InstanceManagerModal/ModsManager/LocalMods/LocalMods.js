@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import path from 'path';
 import Zip from 'adm-zip';
+import fs from 'fs';
+import { promisify } from 'util';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Link } from 'react-router-dom';
@@ -55,6 +57,35 @@ const LocalMods = props => {
       );
       setFilteredMods(modsList);
     }
+  };
+
+  const deleteMod = async instancesPath => {
+    // Remove the actual file
+    await Promise.all(
+      filteredMods
+        .filter(m => m.selected === true)
+        .map(obj => fs.unlinkSync(path.join(modsFolder, obj.name)))
+    );
+    // Remove the reference in the mods file json
+    const config = JSON.parse(
+      await promisify(fs.readFile)(
+        path.join(PACKS_PATH, instancesPath, 'config.json')
+      )
+    );
+
+    await promisify(fs.writeFile)(
+      path.join(PACKS_PATH, instancesPath, 'config.json'),
+      JSON.stringify(
+        {
+          ...config,
+          mods: filteredMods
+            .filter(m => m.selected === false)
+            .map(m => config.mods.find(mm => mm.fileNameOnDisk === m.name))
+        },
+        null,
+        2
+      )
+    );
   };
 
   const getSize = i => {
@@ -126,7 +157,13 @@ const LocalMods = props => {
           <span style={{ width: 140 }}>
             {filteredMods.filter(v => v.selected === true).length} mods selected
           </span>
-          <FontAwesomeIcon className={styles.deleteIcon} icon={faTrash} />
+          <div>
+            <FontAwesomeIcon
+              className={styles.deleteIcon}
+              icon={faTrash}
+              onClick={() => deleteMod(props.match.params.instance)}
+            />
+          </div>
         </div>
         <Input
           allowClear

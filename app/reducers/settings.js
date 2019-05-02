@@ -6,6 +6,7 @@ import {
   SET_THEME,
   RESET_THEME,
   SET_GLOBAL_JAVA_ARGUMENTS,
+  SET_INSTANCE_PATH
 } from '../actions/settings';
 import { THEMES, DEFAULT_ARGS, DEFAULT_MEMORY } from '../constants';
 
@@ -17,7 +18,8 @@ const initialState = {
     memory: DEFAULT_MEMORY,
     javaArgs: DEFAULT_ARGS
   },
-  theme: THEMES.default
+  theme: THEMES.default,
+  instancePath: null
 };
 
 export default function Settings(state = initialState, action) {
@@ -66,6 +68,11 @@ export default function Settings(state = initialState, action) {
           ...state.java,
           javaArgs: action.payload
         }
+      };
+    case SET_INSTANCE_PATH:
+      return {
+        ...state,
+        instancePath: action.path
       };
     default:
       return state;
