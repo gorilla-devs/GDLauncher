@@ -78,25 +78,25 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
 "${javaPath}" ${config.overrideArgs ||
     javaArguments} -Xmx${instanceConfigJSON.overrideMemory ||
     settings.java.memory}m ${dosName} -Djava.library.path="${path.join(
-    PACKS_PATH,
-    packName,
-    'natives'
-  )}"
+      PACKS_PATH,
+      packName,
+      'natives'
+    )}"
   -Dminecraft.client.jar="${path.join(
-    INSTANCES_PATH,
-    'versions',
-    vanillaJSON.id,
-    `${vanillaJSON.id}.jar`
-  )}"
+      INSTANCES_PATH,
+      'versions',
+      vanillaJSON.id,
+      `${vanillaJSON.id}.jar`
+    )}"
  -cp ${libs
-   .filter(lib => !lib.natives)
-   .map(lib => `"${lib.path}"`)
-   .join(CLASSPATH_DIVIDER_CHAR)}${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
-    INSTANCES_PATH,
-    'versions',
-    vanillaJSON.id,
-    `${vanillaJSON.id}.jar`
-  )}"`}
+      .filter(lib => !lib.natives)
+      .map(lib => `"${lib.path}"`)
+      .join(CLASSPATH_DIVIDER_CHAR)}${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
+        INSTANCES_PATH,
+        'versions',
+        vanillaJSON.id,
+        `${vanillaJSON.id}.jar`
+      )}"`}
  ${mainClass} ${Arguments}
   `;
   // We need to hide the access token before printing it to the logs
@@ -133,20 +133,20 @@ const getMCArguments = (vanilla, forge, packName, userData) => {
     .replace('${game_directory}', `"${path.join(PACKS_PATH, packName)}"`)
     .replace(
       '${game_assets}',
-      path.join(
+      `"${path.join(
         INSTANCES_PATH,
         'assets',
         vanilla.assets === 'legacy' ? '/virtual/legacy' : ''
-      )
+      )}"`
     ) // Another check for really old versions
     .replace('${version_name}', forge ? forge.id : vanilla.id)
     .replace(
       '${assets_root}',
-      path.join(
+      `"${path.join(
         INSTANCES_PATH,
         'assets',
         vanilla.assets === 'legacy' ? '/virtual/legacy' : ''
-      )
+      )}"`
     )
     .replace('${assets_index_name}', vanilla.assets)
     .replace('${auth_uuid}', userData.uuid)
