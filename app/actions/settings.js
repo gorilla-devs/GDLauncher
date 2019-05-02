@@ -160,4 +160,3 @@ export function setJavaArgs(args) {
     dispatch(saveSettings());
   };
 }
-

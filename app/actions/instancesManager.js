@@ -3,9 +3,12 @@ import log from 'electron-log';
 import { spawn } from 'child_process';
 import path from 'path';
 import { promisify } from 'util';
+import _ from 'lodash';
 import fs from 'fs';
 import launchCommand from '../utils/MCLaunchCommand';
 import { PACKS_PATH } from '../constants';
+import { readConfig, updateConfig } from '../utils/instances';
+import { setJavaArgs } from './settings';
 
 export const SELECT_INSTANCE = 'SELECT_INSTANCE';
 export const START_INSTANCE = 'START_INSTANCE';
@@ -40,6 +43,17 @@ export function selectInstance(name) {
 export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const { auth, settings } = getState();
+
+    // Checks for legacy java memory
+    const legacyString = [' -Xmx{_RAM_}m', '-Xmx{_RAM_}m'];
+    const config = await readConfig(instanceName);
+    if (_.has(config, 'overrideArgs') && config.overrideArgs.includes(legacyString[0]) || config.overrideArgs.includes(legacyString[1])) {
+      await updateConfig(instanceName, {
+        overrideArgs: config.overrideArgs.replace(legacyString, '')
+      });
+    }
+    if (settings.java.javaArgs.includes(legacyString[0]) || settings.java.javaArgs.includes(legacyString[1]))
+      dispatch(setJavaArgs(settings.java.javaArgs.replace(legacyString, '')));
 
     const command = await launchCommand(
       instanceName,
