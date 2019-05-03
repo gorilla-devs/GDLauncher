@@ -161,6 +161,7 @@ export function setJavaArgs(args) {
     dispatch(saveSettings());
   };
 }
+
 export function setInstancesPath(path) {
   return dispatch => {
     dispatch({
