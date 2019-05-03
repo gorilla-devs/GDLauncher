@@ -32,6 +32,7 @@ const ImportPack = props => {
       if (!err) {
         if (filePath === null) {
           message.warning('Please select a zip file.');
+          return;
         }
 
         try {
@@ -97,7 +98,13 @@ const ImportPack = props => {
                     style={{ color: 'rgba(255,255,255,.8)' }}
                   />
                 }
-                placeholder="Instance Name"
+                placeholder={
+                  filePath
+                    ? filePath
+                        .split('\\')
+                        [filePath.split('\\').length - 1].split('.')[0]
+                    : 'Instance Name'
+                }
               />
             )}
           </FormItem>
