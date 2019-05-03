@@ -11,7 +11,7 @@ import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import ButtonSetting from '../ButtonSetting/ButtonSetting';
-import { setInstancePath } from '../../../../actions/settings';
+import { setInstancesPath } from '../../../../actions/settings';
 import { readFile } from '../../../../utils/instances';
 import store from '../../../../localStore';
 import { func } from 'prop-types';
@@ -40,10 +40,10 @@ function Instances(props) {
     dialog.showOpenDialog(
       {
         properties: ['openDirectory'],
-        defaultPath: path.dirname(props.instancePath)
+        defaultPath: path.dirname(props.instancesPath)
       },
       paths => {
-        props.setInstancePath(paths[0]);
+        props.setInstancesPath(paths[0]);
       }
     );
   };
@@ -66,10 +66,10 @@ function Instances(props) {
         mainText="Override Default Instances Path"
         description="If enabled, instances will be downloaded in the selected path"
         icon="folder"
-        checked={props.instancePath}
-        onChange={e => props.setInstancePath(e ? INSTANCES_PATH : null)}
+        checked={props.instancesPath}
+        onChange={e => props.setInstancesPath(e ? INSTANCES_PATH : null)}
       />
-      {props.instancePath && (
+      {props.instancesPath && (
         <div>
           <span style={{ fontSize: 18 }}>Instances Custom Path</span>
           <Input
@@ -79,8 +79,8 @@ function Instances(props) {
               width: '90%',
               display: 'inline-block',
               height: '60px',
-              marginBottom: 10,
-              marginTop: 4
+              marginBottom: '10px !important',
+              marginTop: '4px !important'
             }}
             prefix={
               <Icon
@@ -89,14 +89,14 @@ function Instances(props) {
                 style={{ color: 'rgba(255,255,255,.8)' }}
               />
             }
-            onChange={e => props.setInstancePath(e.target.value)}
+            onChange={e => props.setInstancesPath(e.target.value)}
           />
           <Button
             type="primary"
             icon="folder"
             theme="filled"
             onClick={openFolderDialog}
-            style={{ height: 60, marginLeft: 10 }}
+            style={{ height: 60, marginLeft: 10, marginBottom: 10, marginTop: 4  }}
           />
         </div>
       )}
@@ -112,7 +112,7 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = {
-  setInstancePath
+  setInstancesPath
 };
 
 export default connect(

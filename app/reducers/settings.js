@@ -6,9 +6,9 @@ import {
   SET_THEME,
   RESET_THEME,
   SET_GLOBAL_JAVA_ARGUMENTS,
-  SET_INSTANCE_PATH
+  SET_INSTANCES_PATH
 } from '../actions/settings';
-import { THEMES, DEFAULT_ARGS, DEFAULT_MEMORY } from '../constants';
+import { THEMES, DEFAULT_ARGS, DEFAULT_MEMORY, INSTANCES_PATH } from '../constants';
 
 const initialState = {
   sounds: true,
@@ -19,7 +19,7 @@ const initialState = {
     javaArgs: DEFAULT_ARGS
   },
   theme: THEMES.default,
-  instancePath: null
+  instancesPath: INSTANCES_PATH
 };
 
 export default function Settings(state = initialState, action) {
@@ -69,10 +69,10 @@ export default function Settings(state = initialState, action) {
           javaArgs: action.payload
         }
       };
-    case SET_INSTANCE_PATH:
+    case SET_INSTANCES_PATH:
       return {
         ...state,
-        instancePath: action.path
+        instancesPath: action.path
       };
     default:
       return state;
