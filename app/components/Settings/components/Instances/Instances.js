@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { bindActionCreators } from 'redux';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, message, Input, Icon } from 'antd';
@@ -12,9 +11,6 @@ import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import ButtonSetting from '../ButtonSetting/ButtonSetting';
 import { setInstancesPath } from '../../../../actions/settings';
-import { readFile } from '../../../../utils/instances';
-import store from '../../../../localStore';
-import { func } from 'prop-types';
 
 function Instances(props) {
   const [deletingInstances, setDeletingInstances] = useState(false);
