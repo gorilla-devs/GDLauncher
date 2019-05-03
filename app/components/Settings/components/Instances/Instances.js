@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import { Button, message, Input, Icon } from 'antd';
+import { Button, message } from 'antd';
 import fsa from 'fs-extra';
 import path from 'path';
 import styles from './Instances.scss';
@@ -16,19 +16,28 @@ import { readFile } from '../../../../utils/instances';
 import store from '../../../../localStore';
 import { func } from 'prop-types';
 
-function Instances(props) {
-  const [deletingInstances, setDeletingInstances] = useState(false);
+type Props = {};
 
-  async function deleteShareData() {
+class Instances extends Component<Props> {
+  props: Props;
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      deletingInstances: false
+    };
+  }
+
+  deleteShareData = async () => {
     try {
-      setDeletingInstances(true);
+      this.setState({ deletingInstances: true });
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'libraries'));
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'packs'));
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'assets'));
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'versions'));
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'temp'));
       await fsa.emptyDir(META_PATH);
-      setDeletingInstances(false);
+      this.setState({ deletingInstances: false });
       message.success('Data has been cleared.');
     } catch (e) {
       message.error('Error while clearing data.');
@@ -106,16 +115,10 @@ function Instances(props) {
 
 function mapStateToProps(state) {
   return {
-    installing: state.downloadManager.actualDownload,
-    instancesPath: state.settings.instancesPath
+    installing: state.downloadManager.actualDownload
   };
 }
 
 const mapDispatchToProps = {
   setInstancesPath
 };
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Instances);
