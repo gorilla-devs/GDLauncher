@@ -30,13 +30,11 @@ const ImportPack = props => {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (!err) {
-        if (filePath === null) {
+        if (!filePath) {
           message.warning('Please select a zip file.');
           return;
         }
-        const name = values.packName
-          ? values.packName
-          : path.parse(path.basename(filePath)).name;
+        const name = values.packName || path.parse(path.basename(filePath)).name;
 
         try {
           await promisify(fs.access)(path.join(PACKS_PATH, name));
