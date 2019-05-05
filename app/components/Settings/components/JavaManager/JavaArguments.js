@@ -29,7 +29,7 @@ function JavaArguments(props: Props) {
   return (
     <div>
       <div style={{ marginBottom: 10 }}>
-        <span style={{ fontSize: 18 }}>Java Custom Path</span>
+        <span style={{ fontSize: 18 }}>Java Custom Arguments</span>
       </div>
       <JavaArgsInput
         overrideArgs={globalArgs}
