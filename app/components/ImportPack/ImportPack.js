@@ -32,14 +32,18 @@ const ImportPack = props => {
       if (!err) {
         if (filePath === null) {
           message.warning('Please select a zip file.');
+          return;
         }
+        const name = values.packName
+          ? values.packName
+          : path.parse(path.basename(filePath)).name;
 
         try {
-          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
+          await promisify(fs.access)(path.join(PACKS_PATH, name));
           message.warning('An instance with this name already exists.');
         } catch (error) {
           setLoading(true);
-          await props.importTwitchProfile(values.packName, filePath);
+          await props.importTwitchProfile(name, filePath);
           setUnMount(true);
         }
       }
@@ -75,7 +79,7 @@ const ImportPack = props => {
             {getFieldDecorator('packName', {
               rules: [
                 {
-                  required: true,
+                  required: false,
                   message:
                     'Please input a valid name with just numbers and letters',
                   pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
@@ -97,7 +101,11 @@ const ImportPack = props => {
                     style={{ color: 'rgba(255,255,255,.8)' }}
                   />
                 }
-                placeholder="Instance Name"
+                placeholder={
+                  filePath
+                    ? path.parse(path.basename(filePath)).name
+                    : 'Instance Name'
+                }
               />
             )}
           </FormItem>
