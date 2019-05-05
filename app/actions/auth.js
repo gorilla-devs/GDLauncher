@@ -38,16 +38,11 @@ export function login(username, password, remember) {
           username,
           password,
           requestUser: true,
-          ...(store.get('clientToken') && { clientToken: getClientToken() })
+          clientToken: getClientToken()
         },
         { headers: { 'Content-Type': 'application/json' } }
       );
-      if (
-        status === 200 &&
-        data !== undefined &&
-        data !== null &&
-        Object.prototype.hasOwnProperty.call(data, 'accessToken')
-      ) {
+      if (status === 200 && data && data.accessToken) {
         const payload = {
           email: data.user.email,
           username: data.user.username,
@@ -62,7 +57,6 @@ export function login(username, password, remember) {
             user: {
               ...payload
             },
-            clientToken: data.clientToken,
             lastUsername: data.user.username
           });
         }
@@ -70,7 +64,7 @@ export function login(username, password, remember) {
           type: AUTH_SUCCESS,
           payload: {
             ...payload,
-            clientToken: data.clientToken
+            clientToken: getClientToken()
           }
         });
 
@@ -89,7 +83,6 @@ export function login(username, password, remember) {
         });
       }
     } catch (err) {
-      console.error(err);
       message.error('Wrong username or password');
     } finally {
       dispatch({
@@ -121,9 +114,10 @@ export function checkAccessToken() {
         const res = await axios.post(
           ACCESS_TOKEN_VALIDATION_URL,
           {
-            accessToken: userData.accessToken
+            accessToken: userData.accessToken,
+            clientToken: getClientToken()
           },
-          { 'Content-Type': 'application/json;charset=UTF-8' }
+          { headers: { 'Content-Type': 'application/json' } }
         );
         if (res.status === 204) {
           dispatch({
@@ -141,13 +135,28 @@ export function checkAccessToken() {
           // Trying refreshing the stored access token
           const newUserData = await refreshAccessToken(
             userData.accessToken,
+            getClientToken(),
             true
           );
           if (newUserData) {
+            const payload = {
+              email: newUserData.user.email,
+              username: newUserData.user.username,
+              displayName: newUserData.selectedProfile.name,
+              accessToken: newUserData.accessToken,
+              legacy: newUserData.selectedProfile.legacyProfile,
+              uuid: newUserData.selectedProfile.id,
+              userID: newUserData.selectedProfile.userId
+            };
+            store.set({
+              user: {
+                ...payload
+              }
+            });
             dispatch({
               type: AUTH_SUCCESS,
               payload: {
-                ...userData,
+                ...payload,
                 clientToken: getClientToken()
               }
             });
@@ -197,9 +206,10 @@ export function tryNativeLauncherProfiles() {
     const vnlJson = await fsa.readJson(
       path.join(vanillaMCPath, 'launcher_profiles.json')
     );
+    const { clientToken } = vnlJson;
     const { account } = vnlJson.selectedUser;
     const { accessToken } = vnlJson.authenticationDatabase[account];
-    const newUserData = await refreshAccessToken(accessToken, true);
+    const newUserData = await refreshAccessToken(accessToken, clientToken, true);
     if (newUserData) {
       const payload = {
         email: newUserData.user.email,
@@ -227,12 +237,12 @@ export function tryNativeLauncherProfiles() {
         type: AUTH_SUCCESS,
         payload: {
           ...payload,
-          clientToken: newUserData.clientToken
+          clientToken: getClientToken()
         }
       });
       const { newUser } = store.get('settings');
 
-      if (newUser === false) {
+      if (!newUser) {
         dispatch(push('/home'));
       } else {
         store.set('settings.newUser', false);
@@ -263,19 +273,18 @@ const uuidv4 = () => {
 
 const getClientToken = () => {
   const clientToken = store.get('clientToken');
-  if (
-    clientToken &&
-    clientToken !== undefined &&
-    typeof clientToken === 'string'
-  ) {
+  if (clientToken) {
     return clientToken;
   }
-  return uuidv4().replace('-', '');
+  const newToken = uuidv4().replace('-', '');
+  store.set('clientToken', newToken);
+  return newToken;
 };
 
 // Returns the user data if successful, otherwise returns false
 const refreshAccessToken = async (
   accessToken: string,
+  clientToken: string,
   requestUser: boolean = false
 ): boolean | {} => {
   try {
@@ -283,17 +292,13 @@ const refreshAccessToken = async (
       ACCESS_TOKEN_REFRESH_URL,
       {
         accessToken,
+        clientToken,
         requestUser
       },
-      { 'Content-Type': 'application/json' }
+      { headers: { 'Content-Type': 'application/json' } }
     );
 
-    if (
-      response.status === 200 &&
-      response.data !== undefined &&
-      response.data !== null &&
-      Object.prototype.hasOwnProperty.call(response.data, 'accessToken')
-    ) {
+    if (response.status === 200 && response.data && response.data.accessToken) {
       return response.data;
     }
   } catch (err) {

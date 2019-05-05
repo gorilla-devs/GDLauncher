@@ -34,8 +34,7 @@ const JavaArgumentInput = ({
           marginRight: '10px',
           marginBottom: 4,
           marginTop: 4,
-          marginLeft: '1%',
-          background: 'var(--secondary-color-1)'
+          marginLeft: '1%'
         }}
         onChange={onInputChange}
       />

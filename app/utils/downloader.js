@@ -34,11 +34,12 @@ export const downloadArr = async (
       }
 
       if (toDownload) {
-        try {
-          await downloadFileInstance(item.path, item.url);
-        } catch (e) {
-          log.error(e);
-        }
+        let counter = 0;
+        let res = false;
+        do {
+          res = await downloadFileInstance(item.path, item.url);
+          counter += 1;
+        } while(!res && counter < 3);
       }
       downloaded += 1;
       if (downloaded % 10 === 0 || downloaded === arr.length)
@@ -58,10 +59,12 @@ const downloadFileInstance = async (filename, url) => {
     }
     const file = await request(url, { encoding: 'binary' });
     await fs.writeFileAsync(filename, file, 'binary');
+    return true;
   } catch (e) {
     log.error(
       `Error while downloading <${url}> to <${filename}> --> ${e.message}`
     );
+    return false;
   }
 };
 
