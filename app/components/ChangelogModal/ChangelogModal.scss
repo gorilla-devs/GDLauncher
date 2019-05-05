@@ -59,6 +59,15 @@
   }
 }
 
+.hdTextBlue {
+  @include hrText;
+  color: #3498db;
+  &:before,
+  &:after {
+    background-color: #3498db;
+  }
+}
+
 .subHrList {
   text-align: left;
   li {
