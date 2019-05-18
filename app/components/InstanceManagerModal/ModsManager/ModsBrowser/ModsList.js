@@ -149,6 +149,8 @@ const ModsList = props => {
             height={height}
             setClick={setModOverview}
             installedMods={installedMods}
+            instance={props.match.params.instance}
+            version={props.match.params.version}
           />
         )}
       </AutoSizer>

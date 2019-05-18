@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ContentLoader from 'react-content-loader';
 import InfiniteLoader from 'react-window-infinite-loader';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { promisify } from 'util';
+import path from 'path';
+import fs, { readFile } from 'fs';
+import _ from 'lodash';
+import { Button } from 'antd';
+
+import { getAddon, getAddonFiles } from '../../../../utils/cursemeta';
+import { downloadMod, downloadDependancies } from '../../../../utils/mods';
+import { PACKS_PATH } from '../../../../constants';
 
 import styles from './ModsList.scss';
 
@@ -23,8 +34,69 @@ export default function ModsListWrapper({
   width,
   height,
   setClick,
-  installedMods
+  installedMods,
+  instance,
+  version
 }) {
+  const [modData, setModData] = useState([]);
+  const [modsInstalling, setModsInstalling] = useState([]);
+
+  const installMod = async (id, projectFileId, filename) => {
+    setModsInstalling({
+      ...modsInstalling,
+      [filename]: { installing: true, completed: false }
+    });
+
+    const newMod = await downloadMod(id, projectFileId, filename, instance);
+    const dependancies = await downloadDependancies(
+      id,
+      projectFileId,
+      instance
+    );
+    try {
+      const config = JSON.parse(
+        await promisify(fs.readFile)(
+          path.join(PACKS_PATH, instance, 'config.json')
+        )
+      );
+      await promisify(fs.writeFile)(
+        path.join(PACKS_PATH, instance, 'config.json'),
+        JSON.stringify({
+          ...config,
+          mods: [...config.mods, newMod, ...dependancies]
+        })
+      );
+    } catch {}
+
+    setModsInstalling({
+      ...modsInstalling,
+      [filename]: { installing: false, completed: true }
+    });
+  };
+
+  async function downloadModFunc(e, mod) {
+    e.stopPropagation();
+
+    const [data, files] = await Promise.all([
+      getAddon(mod.id),
+      getAddonFiles(mod.id)
+    ]);
+
+    const filteredFiles = await Promise.all(
+      files.filter(el => el.gameVersion.includes(version))
+    );
+
+    const dataMod = {
+      ...data,
+      allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc'])
+    };
+
+    installMod(
+      dataMod.id,
+      dataMod.allFiles[0].id,
+      dataMod.allFiles[0].fileNameOnDisk
+    );
+  }
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
 
@@ -99,6 +171,15 @@ export default function ModsListWrapper({
               onClick={() => setClick(mod.id)}
             >
               {mod && mod.name}
+              {mod && installedMods.find(v => v.projectID === mod.id) ? null : (
+                <Button
+                  className={styles.installMod}
+                  onClick={e => downloadModFunc(e, mod)}
+                >
+                  INSTALL&nbsp;
+                  <FontAwesomeIcon icon={faDownload} />
+                </Button>
+              )}
             </div>
             {mod && installedMods.find(v => v.projectID === mod.id) && (
               <div className={styles.modInstalled}>INSTALLED</div>

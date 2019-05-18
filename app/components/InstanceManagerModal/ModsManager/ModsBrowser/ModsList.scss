@@ -48,8 +48,57 @@
         text-align: center;
         background: var(--primary);
       }
+
+      .installMod {
+        position: absolute;
+        width: 100px;
+        height: 30px;
+        bottom: 30px;
+        text-align: center;
+        // display: none;
+        visibility: hidden;
+        opacity: 0;
+        z-index: 50;
+      }
+
+
+      .modIcon:hover .installMod {
+        // display: block;
+        // transition: opacity 0.5s ease-out;
+        // -moz-transition: opacity 0.5s ease-out;
+        // -webkit-transition: opacity 0.5s ease-out;
+        visibility: visible;
+        opacity: 1;
+        transition: visibility 0s, opacity 0.2s ease-in-out;
+      }
+
+      @keyframes fadeInOut {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
     }
   }
+
+  // .installMod {
+  //   position: absolute;
+  //   width: 100px;
+  //   height: 30px;
+  //   bottom: 30px;
+  //   text-align: center;
+  //   display: none;
+  // }
+
+  //   .mo:hover + .button, .button:hover {
+  //     display: inline-block;
+  // }
+
   .modsNotFound {
     display: flex;
     justify-content: center;
