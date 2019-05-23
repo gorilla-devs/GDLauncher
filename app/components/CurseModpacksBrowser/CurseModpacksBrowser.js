@@ -39,7 +39,7 @@ function CurseModpacksBrowser(props) {
       filterType !== 'author' && filterType !== 'name'
     );
     // We now remove the previous 15 elements and add the real 15
-    const mappedData = res.map(v => ({
+    const mappedData = res && res.map(v => ({
       loading: false,
       name: v.name,
       id: v.id,
@@ -51,7 +51,7 @@ function CurseModpacksBrowser(props) {
     }));
 
     const data = reset === true ? mappedData : packs.concat(mappedData);
-    setPacks(data);
+    setPacks(data || []);
 
     setLoading(false);
   };
@@ -92,7 +92,8 @@ function CurseModpacksBrowser(props) {
           textAlign: 'center',
           paddingTop: '20%',
           height: 'calc(100vh - 60px)',
-          background: 'var(--secondary-color-2)'
+          background: 'var(--secondary-color-1)',
+          fontSize: 18
         }}
       >
         Servers are not currently available. Try again later

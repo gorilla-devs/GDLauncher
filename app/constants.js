@@ -24,7 +24,7 @@ export const META_PATH = path.join(DATAPATH, 'meta');
 export const GAME_VERSIONS_URL =
   'https://launchermeta.mojang.com/mc/game/version_manifest.json';
 export const FORGE_PROMOS =
-  'https://staging_cursemeta.dries007.net/api/v3/direct/minecraft/modloader';
+  'https://addons-ecs.forgesvc.net/api/v2/minecraft/modloader';
 export const ACCESS_TOKEN_VALIDATION_URL =
 'https://authserver.mojang.com/validate';
 

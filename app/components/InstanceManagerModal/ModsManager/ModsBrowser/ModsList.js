@@ -37,7 +37,7 @@ const ModsList = props => {
   useEffect(() => {
     try {
       loadInstalledMods();
-    } catch {}
+    } catch { }
   }, [props.localMods]);
 
   const loadInstalledMods = async () => {
@@ -64,8 +64,9 @@ const ModsList = props => {
       filterType !== 'Author' && filterType !== 'Name',
       props.match.params.version
     );
-    setMods(reset ? data : mods.concat(data));
-    setHasNextPage(data.length === 21);
+    const newMods = reset ? data : mods.concat(data);
+    setMods(newMods || []);
+    setHasNextPage((newMods || []).length === 21);
     setAreModsLoading(false);
   };
 
@@ -127,7 +128,7 @@ const ModsList = props => {
         version={props.match.params.version}
         instance={props.match.params.instance}
       />
-      {mods.length === 0 && !areModsLoading && (
+      {mods.length === 0 && !areModsLoading && searchQuery !== "" && (
         <div className={styles.modsNotFound}>
           <div>
             <h1>Oops :|</h1>
@@ -135,6 +136,15 @@ const ModsList = props => {
             We couldn't find any mod matching your criteria: <br />
             <br />
             <span>"{searchQuery}"</span>
+          </div>
+        </div>
+      )}
+      {mods.length === 0 && !areModsLoading && searchQuery === "" && (
+        <div className={styles.modsNotFound}>
+          <div>
+            <h1>Oops :|</h1>
+            <br />
+            Looks like our servers are not working... Try again later
           </div>
         </div>
       )}
