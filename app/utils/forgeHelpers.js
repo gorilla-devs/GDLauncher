@@ -21,7 +21,7 @@ const makeRequest = async (url: string, params: {} = {}) => {
 };
 
 export const getForgeVersionJSON = async (forgeVersion: string) => {
-  const url = `https://addons-ecs.forgesvc.net/api/minecraft/modloader/forge-${forgeVersion}`;
+  const url = `https://addons-ecs.forgesvc.net/api/v2/minecraft/modloader/forge-${forgeVersion}`;
   return makeRequest(url);
 };
 
