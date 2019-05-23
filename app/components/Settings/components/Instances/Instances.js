@@ -44,6 +44,12 @@ function Instances(props) {
     );
   };
 
+  const restartLauncher = () => {
+    const remote = require('electron').remote;
+    remote.app.relaunch();
+    remote.app.exit(0);
+  };
+
   return (
     <div>
       <Title>Instances</Title>
@@ -60,40 +66,49 @@ function Instances(props) {
       </SettingCard>
       <SwitchSetting
         mainText="Override Default Instances Path"
-        description="If enabled, instances will be downloaded in the selected path"
+        description={<div>
+          <div>If enabled, instances will be downloaded in the selected path</div>
+          <div className={styles.restart}>
+            You need to{' '}
+            <span style={{ color: 'white', cursor: 'pointer' }} onClick={restartLauncher}>restart</span>{' '}
+            the launcher for this setting to apply
+          </div>
+        </div>}
         icon="folder"
         checked={props.instancesPath}
         onChange={e => props.setInstancesPath(e ? INSTANCES_PATH : null)}
       />
       {props.instancesPath && (
         <div>
-          <span style={{ fontSize: 18 }}>Instances Custom Path</span>
-          <Input
-            value={props.instancesPath}
-            size="large"
-            style={{
-              width: '90%',
-              display: 'inline-block',
-              height: '60px',
-              marginBottom: '10px !important',
-              marginTop: '4px !important'
-            }}
-            prefix={
-              <Icon
-                type="folder"
-                theme="filled"
-                style={{ color: 'rgba(255,255,255,.8)' }}
-              />
-            }
-            onChange={e => props.setInstancesPath(e.target.value)}
-          />
-          <Button
-            type="primary"
-            icon="folder"
-            theme="filled"
-            onClick={openFolderDialog}
-            style={{ height: 60, marginLeft: 10, marginBottom: 10, marginTop: 4  }}
-          />
+          <div>
+            <span style={{ fontSize: 18 }}>Instances Custom Path</span>
+            <Input
+              value={props.instancesPath}
+              size="large"
+              style={{
+                width: '90%',
+                display: 'inline-block',
+                height: '60px',
+                marginBottom: '10px !important',
+                marginTop: '4px !important'
+              }}
+              prefix={
+                <Icon
+                  type="folder"
+                  theme="filled"
+                  style={{ color: 'rgba(255,255,255,.8)' }}
+                />
+              }
+              onChange={e => props.setInstancesPath(e.target.value)}
+            />
+            <Button
+              type="primary"
+              icon="folder"
+              theme="filled"
+              onClick={openFolderDialog}
+              style={{ height: 60, marginLeft: 10, marginBottom: 10, marginTop: 4 }}
+            />
+          </div>
         </div>
       )}
     </div>

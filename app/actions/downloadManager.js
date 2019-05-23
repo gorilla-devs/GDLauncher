@@ -448,7 +448,7 @@ export function downloadPack(pack, isRepair = false) {
     const updatePercentage = downloaded => {
       const actPercentage = (
         (downloaded * totalPercentage) / totalFiles +
-        (100 - totalPercentage)
+        ((installProfileJson ? 88 : 100) - totalPercentage)
       ).toFixed(0);
       return dispatch({
         type: UPDATE_PROGRESS,
@@ -532,9 +532,8 @@ export function downloadPack(pack, isRepair = false) {
           { maxBuffer: 10000000000 }
         );
 
-        console.log(stderr, stdout);
+        log.error(stderr);
         const actPercentage = ((i * 12) / processors.length).toFixed(0);
-        console.log(actPercentage);
         dispatch({
           type: UPDATE_PROGRESS,
           payload: {
