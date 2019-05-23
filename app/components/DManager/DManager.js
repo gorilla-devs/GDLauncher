@@ -33,7 +33,7 @@ const SortableList = SortableContainer(({ items }) => {
   return (
     <div style={{ height: '100%', overflowY: 'auto' }}>
       {items.map((value, index) => (
-        <SortableItem key={`item-${index}`} index={index} value={value} />
+        <SortableItem key={`item-${index}`} index={index} value={value.name} />
       ))}
     </div>
   );

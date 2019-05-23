@@ -55,13 +55,27 @@ export function initInstances() {
         .filter(isDirectory)
         .map(dir => basename(dir));
 
+    const getInstances = async () => {
+      const instances = await getDirectories(PACKS_PATH);
+      const instancesObj = await Promise.all(instances.map(async instance => {
+        let mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
+          el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
+        );
+        return {
+          name: instance,
+          mods
+        };
+      }));
+      return instancesObj;
+    };
+
     const watchRoutine = async () => {
       try {
         await fs.accessAsync(PACKS_PATH);
       } catch (e) {
         await makeDir(PACKS_PATH);
       }
-      let instances = await getDirectories(PACKS_PATH);
+      let instances = await getInstances();
       dispatch({
         type: UPDATE_INSTANCES,
         instances
@@ -73,7 +87,8 @@ export function initInstances() {
         } catch (e) {
           await makeDir(PACKS_PATH);
         }
-        instances = await getDirectories(PACKS_PATH);
+
+        instances = await getInstances();
         dispatch({
           type: UPDATE_INSTANCES,
           instances
