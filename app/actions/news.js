@@ -11,7 +11,7 @@ export const UPDATE_NEWS = 'UPDATE_NEWS';
 export function getNews() {
   return async (dispatch, getState) => {
     const { news } = getState();
-    if (news.news.length === 0) {
+    if (news.news.length === 0 && !news.loadingNews) {
       dispatch({
         type: START_LOADING_NEWS
       });

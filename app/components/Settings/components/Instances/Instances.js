@@ -5,7 +5,7 @@ import { Button, message, Input, Icon } from 'antd';
 import fsa from 'fs-extra';
 import path from 'path';
 import styles from './Instances.scss';
-import { INSTANCES_PATH, META_PATH } from '../../../../constants';
+import { INSTANCES_PATH, META_PATH, DATAPATH, INSTANCES_FOLDER } from '../../../../constants';
 import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
@@ -81,7 +81,13 @@ function Instances(props) {
       {props.instancesPath && (
         <div>
           <div>
-            <span style={{ fontSize: 18 }}>Instances Custom Path</span>
+            <span style={{ fontSize: 18 }}>Instances Custom Path{' '}</span>
+            <a
+              onClick={() => props.setInstancesPath(path.join(DATAPATH, INSTANCES_FOLDER))}
+              style={{ fontSize: 13 }}
+            >
+              Reset Path
+              </a>
             <Input
               value={props.instancesPath}
               size="large"
