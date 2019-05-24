@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Transition } from 'react-transition-group';
 import DelayLink from '../Common/DelayLink';
 import { THEMES } from '../../constants';
@@ -27,6 +28,7 @@ const internalDivStyles = {
 
 const NewUserPage = props => {
   const [mounted, setMounted] = useState(true);
+  const { t } = useTranslation();
   const transitionStyles = {
     entered: {
       backgroundSize: `${window.screen.availWidth * 3}px ${window.screen
@@ -41,7 +43,7 @@ const NewUserPage = props => {
       style={{
         background: `linear-gradient( ${colors['secondary-color-2']}8A, ${
           colors['secondary-color-2']
-        }8A), url(${background})`
+          }8A), url(${background})`
       }}
     >
       <Transition in={mounted} timeout={{ enter: 250, exit: 0 }} appear key="1">
@@ -60,16 +62,14 @@ const NewUserPage = props => {
                 ...internalDivStyles[state]
               }}
             >
-              <h1 style={{ fontSize: 37 }}>Welcome to GDLauncher!</h1>
+              <h1 style={{ fontSize: 37 }}>{t('WelcomeToGDLauncher', 'Welcome to GDLauncher!')}</h1>
               <div style={{ display: 'flex' }}>
                 <p style={{ fontSize: 25 }}>
-                  Hello {props.username}!<br />
-                  GDLauncher is free and open source, it wouldn't exist without
-                  its community. If you find any bug or have any suggestion,
-                  tell us on Discord!
+                  {t('helloUser', 'Hello {props.username}!')}<br />
+                  {t('GDLauncherOpenSource', 'GDLauncher is free and open source, it wouldn\'t exist without its community. If you find any bug or have any suggestion, tell us on Discord!')}
                   <br />
                   <br />
-                  Happy gaming!
+                  {t('HappyGaming', 'Happy gaming!')}
                 </p>
                 <iframe
                   style={{
@@ -93,7 +93,7 @@ const NewUserPage = props => {
                   fontSize: 25
                 }}
               >
-                GOT IT
+                {t('GotIt', 'GOT IT')}
               </DelayLink>
             </div>
           </div>

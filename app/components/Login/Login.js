@@ -32,7 +32,7 @@ const FormItem = Form.Item;
 function Login(props) {
   const [fastLogin, setFastLogin] = useState(true);
   const [nativeLauncherProfiles, setNativeLauncherProfiles] = useState(false);
-  const { t } = useTranslation('common');
+  const { t } = useTranslation();
   const [colors, setColors] = useState(
     store.get('settings') ? store.get('settings').theme : THEMES.default
   );
