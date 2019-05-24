@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 import log from 'electron-log';
 import { AppContainer, setConfig } from 'react-hot-loader';
 import Root from './containers/Root';
+import './i18n';
 import { configureStore, history } from './store/configureStore';
 import './app.global.scss';
 
