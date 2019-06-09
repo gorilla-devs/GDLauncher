@@ -17,17 +17,17 @@ const makeRequest = async (url: string, params: {} = {}) => {
 };
 
 export const getAddon = async (addonID: number | string) => {
-  const url = `${CURSEMETA_API_URL}/direct/addon/${addonID}`;
+  const url = `${CURSEMETA_API_URL}/addon/${addonID}`;
   return makeRequest(url);
 };
 
 export const getAddonFiles = async (addonID: number | string) => {
-  const url = `${CURSEMETA_API_URL}/direct/addon/${addonID}/files`;
+  const url = `${CURSEMETA_API_URL}/addon/${addonID}/files`;
   return makeRequest(url);
 };
 
 export const getAddonDescription = async (addonID: number | string) => {
-  const url = `${CURSEMETA_API_URL}/direct/addon/${addonID}/description`;
+  const url = `${CURSEMETA_API_URL}/addon/${addonID}/description`;
   return makeRequest(url);
 };
 
@@ -35,7 +35,7 @@ export const getAddonFile = async (
   addonID: number | string,
   fileID: number | string
 ) => {
-  const url = `${CURSEMETA_API_URL}/direct/addon/${addonID}/file/${fileID}`;
+  const url = `${CURSEMETA_API_URL}/addon/${addonID}/file/${fileID}`;
   return makeRequest(url);
 };
 
@@ -63,7 +63,7 @@ export const getSearch = (
   isSortDescending: boolean,
   gameVersion?: string
 ) => {
-  const url = `${CURSEMETA_API_URL}/direct/addon/search`;
+  const url = `${CURSEMETA_API_URL}/addon/search`;
   const params: {} = {
     gameId: 432,
     sectionId: type === 'mods' ? 6 : 4471,

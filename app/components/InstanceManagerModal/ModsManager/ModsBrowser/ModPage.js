@@ -15,7 +15,7 @@ import { PACKS_PATH } from '../../../../constants';
 import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 
 import styles from './ModPage.scss';
-import { getAddon, getAddonFiles } from '../../../../utils/cursemeta';
+import { getAddon, getAddonFiles, getAddonDescription } from '../../../../utils/cursemeta';
 
 function ModPage(props) {
   const [modData, setModData] = useState(null);
@@ -64,9 +64,10 @@ function ModPage(props) {
   };
 
   const getAddonData = async addon => {
-    const [data, files] = await Promise.all([
+    const [data, files, description] = await Promise.all([
       getAddon(addon),
-      getAddonFiles(addon)
+      getAddonFiles(addon),
+      getAddonDescription(addon)
     ]);
 
     const filteredFiles = files.filter(el =>
@@ -75,7 +76,8 @@ function ModPage(props) {
 
     setModData({
       ...data,
-      allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc'])
+      description,
+      allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc']),
     });
   };
 
@@ -212,7 +214,7 @@ function ModPage(props) {
           <div className={styles.modDescription}>
             <span
               dangerouslySetInnerHTML={{
-                __html: modData.fullDescription
+                __html: modData.description
               }}
             />
           </div>

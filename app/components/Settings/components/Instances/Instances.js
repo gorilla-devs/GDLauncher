@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, message, Input, Icon } from 'antd';
+import { useTranslation } from 'react-i18next';
 import fsa from 'fs-extra';
 import path from 'path';
 import styles from './Instances.scss';
@@ -14,6 +15,7 @@ import { setInstancesPath } from '../../../../actions/settings';
 
 function Instances(props) {
   const [deletingInstances, setDeletingInstances] = useState(false);
+  const {t} = useTranslation();
 
   async function deleteShareData() {
     try {

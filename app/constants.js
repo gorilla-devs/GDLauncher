@@ -37,7 +37,7 @@ export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
 export const GDL_LEGACYJAVAFIXER_MOD_URL =
   'https://gdevs.io/legacyjavafixer-1.0.jar';
-export const CURSEMETA_API_URL = `https://staging_cursemeta.dries007.net/api/v3`;
+export const CURSEMETA_API_URL = `https://addons-ecs.forgesvc.net/api/v2`;
 export const CURSEFORGE_MODLOADERS_API =
   'https://modloaders.cursecdn.com/647622546/maven';
 export const NEWS_URL =
