@@ -25,8 +25,6 @@ type Props = {
   selectInstance: () => void
 };
 
-let watcher;
-
 const SortableItem = SortableElement(({ value }) => <DInstance name={value} />);
 
 const SortableList = SortableContainer(({ items }) => {

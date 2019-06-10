@@ -58,9 +58,12 @@ export function initInstances() {
     const getInstances = async () => {
       const instances = await getDirectories(PACKS_PATH);
       const instancesObj = await Promise.all(instances.map(async instance => {
-        let mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
-          el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
-        );
+        let mods = [];
+        try {
+          mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
+            el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
+          );
+        } catch(err) { }
         return {
           name: instance,
           mods

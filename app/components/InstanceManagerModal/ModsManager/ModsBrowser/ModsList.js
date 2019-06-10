@@ -21,6 +21,8 @@ import { getSearch } from '../../../../utils/cursemeta';
 import styles from './ModsList.scss';
 
 const ModsList = props => {
+  const itemsNumber = 21;
+
   const [mods, setMods] = useState([]);
   const [areModsLoading, setAreModsLoading] = useState(true);
   const [filterType, setFilterType] = useState('Featured');
@@ -58,7 +60,7 @@ const ModsList = props => {
     const data = await getSearch(
       'mods',
       search,
-      21,
+      itemsNumber,
       isReset ? 0 : mods.length,
       filterType,
       filterType !== 'Author' && filterType !== 'Name',
@@ -66,7 +68,7 @@ const ModsList = props => {
     );
     const newMods = reset ? data : mods.concat(data);
     setMods(newMods || []);
-    setHasNextPage((newMods || []).length === 21);
+    setHasNextPage((newMods || []).length % itemsNumber === 0);
     setAreModsLoading(false);
   };
 
