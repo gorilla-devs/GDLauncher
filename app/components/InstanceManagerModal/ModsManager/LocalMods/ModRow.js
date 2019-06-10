@@ -75,14 +75,20 @@ const ModRow = ({
     <div
       className={index % 2 ? styles.listItemOdd : styles.listItemEven}
       style={style}
-      onClick={() => toggleSize(index)}
+      onClick={() => {
+        toggleSize(index);
+      }}
       role="none"
       key={modData.name}
     >
       <div className={styles.innerItemMod}>
         <div>
           <Checkbox
-            onChange={() => selectMod(index)}
+            onChange={e => {
+              e.stopPropagation();
+              e.nativeEvent.stopImmediatePropagation();
+              selectMod(index);
+            }}
             checked={modData.selected}
           />
           <Switch
@@ -90,7 +96,10 @@ const ModRow = ({
             style={{
               marginLeft: 15
             }}
-            onChange={v => toggleDisableMod(v, index)}
+            onChange={(v, e) => {
+              e.stopPropagation();
+              toggleDisableMod(v, index);
+            }}
           />
         </div>
         {modData.name.replace('.disabled', '')}
