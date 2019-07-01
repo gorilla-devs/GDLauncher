@@ -23,14 +23,18 @@ export const downloadMod = async (
   instanceName
 ) => {
   const data = await getAddonFile(modId, projectFileId);
-  const validatedFileName = filename !== null ? filename : data.fileNameOnDisk;
+  const validatedFileName =
+    filename !== null && filename !== undefined ? filename : data.fileName;
+  // console.log('filename!!!!', filename);
+  // console.log('filename', data.fileName);
+  // console.log('validatedFileName', validatedFileName);
   const sanitizedFileName = validatedFileName.includes('.jar')
     ? validatedFileName
     : `${validatedFileName}.jar`;
   await downloadFile(
     path.join(PACKS_PATH, instanceName, 'mods', sanitizedFileName),
     data.downloadUrl,
-    () => { }
+    () => {}
   );
   return {
     projectID: modId,
@@ -72,7 +76,8 @@ export const downloadDependancies = async (
           }
           if (toDownload) {
             const depData = await getAddonFiles(dep.addonId);
-            const { id, fileNameOnDisk } = depData
+            console.log("depData", depData);
+            const { id, fileName } = depData
               .reverse()
               .find(n => n.gameVersion.includes(gameVersion));
             const downloadedDep = await downloadMod(
@@ -81,9 +86,12 @@ export const downloadDependancies = async (
               fileNameOnDisk,
               instanceName
             );
-            const nestedDeps = await downloadDependancies(dep.addonId, id, instanceName);
+            const nestedDeps = await downloadDependancies(
+              dep.addonId,
+              id,
+              instanceName
+            );
             deps = deps.concat(downloadedDep).concat(nestedDeps);
-
           }
         }
       })

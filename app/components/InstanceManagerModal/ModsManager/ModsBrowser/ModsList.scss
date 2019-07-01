@@ -59,8 +59,15 @@
         visibility: hidden;
         opacity: 0;
         z-index: 50;
+        color: rgb(197, 197, 197);
+        background: var(--primary);
+        border: 0;
+        transition: all 0.3s ease-in-out;
       }
 
+      .installMod:hover {
+        filter: brightness(1);
+      }
 
       .modIcon:hover .installMod {
         // display: block;

@@ -76,6 +76,7 @@ export default function ModsListWrapper({
 
   async function downloadModFunc(e, mod) {
     e.stopPropagation();
+    console.log(mod.id);
 
     const [data, files] = await Promise.all([
       getAddon(mod.id),
@@ -91,11 +92,14 @@ export default function ModsListWrapper({
       allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc'])
     };
 
+    console.log("installedMods", installedMods);
+    console.log("mod", mod);
     installMod(
       dataMod.id,
       dataMod.allFiles[0].id,
       dataMod.allFiles[0].fileNameOnDisk
     );
+
   }
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
