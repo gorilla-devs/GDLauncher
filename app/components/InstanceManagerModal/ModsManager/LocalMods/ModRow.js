@@ -53,7 +53,7 @@ const ModRow = ({
       path.join(PACKS_PATH, instance, 'config.json'),
       JSON.stringify({
         ...config,
-        mods: config.mods.filter(v => v.fileNameOnDisk !== modData.name)
+        mods: config.mods.filter(v => v.filename !== modData.name)
       })
     );
   };

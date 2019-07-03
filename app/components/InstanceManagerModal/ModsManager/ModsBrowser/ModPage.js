@@ -152,12 +152,12 @@ function ModPage(props) {
                   installMod(
                     modData.id,
                     modData.allFiles[0].id,
-                    modData.allFiles[0].fileNameOnDisk
+                    modData.allFiles[0].filename
                   )
                 }
-                loading={isInstalling(modData.allFiles[0].fileNameOnDisk)}
+                loading={isInstalling(modData.allFiles[0].filename)}
                 disabled={isDownloadCompleted(
-                  modData.allFiles[0].fileNameOnDisk
+                  modData.allFiles[0].filename
                 )}
               >
                 Install Latest
@@ -177,10 +177,10 @@ function ModPage(props) {
               >
                 {modData.allFiles.map(ver => (
                   <Select.Option
-                    key={ver.fileNameOnDisk}
-                    value={ver.fileNameOnDisk}
+                    key={ver.filename}
+                    value={ver.filename}
                   >
-                    {ver.fileNameOnDisk}
+                    {ver.filename}
                   </Select.Option>
                 ))}
               </Select>
@@ -191,11 +191,11 @@ function ModPage(props) {
                   installMod(
                     modData.id,
                     modData.allFiles.find(
-                      v => v.fileNameOnDisk === selectedModVersion
+                      v => v.filename === selectedModVersion
                     ).id,
                     modData.allFiles.find(
-                      v => v.fileNameOnDisk === selectedModVersion
-                    ).fileNameOnDisk
+                      v => v.filename === selectedModVersion
+                    ).filename
                   )
                 }
                 loading={isInstalling(selectedModVersion)}

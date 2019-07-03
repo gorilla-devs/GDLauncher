@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ContentLoader from 'react-content-loader';
@@ -16,8 +17,9 @@ import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './ModsList.scss';
+import { updateConfig, readConfig } from '../../../../utils/instances';
 
-export default function ModsListWrapper({
+const ModsListWrapper = ({
   // Are there more items to load?
   // (This information comes from the most recent API request.)
   hasNextPage,
@@ -37,70 +39,36 @@ export default function ModsListWrapper({
   installedMods,
   instance,
   version
-}) {
-  const [modData, setModData] = useState([]);
-  const [modsInstalling, setModsInstalling] = useState([]);
-
-  const installMod = async (id, projectFileId, filename) => {
-    setModsInstalling({
-      ...modsInstalling,
-      [filename]: { installing: true, completed: false }
-    });
-
-    const newMod = await downloadMod(id, projectFileId, filename, instance);
-    const dependancies = await downloadDependancies(
-      id,
-      projectFileId,
-      instance
-    );
-    try {
-      const config = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, instance, 'config.json')
-        )
-      );
-      await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, instance, 'config.json'),
-        JSON.stringify({
-          ...config,
-          mods: [...config.mods, newMod, ...dependancies]
-        })
-      );
-    } catch {}
-
-    setModsInstalling({
-      ...modsInstalling,
-      [filename]: { installing: false, completed: true }
-    });
-  };
+}) => {
+  const [modsInstalling, setModsInstalling] = useState({});
 
   async function downloadModFunc(e, mod) {
     e.stopPropagation();
-    console.log(mod.id);
 
-    const [data, files] = await Promise.all([
-      getAddon(mod.id),
-      getAddonFiles(mod.id)
-    ]);
+    const files = await getAddonFiles(mod.id);
 
-    const filteredFiles = await Promise.all(
-      files.filter(el => el.gameVersion.includes(version))
-    );
+    const filteredFiles = files.filter(el => el.gameVersion.includes(version));
 
-    const dataMod = {
-      ...data,
-      allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc'])
-    };
+    const fileID = filteredFiles[0].id;
+    const { fileName } = filteredFiles[0].fileName;
 
-    console.log("installedMods", installedMods);
-    console.log("mod", mod);
-    installMod(
-      dataMod.id,
-      dataMod.allFiles[0].id,
-      dataMod.allFiles[0].fileNameOnDisk
-    );
+    setModsInstalling({
+      ...modsInstalling,
+      [mod.id]: true
+    });
 
+    const newMod = await downloadMod(mod.id, fileID, fileName, instance);
+    const dependancies = await downloadDependancies(mod.id, fileID, instance);
+
+    const instanceCfg = await readConfig(instance);
+    await updateConfig(instance, { mods: [...instanceCfg.mods, newMod, ...dependancies] })
+
+    setModsInstalling({
+      ...modsInstalling,
+      [mod.id]: false
+    });
   }
+
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
 
@@ -175,10 +143,11 @@ export default function ModsListWrapper({
               onClick={() => setClick(mod.id)}
             >
               {mod && mod.name}
-              {mod && installedMods.find(v => v.projectID === mod.id) ? null : (
+              {mod && !installedMods.find(v => v.projectID === mod.id) && (
                 <Button
                   className={styles.installMod}
                   onClick={e => downloadModFunc(e, mod)}
+                  loading={modsInstalling[mod.id]}
                 >
                   INSTALL&nbsp;
                   <FontAwesomeIcon icon={faDownload} />
@@ -254,4 +223,10 @@ export default function ModsListWrapper({
       )}
     </InfiniteLoader>
   );
-}
+};
+
+const mapStateToProps = (state, ownProps) => ({
+  installedMods: state.instancesManager.instances.find(v => v.name === ownProps.instance).mods
+});
+
+export default connect(mapStateToProps)(ModsListWrapper);

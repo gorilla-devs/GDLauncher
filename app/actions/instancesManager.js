@@ -4,8 +4,10 @@ import { spawn } from 'child_process';
 import { Promise } from 'bluebird';
 import path, { join, basename } from 'path';
 import { promisify } from 'util';
+import makeDir from 'make-dir';
 import _ from 'lodash';
 import fss from 'fs';
+import watch from 'node-watch';
 import launchCommand from '../utils/MCLaunchCommand';
 import { PACKS_PATH } from '../constants';
 import { readConfig, updateConfig } from '../utils/instances';
@@ -60,14 +62,22 @@ export function initInstances() {
       const instancesObj = await Promise.all(instances.map(async instance => {
         let mods = [];
         try {
+          const config = await readConfig(instance);
           mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
             el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
-          );
-        } catch(err) { }
-        return {
-          name: instance,
-          mods
-        };
+          ).map(mod => {
+            const { projectID, fileID } = config.mods.find(v => v.filename === mod);
+            return {
+              name: mod,
+              projectID,
+              fileID
+            };
+          });
+          return {
+            name: instance,
+            mods: mods || []
+          };
+        } catch (err) { }
       }));
       return instancesObj;
     };
@@ -83,25 +93,34 @@ export function initInstances() {
         type: UPDATE_INSTANCES,
         instances
       });
+
+      const updateInstances = async () => {
+        instances = await getInstances();
+        console.log(instances)
+        dispatch({
+          type: UPDATE_INSTANCES,
+          instances
+        });
+      };
+
+      const getInstancesDebounced = _.debounce(updateInstances, 100);
+
       // Watches for any changes in the packs dir. TODO: Optimize
-      watcher = fss.watch(PACKS_PATH, async () => {
+      watcher = watch(PACKS_PATH, { recursive: true }, async (event, filename) => {
         try {
           await fs.accessAsync(PACKS_PATH);
         } catch (e) {
           await makeDir(PACKS_PATH);
         }
-
-        instances = await getInstances();
-        dispatch({
-          type: UPDATE_INSTANCES,
-          instances
-        });
+        getInstancesDebounced();
       });
       watcher.on('error', async err => {
         try {
           await fs.accessAsync(PACKS_PATH);
         } catch (e) {
           await makeDir(PACKS_PATH);
+        }
+        finally {
           watchRoutine();
         }
       });

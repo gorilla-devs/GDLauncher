@@ -23,11 +23,7 @@ export const downloadMod = async (
   instanceName
 ) => {
   const data = await getAddonFile(modId, projectFileId);
-  const validatedFileName =
-    filename !== null && filename !== undefined ? filename : data.fileName;
-  // console.log('filename!!!!', filename);
-  // console.log('filename', data.fileName);
-  // console.log('validatedFileName', validatedFileName);
+  const validatedFileName = filename || data.fileName;
   const sanitizedFileName = validatedFileName.includes('.jar')
     ? validatedFileName
     : `${validatedFileName}.jar`;
@@ -40,7 +36,7 @@ export const downloadMod = async (
     projectID: modId,
     fileID: projectFileId,
     packageFingerprint: data.packageFingerprint,
-    fileNameOnDisk: sanitizedFileName
+    filename: sanitizedFileName
   };
 };
 
@@ -53,7 +49,7 @@ export const downloadDependancies = async (
   instanceName
 ) => {
   const data = await getAddonFile(modId, projectFileId);
-
+  console.log(data)
   let deps = [];
   if (data.dependencies.length !== 0) {
     const gameVersion = data.gameVersion[0];
@@ -76,14 +72,13 @@ export const downloadDependancies = async (
           }
           if (toDownload) {
             const depData = await getAddonFiles(dep.addonId);
-            console.log("depData", depData);
-            const { id, fileName } = depData
+            const { id, filename } = depData
               .reverse()
               .find(n => n.gameVersion.includes(gameVersion));
             const downloadedDep = await downloadMod(
               dep.addonId,
               id,
-              fileNameOnDisk,
+              filename,
               instanceName
             );
             const nestedDeps = await downloadDependancies(
@@ -114,7 +109,7 @@ export const getModsList = async (
       try {
         const { data } = await getAddonFile(mod.projectID, mod.fileID);
         return {
-          path: path.join(PACKS_PATH, packName, 'mods', data.fileNameOnDisk),
+          path: path.join(PACKS_PATH, packName, 'mods', data.filename),
           url: data.downloadUrl
         };
       } catch (e) {

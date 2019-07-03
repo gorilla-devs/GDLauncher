@@ -44,7 +44,7 @@ export const getAddonFileIDFromVersion = async (
   modpackVersion: string
 ) => {
   const files = await getAddonFiles(addonID);
-  const foundID = files.find(a => a.fileNameOnDisk.includes(modpackVersion));
+  const foundID = files.find(a => a.filename.includes(modpackVersion));
   return foundID ? foundID.id : null;
 };
 

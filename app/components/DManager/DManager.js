@@ -19,7 +19,6 @@ import { hideMenu } from 'react-contextmenu/es6/actions';
 import styles from './DManager.scss';
 import DInstance from '../../containers/DInstance';
 import { history } from '../../store/configureStore';
-import { PACKS_PATH } from '../../constants';
 
 type Props = {
   selectInstance: () => void
@@ -36,8 +35,6 @@ const SortableList = SortableContainer(({ items }) => {
     </div>
   );
 });
-
-const fs = Promise.promisifyAll(fss);
 
 export default class DManager extends Component<Props> {
   props: Props;

@@ -29,25 +29,10 @@ const ModsList = props => {
   const [modOverview, setModOverview] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [localMods, setLocalMods] = useState([]);
-  const [installedMods, setInstalledMods] = useState([]);
 
   useEffect(() => {
     loadMoreMods(null, null, '', true);
   }, [filterType]);
-
-  useEffect(() => {
-    try {
-      loadInstalledMods();
-    } catch { }
-  }, [props.localMods]);
-
-  const loadInstalledMods = async () => {
-    const Imods = await promisify(fs.readFile)(
-      path.join(PACKS_PATH, props.match.params.instance, 'config.json')
-    );
-    setInstalledMods(JSON.parse(Imods).mods);
-  };
 
   // The "e" param is just used for invoking this function without params in events handlers
   const loadMoreMods = async (e, v, searchQueryP, reset) => {
@@ -160,7 +145,6 @@ const ModsList = props => {
             width={width}
             height={height}
             setClick={setModOverview}
-            installedMods={installedMods}
             instance={props.match.params.instance}
             version={props.match.params.version}
           />
