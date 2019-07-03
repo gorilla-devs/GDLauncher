@@ -9542,6 +9542,11 @@ node-sass@^4.12.0:
     stdout-stream "^1.4.0"
     "true-case-path" "^1.0.2"
 
+node-watch@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/node-watch/-/node-watch-0.6.2.tgz#48fd517b527ec21ac4f5f981aad2a6ddebc0131c"
+  integrity sha512-qmb/2ehVk1DC4gZYox7JgWXNucKnVk7uQmcoSeRaC7kzXsT8VOPIe7mbrR9Vc2TpGggS2yGUcgC98A2fKE53AA==
+
 "nopt@2 || 3":
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/nopt/-/nopt-3.0.6.tgz#c6465dbf08abcd4db359317f79ac68a646b28ff9"
