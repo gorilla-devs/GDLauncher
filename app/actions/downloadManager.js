@@ -225,8 +225,8 @@ export function downloadPack(pack, isRepair = false) {
       vnlJSON = JSON.parse(
         await promisify(fs.readFile)(
           path.join(
-            META_PATH,
-            'net.minecraft',
+            INSTANCES_PATH,
+            'versions',
             currPack.version,
             `${currPack.version}.json`
           )
@@ -237,11 +237,11 @@ export function downloadPack(pack, isRepair = false) {
         v => v.id === currPack.version
       ).url;
       vnlJSON = (await axios.get(versionURL)).data;
-      await makeDir(path.join(META_PATH, 'net.minecraft', currPack.version));
+      await makeDir(path.join(INSTANCES_PATH, 'versions', currPack.version));
       await promisify(fs.writeFile)(
         path.join(
-          META_PATH,
-          'net.minecraft',
+          INSTANCES_PATH,
+          'versions',
           currPack.version,
           `${currPack.version}.json`
         ),
@@ -436,9 +436,11 @@ export function downloadPack(pack, isRepair = false) {
       }
     });
 
+    
     // Check if needs 1.13 forge patching
     const installProfileJson =
-      forgeJSON && JSON.parse(forgeJSON.installProfileJson);
+    forgeJSON && JSON.parse(forgeJSON.installProfileJson);
+    console.log('TESTING', forgeJSON, installProfileJson)
 
     let totalPercentage = 100;
 

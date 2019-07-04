@@ -58,28 +58,37 @@ export function initInstances() {
         .map(dir => basename(dir));
 
     const getInstances = async () => {
-      const instances = await getDirectories(PACKS_PATH);
-      const instancesObj = await Promise.all(instances.map(async instance => {
-        let mods = [];
-        try {
-          const config = await readConfig(instance);
-          mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
-            el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
-          ).map(mod => {
-            const { projectID, fileID } = config.mods.find(v => v.filename === mod);
-            return {
-              name: mod,
-              projectID,
-              fileID
-            };
-          });
+      let mappedInstances = [];
+      try {
+        const instances = await getDirectories(PACKS_PATH);
+        mappedInstances = await Promise.all(instances.map(async instance => {
+          let mods = [];
+          try {
+            const config = await readConfig(instance);
+            try {
+              mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
+                el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
+              ).map(mod => {
+                const { projectID, fileID } = config.mods.find(v => v.filename === mod);
+                return {
+                  name: mod,
+                  projectID,
+                  fileID
+                };
+              });
+            } catch (err) { }
+          } catch (err) {
+
+          }
           return {
             name: instance,
             mods: mods || []
-          };
-        } catch (err) { }
-      }));
-      return instancesObj;
+          }
+        }));
+      } catch (err) {
+
+      }
+      return mappedInstances;
     };
 
     const watchRoutine = async () => {
@@ -96,7 +105,6 @@ export function initInstances() {
 
       const updateInstances = async () => {
         instances = await getInstances();
-        console.log(instances)
         dispatch({
           type: UPDATE_INSTANCES,
           instances
