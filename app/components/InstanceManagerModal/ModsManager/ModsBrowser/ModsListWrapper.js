@@ -162,7 +162,7 @@ const ModsListWrapper = ({
                   // }}
 
                   onClick={e => downloadModFunc(e, mod)}
-                  loading={modsInstalling[mod.id]}
+                  // loading={modsInstalling[mod.id]}
                 >
 
                   INSTALL&nbsp;
