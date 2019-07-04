@@ -21,8 +21,8 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
   const vanillaJSON = JSON.parse(
     await promisify(fs.readFile)(
       path.join(
-        META_PATH,
-        'net.minecraft',
+        INSTANCES_PATH,
+        'versions',
         instanceConfigJSON.version,
         `${instanceConfigJSON.version}.json`
       )
