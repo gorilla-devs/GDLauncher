@@ -146,9 +146,25 @@ const ModsListWrapper = ({
               {mod && !installedMods.find(v => v.projectID === mod.id) && (
                 <Button
                   className={styles.installMod}
+                  // style={{
+                  //   position: 'absolute',
+                  //   width: '100',
+                  //   height: '30',
+                  //   bottom: '30',
+                  //   alignItems: 'center',
+                  //   visibility: 'hidden',
+                  //   opacity: '0',
+                  //   zIndex: '50',
+                  //   color: 'rgb(197, 197, 197)',
+                  //   background: 'var(--primary)',
+                  //   border: '0'
+                  //   transition: 'all 0.3s ease-in-out'
+                  // }}
+
                   onClick={e => downloadModFunc(e, mod)}
                   loading={modsInstalling[mod.id]}
                 >
+
                   INSTALL&nbsp;
                   <FontAwesomeIcon icon={faDownload} />
                 </Button>
