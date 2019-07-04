@@ -35,7 +35,12 @@ const LocalMods = props => {
 
     if (filteredMods[i].height === 50) {
       const zipFile = new Zip(path.join(modsFolder, filteredMods[i].name));
-      const mcmodInfo = JSON.parse(zipFile.readAsText('mcmod.info'));
+      try{
+        const mcmodInfo = JSON.parse(zipFile.readAsText('mcmod.info'));
+        
+      }catch(err){
+        const mcmodInfo = JSON.parse(zipFile.readAsText('pack.mcmeta'));
+      }
     }
 
     const newMods = Object.assign([...filteredMods], {
