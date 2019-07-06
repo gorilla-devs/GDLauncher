@@ -267,12 +267,9 @@ export function downloadPack(pack, isRepair = false) {
           'libraries',
           ...arraify(forgeJSON.mavenVersionString)
         );
-
+        console.log('TESTING START FORGE')
         await downloadFile(forgeBinPath, forgeJSON.downloadUrl, p => {
-          dispatch({
-            type: UPDATE_PROGRESS,
-            payload: { pack, percentage: ((p * 18) / 100).toFixed(0) }
-          });
+          dispatch(updateDownloadProgress(0, 15, p, 100));
         });
 
         await outputFile(
@@ -362,6 +359,7 @@ export function downloadPack(pack, isRepair = false) {
         })
       );
 
+      console.log('TESTING START MODS')
       let modsDownloaded = 0;
       await Promise.map(
         manifest.files,
@@ -374,16 +372,7 @@ export function downloadPack(pack, isRepair = false) {
             pack
           );
           modsManifest = modsManifest.concat(modManifest);
-          dispatch({
-            type: UPDATE_PROGRESS,
-            payload: {
-              pack,
-              percentage: (
-                (modsDownloaded * 12) / manifest.files.length +
-                18
-              ).toFixed(0)
-            }
-          });
+          dispatch(updateDownloadProgress(15, 15, modsDownloaded, manifest.files.length));
         },
         { concurrency: cpus().length + 2 }
       );
@@ -436,29 +425,30 @@ export function downloadPack(pack, isRepair = false) {
       }
     });
 
-    
+
     // Check if needs 1.13 forge patching
     const installProfileJson =
-    forgeJSON && JSON.parse(forgeJSON.installProfileJson);
-    console.log('TESTING', forgeJSON, installProfileJson)
+      forgeJSON && JSON.parse(forgeJSON.installProfileJson);
 
     let totalPercentage = 100;
+    let minPercentage = 0;
 
-    if (currPack.forgeVersion) totalPercentage = 70;
-    if (installProfileJson) totalPercentage = 58;
+    if (currPack.forgeVersion) {
+      if (modsManifest.length) {
+        minPercentage = 30;
+        totalPercentage = 60;
+      } else {
+        minPercentage = 15;
+        totalPercentage = 85;
+      }
 
+      if (installProfileJson) {
+        totalPercentage = totalPercentage - 10;
+      }
+    }
+    console.log('TESTING START FILES')
     const updatePercentage = downloaded => {
-      const actPercentage = (
-        (downloaded * totalPercentage) / totalFiles +
-        ((installProfileJson ? 88 : 100) - totalPercentage)
-      ).toFixed(0);
-      return dispatch({
-        type: UPDATE_PROGRESS,
-        payload: {
-          pack,
-          percentage: actPercentage
-        }
-      });
+      dispatch(updateDownloadProgress(minPercentage, totalPercentage, downloaded, totalFiles));
     };
 
     const allFiles =
@@ -477,6 +467,7 @@ export function downloadPack(pack, isRepair = false) {
 
     // Finish forge patches >= 1.13
     if (installProfileJson) {
+      console.log('TESTING START PROCESS')
       const { processors } = installProfileJson;
       const replaceIfPossible = arg => {
         const finalArg = arg.replace('{', '').replace('}', '');
@@ -535,14 +526,7 @@ export function downloadPack(pack, isRepair = false) {
         );
 
         log.error(stderr);
-        const actPercentage = ((i * 12) / processors.length).toFixed(0);
-        dispatch({
-          type: UPDATE_PROGRESS,
-          payload: {
-            pack,
-            percentage: 88 + Number(actPercentage)
-          }
-        });
+        dispatch(updateDownloadProgress(90, 10, i, processors.length));
       }
     }
     dispatch({
@@ -580,4 +564,26 @@ function addNextPackToActualDownload() {
       return false;
     });
   };
+}
+
+// Download progress selectors
+
+// Phase 1 = Get forge
+// Phase 2 = Get mods
+// Phase 3 = Download all files
+// Phase 4 = Apply patches
+
+function updateDownloadProgress(min, percDifference, computed, total) {
+  return (dispatch, getState) => {
+    const { downloadManager: { downloadQueue } } = getState();
+    const actualDownload = Object.keys(downloadQueue).find(v => downloadQueue[v].status === "Downloading");
+    const actualPercentage = (computed * percDifference) / total;
+    dispatch({
+      type: UPDATE_PROGRESS,
+      payload: {
+        pack: downloadQueue[actualDownload].name,
+        percentage: Number(actualPercentage.toFixed()) + Number(min)
+      }
+    });
+  }
 }
