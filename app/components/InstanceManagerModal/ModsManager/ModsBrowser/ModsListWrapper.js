@@ -45,15 +45,20 @@ const InstallButtonComponent = ({ mod, installedMods, instance, version }) => {
   if (!mod || installedMods.mods.find(v => v.projectID === mod.id))
     return null;
 
+  if (isInstalling) {
+    return (
+      <div className={styles.modInstalling}>INSTALLING</div>
+    )
+  }
+
   return (
-    <Button
+    <div
       className={styles.installMod}
       onClick={e => downloadModFunc(e, mod)}
-      loading={isInstalling}
     >
       INSTALL&nbsp;
         <FontAwesomeIcon icon={faDownload} />
-    </Button>
+    </div>
   );
 };
 
