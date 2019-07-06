@@ -5,7 +5,7 @@ import { Promise } from 'bluebird';
 import path, { join, basename } from 'path';
 import { promisify } from 'util';
 import makeDir from 'make-dir';
-import _ from 'lodash';
+import _, { isEqual } from 'lodash';
 import fss from 'fs';
 import watch from 'node-watch';
 import launchCommand from '../utils/MCLaunchCommand';
@@ -68,7 +68,7 @@ export function initInstances() {
             if (config.mods && Array.isArray(config.mods) && config.mods.length) {
               try {
                 mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
-                  el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
+                  el => path.extname(el) === '.zip' || path.extname(el) === '.jar' || path.extname(el) === '.disabled'
                 ).map(mod => {
                   const configMod = config.mods.find(v => v.filename === mod);
                   return {
@@ -109,10 +109,13 @@ export function initInstances() {
 
       const updateInstances = async () => {
         instances = await getInstances();
-        dispatch({
-          type: UPDATE_INSTANCES,
-          instances
-        });
+        const { instancesManager: { instances: stateInstances } } = getState();
+        if (!isEqual(stateInstances, instances)) {
+          dispatch({
+            type: UPDATE_INSTANCES,
+            instances
+          });
+        }
       };
 
       const getInstancesDebounced = _.debounce(updateInstances, 100);
