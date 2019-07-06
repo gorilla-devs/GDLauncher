@@ -25,16 +25,16 @@ function ModPage(props) {
     getAddonData(props.mod);
   }, []);
 
-  const installMod = async (id, projectFileId, filename) => {
+  const installMod = async (id, projectFileId, fileName) => {
     setModsInstalling({
       ...modsInstalling,
-      [filename]: { installing: true, completed: false }
+      [fileName]: { installing: true, completed: false }
     });
 
     const newMod = await downloadMod(
       id,
       projectFileId,
-      filename,
+      fileName,
       props.instance
     );
     const dependancies = await downloadDependancies(
@@ -59,7 +59,7 @@ function ModPage(props) {
 
     setModsInstalling({
       ...modsInstalling,
-      [filename]: { installing: false, completed: true }
+      [fileName]: { installing: false, completed: true }
     });
   };
 
@@ -152,12 +152,12 @@ function ModPage(props) {
                   installMod(
                     modData.id,
                     modData.allFiles[0].id,
-                    modData.allFiles[0].filename
+                    modData.allFiles[0].fileName
                   )
                 }
-                loading={isInstalling(modData.allFiles[0].filename)}
+                loading={isInstalling(modData.allFiles[0].fileName)}
                 disabled={isDownloadCompleted(
-                  modData.allFiles[0].filename
+                  modData.allFiles[0].fileName
                 )}
               >
                 Install Latest
@@ -177,10 +177,10 @@ function ModPage(props) {
               >
                 {modData.allFiles.map(ver => (
                   <Select.Option
-                    key={ver.filename}
-                    value={ver.filename}
+                    key={ver.fileName}
+                    value={ver.fileName}
                   >
-                    {ver.filename}
+                    {ver.fileName}
                   </Select.Option>
                 ))}
               </Select>
@@ -188,14 +188,14 @@ function ModPage(props) {
               <Button
                 type="primary"
                 onClick={() =>
-                  installMod(
+                  selectedModVersion && installMod(
                     modData.id,
                     modData.allFiles.find(
-                      v => v.filename === selectedModVersion
+                      v => v.fileName === selectedModVersion
                     ).id,
                     modData.allFiles.find(
-                      v => v.filename === selectedModVersion
-                    ).filename
+                      v => v.fileName === selectedModVersion
+                    ).fileName
                   )
                 }
                 loading={isInstalling(selectedModVersion)}
