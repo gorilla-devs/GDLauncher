@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../Common/Modal/Modal';
 import { numberToRoundedWord } from '../../utils/numbers';
-import { useGetAddon } from '../../hooks/cursemeta';
+import { useGetAddon, useGetAddonDescription } from '../../hooks/cursemeta';
 import styles from './CurseModpackExplorerModal.scss';
 
 const Loader = () => (
@@ -36,6 +36,7 @@ export default props => {
   const { addonID } = props.match.params;
   const [unMount, setUnMount] = useState(false);
   const response = useGetAddon(addonID);
+  const description = useGetAddonDescription(addonID);
 
   return (
     <Modal
@@ -50,7 +51,7 @@ export default props => {
       }
       style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}
     >
-      {response !== null ? (
+      {response && description ? (
         <div className={styles.container}>
           <div
             style={{
@@ -114,12 +115,12 @@ export default props => {
             </span>
           </span>
           <div className={styles.description}>
-            {ReactHtmlParser(response.fullDescription)}
+            {ReactHtmlParser(description)}
           </div>
         </div>
       ) : (
-        <Loader />
-      )}
+          <Loader />
+        )}
     </Modal>
   );
 };

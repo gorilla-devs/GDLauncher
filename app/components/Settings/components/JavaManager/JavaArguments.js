@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Input, Button, message } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { useTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 import { setJavaArgs } from '../../../../actions/settings';
 import { DEFAULT_ARGS } from '../../../../constants';
@@ -15,6 +16,7 @@ type Props = {
 function JavaArguments(props: Props) {
   const { javaArgs } = props;
   const [globalArgs, setGlobalArgsInput] = useState(javaArgs);
+  const { t } = useTranslation();
 
   const updateJavaArguments = javaArguments => {
     props.setJavaArgs(javaArguments);
@@ -29,7 +31,7 @@ function JavaArguments(props: Props) {
   return (
     <div>
       <div style={{ marginBottom: 10 }}>
-        <span style={{ fontSize: 18 }}>Java Custom Path</span>
+        <span style={{ fontSize: 18 }}>{t('JavaCustomArguments', 'Java Custom Arguments')}</span>
       </div>
       <JavaArgsInput
         overrideArgs={globalArgs}

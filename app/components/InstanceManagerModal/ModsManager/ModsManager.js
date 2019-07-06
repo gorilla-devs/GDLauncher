@@ -49,66 +49,6 @@ class ModsManager extends Component<Props> {
     } finally {
       this.setState({ checkingForge: false });
     }
-
-    // Starts the watcher and reads the local mods
-    try {
-      await promisify(fs.access)(path.join(this.instanceFolder, 'mods'));
-    } catch (err) {
-      await makeDir(path.join(this.instanceFolder, 'mods'));
-    }
-
-    this.getMods();
-  };
-
-  componentWillUnmount() {
-    // Stop watching for changes when this component is unmounted
-    try {
-      watcher.close();
-    } catch (err) {
-      log.error(err);
-    }
-  }
-
-  getMods = async () => {
-    let modsList = await this.filterMapMods(
-      await promisify(fs.readdir)(path.join(this.instanceFolder, 'mods'))
-    );
-
-    this.setState({
-      localMods: modsList
-    });
-
-    // Watches for any changes in the packs dir
-    watcher = fs.watch(path.join(this.instanceFolder, 'mods'), async () => {
-      modsList = await this.filterMapMods(
-        await promisify(fs.readdir)(path.join(this.instanceFolder, 'mods'))
-      );
-      this.setState({
-        localMods: modsList
-      });
-    });
-  };
-
-  filterMapMods = async mods => {
-    return Promise.all(
-      mods
-        .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
-        .filter(
-          el =>
-            path.extname(el) === '.zip' ||
-            path.extname(el) === '.jar' ||
-            path.extname(el) === '.disabled'
-        )
-        .map(async el => {
-          return {
-            name: el,
-            state: path.extname(el) !== '.disabled',
-            key: el,
-            height: 50,
-            selected: false
-          };
-        })
-    );
   };
 
   render() {
@@ -138,7 +78,7 @@ class ModsManager extends Component<Props> {
           <Route
             path="/editInstance/:instance/mods/local/:version"
             render={props => (
-              <LocalMods localMods={this.state.localMods} {...props} />
+              <LocalMods {...props} />
             )}
           />
           <Route
@@ -148,7 +88,7 @@ class ModsManager extends Component<Props> {
           <Route
             path="/editInstance/:instance/mods/browse/:version"
             render={props => (
-              <ModsList localMods={this.state.localMods} {...props} />
+              <ModsList {...props} />
             )}
           />
         </Switch>

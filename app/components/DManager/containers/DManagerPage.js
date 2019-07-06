@@ -6,7 +6,8 @@ import * as instancesManagerActions from '../../../actions/instancesManager';
 
 function mapStateToProps(state) {
   return {
-    userData: state.auth
+    userData: state.auth,
+    instances: state.instancesManager.instances
   };
 }
 

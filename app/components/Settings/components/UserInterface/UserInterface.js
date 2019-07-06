@@ -2,6 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { SketchPicker } from 'react-color';
+import { useTranslation } from 'react-i18next';
 import styles from './UserInterface.scss';
 import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
@@ -50,25 +51,26 @@ const secondaryPresets = [
 ];
 
 const UserInterface = props => {
+  const { t } = useTranslation();
   return (
     <div>
-      <Title>User Interface Preferences</Title>
+      <Title>{t('UserInterfacePreferences', 'User Interface Preferences')}</Title>
       <SettingCard>
         <SelectSetting
           mainText={
             <span>
-              Select Theme{' '}
+              {t('SelectedTheme', 'Select Theme')}{' '}
               <a
                 onClick={() => props.applyTheme(THEMES.default)}
                 style={{ fontSize: 13 }}
               >
-                Reset Theme
+                {t('ResetTheme', 'Reset Theme')}
               </a>
             </span>
           }
-          description="Adjust these values to fit your taste"
+          description={t('AdjustValuesToFitTaste', 'Adjust these values to fit your taste')}
           icon="layout"
-          placeholder="Select a theme"
+          placeholder={t('SelectATheme', 'Select A Theme')}
           onChange={v =>
             props.applyTheme(
               THEMES[Object.keys(THEMES).find(ver => THEMES[ver].name === v)]
@@ -78,7 +80,7 @@ const UserInterface = props => {
         />
         <div className={styles.pickersContainer}>
           <div>
-            Primary Color{' '}
+            {t('PrimaryColor', 'Primary Color')}{' '}
             <SketchPicker
               onChange={v => props.setThemeValue('primary', v.hex)}
               onChangeComplete={v => props.saveThemeValue('primary', v.hex)}
@@ -88,7 +90,7 @@ const UserInterface = props => {
             />
           </div>
           <div>
-            Secondary Color{' '}
+            {t('SecondaryColor', 'Secondary Color')}{' '}
             <SketchPicker
               onChange={v => {
                 props.setThemeValue('secondary-color-1', shader(v.hex, 40));

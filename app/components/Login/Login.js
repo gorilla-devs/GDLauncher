@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
+import { useTranslation } from 'react-i18next';
 import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
@@ -31,6 +32,7 @@ const FormItem = Form.Item;
 function Login(props) {
   const [fastLogin, setFastLogin] = useState(true);
   const [nativeLauncherProfiles, setNativeLauncherProfiles] = useState(false);
+  const { t } = useTranslation();
   const [colors, setColors] = useState(
     store.get('settings') ? store.get('settings').theme : THEMES.default
   );
@@ -71,16 +73,16 @@ function Login(props) {
         style={{
           background: `linear-gradient( ${colors['secondary-color-2']}8A, ${
             colors['secondary-color-2']
-          }8A), url(${background})`
+            }8A), url(${background})`
         }}
       >
         <div className={styles.login_form}>
-          <h1 style={{ textAlign: 'center', fontSize: 30 }}>Mojang Login</h1>
+          <h1 style={{ textAlign: 'center', fontSize: 30 }}>{t('MojangLogin', 'Mojang Login')}</h1>
           <Form onSubmit={handleSubmit}>
             <FormItem>
               {getFieldDecorator('username', {
                 rules: [
-                  { required: true, message: 'Please input your email!' }
+                  { required: true, message: t('InputEmail', 'Please Input Your Email') }
                 ],
                 initialValue: store.has('lastUsername')
                   ? store.get('lastUsername')
@@ -99,14 +101,14 @@ function Login(props) {
                       style={{ color: 'rgba(255,255,255,.8)' }}
                     />
                   }
-                  placeholder="Email"
+                  placeholder={t('Email', 'Email')}
                 />
               )}
             </FormItem>
             <FormItem>
               {getFieldDecorator('password', {
                 rules: [
-                  { required: true, message: 'Please input your Password!' }
+                  { required: true, message: t('InputPassword', 'Please Input Your Password') }
                 ]
               })(
                 <Input
@@ -130,13 +132,13 @@ function Login(props) {
                       }}
                       draggable="false"
                     >
-                      <Tooltip title="Need Help?">
+                      <Tooltip title={t('NeedHelp', 'Need Help?')}>
                         <Icon type="question" />
                       </Tooltip>
                     </Link>
                   }
                   type="password"
-                  placeholder="Password"
+                  placeholder={t('Password', 'Password')}
                 />
               )}
             </FormItem>
@@ -144,7 +146,7 @@ function Login(props) {
               {getFieldDecorator('remember', {
                 valuePropName: 'checked',
                 initialValue: true
-              })(<Checkbox>Remember me</Checkbox>)}
+              })(<Checkbox>{t('RememberMe', 'Remember Me')}</Checkbox>)}
               <Button
                 icon="login"
                 loading={props.authLoading}
@@ -154,7 +156,7 @@ function Login(props) {
                 htmlType="submit"
                 className={styles.login_form_button}
               >
-                Log in
+                {t('LogIn', 'Log In')}
               </Button>
             </FormItem>
           </Form>
@@ -169,7 +171,7 @@ function Login(props) {
               onClick={() => props.tryNativeLauncherProfiles()}
             >
               <span>
-                Login as{' '}
+                {t('LoginAs', 'Login As')}{' '}
                 <span
                   style={{ fontStyle: 'italic', textDecoration: 'underline' }}
                 >
@@ -190,7 +192,7 @@ function Login(props) {
           {update && (
             <Link to="/autoUpdate">
               <Button type="primary" style={{ marginRight: 10 }}>
-                Update Available
+                {t('UpdateAvailable', 'Update Available')}
               </Button>
             </Link>
           )}

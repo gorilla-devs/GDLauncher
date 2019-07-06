@@ -5,8 +5,7 @@ import axios from 'axios';
 import makeDir from 'make-dir';
 import fse, { outputFile } from 'fs-extra';
 import { cpus } from 'os';
-import dirTree from 'directory-tree';
-import { spawn, exec } from 'child_process';
+import { exec } from 'child_process';
 import jarAnalyzer from 'jarfile';
 import log from 'electron-log';
 import Promise from 'bluebird';
@@ -27,21 +26,79 @@ import {
   extractNatives,
   computeVanillaAndForgeLibraries
 } from '../utils/getMCFilesList';
-import { downloadMod, getModsList, createDoNotTouchFile } from '../utils/mods';
+import { downloadMod, createDoNotTouchFile } from '../utils/mods';
 import { findJavaHome } from '../utils/javaHelpers';
 import { arraify } from '../utils/strings';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
-import { getAddonFile, getAddon } from '../utils/cursemeta';
-import { getForgeVersionJSON, checkForgeMeta, checkForgeDownloaded } from '../utils/forgeHelpers';
+import {
+  getAddonFile,
+  getAddon,
+  getAddonFileIDFromVersion
+} from '../utils/cursemeta';
+import {
+  getForgeVersionJSON,
+  checkForgeMeta,
+  checkForgeDownloaded
+} from '../utils/forgeHelpers';
+import { readConfig } from '../utils/instances';
 
 export const START_DOWNLOAD = 'START_DOWNLOAD';
 export const CLEAR_QUEUE = 'CLEAR_QUEUE';
 export const ADD_TO_QUEUE = 'ADD_TO_QUEUE';
+export const ADD_NOT_READY_TO_QUEUE = 'ADD_NOT_READY_TO_QUEUE';
 export const DOWNLOAD_COMPLETED = 'DOWNLOAD_COMPLETED';
 export const UPDATE_TOTAL_FILES_TO_DOWNLOAD = 'UPDATE_TOTAL_FILES_TO_DOWNLOAD';
 export const UPDATE_PROGRESS = 'UPDATE_PROGRESS';
 
-export function addToQueue(pack, version, forgeVersion = null) {
+export function repairInstance(pack) {
+  return async (dispatch, getState) => {
+    const { packCreator } = getState();
+    dispatch({
+      type: ADD_NOT_READY_TO_QUEUE,
+      payload: pack
+    });
+    const config = await readConfig(pack);
+    if (config.projectID) {
+      const fileID = await getAddonFileIDFromVersion(
+        config.projectID,
+        config.modpackVersion
+      );
+      if (fileID)
+        dispatch(addCursePackToQueue(pack, config.projectID, fileID, true));
+      else {
+        dispatch({
+          type: CLEAR_QUEUE,
+          payload: pack
+        });
+        message.error('Could not repair');
+        log.error(
+          'Could not find fileID for',
+          pack,
+          config.projectID,
+          config.modpackVersion
+        );
+      }
+    } else {
+      dispatch(
+        addToQueue(
+          pack,
+          config.version,
+          config.forgeVersion
+            ? config.forgeVersion.replace('forge-', '')
+            : null,
+          true
+        )
+      );
+    }
+  };
+}
+
+export function addToQueue(
+  pack,
+  version,
+  forgeVersion = null,
+  isRepair = false
+) {
   return (dispatch, getState) => {
     const { downloadManager } = getState();
     dispatch({
@@ -55,7 +112,7 @@ export function addToQueue(pack, version, forgeVersion = null) {
         type: START_DOWNLOAD,
         payload: pack
       });
-      dispatch(downloadPack(pack));
+      dispatch(downloadPack(pack, isRepair));
     }
   };
 }
@@ -96,7 +153,7 @@ export function importTwitchProfile(pack, filePath) {
   };
 }
 
-export function addCursePackToQueue(pack, addonID, fileID) {
+export function addCursePackToQueue(pack, addonID, fileID, isRepair = false) {
   return async (dispatch, getState) => {
     const { downloadManager } = getState();
     const packURL = (await getAddonFile(addonID, fileID)).downloadUrl;
@@ -122,6 +179,7 @@ export function addCursePackToQueue(pack, addonID, fileID) {
       'forge-',
       ''
     );
+
     dispatch({
       type: ADD_TO_QUEUE,
       payload: pack,
@@ -134,7 +192,7 @@ export function addCursePackToQueue(pack, addonID, fileID) {
         type: START_DOWNLOAD,
         payload: pack
       });
-      dispatch(downloadPack(pack));
+      dispatch(downloadPack(pack, isRepair));
     }
   };
 }
@@ -156,17 +214,19 @@ export function clearQueue() {
   };
 }
 
-export function downloadPack(pack) {
+export function downloadPack(pack, isRepair = false) {
   return async (dispatch, getState) => {
     const { downloadManager, packCreator } = getState();
     const currPack = downloadManager.downloadQueue[pack];
     let vnlJSON = null;
     try {
+      // If is repair, skip this and download it again
+      if (isRepair) throw new Error();
       vnlJSON = JSON.parse(
         await promisify(fs.readFile)(
           path.join(
-            META_PATH,
-            'net.minecraft',
+            INSTANCES_PATH,
+            'versions',
             currPack.version,
             `${currPack.version}.json`
           )
@@ -177,11 +237,11 @@ export function downloadPack(pack) {
         v => v.id === currPack.version
       ).url;
       vnlJSON = (await axios.get(versionURL)).data;
-      await makeDir(path.join(META_PATH, 'net.minecraft', currPack.version));
+      await makeDir(path.join(INSTANCES_PATH, 'versions', currPack.version));
       await promisify(fs.writeFile)(
         path.join(
-          META_PATH,
-          'net.minecraft',
+          INSTANCES_PATH,
+          'versions',
           currPack.version,
           `${currPack.version}.json`
         ),
@@ -194,8 +254,10 @@ export function downloadPack(pack) {
     const assets = await extractAssets(vnlJSON, pack);
     const mainJar = await extractMainJar(vnlJSON);
 
-    if (currPack.forgeVersion !== null) {
+    if (currPack.forgeVersion) {
       try {
+        // If is repair, skip this and download it again
+        if (isRepair) throw new Error();
         forgeJSON = await checkForgeMeta(currPack.forgeVersion);
         await checkForgeDownloaded(forgeJSON.mavenVersionString);
       } catch (err) {
@@ -206,27 +268,27 @@ export function downloadPack(pack) {
           ...arraify(forgeJSON.mavenVersionString)
         );
 
-        await downloadFile(
-          forgeBinPath,
-          forgeJSON.downloadUrl,
-          p => {
-            dispatch({
-              type: UPDATE_PROGRESS,
-              payload: { pack, percentage: ((p * 18) / 100).toFixed(0) }
-            });
-          }
-        );
+        await downloadFile(forgeBinPath, forgeJSON.downloadUrl, p => {
+          dispatch(updateDownloadProgress(0, 15, p, 100));
+        });
 
-        await outputFile(path.join(
-          META_PATH,
-          'net.minecraftforge',
-          `forge-${currPack.forgeVersion}`,
-          `forge-${currPack.forgeVersion}.json`
-        ), JSON.stringify(forgeJSON))
+        await outputFile(
+          path.join(
+            META_PATH,
+            'net.minecraftforge',
+            `forge-${currPack.forgeVersion}`,
+            `forge-${currPack.forgeVersion}.json`
+          ),
+          JSON.stringify(forgeJSON)
+        );
       }
     }
 
-    const libraries = await computeVanillaAndForgeLibraries(vnlJSON, forgeJSON, false);
+    const libraries = await computeVanillaAndForgeLibraries(
+      vnlJSON,
+      forgeJSON,
+      false
+    );
 
     // This is the main config file for the instance
     await makeDir(path.join(PACKS_PATH, pack));
@@ -297,9 +359,6 @@ export function downloadPack(pack) {
         })
       );
 
-      // Finally removes the entire temp folder
-      await fse.remove(path.join(INSTANCES_PATH, 'temp'));
-
       let modsDownloaded = 0;
       await Promise.map(
         manifest.files,
@@ -312,16 +371,7 @@ export function downloadPack(pack) {
             pack
           );
           modsManifest = modsManifest.concat(modManifest);
-          dispatch({
-            type: UPDATE_PROGRESS,
-            payload: {
-              pack,
-              percentage: (
-                (modsDownloaded * 12) / manifest.files.length +
-                18
-              ).toFixed(0)
-            }
-          });
+          dispatch(updateDownloadProgress(15, 15, modsDownloaded, manifest.files.length));
         },
         { concurrency: cpus().length + 2 }
       );
@@ -344,22 +394,25 @@ export function downloadPack(pack) {
       );
     }
 
-    await promisify(fs.writeFile)(
-      path.join(PACKS_PATH, pack, 'config.json'),
-      JSON.stringify({
-        version: currPack.version,
-        forgeVersion:
-          currPack.forgeVersion === null
-            ? null
-            : `forge-${currPack.forgeVersion}`,
-        ...(currPack.addonID && { projectID: currPack.addonID }),
-        ...(modpackVersion && { modpackVersion }),
-        ...(thumbnailURL && { icon: 'icon.png' }),
-        timePlayed: 0,
-        mods: modsManifest,
-        overrideFiles: overrideFilesList
-      })
-    );
+    // Don't write a new config if it's repairing
+    if (!isRepair) {
+      await promisify(fs.writeFile)(
+        path.join(PACKS_PATH, pack, 'config.json'),
+        JSON.stringify({
+          version: currPack.version,
+          forgeVersion:
+            currPack.forgeVersion === null
+              ? null
+              : `forge-${currPack.forgeVersion}`,
+          ...(currPack.addonID && { projectID: currPack.addonID }),
+          ...(modpackVersion && { modpackVersion }),
+          ...(thumbnailURL && { icon: 'icon.png' }),
+          timePlayed: 0,
+          mods: modsManifest,
+          overrideFiles: overrideFilesList
+        })
+      );
+    }
 
     const totalFiles = libraries.length + assets.length + mainJar.length;
 
@@ -371,16 +424,29 @@ export function downloadPack(pack) {
       }
     });
 
+
+    // Check if needs 1.13 forge patching
+    const installProfileJson =
+      forgeJSON && JSON.parse(forgeJSON.installProfileJson);
+
+    let totalPercentage = 100;
+    let minPercentage = 0;
+
+    if (currPack.forgeVersion) {
+      if (modsManifest.length) {
+        minPercentage = 30;
+        totalPercentage = 60;
+      } else {
+        minPercentage = 15;
+        totalPercentage = 85;
+      }
+
+      if (installProfileJson) {
+        totalPercentage = totalPercentage - 10;
+      }
+    }
     const updatePercentage = downloaded => {
-      const actPercentage = ((downloaded * 70) / totalFiles + 30).toFixed(0);
-      if (currPack.percentage !== actPercentage)
-        return dispatch({
-          type: UPDATE_PROGRESS,
-          payload: {
-            pack,
-            percentage: actPercentage
-          }
-        });
+      dispatch(updateDownloadProgress(minPercentage, totalPercentage, downloaded, totalFiles));
     };
 
     const allFiles =
@@ -388,7 +454,7 @@ export function downloadPack(pack) {
         ? [...libraries, ...assets, ...mainJar, legacyJavaFixer]
         : [...libraries, ...assets, ...mainJar];
 
-    await downloadArr(allFiles, updatePercentage, pack);
+    await downloadArr(allFiles, updatePercentage, pack, isRepair);
 
     if (vnlJSON.assets === 'legacy') {
       await copyAssetsToLegacy(assets);
@@ -398,7 +464,6 @@ export function downloadPack(pack) {
     await extractNatives(libraries.filter(lib => 'natives' in lib), pack);
 
     // Finish forge patches >= 1.13
-    const installProfileJson = JSON.parse(forgeJSON.installProfileJson);
     if (installProfileJson) {
       const { processors } = installProfileJson;
       const replaceIfPossible = arg => {
@@ -406,44 +471,68 @@ export function downloadPack(pack) {
         if (installProfileJson.data[finalArg]) {
           // Handle special case
           if (finalArg === 'BINPATCH') {
-            return path.join(
-              INSTANCES_PATH,
-              'libraries',
-              ...arraify(installProfileJson.path)
-            ).replace('.jar', "-clientdata.lzma")
+            return path
+              .join(
+                INSTANCES_PATH,
+                'libraries',
+                ...arraify(installProfileJson.path)
+              )
+              .replace('.jar', '-clientdata.lzma');
           }
           // Return replaced string
           return installProfileJson.data[finalArg].client;
         }
         // Return original string (checking for MINECRAFT_JAR)
         return arg.replace('{MINECRAFT_JAR}', mainJar[0].path);
-      }
+      };
       const computePathIfPossible = arg => {
         if (arg[0] === '[') {
-          return path.join(INSTANCES_PATH, 'libraries', arraify(arg.replace('[', '').replace(']', '')).join('/'));
+          return path.join(
+            INSTANCES_PATH,
+            'libraries',
+            arraify(arg.replace('[', '').replace(']', '')).join('/')
+          );
         }
         return arg;
-      }
+      };
       const javaPath = await findJavaHome();
+      let i = 0;
       for (const p in processors) {
-        const filePath = path.join(INSTANCES_PATH, 'libraries', ...arraify(processors[p].jar));
+        i += 1;
+        const filePath = path.join(
+          INSTANCES_PATH,
+          'libraries',
+          ...arraify(processors[p].jar)
+        );
         const args = processors[p].args
           .map(arg => replaceIfPossible(arg))
           .map(arg => computePathIfPossible(arg));
 
-        const classPaths = processors[p].classpath.map(cp => path.join(INSTANCES_PATH, 'libraries', arraify(cp).join('/')));
+        const classPaths = processors[p].classpath.map(cp =>
+          path.join(INSTANCES_PATH, 'libraries', arraify(cp).join('/'))
+        );
 
         const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
-        const mainClass = jarFile.valueForManifestEntry("Main-Class");
+        const mainClass = jarFile.valueForManifestEntry('Main-Class');
 
         const { stderr, stdout } = await promisify(exec)(
-          `"${javaPath}" -classpath "${filePath}${CLASSPATH_DIVIDER_CHAR}${classPaths.join(CLASSPATH_DIVIDER_CHAR)}" ${mainClass} ${args.join(' ')}`
-          , { maxBuffer: 10000000000 })
+          `"${javaPath}" -classpath "${filePath}${CLASSPATH_DIVIDER_CHAR}${classPaths.join(
+            CLASSPATH_DIVIDER_CHAR
+          )}" ${mainClass} ${args.join(' ')}`,
+          { maxBuffer: 10000000000 }
+        );
 
-        console.log(stderr, stdout)
+        log.error(stderr);
+        dispatch(updateDownloadProgress(90, 10, i, processors.length));
       }
     }
-
+    dispatch({
+      type: UPDATE_PROGRESS,
+      payload: {
+        pack,
+        percentage: 100
+      }
+    });
     dispatch({
       type: DOWNLOAD_COMPLETED,
       payload: pack
@@ -458,7 +547,10 @@ function addNextPackToActualDownload() {
     const { downloadManager } = getState();
     const queueArr = Object.keys(downloadManager.downloadQueue);
     queueArr.some(pack => {
-      if (downloadManager.downloadQueue[pack].status !== 'Completed') {
+      if (
+        downloadManager.downloadQueue[pack].status !== 'Completed' &&
+        downloadManager.downloadQueue[pack].status !== 'NotReady'
+      ) {
         dispatch({
           type: START_DOWNLOAD,
           payload: pack
@@ -469,4 +561,26 @@ function addNextPackToActualDownload() {
       return false;
     });
   };
+}
+
+// Download progress selectors
+
+// Phase 1 = Get forge
+// Phase 2 = Get mods
+// Phase 3 = Download all files
+// Phase 4 = Apply patches
+
+function updateDownloadProgress(min, percDifference, computed, total) {
+  return (dispatch, getState) => {
+    const { downloadManager: { downloadQueue } } = getState();
+    const actualDownload = Object.keys(downloadQueue).find(v => downloadQueue[v].status === "Downloading");
+    const actualPercentage = (computed * percDifference) / total;
+    dispatch({
+      type: UPDATE_PROGRESS,
+      payload: {
+        pack: downloadQueue[actualDownload].name,
+        percentage: Number(actualPercentage.toFixed()) + Number(min)
+      }
+    });
+  }
 }

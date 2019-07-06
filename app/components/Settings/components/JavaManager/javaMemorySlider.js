@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Slider, Tooltip } from 'antd';
+import { useTranslation } from 'react-i18next';
 import os from 'os';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
@@ -8,6 +9,7 @@ import styles from './javaMemorySlider.scss';
 function javaMemorySlider(props) {
   const { mainText, icon, description, updateMemory, ram } = props;
   const [memory, setMemory] = useState(ram);
+  const { t } = useTranslation();
 
   const marks = {
     2048: '2048',
@@ -50,7 +52,7 @@ function javaMemorySlider(props) {
         <div>
           <div className={styles.mainContainer}>
             <div className={styles.mainText}>
-              Java Memory (
+              {t('JavaMemory', 'Java Memory')} (
               {props.is64bit ? (
                 '64 bit)'
               ) : (
@@ -58,8 +60,7 @@ function javaMemorySlider(props) {
                   32 bit)&nbsp;
                   <Tooltip
                     placement="right"
-                    title="Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used.
-                     If you want more, install or select a 64 bit java executable"
+                    title={t('Java32BitSystemTitle', 'Your system uses a 32 bit Java, which allows a maximum of 1.5GB to be used. If you want more, install or select a 64 bit java executable')}
                   >
                     <FontAwesomeIcon
                       className={styles.iconPointer}

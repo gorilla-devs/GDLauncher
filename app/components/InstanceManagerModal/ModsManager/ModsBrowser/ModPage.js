@@ -15,7 +15,7 @@ import { PACKS_PATH } from '../../../../constants';
 import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 
 import styles from './ModPage.scss';
-import { getAddon, getAddonFiles } from '../../../../utils/cursemeta';
+import { getAddon, getAddonFiles, getAddonDescription } from '../../../../utils/cursemeta';
 
 function ModPage(props) {
   const [modData, setModData] = useState(null);
@@ -25,16 +25,16 @@ function ModPage(props) {
     getAddonData(props.mod);
   }, []);
 
-  const installMod = async (id, projectFileId, filename) => {
+  const installMod = async (id, projectFileId, fileName) => {
     setModsInstalling({
       ...modsInstalling,
-      [filename]: { installing: true, completed: false }
+      [fileName]: { installing: true, completed: false }
     });
 
     const newMod = await downloadMod(
       id,
       projectFileId,
-      filename,
+      fileName,
       props.instance
     );
     const dependancies = await downloadDependancies(
@@ -59,14 +59,15 @@ function ModPage(props) {
 
     setModsInstalling({
       ...modsInstalling,
-      [filename]: { installing: false, completed: true }
+      [fileName]: { installing: false, completed: true }
     });
   };
 
   const getAddonData = async addon => {
-    const [data, files] = await Promise.all([
+    const [data, files, description] = await Promise.all([
       getAddon(addon),
-      getAddonFiles(addon)
+      getAddonFiles(addon),
+      getAddonDescription(addon)
     ]);
 
     const filteredFiles = files.filter(el =>
@@ -75,7 +76,8 @@ function ModPage(props) {
 
     setModData({
       ...data,
-      allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc'])
+      description,
+      allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc']),
     });
   };
 
@@ -150,12 +152,12 @@ function ModPage(props) {
                   installMod(
                     modData.id,
                     modData.allFiles[0].id,
-                    modData.allFiles[0].fileNameOnDisk
+                    modData.allFiles[0].fileName
                   )
                 }
-                loading={isInstalling(modData.allFiles[0].fileNameOnDisk)}
+                loading={isInstalling(modData.allFiles[0].fileName)}
                 disabled={isDownloadCompleted(
-                  modData.allFiles[0].fileNameOnDisk
+                  modData.allFiles[0].fileName
                 )}
               >
                 Install Latest
@@ -175,10 +177,10 @@ function ModPage(props) {
               >
                 {modData.allFiles.map(ver => (
                   <Select.Option
-                    key={ver.fileNameOnDisk}
-                    value={ver.fileNameOnDisk}
+                    key={ver.fileName}
+                    value={ver.fileName}
                   >
-                    {ver.fileNameOnDisk}
+                    {ver.fileName}
                   </Select.Option>
                 ))}
               </Select>
@@ -186,14 +188,14 @@ function ModPage(props) {
               <Button
                 type="primary"
                 onClick={() =>
-                  installMod(
+                  selectedModVersion && installMod(
                     modData.id,
                     modData.allFiles.find(
-                      v => v.fileNameOnDisk === selectedModVersion
+                      v => v.fileName === selectedModVersion
                     ).id,
                     modData.allFiles.find(
-                      v => v.fileNameOnDisk === selectedModVersion
-                    ).fileNameOnDisk
+                      v => v.fileName === selectedModVersion
+                    ).fileName
                   )
                 }
                 loading={isInstalling(selectedModVersion)}
@@ -212,7 +214,7 @@ function ModPage(props) {
           <div className={styles.modDescription}>
             <span
               dangerouslySetInnerHTML={{
-                __html: modData.fullDescription
+                __html: modData.description
               }}
             />
           </div>

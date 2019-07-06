@@ -16,6 +16,7 @@ export const downloadArr = async (
   arr,
   updatePercentage,
   pack,
+  forceDownload = false,
   threads = cpus().length
 ) => {
   let downloaded = 0;
@@ -23,18 +24,22 @@ export const downloadArr = async (
     arr,
     async item => {
       let toDownload = true;
-      try {
-        await fs.accessAsync(item.path);
-        toDownload = false;
-      } catch (err) {
-        // It needs to be downloaded
-      }
-      if (toDownload) {
+      if (!forceDownload) {
         try {
-          await downloadFileInstance(item.path, item.url);
-        } catch (e) {
-          log.error(e);
+          await fs.accessAsync(item.path);
+          toDownload = false;
+        } catch (err) {
+          // It needs to be downloaded
         }
+      }
+
+      if (toDownload) {
+        let counter = 0;
+        let res = false;
+        do {
+          res = await downloadFileInstance(item.path, item.url);
+          counter += 1;
+        } while(!res && counter < 3);
       }
       downloaded += 1;
       if (downloaded % 10 === 0 || downloaded === arr.length)
@@ -54,10 +59,12 @@ const downloadFileInstance = async (filename, url) => {
     }
     const file = await request(url, { encoding: 'binary' });
     await fs.writeFileAsync(filename, file, 'binary');
+    return true;
   } catch (e) {
     log.error(
       `Error while downloading <${url}> to <${filename}> --> ${e.message}`
     );
+    return false;
   }
 };
 

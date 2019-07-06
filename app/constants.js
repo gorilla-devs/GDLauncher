@@ -2,6 +2,7 @@ import path from 'path';
 import electron from 'electron';
 import { platform, homedir } from 'os';
 import getAppPath from './utils/getAppPath';
+import store from './localStore';
 
 export const WINDOWS = 'win32';
 export const LINUX = 'linux';
@@ -17,13 +18,13 @@ export const CLASSPATH_DIVIDER_CHAR = platform() === WINDOWS ? ';' : ':';
 export const LAUNCHER_FOLDER = 'launcherData';
 export const INSTANCES_FOLDER = 'instances';
 export const SERVERS_PATH = path.join(DATAPATH, 'servers');
-export const INSTANCES_PATH = path.join(DATAPATH, INSTANCES_FOLDER);
-export const PACKS_PATH = path.join(DATAPATH, INSTANCES_FOLDER, 'packs');
+export const INSTANCES_PATH = (store.has('settings') && store.get('settings').instancesPath) ? store.get('settings').instancesPath : path.join(DATAPATH, INSTANCES_FOLDER);
+export const PACKS_PATH = path.join(INSTANCES_PATH, 'packs');
 export const META_PATH = path.join(DATAPATH, 'meta');
 export const GAME_VERSIONS_URL =
   'https://launchermeta.mojang.com/mc/game/version_manifest.json';
 export const FORGE_PROMOS =
-  'https://staging_cursemeta.dries007.net/api/v3/direct/minecraft/modloader';
+  'https://addons-ecs.forgesvc.net/api/v2/minecraft/modloader';
 export const ACCESS_TOKEN_VALIDATION_URL =
 'https://authserver.mojang.com/validate';
 
@@ -36,13 +37,13 @@ export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const GDL_COMPANION_MOD_URL = 'https://gdevs.io/GDLCompanion.jar';
 export const GDL_LEGACYJAVAFIXER_MOD_URL =
   'https://gdevs.io/legacyjavafixer-1.0.jar';
-export const CURSEMETA_API_URL = `https://staging_cursemeta.dries007.net/api/v3`;
+export const CURSEMETA_API_URL = `https://addons-ecs.forgesvc.net/api/v2`;
 export const CURSEFORGE_MODLOADERS_API =
   'https://modloaders.cursecdn.com/647622546/maven';
 export const NEWS_URL =
   'https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/culture,minecraft:article/insider,minecraft:article/merch,minecraft:article/news&propResPath=/content/minecraft-net/language-masters/it-it/jcr:content/root/generic-container/par/grid&count=2000&pageSize=10&tag=ALL';
 export const JAVA_URL =
-  'https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html';
+  'https://java.com/en/download/manual.jsp';
 export const DEFAULT_ARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${
   platform() === WINDOWS
     ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'

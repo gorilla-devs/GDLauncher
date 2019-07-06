@@ -10,7 +10,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import {faDiscord, faFacebook} from '@fortawesome/free-brands-svg-icons';
+import { faDiscord, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import { promisify } from 'util';
 import CIcon from '../Icon/Icon';
 import SocialIcon from './SocialIcon';
@@ -41,7 +41,11 @@ const SideBar = props => {
       try {
         mods = (await fs.readdirAsync(
           path.join(PACKS_PATH, props.selectedInstance, 'mods')
-        )).filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar').length;
+        ))
+          .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
+          .filter(
+            el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
+          ).length;
       } catch {}
 
       try {

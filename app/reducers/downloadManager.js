@@ -5,7 +5,8 @@ import {
   DOWNLOAD_COMPLETED,
   UPDATE_TOTAL_FILES_TO_DOWNLOAD,
   UPDATE_PROGRESS,
-  CLEAR_QUEUE
+  CLEAR_QUEUE,
+  ADD_NOT_READY_TO_QUEUE
 } from '../actions/downloadManager';
 
 const initialState = {
@@ -30,6 +31,17 @@ export default function downloadManager(state = initialState, action) {
             addonID: action.addonID,
             downloadCompleted: false,
             status: 'Queued'
+          }
+        }
+      };
+    case ADD_NOT_READY_TO_QUEUE:
+      return {
+        ...state,
+        downloadQueue: {
+          ...state.downloadQueue,
+          [action.payload]: {
+            name: action.payload,
+            status: 'NotReady'
           }
         }
       };

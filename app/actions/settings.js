@@ -11,6 +11,7 @@ export const SET_JAVA_MEMORY = 'SET_JAVA_MEMORY';
 export const SET_THEME = 'SET_THEME';
 export const RESET_THEME = 'RESET_THEME';
 export const SET_GLOBAL_JAVA_ARGUMENTS = 'SET_GLOBAL_JAVA_ARGUMENTS';
+export const SET_INSTANCES_PATH = 'SET_INSTANCES_PATH';
 
 export function loadSettings() {
   return dispatch => {
@@ -161,3 +162,12 @@ export function setJavaArgs(args) {
   };
 }
 
+export function setInstancesPath(path) {
+  return dispatch => {
+    dispatch({
+      type: SET_INSTANCES_PATH,
+      path
+    });
+    dispatch(saveSettings());
+  };
+}

@@ -5,7 +5,13 @@ import { promisify } from 'util';
 import log from 'electron-log';
 import { connect } from 'react-redux';
 import { findJavaHome } from './javaHelpers';
-import { PACKS_PATH, INSTANCES_PATH, WINDOWS, META_PATH, CLASSPATH_DIVIDER_CHAR } from '../constants';
+import {
+  PACKS_PATH,
+  INSTANCES_PATH,
+  WINDOWS,
+  META_PATH,
+  CLASSPATH_DIVIDER_CHAR
+} from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
 const getStartCommand = async (packName, userData, settings, javaArguments) => {
@@ -15,8 +21,8 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
   const vanillaJSON = JSON.parse(
     await promisify(fs.readFile)(
       path.join(
-        META_PATH,
-        'net.minecraft',
+        INSTANCES_PATH,
+        'versions',
         instanceConfigJSON.version,
         `${instanceConfigJSON.version}.json`
       )
@@ -53,9 +59,15 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
       : '';
   // It concatenates vanilla and forge libraries. If the instance does not contain forge, it concatenates an empty array
   const libs = await computeVanillaAndForgeLibraries(vanillaJSON, forgeJSON);
-  const Arguments = getMCArguments(vanillaJSON, JSON.parse(forgeJSON.versionJson), packName, userData);
-  const mainClass =
-    forge === null ? vanillaJSON.mainClass : JSON.parse(forgeJSON.versionJson).mainClass;
+  const Arguments = getMCArguments(
+    vanillaJSON,
+    forgeJSON && JSON.parse(forgeJSON.versionJson),
+    packName,
+    userData
+  );
+  const mainClass = forge
+    ? JSON.parse(forgeJSON.versionJson).mainClass
+    : vanillaJSON.mainClass;
 
   const config = JSON.parse(
     await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
@@ -63,17 +75,19 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
 
   const completeCMD = `
 
-"${javaPath}" ${config.overrideArgs || javaArguments} -Xmx${instanceConfigJSON.overrideMemory || settings.java.memory}m ${dosName} -Djava.library.path="${path.join(
-    PACKS_PATH,
-    packName,
-    'natives'
-  )}"
+"${javaPath}" ${config.overrideArgs ||
+    javaArguments} -Xmx${instanceConfigJSON.overrideMemory ||
+    settings.java.memory}m ${dosName} -Djava.library.path="${path.join(
+      PACKS_PATH,
+      packName,
+      'natives'
+    )}"
   -Dminecraft.client.jar="${path.join(
-    INSTANCES_PATH,
-    'versions',
-    vanillaJSON.id,
-    `${vanillaJSON.id}.jar`
-  )}"
+      INSTANCES_PATH,
+      'versions',
+      vanillaJSON.id,
+      `${vanillaJSON.id}.jar`
+    )}"
  -cp ${libs
       .filter(lib => !lib.natives)
       .map(lib => `"${lib.path}"`)
@@ -96,7 +110,7 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
 
 const getMCArguments = (vanilla, forge, packName, userData) => {
   let Arguments = '';
-  if (forge !== null && forge.minecraftArguments) {
+  if (forge && forge.minecraftArguments) {
     Arguments = forge.minecraftArguments;
   } else if (vanilla.minecraftArguments) {
     // Up to 1.13
@@ -107,9 +121,9 @@ const getMCArguments = (vanilla, forge, packName, userData) => {
       .filter(arg => typeof arg === 'string')
       .join(' ');
 
-    const forgeArguments = forge.arguments.game.filter(
-      arg => typeof arg === 'string'
-    ).join(' ')
+    const forgeArguments = forge
+      ? forge.arguments.game.filter(arg => typeof arg === 'string').join(' ')
+      : '';
 
     Arguments = `${vanillaArguments} ${forgeArguments}`;
   }
@@ -119,20 +133,20 @@ const getMCArguments = (vanilla, forge, packName, userData) => {
     .replace('${game_directory}', `"${path.join(PACKS_PATH, packName)}"`)
     .replace(
       '${game_assets}',
-      path.join(
+      `"${path.join(
         INSTANCES_PATH,
         'assets',
         vanilla.assets === 'legacy' ? '/virtual/legacy' : ''
-      )
+      )}"`
     ) // Another check for really old versions
-    .replace('${version_name}', forge !== null ? forge.id : vanilla.id)
+    .replace('${version_name}', forge ? forge.id : vanilla.id)
     .replace(
       '${assets_root}',
-      path.join(
+      `"${path.join(
         INSTANCES_PATH,
         'assets',
         vanilla.assets === 'legacy' ? '/virtual/legacy' : ''
-      )
+      )}"`
     )
     .replace('${assets_index_name}', vanilla.assets)
     .replace('${auth_uuid}', userData.uuid)

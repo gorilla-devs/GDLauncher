@@ -37,19 +37,86 @@
         /* Adds a hyphen where the word breaks, if supported (No Blink) */
         hyphens: auto;
         &:hover {
+          .modInstalling {
+            color: rgba(255, 255, 255, 0.65);
+          }
           color: white;
         }
       }
       .modInstalled {
         position: absolute;
         width: 110px;
+        height: 20px;
         margin: 0 20px;
         bottom: 30px;
         text-align: center;
         background: var(--primary);
       }
+
+      .modInstalling {
+        position: absolute;
+        width: 110px;
+        height: 20px;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 14px;
+        bottom: 30px;
+        text-align: center;
+        background: var(--primary);
+      }
+
+      .installMod {
+        position: absolute;
+        width: 110px;
+        height: 20px;
+        bottom: 30px;
+        text-align: center;
+        background: var(--primary);
+        font-size: 14px;
+        // display: none;
+        visibility: hidden;
+        opacity: 0;
+        z-index: 50;
+      }
+
+
+      .modIcon:hover .installMod {
+        // display: block;
+        // transition: opacity 0.5s ease-out;
+        // -moz-transition: opacity 0.5s ease-out;
+        // -webkit-transition: opacity 0.5s ease-out;
+        visibility: visible;
+        opacity: 1;
+        transition: visibility 0s, opacity 0.2s ease-in-out;
+      }
+
+      @keyframes fadeInOut {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
     }
   }
+
+  // .installMod {
+  //   position: absolute;
+  //   width: 100px;
+  //   height: 30px;
+  //   bottom: 30px;
+  //   text-align: center;
+  //   display: none;
+  // }
+
+  //   .mo:hover + .button, .button:hover {
+  //     display: inline-block;
+  // }
+
   .modsNotFound {
     display: flex;
     justify-content: center;

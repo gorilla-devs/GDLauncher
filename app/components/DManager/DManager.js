@@ -19,13 +19,10 @@ import { hideMenu } from 'react-contextmenu/es6/actions';
 import styles from './DManager.scss';
 import DInstance from '../../containers/DInstance';
 import { history } from '../../store/configureStore';
-import { PACKS_PATH } from '../../constants';
 
 type Props = {
   selectInstance: () => void
 };
-
-let watcher;
 
 const SortableItem = SortableElement(({ value }) => <DInstance name={value} />);
 
@@ -33,92 +30,14 @@ const SortableList = SortableContainer(({ items }) => {
   return (
     <div style={{ height: '100%', overflowY: 'auto' }}>
       {items.map((value, index) => (
-        <SortableItem key={`item-${index}`} index={index} value={value} />
+        <SortableItem key={`item-${index}`} index={index} value={value.name} />
       ))}
     </div>
   );
 });
 
-const fs = Promise.promisifyAll(fss);
-
 export default class DManager extends Component<Props> {
   props: Props;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      instances: [],
-      checkingInstances: true
-    };
-  }
-
-  componentDidMount = async () => {
-    this.watchRoutine();
-  };
-
-  componentWillUnmount() {
-    // Stop watching for changes when this component is unmounted
-    try {
-      watcher.close();
-    } catch (err) {
-      log.error(err);
-    }
-  }
-
-  watchRoutine = async () => {
-    try {
-      await fs.accessAsync(PACKS_PATH);
-    } catch (e) {
-      await makeDir(PACKS_PATH);
-    }
-    this.setState({
-      instances: await this.getDirectories(PACKS_PATH)
-    });
-    // Watches for any changes in the packs dir. TODO: Optimize
-    try {
-      watcher = fss.watch(PACKS_PATH, async () => {
-        try {
-          await fs.accessAsync(PACKS_PATH);
-        } catch (e) {
-          await makeDir(PACKS_PATH);
-        }
-        this.setState({
-          instances: await this.getDirectories(PACKS_PATH)
-        });
-      });
-      watcher.on('error', async err => {
-        try {
-          await fs.accessAsync(PACKS_PATH);
-        } catch (e) {
-          await makeDir(PACKS_PATH);
-          this.watchRoutine();
-        }
-      });
-    } catch (error) {
-      log.error(error);
-      if (error.message === `watch ${PACKS_PATH} ENOSPC`) {
-        message.error(
-          <span>
-            There was an error with inotify limit. see
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/guard/listen/wiki/Increasing-the-amount-of-inotify-watchers"
-            >
-              {' '}
-              here
-            </a>
-          </span>
-        );
-      } else {
-        message.error('Cannot update instances in real time');
-      }
-    } finally {
-      this.setState({
-        checkingInstances: false
-      });
-    }
-  };
 
   handleScroll = () => {
     hideMenu();
@@ -132,23 +51,14 @@ export default class DManager extends Component<Props> {
   /* eslint-enable */
 
   onSortEnd = ({ oldIndex, newIndex }) => {
-    this.setState({
-      instances: arrayMove(this.state.instances, oldIndex, newIndex)
-    });
+    // this.setState({
+    //   instances: arrayMove(this.state.instances, oldIndex, newIndex)
+    // });
   };
 
   onSortStart = ({ node, index, collection }) => {
     hideMenu();
   };
-
-  isDirectory = source => fss.lstatSync(source).isDirectory();
-
-  getDirectories = async source =>
-    fs
-      .readdirAsync(source)
-      .map(name => join(source, name))
-      .filter(this.isDirectory)
-      .map(dir => basename(dir));
 
   render() {
     return (
@@ -192,14 +102,13 @@ export default class DManager extends Component<Props> {
         </div>
         <ContextMenuTrigger id="contextMenu-dmanager">
           <div className={styles.content} onScroll={this.handleScroll}>
-            {this.state.instances.length === 0 &&
-            !this.state.checkingInstances ? (
+            {this.props.instances.length === 0 ? (
               <h1 className={styles.NoServerCreated}>
                 YOU HAVEN'T ADDED ANY INSTANCE YET
               </h1>
             ) : (
               <SortableList
-                items={this.state.instances}
+                items={this.props.instances}
                 onSortEnd={this.onSortEnd}
                 onSortStart={this.onSortStart}
                 lockToContainerEdges
