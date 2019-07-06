@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../Common/Modal/Modal';
@@ -10,6 +11,7 @@ import MenuItem from '../Common/SideMenu/MenuItem/MenuItem';
 import Content from './components/Content/Content';
 
 const Settings = ({ match, history }) => {
+  const { t } = useTranslation();
   return (
     <Modal
       history={history}
@@ -27,19 +29,19 @@ const Settings = ({ match, history }) => {
             active={match.params.page === 'myAccount_Preferences'}
             to="/settings/myAccount_Preferences"
           >
-            My Account & Preferences
+            {t('MyAccountAndPreferences', 'My Account & Preferences')}
           </MenuItem>
           <MenuItem active={match.params.page === 'java'} to="/settings/java">
-            Java
+            {t('Java', 'Java')}
           </MenuItem>
           <MenuItem
             active={match.params.page === 'instances'}
             to="/settings/instances"
           >
-            Instances
+            {t('Instances', 'Instances')}
           </MenuItem>
           <MenuItem active={match.params.page === 'ui'} to="/settings/ui">
-            User Interface
+            {t('UserInterface', 'User Interface')}
           </MenuItem>
         </SideMenu>
         <Content match={match} />

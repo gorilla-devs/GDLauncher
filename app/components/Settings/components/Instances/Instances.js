@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, message, Input, Icon } from 'antd';
+import { useTranslation } from 'react-i18next';
 import fsa from 'fs-extra';
 import path from 'path';
 import styles from './Instances.scss';
@@ -14,6 +15,7 @@ import { setInstancesPath } from '../../../../actions/settings';
 
 function Instances(props) {
   const [deletingInstances, setDeletingInstances] = useState(false);
+  const {t} = useTranslation();
 
   async function deleteShareData() {
     try {
@@ -25,9 +27,9 @@ function Instances(props) {
       await fsa.emptyDir(path.join(INSTANCES_PATH, 'temp'));
       await fsa.emptyDir(META_PATH);
       setDeletingInstances(false);
-      message.success('Data has been cleared.');
+      message.success(t('DataHasBeenCleared', 'Data has been cleared.'));
     } catch (e) {
-      message.error('Error while clearing data.');
+      message.error(t('ErrorClearingData', 'Error while clearing data.'));
     }
   }
 
@@ -55,23 +57,21 @@ function Instances(props) {
       <Title>Instances</Title>
       <SettingCard>
         <ButtonSetting
-          mainText="Clear Shared Data"
-          description="Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data"
+          mainText={t('ClearAllData', 'Clear Shared Data')}
+          description={t('ClearAllDataDescription', 'Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data')}
           icon="delete"
           onClick={() => deleteShareData()}
           disabled={props.installing !== null}
           loading={deletingInstances}
-          btnText="Clear"
+          btnText={t('Clear', 'Clear')}
         />
       </SettingCard>
       <SwitchSetting
-        mainText="Override Default Instances Path"
+        mainText={t('OverrideDefaultInstancesPath', 'Override Default Instances Path')}
         description={<div>
-          <div>If enabled, instances will be downloaded in the selected path</div>
+          <div>{t('OverrideDefaultInstancesPathDescription1', 'If enabled, instances will be downloaded in the selected path')}</div>
           <div className={styles.restart}>
-            You need to{' '}
-            <span style={{ color: 'white', cursor: 'pointer' }} onClick={restartLauncher}>restart</span>{' '}
-            the launcher for this setting to apply
+            You need to <span style={{ color: 'white', cursor: 'pointer' }} onClick={restartLauncher}>restart</span> the launcher for this setting to apply
           </div>
         </div>}
         icon="folder"
@@ -81,13 +81,13 @@ function Instances(props) {
       {props.instancesPath && (
         <div>
           <div>
-            <span style={{ fontSize: 18 }}>Instances Custom Path{' '}</span>
+            <span style={{ fontSize: 18 }}>{t('InstancesCustomPath', 'Instances Custom Path')}{' '}</span>
             <a
               onClick={() => props.setInstancesPath(path.join(DATAPATH, INSTANCES_FOLDER))}
               style={{ fontSize: 13 }}
             >
-              Reset Path
-              </a>
+              {t('ResetPath', 'Reset Path')}
+            </a>
             <Input
               value={props.instancesPath}
               size="large"

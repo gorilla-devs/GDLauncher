@@ -1,8 +1,10 @@
 import React from 'react';
 import { Select, Divider, Icon } from 'antd';
+import { useTranslation } from 'react-i18next';
 import styles from './SelectSetting.scss';
 
 const SelectSetting = props => {
+  const {t} = useTranslation();
   return (
     <div>
       <div className={styles.container}>
@@ -16,7 +18,7 @@ const SelectSetting = props => {
         <div className={styles.action}>
           <Select
             style={{ width: 150 }}
-            placeholder={props.placeholder || 'Select a value'}
+            placeholder={props.placeholder || t('SelectAValue', 'Select a value')}
             disabled={props.disabled || false}
             loading={props.loading || false}
             onChange={props.onChange || null}

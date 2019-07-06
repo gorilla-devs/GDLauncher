@@ -4,8 +4,10 @@ import { spawn } from 'child_process';
 import { Promise } from 'bluebird';
 import path, { join, basename } from 'path';
 import { promisify } from 'util';
-import _ from 'lodash';
+import makeDir from 'make-dir';
+import _, { isEqual } from 'lodash';
 import fss from 'fs';
+import watch from 'node-watch';
 import launchCommand from '../utils/MCLaunchCommand';
 import { PACKS_PATH } from '../constants';
 import { readConfig, updateConfig } from '../utils/instances';
@@ -56,17 +58,41 @@ export function initInstances() {
         .map(dir => basename(dir));
 
     const getInstances = async () => {
-      const instances = await getDirectories(PACKS_PATH);
-      const instancesObj = await Promise.all(instances.map(async instance => {
-        let mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
-          el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
-        );
-        return {
-          name: instance,
-          mods
-        };
-      }));
-      return instancesObj;
+      let mappedInstances = [];
+      try {
+        const instances = await getDirectories(PACKS_PATH);
+        mappedInstances = await Promise.all(instances.map(async instance => {
+          let mods = [];
+          try {
+            const config = await readConfig(instance);
+            if (config.mods && Array.isArray(config.mods) && config.mods.length) {
+              try {
+                mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
+                  el => path.extname(el) === '.zip' || path.extname(el) === '.jar' || path.extname(el) === '.disabled'
+                ).map(mod => {
+                  const configMod = config.mods.find(v => v.filename === mod);
+                  return {
+                    name: mod,
+                    projectID: configMod && configMod.projectID,
+                    fileID: configMod && configMod.fileID
+                  };
+                });
+              } catch (err) {
+                console.error('Failed to get instance\'s mods', err)
+              }
+            }
+          } catch (err) {
+            console.error('Failed to get instance\'s config', err)
+          }
+          return {
+            name: instance,
+            mods: mods
+          }
+        }));
+      } catch (err) {
+        console.error('Failed to get instances', err);
+      }
+      return mappedInstances;
     };
 
     const watchRoutine = async () => {
@@ -80,25 +106,36 @@ export function initInstances() {
         type: UPDATE_INSTANCES,
         instances
       });
+
+      const updateInstances = async () => {
+        instances = await getInstances();
+        const { instancesManager: { instances: stateInstances } } = getState();
+        if (!isEqual(stateInstances, instances)) {
+          dispatch({
+            type: UPDATE_INSTANCES,
+            instances
+          });
+        }
+      };
+
+      const getInstancesDebounced = _.debounce(updateInstances, 100);
+
       // Watches for any changes in the packs dir. TODO: Optimize
-      watcher = fss.watch(PACKS_PATH, async () => {
+      watcher = watch(PACKS_PATH, { recursive: true }, async (event, filename) => {
         try {
           await fs.accessAsync(PACKS_PATH);
         } catch (e) {
           await makeDir(PACKS_PATH);
         }
-
-        instances = await getInstances();
-        dispatch({
-          type: UPDATE_INSTANCES,
-          instances
-        });
+        getInstancesDebounced();
       });
       watcher.on('error', async err => {
         try {
           await fs.accessAsync(PACKS_PATH);
         } catch (e) {
           await makeDir(PACKS_PATH);
+        }
+        finally {
           watchRoutine();
         }
       });

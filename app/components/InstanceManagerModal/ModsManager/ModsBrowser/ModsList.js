@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
 import path from 'path';
@@ -8,7 +8,7 @@ import ContentLoader from 'react-content-loader';
 import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import { promisify } from 'util';
 import ModsListWrapper from './ModsListWrapper';
 import { PACKS_PATH } from '../../../../constants';
@@ -21,31 +21,18 @@ import { getSearch } from '../../../../utils/cursemeta';
 import styles from './ModsList.scss';
 
 const ModsList = props => {
+  const itemsNumber = 21;
+
   const [mods, setMods] = useState([]);
   const [areModsLoading, setAreModsLoading] = useState(true);
   const [filterType, setFilterType] = useState('Featured');
   const [modOverview, setModOverview] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [localMods, setLocalMods] = useState([]);
-  const [installedMods, setInstalledMods] = useState([]);
 
   useEffect(() => {
     loadMoreMods(null, null, '', true);
   }, [filterType]);
-
-  useEffect(() => {
-    try {
-      loadInstalledMods();
-    } catch { }
-  }, [props.localMods]);
-
-  const loadInstalledMods = async () => {
-    const Imods = await promisify(fs.readFile)(
-      path.join(PACKS_PATH, props.match.params.instance, 'config.json')
-    );
-    setInstalledMods(JSON.parse(Imods).mods);
-  };
 
   // The "e" param is just used for invoking this function without params in events handlers
   const loadMoreMods = async (e, v, searchQueryP, reset) => {
@@ -58,7 +45,7 @@ const ModsList = props => {
     const data = await getSearch(
       'mods',
       search,
-      21,
+      itemsNumber,
       isReset ? 0 : mods.length,
       filterType,
       filterType !== 'Author' && filterType !== 'Name',
@@ -66,7 +53,7 @@ const ModsList = props => {
     );
     const newMods = reset ? data : mods.concat(data);
     setMods(newMods || []);
-    setHasNextPage((newMods || []).length === 21);
+    setHasNextPage((newMods || []).length % itemsNumber === 0);
     setAreModsLoading(false);
   };
 
@@ -158,7 +145,8 @@ const ModsList = props => {
             width={width}
             height={height}
             setClick={setModOverview}
-            installedMods={installedMods}
+            instance={props.match.params.instance}
+            version={props.match.params.version}
           />
         )}
       </AutoSizer>
@@ -174,8 +162,13 @@ const ModsList = props => {
   );
 };
 
+
 function mapStateToProps(state) {
   return {};
 }
 
-export default connect(mapStateToProps)(ModsList);
+const MemoizedModsList = memo(ModsList, (prev, next) => {
+  return isEqual(prev.match, next.match)
+});
+
+export default connect(mapStateToProps)(MemoizedModsList);
