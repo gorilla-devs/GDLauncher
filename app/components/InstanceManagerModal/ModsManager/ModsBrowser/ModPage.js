@@ -5,7 +5,7 @@ import ContentLoader from 'react-content-loader';
 import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import Promise from 'bluebird';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { promisify } from 'util';
@@ -15,7 +15,11 @@ import { PACKS_PATH } from '../../../../constants';
 import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 
 import styles from './ModPage.scss';
-import { getAddon, getAddonFiles, getAddonDescription } from '../../../../utils/cursemeta';
+import {
+  getAddon,
+  getAddonFiles,
+  getAddonDescription
+} from '../../../../utils/cursemeta';
 
 function ModPage(props) {
   const [modData, setModData] = useState(null);
@@ -77,7 +81,7 @@ function ModPage(props) {
     setModData({
       ...data,
       description,
-      allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc']),
+      allFiles: _.orderBy(filteredFiles, ['fileDate'], ['desc'])
     });
   };
 
@@ -152,13 +156,11 @@ function ModPage(props) {
                   installMod(
                     modData.id,
                     modData.allFiles[0].id,
-                    modData.allFiles[0].filename
+                    modData.allFiles[0].fileName
                   )
                 }
-                loading={isInstalling(modData.allFiles[0].filename)}
-                disabled={isDownloadCompleted(
-                  modData.allFiles[0].filename
-                )}
+                loading={isInstalling(modData.allFiles[0].fileName)}
+                disabled={isDownloadCompleted(modData.allFiles[0].fileName)}
               >
                 Install Latest
               </Button>
@@ -176,13 +178,10 @@ function ModPage(props) {
                 onChange={handleModVersionChange}
               >
                 {modData.allFiles.map(ver => (
-                  <Select.Option
-                    key={ver.filename}
-                    value={ver.filename}
-                  >
-                    {ver.filename}
-                  </Select.Option>
-                ))}
+                    <Select.Option key={ver.fileName} value={ver.fileName}>
+                      {ver.fileName}
+                    </Select.Option>                  
+                )}
               </Select>
               <br />
               <Button
@@ -191,11 +190,11 @@ function ModPage(props) {
                   installMod(
                     modData.id,
                     modData.allFiles.find(
-                      v => v.filename === selectedModVersion
+                      v => v.fileName === selectedModVersion
                     ).id,
                     modData.allFiles.find(
-                      v => v.filename === selectedModVersion
-                    ).filename
+                      v => v.fileName === selectedModVersion
+                    ).fileName
                   )
                 }
                 loading={isInstalling(selectedModVersion)}
