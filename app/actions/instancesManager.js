@@ -65,28 +65,32 @@ export function initInstances() {
           let mods = [];
           try {
             const config = await readConfig(instance);
-            try {
-              mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
-                el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
-              ).map(mod => {
-                const { projectID, fileID } = config.mods.find(v => v.filename === mod);
-                return {
-                  name: mod,
-                  projectID,
-                  fileID
-                };
-              });
-            } catch (err) { }
+            if (config.mods && Array.isArray(config.mods) && config.mods.length) {
+              try {
+                mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
+                  el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
+                ).map(mod => {
+                  const configMod = config.mods.find(v => v.filename === mod);
+                  return {
+                    name: mod,
+                    projectID: configMod && configMod.projectID,
+                    fileID: configMod && configMod.fileID
+                  };
+                });
+              } catch (err) {
+                console.error('Failed to get instance\'s mods', err)
+              }
+            }
           } catch (err) {
-
+            console.error('Failed to get instance\'s config', err)
           }
           return {
             name: instance,
-            mods: mods || []
+            mods: mods
           }
         }));
       } catch (err) {
-
+        console.error('Failed to get instances', err);
       }
       return mappedInstances;
     };
