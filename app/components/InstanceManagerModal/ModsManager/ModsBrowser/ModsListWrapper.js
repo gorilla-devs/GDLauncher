@@ -18,6 +18,7 @@ import { PACKS_PATH } from '../../../../constants';
 
 import styles from './ModsList.scss';
 import { updateConfig, readConfig } from '../../../../utils/instances';
+import { getInstance } from '../../../../utils/selectors';
 
 const ModsListWrapper = ({
   // Are there more items to load?
@@ -143,7 +144,7 @@ const ModsListWrapper = ({
               onClick={() => setClick(mod.id)}
             >
               {mod && mod.name}
-              {mod && !installedMods.find(v => v.projectID === mod.id) && (
+              {mod && !installedMods.mods.find(v => v.projectID === mod.id) && (
                 <Button
                   className={styles.installMod}
                   onClick={e => downloadModFunc(e, mod)}
@@ -154,7 +155,7 @@ const ModsListWrapper = ({
                 </Button>
               )}
             </div>
-            {mod && installedMods.find(v => v.projectID === mod.id) && (
+            {mod && installedMods.mods.find(v => v.projectID === mod.id) && (
               <div className={styles.modInstalled}>INSTALLED</div>
             )}
           </div>
@@ -226,7 +227,7 @@ const ModsListWrapper = ({
 };
 
 const mapStateToProps = (state, ownProps) => ({
-  installedMods: state.instancesManager.instances.find(v => v.name === ownProps.instance).mods
+  installedMods: getInstance(ownProps.instance)(state)
 });
 
 export default connect(mapStateToProps)(ModsListWrapper);

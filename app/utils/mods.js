@@ -49,7 +49,6 @@ export const downloadDependancies = async (
   instanceName
 ) => {
   const data = await getAddonFile(modId, projectFileId);
-  console.log(data)
   let deps = [];
   if (data.dependencies.length !== 0) {
     const gameVersion = data.gameVersion[0];
@@ -65,24 +64,30 @@ export const downloadDependancies = async (
                 path.join(PACKS_PATH, instanceName, 'config.json')
               )
             ).mods;
-            if (installedMods.find(v => v.id === dep.addonId))
+            console.log(installedMods)
+            if (installedMods.find(v => v.projectID === dep.addonId))
               toDownload = false;
           } catch {
             toDownload = true;
           }
           if (toDownload) {
             const depData = await getAddonFiles(dep.addonId);
-            const { id, filename } = depData
+
+            const correctVersion = depData
               .reverse()
-              .find(n => n.gameVersion.includes(gameVersion));
-            const downloadedDep = await downloadMod(
-              dep.addonId,
-              id,
-              filename,
-              instanceName
-            );
-            const nestedDeps = await downloadDependancies(dep.addonId, id, instanceName);
-            deps = deps.concat(downloadedDep).concat(nestedDeps);
+              .find(n => n.gameVersion.includes(gameVersion)) || {};
+            const { id, filename } = correctVersion;
+
+            if (Object.keys(correctVersion).length) {
+              const downloadedDep = await downloadMod(
+                dep.addonId,
+                id,
+                filename,
+                instanceName
+              );
+              const nestedDeps = await downloadDependancies(dep.addonId, id, instanceName);
+              deps = deps.concat(downloadedDep).concat(nestedDeps);
+            }
 
           }
         }
