@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import path from 'path';
 import Zip from 'adm-zip';
 import fs from 'fs';
 import { promisify } from 'util';
+import { isEqual } from 'lodash';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Link } from 'react-router-dom';
@@ -14,15 +15,28 @@ import ModRow from './ModRow';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
+import { getInstance } from '../../../../utils/selectors';
 
-const LocalMods = props => {
-  const [filteredMods, setFilteredMods] = useState(props.localMods);
+const mapMods = mods => {
+  return mods
+    .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
+    .map(v => ({
+      name: v.name,
+      state: path.extname(v.name) !== '.disabled',
+      key: v.name,
+      height: 50,
+      selected: false
+    }))
+}
+
+const LocalModsComponent = props => {
+  const [filteredMods, setFilteredMods] = useState(mapMods(props.instanceData.mods));
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    setFilteredMods(props.localMods);
+    setFilteredMods(mapMods(props.instanceData.mods));
     filterMods(searchQuery);
-  }, [props.localMods]);
+  }, [props.instanceData]);
 
   const listRef = React.createRef();
 
@@ -50,9 +64,9 @@ const LocalMods = props => {
   const filterMods = v => {
     setSearchQuery(v.toLowerCase());
     if (v === '') {
-      setFilteredMods(props.localMods);
+      setFilteredMods(mapMods(props.instanceData.mods));
     } else {
-      const modsList = props.localMods.filter(mod =>
+      const modsList = mapMods(props.instanceData.mods).filter(mod =>
         mod.name.toLowerCase().includes(v.toLowerCase())
       );
       setFilteredMods(modsList);
@@ -72,7 +86,7 @@ const LocalMods = props => {
         path.join(PACKS_PATH, instancesPath, 'config.json')
       )
     );
- 
+
     await promisify(fs.writeFile)(
       path.join(PACKS_PATH, instancesPath, 'config.json'),
       JSON.stringify(
@@ -92,7 +106,7 @@ const LocalMods = props => {
     return filteredMods[i].height;
   };
 
-  if (props.localMods.length === 0) {
+  if (props.instanceData.mods.length === 0) {
     return (
       <div className={styles.noMod}>
         <div>
@@ -102,7 +116,7 @@ const LocalMods = props => {
             to={{
               pathname: `/editInstance/${
                 props.match.params.instance
-              }/mods/browse/${props.match.params.version}`,
+                }/mods/browse/${props.match.params.version}`,
               state: { modal: true }
             }}
             replace
@@ -186,7 +200,7 @@ const LocalMods = props => {
             to={{
               pathname: `/editInstance/${
                 props.match.params.instance
-              }/mods/browse/${props.match.params.version}`,
+                }/mods/browse/${props.match.params.version}`,
               state: { modal: true }
             }}
             replace
@@ -220,8 +234,18 @@ const LocalMods = props => {
   );
 };
 
-function mapStateToProps(state) {
-  return {};
+function mapStateToProps(state, ownProps) {
+  const instanceData = getInstance(ownProps.match.params.instance)(state);
+  return {
+    instanceData
+  };
 }
 
-export default connect(mapStateToProps)(LocalMods);
+const LocalMods = connect(mapStateToProps)(LocalModsComponent);
+
+
+const MemoizedLocalMods = memo(LocalMods, (prev, next) => {
+  return isEqual(prev.match, next.match);
+});
+
+export default MemoizedLocalMods;
