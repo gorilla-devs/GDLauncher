@@ -12,6 +12,17 @@ type Props = {
   history: object
 };
 
+if (process.env.NODE_ENV !== 'production') {
+  const whyDidYouRender = require('@welldone-software/why-did-you-render');
+  whyDidYouRender(React);
+}
+
+/*
+USE IN CLASS COMPONENTS -> static whyDidYouRender = true
+USE IN PURE COMPONENTS  -> BigListPureComponent.whyDidYouRender = true
+
+*/
+
 class Root extends Component<Props> {
   constructor(props) {
     super(props);

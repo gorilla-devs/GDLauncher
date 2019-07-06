@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { connect } from 'react-redux';
 import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -20,6 +20,127 @@ import styles from './ModsList.scss';
 import { updateConfig, readConfig } from '../../../../utils/instances';
 import { getInstance } from '../../../../utils/selectors';
 
+const InstallButtonComponent = ({ mod, installedMods, instance, version }) => {
+  const [isInstalling, setIsInstalling] = useState(false);
+
+  async function downloadModFunc(e, mod) {
+    e.stopPropagation();
+    setIsInstalling(true);
+
+    const files = await getAddonFiles(mod.id);
+
+    const filteredFiles = files.filter(el => el.gameVersion.includes(version));
+
+    const fileID = filteredFiles[0].id;
+    const { fileName } = filteredFiles[0].fileName;
+
+
+    const newMod = await downloadMod(mod.id, fileID, fileName, instance);
+    const dependancies = await downloadDependancies(mod.id, fileID, instance);
+
+    const instanceCfg = await readConfig(instance);
+    await updateConfig(instance, { mods: [...instanceCfg.mods, newMod, ...dependancies] })
+  }
+
+  if (!mod || installedMods.mods.find(v => v.projectID === mod.id))
+    return null;
+
+  return (
+    <Button
+      className={styles.installMod}
+      onClick={e => downloadModFunc(e, mod)}
+      loading={isInstalling}
+    >
+      INSTALL&nbsp;
+        <FontAwesomeIcon icon={faDownload} />
+    </Button>
+  );
+};
+
+const InstalledBadgeComponent = ({ mod, installedMods }) => {
+  if (!mod || !installedMods.mods.find(v => v.projectID === mod.id))
+    return null;
+
+  return (
+    <div className={styles.modInstalled}>INSTALLED</div>
+  );
+};
+
+const CellComponent = ({ columnIndex, rowIndex, style, height, width, instance, version, items, isItemLoaded, isNextPageLoading }) => {
+  if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
+    return <div />;
+
+  const mod = items[3 * rowIndex + columnIndex];
+  let content;
+
+  if (!isItemLoaded(3 * rowIndex + columnIndex)) {
+    content = (
+      <div style={style} className={styles.modIconContainer}>
+        <div className={styles.overlayContainer}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <ContentLoader
+                height={height}
+                width={width}
+                speed={0.6}
+                ariaLabel={false}
+                primaryColor="var(--secondary-color-2)"
+                secondaryColor="var(--secondary-color-3)"
+                style={{
+                  width,
+                  height
+                }}
+              >
+                <rect
+                  x={0}
+                  y={0}
+                  rx="0"
+                  ry="0"
+                  width={width}
+                  height={height}
+                />
+              </ContentLoader>
+            )}
+          </AutoSizer>
+        </div>
+      </div>
+    );
+  } else {
+    // Tries to find a thumbnail. If none is found, it sets a default one
+    let attachment;
+    try {
+      attachment = mod.attachments.filter(v => v.isDefault)[0].thumbnailUrl;
+    } catch {
+      attachment =
+        'https://www.curseforge.com/Content/2-0-6969-50/Skins/CurseForge/images/background.jpg';
+    }
+    content = (
+      <div style={style} className={styles.modIconContainer}>
+        <div className={styles.overlayContainer}>
+          <div
+            className={styles.modIcon}
+            style={{
+              background: `linear-gradient(
+                rgba(0, 0, 0, 0.8),
+                rgba(0, 0, 0, 0.8)
+                ), url(${attachment})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+            onClick={() => setClick(mod.id)}
+          >
+            {mod && mod.name}
+            <InstallButton mod={mod} instance={instance} version={version} />
+          </div>
+          <InstalledBadge mod={mod} instance={instance} />
+        </div>
+      </div>
+    );
+  }
+
+  return content;
+};
+
 const ModsListWrapper = ({
   // Are there more items to load?
   // (This information comes from the most recent API request.)
@@ -37,38 +158,9 @@ const ModsListWrapper = ({
   width,
   height,
   setClick,
-  installedMods,
   instance,
   version
 }) => {
-  const [modsInstalling, setModsInstalling] = useState({});
-
-  async function downloadModFunc(e, mod) {
-    e.stopPropagation();
-
-    const files = await getAddonFiles(mod.id);
-
-    const filteredFiles = files.filter(el => el.gameVersion.includes(version));
-
-    const fileID = filteredFiles[0].id;
-    const { fileName } = filteredFiles[0].fileName;
-
-    setModsInstalling({
-      ...modsInstalling,
-      [mod.id]: true
-    });
-
-    const newMod = await downloadMod(mod.id, fileID, fileName, instance);
-    const dependancies = await downloadDependancies(mod.id, fileID, instance);
-
-    const instanceCfg = await readConfig(instance);
-    await updateConfig(instance, { mods: [...instanceCfg.mods, newMod, ...dependancies] })
-
-    setModsInstalling({
-      ...modsInstalling,
-      [mod.id]: false
-    });
-  }
 
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
@@ -79,92 +171,6 @@ const ModsListWrapper = ({
 
   // Every row is loaded except for our loading indicator row.
   const isItemLoaded = index => !hasNextPage || index < items.length;
-
-  const Cell = ({ columnIndex, rowIndex, style }) => {
-    if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
-      return <div />;
-
-    const mod = items[3 * rowIndex + columnIndex];
-    let content;
-
-    if (!isItemLoaded(3 * rowIndex + columnIndex)) {
-      content = (
-        <div style={style} className={styles.modIconContainer}>
-          <div className={styles.overlayContainer}>
-            <AutoSizer>
-              {({ height, width }) => (
-                <ContentLoader
-                  height={height}
-                  width={width}
-                  speed={0.6}
-                  ariaLabel={false}
-                  primaryColor="var(--secondary-color-2)"
-                  secondaryColor="var(--secondary-color-3)"
-                  style={{
-                    width,
-                    height
-                  }}
-                >
-                  <rect
-                    x={0}
-                    y={0}
-                    rx="0"
-                    ry="0"
-                    width={width}
-                    height={height}
-                  />
-                </ContentLoader>
-              )}
-            </AutoSizer>
-          </div>
-        </div>
-      );
-    } else {
-      // Tries to find a thumbnail. If none is found, it sets a default one
-      let attachment;
-      try {
-        attachment = mod.attachments.filter(v => v.isDefault)[0].thumbnailUrl;
-      } catch {
-        attachment =
-          'https://www.curseforge.com/Content/2-0-6969-50/Skins/CurseForge/images/background.jpg';
-      }
-      content = (
-        <div style={style} className={styles.modIconContainer}>
-          <div className={styles.overlayContainer}>
-            <div
-              className={styles.modIcon}
-              style={{
-                background: `linear-gradient(
-                  rgba(0, 0, 0, 0.8),
-                  rgba(0, 0, 0, 0.8)
-                  ), url(${attachment})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-              onClick={() => setClick(mod.id)}
-            >
-              {mod && mod.name}
-              {mod && !installedMods.mods.find(v => v.projectID === mod.id) && (
-                <Button
-                  className={styles.installMod}
-                  onClick={e => downloadModFunc(e, mod)}
-                  loading={modsInstalling[mod.id]}
-                >
-                  INSTALL&nbsp;
-                  <FontAwesomeIcon icon={faDownload} />
-                </Button>
-              )}
-            </div>
-            {mod && installedMods.mods.find(v => v.projectID === mod.id) && (
-              <div className={styles.modInstalled}>INSTALLED</div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return content;
-  };
 
   return (
     <InfiniteLoader
@@ -219,7 +225,16 @@ const ModsListWrapper = ({
           rowHeight={180}
           width={width}
         >
-          {Cell}
+          {p => <Cell
+            items={items}
+            height={height}
+            width={width}
+            version={version}
+            instance={instance}
+            isItemLoaded={isItemLoaded}
+            isNextPageLoading={isNextPageLoading}
+            {...p} />
+          }
         </Grid>
       )}
     </InfiniteLoader>
@@ -230,4 +245,11 @@ const mapStateToProps = (state, ownProps) => ({
   installedMods: getInstance(ownProps.instance)(state)
 });
 
-export default connect(mapStateToProps)(ModsListWrapper);
+const InstalledBadge = connect(mapStateToProps)(InstalledBadgeComponent);
+
+const InstallButton = connect(mapStateToProps)(InstallButtonComponent);
+
+
+const Cell = memo(CellComponent);
+
+export default ModsListWrapper;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
 import path from 'path';
@@ -8,7 +8,7 @@ import ContentLoader from 'react-content-loader';
 import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import { promisify } from 'util';
 import ModsListWrapper from './ModsListWrapper';
 import { PACKS_PATH } from '../../../../constants';
@@ -162,8 +162,13 @@ const ModsList = props => {
   );
 };
 
+
 function mapStateToProps(state) {
   return {};
 }
 
-export default connect(mapStateToProps)(ModsList);
+const MemoizedModsList = memo(ModsList, (prev, next) => {
+  return isEqual(prev.match, next.match)
+});
+
+export default connect(mapStateToProps)(MemoizedModsList);

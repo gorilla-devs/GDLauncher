@@ -148,7 +148,7 @@ class ModsManager extends Component<Props> {
           <Route
             path="/editInstance/:instance/mods/browse/:version"
             render={props => (
-              <ModsList localMods={this.state.localMods} {...props} />
+              <ModsList {...props} />
             )}
           />
         </Switch>

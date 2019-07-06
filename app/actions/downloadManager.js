@@ -267,7 +267,7 @@ export function downloadPack(pack, isRepair = false) {
           'libraries',
           ...arraify(forgeJSON.mavenVersionString)
         );
-        console.log('TESTING START FORGE')
+
         await downloadFile(forgeBinPath, forgeJSON.downloadUrl, p => {
           dispatch(updateDownloadProgress(0, 15, p, 100));
         });
@@ -359,7 +359,6 @@ export function downloadPack(pack, isRepair = false) {
         })
       );
 
-      console.log('TESTING START MODS')
       let modsDownloaded = 0;
       await Promise.map(
         manifest.files,
@@ -446,7 +445,6 @@ export function downloadPack(pack, isRepair = false) {
         totalPercentage = totalPercentage - 10;
       }
     }
-    console.log('TESTING START FILES')
     const updatePercentage = downloaded => {
       dispatch(updateDownloadProgress(minPercentage, totalPercentage, downloaded, totalFiles));
     };
@@ -467,7 +465,6 @@ export function downloadPack(pack, isRepair = false) {
 
     // Finish forge patches >= 1.13
     if (installProfileJson) {
-      console.log('TESTING START PROCESS')
       const { processors } = installProfileJson;
       const replaceIfPossible = arg => {
         const finalArg = arg.replace('{', '').replace('}', '');
