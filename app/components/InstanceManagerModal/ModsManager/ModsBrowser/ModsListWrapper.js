@@ -66,7 +66,7 @@ const InstalledBadgeComponent = ({ mod, installedMods }) => {
   );
 };
 
-const CellComponent = ({ columnIndex, rowIndex, style, height, width, instance, version, items, isItemLoaded, isNextPageLoading }) => {
+const CellComponent = ({ columnIndex, rowIndex, style, height, width, instance, version, items, isItemLoaded, isNextPageLoading, setClick }) => {
   if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
     return <div />;
 
@@ -233,6 +233,7 @@ const ModsListWrapper = ({
             instance={instance}
             isItemLoaded={isItemLoaded}
             isNextPageLoading={isNextPageLoading}
+            setClick={setClick}
             {...p} />
           }
         </Grid>
