@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { history } from '../../store/configureStore';
 
 /**
  * Wraps the React Router Link component and creates a delay after the link is clicked.
@@ -47,7 +48,6 @@ export default class DelayLink extends React.Component {
    */
   handleClick = e => {
     const { replace, to, delay, onDelayStart, onDelayEnd } = this.props;
-    const { history } = this.context.router;
 
     onDelayStart(e, to);
     if (e.defaultPrevented) {
