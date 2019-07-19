@@ -23,17 +23,34 @@ import { getInstance } from '../../../../utils/selectors';
 const InstallButtonComponent = ({ mod, installedMods, instance, version }) => {
   const [isInstalling, setIsInstalling] = useState(false);
 
+  function checkFileId(latestVersion, filteredFiles) {
+    let tempArr = [];
+    let versions = latestVersion.map(x => x.fileName.split(".jar")[0].split("-")[x.fileName.split(".jar")[0].split("-").length - 1]);
+    if (latestVersion.length > 0) {
+      tempArr = versions.map((a, i) => a.split('.').map(n => +n + 100000).join('.')).sort()
+        .map(a => a.split('.').map(n => +n - 100000).join('.'));
+      return [tempArr[tempArr.length - 1], latestVersion.filter(x => x.fileName.includes(tempArr[tempArr.length - 1]))[0].id];
+    } else {
+      return filteredFiles[0].id;
+    }
+  };
+
+  function checkFileNameFromVersion(version, filteredFiles) {
+    return filteredFiles.filter(x => x.fileName.split(".jar")[0].split("-")[x.fileName.split(".jar")[0].split("-").length - 1] === version)[0].fileName;
+  }
+
   async function downloadModFunc(e, mod) {
     e.stopPropagation();
     setIsInstalling(true);
 
+
     const files = await getAddonFiles(mod.id);
 
     const filteredFiles = files.filter(el => el.gameVersion.includes(version));
+    const latestVersion = filteredFiles.filter(x => x.fileName.split(".jar")[0].split("-")[x.fileName.split(".jar")[0].length - 1] === mod.gameVersionLatestFiles[0].projectFileName.split(".jar")[0].split("-")[x.fileName.split(".jar")[0].length - 1]);
 
-    const fileID = filteredFiles[0].id;
-    const { fileName } = filteredFiles[0].fileName;
-
+    const fileID = checkFileId(latestVersion, filteredFiles)[1];
+    const { fileName } = latestVersion.length > 0 ? checkFileNameFromVersion(checkFileId(latestVersion, filteredFiles)[0], filteredFiles) : filteredFiles[0].fileName;
 
     const newMod = await downloadMod(mod.id, fileID, fileName, instance);
     const dependancies = await downloadDependancies(mod.id, fileID, instance);
