@@ -152,7 +152,6 @@ export function startInstance(instanceName) {
     // Checks for legacy java memory
     const legacyString = [' -Xmx{_RAM_}m', '-Xmx{_RAM_}m'];
     const config = await readConfig(instanceName);
-    console.log("CONFIG", config.overrideArgs, instanceName);
     if (config.overrideArgs && (config.overrideArgs.includes(legacyString[0]) || config.overrideArgs.includes(legacyString[1]))) {
       await updateConfig(instanceName, {
         overrideArgs: config.overrideArgs.replace(legacyString, '')
