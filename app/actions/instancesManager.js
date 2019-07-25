@@ -163,8 +163,8 @@ export function startInstance(instanceName) {
     const command = await launchCommand(
       instanceName,
       auth,
-      settings,
-      settings.java.javaArgs
+      getState().settings,
+      getState().settings.java.javaArgs
     );
     const start = spawn(command, [], {
       shell: true,
