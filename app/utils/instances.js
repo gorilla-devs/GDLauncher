@@ -18,6 +18,6 @@ export const updateConfig = async (instanceName: string, paramsToEdit: {} | null
 
 export const readConfig = async (instanceName: string) => {
   const configPath = path.join(PACKS_PATH, instanceName, 'config.json');
-  const file = await promisify(fs.readFile)(configPath, "utf8");
+  const file = await promisify(fs.readFile)(configPath);
   return JSON.parse(file);
 };
