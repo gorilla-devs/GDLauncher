@@ -11,6 +11,8 @@ import { bin2string, isWhitespaceCharacter } from './strings';
 import { PACKS_PATH } from '../constants';
 import { getAddonFile, getAddonFiles } from './cursemeta';
 
+// Filetype: 1: stable, 2: beta, 3: alpha
+
 // Downloads a specific mod from curse using the addonID and fileID
 export const downloadMod = async (
   // modId: The generic addon ID of the addon
