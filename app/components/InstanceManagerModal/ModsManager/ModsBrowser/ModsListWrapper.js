@@ -27,16 +27,12 @@ const InstallButtonComponent = ({ mod, installedMods, instance, version }) => {
     e.stopPropagation();
     setIsInstalling(true);
 
-    const files = await getAddonFiles(mod.id);
-
-    const filteredFiles = files.filter(el => el.gameVersion.includes(version));
-
-    const fileID = filteredFiles[0].id;
-    const { fileName } = filteredFiles[0].fileName;
+    const file = mod.gameVersionLatestFiles.find(v => v.gameVersion === version);
+    const { projectFileName, projectFileId } = file;
 
 
-    const newMod = await downloadMod(mod.id, fileID, fileName, instance);
-    const dependancies = await downloadDependancies(mod.id, fileID, instance);
+    const newMod = await downloadMod(mod.id, projectFileId, projectFileName, instance);
+    const dependancies = await downloadDependancies(mod.id, projectFileId, instance);
 
     const instanceCfg = await readConfig(instance);
     await updateConfig(instance, { mods: [...instanceCfg.mods, newMod, ...dependancies] })
