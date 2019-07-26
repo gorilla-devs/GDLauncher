@@ -75,9 +75,9 @@ const ModRow = ({
     <div
       className={index % 2 ? styles.listItemOdd : styles.listItemEven}
       style={style}
-      onClick={() => {
-        toggleSize(index);
-      }}
+      // onClick={() => {
+        // toggleSize(index);
+      // }}
       role="none"
       key={modData.name}
     >

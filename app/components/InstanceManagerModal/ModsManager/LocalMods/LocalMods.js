@@ -42,10 +42,10 @@ const LocalModsComponent = props => {
 
   const modsFolder = path.join(PACKS_PATH, props.match.params.instance, 'mods');
 
-  const toggleSize = i => {
-    if (listRef.current) {
-      listRef.current.resetAfterIndex(i);
-    }
+  // const toggleSize = i => {
+  //   if (listRef.current) {
+  //     listRef.current.resetAfterIndex(i);
+  //   }
 
     if (filteredMods[i].height === 50) {
       const zipFile = new Zip(path.join(modsFolder, filteredMods[i].name));
@@ -221,7 +221,7 @@ const LocalModsComponent = props => {
             {propss => (
               <ModRow
                 {...propss}
-                toggleSize={toggleSize}
+                // toggleSize={toggleSize}
                 modData={filteredMods[propss.index]}
                 setFilteredMods={setFilteredMods}
                 instance={props.match.params.instance}
