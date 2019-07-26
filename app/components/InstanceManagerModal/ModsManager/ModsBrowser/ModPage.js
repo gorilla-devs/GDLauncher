@@ -15,6 +15,7 @@ import { PACKS_PATH } from '../../../../constants';
 import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 
 import styles from './ModPage.scss';
+import colors from '../../../../style/theme/colors.scss';
 import { getAddon, getAddonFiles, getAddonDescription } from '../../../../utils/cursemeta';
 
 function ModPage(props) {
@@ -138,9 +139,9 @@ function ModPage(props) {
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ textAlign: 'center' }}>{modData.name}</h1>
             <div className={styles.versionType}>
-              <h3>[S] stable</h3>
-              <h3>[B] beta</h3>
-              <h3>[A] alpha</h3>
+              <h3 style={{ color: colors.green }}>[S] Stable</h3>
+              <h3 style={{ color: colors.yellow }}>[B] Beta</h3>
+              <h3 style={{ color: colors.red }}>[A] Alpha</h3>
             </div>
             <div className={styles.modActions}>
               <div
@@ -182,11 +183,21 @@ function ModPage(props) {
                 >
                   {modData.allFiles.map(ver => {
                     return (
+                      //(ver.releaseType == 1 ? "[S]" : (ver.releaseType == 2 ? "[B]" : "[A]")).concat(' ', ver.fileName)
                       <Select.Option
                         key={ver.fileName}
                         value={ver.fileName}
                       >
-                        {(ver.releaseType == 1 ? "[S]" : (ver.releaseType == 2 ? "[B]" : "[A]")).concat(' ', ver.fileName)}
+                        <span style={{
+                          color: ver.releaseType == 1 ? colors.green : (
+                            ver.releaseType === 2 ? colors.yellow : colors.red
+                          )
+                        }}>
+                          {(ver.releaseType === 1 ? "[S]" : (ver.releaseType === 2 ? "[B]" : "[A]"))} 
+                        </span>
+                        <span>
+                          &nbsp;{ver.fileName}
+                        </span>
                       </Select.Option>
                     )
                   })}
