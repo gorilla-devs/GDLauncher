@@ -139,9 +139,9 @@ function ModPage(props) {
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ textAlign: 'center' }}>{modData.name}</h1>
             <div className={styles.versionType}>
-              <h3 style={{ color: colors.green }}>[S] Stable</h3>
-              <h3 style={{ color: colors.yellow }}>[B] Beta</h3>
-              <h3 style={{ color: colors.red }}>[A] Alpha</h3>
+              <h4 style={{ color: colors.green }}>[S] Stable</h4>
+              <h4 style={{ color: colors.yellow }}>[B] Beta</h4>
+              <h4 style={{ color: colors.red }}>[A] Alpha</h4>
             </div>
             <div className={styles.modActions}>
               <div
@@ -183,7 +183,6 @@ function ModPage(props) {
                 >
                   {modData.allFiles.map(ver => {
                     return (
-                      //(ver.releaseType == 1 ? "[S]" : (ver.releaseType == 2 ? "[B]" : "[A]")).concat(' ', ver.fileName)
                       <Select.Option
                         key={ver.fileName}
                         value={ver.fileName}
@@ -193,7 +192,7 @@ function ModPage(props) {
                             ver.releaseType === 2 ? colors.yellow : colors.red
                           )
                         }}>
-                          {(ver.releaseType === 1 ? "[S]" : (ver.releaseType === 2 ? "[B]" : "[A]"))} 
+                          {(ver.releaseType === 1 ? "[S]" : (ver.releaseType === 2 ? "[B]" : "[A]"))}
                         </span>
                         <span>
                           &nbsp;{ver.fileName}
