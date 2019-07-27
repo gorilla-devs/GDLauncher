@@ -12,7 +12,8 @@ const JavaArgumentInput = ({
   overrideArgs,
   onChange,
   updateArgs,
-  resetArgs
+  resetArgs,
+  invertedStyle
 }) => {
   const updateConfig = v => {
     updateArgs(v);
@@ -34,7 +35,8 @@ const JavaArgumentInput = ({
           marginRight: '10px',
           marginBottom: 4,
           marginTop: 4,
-          marginLeft: '1%'
+          marginLeft: '1%',
+          ...(invertedStyle && { background: 'var(--secondary-color-1)' })
         }}
         onChange={onInputChange}
       />
