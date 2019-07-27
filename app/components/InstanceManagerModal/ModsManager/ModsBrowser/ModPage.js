@@ -5,7 +5,7 @@ import ContentLoader from 'react-content-loader';
 import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import Promise from 'bluebird';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { promisify } from 'util';
@@ -15,6 +15,7 @@ import { PACKS_PATH } from '../../../../constants';
 import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 
 import styles from './ModPage.scss';
+import colors from '../../../../style/theme/colors.scss';
 import { getAddon, getAddonFiles, getAddonDescription } from '../../../../utils/cursemeta';
 
 function ModPage(props) {
@@ -55,7 +56,7 @@ function ModPage(props) {
           mods: [...config.mods, newMod, ...dependancies]
         })
       );
-    } catch {}
+    } catch { }
 
     setModsInstalling({
       ...modsInstalling,
@@ -135,91 +136,107 @@ function ModPage(props) {
           )}
         </AutoSizer>
       ) : (
-        <div style={{ textAlign: 'center' }}>
-          <h1 style={{ textAlign: 'center' }}>{modData.name}</h1>
-          <div className={styles.modActions}>
-            <div
-              style={{
-                width: '45%',
-                display: 'flex',
-                justifyContent: 'space-evenly',
-                alignItems: 'center'
-              }}
-            >
-              <Button
-                type="primary"
-                onClick={() =>
-                  installMod(
-                    modData.id,
-                    modData.allFiles[0].id,
-                    modData.allFiles[0].fileName
-                  )
-                }
-                loading={isInstalling(modData.allFiles[0].fileName)}
-                disabled={isDownloadCompleted(
-                  modData.allFiles[0].fileName
-                )}
-              >
-                Install Latest
-              </Button>
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ textAlign: 'center' }}>{modData.name}</h1>
+            <div className={styles.versionType}>
+              <h4 style={{ color: colors.green }}>[S] Stable</h4>
+              <h4 style={{ color: colors.yellow }}>[B] Beta</h4>
+              <h4 style={{ color: colors.red }}>[A] Alpha</h4>
             </div>
-            <span>Or</span>
-            <div style={{ width: '45%' }}>
-              <Select
+            <div className={styles.modActions}>
+              <div
                 style={{
-                  width: '200px',
-                  display: 'block',
-                  margin: '0 auto'
+                  width: '45%',
+                  display: 'flex',
+                  justifyContent: 'space-evenly',
+                  alignItems: 'center'
                 }}
-                placeholder="Select a version"
-                notFoundContent="No version found"
-                onChange={handleModVersionChange}
               >
-                {modData.allFiles.map(ver => (
-                  <Select.Option
-                    key={ver.fileName}
-                    value={ver.fileName}
-                  >
-                    {ver.fileName}
-                  </Select.Option>
-                ))}
-              </Select>
-              <br />
-              <Button
-                type="primary"
-                onClick={() =>
-                  selectedModVersion && installMod(
-                    modData.id,
-                    modData.allFiles.find(
-                      v => v.fileName === selectedModVersion
-                    ).id,
-                    modData.allFiles.find(
-                      v => v.fileName === selectedModVersion
-                    ).fileName
-                  )
-                }
-                loading={isInstalling(selectedModVersion)}
-                disabled={isDownloadCompleted(selectedModVersion)}
-                style={{ display: 'block', margin: '0 auto' }}
-              >
-                {isInstalling(selectedModVersion)
-                  ? 'Installing'
-                  : isDownloadCompleted(selectedModVersion)
-                  ? 'Installed'
-                  : 'Install Selected Mod'}
+                <Button
+                  type="primary"
+                  onClick={() =>
+                    installMod(
+                      modData.id,
+                      modData.allFiles[0].id,
+                      modData.allFiles[0].fileName
+                    )
+                  }
+                  loading={isInstalling(modData.allFiles[0].fileName)}
+                  disabled={isDownloadCompleted(
+                    modData.allFiles[0].fileName
+                  )}
+                >
+                  Install Latest
               </Button>
+              </div>
+              <span>Or</span>
+              <div style={{ width: '45%' }}>
+                <Select
+                  style={{
+                    width: '200px',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                  placeholder="Select a version"
+                  notFoundContent="No version found"
+                  onChange={handleModVersionChange}
+                >
+                  {modData.allFiles.map(ver => {
+                    return (
+                      <Select.Option
+                        key={ver.fileName}
+                        value={ver.fileName}
+                      >
+                        <span style={{
+                          color: ver.releaseType == 1 ? colors.green : (
+                            ver.releaseType === 2 ? colors.yellow : colors.red
+                          )
+                        }}>
+                          {(ver.releaseType === 1 ? "[S]" : (ver.releaseType === 2 ? "[B]" : "[A]"))}
+                        </span>
+                        <span>
+                          &nbsp;{ver.fileName}
+                        </span>
+                      </Select.Option>
+                    )
+                  })}
+                </Select>
+                <br />
+                <Button
+                  type="primary"
+                  onClick={() =>
+                    selectedModVersion && installMod(
+                      modData.id,
+                      modData.allFiles.find(
+                        v => v.fileName === selectedModVersion
+                      ).id,
+                      modData.allFiles.find(
+                        v => v.fileName === selectedModVersion
+                      ).fileName
+                    )
+                  }
+                  loading={isInstalling(selectedModVersion)}
+                  disabled={isDownloadCompleted(selectedModVersion)}
+                  style={{ display: 'block', margin: '0 auto' }}
+                >
+                  {isInstalling(selectedModVersion)
+                    ? 'Installing'
+                    : isDownloadCompleted(selectedModVersion)
+                      ? 'Installed'
+                      : 'Install Selected Mod'}
+                </Button>
+              </div>
+            </div>
+            <h2 style={{ textAlign: 'center' }}>Description</h2>
+            <div className={styles.modDescription}>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: modData.description
+                }}
+              />
             </div>
           </div>
-          <h2 style={{ textAlign: 'center' }}>Description</h2>
-          <div className={styles.modDescription}>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: modData.description
-              }}
-            />
-          </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

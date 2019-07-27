@@ -154,6 +154,7 @@ function JavaManagerCard(props) {
             onChange={setOverrideArgsInput}
             updateArgs={updateArgs}
             resetArgs={resetArgs}
+            invertedStyle
           />
         )}
       </div>

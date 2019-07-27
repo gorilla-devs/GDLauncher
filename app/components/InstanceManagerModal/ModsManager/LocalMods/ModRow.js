@@ -10,6 +10,7 @@ import { Checkbox, Switch } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
+import { readConfig, updateConfig } from '../../../../utils/instances';
 
 type Props = {
   index: number,
@@ -44,18 +45,11 @@ const ModRow = ({
     // Remove the actual file
     await promisify(fs.unlink)(path.join(modsFolder, modData.name));
     // Remove the reference in the mods file json
-    const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, instance, 'config.json')
-      )
-    );
-    await promisify(fs.writeFile)(
-      path.join(PACKS_PATH, instance, 'config.json'),
-      JSON.stringify({
-        ...config,
-        mods: config.mods.filter(v => v.filename !== modData.name)
-      })
-    );
+    const config = await readConfig(instance);
+    await updateConfig(instance, {
+      mods: config.mods.filter(v => v.filename !== modData.name)
+    })
+
   };
 
   const toggleDisableMod = async (enabled, index) => {
@@ -75,8 +69,9 @@ const ModRow = ({
     <div
       className={index % 2 ? styles.listItemOdd : styles.listItemEven}
       style={style}
-      onClick={() => {
-        toggleSize(index);
+      onClick={e => {
+        // e.stopPropagation();
+        // toggleSize(index);
       }}
       role="none"
       key={modData.name}
@@ -85,8 +80,6 @@ const ModRow = ({
         <div>
           <Checkbox
             onChange={e => {
-              e.stopPropagation();
-              e.nativeEvent.stopImmediatePropagation();
               selectMod(index);
             }}
             checked={modData.selected}
