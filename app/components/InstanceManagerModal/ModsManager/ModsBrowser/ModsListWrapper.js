@@ -35,7 +35,7 @@ const InstallButtonComponent = ({ mod, installedMods, instance, version }) => {
     const dependancies = await downloadDependancies(mod.id, projectFileId, instance);
 
     const instanceCfg = await readConfig(instance);
-    await updateConfig(instance, { mods: [...instanceCfg.mods, newMod, ...dependancies] })
+    await updateConfig(instance, { mods: [...(instanceCfg.mods || []), newMod, ...dependancies] })
   }
 
   if (!mod || installedMods.mods.find(v => v.projectID === mod.id))
