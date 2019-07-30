@@ -115,12 +115,12 @@ class RouteDef extends Component<Props> {
       ga(this.props.uuid).set('ds', 'app');
       ga(this.props.uuid).set('ua', `${release()} ${arch()}`);
       ga(this.props.uuid).set('cd1', `${release()} ${arch()}`);
-      ga(this.props.uuid).set(
-        'sr',
-        `${screen.getPrimaryDisplay().bounds.width}x${
-          screen.getPrimaryDisplay().bounds.height
-        }`
-      );
+      // ga(this.props.uuid).set(
+      //   'sr',
+      //   `${screen.getPrimaryDisplay().bounds.width}x${
+      //     screen.getPrimaryDisplay().bounds.height
+      //   }`
+      // );
       ga(this.props.uuid).set(
         'vp',
         `${window.innerWidth}x${window.innerHeight}`
