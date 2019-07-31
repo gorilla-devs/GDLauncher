@@ -146,10 +146,12 @@ class RouteDef extends Component<Props> {
       this.props.location.pathname === '/home' &&
       store.get('showChangelogs') !== false
     ) {
-      history.push({
-        pathname: `/changelogs`,
-        state: { modal: true }
-      });
+      setTimeout(() => {
+        history.push({
+          pathname: `/changelogs`,
+          state: { modal: true }
+        });
+      }, 200);
     }
   };
 
