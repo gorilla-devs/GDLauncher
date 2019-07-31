@@ -74,7 +74,8 @@ export function initInstances() {
                   return {
                     name: mod,
                     projectID: configMod && configMod.projectID,
-                    fileID: configMod && configMod.fileID
+                    fileID: configMod && configMod.fileID,
+                    fileDate: configMod && configMod.fileDate
                   };
                 });
               } catch (err) {

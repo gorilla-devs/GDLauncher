@@ -8,6 +8,7 @@ import downloadManager from './downloadManager';
 import instancesManager from './instancesManager';
 import news from './news';
 import settings from './settings';
+import latestModsUpdates from './latestModsUpdates'
 
 export default history =>
   combineReducers({
@@ -18,5 +19,6 @@ export default history =>
     downloadManager,
     instancesManager,
     news,
-    settings
+    settings,
+    latestModsUpdates
   });

@@ -1,6 +1,8 @@
 // @flow
 
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, memo } from 'react';
+import { areEqual } from "react-window";
+import { connect } from 'react-redux';
 import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,6 +15,8 @@ import styles from './LocalMods.scss';
 import { readConfig, updateConfig } from '../../../../utils/instances';
 import { getAddonFiles } from '../../../../utils/cursemeta';
 import { downloadMod } from '../../../../utils/mods';
+import { addNewModToLatestUpdates } from '../../../../actions/latestModsUpdates';
+import { hasLocalUpdate } from '../../../../utils/selectors';
 
 type Props = {
   index: number,
@@ -29,19 +33,28 @@ const ModRow = ({
   toggleSize,
   modData,
   setFilteredMods,
-  instance
+  instance,
+  addNewModToLatestUpdates,
+  localUpdate
 }: Props) => {
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(null);
 
   useEffect(() => {
     if (modData.projectID && modData.fileID) {
-      getAddonFiles(modData.projectID).then(files => {
-        const filteredFiles = files.filter(v => v.gameVersion.includes(modData.version));
-        const installedMod = files.find(v => v.id === modData.fileID);
-        if(installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
-          setIsUpdateAvailable(filteredFiles[0]);
+      if (localUpdate && modData.fileDate) {
+        if (new Date(modData.fileDate) < new Date(localUpdate.fileDate)) {
+          setIsUpdateAvailable(localUpdate);
         }
-      });
+      } else {
+        getAddonFiles(modData.projectID).then(files => {
+          const filteredFiles = files.filter(v => v.gameVersion.includes(modData.version));
+          addNewModToLatestUpdates({ ...filteredFiles[0], projectID: modData.projectID });
+          const installedMod = files.find(v => v.id === modData.fileID);
+          if (installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
+            setIsUpdateAvailable(filteredFiles[0]);
+          }
+        });
+      }
     }
   }, []);
 
@@ -137,4 +150,8 @@ const ModRow = ({
   );
 };
 
-export default ModRow;
+const MemoizedModRow = memo(ModRow, areEqual);
+
+export default connect((state, ownProps) => ({
+  localUpdate: hasLocalUpdate(ownProps.modData.projectID)(state)
+}), { addNewModToLatestUpdates })(MemoizedModRow);

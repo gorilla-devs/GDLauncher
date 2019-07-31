@@ -36,7 +36,8 @@ export const downloadMod = async (
     projectID: modId,
     fileID: projectFileId,
     packageFingerprint: data.packageFingerprint,
-    filename: sanitizedFileName
+    filename: sanitizedFileName,
+    fileDate: data.fileDate
   };
 };
 

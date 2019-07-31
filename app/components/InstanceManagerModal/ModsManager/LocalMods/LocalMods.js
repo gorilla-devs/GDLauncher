@@ -30,7 +30,8 @@ const LocalModsComponent = props => {
         selected: false,
         projectID: v.projectID || null,
         fileID: v.fileID || null,
-        version: props.match.params.version
+        version: props.match.params.version,
+        fileDate: v.fileDate || null,
       }))
   }
   
