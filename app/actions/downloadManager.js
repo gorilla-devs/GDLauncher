@@ -487,11 +487,11 @@ export function downloadPack(pack, isRepair = false) {
       };
       const computePathIfPossible = arg => {
         if (arg[0] === '[') {
-          return path.join(
+          return `"${path.join(
             INSTANCES_PATH,
             'libraries',
             arraify(arg.replace('[', '').replace(']', '')).join('/')
-          );
+          )}"`;
         }
         return arg;
       };
