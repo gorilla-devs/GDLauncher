@@ -18,6 +18,11 @@ type Props = {
 };
 const FormItem = Form.Item;
 
+const sortByDate = (a, b) => {
+  const dateA = new Date(a.fileDate), dateB = new Date(b.fileDate);
+  return dateB - dateA;
+}
+
 const CurseModpackBrowserCreatorModal = props => {
   const { forgeManifest, versionsManifest, match, form } = props;
   const { getFieldDecorator } = form;
@@ -29,10 +34,11 @@ const CurseModpackBrowserCreatorModal = props => {
   const [instanceName, setInstanceName] = useState('');
 
   const getModPackData = async () => {
-    const files = await getAddonFiles(addonID);
-    const instanceNameVar = (await getAddon(addonID)).name;
+    const [files, addon] = await Promise.all([getAddonFiles(addonID), getAddon(addonID)])
 
-    setInstanceName(instanceNameVar);
+    console.log(files)
+
+    setInstanceName(addon.name);
     setVersions(files);
     setLoading(false);
   };
@@ -122,15 +128,11 @@ const CurseModpackBrowserCreatorModal = props => {
                 placeholder="Select a version"
                 loading={loading}
               >
-                {_.reverse(
-                  versions
-                    .map(addon => (
-                      <Select.Option key={addon.id}>
-                        {addon.fileName.replace('.zip', '')}
-                      </Select.Option>
-                    ))
-                    .slice()
-                )}
+                {versions.sort(sortByDate).map(addon => (
+                  <Select.Option key={addon.id}>
+                    {addon.fileName.replace('.zip', '')}
+                  </Select.Option>
+                ))}
               </Select>
             )}
           </FormItem>
