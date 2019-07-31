@@ -1,16 +1,18 @@
 // @flow
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { promisify } from 'util';
 import { Checkbox, Switch } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
 import { readConfig, updateConfig } from '../../../../utils/instances';
+import { getAddonFiles } from '../../../../utils/cursemeta';
+import { downloadMod } from '../../../../utils/mods';
 
 type Props = {
   index: number,
@@ -29,19 +31,33 @@ const ModRow = ({
   setFilteredMods,
   instance
 }: Props) => {
+  const [isUpdateAvailable, setIsUpdateAvailable] = useState(null);
+
+  useEffect(() => {
+    if (modData.projectID && modData.fileID) {
+      getAddonFiles(modData.projectID).then(files => {
+        const filteredFiles = files.filter(v => v.gameVersion.includes(modData.version));
+        const installedMod = files.find(v => v.id === modData.fileID);
+        if(installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
+          setIsUpdateAvailable(filteredFiles[0]);
+        }
+      });
+    }
+  }, []);
+
   const modsFolder = path.join(PACKS_PATH, instance, 'mods');
-  const selectMod = i => {
+  const selectMod = () => {
     setFilteredMods(prevMods =>
       Object.assign([...prevMods], {
-        [i]: {
-          ...prevMods[i],
+        [index]: {
+          ...prevMods[index],
           selected: !modData.selected
         }
       })
     );
   };
 
-  const deleteMod = async i => {
+  const deleteMod = async () => {
     // Remove the actual file
     await promisify(fs.unlink)(path.join(modsFolder, modData.name));
     // Remove the reference in the mods file json
@@ -52,7 +68,7 @@ const ModRow = ({
 
   };
 
-  const toggleDisableMod = async (enabled, index) => {
+  const toggleDisableMod = async (enabled) => {
     if (enabled) {
       await promisify(fs.rename)(
         path.join(modsFolder, modData.name),
@@ -65,6 +81,14 @@ const ModRow = ({
       );
     }
   };
+
+  const updateMod = async () => {
+    await deleteMod();
+    const newMod = await downloadMod(modData.projectID, isUpdateAvailable.id, null, instance);
+    const instanceCfg = await readConfig(instance);
+    await updateConfig(instance, { mods: [...(instanceCfg.mods || []), newMod] })
+  };
+
   return (
     <div
       className={index % 2 ? styles.listItemOdd : styles.listItemEven}
@@ -80,7 +104,7 @@ const ModRow = ({
         <div>
           <Checkbox
             onChange={e => {
-              selectMod(index);
+              selectMod();
             }}
             checked={modData.selected}
           />
@@ -91,16 +115,21 @@ const ModRow = ({
             }}
             onChange={(v, e) => {
               e.stopPropagation();
-              toggleDisableMod(v, index);
+              toggleDisableMod(v);
             }}
           />
         </div>
         {modData.name.replace('.disabled', '')}
         <div>
+          {isUpdateAvailable && <FontAwesomeIcon
+            className={styles.updateIcon}
+            icon={faDownload}
+            onClick={() => updateMod()}
+          />}
           <FontAwesomeIcon
             className={styles.deleteIcon}
             icon={faTrash}
-            onClick={() => deleteMod(index)}
+            onClick={() => deleteMod()}
           />
         </div>
       </div>

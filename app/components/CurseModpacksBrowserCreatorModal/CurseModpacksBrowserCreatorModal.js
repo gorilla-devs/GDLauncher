@@ -18,11 +18,6 @@ type Props = {
 };
 const FormItem = Form.Item;
 
-const sortByDate = (a, b) => {
-  const dateA = new Date(a.fileDate), dateB = new Date(b.fileDate);
-  return dateB - dateA;
-}
-
 const CurseModpackBrowserCreatorModal = props => {
   const { forgeManifest, versionsManifest, match, form } = props;
   const { getFieldDecorator } = form;
@@ -128,7 +123,7 @@ const CurseModpackBrowserCreatorModal = props => {
                 placeholder="Select a version"
                 loading={loading}
               >
-                {versions.sort(sortByDate).map(addon => (
+                {versions.map(addon => (
                   <Select.Option key={addon.id}>
                     {addon.fileName.replace('.zip', '')}
                   </Select.Option>

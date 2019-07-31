@@ -59,6 +59,16 @@
   }
 }
 
+.updateIcon {
+  font-size: 17px;
+  margin: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    color: rgba(39, 174, 96, 0.8);
+  }
+}
+
 .deleteIcon {
   font-size: 17px;
   margin: 10px;
