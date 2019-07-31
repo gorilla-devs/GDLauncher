@@ -17,28 +17,34 @@ import { PACKS_PATH } from '../../../../constants';
 import styles from './LocalMods.scss';
 import { getInstance } from '../../../../utils/selectors';
 
-const mapMods = mods => {
-  return mods
-    .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
-    .map(v => ({
-      name: v.name,
-      state: path.extname(v.name) !== '.disabled',
-      key: v.name,
-      height: 50,
-      selected: false
-    }))
-}
 
 const LocalModsComponent = props => {
+  const mapMods = mods => {
+    return mods
+      .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
+      .map(v => ({
+        name: v.name,
+        state: path.extname(v.name) !== '.disabled',
+        key: v.name,
+        height: 50,
+        selected: false,
+        projectID: v.projectID || null,
+        fileID: v.fileID || null,
+        version: props.match.params.version,
+        fileDate: v.fileDate || null,
+      }))
+  }
+  
   const [filteredMods, setFilteredMods] = useState(mapMods(props.instanceData.mods));
   const [searchQuery, setSearchQuery] = useState('');
-
+  
   useEffect(() => {
     setFilteredMods(mapMods(props.instanceData.mods));
     filterMods(searchQuery);
   }, [props.instanceData]);
-
+  
   const listRef = React.createRef();
+  
 
   const modsFolder = path.join(PACKS_PATH, props.match.params.instance, 'mods');
 

@@ -8,6 +8,25 @@
   align-items: center;
 }
 
+.versionType {
+  height: 20px;
+  background: var(--secondary-color-2);
+  // background: green;
+  margin-right: 20px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-evenly;
+  text-align: center;
+  align-items: center;
+  padding: 20px;
+  border-radius: 2px;
+  
+  h4{
+    margin: 0px;
+    margin-top: 2px;
+  }
+}
+
 .modDescription {
   margin-right: 20px;
   img {

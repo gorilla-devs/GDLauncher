@@ -74,7 +74,8 @@ export function initInstances() {
                   return {
                     name: mod,
                     projectID: configMod && configMod.projectID,
-                    fileID: configMod && configMod.fileID
+                    fileID: configMod && configMod.fileID,
+                    fileDate: configMod && configMod.fileDate
                   };
                 });
               } catch (err) {
@@ -157,14 +158,17 @@ export function startInstance(instanceName) {
         overrideArgs: config.overrideArgs.replace(legacyString, '')
       });
     }
-    if (settings.java.javaArgs.includes(legacyString[0]) || settings.java.javaArgs.includes(legacyString[1]))
-      dispatch(setJavaArgs(settings.java.javaArgs.replace(legacyString, '')));
+    
+    if (settings.java.javaArgs.includes(legacyString[0]))
+      dispatch(setJavaArgs(settings.java.javaArgs.replace(legacyString[0], '')));
+    if (settings.java.javaArgs.includes(legacyString[1]))
+      dispatch(setJavaArgs(settings.java.javaArgs.replace(legacyString[1], '')));
 
     const command = await launchCommand(
       instanceName,
       auth,
-      settings,
-      settings.java.javaArgs
+      getState().settings,
+      getState().settings.java.javaArgs
     );
     const start = spawn(command, [], {
       shell: true,

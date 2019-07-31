@@ -29,10 +29,11 @@ const CurseModpackBrowserCreatorModal = props => {
   const [instanceName, setInstanceName] = useState('');
 
   const getModPackData = async () => {
-    const files = await getAddonFiles(addonID);
-    const instanceNameVar = (await getAddon(addonID)).name;
+    const [files, addon] = await Promise.all([getAddonFiles(addonID), getAddon(addonID)])
 
-    setInstanceName(instanceNameVar);
+    console.log(files)
+
+    setInstanceName(addon.name);
     setVersions(files);
     setLoading(false);
   };
@@ -122,15 +123,11 @@ const CurseModpackBrowserCreatorModal = props => {
                 placeholder="Select a version"
                 loading={loading}
               >
-                {_.reverse(
-                  versions
-                    .map(addon => (
-                      <Select.Option key={addon.id}>
-                        {addon.fileName.replace('.zip', '')}
-                      </Select.Option>
-                    ))
-                    .slice()
-                )}
+                {versions.map(addon => (
+                  <Select.Option key={addon.id}>
+                    {addon.fileName.replace('.zip', '')}
+                  </Select.Option>
+                ))}
               </Select>
             )}
           </FormItem>

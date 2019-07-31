@@ -18,7 +18,7 @@
 		"javascript.format.enable": true,
 		"typescript.validate.enable": false,
 		"typescript.format.enable": false,
-		"workbench.colorTheme": "Atom One Dark",
+		"workbench.colorTheme": "One Dark Pro",
 		"breadcrumbs.enabled": true,
 		"workbench.editor.highlightModifiedTabs": true,
     "search.showLineNumbers": true,
