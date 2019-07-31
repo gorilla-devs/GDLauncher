@@ -10,6 +10,8 @@ matrix:
 
     - os: linux
       language: node_js
+      services:
+        - xvfb
       node_js:
         - 10
       addons:
@@ -64,7 +66,6 @@ install:
 before_script:
   # On Linux, create a "virtual display". This allows browsers to work properly
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
 script:
