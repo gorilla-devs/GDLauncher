@@ -287,9 +287,6 @@
     "nsis": {
       "differentialPackage": false
     },
-    "appImage": {
-      "systemIntegration": "doNotAsk"
-    },
     "win": {
       "target": [
         "nsis"
