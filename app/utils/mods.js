@@ -9,7 +9,7 @@ import murmur from 'murmurhash-js';
 import { downloadFile } from './downloader';
 import { bin2string, isWhitespaceCharacter } from './strings';
 import { PACKS_PATH } from '../constants';
-import { getAddonFile, getAddonFiles } from './cursemeta';
+import { getAddonFile, getAddonFiles, getAddon } from './cursemeta';
 
 // Downloads a specific mod from curse using the addonID and fileID
 export const downloadMod = async (
@@ -72,28 +72,26 @@ export const downloadDependancies = async (
                 path.join(PACKS_PATH, instanceName, 'config.json')
               )
             ).mods;
-            console.log(installedMods)
-            if (installedMods.find(v => v.projectID === dep.addonId))
+            if (installedMods.find(v => v.projectID === dep.addonId)){
               toDownload = false;
+            }
           } catch {
             toDownload = true;
           }
           if (toDownload) {
-            const depData = await getAddonFiles(dep.addonId);
+            const depData = await getAddon(dep.addonId);
 
-            const correctVersion = depData
-              .reverse()
-              .find(n => n.gameVersion.includes(gameVersion)) || {};
-            const { id, filename } = correctVersion;
+            const correctVersion = depData.gameVersionLatestFiles.find(v => v.gameVersion === gameVersion) || {};
+            const { projectFileId, projectFileName } = correctVersion;
 
             if (Object.keys(correctVersion).length) {
               const downloadedDep = await downloadMod(
                 dep.addonId,
-                id,
-                filename,
+                projectFileId,
+                projectFileName,
                 instanceName
               );
-              const nestedDeps = await downloadDependancies(dep.addonId, id, instanceName);
+              const nestedDeps = await downloadDependancies(dep.addonId, projectFileId, instanceName);
               deps = deps.concat(downloadedDep).concat(nestedDeps);
             }
 
