@@ -55,8 +55,15 @@ export const downloadDependancies = async (
     const gameVersion = data.gameVersion[0];
     await Promise.all(
       data.dependencies.map(async dep => {
+        // type 1: embedded
+        // type 2: optional
+        // type 3: required
+        // type 4: tool
+        // type 5: incompatible
+        // type 6: include
+
         // It looks like type 1 are required dependancies and type 3 are dependancies that are already embedded in the parent one
-        if (dep.type === 1) {
+        if (dep.type === 3) {
           let toDownload = true;
           try {
             // See if the mod already exists in this instance
