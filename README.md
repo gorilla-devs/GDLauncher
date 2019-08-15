@@ -74,7 +74,6 @@ You need the following softwares installed:
 
 - Nodejs (> 8)
 - yarn
-- git
 
 ### ▶️ Steps
 
