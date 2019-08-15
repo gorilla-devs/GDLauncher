@@ -23,7 +23,8 @@ module.exports = api => {
         require('@babel/preset-env'),
         {
           targets: { node: 10 },
-          useBuiltIns: 'usage'
+          useBuiltIns: 'usage',
+          corejs: "3.2.1",
         }
       ],
       require('@babel/preset-flow'),
