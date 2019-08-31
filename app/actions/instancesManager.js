@@ -63,8 +63,10 @@ export function initInstances() {
         const instances = await getDirectories(PACKS_PATH);
         mappedInstances = await Promise.all(instances.map(async instance => {
           let mods = [];
+          let projectID = null;
           try {
             const config = await readConfig(instance);
+            projectID = config.projectID;
             if (config.mods && Array.isArray(config.mods) && config.mods.length) {
               try {
                 mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
@@ -87,6 +89,7 @@ export function initInstances() {
           }
           return {
             name: instance,
+            ...(projectID && { projectID }),
             mods: mods
           }
         }));

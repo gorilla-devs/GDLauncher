@@ -45,6 +45,14 @@ export const getAddonFile = async (
   return makeRequest(url);
 };
 
+export const getAddonFileChangelog = async (
+  addonID: number | string,
+  fileID: number | string
+) => {
+  const url = `${CURSEMETA_API_URL}/addon/${addonID}/file/${fileID}/changelog`;
+  return makeRequest(url);
+};
+
 export const getAddonFileIDFromVersion = async (
   addonID: number | string,
   modpackVersion: string
