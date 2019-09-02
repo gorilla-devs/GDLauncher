@@ -46,7 +46,7 @@ const SideBar = props => {
           .filter(
             el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
           ).length;
-      } catch {}
+      } catch { }
 
       try {
         const thumbnail = await promisify(fs.readFile)(
@@ -176,15 +176,15 @@ const SideBar = props => {
               <span style={{ padding: '0 5px' }}>Played for:</span>
               <span style={{ padding: '0 5px' }}>
                 {instanceData.timePlayed && instanceData.timePlayed !== null
-                  ? instanceData.timePlayed
+                  ? (instanceData.timePlayed < 60 ? instanceData.timePlayed : Math.floor(instanceData.timePlayed / 60))
                   : '0'}{' '}
-                m
+                { instanceData.timePlayed < 60 ? "m" : "h" }
               </span>
             </div>
           </div>
         ) : (
-          'No instance selected'
-        )}
+            'No instance selected'
+          )}
       </div>
       <div className={styles.scroller} />
       <hr style={{ margin: 0 }} />
