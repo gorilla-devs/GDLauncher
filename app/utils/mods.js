@@ -18,12 +18,14 @@ export const downloadMod = async (
   // projectFileId: The specific id of the file to download
   projectFileId,
   // filename: A name to save the file (example.jar)
-  filename,
+  fileName,
   // The name of the instance where to save this mod
-  instanceName
+  instanceName,
+  // Is this mod part of a modpack?
+  isModFromModpack
 ) => {
   const data = await getAddonFile(modId, projectFileId);
-  const validatedFileName = filename || data.fileName;
+  const validatedFileName = fileName || data.fileName;
   const sanitizedFileName = validatedFileName.includes('.jar')
     ? validatedFileName
     : `${validatedFileName}.jar`;
@@ -36,8 +38,9 @@ export const downloadMod = async (
     projectID: modId,
     fileID: projectFileId,
     packageFingerprint: data.packageFingerprint,
-    filename: sanitizedFileName,
-    fileDate: data.fileDate
+    fileName: sanitizedFileName,
+    fileDate: data.fileDate,
+    ...(isModFromModpack && { isModFromModpack: true })
   };
 };
 
@@ -72,7 +75,7 @@ export const downloadDependancies = async (
                 path.join(PACKS_PATH, instanceName, 'config.json')
               )
             ).mods;
-            if (installedMods.find(v => v.projectID === dep.addonId)){
+            if (installedMods.find(v => v.projectID === dep.addonId)) {
               toDownload = false;
             }
           } catch {
@@ -117,7 +120,7 @@ export const getModsList = async (
       try {
         const { data } = await getAddonFile(mod.projectID, mod.fileID);
         return {
-          path: path.join(PACKS_PATH, packName, 'mods', data.filename),
+          path: path.join(PACKS_PATH, packName, 'mods', data.fileName),
           url: data.downloadUrl
         };
       } catch (e) {

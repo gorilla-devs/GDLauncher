@@ -76,7 +76,7 @@ const ModRow = ({
     // Remove the reference in the mods file json
     const config = await readConfig(instance);
     await updateConfig(instance, {
-      mods: config.mods.filter(v => v.filename !== modData.name)
+      mods: config.mods.filter(v => v.fileName !== modData.name)
     })
 
   };

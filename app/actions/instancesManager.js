@@ -72,13 +72,8 @@ export function initInstances() {
                 mods = (await promisify(fss.readdir)(path.join(PACKS_PATH, instance, 'mods'))).filter(
                   el => path.extname(el) === '.zip' || path.extname(el) === '.jar' || path.extname(el) === '.disabled'
                 ).map(mod => {
-                  const configMod = config.mods.find(v => v.filename === mod);
-                  return {
-                    name: mod,
-                    projectID: configMod && configMod.projectID,
-                    fileID: configMod && configMod.fileID,
-                    fileDate: configMod && configMod.fileDate
-                  };
+                  const configMod = config.mods.find(v => v.fileName === mod);
+                  return configMod;
                 });
               } catch (err) {
                 console.error('Failed to get instance\'s mods', err)

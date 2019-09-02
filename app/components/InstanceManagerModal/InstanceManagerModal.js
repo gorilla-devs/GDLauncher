@@ -238,7 +238,12 @@ class InstanceManagerModal extends Component<Props> {
             />
             <Route
               path="/editInstance/:instance/modpackVersions"
-              component={ModpackVersions}
+              render={() => (
+                <ModpackVersions
+                  close={this.closeModal}
+                  instance={this.props.match.params.instance}
+                />
+              )}
             />
             <Route path="/editInstance/:instance/worlds" component={Worlds} />
             <Route
