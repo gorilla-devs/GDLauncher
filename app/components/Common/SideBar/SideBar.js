@@ -176,9 +176,8 @@ const SideBar = props => {
               <span style={{ padding: '0 5px' }}>Played for:</span>
               <span style={{ padding: '0 5px' }}>
                 {instanceData.timePlayed && instanceData.timePlayed !== null
-                  ? (instanceData.timePlayed < 60 ? instanceData.timePlayed : Math.floor(instanceData.timePlayed / 60))
+                  ? (`${Math.floor(instanceData.timePlayed / 60)}${'h'} ${Math.round(((instanceData.timePlayed / 60) - Math.floor(instanceData.timePlayed / 60)) * 60)}${'min'}`)
                   : '0'}{' '}
-                { instanceData.timePlayed < 60 ? "m" : "h" }
               </span>
             </div>
           </div>
