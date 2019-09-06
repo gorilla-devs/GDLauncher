@@ -136,7 +136,8 @@ const SideBar = props => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                left: 25
+                left: 25,
+
               }}
             >
               <span style={{ padding: '0 5px' }}>MC version:</span>
@@ -173,10 +174,12 @@ const SideBar = props => {
                 left: 25
               }}
             >
-              <span style={{ padding: '0 5px' }}>Played for:</span>
-              <span style={{ padding: '0 5px' }}>
+              <span style={{ padding: '0 5px', display: 'inline', fontSize: '12px'  }}>Played for:</span>
+              <span style={{ padding: '0 5px', display: 'inline', fontSize: '13px'  }}>
                 {instanceData.timePlayed && instanceData.timePlayed !== null
-                  ? (`${Math.floor(instanceData.timePlayed / 60)}${'h'} ${Math.round(((instanceData.timePlayed / 60) - Math.floor(instanceData.timePlayed / 60)) * 60)}${'min'}`)
+                  ? (instanceData.timePlayed > 100 ? 
+                    (` ${Math.floor(instanceData.timePlayed / (60*24))}${'d'} ${Math.floor(instanceData.timePlayed % (60*24) / 60) }${'h'} ${Math.floor(instanceData.timePlayed % (60*24) % 60) }${'m'}`) : 
+                    (`${Math.floor(instanceData.timePlayed / 60)}${'h'} ${Math.round(((instanceData.timePlayed / 60) - Math.floor(instanceData.timePlayed / 60)) * 60)}${'min'}`))
                   : '0'}{' '}
               </span>
             </div>
