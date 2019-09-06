@@ -178,7 +178,7 @@ const SideBar = props => {
               <span style={{ padding: '0 5px', display: 'inline', fontSize: '13px'  }}>
                 {instanceData.timePlayed && instanceData.timePlayed !== null
                   ? (instanceData.timePlayed > 100 ? 
-                    (` ${Math.floor(instanceData.timePlayed / (60*24))}${'d'} ${Math.floor(instanceData.timePlayed % (60*24) / 60) }${'h'} ${Math.floor(instanceData.timePlayed % (60*24) % 60) }${'m'}`) : 
+                    (instanceData.timePlayed >= 525600 ? `${Math.floor(instanceData.timePlayed / 525600)}${'y'} ` : (` ${Math.floor(instanceData.timePlayed / (60*24))}${'d'} ${Math.floor(instanceData.timePlayed % (60*24) / 60) }${'h'} ${Math.floor(instanceData.timePlayed % (60*24) % 60) }${'m'}`)) : 
                     (`${Math.floor(instanceData.timePlayed / 60)}${'h'} ${Math.round(((instanceData.timePlayed / 60) - Math.floor(instanceData.timePlayed / 60)) * 60)}${'min'}`))
                   : '0'}{' '}
               </span>
