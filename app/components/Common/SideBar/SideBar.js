@@ -73,6 +73,20 @@ const SideBar = props => {
     UpdateSideBar();
   }, [props.selectedInstance]);
 
+  function timeCalc(minutes) {
+    if (minutes > 100) {
+      if (minutes < 525600 && minutes > 100) {
+        return `${Math.floor(instanceData.timePlayed / (60 * 24))}${'d'} ${Math.floor(instanceData.timePlayed % (60 * 24) / 60)}${'h'} ${Math.floor(instanceData.timePlayed % (60 * 24) % 60)}${'m'}`;
+      } else if (minutes > 525600) {
+        return `${Math.floor(instanceData.timePlayed / 525600)}${'y'} `;
+      } else {
+        return `${Math.floor(instanceData.timePlayed / 60)}${'h'} ${Math.round(((instanceData.timePlayed / 60) - Math.floor(instanceData.timePlayed / 60)) * 60)}${'min'}`;
+      }
+    } else if (minutes < 60) {
+      return `${minutes}${'m'}`
+    }
+  }
+
   return (
     <aside className={styles.sidenav}>
       <div className={styles.account}>
@@ -174,12 +188,10 @@ const SideBar = props => {
                 left: 25
               }}
             >
-              <span style={{ padding: '0 5px', display: 'inline', fontSize: '12px'  }}>Played for:</span>
-              <span style={{ padding: '0 5px', display: 'inline', fontSize: '13px'  }}>
+              <span style={{ padding: '0 5px', display: 'inline', fontSize: '12px' }}>Played for:</span>
+              <span style={{ padding: '0 5px', display: 'inline', fontSize: '13px' }}>
                 {instanceData.timePlayed && instanceData.timePlayed !== null
-                  ? (instanceData.timePlayed > 100 ? 
-                    (instanceData.timePlayed >= 525600 ? `${Math.floor(instanceData.timePlayed / 525600)}${'y'} ` : (` ${Math.floor(instanceData.timePlayed / (60*24))}${'d'} ${Math.floor(instanceData.timePlayed % (60*24) / 60) }${'h'} ${Math.floor(instanceData.timePlayed % (60*24) % 60) }${'m'}`)) : 
-                    (`${Math.floor(instanceData.timePlayed / 60)}${'h'} ${Math.round(((instanceData.timePlayed / 60) - Math.floor(instanceData.timePlayed / 60)) * 60)}${'min'}`))
+                  ? timeCalc(instanceData.timePlayed)
                   : '0'}{' '}
               </span>
             </div>
