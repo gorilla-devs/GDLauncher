@@ -73,8 +73,10 @@ export function initInstances() {
                   el => path.extname(el) === '.zip' || path.extname(el) === '.jar' || path.extname(el) === '.disabled'
                 ).map(mod => {
                   const configMod = config.mods.find(v => v.fileName === mod);
-                  return configMod;
-                }).filter(_ => _);
+                  if(configMod)
+                    return configMod;
+                  return { fileName: mod }
+                });
               } catch (err) {
                 console.error('Failed to get instance\'s mods', err)
               }
