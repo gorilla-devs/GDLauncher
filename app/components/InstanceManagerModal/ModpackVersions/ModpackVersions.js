@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getAddon, getAddonFiles, getAddonFileChangelog } from '../../../utils/cursemeta';
 import { readConfig, updateConfig } from '../../../utils/instances';
 import { Select, Button } from 'antd';
@@ -8,12 +8,14 @@ import { promises } from 'fs';
 import fse from 'fs-extra';
 import path from 'path';
 import { PACKS_PATH } from '../../../constants';
+import { addCursePackToQueue } from '../../../actions/downloadManager';
 
 const ModpackVersions = props => {
   const [versions, setVersions] = useState([]);
   const [installedVersion, setInstalledVersion] = useState(null);
   const [selectedVersion, setSelectedVersion] = useState(0);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const instances = useSelector(state => state.instancesManager.instances);
   const ownInstance = instances.find(instance => instance.name === props.instance);
@@ -37,8 +39,8 @@ const ModpackVersions = props => {
     setInstalledVersion(config.modpackVersion);
   };
 
+  
   const removeModpackFiles = async () => {
-    setLoading(true);
     const { overrideFiles, mods } = await readConfig(props.instance);
     // Deleting overrides
     const sortedFiles = overrideFiles.sort((a, b) => b.length - a.length);
@@ -57,15 +59,23 @@ const ModpackVersions = props => {
         }
       } catch (err) { }
     });
+
+    const modpacksMods = mods.filter(mod => mod.isModFromModpack);
     // Deleting old mods
-    await Promise.mapSeries(mods, async mod => {
+    await Promise.mapSeries(modpacksMods, async mod => {
       try {
         const filePath = path.join(PACKS_PATH, props.instance, 'mods', mod.fileName);
         await fse.remove(filePath);
       } catch (err) { }
     });
-    const newMods = mods.filter(mod => !mod.isModFromModpack);
-    await updateConfig(props.instance, { mods: newMods }, ['overrideFiles']);
+    await updateConfig(props.instance, { mods: mods.filter(mod => !mod.isModFromModpack) }, ['overrideFiles']);
+  };
+  
+  const switchVersion = async () => {
+    setLoading(true);
+    console.log(versions[selectedVersion])
+    await removeModpackFiles();
+    await dispatch(addCursePackToQueue(props.instance, ownInstance.projectID, versions[selectedVersion].id, true));
 
     setLoading(false);
     props.close();
@@ -75,17 +85,17 @@ const ModpackVersions = props => {
     initVersions();
     initInstalledVersion();
   }, []);
-
+  
   if (versions.length === 0) {
     return (
       <div>Loading...</div>
-    )
-  }
-
-  return (
-    <div style={{
-      height: '100%',
-      width: '100%'
+      )
+    }
+    
+    return (
+      <div style={{
+        height: '100%',
+        width: '100%'
     }}>
       <div style={{
         display: 'block',
@@ -119,7 +129,7 @@ const ModpackVersions = props => {
         <Button
           type="primary"
           style={{ marginTop: 15 }}
-          onClick={removeModpackFiles}
+          onClick={switchVersion}
           loading={loading}
         >
           Update Modpack

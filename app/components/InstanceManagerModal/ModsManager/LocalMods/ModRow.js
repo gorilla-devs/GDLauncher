@@ -50,7 +50,7 @@ const ModRow = ({
           const filteredFiles = files.filter(v => v.gameVersion.includes(modData.version));
           addNewModToLatestUpdates({ ...filteredFiles[0], projectID: modData.projectID });
           const installedMod = files.find(v => v.id === modData.fileID);
-          if (installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
+          if (filteredFiles[0] && installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
             setIsUpdateAvailable(filteredFiles[0]);
           }
         });

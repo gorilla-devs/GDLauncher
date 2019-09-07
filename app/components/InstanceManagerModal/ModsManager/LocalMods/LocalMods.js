@@ -21,7 +21,7 @@ import { getInstance } from '../../../../utils/selectors';
 const LocalModsComponent = props => {
   const mapMods = mods => {
     return mods
-      .filter(el => el.fileName !== 'GDLCompanion.jar' && el.fileName !== 'LJF.jar')
+      .filter(el => el && el.fileName !== 'GDLCompanion.jar' && el.fileName !== 'LJF.jar')
       .map(v => ({
         name: v.fileName,
         state: path.extname(v.fileName) !== '.disabled',

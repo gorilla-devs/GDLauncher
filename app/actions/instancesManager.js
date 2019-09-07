@@ -74,7 +74,7 @@ export function initInstances() {
                 ).map(mod => {
                   const configMod = config.mods.find(v => v.fileName === mod);
                   return configMod;
-                });
+                }).filter(_ => _);
               } catch (err) {
                 console.error('Failed to get instance\'s mods', err)
               }
