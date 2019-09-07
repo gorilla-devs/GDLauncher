@@ -21,6 +21,7 @@ import ResourcePacks from './ResourcePacks/ResourcePacks';
 import Worlds from './Worlds/Worlds';
 import Screenshots from './Screenshots/Screenshots';
 import InstanceIcon from '../../assets/images/instanceDefault.png';
+import ModpackVersions from './ModpackVersions/ModpackVersions';
 
 type Props = {};
 let pack;
@@ -126,7 +127,7 @@ class InstanceManagerModal extends Component<Props> {
         instanceIcon: InstanceIcon
       });
     } catch {
-      log.warn('The instance icon could not be removed');
+      log.warn('The instance icon could not be removed', this.props.match.params.instance);
     }
   };
 
@@ -187,6 +188,14 @@ class InstanceManagerModal extends Component<Props> {
               Mods Manager
             </MenuItem>
             <MenuItem
+              active={this.props.match.params.page === 'modpackVersions'}
+              to={`/editInstance/${
+                this.props.match.params.instance
+              }/modpackVersions`}
+            >
+              Modpack Versions
+            </MenuItem>
+            <MenuItem
               active={this.props.match.params.page === 'resourcepacks'}
               to={`/editInstance/${
                 this.props.match.params.instance
@@ -226,6 +235,15 @@ class InstanceManagerModal extends Component<Props> {
             <Route
               path="/editInstance/:instance/resourcepacks"
               component={ResourcePacks}
+            />
+            <Route
+              path="/editInstance/:instance/modpackVersions"
+              render={() => (
+                <ModpackVersions
+                  close={this.closeModal}
+                  instance={this.props.match.params.instance}
+                />
+              )}
             />
             <Route path="/editInstance/:instance/worlds" component={Worlds} />
             <Route

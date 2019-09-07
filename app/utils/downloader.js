@@ -49,26 +49,26 @@ export const downloadArr = async (
   );
 };
 
-const downloadFileInstance = async (filename, url) => {
+const downloadFileInstance = async (fileName, url) => {
   try {
-    const filePath = path.dirname(filename);
+    const filePath = path.dirname(fileName);
     try {
       await fs.accessAsync(filePath);
     } catch (e) {
       await makeDir(filePath);
     }
     const file = await request(url, { encoding: 'binary' });
-    await fs.writeFileAsync(filename, file, 'binary');
+    await fs.writeFileAsync(fileName, file, 'binary');
     return true;
   } catch (e) {
     log.error(
-      `Error while downloading <${url}> to <${filename}> --> ${e.message}`
+      `Error while downloading <${url}> to <${fileName}> --> ${e.message}`
     );
     return false;
   }
 };
 
-export const downloadFile = (filename, url, onProgress) => {
+export const downloadFile = (fileName, url, onProgress) => {
   return new Promise(async (resolve, reject) => {
     // Save variable to know progress
     let received_bytes = 0;
@@ -78,8 +78,8 @@ export const downloadFile = (filename, url, onProgress) => {
       method: 'GET',
       uri: url
     });
-    await makeDir(path.dirname(filename));
-    const out = fss.createWriteStream(filename);
+    await makeDir(path.dirname(fileName));
+    const out = fss.createWriteStream(fileName);
     req.pipe(out);
 
     req.on('response', data => {

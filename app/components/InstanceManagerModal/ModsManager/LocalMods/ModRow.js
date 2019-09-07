@@ -50,7 +50,7 @@ const ModRow = ({
           const filteredFiles = files.filter(v => v.gameVersion.includes(modData.version));
           addNewModToLatestUpdates({ ...filteredFiles[0], projectID: modData.projectID });
           const installedMod = files.find(v => v.id === modData.fileID);
-          if (installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
+          if (filteredFiles[0] && installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
             setIsUpdateAvailable(filteredFiles[0]);
           }
         });
@@ -76,7 +76,7 @@ const ModRow = ({
     // Remove the reference in the mods file json
     const config = await readConfig(instance);
     await updateConfig(instance, {
-      mods: config.mods.filter(v => v.filename !== modData.name)
+      mods: config.mods.filter(v => v.fileName !== modData.name)
     })
 
   };

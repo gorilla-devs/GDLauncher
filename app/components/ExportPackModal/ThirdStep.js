@@ -30,7 +30,7 @@ const ThirdStep = props => {
     const filteredFiles = props.selectedFiles.filter(
       file =>
         !installedMods.find(
-          installedMod => installedMod.filename === path.basename(file)
+          installedMod => installedMod.fileName === path.basename(file)
         )
     );
     const zipFile = new yazl.ZipFile();

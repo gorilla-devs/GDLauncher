@@ -31,8 +31,6 @@ const CurseModpackBrowserCreatorModal = props => {
   const getModPackData = async () => {
     const [files, addon] = await Promise.all([getAddonFiles(addonID), getAddon(addonID)])
 
-    console.log(files)
-
     setInstanceName(addon.name);
     setVersions(files);
     setLoading(false);
