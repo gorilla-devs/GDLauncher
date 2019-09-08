@@ -7,7 +7,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord, faFacebook } from '@fortawesome/free-brands-svg-icons';
@@ -19,38 +19,25 @@ import forgeIcon from '../../../assets/images/forge_icon.jpg';
 
 import styles from './SideBar.scss';
 import { PACKS_PATH } from '../../../constants';
-
-import * as AuthActions from '../../../actions/accounts';
-import * as ProfileActions from '../../../actions/profile';
+import { readConfig } from '../../../utils/instances';
+import { getInstance } from '../../../utils/selectors';
 
 type Props = {};
 
 const SideBar = props => {
   const [instanceData, setInstanceData] = useState(null);
+  const selectedInstance = useSelector(state => state.selectedInstance);
+  const instance = useSelector(state => getInstance(state));
 
   const UpdateSideBar = async () => {
-    if (props.selectedInstance !== null) {
-      const data = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.selectedInstance, 'config.json')
-        )
-      );
+    if (selectedInstance !== null) {
+      const data = await readConfig(selectedInstance);
 
-      let mods = 0;
-
-      try {
-        mods = (await fs.readdirAsync(
-          path.join(PACKS_PATH, props.selectedInstance, 'mods')
-        ))
-          .filter(el => el !== 'GDLCompanion.jar' && el !== 'LJF.jar')
-          .filter(
-            el => path.extname(el) === '.zip' || path.extname(el) === '.jar'
-          ).length;
-      } catch {}
+      let mods = instance.mods.length;
 
       try {
         const thumbnail = await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.selectedInstance, 'thumbnail.png')
+          path.join(PACKS_PATH, selectedInstance, 'thumbnail.png')
         );
         setInstanceData({
           ...data,
@@ -71,7 +58,7 @@ const SideBar = props => {
 
   useEffect(() => {
     UpdateSideBar();
-  }, [props.selectedInstance]);
+  }, [selectedInstance]);
 
   return (
     <aside className={styles.sidenav}>
@@ -98,7 +85,7 @@ const SideBar = props => {
         <h2>Instance Overview</h2>
         {instanceData !== null ? (
           <div style={{ marginTop: 10 }}>
-            <h3 style={{ color: '#c2c2c2' }}>{props.selectedInstance}</h3>
+            <h3 style={{ color: '#c2c2c2' }}>{selectedInstance}</h3>
             <img
               src={instanceData.thumbnail || vanillaCover}
               style={{
@@ -183,8 +170,8 @@ const SideBar = props => {
             </div>
           </div>
         ) : (
-          'No instance selected'
-        )}
+            'No instance selected'
+          )}
       </div>
       <div className={styles.scroller} />
       <hr style={{ margin: 0 }} />
@@ -207,16 +194,4 @@ const SideBar = props => {
   );
 };
 
-const mapStateToProps = state => ({
-  username: state.auth.displayName,
-  selectedInstance: state.instancesManager.selectedInstance
-});
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...AuthActions, ...ProfileActions }, dispatch);
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SideBar);
+export default SideBar;

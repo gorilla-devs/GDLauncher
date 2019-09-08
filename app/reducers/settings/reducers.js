@@ -11,10 +11,9 @@ function sounds(state = true, action) {
   }
 }
 
-function generalSettings(state = {
+function general(state = {
   releaseChannel: 0, // 0 is stable, 1 is beta
   instancesPath: null,
-  showChangelog: false,
 
 }, action) {
   switch (action.type) {
@@ -25,10 +24,10 @@ function generalSettings(state = {
   }
 }
 
-function javaSettings(state = {
+function java(state = {
   path: null,
   memory: DEFAULT_JAVA_MEMORY,
-  javaArguments: DEFAULT_JAVA_ARGUMENTS
+  arguments: DEFAULT_JAVA_ARGUMENTS
 }, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_JAVA_SETTINGS:
@@ -40,6 +39,6 @@ function javaSettings(state = {
 
 export default combineReducers({
   sounds,
-  generalSettings,
-  javaSettings
+  general,
+  java
 });

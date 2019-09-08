@@ -6,17 +6,13 @@ import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import { screen } from 'electron';
 import { release, arch } from 'os';
-import * as AuthActions from './actions/accounts';
-import * as SettingsActions from './actions/settings';
-import * as InstancesActions from './actions/instancesManager';
-import * as NewsActions from './actions/news';
+import { initInstances, initNews, checkAccessToken } from './reducers/actions';
 import { JAVA_URL } from './constants';
 import ga from './GAnalytics';
 import App from './containers/App';
-import store from './localStore';
 import { history } from './store/configureStore';
 import SideBar from './components/Common/SideBar/SideBar';
-import Navigation from './containers/Navigation';
+import Navigation from './components/Common/WindowNavigation/NavigationBar';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import { findJavaHome, isGlobalJavaOptions } from './utils/javaHelpers';
 import DManager from './components/DManager/containers/DManagerPage';
@@ -72,9 +68,8 @@ class RouteDef extends Component<Props> {
   }
 
   componentDidMount = async () => {
-    const { loadSettings, checkAccessToken, initInstances, getNews } = this.props;
-    loadSettings();
-    getNews();
+    const { checkAccessToken, initInstances, initNews } = this.props;
+    initNews();
     initInstances();
     if (!this.props.isAuthValid) checkAccessToken();
     if ((await findJavaHome()) === null) {
@@ -131,8 +126,7 @@ class RouteDef extends Component<Props> {
     }
     if (
       this.state.globalJavaOptions &&
-      this.props.location.pathname === '/home' &&
-      store.get('showGlobalOptionsJavaModal') !== false
+      this.props.location.pathname === '/home'
     ) {
       history.push({
         pathname: `/javaGlobalOptionsFix`,
@@ -144,7 +138,7 @@ class RouteDef extends Component<Props> {
     /* Show the changelogs after an update */
     if (
       this.props.location.pathname === '/home' &&
-      store.get('showChangelogs') !== false
+      this.props.showChangelog
     ) {
       setTimeout(() => {
         history.push({
@@ -294,13 +288,16 @@ function WaitingComponent(MyComponent) {
 function mapStateToProps(state) {
   return {
     location: state.router.location,
-    isAuthValid: state.auth.isAuthValid,
-    uuid: state.auth.clientToken
+    isAuthValid: state.loading.account_authentication.isReceived,
+    uuid: state.clientToken,
+    showChangelog: state.showChangelog
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...AuthActions, ...SettingsActions, ...InstancesActions, ...NewsActions }, dispatch);
+const mapDispatchToProps = {
+  initNews,
+  initInstances,
+  checkAccessToken
 }
 
 export default connect(

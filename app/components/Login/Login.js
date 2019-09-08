@@ -4,17 +4,17 @@ import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { useTranslation } from 'react-i18next';
 import { ipcRenderer } from 'electron';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Form, Input, Icon, Checkbox, Tooltip } from 'antd';
 import log from 'electron-log';
 import styles from './Login.scss';
 import store from '../../localStore';
 import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
-import * as AuthActions from '../../actions/accounts';
 import { THEMES } from '../../constants';
 import shader from '../../utils/colors';
 import background from '../../assets/images/login_background.jpg';
-import { tryNativeLauncherProfiles, login } from '../../actions/accounts';
+import { login, loginThroughNativeLauncher } from '../../reducers/actions';
+import { load } from '../../reducers/loading/actions';
 
 type Props = {
   form: any,
@@ -32,6 +32,8 @@ const FormItem = Form.Item;
 function Login(props) {
   const [fastLogin, setFastLogin] = useState(true);
   const [nativeLauncherProfiles, setNativeLauncherProfiles] = useState(false);
+  const isAuthLoading = useSelector(state => state.loading.account_authentication.isRequesting);
+  const dispatch = useDispatch();
   const { t } = useTranslation();
   const [colors, setColors] = useState(
     store.get('settings') ? store.get('settings').theme : THEMES.default
@@ -57,7 +59,12 @@ function Login(props) {
     e.preventDefault();
     props.form.validateFields((err, values) => {
       if (!err) {
-        props.login(values.username, values.password, values.remember);
+        dispatch(
+          load(
+            'account_authentication',
+            login(values.username, values.password, values.remember)
+          )
+        );
       } else {
         log.error(err);
       }
@@ -89,11 +96,7 @@ function Login(props) {
                   : ''
               })(
                 <Input
-                  disabled={
-                    props.tokenLoading ||
-                    props.nativeLoading ||
-                    props.authLoading
-                  }
+                  disabled={isAuthLoading}
                   size="large"
                   prefix={
                     <Icon
@@ -113,11 +116,7 @@ function Login(props) {
               })(
                 <Input
                   size="large"
-                  disabled={
-                    props.tokenLoading ||
-                    props.nativeLoading ||
-                    props.authLoading
-                  }
+                  disabled={isAuthLoading}
                   prefix={
                     <Icon
                       type="lock"
@@ -149,8 +148,8 @@ function Login(props) {
               })(<Checkbox>{t('RememberMe', 'Remember Me')}</Checkbox>)}
               <Button
                 icon="login"
-                loading={props.authLoading}
-                disabled={props.tokenLoading || props.nativeLoading}
+                loading={isAuthLoading}
+                disabled={isAuthLoading}
                 size="large"
                 type="primary"
                 htmlType="submit"
@@ -168,7 +167,7 @@ function Login(props) {
               type="primary"
               className={styles.login_form_button}
               style={{ marginTop: '30px' }}
-              onClick={() => props.tryNativeLauncherProfiles()}
+              onClick={() => dispatch(load('account_authentication', loginThroughNativeLauncher()))}
             >
               <span>
                 {t('LoginAs', 'Login As')}{' '}
@@ -203,21 +202,4 @@ function Login(props) {
   );
 }
 
-function mapStateToProps(state) {
-  return {
-    authLoading: state.auth.loading,
-    isAuthValid: state.auth.isAuthValid,
-    tokenLoading: state.auth.tokenLoading,
-    nativeLoading: state.auth.nativeLoading
-  };
-}
-
-const mapDispatchToProps = {
-  login,
-  tryNativeLauncherProfiles
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Login);
+export default Login;

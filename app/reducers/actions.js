@@ -1,7 +1,44 @@
 import { get } from 'lodash';
+import { spawn } from 'child_process';
+import { promises as fs }, fs from 'fs';
+import fse from 'fs-extra';
+import path from 'path';
+import makeDir from 'make-dir';
 import * as ActionTypes from './actionTypes';
 import { minecraftLogin, minecraftCheckAccessToken, minecraftRefreshAccessToken } from '../APIs';
 import { uuidv4 } from '../utils';
+import { updateJavaArguments } from './settings/actions';
+import launchCommand from '../utils/MCLaunchCommand';
+import { PACKS_PATH } from '../constants';
+import { readConfig, updateConfig } from '../utils/instances';
+
+export function initManifests() {
+  return async dispatch => {
+    const versions = (await axios.get(GAME_VERSIONS_URL)).data;
+    dispatch({
+      type: UPDATE_VANILLA_MANIFEST,
+      data: versions
+    });
+    const promos = (await axios.get(FORGE_PROMOS)).data;
+    const forgeVersions = {};
+    // Looping over vanilla versions, create a new entry in forge object
+    // and add to it all correct versions
+    versions.versions.forEach(v => {
+      forgeVersions[v.id] = promos
+        .filter(ver => {
+          // Filter out all versions below 1.6.1 until we decide to support them
+          if (versionCompare(v.id, '1.6.1') === -1) return false;
+          return ver.gameVersion === v.id;
+        })
+        .map(ver => ver.name.replace('forge-', ''));
+    });
+
+    dispatch({
+      type: UPDATE_FORGE_MANIFEST,
+      data: _.omitBy(forgeVersions, v => v.length === 0)
+    });
+  };
+}
 
 export function removeAccount(uuid) {
   return (dispatch, getState) => {
@@ -22,7 +59,7 @@ export function updateAccount(uuid, account) {
   };
 }
 
-export function updateNews(news) {
+export function initNews(news) {
   return async (dispatch, getState) => {
     const { news, loading: { loading_news } } = getState();
     if (news.length === 0 && !loading_news) {
@@ -130,7 +167,7 @@ export function loginThroughNativeLauncher(accessToken) {
 
     const homedir = process.env.APPDATA || os.homedir();
     const vanillaMCPath = path.join(homedir, '.minecraft');
-    const vnlJson = await fsa.readJson(
+    const vnlJson = await fse.readJson(
       path.join(vanillaMCPath, 'launcher_profiles.json')
     );
 
@@ -209,3 +246,180 @@ export function removeModsManifests(id) {
   };
 }
 
+export function updateSelectedInstance(name) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_SELECTED_INSTANCE,
+      name
+    });
+  };
+}
+
+export function startInstance(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const {
+      app: { currentAccountIndex, accounts },
+      settings: { java: { arguments } }
+    } = state;
+
+    // Checks for legacy java memory
+    const legacyString = [' -Xmx{_RAM_}m', '-Xmx{_RAM_}m'];
+    const config = await readConfig(instanceName);
+    if (config.overrideArgs && (config.overrideArgs.includes(legacyString[0]) || config.overrideArgs.includes(legacyString[1]))) {
+      await updateConfig(instanceName, {
+        overrideArgs: config.overrideArgs.replace(legacyString, '')
+      });
+    }
+
+    if (arguments.includes(legacyString[0]))
+      dispatch(updateJavaArguments(arguments.replace(legacyString[0], '')));
+    if (settings.java.javaArgs.includes(legacyString[1]))
+      dispatch(updateJavaArguments(arguments.replace(legacyString[1], '')));
+
+    const command = await launchCommand(
+      instanceName,
+      state
+    );
+
+    const start = spawn(command, [], {
+      shell: true,
+      cwd: path.join(PACKS_PATH, instanceName)
+    });
+
+    let minutes = 0;
+    const timer = setInterval(() => {
+      minutes += 1;
+    }, 60000);
+
+    start.stdout.on('data', data => {
+      console.log(data.toString());
+    });
+
+    start.stderr.on('data', data => {
+      log.error(data.toString());
+    });
+
+    dispatch({
+      type: ActionTypes.ADD_STARTED_INSTANCE,
+      name: instanceName,
+      pid: start.pid
+    });
+
+    start.on('exit', async () => {
+      clearInterval(timer);
+      dispatch({
+        type: ActionTypes.REMOVE_STARTED_INSTANCE,
+        name: instanceName
+      });
+      const config = await readConfig(instanceName);
+      await updateConfig(instanceName, {
+        timePlayed: config.timePlayed ? config.timePlayed + minutes : minutes
+      });
+    });
+    start.on('error', err => {
+      message.error('There was an error while starting the instance');
+      log.error(err);
+    });
+  };
+}
+
+export function initInstances() {
+  return async (dispatch, getState) => {
+    let watcher;
+    const isDirectory = source => fss.lstatSync(source).isDirectory();
+
+    const getDirectories = async source =>
+      fs.readdir(source)
+        .map(name => join(source, name))
+        .filter(isDirectory)
+        .map(dir => basename(dir));
+
+    const getInstances = async () => {
+      let mappedInstances = [];
+      try {
+        const instances = await getDirectories(PACKS_PATH);
+        mappedInstances = await Promise.all(instances.map(async instance => {
+          let mods = [];
+          let projectID = null;
+          try {
+            const config = await readConfig(instance);
+            projectID = config.projectID;
+            if (config.mods && Array.isArray(config.mods) && config.mods.length) {
+              try {
+                mods = (await fs.readdir(path.join(PACKS_PATH, instance, 'mods'))).filter(
+                  el => path.extname(el) === '.zip' || path.extname(el) === '.jar' || path.extname(el) === '.disabled'
+                ).map(mod => {
+                  const configMod = config.mods.find(v => v.fileName === mod);
+                  if (configMod)
+                    return configMod;
+                  return { fileName: mod }
+                });
+              } catch (err) {
+                console.error('Failed to get instance\'s mods', err)
+              }
+            }
+          } catch (err) {
+            console.error('Failed to get instance\'s config', err)
+          }
+          return {
+            name: instance,
+            ...(projectID && { projectID }),
+            mods: mods
+          }
+        }));
+      } catch (err) {
+        console.error('Failed to get instances', err);
+      }
+      return mappedInstances;
+    };
+
+    const watchRoutine = async () => {
+      try {
+        await fs.access(PACKS_PATH);
+      } catch (e) {
+        await makeDir(PACKS_PATH);
+      }
+      let instances = await getInstances();
+      dispatch({
+        type: ActionTypes.UPDATE_INSTANCES,
+        instances
+      });
+
+      const updateInstances = async () => {
+        instances = await getInstances();
+        const { instances: stateInstances } = getState();
+        if (!isEqual(stateInstances, instances)) {
+          dispatch({
+            type: ActionTypes.UPDATE_INSTANCES,
+            instances
+          });
+        }
+      };
+
+      const getInstancesDebounced = _.debounce(updateInstances, 100);
+
+      // Watches for any changes in the packs dir. TODO: Optimize
+      watcher = watch(PACKS_PATH, { recursive: true }, async (event, filename) => {
+        try {
+          await fs.access(PACKS_PATH);
+        } catch (e) {
+          await makeDir(PACKS_PATH);
+        }
+        getInstancesDebounced();
+      });
+      watcher.on('error', async err => {
+        try {
+          await fs.access(PACKS_PATH);
+        } catch (e) {
+          await makeDir(PACKS_PATH);
+        }
+        finally {
+          watchRoutine();
+        }
+      });
+    };
+
+    watchRoutine();
+  };
+}

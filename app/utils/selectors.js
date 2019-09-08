@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-const instances = state => state.instancesManager.instances;
+const instances = state => state.instances;
 const latestModsUpdates = state => state.latestModsUpdates;
 
 export const getInstance = instance => createSelector(

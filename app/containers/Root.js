@@ -3,7 +3,6 @@ import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux';
 import log from 'electron-log';
 import { ConnectedRouter } from 'connected-react-router';
-import * as SettingsActions from '../actions/settings';
 import CrashHandler from '../components/CrashHandler/CrashHandler';
 import RouteDef from '../routes';
 import GlobalStyles from '../globalStyles';

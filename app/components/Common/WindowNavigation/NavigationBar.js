@@ -1,6 +1,7 @@
 // @flow
 import React, { useState, useEffect } from 'react';
 import { Button } from 'antd';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,6 +12,7 @@ import logo from '../../../assets/images/logo.png';
 
 export default props => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const location = useSelector(state => state.router.location.pathname);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'development') {
@@ -26,7 +28,7 @@ export default props => {
       <div className={styles.logoText}>
         <img src={logo} height="40px" alt="logo" draggable="false" />
       </div>
-      <HorizontalMenu location={props.location} />
+      <HorizontalMenu location={location} />
       <Link
         to={{
           pathname: '/settings/myAccount_Preferences',

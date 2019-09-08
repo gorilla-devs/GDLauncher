@@ -8,18 +8,14 @@ import log from 'electron-log';
 import Card from '../../Common/Card/Card';
 import styles from './Settings.scss';
 import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
-import { setJavaArgs } from '../../../actions/settings';
 import ForgeManager from './ForgeManager';
 import JavaManagerCard from './JavaManagerCard';
+import { readConfig } from '../../../utils/instances';
 
 const FormItem = Form.Item;
 
-type Props = {
-  setJavaArgs: () => void,
-  javaArgs: string
-};
 
-function Instances(props: Props) {
+function Instances(props) {
   const [instanceConfig, setInstanceConfig] = useState(null);
   const [checkingForge, setCheckingForge] = useState(true);
   const [unMounting, setUnMounting] = useState(false);
@@ -28,11 +24,7 @@ function Instances(props: Props) {
 
   async function configManagement() {
     try {
-      const configFile = JSON.parse(
-        await promisify(fs.readFile)(
-          path.join(PACKS_PATH, props.instance, 'config.json')
-        )
-      );
+      const configFile = await readConfig(props.instance);
 
       setInstanceConfig(configFile);
 
@@ -40,11 +32,7 @@ function Instances(props: Props) {
         path.join(PACKS_PATH, props.instance, 'config.json'),
         { encoding: 'utf8' },
         async (eventType, filename) => {
-          const config = JSON.parse(
-            await promisify(fs.readFile)(
-              path.join(PACKS_PATH, props.instance, 'config.json')
-            )
-          );
+          const config = await readConfig(props.instance);
           setInstanceConfig(config);
         }
       );
@@ -161,21 +149,4 @@ function Instances(props: Props) {
   );
 }
 
-function mapStateToProps(state) {
-  return {
-    settings: state.settings,
-    javaArgs: state.settings.java.javaArgs,
-    overrideJavaArgs: state.settings.java.overrideJavaArgs
-  };
-}
-
-const mapDispatchToProps = {
-  setJavaArgs
-};
-
-export default Form.create()(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(Instances)
-);
+export default Form.create()(Instances);
