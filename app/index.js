@@ -13,6 +13,7 @@ if (module.hot)
     pureRender: true // RHL will not change render method
   });
 const store = configureStore();
+window.__store = store;
 log.info('Welcome to GDLauncher');
 render(
   <AppContainer>

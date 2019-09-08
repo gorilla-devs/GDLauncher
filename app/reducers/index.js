@@ -1,24 +1,20 @@
-// @flow
-import { combineReducers } from 'redux';
 import { connectRouter } from 'connected-react-router';
-import profile from './profile';
-import auth from './auth';
-import packCreator from './packCreator';
-import downloadManager from './downloadManager';
-import instancesManager from './instancesManager';
-import news from './news';
-import settings from './settings';
-import latestModsUpdates from './latestModsUpdates'
+import { combineReducers } from 'redux';
+import reducers from './reducers';
+import app from './app'./app
+import loading from './loading/reducers';
+import modals from './modals/reducers';
+import settings from './settings/reducers';
 
-export default history =>
+
+const createRootReducer = history =>
   combineReducers({
-    profile,
+    ...reducers,
+    loading,
+    modals,
+    app, // persisted
+    settings,  // persisted
     router: connectRouter(history),
-    auth,
-    packCreator,
-    downloadManager,
-    instancesManager,
-    news,
-    settings,
-    latestModsUpdates
   });
+
+export default createRootReducer;

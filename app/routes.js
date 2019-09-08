@@ -6,7 +6,7 @@ import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import { screen } from 'electron';
 import { release, arch } from 'os';
-import * as AuthActions from './actions/auth';
+import * as AuthActions from './actions/accounts';
 import * as SettingsActions from './actions/settings';
 import * as InstancesActions from './actions/instancesManager';
 import * as NewsActions from './actions/news';

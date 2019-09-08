@@ -5,7 +5,6 @@ import path from 'path';
 import fsa from 'fs-extra';
 import os from 'os';
 import log from 'electron-log';
-import store from '../localStore';
 import {
   LOGIN_API,
   ACCESS_TOKEN_VALIDATION_URL,
@@ -21,9 +20,11 @@ export const AUTH_SUCCESS = 'AUTH_SUCCESS';
 export const AUTH_FAILED = 'AUTH_FAILED';
 export const START_NATIVE_LOADING = 'START_NATIVE_LOADING';
 export const STOP_NATIVE_LOADING = 'STOP_NATIVE_LOADING';
+export const SET_IS_NEW_USER = 'SET_IS_NEW_USER';
 
 export function login(username, password, remember) {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    const { settings } = getState();
     dispatch({
       type: START_AUTH_LOADING
     });

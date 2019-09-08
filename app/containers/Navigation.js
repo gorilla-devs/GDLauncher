@@ -1,7 +1,7 @@
 // @flow
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import * as AuthActions from '../actions/auth';
+import * as AuthActions from '../actions/accounts';
 import NavigationBar from '../components/Common/WindowNavigation/NavigationBar';
 
 function mapStateToProps(state) {

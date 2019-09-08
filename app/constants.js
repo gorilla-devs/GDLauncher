@@ -44,12 +44,12 @@ export const NEWS_URL =
   'https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/culture,minecraft:article/insider,minecraft:article/merch,minecraft:article/news&propResPath=/content/minecraft-net/language-masters/it-it/jcr:content/root/generic-container/par/grid&count=2000&pageSize=10&tag=ALL';
 export const JAVA_URL =
   'https://java.com/en/download/manual.jsp';
-export const DEFAULT_ARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${
+export const DEFAULT_JAVA_ARGUMENTS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${
   platform() === WINDOWS
     ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
     : ''
 } -Xms256m`;
-export const DEFAULT_MEMORY = 4096;
+export const DEFAULT_JAVA_MEMORY = 3072;
 export const UPDATE_URL =
   'https://raw.githubusercontent.com/gorilla-devs/GDLauncher/master/package.json';
 export const THEMES = {

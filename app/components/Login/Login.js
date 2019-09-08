@@ -10,11 +10,11 @@ import log from 'electron-log';
 import styles from './Login.scss';
 import store from '../../localStore';
 import OfficialLancherProfilesExists from '../../utils/nativeLauncher';
-import * as AuthActions from '../../actions/auth';
+import * as AuthActions from '../../actions/accounts';
 import { THEMES } from '../../constants';
 import shader from '../../utils/colors';
 import background from '../../assets/images/login_background.jpg';
-import { tryNativeLauncherProfiles, login } from '../../actions/auth';
+import { tryNativeLauncherProfiles, login } from '../../actions/accounts';
 
 type Props = {
   form: any,

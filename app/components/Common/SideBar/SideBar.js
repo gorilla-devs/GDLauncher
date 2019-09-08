@@ -20,7 +20,7 @@ import forgeIcon from '../../../assets/images/forge_icon.jpg';
 import styles from './SideBar.scss';
 import { PACKS_PATH } from '../../../constants';
 
-import * as AuthActions from '../../../actions/auth';
+import * as AuthActions from '../../../actions/accounts';
 import * as ProfileActions from '../../../actions/profile';
 
 type Props = {};
