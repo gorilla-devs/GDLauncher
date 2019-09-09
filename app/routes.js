@@ -19,6 +19,7 @@ import DManager from './components/DManager/DManager';
 import InstanceManagerModal from './components/InstanceManagerModal/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
+import { ModalManager } from './components/Common/ModalManager/ModalManager';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/Home'));
@@ -170,6 +171,7 @@ class RouteDef extends Component<Props> {
                 <SideBar />
               </div>
             )}
+          <ModalManager />
           <Switch location={isModal ? this.previousLocation : location}>
             <Route
               exact
