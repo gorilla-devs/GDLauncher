@@ -3,28 +3,24 @@ import { Input, Button, message } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
-import { connect } from 'react-redux';
-import { setJavaArgs } from '../../../../actions/settings';
+import { useDispatch, useSelector } from 'react-redux';
 import { DEFAULT_ARGS } from '../../../../constants';
 import JavaArgsInput from '../../../Common/JavaArgumentInput';
+import { updateJavaArguments } from '../../../../reducers/settings/actions';
 
 type Props = {
-  setJavaArgs: () => void,
   javaArgs: string
 };
 
 function JavaArguments(props: Props) {
-  const { javaArgs } = props;
+  const javaArgs = useSelector(state => state.settings.java.arguments);
   const [globalArgs, setGlobalArgsInput] = useState(javaArgs);
   const { t } = useTranslation();
-
-  const updateJavaArguments = javaArguments => {
-    props.setJavaArgs(javaArguments);
-  };
+  const dispatch = useDispatch();
 
   // Reset the global arguments to the default one
   function resetJavaArguments() {
-    props.setJavaArgs(DEFAULT_ARGS);
+    dispatch(updateJavaArguments(DEFAULT_ARGS));
     setGlobalArgsInput(DEFAULT_ARGS);
   }
 
@@ -36,7 +32,7 @@ function JavaArguments(props: Props) {
       <JavaArgsInput
         overrideArgs={globalArgs}
         onChange={setGlobalArgsInput}
-        updateArgs={updateJavaArguments}
+        updateArgs={args => dispatch(updateJavaArguments(args))}
         resetArgs={resetJavaArguments}
       />
       <hr />
@@ -44,17 +40,4 @@ function JavaArguments(props: Props) {
   );
 }
 
-const mapStateToProps = state => {
-  return {
-    javaArgs: state.settings.java.javaArgs
-  };
-};
-
-const mapDispatchToProps = {
-  setJavaArgs
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(JavaArguments);
+export default JavaArguments;
