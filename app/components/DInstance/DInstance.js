@@ -30,7 +30,7 @@ import styles from './DInstance.scss';
 import InstanceIcon from '../../assets/images/instanceDefault.png';
 import { repairInstance, updateSelectedInstance, startInstance, updatePercentage } from '../../reducers/actions';
 
-export default function DInstance(props) {
+export default function DInstance({ name, ...props }) {
   const [version, setVersion] = useState(null);
   const [isValid, setIsValid] = useState(true);
   const [forgeVersion, setForgeversion] = useState(null);
@@ -57,7 +57,6 @@ export default function DInstance(props) {
 
 
   const updateInstanceConfig = async () => {
-    const { name } = props;
     if (!isInstalling()) {
       try {
         const config = JSON.parse(
@@ -70,7 +69,7 @@ export default function DInstance(props) {
         // Tries to read the instance config file and updates the icon accordingly
         if (config.icon) {
           const icon = await fs.readFile(
-            path.join(PACKS_PATH, this.props.name, config.icon)
+            path.join(PACKS_PATH, name, config.icon)
           );
           setIcon(`url("data:image/png;base64,${icon.toString(
             'base64'
@@ -94,13 +93,11 @@ export default function DInstance(props) {
   };
 
   const isInstalling = () => {
-    const { name } = props;
     if (installingQueue[name]) return true;
     return false;
   };
 
   const updatePercentage = () => {
-    const { name } = props;
     const { percentage } = installingQueue[name] || 0;
     if (installingQueue[name]) {
       switch (installingQueue[name].status) {
@@ -119,7 +116,6 @@ export default function DInstance(props) {
   };
 
   const handleClickPlay = async e => {
-    const { name } = props;
     if (!isInstalling()) {
       e.stopPropagation();
       if (playing.find(el => el.name === name) && isValid) {
@@ -128,7 +124,7 @@ export default function DInstance(props) {
             process.kill(el.PID);
           });
         });
-        message.info('Instance terminated from user');
+        message.info('Instance terminated by user');
       } else {
         dispatch(startInstance(name));
         dispatch(updateSelectedInstance(name));
@@ -346,12 +342,12 @@ export default function DInstance(props) {
             isInstalling() || playing.find(el => el.name === name)
           }
           data={{ foo: 'bar' }}
-          onClick={() =>
+          onClick={() => {
             dispatch(push({
               pathname: `/confirmInstanceDelete/instance/${name}`,
               state: { modal: true }
             }))
-          }
+          }}
         >
           <span>
             <FontAwesomeIcon icon={faTrash} />

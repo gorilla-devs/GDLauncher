@@ -4,6 +4,7 @@ import fss, { promises as fs } from 'fs';
 import { message } from 'antd';
 import axios from 'axios';
 import cheerio from 'cheerio';
+import _, { isEqual } from 'lodash';
 import fse from 'fs-extra';
 import log from 'electron-log';
 import versionCompare from '../utils/versionsCompare';
