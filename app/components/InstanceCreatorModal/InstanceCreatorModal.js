@@ -1,89 +1,86 @@
 // @flow
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { message, Form, Input, Icon, Button, Cascader } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
 import path from 'path';
-import { promisify } from 'util';
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import vSort from 'version-sort';
 import _ from 'lodash';
 import { PACKS_PATH } from '../../constants';
 import styles from './InstanceCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
+import { createInstance } from '../../reducers/actions';
 
 type Props = {};
 const FormItem = Form.Item;
 
-class InstanceCreatorModal extends Component<Props> {
-  props: Props;
+function InstanceCreatorModal(props) {
+  const [unMount, setUnmount] = useState(false);
+  const dispatch = useDispatch();
+  const vanillaManifest = useSelector(state => state.app.vanillaManifest);
+  const forgeManifest = useSelector(state => state.app.forgeManifest);
 
-  constructor(props) {
-    super(props);
-    const { forgeManifest, versionsManifest } = props;
-    this.state = {
-      unMount: false,
-      versions: [
+  const versions = [
+    {
+      value: 'vanilla',
+      label: 'Vanilla',
+      children: [
         {
-          value: 'vanilla',
-          label: 'Vanilla',
-          children: [
-            {
-              value: 'releases',
-              label: 'Releases',
-              children: versionsManifest
-                .filter(v => v.type === 'release')
-                .map(v => ({
-                  value: v.id,
-                  label: v.id
-                }))
-            },
-            {
-              value: 'snapshots',
-              label: 'Snapshots',
-              children: versionsManifest
-                .filter(v => v.type === 'snapshot')
-                .map(v => ({
-                  value: v.id,
-                  label: v.id
-                }))
-            }
-          ]
+          value: 'releases',
+          label: 'Releases',
+          children: vanillaManifest
+            .filter(v => v.type === 'release')
+            .map(v => ({
+              value: v.id,
+              label: v.id
+            }))
         },
         {
-          value: 'forge',
-          label: 'Forge',
-          // _.reverse mutates arrays so we make a copy of it first using .slice() and then we reverse it
-          children: Object.keys(forgeManifest).map(v => ({
-            value: v,
-            label: v,
-            // same as above
-            children: _.reverse(vSort(forgeManifest[v]).slice()).map(ver => ({
-              value: ver,
-              label: ver
+          value: 'snapshots',
+          label: 'Snapshots',
+          children: vanillaManifest
+            .filter(v => v.type === 'snapshot')
+            .map(v => ({
+              value: v.id,
+              label: v.id
             }))
-          }))
         }
       ]
-    };
-  }
+    },
+    {
+      value: 'forge',
+      label: 'Forge',
+      // _.reverse mutates arrays so we make a copy of it first using .slice() and then we reverse it
+      children: Object.keys(forgeManifest).map(v => ({
+        value: v,
+        label: v,
+        // same as above
+        children: _.reverse(vSort(forgeManifest[v]).slice()).map(ver => ({
+          value: ver,
+          label: ver
+        }))
+      }))
+    }
+  ];
 
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields(async (err, values) => {
+    props.form.validateFields(async (err, values) => {
       if (!err) {
         try {
-          await promisify(fs.access)(path.join(PACKS_PATH, values.packName));
+          await fs.access(path.join(PACKS_PATH, values.packName));
           message.warning('An instance with this name already exists.');
         } catch (error) {
           if (values.version[0] === 'vanilla') {
-            await this.props.createPack(values.version[2], values.packName);
+            await dispatch(createInstance(values.version[2], values.packName));
           } else if (values.version[0] === 'forge') {
-            await this.props.createPack(
+            await dispatch(createInstance(
               values.version[1],
               values.packName,
               values.version[2]
-            );
+            ));
           }
-          this.setState({ unMount: true });
+          setUnmount(false);
         }
       }
     });
@@ -92,19 +89,19 @@ class InstanceCreatorModal extends Component<Props> {
   filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1;
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator } = props.form;
 
     return (
       <Modal
-        history={this.props.history}
-        unMount={this.state.unMount}
+        history={props.history}
+        unMount={unMount}
         title="Create New Instance"
         style={{ height: 330, width: 540 }}
       >
         <Form
           layout="inline"
           className={styles.container}
-          onSubmit={this.handleSubmit}
+          onSubmit={handleSubmit}
         >
           <div>
             <FormItem style={{ margin: 0 }}>
@@ -144,9 +141,9 @@ class InstanceCreatorModal extends Component<Props> {
                 rules: [{ required: true, message: 'Please select a version' }]
               })(
                 <Cascader
-                  options={this.state.versions}
+                  options={versions}
                   size="large"
-                  showSearch={{ filter: this.filter }}
+                  showSearch={{ filter: filter }}
                   style={{ width: 335, display: 'inline-block' }}
                   placeholder="Select a version"
                 />
