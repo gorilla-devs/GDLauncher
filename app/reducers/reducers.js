@@ -4,10 +4,7 @@ import * as ActionTypes from './actionTypes';
 function news(state = [], action) {
   switch (action.type) {
     case ActionTypes.UPDATE_NEWS:
-      return {
-        ...state,
-        news: action.news
-      };
+      return action.news;
     default:
       return state;
   }

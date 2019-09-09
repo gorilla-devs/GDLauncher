@@ -2,7 +2,10 @@ import { get } from 'lodash';
 import { spawn } from 'child_process';
 import fss, { promises as fs } from 'fs';
 import { message } from 'antd';
+import axios from 'axios';
+import cheerio from 'cheerio';
 import fse from 'fs-extra';
+import log from 'electron-log';
 import path from 'path';
 import watch from 'node-watch';
 import makeDir from 'make-dir';
@@ -12,7 +15,7 @@ import { minecraftLogin, minecraftCheckAccessToken, minecraftRefreshAccessToken 
 import { uuidv4 } from '../utils';
 import { updateJavaArguments } from './settings/actions';
 import launchCommand from '../utils/MCLaunchCommand';
-import { PACKS_PATH } from '../constants';
+import { PACKS_PATH, NEWS_URL } from '../constants';
 import { readConfig, updateConfig } from '../utils/instances';
 import { getCurrentAccount } from '../utils/selectors';
 
@@ -46,8 +49,16 @@ export function initManifests() {
 
 export function initNews(news) {
   return async (dispatch, getState) => {
-    const { news, loading: { loading_news } } = getState();
-    if (news.length === 0 && !loading_news) {
+    const getArticleHeaderImage = async (articleURL) => {
+      // This extracts a <meta property="og:image" content="some url" />
+      // and gets the url of the header image
+      const req = await axios.get(`https://minecraft.net${articleURL}`);
+      const $ = cheerio.load(req.data);
+      const url = $('meta[property="og:image"]').prop('content');
+      return url;
+    }
+    const { news, loading: { minecraft_news } } = getState();
+    if (news.length === 0 && !minecraft_news.isRequesting) {
       try {
         const res = await axios.get(NEWS_URL);
         const newsArr = await Promise.all(
@@ -62,7 +73,7 @@ export function initNews(news) {
             };
           })
         );
-        dispatch({ type: UPDATE_NEWS, payload: newsArr.splice(0, 12) });
+        dispatch({ type: ActionTypes.UPDATE_NEWS, news: newsArr.splice(0, 12) });
       } catch (err) {
         log.error(err.message);
       }
