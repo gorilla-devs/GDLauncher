@@ -79,11 +79,11 @@ function selectedInstance(state = null, action) {
   }
 }
 
-export default combineReducers({
+export default {
   news,
   downloadQueue,
   currentDownload,
   instances,
   startedInstances,
   selectedInstance
-});
+};
