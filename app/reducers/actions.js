@@ -6,6 +6,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import fse from 'fs-extra';
 import log from 'electron-log';
+import versionCompare from '../utils/versionsCompare';
 import path from 'path';
 import watch from 'node-watch';
 import makeDir from 'make-dir';
@@ -15,7 +16,7 @@ import { minecraftLogin, minecraftCheckAccessToken, minecraftRefreshAccessToken 
 import { uuidv4 } from '../utils';
 import { updateJavaArguments } from './settings/actions';
 import launchCommand from '../utils/MCLaunchCommand';
-import { PACKS_PATH, NEWS_URL } from '../constants';
+import { PACKS_PATH, NEWS_URL, GAME_VERSIONS_URL, FORGE_PROMOS } from '../constants';
 import { readConfig, updateConfig } from '../utils/instances';
 import { getCurrentAccount } from '../utils/selectors';
 
@@ -23,7 +24,7 @@ export function initManifests() {
   return async dispatch => {
     const versions = (await axios.get(GAME_VERSIONS_URL)).data;
     dispatch({
-      type: UPDATE_VANILLA_MANIFEST,
+      type: ActionTypes.UPDATE_VANILLA_MANIFEST,
       data: versions
     });
     const promos = (await axios.get(FORGE_PROMOS)).data;
@@ -41,7 +42,7 @@ export function initManifests() {
     });
 
     dispatch({
-      type: UPDATE_FORGE_MANIFEST,
+      type: ActionTypes.UPDATE_FORGE_MANIFEST,
       data: _.omitBy(forgeVersions, v => v.length === 0)
     });
   };
@@ -339,11 +340,12 @@ export function initInstances() {
     let watcher;
     const isDirectory = source => fss.lstatSync(source).isDirectory();
 
-    const getDirectories = async source =>
-      fs.readdir(source)
-        .map(name => join(source, name))
+    const getDirectories = async source => {
+      const dirs = await fs.readdir(source);
+      return dirs.map(name => path.join(source, name))
         .filter(isDirectory)
-        .map(dir => basename(dir));
+        .map(dir => path.basename(dir));
+    }
 
     const getInstances = async () => {
       let mappedInstances = [];

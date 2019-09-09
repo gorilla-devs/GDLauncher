@@ -21,6 +21,7 @@ import DInstance from '../DInstance/DInstance';
 import { history } from '../../store/configureStore';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSelectedInstance } from '../../reducers/actions';
+import { push } from 'connected-react-router';
 
 const SortableItem = SortableElement(({ value }) => <DInstance name={value} />);
 
@@ -126,10 +127,10 @@ const DManager = props => {
         <MenuItem
           data={{ foo: 'bar' }}
           onClick={() =>
-            history.push({
+            dispatch(push({
               pathname: '/InstanceCreatorModal',
               state: { modal: true }
-            })
+            }))
           }
         >
           <FontAwesomeIcon icon={faPlay} style={{ marginRight: '8px' }} />
