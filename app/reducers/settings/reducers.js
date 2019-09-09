@@ -11,14 +11,20 @@ function sounds(state = true, action) {
   }
 }
 
-function general(state = {
-  releaseChannel: 0, // 0 is stable, 1 is beta
-  instancesPath: null,
-
-}, action) {
+function instancesPath(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_GENERAL_SETTINGS:
       return { ...state, ...action.settings };
+    default:
+      return state;
+  }
+}
+
+// 0 is stable, 1 is beta
+function releaseChannel(state = 0, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_RELEASE_CHANNEL:
+      return action.releaseChannel;
     default:
       return state;
   }
@@ -31,7 +37,7 @@ function java(state = {
 }, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_JAVA_SETTINGS:
-        return { ...state, ...action.settings };
+      return { ...state, ...action.settings };
     default:
       return state;
   }

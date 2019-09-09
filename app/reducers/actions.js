@@ -1,6 +1,6 @@
 import { get } from 'lodash';
 import { spawn } from 'child_process';
-import { promises as fs }, fs from 'fs';
+import fss, { promises as fs } from 'fs';
 import fse from 'fs-extra';
 import path from 'path';
 import makeDir from 'make-dir';
@@ -40,25 +40,6 @@ export function initManifests() {
   };
 }
 
-export function removeAccount(uuid) {
-  return (dispatch, getState) => {
-    dispatch({
-      type: ActionTypes.REMOVE_ACCOUNT,
-      uuid
-    });
-  };
-}
-
-export function updateAccount(uuid, account) {
-  return (dispatch, getState) => {
-    dispatch({
-      type: ActionTypes.UPDATE_ACCOUNT,
-      uuid,
-      account
-    });
-  };
-}
-
 export function initNews(news) {
   return async (dispatch, getState) => {
     const { news, loading: { loading_news } } = getState();
@@ -86,10 +67,10 @@ export function initNews(news) {
 };
 
 export function updateAccount(uuid, account) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     dispatch({
       type: ActionTypes.UPDATE_ACCOUNT,
-      id: uuid
+      id: uuid,
       account,
     });
   };
@@ -260,7 +241,7 @@ export function startInstance(instanceName) {
     const state = getState();
     const {
       app: { currentAccountIndex, accounts },
-      settings: { java: { arguments } }
+      settings: { java: { args } }
     } = state;
 
     // Checks for legacy java memory
@@ -272,10 +253,10 @@ export function startInstance(instanceName) {
       });
     }
 
-    if (arguments.includes(legacyString[0]))
-      dispatch(updateJavaArguments(arguments.replace(legacyString[0], '')));
+    if (args.includes(legacyString[0]))
+      dispatch(updateJavaArguments(args.replace(legacyString[0], '')));
     if (settings.java.javaArgs.includes(legacyString[1]))
-      dispatch(updateJavaArguments(arguments.replace(legacyString[1], '')));
+      dispatch(updateJavaArguments(args.replace(legacyString[1], '')));
 
     const command = await launchCommand(
       instanceName,
@@ -421,5 +402,31 @@ export function initInstances() {
     };
 
     watchRoutine();
+  };
+}
+
+export function createInstance(version, packName, forgeVersion = null) {
+  return async dispatch => {
+    await makeDir(path.join(PACKS_PATH, packName));
+    await dispatch(addToQueue(packName, version, forgeVersion));
+  };
+}
+
+export function instanceDownloadOverride(
+  version,
+  packName,
+  forgeVersion = null
+) {
+  return async dispatch => {
+    dispatch({ type: START_PACK_CREATION });
+
+    try {
+      await promisify(fs.access)(path.join(PACKS_PATH, packName));
+    } catch (e) {
+      await makeDir(path.join(PACKS_PATH, packName));
+    } finally {
+      dispatch(addToQueue(packName, version, forgeVersion));
+      dispatch({ type: CREATION_COMPLETE });
+    }
   };
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, message, Input, Icon } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -11,13 +11,16 @@ import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import ButtonSetting from '../ButtonSetting/ButtonSetting';
-import { setInstancesPath } from '../../../../actions/settings';
-import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { updateJavaPath, updateInstancesPath } from '../../../../reducers/settings/actions';
 
 function Instances(props) {
   const [deletingInstances, setDeletingInstances] = useState(false);
   const { t } = useTranslation();
+  const isInstalling = useSelector(state => state.loading.instance_installing.isRequesting)
+  const instancesPath = useSelector(state => state.settings.general.instancesPath);
+  const dispatch = useDispatch();
 
   async function deleteShareData() {
     try {
@@ -42,9 +45,7 @@ function Instances(props) {
         properties: ['openDirectory'],
         defaultPath: path.dirname(props.instancesPath)
       },
-      paths => {
-        props.setInstancesPath(paths[0]);
-      }
+      paths => dispatch(updateJavaPath(paths[0]))
     );
   };
 
@@ -63,7 +64,7 @@ function Instances(props) {
           description={t('ClearAllDataDescription', 'Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data')}
           icon={faTrash}
           onClick={() => deleteShareData()}
-          disabled={props.installing !== null}
+          disabled={isInstalling}
           loading={deletingInstances}
           btnText={t('Clear', 'Clear')}
         />
@@ -76,22 +77,22 @@ function Instances(props) {
             You need to <span style={{ color: 'white', cursor: 'pointer' }} onClick={restartLauncher}>restart</span> the launcher for this setting to apply
           </div>
         </div>}
+        checked={instancesPath}
         icon={faFolder}
-        checked={props.instancesPath}
         onChange={e => props.setInstancesPath(e ? INSTANCES_PATH : null)}
       />
-      {props.instancesPath && (
+      {instancesPath && (
         <div>
           <div>
             <span style={{ fontSize: 18 }}>{t('InstancesCustomPath', 'Instances Custom Path')}{' '}</span>
             <a
-              onClick={() => props.setInstancesPath(path.join(DATAPATH, INSTANCES_FOLDER))}
+              onClick={() => dispatch(updateInstancesPath(path.join(DATAPATH, INSTANCES_FOLDER)))}
               style={{ fontSize: 13 }}
             >
               {t('ResetPath', 'Reset Path')}
             </a>
             <Input
-              value={props.instancesPath}
+              value={instancesPath}
               size="large"
               style={{
                 width: '90%',
@@ -103,7 +104,7 @@ function Instances(props) {
               prefix={
                 <FontAwesomeIcon icon={faFolder} />
               }
-              onChange={e => props.setInstancesPath(e.target.value)}
+              onChange={e => dispatch(updateInstancesPath(e.target.value))}
             />
             <Button
               type="primary"
@@ -119,18 +120,4 @@ function Instances(props) {
   );
 }
 
-function mapStateToProps(state) {
-  return {
-    installing: state.downloadManager.actualDownload,
-    instancesPath: state.settings.instancesPath
-  };
-}
-
-const mapDispatchToProps = {
-  setInstancesPath
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Instances);
+export default Instances;

@@ -1,14 +1,10 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { Component, useEffect, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Icon, Tooltip, Select, message, Switch } from 'antd';
 import path from 'path';
-import fs from 'fs';
-import { promisify } from 'util';
+import {promises as fs} from 'fs';
 import _ from 'lodash';
 import makeDir from 'make-dir';
-import { bindActionCreators } from 'redux';
-import * as packCreatorActions from '../../../actions/packCreator';
-import * as downloadManagerActions from '../../../actions/downloadManager';
 import { downloadFile } from '../../../utils/downloader';
 import {
   PACKS_PATH,
@@ -18,104 +14,95 @@ import {
 import vCompare from '../../../utils/versionsCompare';
 import colors from '../../../style/theme/colors.scss';
 import styles from './ForgeManager.scss';
+import { instanceDownloadOverride } from '../../../reducers/actions';
 
-type Props = {};
+const Instances = props => {
+  const [forgeSelectVersion, setForgeSelectVersion] = useState(null);
+  const [loadingCompanionDownload, setLoadingCompanionDownload] = useState(false);
+  const [companionModState, setCompanionModState] = useState(false);
+  const [legacyJavaFixerState, setLegacyJavaFixerState] = useState(false);
+  const [loadingLJFDownload, setLoadingLJFDownload] = useState(false);
 
-class Instances extends Component<Props> {
-  props: Props;
+  const dispatch = useDispatch();
 
-  state = {
-    forgeSelectVersion: null,
-    loadingCompanionDownload: false,
-    companionModState: false,
-    legacyJavaFixerState: false,
-    loadingLJFDownload: false
-  };
+  const vanillaManifest = useSelector(state => state.app.vanillaManifest);
+  const forgeManifest = useSelector(state => state.app.forgeManifest);
+  
 
-  componentDidMount = async () => {
-    try {
-      await promisify(fs.access)(
-        path.join(PACKS_PATH, this.props.name, 'mods', 'GDLCompanion.jar')
-      );
-      this.setState({ companionModState: true });
-    } catch (err) {}
-    try {
-      await promisify(fs.access)(
-        path.join(PACKS_PATH, this.props.name, 'mods', 'LJF.jar')
-      );
-      this.setState({ legacyJavaFixerState: true });
-    } catch (err) {}
-  };
+  useEffect(() => {
+      fs.access(
+        path.join(PACKS_PATH, props.name, 'mods', 'GDLCompanion.jar')
+      ).then(() => setCompanionModState(true)).catch(() => {});
+      
+      fs.access(
+        path.join(PACKS_PATH, props.name, 'mods', 'LJF.jar')
+      ).then(() => legacyJavaFixerState(true)).catch(() => {});
+  });
 
-  removeForge = async () => {
+  const removeForge = async () => {
     const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, this.props.name, 'config.json')
+      await fs.readFile(
+        path.join(PACKS_PATH, props.name, 'config.json')
       )
     );
-    await promisify(fs.writeFile)(
-      path.join(PACKS_PATH, this.props.name, 'config.json'),
+    await fs.writeFile(
+      path.join(PACKS_PATH, props.name, 'config.json'),
       JSON.stringify({ ...config, forgeVersion: null })
     );
   };
 
-  installForge = () => {
-    if (this.state.forgeSelectVersion === null) {
+  const installForge = () => {
+    if (!forgeSelectVersion) {
       message.warning('You need to select a version.');
     } else {
-      this.props.instanceDownloadOverride(
-        this.props.data.version,
-        this.props.name,
-        this.state.forgeSelectVersion
-      );
-      this.props.closeModal();
+      dispatch(instanceDownloadOverride(
+        props.data.version,
+        props.name,
+        forgeSelectVersion
+      ));
+      props.closeModal();
     }
   };
 
-  handleForgeVersionChange = value => {
-    this.setState({ forgeSelectVersion: value });
-  };
-
-  companionModSwitchChange = async value => {
-    this.setState({ loadingCompanionDownload: true });
+  const companionModSwitchChange = async value => {
+    setLoadingCompanionDownload(true);
     if (value) {
-      await makeDir(path.join(PACKS_PATH, this.props.name, 'mods'));
+      await makeDir(path.join(PACKS_PATH, props.name, 'mods'));
       await downloadFile(
-        path.join(PACKS_PATH, this.props.name, 'mods', 'GDLCompanion.jar'),
+        path.join(PACKS_PATH, props.name, 'mods', 'GDLCompanion.jar'),
         GDL_COMPANION_MOD_URL,
         () => {}
       );
-      this.setState({ companionModState: true });
+      setCompanionModState(true);
     } else {
-      await promisify(fs.unlink)(
-        path.join(PACKS_PATH, this.props.name, 'mods', 'GDLCompanion.jar')
+      await fs.unlink(
+        path.join(PACKS_PATH, props.name, 'mods', 'GDLCompanion.jar')
       );
-      this.setState({ companionModState: false });
+      setCompanionModState(false);
     }
-    this.setState({ loadingCompanionDownload: false });
+    setLoadingCompanionDownload(false);
   };
 
-  legacyJavaFixerModSwitchChange = async value => {
-    this.setState({ loadingLJFDownload: true });
+  const legacyJavaFixerModSwitchChange = async value => {
+    setLoadingLJFDownload(true);
     if (value) {
-      await makeDir(path.join(PACKS_PATH, this.props.name, 'mods'));
+      await makeDir(path.join(PACKS_PATH, props.name, 'mods'));
       await downloadFile(
-        path.join(PACKS_PATH, this.props.name, 'mods', 'LJF.jar'),
+        path.join(PACKS_PATH, props.name, 'mods', 'LJF.jar'),
         GDL_LEGACYJAVAFIXER_MOD_URL,
         () => {}
       );
-      this.setState({ legacyJavaFixerState: true });
+      setLegacyJavaFixerState(true);
     } else {
-      await promisify(fs.unlink)(
-        path.join(PACKS_PATH, this.props.name, 'mods', 'LJF.jar')
+      await fs.unlink(
+        path.join(PACKS_PATH, props.name, 'mods', 'LJF.jar')
       );
-      this.setState({ legacyJavaFixerState: false });
+      setLegacyJavaFixerState(false);
     }
-    this.setState({ loadingLJFDownload: false });
+    setLoadingLJFDownload(false);
   };
 
-  render() {
-    if (this.props.data.forgeVersion === null) {
+    if (!props.data.forgeVersion) {
       return (
         <div style={{ textAlign: 'center', color: colors.red }}>
           Forge is not installed <br />
@@ -123,11 +110,11 @@ class Instances extends Component<Props> {
             style={{ width: '140px' }}
             placeholder="Select a version"
             notFoundContent="No version found"
-            onChange={this.handleForgeVersionChange}
+            onChange={setForgeSelectVersion}
           >
-            {this.props.forgeVersions[this.props.data.version] &&
+            {forgeManifest[props.data.version] &&
               _.reverse(
-                this.props.forgeVersions[this.props.data.version].slice()
+                forgeManifest[props.data.version].slice()
               ).map(ver => (
                 <Select.Option key={ver} value={ver}>
                   {ver}
@@ -137,7 +124,7 @@ class Instances extends Component<Props> {
           <br />
           <Button
             type="primary"
-            onClick={this.installForge}
+            onClick={installForge}
             style={{ marginTop: 10 }}
           >
             Install Forge
@@ -145,6 +132,7 @@ class Instances extends Component<Props> {
         </div>
       );
     }
+
     return (
       <div
         style={{
@@ -154,10 +142,10 @@ class Instances extends Component<Props> {
         }}
       >
         <div style={{ color: colors.green }}>
-          {this.props.data.forgeVersion} <br />
+          {props.data.forgeVersion} <br />
           <Button
             type="primary"
-            onClick={this.removeForge}
+            onClick={removeForge}
             style={{ marginTop: 10 }}
           >
             Remove Forge
@@ -178,16 +166,16 @@ class Instances extends Component<Props> {
             </Tooltip>
             <br />
             <Switch
-              onChange={this.companionModSwitchChange}
-              checked={this.state.companionModState}
-              loading={this.state.loadingCompanionDownload}
+              onChange={companionModSwitchChange}
+              checked={companionModState}
+              loading={loadingCompanionDownload}
               style={{ marginTop: 10 }}
             />
           </div>
           {vCompare(
-            this.props.data.forgeVersion.includes('-')
-              ? this.props.data.forgeVersion.split('-')[1]
-              : this.props.data.forgeVersion,
+            props.data.forgeVersion.includes('-')
+              ? props.data.forgeVersion.split('-')[1]
+              : props.data.forgeVersion,
             '10.13.1.1217'
           ) === -1 && (
             <div style={{ marginTop: 15 }}>
@@ -201,9 +189,9 @@ class Instances extends Component<Props> {
               </Tooltip>
               <br />
               <Switch
-                onChange={this.legacyJavaFixerModSwitchChange}
-                checked={this.state.legacyJavaFixerState}
-                loading={this.state.loadingLJFDownload}
+                onChange={legacyJavaFixerModSwitchChange}
+                checked={legacyJavaFixerState}
+                loading={loadingLJFDownload}
                 style={{ marginTop: 10 }}
               />
             </div>
@@ -211,23 +199,5 @@ class Instances extends Component<Props> {
         </div>
       </div>
     );
-  }
 }
-
-function mapStateToProps(state) {
-  return {
-    forgeVersions: state.packCreator.forgeManifest
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(
-    { ...packCreatorActions, ...downloadManagerActions },
-    dispatch
-  );
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Instances);
+export default Instances;

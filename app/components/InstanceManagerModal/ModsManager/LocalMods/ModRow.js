@@ -2,8 +2,8 @@
 
 import React, { useMemo, useEffect, useState, memo } from 'react';
 import { areEqual } from "react-window";
-import { connect } from 'react-redux';
-import fs from 'fs';
+import { connect, useSelector, useDispatch } from 'react-redux';
+import { promises as fs } from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -15,8 +15,8 @@ import styles from './LocalMods.scss';
 import { readConfig, updateConfig } from '../../../../utils/instances';
 import { getAddonFiles } from '../../../../utils/cursemeta';
 import { downloadMod } from '../../../../utils/mods';
-import { addNewModToLatestUpdates } from '../../../../actions/latestModsUpdates';
 import { hasLocalUpdate } from '../../../../utils/selectors';
+import { updateModsManifests } from '../../../../reducers/actions';
 
 type Props = {
   index: number,
@@ -35,9 +35,10 @@ const ModRow = ({
   setFilteredMods,
   instance,
   addNewModToLatestUpdates,
-  localUpdate
 }: Props) => {
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(null);
+  const localUpdate = useSelector(state => hasLocalUpdate(modData.projectID)(state));
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (modData.projectID && modData.fileID) {
@@ -48,7 +49,7 @@ const ModRow = ({
       } else {
         getAddonFiles(modData.projectID).then(files => {
           const filteredFiles = files.filter(v => v.gameVersion.includes(modData.version));
-          addNewModToLatestUpdates({ ...filteredFiles[0], projectID: modData.projectID });
+          dispatch(updateModsManifests({ ...filteredFiles[0], projectID: modData.projectID }));
           const installedMod = files.find(v => v.id === modData.fileID);
           if (filteredFiles[0] && installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
             setIsUpdateAvailable(filteredFiles[0]);
@@ -72,7 +73,7 @@ const ModRow = ({
 
   const deleteMod = async () => {
     // Remove the actual file
-    await promisify(fs.unlink)(path.join(modsFolder, modData.name));
+    await fs.unlink(path.join(modsFolder, modData.name));
     // Remove the reference in the mods file json
     const config = await readConfig(instance);
     await updateConfig(instance, {
@@ -83,12 +84,12 @@ const ModRow = ({
 
   const toggleDisableMod = async (enabled) => {
     if (enabled) {
-      await promisify(fs.rename)(
+      await fs.rename(
         path.join(modsFolder, modData.name),
         path.join(modsFolder, modData.name.replace('.disabled', ''))
       );
     } else {
-      await promisify(fs.rename)(
+      await fs.rename(
         path.join(modsFolder, modData.name),
         path.join(modsFolder, `${modData.name}.disabled`)
       );
@@ -152,6 +153,4 @@ const ModRow = ({
 
 const MemoizedModRow = memo(ModRow, areEqual);
 
-export default connect((state, ownProps) => ({
-  localUpdate: hasLocalUpdate(ownProps.modData.projectID)(state)
-}), { addNewModToLatestUpdates })(MemoizedModRow);
+export default MemoizedModRow;

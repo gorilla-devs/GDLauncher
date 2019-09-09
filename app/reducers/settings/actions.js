@@ -54,11 +54,11 @@ export function updateJavaMemory(memory) {
   };
 }
 
-export function updateJavaArguments(arguments) {
-  return (dispatch, getState) => {
+export function updateJavaArguments(args) {
+  return (dispatch) => {
     dispatch({
       type: ActionTypes.UPDATE_JAVA_ARGUMENTS,
-      arguments
+      args
     })
   };
 }

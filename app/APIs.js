@@ -11,7 +11,7 @@ export const minecraftLogin = (username, password, clientToken) => {
       },
       username,
       password,
-      clientToken
+      clientToken,
       requestUser: true,
     },
     { headers: { 'Content-Type': 'application/json' } }

@@ -5,6 +5,7 @@ const FEATURES = [
   'minecraft_news',
   'vanilla_manifest',
   'forge_manifest',
+  'instance_pre_download'
 ];
 const defaultState = FEATURES.reduce(
   (previous, current) => ({
