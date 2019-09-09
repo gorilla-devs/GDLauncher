@@ -1,7 +1,9 @@
 import React from 'react';
-import { Select, Divider, Icon } from 'antd';
+import { Select, Divider } from 'antd';
 import { useTranslation } from 'react-i18next';
 import styles from './SelectSetting.scss';
+import { faVolumeUp, faRocket } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const SelectSetting = props => {
   const {t} = useTranslation();
@@ -11,7 +13,7 @@ const SelectSetting = props => {
         <div>
           <div className={styles.mainText}>
             {props.mainText}{' '}
-            <Icon type={props.icon || 'robot'} theme="filled" />
+            <FontAwesomeIcon icon={props.icon} />
           </div>
           <div className={styles.description}>{props.description}</div>
         </div>

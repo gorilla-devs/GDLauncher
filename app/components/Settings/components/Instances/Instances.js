@@ -12,10 +12,12 @@ import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import ButtonSetting from '../ButtonSetting/ButtonSetting';
 import { setInstancesPath } from '../../../../actions/settings';
+import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function Instances(props) {
   const [deletingInstances, setDeletingInstances] = useState(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   async function deleteShareData() {
     try {
@@ -59,7 +61,7 @@ function Instances(props) {
         <ButtonSetting
           mainText={t('ClearAllData', 'Clear Shared Data')}
           description={t('ClearAllDataDescription', 'Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data')}
-          icon="delete"
+          icon={faTrash}
           onClick={() => deleteShareData()}
           disabled={props.installing !== null}
           loading={deletingInstances}
@@ -74,7 +76,7 @@ function Instances(props) {
             You need to <span style={{ color: 'white', cursor: 'pointer' }} onClick={restartLauncher}>restart</span> the launcher for this setting to apply
           </div>
         </div>}
-        icon="folder"
+        icon={faFolder}
         checked={props.instancesPath}
         onChange={e => props.setInstancesPath(e ? INSTANCES_PATH : null)}
       />
@@ -99,21 +101,17 @@ function Instances(props) {
                 marginTop: '4px !important'
               }}
               prefix={
-                <Icon
-                  type="folder"
-                  theme="filled"
-                  style={{ color: 'rgba(255,255,255,.8)' }}
-                />
+                <FontAwesomeIcon icon={faFolder} />
               }
               onChange={e => props.setInstancesPath(e.target.value)}
             />
             <Button
               type="primary"
-              icon="folder"
+              // icon="folder"
               theme="filled"
               onClick={openFolderDialog}
-              style={{ height: 60, marginLeft: 10, marginBottom: 10, marginTop: 4 }}
-            />
+              style={{ height: 60, marginLeft: 10, marginBottom: 10, marginTop: 4, padding: 8 }}
+            ><FontAwesomeIcon icon={faFolder} /></Button>
           </div>
         </div>
       )}

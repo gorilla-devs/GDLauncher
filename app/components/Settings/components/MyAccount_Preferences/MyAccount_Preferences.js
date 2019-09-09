@@ -13,6 +13,7 @@ import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import * as SettingsActions from '../../../../actions/settings';
 import SelectSetting from '../SelectSetting/SelectSetting';
+import { faRocket, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 
 const MyAccount = props => {
   const initialChannel =
@@ -49,14 +50,14 @@ const MyAccount = props => {
         <SwitchSetting
           mainText={t('EnableSoundsTitle', 'Enable Sounds')}
           description={t('EnableSoundsDescription', 'Enable sounds to be played when specific actions are triggered')}
-          icon="sound"
+          icon={faVolumeUp}
           checked={props.settings.sounds}
           onChange={props.setSounds}
         />
         <SelectSetting
           mainText={<span>{t('ReleaseChannel', 'Release Channel')}</span>}
           description={t('ReleaseChannelDescription', 'Stable updates once a month, beta does update more often but it may have more bugs.')}
-          icon="rocket"
+          icon={faRocket}
           onChange={v => {
             setChannel(v);
             store.set(

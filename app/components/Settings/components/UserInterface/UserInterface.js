@@ -10,6 +10,7 @@ import SelectSetting from '../SelectSetting/SelectSetting';
 import * as SettingsActions from '../../../../actions/settings';
 import shader from '../../../../utils/colors';
 import { THEMES } from '../../../../constants';
+import { faPalette } from '@fortawesome/free-solid-svg-icons';
 
 const themes = ['Blue', 'Black', 'Green'];
 const primaryPresets = [
@@ -69,7 +70,7 @@ const UserInterface = props => {
             </span>
           }
           description={t('AdjustValuesToFitTaste', 'Adjust these values to fit your taste')}
-          icon="layout"
+          icon={faPalette}
           placeholder={t('SelectATheme', 'Select A Theme')}
           onChange={v =>
             props.applyTheme(

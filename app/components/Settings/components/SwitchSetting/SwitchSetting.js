@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, Divider, Icon } from 'antd';
 import styles from './SwitchSetting.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const SwitchSetting = props => {
   return (
@@ -9,7 +10,7 @@ const SwitchSetting = props => {
         <div>
           <div className={styles.mainText}>
             {props.mainText}{' '}
-            <Icon type={props.icon || 'robot'} theme="filled" />
+            <FontAwesomeIcon icon={props.icon} />
           </div>
           <div className={styles.description}>{props.description}</div>
         </div>

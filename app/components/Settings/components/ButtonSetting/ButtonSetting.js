@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Divider, Icon } from 'antd';
 import styles from './ButtonSetting.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const ButtonSetting = props => {
   return (
@@ -9,7 +10,7 @@ const ButtonSetting = props => {
         <div>
           <div className={styles.mainText}>
             {props.mainText}{' '}
-            <Icon type={props.icon || 'robot'} theme="filled" />
+            <FontAwesomeIcon icon={props.icon} />
           </div>
           <div className={styles.description}>{props.description}</div>
         </div>
