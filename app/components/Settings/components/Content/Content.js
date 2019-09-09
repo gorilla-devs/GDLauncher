@@ -5,7 +5,7 @@ import styles from './Content.scss';
 import MyAccount_Preferences from '../MyAccount_Preferences/MyAccount_Preferences';
 import Instances from '../Instances/Instances';
 import JavaManager from '../JavaManager/JavaManager';
-import UserInterface from '../UserInterface/UserInterface';
+// import UserInterface from '../UserInterface/UserInterface';
 
 const Content = ({ match }) => {
   return (
@@ -17,7 +17,7 @@ const Content = ({ match }) => {
         />
         <Route path="/settings/java" component={JavaManager} />
         <Route path="/settings/instances" component={Instances} />
-        <Route path="/settings/ui" component={UserInterface} />
+        {/* <Route path="/settings/ui" component={UserInterface} /> */}
       </div>
     </div>
   );
