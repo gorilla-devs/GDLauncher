@@ -40,9 +40,9 @@ const Settings = ({ match, history }) => {
           >
             {t('Instances', 'Instances')}
           </MenuItem>
-          <MenuItem active={match.params.page === 'ui'} to="/settings/ui">
+          {/* <MenuItem active={match.params.page === 'ui'} to="/settings/ui">
             {t('UserInterface', 'User Interface')}
-          </MenuItem>
+          </MenuItem> */}
         </SideMenu>
         <Content match={match} />
       </div>
