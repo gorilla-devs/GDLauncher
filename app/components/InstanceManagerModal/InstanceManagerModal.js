@@ -1,9 +1,9 @@
 // @flow
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Form } from 'antd';
 import { Route } from 'react-router-dom';
 import { remote } from 'electron';
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import _ from 'lodash';
 import { promisify } from 'util';
@@ -23,47 +23,35 @@ import Screenshots from './Screenshots/Screenshots';
 import InstanceIcon from '../../assets/images/instanceDefault.png';
 import ModpackVersions from './ModpackVersions/ModpackVersions';
 
-type Props = {};
 let pack;
 
-class InstanceManagerModal extends Component<Props> {
-  props: Props;
+function InstanceManagerModal(props) {
+  const [unMounting, setUnMounting] = useState(false);
+  const [instanceIcon, setInstanceIcon] = useState(InstanceIcon);
+  const [version, setVersion] = useState(null);
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      unMounting: false,
-      instanceIcon: InstanceIcon,
-      version: null
-    };
-  }
-
-  readConfig = async () => {
+  const readConfig = async () => {
     const config = JSON.parse(
-      await promisify(fs.readFile)(
+      await fs.readFile(
         path.join(PACKS_PATH, this.props.match.params.instance, 'config.json')
       )
     );
     return config;
   };
 
-  closeModal = () => {
-    this.setState({ unMounting: true });
+  const closeModal = () => {
+    setUnMounting(true);
   };
 
   componentDidMount = async () => {
     try {
-      const config = await this.readConfig();
-      this.setState({
-        version: config.version
-      });
+      const config = await readConfig();
+      setVersion(config.version);
       if (config.icon) {
-        const icon = await promisify(fs.readFile)(
+        const icon = await fs.readFile(
           path.join(PACKS_PATH, this.props.match.params.instance, config.icon)
         );
-        this.setState({
-          instanceIcon: `data:image/png;base64,${icon.toString('base64')}`
-        });
+        setInstanceIcon(`data:image/png;base64,${icon.toString('base64')}`);
       }
     } catch {
       log.warn(
@@ -72,7 +60,7 @@ class InstanceManagerModal extends Component<Props> {
     }
   };
 
-  selectNewIcon = e => {
+  const selectNewIcon = e => {
     e.stopPropagation();
     remote.dialog.showOpenDialog(
       {
@@ -80,19 +68,19 @@ class InstanceManagerModal extends Component<Props> {
         properties: ['openFile']
       },
       async paths => {
-        await promisify(fs.copyFile)(
+        await fs.copyFile(
           paths[0],
           path.join(
             PACKS_PATH,
-            this.props.match.params.instance,
+            props.match.params.instance,
             `icon${path.extname(paths[0])}`
           )
         );
-        const config = await this.readConfig();
-        await promisify(fs.writeFile)(
+        const config = await readConfig();
+        await fs.writeFile(
           path.join(
             PACKS_PATH,
-            this.props.match.params.instance,
+            props.match.params.instance,
             'config.json'
           ),
           JSON.stringify({
@@ -101,31 +89,27 @@ class InstanceManagerModal extends Component<Props> {
           })
         );
 
-        const icon = await promisify(fs.readFile)(
+        const icon = await fs.readFile(
           path.join(
             PACKS_PATH,
             this.props.match.params.instance,
             `icon${path.extname(paths[0])}`
           )
         );
-        this.setState({
-          instanceIcon: `data:image/png;base64,${icon.toString('base64')}`
-        });
+        setInstanceIcon(`data:image/png;base64,${icon.toString('base64')}`);
       }
     );
   };
 
-  removeInstanceIcon = async e => {
+  const removeInstanceIcon = async e => {
     e.stopPropagation();
     try {
-      const config = await this.readConfig();
-      await promisify(fs.writeFile)(
+      const config = await readConfig();
+      await fs.writeFile(
         path.join(PACKS_PATH, this.props.match.params.instance, 'config.json'),
         JSON.stringify(_.omit(config, 'icon'))
       );
-      this.setState({
-        instanceIcon: InstanceIcon
-      });
+      setInstanceIcon(InstanceIcon);
     } catch {
       log.warn('The instance icon could not be removed', this.props.match.params.instance);
     }
@@ -134,14 +118,14 @@ class InstanceManagerModal extends Component<Props> {
   render() {
     return (
       <Modal
-        history={this.props.history}
-        unMount={this.state.unMounting}
-        title={`Editing "${this.props.match.params.instance}"`}
+        history={props.history}
+        unMount={unMounting}
+        title={`Editing "${props.match.params.instance}"`}
         style={{ width: '90vw', height: '90vh', maxWidth: 1000 }}
       >
         <div className={styles.container}>
           <SideMenu
-            match={this.props.match}
+            match={props.match}
             style={{
               display: 'flex',
               justifyContent: 'space-around',
@@ -150,70 +134,70 @@ class InstanceManagerModal extends Component<Props> {
           >
             <span
               className={styles.instanceIconContainer}
-              onClick={this.selectNewIcon}
+              onClick={selectNewIcon}
             >
               <span
                 className={styles.instanceIconText}
                 style={{
-                  top: this.state.instanceIcon !== InstanceIcon ? 50 : 40
+                  top: instanceIcon !== InstanceIcon ? 50 : 40
                 }}
               >
                 Change <br /> Icon
               </span>
               <img
                 className={styles.instanceIcon}
-                src={this.state.instanceIcon}
+                src={instanceIcon}
               />
               <div className={styles.instanceIconOverlay} />
-              {this.state.instanceIcon !== InstanceIcon && (
+              {instanceIcon !== InstanceIcon && (
                 <FontAwesomeIcon
-                  onClick={this.removeInstanceIcon}
+                  onClick={removeInstanceIcon}
                   icon={faWindowClose}
                   className={styles.resetIcon}
                 />
               )}
             </span>
             <MenuItem
-              active={this.props.match.params.page === 'settings'}
-              to={`/editInstance/${this.props.match.params.instance}/settings`}
+              active={props.match.params.page === 'settings'}
+              to={`/editInstance/${props.match.params.instance}/settings`}
             >
               Settings
             </MenuItem>
             <MenuItem
-              active={this.props.match.params.page === 'mods'}
+              active={props.match.params.page === 'mods'}
               to={`/editInstance/${
-                this.props.match.params.instance
-              }/mods/local/${this.state.version}`}
+                props.match.params.instance
+                }/mods/local/${version}`}
             >
               Mods Manager
             </MenuItem>
             <MenuItem
-              active={this.props.match.params.page === 'modpackVersions'}
+              active={props.match.params.page === 'modpackVersions'}
               to={`/editInstance/${
-                this.props.match.params.instance
-              }/modpackVersions`}
+                props.match.params.instance
+                }/modpackVersions`}
             >
               Modpack Versions
             </MenuItem>
             <MenuItem
-              active={this.props.match.params.page === 'resourcepacks'}
+              active={props.match.params.page === 'resourcepacks'}
               to={`/editInstance/${
-                this.props.match.params.instance
-              }/resourcepacks`}
+                props.match.params.instance
+                }/resourcepacks`}
             >
               Resource Packs
             </MenuItem>
             <MenuItem
-              active={this.props.match.params.page === 'worlds'}
-              to={`/editInstance/${this.props.match.params.instance}/worlds`}
+              active={props.match.params.page === 'worlds'}
+              to={`/editInstance/${props.match.params.instance}/worlds`}
             >
               Worlds
             </MenuItem>
             <MenuItem
-              active={this.props.match.params.page === 'screenshots'}
+              active={props.match.params.page === 'screenshots'}
               to={`/editInstance/${
-                this.props.match.params.instance
-              }/screenshots`}
+                props.match.params.instance
+                }/screenshots`}
             >
               Screenshots
             </MenuItem>
@@ -223,7 +207,7 @@ class InstanceManagerModal extends Component<Props> {
               path="/editInstance/:instance/settings"
               render={() => (
                 <Settings
-                  close={this.closeModal}
+                  close={closeModal}
                   instance={this.props.match.params.instance}
                 />
               )}
@@ -240,8 +224,8 @@ class InstanceManagerModal extends Component<Props> {
               path="/editInstance/:instance/modpackVersions"
               render={() => (
                 <ModpackVersions
-                  close={this.closeModal}
-                  instance={this.props.match.params.instance}
+                  close={closeModal}
+                  instance={props.match.params.instance}
                 />
               )}
             />
