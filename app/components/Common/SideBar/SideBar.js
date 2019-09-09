@@ -20,7 +20,7 @@ import forgeIcon from '../../../assets/images/forge_icon.jpg';
 import styles from './SideBar.scss';
 import { PACKS_PATH } from '../../../constants';
 import { readConfig } from '../../../utils/instances';
-import { getInstance } from '../../../utils/selectors';
+import { getInstance, getCurrentAccount } from '../../../utils/selectors';
 
 type Props = {};
 
@@ -28,6 +28,7 @@ const SideBar = props => {
   const [instanceData, setInstanceData] = useState(null);
   const selectedInstance = useSelector(state => state.selectedInstance);
   const instance = useSelector(state => getInstance(state));
+  const account = useSelector(state => getCurrentAccount(state));
 
   const UpdateSideBar = async () => {
     if (selectedInstance !== null) {
@@ -66,10 +67,10 @@ const SideBar = props => {
         <div className={styles.header}>
           <span>
             <CIcon size={32}>
-              {props.username && props.username.charAt(0).toUpperCase()}
+              {account.selectedProfile.name && account.selectedProfile.name.charAt(0).toUpperCase()}
             </CIcon>
           </span>
-          <span>{props.username}</span>
+          <span>{account.selectedProfile.name}</span>
           <div onClick={() => props.logout()}>
             <FontAwesomeIcon icon={faSignOutAlt} className={styles.logout} />
           </div>
