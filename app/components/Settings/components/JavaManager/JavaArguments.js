@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { DEFAULT_ARGS } from '../../../../constants';
+import { DEFAULT_JAVA_ARGUMENTS } from '../../../../constants';
 import JavaArgsInput from '../../../Common/JavaArgumentInput';
 import { updateJavaArguments } from '../../../../reducers/settings/actions';
 
@@ -20,8 +20,8 @@ function JavaArguments(props: Props) {
 
   // Reset the global arguments to the default one
   function resetJavaArguments() {
-    dispatch(updateJavaArguments(DEFAULT_ARGS));
-    setGlobalArgsInput(DEFAULT_ARGS);
+    dispatch(updateJavaArguments(DEFAULT_JAVA_ARGUMENTS));
+    setGlobalArgsInput(DEFAULT_JAVA_ARGUMENTS);
   }
 
   return (

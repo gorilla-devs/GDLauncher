@@ -5,7 +5,7 @@ import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import log from 'electron-log';
 import Card from '../../Common/Card/Card';
 import styles from './JavaManagerCard.scss';
-import { DEFAULT_ARGS, DEFAULT_MEMORY } from '../../../constants';
+import { DEFAULT_JAVA_ARGUMENTS, DEFAULT_JAVA_MEMORY } from '../../../constants';
 import { findJavaHome, checkJavaArch } from '../../../utils/javaHelpers';
 import { updateConfig, readConfig } from '../../../utils/instances';
 import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
@@ -19,8 +19,8 @@ function JavaManagerCard(props) {
   const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
 
   const resetArgs = async () => {
-    await updateConfig(props.instanceName, { overrideArgs: DEFAULT_ARGS });
-    setOverrideArgsInput(DEFAULT_ARGS);
+    await updateConfig(props.instanceName, { overrideArgs: DEFAULT_JAVA_ARGUMENTS });
+    setOverrideArgsInput(DEFAULT_JAVA_ARGUMENTS);
   };
 
   // Set the changed java arguments
@@ -54,8 +54,8 @@ function JavaManagerCard(props) {
   async function toggleJavaArguments(e) {
     try {
       if (e) {
-        await updateConfig(props.instanceName, { overrideArgs: DEFAULT_ARGS });
-        setOverrideArgsInput(DEFAULT_ARGS);
+        await updateConfig(props.instanceName, { overrideArgs: DEFAULT_JAVA_ARGUMENTS });
+        setOverrideArgsInput(DEFAULT_JAVA_ARGUMENTS);
         setJavaArgsSwitchState(true);
       } else if (!e) {
         await updateConfig(props.instanceName, {}, ['overrideArgs']);
@@ -79,9 +79,9 @@ function JavaManagerCard(props) {
     try {
       if (e) {
         await updateConfig(props.instanceName, {
-          overrideMemory: DEFAULT_MEMORY
+          overrideMemory: DEFAULT_JAVA_MEMORY
         });
-        setOverrideJavaMemory(DEFAULT_MEMORY);
+        setOverrideJavaMemory(DEFAULT_JAVA_MEMORY);
         setJavaMemorySwitchState(true);
       } else if (!e) {
         await updateConfig(props.instanceName, {}, ['overrideMemory']);

@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import * as ActionTypes from './actionTypes';
-import { DEFAULT_ARGS, DEFAULT_JAVA_MEMORY } from '../../constants';
+import { DEFAULT_JAVA_ARGUMENTS, DEFAULT_JAVA_MEMORY } from '../../constants';
 
 function sounds(state = true, action) {
   switch (action.type) {
@@ -13,7 +13,7 @@ function sounds(state = true, action) {
 
 function instancesPath(state = null, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_GENERAL_SETTINGS:
+    case ActionTypes.UPDATE_INSTANCES_PATH:
       return { ...state, ...action.settings };
     default:
       return state;
@@ -33,11 +33,15 @@ function releaseChannel(state = 0, action) {
 function java(state = {
   path: null,
   memory: DEFAULT_JAVA_MEMORY,
-  arguments: DEFAULT_JAVA_ARGUMENTS
+  args: DEFAULT_JAVA_ARGUMENTS
 }, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_JAVA_SETTINGS:
-      return { ...state, ...action.settings };
+    case ActionTypes.UPDATE_JAVA_ARGUMENTS:
+      return { ...state, args: action.args };
+    case ActionTypes.UPDATE_JAVA_MEMORY:
+      return { ...state, memory: action.memory };
+    case ActionTypes.UPDATE_JAVA_PATH:
+      return { ...state, path: action.path };
     default:
       return state;
   }
@@ -45,6 +49,7 @@ function java(state = {
 
 export default combineReducers({
   sounds,
-  general,
+  instancesPath,
+  releaseChannel,
   java
 });

@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import * as ActionTypes from './actionTypes';
-import { DEFAULT_ARGS } from '../constants';
+import { DEFAULT_JAVA_ARGUMENTS } from '../constants';
 
 function accounts(state = [], action) {
   switch (action.type) {
@@ -103,7 +103,7 @@ export default combineReducers({
   currentAccountIndex,
   vanillaManifest,
   forgeManifest,
-  modsManifest,
+  modsManifests,
   clientToken,
   isNewUser,
   showChangelog

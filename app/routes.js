@@ -6,7 +6,7 @@ import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import { screen } from 'electron';
 import { release, arch } from 'os';
-import { initInstances, initNews, checkAccessToken } from './reducers/actions';
+import { initInstances, initNews, loginWithAccessToken } from './reducers/actions';
 import { JAVA_URL } from './constants';
 import ga from './GAnalytics';
 import App from './containers/App';
@@ -54,7 +54,7 @@ const JavaGlobalOptionsFixModal = lazy(() =>
 
 type Props = {
   location: object,
-  checkAccessToken: () => void,
+  loginWithAccessToken: () => void,
   isAuthValid: boolean
 };
 
@@ -68,10 +68,10 @@ class RouteDef extends Component<Props> {
   }
 
   componentDidMount = async () => {
-    const { checkAccessToken, initInstances, initNews } = this.props;
+    const { loginWithAccessToken, initInstances, initNews } = this.props;
     initNews();
     initInstances();
-    if (!this.props.isAuthValid) checkAccessToken();
+    if (!this.props.isAuthValid) loginWithAccessToken();
     if ((await findJavaHome()) === null) {
       notification.warning({
         duration: 0,
@@ -297,7 +297,7 @@ function mapStateToProps(state) {
 const mapDispatchToProps = {
   initNews,
   initInstances,
-  checkAccessToken
+  loginWithAccessToken
 }
 
 export default connect(

@@ -40,7 +40,7 @@ type Props = {
   playing: array
 };
 
-export function DInstance(props) {
+export default function DInstance(props) {
   const [version, setVersion] = useState(null);
   const [isValid, setIsValid] = useState(true);
   const [forgeVersion, setForgeversion] = useState(null);

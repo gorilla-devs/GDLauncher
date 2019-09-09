@@ -7,7 +7,7 @@ import fs from 'fs';
 import log from 'electron-log';
 import Card from '../../Common/Card/Card';
 import styles from './Settings.scss';
-import { PACKS_PATH, DEFAULT_ARGS } from '../../../constants';
+import { PACKS_PATH, DEFAULT_JAVA_ARGUMENTS } from '../../../constants';
 import ForgeManager from './ForgeManager';
 import JavaManagerCard from './JavaManagerCard';
 import { readConfig } from '../../../utils/instances';
