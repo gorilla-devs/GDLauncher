@@ -2,7 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
 import { routerMiddleware, routerActions } from 'connected-react-router';
-import { persistReducer } from 'redux-persist';
+import { persistReducer, persistStore } from 'redux-persist';
 import { createLogger } from 'redux-logger';
 import createRootReducer from '../reducers';
 import { UPDATE_PROGRESS } from '../actions/downloadManager';
@@ -51,9 +51,9 @@ const configureStore = (initialState) => {
   /* eslint-disable no-underscore-dangle */
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-        // Options: http://zalmoxisus.github.io/redux-devtools-extension/API/Arguments.html
-        actionCreators
-      })
+      // Options: http://zalmoxisus.github.io/redux-devtools-extension/API/Arguments.html
+      actionCreators
+    })
     : compose;
   /* eslint-enable no-underscore-dangle */
 
@@ -63,6 +63,7 @@ const configureStore = (initialState) => {
 
   // Create Store
   const store = createStore(persistedReducer, initialState, enhancer);
+  const persistor = persistStore(store);
 
   if (module.hot) {
     module.hot.accept(
@@ -71,7 +72,7 @@ const configureStore = (initialState) => {
     ); // eslint-disable-line global-require
   }
 
-  return store;
+  return { store, persistor };
 };
 
 export default { configureStore, history };

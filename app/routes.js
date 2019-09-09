@@ -9,6 +9,8 @@ import { release, arch } from 'os';
 import { initInstances, initNews, loginWithAccessToken } from './reducers/actions';
 import { JAVA_URL } from './constants';
 import ga from './GAnalytics';
+import GlobalStyles from './globalStyles';
+import './app.global.scss';
 import App from './containers/App';
 import { history } from './store/configureStore';
 import SideBar from './components/Common/SideBar/SideBar';
@@ -19,7 +21,7 @@ import DManager from './components/DManager/DManager';
 import InstanceManagerModal from './components/InstanceManagerModal/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
-import { ModalManager } from './components/Common/ModalManager/ModalManager';
+// import { ModalManager } from './components/Common/ModalManager/ModalManager';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/Home'));
@@ -69,10 +71,9 @@ class RouteDef extends Component<Props> {
   }
 
   componentDidMount = async () => {
-    const { loginWithAccessToken, initInstances, initNews } = this.props;
-    initNews();
-    initInstances();
-    if (!this.props.isAuthValid) loginWithAccessToken();
+    this.props.initNews();
+    this.props.initInstances();
+    if (!this.props.isAuthValid) this.props.loginWithAccessToken();
     if ((await findJavaHome()) === null) {
       notification.warning({
         duration: 0,
@@ -161,6 +162,7 @@ class RouteDef extends Component<Props> {
     ); // not initial render
     return (
       <App>
+        <GlobalStyles />
         <SysNavBar />
         <div>
           {location.pathname !== '/' &&
@@ -171,7 +173,7 @@ class RouteDef extends Component<Props> {
                 <SideBar />
               </div>
             )}
-          <ModalManager />
+          {/* <ModalManager /> */}
           <Switch location={isModal ? this.previousLocation : location}>
             <Route
               exact

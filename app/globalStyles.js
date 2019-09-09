@@ -99,12 +99,6 @@ export default createGlobalStyle`
     margin-top: -150px;
   }
 
-  /*
-  * Had to remove scale animation because of how the menu position is calculated.
-  * If it starts with a scale of 0, it's initial position is always from the pointer, direction bottom.
-  * If the menu is opened at the end of the page it will overflow because it cannot calculate the overflowY.
-  */
-
   .react-contextmenu {
     background: var(--secondary-color-2);
     background-clip: padding-box;
@@ -192,7 +186,7 @@ export default createGlobalStyle`
     display: block;
   }
 
-  /* Overwrites ANTD CSS */
+
   .ant-btn-primary {
     background-color: var(--primary);
     border-color: var(--primary);
@@ -357,7 +351,6 @@ export default createGlobalStyle`
     background-color: var(--primary);
   }
 
-  // Table
   .ant-table-thead > tr.ant-table-row-hover > td,
   .ant-table-tbody > tr.ant-table-row-hover > td,
   .ant-table-thead > tr > th,

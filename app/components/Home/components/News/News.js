@@ -5,9 +5,9 @@ import styles from './News.scss';
 
 const News = props => (
   <div className={styles.container}>
-    {props.news.news.length !== 0 ? (
+    {props.news.length !== 0 ? (
       <Carousel infinite autoplay style={{ height: '180px' }}>
-        {props.news.news.map(inf => {
+        {props.news.map(inf => {
           return (
             <a
               href={inf.url}

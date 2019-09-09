@@ -175,9 +175,9 @@ export function loginThroughNativeLauncher() {
 
       // We need to update the accessToken in launcher_profiles.json
       vnlJson.authenticationDatabase[
-        newUserData.selectedProfile.userId
+        data.selectedProfile.userId
       ].accessToken = data.accessToken;
-      await fsa.writeJson(
+      await fse.writeJson(
         path.join(vanillaMCPath, 'launcher_profiles.json'),
         vnlJson
       );
@@ -191,10 +191,11 @@ export function loginThroughNativeLauncher() {
       } else {
         dispatch(push('/home'));
       }
-    } catch {
+    } catch (err) {
       message.error(
         'We could not log you in through Minecraft Launcher. Invalid data.'
       );
+      console.error(err);
       throw new Error();
     }
   };
