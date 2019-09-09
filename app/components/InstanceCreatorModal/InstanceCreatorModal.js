@@ -20,6 +20,8 @@ function InstanceCreatorModal(props) {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
 
+  const { getFieldDecorator } = props.form;
+
   const versions = [
     {
       value: 'vanilla',
@@ -88,77 +90,73 @@ function InstanceCreatorModal(props) {
 
   filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1;
 
-  render() {
-    const { getFieldDecorator } = props.form;
-
-    return (
-      <Modal
-        history={props.history}
-        unMount={unMount}
-        title="Create New Instance"
-        style={{ height: 330, width: 540 }}
+  return (
+    <Modal
+      history={props.history}
+      unMount={unMount}
+      title="Create New Instance"
+      style={{ height: 330, width: 540 }}
+    >
+      <Form
+        layout="inline"
+        className={styles.container}
+        onSubmit={handleSubmit}
       >
-        <Form
-          layout="inline"
-          className={styles.container}
-          onSubmit={handleSubmit}
-        >
-          <div>
-            <FormItem style={{ margin: 0 }}>
-              {getFieldDecorator('packName', {
-                rules: [
-                  {
-                    required: true,
-                    message:
-                      'Please input a valid name with just numbers and letters',
-                    pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
-                  }
-                ]
-              })(
-                <Input
-                  autoFocus
-                  size="large"
-                  style={{
-                    width: 450,
-                    display: 'inline-block',
-                    height: '60px'
-                  }}
-                  prefix={
-                    <Icon
-                      type="play-circle"
-                      theme="filled"
-                      style={{ color: 'rgba(255,255,255,.8)' }}
-                    />
-                  }
-                  placeholder="Instance Name"
-                />
-              )}
-            </FormItem>
-          </div>
-          <div style={{ marginTop: '20px' }}>
-            <FormItem>
-              {getFieldDecorator('version', {
-                rules: [{ required: true, message: 'Please select a version' }]
-              })(
-                <Cascader
-                  options={versions}
-                  size="large"
-                  showSearch={{ filter: filter }}
-                  style={{ width: 335, display: 'inline-block' }}
-                  placeholder="Select a version"
-                />
-              )}
-            </FormItem>
-          </div>
-          <div className={styles.createInstance}>
-            <Button icon="plus" size="large" type="primary" htmlType="submit">
-              Create Instance
+        <div>
+          <FormItem style={{ margin: 0 }}>
+            {getFieldDecorator('packName', {
+              rules: [
+                {
+                  required: true,
+                  message:
+                    'Please input a valid name with just numbers and letters',
+                  pattern: new RegExp('^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$')
+                }
+              ]
+            })(
+              <Input
+                autoFocus
+                size="large"
+                style={{
+                  width: 450,
+                  display: 'inline-block',
+                  height: '60px'
+                }}
+                prefix={
+                  <Icon
+                    type="play-circle"
+                    theme="filled"
+                    style={{ color: 'rgba(255,255,255,.8)' }}
+                  />
+                }
+                placeholder="Instance Name"
+              />
+            )}
+          </FormItem>
+        </div>
+        <div style={{ marginTop: '20px' }}>
+          <FormItem>
+            {getFieldDecorator('version', {
+              rules: [{ required: true, message: 'Please select a version' }]
+            })(
+              <Cascader
+                options={versions}
+                size="large"
+                showSearch={{ filter: filter }}
+                style={{ width: 335, display: 'inline-block' }}
+                placeholder="Select a version"
+              />
+            )}
+          </FormItem>
+        </div>
+        <div className={styles.createInstance}>
+          <Button icon="plus" size="large" type="primary" htmlType="submit">
+            Create Instance
             </Button>
-          </div>
-        </Form>
-      </Modal>
-    );
-  }
+        </div>
+      </Form>
+    </Modal>
+  );
 }
 
 export default Form.create()(InstanceCreatorModal);

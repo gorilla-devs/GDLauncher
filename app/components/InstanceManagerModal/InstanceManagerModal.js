@@ -115,130 +115,128 @@ function InstanceManagerModal(props) {
     }
   };
 
-  render() {
-    return (
-      <Modal
-        history={props.history}
-        unMount={unMounting}
-        title={`Editing "${props.match.params.instance}"`}
-        style={{ width: '90vw', height: '90vh', maxWidth: 1000 }}
-      >
-        <div className={styles.container}>
-          <SideMenu
-            match={props.match}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-around',
-              paddingTop: 10
-            }}
+  return (
+    <Modal
+      history={props.history}
+      unMount={unMounting}
+      title={`Editing "${props.match.params.instance}"`}
+      style={{ width: '90vw', height: '90vh', maxWidth: 1000 }}
+    >
+      <div className={styles.container}>
+        <SideMenu
+          match={props.match}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-around',
+            paddingTop: 10
+          }}
+        >
+          <span
+            className={styles.instanceIconContainer}
+            onClick={selectNewIcon}
           >
             <span
-              className={styles.instanceIconContainer}
-              onClick={selectNewIcon}
+              className={styles.instanceIconText}
+              style={{
+                top: instanceIcon !== InstanceIcon ? 50 : 40
+              }}
             >
-              <span
-                className={styles.instanceIconText}
-                style={{
-                  top: instanceIcon !== InstanceIcon ? 50 : 40
-                }}
-              >
-                Change <br /> Icon
+              Change <br /> Icon
               </span>
-              <img
-                className={styles.instanceIcon}
-                src={instanceIcon}
+            <img
+              className={styles.instanceIcon}
+              src={instanceIcon}
+            />
+            <div className={styles.instanceIconOverlay} />
+            {instanceIcon !== InstanceIcon && (
+              <FontAwesomeIcon
+                onClick={removeInstanceIcon}
+                icon={faWindowClose}
+                className={styles.resetIcon}
               />
-              <div className={styles.instanceIconOverlay} />
-              {instanceIcon !== InstanceIcon && (
-                <FontAwesomeIcon
-                  onClick={removeInstanceIcon}
-                  icon={faWindowClose}
-                  className={styles.resetIcon}
-                />
-              )}
-            </span>
-            <MenuItem
-              active={props.match.params.page === 'settings'}
-              to={`/editInstance/${props.match.params.instance}/settings`}
-            >
-              Settings
+            )}
+          </span>
+          <MenuItem
+            active={props.match.params.page === 'settings'}
+            to={`/editInstance/${props.match.params.instance}/settings`}
+          >
+            Settings
             </MenuItem>
-            <MenuItem
-              active={props.match.params.page === 'mods'}
-              to={`/editInstance/${
-                props.match.params.instance
-                }/mods/local/${version}`}
-            >
-              Mods Manager
+          <MenuItem
+            active={props.match.params.page === 'mods'}
+            to={`/editInstance/${
+              props.match.params.instance
+              }/mods/local/${version}`}
+          >
+            Mods Manager
             </MenuItem>
-            <MenuItem
-              active={props.match.params.page === 'modpackVersions'}
-              to={`/editInstance/${
-                props.match.params.instance
-                }/modpackVersions`}
-            >
-              Modpack Versions
+          <MenuItem
+            active={props.match.params.page === 'modpackVersions'}
+            to={`/editInstance/${
+              props.match.params.instance
+              }/modpackVersions`}
+          >
+            Modpack Versions
             </MenuItem>
-            <MenuItem
-              active={props.match.params.page === 'resourcepacks'}
-              to={`/editInstance/${
-                props.match.params.instance
-                }/resourcepacks`}
-            >
-              Resource Packs
+          <MenuItem
+            active={props.match.params.page === 'resourcepacks'}
+            to={`/editInstance/${
+              props.match.params.instance
+              }/resourcepacks`}
+          >
+            Resource Packs
             </MenuItem>
-            <MenuItem
-              active={props.match.params.page === 'worlds'}
-              to={`/editInstance/${props.match.params.instance}/worlds`}
-            >
-              Worlds
+          <MenuItem
+            active={props.match.params.page === 'worlds'}
+            to={`/editInstance/${props.match.params.instance}/worlds`}
+          >
+            Worlds
             </MenuItem>
-            <MenuItem
-              active={props.match.params.page === 'screenshots'}
-              to={`/editInstance/${
-                props.match.params.instance
-                }/screenshots`}
-            >
-              Screenshots
+          <MenuItem
+            active={props.match.params.page === 'screenshots'}
+            to={`/editInstance/${
+              props.match.params.instance
+              }/screenshots`}
+          >
+            Screenshots
             </MenuItem>
-          </SideMenu>
-          <div className={styles.content}>
-            <Route
-              path="/editInstance/:instance/settings"
-              render={() => (
-                <Settings
-                  close={closeModal}
-                  instance={this.props.match.params.instance}
-                />
-              )}
-            />
-            <Route
-              path="/editInstance/:instance/mods/:state/:version?/:mod?"
-              component={ModsManager}
-            />
-            <Route
-              path="/editInstance/:instance/resourcepacks"
-              component={ResourcePacks}
-            />
-            <Route
-              path="/editInstance/:instance/modpackVersions"
-              render={() => (
-                <ModpackVersions
-                  close={closeModal}
-                  instance={props.match.params.instance}
-                />
-              )}
-            />
-            <Route path="/editInstance/:instance/worlds" component={Worlds} />
-            <Route
-              path="/editInstance/:instance/screenshots"
-              component={Screenshots}
-            />
-          </div>
+        </SideMenu>
+        <div className={styles.content}>
+          <Route
+            path="/editInstance/:instance/settings"
+            render={() => (
+              <Settings
+                close={closeModal}
+                instance={this.props.match.params.instance}
+              />
+            )}
+          />
+          <Route
+            path="/editInstance/:instance/mods/:state/:version?/:mod?"
+            component={ModsManager}
+          />
+          <Route
+            path="/editInstance/:instance/resourcepacks"
+            component={ResourcePacks}
+          />
+          <Route
+            path="/editInstance/:instance/modpackVersions"
+            render={() => (
+              <ModpackVersions
+                close={closeModal}
+                instance={props.match.params.instance}
+              />
+            )}
+          />
+          <Route path="/editInstance/:instance/worlds" component={Worlds} />
+          <Route
+            path="/editInstance/:instance/screenshots"
+            component={Screenshots}
+          />
         </div>
-      </Modal>
-    );
-  }
+      </div>
+    </Modal>
+  );
 }
 
 export default InstanceManagerModal;

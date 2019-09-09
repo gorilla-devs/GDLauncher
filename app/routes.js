@@ -15,18 +15,18 @@ import SideBar from './components/Common/SideBar/SideBar';
 import Navigation from './components/Common/WindowNavigation/NavigationBar';
 import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import { findJavaHome, isGlobalJavaOptions } from './utils/javaHelpers';
-import DManager from './components/DManager/containers/DManagerPage';
-import InstanceManagerModal from './components/InstanceManagerModal/containers/InstanceManagerModal';
+import DManager from './components/DManager/DManager';
+import InstanceManagerModal from './components/InstanceManagerModal/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
 import NewUserPage from './components/NewUserPage/NewUserPage';
 
 const Login = lazy(() => import('./components/Login/Login'));
-const HomePage = lazy(() => import('./components/Home/containers/HomePage'));
+const HomePage = lazy(() => import('./components/Home/Home'));
 const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
 
 const InstanceCreatorModal = lazy(() =>
-  import('./components/InstanceCreatorModal/containers/InstanceCreatorModal')
+  import('./components/InstanceCreatorModal/InstanceCreatorModal')
 );
 
 const loginHelperModal = lazy(() =>

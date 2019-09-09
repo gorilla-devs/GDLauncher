@@ -418,15 +418,25 @@ export function instanceDownloadOverride(
   forgeVersion = null
 ) {
   return async dispatch => {
-    dispatch({ type: START_PACK_CREATION });
-
     try {
-      await promisify(fs.access)(path.join(PACKS_PATH, packName));
+      await fs.access(path.join(PACKS_PATH, packName));
     } catch (e) {
       await makeDir(path.join(PACKS_PATH, packName));
     } finally {
-      dispatch(addToQueue(packName, version, forgeVersion));
-      dispatch({ type: CREATION_COMPLETE });
+      await dispatch(addToQueue(packName, version, forgeVersion));
     }
   };
+}
+
+function updateDownloadProgress(min, percDifference, computed, total) {
+  return (dispatch, getState) => {
+    const { downloadQueue } = getState();
+    const actualDownload = Object.keys(downloadQueue).find(v => downloadQueue[v].status === "Downloading");
+    const actualPercentage = (computed * percDifference) / total;
+    dispatch({
+      type: ActionTypes.UPDATE_DOWNLOAD_PROGRESS,
+      name: downloadQueue[actualDownload].name,
+      percentage: Number(actualPercentage.toFixed()) + Number(min)
+    });
+  }
 }

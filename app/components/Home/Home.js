@@ -28,7 +28,7 @@ const Home = props => {
   });
 
   /* eslint-disable */
-  const openLink(url) {
+  const openLink = (url) => {
     require('electron').shell.openExternal(url);
   }
 

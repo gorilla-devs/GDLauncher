@@ -17,7 +17,7 @@ import {
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import styles from './DManager.scss';
-import DInstance from '../../containers/DInstance';
+import DInstance from '../DInstance/DInstance';
 import { history } from '../../store/configureStore';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSelectedInstance } from '../../reducers/actions';
@@ -43,7 +43,7 @@ const DManager = props => {
   };
 
   /* eslint-disable */
-  const openLink(url) {
+  const openLink = url => {
     require('electron').shell.openExternal(url);
   }
 
