@@ -1,9 +1,12 @@
 import { get } from 'lodash';
 import { spawn } from 'child_process';
 import fss, { promises as fs } from 'fs';
+import { message } from 'antd';
 import fse from 'fs-extra';
 import path from 'path';
+import watch from 'node-watch';
 import makeDir from 'make-dir';
+import { push } from 'connected-react-router';
 import * as ActionTypes from './actionTypes';
 import { minecraftLogin, minecraftCheckAccessToken, minecraftRefreshAccessToken } from '../APIs';
 import { uuidv4 } from '../utils';
@@ -11,6 +14,7 @@ import { updateJavaArguments } from './settings/actions';
 import launchCommand from '../utils/MCLaunchCommand';
 import { PACKS_PATH } from '../constants';
 import { readConfig, updateConfig } from '../utils/instances';
+import { getCurrentAccount } from '../utils/selectors';
 
 export function initManifests() {
   return async dispatch => {
@@ -94,6 +98,15 @@ export function updateIsNewUser(isNewUser) {
   };
 }
 
+export function updateCurrentAccountId(id) {
+  return async (dispatch, getState) => {
+    dispatch({
+      type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
+      id
+    });
+  };
+}
+
 export function login(username, password, remember) {
   return async (dispatch, getState) => {
     const { app: { clientToken, isNewUser } } = getState();
@@ -101,6 +114,7 @@ export function login(username, password, remember) {
       const { data, status } = await minecraftLogin(username, password);
       if (status !== 200) throw new Error();
       dispatch(updateAccount(data.selectedProfile.id, data));
+      dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
       if (!isNewUser) {
         dispatch(push('/home'));
@@ -117,8 +131,9 @@ export function login(username, password, remember) {
 
 export function loginWithAccessToken(accessToken) {
   return async (dispatch, getState) => {
-    const { app: { currentAccountIndex, accounts, clientToken } } = getState();
-    const accessToken = accounts[currentAccountIndex].accessToken;
+    const state = getState();
+    const { app: { clientToken } } = state;
+    const accessToken = getCurrentAccount(state).accessToken;
     try {
       const { data, status } = await minecraftCheckAccessToken(accessToken, clientToken);
       dispatch(push('/home'));
@@ -128,6 +143,7 @@ export function loginWithAccessToken(accessToken) {
         try {
           const { data, status } = await minecraftRefreshAccessToken(accessToken, clientToken);
           dispatch(updateAccount(data.selectedProfile.id, data));
+          dispatch(updateCurrentAccountId(data.selectedProfile.id));
           dispatch(push('/home'));
         } catch {
           message.error('Token Not Valid. You Need To Log-In Again :(');
@@ -142,7 +158,7 @@ export function loginWithAccessToken(accessToken) {
   };
 }
 
-export function loginThroughNativeLauncher(accessToken) {
+export function loginThroughNativeLauncher() {
   return async (dispatch, getState) => {
     const { app: { clientToken, isNewUser } } = getState();
 
@@ -167,6 +183,7 @@ export function loginThroughNativeLauncher(accessToken) {
       );
 
       dispatch(updateAccount(data.selectedProfile.id, data));
+      dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
       if (isNewUser) {
         dispatch(updateIsNewUser(false));
@@ -185,8 +202,8 @@ export function loginThroughNativeLauncher(accessToken) {
 
 export function logout() {
   return (dispatch, getState) => {
-    const { app: { currentAccountIndex, accounts } } = getState();
-    const id = accounts[currentAccountIndex].selectedProfile.id;
+    const state = getState();
+    const id = getCurrentAccount(state).selectedProfile.id;
     dispatch(removeAccount(id));
     dispatch(push('/'));
   };

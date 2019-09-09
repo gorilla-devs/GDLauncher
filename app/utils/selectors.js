@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 const instances = state => state.instances;
 const latestModsUpdates = state => state.latestModsUpdates;
 const accounts = state => state.app.accounts;
-const currentAccountIndex = state => state.app.currentAccountIndex;
+const currentAccountId = state => state.app.currentAccountId;
 
 export const getInstance = instance => createSelector(
   instances,
@@ -16,6 +16,6 @@ export const hasLocalUpdate = projectID => createSelector(
 )
 
 export const getCurrentAccount = createSelector(
-  accounts, currentAccountIndex,
-  (accounts, currentAccountIndex) => accounts[currentAccountIndex]
+  accounts, currentAccountId,
+  (accounts, currentAccountId) => accounts.find(account => account.selectedProfile.id === currentAccountId)
 );

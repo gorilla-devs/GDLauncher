@@ -19,11 +19,11 @@ import DManager from './components/DManager/DManager';
 import InstanceManagerModal from './components/InstanceManagerModal/InstanceManagerModal';
 import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
-import NewUserPage from './components/NewUserPage/NewUserPage';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/Home'));
 const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
+const NewUserPage = lazy(() => import('./components/NewUserPage/NewUserPage'));
 
 const InstanceCreatorModal = lazy(() =>
   import('./components/InstanceCreatorModal/InstanceCreatorModal')
@@ -182,7 +182,7 @@ class RouteDef extends Component<Props> {
               component={WaitingComponent(AutoUpdate)}
             />
             {/* {!isAuthValid && <Redirect push to="/" />} */}
-            <Route path="/newUserPage" component={NewUserPage} />
+            <Route path="/newUserPage" component={WaitingComponent(NewUserPage)} />
             <Route>
               <div
                 style={{

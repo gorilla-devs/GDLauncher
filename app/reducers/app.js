@@ -23,10 +23,11 @@ function accounts(state = [], action) {
   }
 }
 
-function currentAccountIndex(state = null, action) {
+// Based on account UUID
+function currentAccountId(state = null, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_CURRENT_ACCOUNT_INDEX:
-      return action.index;
+    case ActionTypes.UPDATE_CURRENT_ACCOUNT_ID:
+      return action.id;
     default:
       return state;
   }
@@ -100,7 +101,7 @@ function showChangelog(state = false, action) {
 
 export default combineReducers({
   accounts,
-  currentAccountIndex,
+  currentAccountId,
   vanillaManifest,
   forgeManifest,
   modsManifests,

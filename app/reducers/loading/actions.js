@@ -35,7 +35,7 @@ export function load(feature, request) {
       const res = await request;
       dispatch(received(feature))
       return res;
-    } catch {
+    } catch (error) {
       dispatch(catchError(feature, error));
       throw error;
     }

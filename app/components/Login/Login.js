@@ -62,7 +62,7 @@ function Login(props) {
         dispatch(
           load(
             'account_authentication',
-            login(values.username, values.password, values.remember)
+            dispatch(login(values.username, values.password, values.remember))
           )
         );
       } else {
@@ -167,7 +167,11 @@ function Login(props) {
               type="primary"
               className={styles.login_form_button}
               style={{ marginTop: '30px' }}
-              onClick={() => dispatch(load('account_authentication', loginThroughNativeLauncher()))}
+              onClick={() => {
+                dispatch(
+                  load('account_authentication', dispatch(loginThroughNativeLauncher()))
+                ).catch(err => {});
+              }}
             >
               <span>
                 {t('LoginAs', 'Login As')}{' '}

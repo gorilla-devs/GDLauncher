@@ -8,6 +8,7 @@ import { THEMES } from '../../constants';
 import store from '../../localStore';
 import background from '../../assets/images/login_background.jpg';
 import circleBlue from '../../assets/images/circleBlue.svg';
+import { getCurrentAccount } from '../../utils/selectors';
 
 const colors = store.get('settings')
   ? store.get('settings').theme
@@ -65,7 +66,7 @@ const NewUserPage = props => {
               <h1 style={{ fontSize: 37 }}>{t('WelcomeToGDLauncher', 'Welcome to GDLauncher!')}</h1>
               <div style={{ display: 'flex' }}>
                 <p style={{ fontSize: 25 }}>
-                  {t('helloUser', `Hello ${props.username}!`)}<br />
+                  {t('helloUser', `Hello ${props.account.selectedProfile.name}!`)}<br />
                   {t('GDLauncherOpenSource', 'GDLauncher is free and open source, it wouldn\'t exist without its community. If you find any bug or have any suggestion, tell us on Discord!')}
                   <br />
                   <br />
@@ -104,7 +105,7 @@ const NewUserPage = props => {
 };
 
 const mapStateToProps = state => ({
-  username: state.auth.displayName
+  account: getCurrentAccount(state)
 });
 
 export default connect(mapStateToProps)(NewUserPage);
