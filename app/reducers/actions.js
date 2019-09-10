@@ -1,14 +1,16 @@
-import { get } from 'lodash';
+import { get, unionBy } from 'lodash';
 import { spawn } from 'child_process';
-import fss, { promises as fs } from 'fs';
+import fss, { promises as fs, copyFile } from 'fs';
 import { message } from 'antd';
 import axios from 'axios';
 import cheerio from 'cheerio';
 import _, { isEqual } from 'lodash';
+import Promise from 'bluebird';
 import fse from 'fs-extra';
 import log from 'electron-log';
 import versionCompare from '../utils/versionsCompare';
 import path from 'path';
+import { cpus } from 'os';
 import watch from 'node-watch';
 import makeDir from 'make-dir';
 import { push } from 'connected-react-router';
@@ -20,6 +22,15 @@ import launchCommand from '../utils/MCLaunchCommand';
 import { PACKS_PATH, NEWS_URL, GAME_VERSIONS_URL, FORGE_PROMOS, INSTANCES_PATH, META_PATH, GDL_LEGACYJAVAFIXER_MOD_URL } from '../constants';
 import { readConfig, updateConfig } from '../utils/instances';
 import { getCurrentAccount } from '../utils/selectors';
+import { extractAssets, extractMainJar, computeVanillaAndForgeLibraries, extractNatives } from '../utils/getMCFilesList';
+import { checkForgeMeta, checkForgeDownloaded, getForgeVersionJSON } from '../utils/forgeHelpers';
+import { arraify } from '../utils/strings';
+import { downloadFile, downloadArr } from '../utils/downloader';
+import { getAddon } from '../utils/cursemeta';
+import vCompare from '../utils/versionsCompare';
+import { createDoNotTouchFile, downloadMod } from '../utils/mods';
+import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
+import { findJavaHome } from '../utils/javaHelpers';
 
 export function initManifests() {
   return async dispatch => {
@@ -686,7 +697,7 @@ export function downloadInstance(pack, isRepair = false) {
           dispatch(updateDownloadProgress(0, 15, p, 100));
         });
 
-        await outputFile(
+        await fse.outputFile(
           path.join(
             META_PATH,
             'net.minecraftforge',
@@ -803,7 +814,7 @@ export function downloadInstance(pack, isRepair = false) {
       );
 
       // Copy the thumbnail as icon
-      await copyFile(
+      await fs.copyFile(
         path.join(PACKS_PATH, pack, 'thumbnail.png'),
         path.join(PACKS_PATH, pack, 'icon.png')
       );
@@ -839,7 +850,7 @@ export function downloadInstance(pack, isRepair = false) {
     const totalFiles = libraries.length + assets.length + mainJar.length;
 
     dispatch({
-      type: UPDATE_TOTAL_FILES_TO_DOWNLOAD,
+      type: ActionTypes.UPDATE_TOTAL_FILES_TO_DOWNLOAD,
       payload: {
         pack,
         total: totalFiles
