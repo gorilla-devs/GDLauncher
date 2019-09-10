@@ -1,20 +1,19 @@
-import { get, unionBy } from 'lodash';
 import { spawn } from 'child_process';
 import fss, { promises as fs, copyFile } from 'fs';
 import { message } from 'antd';
 import axios from 'axios';
 import cheerio from 'cheerio';
-import _, { isEqual } from 'lodash';
+import _, { isEqual, unionBy } from 'lodash';
 import compressing from 'compressing';
 import Promise from 'bluebird';
 import fse from 'fs-extra';
 import log from 'electron-log';
-import versionCompare from '../utils/versionsCompare';
 import path from 'path';
 import { cpus } from 'os';
 import watch from 'node-watch';
 import makeDir from 'make-dir';
 import { push } from 'connected-react-router';
+import versionCompare from '../utils/versionsCompare';
 import * as ActionTypes from './actionTypes';
 import {
   minecraftLogin,
@@ -49,7 +48,6 @@ import {
 import { arraify } from '../utils/strings';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import { getAddon } from '../utils/cursemeta';
-import vCompare from '../utils/versionsCompare';
 import { createDoNotTouchFile, downloadMod } from '../utils/mods';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
 import { findJavaHome } from '../utils/javaHelpers';
@@ -802,7 +800,7 @@ export function downloadInstance(pack, isRepair = false) {
 
     // We download the legacy java fixer if needed
     const legacyJavaFixer =
-      vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
+      versionCompare(currPack.forgeVersion, '10.13.1.1217') === -1
         ? {
             url: GDL_LEGACYJAVAFIXER_MOD_URL,
             path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
