@@ -10,7 +10,7 @@ import { promisify } from 'util';
 import { PACKS_PATH } from '../../constants';
 import styles from './ImportPack.scss';
 import Modal from '../Common/Modal/Modal';
-import { importTwitchProfile } from '../../actions/downloadManager';
+import { importInstanceFromTwitch } from '../../reducers/actions';
 
 type Props = {
   forgeManifest: Array,
@@ -41,7 +41,7 @@ const ImportPack = props => {
           message.warning('An instance with this name already exists.');
         } catch (error) {
           setLoading(true);
-          await props.importTwitchProfile(name, filePath);
+          await props.importInstanceFromTwitch(name, filePath);
           setUnMount(true);
         }
       }
@@ -152,7 +152,7 @@ const ImportPack = props => {
 };
 
 const mapDispatchToProps = {
-  importTwitchProfile
+  importInstanceFromTwitch
 };
 
 export default connect(

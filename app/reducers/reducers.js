@@ -24,7 +24,7 @@ function downloadQueue(state = {}, action) {
         }
       };
     case ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE:
-      return _.omit(state, action.payload)
+      return _.omitBy(state, obj => obj.name === action.name)
     case ActionTypes.UPDATE_DOWNLOAD_PROGRESS:
       return {
         ...state,
