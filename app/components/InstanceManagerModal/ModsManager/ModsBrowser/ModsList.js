@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { connect } from 'react-redux';
-import Link from 'react-router-dom/Link';
+import { Link } from 'react-router-dom';
 import path from 'path';
 import axios from 'axios';
 import fs from 'fs';

@@ -7,7 +7,7 @@ import makeDir from 'make-dir';
 import { Promise } from 'bluebird';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
-import Link from 'react-router-dom/Link';
+import { Link } from 'react-router-dom';
 import log from 'electron-log';
 import {
   SortableContainer,

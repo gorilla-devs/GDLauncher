@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Link from 'react-router-dom/Link';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ContentLoader from 'react-content-loader';
 import _ from 'lodash';
@@ -213,62 +213,62 @@ function CurseModpacksBrowser(props) {
                   />
                 </ContentLoader>
               ) : (
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      src={
-                        item.loading
-                          ? ''
-                          : item.attachments
-                          ? item.attachments[0].thumbnailUrl
-                          : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
-                      }
-                    />
-                  }
-                  title={
-                    <span>
-                      <Link
-                        to={{
-                          pathname: `/curseModpackExplorerModal/${item.id}`,
-                          state: { modal: true }
-                        }}
-                      >
-                        {item.name}
-                      </Link>{' '}
-                      by {item.authors.join(', ')}
-                    </span>
-                  }
-                  description={
-                    item.loading ? (
-                      ''
-                    ) : (
-                      <div>
-                        <span style={{ maxWidth: 'calc(100% - 100px)' }}>
-                          {/* Truncate the text if over 30 words */}
-                          {item.summary.length >= 100
-                            ? `${item.summary.slice(0, 100)}...`
-                            : item.summary}
-                        </span>
-                        <div className={styles.modFooter}>
-                          <span>
-                            Downloads: {numberToRoundedWord(item.downloadCount)}
-                          </span>
-                          <span>
-                            Updated:{' '}
-                            {new Date(
-                              item.latestFiles[0].fileDate
-                            ).toLocaleDateString('en-US', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric'
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  }
-                />
-              )}
+                  <List.Item.Meta
+                    avatar={
+                      <Avatar
+                        src={
+                          item.loading
+                            ? ''
+                            : item.attachments
+                              ? item.attachments[0].thumbnailUrl
+                              : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
+                        }
+                      />
+                    }
+                    title={
+                      <span>
+                        <Link
+                          to={{
+                            pathname: `/curseModpackExplorerModal/${item.id}`,
+                            state: { modal: true }
+                          }}
+                        >
+                          {item.name}
+                        </Link>{' '}
+                        by {item.authors.join(', ')}
+                      </span>
+                    }
+                    description={
+                      item.loading ? (
+                        ''
+                      ) : (
+                          <div>
+                            <span style={{ maxWidth: 'calc(100% - 100px)' }}>
+                              {/* Truncate the text if over 30 words */}
+                              {item.summary.length >= 100
+                                ? `${item.summary.slice(0, 100)}...`
+                                : item.summary}
+                            </span>
+                            <div className={styles.modFooter}>
+                              <span>
+                                Downloads: {numberToRoundedWord(item.downloadCount)}
+                              </span>
+                              <span>
+                                Updated:{' '}
+                                {new Date(
+                                  item.latestFiles[0].fileDate
+                                ).toLocaleDateString('en-US', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric'
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                    }
+                  />
+                )}
             </List.Item>
           )}
         />
