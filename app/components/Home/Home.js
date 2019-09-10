@@ -18,11 +18,12 @@ const Home = props => {
   const [latestInstalled, setLatestInstalled] = useState(false);
   const dispatch = useDispatch();
   const news = useSelector(state => state.news);
+  const latest = useSelector(state => state.app.vanillaManifest.latest.release);
   const loading = useSelector(state => state.loading.instance_pre_download.isRequesting);
   const account = useSelector(state => getCurrentAccount(state));
 
   useEffect(() => {
-    fs.access(path.join(PACKS_PATH, '1.13.2')).then(data => {
+    fs.access(path.join(PACKS_PATH, latest)).then(data => {
       setLatestInstalled(true);
     }).catch(e => setLatestInstalled(false));
   });
@@ -96,9 +97,9 @@ const Home = props => {
                 marginTop: 15,
                 textAlign: 'center'
               }}
-              title="Try out the new v1.13.2"
+              title={`Try out the new v${latest}`}
             >
-              V1.13.2 has just been released. Wanna try it out?
+              V{latest} has just been released. Wanna try it out?
                 {latestBtnClicked || latestInstalled ? (
                 <Link
                   to="/dmanager"
@@ -112,11 +113,11 @@ const Home = props => {
                     loading={loading}
                     style={{ display: 'block', margin: '35px auto' }}
                     onClick={() => {
-                      dispatch(createInstance('1.13.2', '1.13.2'));
+                      dispatch(createInstance(latest, latest));
                       setLatestBtnClicked(true);
                     }}
                   >
-                    Install and Start v1.13.2
+                    Install and Start v{latest}
                   </Button>
                 )}
             </Card>

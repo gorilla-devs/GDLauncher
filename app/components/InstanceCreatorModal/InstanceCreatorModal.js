@@ -17,7 +17,7 @@ const FormItem = Form.Item;
 function InstanceCreatorModal(props) {
   const [unMount, setUnmount] = useState(false);
   const dispatch = useDispatch();
-  const vanillaManifest = useSelector(state => state.app.vanillaManifest);
+  const vanillaManifest = useSelector(state => state.app.vanillaManifest.versions);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
 
   const { getFieldDecorator } = props.form;
@@ -88,7 +88,7 @@ function InstanceCreatorModal(props) {
     });
   };
 
-  filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1;
+  const filter = (inputValue, pathy) => pathy[2].label.indexOf(inputValue) > -1;
 
   return (
     <Modal

@@ -5,8 +5,8 @@ import { routerMiddleware, routerActions } from 'connected-react-router';
 import { persistReducer, persistStore } from 'redux-persist';
 import { createLogger } from 'redux-logger';
 import createRootReducer from '../reducers';
-import { UPDATE_PROGRESS } from '../actions/downloadManager';
 import persistConfig from './persistConfig';
+import { UPDATE_DOWNLOAD_PROGRESS } from '../reducers/actionTypes';
 
 const history = createHashHistory();
 const rootReducer = createRootReducer(history);
@@ -25,7 +25,7 @@ const configureStore = (initialState) => {
   if (process.env.NODE_ENV !== 'test') {
     const logger = createLogger({
       // We need to hide the UPDATE_PROGRESS dispatches, since they are just too many and they slow down the execution
-      predicate: (getState, action) => action.type !== UPDATE_PROGRESS,
+      predicate: (getState, action) => action.type !== UPDATE_DOWNLOAD_PROGRESS,
       collapsed: true,
       duration: true,
       colors: {

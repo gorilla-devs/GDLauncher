@@ -8,7 +8,7 @@ import { promises } from 'fs';
 import fse from 'fs-extra';
 import path from 'path';
 import { PACKS_PATH } from '../../../constants';
-import { addCursePackToQueue } from '../../../actions/downloadManager';
+import { addTwitchModpackToQueue } from '../../../reducers/actions';
 
 const ModpackVersions = props => {
   const [versions, setVersions] = useState([]);
@@ -75,7 +75,7 @@ const ModpackVersions = props => {
     setLoading(true);
     console.log(versions[selectedVersion])
     await removeModpackFiles();
-    await dispatch(addCursePackToQueue(props.instance, ownInstance.projectID, versions[selectedVersion].id, true));
+    await dispatch(addTwitchModpackToQueue(props.instance, ownInstance.projectID, versions[selectedVersion].id, true));
 
     setLoading(false);
     props.close();

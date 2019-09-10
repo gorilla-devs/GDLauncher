@@ -19,33 +19,26 @@ import {
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import log from 'electron-log';
+import { push } from 'connected-react-router';
 import { promisify } from 'util';
 import { exec } from 'child_process';
 import { shell } from 'electron';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { hideMenu } from 'react-contextmenu/es6/actions';
 import { PACKS_PATH, APPPATH } from '../../constants';
-import { history } from '../../store/configureStore';
 import styles from './DInstance.scss';
 import InstanceIcon from '../../assets/images/instanceDefault.png';
-import { repairInstance, updateupdateSelectedInstance, startInstance, updatePercentage } from '../../reducers/actions';
+import { repairInstance, updateSelectedInstance, startInstance, updatePercentage } from '../../reducers/actions';
 
-type Props = {
-  name: string,
-  installingQueue: object,
-  updateSelectedInstance: ?string,
-  startInstance: () => void,
-  updateupdateSelectedInstance: () => void,
-  repairInstance: () => void,
-  playing: array
-};
-
-export default function DInstance(props) {
+export default function DInstance({ name, ...props }) {
   const [version, setVersion] = useState(null);
   const [isValid, setIsValid] = useState(true);
   const [forgeVersion, setForgeversion] = useState(null);
   const [icon, setIcon] = useState(`url(${InstanceIcon}) center no-repeat`);
-  const dipatch = useDispatch();
+  const dispatch = useDispatch();
+
+  const playing = useSelector(state => state.startedInstances);
+  const installingQueue = useSelector(state => state.downloadQueue)
 
   useEffect(() => {
     updateInstanceConfig();
@@ -55,7 +48,7 @@ export default function DInstance(props) {
       updateInstanceConfig();
     }, 1000);
 
-    const percentage = dispatch(updatePercentage());
+    const percentage = updatePercentage();
 
     return () => {
       clearInterval(interval);
@@ -64,7 +57,6 @@ export default function DInstance(props) {
 
 
   const updateInstanceConfig = async () => {
-    const { name } = props;
     if (!isInstalling()) {
       try {
         const config = JSON.parse(
@@ -77,7 +69,7 @@ export default function DInstance(props) {
         // Tries to read the instance config file and updates the icon accordingly
         if (config.icon) {
           const icon = await fs.readFile(
-            path.join(PACKS_PATH, this.props.name, config.icon)
+            path.join(PACKS_PATH, name, config.icon)
           );
           setIcon(`url("data:image/png;base64,${icon.toString(
             'base64'
@@ -101,13 +93,11 @@ export default function DInstance(props) {
   };
 
   const isInstalling = () => {
-    const { name, installingQueue } = props;
     if (installingQueue[name]) return true;
     return false;
   };
 
   const updatePercentage = () => {
-    const { name, installingQueue } = props;
     const { percentage } = installingQueue[name] || 0;
     if (installingQueue[name]) {
       switch (installingQueue[name].status) {
@@ -126,7 +116,6 @@ export default function DInstance(props) {
   };
 
   const handleClickPlay = async e => {
-    const { startInstance, selectInstance, name, playing } = props;
     if (!isInstalling()) {
       e.stopPropagation();
       if (playing.find(el => el.name === name) && isValid) {
@@ -135,18 +124,17 @@ export default function DInstance(props) {
             process.kill(el.PID);
           });
         });
-        message.info('Instance terminated from user');
+        message.info('Instance terminated by user');
       } else {
         dispatch(startInstance(name));
-        dispatch(selectInstance(name));
+        dispatch(updateSelectedInstance(name));
       }
     }
   };
 
-  const { name, updateSelectedInstance, selectInstance, playing } = props;
   return (
     <div
-      className={`${updateSelectedInstance === name ? styles.selectedItem : ''} ${
+      className={`${playing === name ? styles.selectedItem : ''} ${
         styles.main
         }`}
     >
@@ -161,10 +149,9 @@ export default function DInstance(props) {
           }
           onClick={e => {
             e.stopPropagation();
-            dispatch(selectInstance(name));
+            dispatch(updateSelectedInstance(name));
           }}
           onDoubleClick={handleClickPlay}
-          onKeyPress={handleKeyPress}
           role="button"
           tabIndex={0}
         >
@@ -173,7 +160,7 @@ export default function DInstance(props) {
               <FontAwesomeIcon icon={faPlay} style={{ fontSize: '17px' }} />
             </span>
           )}
-          {this.isInstalling() && (
+          {isInstalling() && (
             <Icon
               className={styles.icon__iconState}
               type="loading"
@@ -226,7 +213,7 @@ export default function DInstance(props) {
         id={`contextMenu-${name}`}
         onShow={e => {
           e.stopPropagation();
-          dispatch(selectInstance(name));
+          dispatch(updateSelectedInstance(name));
         }}
       >
         <span>
@@ -256,10 +243,10 @@ export default function DInstance(props) {
           disabled={isInstalling() || !isValid}
           data={{ foo: 'bar' }}
           onClick={() =>
-            history.push({
+            dispatch(push({
               pathname: `/editInstance/${name}/settings/`,
               state: { modal: true }
-            })
+            }))
           }
         >
           <span>
@@ -326,10 +313,10 @@ export default function DInstance(props) {
           }
           data={{ foo: 'bar' }}
           onClick={() =>
-            history.push({
+            dispatch(push({
               pathname: `/exportPackModal/${name}`,
               state: { modal: true }
-            })
+            }))
           }
         >
           <span>
@@ -343,7 +330,7 @@ export default function DInstance(props) {
             !isValid ||
             playing.find(el => el.name === name)
           }
-          onClick={() => dispatch(repairInstance(name))}
+        // onClick={() => dispatch(repairInstance(name))}
         >
           <span>
             <FontAwesomeIcon icon={faWrench} />
@@ -355,12 +342,12 @@ export default function DInstance(props) {
             isInstalling() || playing.find(el => el.name === name)
           }
           data={{ foo: 'bar' }}
-          onClick={() =>
-            history.push({
+          onClick={() => {
+            dispatch(push({
               pathname: `/confirmInstanceDelete/instance/${name}`,
               state: { modal: true }
-            })
-          }
+            }))
+          }}
         >
           <span>
             <FontAwesomeIcon icon={faTrash} />

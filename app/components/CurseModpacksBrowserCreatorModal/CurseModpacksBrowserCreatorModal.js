@@ -9,8 +9,8 @@ import { promisify } from 'util';
 import { PACKS_PATH } from '../../constants';
 import styles from './CurseModpackBrowserCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
-import { addCursePackToQueue } from '../../actions/downloadManager';
 import { getAddonFiles, getAddon } from '../../utils/cursemeta';
+import { addTwitchModpackToQueue } from '../../reducers/actions';
 
 type Props = {
   forgeManifest: Array,
@@ -53,7 +53,7 @@ const CurseModpackBrowserCreatorModal = props => {
           message.warning('An instance with this name already exists.');
         } catch (error) {
           setLoadingBtn(true);
-          await props.addCursePackToQueue(name, addonID, values.version);
+          await props.addTwitchModpackToQueue(name, addonID, values.version);
           setUnMount(true);
           setTimeout(() => {
             props.history.push('/dmanager');
@@ -147,7 +147,7 @@ const CurseModpackBrowserCreatorModal = props => {
 };
 
 const mapDispatchToProps = {
-  addCursePackToQueue
+  addTwitchModpackToQueue
 };
 
 export default connect(

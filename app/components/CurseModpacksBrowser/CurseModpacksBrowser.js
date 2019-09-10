@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { List, Avatar, Button, Input, Select, Icon } from 'antd';
 import { numberToRoundedWord } from '../../utils/numbers';
-import * as downloadManagerActions from '../../actions/downloadManager';
 import styles from './CurseModpacksBrowser.scss';
 import { getSearch } from '../../utils/cursemeta';
 
@@ -278,11 +277,5 @@ function CurseModpacksBrowser(props) {
   );
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ ...downloadManagerActions }, dispatch);
-}
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(CurseModpacksBrowser);
+export default CurseModpacksBrowser;

@@ -6,7 +6,12 @@ import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import { screen } from 'electron';
 import { release, arch } from 'os';
-import { initInstances, initNews, loginWithAccessToken } from './reducers/actions';
+import {
+  initInstances,
+  initNews,
+  loginWithAccessToken,
+  initManifests
+} from './reducers/actions';
 import { JAVA_URL } from './constants';
 import ga from './GAnalytics';
 import GlobalStyles from './globalStyles';
@@ -73,6 +78,7 @@ class RouteDef extends Component<Props> {
   componentDidMount = async () => {
     this.props.initNews();
     this.props.initInstances();
+    this.props.initManifests();
     if (!this.props.isAuthValid) this.props.loginWithAccessToken();
     if ((await findJavaHome()) === null) {
       notification.warning({
@@ -301,7 +307,8 @@ function mapStateToProps(state) {
 const mapDispatchToProps = {
   initNews,
   initInstances,
-  loginWithAccessToken
+  loginWithAccessToken,
+  initManifests
 }
 
 export default connect(
