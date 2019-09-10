@@ -27,13 +27,13 @@ const Instances = props => {
 
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
-  
+
 
   useEffect(() => {
       fs.access(
         path.join(PACKS_PATH, props.name, 'mods', 'GDLCompanion.jar')
       ).then(() => setCompanionModState(true)).catch(() => {});
-      
+
       fs.access(
         path.join(PACKS_PATH, props.name, 'mods', 'LJF.jar')
       ).then(() => legacyJavaFixerState(true)).catch(() => {});

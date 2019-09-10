@@ -5,6 +5,7 @@ import { message } from 'antd';
 import axios from 'axios';
 import cheerio from 'cheerio';
 import _, { isEqual } from 'lodash';
+import compressing from 'compressing';
 import Promise from 'bluebird';
 import fse from 'fs-extra';
 import log from 'electron-log';
@@ -15,15 +16,36 @@ import watch from 'node-watch';
 import makeDir from 'make-dir';
 import { push } from 'connected-react-router';
 import * as ActionTypes from './actionTypes';
-import { minecraftLogin, minecraftCheckAccessToken, minecraftRefreshAccessToken } from '../APIs';
+import {
+  minecraftLogin,
+  minecraftCheckAccessToken,
+  minecraftRefreshAccessToken
+} from '../APIs';
 import { uuidv4 } from '../utils';
 import { updateJavaArguments } from './settings/actions';
 import launchCommand from '../utils/MCLaunchCommand';
-import { PACKS_PATH, NEWS_URL, GAME_VERSIONS_URL, FORGE_PROMOS, INSTANCES_PATH, META_PATH, GDL_LEGACYJAVAFIXER_MOD_URL } from '../constants';
+import {
+  PACKS_PATH,
+  NEWS_URL,
+  GAME_VERSIONS_URL,
+  FORGE_PROMOS,
+  INSTANCES_PATH,
+  META_PATH,
+  GDL_LEGACYJAVAFIXER_MOD_URL
+} from '../constants';
 import { readConfig, updateConfig } from '../utils/instances';
 import { getCurrentAccount } from '../utils/selectors';
-import { extractAssets, extractMainJar, computeVanillaAndForgeLibraries, extractNatives } from '../utils/getMCFilesList';
-import { checkForgeMeta, checkForgeDownloaded, getForgeVersionJSON } from '../utils/forgeHelpers';
+import {
+  extractAssets,
+  extractMainJar,
+  computeVanillaAndForgeLibraries,
+  extractNatives
+} from '../utils/getMCFilesList';
+import {
+  checkForgeMeta,
+  checkForgeDownloaded,
+  getForgeVersionJSON
+} from '../utils/forgeHelpers';
 import { arraify } from '../utils/strings';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import { getAddon } from '../utils/cursemeta';
@@ -62,15 +84,18 @@ export function initManifests() {
 
 export function initNews(news) {
   return async (dispatch, getState) => {
-    const getArticleHeaderImage = async (articleURL) => {
+    const getArticleHeaderImage = async articleURL => {
       // This extracts a <meta property="og:image" content="some url" />
       // and gets the url of the header image
       const req = await axios.get(`https://minecraft.net${articleURL}`);
       const $ = cheerio.load(req.data);
       const url = $('meta[property="og:image"]').prop('content');
       return url;
-    }
-    const { news, loading: { minecraft_news } } = getState();
+    };
+    const {
+      news,
+      loading: { minecraft_news }
+    } = getState();
     if (news.length === 0 && !minecraft_news.isRequesting) {
       try {
         const res = await axios.get(NEWS_URL);
@@ -86,23 +111,26 @@ export function initNews(news) {
             };
           })
         );
-        dispatch({ type: ActionTypes.UPDATE_NEWS, news: newsArr.splice(0, 12) });
+        dispatch({
+          type: ActionTypes.UPDATE_NEWS,
+          news: newsArr.splice(0, 12)
+        });
       } catch (err) {
         log.error(err.message);
       }
     }
   };
-};
+}
 
 export function updateAccount(uuid, account) {
   return (dispatch, getState) => {
     dispatch({
       type: ActionTypes.UPDATE_ACCOUNT,
       id: uuid,
-      account,
+      account
     });
   };
-};
+}
 
 export function removeAccount(id) {
   return async (dispatch, getState) => {
@@ -111,7 +139,7 @@ export function removeAccount(id) {
       id
     });
   };
-};
+}
 
 export function updateIsNewUser(isNewUser) {
   return async (dispatch, getState) => {
@@ -133,7 +161,9 @@ export function updateCurrentAccountId(id) {
 
 export function login(username, password, remember) {
   return async (dispatch, getState) => {
-    const { app: { clientToken, isNewUser } } = getState();
+    const {
+      app: { clientToken, isNewUser }
+    } = getState();
     try {
       const { data, status } = await minecraftLogin(username, password);
       if (status !== 200) throw new Error();
@@ -156,16 +186,24 @@ export function login(username, password, remember) {
 export function loginWithAccessToken(accessToken) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { app: { clientToken } } = state;
+    const {
+      app: { clientToken }
+    } = state;
     const accessToken = getCurrentAccount(state).accessToken;
     try {
-      const { data, status } = await minecraftCheckAccessToken(accessToken, clientToken);
+      const { data, status } = await minecraftCheckAccessToken(
+        accessToken,
+        clientToken
+      );
       dispatch(push('/home'));
     } catch (err) {
       // Trying refreshing the stored access token
       if (error.response && error.response.status === 403) {
         try {
-          const { data, status } = await minecraftRefreshAccessToken(accessToken, clientToken);
+          const { data, status } = await minecraftRefreshAccessToken(
+            accessToken,
+            clientToken
+          );
           dispatch(updateAccount(data.selectedProfile.id, data));
           dispatch(updateCurrentAccountId(data.selectedProfile.id));
           dispatch(push('/home'));
@@ -184,7 +222,9 @@ export function loginWithAccessToken(accessToken) {
 
 export function loginThroughNativeLauncher() {
   return async (dispatch, getState) => {
-    const { app: { clientToken, isNewUser } } = getState();
+    const {
+      app: { clientToken, isNewUser }
+    } = getState();
 
     const homedir = process.env.APPDATA || os.homedir();
     const vanillaMCPath = path.join(homedir, '.minecraft');
@@ -195,12 +235,14 @@ export function loginThroughNativeLauncher() {
     const { account } = vnlJson.selectedUser;
     const { accessToken } = vnlJson.authenticationDatabase[account];
     try {
-      const { data, status } = await minecraftRefreshAccessToken(accessToken, clientToken);
+      const { data, status } = await minecraftRefreshAccessToken(
+        accessToken,
+        clientToken
+      );
 
       // We need to update the accessToken in launcher_profiles.json
-      vnlJson.authenticationDatabase[
-        data.selectedProfile.userId
-      ].accessToken = data.accessToken;
+      vnlJson.authenticationDatabase[data.selectedProfile.userId].accessToken =
+        data.accessToken;
       await fse.writeJson(
         path.join(vanillaMCPath, 'launcher_profiles.json'),
         vnlJson
@@ -236,20 +278,24 @@ export function logout() {
 
 export function checkClientToken() {
   return (dispatch, getState) => {
-    const { app: { clientToken } } = getState();
+    const {
+      app: { clientToken }
+    } = getState();
     if (clientToken) return clientToken;
     const newToken = uuidv4().replace('-', '');
     dispatch({
       type: ActionTypes.UPDATE_CLIENT_TOKEN,
-      clientToken: newToken,
+      clientToken: newToken
     });
     return newToken;
   };
-};
+}
 
 export function updateModsManifests(modManifest) {
   return (dispatch, getState) => {
-    const { app: { modsManifests } } = getState();
+    const {
+      app: { modsManifests }
+    } = getState();
     if (!modsManifests.find(v => v.projectID === modManifest.projectID)) {
       dispatch({
         type: ActionTypes.UPDATE_MODS_MANIFESTS,
@@ -264,7 +310,7 @@ export function removeModsManifests(id) {
   return (dispatch, getState) => {
     dispatch({
       type: ActionTypes.REMOVE_MOD_MANIFEST,
-      id,
+      id
     });
   };
 }
@@ -283,13 +329,19 @@ export function startInstance(instanceName) {
     const state = getState();
     const {
       app: { currentAccountIndex, accounts },
-      settings: { java: { args } }
+      settings: {
+        java: { args }
+      }
     } = state;
 
     // Checks for legacy java memory
     const legacyString = [' -Xmx{_RAM_}m', '-Xmx{_RAM_}m'];
     const config = await readConfig(instanceName);
-    if (config.overrideArgs && (config.overrideArgs.includes(legacyString[0]) || config.overrideArgs.includes(legacyString[1]))) {
+    if (
+      config.overrideArgs &&
+      (config.overrideArgs.includes(legacyString[0]) ||
+        config.overrideArgs.includes(legacyString[1]))
+    ) {
       await updateConfig(instanceName, {
         overrideArgs: config.overrideArgs.replace(legacyString, '')
       });
@@ -300,10 +352,7 @@ export function startInstance(instanceName) {
     if (settings.java.javaArgs.includes(legacyString[1]))
       dispatch(updateJavaArguments(args.replace(legacyString[1], '')));
 
-    const command = await launchCommand(
-      instanceName,
-      state
-    );
+    const command = await launchCommand(instanceName, state);
 
     const start = spawn(command, [], {
       shell: true,
@@ -354,44 +403,59 @@ export function initInstances() {
 
     const getDirectories = async source => {
       const dirs = await fs.readdir(source);
-      return dirs.map(name => path.join(source, name))
+      return dirs
+        .map(name => path.join(source, name))
         .filter(isDirectory)
         .map(dir => path.basename(dir));
-    }
+    };
 
     const getInstances = async () => {
       let mappedInstances = [];
       try {
         const instances = await getDirectories(PACKS_PATH);
-        mappedInstances = await Promise.all(instances.map(async instance => {
-          let mods = [];
-          let projectID = null;
-          try {
-            const config = await readConfig(instance);
-            projectID = config.projectID;
-            if (config.mods && Array.isArray(config.mods) && config.mods.length) {
-              try {
-                mods = (await fs.readdir(path.join(PACKS_PATH, instance, 'mods'))).filter(
-                  el => path.extname(el) === '.zip' || path.extname(el) === '.jar' || path.extname(el) === '.disabled'
-                ).map(mod => {
-                  const configMod = config.mods.find(v => v.fileName === mod);
-                  if (configMod)
-                    return configMod;
-                  return { fileName: mod }
-                });
-              } catch (err) {
-                console.error('Failed to get instance\'s mods', err)
+        mappedInstances = await Promise.all(
+          instances.map(async instance => {
+            let mods = [];
+            let projectID = null;
+            try {
+              const config = await readConfig(instance);
+              projectID = config.projectID;
+              if (
+                config.mods &&
+                Array.isArray(config.mods) &&
+                config.mods.length
+              ) {
+                try {
+                  mods = (await fs.readdir(
+                    path.join(PACKS_PATH, instance, 'mods')
+                  ))
+                    .filter(
+                      el =>
+                        path.extname(el) === '.zip' ||
+                        path.extname(el) === '.jar' ||
+                        path.extname(el) === '.disabled'
+                    )
+                    .map(mod => {
+                      const configMod = config.mods.find(
+                        v => v.fileName === mod
+                      );
+                      if (configMod) return configMod;
+                      return { fileName: mod };
+                    });
+                } catch (err) {
+                  console.error("Failed to get instance's mods", err);
+                }
               }
+            } catch (err) {
+              console.error("Failed to get instance's config", err);
             }
-          } catch (err) {
-            console.error('Failed to get instance\'s config', err)
-          }
-          return {
-            name: instance,
-            ...(projectID && { projectID }),
-            mods: mods
-          }
-        }));
+            return {
+              name: instance,
+              ...(projectID && { projectID }),
+              mods: mods
+            };
+          })
+        );
       } catch (err) {
         console.error('Failed to get instances', err);
       }
@@ -424,21 +488,24 @@ export function initInstances() {
       const getInstancesDebounced = _.debounce(updateInstances, 100);
 
       // Watches for any changes in the packs dir. TODO: Optimize
-      watcher = watch(PACKS_PATH, { recursive: true }, async (event, filename) => {
-        try {
-          await fs.access(PACKS_PATH);
-        } catch (e) {
-          await makeDir(PACKS_PATH);
+      watcher = watch(
+        PACKS_PATH,
+        { recursive: true },
+        async (event, filename) => {
+          try {
+            await fs.access(PACKS_PATH);
+          } catch (e) {
+            await makeDir(PACKS_PATH);
+          }
+          getInstancesDebounced();
         }
-        getInstancesDebounced();
-      });
+      );
       watcher.on('error', async err => {
         try {
           await fs.access(PACKS_PATH);
         } catch (e) {
           await makeDir(PACKS_PATH);
-        }
-        finally {
+        } finally {
           watchRoutine();
         }
       });
@@ -453,7 +520,7 @@ export function removeDownloadFromQueue(name) {
     dispatch({
       type: ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE,
       name
-    })
+    });
   };
 }
 
@@ -485,21 +552,20 @@ export function updateCurrentDownload(name) {
     dispatch({
       type: ActionTypes.UPDATE_CURRENT_DOWNLOAD,
       name
-    })
-  }
+    });
+  };
 }
 
 export function updateDownloadProgress(min, percDifference, computed, total) {
   return (dispatch, getState) => {
-    const { downloadQueue } = getState();
-    const actualDownload = Object.keys(downloadQueue).find(v => downloadQueue[v].status === "Downloading");
+    const { currentDownload } = getState();
     const actualPercentage = (computed * percDifference) / total;
     dispatch({
       type: ActionTypes.UPDATE_DOWNLOAD_PROGRESS,
-      name: downloadQueue[actualDownload].name,
+      name: currentDownload,
       percentage: Number(actualPercentage.toFixed()) + Number(min)
     });
-  }
+  };
 }
 
 export function repairInstance(name) {
@@ -559,7 +625,7 @@ export function addToQueue(
       forgeVersion
     });
     if (!currentDownload) {
-      dispatch(updateCurrentDownload(name))
+      dispatch(updateCurrentDownload(name));
       dispatch(downloadInstance(name, isRepair));
     }
   };
@@ -598,7 +664,12 @@ export function importInstanceFromTwitch(name, filePath) {
   };
 }
 
-export function addTwitchModpackToQueue(name, addonID, fileID, isRepair = false) {
+export function addTwitchModpackToQueue(
+  name,
+  addonID,
+  fileID,
+  isRepair = false
+) {
   return async (dispatch, getState) => {
     const { currentDownload } = getState();
     const packURL = (await getAddonFile(addonID, fileID)).downloadUrl;
@@ -607,7 +678,7 @@ export function addTwitchModpackToQueue(name, addonID, fileID, isRepair = false)
       'temp',
       path.basename(packURL)
     );
-    await downloadFile(tempPackPath, packURL, () => { });
+    await downloadFile(tempPackPath, packURL, () => {});
     await compressing.zip.uncompress(
       tempPackPath,
       path.join(INSTANCES_PATH, 'temp', name)
@@ -641,7 +712,13 @@ export function addTwitchModpackToQueue(name, addonID, fileID, isRepair = false)
 
 export function downloadInstance(pack, isRepair = false) {
   return async (dispatch, getState) => {
-    const { downloadQueue, currentDownload, app: { vanillaManifest: { versions: vnlVersions } } } = getState();
+    const {
+      downloadQueue,
+      currentDownload,
+      app: {
+        vanillaManifest: { versions: vnlVersions }
+      }
+    } = getState();
     const currPack = downloadQueue[currentDownload];
     let vnlJSON = null;
     try {
@@ -658,9 +735,7 @@ export function downloadInstance(pack, isRepair = false) {
         )
       );
     } catch (err) {
-      const versionURL = vnlVersions.find(
-        v => v.id === currPack.version
-      ).url;
+      const versionURL = vnlVersions.find(v => v.id === currPack.version).url;
       vnlJSON = (await axios.get(versionURL)).data;
       await makeDir(path.join(INSTANCES_PATH, 'versions', currPack.version));
       await fs.writeFile(
@@ -729,9 +804,9 @@ export function downloadInstance(pack, isRepair = false) {
     const legacyJavaFixer =
       vCompare(currPack.forgeVersion, '10.13.1.1217') === -1
         ? {
-          url: GDL_LEGACYJAVAFIXER_MOD_URL,
-          path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
-        }
+            url: GDL_LEGACYJAVAFIXER_MOD_URL,
+            path: path.join(PACKS_PATH, pack, 'mods', 'LJF.jar')
+          }
         : null;
 
     // Here we work on the mods
@@ -750,15 +825,11 @@ export function downloadInstance(pack, isRepair = false) {
 
       // Read every single file in the overrides folder
       const rreaddir = async (dir, allFiles = []) => {
-        const files = (await readdir(dir)).map(f =>
-          path.join(dir, f)
-        );
+        const files = (await readdir(dir)).map(f => path.join(dir, f));
         allFiles.push(...files);
         await Promise.all(
           files.map(
-            async f =>
-              (await fs.stat(f)).isDirectory() &&
-              rreaddir(f, allFiles)
+            async f => (await fs.stat(f)).isDirectory() && rreaddir(f, allFiles)
           )
         );
         return allFiles;
@@ -797,7 +868,14 @@ export function downloadInstance(pack, isRepair = false) {
             true
           );
           modsManifest = modsManifest.concat(modManifest);
-          dispatch(updateDownloadProgress(15, 15, modsDownloaded, manifest.files.length));
+          dispatch(
+            updateDownloadProgress(
+              15,
+              15,
+              modsDownloaded,
+              manifest.files.length
+            )
+          );
         },
         { concurrency: cpus().length + 2 }
       );
@@ -810,7 +888,7 @@ export function downloadInstance(pack, isRepair = false) {
       await downloadFile(
         path.join(PACKS_PATH, pack, 'thumbnail.png'),
         thumbnailURL,
-        () => { }
+        () => {}
       );
 
       // Copy the thumbnail as icon
@@ -857,7 +935,6 @@ export function downloadInstance(pack, isRepair = false) {
       }
     });
 
-
     // Check if needs 1.13 forge patching
     const installProfileJson =
       forgeJSON && JSON.parse(forgeJSON.installProfileJson);
@@ -879,7 +956,14 @@ export function downloadInstance(pack, isRepair = false) {
       }
     }
     const updatePercentage = downloaded => {
-      dispatch(updateDownloadProgress(minPercentage, totalPercentage, downloaded, totalFiles));
+      dispatch(
+        updateDownloadProgress(
+          minPercentage,
+          totalPercentage,
+          downloaded,
+          totalFiles
+        )
+      );
     };
 
     const allFiles =
@@ -961,10 +1045,8 @@ export function downloadInstance(pack, isRepair = false) {
     }
     dispatch({
       type: ActionTypes.UPDATE_DOWNLOAD_PROGRESS,
-      payload: {
-        pack,
-        percentage: 100
-      }
+      name,
+      percentage: 100
     });
     dispatch(removeDownloadFromQueue(pack));
     message.success(`${pack} has been downloaded!`);
@@ -977,6 +1059,7 @@ function addNextInstanceToCurrentDownload() {
     const { downloadQueue } = getState();
     const queueArr = Object.keys(downloadQueue);
     if (queueArr.length > 0) {
+      console.log(downloadQueue, queueArr);
       dispatch(updateCurrentDownload(downloadQueue[queueArr[0]].name));
       dispatch(downloadInstance(pack));
     }

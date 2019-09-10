@@ -18,7 +18,10 @@ export const CLASSPATH_DIVIDER_CHAR = platform() === WINDOWS ? ';' : ':';
 export const LAUNCHER_FOLDER = 'launcherData';
 export const INSTANCES_FOLDER = 'instances';
 export const SERVERS_PATH = path.join(DATAPATH, 'servers');
-export const INSTANCES_PATH = (store.has('settings') && store.get('settings').instancesPath) ? store.get('settings').instancesPath : path.join(DATAPATH, INSTANCES_FOLDER);
+export const INSTANCES_PATH =
+  store.has('settings') && store.get('settings').instancesPath
+    ? store.get('settings').instancesPath
+    : path.join(DATAPATH, INSTANCES_FOLDER);
 export const PACKS_PATH = path.join(INSTANCES_PATH, 'packs');
 export const META_PATH = path.join(DATAPATH, 'meta');
 export const GAME_VERSIONS_URL =
@@ -26,7 +29,7 @@ export const GAME_VERSIONS_URL =
 export const FORGE_PROMOS =
   'https://addons-ecs.forgesvc.net/api/v2/minecraft/modloader';
 export const ACCESS_TOKEN_VALIDATION_URL =
-'https://authserver.mojang.com/validate';
+  'https://authserver.mojang.com/validate';
 
 // Mojang API Endpoints
 export const LOGIN_API = 'https://authserver.mojang.com/authenticate';
@@ -42,8 +45,7 @@ export const CURSEFORGE_MODLOADERS_API =
   'https://modloaders.cursecdn.com/647622546/maven';
 export const NEWS_URL =
   'https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/culture,minecraft:article/insider,minecraft:article/merch,minecraft:article/news&propResPath=/content/minecraft-net/language-masters/it-it/jcr:content/root/generic-container/par/grid&count=2000&pageSize=10&tag=ALL';
-export const JAVA_URL =
-  'https://java.com/en/download/manual.jsp';
+export const JAVA_URL = 'https://java.com/en/download/manual.jsp';
 export const DEFAULT_JAVA_ARGUMENTS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.ignoreInvalidMinecraftCertificates=true ${
   platform() === WINDOWS
     ? '-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump'
