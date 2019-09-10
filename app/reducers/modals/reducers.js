@@ -1,6 +1,6 @@
 import * as ActionTypes from './actionTypes';
 
-export default function modals(state = [], action) {
+export default function modals(state = [{ modalType: 'Modal1', modalProps: {} }], action) {
 
   switch (action.type) {
     case ActionTypes.OPEN_MODAL:

@@ -1,18 +1,15 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 
-import Modal from "../Modal/Modal";
+import Modal1 from "./ModalTest";
 
 const modalComponentLookupTable = {
-  Modal
+  Modal1
 };
-
-const mapState = (state) => ({ currentModals: state.modals });
 
 
 export function ModalManager(props) {
-
-  const { currentModals } = props;
+  const currentModals = useSelector(state => state.modals);
 
 
   const renderedModals = currentModals.map((modalDescription, index) => {
@@ -28,4 +25,4 @@ export function ModalManager(props) {
 
 }
 
-export default connect(mapState)(ModalManager);
+export default ModalManager;

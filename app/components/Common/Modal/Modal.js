@@ -99,17 +99,17 @@ export default class Modal extends Component<Props> {
     });
   }
 
-  back = e => {
-    e.stopPropagation();
-    setTimeout(this.unMountStyle, 10); // call the into animiation
-    setTimeout(this.props.history.goBack, 220);
-  };
+  // back = e => {
+  //   e.stopPropagation();
+  //   setTimeout(this.unMountStyle, 10); // call the into animiation
+  //   setTimeout(this.props.history.goBack, 220);
+  // };
 
   render() {
     return (
       <div
         className={styles.overlay}
-        onClick={this.back}
+        onClick={this.props.closeFunc}
         style={this.state.bgStyle}
       >
         <div
@@ -122,7 +122,7 @@ export default class Modal extends Component<Props> {
               <h3 style={{ display: 'inline-block' }}>
                 {this.props.title || 'Modal'}
               </h3>
-              <div className={styles.closeBtn} onClick={this.back}>
+              <div className={styles.closeBtn} onClick={this.props.closeFunc}>
                 <FontAwesomeIcon icon={faWindowClose} />
               </div>
             </div>
@@ -137,7 +137,7 @@ export default class Modal extends Component<Props> {
             }}
           >
             {this.props.backBtn !== undefined && (
-              <span onClick={this.back}>{this.props.backBtn}</span>
+              this.props.backBtn
             )}
             {this.props.children}
           </div>
