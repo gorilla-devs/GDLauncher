@@ -8,7 +8,7 @@ const Progress = styled(CircularProgress)`
 `;
 
 const Button = styled(MDButton)`
-  margin: ${props => props.spacing(1)};
+  margin: ${props => props.theme.spacing(1)};
   display: 'flex';
   alignitems: 'center';
 `;

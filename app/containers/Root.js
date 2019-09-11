@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux';
-import { ThemeProvider } from '@material-ui/styles';
+import { ThemeProvider } from 'styled-components';
 import log from 'electron-log';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ConnectedRouter } from 'connected-react-router';
