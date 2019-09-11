@@ -10,7 +10,7 @@ export default props => {
     <div className={styles.main}>
       <div>
         <img src={creeper} />
-        <h1>WE’RE SSSSSSSORRY</h1>
+        <h1>WE'RE SSSSSSSORRY</h1>
         <h2>GDLauncher ran into a creeper and blew up..</h2>
         <Button
           type="primary"

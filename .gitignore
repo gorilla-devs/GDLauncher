@@ -38,6 +38,7 @@ flow-typed/npm/*
 # App packaged
 release
 app/main.prod.js
+app/main.prod.js.LICENSE
 app/main.prod.js.map
 app/renderer.prod.js
 app/renderer.prod.js.map
