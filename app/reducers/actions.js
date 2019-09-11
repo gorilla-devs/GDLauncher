@@ -1,7 +1,8 @@
 import { spawn } from 'child_process';
-import fss, { promises as fs, copyFile } from 'fs';
+import fss, { promises as fs } from 'fs';
 import { message } from 'antd';
 import axios from 'axios';
+import os from 'os';
 import cheerio from 'cheerio';
 import _, { isEqual, unionBy } from 'lodash';
 import compressing from 'compressing';
@@ -47,7 +48,11 @@ import {
 } from '../utils/forgeHelpers';
 import { arraify } from '../utils/strings';
 import { downloadFile, downloadArr } from '../utils/downloader';
-import { getAddon } from '../utils/cursemeta';
+import {
+  getAddon,
+  getAddonFileIDFromVersion,
+  getAddonFile
+} from '../utils/cursemeta';
 import { createDoNotTouchFile, downloadMod } from '../utils/mods';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
 import { findJavaHome } from '../utils/javaHelpers';
@@ -80,7 +85,7 @@ export function initManifests() {
   };
 }
 
-export function initNews(news) {
+export function initNews() {
   return async (dispatch, getState) => {
     const getArticleHeaderImage = async articleURL => {
       // This extracts a <meta property="og:image" content="some url" />
@@ -121,7 +126,7 @@ export function initNews(news) {
 }
 
 export function updateAccount(uuid, account) {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_ACCOUNT,
       id: uuid,
@@ -131,7 +136,7 @@ export function updateAccount(uuid, account) {
 }
 
 export function removeAccount(id) {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     dispatch({
       type: ActionTypes.REMOVE_ACCOUNT,
       id
@@ -140,7 +145,7 @@ export function removeAccount(id) {
 }
 
 export function updateIsNewUser(isNewUser) {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_IS_NEW_USER,
       isNewUser
@@ -149,7 +154,7 @@ export function updateIsNewUser(isNewUser) {
 }
 
 export function updateCurrentAccountId(id) {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
       id
@@ -160,7 +165,7 @@ export function updateCurrentAccountId(id) {
 export function login(username, password, remember) {
   return async (dispatch, getState) => {
     const {
-      app: { clientToken, isNewUser }
+      app: { isNewUser }
     } = getState();
     try {
       const { data, status } = await minecraftLogin(username, password);
@@ -181,24 +186,21 @@ export function login(username, password, remember) {
   };
 }
 
-export function loginWithAccessToken(accessToken) {
+export function loginWithAccessToken() {
   return async (dispatch, getState) => {
     const state = getState();
     const {
       app: { clientToken }
     } = state;
-    const accessToken = getCurrentAccount(state).accessToken;
+    const { accessToken, selectedProfile } = getCurrentAccount(state);
     try {
-      const { data, status } = await minecraftCheckAccessToken(
-        accessToken,
-        clientToken
-      );
+      await minecraftCheckAccessToken(accessToken, clientToken);
       dispatch(push('/home'));
-    } catch (err) {
+    } catch (error) {
       // Trying refreshing the stored access token
       if (error.response && error.response.status === 403) {
         try {
-          const { data, status } = await minecraftRefreshAccessToken(
+          const { data } = await minecraftRefreshAccessToken(
             accessToken,
             clientToken
           );
@@ -207,7 +209,7 @@ export function loginWithAccessToken(accessToken) {
           dispatch(push('/home'));
         } catch {
           message.error('Token Not Valid. You Need To Log-In Again :(');
-          dispatch(removeAccount(data.selectedProfile.id));
+          dispatch(removeAccount(selectedProfile.id));
           throw new Error();
         }
       } else if (error.message === 'Network Error') {
@@ -233,7 +235,7 @@ export function loginThroughNativeLauncher() {
     const { account } = vnlJson.selectedUser;
     const { accessToken } = vnlJson.authenticationDatabase[account];
     try {
-      const { data, status } = await minecraftRefreshAccessToken(
+      const { data } = await minecraftRefreshAccessToken(
         accessToken,
         clientToken
       );
@@ -268,7 +270,7 @@ export function loginThroughNativeLauncher() {
 export function logout() {
   return (dispatch, getState) => {
     const state = getState();
-    const id = getCurrentAccount(state).selectedProfile.id;
+    const { id } = getCurrentAccount(state).selectedProfile;
     dispatch(removeAccount(id));
     dispatch(push('/'));
   };
@@ -305,7 +307,7 @@ export function updateModsManifests(modManifest) {
 }
 
 export function removeModsManifests(id) {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch({
       type: ActionTypes.REMOVE_MOD_MANIFEST,
       id
@@ -326,7 +328,6 @@ export function startInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const {
-      app: { currentAccountIndex, accounts },
       settings: {
         java: { args }
       }
@@ -334,7 +335,7 @@ export function startInstance(instanceName) {
 
     // Checks for legacy java memory
     const legacyString = [' -Xmx{_RAM_}m', '-Xmx{_RAM_}m'];
-    const config = await readConfig(instanceName);
+    let config = await readConfig(instanceName);
     if (
       config.overrideArgs &&
       (config.overrideArgs.includes(legacyString[0]) ||
@@ -347,7 +348,7 @@ export function startInstance(instanceName) {
 
     if (args.includes(legacyString[0]))
       dispatch(updateJavaArguments(args.replace(legacyString[0], '')));
-    if (settings.java.javaArgs.includes(legacyString[1]))
+    if (args.includes(legacyString[1]))
       dispatch(updateJavaArguments(args.replace(legacyString[1], '')));
 
     const command = await launchCommand(instanceName, state);
@@ -382,7 +383,7 @@ export function startInstance(instanceName) {
         type: ActionTypes.REMOVE_STARTED_INSTANCE,
         name: instanceName
       });
-      const config = await readConfig(instanceName);
+      config = await readConfig(instanceName);
       await updateConfig(instanceName, {
         timePlayed: config.timePlayed ? config.timePlayed + minutes : minutes
       });
@@ -450,7 +451,7 @@ export function initInstances() {
             return {
               name: instance,
               ...(projectID && { projectID }),
-              mods: mods
+              mods
             };
           })
         );
@@ -486,19 +487,15 @@ export function initInstances() {
       const getInstancesDebounced = _.debounce(updateInstances, 100);
 
       // Watches for any changes in the packs dir. TODO: Optimize
-      watcher = watch(
-        PACKS_PATH,
-        { recursive: true },
-        async (event, filename) => {
-          try {
-            await fs.access(PACKS_PATH);
-          } catch (e) {
-            await makeDir(PACKS_PATH);
-          }
-          getInstancesDebounced();
+      watcher = watch(PACKS_PATH, { recursive: true }, async () => {
+        try {
+          await fs.access(PACKS_PATH);
+        } catch (e) {
+          await makeDir(PACKS_PATH);
         }
-      );
-      watcher.on('error', async err => {
+        getInstancesDebounced();
+      });
+      watcher.on('error', async () => {
         try {
           await fs.access(PACKS_PATH);
         } catch (e) {
@@ -567,7 +564,7 @@ export function updateDownloadProgress(min, percDifference, computed, total) {
 }
 
 export function repairInstance(name) {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       name
@@ -579,7 +576,7 @@ export function repairInstance(name) {
         config.modpackVersion
       );
       if (fileID)
-        dispatch(addCursePackToQueue(name, config.projectID, fileID, true));
+        dispatch(addTwitchModpackToQueue(name, config.projectID, fileID, true));
       else {
         dispatch({
           type: ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE,
@@ -596,7 +593,7 @@ export function repairInstance(name) {
     } else {
       dispatch(
         addToQueue(
-          pack,
+          name,
           config.version,
           config.forgeVersion
             ? config.forgeVersion.replace('forge-', '')
@@ -657,7 +654,7 @@ export function importInstanceFromTwitch(name, filePath) {
     });
     if (!currentDownload) {
       dispatch(updateCurrentDownload(name));
-      dispatch(downloadInstance(pack));
+      dispatch(downloadInstance(name));
     }
   };
 }
@@ -823,7 +820,7 @@ export function downloadInstance(pack, isRepair = false) {
 
       // Read every single file in the overrides folder
       const rreaddir = async (dir, allFiles = []) => {
-        const files = (await readdir(dir)).map(f => path.join(dir, f));
+        const files = (await fs.readdir(dir)).map(f => path.join(dir, f));
         allFiles.push(...files);
         await Promise.all(
           files.map(
@@ -904,6 +901,7 @@ export function downloadInstance(pack, isRepair = false) {
       try {
         const prevConfig = await readConfig(pack);
         mods = unionBy(modsManifest, prevConfig.mods, 'projectID');
+        timePlayed = prevConfig.timePlayed;
       } catch {
         console.error('Could not find a valid config - using defaults');
       }
@@ -950,7 +948,7 @@ export function downloadInstance(pack, isRepair = false) {
       }
 
       if (installProfileJson) {
-        totalPercentage = totalPercentage - 10;
+        totalPercentage -= 10;
       }
     }
     const updatePercentage = downloaded => {
@@ -1043,7 +1041,7 @@ export function downloadInstance(pack, isRepair = false) {
     }
     dispatch({
       type: ActionTypes.UPDATE_DOWNLOAD_PROGRESS,
-      name,
+      name: pack,
       percentage: 100
     });
     dispatch(removeDownloadFromQueue(pack));
@@ -1057,9 +1055,9 @@ function addNextInstanceToCurrentDownload() {
     const { downloadQueue } = getState();
     const queueArr = Object.keys(downloadQueue);
     if (queueArr.length > 0) {
-      console.log(downloadQueue, queueArr);
-      dispatch(updateCurrentDownload(downloadQueue[queueArr[0]].name));
-      dispatch(downloadInstance(pack));
+      const nextDownload = downloadQueue[queueArr[0]].name;
+      dispatch(updateCurrentDownload(nextDownload));
+      dispatch(downloadInstance(nextDownload));
     }
   };
 }

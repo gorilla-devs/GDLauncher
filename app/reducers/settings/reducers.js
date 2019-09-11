@@ -30,11 +30,14 @@ function releaseChannel(state = 0, action) {
   }
 }
 
-function java(state = {
-  path: null,
-  memory: DEFAULT_JAVA_MEMORY,
-  args: DEFAULT_JAVA_ARGUMENTS
-}, action) {
+function java(
+  state = {
+    path: null,
+    memory: DEFAULT_JAVA_MEMORY,
+    args: DEFAULT_JAVA_ARGUMENTS
+  },
+  action
+) {
   switch (action.type) {
     case ActionTypes.UPDATE_JAVA_ARGUMENTS:
       return { ...state, args: action.args };
