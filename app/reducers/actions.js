@@ -210,6 +210,7 @@ export function loginWithAccessToken() {
         } catch {
           message.error('Token Not Valid. You Need To Log-In Again :(');
           dispatch(removeAccount(selectedProfile.id));
+          dispatch(push('/'));
           throw new Error();
         }
       } else if (error.message === 'Network Error') {

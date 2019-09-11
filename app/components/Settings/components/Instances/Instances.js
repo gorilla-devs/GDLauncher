@@ -6,20 +6,32 @@ import { useTranslation } from 'react-i18next';
 import fsa from 'fs-extra';
 import path from 'path';
 import styles from './Instances.scss';
-import { INSTANCES_PATH, META_PATH, DATAPATH, INSTANCES_FOLDER } from '../../../../constants';
+import {
+  INSTANCES_PATH,
+  META_PATH,
+  DATAPATH,
+  INSTANCES_FOLDER
+} from '../../../../constants';
 import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import ButtonSetting from '../ButtonSetting/ButtonSetting';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { updateJavaPath, updateInstancesPath } from '../../../../reducers/settings/actions';
+import {
+  updateJavaPath,
+  updateInstancesPath
+} from '../../../../reducers/settings/actions';
 
 function Instances(props) {
   const [deletingInstances, setDeletingInstances] = useState(false);
   const { t } = useTranslation();
-  const isInstalling = useSelector(state => state.loading.instance_installing.isRequesting)
-  const instancesPath = useSelector(state => state.settings.general.instancesPath);
+  const isInstalling = useSelector(
+    state => state.loading.instanceDownload.isRequesting
+  );
+  const instancesPath = useSelector(
+    state => state.settings.general.instancesPath
+  );
   const dispatch = useDispatch();
 
   async function deleteShareData() {
@@ -61,7 +73,10 @@ function Instances(props) {
       <SettingCard>
         <ButtonSetting
           mainText={t('ClearAllData', 'Clear Shared Data')}
-          description={t('ClearAllDataDescription', 'Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data')}
+          description={t(
+            'ClearAllDataDescription',
+            'Deletes all the shared files between instances. Doing this will result in the complete loss of the instances data'
+          )}
           icon={faTrash}
           onClick={() => deleteShareData()}
           disabled={isInstalling}
@@ -70,13 +85,30 @@ function Instances(props) {
         />
       </SettingCard>
       <SwitchSetting
-        mainText={t('OverrideDefaultInstancesPath', 'Override Default Instances Path')}
-        description={<div>
-          <div>{t('OverrideDefaultInstancesPathDescription1', 'If enabled, instances will be downloaded in the selected path')}</div>
-          <div className={styles.restart}>
-            You need to <span style={{ color: 'white', cursor: 'pointer' }} onClick={restartLauncher}>restart</span> the launcher for this setting to apply
+        mainText={t(
+          'OverrideDefaultInstancesPath',
+          'Override Default Instances Path'
+        )}
+        description={
+          <div>
+            <div>
+              {t(
+                'OverrideDefaultInstancesPathDescription1',
+                'If enabled, instances will be downloaded in the selected path'
+              )}
+            </div>
+            <div className={styles.restart}>
+              You need to{' '}
+              <span
+                style={{ color: 'white', cursor: 'pointer' }}
+                onClick={restartLauncher}
+              >
+                restart
+              </span>{' '}
+              the launcher for this setting to apply
+            </div>
           </div>
-        </div>}
+        }
         checked={instancesPath}
         icon={faFolder}
         onChange={e => props.setInstancesPath(e ? INSTANCES_PATH : null)}
@@ -84,9 +116,15 @@ function Instances(props) {
       {instancesPath && (
         <div>
           <div>
-            <span style={{ fontSize: 18 }}>{t('InstancesCustomPath', 'Instances Custom Path')}{' '}</span>
+            <span style={{ fontSize: 18 }}>
+              {t('InstancesCustomPath', 'Instances Custom Path')}{' '}
+            </span>
             <a
-              onClick={() => dispatch(updateInstancesPath(path.join(DATAPATH, INSTANCES_FOLDER)))}
+              onClick={() =>
+                dispatch(
+                  updateInstancesPath(path.join(DATAPATH, INSTANCES_FOLDER))
+                )
+              }
               style={{ fontSize: 13 }}
             >
               {t('ResetPath', 'Reset Path')}
@@ -101,9 +139,7 @@ function Instances(props) {
                 marginBottom: '10px !important',
                 marginTop: '4px !important'
               }}
-              prefix={
-                <FontAwesomeIcon icon={faFolder} />
-              }
+              prefix={<FontAwesomeIcon icon={faFolder} />}
               onChange={e => dispatch(updateInstancesPath(e.target.value))}
             />
             <Button
@@ -111,8 +147,16 @@ function Instances(props) {
               // icon="folder"
               theme="filled"
               onClick={openFolderDialog}
-              style={{ height: 60, marginLeft: 10, marginBottom: 10, marginTop: 4, padding: 8 }}
-            ><FontAwesomeIcon icon={faFolder} /></Button>
+              style={{
+                height: 60,
+                marginLeft: 10,
+                marginBottom: 10,
+                marginTop: 4,
+                padding: 8
+              }}
+            >
+              <FontAwesomeIcon icon={faFolder} />
+            </Button>
           </div>
         </div>
       )}

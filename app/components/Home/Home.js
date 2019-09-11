@@ -3,6 +3,7 @@ import React, { Component, useState, useEffect } from 'react';
 import { Input } from 'antd';
 import { Link } from 'react-router-dom';
 import { push } from 'connected-react-router';
+import { useSelector, useDispatch } from 'react-redux';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { Button } from 'ui';
@@ -10,7 +11,6 @@ import { PACKS_PATH, THEMES } from '../../constants';
 import styles from './Home.scss';
 import News from './components/News/News';
 import Card from '../Common/Card/Card';
-import { useSelector, useDispatch } from 'react-redux';
 import { getCurrentAccount } from '../../utils/selectors';
 import { createInstance } from '../../reducers/actions';
 
@@ -21,7 +21,7 @@ const Home = props => {
   const news = useSelector(state => state.news);
   const latest = useSelector(state => state.app.vanillaManifest.latest.release);
   const loading = useSelector(
-    state => state.loading.instance_pre_download.isRequesting
+    state => state.loading.instanceDownload.isRequesting
   );
   const account = useSelector(state => getCurrentAccount(state));
 

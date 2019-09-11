@@ -5,6 +5,20 @@
     <title>GDLauncher</title>
     <script>
       (function() {
+        if (process.env.NODE_ENV !== 'development') {
+          window.ga =
+            window.ga ||
+            function() {
+              (ga.q = ga.q || []).push(arguments);
+            };
+          ga.l = +new Date();
+          ga('create', 'UA-147631204-1', 'auto');
+          ga('set', 'transport', 'xhr');
+          ga('set', 'appName', 'GDLauncher');
+          ga('set', 'checkProtocolTask', null);
+          ga('set', 'checkStorageTask', null);
+          ga('send', 'pageview');
+        }
         if (!process.env.HOT) {
           const link = document.createElement('link');
           link.rel = 'stylesheet';
@@ -14,6 +28,7 @@
         }
       })();
     </script>
+    <script async src="https://www.google-analytics.com/analytics.js"></script>
   </head>
 
   <body>

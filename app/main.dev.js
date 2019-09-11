@@ -66,7 +66,7 @@ if (minimist(process.argv.slice(1)).i) {
     ];
 
     return Promise.all(
-      extensions.map(name => installer.default(installer[name], forceDownload))
+      extensions.map(ext => installer.default(ext, forceDownload))
     ).catch(log.error);
   };
 

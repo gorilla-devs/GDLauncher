@@ -5,19 +5,14 @@ import { DEFAULT_JAVA_ARGUMENTS } from '../constants';
 function accounts(state = [], action) {
   switch (action.type) {
     case ActionTypes.UPDATE_ACCOUNT:
-      const index = state.findIndex(account => account.selectedProfile.id === action.id);
-      return (
-        (index !== -1
-          ? [
-            ...state.slice(0, index),
-            action.account,
-            ...state.slice(index + 1),
-          ]
-          : [...state, action.account]
-        )
+      const index = state.findIndex(
+        account => account.selectedProfile.id === action.id
       );
+      return index !== -1
+        ? [...state.slice(0, index), action.account, ...state.slice(index + 1)]
+        : [...state, action.account];
     case ActionTypes.REMOVE_ACCOUNT:
-      return accounts.filter(account => account.selectedProfile.id !== action.id);
+      return state.filter(account => account.selectedProfile.id !== action.id);
     default:
       return state;
   }
@@ -31,7 +26,7 @@ function currentAccountId(state = null, action) {
     default:
       return state;
   }
-};
+}
 
 function vanillaManifest(state = [], action) {
   switch (action.type) {
@@ -40,7 +35,7 @@ function vanillaManifest(state = [], action) {
     default:
       return state;
   }
-};
+}
 
 function forgeManifest(state = [], action) {
   switch (action.type) {
@@ -49,22 +44,15 @@ function forgeManifest(state = [], action) {
     default:
       return state;
   }
-};
+}
 
 function modsManifests(state = [], action) {
   switch (action.type) {
     case ActionTypes.UPDATE_MODS_MANIFESTS:
       const index = state.findIndex(mod => mod.id === action.id);
-      return (
-        (index !== -1
-          ? [
-            ...state.slice(0, index),
-            action.mod,
-            ...state.slice(index + 1),
-          ]
-          : [...state, action.mod]
-        )
-      );
+      return index !== -1
+        ? [...state.slice(0, index), action.mod, ...state.slice(index + 1)]
+        : [...state, action.mod];
     case ActionTypes.REMOVE_MOD_MANIFEST:
       return accounts.filter(mod => mod.id !== action.id);
     default:

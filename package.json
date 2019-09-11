@@ -245,7 +245,6 @@
     "source-map-support": "^0.5.13",
     "styled-components": "^4.3.2",
     "sudo-prompt": "^9.0.0",
-    "universal-analytics": "^0.4.20",
     "version-sort": "^0.1.1",
     "yazl": "^2.5.1"
   },

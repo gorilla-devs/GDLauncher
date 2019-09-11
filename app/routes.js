@@ -1,17 +1,19 @@
 /* eslint flowtype-errors/show-errors: 0 */
-import React, { Component, lazy, Suspense } from 'react';
-import { connect } from 'react-redux';
+import React, { Component, lazy, Suspense, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Switch, Route, Redirect } from 'react-router';
 import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import { screen } from 'electron';
-import { release, arch } from 'os';
 import {
   initInstances,
   initNews,
   loginWithAccessToken,
-  initManifests
+  initManifests,
+  checkClientToken
 } from './reducers/actions';
+import { load } from './reducers/loading/actions';
+import features from './reducers/loading/features';
 import { JAVA_URL } from './constants';
 import ga from './GAnalytics';
 import GlobalStyles from './globalStyles';
@@ -41,7 +43,9 @@ const loginHelperModal = lazy(() =>
   import('./components/LoginHelperModal/LoginHelperModal')
 );
 const CurseModpacksBrowserCreatorModal = lazy(() =>
-  import('./components/CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal')
+  import(
+    './components/CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal'
+  )
 );
 const CurseModpackExplorerModal = lazy(() =>
   import('./components/CurseModpackExplorerModal/CurseModpackExplorerModal')
@@ -60,220 +64,185 @@ const JavaGlobalOptionsFixModal = lazy(() =>
   import('./components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal')
 );
 
-type Props = {
-  location: object,
-  loginWithAccessToken: () => void,
-  isAuthValid: boolean
-};
+const RouteDef = props => {
+  const [globalJavaOptions, setGlobalJavaOptions] = useState(false);
+  const isAccountValid = useSelector(
+    state => state.loading.accountAuthentication.isReceived
+  );
+  const location = useSelector(state => state.router.location);
+  const clientToken = useSelector(state => state.app.clientToken);
+  const dispatch = useDispatch();
+  const appVersion = require('../package.json').version;
 
-class RouteDef extends Component<Props> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      globalJavaOptions: false
-    };
-    this.appVersion = require('../package.json').version;
-  }
-
-  componentDidMount = async () => {
-    this.props.initNews();
-    this.props.initInstances();
-    this.props.initManifests();
-    if (!this.props.isAuthValid) this.props.loginWithAccessToken();
-    if ((await findJavaHome()) === null) {
-      notification.warning({
-        duration: 0,
-        message: 'JAVA NOT FOUND',
-        description: (
-          <div>
-            Java has not been found. Click{' '}
-            <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">
-              here
-            </a>{' '}
-            to download it. After installing you will need to restart your PC.
-          </div>
-        )
-      });
-    }
-    const globalJavaOptions = await isGlobalJavaOptions();
-    this.setState({
-      globalJavaOptions
-    });
-  };
-
-  componentWillUpdate(nextProps) {
-    const { location } = this.props;
-    // set previousLocation if props.location is not modal
-    if (
-      nextProps.history.action !== 'POP' &&
-      (!location.state || !location.state.modal)
-    ) {
-      this.previousLocation = location;
-    }
-  }
-
-  componentDidUpdate = (prevProps, prevState) => {
-    if (this.props.isAuthValid && process.env.NODE_ENV !== 'development') {
-      ga(this.props.uuid).set('uid', this.props.uuid);
-      ga(this.props.uuid).set('ds', 'app');
-      ga(this.props.uuid).set('ua', `${release()} ${arch()}`);
-      ga(this.props.uuid).set('cd1', `${release()} ${arch()}`);
-      // ga(this.props.uuid).set(
-      //   'sr',
-      //   `${screen.getPrimaryDisplay().bounds.width}x${
-      //     screen.getPrimaryDisplay().bounds.height
-      //   }`
-      // );
-      ga(this.props.uuid).set(
-        'vp',
-        `${window.innerWidth}x${window.innerHeight}`
+  useEffect(() => {
+    dispatch(checkClientToken());
+    ga.setUserId(uuid);
+    Promise.all(
+      dispatch(initNews()),
+      dispatch(initInstances()),
+      dispatch(initManifests())
+    );
+    if (!isAccountValid) {
+      dispatch(
+        load(features.accountAuthentication, dispatch(loginWithAccessToken()))
       );
-      ga(this.props.uuid)
-        .screenview(this.props.location.pathname, 'GDLauncher', this.appVersion)
-        .send();
     }
-    if (
-      this.state.globalJavaOptions &&
-      this.props.location.pathname === '/home'
-    ) {
-      history.push({
-        pathname: `/javaGlobalOptionsFix`,
-        state: { modal: true }
-      });
-      this.setState({ globalJavaOptions: false });
-      return;
+    findJavaHome().then(result => {
+      if (!result) {
+        notification.warning({
+          duration: 0,
+          message: 'JAVA NOT FOUND',
+          description: (
+            <div>
+              Java has not been found. Click{' '}
+              <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">
+                here
+              </a>{' '}
+              to download it. After installing you will need to restart your PC.
+            </div>
+          )
+        });
+      }
+    });
+    isGlobalJavaOptions().then(result => setGlobalJavaOptions(result));
+  }, []);
+
+  useEffect(() => {
+    if (isAccountValid && process.env.NODE_ENV !== 'development') {
+      ga.trackPage(location.pathname);
+    }
+  }, [isAccountValid, location.pathname]);
+
+  useEffect(() => {
+    if (globalJavaOptions && location.pathname === '/home') {
+      // Modal
+      dispatch(
+        push({
+          pathname: `/javaGlobalOptionsFix`
+        })
+      );
+      setGlobalJavaOptions(false);
     }
     /* Show the changelogs after an update */
-    if (
-      this.props.location.pathname === '/home' &&
-      this.props.showChangelog
-    ) {
+    if (location.pathname === '/home' && showChangelog) {
       setTimeout(() => {
         history.push({
-          pathname: `/changelogs`,
-          state: { modal: true }
+          pathname: `/changelogs`
         });
       }, 200);
     }
-  };
+  }, [globalJavaOptions, location.pathname]);
 
-  previousLocation = this.props.location;
-
-  render() {
-    const { location, isAuthValid } = this.props;
-    const isModal = !!(
-      location.state &&
-      location.state.modal &&
-      this.previousLocation !== location
-    ); // not initial render
-    return (
-      <App>
-        <GlobalStyles />
-        <SysNavBar />
-        <div>
-          {location.pathname !== '/' &&
-            location.pathname !== '/newUserPage' &&
-            location.pathname !== '/loginHelperModal' && (
-              <div>
-                <Navigation />
-                <SideBar />
-              </div>
-            )}
-          <ModalManager />
-          <Switch location={isModal ? this.previousLocation : location}>
-            <Route
-              exact
-              path="/"
-              component={WaitingComponent(Form.create()(Login))}
-            />
-            <Route
-              exact
-              path="/autoUpdate"
-              component={WaitingComponent(AutoUpdate)}
-            />
-            {/* {!isAuthValid && <Redirect push to="/" />} */}
-            <Route path="/newUserPage" component={WaitingComponent(NewUserPage)} />
-            <Route>
-              <div
-                style={{
-                  width: 'calc(100% - 200px)',
-                  position: 'absolute',
-                  right: 200
-                }}
-              >
-                <Route path="/dmanager" component={DManager} />
-                <Route
-                  path="/curseModpacksBrowser"
-                  component={CurseModpacksBrowser}
-                />
-                <Route path="/home" component={WaitingComponent(HomePage)} />
-              </div>
-            </Route>
-          </Switch>
-        </div>
-        {/* ALL MODALS */}
-        {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
-        {isModal ? (
+  return (
+    <App>
+      <GlobalStyles />
+      <SysNavBar />
+      <div>
+        {location.pathname !== '/' &&
+          location.pathname !== '/newUserPage' &&
+          location.pathname !== '/loginHelperModal' && (
+            <div>
+              <Navigation />
+              <SideBar />
+            </div>
+          )}
+        <ModalManager />
+        <Switch location={location}>
           <Route
-            path="/InstanceCreatorModal"
-            component={WaitingComponent(InstanceCreatorModal)}
+            exact
+            path="/"
+            component={WaitingComponent(Form.create()(Login))}
           />
-        ) : null}
-        {isModal ? (
           <Route
-            path="/curseModpackBrowserCreatorModal/:addonID"
-            component={WaitingComponent(CurseModpacksBrowserCreatorModal)}
+            exact
+            path="/autoUpdate"
+            component={WaitingComponent(AutoUpdate)}
           />
-        ) : null}
-        {isModal ? (
+          {/* {!isAuthValid && <Redirect push to="/" />} */}
           <Route
-            path="/curseModpackExplorerModal/:addonID"
-            component={WaitingComponent(CurseModpackExplorerModal)}
+            path="/newUserPage"
+            component={WaitingComponent(NewUserPage)}
           />
-        ) : null}
-        {isModal ? (
-          <Route
-            path="/editInstance/:instance/:page/:state?/:version?/:mod?"
-            component={InstanceManagerModal}
-          />
-        ) : null}
-        {isModal ? (
-          <Route path="/importPack" component={WaitingComponent(ImportPack)} />
-        ) : null}
-        {isModal ? (
-          <Route
-            path="/exportPackModal/:instanceName"
-            component={WaitingComponent(ExportPackModal)}
-          />
-        ) : null}
-        {isModal ? (
-          <Route
-            path="/loginHelperModal"
-            component={WaitingComponent(loginHelperModal)}
-          />
-        ) : null}
-        {isModal ? (
-          <Route
-            path="/changelogs"
-            component={WaitingComponent(ChangelogsModal)}
-          />
-        ) : null}
-        {isModal ? (
-          <Route
-            path="/confirmInstanceDelete/:type/:name"
-            component={WaitingComponent(ConfirmDeleteModal)}
-          />
-        ) : null}
-        {isModal ? (
-          <Route
-            path="/javaGlobalOptionsFix"
-            component={WaitingComponent(JavaGlobalOptionsFixModal)}
-          />
-        ) : null}
-      </App>
-    );
-  }
-}
+          <Route>
+            <div
+              style={{
+                width: 'calc(100% - 200px)',
+                position: 'absolute',
+                right: 200
+              }}
+            >
+              <Route path="/dmanager" component={DManager} />
+              <Route
+                path="/curseModpacksBrowser"
+                component={CurseModpacksBrowser}
+              />
+              <Route path="/home" component={WaitingComponent(HomePage)} />
+            </div>
+          </Route>
+        </Switch>
+      </div>
+      {/* ALL MODALS */}
+      {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
+      {isModal ? (
+        <Route
+          path="/InstanceCreatorModal"
+          component={WaitingComponent(InstanceCreatorModal)}
+        />
+      ) : null}
+      {isModal ? (
+        <Route
+          path="/curseModpackBrowserCreatorModal/:addonID"
+          component={WaitingComponent(CurseModpacksBrowserCreatorModal)}
+        />
+      ) : null}
+      {isModal ? (
+        <Route
+          path="/curseModpackExplorerModal/:addonID"
+          component={WaitingComponent(CurseModpackExplorerModal)}
+        />
+      ) : null}
+      {isModal ? (
+        <Route
+          path="/editInstance/:instance/:page/:state?/:version?/:mod?"
+          component={InstanceManagerModal}
+        />
+      ) : null}
+      {isModal ? (
+        <Route path="/importPack" component={WaitingComponent(ImportPack)} />
+      ) : null}
+      {isModal ? (
+        <Route
+          path="/exportPackModal/:instanceName"
+          component={WaitingComponent(ExportPackModal)}
+        />
+      ) : null}
+      {isModal ? (
+        <Route
+          path="/loginHelperModal"
+          component={WaitingComponent(loginHelperModal)}
+        />
+      ) : null}
+      {isModal ? (
+        <Route
+          path="/changelogs"
+          component={WaitingComponent(ChangelogsModal)}
+        />
+      ) : null}
+      {isModal ? (
+        <Route
+          path="/confirmInstanceDelete/:type/:name"
+          component={WaitingComponent(ConfirmDeleteModal)}
+        />
+      ) : null}
+      {isModal ? (
+        <Route
+          path="/javaGlobalOptionsFix"
+          component={WaitingComponent(JavaGlobalOptionsFixModal)}
+        />
+      ) : null}
+    </App>
+  );
+};
 
 function WaitingComponent(MyComponent) {
   return props => (
@@ -295,23 +264,4 @@ function WaitingComponent(MyComponent) {
   );
 }
 
-function mapStateToProps(state) {
-  return {
-    location: state.router.location,
-    isAuthValid: state.loading.account_authentication.isReceived,
-    uuid: state.clientToken,
-    showChangelog: state.showChangelog
-  };
-}
-
-const mapDispatchToProps = {
-  initNews,
-  initInstances,
-  loginWithAccessToken,
-  initManifests
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RouteDef);
+export default RouteDef;

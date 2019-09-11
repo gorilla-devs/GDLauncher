@@ -15,6 +15,7 @@ import shader from '../../utils/colors';
 import background from '../../assets/images/login_background.jpg';
 import { login, loginThroughNativeLauncher } from '../../reducers/actions';
 import { load } from '../../reducers/loading/actions';
+import features from '../../reducers/loading/features';
 
 type Props = {
   form: any,
@@ -32,7 +33,9 @@ const FormItem = Form.Item;
 function Login(props) {
   const [fastLogin, setFastLogin] = useState(true);
   const [nativeLauncherProfiles, setNativeLauncherProfiles] = useState(false);
-  const isAuthLoading = useSelector(state => state.loading.account_authentication.isRequesting);
+  const isAuthLoading = useSelector(
+    state => state.loading.accountAuthentication.isRequesting
+  );
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [colors, setColors] = useState(
@@ -61,7 +64,7 @@ function Login(props) {
       if (!err) {
         dispatch(
           load(
-            'account_authentication',
+            features.accountAuthentication,
             dispatch(login(values.username, values.password, values.remember))
           )
         );
@@ -80,16 +83,21 @@ function Login(props) {
         style={{
           background: `linear-gradient( ${colors['secondary-color-2']}8A, ${
             colors['secondary-color-2']
-            }8A), url(${background})`
+          }8A), url(${background})`
         }}
       >
         <div className={styles.login_form}>
-          <h1 style={{ textAlign: 'center', fontSize: 30 }}>{t('MojangLogin', 'Mojang Login')}</h1>
+          <h1 style={{ textAlign: 'center', fontSize: 30 }}>
+            {t('MojangLogin', 'Mojang Login')}
+          </h1>
           <Form onSubmit={handleSubmit}>
             <FormItem>
               {getFieldDecorator('username', {
                 rules: [
-                  { required: true, message: t('InputEmail', 'Please Input Your Email') }
+                  {
+                    required: true,
+                    message: t('InputEmail', 'Please Input Your Email')
+                  }
                 ],
                 initialValue: store.has('lastUsername')
                   ? store.get('lastUsername')
@@ -111,7 +119,10 @@ function Login(props) {
             <FormItem>
               {getFieldDecorator('password', {
                 rules: [
-                  { required: true, message: t('InputPassword', 'Please Input Your Password') }
+                  {
+                    required: true,
+                    message: t('InputPassword', 'Please Input Your Password')
+                  }
                 ]
               })(
                 <Input
@@ -169,7 +180,10 @@ function Login(props) {
               style={{ marginTop: '30px' }}
               onClick={() => {
                 dispatch(
-                  load('account_authentication', dispatch(loginThroughNativeLauncher()))
+                  load(
+                    'account_authentication',
+                    dispatch(loginThroughNativeLauncher())
+                  )
                 ).catch(err => {});
               }}
             >

@@ -67,10 +67,10 @@ const SideBar = props => {
         <div className={styles.header}>
           <span>
             <CIcon size={32}>
-              {account.selectedProfile.name && account.selectedProfile.name.charAt(0).toUpperCase()}
+              {account && account.selectedProfile.name.charAt(0).toUpperCase()}
             </CIcon>
           </span>
-          <span>{account.selectedProfile.name}</span>
+          <span>{account && account.selectedProfile.name}</span>
           <div onClick={() => props.logout()}>
             <FontAwesomeIcon icon={faSignOutAlt} className={styles.logout} />
           </div>
@@ -171,8 +171,8 @@ const SideBar = props => {
             </div>
           </div>
         ) : (
-            'No instance selected'
-          )}
+          'No instance selected'
+        )}
       </div>
       <div className={styles.scroller} />
       <hr style={{ margin: 0 }} />
