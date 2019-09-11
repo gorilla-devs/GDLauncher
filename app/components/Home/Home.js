@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { push } from 'connected-react-router';
 import { promises as fs } from 'fs';
 import path from 'path';
-import Button from 'ui/Button';
+import { Button } from 'ui';
 import { PACKS_PATH, THEMES } from '../../constants';
 import styles from './Home.scss';
 import News from './components/News/News';

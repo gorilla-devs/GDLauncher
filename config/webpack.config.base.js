@@ -34,7 +34,7 @@ export default {
     extensions: ['.js', '.jsx', '.json'],
     alias: {
       app: path.join(__dirname, '..', 'app'),
-      ui: path.join(__dirname, '..', 'ui')
+      ui$: path.join(__dirname, '..', 'ui/index.js')
     }
   },
 
