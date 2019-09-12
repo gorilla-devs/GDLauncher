@@ -26,9 +26,8 @@ import SysNavBar from './components/Common/SystemNavBar/SystemNavBar';
 import { findJavaHome, isGlobalJavaOptions } from './utils/javaHelpers';
 import DManager from './components/DManager/DManager';
 import InstanceManagerModal from './components/InstanceManagerModal/InstanceManagerModal';
-import Settings from './components/Settings/Settings';
 import CurseModpacksBrowser from './components/CurseModpacksBrowser/CurseModpacksBrowser';
-import { ModalManager } from './components/Common/ModalManager/ModalManager';
+import ModalsManager from './components/Common/ModalsManager';
 
 const Login = lazy(() => import('./components/Login/Login'));
 const HomePage = lazy(() => import('./components/Home/Home'));
@@ -70,19 +69,21 @@ const RouteDef = props => {
     state => state.loading.accountAuthentication.isReceived
   );
   const location = useSelector(state => state.router.location);
+  const currentAccountId = useSelector(state => state.app.currentAccountId);
+  const showChangelogs = useSelector(state => state.app.showChangelogs);
   const clientToken = useSelector(state => state.app.clientToken);
   const dispatch = useDispatch();
   const appVersion = require('../package.json').version;
 
   useEffect(() => {
     dispatch(checkClientToken());
-    ga.setUserId(uuid);
-    Promise.all(
+    ga.setUserId(clientToken);
+    Promise.all([
       dispatch(initNews()),
       dispatch(initInstances()),
       dispatch(initManifests())
-    );
-    if (!isAccountValid) {
+    ]);
+    if (!isAccountValid && currentAccountId) {
       dispatch(
         load(features.accountAuthentication, dispatch(loginWithAccessToken()))
       );
@@ -124,7 +125,7 @@ const RouteDef = props => {
       setGlobalJavaOptions(false);
     }
     /* Show the changelogs after an update */
-    if (location.pathname === '/home' && showChangelog) {
+    if (location.pathname === '/home' && showChangelogs) {
       setTimeout(() => {
         history.push({
           pathname: `/changelogs`
@@ -138,7 +139,8 @@ const RouteDef = props => {
       <GlobalStyles />
       <SysNavBar />
       <div>
-        {location.pathname !== '/' &&
+        {isAccountValid &&
+          location.pathname !== '/' &&
           location.pathname !== '/newUserPage' &&
           location.pathname !== '/loginHelperModal' && (
             <div>
@@ -146,7 +148,7 @@ const RouteDef = props => {
               <SideBar />
             </div>
           )}
-        <ModalManager />
+        <ModalsManager />
         <Switch location={location}>
           <Route
             exact
@@ -181,84 +183,13 @@ const RouteDef = props => {
           </Route>
         </Switch>
       </div>
-      {/* ALL MODALS */}
-      {isModal ? <Route path="/settings/:page" component={Settings} /> : null}
-      {isModal ? (
-        <Route
-          path="/InstanceCreatorModal"
-          component={WaitingComponent(InstanceCreatorModal)}
-        />
-      ) : null}
-      {isModal ? (
-        <Route
-          path="/curseModpackBrowserCreatorModal/:addonID"
-          component={WaitingComponent(CurseModpacksBrowserCreatorModal)}
-        />
-      ) : null}
-      {isModal ? (
-        <Route
-          path="/curseModpackExplorerModal/:addonID"
-          component={WaitingComponent(CurseModpackExplorerModal)}
-        />
-      ) : null}
-      {isModal ? (
-        <Route
-          path="/editInstance/:instance/:page/:state?/:version?/:mod?"
-          component={InstanceManagerModal}
-        />
-      ) : null}
-      {isModal ? (
-        <Route path="/importPack" component={WaitingComponent(ImportPack)} />
-      ) : null}
-      {isModal ? (
-        <Route
-          path="/exportPackModal/:instanceName"
-          component={WaitingComponent(ExportPackModal)}
-        />
-      ) : null}
-      {isModal ? (
-        <Route
-          path="/loginHelperModal"
-          component={WaitingComponent(loginHelperModal)}
-        />
-      ) : null}
-      {isModal ? (
-        <Route
-          path="/changelogs"
-          component={WaitingComponent(ChangelogsModal)}
-        />
-      ) : null}
-      {isModal ? (
-        <Route
-          path="/confirmInstanceDelete/:type/:name"
-          component={WaitingComponent(ConfirmDeleteModal)}
-        />
-      ) : null}
-      {isModal ? (
-        <Route
-          path="/javaGlobalOptionsFix"
-          component={WaitingComponent(JavaGlobalOptionsFixModal)}
-        />
-      ) : null}
     </App>
   );
 };
 
 function WaitingComponent(MyComponent) {
   return props => (
-    <Suspense
-      fallback={
-        <div
-          style={{
-            width: '100vw',
-            height: '100vh',
-            background: 'var(--secondary-color-1)'
-          }}
-        >
-          Loading...
-        </div>
-      }
-    >
+    <Suspense fallback={null}>
       <MyComponent {...props} />
     </Suspense>
   );

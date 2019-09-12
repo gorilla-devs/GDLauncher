@@ -78,7 +78,7 @@ function isNewUser(state = true, action) {
   }
 }
 
-function showChangelog(state = false, action) {
+function showChangelogs(state = false, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_SHOW_CHANGELOG:
       return action.show;
@@ -95,5 +95,5 @@ export default combineReducers({
   modsManifests,
   clientToken,
   isNewUser,
-  showChangelog
+  showChangelogs
 });

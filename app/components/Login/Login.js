@@ -181,7 +181,7 @@ function Login(props) {
               onClick={() => {
                 dispatch(
                   load(
-                    'account_authentication',
+                    features.accountAuthentication,
                     dispatch(loginThroughNativeLauncher())
                   )
                 ).catch(err => {});

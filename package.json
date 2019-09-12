@@ -284,7 +284,7 @@
       "artifactName": "${productName}-mac-setup.${ext}"
     },
     "nsis": {
-      "differentialPackage": false
+      "differentialPackage": true
     },
     "win": {
       "target": [

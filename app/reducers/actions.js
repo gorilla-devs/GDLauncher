@@ -97,9 +97,9 @@ export function initNews() {
     };
     const {
       news,
-      loading: { minecraft_news }
+      loading: { minecraftNews }
     } = getState();
-    if (news.length === 0 && !minecraft_news.isRequesting) {
+    if (news.length === 0 && !minecraftNews.isRequesting) {
       try {
         const res = await axios.get(NEWS_URL);
         const newsArr = await Promise.all(
@@ -132,15 +132,22 @@ export function updateAccount(uuid, account) {
       id: uuid,
       account
     });
+    dispatch(updateCurrentAccountId(uuid));
   };
 }
 
 export function removeAccount(id) {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     dispatch({
       type: ActionTypes.REMOVE_ACCOUNT,
       id
     });
+    const { app } = getState();
+    if (app.accounts.length > 0) {
+      dispatch(updateCurrentAccountId(app.accounts[0].selectedProfile.id));
+    } else {
+      dispatch(updateCurrentAccountId(null));
+    }
   };
 }
 
@@ -171,7 +178,6 @@ export function login(username, password, remember) {
       const { data, status } = await minecraftLogin(username, password);
       if (status !== 200) throw new Error();
       dispatch(updateAccount(data.selectedProfile.id, data));
-      dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
       if (!isNewUser) {
         dispatch(push('/home'));
@@ -205,7 +211,6 @@ export function loginWithAccessToken() {
             clientToken
           );
           dispatch(updateAccount(data.selectedProfile.id, data));
-          dispatch(updateCurrentAccountId(data.selectedProfile.id));
           dispatch(push('/home'));
         } catch {
           message.error('Token Not Valid. You Need To Log-In Again :(');
@@ -250,7 +255,6 @@ export function loginThroughNativeLauncher() {
       );
 
       dispatch(updateAccount(data.selectedProfile.id, data));
-      dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
       if (isNewUser) {
         dispatch(updateIsNewUser(false));
