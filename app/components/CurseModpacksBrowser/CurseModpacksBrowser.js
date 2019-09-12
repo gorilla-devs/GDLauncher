@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ContentLoader from 'react-content-loader';
 import _ from 'lodash';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { useDispatch } from 'react-redux';
 import { List, Avatar, Button, Input, Select, Icon } from 'antd';
+import { openModal } from 'reducers/modals/actions';
 import { numberToRoundedWord } from '../../utils/numbers';
 import styles from './CurseModpacksBrowser.scss';
 import { getSearch } from '../../utils/cursemeta';
@@ -15,6 +15,7 @@ function CurseModpacksBrowser(props) {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('Featured');
   const [searchQuery, setSearchQuery] = useState('');
+  const dispatch = useDispatch();
 
   useEffect(() => {
     loadPacks();
@@ -38,16 +39,18 @@ function CurseModpacksBrowser(props) {
       filterType !== 'author' && filterType !== 'name'
     );
     // We now remove the previous 15 elements and add the real 15
-    const mappedData = res && res.map(v => ({
-      loading: false,
-      name: v.name,
-      id: v.id,
-      attachments: v.attachments,
-      summary: v.summary,
-      latestFiles: v.latestFiles,
-      downloadCount: v.downloadCount,
-      authors: v.authors.map(author => author.name)
-    }));
+    const mappedData =
+      res &&
+      res.map(v => ({
+        loading: false,
+        name: v.name,
+        id: v.id,
+        attachments: v.attachments,
+        summary: v.summary,
+        latestFiles: v.latestFiles,
+        downloadCount: v.downloadCount,
+        authors: v.authors.map(author => author.name)
+      }));
 
     const data = reset === true ? mappedData : packs.concat(mappedData);
     setPacks(data || []);
@@ -162,16 +165,16 @@ function CurseModpacksBrowser(props) {
                   </Link>
                 ),
                 !item.loading && (
-                  <Link
-                    to={{
-                      pathname: `/curseModpackExplorerModal/${item.id}`,
-                      state: { modal: true }
-                    }}
+                  <Button
+                    type="primary"
+                    onClick={() =>
+                      dispatch(
+                        openModal('CurseModpackExplorerModal', { id: item.id })
+                      )
+                    }
                   >
-                    <Button type="primary">
-                      Explore <Icon type="arrow-right" />
-                    </Button>
-                  </Link>
+                    Explore <Icon type="arrow-right" />
+                  </Button>
                 )
               ]}
             >
@@ -213,62 +216,62 @@ function CurseModpacksBrowser(props) {
                   />
                 </ContentLoader>
               ) : (
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        src={
-                          item.loading
-                            ? ''
-                            : item.attachments
-                              ? item.attachments[0].thumbnailUrl
-                              : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
-                        }
-                      />
-                    }
-                    title={
-                      <span>
-                        <Link
-                          to={{
-                            pathname: `/curseModpackExplorerModal/${item.id}`,
-                            state: { modal: true }
-                          }}
-                        >
-                          {item.name}
-                        </Link>{' '}
-                        by {item.authors.join(', ')}
-                      </span>
-                    }
-                    description={
-                      item.loading ? (
-                        ''
-                      ) : (
-                          <div>
-                            <span style={{ maxWidth: 'calc(100% - 100px)' }}>
-                              {/* Truncate the text if over 30 words */}
-                              {item.summary.length >= 100
-                                ? `${item.summary.slice(0, 100)}...`
-                                : item.summary}
-                            </span>
-                            <div className={styles.modFooter}>
-                              <span>
-                                Downloads: {numberToRoundedWord(item.downloadCount)}
-                              </span>
-                              <span>
-                                Updated:{' '}
-                                {new Date(
-                                  item.latestFiles[0].fileDate
-                                ).toLocaleDateString('en-US', {
-                                  day: 'numeric',
-                                  month: 'long',
-                                  year: 'numeric'
-                                })}
-                              </span>
-                            </div>
-                          </div>
-                        )
-                    }
-                  />
-                )}
+                <List.Item.Meta
+                  avatar={
+                    <Avatar
+                      src={
+                        item.loading
+                          ? ''
+                          : item.attachments
+                          ? item.attachments[0].thumbnailUrl
+                          : 'https://www.curseforge.com/Content/2-0-6836-19060/Skins/CurseForge/images/anvilBlack.png'
+                      }
+                    />
+                  }
+                  title={
+                    <span>
+                      <Link
+                        to={{
+                          pathname: `/curseModpackExplorerModal/${item.id}`,
+                          state: { modal: true }
+                        }}
+                      >
+                        {item.name}
+                      </Link>{' '}
+                      by {item.authors.join(', ')}
+                    </span>
+                  }
+                  description={
+                    item.loading ? (
+                      ''
+                    ) : (
+                      <div>
+                        <span style={{ maxWidth: 'calc(100% - 100px)' }}>
+                          {/* Truncate the text if over 30 words */}
+                          {item.summary.length >= 100
+                            ? `${item.summary.slice(0, 100)}...`
+                            : item.summary}
+                        </span>
+                        <div className={styles.modFooter}>
+                          <span>
+                            Downloads: {numberToRoundedWord(item.downloadCount)}
+                          </span>
+                          <span>
+                            Updated:{' '}
+                            {new Date(
+                              item.latestFiles[0].fileDate
+                            ).toLocaleDateString('en-US', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  }
+                />
+              )}
             </List.Item>
           )}
         />
@@ -276,6 +279,5 @@ function CurseModpacksBrowser(props) {
     </div>
   );
 }
-
 
 export default CurseModpacksBrowser;

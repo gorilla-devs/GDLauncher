@@ -23,7 +23,10 @@ class Modal extends Component<Props> {
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          background: 'var(--secondary-color-1)',
+          background: this.props.transparentBackground
+            ? 'transparent'
+            : 'var(--secondary-color-1)',
+          position: 'relative',
           ...this.props.style
         }}
       >
@@ -49,7 +52,9 @@ class Modal extends Component<Props> {
                 : '100%'
           }}
         >
-          {this.props.backBtn !== undefined && this.props.backBtn}
+          <span onClick={() => this.props.closeModal()}>
+            {this.props.backBtn !== undefined && this.props.backBtn}
+          </span>
           {this.props.children}
         </div>
       </div>

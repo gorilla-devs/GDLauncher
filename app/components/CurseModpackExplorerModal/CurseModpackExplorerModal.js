@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import ContentLoader from 'react-content-loader';
 import axios from 'axios';
 import { Button } from 'antd';
@@ -33,94 +33,88 @@ const Loader = () => (
 );
 
 export default props => {
-  const { addonID } = props.match.params;
-  const [unMount, setUnMount] = useState(false);
+  const { id: addonID } = props;
   const response = useGetAddon(addonID);
   const description = useGetAddonDescription(addonID);
 
   return (
     <Modal
-      history={props.history}
-      unMount={unMount}
       header="false"
       title="Modpack Explorer"
+      transparentBackground
       backBtn={
         <div className={styles.closeBtn}>
           <FontAwesomeIcon icon={faWindowClose} />
         </div>
       }
-      style={{ height: '80vh', width: '80vw', maxWidth: 1000 }}
+      style={{ height: '100%', width: '100%' }}
     >
       {response && description ? (
-        <div className={styles.container}>
-          <div
-            style={{
-              height: '100%'
-            }}
-            className={styles.overlay}
+        <>
+          <ProgressiveImage
+            src={response.attachments[0].url}
+            placeholder={response.attachments[0].thumbnailUrl}
           >
-            <ProgressiveImage
-              src={response.attachments[0].url}
-              placeholder={response.attachments[0].thumbnailUrl}
-            >
-              {(src, loading) => (
-                <img
-                  style={{
-                    zIndex: -1,
-                    position: 'fixed',
-                    left: 0,
-                    top: 0,
-                    objectFit: 'cover',
-                    height: '100%',
-                    width: '100%'
-                  }}
-                  src={src}
-                />
-              )}
-            </ProgressiveImage>
+            {(src, loading) => (
+              <img
+                alt="background"
+                style={{
+                  zIndex: -1,
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  objectFit: 'cover',
+                  height: '100%',
+                  width: '100%'
+                }}
+                src={src}
+              />
+            )}
+          </ProgressiveImage>
+          <div className={styles.container}>
+            <div className={styles.content}>
+              <h1
+                style={{
+                  fontSize: 60,
+                  fontWeight: 900,
+                  marginTop: 20
+                }}
+              >
+                {response.name}
+              </h1>
+              <span
+                style={{
+                  position: 'relative',
+                  display: 'flex',
+                  justifyContent: 'space-around'
+                }}
+              >
+                <span>
+                  {numberToRoundedWord(response.downloadCount)} downloads
+                </span>
+                <span>
+                  by {response.authors.map(author => author.name).join(', ')}
+                </span>
+                <span>
+                  Updated:{' '}
+                  {new Date(
+                    response.latestFiles[0].fileDate
+                  ).toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </span>
+              </span>
+              <div className={styles.description}>
+                {ReactHtmlParser(description)}
+              </div>
+            </div>
           </div>
-          <h1
-            style={{
-              position: 'relative',
-              top: -150,
-              fontSize: 40,
-              width: '100%',
-              textAlign: 'center'
-            }}
-          >
-            {response.name}
-          </h1>
-          <span
-            style={{
-              position: 'relative',
-              marginTop: -140,
-              display: 'flex',
-              justifyContent: 'space-around'
-            }}
-          >
-            <span>{numberToRoundedWord(response.downloadCount)} downloads</span>
-            <span>
-              by {response.authors.map(author => author.name).join(', ')}
-            </span>
-            <span>
-              Updated:{' '}
-              {new Date(response.latestFiles[0].fileDate).toLocaleDateString(
-                'en-US',
-                {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                }
-              )}
-            </span>
-          </span>
-          <div className={styles.description}>
-            {ReactHtmlParser(description)}
-          </div>
-        </div>
+        </>
       ) : (
-          <Loader />
-        )}
+        <Loader />
+      )}
     </Modal>
   );
 };
