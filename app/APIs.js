@@ -1,5 +1,9 @@
 import axios from 'axios';
-import { LOGIN_API, ACCESS_TOKEN_VALIDATION_URL, ACCESS_TOKEN_REFRESH_URL } from './constants';
+import {
+  LOGIN_API,
+  ACCESS_TOKEN_VALIDATION_URL,
+  ACCESS_TOKEN_REFRESH_URL
+} from './constants';
 
 export const minecraftLogin = (username, password, clientToken) => {
   return axios.post(
@@ -12,10 +16,10 @@ export const minecraftLogin = (username, password, clientToken) => {
       username,
       password,
       clientToken,
-      requestUser: true,
+      requestUser: true
     },
     { headers: { 'Content-Type': 'application/json' } }
-  )
+  );
 };
 
 export const minecraftCheckAccessToken = (accessToken, clientToken) => {

@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 import fss, { promises as fs } from 'fs';
 import { message } from 'antd';
 import axios from 'axios';
-import os from 'os';
+import os, { cpus } from 'os';
 import cheerio from 'cheerio';
 import _, { isEqual, unionBy } from 'lodash';
 import compressing from 'compressing';
@@ -10,9 +10,9 @@ import Promise from 'bluebird';
 import fse from 'fs-extra';
 import log from 'electron-log';
 import path from 'path';
-import { cpus } from 'os';
 import watch from 'node-watch';
 import makeDir from 'make-dir';
+import uuid from 'uuid/v1';
 import { push } from 'connected-react-router';
 import versionCompare from '../utils/versionsCompare';
 import * as ActionTypes from './actionTypes';
@@ -21,7 +21,6 @@ import {
   minecraftCheckAccessToken,
   minecraftRefreshAccessToken
 } from '../APIs';
-import { uuidv4 } from '../utils';
 import { updateJavaArguments } from './settings/actions';
 import launchCommand from '../utils/MCLaunchCommand';
 import {
@@ -172,10 +171,14 @@ export function updateCurrentAccountId(id) {
 export function login(username, password, remember) {
   return async (dispatch, getState) => {
     const {
-      app: { isNewUser }
+      app: { isNewUser, clientToken }
     } = getState();
     try {
-      const { data, status } = await minecraftLogin(username, password);
+      const { data, status } = await minecraftLogin(
+        username,
+        password,
+        clientToken
+      );
       if (status !== 200) throw new Error();
       dispatch(updateAccount(data.selectedProfile.id, data));
 
@@ -196,10 +199,9 @@ export function login(username, password, remember) {
 export function loginWithAccessToken() {
   return async (dispatch, getState) => {
     const state = getState();
-    const {
-      app: { clientToken }
-    } = state;
-    const { accessToken, selectedProfile } = getCurrentAccount(state);
+    const { accessToken, selectedProfile, clientToken } = getCurrentAccount(
+      state
+    );
     try {
       await minecraftCheckAccessToken(accessToken, clientToken);
       dispatch(push('/home'));
@@ -232,7 +234,7 @@ export function loginWithAccessToken() {
 export function loginThroughNativeLauncher() {
   return async (dispatch, getState) => {
     const {
-      app: { clientToken, isNewUser }
+      app: { isNewUser }
     } = getState();
 
     const homedir = process.env.APPDATA || os.homedir();
@@ -241,6 +243,7 @@ export function loginThroughNativeLauncher() {
       path.join(vanillaMCPath, 'launcher_profiles.json')
     );
 
+    const { clientToken } = vnlJson;
     const { account } = vnlJson.selectedUser;
     const { accessToken } = vnlJson.authenticationDatabase[account];
     try {
@@ -290,7 +293,10 @@ export function checkClientToken() {
       app: { clientToken }
     } = getState();
     if (clientToken) return clientToken;
-    const newToken = uuidv4().replace('-', '');
+    const newToken = uuid()
+      .split('')
+      .filter(v => v !== '-')
+      .join('');
     dispatch({
       type: ActionTypes.UPDATE_CLIENT_TOKEN,
       clientToken: newToken

@@ -245,6 +245,7 @@
     "source-map-support": "^0.5.13",
     "styled-components": "^4.3.2",
     "sudo-prompt": "^9.0.0",
+    "uuid": "^3.3.3",
     "version-sort": "^0.1.1",
     "yazl": "^2.5.1"
   },

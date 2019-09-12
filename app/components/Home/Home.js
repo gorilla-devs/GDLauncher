@@ -19,7 +19,10 @@ const Home = props => {
   const [latestInstalled, setLatestInstalled] = useState(false);
   const dispatch = useDispatch();
   const news = useSelector(state => state.news);
-  const latest = useSelector(state => state.app.vanillaManifest.latest.release);
+  const latest = useSelector(
+    state =>
+      state.app.vanillaManifest && state.app.vanillaManifest.latest.release
+  );
   const loading = useSelector(
     state => state.loading.instanceDownload.isRequesting
   );
@@ -91,39 +94,41 @@ const Home = props => {
                 </div>
               </div>
             </Card>
-            <Card
-              style={{
-                height: 170,
-                width: '100%',
-                minWidth: 420,
-                display: 'block',
-                marginTop: 15,
-                textAlign: 'center'
-              }}
-              title={`Try out the new v${latest}`}
-            >
-              V{latest} has just been released. Wanna try it out?
-              {latestBtnClicked || latestInstalled ? (
-                <Link
-                  to="/dmanager"
-                  style={{ display: 'block', margin: '35px auto' }}
-                >
-                  Go to your instances
-                </Link>
-              ) : (
-                <Button
-                  type="primary"
-                  loading={loading}
-                  style={{ display: 'block', margin: '35px auto' }}
-                  onClick={() => {
-                    dispatch(createInstance(latest, latest));
-                    setLatestBtnClicked(true);
-                  }}
-                >
-                  Install and Start v{latest}
-                </Button>
-              )}
-            </Card>
+            {latest && (
+              <Card
+                style={{
+                  height: 170,
+                  width: '100%',
+                  minWidth: 420,
+                  display: 'block',
+                  marginTop: 15,
+                  textAlign: 'center'
+                }}
+                title={`Try out the new v${latest}`}
+              >
+                V{latest} has just been released. Wanna try it out?
+                {latestBtnClicked || latestInstalled ? (
+                  <Link
+                    to="/dmanager"
+                    style={{ display: 'block', margin: '35px auto' }}
+                  >
+                    Go to your instances
+                  </Link>
+                ) : (
+                  <Button
+                    type="primary"
+                    loading={loading}
+                    style={{ display: 'block', margin: '35px auto' }}
+                    onClick={() => {
+                      dispatch(createInstance(latest, latest));
+                      setLatestBtnClicked(true);
+                    }}
+                  >
+                    Install and Start v{latest}
+                  </Button>
+                )}
+              </Card>
+            )}
           </div>
         </div>
       </main>

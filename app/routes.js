@@ -2,6 +2,7 @@
 import React, { Component, lazy, Suspense, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Switch, Route, Redirect } from 'react-router';
+import { push } from 'connected-react-router';
 import { Form, notification } from 'antd';
 import { bindActionCreators } from 'redux';
 import { screen } from 'electron';
@@ -54,13 +55,16 @@ const RouteDef = props => {
       dispatch(initInstances()),
       dispatch(initManifests())
     ]);
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && currentAccountId) {
       dispatch(received(features.accountAuthentication));
+      dispatch(push('/home'));
     } else {
       if (!isAccountValid && currentAccountId) {
         dispatch(
           load(features.accountAuthentication, dispatch(loginWithAccessToken()))
         );
+      } else if (!isAccountValid && !currentAccountId) {
+        dispatch(push('/'));
       }
     }
     findJavaHome().then(result => {
