@@ -28,13 +28,14 @@
   height: calc(100% - 40px);
 }
 
-.header{
+.header {
   position: relative;
   width: 100%;
   height: 30px;
   line-height: 30px;
   padding-left: 10px;
   background: var(--secondary-color-2);
+  border-radius: 4px;
 }
 
 .closeBtn {

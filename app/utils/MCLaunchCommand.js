@@ -1,9 +1,7 @@
 import os from 'os';
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
-import { promisify } from 'util';
 import log from 'electron-log';
-import { connect } from 'react-redux';
 import { findJavaHome } from './javaHelpers';
 import {
   PACKS_PATH,
@@ -14,12 +12,12 @@ import {
 } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
-const getStartCommand = async (packName, userData, settings, javaArguments) => {
+const getStartCommand = async (packName, account, settings) => {
   const instanceConfigJSON = JSON.parse(
-    await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
+    await fs.readFile(path.join(PACKS_PATH, packName, 'config.json'))
   );
   const vanillaJSON = JSON.parse(
-    await promisify(fs.readFile)(
+    await fs.readFile(
       path.join(
         INSTANCES_PATH,
         'versions',
@@ -34,13 +32,13 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
     try {
       // Handling legacy GDLauncher instances without the forge- in the name
       forgeJSON = JSON.parse(
-        await promisify(fs.readFile)(
+        await fs.readFile(
           path.join(META_PATH, 'net.minecraftforge', forge, `${forge}.json`)
         )
       );
     } catch {
       forgeJSON = JSON.parse(
-        await promisify(fs.readFile)(
+        await fs.readFile(
           path.join(
             META_PATH,
             'net.minecraftforge',
@@ -63,52 +61,52 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
     vanillaJSON,
     forgeJSON && JSON.parse(forgeJSON.versionJson),
     packName,
-    userData
+    account
   );
   const mainClass = forge
     ? JSON.parse(forgeJSON.versionJson).mainClass
     : vanillaJSON.mainClass;
 
   const config = JSON.parse(
-    await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
+    await fs.readFile(path.join(PACKS_PATH, packName, 'config.json'))
   );
 
   const completeCMD = `
 
 "${javaPath}" ${config.overrideArgs ||
-    javaArguments} -Xmx${instanceConfigJSON.overrideMemory ||
+    settings.java.args} -Xmx${instanceConfigJSON.overrideMemory ||
     settings.java.memory}m ${dosName} -Djava.library.path="${path.join(
-      PACKS_PATH,
-      packName,
-      'natives'
-    )}"
+    PACKS_PATH,
+    packName,
+    'natives'
+  )}"
   -Dminecraft.client.jar="${path.join(
-      INSTANCES_PATH,
-      'versions',
-      vanillaJSON.id,
-      `${vanillaJSON.id}.jar`
-    )}"
+    INSTANCES_PATH,
+    'versions',
+    vanillaJSON.id,
+    `${vanillaJSON.id}.jar`
+  )}"
  -cp ${libs
-      .filter(lib => !lib.natives)
-      .map(lib => `"${lib.path}"`)
-      .join(CLASSPATH_DIVIDER_CHAR)}${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
-        INSTANCES_PATH,
-        'versions',
-        vanillaJSON.id,
-        `${vanillaJSON.id}.jar`
-      )}"`}
+   .filter(lib => !lib.natives)
+   .map(lib => `"${lib.path}"`)
+   .join(CLASSPATH_DIVIDER_CHAR)}${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
+    INSTANCES_PATH,
+    'versions',
+    vanillaJSON.id,
+    `${vanillaJSON.id}.jar`
+  )}"`}
  ${mainClass} ${Arguments}
   `;
   // We need to hide the access token before printing it to the logs
   log.info(
     completeCMD
       .replace(/\n|\r/g, '')
-      .replace(userData.accessToken, 'HIDDEN_ACCESS_TOKEN')
+      .replace(account.accessToken, 'HIDDEN_ACCESS_TOKEN')
   );
   return completeCMD.replace(/\n|\r/g, '');
 };
 
-const getMCArguments = (vanilla, forge, packName, userData) => {
+const getMCArguments = (vanilla, forge, packName, account) => {
   let Arguments = '';
   if (forge && forge.minecraftArguments) {
     Arguments = forge.minecraftArguments;
@@ -128,8 +126,8 @@ const getMCArguments = (vanilla, forge, packName, userData) => {
     Arguments = `${vanillaArguments} ${forgeArguments}`;
   }
   // Replaces the arguments and returns the result
-  return Arguments.replace('${auth_player_name}', userData.displayName)
-    .replace('${auth_session}', userData.accessToken) // Legacy check for really old versions
+  return Arguments.replace('${auth_player_name}', account.selectedProfile.name)
+    .replace('${auth_session}', account.accessToken) // Legacy check for really old versions
     .replace('${game_directory}', `"${path.join(PACKS_PATH, packName)}"`)
     .replace(
       '${game_assets}',
@@ -149,10 +147,10 @@ const getMCArguments = (vanilla, forge, packName, userData) => {
       )}"`
     )
     .replace('${assets_index_name}', vanilla.assets)
-    .replace('${auth_uuid}', userData.uuid)
-    .replace('${auth_access_token}', userData.accessToken)
+    .replace('${auth_uuid}', account.selectedProfile.id)
+    .replace('${auth_access_token}', account.accessToken)
     .replace('${user_properties}', '{}')
-    .replace('${user_type}', userData.legacy ? 'legacy' : 'mojang')
+    .replace('${user_type}', account.user.legacyUser ? 'legacy' : 'mojang')
     .replace('${version_type}', vanilla.type);
 };
 

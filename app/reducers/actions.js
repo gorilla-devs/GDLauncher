@@ -347,6 +347,8 @@ export function startInstance(instanceName) {
       }
     } = state;
 
+    const account = getCurrentAccount(state);
+
     // Checks for legacy java memory
     const legacyString = [' -Xmx{_RAM_}m', '-Xmx{_RAM_}m'];
     let config = await readConfig(instanceName);
@@ -365,7 +367,7 @@ export function startInstance(instanceName) {
     if (args.includes(legacyString[1]))
       dispatch(updateJavaArguments(args.replace(legacyString[1], '')));
 
-    const command = await launchCommand(instanceName, state);
+    const command = await launchCommand(instanceName, account, state.settings);
 
     const start = spawn(command, [], {
       shell: true,

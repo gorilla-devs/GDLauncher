@@ -27,6 +27,7 @@ class Modal extends Component<Props> {
             ? 'transparent'
             : 'var(--secondary-color-1)',
           position: 'relative',
+          borderRadius: 4,
           ...this.props.style
         }}
       >
