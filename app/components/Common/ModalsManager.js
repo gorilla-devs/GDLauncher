@@ -13,7 +13,17 @@ import ConfirmDeleteModal from '../ConfirmDeleteModal/ConfirmDeleteModal';
 import JavaGlobalOptionsFixModal from '../JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal';
 
 const modalsComponentLookupTable = {
-  Settings
+  Settings,
+  InstanceCreatorModal,
+  CurseModpacksBrowserCreatorModal,
+  CurseModpackExplorerModal,
+  InstanceManagerModal,
+  ImportPack,
+  ExportPackModal,
+  LoginHelperModal,
+  ChangelogsModal,
+  ConfirmDeleteModal,
+  JavaGlobalOptionsFixModal
 };
 
 const ModalsManager = props => {

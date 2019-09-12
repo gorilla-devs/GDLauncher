@@ -28,7 +28,12 @@ import { hideMenu } from 'react-contextmenu/es6/actions';
 import { PACKS_PATH, APPPATH } from '../../constants';
 import styles from './DInstance.scss';
 import InstanceIcon from '../../assets/images/instanceDefault.png';
-import { repairInstance, updateSelectedInstance, startInstance, updatePercentage } from '../../reducers/actions';
+import {
+  repairInstance,
+  updateSelectedInstance,
+  startInstance,
+  updatePercentage
+} from '../../reducers/actions';
 
 export default function DInstance({ name, ...props }) {
   const [version, setVersion] = useState(null);
@@ -38,7 +43,8 @@ export default function DInstance({ name, ...props }) {
   const dispatch = useDispatch();
 
   const playing = useSelector(state => state.startedInstances);
-  const installingQueue = useSelector(state => state.downloadQueue)
+  const selectedInstance = useSelector(state => state.selectedInstance);
+  const installingQueue = useSelector(state => state.downloadQueue);
 
   useEffect(() => {
     updateInstanceConfig();
@@ -52,17 +58,14 @@ export default function DInstance({ name, ...props }) {
 
     return () => {
       clearInterval(interval);
-    }
+    };
   }, []);
-
 
   const updateInstanceConfig = async () => {
     if (!isInstalling()) {
       try {
         const config = JSON.parse(
-          await fs.readFile(
-            path.join(PACKS_PATH, name, 'config.json')
-          )
+          await fs.readFile(path.join(PACKS_PATH, name, 'config.json'))
         );
         const { version, forgeVersion } = config;
 
@@ -71,19 +74,22 @@ export default function DInstance({ name, ...props }) {
           const icon = await fs.readFile(
             path.join(PACKS_PATH, name, config.icon)
           );
-          setIcon(`url("data:image/png;base64,${icon.toString(
-            'base64'
-          )}") center no-repeat`);
+          setIcon(
+            `url("data:image/png;base64,${icon.toString(
+              'base64'
+            )}") center no-repeat`
+          );
         } else {
           setIcon(`url(${InstanceIcon}) center no-repeat`);
         }
         setVersion(version);
-        setForgeversion(forgeVersion === null
-          ? null
-          : forgeVersion.includes('-')
+        setForgeversion(
+          forgeVersion === null
+            ? null
+            : forgeVersion.includes('-')
             ? forgeVersion.split('-')[1]
-            : forgeVersion);
-
+            : forgeVersion
+        );
       } catch (e) {
         setVersion('Error');
         setIsValid(false);
@@ -134,9 +140,9 @@ export default function DInstance({ name, ...props }) {
 
   return (
     <div
-      className={`${playing === name ? styles.selectedItem : ''} ${
+      className={`${selectedInstance === name ? styles.selectedItem : ''} ${
         styles.main
-        }`}
+      }`}
     >
       <ContextMenuTrigger id={`contextMenu-${name}`}>
         <div
@@ -218,7 +224,7 @@ export default function DInstance({ name, ...props }) {
       >
         <span>
           {name} ({version})
-          </span>
+        </span>
         <MenuItem
           disabled={isInstalling() || !isValid}
           onClick={handleClickPlay}
@@ -229,37 +235,39 @@ export default function DInstance({ name, ...props }) {
                 <FontAwesomeIcon icon={faBolt} />
               </span>{' '}
               Kill
-              </div>
+            </div>
           ) : (
-              <div>
-                <span>
-                  <FontAwesomeIcon icon={faPlay} />
-                </span>{' '}
-                Launch
-              </div>
-            )}
+            <div>
+              <span>
+                <FontAwesomeIcon icon={faPlay} />
+              </span>{' '}
+              Launch
+            </div>
+          )}
         </MenuItem>
         <MenuItem
           disabled={isInstalling() || !isValid}
           data={{ foo: 'bar' }}
           onClick={() =>
-            dispatch(push({
-              pathname: `/editInstance/${name}/settings/`,
-              state: { modal: true }
-            }))
+            dispatch(
+              push({
+                pathname: `/editInstance/${name}/settings/`,
+                state: { modal: true }
+              })
+            )
           }
         >
           <span>
             <FontAwesomeIcon icon={faPen} />
           </span>{' '}
           Manage
-          </MenuItem>
+        </MenuItem>
         <MenuItem onClick={() => shell.openItem(path.join(PACKS_PATH, name))}>
           <span>
             <FontAwesomeIcon icon={faFolder} />
           </span>{' '}
           Open Folder
-          </MenuItem>
+        </MenuItem>
         <MenuItem
           onClick={() => {
             exec(
@@ -279,9 +287,9 @@ export default function DInstance({ name, ...props }) {
                         rel="noopener noreferrer"
                       >
                         here
-                        </a>{' '}
+                      </a>{' '}
                       to know more
-                      </span>
+                    </span>
                   );
                 }
               }
@@ -298,7 +306,7 @@ export default function DInstance({ name, ...props }) {
             <FontAwesomeIcon icon={faLink} />
           </span>{' '}
           Create Shortcut
-          </MenuItem>
+        </MenuItem>
         {/* <MenuItem
             disabled={this.isInstalling() || !isValid}
             onClick={() => {}}
@@ -307,53 +315,51 @@ export default function DInstance({ name, ...props }) {
           </MenuItem> */}
         <MenuItem
           disabled={
-            isInstalling() ||
-            !isValid ||
-            playing.find(el => el.name === name)
+            isInstalling() || !isValid || playing.find(el => el.name === name)
           }
           data={{ foo: 'bar' }}
           onClick={() =>
-            dispatch(push({
-              pathname: `/exportPackModal/${name}`,
-              state: { modal: true }
-            }))
+            dispatch(
+              push({
+                pathname: `/exportPackModal/${name}`,
+                state: { modal: true }
+              })
+            )
           }
         >
           <span>
             <FontAwesomeIcon icon={faTruckMoving} />
           </span>{' '}
           Export
-          </MenuItem>
+        </MenuItem>
         <MenuItem
           disabled={
-            isInstalling() ||
-            !isValid ||
-            playing.find(el => el.name === name)
+            isInstalling() || !isValid || playing.find(el => el.name === name)
           }
-        // onClick={() => dispatch(repairInstance(name))}
+          // onClick={() => dispatch(repairInstance(name))}
         >
           <span>
             <FontAwesomeIcon icon={faWrench} />
           </span>{' '}
           Repair
-          </MenuItem>
+        </MenuItem>
         <MenuItem
-          disabled={
-            isInstalling() || playing.find(el => el.name === name)
-          }
+          disabled={isInstalling() || playing.find(el => el.name === name)}
           data={{ foo: 'bar' }}
           onClick={() => {
-            dispatch(push({
-              pathname: `/confirmInstanceDelete/instance/${name}`,
-              state: { modal: true }
-            }))
+            dispatch(
+              push({
+                pathname: `/confirmInstanceDelete/instance/${name}`,
+                state: { modal: true }
+              })
+            );
           }}
         >
           <span>
             <FontAwesomeIcon icon={faTrash} />
           </span>{' '}
           Delete
-          </MenuItem>
+        </MenuItem>
       </ContextMenu>
     </div>
   );

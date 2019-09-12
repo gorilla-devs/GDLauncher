@@ -7,7 +7,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import { bindActionCreators } from 'redux';
-import { connect, useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord, faFacebook } from '@fortawesome/free-brands-svg-icons';
@@ -21,6 +21,7 @@ import styles from './SideBar.scss';
 import { PACKS_PATH } from '../../../constants';
 import { readConfig } from '../../../utils/instances';
 import { getInstance, getCurrentAccount } from '../../../utils/selectors';
+import { openModal } from '../../../reducers/modals/actions';
 
 type Props = {};
 
@@ -29,12 +30,13 @@ const SideBar = props => {
   const selectedInstance = useSelector(state => state.selectedInstance);
   const instance = useSelector(state => getInstance(state));
   const account = useSelector(state => getCurrentAccount(state));
+  const dispatch = useDispatch();
 
   const UpdateSideBar = async () => {
     if (selectedInstance !== null) {
       const data = await readConfig(selectedInstance);
 
-      let mods = instance.mods.length;
+      let mods = (instance.mods || []).length;
 
       try {
         const thumbnail = await promisify(fs.readFile)(
@@ -184,10 +186,11 @@ const SideBar = props => {
           icon={faDiscord}
           url="https://discordapp.com/invite/4cGYzen"
         />
-        <span className={styles.version}>
-          <Link to={{ pathname: '/changelogs', state: { modal: true } }}>
-            v{require('../../../../package.json').version}
-          </Link>
+        <span
+          className={styles.version}
+          onClick={() => dispatch(openModal('ChangelogsModal'))}
+        >
+          v{require('../../../../package.json').version}
         </span>
         {/* eslint-enable */}
       </div>

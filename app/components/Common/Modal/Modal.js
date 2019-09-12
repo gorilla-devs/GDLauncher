@@ -1,9 +1,11 @@
 // @flow
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { closeModal } from '../../../reducers/modals/actions';
 import styles from './Modal.scss';
 
 type Props = {
@@ -15,7 +17,7 @@ type Props = {
   children: React.ReactNode
 };
 
-export default class Modal extends Component<Props> {
+class Modal extends Component<Props> {
   props: Props;
 
   constructor(props) {
@@ -99,17 +101,18 @@ export default class Modal extends Component<Props> {
     });
   }
 
-  // back = e => {
-  //   e.stopPropagation();
-  //   setTimeout(this.unMountStyle, 10); // call the into animiation
-  //   setTimeout(this.props.history.goBack, 220);
-  // };
+  back = e => {
+    e.stopPropagation();
+    setTimeout(this.unMountStyle, 10); // call the into animiation
+
+    setTimeout(() => this.props.closeModal(), 220);
+  };
 
   render() {
     return (
       <div
         className={styles.overlay}
-        onClick={this.props.closeFunc}
+        onClick={this.back}
         style={this.state.bgStyle}
       >
         <div
@@ -122,7 +125,7 @@ export default class Modal extends Component<Props> {
               <h3 style={{ display: 'inline-block' }}>
                 {this.props.title || 'Modal'}
               </h3>
-              <div className={styles.closeBtn} onClick={this.props.closeFunc}>
+              <div className={styles.closeBtn} onClick={this.back}>
                 <FontAwesomeIcon icon={faWindowClose} />
               </div>
             </div>
@@ -136,9 +139,7 @@ export default class Modal extends Component<Props> {
                   : '100%'
             }}
           >
-            {this.props.backBtn !== undefined && (
-              this.props.backBtn
-            )}
+            {this.props.backBtn !== undefined && this.props.backBtn}
             {this.props.children}
           </div>
         </div>
@@ -146,3 +147,8 @@ export default class Modal extends Component<Props> {
     );
   }
 }
+
+export default connect(
+  null,
+  { closeModal }
+)(Modal);

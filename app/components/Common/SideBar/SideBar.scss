@@ -82,10 +82,10 @@
   justify-content: space-between;
 
   .version {
-    a {
-      color: #7f8c8d;
-      padding-right: 9px;
-    }
+    color: #7f8c8d;
+    padding-right: 9px;
+    padding-bottom: 7px;
+    cursor: pointer;
   }
 }
 
