@@ -26,7 +26,7 @@ class Modal extends Component<Props> {
             <h3 style={{ display: 'inline-block' }}>
               {this.props.title || 'Modal'}
             </h3>
-            <div className={styles.closeBtn} onClick={() => closeModal())}>
+            <div className={styles.closeBtn} onClick={() => closeModal()}>
               <FontAwesomeIcon icon={faWindowClose} />
             </div>
           </div>

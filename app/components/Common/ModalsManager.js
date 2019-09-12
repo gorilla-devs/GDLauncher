@@ -62,7 +62,8 @@ const ModalContainer = ({ unmounting, children, style }) => {
     transitionTimingFunction: 'cubic-bezier(0.165, 0.840, 0.440, 1.000)'
   });
   const [bgStyle, setBgStyle] = useState({
-    background: 'rgba(0, 0, 0, 0.90)',
+    background: 'rgba(0, 0, 0, 0.70)',
+    backdropFilter: 'blur(4px)',
     transition: 'all 220ms cubic-bezier(0.165, 0.840, 0.440, 1.000)',
     opacity: 0
   });
@@ -96,7 +97,8 @@ const ModalContainer = ({ unmounting, children, style }) => {
       backfaceVisibility: 'hidden',
       perspective: 1000,
       transform: 'translate3d(0, 0, 0) translateZ(0)',
-      background: 'rgba(0, 0, 0, 0.90)',
+      background: 'rgba(0, 0, 0, 0.70)',
+      backdropFilter: 'blur(0px)',
       transition: 'all 260ms cubic-bezier(0.165, 0.840, 0.440, 1.000)',
       opacity: 0
     });
@@ -117,7 +119,8 @@ const ModalContainer = ({ unmounting, children, style }) => {
       backfaceVisibility: 'hidden',
       perspective: 1000,
       transform: 'translate3d(0, 0, 0) translateZ(0)',
-      background: 'rgba(0, 0, 0, 0.90)',
+      backdropFilter: 'blur(4px)',
+      background: 'rgba(0, 0, 0, 0.70)',
       transition: 'all 220ms cubic-bezier(0.165, 0.840, 0.440, 1.000)'
     });
   };
