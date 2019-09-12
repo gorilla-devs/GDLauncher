@@ -20,7 +20,13 @@ type Props = {
 class Modal extends Component<Props> {
   render() {
     return (
-      <div style={this.props.style}>
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: 'var(--secondary-color-1)',
+          ...this.props.style
+        }}
+      >
         {(this.props.header === undefined || this.props.header === true) && (
           <div className={styles.header}>
             <h3 style={{ display: 'inline-block' }}>

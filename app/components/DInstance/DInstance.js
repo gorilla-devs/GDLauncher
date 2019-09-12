@@ -344,12 +344,7 @@ export default function DInstance({ name, ...props }) {
           disabled={isInstalling() || playing.find(el => el.name === name)}
           data={{ foo: 'bar' }}
           onClick={() => {
-            dispatch(
-              openModal('ConfirmDeleteModal', {
-                name,
-                style: { height: 210, width: 400 }
-              })
-            );
+            dispatch(openModal('ConfirmDeleteModal'));
           }}
         >
           <span>

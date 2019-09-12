@@ -19,23 +19,19 @@ const Overlay = styled.div`
   top: 20px;
   left: 0;
   bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   right: 0;
   z-index: 10000;
 `;
 
 const Modal = styled.div`
   position: absolute;
-  height: 90vh;
-  width: 60vw;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  background: var(--secondary-color-1);
-  border-radius: 2px;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
 `;
 
 const modalsComponentLookupTable = {
@@ -52,9 +48,8 @@ const modalsComponentLookupTable = {
   JavaGlobalOptionsFixModal
 };
 
-const ModalContainer = ({ unmounting, children, style }) => {
+const ModalContainer = ({ unmounting, children }) => {
   const [modalStyle, setModalStyle] = useState({
-    display: 'block',
     transform: 'scale(0)',
     opacity: 0,
     transition: 'all 220ms',
@@ -86,7 +81,6 @@ const ModalContainer = ({ unmounting, children, style }) => {
   const unMountStyle = () => {
     // css for unmount animation
     setModalStyle({
-      display: 'block',
       transform: 'scale(0)',
       opacity: 0,
       transition: 'all 260ms',
@@ -107,7 +101,6 @@ const ModalContainer = ({ unmounting, children, style }) => {
   const mountStyle = () => {
     // css for mount animation
     setModalStyle({
-      display: 'block',
       transform: 'scale(1)',
       opacity: 1,
       transition: 'all 220ms',
@@ -127,13 +120,7 @@ const ModalContainer = ({ unmounting, children, style }) => {
 
   return (
     <Overlay onClick={back} style={bgStyle}>
-      <Modal
-        style={{
-          ...modalStyle,
-          ...style
-        }}
-        onClick={e => e.stopPropagation()}
-      >
+      <Modal style={modalStyle} onClick={back}>
         {children}
       </Modal>
     </Overlay>
@@ -148,7 +135,7 @@ const ModalsManager = props => {
     const ModalComponent = modalsComponentLookupTable[modalType];
 
     return (
-      <ModalContainer unmounting={unmounting} style={modalProps.style}>
+      <ModalContainer unmounting={unmounting}>
         <ModalComponent {...modalProps} key={modalType + index} />
       </ModalContainer>
     );

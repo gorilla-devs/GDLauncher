@@ -12,9 +12,9 @@
 }
 
 .buttons {
-  position: absolute;
+  position: relative;
   width: 100%;
-  bottom: 0;
+  top: 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
