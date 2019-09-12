@@ -188,7 +188,13 @@ const SideBar = props => {
         />
         <span
           className={styles.version}
-          onClick={() => dispatch(openModal('ChangelogsModal'))}
+          onClick={() =>
+            dispatch(
+              openModal('ChangelogsModal', {
+                style: { height: '70vh', width: 540 }
+              })
+            )
+          }
         >
           v{require('../../../../package.json').version}
         </span>

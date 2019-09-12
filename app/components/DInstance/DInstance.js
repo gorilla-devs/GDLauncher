@@ -20,7 +20,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import log from 'electron-log';
 import { push } from 'connected-react-router';
-import { promisify } from 'util';
 import { exec } from 'child_process';
 import { shell } from 'electron';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,9 +30,9 @@ import InstanceIcon from '../../assets/images/instanceDefault.png';
 import {
   repairInstance,
   updateSelectedInstance,
-  startInstance,
-  updatePercentage
+  startInstance
 } from '../../reducers/actions';
+import { openModal } from '../../reducers/modals/actions';
 
 export default function DInstance({ name, ...props }) {
   const [version, setVersion] = useState(null);
@@ -53,8 +52,6 @@ export default function DInstance({ name, ...props }) {
     const interval = setInterval(() => {
       updateInstanceConfig();
     }, 1000);
-
-    const percentage = updatePercentage();
 
     return () => {
       clearInterval(interval);
@@ -348,9 +345,9 @@ export default function DInstance({ name, ...props }) {
           data={{ foo: 'bar' }}
           onClick={() => {
             dispatch(
-              push({
-                pathname: `/confirmInstanceDelete/instance/${name}`,
-                state: { modal: true }
+              openModal('ConfirmDeleteModal', {
+                name,
+                style: { height: 210, width: 400 }
               })
             );
           }}

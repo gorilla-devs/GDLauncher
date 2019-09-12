@@ -1,4 +1,4 @@
-import { OPEN_MODAL, CLOSE_MODAL } from './actionTypes';
+import { OPEN_MODAL, CLOSE_MODAL, UNMOUNTING_MODAL } from './actionTypes';
 
 export function openModal(modalType, modalProps = {}) {
   return {
@@ -9,7 +9,16 @@ export function openModal(modalType, modalProps = {}) {
 }
 
 export function closeModal() {
-  return {
-    type: CLOSE_MODAL
+  return dispatch => {
+    dispatch({
+      type: UNMOUNTING_MODAL
+    });
+    setTimeout(
+      () =>
+        dispatch({
+          type: CLOSE_MODAL
+        }),
+      220
+    );
   };
 }

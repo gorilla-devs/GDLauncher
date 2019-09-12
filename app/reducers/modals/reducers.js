@@ -7,6 +7,14 @@ export default function modals(state = [], action) {
         modalType: action.modalType,
         modalProps: action.modalProps
       });
+    case ActionTypes.UNMOUNTING_MODAL:
+      return [
+        ...state.slice(0, state.length - 1),
+        {
+          ...state[state.length - 1],
+          unmounting: true
+        }
+      ];
     case ActionTypes.CLOSE_MODAL:
       return state.slice(0, state.length - 1);
     default:
