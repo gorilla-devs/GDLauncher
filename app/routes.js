@@ -12,7 +12,7 @@ import {
   initManifests,
   checkClientToken
 } from './reducers/actions';
-import { load } from './reducers/loading/actions';
+import { load, received } from './reducers/loading/actions';
 import features from './reducers/loading/features';
 import { JAVA_URL } from './constants';
 import ga from './GAnalytics';
@@ -34,35 +34,6 @@ const HomePage = lazy(() => import('./components/Home/Home'));
 const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
 const NewUserPage = lazy(() => import('./components/NewUserPage/NewUserPage'));
 
-const InstanceCreatorModal = lazy(() =>
-  import('./components/InstanceCreatorModal/InstanceCreatorModal')
-);
-
-const loginHelperModal = lazy(() =>
-  import('./components/LoginHelperModal/LoginHelperModal')
-);
-const CurseModpacksBrowserCreatorModal = lazy(() =>
-  import(
-    './components/CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal'
-  )
-);
-const CurseModpackExplorerModal = lazy(() =>
-  import('./components/CurseModpackExplorerModal/CurseModpackExplorerModal')
-);
-const ImportPack = lazy(() => import('./components/ImportPack/ImportPack'));
-const ExportPackModal = lazy(() =>
-  import('./components/ExportPackModal/ExportPackModal')
-);
-const ChangelogsModal = lazy(() =>
-  import('./components/ChangelogModal/ChangelogModal')
-);
-const ConfirmDeleteModal = lazy(() =>
-  import('./components/ConfirmDeleteModal/ConfirmDeleteModal')
-);
-const JavaGlobalOptionsFixModal = lazy(() =>
-  import('./components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal')
-);
-
 const RouteDef = props => {
   const [globalJavaOptions, setGlobalJavaOptions] = useState(false);
   const isAccountValid = useSelector(
@@ -83,10 +54,14 @@ const RouteDef = props => {
       dispatch(initInstances()),
       dispatch(initManifests())
     ]);
-    if (!isAccountValid && currentAccountId) {
-      dispatch(
-        load(features.accountAuthentication, dispatch(loginWithAccessToken()))
-      );
+    if (process.env.NODE_ENV === 'development') {
+      dispatch(received(features.accountAuthentication));
+    } else {
+      if (!isAccountValid && currentAccountId) {
+        dispatch(
+          load(features.accountAuthentication, dispatch(loginWithAccessToken()))
+        );
+      }
     }
     findJavaHome().then(result => {
       if (!result) {

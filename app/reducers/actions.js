@@ -185,7 +185,8 @@ export function login(username, password, remember) {
         dispatch(updateIsNewUser(false));
         dispatch(push('/newUserPage'));
       }
-    } catch {
+    } catch (err) {
+      log.error(err);
       message.error('Wrong username or password');
       throw new Error();
     }
@@ -203,6 +204,7 @@ export function loginWithAccessToken() {
       await minecraftCheckAccessToken(accessToken, clientToken);
       dispatch(push('/home'));
     } catch (error) {
+      log.error(error);
       // Trying refreshing the stored access token
       if (error.response && error.response.status === 403) {
         try {
@@ -212,7 +214,8 @@ export function loginWithAccessToken() {
           );
           dispatch(updateAccount(data.selectedProfile.id, data));
           dispatch(push('/home'));
-        } catch {
+        } catch (nestedError) {
+          log.error(error, nestedError);
           message.error('Token Not Valid. You Need To Log-In Again :(');
           dispatch(removeAccount(selectedProfile.id));
           dispatch(push('/'));
