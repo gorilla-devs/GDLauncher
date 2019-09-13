@@ -12,6 +12,8 @@
 .content {
   width: 70%;
   max-width: 1000px;
+  opacity: 0;
+  transition: all 0.2s ease-in;
 }
 
 .description {

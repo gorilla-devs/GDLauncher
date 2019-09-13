@@ -49,72 +49,76 @@ export default props => {
       }
       style={{ height: '100%', width: '100%' }}
     >
-      {response && description ? (
-        <>
-          <ProgressiveImage
-            src={response.attachments[0].url}
-            placeholder={response.attachments[0].thumbnailUrl}
+      <>
+        <ProgressiveImage
+          src={props.images.url}
+          placeholder={props.images.thumbnailUrl}
+        >
+          {(src, loading) => (
+            <img
+              alt="background"
+              style={{
+                zIndex: -1,
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                objectFit: 'cover',
+                height: '100%',
+                width: '100%'
+              }}
+              src={src}
+            />
+          )}
+        </ProgressiveImage>
+        <div className={styles.container}>
+          <div
+            className={styles.content}
+            style={{ opacity: response && description ? 1 : 0 }}
           >
-            {(src, loading) => (
-              <img
-                alt="background"
-                style={{
-                  zIndex: -1,
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  objectFit: 'cover',
-                  height: '100%',
-                  width: '100%'
-                }}
-                src={src}
-              />
-            )}
-          </ProgressiveImage>
-          <div className={styles.container}>
-            <div className={styles.content}>
-              <h1
-                style={{
-                  fontSize: 60,
-                  fontWeight: 900,
-                  marginTop: 20
-                }}
-              >
-                {response.name}
-              </h1>
-              <span
-                style={{
-                  position: 'relative',
-                  display: 'flex',
-                  justifyContent: 'space-around'
-                }}
-              >
-                <span>
-                  {numberToRoundedWord(response.downloadCount)} downloads
-                </span>
-                <span>
-                  by {response.authors.map(author => author.name).join(', ')}
-                </span>
-                <span>
-                  Updated:{' '}
-                  {new Date(
-                    response.latestFiles[0].fileDate
-                  ).toLocaleDateString('en-US', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                  })}
-                </span>
+            <h1
+              style={{
+                fontSize: 60,
+                fontWeight: 900,
+                marginTop: 20
+              }}
+            >
+              {response && response.name}
+            </h1>
+            <span
+              style={{
+                position: 'relative',
+                display: 'flex',
+                justifyContent: 'space-around'
+              }}
+            >
+              <span>
+                {response && numberToRoundedWord(response.downloadCount)}{' '}
+                downloads
               </span>
-              <div className={styles.description}>
-                {ReactHtmlParser(description)}
-              </div>
+              <span>
+                by{' '}
+                {response &&
+                  response.authors.map(author => author.name).join(', ')}
+              </span>
+              <span>
+                Updated:{' '}
+                {response &&
+                  new Date(response.latestFiles[0].fileDate).toLocaleDateString(
+                    'en-US',
+                    {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    }
+                  )}
+              </span>
+            </span>
+            <div className={styles.description}>
+              {description && ReactHtmlParser(description)}
             </div>
           </div>
-        </>
-      ) : (
-        <Loader />
-      )}
+        </div>
+      </>
     </Modal>
   );
 };

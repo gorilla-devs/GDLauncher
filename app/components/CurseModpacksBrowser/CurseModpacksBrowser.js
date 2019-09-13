@@ -169,10 +169,16 @@ function CurseModpacksBrowser(props) {
                     type="primary"
                     onClick={() =>
                       dispatch(
-                        openModal('CurseModpackExplorerModal', { id: item.id })
+                        openModal('CurseModpackExplorerModal', {
+                          id: item.id,
+                          images: item.attachments.find(
+                            attachment => attachment.isDefault
+                          )
+                        })
                       )
                     }
                   >
+                    {console.log(item)}
                     Explore <Icon type="arrow-right" />
                   </Button>
                 )
