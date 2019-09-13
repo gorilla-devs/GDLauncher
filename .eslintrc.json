@@ -4,18 +4,19 @@
     "es6": true,
     "node": true
   },
-  "extends": ["airbnb", "prettier"],
+  "extends": [
+    "airbnb",
+    "prettier",
+    "plugin:flowtype/recommended",
+    "plugin:prettier/recommended",
+    "prettier/flowtype",
+    "prettier/react"
+  ],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 2019,
-    "sourceType": "module"
-  },
+  "parser": "babel-eslint",
   "plugins": [
     "react",
     "prettier",
@@ -44,9 +45,6 @@
     "flowtype/require-return-type": "off",
     "flowtype/require-valid-file-annotation": "off",
     "flowtype/semi": ["error", "always"],
-    "flowtype/space-after-type-colon": ["error", "always"],
-    "flowtype/space-before-generic-bracket": ["error", "never"],
-    "flowtype/space-before-type-colon": ["error", "never"],
     "flowtype/union-intersection-spacing": ["error", "always"],
     "flowtype/use-flow-type": "error",
     "flowtype/valid-syntax": "error",
@@ -57,7 +55,7 @@
     "no-console": "off",
     "no-use-before-define": "off",
     "no-multi-assign": "off",
-    "prettier/prettier": ["error", { "singleQuote": true, "parser": "flow" }],
+    "prettier/prettier": "error",
     "promise/param-names": "error",
     "promise/always-return": "error",
     "promise/catch-or-return": "error",
