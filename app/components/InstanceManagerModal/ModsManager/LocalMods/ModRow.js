@@ -1,7 +1,7 @@
 // @flow
 
 import React, { useMemo, useEffect, useState, memo } from 'react';
-import { areEqual } from "react-window";
+import { areEqual } from 'react-window';
 import { connect, useSelector, useDispatch } from 'react-redux';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -13,10 +13,10 @@ import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
 import { readConfig, updateConfig } from '../../../../utils/instances';
-import { getAddonFiles } from '../../../../utils/cursemeta';
+import { getAddonFiles } from 'app/APIs';
 import { downloadMod } from '../../../../utils/mods';
 import { hasLocalUpdate } from '../../../../utils/selectors';
-import { updateModsManifests } from '../../../../reducers/actions';
+import { updateModsManifests } from 'reducers/actions';
 
 type Props = {
   index: number,
@@ -34,10 +34,12 @@ const ModRow = ({
   modData,
   setFilteredMods,
   instance,
-  addNewModToLatestUpdates,
+  addNewModToLatestUpdates
 }: Props) => {
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(null);
-  const localUpdate = useSelector(state => hasLocalUpdate(modData.projectID)(state));
+  const localUpdate = useSelector(state =>
+    hasLocalUpdate(modData.projectID)(state)
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -48,10 +50,22 @@ const ModRow = ({
         }
       } else {
         getAddonFiles(modData.projectID).then(files => {
-          const filteredFiles = files.filter(v => v.gameVersion.includes(modData.version));
-          dispatch(updateModsManifests({ ...filteredFiles[0], projectID: modData.projectID }));
+          const filteredFiles = files.filter(v =>
+            v.gameVersion.includes(modData.version)
+          );
+          dispatch(
+            updateModsManifests({
+              ...filteredFiles[0],
+              projectID: modData.projectID
+            })
+          );
           const installedMod = files.find(v => v.id === modData.fileID);
-          if (filteredFiles[0] && installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
+          if (
+            filteredFiles[0] &&
+            installedMod &&
+            new Date(installedMod.fileDate) <
+              new Date(filteredFiles[0].fileDate)
+          ) {
             setIsUpdateAvailable(filteredFiles[0]);
           }
         });
@@ -78,11 +92,10 @@ const ModRow = ({
     const config = await readConfig(instance);
     await updateConfig(instance, {
       mods: config.mods.filter(v => v.fileName !== modData.name)
-    })
-
+    });
   };
 
-  const toggleDisableMod = async (enabled) => {
+  const toggleDisableMod = async enabled => {
     if (enabled) {
       await fs.rename(
         path.join(modsFolder, modData.name),
@@ -98,9 +111,16 @@ const ModRow = ({
 
   const updateMod = async () => {
     await deleteMod();
-    const newMod = await downloadMod(modData.projectID, isUpdateAvailable.id, null, instance);
+    const newMod = await downloadMod(
+      modData.projectID,
+      isUpdateAvailable.id,
+      null,
+      instance
+    );
     const instanceCfg = await readConfig(instance);
-    await updateConfig(instance, { mods: [...(instanceCfg.mods || []), newMod] })
+    await updateConfig(instance, {
+      mods: [...(instanceCfg.mods || []), newMod]
+    });
   };
 
   return (
@@ -135,11 +155,13 @@ const ModRow = ({
         </div>
         {modData.name.replace('.disabled', '')}
         <div>
-          {isUpdateAvailable && <FontAwesomeIcon
-            className={styles.updateIcon}
-            icon={faDownload}
-            onClick={() => updateMod()}
-          />}
+          {isUpdateAvailable && (
+            <FontAwesomeIcon
+              className={styles.updateIcon}
+              icon={faDownload}
+              onClick={() => updateMod()}
+            />
+          )}
           <FontAwesomeIcon
             className={styles.deleteIcon}
             icon={faTrash}

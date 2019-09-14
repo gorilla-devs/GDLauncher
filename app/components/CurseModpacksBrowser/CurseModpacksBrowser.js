@@ -2,16 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ContentLoader from 'react-content-loader';
-import _ from 'lodash';
 import { useDispatch } from 'react-redux';
 import { List, Avatar, Button, Input, Select, Icon } from 'antd';
+import { getSearch } from 'app/APIs';
 import { openModal } from 'reducers/modals/actions';
-import { numberToRoundedWord } from '../../utils/numbers';
+import { numberToRoundedWord } from 'app/utils';
 import styles from './CurseModpacksBrowser.scss';
-import { getSearch } from '../../utils/cursemeta';
 
 function CurseModpacksBrowser(props) {
-  const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('Featured');
   const [searchQuery, setSearchQuery] = useState('');

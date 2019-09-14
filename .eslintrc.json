@@ -49,7 +49,7 @@
     "flowtype/use-flow-type": "error",
     "flowtype/valid-syntax": "error",
     "generator-star-spacing": "off",
-    "import/no-unresolved": "error",
+    "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "jsx-a11y/anchor-is-valid": "off",
     "no-console": "off",

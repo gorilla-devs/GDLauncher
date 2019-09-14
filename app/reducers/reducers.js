@@ -20,11 +20,11 @@ function downloadQueue(state = {}, action) {
           percentage: 0,
           version: action.version,
           forgeVersion: action.forgeVersion,
-          addonID: action.addonID,
+          addonID: action.addonID
         }
       };
     case ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE:
-      return _.omitBy(state, obj => obj.name === action.name)
+      return _.omitBy(state, obj => obj.name === action.name);
     case ActionTypes.UPDATE_DOWNLOAD_PROGRESS:
       return {
         ...state,
@@ -76,11 +76,39 @@ function selectedInstance(state = null, action) {
   }
 }
 
+function modpacks(
+  state = { list: [], filter: 'Featured', search: '' },
+  action
+) {
+  switch (action.type) {
+    case ActionTypes.ADD_MODPACKS:
+      return {
+        ...state,
+        list: [...state.list, action.modpacks]
+      };
+    case ActionTypes.UPDATE_MODPACKS_FILTER:
+      return {
+        ...state,
+        filter: action.filter,
+        list: []
+      };
+    case ActionTypes.UPDATE_MODPACKS_SEARCH:
+      return {
+        ...state,
+        search: action.search,
+        list: []
+      };
+    default:
+      return state;
+  }
+}
+
 export default {
   news,
   downloadQueue,
   currentDownload,
   instances,
   startedInstances,
-  selectedInstance
+  selectedInstance,
+  modpacks
 };

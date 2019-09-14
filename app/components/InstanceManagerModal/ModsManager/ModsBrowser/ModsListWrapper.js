@@ -12,7 +12,7 @@ import fs, { readFile } from 'fs';
 import _ from 'lodash';
 import { Button } from 'antd';
 
-import { getAddon, getAddonFiles } from '../../../../utils/cursemeta';
+import { getAddon, getAddonFiles } from 'app/APIs';
 import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 import { PACKS_PATH } from '../../../../constants';
 
@@ -27,33 +27,39 @@ const InstallButtonComponent = ({ mod, installedMods, instance, version }) => {
     e.stopPropagation();
     setIsInstalling(true);
 
-    const file = mod.gameVersionLatestFiles.find(v => v.gameVersion === version);
+    const file = mod.gameVersionLatestFiles.find(
+      v => v.gameVersion === version
+    );
     const { projectFileName, projectFileId } = file;
 
-
-    const newMod = await downloadMod(mod.id, projectFileId, projectFileName, instance);
-    const dependancies = await downloadDependancies(mod.id, projectFileId, instance);
+    const newMod = await downloadMod(
+      mod.id,
+      projectFileId,
+      projectFileName,
+      instance
+    );
+    const dependancies = await downloadDependancies(
+      mod.id,
+      projectFileId,
+      instance
+    );
 
     const instanceCfg = await readConfig(instance);
-    await updateConfig(instance, { mods: [...(instanceCfg.mods || []), newMod, ...dependancies] })
+    await updateConfig(instance, {
+      mods: [...(instanceCfg.mods || []), newMod, ...dependancies]
+    });
   }
 
-  if (!mod || installedMods.mods.find(v => v.projectID === mod.id))
-    return null;
+  if (!mod || installedMods.mods.find(v => v.projectID === mod.id)) return null;
 
   if (isInstalling) {
-    return (
-      <div className={styles.modInstalling}>INSTALLING</div>
-    )
+    return <div className={styles.modInstalling}>INSTALLING</div>;
   }
 
   return (
-    <div
-      className={styles.installMod}
-      onClick={e => downloadModFunc(e, mod)}
-    >
+    <div className={styles.installMod} onClick={e => downloadModFunc(e, mod)}>
       INSTALL&nbsp;
-        <FontAwesomeIcon icon={faDownload} />
+      <FontAwesomeIcon icon={faDownload} />
     </div>
   );
 };
@@ -62,12 +68,22 @@ const InstalledBadgeComponent = ({ mod, installedMods }) => {
   if (!mod || !installedMods.mods.find(v => v.projectID === mod.id))
     return null;
 
-  return (
-    <div className={styles.modInstalled}>INSTALLED</div>
-  );
+  return <div className={styles.modInstalled}>INSTALLED</div>;
 };
 
-const CellComponent = ({ columnIndex, rowIndex, style, height, width, instance, version, items, isItemLoaded, isNextPageLoading, setClick }) => {
+const CellComponent = ({
+  columnIndex,
+  rowIndex,
+  style,
+  height,
+  width,
+  instance,
+  version,
+  items,
+  isItemLoaded,
+  isNextPageLoading,
+  setClick
+}) => {
   if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
     return <div />;
 
@@ -92,14 +108,7 @@ const CellComponent = ({ columnIndex, rowIndex, style, height, width, instance, 
                   height
                 }}
               >
-                <rect
-                  x={0}
-                  y={0}
-                  rx="0"
-                  ry="0"
-                  width={width}
-                  height={height}
-                />
+                <rect x={0} y={0} rx="0" ry="0" width={width} height={height} />
               </ContentLoader>
             )}
           </AutoSizer>
@@ -162,7 +171,6 @@ const ModsListWrapper = ({
   instance,
   version
 }) => {
-
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
 
@@ -226,17 +234,19 @@ const ModsListWrapper = ({
           rowHeight={180}
           width={width}
         >
-          {p => <Cell
-            items={items}
-            height={height}
-            width={width}
-            version={version}
-            instance={instance}
-            isItemLoaded={isItemLoaded}
-            isNextPageLoading={isNextPageLoading}
-            setClick={setClick}
-            {...p} />
-          }
+          {p => (
+            <Cell
+              items={items}
+              height={height}
+              width={width}
+              version={version}
+              instance={instance}
+              isItemLoaded={isItemLoaded}
+              isNextPageLoading={isNextPageLoading}
+              setClick={setClick}
+              {...p}
+            />
+          )}
         </Grid>
       )}
     </InfiniteLoader>
@@ -250,7 +260,6 @@ const mapStateToProps = (state, ownProps) => ({
 const InstalledBadge = connect(mapStateToProps)(InstalledBadgeComponent);
 
 const InstallButton = connect(mapStateToProps)(InstallButtonComponent);
-
 
 const Cell = memo(CellComponent);
 

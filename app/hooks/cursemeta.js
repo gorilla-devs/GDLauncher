@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import log from 'electron-log';
-import { getAddon, getAddonDescription } from '../utils/cursemeta';
+import { getAddon, getAddonDescription } from 'app/APIs';
 
 export const useGetAddon = addonID => {
   const [response, setResponse] = useState(null);

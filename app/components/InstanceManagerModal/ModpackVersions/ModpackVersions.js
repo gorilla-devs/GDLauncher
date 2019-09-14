@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAddon, getAddonFiles, getAddonFileChangelog } from '../../../utils/cursemeta';
+import { getAddon, getAddonFiles, getAddonFileChangelog } from 'app/APIs';
 import { readConfig, updateConfig } from '../../../utils/instances';
 import { Select, Button } from 'antd';
 import Promise from 'bluebird';
@@ -18,18 +18,25 @@ const ModpackVersions = props => {
   const dispatch = useDispatch();
 
   const instances = useSelector(state => state.instancesManager.instances);
-  const ownInstance = instances.find(instance => instance.name === props.instance);
+  const ownInstance = instances.find(
+    instance => instance.name === props.instance
+  );
 
   const initVersions = async () => {
     const addons = await getAddonFiles(ownInstance.projectID);
     const localAddons = [];
-    await Promise.all(addons.map(async addon => {
-      const changelog = await getAddonFileChangelog(ownInstance.projectID, addon.id);
-      localAddons.push({
-        ...addon,
-        changelog
-      });
-    }));
+    await Promise.all(
+      addons.map(async addon => {
+        const changelog = await getAddonFileChangelog(
+          ownInstance.projectID,
+          addon.id
+        );
+        localAddons.push({
+          ...addon,
+          changelog
+        });
+      })
+    );
     const sortedVersions = _.orderBy(localAddons, ['fileDate'], ['desc']);
     setVersions(sortedVersions);
   };
@@ -39,7 +46,6 @@ const ModpackVersions = props => {
     setInstalledVersion(config.modpackVersion);
   };
 
-  
   const removeModpackFiles = async () => {
     const { overrideFiles, mods } = await readConfig(props.instance);
     // Deleting overrides
@@ -47,7 +53,7 @@ const ModpackVersions = props => {
     await Promise.mapSeries(sortedFiles, async file => {
       try {
         const filePath = path.join(PACKS_PATH, props.instance, file);
-        const lstat = await promises.lstat(filePath)
+        const lstat = await promises.lstat(filePath);
         if (lstat.isFile()) {
           await fse.remove(filePath);
         }
@@ -57,25 +63,41 @@ const ModpackVersions = props => {
             await fse.remove(filePath);
           }
         }
-      } catch (err) { }
+      } catch (err) {}
     });
 
     const modpacksMods = mods.filter(mod => mod.isModFromModpack);
     // Deleting old mods
     await Promise.mapSeries(modpacksMods, async mod => {
       try {
-        const filePath = path.join(PACKS_PATH, props.instance, 'mods', mod.fileName);
+        const filePath = path.join(
+          PACKS_PATH,
+          props.instance,
+          'mods',
+          mod.fileName
+        );
         await fse.remove(filePath);
-      } catch (err) { }
+      } catch (err) {}
     });
-    await updateConfig(props.instance, { mods: mods.filter(mod => !mod.isModFromModpack) }, ['overrideFiles']);
+    await updateConfig(
+      props.instance,
+      { mods: mods.filter(mod => !mod.isModFromModpack) },
+      ['overrideFiles']
+    );
   };
-  
+
   const switchVersion = async () => {
     setLoading(true);
-    console.log(versions[selectedVersion])
+    console.log(versions[selectedVersion]);
     await removeModpackFiles();
-    await dispatch(addTwitchModpackToQueue(props.instance, ownInstance.projectID, versions[selectedVersion].id, true));
+    await dispatch(
+      addTwitchModpackToQueue(
+        props.instance,
+        ownInstance.projectID,
+        versions[selectedVersion].id,
+        true
+      )
+    );
 
     setLoading(false);
     props.close();
@@ -85,25 +107,27 @@ const ModpackVersions = props => {
     initVersions();
     initInstalledVersion();
   }, []);
-  
+
   if (versions.length === 0) {
-    return (
-      <div>Loading...</div>
-      )
-    }
-    
-    return (
-      <div style={{
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div
+      style={{
         height: '100%',
         width: '100%'
-    }}>
-      <div style={{
-        display: 'block',
-        margin: '0 auto',
-        width: '80%',
-        height: '100%',
-        textAlign: 'center'
-      }}>
+      }}
+    >
+      <div
+        style={{
+          display: 'block',
+          margin: '0 auto',
+          width: '80%',
+          height: '100%',
+          textAlign: 'center'
+        }}
+      >
         <div>Installed Version: {installedVersion}</div>
         <Select
           size="large"
@@ -119,7 +143,15 @@ const ModpackVersions = props => {
             </Select.Option>
           ))}
         </Select>
-        <div style={{ height: 'calc(100% - 150px)', overflow: 'scroll', overflowX: 'hidden', backgroundColor: 'var(--secondary-color-2)', marginTop: 10 }}>
+        <div
+          style={{
+            height: 'calc(100% - 150px)',
+            overflow: 'scroll',
+            overflowX: 'hidden',
+            backgroundColor: 'var(--secondary-color-2)',
+            marginTop: 10
+          }}
+        >
           <span
             dangerouslySetInnerHTML={{
               __html: versions[selectedVersion].changelog

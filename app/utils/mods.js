@@ -5,11 +5,9 @@ import fs from 'fs';
 import makeDir from 'make-dir';
 import { promisify } from 'util';
 import log from 'electron-log';
-import murmur from 'murmurhash-js';
+import { getAddonFile, getAddon } from 'app/APIs';
 import { downloadFile } from './downloader';
-import { bin2string, isWhitespaceCharacter } from './strings';
 import { PACKS_PATH } from '../constants';
-import { getAddonFile, getAddonFiles, getAddon } from './cursemeta';
 
 // Downloads a specific mod from curse using the addonID and fileID
 export const downloadMod = async (
@@ -32,7 +30,7 @@ export const downloadMod = async (
   await downloadFile(
     path.join(PACKS_PATH, instanceName, 'mods', sanitizedFileName),
     data.downloadUrl,
-    () => { }
+    () => {}
   );
   return {
     projectID: modId,
@@ -84,7 +82,10 @@ export const downloadDependancies = async (
           if (toDownload) {
             const depData = await getAddon(dep.addonId);
 
-            const correctVersion = depData.gameVersionLatestFiles.find(v => v.gameVersion === gameVersion) || {};
+            const correctVersion =
+              depData.gameVersionLatestFiles.find(
+                v => v.gameVersion === gameVersion
+              ) || {};
             const { projectFileId, projectFileName } = correctVersion;
 
             if (Object.keys(correctVersion).length) {
@@ -94,10 +95,13 @@ export const downloadDependancies = async (
                 projectFileName,
                 instanceName
               );
-              const nestedDeps = await downloadDependancies(dep.addonId, projectFileId, instanceName);
+              const nestedDeps = await downloadDependancies(
+                dep.addonId,
+                projectFileId,
+                instanceName
+              );
               deps = deps.concat(downloadedDep).concat(nestedDeps);
             }
-
           }
         }
       })
@@ -130,12 +134,6 @@ export const getModsList = async (
     { concurrency: 20 }
   );
   return mods;
-};
-
-// Create the murmur hash of a mod
-export const getModMurmurHash2 = async modPath => {
-  const file = await promisify(fs.readFile)(modPath);
-  return murmur.murmur2(bin2string(file), 1);
 };
 
 export const createDoNotTouchFile = async instance => {

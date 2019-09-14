@@ -2,8 +2,12 @@ import path from 'path';
 
 export const arraify = s => {
   const pathSplit = s.split(':');
-  const fileName = pathSplit[3] ? `${pathSplit[2]}-${pathSplit[3]}` : pathSplit[2];
-  const finalFileName = fileName.includes('@') ? fileName.replace('@', '.') : `${fileName}.jar`;
+  const fileName = pathSplit[3]
+    ? `${pathSplit[2]}-${pathSplit[3]}`
+    : pathSplit[2];
+  const finalFileName = fileName.includes('@')
+    ? fileName.replace('@', '.')
+    : `${fileName}.jar`;
   const initPath = pathSplit[0]
     .split('.')
     .concat(pathSplit[1])
@@ -32,19 +36,4 @@ export const pathify = s => {
     .concat(pathSplit[2])
     .concat(`${pathSplit[1]}-${pathSplit[2]}.jar`);
   return initPath;
-};
-
-// Converts an array of bytes into a string
-export const bin2string = array => {
-  let result = '';
-  for (let i = 0; i < array.length; ++i) {
-    if (!isWhitespaceCharacter(array[i]))
-      result += String.fromCharCode(array[i]);
-  }
-  return result;
-};
-
-// Returns if a specific byte is a whitespace
-export const isWhitespaceCharacter = b => {
-  return b === 9 || b === 10 || b === 13 || b === 32;
 };

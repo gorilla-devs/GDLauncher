@@ -14,6 +14,7 @@ import watch from 'node-watch';
 import makeDir from 'make-dir';
 import uuid from 'uuid/v1';
 import { push } from 'connected-react-router';
+import { getAddon, getAddonFiles, getAddonFile } from 'app/APIs';
 import versionCompare from '../utils/versionsCompare';
 import * as ActionTypes from './actionTypes';
 import {
@@ -45,13 +46,9 @@ import {
   checkForgeDownloaded,
   getForgeVersionJSON
 } from '../utils/forgeHelpers';
+import { getForgeFileIDFromAddonVersion } from '../utils';
 import { arraify } from '../utils/strings';
 import { downloadFile, downloadArr } from '../utils/downloader';
-import {
-  getAddon,
-  getAddonFileIDFromVersion,
-  getAddonFile
-} from '../utils/cursemeta';
 import { createDoNotTouchFile, downloadMod } from '../utils/mods';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
 import { findJavaHome } from '../utils/javaHelpers';
@@ -587,8 +584,9 @@ export function repairInstance(name) {
     });
     const config = await readConfig(name);
     if (config.projectID) {
-      const fileID = await getAddonFileIDFromVersion(
-        config.projectID,
+      const files = await getAddonFiles(config.projectID);
+      const fileID = await getForgeFileIDFromAddonVersion(
+        files,
         config.modpackVersion
       );
       if (fileID)
@@ -1076,4 +1074,22 @@ function addNextInstanceToCurrentDownload() {
       dispatch(downloadInstance(nextDownload));
     }
   };
+}
+
+export function updateModpacksFilter(filter) {
+  return {
+    type: ActionTypes.UPDATE_MODPACKS_FILTER,
+    filter
+  };
+}
+
+export function updateModpacksSearch(search) {
+  return {
+    type: ActionTypes.UPDATE_MODPACKS_FILTER,
+    search
+  };
+}
+
+export function loadMoreModpacks() {
+  return (dispatch, getState) => {};
 }

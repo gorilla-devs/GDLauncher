@@ -9,14 +9,10 @@ import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { isEqual } from 'lodash';
-import { promisify } from 'util';
 import ModsListWrapper from './ModsListWrapper';
-import { PACKS_PATH } from '../../../../constants';
-import { downloadFile } from '../../../../utils/downloader';
-import { numberToRoundedWord } from '../../../../utils/numbers';
 import ModsListHeader from './ModsListHeader';
 import ModPage from './ModPage';
-import { getSearch } from '../../../../utils/cursemeta';
+import { getSearch } from 'app/APIs';
 
 import styles from './ModsList.scss';
 
@@ -115,7 +111,7 @@ const ModsList = props => {
         version={props.match.params.version}
         instance={props.match.params.instance}
       />
-      {mods.length === 0 && !areModsLoading && searchQuery !== "" && (
+      {mods.length === 0 && !areModsLoading && searchQuery !== '' && (
         <div className={styles.modsNotFound}>
           <div>
             <h1>Oops :|</h1>
@@ -126,7 +122,7 @@ const ModsList = props => {
           </div>
         </div>
       )}
-      {mods.length === 0 && !areModsLoading && searchQuery === "" && (
+      {mods.length === 0 && !areModsLoading && searchQuery === '' && (
         <div className={styles.modsNotFound}>
           <div>
             <h1>Oops :|</h1>
@@ -162,13 +158,12 @@ const ModsList = props => {
   );
 };
 
-
 function mapStateToProps(state) {
   return {};
 }
 
 const MemoizedModsList = memo(ModsList, (prev, next) => {
-  return isEqual(prev.match, next.match)
+  return isEqual(prev.match, next.match);
 });
 
 export default connect(mapStateToProps)(MemoizedModsList);

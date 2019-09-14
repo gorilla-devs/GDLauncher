@@ -1,3 +1,4 @@
+// @flow
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { message, Form, Input, Icon, Button, Select } from 'antd';
@@ -6,19 +7,19 @@ import _ from 'lodash';
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
+import { getAddonFiles, getAddon } from 'app/APIs';
 import { PACKS_PATH } from '../../constants';
 import styles from './CurseModpackBrowserCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';
-import { getAddonFiles, getAddon } from '../../utils/cursemeta';
 import { addTwitchModpackToQueue } from '../../reducers/actions';
 
 type Props = {
-  forgeManifest: Array,
-  versionsManifest: Array
+  forgeManifest: array,
+  versionsManifest: array
 };
 const FormItem = Form.Item;
 
-const CurseModpackBrowserCreatorModal = props => {
+const CurseModpackBrowserCreatorModal = (props: Props) => {
   const { forgeManifest, versionsManifest, match, form } = props;
   const { getFieldDecorator } = form;
   const { addonID } = match.params;
@@ -29,7 +30,10 @@ const CurseModpackBrowserCreatorModal = props => {
   const [instanceName, setInstanceName] = useState('');
 
   const getModPackData = async () => {
-    const [files, addon] = await Promise.all([getAddonFiles(addonID), getAddon(addonID)])
+    const [files, addon] = await Promise.all([
+      getAddonFiles(addonID),
+      getAddon(addonID)
+    ]);
 
     setInstanceName(addon.name);
     setVersions(files);

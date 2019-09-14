@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useRef, Fragment } from 'react';
+import React from 'react';
 import ContentLoader from 'react-content-loader';
-import axios from 'axios';
-import { Button } from 'antd';
-import log from 'electron-log';
 import ReactHtmlParser from 'react-html-parser';
 import ProgressiveImage from 'react-progressive-image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { numberToRoundedWord } from 'app/utils';
 import Modal from '../Common/Modal/Modal';
-import { numberToRoundedWord } from '../../utils/numbers';
 import { useGetAddon, useGetAddonDescription } from '../../hooks/cursemeta';
 import styles from './CurseModpackExplorerModal.scss';
 

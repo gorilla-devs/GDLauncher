@@ -31,6 +31,16 @@
     white-space: pre-wrap;
     overflow-x: hidden;
   }
+  a {
+    font-weight: 900;
+    cursor: pointer;
+    font-style: italic;
+    * {
+      font-weight: 900;
+      cursor: pointer;
+      font-style: italic;
+    }
+  }
   img {
     max-width: 100%;
     height: auto;
