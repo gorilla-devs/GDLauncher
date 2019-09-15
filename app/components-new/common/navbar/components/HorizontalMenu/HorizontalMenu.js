@@ -31,24 +31,10 @@ export default props => {
         </li>
         <li
           className={`${styles.li} ${
-            isLocation('/dmanager') ? styles.activeLink : null
+            isLocation('/modpacks') ? styles.activeLink : null
           }`}
         >
-          <Link to="/dmanager" draggable="false" className={styles.a}>
-            <FontAwesomeIcon icon={faPlay} className={styles.i} />
-            INSTANCES
-          </Link>
-        </li>
-        <li
-          className={`${styles.li} ${
-            isLocation('/curseModpacksBrowser') ? styles.activeLink : null
-          }`}
-        >
-          <Link
-            to="/curseModpacksBrowser"
-            draggable="false"
-            className={styles.a}
-          >
+          <Link to="/modpacks" draggable="false" className={styles.a}>
             <FontAwesomeIcon icon={faThList} className={styles.i} />
             MODPACKS
           </Link>
