@@ -60,33 +60,37 @@ const App = ({ children }) => {
     if (process.env.NODE_ENV === 'development' && currentAccountId) {
       dispatch(received(features.accountAuthentication));
       dispatch(push('/home'));
-    } else {
-      if (!isAccountValid && currentAccountId) {
-        dispatch(
-          load(features.accountAuthentication, dispatch(loginWithAccessToken()))
-        );
-      } else if (!isAccountValid && !currentAccountId) {
-        dispatch(push('/'));
-      }
+    } else if (!isAccountValid && currentAccountId) {
+      dispatch(
+        load(features.accountAuthentication, dispatch(loginWithAccessToken()))
+      );
+    } else if (!isAccountValid && !currentAccountId) {
+      dispatch(push('/'));
     }
-    dispatch(getJavaPath()).then(result => {
-      if (!result) {
-        notification.warning({
-          duration: 0,
-          message: 'JAVA NOT FOUND',
-          description: (
-            <div>
-              Java has not been found. Click{' '}
-              <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">
-                here
-              </a>{' '}
-              to download it. After installing you will need to restart your PC.
-            </div>
-          )
-        });
-      }
-    });
-    isGlobalJavaOptions(dispatch).then(result => setGlobalJavaOptions(result));
+    dispatch(getJavaPath())
+      .then(result => {
+        if (!result) {
+          return notification.warning({
+            duration: 0,
+            message: 'JAVA NOT FOUND',
+            description: (
+              <div>
+                Java has not been found. Click{' '}
+                <a href={JAVA_URL} target="_blank" rel="noopener noreferrer">
+                  here
+                </a>{' '}
+                to download it. After installing you will need to restart your
+                PC.
+              </div>
+            )
+          });
+        }
+        return null;
+      })
+      .catch(log.error);
+    isGlobalJavaOptions(dispatch)
+      .then(result => setGlobalJavaOptions(result))
+      .catch(log.error);
   }, []);
 
   useEffect(() => {
