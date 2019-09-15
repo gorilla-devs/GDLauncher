@@ -12,7 +12,7 @@ import { isEqual } from 'lodash';
 import ModsListWrapper from './ModsListWrapper';
 import ModsListHeader from './ModsListHeader';
 import ModPage from './ModPage';
-import { getSearch } from 'app/APIs';
+import { getSearch } from 'App/APIs';
 
 import styles from './ModsList.scss';
 

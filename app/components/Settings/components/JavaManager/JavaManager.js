@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { bindActionCreators } from 'redux';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Button, Icon, Tooltip, Input } from 'antd';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -11,13 +10,18 @@ import CopyIcon from '../../../Common/CopyIcon/CopyIcon';
 import styles from './JavaManager.scss';
 import SettingCard from '../SettingCard/SettingCard';
 import Title from '../Title/Title';
-import { findJavaHome, checkJavaArch } from '../../../../utils/javaHelpers';
+import { checkJavaArch } from '../../../../utils/java';
 import store from '../../../../localStore';
 import SwitchSetting from '../SwitchSetting/SwitchSetting';
 import SettingInput from '../SettingInput/SettingInput';
 import JavaMemorySlider from './javaMemorySlider';
 import JavaArguments from './JavaArguments';
-import { updateJavaArguments, updateJavaPath, updateJavaMemory } from '../../../../reducers/settings/actions';
+import {
+  updateJavaArguments,
+  updateJavaPath,
+  updateJavaMemory
+} from '../../../../reducers/settings/actions';
+import { getJavaPath } from '../../../../reducers/actions';
 
 function JavaManager(props) {
   const [is64bit, setIs64bit] = useState(true);
@@ -50,14 +54,22 @@ function JavaManager(props) {
       <Title>{t('JavaManagerGlobal', 'Java Manager (Global)')}</Title>
       <SwitchSetting
         mainText={t('AutodetectJavaPath', 'Autodetect Java Path')}
-        description={t('AutodetectJavaPathDescription', 'If enabled, java path will be autodetected')}
+        description={t(
+          'AutodetectJavaPathDescription',
+          'If enabled, java path will be autodetected'
+        )}
         icon="folder"
         checked={!javaPath}
-        onChange={async c => dispatch(updateJavaPath(c, c ? null : await findJavaHome()))}
+        onChange={async c => {
+          const javaP = await dispatch(getJavaPath());
+          dispatch(updateJavaPath(c, c ? null : javaP));
+        }}
       />
       {!javaPath ? null : (
         <div>
-          <span style={{ fontSize: 18 }}>{t('JavaCustomPath', 'Java Custom Path')}</span>
+          <span style={{ fontSize: 18 }}>
+            {t('JavaCustomPath', 'Java Custom Path')}
+          </span>
           <Input
             size="large"
             style={{
@@ -74,7 +86,10 @@ function JavaManager(props) {
                 style={{ color: 'rgba(255,255,255,.8)' }}
               />
             }
-            placeholder={t('IfEmptyGameWontStart', '(If empty, the game won\'t start)')}
+            placeholder={t(
+              'IfEmptyGameWontStart',
+              "(If empty, the game won't start)"
+            )}
             onChange={e => dispatch(updateJavaPath(false, e.target.value))}
             value={javaPath}
           />

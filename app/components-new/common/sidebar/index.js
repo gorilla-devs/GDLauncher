@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import { promisify } from 'util';
-import CIcon from '../Icon/Icon';
+import CIcon from '../../../components/Common/Icon/Icon';
 import SocialIcon from './SocialIcon';
 import vanillaCover from '../../../assets/images/minecraft_vanilla_cover.jpg';
 import forgeIcon from '../../../assets/images/forge_icon.jpg';

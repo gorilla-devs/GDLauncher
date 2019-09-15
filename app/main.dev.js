@@ -108,10 +108,10 @@ if (minimist(process.argv.slice(1)).i) {
 
     mainWindow = new BrowserWindow({
       show: false,
-      width: 930,
-      height: 710,
-      minHeight: 600,
-      minWidth: 900,
+      width: 1000,
+      height: 650,
+      minWidth: 1000,
+      minHeight: 650,
       frame: false,
       backgroundColor: secondaryColor,
       webPreferences: {

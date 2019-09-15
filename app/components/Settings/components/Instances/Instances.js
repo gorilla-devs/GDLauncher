@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, message, Input, Icon } from 'antd';
 import { useTranslation } from 'react-i18next';
 import fsa from 'fs-extra';

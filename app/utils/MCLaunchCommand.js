@@ -2,7 +2,7 @@ import os from 'os';
 import { promises as fs } from 'fs';
 import path from 'path';
 import log from 'electron-log';
-import { findJavaHome } from './javaHelpers';
+import { getJavaPath } from 'Reducers/actions';
 import {
   PACKS_PATH,
   INSTANCES_PATH,
@@ -12,7 +12,7 @@ import {
 } from '../constants';
 import { computeVanillaAndForgeLibraries } from './getMCFilesList';
 
-const getStartCommand = async (packName, account, settings) => {
+const getStartCommand = async (packName, account, settings, dispatch) => {
   const instanceConfigJSON = JSON.parse(
     await fs.readFile(path.join(PACKS_PATH, packName, 'config.json'))
   );
@@ -50,7 +50,7 @@ const getStartCommand = async (packName, account, settings) => {
     }
   }
 
-  const javaPath = await findJavaHome();
+  const javaPath = await dispatch(getJavaPath());
   const dosName =
     os.release().substr(0, 2) === 10
       ? '"-Dos.name=Windows 10" -Dos.version=10.0 '

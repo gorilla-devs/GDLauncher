@@ -1,4 +1,5 @@
 /* eslint global-require: 0 */
+const path = require('path');
 
 const devPlugins = [
   // require('babel-plugin-flow-runtime')
@@ -35,6 +36,18 @@ module.exports = api => {
     ],
     plugins: [
       ...(isDevEnv ? devPlugins : prodPlugins),
+      [
+        require('babel-plugin-module-resolver'),
+        {
+          extensions: ['.js', '.jsx', '.json'],
+          root: ['./app'],
+          alias: {
+            App: path.resolve(__dirname, 'app/'),
+            ui$: path.resolve(__dirname, 'ui/index.js'),
+            Reducers: path.resolve(__dirname, 'app/reducers/')
+          }
+        }
+      ],
 
       require('babel-plugin-styled-components'),
 

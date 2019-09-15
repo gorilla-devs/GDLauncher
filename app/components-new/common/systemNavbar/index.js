@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import styles from './SystemNavBar.scss';
-import WindowCloseBtn from './components/WindowCloseButton/WindowCloseButton';
-import WindowMinimizeBtn from './components/WindowMinimizeButton/WindowMinimizeButton';
-import WindowHideBtn from './components/WindowHideButton/WindowHideButton';
-import OpenDevTools from './components/OpenDevTools/OpenDevTools';
+import WindowCloseBtn from './components/WindowCloseButton';
+import WindowMinimizeBtn from './components/WindowMinimizeButton';
+import WindowHideBtn from './components/WindowHideButton';
+import OpenDevTools from './components/OpenDevTools';
 
 type Props = {};
 export default class SystemNavBar extends Component<Props> {

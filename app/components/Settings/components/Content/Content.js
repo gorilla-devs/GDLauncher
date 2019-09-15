@@ -1,8 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import { Button } from 'antd';
+import { Route } from 'react-router-dom';
 import styles from './Content.scss';
-import MyAccount_Preferences from '../MyAccount_Preferences/MyAccount_Preferences';
+import MyAccountPreferences from '../MyAccount_Preferences/MyAccount_Preferences';
 import Instances from '../Instances/Instances';
 import JavaManager from '../JavaManager/JavaManager';
 // import UserInterface from '../UserInterface/UserInterface';
@@ -13,7 +12,7 @@ const Content = ({ match }) => {
       <div style={{ maxWidth: 700, width: '85%' }}>
         <Route
           path="/settings/myAccount_Preferences"
-          component={MyAccount_Preferences}
+          component={MyAccountPreferences}
         />
         <Route path="/settings/java" component={JavaManager} />
         <Route path="/settings/instances" component={Instances} />

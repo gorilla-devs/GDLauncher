@@ -4,9 +4,9 @@ import axios from 'axios';
 import ContentLoader from 'react-content-loader';
 import { useDispatch } from 'react-redux';
 import { List, Avatar, Button, Input, Select, Icon } from 'antd';
-import { getSearch } from 'app/APIs';
-import { openModal } from 'reducers/modals/actions';
-import { numberToRoundedWord } from 'app/utils';
+import { getSearch } from 'App/APIs';
+import { openModal } from 'Reducers/modals/actions';
+import { numberToRoundedWord } from 'App/utils';
 import styles from './CurseModpacksBrowser.scss';
 
 function CurseModpacksBrowser(props) {

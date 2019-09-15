@@ -4,7 +4,7 @@ import { Menu, Icon, Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faPlay, faThList } from '@fortawesome/free-solid-svg-icons';
-import Badge from '../../../Badge/Badge';
+import Badge from '../../../../../components/Common/Badge/Badge';
 import styles from './HorizontalMenu.scss';
 import logo from '../../../../../assets/images/logo.png';
 
@@ -52,7 +52,7 @@ export default props => {
             <FontAwesomeIcon icon={faThList} className={styles.i} />
             MODPACKS
           </Link>
-        </li>   
+        </li>
       </ul>
     </div>
   );

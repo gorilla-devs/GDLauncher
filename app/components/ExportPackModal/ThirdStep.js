@@ -10,7 +10,7 @@ import { promisify } from 'util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import Promise from 'bluebird';
-import { getAddon } from 'app/APIs';
+import { getAddon } from 'App/APIs';
 import BackButton from './BackButton';
 import styles from './ExportPackModal.scss';
 import { PACKS_PATH } from '../../constants';

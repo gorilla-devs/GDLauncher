@@ -7,7 +7,7 @@ import _ from 'lodash';
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
-import { getAddonFiles, getAddon } from 'app/APIs';
+import { getAddonFiles, getAddon } from 'App/APIs';
 import { PACKS_PATH } from '../../constants';
 import styles from './CurseModpackBrowserCreatorModal.scss';
 import Modal from '../Common/Modal/Modal';

@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect, Provider } from 'react-redux';
+import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 import log from 'electron-log';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ConnectedRouter } from 'connected-react-router';
+import theme from '../../ui/theme';
 import CrashHandler from '../components/CrashHandler/CrashHandler';
-import theme from '../themes';
-import RouteDef from '../routes';
+import App from './App';
 
 type Props = {
   store: object,
@@ -49,7 +48,7 @@ class Root extends Component<Props> {
           <ThemeProvider theme={theme}>
             <div>
               <ConnectedRouter history={history}>
-                <RouteDef history={history} />
+                <App history={history} />
               </ConnectedRouter>
             </div>
           </ThemeProvider>

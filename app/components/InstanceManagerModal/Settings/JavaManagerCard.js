@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Switch, Tooltip } from 'antd';
+import { useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import log from 'electron-log';
 import Card from '../../Common/Card/Card';
 import styles from './JavaManagerCard.scss';
-import { DEFAULT_JAVA_ARGUMENTS, DEFAULT_JAVA_MEMORY } from '../../../constants';
-import { findJavaHome, checkJavaArch } from '../../../utils/javaHelpers';
+import {
+  DEFAULT_JAVA_ARGUMENTS,
+  DEFAULT_JAVA_MEMORY
+} from '../../../constants';
+import { checkJavaArch } from '../../../utils/java';
 import { updateConfig, readConfig } from '../../../utils/instances';
 import JavaMemorySlider from '../../Settings/components/JavaManager/javaMemorySlider';
 import JavaArgInput from '../../Common/JavaArgumentInput';
+import { getJavaPath } from '../../../reducers/actions';
 
 function JavaManagerCard(props) {
   const [is64bit, setIs64bit] = useState(true);
@@ -17,9 +22,12 @@ function JavaManagerCard(props) {
   const [javaArgsSwitchState, setJavaArgsSwitchState] = useState(false);
   const [javaMemorySwitchState, setJavaMemorySwitchState] = useState(false);
   const [overrideJavaMemory, setOverrideJavaMemory] = useState(null);
+  const dispatch = useDispatch();
 
   const resetArgs = async () => {
-    await updateConfig(props.instanceName, { overrideArgs: DEFAULT_JAVA_ARGUMENTS });
+    await updateConfig(props.instanceName, {
+      overrideArgs: DEFAULT_JAVA_ARGUMENTS
+    });
     setOverrideArgsInput(DEFAULT_JAVA_ARGUMENTS);
   };
 
@@ -30,7 +38,7 @@ function JavaManagerCard(props) {
 
   async function configManagement() {
     try {
-      const javaP = await findJavaHome();
+      const javaP = await dispatch(getJavaPath());
       setIs64bit(checkJavaArch(javaP));
       const configFile = await readConfig(props.instanceName);
       if (configFile.overrideMemory) {
@@ -54,7 +62,9 @@ function JavaManagerCard(props) {
   async function toggleJavaArguments(e) {
     try {
       if (e) {
-        await updateConfig(props.instanceName, { overrideArgs: DEFAULT_JAVA_ARGUMENTS });
+        await updateConfig(props.instanceName, {
+          overrideArgs: DEFAULT_JAVA_ARGUMENTS
+        });
         setOverrideArgsInput(DEFAULT_JAVA_ARGUMENTS);
         setJavaArgsSwitchState(true);
       } else if (!e) {

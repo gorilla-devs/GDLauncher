@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 import fss, { promises as fs } from 'fs';
 import { message } from 'antd';
 import axios from 'axios';
@@ -9,18 +9,21 @@ import compressing from 'compressing';
 import Promise from 'bluebird';
 import fse from 'fs-extra';
 import log from 'electron-log';
+import { promisify } from 'util';
 import path from 'path';
 import watch from 'node-watch';
 import makeDir from 'make-dir';
 import uuid from 'uuid/v1';
 import { push } from 'connected-react-router';
-import { getAddon, getAddonFiles, getAddonFile } from 'app/APIs';
 import versionCompare from '../utils/versionsCompare';
 import * as ActionTypes from './actionTypes';
 import {
   minecraftLogin,
   minecraftCheckAccessToken,
-  minecraftRefreshAccessToken
+  minecraftRefreshAccessToken,
+  getAddon,
+  getAddonFiles,
+  getAddonFile
 } from '../APIs';
 import { updateJavaArguments } from './settings/actions';
 import launchCommand from '../utils/MCLaunchCommand';
@@ -31,7 +34,10 @@ import {
   FORGE_PROMOS,
   INSTANCES_PATH,
   META_PATH,
-  GDL_LEGACYJAVAFIXER_MOD_URL
+  GDL_LEGACYJAVAFIXER_MOD_URL,
+  LINUX,
+  DARWIN,
+  WINDOWS
 } from '../constants';
 import { readConfig, updateConfig } from '../utils/instances';
 import { getCurrentAccount } from '../utils/selectors';
@@ -51,7 +57,6 @@ import { arraify } from '../utils/strings';
 import { downloadFile, downloadArr } from '../utils/downloader';
 import { createDoNotTouchFile, downloadMod } from '../utils/mods';
 import { copyAssetsToLegacy, copyAssetsToResources } from '../utils/assets';
-import { findJavaHome } from '../utils/javaHelpers';
 
 export function initManifests() {
   return async dispatch => {
@@ -1022,7 +1027,7 @@ export function downloadInstance(pack, isRepair = false) {
         }
         return arg;
       };
-      const javaPath = await findJavaHome();
+      const javaPath = await dispatch(getJavaPath());
       let i = 0;
       for (const p in processors) {
         i += 1;
@@ -1073,6 +1078,38 @@ function addNextInstanceToCurrentDownload() {
       dispatch(updateCurrentDownload(nextDownload));
       dispatch(downloadInstance(nextDownload));
     }
+  };
+}
+
+export function getJavaPath() {
+  return async (dispatch, getState) => {
+    const {
+      settings: { java }
+    } = getState();
+
+    if (!java.path) {
+      let command = null;
+      switch (os.platform()) {
+        case LINUX:
+        case DARWIN:
+          command = 'which java';
+          break;
+        case WINDOWS:
+          command = 'where java';
+          break;
+        default:
+          break;
+      }
+      try {
+        const { stdout } = await promisify(exec)(command);
+        // This returns the first path found
+        return stdout.split('\n')[0];
+      } catch (e) {
+        log.info(`Could not find java path: ${e.message}`);
+        return null;
+      }
+    }
+    return Promise.resolve(java.path);
   };
 }
 
