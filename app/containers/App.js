@@ -29,13 +29,26 @@ import { isGlobalJavaOptions } from 'app/utils/java';
 import ModalsManager from 'app/components/Common/ModalsManager';
 
 const Wrapper = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
   .switch-wrapper {
     position: relative;
+    width: 100%;
+    height: 100%;
   }
 
   .switch-wrapper > div {
     position: absolute;
+    width: 100%;
+    height: 100%;
   }
+`;
+
+const RouteContainer = styled.div`
+  position: relative;
+  width: calc(100% - ${props => props.theme.sidebarWidth});
+  height: 100%;
 `;
 
 const GlobalBackground = styled.div`
@@ -47,13 +60,15 @@ const GlobalBackground = styled.div`
 
 function RouteWithSubRoutes(route) {
   return (
-    <Route
-      path={route.path}
-      render={props => (
-        // pass the sub-routes down to keep nesting
-        <route.component {...props} routes={route.routes} />
-      )}
-    />
+    <RouteContainer>
+      <Route
+        path={route.path}
+        render={props => (
+          // pass the sub-routes down to keep nesting
+          <route.component {...props} routes={route.routes} />
+        )}
+      />
+    </RouteContainer>
   );
 }
 
