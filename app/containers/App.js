@@ -34,8 +34,13 @@ const Wrapper = styled.div`
   height: 100%;
   .switch-wrapper {
     position: relative;
-    width: 100%;
-    height: 100%;
+    position: relative;
+    width: calc(100% - ${props => props.theme.sizes.width.sidebar} - 40px);
+    height: calc(
+      100% - 40px - ${props => props.theme.sizes.height.systemNavbar} -
+        ${props => props.theme.sizes.height.navbar}
+    );
+    margin: 20px;
   }
 
   .switch-wrapper > div {
@@ -43,16 +48,6 @@ const Wrapper = styled.div`
     width: 100%;
     height: 100%;
   }
-`;
-
-const RouteContainer = styled.div`
-  position: relative;
-  width: calc(100% - ${props => props.theme.sizes.width.sidebar} - 40px);
-  height: calc(
-    100% - 40px - ${props => props.theme.sizes.height.systemNavbar} -
-      ${props => props.theme.sizes.height.navbar}
-  );
-  margin: 20px;
 `;
 
 const GlobalBackground = styled.div`
@@ -64,15 +59,13 @@ const GlobalBackground = styled.div`
 
 function RouteWithSubRoutes(route) {
   return (
-    <RouteContainer>
-      <Route
-        path={route.path}
-        render={props => (
-          // pass the sub-routes down to keep nesting
-          <route.component {...props} routes={route.routes} />
-        )}
-      />
-    </RouteContainer>
+    <Route
+      path={route.path}
+      render={props => (
+        // pass the sub-routes down to keep nesting
+        <route.component {...props} routes={route.routes} />
+      )}
+    />
   );
 }
 
