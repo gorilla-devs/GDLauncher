@@ -47,8 +47,12 @@ const Wrapper = styled.div`
 
 const RouteContainer = styled.div`
   position: relative;
-  width: calc(100% - ${props => props.theme.sidebarWidth});
-  height: 100%;
+  width: calc(100% - ${props => props.theme.sizes.width.sidebar} - 40px);
+  height: calc(
+    100% - 40px - ${props => props.theme.sizes.height.systemNavbar} -
+      ${props => props.theme.sizes.height.navbar}
+  );
+  margin: 20px;
 `;
 
 const GlobalBackground = styled.div`
