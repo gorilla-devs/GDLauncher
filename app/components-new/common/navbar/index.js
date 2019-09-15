@@ -5,10 +5,16 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faHome, faThList } from '@fortawesome/free-solid-svg-icons';
 import logo from 'App/assets/images/logo.png';
-import styles from './NavigationBar.scss';
-import HorizontalMenu from './components/HorizontalMenu/HorizontalMenu';
+import {
+  Container,
+  Logo,
+  SettingsButton,
+  UpdateButton,
+  NavigationContainer,
+  NavigationElement
+} from './style';
 
 export default props => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -23,29 +29,51 @@ export default props => {
     }
   }, []);
 
+  const isLocation = loc => {
+    if (loc === location) {
+      return true;
+    }
+    return false;
+  };
+
   return (
-    <div className={styles.container}>
-      <div className={styles.logoText}>
-        <img src={logo} height="40px" alt="logo" draggable="false" />
-      </div>
-      <HorizontalMenu location={location} />
-      <Link
-        to={{
-          pathname: '/settings/myAccount_Preferences',
-          state: { modal: true }
-        }}
-      >
-        <FontAwesomeIcon icon={faCog} className={styles.settings} />
-      </Link>
+    <Container>
+      <NavigationContainer>
+        {/* <img src={logo} height="40px" alt="logo" draggable="false" /> */}
+        <ul>
+          <NavigationElement selected={isLocation('/home')}>
+            <Link to="/home" draggable="false">
+              <FontAwesomeIcon icon={faHome} />
+              HOME
+            </Link>
+          </NavigationElement>
+          <NavigationElement selected={isLocation('/modpacks')}>
+            <Link to="/modpacks" draggable="false">
+              <FontAwesomeIcon icon={faThList} />
+              MODPACKS
+            </Link>
+          </NavigationElement>
+        </ul>
+      </NavigationContainer>
+      <SettingsButton>
+        <Link
+          to={{
+            pathname: '/settings/myAccount_Preferences',
+            state: { modal: true }
+          }}
+        >
+          <FontAwesomeIcon icon={faCog} />
+        </Link>
+      </SettingsButton>
       {updateAvailable && (
-        <div className={styles.updateAvailable}>
+        <UpdateButton>
           <Link to="/autoUpdate">
             <Button type="primary" size="small" style={{ marginLeft: 5 }}>
               Update Available
             </Button>
           </Link>
-        </div>
+        </UpdateButton>
       )}
-    </div>
+    </Container>
   );
 };
