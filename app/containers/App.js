@@ -38,6 +38,13 @@ const Wrapper = styled.div`
   }
 `;
 
+const GlobalBackground = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: green;
+`;
+
 function RouteWithSubRoutes(route) {
   return (
     <Route
@@ -140,6 +147,7 @@ const App = ({ children }) => {
     <Wrapper>
       <GlobalStyles />
       <SysNavBar />
+      <GlobalBackground />
       <ModalsManager />
       {!isFullScreenPage && (
         <>
