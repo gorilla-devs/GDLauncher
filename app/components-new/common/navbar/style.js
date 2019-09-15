@@ -54,7 +54,6 @@ export const NavigationContainer = styled.div`
 export const NavigationElement = styled.li`
   display: inline;
   cursor: pointer;
-  ${props => console.log(props)}
   ${props =>
     props.selected
       ? `

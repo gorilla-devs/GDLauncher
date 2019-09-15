@@ -4,7 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Route, Switch } from 'react-router';
 import { push } from 'connected-react-router';
 import { notification } from 'antd';
+import { AnimatedSwitch } from 'react-router-transition';
 import log from 'electron-log';
+import styled from 'styled-components';
 import { JAVA_URL } from 'App/constants';
 import {
   initInstances,
@@ -25,6 +27,16 @@ import Navigation from 'App/components-new/common/navbar';
 import SysNavBar from 'App/components-new/common/systemNavbar';
 import { isGlobalJavaOptions } from 'App/utils/java';
 import ModalsManager from 'App/components/Common/ModalsManager';
+
+const Wrapper = styled.div`
+  .switch-wrapper {
+    position: relative;
+  }
+
+  .switch-wrapper > div {
+    position: absolute;
+  }
+`;
 
 function RouteWithSubRoutes(route) {
   return (
@@ -125,7 +137,7 @@ const App = ({ children }) => {
     location.pathname === '/newUserPage';
 
   return (
-    <>
+    <Wrapper>
       <GlobalStyles />
       <SysNavBar />
       <ModalsManager />
@@ -135,12 +147,17 @@ const App = ({ children }) => {
           <SideBar />
         </>
       )}
-      <Switch>
+      <AnimatedSwitch
+        atEnter={{ opacity: 0 }}
+        atLeave={{ opacity: 0 }}
+        atActive={{ opacity: 1 }}
+        className="switch-wrapper"
+      >
         {routes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}
-      </Switch>
-    </>
+      </AnimatedSwitch>
+    </Wrapper>
   );
 };
 
