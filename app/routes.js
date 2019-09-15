@@ -8,11 +8,11 @@ function WaitingComponent(MyComponent) {
   );
 }
 
-const Login = lazy(() => import('App/components-new/views/login'));
-const HomePage = lazy(() => import('App/components-new/views/home'));
+const Login = lazy(() => import('app/components-new/views/login'));
+const HomePage = lazy(() => import('app/components-new/views/home'));
 // const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
 // const NewUserPage = lazy(() => import('./components/NewUserPage/NewUserPage'));
-const Modpacks = lazy(() => import('App/components-new/views/modpacks'));
+const Modpacks = lazy(() => import('app/components-new/views/modpacks'));
 
 const routes = [
   {

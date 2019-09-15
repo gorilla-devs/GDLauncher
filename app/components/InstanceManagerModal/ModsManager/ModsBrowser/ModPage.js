@@ -16,7 +16,7 @@ import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 
 import styles from './ModPage.scss';
 import colors from '../../../../style/theme/colors.scss';
-import { getAddon, getAddonFiles, getAddonDescription } from 'App/APIs';
+import { getAddon, getAddonFiles, getAddonDescription } from 'app/APIs';
 
 function ModPage(props) {
   const [modData, setModData] = useState(null);

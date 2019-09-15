@@ -5,7 +5,7 @@ import fs from 'fs';
 import makeDir from 'make-dir';
 import { promisify } from 'util';
 import log from 'electron-log';
-import { getAddonFile, getAddon } from 'App/APIs';
+import { getAddonFile, getAddon } from 'app/APIs';
 import { downloadFile } from './downloader';
 import { PACKS_PATH } from '../constants';
 

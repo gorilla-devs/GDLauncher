@@ -4,7 +4,7 @@ import ReactHtmlParser from 'react-html-parser';
 import ProgressiveImage from 'react-progressive-image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
-import { numberToRoundedWord } from 'App/utils';
+import { numberToRoundedWord } from 'app/utils';
 import Modal from '../Common/Modal/Modal';
 import { useGetAddon, useGetAddonDescription } from '../../hooks/cursemeta';
 import styles from './CurseModpackExplorerModal.scss';

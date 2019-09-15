@@ -12,7 +12,7 @@ import fs, { readFile } from 'fs';
 import _ from 'lodash';
 import { Button } from 'antd';
 
-import { getAddon, getAddonFiles } from 'App/APIs';
+import { getAddon, getAddonFiles } from 'app/APIs';
 import { downloadMod, downloadDependancies } from '../../../../utils/mods';
 import { PACKS_PATH } from '../../../../constants';
 

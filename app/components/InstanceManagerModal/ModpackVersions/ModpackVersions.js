@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAddon, getAddonFiles, getAddonFileChangelog } from 'App/APIs';
+import { getAddon, getAddonFiles, getAddonFileChangelog } from 'app/APIs';
 import { readConfig, updateConfig } from '../../../utils/instances';
 import { Select, Button } from 'antd';
 import Promise from 'bluebird';

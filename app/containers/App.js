@@ -7,7 +7,7 @@ import { notification } from 'antd';
 import { AnimatedSwitch } from 'react-router-transition';
 import log from 'electron-log';
 import styled from 'styled-components';
-import { JAVA_URL } from 'App/constants';
+import { JAVA_URL } from 'app/constants';
 import {
   initInstances,
   initNews,
@@ -15,18 +15,18 @@ import {
   initManifests,
   checkClientToken,
   getJavaPath
-} from 'Reducers/actions';
-import routes from 'App/routes';
-import { load, received } from 'Reducers/loading/actions';
-import features from 'Reducers/loading/features';
-import ga from 'App/GAnalytics';
-import GlobalStyles from 'App/globalStyles';
-import 'App/app.global.scss';
-import SideBar from 'App/components-new/common/sidebar';
-import Navigation from 'App/components-new/common/navbar';
-import SysNavBar from 'App/components-new/common/systemNavbar';
-import { isGlobalJavaOptions } from 'App/utils/java';
-import ModalsManager from 'App/components/Common/ModalsManager';
+} from 'reducers/actions';
+import routes from 'app/routes';
+import { load, received } from 'reducers/loading/actions';
+import features from 'reducers/loading/features';
+import ga from 'app/GAnalytics';
+import GlobalStyles from 'app/globalStyles';
+import 'app/app.global.scss';
+import SideBar from 'app/components-new/common/sidebar';
+import Navigation from 'app/components-new/common/navbar';
+import SysNavBar from 'app/components-new/common/systemNavbar';
+import { isGlobalJavaOptions } from 'app/utils/java';
+import ModalsManager from 'app/components/Common/ModalsManager';
 
 const Wrapper = styled.div`
   .switch-wrapper {

@@ -34,7 +34,7 @@ node_modules
 flow-typed/npm/*
 !flow-typed/npm/module_vx.x.x.js
 
-# App packaged
+# app packaged
 release
 app/main.prod.js
 app/main.prod.js.map

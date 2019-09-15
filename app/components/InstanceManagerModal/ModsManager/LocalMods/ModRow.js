@@ -13,10 +13,10 @@ import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
 import { readConfig, updateConfig } from '../../../../utils/instances';
-import { getAddonFiles } from 'App/APIs';
+import { getAddonFiles } from 'app/APIs';
 import { downloadMod } from '../../../../utils/mods';
 import { hasLocalUpdate } from '../../../../utils/selectors';
-import { updateModsManifests } from 'Reducers/actions';
+import { updateModsManifests } from 'reducers/actions';
 
 type Props = {
   index: number,

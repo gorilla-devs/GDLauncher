@@ -2,7 +2,7 @@ import os from 'os';
 import { promises as fs } from 'fs';
 import path from 'path';
 import log from 'electron-log';
-import { getJavaPath } from 'Reducers/actions';
+import { getJavaPath } from 'reducers/actions';
 import {
   PACKS_PATH,
   INSTANCES_PATH,
