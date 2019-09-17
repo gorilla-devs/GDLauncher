@@ -8,10 +8,10 @@ import { go } from 'connected-react-router';
 import fs from 'fs';
 import fsa from 'fs-extra';
 import { promisify } from 'util';
+import { closeModal } from 'reducers/modals/actions';
 import styles from './ConfirmDeleteModal.scss';
 import Modal from '../Common/Modal/Modal';
 import { PACKS_PATH, SERVERS_PATH } from '../../constants';
-import { closeModal } from '../../reducers/modals/actions';
 
 type Props = {};
 

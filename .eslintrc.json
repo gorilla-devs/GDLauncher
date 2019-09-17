@@ -16,6 +16,18 @@
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
+  "settings": {
+    "import/resolver": {
+      "alias": {
+        "map": [
+          ["ui$", "./ui"],
+          ["app", "./app"],
+          ["reducers", "./app/reducers"]
+        ],
+        "extensions": [".js", ".jsx", ".json"]
+      }
+    }
+  },
   "parser": "babel-eslint",
   "plugins": [
     "react",
@@ -49,7 +61,7 @@
     "flowtype/use-flow-type": "error",
     "flowtype/valid-syntax": "error",
     "generator-star-spacing": "off",
-    "import/no-unresolved": "off",
+    "import/no-unresolved": "error",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "jsx-a11y/anchor-is-valid": "off",
     "no-console": "off",
