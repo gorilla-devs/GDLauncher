@@ -1,20 +1,20 @@
 // @flow
 import React, { useState, useEffect } from 'react';
-import { Button } from 'antd';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog, faHome, faThList } from '@fortawesome/free-solid-svg-icons';
-import logo from 'app/assets/images/logo.png';
+import logo from '../../../assets/images/logo.png';
 import {
   Container,
-  Logo,
+  // Logo,
   SettingsButton,
   UpdateButton,
   NavigationContainer,
   NavigationElement
 } from './style';
+import { Button } from 'ui';
 
 export default props => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -37,23 +37,37 @@ export default props => {
   };
 
   return (
-    <Container>
+    <Container style={{ background: 'red' }}>
+      <img
+        src={logo}
+        height="30px"
+        alt="logo"
+        draggable="false"
+        style={{ zIndex: 9999999999999 }}
+      />
       <NavigationContainer>
-        {/* <img src={logo} height="40px" alt="logo" draggable="false" /> */}
-        <ul>
+        <NavigationElement>
+          <Link to="/home" draggable="false">
+            <Button selected={isLocation('/home')}>Home</Button>
+          </Link>
+        </NavigationElement>
+        <NavigationElement>
+          <Link to="/modpacks" draggable="false">
+            <Button selected={isLocation('/modpacks')}>ModPacks</Button>
+          </Link>
+        </NavigationElement>
+        {/* <ul>
           <NavigationElement selected={isLocation('/home')}>
             <Link to="/home" draggable="false">
-              <FontAwesomeIcon icon={faHome} />
-              HOME
+              Home
             </Link>
           </NavigationElement>
           <NavigationElement selected={isLocation('/modpacks')}>
             <Link to="/modpacks" draggable="false">
-              <FontAwesomeIcon icon={faThList} />
-              MODPACKS
+              ModPacks
             </Link>
           </NavigationElement>
-        </ul>
+        </ul> */}
       </NavigationContainer>
       <SettingsButton>
         <Link

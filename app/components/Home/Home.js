@@ -13,6 +13,10 @@ import News from './components/News/News';
 import Card from '../Common/Card/Card';
 import { getCurrentAccount } from '../../utils/selectors';
 import { createInstance } from '../../reducers/actions';
+import GDInput from '../../components/Common/Input/Input';
+import GDButton from '../../components/Common/Button/Button';
+import GDSwitch from '../../components/Common/Switch/Switch';
+import GDCheckBox from '../../components/Common/CheckBox/CheckBox';
 
 const Home = props => {
   const [latestBtnClicked, setLatestBtnClicked] = useState(false);
@@ -115,17 +119,23 @@ const Home = props => {
                     Go to your instances
                   </Link>
                 ) : (
-                  <Button
-                    type="primary"
-                    loading={loading}
-                    style={{ display: 'block', margin: '35px auto' }}
-                    onClick={() => {
-                      dispatch(createInstance(latest, latest));
-                      setLatestBtnClicked(true);
-                    }}
-                  >
-                    Install and Start v{latest}
-                  </Button>
+                  // <Button
+                  //   type="primary"
+                  //   loading={loading}
+                  //   style={{ display: 'block', margin: '35px auto' }}
+                  //   onClick={() => {
+                  //     dispatch(createInstance(latest, latest));
+                  //     setLatestBtnClicked(true);
+                  //   }}
+                  // >
+                  //   Install and Start v{latest}
+                  // </Button>
+                  <div>
+                    {/* <GDInput placeholder="ciao" />
+                    <GDButton>Home</GDButton>
+                    <GDSwitch />
+                    <GDCheckBox /> */}
+                  </div>
                 )}
               </Card>
             )}

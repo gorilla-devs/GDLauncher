@@ -27,20 +27,22 @@ import Navigation from 'app/components-new/common/navbar';
 import SysNavBar from 'app/components-new/common/systemNavbar';
 import { isGlobalJavaOptions } from 'app/utils/java';
 import ModalsManager from 'app/components/Common/ModalsManager';
+import background from '../assets/images/fullHdBackground.jpg';
 
 const Wrapper = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
   .switch-wrapper {
-    position: relative;
+    background: red;
     position: relative;
     width: calc(100% - ${props => props.theme.sizes.width.sidebar} - 40px);
     height: calc(
-      100% - 40px - ${props => props.theme.sizes.height.systemNavbar} -
+      100% - 20px - ${props => props.theme.sizes.height.systemNavbar} -
         ${props => props.theme.sizes.height.navbar}
     );
     margin: 20px;
+    margin-top: 10px;
   }
 
   .switch-wrapper > div {
@@ -54,7 +56,7 @@ const GlobalBackground = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: green;
+  background-image: url(${background});
 `;
 
 function RouteWithSubRoutes(route) {

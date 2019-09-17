@@ -64,7 +64,7 @@ const SideBar = props => {
   }, [selectedInstance]);
 
   return (
-    <aside className={styles.sidenav}>
+    <aside className={styles.sidenav} style={{ background: '#1C242D' }}>
       <div className={styles.account}>
         <div className={styles.header}>
           <span>
@@ -120,7 +120,7 @@ const SideBar = props => {
               style={{
                 position: 'relative',
                 top: 30,
-                background: '#c0392b',
+                background: '#212B36',
                 width: 150,
                 height: 30,
                 display: 'flex',
