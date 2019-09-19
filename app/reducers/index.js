@@ -6,15 +6,14 @@ import loading from './loading/reducers';
 import modals from './modals/reducers';
 import settings from './settings/reducers';
 
-
 const createRootReducer = history =>
   combineReducers({
     ...reducers,
     loading,
     modals,
     app, // persisted
-    settings,  // persisted
-    router: connectRouter(history),
+    settings, // persisted
+    router: connectRouter(history)
   });
 
 export default createRootReducer;

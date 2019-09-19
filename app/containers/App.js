@@ -34,7 +34,6 @@ const Wrapper = styled.div`
   width: 100%;
   height: 100%;
   .switch-wrapper {
-    background: red;
     position: relative;
     width: calc(100% - ${props => props.theme.sizes.width.sidebar} - 40px);
     height: calc(

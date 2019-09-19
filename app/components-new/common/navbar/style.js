@@ -7,7 +7,6 @@ export const Container = styled.div`
   -webkit-user-select: none;
   display: flex;
   justify-content: space-between;
-  background: red;
 `;
 
 export const SettingsButton = styled.div`

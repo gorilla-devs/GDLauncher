@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button } from 'ui';
+import { Button, News } from 'ui';
+import { useSelector } from 'react-redux';
+// const news = useSelector(state => state.news);
 
 export default () => {
   return (
@@ -9,7 +11,7 @@ export default () => {
         width: '100%',
         // left: '50%',
         height: '100%',
-        backgroundColor: 'yellow',
+        // backgroundColor: 'yellow',
         padding: '0px 10px 10px 10px'
       }}
     >
@@ -40,7 +42,7 @@ export default () => {
             marginBottom: 10
           }}
         >
-          prova
+          <News />
         </div>
         <div
           style={{
