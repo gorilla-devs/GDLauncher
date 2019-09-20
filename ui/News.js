@@ -44,21 +44,50 @@ const Select = styled.div`
   left: 50%;
   margin-left: -79px;
 `;
+
 const SelectElement = styled.div`
   width: 16px;
   height: 5px;
+  flex: 1;
+  margin: 0 2px 0 2px;
   display: block;
   text-decorations: none;
-  background: #f0f0f1;
+  background: ${props => props.theme.secondaryColor_shade_1};
   opacity: 0.6;
+  transition: flex-grow 0.3s ease-in-out;
   border-radius: 2px;
+  &:hover {
+    margin: 0 2px 0 2px;
+    flex-grow: 2;
+    background: ${props => props.theme.secondaryColor_shade_1};
+    opacity: 100;
+    vertical-align: middle;
+  }
 `;
 
-function News(props) {
+const Title = styled.h1`
+  position: absolute;
+  bottom: 50px;
+  left: 15px;
+`;
+
+const SubTitle = styled.p`
+  position: absolute;
+  bottom: 30px;
+  left: 15px;
+`;
+
+type Props = {
+  title: string,
+  news: Object,
+  description: string
+};
+
+function News(props: Props) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   return (
-    <Carousel>
+    <Carousel style={props.style}>
       <Select>
         <SelectElement />
         <SelectElement />
@@ -70,7 +99,15 @@ function News(props) {
         <SelectElement />
       </Select>
       <Gradient />
-      <ImageSlide url={props.url} style={props.style} />
+      {/* {props.news.map((inf, i) => {
+        return (
+          <>
+            <Title>{inf.title}</Title>
+            <SubTitle>{inf.description}</SubTitle>
+            <ImageSlide image={inf.image} style={props.style} key={i} />
+          </>
+        );
+      })} */}
     </Carousel>
   );
 }
