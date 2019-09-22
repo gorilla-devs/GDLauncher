@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ContentLoader from 'react-content-loader';
 import styled from 'styled-components';
 import { shell } from 'electron';
@@ -10,11 +10,16 @@ const Carousel = styled.div`
   border-radious: 2px;
   ...props.style;
 `;
-// transform: translate(${props => -788 * (props.imageIndex + 1)})
+
+// transform: translate(
+//   ${props =>
+//     props.currentImageIndex ? `${props.currentImageIndex}px` : '0px'}
+// );
 const ImageSlider = styled.div`
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  border-radius: 2px;
   justify-content: space-between;
   padding: 0;
   margin: 0;
@@ -22,31 +27,29 @@ const ImageSlider = styled.div`
   width: 1000%;
   height: 100%;
   z-index: 0;
-  transform: translate(${props => -788 * (props.imageIndex + 1)});
+  transform: translate(${props => `${props.currentImageIndex}px`});
+  transition: transform 0.3s ease-in-out;
 `;
 
 const Slide = styled.div`
   display: inline-block;
   position: relative;
   top: 0;
-  height: 158px%;
   width: 100%;
-  margin0 2px 0 2px;
-  background-size: cover;
-  background-position: center;
+  border-radius: 2px;
   z-index: 0;
 `;
 
 const ImageSlide = styled.img`
   position: absolute;
-  display: block;
   top: 0;
   height: 100%;
   width: 100%;
+  padding: 80px;
+  border-radius: 2px;
   background-image: url(${props => (props.image ? props.image : null)});
   background-size: cover;
   background-position: center;
-  flex-shrink: 0;
   z-index: -1;
 `;
 
@@ -100,6 +103,14 @@ const SelectElement = styled.div`
     opacity: 1;
     vertical-align: middle;
   }
+
+  &:nth-child(${props => props.currentImageIndex}) {
+    margin: 0 2px 0 2px;
+    flex-grow: 2;
+    background: ${props => props.theme.secondaryColor_shade_1};
+    opacity: 1;
+    vertical-align: middle;
+  }
 `;
 
 const Title = styled.h1`
@@ -122,15 +133,16 @@ type Props = {
   description: string
 };
 
-// function openNews(inf) {
-//   console.log(inf.url);
-// }
+function openNews(e, inf) {
+  e.preventDefault();
+  shell.openExternal(inf.url);
+}
 
 function ImageList(props) {
   const currentImageIndex = props.currentImageIndex;
   const news = props.news;
   const listImages = news.map((inf, i) => (
-    <Slide key={i}>
+    <Slide key={i} onClick={e => openNews(e, inf)}>
       <Title>{inf.title}</Title>
       <SubTitle>{inf.description}</SubTitle>
       <Gradient />
@@ -138,24 +150,64 @@ function ImageList(props) {
     </Slide>
   ));
 
-  return <ImageSlider imageIndex={props.imageIndex}>{listImages}</ImageSlider>;
+  return (
+    <ImageSlider currentImageIndex={-788 * props.currentImageIndex}>
+      {listImages}
+    </ImageSlider>
+  );
 }
 
 function SelectNews(props) {
   const news = props.news;
   const setCurrentImageIndex = props.setCurrentImageIndex;
   const selectElementList = news.map((inf, i) => (
-    <SelectElement key={i} onClick={() => setCurrentImageIndex(i)} />
+    <SelectElement
+      key={i}
+      onClick={() => setCurrentImageIndex(i)}
+      currentImageIndex={props.currentImageIndex + 1}
+    />
   ));
 
   return <Select>{selectElementList}</Select>;
 }
 
-function News(props: Props) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(null);
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest function.
   useEffect(() => {
-    console.log(currentImageIndex);
-  }, [currentImageIndex]);
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
+function News(props: Props) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useInterval(() => {
+    if (currentImageIndex < 9) {
+      setCurrentImageIndex(currentImageIndex + 1);
+    } else setCurrentImageIndex(0);
+  }, 5000);
+
+  // memo(
+  //   setInterval(() => {
+  //     console.log(currentImageIndex);
+  //     // if (currentImageIndex < 9) {
+  //     setCurrentImageIndex(currentImageIndex + 1);
+  //     // } else setCurrentImageIndex(0);
+  //   }, 5000)
+  // );
 
   return (
     <Carousel style={props.style}>
@@ -164,21 +216,7 @@ function News(props: Props) {
         setCurrentImageIndex={setCurrentImageIndex}
         currentImageIndex={currentImageIndex}
       />
-      {/* <Select>
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-        <SelectElement />
-      </Select>
-       */}
-      <ImageList news={props.news} imageIndex={currentImageIndex} />
+      <ImageList news={props.news} currentImageIndex={currentImageIndex} />
     </Carousel>
   );
 }

@@ -11,7 +11,7 @@ const Home = () => {
         width: '100%',
         // left: '50%',
         height: '100%',
-        backgroundColor: 'red',
+        // backgroundColor: 'red',
         padding: '0px 10px 10px 10px'
       }}
     >
@@ -48,7 +48,7 @@ const Home = () => {
           style={{
             widht: '100%',
             height: '70%',
-            backgroundColor: 'green',
+            // backgroundColor: 'green',
             position: 'absolute',
             bottom: 0,
             left: 0,
