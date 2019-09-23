@@ -32,7 +32,7 @@ const ImageSlide = styled.img`
   top: 0;
   height: 100%;
   width: 100%;
-  padding: 80px;
+  padding: 100px;
   border-radius: 2px;
   background-image: url(${props => (props.image ? props.image : null)});
   background-position: center;
@@ -129,6 +129,16 @@ const SubTitle = styled.p`
   z-index: 2;
 `;
 
+const StyledContentLoader = styled(ContentLoader)`
+  height: 180px;
+  speed: 0.6;
+  arialabel: false;
+  primarycolor: ${props => props.theme.secondaryColor_shade_11};
+  secondarycolor: ${props => props.theme.secondaryColor_shade_11};
+  height: 180px;
+  maxwidth: 1050px;
+`;
+
 type Props = {
   title: string,
   news: Object,
@@ -212,20 +222,10 @@ function News(props: Props) {
       <ImageList news={props.news} currentImageIndex={currentImageIndex} />
     </Carousel>
   ) : (
-    <ContentLoader
-      height={180}
-      speed={0.6}
-      ariaLabel={false}
-      primaryColor="var(--secondary-color-2)"
-      secondaryColor="var(--secondary-color-3)"
-      style={{
-        height: '180px',
-        maxWidth: '1050px'
-      }}
-    >
+    <StyledContentLoader>
       <rect x="16" y="100" rx="0" ry="0" width="200" height="20" />
       <rect x="16" y="130" rx="0" ry="0" width="400" height="20" />
-    </ContentLoader>
+    </StyledContentLoader>
   );
 }
 
