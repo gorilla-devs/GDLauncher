@@ -11,10 +11,6 @@ const Carousel = styled.div`
   ...props.style;
 `;
 
-// transform: translate(
-//   ${props =>
-//     props.currentImageIndex ? `${props.currentImageIndex}px` : '0px'}
-// );
 const ImageSlider = styled.div`
   display: flex;
   flex-direction: row;
@@ -31,15 +27,6 @@ const ImageSlider = styled.div`
   transition: transform 0.3s ease-in-out;
 `;
 
-const Slide = styled.div`
-  display: inline-block;
-  position: relative;
-  top: 0;
-  width: 100%;
-  border-radius: 2px;
-  z-index: 0;
-`;
-
 const ImageSlide = styled.img`
   position: absolute;
   top: 0;
@@ -48,9 +35,23 @@ const ImageSlide = styled.img`
   padding: 80px;
   border-radius: 2px;
   background-image: url(${props => (props.image ? props.image : null)});
-  background-size: cover;
   background-position: center;
+  background-size: cover;
+  transition: transform 0.3s ease-in-out;
+  object-fit: cover;
   z-index: -1;
+`;
+
+const Slide = styled.div`
+  display: inline-block;
+  position: relative;
+  top: 0;
+  width: 100%;
+  border-radius: 2px;
+  z-index: 0;
+  &:hover ${ImageSlide} {
+    transform: scale(1.5);
+  }
 `;
 
 const Gradient = styled.div`
@@ -85,6 +86,7 @@ const SelectElement = styled.div`
   height: 5px;
   flex: 1;
   margin: 0 2px 0 2px;
+  cursor: pointer;
   background: ${props => props.theme.secondaryColor_shade_1};
   opacity: 0.6;
   transition: flex-grow 0.2s ease-in-out;
@@ -199,15 +201,6 @@ function News(props: Props) {
       setCurrentImageIndex(currentImageIndex + 1);
     } else setCurrentImageIndex(0);
   }, 5000);
-
-  // memo(
-  //   setInterval(() => {
-  //     console.log(currentImageIndex);
-  //     // if (currentImageIndex < 9) {
-  //     setCurrentImageIndex(currentImageIndex + 1);
-  //     // } else setCurrentImageIndex(0);
-  //   }, 5000)
-  // );
 
   return (
     <Carousel style={props.style}>
