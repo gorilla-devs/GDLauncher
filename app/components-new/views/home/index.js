@@ -34,7 +34,7 @@ const Home = () => {
           style={{
             widht: '100%',
             height: '28%',
-            backgroundColor: 'purple',
+            // backgroundColor: 'purple',
             position: 'absolute',
             top: 0,
             left: 0,

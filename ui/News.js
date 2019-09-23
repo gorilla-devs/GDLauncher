@@ -202,7 +202,7 @@ function News(props: Props) {
     } else setCurrentImageIndex(0);
   }, 5000);
 
-  return (
+  return props.news.length !== 0 ? (
     <Carousel style={props.style}>
       <SelectNews
         news={props.news}
@@ -211,6 +211,21 @@ function News(props: Props) {
       />
       <ImageList news={props.news} currentImageIndex={currentImageIndex} />
     </Carousel>
+  ) : (
+    <ContentLoader
+      height={180}
+      speed={0.6}
+      ariaLabel={false}
+      primaryColor="var(--secondary-color-2)"
+      secondaryColor="var(--secondary-color-3)"
+      style={{
+        height: '180px',
+        maxWidth: '1050px'
+      }}
+    >
+      <rect x="16" y="100" rx="0" ry="0" width="200" height="20" />
+      <rect x="16" y="130" rx="0" ry="0" width="400" height="20" />
+    </ContentLoader>
   );
 }
 
