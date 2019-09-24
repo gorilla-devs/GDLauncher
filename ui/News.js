@@ -34,7 +34,7 @@ const ImageSlide = styled.img`
   top: 0;
   height: 100%;
   width: 100%;
-  padding: 100px;
+  padding: 200px;
   border-radius: 2px;
   background-image: url(${props => (props.image ? props.image : null)});
   background-position: center;
