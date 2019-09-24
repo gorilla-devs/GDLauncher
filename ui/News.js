@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import ContentLoader from 'react-content-loader';
 import styled from 'styled-components';
 import { shell } from 'electron';
+import { useContext } from 'react';
+import { ThemeContext } from 'styled-components';
 
 const Carousel = styled.div`
   width: 788px;
@@ -130,13 +132,10 @@ const SubTitle = styled.p`
 `;
 
 const StyledContentLoader = styled(ContentLoader)`
-  height: 180px;
   speed: 0.6;
   arialabel: false;
-  primarycolor: ${props => props.theme.secondaryColor_shade_11};
-  secondarycolor: ${props => props.theme.secondaryColor_shade_11};
-  height: 180px;
-  maxwidth: 1050px;
+  height: 158px;
+  width: 788px;
 `;
 
 type Props = {
@@ -205,6 +204,7 @@ function useInterval(callback, delay) {
 
 function News(props: Props) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const ContextTheme = useContext(ThemeContext);
 
   useInterval(() => {
     if (currentImageIndex < 9) {
@@ -222,9 +222,17 @@ function News(props: Props) {
       <ImageList news={props.news} currentImageIndex={currentImageIndex} />
     </Carousel>
   ) : (
-    <StyledContentLoader>
-      <rect x="16" y="100" rx="0" ry="0" width="200" height="20" />
-      <rect x="16" y="130" rx="0" ry="0" width="400" height="20" />
+    <StyledContentLoader
+      primaryColor={ContextTheme.secondaryColor_shade_11}
+      secondaryColor={ContextTheme.secondaryColor_shade_10}
+    >
+      <rect
+        rx="0"
+        ry="0"
+        width="788"
+        height="158"
+        style={{ borderRadious: 2 }}
+      />
     </StyledContentLoader>
   );
 }
