@@ -39,7 +39,7 @@ const ImageSlide = styled.img`
   background-image: url(${props => (props.image ? props.image : null)});
   background-position: center;
   background-size: cover;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.2s ease-in-out;
   object-fit: cover;
   z-index: -1;
 `;
@@ -52,7 +52,7 @@ const Slide = styled.div`
   border-radius: 2px;
   z-index: 0;
   &:hover ${ImageSlide} {
-    transform: scale(1.5);
+    transform: scale(1.06);
   }
 `;
 
