@@ -7,24 +7,23 @@ const Home = () => {
   return (
     <div
       style={{
-        // minWidth: 788,
         width: '100%',
         // left: '50%',
-        height: '100%',
-        // backgroundColor: 'red',
-        padding: '0px 10px 10px 10px'
+        height: '100%'
+        // backgroundColor: 'red'
+        // padding: '0px 10px 10px 10px'
       }}
     >
       <div
         style={{
           position: 'absolute',
-          // top: 0,
-          // bottom: 0,
-          // left: 788,
-          // right: 788,
+          top: 0,
+          bottom: 0,
+          // left: 0,
+          // right: 0,
           width: 788,
           height: '100%',
-          backgroundColor: '#212B36',
+          backgroundColor: 'transparent',
           left: '50%',
           marginLeft: '-394px'
         }}
@@ -48,7 +47,7 @@ const Home = () => {
           style={{
             widht: '100%',
             height: '70%',
-            // backgroundColor: 'green',
+            backgroundColor: '#212B36',
             position: 'absolute',
             bottom: 0,
             left: 0,

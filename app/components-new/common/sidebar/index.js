@@ -7,6 +7,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import { bindActionCreators } from 'redux';
+import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
@@ -22,6 +23,26 @@ import { PACKS_PATH } from '../../../constants';
 import { readConfig } from '../../../utils/instances';
 import { getInstance, getCurrentAccount } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
+
+const MainSidebar = styled.aside`
+  position: absolute;
+  top: calc(${props => props.theme.sizes.height.systemNavbar} + 17px);
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  font-family: 'GlacialIndifferenceRegular';
+  z-index: 1;
+`;
+
+const SecondarySidebar = styled.aside`
+  position: absolute;
+  top: calc(${props => props.theme.sizes.height.systemNavbar} + 26px);
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  font-family: 'GlacialIndifferenceRegular';
+  z-index: 0;
+`;
 
 type Props = {};
 
@@ -63,138 +84,40 @@ const SideBar = props => {
     UpdateSideBar();
   }, [selectedInstance]);
 
+  // <aside className={styles.sidenav} style={{ background: '#1C242D' }}>
   return (
-    <aside className={styles.sidenav} style={{ background: '#1C242D' }}>
-      <div className={styles.account}>
-        <div className={styles.header}>
-          <span>
-            <CIcon size={32}>
-              {account && account.selectedProfile.name.charAt(0).toUpperCase()}
-            </CIcon>
-          </span>
-          <span>{account && account.selectedProfile.name}</span>
-          <div onClick={() => props.logout()}>
-            <FontAwesomeIcon icon={faSignOutAlt} className={styles.logout} />
-          </div>
-        </div>
-      </div>
-      <hr />
-      <div className={styles.instanceTitle}>
-        <h2>Bookmarked Servers</h2>
-        No server
-      </div>
-      <hr />
-      <div className={styles.instanceTitle}>
-        <h2>Instance Overview</h2>
-        {instanceData !== null ? (
-          <div style={{ marginTop: 10 }}>
-            <h3 style={{ color: '#c2c2c2' }}>{selectedInstance}</h3>
-            <img
-              src={instanceData.thumbnail || vanillaCover}
-              style={{
-                position: 'relative',
-                left:
-                  instanceData.forgeVersion === null || instanceData.thumbnail
-                    ? 0
-                    : 25,
-                height: 100,
-                width: 150,
-                objectFit: 'cover',
-                borderRadius: 2
-              }}
-            />
-            {instanceData.forgeVersion !== null && !instanceData.thumbnail && (
-              <img
-                src={forgeIcon}
-                style={{
-                  position: 'relative',
-                  width: 50,
-                  height: 50,
-                  top: -25,
-                  right: 25,
-                  borderRadius: '2px'
-                }}
-              />
-            )}
-            <div
-              style={{
-                position: 'relative',
-                top: 30,
-                background: '#212B36',
-                width: 150,
-                height: 30,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                left: 25
-              }}
-            >
-              <span style={{ padding: '0 5px' }}>MC version:</span>
-              <span style={{ padding: '0 5px' }}>{instanceData.version}</span>
-            </div>
-            {instanceData.forgeVersion !== null && (
-              <div
-                style={{
-                  position: 'relative',
-                  top: 40,
-                  background: '#f39c12',
-                  width: 150,
-                  height: 30,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  left: 25
-                }}
-              >
-                <span style={{ padding: '0 5px' }}>mods:</span>
-                <span style={{ padding: '0 5px' }}>{instanceData.mods}</span>
-              </div>
-            )}
-            <div
-              style={{
-                position: 'relative',
-                top: instanceData.forgeVersion !== null ? 50 : 40,
-                background: '#27ae60',
-                width: 150,
-                height: 30,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                left: 25
-              }}
-            >
-              <span style={{ padding: '0 5px' }}>Played for:</span>
-              <span style={{ padding: '0 5px' }}>
-                {instanceData.timePlayed && instanceData.timePlayed !== null
-                  ? instanceData.timePlayed
-                  : '0'}{' '}
-                m
-              </span>
-            </div>
-          </div>
-        ) : (
-          'No instance selected'
-        )}
-      </div>
-      <div className={styles.scroller} />
-      <hr style={{ margin: 0 }} />
-      <div className={styles.socialsContainer}>
-        {/* eslint-disable */}
-        {/* <SocialIcon icon="twitter" url="https://twitter.com/gorilladevs" /> */}
-        <SocialIcon icon={faFacebook} url="https://facebook.com/gorilladevs" />
-        <SocialIcon
-          icon={faDiscord}
-          url="https://discordapp.com/invite/4cGYzen"
-        />
-        <span
-          className={styles.version}
-          onClick={() => dispatch(openModal('ChangelogsModal'))}
+    <>
+      <MainSidebar>
+        <svg
+          width="172"
+          height="100%"
+          viewBox="0 0 172 610"
+          fill="#1C242D"
+          preserveAspectRatio="xMidYMin"
+          // backgroundSize="100% 10%"
         >
-          v{require('../../../../package.json').version}
-        </span>
-        {/* eslint-enable */}
-      </div>
-    </aside>
+          <path
+            d="M0 5C0 2.23853 2.23853 0 5 0H58.6074C63.5847 0 68.3833 1.85596 72.0652 5.20508L89.0991 20.6997C98.304 29.0725 110.3 33.7124 122.743 33.7124H169C170.657 33.7124 172 35.0557 172 36.7124V2160H0V5Z"
+            fill="#1C242D"
+          />
+          <rect width="172" bottom="0" />
+        </svg>
+      </MainSidebar>
+      <SecondarySidebar>
+        <svg
+          width="172"
+          height="100%"
+          viewBox="0 0 172 601"
+          fill="none"
+          preserveAspectRatio="xMidYMin"
+        >
+          <path
+            d="M167 0C169.761 0 172 2.23865 172 5V2151H0V42.9629C0 41.306 1.34326 39.9629 3 39.9629H46.7732C60.6875 39.9629 73.9724 34.1647 83.4341 23.9625L99.7217 6.40015C103.506 2.31921 108.82 0 114.386 0H167Z"
+            fill="#49515A"
+          />
+        </svg>
+      </SecondarySidebar>
+    </>
   );
 };
 

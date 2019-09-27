@@ -22,7 +22,7 @@ export default {
   spacing: factor => [0, 4, 8, 16, 32, 64][factor],
   sizes: {
     width: {
-      sidebar: '200px'
+      sidebar: '172px'
     },
     height: {
       systemNavbar: '23px',
