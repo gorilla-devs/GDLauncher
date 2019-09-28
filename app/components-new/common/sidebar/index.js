@@ -31,7 +31,11 @@ const MainSidebar = styled.aside`
   bottom: 0;
   height: 100%;
   font-family: 'GlacialIndifferenceRegular';
-  z-index: 1;
+  z-index: ${props => (props.clickedSidebar ? 0 : 1)};
+  pointer-events: none;
+  svg {
+    pointer-events: none;
+  }
 `;
 
 const SecondarySidebar = styled.aside`
@@ -41,13 +45,18 @@ const SecondarySidebar = styled.aside`
   bottom: 0;
   height: 100%;
   font-family: 'GlacialIndifferenceRegular';
-  z-index: 0;
+  z-index: ${props => (props.clickedSidebar ? 1 : 0)};
+  pointer-events: none;
+  svg {
+    pointer-events: none;
+  }
 `;
 
 type Props = {};
 
 const SideBar = props => {
   const [instanceData, setInstanceData] = useState(null);
+  const [clickedSideBar, setClickedSidebar] = useState(false);
   const selectedInstance = useSelector(state => state.selectedInstance);
   const instance = useSelector(state => getInstance(state));
   const account = useSelector(state => getCurrentAccount(state));
@@ -84,10 +93,16 @@ const SideBar = props => {
     UpdateSideBar();
   }, [selectedInstance]);
 
+  useEffect(() => {
+    console.log(clickedSideBar);
+  }, [clickedSideBar]);
   // <aside className={styles.sidenav} style={{ background: '#1C242D' }}>
   return (
     <>
-      <MainSidebar>
+      <MainSidebar
+        clickedSideBar={clickedSideBar}
+        onClick={() => setClickedSidebar(false)}
+      >
         <svg
           width="172"
           height="100%"
@@ -97,13 +112,17 @@ const SideBar = props => {
           // backgroundSize="100% 10%"
         >
           <path
+            style={{ pointerEvents: 'visible' }}
             d="M0 5C0 2.23853 2.23853 0 5 0H58.6074C63.5847 0 68.3833 1.85596 72.0652 5.20508L89.0991 20.6997C98.304 29.0725 110.3 33.7124 122.743 33.7124H169C170.657 33.7124 172 35.0557 172 36.7124V2160H0V5Z"
             fill="#1C242D"
           />
           <rect width="172" bottom="0" />
         </svg>
       </MainSidebar>
-      <SecondarySidebar>
+      <SecondarySidebar
+        clickedSideBar={clickedSideBar}
+        onClick={() => setClickedSidebar(true)}
+      >
         <svg
           width="172"
           height="100%"
@@ -112,6 +131,7 @@ const SideBar = props => {
           preserveAspectRatio="xMidYMin"
         >
           <path
+            style={{ pointerEvents: 'visible' }}
             d="M167 0C169.761 0 172 2.23865 172 5V2151H0V42.9629C0 41.306 1.34326 39.9629 3 39.9629H46.7732C60.6875 39.9629 73.9724 34.1647 83.4341 23.9625L99.7217 6.40015C103.506 2.31921 108.82 0 114.386 0H167Z"
             fill="#49515A"
           />
