@@ -1,5 +1,6 @@
 import React from 'react';
 import Input from '../../../../ui/Input';
+import Select from '../../../../ui/Select';
 import styled from 'styled-components';
 
 const SortingNavbar = styled.div`
@@ -30,9 +31,16 @@ export default () => {
           <div>
             <Input placeholder="search"></Input>
           </div>
-          <div style={{ width: '150px' }}>
-            sort by &nbsp;
-            <Input />
+          <div
+            style={{
+              width: '160px',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-around'
+            }}
+          >
+            sort by&nbsp;
+            <Select></Select>
           </div>
         </div>
       </SortingNavbar>

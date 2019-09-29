@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Input = styled.input`
-  width: ${props => props.width || '90px'};
-  height: ${props => props.width || '30px'};;
+  width: ${props => props.width || '100px'};
+  height: ${props => props.height || '24px'};
   padding 10px;
   background: transparent;
   border-radius: 5px;
@@ -26,6 +26,9 @@ const Input = styled.input`
     background: #212b36;
     opacity: 10%;
     border: 2px solid #0f7173;
+  }
+  ::placeholder { 
+    color: #e1e2e4;
   }
   ...props.style;
 `;

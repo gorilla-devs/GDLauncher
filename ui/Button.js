@@ -51,7 +51,6 @@ type Props = {
 };
 
 function GDButton(props: Props) {
-  console.log(props);
   return props.selected ? (
     <SelectedButton
       width={props.width}
