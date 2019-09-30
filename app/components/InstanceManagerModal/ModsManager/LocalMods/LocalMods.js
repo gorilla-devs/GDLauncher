@@ -16,12 +16,14 @@ import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
 import { getInstance } from '../../../../utils/selectors';
-
+import { readConfig, updateConfig } from '../../../../utils/instances';
 
 const LocalModsComponent = props => {
   const mapMods = mods => {
     return mods
-      .filter(el => el.fileName !== 'GDLCompanion.jar' && el.fileName !== 'LJF.jar')
+      .filter(
+        el => el.fileName !== 'GDLCompanion.jar' && el.fileName !== 'LJF.jar'
+      )
       .map(v => ({
         name: v.fileName,
         state: path.extname(v.fileName) !== '.disabled',
@@ -31,20 +33,21 @@ const LocalModsComponent = props => {
         projectID: v.projectID || null,
         fileID: v.fileID || null,
         version: props.match.params.version,
-        fileDate: v.fileDate || null,
-      }))
-  }
-  
-  const [filteredMods, setFilteredMods] = useState(mapMods(props.instanceData.mods));
+        fileDate: v.fileDate || null
+      }));
+  };
+
+  const [filteredMods, setFilteredMods] = useState(
+    mapMods(props.instanceData.mods)
+  );
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   useEffect(() => {
     setFilteredMods(mapMods(props.instanceData.mods));
     filterMods(searchQuery);
   }, [props.instanceData]);
-  
+
   const listRef = React.createRef();
-  
 
   const modsFolder = path.join(PACKS_PATH, props.match.params.instance, 'mods');
 
@@ -86,26 +89,15 @@ const LocalModsComponent = props => {
         .filter(m => m.selected === true)
         .map(obj => fs.unlinkSync(path.join(modsFolder, obj.name)))
     );
-    // Remove the reference in the mods file json
-    const config = JSON.parse(
-      await promisify(fs.readFile)(
-        path.join(PACKS_PATH, instancesPath, 'config.json')
-      )
-    );
 
-    await promisify(fs.writeFile)(
-      path.join(PACKS_PATH, instancesPath, 'config.json'),
-      JSON.stringify(
-        {
-          ...config,
-          mods: filteredMods
-            .filter(m => m.selected === false)
-            .map(m => config.mods.find(mm => mm.fileNameOnDisk === m.name))
-        },
-        null,
-        2
+    // Remove the reference in the mods file json
+    const config = await readConfig(instancesPath);
+
+    await updateConfig(instancesPath, {
+      mods: config.mods.filter(mod =>
+        filteredMods.find(fMod => fMod.name === mod.fileName && !fMod.selected)
       )
-    );
+    });
   };
 
   const getSize = i => {
@@ -120,9 +112,7 @@ const LocalModsComponent = props => {
           <br />
           <Link
             to={{
-              pathname: `/editInstance/${
-                props.match.params.instance
-                }/mods/browse/${props.match.params.version}`,
+              pathname: `/editInstance/${props.match.params.instance}/mods/browse/${props.match.params.version}`,
               state: { modal: true }
             }}
             replace
@@ -204,9 +194,7 @@ const LocalModsComponent = props => {
         >
           <Link
             to={{
-              pathname: `/editInstance/${
-                props.match.params.instance
-                }/mods/browse/${props.match.params.version}`,
+              pathname: `/editInstance/${props.match.params.instance}/mods/browse/${props.match.params.version}`,
               state: { modal: true }
             }}
             replace
@@ -248,7 +236,6 @@ function mapStateToProps(state, ownProps) {
 }
 
 const LocalMods = connect(mapStateToProps)(LocalModsComponent);
-
 
 const MemoizedLocalMods = memo(LocalMods, (prev, next) => {
   return isEqual(prev.match, next.match);
