@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux';
+import {createGlobalStyle} from 'styled-components';
 import log from 'electron-log';
 import { ConnectedRouter } from 'connected-react-router';
 import * as SettingsActions from '../actions/settings';
@@ -23,6 +24,36 @@ USE IN PURE COMPONENTS  -> BigListPureComponent.whyDidYouRender = true
 
 */
 
+const GlobalStyle = createGlobalStyle`
+  @font-face {
+    font-family: 'GlacialIndifferenceBold';
+    src: url('./assets/fonts/GlacialIndifferenceBold.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'GlacialIndifferenceItalic';
+    src: url('./assets/fonts/GlacialIndifferenceItalic.otf') format('opentype');
+    font-weight: normal;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'GlacialIndifferenceMedium';
+    src: url('./assets/fonts/GlacialIndifferenceMedium.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'GlacialIndifferenceRegular';
+    src: url('./assets/fonts/GlacialIndifferenceRegular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+`;
+
 class Root extends Component<Props> {
   constructor(props) {
     super(props);
@@ -44,6 +75,7 @@ class Root extends Component<Props> {
     return (
       <Provider store={store}>
         <div>
+          <GlobalStyle />
           <ConnectedRouter history={history}>
             <RouteDef history={history} />
           </ConnectedRouter>

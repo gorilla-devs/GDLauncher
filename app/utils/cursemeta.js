@@ -4,6 +4,11 @@ import axios from 'axios';
 import log from 'electron-log';
 import { CURSEMETA_API_URL } from '../constants';
 
+const sortByDate = (a, b) => {
+  const dateA = new Date(a.fileDate), dateB = new Date(b.fileDate);
+  return dateB - dateA;
+}
+
 const makeRequest = async (url: string, params: {} = {}) => {
   const requestPayload = {
     params
@@ -23,7 +28,8 @@ export const getAddon = async (addonID: number | string) => {
 
 export const getAddonFiles = async (addonID: number | string) => {
   const url = `${CURSEMETA_API_URL}/addon/${addonID}/files`;
-  return makeRequest(url);
+  const data = await makeRequest(url);
+  return data.sort(sortByDate);
 };
 
 export const getAddonDescription = async (addonID: number | string) => {
@@ -39,12 +45,20 @@ export const getAddonFile = async (
   return makeRequest(url);
 };
 
+export const getAddonFileChangelog = async (
+  addonID: number | string,
+  fileID: number | string
+) => {
+  const url = `${CURSEMETA_API_URL}/addon/${addonID}/file/${fileID}/changelog`;
+  return makeRequest(url);
+};
+
 export const getAddonFileIDFromVersion = async (
   addonID: number | string,
   modpackVersion: string
 ) => {
   const files = await getAddonFiles(addonID);
-  const foundID = files.find(a => a.filename.includes(modpackVersion));
+  const foundID = files.find(a => a.fileName.includes(modpackVersion));
   return foundID ? foundID.id : null;
 };
 

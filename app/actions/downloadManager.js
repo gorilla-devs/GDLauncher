@@ -8,6 +8,7 @@ import { cpus } from 'os';
 import { exec } from 'child_process';
 import jarAnalyzer from 'jarfile';
 import log from 'electron-log';
+import { unionBy } from 'lodash';
 import Promise from 'bluebird';
 import fs, { readdir, copyFile } from 'fs';
 import compressing from 'compressing';
@@ -351,7 +352,7 @@ export function downloadPack(pack, isRepair = false) {
       );
       await Promise.all(
         overrideFiles.map(async item => {
-          await fse.move(
+          await fse.copy(
             path.join(INSTANCES_PATH, 'temp', pack, 'overrides', item),
             path.join(PACKS_PATH, pack, item),
             { overwrite: true }
@@ -368,7 +369,8 @@ export function downloadPack(pack, isRepair = false) {
             mod.projectID,
             mod.fileID,
             null,
-            pack
+            pack,
+            true
           );
           modsManifest = modsManifest.concat(modManifest);
           dispatch(updateDownloadProgress(15, 15, modsDownloaded, manifest.files.length));
@@ -394,25 +396,32 @@ export function downloadPack(pack, isRepair = false) {
       );
     }
 
-    // Don't write a new config if it's repairing
-    if (!isRepair) {
-      await promisify(fs.writeFile)(
-        path.join(PACKS_PATH, pack, 'config.json'),
-        JSON.stringify({
-          version: currPack.version,
-          forgeVersion:
-            currPack.forgeVersion === null
-              ? null
-              : `forge-${currPack.forgeVersion}`,
-          ...(currPack.addonID && { projectID: currPack.addonID }),
-          ...(modpackVersion && { modpackVersion }),
-          ...(thumbnailURL && { icon: 'icon.png' }),
-          timePlayed: 0,
-          mods: modsManifest,
-          overrideFiles: overrideFilesList
-        })
-      );
+    let timePlayed = 0;
+    let mods = modsManifest;
+
+    // If it's repairing (also switching modpack version), try to keep played time
+    if (isRepair) {
+      try {
+        const prevConfig = await readConfig(pack);
+        mods = unionBy(modsManifest, prevConfig.mods, 'projectID');
+      } catch {
+        console.error('Could not find a valid config - using defaults');
+      }
     }
+
+    await promisify(fs.writeFile)(
+      path.join(PACKS_PATH, pack, 'config.json'),
+      JSON.stringify({
+        version: currPack.version,
+        forgeVersion: currPack.forgeVersion && `forge-${currPack.forgeVersion}`,
+        ...(currPack.addonID && { projectID: currPack.addonID }),
+        ...(modpackVersion && { modpackVersion }),
+        ...(thumbnailURL && { icon: 'icon.png' }),
+        timePlayed,
+        mods,
+        overrideFiles: overrideFilesList
+      })
+    );
 
     const totalFiles = libraries.length + assets.length + mainJar.length;
 
@@ -487,11 +496,11 @@ export function downloadPack(pack, isRepair = false) {
       };
       const computePathIfPossible = arg => {
         if (arg[0] === '[') {
-          return path.join(
+          return `"${path.join(
             INSTANCES_PATH,
             'libraries',
             arraify(arg.replace('[', '').replace(']', '')).join('/')
-          );
+          )}"`;
         }
         return arg;
       };

@@ -1,16 +1,22 @@
 // @flow
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState, memo } from 'react';
+import { areEqual } from "react-window";
+import { connect } from 'react-redux';
 import fs from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { promisify } from 'util';
 import { Checkbox, Switch } from 'antd';
 import { PACKS_PATH } from '../../../../constants';
 
 import styles from './LocalMods.scss';
 import { readConfig, updateConfig } from '../../../../utils/instances';
+import { getAddonFiles } from '../../../../utils/cursemeta';
+import { downloadMod } from '../../../../utils/mods';
+import { addNewModToLatestUpdates } from '../../../../actions/latestModsUpdates';
+import { hasLocalUpdate } from '../../../../utils/selectors';
 
 type Props = {
   index: number,
@@ -27,32 +33,55 @@ const ModRow = ({
   toggleSize,
   modData,
   setFilteredMods,
-  instance
+  instance,
+  addNewModToLatestUpdates,
+  localUpdate
 }: Props) => {
+  const [isUpdateAvailable, setIsUpdateAvailable] = useState(null);
+
+  useEffect(() => {
+    if (modData.projectID && modData.fileID) {
+      if (localUpdate && modData.fileDate) {
+        if (new Date(modData.fileDate) < new Date(localUpdate.fileDate)) {
+          setIsUpdateAvailable(localUpdate);
+        }
+      } else {
+        getAddonFiles(modData.projectID).then(files => {
+          const filteredFiles = files.filter(v => v.gameVersion.includes(modData.version));
+          addNewModToLatestUpdates({ ...filteredFiles[0], projectID: modData.projectID });
+          const installedMod = files.find(v => v.id === modData.fileID);
+          if (filteredFiles[0] && installedMod && new Date(installedMod.fileDate) < new Date(filteredFiles[0].fileDate)) {
+            setIsUpdateAvailable(filteredFiles[0]);
+          }
+        });
+      }
+    }
+  }, []);
+
   const modsFolder = path.join(PACKS_PATH, instance, 'mods');
-  const selectMod = i => {
+  const selectMod = () => {
     setFilteredMods(prevMods =>
       Object.assign([...prevMods], {
-        [i]: {
-          ...prevMods[i],
+        [index]: {
+          ...prevMods[index],
           selected: !modData.selected
         }
       })
     );
   };
 
-  const deleteMod = async i => {
+  const deleteMod = async () => {
     // Remove the actual file
     await promisify(fs.unlink)(path.join(modsFolder, modData.name));
     // Remove the reference in the mods file json
     const config = await readConfig(instance);
     await updateConfig(instance, {
-      mods: config.mods.filter(v => v.filename !== modData.name)
+      mods: config.mods.filter(v => v.fileName !== modData.name)
     })
 
   };
 
-  const toggleDisableMod = async (enabled, index) => {
+  const toggleDisableMod = async (enabled) => {
     if (enabled) {
       await promisify(fs.rename)(
         path.join(modsFolder, modData.name),
@@ -65,6 +94,14 @@ const ModRow = ({
       );
     }
   };
+
+  const updateMod = async () => {
+    await deleteMod();
+    const newMod = await downloadMod(modData.projectID, isUpdateAvailable.id, null, instance);
+    const instanceCfg = await readConfig(instance);
+    await updateConfig(instance, { mods: [...(instanceCfg.mods || []), newMod] })
+  };
+
   return (
     <div
       className={index % 2 ? styles.listItemOdd : styles.listItemEven}
@@ -80,7 +117,7 @@ const ModRow = ({
         <div>
           <Checkbox
             onChange={e => {
-              selectMod(index);
+              selectMod();
             }}
             checked={modData.selected}
           />
@@ -91,16 +128,21 @@ const ModRow = ({
             }}
             onChange={(v, e) => {
               e.stopPropagation();
-              toggleDisableMod(v, index);
+              toggleDisableMod(v);
             }}
           />
         </div>
         {modData.name.replace('.disabled', '')}
         <div>
+          {isUpdateAvailable && <FontAwesomeIcon
+            className={styles.updateIcon}
+            icon={faDownload}
+            onClick={() => updateMod()}
+          />}
           <FontAwesomeIcon
             className={styles.deleteIcon}
             icon={faTrash}
-            onClick={() => deleteMod(index)}
+            onClick={() => deleteMod()}
           />
         </div>
       </div>
@@ -108,4 +150,8 @@ const ModRow = ({
   );
 };
 
-export default ModRow;
+const MemoizedModRow = memo(ModRow, areEqual);
+
+export default connect((state, ownProps) => ({
+  localUpdate: hasLocalUpdate(ownProps.modData.projectID)(state)
+}), { addNewModToLatestUpdates })(MemoizedModRow);
