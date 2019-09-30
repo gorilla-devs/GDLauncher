@@ -33,14 +33,21 @@ export default () => {
           </div>
           <div
             style={{
-              width: '160px',
+              width: '200px',
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-around'
             }}
           >
             sort by&nbsp;
-            <Select></Select>
+            <Select width="130px">
+              <div>Featured</div>
+              <div>Popularity</div>
+              <div>Last Updated</div>
+              <div>Name</div>
+              <div>Author</div>
+              <div>Total Downloads</div>
+            </Select>
           </div>
         </div>
       </SortingNavbar>

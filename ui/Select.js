@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import arrow from '../../GDLauncher/app/assets/images/selectArrow.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
@@ -16,6 +15,7 @@ const Select = styled.div`
   background: transparent;
   border: 2px solid #0f7173;
   overflow: hidden;
+  transition: all 0.15s ease-in-out;
   appearance: none;
   -moz-appearance: none; /* Firefox */
   -webkit-appearance: none; /* Safari and Chrome */
@@ -35,6 +35,7 @@ const Icon = styled(FontAwesomeIcon)`
   transition: transform 0.15s ease-in-out;
 `;
 
+// padding: 0 0 0 5px;
 const Options = styled.div`
   display: ${props => (props.opened ? 'block' : 'none')};
   position: relative;
@@ -42,15 +43,33 @@ const Options = styled.div`
   height: ${props => (props.opened ? '100px' : 0)};
   background: transparent;
   border-radius: 5px;
+  text-decorations: none;
   color: #e1e2e4;
   border: 2px solid #0f7173;
+  transform: ${props => (props.opened ? 'scale(1)' : 'scale(0)')};
   margin-top: 5px;
+  padding: 0;
+  overflow: auto;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const Option = styled.div`
+  display: inline-block;
+  width: 100%;
+  height: 21px;
+  padding: 0 0 0 5px;
+  white-space: nowrap;
+  &:hover {
+    background: ${props => props.theme.secondaryColor_shade_11};
+  }
 `;
 
 const SelectedOption = styled.p`
   font-family: Glacial Indifference;
-  font-size: 14px;
-  line-height: 16px;
+  font-size: 13px;
+  line-height: 17px;
   postion: absolute;
   top: 6px;
   left: 10px;
@@ -63,20 +82,28 @@ type Props = {};
 
 function GDSelect(props: Props) {
   const [isOpened, setIsOpened] = useState(false);
+  const [selected, setSelected] = useState('Featured');
   return (
     <div style={{ maxHeigth: '2000px', position: 'relative' }}>
-      <Select onClick={() => setIsOpened(!isOpened)}>
-        {/* <option value="0">featured</option>
-      <option value="1">Audi</option>
-    <option value="2">BMW</option> */}
-        <SelectedOption>featured</SelectedOption>
+      <Select
+        onClick={() => setIsOpened(!isOpened)}
+        width={props.width}
+        style={props.style}
+      >
+        <SelectedOption>{selected}</SelectedOption>
       </Select>
       <Icon
         opened={isOpened}
         onClick={() => setIsOpened(!isOpened)}
         icon={faCaretDown}
       />
-      <Options opened={isOpened}></Options>
+      <Options opened={isOpened} width={props.width} style={props.style}>
+        {props.children.length > 1
+          ? props.children.map(option => (
+              <Option onClick={() => setSelected(option)}>{option}</Option>
+            ))
+          : props.children}
+      </Options>
     </div>
   );
 }
