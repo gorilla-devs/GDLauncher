@@ -100,9 +100,7 @@ const LocalModsComponent = props => {
     });
   };
 
-  const getSize = i => {
-    return filteredMods[i].height;
-  };
+  const getSize = i => filteredMods[i].height;
 
   if (props.instanceData.mods.length === 0) {
     return (
