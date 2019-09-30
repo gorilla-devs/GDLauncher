@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { promisify } from 'util';
 import log from 'electron-log';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { faWindowClose, faHome } from '@fortawesome/free-solid-svg-icons';
 import styles from './InstanceManagerModal.scss';
 import { PACKS_PATH } from '../../constants';
 import Modal from '../Common/Modal/Modal';
@@ -34,7 +34,8 @@ class InstanceManagerModal extends Component<Props> {
     this.state = {
       unMounting: false,
       instanceIcon: InstanceIcon,
-      version: null
+      version: null,
+      isModpack: false
     };
   }
 
@@ -55,7 +56,8 @@ class InstanceManagerModal extends Component<Props> {
     try {
       const config = await this.readConfig();
       this.setState({
-        version: config.version
+        version: config.version,
+        isModpack: !!config.projectID
       });
       if (config.icon) {
         const icon = await promisify(fs.readFile)(
@@ -127,7 +129,10 @@ class InstanceManagerModal extends Component<Props> {
         instanceIcon: InstanceIcon
       });
     } catch {
-      log.warn('The instance icon could not be removed', this.props.match.params.instance);
+      log.warn(
+        'The instance icon could not be removed',
+        this.props.match.params.instance
+      );
     }
   };
 
@@ -181,25 +186,21 @@ class InstanceManagerModal extends Component<Props> {
             </MenuItem>
             <MenuItem
               active={this.props.match.params.page === 'mods'}
-              to={`/editInstance/${
-                this.props.match.params.instance
-              }/mods/local/${this.state.version}`}
+              to={`/editInstance/${this.props.match.params.instance}/mods/local/${this.state.version}`}
             >
               Mods Manager
             </MenuItem>
-            <MenuItem
-              active={this.props.match.params.page === 'modpackVersions'}
-              to={`/editInstance/${
-                this.props.match.params.instance
-              }/modpackVersions`}
-            >
-              Modpack Versions
-            </MenuItem>
+            {this.state.isModpack && (
+              <MenuItem
+                active={this.props.match.params.page === 'modpackVersions'}
+                to={`/editInstance/${this.props.match.params.instance}/modpackVersions`}
+              >
+                Modpack Versions
+              </MenuItem>
+            )}
             <MenuItem
               active={this.props.match.params.page === 'resourcepacks'}
-              to={`/editInstance/${
-                this.props.match.params.instance
-              }/resourcepacks`}
+              to={`/editInstance/${this.props.match.params.instance}/resourcepacks`}
             >
               Resource Packs
             </MenuItem>
@@ -211,9 +212,7 @@ class InstanceManagerModal extends Component<Props> {
             </MenuItem>
             <MenuItem
               active={this.props.match.params.page === 'screenshots'}
-              to={`/editInstance/${
-                this.props.match.params.instance
-              }/screenshots`}
+              to={`/editInstance/${this.props.match.params.instance}/screenshots`}
             >
               Screenshots
             </MenuItem>
