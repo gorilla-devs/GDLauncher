@@ -36,8 +36,8 @@ const Icon = styled(FontAwesomeIcon)`
 `;
 
 // padding: 0 0 0 5px;
+// display: ${props => (props.opened ? 'block' : 'none')};
 const Options = styled.div`
-  display: ${props => (props.opened ? 'block' : 'none')};
   position: relative;
   width: ${props => props.width || '100px'};
   height: ${props => (props.opened ? '100px' : 0)};
@@ -46,10 +46,12 @@ const Options = styled.div`
   text-decorations: none;
   color: #e1e2e4;
   border: 2px solid #0f7173;
-  transform: ${props => (props.opened ? 'scale(1)' : 'scale(0)')};
+  transform-origin: top;
+  transform: ${props => (props.opened ? 'scaleY(1)' : 'scaleY(0)')};
   margin-top: 5px;
   padding: 0;
   overflow: auto;
+  transition: transform 0.1s ease-in-out;
   ::-webkit-scrollbar {
     display: none;
   }
@@ -61,6 +63,7 @@ const Option = styled.div`
   height: 21px;
   padding: 0 0 0 5px;
   white-space: nowrap;
+  transition: background 0.15s ease-in-out;
   &:hover {
     background: ${props => props.theme.secondaryColor_shade_11};
   }

@@ -40,7 +40,7 @@ export default () => {
             }}
           >
             sort by&nbsp;
-            <Select width="130px">
+            <Select width="140px">
               <div>Featured</div>
               <div>Popularity</div>
               <div>Last Updated</div>
