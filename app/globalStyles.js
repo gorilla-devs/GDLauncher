@@ -36,6 +36,7 @@ export default createGlobalStyle`
     margin: 0;
     overflow: hidden;
     background-color: white;
+    color: ${props => props.theme.shade3};
   }
 
   a {

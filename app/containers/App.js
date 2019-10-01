@@ -41,8 +41,8 @@ const Wrapper = styled.div`
       100% - 20px - ${props => props.theme.sizes.height.systemNavbar} -
         ${props => props.theme.sizes.height.navbar}
     );
-    margin: 20px;
-    margin-top: 10px;
+    margin: ${props => (props.isFullScreenPage ? 0 : 20)}px;
+    margin-top: ${props => (props.isFullScreenPage ? 0 : 10)}px;
   }
 
   .switch-wrapper > div {
@@ -158,7 +158,7 @@ const App = ({ children }) => {
     location.pathname === '/newUserPage';
 
   return (
-    <Wrapper>
+    <Wrapper isFullScreenPage={isFullScreenPage}>
       <GlobalStyles />
       <SysNavBar />
       <GlobalBackground />

@@ -8,6 +8,9 @@ import { closeModal } from 'reducers/modals/actions';
 
 const HeaderComponent = styled.div`
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   height: 30px;
   line-height: 30px;
@@ -69,13 +72,7 @@ const Modal = ({
     >
       {(header === undefined || header === true) && (
         <HeaderComponent>
-          <h3
-            css={`
-              display: inline-block;
-            `}
-          >
-            {title || 'Modal'}
-          </h3>
+          <h3>{title || 'Modal'}</h3>
           <CloseButton onClick={() => dispatch(closeModal())}>
             <FontAwesomeIcon icon={faWindowClose} />
           </CloseButton>
