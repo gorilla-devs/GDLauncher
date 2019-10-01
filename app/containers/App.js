@@ -36,10 +36,19 @@ const Wrapper = styled.div`
   height: 100%;
   .switch-wrapper {
     position: relative;
-    width: calc(100% - ${props => props.theme.sizes.width.sidebar} - 40px);
+    width: calc(
+      100% -
+        ${props =>
+          props.isFullScreenPage
+            ? '0px'
+            : `${props.theme.sizes.width.sidebar} - 40px`}
+    );
     height: calc(
-      100% - 20px - ${props => props.theme.sizes.height.systemNavbar} -
-        ${props => props.theme.sizes.height.navbar}
+      100% -
+        ${props =>
+          props.isFullScreenPage
+            ? '0px'
+            : `${props.theme.sizes.height.systemNavbar} - 40px - ${props.theme.sizes.height.navbar}`}
     );
     margin: ${props => (props.isFullScreenPage ? 0 : 20)}px;
     margin-top: ${props => (props.isFullScreenPage ? 0 : 10)}px;
