@@ -39,7 +39,7 @@ const HrText = styled.h2`
   }
 `;
 
-const hrTextGreen = styled(HrText)`
+const HrTextGreen = styled(HrText)`
   color: #27ae60;
   &:before,
   &:after {
@@ -47,7 +47,7 @@ const hrTextGreen = styled(HrText)`
   }
 `;
 
-const hrTextRed = styled(HrText)`
+const HrTextRed = styled(HrText)`
   color: #d35400;
   &:before,
   &:after {
@@ -55,7 +55,7 @@ const hrTextRed = styled(HrText)`
   }
 `;
 
-const hrTextYellow = styled(HrText)`
+const HrTextYellow = styled(HrText)`
   color: #f39c12;
   &:before,
   &:after {
@@ -63,7 +63,7 @@ const hrTextYellow = styled(HrText)`
   }
 `;
 
-const hrTextBlue = styled(HrText)`
+const HrTextBlue = styled(HrText)`
   color: #3498db;
   &:before,
   &:after {
@@ -71,7 +71,7 @@ const hrTextBlue = styled(HrText)`
   }
 `;
 
-const subHrList = styled.div`
+const SubHrList = styled.div`
   text-align: left;
   li {
     font-size: 18px;
@@ -120,15 +120,15 @@ export default props => {
       width="540px"
     >
       <Container>
-        <hrTextYellow>WARNING!</hrTextYellow>
+        <HrTextYellow>WARNING!</HrTextYellow>
         <Summary>
           This update contains{' '}
           <span style={{ color: '#f39c12' }}>breaking changes</span>. If your
           instances don't run, try right-clicking on them and select "Repair"
         </Summary>
         <div style={{ margin: 15 }} />
-        <hrTextGreen>SOME COOL NEW STUFF</hrTextGreen>
-        <subHrList>
+        <HrTextGreen>SOME COOL NEW STUFF</HrTextGreen>
+        <SubHrList>
           <ul>
             <ChangelogRow
               main="Added a crash handler"
@@ -155,9 +155,9 @@ export default props => {
               secondary=". You'll have more time to play now!!"
             />
           </ul>
-        </subHrList>
-        <hrTextRed>SOME BUGFIXES</hrTextRed>
-        <subHrList>
+        </SubHrList>
+        <HrTextRed>SOME BUGFIXES</HrTextRed>
+        <SubHrList>
           <ul>
             <ChangelogRow
               main="Fixed download progress bar zindex"
@@ -180,8 +180,8 @@ export default props => {
               secondary=", we fixed and improved a lot of under-the-hood stuff. Enjoyy!"
             />
           </ul>
-        </subHrList>
-        <hrTextBlue>WE LOVE YOU</hrTextBlue>
+        </SubHrList>
+        <HrTextBlue>WE LOVE YOU</HrTextBlue>
         <Summary>
           We love our users, that's why we have a dedicated discord server just
           to talk with all of them :)
