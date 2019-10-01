@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { closeModal } from '../../reducers/modals/actions';
-import Settings from '../Settings/Settings';
-import InstanceCreatorModal from '../InstanceCreatorModal/InstanceCreatorModal';
-import CurseModpacksBrowserCreatorModal from '../CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal';
-import CurseModpackExplorerModal from '../CurseModpackExplorerModal/CurseModpackExplorerModal';
-import InstanceManagerModal from '../InstanceManagerModal/InstanceManagerModal';
-import ImportPack from '../ImportPack/ImportPack';
-import ExportPackModal from '../ExportPackModal/ExportPackModal';
-import LoginHelperModal from '../LoginHelperModal/LoginHelperModal';
-import ChangelogsModal from '../ChangelogModal/ChangelogModal';
-import ConfirmDeleteModal from '../ConfirmDeleteModal/ConfirmDeleteModal';
-import JavaGlobalOptionsFixModal from '../JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal';
+import Settings from '../../components/Settings/Settings';
+import InstanceCreatorModal from '../../components/InstanceCreatorModal/InstanceCreatorModal';
+import CurseModpacksBrowserCreatorModal from '../../components/CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal';
+import CurseModpackExplorerModal from '../../components/CurseModpackExplorerModal/CurseModpackExplorerModal';
+import InstanceManagerModal from '../../components/InstanceManagerModal/InstanceManagerModal';
+import ImportPack from '../../components/ImportPack/ImportPack';
+import ExportPackModal from '../../components/ExportPackModal/ExportPackModal';
+import LoginHelperModal from '../../components/LoginHelperModal/LoginHelperModal';
+import ChangelogsModal from '../../components/ChangelogModal/ChangelogModal';
+import ConfirmDeleteModal from '../../components/ConfirmDeleteModal/ConfirmDeleteModal';
+import JavaGlobalOptionsFixModal from '../../components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal';
 
 const Overlay = styled.div`
   position: absolute;
