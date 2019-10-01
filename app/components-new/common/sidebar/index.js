@@ -10,7 +10,7 @@ import { bindActionCreators } from 'redux';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faExchangeAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import { promisify } from 'util';
 import CIcon from '../../../components/Common/Icon/Icon';
@@ -31,10 +31,22 @@ const MainSidebar = styled.aside`
   bottom: 0;
   height: 100%;
   font-family: 'GlacialIndifferenceRegular';
-  z-index: ${props => (props.clickedSidebar ? 0 : 1)};
+  z-index: ${props => Number(!props.clickedSideBar)};
+  transition: all 0.1s ease-in-out;
   pointer-events: none;
   svg {
     pointer-events: none;
+  }
+  profileIcon {
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: ${props => props.theme.secondaryColor_shade_3};
+    pointer-event: visible;
+    z-index: ${props => Number(!props.clickedSideBar) + 1};
   }
 `;
 
@@ -45,12 +57,25 @@ const SecondarySidebar = styled.aside`
   bottom: 0;
   height: 100%;
   font-family: 'GlacialIndifferenceRegular';
-  z-index: ${props => (props.clickedSidebar ? 1 : 0)};
+  z-index: ${props => Number(props.clickedSideBar)};
+  transition: all 0.1s ease-in-out;
   pointer-events: none;
   svg {
     pointer-events: none;
   }
 `;
+
+// const userName = styled.h3`
+//   font-family: Glacial Indifference;
+//   font-size: 13px;
+//   line-height: 17px;
+//   postion: absolute;
+//   top: 43px;
+//   left: 10px;
+//   right: 50px;
+//   z-index: z-index: ${props => Number(!props.clickedSideBar) + 1};
+//   margin: 0;
+// `;
 
 type Props = {};
 
@@ -96,13 +121,39 @@ const SideBar = props => {
   useEffect(() => {
     console.log(clickedSideBar);
   }, [clickedSideBar]);
+
   // <aside className={styles.sidenav} style={{ background: '#1C242D' }}>
   return (
     <>
       <MainSidebar
         clickedSideBar={clickedSideBar}
-        onClick={() => setClickedSidebar(false)}
+        // onClick={() => setClickedSidebar(false)}
       >
+        <profileIcon />
+        <FontAwesomeIcon
+          icon={faSignOutAlt}
+          style={{
+            position: 'absolute',
+            top: '50px',
+            right: '10px',
+            zIndex: 3,
+            pointerEvents: 'visible',
+            cursor: 'pointer'
+          }}
+          color="white"
+          // onClick={() => log out}
+        />
+        <h3
+          style={{
+            position: 'absolute',
+            top: '47px',
+            left: '12px',
+            fontSize: '14px'
+          }}
+        >
+          xXPeppe3214Xx
+        </h3>
+
         <svg
           width="172"
           height="100%"
@@ -121,8 +172,21 @@ const SideBar = props => {
       </MainSidebar>
       <SecondarySidebar
         clickedSideBar={clickedSideBar}
-        onClick={() => setClickedSidebar(true)}
+        // onClick={() => setClickedSidebar(true)}
       >
+        <FontAwesomeIcon
+          icon={faExchangeAlt}
+          style={{
+            position: 'absolute',
+            top: '6px',
+            width: '40px',
+            right: '12px',
+            // zIndex: 3
+            pointerEvents: 'visible',
+            cursor: 'pointer'
+          }}
+          onClick={() => setClickedSidebar(!clickedSideBar)}
+        />
         <svg
           width="172"
           height="100%"

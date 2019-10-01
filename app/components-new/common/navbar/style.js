@@ -10,6 +10,8 @@ export const Container = styled.div`
 `;
 
 export const SettingsButton = styled.div`
+  position: absolute;
+  right: calc(${props => props.theme.sizes.width.sidebar} + 10px);
   font-size: 22px;
   color: white;
   cursor: pointer;
