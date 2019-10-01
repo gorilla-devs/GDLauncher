@@ -3,8 +3,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { updateShowChangelog } from 'reducers/settings/actions';
 import store from '../../localStore';
-import Modal from '../Common/Modal/Modal';
-import ChangelogRow from './ChangelogRow';
+import Modal from 'components/common/Modal';
 
 const Container = styled.div`
   width: 100%;

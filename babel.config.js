@@ -44,7 +44,8 @@ module.exports = api => {
           alias: {
             app: path.resolve(__dirname, 'app/'),
             ui$: path.resolve(__dirname, 'ui/index.js'),
-            reducers: path.resolve(__dirname, 'app/reducers/')
+            reducers: path.resolve(__dirname, 'app/reducers/'),
+            components: path.resolve(__dirname, 'app/components-new/')
           }
         }
       ],

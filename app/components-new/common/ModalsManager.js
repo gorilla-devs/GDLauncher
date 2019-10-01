@@ -2,17 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { closeModal } from '../../reducers/modals/actions';
-import Settings from '../../components/Settings/Settings';
-import InstanceCreatorModal from '../../components/InstanceCreatorModal/InstanceCreatorModal';
-import CurseModpacksBrowserCreatorModal from '../../components/CurseModpacksBrowserCreatorModal/CurseModpacksBrowserCreatorModal';
-import CurseModpackExplorerModal from '../../components/CurseModpackExplorerModal/CurseModpackExplorerModal';
-import InstanceManagerModal from '../../components/InstanceManagerModal/InstanceManagerModal';
-import ImportPack from '../../components/ImportPack/ImportPack';
-import ExportPackModal from '../../components/ExportPackModal/ExportPackModal';
-import LoginHelperModal from '../../components/LoginHelperModal/LoginHelperModal';
-import ChangelogsModal from '../../components/ChangelogModal/ChangelogModal';
-import ConfirmDeleteModal from '../../components/ConfirmDeleteModal/ConfirmDeleteModal';
-import JavaGlobalOptionsFixModal from '../../components/JavaGlobalOptionsFixModal/JavaGlobalOptionsFixModal';
+import Settings from 'components/modals/Settings';
+import Changelogs from 'components/modals/Changelog';
 
 const Overlay = styled.div`
   position: absolute;
@@ -36,16 +27,7 @@ const Modal = styled.div`
 
 const modalsComponentLookupTable = {
   Settings,
-  InstanceCreatorModal,
-  CurseModpacksBrowserCreatorModal,
-  CurseModpackExplorerModal,
-  InstanceManagerModal,
-  ImportPack,
-  ExportPackModal,
-  LoginHelperModal,
-  ChangelogsModal,
-  ConfirmDeleteModal,
-  JavaGlobalOptionsFixModal
+  Changelogs
 };
 
 const ModalContainer = ({ unmounting, children }) => {

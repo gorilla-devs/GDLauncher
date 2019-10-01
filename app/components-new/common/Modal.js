@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
@@ -40,29 +40,43 @@ type Props = {
   children: React.ReactNode
 };
 
-const Modal = props => {
+const Modal = ({
+  transparentBackground,
+  height,
+  width,
+  header,
+  title,
+  backBtn,
+  children
+}) => {
+  const dispatch = useDispatch();
   return (
     <div
       onClick={e => e.stopPropagation()}
-      style={{
-        background: props.transparentBackground
-          ? 'transparent'
-          : 'var(--secondary-color-1)',
-        position: 'relative',
-        borderRadius: 4,
-        ...props.style
-      }}
+      transparentBackground={transparentBackground}
+      height={height}
+      width={width}
+      css={`
+        background: ${props =>
+          props.transparentBackground
+            ? 'transparent'
+            : 'var(--secondary-color-1)'};
+        position: relative;
+        border-radius: 4;
+        height: ${props => props.height || 'auto'};
+        width: ${props => props.width || 'auto'};
+      `}
     >
-      {(props.header === undefined || props.header === true) && (
+      {(header === undefined || header === true) && (
         <Header>
           <h3
             css={`
               display: inline-block;
             `}
           >
-            {props.title || 'Modal'}
+            {title || 'Modal'}
           </h3>
-          <CloseButton onClick={() => props.closeModal()}>
+          <CloseButton onClick={() => dispatch(closeModal())}>
             <FontAwesomeIcon icon={faWindowClose} />
           </CloseButton>
         </Header>
@@ -70,15 +84,15 @@ const Modal = props => {
       <div
         header={header}
         css={`
-          height: ${props.header === undefined || props.header === true
+          height: ${header === undefined || header === true
             ? 'calc(100% - 30px)'
             : '100%'};
         `}
       >
-        <span onClick={() => props.closeModal()}>
-          {props.backBtn !== undefined && props.backBtn}
+        <span onClick={() => dispatch(closeModal())}>
+          {backBtn !== undefined && backBtn}
         </span>
-        {props.children}
+        {children}
       </div>
     </div>
   );

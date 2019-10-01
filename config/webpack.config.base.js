@@ -34,6 +34,7 @@ export default {
     extensions: ['.js', '.jsx', '.json'],
     alias: {
       app: path.resolve(__dirname, '..', 'app/'),
+      components: path.resolve(__dirname, '..', 'app/components-new/'),
       ui$: path.resolve(__dirname, '..', 'ui/index.js'),
       reducers: path.resolve(__dirname, '..', 'app/reducers/')
     }

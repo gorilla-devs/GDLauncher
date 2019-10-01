@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Route, Switch } from 'react-router';
+import { useTheme } from '@material-ui/styles';
 import { push } from 'connected-react-router';
 import { notification } from 'antd';
 import { AnimatedSwitch } from 'react-router-transition';
@@ -26,7 +27,7 @@ import SideBar from 'app/components-new/common/sidebar';
 import Navigation from 'app/components-new/common/navbar';
 import SysNavBar from 'app/components-new/common/systemNavbar';
 import { isGlobalJavaOptions } from 'app/utils/java';
-import ModalsManager from 'app/components/Common/ModalsManager';
+import ModalsManager from 'app/components-new/common/ModalsManager';
 import background from '../assets/images/fullHdBackground.jpg';
 
 const Wrapper = styled.div`

@@ -1,24 +1,25 @@
 // @flow
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog, faHome, faThList } from '@fortawesome/free-solid-svg-icons';
-import logo from '../../../assets/images/logo.png';
+import logo from 'app/assets/images/logo.png';
 import {
   Container,
-  // Logo,
   SettingsButton,
   UpdateButton,
   NavigationContainer,
   NavigationElement
 } from './style';
 import { Button } from 'ui';
+import { openModal } from 'reducers/modals/actions';
 
 export default props => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const location = useSelector(state => state.router.location.pathname);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'development') {
@@ -56,28 +57,12 @@ export default props => {
             <Button selected={isLocation('/modpacks')}>ModPacks</Button>
           </Link>
         </NavigationElement>
-        {/* <ul>
-          <NavigationElement selected={isLocation('/home')}>
-            <Link to="/home" draggable="false">
-              Home
-            </Link>
-          </NavigationElement>
-          <NavigationElement selected={isLocation('/modpacks')}>
-            <Link to="/modpacks" draggable="false">
-              ModPacks
-            </Link>
-          </NavigationElement>
-        </ul> */}
       </NavigationContainer>
       <SettingsButton>
-        <Link
-          to={{
-            pathname: '/settings/myAccount_Preferences',
-            state: { modal: true }
-          }}
-        >
-          <FontAwesomeIcon icon={faCog} />
-        </Link>
+        <FontAwesomeIcon
+          icon={faCog}
+          onClick={() => dispatch(openModal('Settings'))}
+        />
       </SettingsButton>
       {updateAvailable && (
         <UpdateButton>

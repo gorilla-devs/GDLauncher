@@ -1,4 +1,6 @@
-export default {
+import { createMuiTheme } from '@material-ui/core/styles';
+
+export default createMuiTheme({
   primaryColor: '#0F7173',
   shade_1: '#F0F0F1',
   shade_2: '#E1E2E4',
@@ -29,4 +31,4 @@ export default {
       navbar: '40px'
     }
   }
-};
+});
