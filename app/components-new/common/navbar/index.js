@@ -4,7 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faHome, faThList } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCog,
+  faHome,
+  faThList,
+  faAlignJustify
+} from '@fortawesome/free-solid-svg-icons';
 import logo from 'app/assets/images/logo.png';
 import {
   Container,
@@ -62,6 +67,10 @@ export default props => {
         <FontAwesomeIcon
           icon={faCog}
           onClick={() => dispatch(openModal('Settings'))}
+        />
+        <FontAwesomeIcon
+          icon={faAlignJustify}
+          onClick={() => dispatch(openModal('Changelog'))}
         />
       </SettingsButton>
       {updateAvailable && (

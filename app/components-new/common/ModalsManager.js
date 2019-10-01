@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { closeModal } from '../../reducers/modals/actions';
 import Settings from 'components/modals/Settings';
-import Changelogs from 'components/modals/Changelog';
+import Changelog from 'components/modals/Changelog';
 
 const Overlay = styled.div`
   position: absolute;
@@ -27,7 +27,7 @@ const Modal = styled.div`
 
 const modalsComponentLookupTable = {
   Settings,
-  Changelogs
+  Changelog
 };
 
 const ModalContainer = ({ unmounting, children }) => {

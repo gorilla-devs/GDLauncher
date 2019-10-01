@@ -116,7 +116,8 @@ export default props => {
   return (
     <Modal
       title={`WHAT'S NEW IN v${require('../../../package.json').version}`}
-      style={{ height: '70vh', width: 540 }}
+      height="70vh"
+      width="540px"
     >
       <Container>
         <hrTextYellow>WARNING!</hrTextYellow>
