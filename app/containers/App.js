@@ -153,8 +153,8 @@ const App = ({ children }) => {
   }, [globalJavaOptions, location.pathname]);
 
   const isFullScreenPage =
-    location.pathname === '/' &&
-    location.pathname === '/autoUpdate' &&
+    location.pathname === '/' ||
+    location.pathname === '/autoUpdate' ||
     location.pathname === '/newUserPage';
 
   return (

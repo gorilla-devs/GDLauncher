@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import { closeModal } from 'reducers/modals/actions';
 
-const Header = styled.div`
+const HeaderComponent = styled.div`
   position: relative;
   width: 100%;
   height: 30px;
@@ -68,7 +68,7 @@ const Modal = ({
       `}
     >
       {(header === undefined || header === true) && (
-        <Header>
+        <HeaderComponent>
           <h3
             css={`
               display: inline-block;
@@ -79,7 +79,7 @@ const Modal = ({
           <CloseButton onClick={() => dispatch(closeModal())}>
             <FontAwesomeIcon icon={faWindowClose} />
           </CloseButton>
-        </Header>
+        </HeaderComponent>
       )}
       <div
         header={header}
