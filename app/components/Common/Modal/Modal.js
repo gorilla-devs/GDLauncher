@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
-import { closeModal } from '../../../reducers/modals/actions';
+import { closeModal } from 'reducers/modals/actions';
 import styles from './Modal.scss';
 
 type Props = {
@@ -15,28 +15,28 @@ type Props = {
   children: React.ReactNode
 };
 
-class Modal extends Component<Props> {
+const Modal = props => {
   render() {
     return (
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          background: this.props.transparentBackground
+          background: props.transparentBackground
             ? 'transparent'
             : 'var(--secondary-color-1)',
           position: 'relative',
           borderRadius: 4,
-          ...this.props.style
+          ...props.style
         }}
       >
-        {(this.props.header === undefined || this.props.header === true) && (
+        {(props.header === undefined || props.header === true) && (
           <div className={styles.header}>
             <h3 style={{ display: 'inline-block' }}>
-              {this.props.title || 'Modal'}
+              {props.title || 'Modal'}
             </h3>
             <div
               className={styles.closeBtn}
-              onClick={() => this.props.closeModal()}
+              onClick={() => props.closeModal()}
             >
               <FontAwesomeIcon icon={faWindowClose} />
             </div>
@@ -46,22 +46,19 @@ class Modal extends Component<Props> {
           className={styles.modalContent}
           style={{
             height:
-              this.props.header === undefined || this.props.header === true
+              props.header === undefined || props.header === true
                 ? 'calc(100% - 30px)'
                 : '100%'
           }}
         >
-          <span onClick={() => this.props.closeModal()}>
-            {this.props.backBtn !== undefined && this.props.backBtn}
+          <span onClick={() => props.closeModal()}>
+            {props.backBtn !== undefined && props.backBtn}
           </span>
-          {this.props.children}
+          {props.children}
         </div>
       </div>
     );
   }
 }
 
-export default connect(
-  null,
-  { closeModal }
-)(Modal);
+export default Modal;
