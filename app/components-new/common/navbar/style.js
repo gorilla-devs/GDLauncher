@@ -56,27 +56,6 @@ export const NavigationContainer = styled.div`
 export const NavigationElement = styled.li`
   display: inline;
   cursor: pointer;
-  ${props =>
-    props.selected
-      ? `
-  a {
-    background: ${props => props.theme.primaryColor};
-    border: 2px solid ${props => props.theme.primaryColor};
-    color: white;
-    transition: all 0.25s;
-    text-decoration: none;
-    display: block;
-  }
-  `
-      : `
-  &:hover a {
-    background: ${props => props.theme.secondaryColor_shade_11};
-    border: 2px solid ${props => props.theme.secondaryColor_shade_11};
-    transition: all .25s;
-    background: var(--secondary-color-3);
-    border-radius: 2px;
-  }
-  `}
   &:hover a,
   &:active a,
   &:focus a {
