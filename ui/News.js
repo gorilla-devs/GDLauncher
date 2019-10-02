@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import ContentLoader from 'react-content-loader';
 import styled from 'styled-components';
 import { shell } from 'electron';
-import { useContext } from 'react';
 import { ThemeContext } from 'styled-components';
 
 const Carousel = styled.div`
@@ -10,7 +9,6 @@ const Carousel = styled.div`
   height: 100%;
   overflow: hidden;
   border-radious: 2px;
-  ...props.style;
 `;
 
 const ImageSlider = styled.div`
@@ -69,15 +67,6 @@ const Gradient = styled.div`
   opacity: 0.99;
   z-index: 1;
 `;
-
-// const Overlay = styled.div`
-//   height: 100%;
-//   width: 100%;
-//   border-radious: 2px;
-//   background: black;
-//   opacity: 0.4;
-//   z-index: 1;
-// `;
 
 const Select = styled.div`
   display: flex;
@@ -166,7 +155,6 @@ function ImageList(props) {
     <Slide key={i} onClick={e => openNews(e, inf)}>
       <Title>{inf.title}</Title>
       <SubTitle>{inf.description}</SubTitle>
-      {/* <Overlay /> */}
       <Gradient />
       <ImageSlide image={inf.image} />
     </Slide>
@@ -234,15 +222,15 @@ function News(props: Props) {
     </Carousel>
   ) : (
     <StyledContentLoader
-      primaryColor={ContextTheme.secondaryColor_shade_11}
-      secondaryColor={ContextTheme.secondaryColor_shade_10}
+      primaryColor={ContextTheme.shade11}
+      secondaryColor={ContextTheme.shade10}
     >
       <rect
         rx="0"
         ry="0"
         width="788"
         height="158"
-        style={{ borderRadious: 2 }}
+        style={{ borderRadius: 2 }}
       />
     </StyledContentLoader>
   );
