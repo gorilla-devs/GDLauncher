@@ -38,20 +38,18 @@ export default createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    background-color: var(--secondary-color-3);
-    width: 10px;
-    border-radius: 2px;
+    width: 8px;
+    border-radius: 1px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: $text-main-color;
-    border-radius: 2px;
+    background-color: ${props => props.theme.shade3};
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px var(--secondary-color-3);
-    background-color: var(--secondary-color-3);
-    border-radius: 2px;
+    background-color: ${props => props.theme.shade11};
+    border-radius: 1px;
   }
 
   :not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path),
