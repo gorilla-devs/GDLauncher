@@ -43,10 +43,10 @@ export default props => {
   };
 
   return (
-    <Container style={{ background: 'red' }}>
+    <Container>
       <img
         src={logo}
-        height="30px"
+        height="36px"
         alt="logo"
         draggable="false"
         style={{ zIndex: 1 }}

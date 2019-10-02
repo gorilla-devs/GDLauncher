@@ -28,7 +28,7 @@ export default createMuiTheme({
     },
     height: {
       systemNavbar: '23px',
-      navbar: '40px'
+      navbar: '36px'
     }
   }
 });

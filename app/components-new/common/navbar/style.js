@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const Container = styled.div`
   margin: 0;
   width: 100%;
-  height: 30px;
+  height: ${({ theme }) => theme.sizes.height.navbar};
   -webkit-user-select: none;
   display: flex;
   justify-content: space-between;
