@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, News } from 'ui';
+import { News } from 'ui';
 import { useSelector } from 'react-redux';
+import StyledRipple from '../../../../ui/Ripple';
 
 const Home = () => {
   const news = useSelector(state => state.news);
@@ -54,7 +55,14 @@ const Home = () => {
             right: 0
           }}
         >
-          prova
+          <StyledRipple
+            css={`
+              width: 100%;
+              height: 100%;
+            `}
+          >
+            prova
+          </StyledRipple>
         </div>
       </div>
     </div>
