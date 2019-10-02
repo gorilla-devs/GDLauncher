@@ -88,14 +88,6 @@ export function initManifests() {
 
 export function initNews() {
   return async (dispatch, getState) => {
-    const getArticleHeaderImage = async articleURL => {
-      // This extracts a <meta property="og:image" content="some url" />
-      // and gets the url of the header image
-      const req = await axios.get(`https://minecraft.net${articleURL}`);
-      const $ = cheerio.load(req.data);
-      const url = $('meta[property="og:image"]').prop('content');
-      return url;
-    };
     const {
       news,
       loading: { minecraftNews }
@@ -103,6 +95,7 @@ export function initNews() {
     if (news.length === 0 && !minecraftNews.isRequesting) {
       try {
         const res = await axios.get(NEWS_URL);
+        console.log(res);
         const newsArr = await Promise.all(
           res.data.article_grid.map(async item => {
             return {
@@ -110,7 +103,7 @@ export function initNews() {
               description: item.default_tile.sub_header,
               // We need to get the header image of every article, since
               // the ones present in this json are thumbnails
-              image: await getArticleHeaderImage(item.article_url),
+              image: `https://minecraft.net${item.default_tile.image.imageURL}`,
               url: `https://minecraft.net${item.article_url}`
             };
           })
