@@ -8,7 +8,7 @@ const Carousel = styled.div`
   width: 788px;
   height: 100%;
   overflow: hidden;
-  border-radious: 2px;
+  border-radius: ${props => props.theme.shape.borderRadius};
 `;
 
 const ImageSlider = styled.div`
@@ -17,7 +17,7 @@ const ImageSlider = styled.div`
   align-items: stretch;
   object-fit: covert;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: ${props => props.theme.shape.borderRadius};
   justify-content: space-between;
   padding: 0;
   margin: 0;
@@ -35,7 +35,7 @@ const ImageSlide = styled.div`
   top: 0;
   height: 100%;
   width: 100%;
-  border-radius: 2px;
+  border-radius: ${props => props.theme.shape.borderRadius};
   background-image: url("${props => (props.image ? props.image : null)}");
   background-position: center;
   background-size: cover;
@@ -58,7 +58,7 @@ const Slide = styled.div`
 const Gradient = styled.div`
   height: 100%;
   width: 100%;
-  border-radious: 2px;
+  border-radius: ${props => props.theme.shape.borderRadius};
   background-image: linear-gradient(
     0deg,
     rgba(0, 0, 0, 1) 0%,
@@ -88,21 +88,21 @@ const SelectElement = styled.div`
   flex: 1;
   margin: 0 2px 0 2px;
   cursor: pointer;
-  background: ${props => props.theme.shade1};
+  background: ${props => props.theme.palette.grey[50]};
   opacity: 0.6;
   transition: flex-grow 0.2s ease-in-out;
   border-radius: 2px;
   &:hover {
     margin: 0 2px 0 2px;
     flex-grow: 2;
-    background: ${props => props.theme.shade1};
+    background: ${props => props.theme.palette.grey[50]};
     opacity: 0.79;
     vertical-align: middle;
   }
   &:active {
     margin: 0 2px 0 2px;
     flex-grow: 2;
-    background: ${props => props.theme.shade1};
+    background: ${props => props.theme.palette.grey[50]};
     opacity: 1;
     vertical-align: middle;
   }
@@ -110,7 +110,7 @@ const SelectElement = styled.div`
   &:nth-child(${props => props.currentImageIndex}) {
     margin: 0 2px 0 2px;
     flex-grow: 2;
-    background: ${props => props.theme.shade1};
+    background: ${props => props.theme.palette.grey[50]};
     opacity: 1;
     vertical-align: middle;
   }

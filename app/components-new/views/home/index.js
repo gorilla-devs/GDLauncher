@@ -1,5 +1,5 @@
 import React from 'react';
-import { News } from 'ui';
+import News from 'components/common/News';
 import { useSelector } from 'react-redux';
 import StyledRipple from '../../../../ui/Ripple';
 
