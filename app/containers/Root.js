@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
+import { StylesProvider } from '@material-ui/styles';
 import log from 'electron-log';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ConnectedRouter } from 'connected-react-router';
@@ -46,13 +47,15 @@ class Root extends Component<Props> {
     return (
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <ThemeProvider theme={theme}>
-            <div>
-              <ConnectedRouter history={history}>
-                <App history={history} />
-              </ConnectedRouter>
-            </div>
-          </ThemeProvider>
+          <StylesProvider injectFirst>
+            <ThemeProvider theme={theme}>
+              <div>
+                <ConnectedRouter history={history}>
+                  <App history={history} />
+                </ConnectedRouter>
+              </div>
+            </ThemeProvider>
+          </StylesProvider>
         </PersistGate>
       </Provider>
     );

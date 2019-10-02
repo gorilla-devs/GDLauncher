@@ -94,7 +94,6 @@ export function initNews() {
     if (news.length === 0 && !minecraftNews.isRequesting) {
       try {
         const res = await axios.get(NEWS_URL);
-        console.log(res);
         const newsArr = await Promise.all(
           res.data.article_grid.map(async item => {
             return {
