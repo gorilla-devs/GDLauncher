@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { promisify } from 'util';
 import log from 'electron-log';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { faWindowClose, faHome } from '@fortawesome/free-solid-svg-icons';
 import styles from './InstanceManagerModal.scss';
 import { PACKS_PATH } from '../../constants';
 import Modal from '../Common/Modal/Modal';
@@ -111,7 +111,10 @@ function InstanceManagerModal(props) {
       );
       setInstanceIcon(InstanceIcon);
     } catch {
-      log.warn('The instance icon could not be removed', this.props.match.params.instance);
+      log.warn(
+        'The instance icon could not be removed',
+        this.props.match.params.instance
+      );
     }
   };
 
