@@ -3,7 +3,6 @@ import fss, { promises as fs } from 'fs';
 import { message } from 'antd';
 import axios from 'axios';
 import os, { cpus } from 'os';
-import cheerio from 'cheerio';
 import _, { isEqual, unionBy } from 'lodash';
 import compressing from 'compressing';
 import Promise from 'bluebird';
