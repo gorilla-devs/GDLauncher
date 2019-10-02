@@ -89,21 +89,21 @@ const SelectElement = styled.div`
   flex: 1;
   margin: 0 2px 0 2px;
   cursor: pointer;
-  background: ${props => props.theme.secondaryColor_shade_1};
+  background: ${props => props.theme.shade1};
   opacity: 0.6;
   transition: flex-grow 0.2s ease-in-out;
   border-radius: 2px;
   &:hover {
     margin: 0 2px 0 2px;
     flex-grow: 2;
-    background: ${props => props.theme.secondaryColor_shade_1};
+    background: ${props => props.theme.shade1};
     opacity: 0.79;
     vertical-align: middle;
   }
   &:active {
     margin: 0 2px 0 2px;
     flex-grow: 2;
-    background: ${props => props.theme.secondaryColor_shade_1};
+    background: ${props => props.theme.shade1};
     opacity: 1;
     vertical-align: middle;
   }
@@ -111,7 +111,7 @@ const SelectElement = styled.div`
   &:nth-child(${props => props.currentImageIndex}) {
     margin: 0 2px 0 2px;
     flex-grow: 2;
-    background: ${props => props.theme.secondaryColor_shade_1};
+    background: ${props => props.theme.shade1};
     opacity: 1;
     vertical-align: middle;
   }
