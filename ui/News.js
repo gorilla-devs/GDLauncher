@@ -16,6 +16,8 @@ const Carousel = styled.div`
 const ImageSlider = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: stretch;
+  object-fit: covert;
   overflow: hidden;
   border-radius: 2px;
   justify-content: space-between;
@@ -29,18 +31,17 @@ const ImageSlider = styled.div`
   transition: transform 0.3s ease-in-out;
 `;
 
-const ImageSlide = styled.img`
+// padding: 200px;
+const ImageSlide = styled.div`
   position: absolute;
   top: 0;
   height: 100%;
   width: 100%;
-  padding: 200px;
   border-radius: 2px;
   background-image: url(${props => (props.image ? props.image : null)});
   background-position: center;
   background-size: cover;
   transition: transform 0.2s ease-in-out;
-  object-fit: cover;
   z-index: -1;
 `;
 
@@ -65,9 +66,18 @@ const Gradient = styled.div`
     rgba(0, 0, 0, 1) 0%,
     rgba(165, 165, 165, 0) 80%
   );
-  opacity: 0.9;
+  opacity: 0.99;
   z-index: 1;
 `;
+
+// const Overlay = styled.div`
+//   height: 100%;
+//   width: 100%;
+//   border-radious: 2px;
+//   background: black;
+//   opacity: 0.4;
+//   z-index: 1;
+// `;
 
 const Select = styled.div`
   display: flex;
@@ -156,6 +166,7 @@ function ImageList(props) {
     <Slide key={i} onClick={e => openNews(e, inf)}>
       <Title>{inf.title}</Title>
       <SubTitle>{inf.description}</SubTitle>
+      {/* <Overlay /> */}
       <Gradient />
       <ImageSlide image={inf.image} />
     </Slide>
