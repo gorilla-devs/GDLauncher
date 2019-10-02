@@ -49,7 +49,7 @@ export default props => {
         height="30px"
         alt="logo"
         draggable="false"
-        style={{ zIndex: 9999999999999 }}
+        style={{ zIndex: 1 }}
       />
       <NavigationContainer>
         <NavigationElement>
