@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Modal from 'components/Common/Modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 
 const Container = styled.div`
   width: 100%;
@@ -12,7 +14,26 @@ const Container = styled.div`
 
 export default props => {
   return (
-    <Modal header={false} height="100%" width="100%">
+    <Modal
+      header={false}
+      height="100%"
+      width="100%"
+      backBtn={
+        <FontAwesomeIcon
+          icon={faWindowClose}
+          css={`
+            position: relative;
+            margin-left: 97%;
+            width: 40px;
+            height: 40px;
+            transition: color 0.2s ease-in-out;
+            &:hover {
+              color: ${props => props.theme.red};
+            }
+          `}
+        />
+      }
+    >
       <Container>Test</Container>
     </Modal>
   );
