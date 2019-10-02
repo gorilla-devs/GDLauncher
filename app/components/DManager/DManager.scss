@@ -2,7 +2,8 @@
 
 .header {
   position: relative;
-  background: linear-gradient( rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)), url("../../assets/images/dmanagerBG.jpg");
+  background: linear-gradient(rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)),
+    url('../../assets/images/dmanagerBG.jpg');
   background-position: center left;
   background-repeat: no-repeat;
   background-size: cover;
@@ -30,7 +31,7 @@
   position: relative;
   top: 40px;
   a:hover {
-    text-decoration: none; 
+    text-decoration: none;
   }
 }
 
@@ -49,7 +50,6 @@
 .NoServerCreated {
   text-align: center;
   margin-top: 25vh;
-  font-family: GlacialIndifferenceRegular;
   font-size: 20px;
   font-weight: 600;
   color: $text-main-color;

@@ -247,6 +247,7 @@
     "source-map-support": "^0.5.13",
     "styled-components": "^4.4.0",
     "sudo-prompt": "^9.0.0",
+    "typeface-roboto": "^0.0.75",
     "uuid": "^3.3.3",
     "version-sort": "^0.1.1",
     "yazl": "^2.5.1"

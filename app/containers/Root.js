@@ -7,6 +7,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import { theme } from 'ui';
 import CrashHandler from '../components/CrashHandler/CrashHandler';
 import App from './App';
+import 'typeface-roboto';
 
 type Props = {
   store: object,

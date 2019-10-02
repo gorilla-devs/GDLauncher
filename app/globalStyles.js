@@ -1,37 +1,9 @@
 import { createGlobalStyle } from 'styled-components';
 
 export default createGlobalStyle`
-  @font-face {
-    font-family: 'GlacialIndifferenceBold';
-    src: url('./assets/fonts/GlacialIndifferenceBold.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'GlacialIndifferenceItalic';
-    src: url('./assets/fonts/GlacialIndifferenceItalic.otf') format('opentype');
-    font-weight: normal;
-    font-style: italic;
-  }
-
-  @font-face {
-    font-family: 'GlacialIndifferenceMedium';
-    src: url('./assets/fonts/GlacialIndifferenceMedium.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'GlacialIndifferenceRegular';
-    src: url('./assets/fonts/GlacialIndifferenceRegular.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
   html,
   body {
-    font-family: 'GlacialIndifferenceRegular', sans-serif;
+    font-family: Roboto, Helvetica, sans-serif;
     padding: 0;
     margin: 0;
     overflow: hidden;

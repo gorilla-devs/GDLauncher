@@ -40,7 +40,6 @@ export const UpdateButton = styled.div`
 
 export const NavigationContainer = styled.div`
   -webkit-app-region: no-drag;
-  font-family: 'GlacialIndifferenceRegular';
   font-weight: 700;
   font-size: 16px;
   height: 30px;

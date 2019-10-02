@@ -3,7 +3,6 @@
   grid-template-columns: 1.1fr 3fr;
   height: 100%;
   width: 100%;
-  font-family: 'GlacialIndifferenceRegular';
 }
 
 .content {
@@ -52,7 +51,8 @@
   }
 }
 
-.instanceIconContainer:hover, .resetIcon:hover ~ .instanceIconContainer {
+.instanceIconContainer:hover,
+.resetIcon:hover ~ .instanceIconContainer {
   cursor: pointer;
   .instanceIconOverlay {
     position: absolute;
@@ -93,4 +93,3 @@
   font-size: 18px;
   transition: opacity 0.2s ease-in-out;
 }
-

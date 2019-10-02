@@ -30,7 +30,6 @@ const MainSidebar = styled.aside`
   right: 0;
   bottom: 0;
   height: 100%;
-  font-family: 'GlacialIndifferenceRegular';
   z-index: ${props => Number(!props.clickedSideBar)};
   transition: all 0.1s ease-in-out;
   pointer-events: none;
@@ -56,7 +55,6 @@ const SecondarySidebar = styled.aside`
   right: 0;
   bottom: 0;
   height: 100%;
-  font-family: 'GlacialIndifferenceRegular';
   z-index: ${props => Number(props.clickedSideBar)};
   transition: all 0.1s ease-in-out;
   pointer-events: none;
