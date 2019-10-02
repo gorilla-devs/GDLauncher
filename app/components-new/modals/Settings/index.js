@@ -24,9 +24,9 @@ export default props => {
           css={`
             position: relative;
             margin-left: 97%;
-            width: 40px;
-            height: 40px;
-            transition: color 0.2s ease-in-out;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: color 0.1s ease-in-out;
             &:hover {
               color: ${props => props.theme.red};
             }
