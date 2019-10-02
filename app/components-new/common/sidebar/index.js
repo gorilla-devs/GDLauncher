@@ -10,8 +10,13 @@ import { bindActionCreators } from 'redux';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExchangeAlt, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import { faDiscord, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import {
+  faExchangeAlt,
+  faSignOutAlt,
+  faClipboardList,
+  faFacebook,
+  faDiscord
+} from '@fortawesome/free-solid-svg-icons';
 import { promisify } from 'util';
 import CIcon from '../../../components/Common/Icon/Icon';
 import SocialIcon from './SocialIcon';
@@ -22,7 +27,7 @@ import styles from './SideBar.scss';
 import { PACKS_PATH } from '../../../constants';
 import { readConfig } from '../../../utils/instances';
 import { getInstance, getCurrentAccount } from '../../../utils/selectors';
-import { openModal } from '../../../reducers/modals/actions';
+import { openModal } from 'reducers/modals/actions';
 
 const MainSidebar = styled.aside`
   position: absolute;
@@ -43,7 +48,7 @@ const MainSidebar = styled.aside`
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: ${props => props.theme.secondaryColor_shade_3};
+    background: ${props => props.theme.shade3};
     pointer-event: visible;
     z-index: ${props => Number(!props.clickedSideBar) + 1};
   }
@@ -62,18 +67,6 @@ const SecondarySidebar = styled.aside`
     pointer-events: none;
   }
 `;
-
-// const userName = styled.h3`
-//   font-family: Glacial Indifference;
-//   font-size: 13px;
-//   line-height: 17px;
-//   postion: absolute;
-//   top: 43px;
-//   left: 10px;
-//   right: 50px;
-//   z-index: z-index: ${props => Number(!props.clickedSideBar) + 1};
-//   margin: 0;
-// `;
 
 type Props = {};
 
@@ -141,17 +134,38 @@ const SideBar = props => {
           color="white"
           // onClick={() => log out}
         />
-        <h3
+
+        <FontAwesomeIcon
+          icon={faClipboardList}
+          onClick={() => dispatch(openModal('Changelog'))}
+          // css={`
+          //   position: absolute;
+          //   top: 90%;
+          //   right: 10px;
+          //   z-index: 3;
+          //   pointer-events: visible;
+          //   cursor: pointer;
+          // `}
           style={{
             position: 'absolute',
-            top: '47px',
-            left: '12px',
-            fontSize: '14px'
+            top: '90%',
+            right: '10px',
+            zIndex: 3,
+            pointerEvents: 'visible',
+            cursor: 'pointer'
           }}
+        />
+
+        <h3
+          css={`
+            position: absolute;
+            top: 37px;
+            left: 12px;
+            font-size: 14px;
+          `}
         >
           xXPeppe3214Xx
         </h3>
-
         <svg
           width="172"
           height="100%"

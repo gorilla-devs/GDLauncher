@@ -67,10 +67,10 @@ export default props => {
         <FontAwesomeIcon
           icon={faCog}
           onClick={() => dispatch(openModal('Settings'))}
-        />
-        <FontAwesomeIcon
-          icon={faAlignJustify}
-          onClick={() => dispatch(openModal('Changelog'))}
+          css={`
+            display: inline-block;
+            vertical-align: middle;
+          `}
         />
       </SettingsButton>
       {updateAvailable && (
