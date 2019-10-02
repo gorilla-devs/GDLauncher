@@ -22,29 +22,45 @@ export default createMuiTheme({
       dark: '#952f2d'
     },
     grey: {
-      50: '#F0F0F1',
-      100: '#E1E2E4',
-      200: '#D2D4D6',
-      300: '#B5B8BC',
-      400: '#979CA1',
-      500: '#7A8086',
-      600: '#5D646C',
-      700: '#49515A',
-      800: '#353E48',
-      900: '#353E48',
-      A100: '#212B36',
-      A200: '#1C242D',
-      A400: '#101419'
+      50: '#B5B8BC',
+      100: '#979CA1',
+      200: '#7A8086',
+      300: '#5D646C',
+      400: '#49515A',
+      500: '#353E48',
+      600: '#353E48',
+      700: '#212B36',
+      800: '#1C242D',
+      900: '#101419'
+    },
+    colors: {
+      red: '#D64441',
+      yellow: '#FAB849',
+      purple: '#BB6BD9',
+      green: '#27AE60',
+      blue: '#3FA7D6',
+      darkBlue: '#203753'
     },
     text: {
       disabled: 'rgba(255, 255, 255, 0.38)',
       hint: 'rgba(255, 255, 255, 0.38)',
       primary: 'rgba(255, 255, 255, 0.87)',
-      secondary: 'rgba(255, 255, 255, 0.54)'
+      secondary: 'rgba(255, 255, 255, 0.54)',
+      icon: '#F0F0F1'
     },
     type: 'dark'
   },
-  spacing: factor => [0, 4, 8, 16, 32, 64][factor],
+  action: {
+    hover: 'rgba(255, 255, 255, 0.1)',
+    selected: 'rgba(255, 255, 255, 0.2)'
+  },
+  duration: {
+    longer: 0.3,
+    main: 0.2,
+    shorter: 0.1
+  },
+  shape: { borderRadius: '4px' },
+  spacing: factor => [4, 8, 12, 15, 20][factor],
   sizes: {
     width: {
       sidebar: '172px'
