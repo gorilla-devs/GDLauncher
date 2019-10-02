@@ -9,7 +9,6 @@ const Container = styled.div`
   height: 100%;
   overflow-y: auto;
   text-align: center;
-  padding: 0 30px;
 `;
 
 export default props => {
@@ -22,9 +21,9 @@ export default props => {
         <FontAwesomeIcon
           icon={faWindowClose}
           css={`
-            position: relative;
-            margin-left: 97%;
-            margin-top: 15px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
             cursor: pointer;
             transition: color 0.1s ease-in-out;
             &:hover {

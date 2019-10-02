@@ -60,7 +60,7 @@ const Modal = ({
             ? 'transparent'
             : 'var(--secondary-color-1)'};
         position: absolute;
-        border-radius: 4;
+        border-radius: 4px;
         height: ${props => props.height || '100vh'};
         width: ${props => props.width || '100vw'};
       `}
