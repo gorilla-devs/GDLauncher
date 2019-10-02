@@ -42,7 +42,7 @@ export const NavigationContainer = styled.div`
   -webkit-app-region: no-drag;
   font-weight: 700;
   font-size: 16px;
-  height: 30px;
+  height: ${({ theme }) => theme.sizes.height.navbar};
   width: 100%;
   ul {
     list-style-type: none;
