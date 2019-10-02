@@ -7,8 +7,6 @@ export default createGlobalStyle`
     padding: 0;
     margin: 0;
     overflow: hidden;
-    background-color: white;
-    ${props => console.log(props)}
     color: ${props => props.theme.palette.text.primary};
   }
 
@@ -36,6 +34,7 @@ export default createGlobalStyle`
 
   img {
     -webkit-user-drag: none;
+    -webkit-transform:translate3d(0,0,0);
   }
 
   ::-webkit-scrollbar {
