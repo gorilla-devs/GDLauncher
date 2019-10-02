@@ -1,5 +1,4 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import { white } from 'ansi-colors';
 
 export default createMuiTheme({
   palette: {
