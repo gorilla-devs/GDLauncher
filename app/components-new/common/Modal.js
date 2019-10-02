@@ -11,26 +11,21 @@ const HeaderComponent = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  height: 30px;
-  line-height: 30px;
-  padding-left: 10px;
+  width: calc(100% - 20px);
+  padding: 0 10px;
+  height: 40px;
   background: var(--secondary-color-2);
   border-radius: 4px;
 `;
 
 const CloseButton = styled.div`
-  float: right;
-  position: relative;
-  top: 2px;
-  right: 10px;
-  font-size: 19px;
+  font-size: 20px;
   width: 20px;
   height: 20px;
   cursor: pointer;
   transition: all 0.15s ease-in-out;
   &:hover {
-    color: rgba(231, 76, 60, 0.8);
+    color: ${props => props.theme.red};
   }
 `;
 
@@ -64,10 +59,10 @@ const Modal = ({
           props.transparentBackground
             ? 'transparent'
             : 'var(--secondary-color-1)'};
-        position: relative;
+        position: absolute;
         border-radius: 4;
-        height: ${props => props.height || 'auto'};
-        width: ${props => props.width || 'auto'};
+        height: ${props => props.height || '100vh'};
+        width: ${props => props.width || '100vw'};
       `}
     >
       {(header === undefined || header === true) && (
@@ -82,8 +77,11 @@ const Modal = ({
         header={header}
         css={`
           height: ${header === undefined || header === true
-            ? 'calc(100% - 30px)'
+            ? 'calc(100% - 40px - 40px)'
             : '100%'};
+          padding: ${({ header }) =>
+            header === undefined || header === true ? 20 : 0}px;
+          overflow-y: auto;
         `}
       >
         <span onClick={() => dispatch(closeModal())}>

@@ -19,7 +19,7 @@ export default createMuiTheme({
   yellow: '#FAC05E',
   green: '#27AE60',
   purple: '#BB6BD9',
-  lightBlue: '#3FA7D6',
+  blue: '#3FA7D6',
   darkBlue: '#203753',
   spacing: factor => [0, 4, 8, 16, 32, 64][factor],
   sizes: {

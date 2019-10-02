@@ -48,7 +48,7 @@ const Wrapper = styled.div`
         ${props =>
           props.isFullScreenPage
             ? '0px'
-            : `${props.theme.sizes.height.systemNavbar} - 40px - ${props.theme.sizes.height.navbar}`}
+            : `${props.theme.sizes.height.systemNavbar} - 20px - ${props.theme.sizes.height.navbar}`}
     );
     margin: ${props => (props.isFullScreenPage ? 0 : 20)}px;
     margin-top: ${props => (props.isFullScreenPage ? 0 : 10)}px;

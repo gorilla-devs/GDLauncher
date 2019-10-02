@@ -63,8 +63,6 @@ export const NavigationElement = styled.li`
   a {
     position: relative;
     display: inline-block;
-    height: 30px;
-    width: 90px;
     line-height: 30px;
     color: white;
     text-align: center;

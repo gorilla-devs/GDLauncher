@@ -8,9 +8,7 @@ import Modal from 'components/common/Modal';
 const Container = styled.div`
   width: 100%;
   height: 100%;
-  overflow-y: auto;
   text-align: center;
-  padding: 0 30px;
 `;
 
 const HrText = styled.h2`
@@ -40,34 +38,34 @@ const HrText = styled.h2`
 `;
 
 const HrTextGreen = styled(HrText)`
-  color: #27ae60;
+  color: ${({ theme }) => theme.green};
   &:before,
   &:after {
-    background-color: #27ae60;
+    background-color: ${({ theme }) => theme.green};
   }
 `;
 
 const HrTextRed = styled(HrText)`
-  color: #d35400;
+  color: ${({ theme }) => theme.red};
   &:before,
   &:after {
-    background-color: #d35400;
+    background-color: ${({ theme }) => theme.red};
   }
 `;
 
 const HrTextYellow = styled(HrText)`
-  color: #f39c12;
+  color: ${({ theme }) => theme.yellow};
   &:before,
   &:after {
-    background-color: #f39c12;
+    background-color: ${({ theme }) => theme.yellow};
   }
 `;
 
 const HrTextBlue = styled(HrText)`
-  color: #3498db;
+  color: ${({ theme }) => theme.blue};
   &:before,
   &:after {
-    background-color: #3498db;
+    background-color: ${({ theme }) => theme.blue};
   }
 `;
 
@@ -117,14 +115,27 @@ export default props => {
     <Modal
       title={`WHAT'S NEW IN v${require('../../../package.json').version}`}
       height="70vh"
-      width="540px"
+      width="600px"
     >
       <Container>
-        <HrTextYellow>WARNING!</HrTextYellow>
+        <HrTextYellow
+          css={`
+            margin-top: 0;
+          `}
+        >
+          WARNING!
+        </HrTextYellow>
         <Summary>
           This update contains{' '}
-          <span style={{ color: '#f39c12' }}>breaking changes</span>. If your
-          instances don't run, try right-clicking on them and select "Repair"
+          <span
+            css={`
+              color: ${({ theme }) => theme.yellow};
+            `}
+          >
+            breaking changes
+          </span>
+          . If your instances don't run, try right-clicking on them and select
+          "Repair"
         </Summary>
         <div style={{ margin: 15 }} />
         <HrTextGreen>SOME COOL NEW STUFF</HrTextGreen>
