@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { closeModal } from 'reducers/modals/actions';
 import Settings from 'components/modals/Settings';
 import Changelog from 'components/modals/Changelog';
-import LoginHelper from 'components/modals/loginHelper';
+import LoginHelper from 'components/modals/LoginHelper';
 
 const Overlay = styled.div`
   position: absolute;
