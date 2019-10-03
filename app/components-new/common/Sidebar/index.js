@@ -28,6 +28,7 @@ import { PACKS_PATH } from '../../../constants';
 import { readConfig } from '../../../utils/instances';
 import { getInstance, getCurrentAccount } from '../../../utils/selectors';
 import { openModal } from 'reducers/modals/actions';
+import { logout } from 'reducers/actions';
 
 const MainSidebar = styled.aside`
   position: absolute;
@@ -132,7 +133,7 @@ const SideBar = props => {
             cursor: 'pointer'
           }}
           color="white"
-          // onClick={() => log out}
+          onClick={() => dispatch(logout())}
         />
 
         <FontAwesomeIcon

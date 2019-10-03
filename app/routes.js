@@ -11,7 +11,7 @@ function WaitingComponent(MyComponent) {
 const Login = lazy(() => import('app/components-new/views/login'));
 const HomePage = lazy(() => import('app/components-new/views/home'));
 // const AutoUpdate = lazy(() => import('./components/AutoUpdate/AutoUpdate'));
-// const NewUserPage = lazy(() => import('./components/NewUserPage/NewUserPage'));
+const NewUserPage = lazy(() => import('app/components-new/views/NewUserPage'));
 const Modpacks = lazy(() => import('app/components-new/views/modpacks'));
 
 const routes = [
@@ -24,10 +24,10 @@ const routes = [
   //   path: '/autoUpdate',
   //   component: WaitingComponent(AutoUpdate)
   // },
-  // {
-  //   path: '/newUserPage',
-  //   component: WaitingComponent(NewUserPage)
-  // },
+  {
+    path: '/newUserPage',
+    component: WaitingComponent(NewUserPage)
+  },
   {
     path: '/home',
     component: WaitingComponent(HomePage)

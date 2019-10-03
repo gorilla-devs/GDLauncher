@@ -18,9 +18,7 @@ const News = props => (
             >
               <div
                 style={{
-                  background: `linear-gradient(rgba(44, 62, 80, 0), rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 1)), url(${
-                    inf.image
-                  })`,
+                  background: `linear-gradient(rgba(44, 62, 80, 0), rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 1)), url(${inf.image})`,
                   backgroundSize: 'cover',
                   height: '180px',
                   backgroundPosition: 'center',

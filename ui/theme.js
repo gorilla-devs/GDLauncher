@@ -60,7 +60,7 @@ export default createMuiTheme({
     shorter: 0.1
   },
   shape: { borderRadius: '4px' },
-  spacing: factor => [4, 8, 12, 15, 20][factor],
+  spacing: factor => [0, 4, 8, 16, 32, 64][factor],
   sizes: {
     width: {
       sidebar: '172px'
