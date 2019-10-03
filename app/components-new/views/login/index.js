@@ -97,7 +97,7 @@ export default () => {
             disabled={isAuthLoading}
             width="290"
             height="34"
-            placeholder="password"
+            placeholder="Password"
             type="password"
             onChange={({ target: { value } }) => setPassword(value)}
             onKeyPress={onKeyPressEnter}
@@ -127,9 +127,6 @@ export default () => {
               loading={isAuthLoading}
               size="large"
               color="primary"
-              css={`
-                marginmargin-top: 30px;
-              `}
               onClick={tryLoginFromNativeLauncher}
             >
               <span>
