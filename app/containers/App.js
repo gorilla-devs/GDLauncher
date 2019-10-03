@@ -19,7 +19,7 @@ import {
 } from 'reducers/actions';
 import routes from 'app/routes';
 import { ipcRenderer } from 'electron';
-import { load } from 'reducers/loading/actions';
+import { load, received } from 'reducers/loading/actions';
 import features from 'reducers/loading/features';
 import ga from 'app/GAnalytics';
 import GlobalStyles from 'app/globalStyles';
@@ -107,11 +107,10 @@ const App = () => {
       dispatch(initInstances()),
       dispatch(initManifests())
     ]).catch(log.error);
-    // if (process.env.NODE_ENV === 'development' && currentAccountId) {
-    //   dispatch(received(features.accountAuthentication));
-    //   dispatch(push('/home'));
-    // }
-    if (!isAccountValid && currentAccountId) {
+    if (process.env.NODE_ENV === 'development' && currentAccountId) {
+      dispatch(received(features.accountAuthentication));
+      dispatch(push('/home'));
+    } else if (!isAccountValid && currentAccountId) {
       dispatch(
         load(features.accountAuthentication, dispatch(loginWithAccessToken()))
       );
