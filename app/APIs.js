@@ -4,7 +4,8 @@ import {
   LOGIN_API,
   ACCESS_TOKEN_VALIDATION_URL,
   ACCESS_TOKEN_REFRESH_URL,
-  CURSEMETA_API_URL
+  CURSEMETA_API_URL,
+  ACCESS_TOKEN_INVALIDATE_URL
 } from './constants';
 import { sortByDate } from './utils';
 
@@ -53,6 +54,20 @@ export const minecraftRefreshAccessToken = (
       accessToken,
       clientToken,
       requestUser: true
+    },
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+};
+
+export const minecraftInvalidateAccessToken = (
+  accessToken: string,
+  clientToken: string
+) => {
+  return axios.post(
+    ACCESS_TOKEN_INVALIDATE_URL,
+    {
+      accessToken,
+      clientToken
     },
     { headers: { 'Content-Type': 'application/json' } }
   );

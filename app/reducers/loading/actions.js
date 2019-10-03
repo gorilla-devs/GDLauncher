@@ -20,7 +20,9 @@ export function received(feature) {
     feature
   };
 }
-export function catchError(feature, error) {
+export function catchError(feature, errorValue) {
+  const isErrorObject = typeof errorValue === 'object' && errorValue !== null;
+  const error = isErrorObject ? errorValue.message || errorValue : errorValue;
   return {
     type: ActionTypes.CATCH_ERROR,
     feature,
@@ -29,7 +31,7 @@ export function catchError(feature, error) {
 }
 
 export function load(feature, request) {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     try {
       dispatch(requesting(feature));
       const res = await request;

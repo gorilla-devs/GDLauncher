@@ -1,25 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ipcRenderer } from 'electron';
-import { push } from 'connected-react-router';
 import { Button, Input, CheckBox } from 'ui';
 import styled from 'styled-components';
-import {
-  login,
-  loginWithAccessToken,
-  loginThroughNativeLauncher
-} from 'reducers/actions';
+import { login, loginThroughNativeLauncher } from 'reducers/actions';
 import Fab from '@material-ui/core/Fab';
 import { load } from 'reducers/loading/actions';
-import { openModal } from 'reducers/modals/actions';
 import features from 'reducers/loading/features';
+import { openModal } from 'reducers/modals/actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons';
-import OfficialLancherProfilesExists from 'utils/nativeLauncher';
-import background from '../../../assets/images/LoginBg.jpg';
+import OfficialLancherProfilesExists from 'app/utils/nativeLauncher';
+import background from '../../../assets/images/loginBackground.jpg';
 
-const Bg = styled.div`
-  background-image: url(${background});
+const Background = styled.div`
+  background-image: url("${background}");
   background-position: center;
   background-size: cover;
   width: 100%;
@@ -49,48 +43,46 @@ const Form = styled.div`
   top: 50%;
 `;
 
-const FormRow = styled.div`
-  display: inline;
-`;
-
-function onKeyPressEnter(e, dispatch) {
-  if (e.key === 'Enter') {
-    dispatch(login(Email, Password));
-  }
-}
-
 export default () => {
+  const dispatch = useDispatch();
+
   const [nativeLauncherProfiles, setNativeLauncherProfiles] = useState(false);
-  const [Email, setEmail] = useState(null);
-  const [Password, setPassword] = useState(null);
-  const [update, setUpdate] = useState(false);
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
 
   const isAuthLoading = useSelector(
     state => state.loading.accountAuthentication.isRequesting
   );
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    console.log('logInAcessToke');
-    loginThroughNativeLauncher();
-  }, []);
 
   useEffect(() => {
     OfficialLancherProfilesExists()
-      .then(v => {
-        return setNativeLauncherProfiles(v);
-      })
-      .catch(e => log.error(e));
-    if (process.env.NODE_ENV !== 'development') {
-      ipcRenderer.send('check-for-updates');
-      ipcRenderer.on('update-available', () => {
-        setUpdate(true);
-      });
-    }
+      .then(setNativeLauncherProfiles)
+      .catch(console.error);
   }, []);
 
+  const tryLogin = () => {
+    return dispatch(
+      load(features.accountAuthentication, dispatch(login(email, password)))
+    );
+  };
+
+  const tryLoginFromNativeLauncher = () => {
+    return dispatch(
+      load(
+        features.accountAuthentication,
+        dispatch(loginThroughNativeLauncher())
+      )
+    );
+  };
+
+  const onKeyPressEnter = e => {
+    if (e.key === 'Enter') {
+      tryLogin();
+    }
+  };
+
   return (
-    <Bg>
+    <Background>
       <Overlay>
         <Form>
           <Input
@@ -98,8 +90,8 @@ export default () => {
             width="290"
             height="34"
             placeholder="Email"
-            onChange={e => setEmail(e.target.value)}
-            onKeyPress={e => onKeyPressEnter(e, dispatch, Email, Password)}
+            onChange={({ target: { value } }) => setEmail(value)}
+            onKeyPress={onKeyPressEnter}
           />
           <Input
             disabled={isAuthLoading}
@@ -107,24 +99,20 @@ export default () => {
             height="34"
             placeholder="password"
             type="password"
-            onChange={e => setPassword(e.target.value)}
-            onKeyPress={e => onKeyPressEnter(e, dispatch, Email, Password)}
+            onChange={({ target: { value } }) => setPassword(value)}
+            onKeyPress={onKeyPressEnter}
           />
-          <FormRow>
+          <div
+            css={`
+              display: inline;
+            `}
+          >
             <Button
               variant="contained"
               color="primary"
-              // onClick={() => dispatch(push('/home'))}
               loading={isAuthLoading}
-              disabled={isAuthLoading}
-              onClick={() =>
-                dispatch(
-                  load(
-                    features.accountAuthentication,
-                    dispatch(login(Email, Password), 'accountAuthentication')
-                  )
-                )
-              }
+              disabled={isAuthLoading || !email || !password}
+              onClick={tryLogin}
               css={`
                 float: right;
               `}
@@ -132,7 +120,7 @@ export default () => {
               Login
             </Button>
             <CheckBox color="primary" />
-          </FormRow>
+          </div>
           {nativeLauncherProfiles && (
             <Button
               icon="forward"
@@ -142,14 +130,7 @@ export default () => {
               css={`
                 marginmargin-top: 30px;
               `}
-              onClick={() => {
-                dispatch(
-                  load(
-                    features.accountAuthentication,
-                    dispatch(loginThroughNativeLauncher())
-                  )
-                ).catch(err => {});
-              }}
+              onClick={tryLoginFromNativeLauncher}
             >
               <span>
                 Login As&nbsp;
@@ -174,11 +155,11 @@ export default () => {
           `}
           size="medium"
           color="primary"
-          onClick={() => dispatch(openModal('loginHelperModal'))}
+          onClick={() => dispatch(openModal('LoginHelper'))}
         >
           <FontAwesomeIcon icon={faQuestion} />
         </Fab>
       </Overlay>
-    </Bg>
+    </Background>
   );
 };

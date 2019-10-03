@@ -34,6 +34,8 @@ export const ACCESS_TOKEN_VALIDATION_URL =
 // Mojang API Endpoints
 export const LOGIN_API = 'https://authserver.mojang.com/authenticate';
 export const ACCESS_TOKEN_REFRESH_URL = 'https://authserver.mojang.com/refresh';
+export const ACCESS_TOKEN_INVALIDATE_URL =
+  'https://authserver.mojang.com/invalidate';
 
 export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';

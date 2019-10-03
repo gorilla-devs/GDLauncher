@@ -14,10 +14,12 @@ import {
   loginWithAccessToken,
   initManifests,
   checkClientToken,
-  getJavaPath
+  getJavaPath,
+  updateIsUpdateAvailable
 } from 'reducers/actions';
 import routes from 'app/routes';
-import { load, received } from 'reducers/loading/actions';
+import { ipcRenderer } from 'electron';
+import { load } from 'reducers/loading/actions';
 import features from 'reducers/loading/features';
 import ga from 'app/GAnalytics';
 import GlobalStyles from 'app/globalStyles';
@@ -79,7 +81,7 @@ function RouteWithSubRoutes(route) {
   );
 }
 
-const App = ({ children }) => {
+const App = () => {
   const [globalJavaOptions, setGlobalJavaOptions] = useState(false);
   const isAccountValid = useSelector(
     state => state.loading.accountAuthentication.isReceived
@@ -91,6 +93,13 @@ const App = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // Check for updates
+    if (process.env.NODE_ENV !== 'development') {
+      ipcRenderer.send('check-for-updates');
+      ipcRenderer.on('update-available', () => {
+        dispatch(updateIsUpdateAvailable(true));
+      });
+    }
     dispatch(checkClientToken());
     ga.setUserId(clientToken);
     Promise.all([
@@ -98,10 +107,11 @@ const App = ({ children }) => {
       dispatch(initInstances()),
       dispatch(initManifests())
     ]).catch(log.error);
-    if (process.env.NODE_ENV === 'development' && currentAccountId) {
-      dispatch(received(features.accountAuthentication));
-      dispatch(push('/home'));
-    } else if (!isAccountValid && currentAccountId) {
+    // if (process.env.NODE_ENV === 'development' && currentAccountId) {
+    //   dispatch(received(features.accountAuthentication));
+    //   dispatch(push('/home'));
+    // }
+    if (!isAccountValid && currentAccountId) {
       dispatch(
         load(features.accountAuthentication, dispatch(loginWithAccessToken()))
       );

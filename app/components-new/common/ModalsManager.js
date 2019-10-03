@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { closeModal } from '../../reducers/modals/actions';
+import { closeModal } from 'reducers/modals/actions';
 import Settings from 'components/modals/Settings';
 import Changelog from 'components/modals/Changelog';
-import loginHelperModal from 'components/modals/loginHelperModal';
+import LoginHelper from 'components/modals/loginHelper';
 
 const Overlay = styled.div`
   position: absolute;
@@ -29,7 +29,7 @@ const Modal = styled.div`
 const modalsComponentLookupTable = {
   Settings,
   Changelog,
-  loginHelperModal
+  LoginHelper
 };
 
 const ModalContainer = ({ unmounting, children }) => {

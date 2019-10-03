@@ -22,7 +22,8 @@ import {
   minecraftRefreshAccessToken,
   getAddon,
   getAddonFiles,
-  getAddonFile
+  getAddonFile,
+  minecraftInvalidateAccessToken
 } from '../APIs';
 import { updateJavaArguments } from './settings/actions';
 import launchCommand from '../utils/MCLaunchCommand';
@@ -117,6 +118,15 @@ export function initNews() {
   };
 }
 
+export function updateIsUpdateAvailable(isUpdateAvailable) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_IS_UPDATE_AVAILABLE,
+      isUpdateAvailable
+    });
+  };
+}
+
 export function updateAccount(uuid, account) {
   return dispatch => {
     dispatch({
@@ -172,7 +182,6 @@ export function login(username, password, remember) {
         password,
         clientToken
       );
-      if (status !== 200) throw new Error();
       dispatch(updateAccount(data.selectedProfile.id, data));
 
       if (!isNewUser) {
@@ -183,8 +192,7 @@ export function login(username, password, remember) {
       }
     } catch (err) {
       log.error(err);
-      message.error('Wrong username or password');
-      throw new Error();
+      throw new Error(err);
     }
   };
 }
@@ -262,11 +270,7 @@ export function loginThroughNativeLauncher() {
         dispatch(push('/home'));
       }
     } catch (err) {
-      message.error(
-        'We could not log you in through Minecraft Launcher. Invalid data.'
-      );
-      console.error(err);
-      throw new Error();
+      throw new Error(err);
     }
   };
 }
@@ -274,7 +278,14 @@ export function loginThroughNativeLauncher() {
 export function logout() {
   return (dispatch, getState) => {
     const state = getState();
-    const { id } = getCurrentAccount(state).selectedProfile;
+    const {
+      clientToken,
+      accessToken,
+      selectedProfile: { id }
+    } = getCurrentAccount(state);
+    minecraftInvalidateAccessToken(accessToken, clientToken).catch(
+      console.error
+    );
     dispatch(removeAccount(id));
     dispatch(push('/'));
   };

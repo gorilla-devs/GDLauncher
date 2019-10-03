@@ -1,10 +1,18 @@
-import { combineReducers } from 'redux';
 import * as ActionTypes from './actionTypes';
 
 function news(state = [], action) {
   switch (action.type) {
     case ActionTypes.UPDATE_NEWS:
       return action.news;
+    default:
+      return state;
+  }
+}
+
+function isUpdateAvailable(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_IS_UPDATE_AVAILABLE:
+      return action.isUpdateAvailable;
     default:
       return state;
   }
@@ -105,6 +113,7 @@ function modpacks(
 
 export default {
   news,
+  isUpdateAvailable,
   downloadQueue,
   currentDownload,
   instances,
