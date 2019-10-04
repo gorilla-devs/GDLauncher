@@ -54,6 +54,10 @@ export default () => {
     state => state.loading.accountAuthentication.isRequesting
   );
 
+  const authError = useSelector(
+    state => state.loading.accountAuthentication.error
+  );
+
   useEffect(() => {
     OfficialLancherProfilesExists()
       .then(setNativeLauncherProfiles)
@@ -67,6 +71,9 @@ export default () => {
   };
 
   const tryLoginFromNativeLauncher = () => {
+    if (authError) {
+      setNativeLauncherProfiles(false);
+    }
     return dispatch(
       load(
         features.accountAuthentication,
