@@ -71,15 +71,15 @@ export default () => {
   };
 
   const tryLoginFromNativeLauncher = () => {
-    if (authError) {
-      setNativeLauncherProfiles(false);
-    }
-    return dispatch(
+    dispatch(
       load(
         features.accountAuthentication,
         dispatch(loginThroughNativeLauncher())
       )
     );
+    if (authError !== undefined) {
+      setNativeLauncherProfiles(false);
+    } else setNativeLauncherProfiles(true);
   };
 
   const onKeyPressEnter = e => {
@@ -154,7 +154,7 @@ export default () => {
         <Fab
           css={`
             position: absolute;
-            bottom: 100px;
+            bottom: 90px;
             left: 70px;
           `}
           size="medium"
