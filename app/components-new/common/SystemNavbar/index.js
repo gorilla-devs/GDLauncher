@@ -1,23 +1,30 @@
 // @flow
 import React, { Component } from 'react';
-import styles from './SystemNavBar.scss';
+import styled from 'styled-components';
 import WindowCloseBtn from './components/WindowCloseButton';
 import WindowMinimizeBtn from './components/WindowMinimizeButton';
 import WindowHideBtn from './components/WindowHideButton';
 import OpenDevTools from './components/OpenDevTools';
 
-type Props = {};
-export default class SystemNavBar extends Component<Props> {
-  props: Props;
+const Container = styled.div`
+  margin: 0;
+  width: 100%;
+  height: 23px;
+  padding-left: 10px;
+  background: ${props => props.theme.palette.grey[900]};
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  z-index: 100000;
+`;
 
-  render() {
-    return (
-      <div className={styles.container}>
-        <OpenDevTools />
-        <WindowCloseBtn />
-        <WindowMinimizeBtn />
-        <WindowHideBtn />
-      </div>
-    );
-  }
+type Props = {};
+export default function SystemNavBar(props) {
+  return (
+    <Container>
+      <OpenDevTools />
+      <WindowCloseBtn />
+      <WindowMinimizeBtn />
+      <WindowHideBtn />
+    </Container>
+  );
 }

@@ -1,32 +1,35 @@
 @import '../../../../../style/theme/index';
 
-.CloseBtn{
-    display: inline-block;
-    position: absolute;
-    background: var(--secondary-color-3);
-    border: 0;
-    padding: 0;
-    color: $text-main-color;
-    -webkit-app-region: no-drag;
-    height: 20px;
-    width: 35px;
-    right: calc(35px * 2);
-    top: 0;
-    transition: background-color .25s;
+.CloseBtn {
+  display: inline-block;
+  position: absolute;
+  background: #101419;
+  border: 0;
+  padding: 0;
+  color: $text-main-color;
+  -webkit-app-region: no-drag;
+  height: 20px;
+  width: 35px;
+  right: calc(35px * 2);
+  top: 0;
+  transition: background-color 0.25s;
 }
 
-.CloseBtn, .CloseBtn path, .CloseBtn svg {
-    cursor: pointer;
-  }
-
-.CloseBtn:hover{
-    transition: background-color .25s;
-    background-color: rgba(0, 0, 0, 0.3);
+.CloseBtn,
+.CloseBtn path,
+.CloseBtn svg {
+  cursor: pointer;
 }
-.CloseBtn:focus, .CloseBtn:active{
-    border-style: outset;
-    -webkit-border-radius: 0px;
-    border-radius: 0px;
-    outline: none;
-    border: none;
+
+.CloseBtn:hover {
+  transition: background-color 0.25s;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.CloseBtn:focus,
+.CloseBtn:active {
+  border-style: outset;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+  outline: none;
+  border: none;
 }
