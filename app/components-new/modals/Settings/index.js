@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Modal from 'components/Common/Modal';
+// import MyAccountPrf from 'components/Common/Modal/Settings/components/MyAccount_preferences';
+import MyAccountPrf from './components/MyAccount_preferences';
 import { Button } from 'ui';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
@@ -29,6 +31,16 @@ const Settings = styled.div`
   background: ${props => props.theme.palette.secondary.main};
 `;
 
+const SettingsColumn = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 476px;
+  height: '100%';
+  background: transparent;
+  left: 30%;
+`;
+
 const SettingsButton = styled(Button)`
   align-items: left;
   justify-content: left;
@@ -55,7 +67,23 @@ const SettingsTitle = styled.div`
   color: ${props => props.theme.palette.grey[50]};
 `;
 
+function Page(page) {
+  switch (page) {
+    case 'MyAccountPrf':
+      return <MyAccountPrf />;
+    case 'Java':
+      return <div>Java</div>;
+    case 'Instances':
+      return <div>Instances</div>;
+    case 'User Interface':
+      return <div>User Interface</div>;
+    default:
+      return null;
+  }
+}
+
 export default props => {
+  const [page, setPage] = useState('MyAccountPrf');
   return (
     <Modal
       header={false}
@@ -80,15 +108,23 @@ export default props => {
       <Container>
         <SideMenu>
           <SettingsTitle>General</SettingsTitle>
-          <SettingsButton>My Account Preferences</SettingsButton>
-          <SettingsButton>Java</SettingsButton>
-          <SettingsButton>Instances</SettingsButton>
-          <SettingsButton>User Interface</SettingsButton>
+          <SettingsButton onClick={() => setPage('MyAccountPrf')}>
+            My Account Preferences
+          </SettingsButton>
+          <SettingsButton onClick={() => setPage('Java')}>Java</SettingsButton>
+          <SettingsButton onClick={() => setPage('Instances')}>
+            Instances
+          </SettingsButton>
+          <SettingsButton onClick={() => setPage('User Interface')}>
+            User Interface
+          </SettingsButton>
           <SettingsTitle>Game Settings</SettingsTitle>
           <SettingsButton>Graphic Settings</SettingsButton>
           <SettingsButton>Sound Settings</SettingsButton>
         </SideMenu>
-        <Settings></Settings>
+        <Settings>
+          <SettingsColumn>{Page(page)}</SettingsColumn>
+        </Settings>
       </Container>
     </Modal>
   );
