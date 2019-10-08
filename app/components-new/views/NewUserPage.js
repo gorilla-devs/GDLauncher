@@ -30,7 +30,7 @@ const Title = styled.div`
 
 const SubTitle = styled.div`
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 300;
   width: 256px;
 `;
 

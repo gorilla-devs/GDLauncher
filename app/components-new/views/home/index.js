@@ -29,7 +29,6 @@ const Home = () => {
           marginLeft: '-394px'
         }}
       >
-        {/* <Button>Ciao</Button> */}
         <div
           style={{
             widht: '100%',

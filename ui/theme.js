@@ -12,9 +12,9 @@ export default createMuiTheme({
       dark: '#0a4f50'
     },
     secondary: {
-      light: '#ff6333',
-      main: '#ff3d00',
-      dark: '#b22a00'
+      light: '#353E48',
+      main: '#212B36',
+      dark: '#1C242D'
     },
     error: {
       light: '#de6967',
@@ -44,8 +44,9 @@ export default createMuiTheme({
     text: {
       disabled: 'rgba(255, 255, 255, 0.38)',
       hint: 'rgba(255, 255, 255, 0.38)',
-      primary: 'rgba(255, 255, 255, 0.87)',
-      secondary: 'rgba(255, 255, 255, 0.54)',
+      primary: '#E1E2E4',
+      secondary: '#D2D4D6',
+      third: '#979CA1',
       icon: '#F0F0F1'
     },
     type: 'dark'
