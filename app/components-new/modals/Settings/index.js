@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Modal from 'components/Common/Modal';
 // import MyAccountPrf from 'components/Common/Modal/Settings/components/MyAccount_preferences';
 import MyAccountPrf from './components/MyAccount_preferences';
+import Java from './components/Java';
 import { Button } from 'ui';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
@@ -72,7 +73,7 @@ function Page(page) {
     case 'MyAccountPrf':
       return <MyAccountPrf />;
     case 'Java':
-      return <div>Java</div>;
+      return <Java />;
     case 'Instances':
       return <div>Instances</div>;
     case 'User Interface':

@@ -7,7 +7,7 @@ import logo from '../../../../../../GDLauncher/app/assets/images/logo.png';
 
 const MyAccountPrf = styled.div`
   width: 100%;
-  height: 450px;
+  height: 500px;
 `;
 
 const PersonalData = styled.div`
@@ -147,6 +147,11 @@ export default function MyAccountPreferences() {
           Stable updates once a month, beta does update more often but it may
           have more bugs.
           <Select
+            css={`
+              position: absolute;
+              top: 250px;
+              right: 0px;
+            `}
             onChange={e => setSelectedInputValue(e.target.value)}
             value={selectedInputValue}
             // input={<BootstrapInput name="age" id="age-customized-select" />}
