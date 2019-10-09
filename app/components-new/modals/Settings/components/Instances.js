@@ -1,28 +1,29 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMemory, faFolder, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faFolder } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Switch } from 'ui';
 import logo from '../../../../../../GDLauncher/app/assets/images/logo.png';
 import { Input } from '@material-ui/core';
 
-const JavaSettings = styled.div`
+const Instances = styled.div`
   width: 100%;
   height: 500px;
 `;
 
 const AutodetectPath = styled.div`
   margin-top: 38px;
+  margin-bottom: 20px;
   width: 100%;
   height: 120px;
 `;
 
-const SelectMemory = styled.div`
+const OverridePath = styled.div`
   width: 100%;
-  height: 120px;
+  height: 90px;
 `;
 
-const JavaCustomArguments = styled.div`
+const InstanceCustomPath = styled.div`
   width: 100%;
   height: 120px;
 `;
@@ -37,7 +38,7 @@ const Title = styled.h3`
 const Paragraph = styled.p`
   text-align: left;
   color: ${props => props.theme.palette.text.third};
-  width: 300px;
+  width: 400px;
 `;
 
 const HR = styled.hr`
@@ -49,32 +50,17 @@ const SettingsButton = styled(Button)`
   background: ${props => props.theme.palette.primary.main};
 `;
 
-const marks = [
-  {
-    value: 0
-  },
-  {
-    value: 20
-  },
-  {
-    value: 37
-  },
-  {
-    value: 100
-  }
-];
-
 export default function MyAccountPreferences() {
   const [selectedInputValue, setSelectedInputValue] = useState('');
   return (
-    <JavaSettings>
+    <Instances>
       <h1
         css={`
           float: left;
           margin: 0;
         `}
       >
-        Java
+        Instances
       </h1>
       <AutodetectPath>
         <Title
@@ -83,7 +69,7 @@ export default function MyAccountPreferences() {
             top: 80px;
           `}
         >
-          Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+          Clear Shared Data&nbsp; <FontAwesomeIcon icon={faTrash} />
         </Title>
         <Paragraph
           css={`
@@ -91,64 +77,63 @@ export default function MyAccountPreferences() {
             top: 100px;
           `}
         >
-          If enable, Java path will be autodetected
+          Deletes all the shared files between instances. Doing this will result
+          in the complete loss of the instances data
         </Paragraph>
-        <Switch
+        <SettingsButton
           css={`
             position: absolute;
-            top: 100px;
+            top: 110px;
             right: 0px;
           `}
-          color="primary"
-        />
+        >
+          Clear
+        </SettingsButton>
       </AutodetectPath>
       <HR />
-      <SelectMemory>
+      <OverridePath>
         <Title
+          css={`
+            position: absolute;
+            top: 180px;
+          `}
+        >
+          Override Default Instance Path&nbsp;{' '}
+          <FontAwesomeIcon icon={faFolder} />
+        </Title>
+        <Paragraph
           css={`
             position: absolute;
             top: 200px;
           `}
         >
-          Java Memory&nbsp; <FontAwesomeIcon icon={faMemory} />
-        </Title>
-        <Paragraph
+          If enabled, instances will be downloaded in the selected path you need
+          to restart the launcher for this settings to applay
+        </Paragraph>
+        <Switch
           css={`
             position: absolute;
             top: 220px;
+            right: 0px;
           `}
-        >
-          Select the preferred amount of memory to use when lauching the game
-        </Paragraph>
-        <Slider
-          css={`
-            position: absolute;
-            top: 280px;
-            right: 0;
-          `}
-          defaultValue={30}
-          //   getAriaValueText={valuetext}
-          valueLabelDisplay="auto"
-          marks={marks}
-          min={10}
-          max={100}
+          color="primary"
         />
-      </SelectMemory>
+      </OverridePath>
       <HR />
-      <JavaCustomArguments>
-        <Title>Java Custom Arguments</Title>
+      <InstanceCustomPath>
+        <Title>Instance Custom Path</Title>
         <Paragraph
           css={`
             position: absolute;
-            top: 360px;
+            top: 340px;
           `}
         >
-          Select the preferred amount of memory to use when lauching the game
+          Select the preferred Path to install you instances
         </Paragraph>
         <Input
           css={`
             position: absolute;
-            top: 420px;
+            top: 390px;
             left: 0;
             width: 80%;
           `}
@@ -156,13 +141,13 @@ export default function MyAccountPreferences() {
         <SettingsButton
           css={`
             position: absolute;
-            top: 430px;
+            top: 400px;
             right: 0px;
           `}
         >
-          <FontAwesomeIcon icon={faUndo} />
+          <FontAwesomeIcon icon={faFolder} />
         </SettingsButton>
-      </JavaCustomArguments>
-    </JavaSettings>
+      </InstanceCustomPath>
+    </Instances>
   );
 }

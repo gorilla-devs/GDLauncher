@@ -115,6 +115,10 @@ const LauncherVersion = styled.div`
   }
 `;
 
+const SettingsButton = styled(Button)`
+  background: ${props => props.theme.palette.primary.main};
+`;
+
 export default function MyAccountPreferences() {
   const [selectedInputValue, setSelectedInputValue] = useState('');
   return (
@@ -194,11 +198,15 @@ export default function MyAccountPreferences() {
           </p>
         </div>
         <buttons>
-          <Button>
+          <SettingsButton
+            css={`
+              margin-right: 10px;
+            `}
+          >
             Update &nbsp;
             <FontAwesomeIcon icon={faDownload} />
-          </Button>
-          <Button>Restart</Button>
+          </SettingsButton>
+          <SettingsButton>Restart</SettingsButton>
         </buttons>
       </LauncherVersion>
     </MyAccountPrf>
