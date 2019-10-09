@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMemory, faFolder } from '@fortawesome/free-solid-svg-icons';
+import { faMemory, faFolder, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Switch } from 'ui';
 import logo from '../../../../../../GDLauncher/app/assets/images/logo.png';
+import { Input } from '@material-ui/core';
 
 const JavaSettings = styled.div`
   width: 100%;
@@ -17,6 +18,11 @@ const AutodetectPath = styled.div`
 `;
 
 const SelectMemory = styled.div`
+  width: 100%;
+  height: 120px;
+`;
+
+const JavaCustomArguments = styled.div`
   width: 100%;
   height: 120px;
 `;
@@ -125,6 +131,34 @@ export default function MyAccountPreferences() {
         />
       </SelectMemory>
       <HR />
+      <JavaCustomArguments>
+        <Title>Java Custom Arguments</Title>
+        <Paragraph
+          css={`
+            position: absolute;
+            top: 360px;
+          `}
+        >
+          Select the preferred amount of memory to use when lauching the game
+        </Paragraph>
+        <Input
+          css={`
+            position: absolute;
+            top: 420px;
+            left: 0;
+            width: 80%;
+          `}
+        />
+        <Button
+          css={`
+            position: absolute;
+            top: 430px;
+            right: 0px;
+          `}
+        >
+          <FontAwesomeIcon icon={faUndo} />
+        </Button>
+      </JavaCustomArguments>
     </JavaSettings>
   );
 }
