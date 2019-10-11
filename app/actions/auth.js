@@ -44,20 +44,20 @@ export function login(username, password, remember) {
       );
       if (status === 200 && data && data.accessToken) {
         const payload = {
-          email: data.user.email,
+          email: username,
           username: data.user.username,
           displayName: data.selectedProfile.name,
           accessToken: data.accessToken,
-          legacy: data.selectedProfile.legacyProfile,
           uuid: data.selectedProfile.id,
-          userID: data.selectedProfile.userId
+          userID: data.user.id
         };
+        console.log(data);
         if (remember) {
           store.set({
             user: {
               ...payload
             },
-            lastUsername: data.user.username
+            lastUsername: username
           });
         }
         dispatch({
@@ -83,6 +83,7 @@ export function login(username, password, remember) {
         });
       }
     } catch (err) {
+      console.error(err);
       message.error('Wrong username or password');
     } finally {
       dispatch({
@@ -140,13 +141,10 @@ export function checkAccessToken() {
           );
           if (newUserData) {
             const payload = {
-              email: newUserData.user.email,
-              username: newUserData.user.username,
-              displayName: newUserData.selectedProfile.name,
+              username: newUserData.selectedProfile.name,
               accessToken: newUserData.accessToken,
-              legacy: newUserData.selectedProfile.legacyProfile,
               uuid: newUserData.selectedProfile.id,
-              userID: newUserData.selectedProfile.userId
+              userID: newUserData.user.id
             };
             store.set({
               user: {
@@ -212,17 +210,15 @@ export function tryNativeLauncherProfiles() {
     const newUserData = await refreshAccessToken(accessToken, clientToken, true);
     if (newUserData) {
       const payload = {
-        email: newUserData.user.email,
-        username: newUserData.user.username,
+        username: newUserData.selectedProfile.name,
         displayName: newUserData.selectedProfile.name,
         accessToken: newUserData.accessToken,
-        legacy: newUserData.selectedProfile.legacyProfile,
         uuid: newUserData.selectedProfile.id,
-        userID: newUserData.selectedProfile.userId
+        userID: newUserData.user.id
       };
       // We need to update the accessToken in launcher_profiles.json
       vnlJson.authenticationDatabase[
-        newUserData.selectedProfile.userId
+        newUserData.user.id
       ].accessToken = newUserData.accessToken;
       await fsa.writeJson(
         path.join(vanillaMCPath, 'launcher_profiles.json'),
@@ -231,7 +227,7 @@ export function tryNativeLauncherProfiles() {
       store.set({
         user: { ...payload },
         clientToken: getClientToken(),
-        lastUsername: newUserData.user.username
+        lastUsername: null
       });
       dispatch({
         type: AUTH_SUCCESS,
