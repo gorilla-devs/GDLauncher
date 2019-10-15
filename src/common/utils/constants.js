@@ -1,7 +1,6 @@
 export const MC_MANIFEST_URL =
   "https://launchermeta.mojang.com/mc/game/version_manifest.json";
-export const FORGE_MANIFEST_URL =
-  "https://addons-ecs.forgesvc.net/api/v2/minecraft/modloader";
+export const FABRIC_APIS = "https://meta.fabricmc.net";
 export const MOJANG_APIS = "https://authserver.mojang.com";
 export const MAVEN_REPO = "http://central.maven.org/maven2";
 export const MC_LIBRARIES_URL = "https://libraries.minecraft.net";

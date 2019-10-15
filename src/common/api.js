@@ -1,6 +1,11 @@
 // @flow
 import axios from "axios";
-import { MOJANG_APIS, FORGESVC_URL } from "./utils/constants";
+import {
+  MOJANG_APIS,
+  FORGESVC_URL,
+  MC_MANIFEST_URL,
+  FABRIC_APIS
+} from "./utils/constants";
 import { sortByDate } from "./utils";
 
 export const mcAuthenticate = (username, password, clientToken) => {
@@ -54,31 +59,49 @@ export const mcInvalidate = (accessToken, clientToken) => {
   );
 };
 
+export const getMcManifest = () => {
+  const url = MC_MANIFEST_URL;
+  return axios.get(url);
+};
+
+export const getForgeManifest = () => {
+  const url = `${FORGESVC_URL}/minecraft/modloader`;
+  return axios.get(url);
+};
+
+export const getFabricManifest = () => {
+  const url = `${FABRIC_APIS}/v2/versions/loader`;
+  return axios.get(url);
+};
+
 // FORGE ADDONS
 
 export const getAddon = addonID => {
   const url = `${FORGESVC_URL}/addon/${addonID}`;
-  return axios.get(url).then(res => res.data);
+  return axios.get(url);
 };
 
 export const getAddonFiles = addonID => {
   const url = `${FORGESVC_URL}/addon/${addonID}/files`;
-  return axios.get(url).then(res => res.data.sort(sortByDate));
+  return axios.get(url).then(res => ({
+    ...res,
+    data: res.data.sort(sortByDate)
+  }));
 };
 
 export const getAddonDescription = addonID => {
   const url = `${FORGESVC_URL}/addon/${addonID}/description`;
-  return axios.get(url).then(res => res.data);
+  return axios.get(url);
 };
 
 export const getAddonFile = (addonID, fileID) => {
   const url = `${FORGESVC_URL}/addon/${addonID}/file/${fileID}`;
-  return axios.get(url).then(res => res.data);
+  return axios.get(url);
 };
 
 export const getAddonFileChangelog = (addonID, fileID) => {
   const url = `${FORGESVC_URL}/addon/${addonID}/file/${fileID}/changelog`;
-  return axios.get(url).then(res => res.data);
+  return axios.get(url);
 };
 
 export const getSearch = (
@@ -103,5 +126,5 @@ export const getSearch = (
     gameVersion:
       gameVersion !== undefined && gameVersion !== null ? gameVersion : ""
   };
-  return axios.get(url, { params }).then(res => res.data);
+  return axios.get(url, { params });
 };

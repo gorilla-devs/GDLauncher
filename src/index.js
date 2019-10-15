@@ -20,6 +20,8 @@ const Root =
 
 const { store, persistor } = configureStore();
 
+if (process.env.NODE_ENV === "development") window.__store = store;
+
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>

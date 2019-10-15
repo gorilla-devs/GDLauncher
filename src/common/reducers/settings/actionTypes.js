@@ -1,7 +1,10 @@
-export const UPDATE_SOUNDS = 'settings/UPDATE_SOUNDS';
-export const UPDATE_RELEASE_CHANNEL = 'settings/UPDATE_RELEASE_CHANNEL';
-export const UPDATE_INSTANCES_PATH = 'settings/UPDATE_INSTANCES_PATH';
+export const UPDATE_SOUNDS = "settings/UPDATE_SOUNDS";
+export const UPDATE_RELEASE_CHANNEL = "settings/UPDATE_RELEASE_CHANNEL";
+export const UPDATE_INSTANCES_PATH = "settings/UPDATE_INSTANCES_PATH";
 
-export const UPDATE_JAVA_PATH = 'settings/UPDATE_JAVA_PATH';
-export const UPDATE_JAVA_MEMORY = 'settings/UPDATE_JAVA_MEMORY';
-export const UPDATE_JAVA_ARGUMENTS = 'settings/UPDATE_JAVA_ARGUMENTS';
+export const UPDATE_CONCURRENT_DOWNLOADS =
+  "settings/UPDATE_CONCURRENT_DOWNLOADS";
+
+export const UPDATE_JAVA_PATH = "settings/UPDATE_JAVA_PATH";
+export const UPDATE_JAVA_MEMORY = "settings/UPDATE_JAVA_MEMORY";
+export const UPDATE_JAVA_ARGUMENTS = "settings/UPDATE_JAVA_ARGUMENTS";

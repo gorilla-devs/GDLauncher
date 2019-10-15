@@ -1,5 +1,5 @@
-import { combineReducers } from 'redux';
-import * as ActionTypes from './actionTypes';
+import { combineReducers } from "redux";
+import * as ActionTypes from "./actionTypes";
 
 function sounds(state = true, action) {
   switch (action.type) {
@@ -29,6 +29,16 @@ function releaseChannel(state = 0, action) {
   }
 }
 
+// 0 is stable, 1 is beta
+function concurrentDownloads(state = 3, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_CONCURRENT_DOWNLOADS:
+      return action.concurrentDownloads;
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path: null,
@@ -53,5 +63,6 @@ export default combineReducers({
   sounds,
   instancesPath,
   releaseChannel,
+  concurrentDownloads,
   java
 });

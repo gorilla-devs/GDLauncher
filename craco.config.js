@@ -6,7 +6,7 @@ const alias = {
   ui: path.resolve("./src/ui/")
 };
 
-module.exports = function({ env }) {
+module.exports = ({ env }) => {
   const isEnvDevelopment = env === "development";
   const isEnvProduction = env === "production";
   return {
@@ -16,7 +16,7 @@ module.exports = function({ env }) {
           "@babel/preset-env",
           {
             targets: {
-              node: "10"
+              node: "12"
             }
           }
         ],
@@ -32,7 +32,8 @@ module.exports = function({ env }) {
         [
           "babel-plugin-styled-components",
           {
-            ssr: true
+            ssr: true,
+            pure: true
           }
         ]
       ]

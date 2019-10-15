@@ -36,6 +36,15 @@ function vanillaManifest(state = [], action) {
   }
 }
 
+function fabricManifest(state = [], action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_FABRIC_MANIFEST:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function forgeManifest(state = [], action) {
   switch (action.type) {
     case ActionTypes.UPDATE_FORGE_MANIFEST:
@@ -91,6 +100,7 @@ export default combineReducers({
   currentAccountId,
   vanillaManifest,
   forgeManifest,
+  fabricManifest,
   modsManifests,
   clientToken,
   isNewUser,
