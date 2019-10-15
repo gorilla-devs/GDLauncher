@@ -1,0 +1,3 @@
+const theme = {};
+
+export { theme };

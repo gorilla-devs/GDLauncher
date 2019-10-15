@@ -1,156 +1,68 @@
-# GDLauncher
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/contains-cat-gifs.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com)
+## Available Scripts
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![GitHub issues](https://img.shields.io/github/issues-raw/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/issues) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/213eb618fa59424fba7ccfcd4f1b6a09)](https://www.codacy.com/app/gorilla-devs/GDLauncher?utm_source=github.com&utm_medium=referral&utm_content=gorilla-devs/GDLauncher&utm_campaign=Badge_Grade) [![GitHub pull requests](https://img.shields.io/github/issues-pr/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/pulls)
+In the project directory, you can run:
 
-[![PRs Welcome](https://img.shields.io/github/license/gorilla-devs/GDLauncher.svg)](http://makeapullrequest.com) [![Travis](https://travis-ci.com/gorilla-devs/GDLauncher.svg?branch=master)](https://travis-ci.com/gorilla-devs/GDLauncher) ![Discord](https://img.shields.io/discord/398091532881756161.svg) ![David](https://img.shields.io/david/gorilla-devs/GDLauncher.svg) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/gorilla-devs/GDLauncher.svg)
+### `yarn start`
 
-![](https://img.shields.io/github/release/gorilla-devs/GDLauncher.svg?style=flat)
-![Github All Releases](https://img.shields.io/github/downloads/gorilla-devs/GDLauncher/total.svg)
-[![Read the Docs (version)](https://img.shields.io/readthedocs/gdlauncher/master.svg)](https://gdlauncher.readthedocs.io/en/master/)
+Runs the app in the development mode.<br />
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-<p align="center">
-    <img width="800" height="auto" src="https://i.imgur.com/kxeGu3f.png" alt="GDLauncher" />
-</p>
+The page will reload if you make edits.<br />
+You will also see any lint errors in the console.
 
-<details>
- <summary><strong>Table of Contents</strong> (click to expand)</summary>
+### `yarn test`
 
-- [Getting Started](#-getting-started)
-- [Features](#️-features-working-on)
-- [Compilation](#️-compilation)
-- [Compilation Requirements](#-requirements)
-- [Compilation Steps](#-steps)
-- [Packaging](#-packaging)
-- [Built and Managed with](#️-built-and-managed-with)
-- [Contributing](#-contributing)
-- [Versioning](#-versioning)
-- [Authors](#-authors)
-- [License](#-license)
-- [Todos](#-todos)
-  </details>
+Launches the test runner in the interactive watch mode.<br />
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-<b>This project was previously developed in C#. That version is now outdated and not mantained but you can find the code [here](https://github.com/gorilla-devs/GDLauncher/tree/csharp_legacy_launcher)</b>
+### `yarn build`
 
-GDLauncher is a custom open source Minecraft launcher written from the ground up in electron/react. Its main goal is to make it easy and enjoyable to manage different Minecraft versions and servers, bringing the playing and modding experience to the next level!
+Builds the app for production to the `build` folder.<br />
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## 🚀 Getting Started
+The build is minified and the filenames include the hashes.<br />
+Your app is ready to be deployed!
 
-Below you will find everything you need to know about the launcher. If you want to download a stable release you can do it from our official website (https://gdevs.io). If you want the latest testing features you can clone the repo and compile it yourself.
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-## 🎮 Download
+### `yarn eject`
 
-To download the latest version, you can either click [here](https://github.com/gorilla-devs/GDLauncher/releases) and select the appropriate version for your operating system, or visit our [website](https://gdevs.io).
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-## 🎨 Features (Working on)
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-- Java Autorunner. You don't need to have java installed, a suitable version will be downloaded automatically.
-- Log console. Always know what's happening.
-- Easy installation. It's as easy as pie to install both the vanilla game and forge. No further action from the user is required.
-- Built-in autoupdater. You will never need to download a new version manually.
-- Vanilla, Forge, and Curse modpacks download and autoupdater.
-- Built-in manager for Minecraft servers.
-- Cloud sync of game saves. You will never lose your saves again!
+Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-You can also:
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-- Import and export modpacks from and to other launchers
-- Drag and drop instances wherever you like them, just like in your desktop
-- Keep track of the time you played each instance
-- Add instances to the download queue, they will automatically download one after the other
-- Manage your minecraft skin directly from the launcher
-- Directly connect to a server from the launcher using quick launch
+## Learn More
 
-Keep in mind that not all of these features are yet part of the launcher. We are constantly updating the code adding new features. Feel free to help us :)
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-## 💾 Compilation
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-These are the steps to compile it yourself.
+### Code Splitting
 
-### ⚙️ Requirements
+This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
 
-You need the following softwares installed:
+### Analyzing the Bundle Size
 
-- Nodejs (> 8)
-- yarn
+This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
 
-### ▶️ Steps
+### Making a Progressive Web App
 
-Install the dependencies and devDependencies.
+This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
 
-```sh
-$ cd GDLauncher
-$ yarn
-```
+### Advanced Configuration
 
-Start the development environment
+This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
 
-```sh
-$ yarn dev
-```
+### Deployment
 
-For production environment...
+This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
 
-```sh
-$ yarn start
-```
+### `yarn build` fails to minify
 
-### 🚚 Packaging
-
-To package apps for the local platform:
-
-```sh
-$ yarn package
-```
-
-To package apps for all platforms:
-
-First, refer to [Multi Platform Build](https://www.electron.build/multi-platform-build) for dependencies.
-
-Then,
-
-```bash
-$ yarn package-all
-```
-
-## 🚀 Built and managed with
-
-- [Javascript](https://developer.mozilla.org/bm/docs/Web/JavaScript) - Language used
-- [React](https://reactjs.org/) - JS Framework
-- [Redux](https://redux.js.org/) - React state management
-- [NodeJS](https://nodejs.org/en/) - JS Runtime
-- [Electron](https://electronjs.org/) - JS Framework
-- [Travis CI](https://travis-ci.org/) - CI Service
-- [Codacy](https://www.codacy.com/) - Automated code review
-- [Webpack](https://webpack.js.org/) - JS module bundler
-- [Babel](https://babeljs.io/) - JS Transpiler
-- [ESLint](https://eslint.org/) - JS Linter
-- [Ant Design](https://ant.design/) - UI Design Language
-
-## 🎁 Contributing
-
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
-
-## 📜 Versioning
-
-We use [SemVer](http://semver.org/) as versioning system.
-
-## ❤️ Authors
-
-- **Davide Ceschia** - _Initial work_ - [GorillaDevs](https://github.com/gorilla-devs)
-
-See also the list of [contributors](https://github.com/gorilla-devs/GDLauncher/contributors) who participated in this project.
-
-## 🎓 License
-
-This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) file for details
-
-## ✏️ Todos
-
-Here is the complete list of things we want to do. If you want to help us doing them or want to suggest some new ideas, comment here!
-[TODOS/IDEAS](https://github.com/gorilla-devs/GDLauncher/issues/70)
+This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
