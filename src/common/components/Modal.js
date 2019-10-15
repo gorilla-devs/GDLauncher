@@ -46,9 +46,7 @@ const Modal = ({
       width={width}
       css={`
         background: ${props =>
-          props.transparentBackground
-            ? "transparent"
-            : "black"};
+          props.transparentBackground ? "transparent" : "black"};
         position: absolute;
         border-radius: 4px;
         height: ${props => props.height || "100vh"};
