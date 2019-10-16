@@ -1,5 +1,6 @@
 import React from "react";
 import Modal from "../components/Modal";
+import Button from "@material-ui/core/Button";
 
 const Test = () => {
   return (
@@ -10,7 +11,7 @@ const Test = () => {
         background: green;
       `}
     >
-      Test
+      <Button>Test</Button>
     </Modal>
   );
 };

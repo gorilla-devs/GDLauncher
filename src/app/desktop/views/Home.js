@@ -1,11 +1,16 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { push } from "connected-react-router";
+import { openModal } from "../../../common/reducers/modals/actions";
 
 const Home = props => {
   const dispatch = useDispatch();
 
-  return <div>Home</div>;
+  return (
+    <div>
+      Home{" "}
+      <button onClick={() => dispatch(openModal("Test"))}>Open Modal</button>
+    </div>
+  );
 };
 
 export default Home;
