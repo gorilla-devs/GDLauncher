@@ -492,7 +492,7 @@ export function downloadPack(pack, isRepair = false) {
           return installProfileJson.data[finalArg].client;
         }
         // Return original string (checking for MINECRAFT_JAR)
-        return arg.replace('{MINECRAFT_JAR}', mainJar[0].path);
+        return arg.replace('{MINECRAFT_JAR}', `"${mainJar[0].path}"`);
       };
       const computePathIfPossible = arg => {
         if (arg[0] === '[') {
