@@ -375,7 +375,7 @@ export function downloadPack(pack, isRepair = false) {
           modsManifest = modsManifest.concat(modManifest);
           dispatch(updateDownloadProgress(15, 15, modsDownloaded, manifest.files.length));
         },
-        { concurrency: cpus().length + 2 }
+        { concurrency: 3 }
       );
     } catch (err) {
       log.error(err);
@@ -463,7 +463,7 @@ export function downloadPack(pack, isRepair = false) {
         ? [...libraries, ...assets, ...mainJar, legacyJavaFixer]
         : [...libraries, ...assets, ...mainJar];
 
-    await downloadArr(allFiles, updatePercentage, pack, isRepair);
+    await downloadArr(allFiles, updatePercentage, pack, isRepair, 3);
 
     if (vnlJSON.assets === 'legacy') {
       await copyAssetsToLegacy(assets);

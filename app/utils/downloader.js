@@ -17,7 +17,7 @@ export const downloadArr = async (
   updatePercentage,
   pack,
   forceDownload = false,
-  threads = cpus().length
+  threads = 3
 ) => {
   let downloaded = 0;
   await Promise.map(
@@ -45,7 +45,7 @@ export const downloadArr = async (
       if (downloaded % 10 === 0 || downloaded === arr.length)
         updatePercentage(downloaded);
     },
-    { concurrency: threads + 2 }
+    { concurrency: 3 }
   );
 };
 
