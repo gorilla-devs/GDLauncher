@@ -4,6 +4,8 @@ import { createHashHistory } from "history";
 import { routerMiddleware, routerActions } from "connected-react-router";
 import { persistReducer, persistStore } from "redux-persist";
 import { createLogger } from "redux-logger";
+import isElectron from "is-electron";
+import middlewareInstances from "../../app/desktop/utils/middlewareInstances";
 import createRootReducer from "../reducers";
 import persistConfig from "./persistConfig";
 import { UPDATE_DOWNLOAD_PROGRESS } from "../reducers/actionTypes";
@@ -39,6 +41,10 @@ const configureStore = initialState => {
   // Router Middleware
   const router = routerMiddleware(history);
   middleware.push(router);
+
+  if (isElectron()) {
+    middleware.push(middlewareInstances);
+  }
 
   // Redux DevTools Configuration
   const actionCreators = {

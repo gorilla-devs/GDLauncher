@@ -56,10 +56,12 @@ function currentDownload(state = null, action) {
   }
 }
 
-function instances(state = [], action) {
+function instances(state = { started: false, list: [] }, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_INSTANCES:
-      return action.instances;
+      return { ...state, list: action.instances };
+    case ActionTypes.UPDATE_INSTANCES_STARTED:
+      return { ...state, started: action.started };
     default:
       return state;
   }

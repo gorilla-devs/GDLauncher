@@ -18,7 +18,8 @@ import {
   mcInvalidate,
   getFabricManifest,
   getMcManifest,
-  getForgeManifest
+  getForgeManifest,
+  mcValidate
 } from "../api";
 import { _getCurrentAccount } from "../utils/selectors";
 
@@ -168,7 +169,7 @@ export function loginWithAccessToken() {
       state
     );
     try {
-      await mcRefresh(accessToken, clientToken);
+      await mcValidate(accessToken, clientToken);
       dispatch(push("/home"));
     } catch (error) {
       console.error(error);

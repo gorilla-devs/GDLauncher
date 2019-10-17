@@ -5,8 +5,8 @@ import Button from "@material-ui/core/Button";
 const Test = () => {
   return (
     <Modal
-      height="400"
-      width="400"
+      height="400px"
+      width="400px"
       css={`
         background: green;
       `}

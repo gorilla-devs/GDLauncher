@@ -1,4 +1,7 @@
 import { combineReducers } from "redux";
+import { remote } from "electron";
+import path from "path";
+import isElectron from "is-electron";
 import * as ActionTypes from "./actionTypes";
 
 function sounds(state = true, action) {
@@ -10,10 +13,14 @@ function sounds(state = true, action) {
   }
 }
 
-function instancesPath(state = null, action) {
+const defaultPath = isElectron()
+  ? path.join(remote.app.getPath("userData"), "instances", "packs")
+  : null;
+
+function instancesPath(state = defaultPath, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_INSTANCES_PATH:
-      return { ...state, ...action.settings };
+      return action.path;
     default:
       return state;
   }

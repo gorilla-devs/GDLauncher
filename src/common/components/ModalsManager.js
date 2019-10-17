@@ -13,7 +13,10 @@ const Overlay = styled.div`
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 10000;
+  backdrop-filter: blur(4px);
+  will-change: opacity;
+  transition: opacity 220ms cubic-bezier(0.165, 0.84, 0.44, 1);
+  z-index: 1000;
 `;
 
 const Modal = styled.div`
@@ -25,6 +28,10 @@ const Modal = styled.div`
   justify-content: center;
   align-items: center;
   background: transparent;
+  transition: transform 220ms, opacity: 200ms;
+  will-change: transform, opacity;
+  transition-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1);
+  z-index: 1001;
 `;
 
 const modalsComponentLookupTable = {
@@ -37,23 +44,17 @@ const modalsComponentLookupTable = {
 const ModalContainer = ({ unmounting, children }) => {
   const [modalStyle, setModalStyle] = useState({
     transform: "scale(0.8)",
-    opacity: 0,
-    transition: "transform 200ms, opacity 200ms",
-    willChange: "transform, opacity",
-    transitionTimingFunction: "cubic-bezier(0.165, 0.840, 0.440, 1.000)"
+    opacity: 0
   });
   const [bgStyle, setBgStyle] = useState({
     background: "rgba(0, 0, 0, 0.70)",
-    backdropFilter: "blur(4px)",
-    willChange: "opacity",
-    transition: "opacity 200ms cubic-bezier(0.165, 0.840, 0.440, 1.000)",
     opacity: 0
   });
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    mountStyle();
+    setTimeout(mountStyle, 0);
   }, []);
 
   useEffect(() => {
@@ -69,16 +70,10 @@ const ModalContainer = ({ unmounting, children }) => {
     // css for unmount animation
     setModalStyle({
       transform: "scale(0.8)",
-      opacity: 0,
-      transition: "transform 220ms, opacity 220ms",
-      willChange: "transform, opacity",
-      transitionTimingFunction: "cubic-bezier(0.165, 0.840, 0.440, 1.000)"
+      opacity: 0
     });
     setBgStyle({
       background: "rgba(0, 0, 0, 0.70)",
-      willChange: "opacity",
-      backdropFilter: "blur(4px)",
-      transition: "opacity 220ms cubic-bezier(0.165, 0.840, 0.440, 1.000)",
       opacity: 0
     });
   };
@@ -87,17 +82,12 @@ const ModalContainer = ({ unmounting, children }) => {
     // css for mount animation
     setModalStyle({
       transform: "scale(1)",
-      opacity: 1,
-      transition: "transform 200ms, opacity: 200ms",
-      willChange: "transform, opacity",
-      transitionTimingFunction: "cubic-bezier(0.165, 0.840, 0.440, 1.000)"
+      opacity: 1
     });
 
     setBgStyle({
-      willChange: "opacity",
-      backdropFilter: "blur(4px)",
       background: "rgba(0, 0, 0, 0.70)",
-      transition: "opacity 200ms cubic-bezier(0.165, 0.840, 0.440, 1.000)"
+      opacity: 1
     });
   };
 
@@ -118,13 +108,13 @@ const ModalsManager = props => {
     const ModalComponent = modalsComponentLookupTable[modalType];
 
     return (
-      <ModalContainer unmounting={unmounting}>
-        <ModalComponent {...modalProps} key={modalType + index} />
+      <ModalContainer unmounting={unmounting} key={modalType + index}>
+        <ModalComponent {...modalProps} />
       </ModalContainer>
     );
   });
 
-  return <span>{renderedModals}</span>;
+  return renderedModals;
 };
 
 export default ModalsManager;
