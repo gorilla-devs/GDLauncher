@@ -4,9 +4,11 @@ export default createGlobalStyle`
   html,
   body {
     font-family: Roboto, Helvetica, sans-serif;
+    font-size: 14px;
     padding: 0;
     margin: 0;
     overflow: hidden;
+    color: ${props => props.theme.palette.text.primary};
   }
 
   a {
@@ -49,5 +51,13 @@ export default createGlobalStyle`
   ::-webkit-scrollbar-track {
     background-color: ${props => props.theme.shade11};
     border-radius: 1px;
+  }
+
+  :not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path),
+  :not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path)::after,
+  :not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path)::before {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
   }
 `;

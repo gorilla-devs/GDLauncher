@@ -2,13 +2,13 @@ import React from "react";
 import Button from "@material-ui/core/Button";
 import Modal from "../components/Modal";
 
-const Test = () => {
+const AddInstance = () => {
   return (
     <Modal
-      height="400px"
-      width="400px"
       css={`
-        background: green;
+        height: 70%;
+        width: 70%;
+        max-width: 1500px;
       `}
     >
       <Button>Test</Button>
@@ -16,4 +16,4 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default AddInstance;

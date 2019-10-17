@@ -10,7 +10,7 @@ const Home = () => {
     <div>
       <NavBar />
       Home{" "}
-      <button type="button" onClick={() => dispatch(openModal("Test"))}>
+      <button type="button" onClick={() => dispatch(openModal("AddInstance"))}>
         Open Modal
       </button>
     </div>
