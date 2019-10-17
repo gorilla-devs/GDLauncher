@@ -23,8 +23,9 @@ const StyledButton = styled(Button)`
   }
 `;
 
-function GDSelect(props) {
-  return <StyledButton {...props}>{props.children}</StyledButton>;
+function GDSelect({ children, ...props }) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <StyledButton {...props}>{children}</StyledButton>;
 }
 
 export default GDSelect;

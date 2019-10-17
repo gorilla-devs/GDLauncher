@@ -54,14 +54,10 @@ const Slider = styled.span`
   }
 `;
 
-function Switch(props) {
+function Switch({ style, onChange, onClick, checked }) {
   return (
-    <Wrapper style={props.style}>
-      <Checkbox
-        checked={props.checked}
-        onChange={props.onChange}
-        onClick={props.onClick}
-      />
+    <Wrapper style={style}>
+      <Checkbox checked={checked} onChange={onChange} onClick={onClick} />
       <Slider />
     </Wrapper>
   );

@@ -204,6 +204,7 @@
     "node-watch": "^0.6.3",
     "p-map": "^3.0.0",
     "react": "^16.10.2",
+    "react-content-loader": "^4.3.2",
     "react-dom": "^16.10.2",
     "react-redux": "^7.1.1",
     "react-router": "^5.1.2",

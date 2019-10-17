@@ -20,7 +20,7 @@ const CheckIcon = styled(FontAwesomeIcon)`
   transition: visibility 0.02s ease-in-out;
 `;
 
-function GDCheckBox(props) {
+function GDCheckBox() {
   const [checked, setChecked] = useState(false);
 
   return (

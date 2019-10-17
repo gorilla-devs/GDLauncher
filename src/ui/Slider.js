@@ -49,25 +49,8 @@ const StyledSlider = styled(Slider)`
 `;
 
 function GDSlider(props) {
-  return (
-    <StyledSlider
-      style={props.style}
-      onClick={props.onClick}
-      onChange={props.onChange}
-      className={props.className}
-      defaultValue={props.defaultValue}
-      valueLabelDisplay={props.valueLabelDisplay}
-      marks={props.marks}
-      disabled={props.disabled}
-      max={props.max}
-      min={props.min}
-      orientation={props.orientation}
-      step={props.step}
-      value={props.value}
-      ValueLabelComponent={props.ValueLabelComponent}
-      onChangeCommitted={props.onChangeCommitted}
-    />
-  );
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <StyledSlider {...props} />;
 }
 
 export default GDSlider;

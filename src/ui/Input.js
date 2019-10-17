@@ -37,24 +37,9 @@ const Input = styled.input`
   }
 `;
 
-type Props = {
-  placeholder: string
-  //   children: React.node
-};
-
-function GDInput(props: Props) {
-  return (
-    <Input
-      name={props.name}
-      type={props.type}
-      placeholder={props.placeholder}
-      width={props.width}
-      height={props.height}
-      style={props.style}
-      onChange={props.onChange}
-      value={props.value}
-    />
-  );
+function GDInput({ ...props }) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <Input {...props} />;
 }
 
 export default GDInput;
