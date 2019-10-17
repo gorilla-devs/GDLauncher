@@ -19,7 +19,6 @@ const Wrapper = styled.div`
   position: absolute;
   width: 100vw;
   height: 100vh;
-  margin: 10px 20px 20px 20px;
 `;
 
 function DesktopRoot() {

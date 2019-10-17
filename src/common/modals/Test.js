@@ -11,7 +11,7 @@ const Test = () => {
         background: green;
       `}
     >
-      <Button>Test</Button>
+      {/* <Button>Test</Button> */}
     </Modal>
   );
 };
