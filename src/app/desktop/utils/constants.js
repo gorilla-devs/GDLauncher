@@ -1,5 +1,4 @@
 import path from "path";
-import electron from "electron";
 import { platform, homedir } from "os";
 
 export const WINDOWS = "win32";

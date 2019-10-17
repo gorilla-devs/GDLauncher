@@ -41,7 +41,7 @@ function DesktopRoot() {
       <GlobalStyles />
       <Switch>
         {routes.map((route, i) => (
-          <RouteWithSubRoutes key={i} {...route} />
+          <RouteWithSubRoutes key={i} {...route} /> // eslint-disable-line
         ))}
       </Switch>
     </Wrapper>

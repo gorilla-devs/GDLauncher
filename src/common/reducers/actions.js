@@ -6,12 +6,7 @@ import fse from "fs-extra";
 import omitBy from "lodash.omitby";
 import { push } from "connected-react-router";
 import * as ActionTypes from "./actionTypes";
-import {
-  FORGE_MANIFEST_URL,
-  MC_MANIFEST_URL,
-  NEWS_URL,
-  FABRIC_APIS
-} from "../utils/constants";
+import { NEWS_URL } from "../utils/constants";
 import {
   mcAuthenticate,
   mcRefresh,
@@ -93,14 +88,14 @@ export function updateIsUpdateAvailable(isUpdateAvailable) {
   };
 }
 
-export function updateAccount(uuid, account) {
+export function updateAccount(uuidVal, account) {
   return dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_ACCOUNT,
-      id: uuid,
+      id: uuidVal,
       account
     });
-    dispatch(updateCurrentAccountId(uuid));
+    dispatch(updateCurrentAccountId(uuidVal));
   };
 }
 
@@ -137,7 +132,7 @@ export function updateCurrentAccountId(id) {
   };
 }
 
-export function login(username, password, remember) {
+export function login(username, password) {
   return async (dispatch, getState) => {
     const {
       app: { isNewUser, clientToken }

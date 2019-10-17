@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { push } from "connected-react-router";
 
-const Home = props => {
+const Home = () => {
   const dispatch = useDispatch();
 
   return (

@@ -36,10 +36,36 @@
     "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron craco build",
     "test": "craco test",
     "eject": "craco eject",
+    "lint": "eslint .",
     "dev": "cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none \"yarn start-electron\"",
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web yarn start",
     "postinstall": "electron-builder install-app-deps",
     "release": "cross-env-shell NODE_ENV=production APP_TYPE=electron \"yarn build\" && electron-builder -w --publish never"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint --fix"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "cross-env NODE_ENV=development eslint --cache --format=pretty",
+      "prettier --ignore-path .eslintignore --single-quote --write",
+      "git add"
+    ],
+    "{*.json,.{babelrc,eslintrc,prettierrc,stylelintrc}}": [
+      "prettier --ignore-path .eslintignore --parser json --write",
+      "git add"
+    ],
+    "*.{css,scss}": [
+      "stylelint --ignore-path .eslintignore --syntax scss --fix",
+      "prettier --ignore-path .eslintignore --single-quote --write",
+      "git add"
+    ],
+    "*.{yml,md}": [
+      "prettier --ignore-path .eslintignore --single-quote --write",
+      "git add"
+    ]
   },
   "build": {
     "generateUpdatesFilesForAllChannels": true,
@@ -167,6 +193,7 @@
     "electron-is-dev": "^1.1.0",
     "fs-extra": "^8.1.0",
     "history": "^4.10.1",
+    "husky": "^3.0.9",
     "is-electron": "^2.2.0",
     "lodash.debounce": "^4.0.8",
     "lodash.memoize": "^4.1.2",

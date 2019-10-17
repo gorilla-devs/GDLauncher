@@ -6,7 +6,7 @@ function RouteWithSubRoutes(route) {
     <Route
       path={route.path}
       render={props => (
-        // pass the sub-routes down to keep nesting
+        // eslint-disable-next-line react/jsx-props-no-spreading
         <route.component {...props} routes={route.routes} />
       )}
     />

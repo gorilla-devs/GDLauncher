@@ -67,8 +67,8 @@ const Modal = ({
           height: ${header === undefined || header === true
             ? "calc(100% - 40px - 40px)"
             : "100%"};
-          padding: ${({ header }) =>
-            header === undefined || header === true ? 20 : 0}px;
+          padding: ${props =>
+            props.header === undefined || props.header === true ? 20 : 0}px;
           overflow-y: auto;
         `}
       >

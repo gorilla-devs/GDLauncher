@@ -1,5 +1,5 @@
-import * as ActionTypes from "./actionTypes";
 import omitBy from "lodash.omitby";
+import * as ActionTypes from "./actionTypes";
 
 function news(state = [], action) {
   switch (action.type) {

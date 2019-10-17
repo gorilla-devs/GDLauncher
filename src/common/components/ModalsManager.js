@@ -100,15 +100,16 @@ const ModalContainer = ({ unmounting, children }) => {
   );
 };
 
-const ModalsManager = props => {
+const ModalsManager = () => {
   const currentModals = useSelector(state => state.modals);
 
-  const renderedModals = currentModals.map((modalDescription, index) => {
+  const renderedModals = currentModals.map(modalDescription => {
     const { modalType, modalProps = {}, unmounting = false } = modalDescription;
     const ModalComponent = modalsComponentLookupTable[modalType];
 
     return (
-      <ModalContainer unmounting={unmounting} key={modalType + index}>
+      <ModalContainer unmounting={unmounting} key={modalType}>
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <ModalComponent {...modalProps} />
       </ModalContainer>
     );

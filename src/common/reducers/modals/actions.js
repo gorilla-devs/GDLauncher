@@ -1,4 +1,4 @@
-import { OPEN_MODAL, CLOSE_MODAL, UNMOUNTING_MODAL } from './actionTypes';
+import { OPEN_MODAL, CLOSE_MODAL, UNMOUNTING_MODAL } from "./actionTypes";
 
 export function openModal(modalType, modalProps = {}) {
   return {

@@ -32,7 +32,7 @@ export const downloadArr = async (
         let counter = 0;
         let res = false;
         do {
-          res = await downloadFileInstance(item.path, item.url);
+          res = await downloadFileInstance(item.path, item.url); // eslint-disable-line no-await-in-loop
           counter += 1;
         } while (!res && counter < 3);
       }
@@ -63,29 +63,29 @@ const downloadFileInstance = async (fileName, url) => {
   }
 };
 
-export const downloadFile = (fileName, url, onProgress) => {
-  return new Promise(async (resolve, reject) => {
+export const downloadFile = async (fileName, url, onProgress) => {
+  await makeDir(path.dirname(fileName));
+  return new Promise((resolve, reject) => {
     // Save variable to know progress
-    let received_bytes = 0;
-    let total_bytes = 0;
+    let receivedBytes = 0;
+    let totalBytes = 0;
 
     const req = reqCall({
       method: "GET",
       uri: url
     });
-    await makeDir(path.dirname(fileName));
     const out = fss.createWriteStream(fileName);
     req.pipe(out);
 
     req.on("response", data => {
       // Change the total bytes value to get progress later.
-      total_bytes = parseInt(data.headers["content-length"]);
+      totalBytes = parseInt(data.headers["content-length"], 10);
     });
 
     req.on("data", chunk => {
       // Update the received bytes
-      received_bytes += chunk.length;
-      onProgress(((received_bytes * 100) / total_bytes).toFixed(1));
+      receivedBytes += chunk.length;
+      onProgress(((receivedBytes * 100) / totalBytes).toFixed(1));
     });
 
     req.on("end", () => {
@@ -97,10 +97,3 @@ export const downloadFile = (fileName, url, onProgress) => {
     });
   });
 };
-
-// function checkFile(lpath, size, sha1) {
-//   return fs.stat(lpath).then(stats => assert.equal(stats.size, size, 'wrong size for ' + lpath))
-//     .then(() => fs.readFile(lpath))
-//     .then(data => assert.equal(crypto.createHash('sha1').update(data).digest('hex'), sha1, `wrong sha1 for ${lpath}`))
-//     .then(() => lpath);
-// }

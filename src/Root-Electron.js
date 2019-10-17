@@ -1,3 +1,3 @@
-import Root from './app/desktop/DesktopRoot';
+import Root from "./app/desktop/DesktopRoot";
 
 export default Root;

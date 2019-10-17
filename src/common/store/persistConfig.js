@@ -1,7 +1,7 @@
-import storage from 'redux-persist/lib/storage';
+import storage from "redux-persist/lib/storage";
 
 export default {
-  key: 'root',
+  key: "root",
   storage,
-  whitelist: ['settings', 'app']
+  whitelist: ["settings", "app"]
 };

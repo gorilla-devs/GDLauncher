@@ -1,6 +1,5 @@
-import path from "path";
 import makeDir from "make-dir";
-import { getDirectories, readConfig } from ".";
+import { getDirectories } from ".";
 
 const getInstances = async instancesPath => {
   const mapFolderToInstance = async instance => {

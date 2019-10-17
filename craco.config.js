@@ -1,10 +1,10 @@
-const path = require("path");
+// const path = require("path");
 
-const alias = {
-  app: path.resolve("./src/app/"),
-  common: path.resolve("./src/common/"),
-  ui: path.resolve("./src/ui/")
-};
+// const alias = {
+//   app: path.resolve("./src/app/"),
+//   common: path.resolve("./src/common/"),
+//   ui: path.resolve("./src/ui/")
+// };
 
 module.exports = ({ env }) => {
   const isEnvDevelopment = env === "development";

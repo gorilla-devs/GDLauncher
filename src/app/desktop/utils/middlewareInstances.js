@@ -1,6 +1,5 @@
 import watch from "node-watch";
 import makeDir from "make-dir";
-import { promises as fs } from "fs";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 
@@ -68,7 +67,16 @@ const middleware = store => next => action => {
     if (!listener.isClosed()) {
       listener.close();
     }
-    startListener();
+    getInstances(nextState.settings.instancesPath)
+      .then(instances => {
+        dispatch({
+          type: ActionTypes.UPDATE_INSTANCES,
+          instances
+        });
+        startListener();
+        return instances;
+      })
+      .catch(console.error);
   }
 
   return result;

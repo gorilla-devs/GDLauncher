@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { useInput } from "rooks";
 import { useDispatch } from "react-redux";
+import { push } from "connected-react-router";
+import styled from "styled-components";
 import { login } from "../../../common/reducers/actions";
 import { load } from "../../../common/reducers/loading/actions";
 import features from "../../../common/reducers/loading/features";
 import { downloadArr } from "../utils/downloader";
-import { push } from "connected-react-router";
-import styled from "styled-components";
 import background from "../../../assets/loginBackground.jpg";
 import { Input, CheckBox, Button } from "../../../ui";
 
@@ -41,7 +40,7 @@ const Form = styled.div`
   top: 50%;
 `;
 
-const Login = props => {
+const Login = () => {
   const [email, setEmail] = useState(undefined);
   const [password, setPassword] = useState(undefined);
 
@@ -51,10 +50,7 @@ const Login = props => {
 
   const authenticate = () => {
     dispatch(
-      load(
-        features.mcAuthentication,
-        dispatch(login(email, password))
-      )
+      load(features.mcAuthentication, dispatch(login(email, password)))
     ).catch(console.error);
   };
 

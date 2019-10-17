@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import Button from '@material-ui/core/Button';
+import React from "react";
+import styled from "styled-components";
+import Button from "@material-ui/core/Button";
 
 const StyledButton = styled(Button)`
   color: ${props => props.theme.palette.text.primary};
@@ -24,18 +24,7 @@ const StyledButton = styled(Button)`
 `;
 
 function GDSelect(props) {
-  return (
-    <StyledButton
-      color={props.color}
-      txtColor={props.txtColor}
-      css={props.css}
-      style={props.style}
-      onClick={props.onClick}
-      className={props.className}
-    >
-      {props.children}
-    </StyledButton>
-  );
+  return <StyledButton {...props}>{props.children}</StyledButton>;
 }
 
 export default GDSelect;

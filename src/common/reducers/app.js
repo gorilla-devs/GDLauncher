@@ -1,12 +1,12 @@
-import { combineReducers } from 'redux';
-import * as ActionTypes from './actionTypes';
+import { combineReducers } from "redux";
+import * as ActionTypes from "./actionTypes";
 
 function accounts(state = [], action) {
+  const index = state.findIndex(
+    account => account.selectedProfile.id === action.id
+  );
   switch (action.type) {
     case ActionTypes.UPDATE_ACCOUNT:
-      const index = state.findIndex(
-        account => account.selectedProfile.id === action.id
-      );
       return index !== -1
         ? [...state.slice(0, index), action.account, ...state.slice(index + 1)]
         : [...state, action.account];
@@ -55,9 +55,9 @@ function forgeManifest(state = [], action) {
 }
 
 function modsManifests(state = [], action) {
+  const index = state.findIndex(mod => mod.id === action.id);
   switch (action.type) {
     case ActionTypes.UPDATE_MODS_MANIFESTS:
-      const index = state.findIndex(mod => mod.id === action.id);
       return index !== -1
         ? [...state.slice(0, index), action.mod, ...state.slice(index + 1)]
         : [...state, action.mod];

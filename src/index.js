@@ -12,6 +12,7 @@ import RootElectron from "./Root-Electron";
 import ModalsManager from "./common/components/ModalsManager";
 
 const Root =
+  // eslint-disable-next-line no-nested-ternary
   process.env.NODE_ENV === "development"
     ? RootDev
     : process.env.APP_TYPE === "web"

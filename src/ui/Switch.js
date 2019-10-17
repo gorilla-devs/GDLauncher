@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const Wrapper = styled.label`
   position: relative;
@@ -10,7 +10,7 @@ const Wrapper = styled.label`
 `;
 
 const Checkbox = styled.input.attrs({
-  type: 'checkbox'
+  type: "checkbox"
 })`
   display: none;
 `;
@@ -37,7 +37,7 @@ const Slider = styled.span`
 
   &:before {
     position: absolute;
-    content: '';
+    content: "";
     left: 3px;
     bottom: 2px;
 
@@ -55,7 +55,6 @@ const Slider = styled.span`
 `;
 
 function Switch(props) {
-  const [value, setValue] = useState(false);
   return (
     <Wrapper style={props.style}>
       <Checkbox

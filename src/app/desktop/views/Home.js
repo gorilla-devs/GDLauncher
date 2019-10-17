@@ -1,17 +1,18 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { openModal } from "../../../common/reducers/modals/actions";
-import navbar from "../../../common/navBar/index";
-import { CheckBox, Button } from "../../../ui/index";
+import NavBar from "../../../common/components/Navbar";
 
-const Home = props => {
+const Home = () => {
   const dispatch = useDispatch();
 
   return (
     <div>
-      <navbar />
+      <NavBar />
       Home{" "}
-      <button onClick={() => dispatch(openModal("Test"))}>Open Modal</button>
+      <button type="button" onClick={() => dispatch(openModal("Test"))}>
+        Open Modal
+      </button>
     </div>
   );
 };

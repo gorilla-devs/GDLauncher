@@ -1,10 +1,10 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const Input = styled.input`
   box-sizing: border-box;
-  width: ${props => props.width || '100px'};
-  height: ${props => props.height || '24px'};
+  width: ${props => props.width || "100px"};
+  height: ${props => props.height || "24px"};
   padding 10px;
   background: transparent;
   border-radius: 5px;
