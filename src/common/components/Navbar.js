@@ -22,7 +22,7 @@ export const Container = styled.div`
 
 export const SettingsButton = styled.div`
   position: absolute;
-  right: 10px;
+  right: 220px;
   font-size: 22px;
   color: white;
   cursor: pointer;
@@ -88,6 +88,33 @@ export const NavigationElement = styled.li`
   }
 `;
 
+const ProfileSettings = styled.div`
+  width: 255px;
+  border-radius: 4px;
+  transition: background 0.2s ease-in-out;
+  &&:hover {
+    background: ${props => props.theme.palette.secondary.main};
+  }
+`;
+
+const ProfileImg = styled.div`
+  width: 30px;
+  height: 30px;
+  background: ${props => props.theme.palette.grey[100]};
+  border-radius: 50%;
+  margin-top: 4px;
+  margin-left: 4px;
+  flot: right;
+`;
+
+const ProfileName = styled.p`
+  float: right;
+  margin: 0;
+  position: absolute;
+  right: 27px;
+  top: 12px;
+`;
+
 const Navbar = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const location = useSelector(state => state.router.location.pathname);
@@ -137,6 +164,10 @@ const Navbar = () => {
           `}
         />
       </SettingsButton>
+      <ProfileSettings onClick={() => dispatch(openModal("ProfileSettings"))}>
+        <ProfileImg />
+        <ProfileName>xXPeppino2310Xx</ProfileName>
+      </ProfileSettings>
       {updateAvailable && (
         <UpdateButton>
           <Link to="/autoUpdate">
