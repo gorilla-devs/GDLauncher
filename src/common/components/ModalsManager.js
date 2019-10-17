@@ -4,7 +4,7 @@ import styled from "styled-components";
 // import Settings from "components/modals/Settings";
 // import Changelog from "components/modals/Changelog";
 // import LoginHelper from "components/modals/LoginHelper";
-import Test from "../modals/Test";
+import AddInstance from "../modals/AddInstance";
 import { closeModal } from "../reducers/modals/actions";
 
 const Overlay = styled.div`
@@ -38,7 +38,7 @@ const modalsComponentLookupTable = {
   // Settings,
   // Changelog,
   // LoginHelper
-  Test
+  AddInstance
 };
 
 const ModalContainer = ({ unmounting, children }) => {

@@ -9,6 +9,7 @@ const HeaderComponent = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+  font-size: 16px;
   justify-content: space-between;
   width: calc(100% - 20px);
   padding: 0 10px;
@@ -30,27 +31,25 @@ const CloseButton = styled.div`
 
 const Modal = ({
   transparentBackground,
-  height,
-  width,
   header,
   title,
   backBtn,
-  children
+  children,
+  className
 }) => {
   const dispatch = useDispatch();
   return (
     <div
       onClick={e => e.stopPropagation()}
       transparentBackground={transparentBackground}
-      height={height}
-      width={width}
+      className={className}
       css={`
         background: ${props =>
-          props.transparentBackground ? "transparent" : "white"};
+          props.transparentBackground
+            ? "transparent"
+            : props.theme.palette.grey[800]};
         position: absolute;
         border-radius: 4px;
-        height: ${props => props.height || "100vh"};
-        width: ${props => props.width || "100vw"};
       `}
     >
       {(header === undefined || header === true) && (
