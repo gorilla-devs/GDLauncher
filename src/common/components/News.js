@@ -4,10 +4,11 @@ import styled, { ThemeContext } from "styled-components";
 import { shell } from "electron";
 
 const Carousel = styled.div`
-  width: 800px;
+  width: 830px;
   height: 100%;
   overflow: hidden;
   border-radius: ${props => props.theme.shape.borderRadius};
+  cursor: pointer;
 `;
 
 const ImageSlider = styled.div`
@@ -65,6 +66,8 @@ const Gradient = styled.div`
   );
   opacity: 0.99;
   z-index: 1;
+  &&:hover {
+  }
 `;
 
 const Select = styled.div`
@@ -135,7 +138,7 @@ const StyledContentLoader = styled(ContentLoader)`
   speed: 0.6;
   arialabel: false;
   height: 158px;
-  width: 800px;
+  width: 830px;
 `;
 
 function openNews(e, inf) {
@@ -145,7 +148,7 @@ function openNews(e, inf) {
 
 function ImageList({ currentImageIndex, news }) {
   const listImages = news.map(inf => (
-    <Slide key={inf} onClick={e => openNews(e, inf)}>
+    <Slide key={inf.title} onClick={e => openNews(e, inf)}>
       <Title>{inf.title}</Title>
       <SubTitle>{inf.description}</SubTitle>
       <Gradient />
@@ -154,7 +157,7 @@ function ImageList({ currentImageIndex, news }) {
   ));
 
   return (
-    <ImageSlider currentImageIndex={-800 * currentImageIndex}>
+    <ImageSlider currentImageIndex={-830 * currentImageIndex}>
       {listImages}
     </ImageSlider>
   );
@@ -165,7 +168,7 @@ function SelectNews(props) {
   const { setCurrentImageIndex } = props;
   const selectElementList = news.map((inf, i) => (
     <SelectElement
-      key={inf}
+      key={inf.url}
       onClick={() => setCurrentImageIndex(i)}
       currentImageIndex={props.currentImageIndex + 1}
     />
@@ -221,7 +224,7 @@ function News({ style, news }) {
       <rect
         rx="0"
         ry="0"
-        width="800"
+        width="830"
         height="158"
         css={`
           border-radius: 2px;

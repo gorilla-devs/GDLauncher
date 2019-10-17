@@ -126,11 +126,6 @@ const Navbar = () => {
             <Button selected={isLocation("/home")}>Home</Button>
           </Link>
         </NavigationElement>
-        <NavigationElement>
-          <Link to="/modpacks" draggable="false">
-            <Button selected={isLocation("/modpacks")}>ModPacks</Button>
-          </Link>
-        </NavigationElement>
       </NavigationContainer>
       <SettingsButton>
         <FontAwesomeIcon

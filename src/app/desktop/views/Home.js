@@ -18,20 +18,20 @@ const NewsContainer = styled.div`
   position: absolute;
   top: Calc(${props => props.theme.sizes.height.navbar} + 10px);
   left: 50%;
-  margin-left: -400px;
+  margin-left: -415px;
   margin-bottom: 10px;
 `;
 
 // background: ${props => props.theme.palette.secondary.main};
 const InstancesContainer = styled.div`
-  width: 800px;
+  width: 830px;
   min-height: 180px;
   height: 58%;
   position: absolute;
   bottom: 20px;
   left: 50%;
   right: 10px;
-  margin-left: -400px;
+  margin-left: -415px;
   background: ${props => props.theme.palette.grey[800]};
 `;
 
@@ -41,7 +41,6 @@ const Home = () => {
   return (
     <Background>
       <NavBar />
-
       <NewsContainer>
         <News news={news} />
       </NewsContainer>
