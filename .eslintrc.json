@@ -42,6 +42,7 @@
     "comma-dangle": "off",
     "no-underscore-dangle": "off",
     "generator-star-spacing": "off",
+    "no-shadow": "off",
     "import/no-unresolved": "error",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "jsx-a11y/anchor-is-valid": "off",
