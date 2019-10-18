@@ -4,11 +4,12 @@ import styled, { ThemeContext } from "styled-components";
 import { shell } from "electron";
 
 const Carousel = styled.div`
-  width: 830px;
-  height: 100%;
+  width: 100%;
+  height: 180px;
   overflow: hidden;
   border-radius: ${props => props.theme.shape.borderRadius};
   cursor: pointer;
+  display: inline-block;
 `;
 
 const ImageSlider = styled.div`
@@ -73,14 +74,13 @@ const Gradient = styled.div`
 const Select = styled.div`
   display: flex;
   justify-content: space-between;
-  position: absolute;
-  bottom: 15px;
+  position: relative;
+  top: 160px;
+  left: 50%;
+  margin-left: -100px;
   padding: 0;
-  margin: 0;
   width: 200px;
   height: 5px;
-  left: 50%;
-  margin-left: -79px;
   z-index: 2;
 `;
 

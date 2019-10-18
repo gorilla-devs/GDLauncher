@@ -1,10 +1,9 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 import NavBar from "../../../common/components/Navbar";
 import background from "../../../assets/fullHdBackground.jpg";
 import News from "../../../common/components/News";
-import { downloadInstance } from "../../../common/reducers/actions";
 
 const Background = styled.div`
   background-image: url("${background}");
@@ -12,49 +11,42 @@ const Background = styled.div`
   background-size: cover;
   width: 100%;
   height: 100%;
-`;
+  `;
 
-const NewsContainer = styled.div`
-  height: 28%;
+const Container = styled.div`
+  width: 830px;
+  height: 100%;
   position: absolute;
   top: Calc(${props => props.theme.sizes.height.navbar} + 10px);
   left: 50%;
   margin-left: -415px;
+`;
+
+const NewsContainer = styled.div`
   margin-bottom: 10px;
+  width: 830px;
 `;
 
 // background: ${props => props.theme.palette.secondary.main};
 const InstancesContainer = styled.div`
-  width: 830px;
-  min-height: 180px;
-  height: 58%;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  right: 10px;
-  margin-left: -415px;
+  width: 100%;
+  height: 80%;
   background: ${props => props.theme.palette.grey[800]};
+  margin-bottom: 10px;
 `;
 
 const Home = () => {
-  const dispatch = useDispatch();
   const news = useSelector(state => state.news);
 
   return (
     <Background>
       <NavBar />
-      <NewsContainer>
-        <News news={news} />
-      </NewsContainer>
-      <InstancesContainer />
-      <button
-        type="button"
-        onClick={() =>
-          dispatch(downloadInstance("test", "1.6.4", "forge-9.11.1.1345"))
-        }
-      >
-        Compute
-      </button>
+      <Container>
+        <NewsContainer>
+          <News news={news} />
+        </NewsContainer>
+        <InstancesContainer />
+      </Container>
     </Background>
   );
 };

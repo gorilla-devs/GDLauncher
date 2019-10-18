@@ -22,7 +22,7 @@ export const Container = styled.div`
 
 export const SettingsButton = styled.div`
   position: absolute;
-  right: 220px;
+  right: 250px;
   font-size: 22px;
   color: white;
   cursor: pointer;
