@@ -24,21 +24,21 @@ function downloadQueue(state = {}, action) {
     case ActionTypes.ADD_DOWNLOAD_TO_QUEUE:
       return {
         ...state,
-        [action.name]: {
-          name: action.name,
+        [action.instanceName]: {
+          instanceName: action.instanceName,
           percentage: 0,
-          version: action.version,
-          forgeVersion: action.forgeVersion,
+          mcVersion: action.mcVersion,
+          modloader: action.modloader,
           addonID: action.addonID
         }
       };
     case ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE:
-      return omitBy(state, obj => obj.name === action.name);
+      return omitBy(state, obj => obj.instanceName === action.instanceName);
     case ActionTypes.UPDATE_DOWNLOAD_PROGRESS:
       return {
         ...state,
-        [action.name]: {
-          ...state[action.name],
+        [action.instanceName]: {
+          ...state[action.instanceName],
           percentage: action.percentage
         }
       };

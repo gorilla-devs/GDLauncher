@@ -3,10 +3,11 @@ import path from "path";
 import os from "os";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
+import semver, { coerce } from "semver";
 import omitBy from "lodash.omitby";
 import { push } from "connected-react-router";
 import * as ActionTypes from "./actionTypes";
-import { NEWS_URL } from "../utils/constants";
+import { NEWS_URL, FORGESVC_URL } from "../utils/constants";
 import {
   mcAuthenticate,
   mcRefresh,
@@ -17,6 +18,8 @@ import {
   mcValidate
 } from "../api";
 import { _getCurrentAccount } from "../utils/selectors";
+import { mavenToArray, librariesMapper } from "../../app/desktop/utils";
+import { downloadFile } from "../../app/desktop/utils/downloader";
 
 export function initManifests() {
   return async dispatch => {
@@ -283,6 +286,15 @@ export function removeModsManifests(id) {
   };
 }
 
+export function updateCurrentDownload(name) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_CURRENT_DOWNLOAD,
+      name
+    });
+  };
+}
+
 export function updateSelectedInstance(name) {
   return dispatch => {
     dispatch({
@@ -291,3 +303,153 @@ export function updateSelectedInstance(name) {
     });
   };
 }
+
+export function addToQueue(instanceName, mcVersion, modloader, isRepair) {
+  return (dispatch, getState) => {
+    const { currentDownload } = getState();
+    dispatch({
+      type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
+      instanceName,
+      mcVersion,
+      modloader
+    });
+    if (!currentDownload) {
+      dispatch(updateCurrentDownload(instanceName));
+      dispatch(downloadInstance(instanceName, isRepair));
+    }
+  };
+}
+/* eslint-disable */
+export function downloadInstance(instanceName, mcVersion, modloader, repair) {
+  return async (dispatch, getState) => {
+    const {
+      downloadQueue,
+      currentDownload,
+      app: {
+        vanillaManifest: { versions: mcVersions },
+        forgeManifest,
+        fabricManifest
+      },
+      settings: { dataPath }
+    } = getState();
+
+    const itemFromQueue = downloadQueue[currentDownload];
+    let mcJson;
+    let modloaderJson;
+
+    // DOWNLOAD MINECRAFT JSON
+    const mcJsonPath = path.join(
+      dataPath,
+      "versions",
+      mcVersion,
+      `${mcVersion}.json`
+    );
+    try {
+      if (repair) throw new Error("isRepair");
+      mcJson = await fse.readJson(mcJsonPath);
+    } catch (err) {
+      const versionURL = mcVersions.find(v => v.id === mcVersion).url;
+      mcJson = (await axios.get(versionURL)).data;
+      await fse.outputJson(mcJsonPath, mcJson);
+    }
+
+    // COMPUTING MC ASSETS
+    let assetsJson;
+    const assetsFile = path.join(
+      dataPath,
+      "assets",
+      "indexes",
+      `${mcJson.assets}.json`
+    );
+    try {
+      assetsJson = await fse.readJson(assetsFile);
+    } catch (e) {
+      assetsJson = (await axios.get(mcJson.assetIndex.url)).data;
+      await fse.outputJson(assetsFile, assetsJson);
+    }
+
+    const assets = Object.entries(assetsJson.objects).map(
+      ([assetKey, asset]) => ({
+        url: `http://resources.download.minecraft.net/${asset.hash.substring(
+          0,
+          2
+        )}/${asset.hash}`,
+        type: "asset",
+        path: path.join(
+          dataPath,
+          "assets",
+          "objects",
+          asset.hash.substring(0, 2),
+          asset.hash
+        ),
+        legacyPath:
+          mcJson.assetIndex.id === "legacy" ||
+          !semver.gt(coerce(mcJson.assetIndex.id), coerce("1.7"))
+            ? path.join(dataPath, "assets", "virtual", "legacy", assetKey)
+            : null,
+        resourcesPath: path.join(
+          dataPath,
+          "instances",
+          instanceName,
+          "resources",
+          assetKey
+        )
+      })
+    );
+
+    const mcMainFile = {
+      url: mcJson.downloads.client.url,
+      path: path.join(dataPath, "versions", mcJson.id, `${mcJson.id}.jar`)
+    };
+
+    if (modloader === "FabricLoader") {
+    } else if (modloader.includes("forge-")) {
+      const forgeMetaPath = path.join(
+        dataPath,
+        "meta",
+        "net.minecraftforge",
+        `${modloader}`,
+        `${modloader}.json`
+      );
+      try {
+        if (repair) throw new Error();
+        modloaderJson = await fse.readJson(forgeMetaPath);
+        await fse.access(
+          path.join(
+            dataPath,
+            "libraries",
+            ...mavenToArray(modloaderJson.mavenVersionString)
+          )
+        );
+      } catch (err) {
+        modloaderJson = (await axios.get(
+          `${FORGESVC_URL}/minecraft/modloader/${modloader}`
+        )).data;
+        const forgeMainFile = path.join(
+          dataPath,
+          "libraries",
+          ...mavenToArray(modloaderJson.mavenVersionString)
+        );
+        await downloadFile(forgeMainFile, modloaderJson.downloadUrl, p => {});
+        await fse.outputFile(forgeMetaPath, modloaderJson);
+      }
+      modloaderJson.versionJson = JSON.parse(modloaderJson.versionJson);
+      modloaderJson.installProfileJson = JSON.parse(
+        modloaderJson.installProfileJson
+      );
+    }
+
+    const libraries = librariesMapper(
+      [...mcJson.libraries, ...modloaderJson.versionJson.libraries],
+      dataPath
+    );
+
+    console.log(libraries);
+    await Promise.all(
+      libraries.map(async lib => {
+        await axios.get(lib.url);
+      })
+    );
+  };
+}
+/* eslint-enable */

@@ -1,5 +1,6 @@
 import watch from "node-watch";
 import makeDir from "make-dir";
+import path from "path";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 
@@ -11,15 +12,17 @@ const middleware = store => next => action => {
   const nextState = store.getState();
   const { dispatch } = store;
 
+  const instancesPath = path.join(nextState.settings.dataPath, "instances");
+
   const startListener = () => {
     return watch(
-      nextState.settings.instancesPath,
+      instancesPath,
       {
         recursive: true,
         filter: f => true || /(config\.json)|(mods)/.test(f)
       },
       () => {
-        getInstances(nextState.settings.instancesPath)
+        getInstances(instancesPath)
           .then(instances => {
             dispatch({
               type: ActionTypes.UPDATE_INSTANCES,
@@ -32,8 +35,8 @@ const middleware = store => next => action => {
     );
   };
 
-  const instancesPathChanged =
-    currState.settings.instancesPath !== nextState.settings.instancesPath;
+  const dataPathChanged =
+    currState.settings.dataPath !== nextState.settings.dataPath;
 
   // If not initialized yet, start listener and do a first-time read
   if (!nextState.instances.started) {
@@ -41,7 +44,7 @@ const middleware = store => next => action => {
       type: ActionTypes.UPDATE_INSTANCES_STARTED,
       started: true
     });
-    getInstances(nextState.settings.instancesPath)
+    getInstances(instancesPath)
       .then(instances => {
         dispatch({
           type: ActionTypes.UPDATE_INSTANCES,
@@ -53,7 +56,7 @@ const middleware = store => next => action => {
         listener = startListener();
         listener.on("error", async () => {
           // Check if the folder exists and create it if it doesn't
-          await makeDir(nextState.settings.instancesPath);
+          await makeDir(instancesPath);
           if (!listener.isClosed()) {
             listener.close();
           }
@@ -62,12 +65,12 @@ const middleware = store => next => action => {
         return null;
       })
       .catch(console.error);
-  } else if (listener && instancesPathChanged) {
+  } else if (listener && dataPathChanged) {
     // If the path changed, close the previous listener and start a new one
     if (!listener.isClosed()) {
       listener.close();
     }
-    getInstances(nextState.settings.instancesPath)
+    getInstances(instancesPath)
       .then(instances => {
         dispatch({
           type: ActionTypes.UPDATE_INSTANCES,

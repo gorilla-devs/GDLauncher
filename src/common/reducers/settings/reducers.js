@@ -14,12 +14,12 @@ function sounds(state = true, action) {
 }
 
 const defaultPath = isElectron()
-  ? path.join(remote.app.getPath("userData"), "instances", "packs")
+  ? path.join(remote.app.getPath("userData"), "gdlauncher")
   : null;
 
-function instancesPath(state = defaultPath, action) {
+function dataPath(state = defaultPath, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_INSTANCES_PATH:
+    case ActionTypes.UPDATE_DATA_PATH:
       return action.path;
     default:
       return state;
@@ -68,7 +68,7 @@ function java(
 
 export default combineReducers({
   sounds,
-  instancesPath,
+  dataPath,
   releaseChannel,
   concurrentDownloads,
   java

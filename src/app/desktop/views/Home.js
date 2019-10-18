@@ -1,9 +1,10 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import NavBar from "../../../common/components/Navbar";
 import background from "../../../assets/fullHdBackground.jpg";
 import News from "../../../common/components/News";
+import { downloadInstance } from "../../../common/reducers/actions";
 
 const Background = styled.div`
   background-image: url("${background}");
@@ -36,6 +37,7 @@ const InstancesContainer = styled.div`
 `;
 
 const Home = () => {
+  const dispatch = useDispatch();
   const news = useSelector(state => state.news);
 
   return (
@@ -45,6 +47,14 @@ const Home = () => {
         <News news={news} />
       </NewsContainer>
       <InstancesContainer />
+      <button
+        type="button"
+        onClick={() =>
+          dispatch(downloadInstance("test", "1.6.4", "forge-9.11.1.1345"))
+        }
+      >
+        Compute
+      </button>
     </Background>
   );
 };

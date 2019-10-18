@@ -2,15 +2,15 @@
 # yarn lockfile v1
 
 
+"7zip-bin@^5.0.3", "7zip-bin@~5.0.3":
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/7zip-bin/-/7zip-bin-5.0.3.tgz#bc5b5532ecafd923a61f2fb097e3b108c0106a3f"
+  integrity sha512-GLyWIFBbGvpKPGo55JyRZAo4lVbnBiD52cKlw/0Vt+wnmKvWJkpZvsjVoaIolyBXDeAQKSicRtqFNPem9w0WYA==
+
 "7zip-bin@~4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/7zip-bin/-/7zip-bin-4.0.2.tgz#6abbdc22f33cab742053777a26db2e25ca527179"
   integrity sha512-XtGk+IF57pr852UK1AhQJXqmm1WmSgS5uISL+LPs0z/iAxXouMvdlLJrHPeukP6gd7yR2rDTMSMkHNODgwIq7A==
-
-"7zip-bin@~5.0.3":
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/7zip-bin/-/7zip-bin-5.0.3.tgz#bc5b5532ecafd923a61f2fb097e3b108c0106a3f"
-  integrity sha512-GLyWIFBbGvpKPGo55JyRZAo4lVbnBiD52cKlw/0Vt+wnmKvWJkpZvsjVoaIolyBXDeAQKSicRtqFNPem9w0WYA==
 
 "@babel/cli@^7.6.4":
   version "7.6.4"
@@ -3768,7 +3768,7 @@ cross-env@^6.0.3:
   dependencies:
     cross-spawn "^7.0.0"
 
-cross-spawn@6.0.5, cross-spawn@^6.0.0, cross-spawn@^6.0.5:
+cross-spawn@6.0.5, cross-spawn@^6.0.0, cross-spawn@^6.0.4, cross-spawn@^6.0.5:
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-6.0.5.tgz#4a5ec7c64dfae22c3a14124dbacdee846d80cbc4"
   integrity sha512-eTVLrBSt7fjbDygz805pMnstIs2VTBNkRm0qxZd+M7A5XDdxVRWO5MxGBXZhjY4cqLYLdtrGqRf8mBPmzwSpWQ==
@@ -8353,6 +8353,17 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
+node-7z@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/node-7z/-/node-7z-1.1.1.tgz#030cac10a4610a1c97b5c54afc341fd7933ee0b1"
+  integrity sha512-sod2JbXoKG+Ky+0ipa5fOWoJO4L3vZeYGdvoL9KSs+1Zs5CWV4zkSsh/KAYIOZY2NWPP8w43JJW1kvXlnIkeZg==
+  dependencies:
+    cross-spawn "^6.0.4"
+    debug "^4.1.1"
+    lodash "^4.17.12"
+    normalize-path "^3.0.0"
+    regexp-polyfill "^1.0.1"
+
 node-forge@0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.9.0.tgz#d624050edbb44874adca12bb9a52ec63cb782579"
@@ -10556,6 +10567,11 @@ regex-parser@2.2.10:
   version "2.2.10"
   resolved "https://registry.yarnpkg.com/regex-parser/-/regex-parser-2.2.10.tgz#9e66a8f73d89a107616e63b39d4deddfee912b37"
   integrity sha512-8t6074A68gHfU8Neftl0Le6KTDwfGAj7IyjPIMSfikI2wJUTHDMaIq42bUsfVnj8mhx0R+45rdUXHGpN164avA==
+
+regexp-polyfill@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/regexp-polyfill/-/regexp-polyfill-1.0.1.tgz#2b2887c3eb15072ba63a4a4186f950910527e3e7"
+  integrity sha512-kyYqOUpy+/MYja6oXu8kNHO2f0BfN/7cb3X3xn2rRGDY8rUUsrti97+BO46TlTOhxDaY7t6AyFERue5x+ZRvcA==
 
 regexp.prototype.flags@^1.2.0:
   version "1.2.0"
