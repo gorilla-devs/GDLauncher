@@ -7,18 +7,22 @@ import RouteWithSubRoutes from "../../common/components/RouteWithSubRoutes";
 import {
   loginWithAccessToken,
   initManifests,
-  initNews
+  initNews,
+  loginThroughNativeLauncher
 } from "../../common/reducers/actions";
 import { load } from "../../common/reducers/loading/actions";
 import features from "../../common/reducers/loading/features";
 import GlobalStyles from "../../common/GlobalStyles";
+import RouteBackground from "../../common/components/RouteBackground";
+import Navbar from "./components/Navbar";
 import routes from "./utils/routes";
 import { _getCurrentAccount } from "../../common/utils/selectors";
 
 const Wrapper = styled.div`
-  position: absolute;
+  height: 100%;
   width: 100vw;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
 `;
 
 function DesktopRoot() {
@@ -33,12 +37,18 @@ function DesktopRoot() {
       dispatch(
         load(features.mcAuthentication, dispatch(loginWithAccessToken()))
       ).catch(console.error);
+    } else {
+      dispatch(
+        load(features.mcAuthentication, dispatch(loginThroughNativeLauncher()))
+      ).catch(console.error);
     }
   });
 
   return (
     <Wrapper>
       <GlobalStyles />
+      <RouteBackground />
+      <Navbar />
       <Switch>
         {routes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} /> // eslint-disable-line

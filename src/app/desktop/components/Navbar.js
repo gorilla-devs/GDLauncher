@@ -6,14 +6,13 @@ import { Link } from "react-router-dom";
 import { ipcRenderer } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog } from "@fortawesome/free-solid-svg-icons";
-import logo from "../../assets/logo.png";
-import { Button } from "../../ui/index";
+import logo from "../../../common/assets/logo.png";
+import { Button } from "../../../ui/index";
 
-import { openModal } from "../reducers/modals/actions";
+import { openModal } from "../../../common/reducers/modals/actions";
 
 export const Container = styled.div`
-  margin: 0;
-  width: 100%;
+  width: 100vw;
   height: ${({ theme }) => theme.sizes.height.navbar};
   -webkit-user-select: none;
   display: flex;
@@ -103,8 +102,6 @@ const ProfileImg = styled.div`
   background: ${props => props.theme.palette.grey[100]};
   border-radius: 50%;
   margin-top: 4px;
-  margin-left: 4px;
-  flot: right;
 `;
 
 const ProfileName = styled.p`
@@ -136,6 +133,7 @@ const Navbar = () => {
     return false;
   };
 
+  if (isLocation("/")) return null;
   return (
     <Container>
       <img

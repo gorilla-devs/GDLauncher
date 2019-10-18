@@ -1,6 +1,5 @@
 import { combineReducers } from "redux";
 import { remote } from "electron";
-import path from "path";
 import isElectron from "is-electron";
 import * as ActionTypes from "./actionTypes";
 
@@ -13,9 +12,7 @@ function sounds(state = true, action) {
   }
 }
 
-const defaultPath = isElectron()
-  ? path.join(remote.app.getPath("userData"), "gdlauncher")
-  : null;
+const defaultPath = isElectron() ? remote.app.getPath("userData") : null;
 
 function dataPath(state = defaultPath, action) {
   switch (action.type) {

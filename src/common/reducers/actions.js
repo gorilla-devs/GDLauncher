@@ -1,6 +1,6 @@
 import axios from "axios";
 import path from "path";
-import os from "os";
+import { remote } from "electron";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
 import semver, { coerce } from "semver";
@@ -196,11 +196,13 @@ export function loginThroughNativeLauncher() {
       app: { isNewUser }
     } = getState();
 
-    const homedir = process.env.APPDATA || os.homedir();
+    const homedir = remote.app.getPath("appData");
     const vanillaMCPath = path.join(homedir, ".minecraft");
     const vnlJson = await fse.readJson(
       path.join(vanillaMCPath, "launcher_profiles.json")
     );
+
+    console.log(vnlJson, " ");
 
     const { clientToken } = vnlJson;
     const { account } = vnlJson.selectedUser;
@@ -209,8 +211,7 @@ export function loginThroughNativeLauncher() {
       const { data } = await mcRefresh(accessToken, clientToken);
 
       // We need to update the accessToken in launcher_profiles.json
-      vnlJson.authenticationDatabase[data.selectedProfile.userId].accessToken =
-        data.accessToken;
+      vnlJson.authenticationDatabase[account].accessToken = data.accessToken;
       await fse.writeJson(
         path.join(vanillaMCPath, "launcher_profiles.json"),
         vnlJson

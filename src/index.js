@@ -39,17 +39,10 @@ ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <ThemeProvider theme={theme}>
-        <div
-          css={`
-            width: 100%;
-            height: 100%;
-          `}
-        >
-          <ConnectedRouter history={history}>
-            <ModalsManager />
-            <Root history={history} store={store} persistor={persistor} />
-          </ConnectedRouter>
-        </div>
+        <ConnectedRouter history={history}>
+          <ModalsManager />
+          <Root history={history} store={store} persistor={persistor} />
+        </ConnectedRouter>
       </ThemeProvider>
     </PersistGate>
   </Provider>,

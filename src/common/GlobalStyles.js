@@ -1,13 +1,25 @@
 import { createGlobalStyle } from "styled-components";
 
 export default createGlobalStyle`
-  html,
+  html {
+    height: 100%;
+  }
+
   body {
+    height: 100%;   
+    overflow: hidden;
+    margin: 0;
+    display: flex;
+  }
+  
+  #root {
     font-family: Roboto, Helvetica, sans-serif;
     font-size: 14px;
-    padding: 0;
-    margin: 0;
+    height: 100%;
     overflow: hidden;
+    margin: 0;
+    display: flex;
+    box-sizing: border-box;
     color: ${props => props.theme.palette.text.primary};
   }
 
@@ -44,12 +56,12 @@ export default createGlobalStyle`
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: ${props => props.theme.shade3};
+    background-color: ${props => props.theme.palette.grey[200]};
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-track {
-    background-color: ${props => props.theme.shade11};
+    background-color: ${props => props.theme.palette.grey[900]};
     border-radius: 1px;
   }
 

@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import AsyncComponent from "../../../common/components/AsyncComponent";
+import withScroll from "./withScroll";
 
 const Login = lazy(() => import("../views/Login"));
 const Home = lazy(() => import("../views/Home"));
@@ -13,7 +14,7 @@ const routes = [
   },
   {
     path: "/home",
-    component: AsyncComponent(Home)
+    component: withScroll(AsyncComponent(Home))
   },
   {
     path: "/onboarding",

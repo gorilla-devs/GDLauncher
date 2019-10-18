@@ -6,7 +6,7 @@ import { login } from "../../../common/reducers/actions";
 import { load } from "../../../common/reducers/loading/actions";
 import features from "../../../common/reducers/loading/features";
 import { downloadArr } from "../utils/downloader";
-import background from "../../../assets/loginBackground.jpg";
+import background from "../../../common/assets/fullHdBackground.jpg";
 import { Input, CheckBox, Button } from "../../../ui";
 
 const Background = styled.div`
