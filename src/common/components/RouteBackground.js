@@ -1,7 +1,7 @@
 import React from "react";
 import background from "../assets/fullHdBackground.jpg";
 
-const RouteBackground = props => {
+const RouteBackground = () => {
   return (
     <div
       css={`
