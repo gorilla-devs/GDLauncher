@@ -166,19 +166,24 @@ export const get7zPath = () => {
 };
 
 export const extract7zAndFixPermissions = async () => {
-  const baseDir = remote.app.getAppPath();
+  const baseDir = path.join(
+    remote.app.getAppPath(),
+    process.env.NODE_ENV === "development" ? "public" : "build",
+    "7z"
+  );
   let zipLocationAsar = path.join(baseDir, "7za-linux");
   if (process.platform === "darwin") {
-    zipLocationAsar = path.join(baseDir, "build", "7z", "7za-osx");
+    zipLocationAsar = path.join(baseDir, "7za-osx");
   }
   if (process.platform === "win32") {
-    zipLocationAsar = path.join(baseDir, "public", "7z", "7za.exe");
+    zipLocationAsar = path.join(baseDir, "7za.exe");
   }
 
   await fse.copy(zipLocationAsar, get7zPath());
 
-  const { stdout, stderr } = await promisify(exec)(
-    `chmod +x "${get7zPath()}"`
-  );
-  console.log(stdout, stderr);
+  if (process.platform === "linux" || process.platform === "darwin") {
+    const { stdout, stderr } = await promisify(exec)(
+      `chmod +x "${get7zPath()}"`
+    );
+  }
 };

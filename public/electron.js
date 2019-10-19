@@ -31,9 +31,9 @@ function createWindow() {
       userAgent: "GDLauncher"
     }
   );
-  if (isDev) {
+  // if (isDev) {
     mainWindow.webContents.openDevTools();
-  }
+  // }
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
