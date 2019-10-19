@@ -148,7 +148,8 @@ export const isLatestJavaDownloaded = async meta => {
     ) {
       throw new Error("Java corrupted");
     }
-  } catch {
+  } catch (err) {
+    console.log(err);
     isValid = false;
   }
   return isValid;
@@ -165,7 +166,14 @@ export const get7zPath = () => {
   return path.join(baseDir, "7za-linux");
 };
 
-export const extract7zAndFixPermissions = async () => {
+export const fixFilePermissions = async filePath => {
+  if (process.platform === "linux" || process.platform === "darwin") {
+    await promisify(exec)(`chmod +x "${filePath}"`);
+    await promisify(exec)(`chmod 755 "${filePath}"`);
+  }
+};
+
+export const extract7z = async () => {
   const baseDir = path.join(
     remote.app.getAppPath(),
     process.env.NODE_ENV === "development" ? "public" : "build",
@@ -180,10 +188,5 @@ export const extract7zAndFixPermissions = async () => {
   }
 
   await fse.copy(zipLocationAsar, get7zPath());
-
-  if (process.platform === "linux" || process.platform === "darwin") {
-    // const { stdout, stderr } = await promisify(exec)(
-    //   `chmod +x "${get7zPath()}"`
-    // );
-  }
+  await fixFilePermissions(get7zPath());
 };

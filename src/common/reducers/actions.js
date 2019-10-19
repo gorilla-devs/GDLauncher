@@ -10,7 +10,7 @@ import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
-import { NEWS_URL, FORGESVC_URL } from "../utils/constants";
+import { NEWS_URL } from "../utils/constants";
 import {
   mcAuthenticate,
   mcRefresh,
@@ -21,14 +21,21 @@ import {
   mcValidate,
   getLauncherManifest
 } from "../api";
-import { _getCurrentAccount } from "../utils/selectors";
 import {
-  mavenToArray,
+  _getCurrentAccount,
+  _getCurrentDownloadItem,
+  _getJavaPath
+} from "../utils/selectors";
+import {
   librariesMapper,
   convertOSToMCFormat,
-  get7zPath
+  get7zPath,
+  readConfig,
+  fixFilePermissions
 } from "../../app/desktop/utils";
-import { downloadFile } from "../../app/desktop/utils/downloader";
+import { downloadFile, downloadArr } from "../../app/desktop/utils/downloader";
+import { removeDuplicates } from "../utils";
+import { updateJavaPath } from "./settings/actions";
 
 export function initManifests() {
   return async dispatch => {
@@ -164,6 +171,17 @@ export function updateJavaStatus(status) {
   };
 }
 
+export function updateDownloadProgress(percentage) {
+  return (dispatch, getState) => {
+    const { currentDownload } = getState();
+    dispatch({
+      type: ActionTypes.UPDATE_DOWNLOAD_PROGRESS,
+      name: currentDownload,
+      percentage: Number(percentage.toFixed())
+    });
+  };
+}
+
 export function downloadJava() {
   return async (dispatch, getState) => {
     const {
@@ -214,6 +232,11 @@ export function downloadJava() {
       });
     });
     await fse.remove(tempFolder);
+
+    await fixFilePermissions(_getJavaPath(getState()));
+
+    dispatch(updateJavaPath(_getJavaPath(getState())));
+
     ipcRenderer.send("update-progress-bar", -1);
     dispatch(updateJavaStatus("downloaded"));
   };
@@ -286,12 +309,11 @@ export function loginThroughNativeLauncher() {
       path.join(vanillaMCPath, "launcher_profiles.json")
     );
 
-    console.log(vnlJson, " ");
-
-    const { clientToken } = vnlJson;
-    const { account } = vnlJson.selectedUser;
-    const { accessToken } = vnlJson.authenticationDatabase[account];
     try {
+      const { clientToken } = vnlJson;
+      const { account } = vnlJson.selectedUser;
+      const { accessToken } = vnlJson.authenticationDatabase[account];
+
       const { data } = await mcRefresh(accessToken, clientToken);
 
       // We need to update the accessToken in launcher_profiles.json
@@ -405,22 +427,17 @@ export function addToQueue(instanceName, mcVersion, modloader, isRepair) {
   };
 }
 /* eslint-disable */
-export function downloadInstance(instanceName, mcVersion, modloader, repair) {
+export function downloadInstance(instanceName, mcVersion, repair) {
   return async (dispatch, getState) => {
     const {
-      downloadQueue,
-      currentDownload,
       app: {
-        vanillaManifest: { versions: mcVersions },
-        forgeManifest,
-        fabricManifest
+        vanillaManifest: { versions: mcVersions }
       },
       settings: { dataPath }
     } = getState();
 
-    const itemFromQueue = downloadQueue[currentDownload];
+    const itemFromQueue = _getCurrentDownloadItem(getState());
     let mcJson;
-    let modloaderJson;
 
     // DOWNLOAD MINECRAFT JSON
     const mcJsonPath = path.join(
@@ -487,53 +504,40 @@ export function downloadInstance(instanceName, mcVersion, modloader, repair) {
       path: path.join(dataPath, "versions", mcJson.id, `${mcJson.id}.jar`)
     };
 
-    if (modloader === "FabricLoader") {
-    } else if (modloader.includes("forge-")) {
-      const forgeMetaPath = path.join(
-        dataPath,
-        "meta",
-        "net.minecraftforge",
-        `${modloader}`,
-        `${modloader}.json`
-      );
-      try {
-        if (repair) throw new Error();
-        modloaderJson = await fse.readJson(forgeMetaPath);
-        await fse.access(
-          path.join(
-            dataPath,
-            "libraries",
-            ...mavenToArray(modloaderJson.mavenVersionString)
-          )
-        );
-      } catch (err) {
-        modloaderJson = (await axios.get(
-          `${FORGESVC_URL}/minecraft/modloader/${modloader}`
-        )).data;
-        const forgeMainFile = path.join(
-          dataPath,
-          "libraries",
-          ...mavenToArray(modloaderJson.mavenVersionString)
-        );
-        await downloadFile(forgeMainFile, modloaderJson.downloadUrl, p => {});
-        await fse.outputFile(forgeMetaPath, modloaderJson);
-      }
-      modloaderJson.versionJson = JSON.parse(modloaderJson.versionJson);
-      modloaderJson.installProfileJson = JSON.parse(
-        modloaderJson.installProfileJson
-      );
-    }
-
-    const libraries = librariesMapper(
-      [...mcJson.libraries, ...modloaderJson.versionJson.libraries],
-      dataPath
+    const libraries = removeDuplicates(
+      librariesMapper(mcJson.libraries, dataPath),
+      "url"
     );
 
-    console.log(libraries);
-    await Promise.all(
-      libraries.map(async lib => {
-        await axios.get(lib.url);
-      })
+    let timePlayed = 0;
+
+    if (repair) {
+      try {
+        const prevConfig = await readConfig(pack);
+        timePlayed = prevConfig.timePlayed;
+      } catch {
+        console.log("Could not find a valid config - using defaults");
+      }
+    }
+
+    await fse.outputJson(path.join(dataPath, instanceName, "config.json"), {
+      version: mcVersion,
+      timePlayed
+    });
+
+    const updatePercentage = downloaded => {
+      dispatch(
+        updateDownloadProgress(
+          (downloaded * 100) / assets.length + libraries.length + 1
+        )
+      );
+    };
+
+    await downloadArr(
+      [...libraries, ...assets, mcMainFile],
+      updatePercentage,
+      instanceName,
+      true
     );
   };
 }

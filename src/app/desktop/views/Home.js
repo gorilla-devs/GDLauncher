@@ -3,10 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import Instances from "../components/Instances";
 import News from "../components/News";
 import { downloadInstance } from "../../../common/reducers/actions";
+import { _getCurrentDownloadItem } from "../../../common/utils/selectors";
 
 const Home = () => {
   const dispatch = useDispatch();
   const news = useSelector(state => state.news);
+  const downloadItem = useSelector(_getCurrentDownloadItem) || {};
 
   return (
     <div>
@@ -14,13 +16,17 @@ const Home = () => {
       <button
         type="button"
         onClick={() =>
-          dispatch(downloadInstance("test", "1.6.4", "forge-9.11.1.1345"))
+          dispatch(
+            downloadInstance(
+              `TEST ${Math.random()}`,
+              "1.12.2",
+              "forge-14.23.5.2847"
+            )
+          )
         }
-        css={`
-          display: none;
-        `}
+        css=""
       >
-        Compute
+        Compute {downloadItem.percentage}
       </button>
       <Instances />
     </div>

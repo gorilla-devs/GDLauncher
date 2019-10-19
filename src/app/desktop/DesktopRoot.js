@@ -19,7 +19,7 @@ import RouteBackground from "../../common/components/RouteBackground";
 import Navbar from "./components/Navbar";
 import routes from "./utils/routes";
 import { _getCurrentAccount } from "../../common/utils/selectors";
-import { isLatestJavaDownloaded, extract7zAndFixPermissions } from "./utils";
+import { isLatestJavaDownloaded, extract7z } from "./utils";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -36,7 +36,7 @@ function DesktopRoot() {
   useDidMount(() => {
     dispatch(initManifests())
       .then(async data => {
-        await extract7zAndFixPermissions();
+        await extract7z();
         return data;
       })
       .then(({ launcher }) => isLatestJavaDownloaded(launcher))
