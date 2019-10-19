@@ -1,5 +1,6 @@
 import { combineReducers } from "redux";
 import { remote } from "electron";
+import path from "path";
 import isElectron from "is-electron";
 import * as ActionTypes from "./actionTypes";
 

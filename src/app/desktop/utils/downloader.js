@@ -37,7 +37,7 @@ export const downloadArr = async (
         } while (!res && counter < 3);
       }
       downloaded += 1;
-      if (downloaded % 10 === 0 || downloaded === arr.length)
+      if (downloaded % 5 === 0 || downloaded === arr.length)
         updatePercentage(downloaded);
     },
     { concurrency: threads }
@@ -45,6 +45,7 @@ export const downloadArr = async (
 };
 
 const downloadFileInstance = async (fileName, url) => {
+  console.log(fileName);
   try {
     const filePath = path.dirname(fileName);
     try {
