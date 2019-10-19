@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import fse from 'fs-extra';
+import fse from "fs-extra";
 import os from "os";
 import { promisify } from "util";
 import { remote } from "electron";
@@ -155,7 +155,7 @@ export const isLatestJavaDownloaded = async meta => {
 };
 
 export const get7zPath = () => {
-  const baseDir = remote.app.getPath('userData');
+  const baseDir = remote.app.getPath("userData");
   if (process.platform === "darwin") {
     return path.join(baseDir, "7za-osx");
   }
@@ -182,8 +182,8 @@ export const extract7zAndFixPermissions = async () => {
   await fse.copy(zipLocationAsar, get7zPath());
 
   if (process.platform === "linux" || process.platform === "darwin") {
-    const { stdout, stderr } = await promisify(exec)(
-      `chmod +x "${get7zPath()}"`
-    );
+    // const { stdout, stderr } = await promisify(exec)(
+    //   `chmod +x "${get7zPath()}"`
+    // );
   }
 };

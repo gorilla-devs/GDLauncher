@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import Button from "@material-ui/core/Button";
 import Select from "@material-ui/core/Select";
-import CheckBox from "@material-ui/core/CheckBox";
-// import { CheckBox } from "../../ui";
-import Modal from "../components/Modal";
 import MenuItem from "@material-ui/core/MenuItem";
+import Checkbox from "@material-ui/core/Checkbox";
+import Modal from "../components/Modal";
 
 const AddInstance = () => {
   const [snapshot, setSnapshot] = useState(false);
@@ -43,17 +41,6 @@ const AddInstance = () => {
             value={version}
             onChange={e => setVersion(e.target.value)}
           >
-            {/* {vanillaManifest.versions
-          .filter(versions =>
-            // versions => versions.type === "release"
-            snapshot ? versions.type === "snapshot" : true
-          )
-          .map((version, i) => (
-            <MenuItem key={version.id} value={i}>
-              {version.id}
-            </MenuItem>
-          ))} */}
-
             {snapshot
               ? vanillaManifest.versions.map((version, i) => (
                   <MenuItem key={version.id} value={i}>
@@ -68,7 +55,7 @@ const AddInstance = () => {
                     </MenuItem>
                   ))}
           </Select>
-          <CheckBox
+          <Checkbox
             css={`
               position: relative;
               top: 20px;
