@@ -19,7 +19,7 @@ import RouteBackground from "../../common/components/RouteBackground";
 import Navbar from "./components/Navbar";
 import routes from "./utils/routes";
 import { _getCurrentAccount } from "../../common/utils/selectors";
-import { isLatestJavaDownloaded } from "./utils";
+import { isLatestJavaDownloaded, extract7zAndFixPermissions } from "./utils";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -35,6 +35,10 @@ function DesktopRoot() {
   // Handle already logged in account redirect
   useDidMount(() => {
     dispatch(initManifests())
+      .then(async data => {
+        await extract7zAndFixPermissions();
+        return data;
+      })
       .then(({ launcher }) => isLatestJavaDownloaded(launcher))
       .then(res => {
         if (!res) dispatch(downloadJava());

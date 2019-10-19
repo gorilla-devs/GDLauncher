@@ -1,4 +1,5 @@
 import { promises as fs } from "fs";
+import fse from 'fs-extra';
 import os from "os";
 import { promisify } from "util";
 import { remote } from "electron";
@@ -154,7 +155,7 @@ export const isLatestJavaDownloaded = async meta => {
 };
 
 export const get7zPath = () => {
-  const baseDir = path.join(remote.app.getAppPath(), "public", "7z");
+  const baseDir = remote.app.getPath('userData');
   if (process.platform === "darwin") {
     return path.join(baseDir, "7za-osx");
   }
@@ -162,4 +163,22 @@ export const get7zPath = () => {
     return path.join(baseDir, "7za.exe");
   }
   return path.join(baseDir, "7za-linux");
+};
+
+export const extract7zAndFixPermissions = async () => {
+  const baseDir = remote.app.getAppPath();
+  let zipLocationAsar = path.join(baseDir, "7za-linux");
+  if (process.platform === "darwin") {
+    zipLocationAsar = path.join(baseDir, "build", "7z", "7za-osx");
+  }
+  if (process.platform === "win32") {
+    zipLocationAsar = path.join(baseDir, "public", "7z", "7za.exe");
+  }
+
+  await fse.copy(zipLocationAsar, get7zPath());
+
+  const { stdout, stderr } = await promisify(exec)(
+    `chmod +x "${get7zPath()}"`
+  );
+  console.log(stdout, stderr);
 };
