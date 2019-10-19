@@ -157,7 +157,7 @@ function ImageList({ currentImageIndex, news }) {
   ));
 
   return (
-    <ImageSlider currentImageIndex={-830 * currentImageIndex}>
+    <ImageSlider currentImageIndex={-1000 * currentImageIndex}>
       {listImages}
     </ImageSlider>
   );
