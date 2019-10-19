@@ -286,12 +286,12 @@ export function loginThroughNativeLauncher() {
       path.join(vanillaMCPath, "launcher_profiles.json")
     );
 
-    console.log(vnlJson, " ");
-
-    const { clientToken } = vnlJson;
-    const { account } = vnlJson.selectedUser;
-    const { accessToken } = vnlJson.authenticationDatabase[account];
     try {
+
+      const { clientToken } = vnlJson;
+      const { account } = vnlJson.selectedUser;
+      const { accessToken } = vnlJson.authenticationDatabase[account];
+      
       const { data } = await mcRefresh(accessToken, clientToken);
 
       // We need to update the accessToken in launcher_profiles.json
@@ -469,7 +469,7 @@ export function downloadInstance(instanceName, mcVersion, modloader, repair) {
         ),
         legacyPath:
           mcJson.assetIndex.id === "legacy" ||
-          !semver.gt(coerce(mcJson.assetIndex.id), coerce("1.7"))
+            !semver.gt(coerce(mcJson.assetIndex.id), coerce("1.7"))
             ? path.join(dataPath, "assets", "virtual", "legacy", assetKey)
             : null,
         resourcesPath: path.join(
@@ -515,7 +515,7 @@ export function downloadInstance(instanceName, mcVersion, modloader, repair) {
           "libraries",
           ...mavenToArray(modloaderJson.mavenVersionString)
         );
-        await downloadFile(forgeMainFile, modloaderJson.downloadUrl, p => {});
+        await downloadFile(forgeMainFile, modloaderJson.downloadUrl, p => { });
         await fse.outputFile(forgeMetaPath, modloaderJson);
       }
       modloaderJson.versionJson = JSON.parse(modloaderJson.versionJson);
