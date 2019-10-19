@@ -10,7 +10,7 @@ import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
-import { NEWS_URL, FORGESVC_URL } from "../utils/constants";
+import { NEWS_URL } from "../utils/constants";
 import {
   mcAuthenticate,
   mcRefresh,
@@ -27,7 +27,6 @@ import {
   _getJavaPath
 } from "../utils/selectors";
 import {
-  mavenToArray,
   librariesMapper,
   convertOSToMCFormat,
   get7zPath,
@@ -36,8 +35,6 @@ import {
 } from "../../app/desktop/utils";
 import { downloadFile, downloadArr } from "../../app/desktop/utils/downloader";
 import { removeDuplicates } from "../utils";
-import { promisify } from "util";
-import { exec } from "child_process";
 import { updateJavaPath } from "./settings/actions";
 
 export function initManifests() {

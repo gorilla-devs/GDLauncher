@@ -24,7 +24,7 @@ const Home = () => {
             )
           )
         }
-        css={``}
+        css=""
       >
         Compute {downloadItem.percentage}
       </button>
