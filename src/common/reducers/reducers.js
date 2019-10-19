@@ -19,6 +19,15 @@ function isUpdateAvailable(state = false, action) {
   }
 }
 
+function javaDownloadStatus(state = null, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_JAVA_DOWNLOAD:
+      return action.status;
+    default:
+      return state;
+  }
+}
+
 function downloadQueue(state = {}, action) {
   switch (action.type) {
     case ActionTypes.ADD_DOWNLOAD_TO_QUEUE:
@@ -119,6 +128,7 @@ export default {
   isUpdateAvailable,
   downloadQueue,
   currentDownload,
+  javaDownloadStatus,
   instances,
   startedInstances,
   selectedInstance,

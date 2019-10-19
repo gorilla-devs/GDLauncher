@@ -1,11 +1,14 @@
 import axios from "axios";
 import path from "path";
-import { remote } from "electron";
+import { remote, ipcRenderer } from "electron";
+import os from "os";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
 import semver, { coerce } from "semver";
 import omitBy from "lodash.omitby";
+import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
+import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
 import { NEWS_URL, FORGESVC_URL } from "../utils/constants";
 import {
@@ -15,10 +18,16 @@ import {
   getFabricManifest,
   getMcManifest,
   getForgeManifest,
-  mcValidate
+  mcValidate,
+  getLauncherManifest
 } from "../api";
 import { _getCurrentAccount } from "../utils/selectors";
-import { mavenToArray, librariesMapper } from "../../app/desktop/utils";
+import {
+  mavenToArray,
+  librariesMapper,
+  convertOSToMCFormat,
+  get7zPath
+} from "../../app/desktop/utils";
 import { downloadFile } from "../../app/desktop/utils/downloader";
 
 export function initManifests() {
@@ -32,6 +41,11 @@ export function initManifests() {
     dispatch({
       type: ActionTypes.UPDATE_FABRIC_MANIFEST,
       data: fabric
+    });
+    const launcher = (await getLauncherManifest()).data;
+    dispatch({
+      type: ActionTypes.UPDATE_LAUNCHER_MANIFEST,
+      data: launcher
     });
     const forge = (await getForgeManifest()).data;
     const forgeVersions = {};
@@ -47,6 +61,12 @@ export function initManifests() {
       type: ActionTypes.UPDATE_FORGE_MANIFEST,
       data: omitBy(forgeVersions, v => v.length === 0)
     });
+    return {
+      mc,
+      fabric,
+      launcher,
+      forge
+    };
   };
 }
 
@@ -132,6 +152,70 @@ export function updateCurrentAccountId(id) {
       type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
       id
     });
+  };
+}
+
+export function updateJavaStatus(status) {
+  return async dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_JAVA_DOWNLOAD,
+      status
+    });
+  };
+}
+
+export function downloadJava() {
+  return async (dispatch, getState) => {
+    const {
+      app: { launcherManifest }
+    } = getState();
+    const mcOs = convertOSToMCFormat(os.type());
+    const { version, url } = launcherManifest[mcOs][64].jre;
+    const javaBaseFolder = path.join(remote.app.getPath("userData"), "java");
+    const tempFolder = path.join(remote.app.getPath("userData"), "temp");
+    await fse.remove(javaBaseFolder);
+    const downloadLocation = path.join(tempFolder, path.basename(url));
+
+    let i = 0;
+    await downloadFile(downloadLocation, url, p => {
+      if (i % 4 === 0) {
+        ipcRenderer.send("update-progress-bar", parseInt(p, 10) / 100);
+        dispatch(updateJavaStatus(p));
+      }
+      i += 1;
+    });
+    await makeDir(path.join(javaBaseFolder, version));
+
+    const firstExtraction = extractFull(downloadLocation, tempFolder, {
+      $bin: get7zPath()
+    });
+    await new Promise((resolve, reject) => {
+      firstExtraction.on("end", () => {
+        resolve();
+      });
+      firstExtraction.on("error", err => {
+        reject(err);
+      });
+    });
+
+    const secondExtraction = extractFull(
+      path.join(tempFolder, path.basename(url, ".lzma")),
+      path.join(javaBaseFolder, version),
+      {
+        $bin: get7zPath()
+      }
+    );
+    await new Promise((resolve, reject) => {
+      secondExtraction.on("end", () => {
+        resolve();
+      });
+      secondExtraction.on("error", err => {
+        reject(err);
+      });
+    });
+    await fse.remove(tempFolder);
+    ipcRenderer.send("update-progress-bar", -1);
+    dispatch(updateJavaStatus("downloaded"));
   };
 }
 

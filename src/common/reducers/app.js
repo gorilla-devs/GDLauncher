@@ -54,6 +54,15 @@ function forgeManifest(state = [], action) {
   }
 }
 
+function launcherManifest(state = {}, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_LAUNCHER_MANIFEST:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function modsManifests(state = [], action) {
   const index = state.findIndex(mod => mod.id === action.id);
   switch (action.type) {
@@ -101,6 +110,7 @@ export default combineReducers({
   vanillaManifest,
   forgeManifest,
   fabricManifest,
+  launcherManifest,
   modsManifests,
   clientToken,
   isNewUser,

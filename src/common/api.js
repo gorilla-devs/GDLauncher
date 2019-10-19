@@ -4,7 +4,8 @@ import {
   MOJANG_APIS,
   FORGESVC_URL,
   MC_MANIFEST_URL,
-  FABRIC_APIS
+  FABRIC_APIS,
+  LAUNCHER_META_URL
 } from "./utils/constants";
 import { sortByDate } from "./utils";
 
@@ -71,6 +72,11 @@ export const getForgeManifest = () => {
 
 export const getFabricManifest = () => {
   const url = `${FABRIC_APIS}/v2/versions/loader`;
+  return axios.get(url);
+};
+
+export const getLauncherManifest = () => {
+  const url = LAUNCHER_META_URL;
   return axios.get(url);
 };
 

@@ -1,6 +1,9 @@
 import { promises as fs } from "fs";
 import os from "os";
+import { promisify } from "util";
+import { remote } from "electron";
 import path from "path";
+import { exec } from "child_process";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
 
 export const isDirectory = source =>
@@ -118,4 +121,45 @@ export const librariesMapper = (libraries, dataPath) => {
         ...(isNative && { natives: true })
       };
     });
+};
+
+export const isLatestJavaDownloaded = async meta => {
+  const mcOs = convertOSToMCFormat(os.type());
+  const javaFolder = path.join(
+    remote.app.getPath("userData"),
+    "java",
+    meta[mcOs][64].jre.version
+  );
+  // Check if it's downloaded, if it's latest version and if it's a valid download
+  let isValid = true;
+  try {
+    await fs.access(javaFolder);
+    const { stdout, stderr } = await promisify(exec)(
+      `"${path.join(
+        javaFolder,
+        "bin",
+        `java${mcOs === "windows" ? ".exe" : ""}`
+      )}" -version`
+    );
+    if (
+      !stderr.includes(meta[mcOs][64].jre.version) &&
+      !stdout.includes(meta[mcOs][64].jre.version)
+    ) {
+      throw new Error("Java corrupted");
+    }
+  } catch {
+    isValid = false;
+  }
+  return isValid;
+};
+
+export const get7zPath = () => {
+  const baseDir = path.join(remote.app.getAppPath(), "public", "7z");
+  if (process.platform === "darwin") {
+    return path.join(baseDir, "7za-osx");
+  }
+  if (process.platform === "win32") {
+    return path.join(baseDir, "7za.exe");
+  }
+  return path.join(baseDir, "7za-linux");
 };

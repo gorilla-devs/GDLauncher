@@ -1,6 +1,6 @@
 const electron = require("electron");
 
-const { app, BrowserWindow } = electron;
+const { app, BrowserWindow, ipcMain } = electron;
 const path = require("path");
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -12,7 +12,7 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1350,
+    width: 1100,
     height: 800,
     minWidth: 1100,
     minHeight: 800,
@@ -51,4 +51,8 @@ app.on("activate", () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+ipcMain.on("update-progress-bar", (event, p) => {
+  mainWindow.setProgressBar(p);
 });
