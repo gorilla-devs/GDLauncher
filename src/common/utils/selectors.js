@@ -11,6 +11,7 @@ const _currentAccountId = state => state.app.currentAccountId;
 const _currentDownload = state => state.currentDownload;
 const _downloadQueue = state => state.downloadQueue;
 const _launcherManifest = state => state.app.launcherManifest;
+const _dataPath = state => state.settings.dataPath;
 
 export const _getInstance = createSelector(
   _instances,
@@ -46,4 +47,29 @@ export const _getJavaPath = createSelector(
       filename
     );
   }
+);
+
+export const _getInstancesPath = createSelector(
+  _dataPath,
+  dataPath => path.join(dataPath, "instances")
+);
+
+export const _getDataStorePath = createSelector(
+  _dataPath,
+  dataPath => path.join(dataPath, "datastore")
+);
+
+export const _getLibrariesPath = createSelector(
+  _getDataStorePath,
+  datastorePath => path.join(datastorePath, "libraries")
+);
+
+export const _getMinecraftVersionsPath = createSelector(
+  _getLibrariesPath,
+  librariesPath => path.join(librariesPath, "net", "minecraft")
+);
+
+export const _getAssetsPath = createSelector(
+  _getDataStorePath,
+  datastorePath => path.join(datastorePath, "assets")
 );

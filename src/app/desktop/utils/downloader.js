@@ -4,38 +4,21 @@ import reqCall from "request";
 import pMap from "p-map";
 import path from "path";
 import request from "request-promise-native";
+import { getFileHash } from ".";
 
 const fs = fss.promises;
 
-export const downloadArr = async (
-  arr,
-  updatePercentage,
-  pack,
-  forceDownload = false,
-  threads = 4
-) => {
+export const downloadArr = async (arr, updatePercentage, threads = 4) => {
   let downloaded = 0;
   await pMap(
     arr,
     async item => {
-      let toDownload = true;
-      if (!forceDownload) {
-        try {
-          await fs.access(item.path);
-          toDownload = false;
-        } catch (err) {
-          // It needs to be downloaded
-        }
-      }
-
-      if (toDownload) {
-        let counter = 0;
-        let res = false;
-        do {
-          res = await downloadFileInstance(item.path, item.url); // eslint-disable-line no-await-in-loop
-          counter += 1;
-        } while (!res && counter < 3);
-      }
+      let counter = 0;
+      let res = false;
+      do {
+        res = await downloadFileInstance(item.path, item.url, item.sha1); // eslint-disable-line no-await-in-loop
+        counter += 1;
+      } while (!res && counter < 3);
       downloaded += 1;
       if (downloaded % 5 === 0 || downloaded === arr.length)
         updatePercentage(downloaded);
@@ -44,12 +27,13 @@ export const downloadArr = async (
   );
 };
 
-const downloadFileInstance = async (fileName, url) => {
-  console.log(fileName);
+const downloadFileInstance = async (fileName, url, sha1) => {
   try {
     const filePath = path.dirname(fileName);
     try {
-      await fs.access(filePath);
+      await fs.access(fileName);
+      const checksum = await getFileHash(fileName);
+      if (checksum === sha1) return true;
     } catch (e) {
       await makeDir(filePath);
     }
