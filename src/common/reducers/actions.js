@@ -180,7 +180,7 @@ export function updateDownloadProgress(percentage) {
     const { currentDownload } = getState();
     dispatch({
       type: ActionTypes.UPDATE_DOWNLOAD_PROGRESS,
-      name: currentDownload,
+      instanceName: currentDownload,
       percentage: Number(percentage.toFixed())
     });
   };
@@ -397,11 +397,11 @@ export function removeModsManifests(id) {
   };
 }
 
-export function updateCurrentDownload(name) {
+export function updateCurrentDownload(instanceName) {
   return dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_CURRENT_DOWNLOAD,
-      name
+      instanceName
     });
   };
 }
@@ -415,23 +415,46 @@ export function updateSelectedInstance(name) {
   };
 }
 
-export function addToQueue(instanceName, mcVersion, modloader, isRepair) {
+export function removeDownloadFromQueue(instanceName) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_CURRENT_DOWNLOAD,
+      instanceName: null
+    });
+    dispatch({
+      type: ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE,
+      instanceName
+    });
+  };
+}
+
+export function addToQueue(instanceName, mcVersion) {
   return (dispatch, getState) => {
     const { currentDownload } = getState();
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,
-      mcVersion,
-      modloader
+      mcVersion
     });
     if (!currentDownload) {
       dispatch(updateCurrentDownload(instanceName));
-      dispatch(downloadInstance(instanceName, isRepair));
+      dispatch(downloadInstance(instanceName));
     }
   };
 }
 
-export function downloadInstance(instanceName, mcVersion) {
+export function addNextInstanceToCurrentDownload() {
+  return (dispatch, getState) => {
+    const { downloadQueue } = getState();
+    const queueArr = Object.keys(downloadQueue);
+    if (queueArr.length > 0) {
+      dispatch(updateCurrentDownload(queueArr[0]));
+      dispatch(downloadInstance(queueArr[0]));
+    }
+  };
+}
+
+export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const {
@@ -440,6 +463,8 @@ export function downloadInstance(instanceName, mcVersion) {
       },
       settings: { dataPath }
     } = state;
+
+    const { mcVersion } = _getCurrentDownloadItem(state);
 
     let mcJson;
 
@@ -529,11 +554,17 @@ export function downloadInstance(instanceName, mcVersion) {
     const updatePercentage = downloaded => {
       dispatch(
         updateDownloadProgress(
-          (downloaded * 100) / assets.length + libraries.length + 1
+          (downloaded * 100) / (assets.length + libraries.length + 1)
         )
       );
     };
 
     await downloadArr([...libraries, ...assets, mcMainFile], updatePercentage);
+    dispatch(removeDownloadFromQueue(instanceName));
+    dispatch(addNextInstanceToCurrentDownload());
   };
 }
+
+export const launchInstance = () => {
+  return async (dispatch, getState) => {};
+};

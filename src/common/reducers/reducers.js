@@ -1,4 +1,4 @@
-import omitBy from "lodash.omitby";
+import omit from "lodash.omit";
 import * as ActionTypes from "./actionTypes";
 
 function news(state = [], action) {
@@ -34,7 +34,6 @@ function downloadQueue(state = {}, action) {
       return {
         ...state,
         [action.instanceName]: {
-          instanceName: action.instanceName,
           percentage: 0,
           mcVersion: action.mcVersion,
           modloader: action.modloader,
@@ -42,7 +41,7 @@ function downloadQueue(state = {}, action) {
         }
       };
     case ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE:
-      return omitBy(state, obj => obj.instanceName === action.instanceName);
+      return omit(state, action.instanceName);
     case ActionTypes.UPDATE_DOWNLOAD_PROGRESS:
       return {
         ...state,
@@ -59,7 +58,7 @@ function downloadQueue(state = {}, action) {
 function currentDownload(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CURRENT_DOWNLOAD:
-      return action.name;
+      return action.instanceName;
     default:
       return state;
   }
@@ -79,9 +78,11 @@ function instances(state = { started: false, list: [] }, action) {
 function startedInstances(state = [], action) {
   switch (action.type) {
     case ActionTypes.ADD_STARTED_INSTANCE:
-      return [...state, { name: action.name, pid: action.pid }];
+      return [...state, { instanceName: action.instanceName, pid: action.pid }];
     case ActionTypes.REMOVE_STARTED_INSTANCE:
-      return state.filter(instance => instance.name !== action.name);
+      return state.filter(
+        instance => instance.instanceName !== action.instanceName
+      );
     default:
       return state;
   }
@@ -90,7 +91,7 @@ function startedInstances(state = [], action) {
 function selectedInstance(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_SELECTED_INSTANCE:
-      return action.name;
+      return action.instanceName;
     default:
       return state;
   }

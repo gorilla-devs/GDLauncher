@@ -199,6 +199,7 @@
     "is-electron": "^2.2.0",
     "lodash.debounce": "^4.0.8",
     "lodash.memoize": "^4.1.2",
+    "lodash.omit": "^4.5.0",
     "lodash.omitby": "^4.6.0",
     "make-dir": "^3.0.0",
     "murmurhash-js": "^1.0.0",
