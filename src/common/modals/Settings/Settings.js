@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../components/Modal";
 import MyAccountPrf from "./components/MyAccount_preferences";
 import Java from "./components/Java";
@@ -90,6 +92,21 @@ export default function Settings() {
         width: 100%;
       `}
       header="false"
+      backBtn={
+        <FontAwesomeIcon
+          icon={faWindowClose}
+          css={`
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            transition: color 0.1s ease-in-out;
+            &:hover {
+              color: ${props => props.theme.palette.colors.red};
+            }
+          `}
+        />
+      }
     >
       <Container>
         <SideMenu>
