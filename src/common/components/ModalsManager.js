@@ -5,6 +5,7 @@ import styled from "styled-components";
 // import Changelog from "components/modals/Changelog";
 // import LoginHelper from "components/modals/LoginHelper";
 import AddInstance from "../modals/AddInstance";
+import Settings from "../modals/Settings/Settings";
 import ProfileSettings from "../modals/ProfileSettings";
 import { closeModal } from "../reducers/modals/actions";
 
@@ -40,7 +41,8 @@ const modalsComponentLookupTable = {
   // Changelog,
   // LoginHelper
   AddInstance,
-  ProfileSettings
+  ProfileSettings,
+  Settings
 };
 
 const ModalContainer = ({ unmounting, children }) => {
