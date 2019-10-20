@@ -10,7 +10,7 @@ import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
-import { NEWS_URL } from "../utils/constants";
+import { NEWS_URL, MC_RESOURCES_URL } from "../utils/constants";
 import {
   mcAuthenticate,
   mcRefresh,
@@ -24,7 +24,11 @@ import {
 import {
   _getCurrentAccount,
   _getCurrentDownloadItem,
-  _getJavaPath
+  _getJavaPath,
+  _getMinecraftVersionsPath,
+  _getAssetsPath,
+  _getInstancesPath,
+  _getLibrariesPath
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -426,28 +430,25 @@ export function addToQueue(instanceName, mcVersion, modloader, isRepair) {
     }
   };
 }
-/* eslint-disable */
-export function downloadInstance(instanceName, mcVersion, repair) {
+
+export function downloadInstance(instanceName, mcVersion) {
   return async (dispatch, getState) => {
+    const state = getState();
     const {
       app: {
         vanillaManifest: { versions: mcVersions }
       },
       settings: { dataPath }
-    } = getState();
+    } = state;
 
-    const itemFromQueue = _getCurrentDownloadItem(getState());
     let mcJson;
 
     // DOWNLOAD MINECRAFT JSON
     const mcJsonPath = path.join(
-      dataPath,
-      "versions",
-      mcVersion,
+      _getMinecraftVersionsPath(state),
       `${mcVersion}.json`
     );
     try {
-      if (repair) throw new Error("isRepair");
       mcJson = await fse.readJson(mcJsonPath);
     } catch (err) {
       const versionURL = mcVersions.find(v => v.id === mcVersion).url;
@@ -470,28 +471,30 @@ export function downloadInstance(instanceName, mcVersion, repair) {
       await fse.outputJson(assetsFile, assetsJson);
     }
 
+    const mcMainFile = {
+      url: mcJson.downloads.client.url,
+      sha1: mcJson.downloads.client.sha1,
+      path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
+    };
+
     const assets = Object.entries(assetsJson.objects).map(
-      ([assetKey, asset]) => ({
-        url: `http://resources.download.minecraft.net/${asset.hash.substring(
-          0,
-          2
-        )}/${asset.hash}`,
+      ([assetKey, { hash }]) => ({
+        url: `${MC_RESOURCES_URL}/${hash.substring(0, 2)}/${hash}`,
         type: "asset",
+        sha1: hash,
         path: path.join(
-          dataPath,
-          "assets",
+          _getAssetsPath(state),
           "objects",
-          asset.hash.substring(0, 2),
-          asset.hash
+          hash.substring(0, 2),
+          hash
         ),
         legacyPath:
           mcJson.assetIndex.id === "legacy" ||
           !semver.gt(coerce(mcJson.assetIndex.id), coerce("1.7"))
-            ? path.join(dataPath, "assets", "virtual", "legacy", assetKey)
+            ? path.join(_getAssetsPath(state), "virtual", "legacy", assetKey)
             : null,
         resourcesPath: path.join(
-          dataPath,
-          "instances",
+          _getInstancesPath(state),
           instanceName,
           "resources",
           assetKey
@@ -499,31 +502,29 @@ export function downloadInstance(instanceName, mcVersion, repair) {
       })
     );
 
-    const mcMainFile = {
-      url: mcJson.downloads.client.url,
-      path: path.join(dataPath, "versions", mcJson.id, `${mcJson.id}.jar`)
-    };
-
     const libraries = removeDuplicates(
-      librariesMapper(mcJson.libraries, dataPath),
+      librariesMapper(mcJson.libraries, _getLibrariesPath(state)),
       "url"
     );
 
     let timePlayed = 0;
 
-    if (repair) {
-      try {
-        const prevConfig = await readConfig(pack);
-        timePlayed = prevConfig.timePlayed;
-      } catch {
-        console.log("Could not find a valid config - using defaults");
-      }
+    try {
+      const prevConfig = await readConfig(
+        path.join(_getInstancesPath(state), instanceName)
+      );
+      timePlayed = prevConfig.timePlayed;
+    } catch {
+      // Do nothing
     }
 
-    await fse.outputJson(path.join(dataPath, instanceName, "config.json"), {
-      version: mcVersion,
-      timePlayed
-    });
+    await fse.outputJson(
+      path.join(_getInstancesPath(state), instanceName, "config.json"),
+      {
+        version: mcVersion,
+        timePlayed
+      }
+    );
 
     const updatePercentage = downloaded => {
       dispatch(
@@ -533,12 +534,6 @@ export function downloadInstance(instanceName, mcVersion, repair) {
       );
     };
 
-    await downloadArr(
-      [...libraries, ...assets, mcMainFile],
-      updatePercentage,
-      instanceName,
-      true
-    );
+    await downloadArr([...libraries, ...assets, mcMainFile], updatePercentage);
   };
 }
-/* eslint-enable */

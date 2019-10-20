@@ -1,5 +1,6 @@
-import { promises as fs } from "fs";
+import fss, { promises as fs } from "fs";
 import fse from "fs-extra";
+import crypto from "crypto";
 import os from "os";
 import { promisify } from "util";
 import { remote } from "electron";
@@ -55,7 +56,7 @@ export const convertOSToMCFormat = ElectronFormat => {
   }
 };
 
-export const librariesMapper = (libraries, dataPath) => {
+export const librariesMapper = (libraries, librariesPath) => {
   function skipLibrary(lib) {
     let skip = false;
     if (lib.rules) {
@@ -87,7 +88,8 @@ export const librariesMapper = (libraries, dataPath) => {
       if (lib.downloads && lib.downloads.artifact) {
         return {
           url: lib.downloads.artifact.url,
-          path: path.join(dataPath, "libraries", lib.downloads.artifact.path)
+          path: path.join(librariesPath, lib.downloads.artifact.path),
+          sha1: lib.downloads.artifact.sha1
         };
       }
       // Vanilla native libs
@@ -99,10 +101,10 @@ export const librariesMapper = (libraries, dataPath) => {
         return {
           url: lib.downloads.classifiers[nativeString].url,
           path: path.join(
-            dataPath,
-            "libraries",
+            librariesPath,
             lib.downloads.classifiers[nativeString].path
           ),
+          sha1: lib.downloads.classifiers[nativeString].sha1,
           natives: true
         };
       }
@@ -115,8 +117,7 @@ export const librariesMapper = (libraries, dataPath) => {
           isNative && `-${nativeString}`
         ).join("/")}`,
         path: path.join(
-          dataPath,
-          "libraries",
+          librariesPath,
           ...mavenToArray(lib.name, isNative && nativeString)
         ),
         ...(isNative && { natives: true })
@@ -189,4 +190,23 @@ export const extract7z = async () => {
 
   await fse.copy(zipLocationAsar, get7zPath());
   await fixFilePermissions(get7zPath());
+};
+
+export const getFileHash = (filename, algorithm = "sha1") => {
+  return new Promise((resolve, reject) => {
+    const shasum = crypto.createHash(algorithm);
+    try {
+      const s = fss.ReadStream(filename);
+      s.on("data", data => {
+        shasum.update(data);
+      });
+      // making digest
+      s.on("end", () => {
+        const hash = shasum.digest("hex");
+        return resolve(hash);
+      });
+    } catch (error) {
+      return reject(new Error("calc fail"));
+    }
+  });
 };

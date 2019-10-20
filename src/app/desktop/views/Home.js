@@ -16,13 +16,7 @@ const Home = () => {
       <button
         type="button"
         onClick={() =>
-          dispatch(
-            downloadInstance(
-              `TEST ${Math.random()}`,
-              "1.12.2",
-              "forge-14.23.5.2847"
-            )
-          )
+          dispatch(downloadInstance(`TEST ${Math.random()}`, "1.12.2"))
         }
         css=""
       >
