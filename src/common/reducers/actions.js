@@ -35,11 +35,15 @@ import {
   convertOSToMCFormat,
   get7zPath,
   readConfig,
-  fixFilePermissions
+  fixFilePermissions,
+  extractNatives,
+  getJVMArguments112
 } from "../../app/desktop/utils";
 import { downloadFile, downloadArr } from "../../app/desktop/utils/downloader";
 import { removeDuplicates } from "../utils";
 import { updateJavaPath } from "./settings/actions";
+import { promisify } from "util";
+import { exec } from "child_process";
 
 export function initManifests() {
   return async dispatch => {
@@ -308,7 +312,8 @@ export function loginThroughNativeLauncher() {
     } = getState();
 
     const homedir = remote.app.getPath("appData");
-    const vanillaMCPath = path.join(homedir, ".minecraft");
+    const mcFolder = process.platform === "darwin" ? "minecraft" : ".minecraft";
+    const vanillaMCPath = path.join(homedir, mcFolder);
     const vnlJson = await fse.readJson(
       path.join(vanillaMCPath, "launcher_profiles.json")
     );
@@ -546,7 +551,7 @@ export function downloadInstance(instanceName) {
     await fse.outputJson(
       path.join(_getInstancesPath(state), instanceName, "config.json"),
       {
-        version: mcVersion,
+        mcVersion,
         timePlayed
       }
     );
@@ -560,11 +565,45 @@ export function downloadInstance(instanceName) {
     };
 
     await downloadArr([...libraries, ...assets, mcMainFile], updatePercentage);
+
     dispatch(removeDownloadFromQueue(instanceName));
     dispatch(addNextInstanceToCurrentDownload());
   };
 }
 
-export const launchInstance = () => {
-  return async (dispatch, getState) => {};
+export const launchInstance = instanceName => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const javaPath = _getJavaPath(state);
+    const account = _getCurrentAccount(state);
+    const librariesPath = _getLibrariesPath(state);
+    const assetsPath = _getAssetsPath(state);
+    const instancePath = path.join(_getInstancesPath(state), instanceName);
+    const { mcVersion } = await readConfig(instancePath);
+    const mcJson = await fse.readJson(
+      path.join(_getMinecraftVersionsPath(state), `${mcVersion}.json`)
+    );
+    const libraries = librariesMapper(mcJson.libraries, librariesPath);
+    await extractNatives(libraries, instancePath);
+
+    const mcMainFile = {
+      url: mcJson.downloads.client.url,
+      sha1: mcJson.downloads.client.sha1,
+      path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
+    };
+
+    const jvmArguments = await getJVMArguments112(
+      libraries,
+      mcMainFile,
+      instancePath,
+      assetsPath,
+      mcJson,
+      account
+    );
+
+
+    await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`);
+  };
 };
+
+window.launch = launchInstance;

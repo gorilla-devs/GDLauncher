@@ -1,6 +1,7 @@
 import fss, { promises as fs } from "fs";
 import fse from "fs-extra";
 import crypto from "crypto";
+import { extractFull } from "node-7z";
 import os from "os";
 import { promisify } from "util";
 import { remote } from "electron";
@@ -64,13 +65,15 @@ export const librariesMapper = (libraries, librariesPath) => {
       lib.rules.forEach(({ action, os: ruleOs }) => {
         if (
           action === "allow" &&
-          ((ruleOs && os.name === convertOSToMCFormat(os.type())) || !os)
+          ((ruleOs && ruleOs.name === convertOSToMCFormat(os.type())) ||
+            !ruleOs)
         ) {
           skip = false;
         }
         if (
           action === "disallow" &&
-          ((ruleOs && os.name === convertOSToMCFormat(os.type())) || !os)
+          ((ruleOs && ruleOs.name === convertOSToMCFormat(os.type())) ||
+            !ruleOs)
         ) {
           skip = true;
         }
@@ -209,4 +212,106 @@ export const getFileHash = (filename, algorithm = "sha1") => {
       return reject(new Error("calc fail"));
     }
   });
+};
+
+export const extractNatives = async (libraries, instancePath) => {
+  const extractLocation = path.join(instancePath, "natives");
+  await Promise.all(
+    libraries
+      .filter(l => l.natives)
+      .map(async l => {
+        console.log(l);
+        const extraction = extractFull(l.path, extractLocation, {
+          $bin: get7zPath()
+        });
+        await new Promise((resolve, reject) => {
+          extraction.on("end", () => {
+            resolve();
+          });
+          extraction.on("error", err => {
+            reject(err);
+          });
+        });
+      })
+  );
+};
+
+export const getJVMArguments112 = async (
+  libraries,
+  mcjar,
+  instancePath,
+  assetsPath,
+  mcJson,
+  account,
+  jvmOptions
+) => {
+  const args = [];
+  args.push("-cp");
+
+  args.push(
+    [mcjar, ...libraries]
+      .filter(l => !l.natives)
+      .map(l => `"${l.path}"`)
+      .join(process.platform === "win32" ? ";" : ":")
+  );
+
+  // if (process.platform === "darwin") {
+  //   args.push("-Xdock:name=instancename");
+  //   args.push("-Xdock:icon=instanceicon");
+  // }
+
+  args.push("-Xmx1024m");
+  args.push("-Xms128m");
+  args.push(...jvmOptions);
+  args.push(`-Djava.library.path="${path.join(instancePath, "natives")}"`);
+
+  args.push(mcJson.mainClass);
+
+  const mcArgs = mcJson.minecraftArguments.split(" ");
+  const argDiscovery = /\${*(.*)}/;
+
+  for (let i = 0; i < mcArgs.length; ++i) {
+    if (argDiscovery.test(mcArgs[i])) {
+      const identifier = mcArgs[i].match(argDiscovery)[1];
+      let val = null;
+      switch (identifier) {
+        case "auth_player_name":
+          val = account.selectedProfile.name.trim();
+          break;
+        case "version_name":
+          val = mcJson.id;
+          break;
+        case "game_directory":
+          val = `"${instancePath}"`;
+          break;
+        case "assets_root":
+          val = `"${assetsPath}"`;
+          break;
+        case "assets_index_name":
+          val = mcJson.assets;
+          break;
+        case "auth_uuid":
+          val = account.selectedProfile.id.trim();
+          break;
+        case "auth_access_token":
+          val = account.accessToken;
+          break;
+        case "user_type":
+          val = "mojang";
+          break;
+        case "version_type":
+          val = mcJson.type;
+          break;
+        default:
+          break;
+      }
+      if (val != null) {
+        mcArgs[i] = val;
+      }
+    }
+  }
+
+  args.push(...mcArgs);
+
+  return args;
 };
