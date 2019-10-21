@@ -1,5 +1,6 @@
 import makeDir from "make-dir";
 import fss from "fs";
+import fse from "fs-extra";
 import reqCall from "request";
 import pMap from "p-map";
 import path from "path";
@@ -8,7 +9,11 @@ import { getFileHash } from ".";
 
 const fs = fss.promises;
 
-export const downloadArr = async (arr, updatePercentage, threads = 4) => {
+export const downloadInstanceFiles = async (
+  arr,
+  updatePercentage,
+  threads = 4
+) => {
   let downloaded = 0;
   await pMap(
     arr,
@@ -16,7 +21,13 @@ export const downloadArr = async (arr, updatePercentage, threads = 4) => {
       let counter = 0;
       let res = false;
       do {
-        res = await downloadFileInstance(item.path, item.url, item.sha1); // eslint-disable-line no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop
+        res = await downloadFileInstance(
+          item.path,
+          item.url,
+          item.sha1,
+          item.legacyPath
+        );
         counter += 1;
       } while (!res && counter < 3);
       downloaded += 1;
@@ -27,18 +38,27 @@ export const downloadArr = async (arr, updatePercentage, threads = 4) => {
   );
 };
 
-const downloadFileInstance = async (fileName, url, sha1) => {
+const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
   try {
     const filePath = path.dirname(fileName);
     try {
       await fs.access(fileName);
+      if (legacyPath) await fs.access(legacyPath);
       const checksum = await getFileHash(fileName);
-      if (checksum === sha1) return true;
-    } catch (e) {
+      const legacyChecksum = legacyPath && (await getFileHash(legacyPath));
+      if (checksum === sha1 && (!legacyPath || legacyChecksum === sha1)) {
+        return true;
+      }
+    } catch {
       await makeDir(filePath);
+      if (legacyPath) await makeDir(path.dirname(legacyPath));
     }
+
     const file = await request(url, { encoding: "binary" });
     await fs.writeFile(fileName, file, "binary");
+    if (legacyPath) {
+      await fs.writeFile(legacyPath, file, "binary");
+    }
     return true;
   } catch (e) {
     console.error(

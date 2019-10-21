@@ -8,6 +8,8 @@ import semver, { coerce } from "semver";
 import omitBy from "lodash.omitby";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
+import { promisify } from "util";
+import { exec } from "child_process";
 import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
 import { NEWS_URL, MC_RESOURCES_URL } from "../utils/constants";
@@ -39,11 +41,12 @@ import {
   extractNatives,
   getJVMArguments112
 } from "../../app/desktop/utils";
-import { downloadFile, downloadArr } from "../../app/desktop/utils/downloader";
+import {
+  downloadFile,
+  downloadInstanceFiles
+} from "../../app/desktop/utils/downloader";
 import { removeDuplicates } from "../utils";
 import { updateJavaPath } from "./settings/actions";
-import { promisify } from "util";
-import { exec } from "child_process";
 
 export function initManifests() {
   return async dispatch => {
@@ -489,8 +492,7 @@ export function downloadInstance(instanceName) {
     // COMPUTING MC ASSETS
     let assetsJson;
     const assetsFile = path.join(
-      dataPath,
-      "assets",
+      _getAssetsPath(state),
       "indexes",
       `${mcJson.assets}.json`
     );
@@ -564,7 +566,10 @@ export function downloadInstance(instanceName) {
       );
     };
 
-    await downloadArr([...libraries, ...assets, mcMainFile], updatePercentage);
+    await downloadInstanceFiles(
+      [...libraries, ...assets, mcMainFile],
+      updatePercentage
+    );
 
     dispatch(removeDownloadFromQueue(instanceName));
     dispatch(addNextInstanceToCurrentDownload());
@@ -601,6 +606,7 @@ export const launchInstance = instanceName => {
       account
     );
 
+    console.log(jvmArguments.join(" "));
 
     await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`);
   };

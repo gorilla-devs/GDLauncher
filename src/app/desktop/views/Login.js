@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { login } from "../../../common/reducers/actions";
 import { load } from "../../../common/reducers/loading/actions";
 import features from "../../../common/reducers/loading/features";
-import { downloadArr } from "../utils/downloader";
 import background from "../../../common/assets/fullHdBackground.jpg";
 import { Input, CheckBox, Button } from "../../../ui";
 
@@ -45,8 +44,6 @@ const Login = () => {
   const [password, setPassword] = useState(undefined);
 
   const dispatch = useDispatch();
-
-  downloadArr([]);
 
   const authenticate = () => {
     dispatch(

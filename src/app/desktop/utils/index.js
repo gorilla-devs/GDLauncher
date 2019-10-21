@@ -243,7 +243,7 @@ export const getJVMArguments112 = async (
   assetsPath,
   mcJson,
   account,
-  jvmOptions
+  jvmOptions = []
 ) => {
   const args = [];
   args.push("-cp");
@@ -270,7 +270,7 @@ export const getJVMArguments112 = async (
   const mcArgs = mcJson.minecraftArguments.split(" ");
   const argDiscovery = /\${*(.*)}/;
 
-  for (let i = 0; i < mcArgs.length; ++i) {
+  for (let i = 0; i < mcArgs.length; i += 1) {
     if (argDiscovery.test(mcArgs[i])) {
       const identifier = mcArgs[i].match(argDiscovery)[1];
       let val = null;
@@ -287,6 +287,9 @@ export const getJVMArguments112 = async (
         case "assets_root":
           val = `"${assetsPath}"`;
           break;
+        case "game_assets":
+          val = `"${path.join(assetsPath, "virtual", "pre-1.6")}"`;
+          break;
         case "assets_index_name":
           val = mcJson.assets;
           break;
@@ -294,6 +297,9 @@ export const getJVMArguments112 = async (
           val = account.selectedProfile.id.trim();
           break;
         case "auth_access_token":
+          val = account.accessToken;
+          break;
+        case "auth_session":
           val = account.accessToken;
           break;
         case "user_type":
