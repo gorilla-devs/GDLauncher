@@ -3,6 +3,7 @@ import { useDidMount } from "rooks";
 import styled from "styled-components";
 import { push } from "connected-react-router";
 import { Switch } from "react-router";
+import { ipcRenderer } from "electron";
 import { useSelector, useDispatch } from "react-redux";
 import RouteWithSubRoutes from "../../common/components/RouteWithSubRoutes";
 import {
@@ -58,6 +59,7 @@ function DesktopRoot() {
         load(features.mcAuthentication, dispatch(loginThroughNativeLauncher()))
       ).catch(console.error);
     }
+    ipcRenderer.send("init-discord-rpc");
   });
 
   return (
