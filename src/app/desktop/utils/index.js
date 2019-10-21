@@ -7,6 +7,7 @@ import { remote } from "electron";
 import path from "path";
 import { exec } from "child_process";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
+import makeDir from "make-dir";
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -230,6 +231,19 @@ export const extractNatives = async (libraries, instancePath) => {
           });
         });
       })
+  );
+};
+
+export const copyAssetsToResources = async assets => {
+  await Promise.all(
+    assets.map(async asset => {
+      try {
+        await fs.access(asset.resourcesPath);
+      } catch {
+        await makeDir(path.dirname(asset.resourcesPath));
+        await fs.copyFile(asset.path, asset.resourcesPath);
+      }
+    })
   );
 };
 

@@ -38,7 +38,8 @@ import {
   readConfig,
   fixFilePermissions,
   extractNatives,
-  getJVMArguments112
+  getJVMArguments112,
+  copyAssetsToResources
 } from "../../app/desktop/utils";
 import {
   downloadFile,
@@ -467,8 +468,7 @@ export function downloadInstance(instanceName) {
     const {
       app: {
         vanillaManifest: { versions: mcVersions }
-      },
-      settings: { dataPath }
+      }
     } = state;
 
     const { mcVersion } = _getCurrentDownloadItem(state);
@@ -519,11 +519,6 @@ export function downloadInstance(instanceName) {
           hash.substring(0, 2),
           hash
         ),
-        legacyPath:
-          mcJson.assetIndex.id === "legacy" ||
-          !semver.gt(coerce(mcJson.assetIndex.id), coerce("1.7"))
-            ? path.join(_getAssetsPath(state), "virtual", "legacy", assetKey)
-            : null,
         resourcesPath: path.join(
           _getInstancesPath(state),
           instanceName,
@@ -569,6 +564,10 @@ export function downloadInstance(instanceName) {
       [...libraries, ...assets, mcMainFile],
       updatePercentage
     );
+
+    if (assetsJson.map_to_resources) {
+      await copyAssetsToResources(assets);
+    }
 
     dispatch(removeDownloadFromQueue(instanceName));
     dispatch(addNextInstanceToCurrentDownload());
