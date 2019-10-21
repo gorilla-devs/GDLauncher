@@ -1,7 +1,6 @@
 import axios from "axios";
 import path from "path";
 import { remote, ipcRenderer } from "electron";
-import os from "os";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
 import semver, { coerce } from "semver";
@@ -198,7 +197,7 @@ export function downloadJava() {
     const {
       app: { launcherManifest }
     } = getState();
-    const mcOs = convertOSToMCFormat(os.type());
+    const mcOs = convertOSToMCFormat(process.platform);
     const { version, url } = launcherManifest[mcOs][64].jre;
     const javaBaseFolder = path.join(remote.app.getPath("userData"), "java");
     const tempFolder = path.join(remote.app.getPath("userData"), "temp");

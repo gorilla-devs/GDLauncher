@@ -36,7 +36,7 @@ export const _getCurrentDownloadItem = createSelector(
 export const _getJavaPath = createSelector(
   _launcherManifest,
   launcherManifest => {
-    const mcOs = convertOSToMCFormat(os.type());
+    const mcOs = convertOSToMCFormat(process.platform);
     const { version } = launcherManifest[mcOs][64].jre;
     const filename = process.platform === "win32" ? "java.exe" : "java";
     return path.join(

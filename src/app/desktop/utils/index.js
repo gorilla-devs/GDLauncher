@@ -2,7 +2,6 @@ import fss, { promises as fs } from "fs";
 import fse from "fs-extra";
 import crypto from "crypto";
 import { extractFull } from "node-7z";
-import os from "os";
 import { promisify } from "util";
 import { remote } from "electron";
 import path from "path";
@@ -46,11 +45,11 @@ export const mavenToArray = (s, nativeString) => {
 
 export const convertOSToMCFormat = ElectronFormat => {
   switch (ElectronFormat) {
-    case "Windows_NT":
+    case "win32":
       return "windows";
-    case "Darwin":
+    case "darwin":
       return "osx";
-    case "Linux":
+    case "linux":
       return "linux";
     default:
       return false;
@@ -62,18 +61,16 @@ export const librariesMapper = (libraries, librariesPath) => {
     let skip = false;
     if (lib.rules) {
       skip = true;
-      lib.rules.forEach(({ action, os: ruleOs }) => {
+      lib.rules.forEach(({ action, os }) => {
         if (
           action === "allow" &&
-          ((ruleOs && ruleOs.name === convertOSToMCFormat(os.type())) ||
-            !ruleOs)
+          ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
         ) {
           skip = false;
         }
         if (
           action === "disallow" &&
-          ((ruleOs && ruleOs.name === convertOSToMCFormat(os.type())) ||
-            !ruleOs)
+          ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
         ) {
           skip = true;
         }
@@ -82,7 +79,7 @@ export const librariesMapper = (libraries, librariesPath) => {
     return skip;
   }
 
-  const nativeString = `natives-${convertOSToMCFormat(os.type())}`;
+  const nativeString = `natives-${convertOSToMCFormat(process.platform)}`;
 
   return libraries
     .filter(v => !skipLibrary(v))
@@ -112,7 +109,7 @@ export const librariesMapper = (libraries, librariesPath) => {
         };
       }
       const isNative =
-        lib.natives && lib.natives[convertOSToMCFormat(os.type())];
+        lib.natives && lib.natives[convertOSToMCFormat(process.platform)];
 
       return {
         url: `${lib.url || `${MC_LIBRARIES_URL}/`}${mavenToArray(
@@ -129,7 +126,7 @@ export const librariesMapper = (libraries, librariesPath) => {
 };
 
 export const isLatestJavaDownloaded = async meta => {
-  const mcOs = convertOSToMCFormat(os.type());
+  const mcOs = convertOSToMCFormat(process.platform);
   const javaFolder = path.join(
     remote.app.getPath("userData"),
     "java",
