@@ -26,6 +26,7 @@ const Container = styled.div`
     align-items: center;
     font-size: 18px;
     font-weight: 800;
+    border-radius: 4px;
     transition: opacity 150ms ease-in-out;
     width: 100%;
     height: 100%;
