@@ -15,7 +15,7 @@ const Home = () => {
       <News news={news} />
       <button
         type="button"
-        onClick={() => dispatch(addToQueue(`TEST ${Math.random()}`, "1.12.2"))}
+        onClick={() => dispatch(addToQueue(`TEST ${Math.random()}`, "19w42a"))}
         css=""
       >
         Compute {downloadItem.percentage}

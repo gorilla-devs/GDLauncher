@@ -39,7 +39,8 @@ import {
   fixFilePermissions,
   extractNatives,
   getJVMArguments112,
-  copyAssetsToResources
+  copyAssetsToResources,
+  getJVMArguments113
 } from "../../app/desktop/utils";
 import {
   downloadFile,
@@ -528,9 +529,9 @@ export function downloadInstance(instanceName) {
       })
     );
 
-    const libraries = removeDuplicates(
-      librariesMapper(mcJson.libraries, _getLibrariesPath(state)),
-      "url"
+    const libraries = librariesMapper(
+      mcJson.libraries,
+      _getLibrariesPath(state)
     );
 
     let timePlayed = 0;
@@ -587,6 +588,7 @@ export const launchInstance = instanceName => {
       path.join(_getMinecraftVersionsPath(state), `${mcVersion}.json`)
     );
     const libraries = librariesMapper(mcJson.libraries, librariesPath);
+    console.log(libraries);
     await extractNatives(libraries, instancePath);
 
     const mcMainFile = {
@@ -595,7 +597,11 @@ export const launchInstance = instanceName => {
       path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
     };
 
-    const jvmArguments = await getJVMArguments112(
+    const getJvmArguments = semver.gte(coerce(mcJson.assets), coerce("1.13"))
+      ? getJVMArguments113
+      : getJVMArguments112;
+
+    const jvmArguments = await getJvmArguments(
       libraries,
       mcMainFile,
       instancePath,
