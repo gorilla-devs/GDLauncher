@@ -2,12 +2,13 @@ import fss, { promises as fs } from "fs";
 import fse from "fs-extra";
 import crypto from "crypto";
 import { extractFull } from "node-7z";
+import makeDir from "make-dir";
 import { promisify } from "util";
 import { remote } from "electron";
 import path from "path";
 import { exec } from "child_process";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
-import makeDir from "make-dir";
+import { removeDuplicates } from "../../../common/utils";
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -57,73 +58,74 @@ export const convertOSToMCFormat = ElectronFormat => {
   }
 };
 
-export const librariesMapper = (libraries, librariesPath) => {
-  function skipLibrary(lib) {
-    let skip = false;
-    if (lib.rules) {
-      skip = true;
-      lib.rules.forEach(({ action, os }) => {
-        if (
-          action === "allow" &&
-          ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
-        ) {
-          skip = false;
-        }
-        if (
-          action === "disallow" &&
-          ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
-        ) {
-          skip = true;
-        }
-      });
-    }
-    return skip;
-  }
-
-  const nativeString = `natives-${convertOSToMCFormat(process.platform)}`;
-
-  return libraries
-    .filter(v => !skipLibrary(v))
-    .map(lib => {
-      // Normal libs
-      if (lib.downloads && lib.downloads.artifact) {
-        return {
-          url: lib.downloads.artifact.url,
-          path: path.join(librariesPath, lib.downloads.artifact.path),
-          sha1: lib.downloads.artifact.sha1
-        };
-      }
-      // Vanilla native libs
+export const skipLibrary = lib => {
+  let skip = false;
+  if (lib.rules) {
+    skip = true;
+    lib.rules.forEach(({ action, os, features }) => {
+      if (features) return true;
       if (
-        lib.downloads &&
-        lib.downloads.classifiers &&
-        lib.downloads.classifiers[nativeString]
+        action === "allow" &&
+        ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
       ) {
-        return {
-          url: lib.downloads.classifiers[nativeString].url,
-          path: path.join(
-            librariesPath,
-            lib.downloads.classifiers[nativeString].path
-          ),
-          sha1: lib.downloads.classifiers[nativeString].sha1,
-          natives: true
-        };
+        skip = false;
       }
-      const isNative =
-        lib.natives && lib.natives[convertOSToMCFormat(process.platform)];
-
-      return {
-        url: `${lib.url || `${MC_LIBRARIES_URL}/`}${mavenToArray(
-          lib.name,
-          isNative && `-${nativeString}`
-        ).join("/")}`,
-        path: path.join(
-          librariesPath,
-          ...mavenToArray(lib.name, isNative && nativeString)
-        ),
-        ...(isNative && { natives: true })
-      };
+      if (
+        action === "disallow" &&
+        ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
+      ) {
+        skip = true;
+      }
     });
+  }
+  return skip;
+};
+
+export const librariesMapper = (libraries, librariesPath) => {
+  return removeDuplicates(
+    libraries
+      .filter(v => !skipLibrary(v))
+      .reduce((acc, lib) => {
+        const tempArr = [];
+        // Normal libs
+        if (lib.downloads && lib.downloads.artifact) {
+          tempArr.push({
+            url: lib.downloads.artifact.url,
+            path: path.join(librariesPath, lib.downloads.artifact.path),
+            sha1: lib.downloads.artifact.sha1
+          });
+        }
+        const native =
+          lib.natives && lib.natives[convertOSToMCFormat(process.platform)];
+        // Vanilla native libs
+        if (
+          lib.downloads &&
+          lib.downloads.classifiers &&
+          lib.downloads.classifiers[native]
+        ) {
+          tempArr.push({
+            url: lib.downloads.classifiers[native].url,
+            path: path.join(
+              librariesPath,
+              lib.downloads.classifiers[native].path
+            ),
+            sha1: lib.downloads.classifiers[native].sha1,
+            natives: true
+          });
+        }
+
+        tempArr.push({
+          url: `${lib.url || `${MC_LIBRARIES_URL}/`}${mavenToArray(
+            lib.name,
+            native && `-${native}`
+          ).join("/")}`,
+          path: path.join(librariesPath, ...mavenToArray(lib.name, native)),
+          ...(native && { natives: true })
+        });
+        return acc.concat(tempArr);
+      }, []),
+    "url"
+  );
 };
 
 export const isLatestJavaDownloaded = async meta => {
@@ -218,7 +220,6 @@ export const extractNatives = async (libraries, instancePath) => {
     libraries
       .filter(l => l.natives)
       .map(async l => {
-        console.log(l);
         const extraction = extractFull(l.path, extractLocation, {
           $bin: get7zPath()
         });
@@ -329,6 +330,112 @@ export const getJVMArguments112 = async (
   }
 
   args.push(...mcArgs);
+
+  return args;
+};
+
+export const getJVMArguments113 = async (
+  libraries,
+  mcjar,
+  instancePath,
+  assetsPath,
+  mcJson,
+  account,
+  jvmOptions = []
+) => {
+  const argDiscovery = /\${*(.*)}/;
+  let args = mcJson.arguments.jvm.filter(v => !skipLibrary(v));
+
+  // if (process.platform === "darwin") {
+  //   args.push("-Xdock:name=instancename");
+  //   args.push("-Xdock:icon=instanceicon");
+  // }
+
+  args.push("-Xmx3096m");
+  args.push("-Xms128m");
+  args.push(...jvmOptions);
+
+  args.push(mcJson.mainClass);
+
+  args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
+
+  for (let i = 0; i < args.length; i += 1) {
+    if (typeof args[i] === "object" && args[i].rules) {
+      if (typeof args[i].value === "string") {
+        args[i] = args[i].value;
+      } else if (typeof args[i].value === "object") {
+        args.splice(i, 1, ...args[i].value);
+      }
+      i -= 1;
+    } else if (typeof args[i] === "string") {
+      if (argDiscovery.test(args[i])) {
+        const identifier = args[i].match(argDiscovery)[1];
+        let val = null;
+        switch (identifier) {
+          case "auth_player_name":
+            val = account.selectedProfile.name.trim();
+            break;
+          case "version_name":
+            val = mcJson.id;
+            break;
+          case "game_directory":
+            val = `"${instancePath}"`;
+            break;
+          case "assets_root":
+            val = `"${assetsPath}"`;
+            break;
+          case "assets_index_name":
+            val = mcJson.assets;
+            break;
+          case "auth_uuid":
+            val = account.selectedProfile.id.trim();
+            break;
+          case "auth_access_token":
+            val = account.accessToken;
+            break;
+          case "user_type":
+            val = "mojang";
+            break;
+          case "version_type":
+            val = mcJson.type;
+            break;
+          case "resolution_width":
+            val = 800;
+            break;
+          case "resolution_height":
+            val = 600;
+            break;
+          case "natives_directory":
+            val = args[i].replace(
+              argDiscovery,
+              `"${path.join(instancePath, "natives")}"`
+            );
+            break;
+          case "launcher_name":
+            val = args[i].replace(argDiscovery, "GDLauncher");
+            break;
+          case "launcher_version":
+            val = args[i].replace(argDiscovery, "1.0");
+            break;
+          case "classpath":
+            val = [mcjar, ...libraries]
+              .filter(l => !l.natives)
+              .map(l => `"${l.path}"`)
+              .join(process.platform === "win32" ? ";" : ":");
+            break;
+          default:
+            break;
+        }
+        if (val != null) {
+          args[i] = val;
+        }
+      }
+    }
+  }
+
+  args = args.filter(arg => {
+    return arg != null;
+  });
 
   return args;
 };

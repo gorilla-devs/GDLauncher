@@ -6,6 +6,7 @@ import { convertOSToMCFormat } from "../../app/desktop/utils";
 
 const _instances = state => state.instances;
 const _accounts = state => state.app.accounts;
+const _java = state => state.settings.java;
 const _currentAccountId = state => state.app.currentAccountId;
 const _currentDownload = state => state.currentDownload;
 const _downloadQueue = state => state.downloadQueue;
@@ -19,7 +20,8 @@ export const _getInstances = createSelector(
 
 export const _getInstance = createSelector(
   _instances,
-  instances => memoize(instance => instances.list.find(v => v.name === instance))
+  instances =>
+    memoize(instance => instances.list.find(v => v.name === instance))
 );
 
 export const _getCurrentAccount = createSelector(
@@ -39,7 +41,9 @@ export const _getCurrentDownloadItem = createSelector(
 
 export const _getJavaPath = createSelector(
   _launcherManifest,
-  launcherManifest => {
+  _java,
+  (launcherManifest, java) => {
+    if (java.path) return java.path;
     const mcOs = convertOSToMCFormat(process.platform);
     const { version } = launcherManifest[mcOs][64].jre;
     const filename = process.platform === "win32" ? "java.exe" : "java";
