@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { ipcRenderer, clipboard } from "electron";
+import { useSelector, useDispatch } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { push } from "connected-react-router";
 import { faCopy, faDownload } from "@fortawesome/free-solid-svg-icons";
 import Select from "@material-ui/core/Select";
-import { Button } from "../../../../ui";
+import Tooltip from "@material-ui/core/Tooltip";
+import { Button, Slider } from "../../../../ui";
 import logo from "../../../assets/logo.png";
+import { _getCurrentAccount } from "../../../utils/selectors";
+import { updateReleaseChannel } from "../../../reducers/settings/actions";
+
+const { app } = require("electron").remote;
 
 const MyAccountPrf = styled.div`
   width: 100%;
@@ -82,7 +90,7 @@ const ReleaseChannel = styled.div`
   width: 400px;
   height: 100px;
   color: ${props => props.theme.palette.text.third};
-  t {
+  p {
     margin-bottom: 7px;
     color: ${props => props.theme.palette.text.secondary};
   }
@@ -96,6 +104,21 @@ const ReleaseChannel = styled.div`
     self-align: end;
   }
 `;
+
+const ParallelDownload = styled.div`
+  display: flex;
+  flex-direcyion: column;
+  text-align: left;
+  margin-top: 10px;
+  width: 100%;
+  height: 100px;
+
+  p {
+    text-align: left;
+    color: ${props => props.theme.palette.text.third};
+  }
+`;
+
 const LauncherVersion = styled.div`
   margin-top: 30px;
   height: 150px;
@@ -107,19 +130,26 @@ const LauncherVersion = styled.div`
     color: ${props => props.theme.palette.text.third};
     margin: 0 0 0 6px;
   }
-  logoVersion {
-    margin-left: -5px;
-  }
-  buttons {
-    position: absolute;
-    margin-top: 120px;
-  }
 `;
 
 const StyledButtons = styled(Button)``;
 
 export default function MyAccountPreferences() {
-  const [selectedInputValue, setSelectedInputValue] = useState("");
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedUsername, setCopiedUsername] = useState(false);
+
+  const currentAccount = useSelector(_getCurrentAccount);
+  const releaseChannel = useSelector(state => state.settings.releaseChannel);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    ipcRenderer.send("check-for-updates");
+    ipcRenderer.on("update-available", () => {
+      setUpdateAvailable(true);
+    });
+  }, []);
+
   return (
     <MyAccountPrf>
       <PersonalData>
@@ -130,14 +160,55 @@ export default function MyAccountPreferences() {
             Username
             <br />
             <Username>
-              paoloPaolino <FontAwesomeIcon icon={faCopy} />
+              {currentAccount.selectedProfile.name}{" "}
+              <Tooltip
+                title={copiedUsername ? "copied" : "copy"}
+                placement="top"
+              >
+                <div
+                  css={`
+                    width: 13px;
+                    height: 14px;
+                    margin: 0;
+                    margin-left: 4px;
+                    float: right;
+                  `}
+                >
+                  <FontAwesomeIcon
+                    icon={faCopy}
+                    onClick={() => {
+                      clipboard.writeText(currentAccount.selectedProfile.name);
+                      setCopiedUsername(!copiedUsername);
+                    }}
+                  />
+                </div>
+              </Tooltip>
             </Username>
           </UsernameContainer>
           <EmailContainer>
             Email
             <br />
             <Email>
-              paoloPaolini@gmail.com <FontAwesomeIcon icon={faCopy} />
+              {currentAccount.user.username}{" "}
+              <Tooltip title={copiedEmail ? "copied" : "copy"} placement="top">
+                <div
+                  css={`
+                    width: 13px;
+                    height: 14px;
+                    margin: 0;
+                    margin-left: 4px;
+                    float: right;
+                  `}
+                >
+                  <FontAwesomeIcon
+                    icon={faCopy}
+                    onClick={() => {
+                      clipboard.writeText(currentAccount.user.username);
+                      setCopiedEmail(!copiedEmail);
+                    }}
+                  />
+                </div>
+              </Tooltip>
             </Email>
           </EmailContainer>
         </PersonalDataContainer>
@@ -145,7 +216,7 @@ export default function MyAccountPreferences() {
       <Hr />
       <Title>Preferences</Title>
       <ReleaseChannel>
-        <t>Release Channel</t>
+        <p>Release Channel</p>
         <div>
           Stable updates once a month, beta does update more often but it may
           have more bugs.
@@ -155,16 +226,47 @@ export default function MyAccountPreferences() {
               top: 250px;
               right: 0px;
             `}
-            onChange={e => setSelectedInputValue(e.target.value)}
-            value={selectedInputValue}
-            // input={<BootstrapInput name="age" id="age-customized-select" />}
+            onChange={e => dispatch(updateReleaseChannel(e.target.value))}
+            value={releaseChannel || 0}
           >
-            <option value={10}>Ten</option>
-            <option value={20}>Twenty</option>
-            <option value={30}>Thirty</option>
+            <option value="1">Beta</option>
+            <option value="0">Stable</option>
           </Select>
         </div>
       </ReleaseChannel>
+      <Hr />
+      <ParallelDownload>
+        <Title
+          css={`
+            margin-top: 0px;
+          `}
+        >
+          Concurrent Downloads
+        </Title>
+        <p
+          css={`
+            margin-top: 25px;
+            width: 200px;
+            position: absolute;
+            left: 0;
+          `}
+        >
+          Select the number of concurrent downloads
+        </p>
+        <Slider
+          css={`
+            margin-top: 70px;
+            margin-bottom: 30px;
+            width: 100%;
+            word-break: break-word;
+          `}
+          defaultValue={1}
+          min={1}
+          max={10}
+          valueLabelDisplay="auto"
+        />
+      </ParallelDownload>
+      <Hr />
       <LauncherVersion>
         <div
           css={`
@@ -173,7 +275,11 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          <logoVersion>
+          <div
+            css={`
+              margin-left: -5px;
+            `}
+          >
             <img
               src={logo}
               css={`
@@ -185,25 +291,48 @@ export default function MyAccountPreferences() {
               css={`
                 margin: 0;
                 float: right;
-                margin-left: -100px;
+                margin-left: 0px;
               `}
             >
               GDLauncher V 0.14.0
             </h1>
-          </logoVersion>
+          </div>
           <p>
             You’re currently on the latest version. We automatically check for
             updates and we will inform you whenever there is one
           </p>
         </div>
-        <buttons>
-          {/* I've used the style instead of the css because the Button component doesn't read css */}
-          <StyledButtons style={{ marginRight: "10px" }} color="primary">
-            Update &nbsp;
-            <FontAwesomeIcon icon={faDownload} />
+        <div
+          css={`
+            position: absolute;
+            margin-top: 120px;
+          `}
+        >
+          {/* I've used the style instead of the css because the Button component doesn'p read css */}
+          {updateAvailable ? (
+            <StyledButtons
+              onClick={() => dispatch(push("/autoUpdate"))}
+              style={{ marginRight: "10px" }}
+              color="primary"
+            >
+              Update &nbsp;
+              <FontAwesomeIcon icon={faDownload} />
+            </StyledButtons>
+          ) : (
+            <StyledButtons style={{ marginRight: "10px" }}>
+              Up to date
+            </StyledButtons>
+          )}
+          <StyledButtons
+            color="primary"
+            onClick={() => {
+              app.relaunch();
+              app.exit(0);
+            }}
+          >
+            Restart
           </StyledButtons>
-          <StyledButtons color="primary">Restart</StyledButtons>
-        </buttons>
+        </div>
       </LauncherVersion>
     </MyAccountPrf>
   );

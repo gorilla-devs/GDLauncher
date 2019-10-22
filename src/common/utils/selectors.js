@@ -1,6 +1,5 @@
 import { createSelector } from "reselect";
 import { remote } from "electron";
-import os from "os";
 import path from "path";
 import memoize from "lodash.memoize";
 import { convertOSToMCFormat } from "../../app/desktop/utils";

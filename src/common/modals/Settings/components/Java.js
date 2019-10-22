@@ -1,8 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
+import { debounce } from "lodash";
+import path from "path";
+import { remote } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMemory, faFolder, faUndo } from "@fortawesome/free-solid-svg-icons";
-import { Slider, Button, Switch, Input } from "../../../../ui";
+import Switch from "@material-ui/core/Switch";
+import { Slider, Button, Input } from "../../../../ui";
+import {
+  updateJavaArguments,
+  updateJavaMemory,
+  updateJavaPath
+} from "../../../reducers/settings/actions";
+import { DEFAULT_JAVA_ARGS } from "../../../../app/desktop/utils/constants";
+import { _getJavaPath } from "../../../utils/selectors";
 
 const JavaSettings = styled.div`
   width: 100%;
@@ -12,12 +24,12 @@ const JavaSettings = styled.div`
 const AutodetectPath = styled.div`
   margin-top: 38px;
   width: 100%;
-  height: 120px;
+  height: 100px;
 `;
 
 const SelectMemory = styled.div`
   width: 100%;
-  height: 120px;
+  height: 100px;
 `;
 
 const JavaCustomArguments = styled.div`
@@ -45,22 +57,47 @@ const Hr = styled.hr`
 
 const StyledButtons = styled(Button)``;
 
-const marks = [
-  {
-    value: 0
-  },
-  {
-    value: 20
-  },
-  {
-    value: 37
-  },
-  {
-    value: 100
-  }
-];
+function resetJavaArguments(setGlobalArgsInput, dispatch) {
+  dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
+  setGlobalArgsInput(DEFAULT_JAVA_ARGS);
+}
+
+function updateConfig(v, dispatch) {
+  dispatch(updateJavaArguments(v));
+}
+
+const debounced = debounce(updateConfig, 300);
+
+function onInputChange(e, setGlobalArgsInput, dispatch) {
+  setGlobalArgsInput(e.target.value);
+  debounced(e.target.value, dispatch);
+}
+
+const openFolderDialog = (
+  javaPath,
+  updateJavaArguments,
+  updateJavaPath,
+  dispatch
+) => {
+  remote.dialog.showOpenDialog(
+    {
+      properties: ["openFile"],
+      defaultPath: path.dirname(javaPath)
+    },
+    paths => dispatch(updateJavaPath(paths[0]))
+  );
+};
 
 export default function MyAccountPreferences() {
+  const javaArgs = useSelector(state => state.settings.java.args);
+  const javaMemory = useSelector(state => state.settings.java.memory);
+  const javaPath = useSelector(_getJavaPath);
+  const javaP = useSelector(state => state.settings.java.path);
+  const [globalArgs, setGlobalArgsInput] = useState(javaArgs);
+  const [autodetectJavaPath, setAutodetectJavaPath] = useState(true);
+  const [memory, setMemory] = useState(javaMemory);
+  const dispatch = useDispatch();
+
   return (
     <JavaSettings>
       <h1
@@ -89,70 +126,157 @@ export default function MyAccountPreferences() {
           If enable, Java path will be autodetected
         </Paragraph>
         <Switch
-          style={{ position: "absolute", top: "100px", right: "0px" }}
+          css={`
+            float: right;
+            margin-top: 60px;
+          `}
           color="primary"
+          onChange={c => setAutodetectJavaPath(c.target.checked)}
+          checked={autodetectJavaPath}
         />
       </AutodetectPath>
+      {!autodetectJavaPath && (
+        <>
+          <Hr />
+          <div
+            css={`
+              height: 100px;
+              margin-top: 30px;
+            `}
+          >
+            <Title
+              css={`
+                position: relative;
+                top: 0;
+                width: 100%;
+                margin-top: 0px;
+                height: 8px;
+                text-align: left;
+              `}
+            >
+              Java Custom Path
+            </Title>
+            <p
+              css={`
+                width: 100%;
+                text-align: left;
+                margin: 0;
+              `}
+            >
+              If enabled, java path will be autodetected
+            </p>
+            <div
+              css={`
+                margin-top: 20px;
+                width: 100%;
+              `}
+            >
+              <Input
+                css={`
+                  width: 83%;
+                  margin-right: 10px;
+                `}
+                onChange={e => dispatch(updateJavaPath(e.target.value))}
+                value={!autodetectJavaPath ? javaP : javaPath}
+              />
+              <StyledButtons
+                color="primary"
+                onClick={() =>
+                  openFolderDialog(
+                    javaPath,
+                    updateJavaArguments,
+                    updateJavaPath,
+                    dispatch
+                  )
+                }
+              >
+                <FontAwesomeIcon icon={faFolder} />
+              </StyledButtons>
+            </div>
+          </div>
+        </>
+      )}
       <Hr />
       <SelectMemory>
         <Title
           css={`
-            position: absolute;
-            top: 200px;
+            position: relative;
+            top: 0;
+            width: 100%;
+            margin-top: 0px;
+            height: 8px;
+            text-align: left;
           `}
         >
           Java Memory&nbsp; <FontAwesomeIcon icon={faMemory} />
         </Title>
-        <Paragraph
+        <p
           css={`
-            position: absolute;
-            top: 220px;
+            width: 100%;
+            text-align: left;
+            margin: 0;
           `}
         >
           Select the preferred amount of memory to use when lauching the game
-        </Paragraph>
+        </p>
         <Slider
           css={`
-            position: absolute;
-            top: 280px;
-            right: 0;
+            margin-top: 20px;
           `}
-          defaultValue={30}
-          //   getAriaValueText={valuetext}
+          onChangeCommitted={(e, val) => dispatch(updateJavaMemory(val))}
+          onChange={(e, val) => setMemory(val)}
+          defaultValue={memory}
+          min={1024}
+          max={16000}
           valueLabelDisplay="auto"
-          marks={marks}
         />
       </SelectMemory>
       <Hr />
       <JavaCustomArguments>
-        <Title>Java Custom Arguments</Title>
-        <Paragraph
+        <Title
           css={`
-            position: absolute;
-            top: 360px;
+            position: relative;
+            top: 0;
+            width: 100%;
+            margin-top: 0px;
+            height: 8px;
+            text-align: left;
+          `}
+        >
+          Java Custom Arguments
+        </Title>
+        <p
+          css={`
+            marin-top: 20px;
+            width: 100%;
+            margin: 0;
+            text-align: left;
           `}
         >
           Select the preferred amount of memory to use when lauching the game
-        </Paragraph>
-        <Input
-          style={{
-            position: "absolute",
-            top: "430px",
-            left: 0,
-            width: "80%"
-          }}
-          height="26px"
-        />
-        <StyledButtons
+        </p>
+        <div
           css={`
-            position: absolute;
-            top: 430px;
-            right: 0px;
+            margin-top: 20px;
+            width: 100%;
           `}
-          color="primary"
         >
-          <FontAwesomeIcon icon={faUndo} />
-        </StyledButtons>
+          <Input
+            onChange={e => onInputChange(e, setGlobalArgsInput, dispatch)}
+            value={globalArgs}
+            css={`
+              width: 83%;
+              height: 26px;
+              margin-right: 10px;
+            `}
+          />
+          <StyledButtons
+            onClick={() => resetJavaArguments(setGlobalArgsInput, dispatch)}
+            color="primary"
+          >
+            <FontAwesomeIcon icon={faUndo} />
+          </StyledButtons>
+        </div>
       </JavaCustomArguments>
     </JavaSettings>
   );

@@ -13,7 +13,7 @@ const Input = styled.input`
   font-family: Glacial Indifference;
   font-size: 14px;
   line-height: 16px;
-  margin: 0 !important;
+  margin: 0;
   &:hover {
     transition: all 0.1s ease-in-out;
     background: ${props => props.theme.palette.secondary.dark};

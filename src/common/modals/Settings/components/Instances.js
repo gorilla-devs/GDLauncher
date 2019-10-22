@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import { useSelector, useDispatch } from "react-redux";
+import fsa from "fs-extra";
+import path from "path";
+import { remote } from "electron";
+import Switch from "@material-ui/core/Switch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faFolder } from "@fortawesome/free-solid-svg-icons";
-import { Button, Switch, Input } from "../../../../ui";
+import { Button, Input } from "../../../../ui";
+import { _getInstancesPath } from "../../../utils/selectors";
+import { META_PATH } from "../../../utils/constants";
+import { updateInstancesPath } from "../../../reducers/settings/actions";
 
 const Instances = styled.div`
   width: 100%;
@@ -46,7 +54,39 @@ const Hr = styled.hr`
 
 const StyledButtons = styled(Button)``;
 
+async function clearSharedData(InstancesPath, setDeletingInstances) {
+  setDeletingInstances(true);
+  try {
+    setDeletingInstances(true);
+    await fsa.emptyDir(path.join(InstancesPath, "libraries"));
+    await fsa.emptyDir(path.join(InstancesPath, "packs"));
+    await fsa.emptyDir(path.join(InstancesPath, "assets"));
+    await fsa.emptyDir(path.join(InstancesPath, "versions"));
+    await fsa.emptyDir(path.join(InstancesPath, "temp"));
+    await fsa.emptyDir(META_PATH);
+    setDeletingInstances(false);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+const openFolderDialog = (InstancesPath, dispatch, updateInstancesPath) => {
+  remote.dialog.showOpenDialog(
+    {
+      properties: ["openDirectory"],
+      defaultPath: path.dirname(InstancesPath)
+    },
+    paths => dispatch(updateInstancesPath(paths[0]))
+  );
+};
+
 export default function MyAccountPreferences() {
+  const [deletingInstances, setDeletingInstances] = useState(false);
+  const [overrideInstancesPath, setOverrideInstancesPath] = useState(false);
+  const InstancesPath = useSelector(_getInstancesPath);
+  const InstancesP = useSelector(state => state.settings.instancesPath);
+  const dispatch = useDispatch();
+
   return (
     <Instances>
       <h1
@@ -76,6 +116,8 @@ export default function MyAccountPreferences() {
           in the complete loss of the instances data
         </Paragraph>
         <StyledButtons
+          onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
+          disabled={deletingInstances}
           css={`
             position: absolute;
             top: 110px;
@@ -107,40 +149,52 @@ export default function MyAccountPreferences() {
           to restart the launcher for this settings to applay
         </Paragraph>
         <Switch
-          style={{ position: "absolute", top: "220px", right: 0 }}
+          css={`
+            float: right;
+            margin-top: 20px;
+          `}
           color="primary"
+          onChange={e => setOverrideInstancesPath(e.target.checked)}
+          checked={overrideInstancesPath}
         />
       </OverridePath>
       <Hr />
-      <InstanceCustomPath>
-        <Title>Instance Custom Path</Title>
-        <Paragraph
-          css={`
-            position: absolute;
-            top: 340px;
-          `}
-        >
-          Select the preferred Path to install you instances
-        </Paragraph>
-        <Input
-          style={{
-            position: "absolute",
-            top: "400px",
-            left: 0,
-            width: "80%"
-          }}
-        />
-        <StyledButtons
-          css={`
-            position: absolute;
-            top: 400px;
-            right: 0px;
-          `}
-          color="primary"
-        >
-          <FontAwesomeIcon icon={faFolder} />
-        </StyledButtons>
-      </InstanceCustomPath>
+      {overrideInstancesPath && (
+        <InstanceCustomPath>
+          <Title>Instance Custom Path</Title>
+          <Paragraph
+            css={`
+              position: absolute;
+              top: 340px;
+            `}
+          >
+            Select the preferred Path to install you instances
+          </Paragraph>
+          <Input
+            style={{
+              position: "absolute",
+              top: "400px",
+              left: 0,
+              width: "80%"
+            }}
+            onChange={e => dispatch(updateInstancesPath(e.target.value))}
+            value={InstancesP}
+          />
+          <StyledButtons
+            css={`
+              position: absolute;
+              top: 400px;
+              right: 0px;
+            `}
+            color="primary"
+            onClick={() =>
+              openFolderDialog(InstancesPath, dispatch, updateInstancesPath)
+            }
+          >
+            <FontAwesomeIcon icon={faFolder} />
+          </StyledButtons>
+        </InstanceCustomPath>
+      )}
     </Instances>
   );
 }

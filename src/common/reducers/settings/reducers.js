@@ -2,6 +2,10 @@ import { combineReducers } from "redux";
 import { remote } from "electron";
 import isElectron from "is-electron";
 import * as ActionTypes from "./actionTypes";
+import {
+  DEFAULT_JAVA_ARGS,
+  DEFAULT_MEMORY
+} from "../../../app/desktop/utils/constants";
 
 function sounds(state = true, action) {
   switch (action.type) {
@@ -17,6 +21,15 @@ const defaultPath = isElectron() ? remote.app.getPath("userData") : null;
 function dataPath(state = defaultPath, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_DATA_PATH:
+      return action.path;
+    default:
+      return state;
+  }
+}
+
+function instancesPath(state = null, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_INSTANCES_PATH:
       return action.path;
     default:
       return state;
@@ -46,8 +59,8 @@ function concurrentDownloads(state = 3, action) {
 function java(
   state = {
     path: null,
-    memory: 1,
-    args: "DEFAULT_JAVA_ARGUMENTS"
+    memory: DEFAULT_MEMORY,
+    args: DEFAULT_JAVA_ARGS
   },
   action
 ) {
@@ -66,6 +79,7 @@ function java(
 export default combineReducers({
   sounds,
   dataPath,
+  instancesPath,
   releaseChannel,
   concurrentDownloads,
   java

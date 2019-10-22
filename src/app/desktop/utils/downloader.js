@@ -1,6 +1,5 @@
 import makeDir from "make-dir";
 import fss from "fs";
-import fse from "fs-extra";
 import reqCall from "request";
 import pMap from "p-map";
 import path from "path";

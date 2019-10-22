@@ -3,7 +3,6 @@ import path from "path";
 import { remote, ipcRenderer } from "electron";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
-import semver, { coerce } from "semver";
 import omitBy from "lodash.omitby";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
