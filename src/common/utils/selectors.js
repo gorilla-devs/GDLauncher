@@ -13,9 +13,14 @@ const _downloadQueue = state => state.downloadQueue;
 const _launcherManifest = state => state.app.launcherManifest;
 const _dataPath = state => state.settings.dataPath;
 
+export const _getInstances = createSelector(
+  _instances,
+  instances => instances
+);
+
 export const _getInstance = createSelector(
   _instances,
-  instances => memoize(instance => instances.find(v => v.name === instance))
+  instances => memoize(instance => instances.list.find(v => v.name === instance))
 );
 
 export const _getCurrentAccount = createSelector(
