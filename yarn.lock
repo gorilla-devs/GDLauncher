@@ -3333,6 +3333,11 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
+classnames@^2.2.5:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
+  integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
+
 clean-css@4.2.x:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.2.1.tgz#2d411ef76b8569b6d0c84068dabe85b0aa5e5c17"
@@ -10235,6 +10240,14 @@ react-content-loader@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/react-content-loader/-/react-content-loader-4.3.2.tgz#2f6546c883707d399a2abc2efd00edcb8f584618"
   integrity sha512-Af2RW2G57+mFRXsiSXROtgvz3KmPz0lATRHNUpJ57DyVw6SRzDRNRXo04I2xhcwmwVnXsfx4s2hsHrU+Lq5jRw==
+
+react-contextmenu@^2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/react-contextmenu/-/react-contextmenu-2.11.0.tgz#ec57614e6d687ceaec5c0ba97d56a302c9551d17"
+  integrity sha512-vT9QV9p/9h1BSIvmajRVG3KsgjuBnISpEQp0F1QYsUPFMe3VOKV2l7IiD8yrNUyXYZKrWMqI0YKsaBwGSRVgJg==
+  dependencies:
+    classnames "^2.2.5"
+    object-assign "^4.1.0"
 
 react-dev-utils@^9.1.0:
   version "9.1.0"

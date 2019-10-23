@@ -6,6 +6,7 @@ import styled from "styled-components";
 // import LoginHelper from "components/modals/LoginHelper";
 import AddInstance from "../modals/AddInstance";
 import Settings from "../modals/Settings/Settings";
+import InstanceDeleteConfirmation from "../modals/InstanceDeleteConfirmation";
 import ProfileSettings from "../modals/ProfileSettings";
 import JavaDownload from "../modals/JavaDownload";
 import { closeModal } from "../reducers/modals/actions";
@@ -44,7 +45,8 @@ const modalsComponentLookupTable = {
   AddInstance,
   ProfileSettings,
   Settings,
-  JavaDownload
+  JavaDownload,
+  InstanceDeleteConfirmation
 };
 
 const ModalContainer = ({ unmounting, children }) => {

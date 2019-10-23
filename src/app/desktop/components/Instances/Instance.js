@@ -1,9 +1,16 @@
 import React from "react";
 import { transparentize } from "polished";
 import styled from "styled-components";
+import path from "path";
+import { shell } from "electron";
+import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import { useSelector, useDispatch } from "react-redux";
-import { _getInstance } from "../../../../common/utils/selectors";
+import {
+  _getInstance,
+  _getInstancesPath
+} from "../../../../common/utils/selectors";
 import { launchInstance } from "../../../../common/reducers/actions";
+import { openModal } from "../../../../common/reducers/modals/actions";
 
 const Container = styled.div`
   display: flex;
@@ -47,10 +54,29 @@ const Container = styled.div`
 const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const instancesPath = useSelector(_getInstancesPath);
   const startInstance = () => {
     dispatch(launchInstance(instanceName));
   };
-  return <Container onClick={startInstance}>{instance.name}</Container>;
+  const openFolder = () => {
+    shell.openItem(path.join(instancesPath, instance.name));
+  };
+  const openConfirmationDeleteModal = () => {
+    dispatch(openModal("InstanceDeleteConfirmation", { instanceName }));
+  };
+  return (
+    <>
+      <ContextMenuTrigger id={instance.name}>
+        <Container onClick={startInstance}>{instance.name}</Container>
+      </ContextMenuTrigger>
+      <ContextMenu id={instance.name}>
+        <MenuItem>Manage</MenuItem>
+        <MenuItem onClick={openFolder}>Open Folder</MenuItem>
+        <MenuItem divider />
+        <MenuItem onClick={openConfirmationDeleteModal}>Delete</MenuItem>
+      </ContextMenu>
+    </>
+  );
 };
 
 export default Instance;
