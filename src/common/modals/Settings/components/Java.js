@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import { debounce } from "lodash";
 import path from "path";
 import { remote } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMemory, faFolder, faUndo } from "@fortawesome/free-solid-svg-icons";
-import Switch from "@material-ui/core/Switch";
-import { Slider, Button, Input } from "../../../../ui";
+import {
+  faMemory,
+  faFolder,
+  faUndo,
+  faLevelDownAlt
+} from "@fortawesome/free-solid-svg-icons";
+
+import { Slider, Button, Input, Switch } from "../../../../ui";
 import {
   updateJavaArguments,
   updateJavaMemory,
@@ -57,20 +61,8 @@ const Hr = styled.hr`
 
 const StyledButtons = styled(Button)``;
 
-function resetJavaArguments(setGlobalArgsInput, dispatch) {
+function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
-  setGlobalArgsInput(DEFAULT_JAVA_ARGS);
-}
-
-function updateConfig(v, dispatch) {
-  dispatch(updateJavaArguments(v));
-}
-
-const debounced = debounce(updateConfig, 300);
-
-function onInputChange(e, setGlobalArgsInput, dispatch) {
-  setGlobalArgsInput(e.target.value);
-  debounced(e.target.value, dispatch);
 }
 
 const openFolderDialog = (
@@ -88,12 +80,29 @@ const openFolderDialog = (
   );
 };
 
+const marks = [
+  {
+    value: 2048,
+    label: "2048 mb"
+  },
+  {
+    value: 4096,
+    label: "4096 mb"
+  },
+  {
+    value: 8192,
+    label: "8192 mb"
+  },
+  {
+    value: 16384,
+    label: "16384 mb"
+  }
+];
+
 export default function MyAccountPreferences() {
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
   const javaPath = useSelector(_getJavaPath);
-  const javaP = useSelector(state => state.settings.java.path);
-  const [globalArgs, setGlobalArgsInput] = useState(javaArgs);
   const [autodetectJavaPath, setAutodetectJavaPath] = useState(true);
   const [memory, setMemory] = useState(javaMemory);
   const dispatch = useDispatch();
@@ -126,10 +135,10 @@ export default function MyAccountPreferences() {
           If enable, Java path will be autodetected
         </Paragraph>
         <Switch
-          css={`
-            float: right;
-            margin-top: 60px;
-          `}
+          style={{
+            float: "right",
+            marginTop: "65px"
+          }}
           color="primary"
           onChange={c => setAutodetectJavaPath(c.target.checked)}
           checked={autodetectJavaPath}
@@ -137,47 +146,31 @@ export default function MyAccountPreferences() {
       </AutodetectPath>
       {!autodetectJavaPath && (
         <>
-          <Hr />
           <div
             css={`
-              height: 100px;
+              height: 40px;
               margin-top: 30px;
             `}
           >
-            <Title
-              css={`
-                position: relative;
-                top: 0;
-                width: 100%;
-                margin-top: 0px;
-                height: 8px;
-                text-align: left;
-              `}
-            >
-              Java Custom Path
-            </Title>
-            <p
-              css={`
-                width: 100%;
-                text-align: left;
-                margin: 0;
-              `}
-            >
-              If enabled, java path will be autodetected
-            </p>
             <div
               css={`
                 margin-top: 20px;
                 width: 100%;
               `}
             >
+              <FontAwesomeIcon
+                icon={faLevelDownAlt}
+                flip="horizontal"
+                transform={{ rotate: 90 }}
+              />
               <Input
                 css={`
-                  width: 83%;
+                  width: 75%;
                   margin-right: 10px;
+                  margin-left: 10px;
                 `}
                 onChange={e => dispatch(updateJavaPath(e.target.value))}
-                value={!autodetectJavaPath ? javaP : javaPath}
+                value={javaPath}
               />
               <StyledButtons
                 color="primary"
@@ -227,7 +220,9 @@ export default function MyAccountPreferences() {
           onChange={(e, val) => setMemory(val)}
           defaultValue={memory}
           min={1024}
-          max={16000}
+          max={16384}
+          step={512}
+          marks={marks}
           valueLabelDisplay="auto"
         />
       </SelectMemory>
@@ -262,8 +257,8 @@ export default function MyAccountPreferences() {
           `}
         >
           <Input
-            onChange={e => onInputChange(e, setGlobalArgsInput, dispatch)}
-            value={globalArgs}
+            onChange={e => dispatch(updateJavaArguments(e.target.value))}
+            value={javaArgs}
             css={`
               width: 83%;
               height: 26px;
@@ -271,7 +266,7 @@ export default function MyAccountPreferences() {
             `}
           />
           <StyledButtons
-            onClick={() => resetJavaArguments(setGlobalArgsInput, dispatch)}
+            onClick={() => resetJavaArguments(dispatch)}
             color="primary"
           >
             <FontAwesomeIcon icon={faUndo} />

@@ -5,7 +5,7 @@ import Slider from "@material-ui/core/Slider";
 const StyledSlider = styled(Slider)`
   .MuiSlider-root {
     height: 4px;
-    padding: 4px !important;
+    padding: 4px;
   }
 
   .MuiSlider-track {
@@ -14,7 +14,7 @@ const StyledSlider = styled(Slider)`
 
   .MuiSlider-rail {
     height: 4px;
-    background: #7a8086;
+    background: ${props => props.theme.palette.grey[200]};
   }
 
   .MuiSlider-thumb {
@@ -22,22 +22,22 @@ const StyledSlider = styled(Slider)`
     margin-top: -8px;
     width: 20px;
     height: 20px;
-    background: #c4c4c4;
+    background: ${props => props.theme.palette.grey[50]};
     border: 3px solid ${props => props.theme.palette.primary.main};
   }
 
   .MuiSlider-mark {
-    height: 12px;
-    width: 12px;
+    height: 5px;
+    width: 5px;
     border-radius: 50%;
-    margin-top: -4px;
+
     background: #c4c4c4;
   }
 
   .MuiSlider-markActive {
-    height: 10px;
-    width: 10px;
-    margin-top: -5px;
+    height: 5px;
+    width: 5px;
+    margin-top: -2px;
     background: #c4c4c4;
     opacity: 1;
     border: 2px solid ${props => props.theme.palette.primary.main};

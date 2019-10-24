@@ -46,7 +46,6 @@ import {
   downloadFile,
   downloadInstanceFiles
 } from "../../app/desktop/utils/downloader";
-import { removeDuplicates } from "../utils";
 import { updateJavaPath } from "./settings/actions";
 
 export function initManifests() {

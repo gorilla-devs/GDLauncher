@@ -7,7 +7,7 @@ import { push } from "connected-react-router";
 import { faCopy, faDownload } from "@fortawesome/free-solid-svg-icons";
 import Select from "@material-ui/core/Select";
 import Tooltip from "@material-ui/core/Tooltip";
-import { Button, Slider } from "../../../../ui";
+import { Button } from "../../../../ui";
 import logo from "../../../assets/logo.png";
 import { _getCurrentAccount } from "../../../utils/selectors";
 import { updateReleaseChannel } from "../../../reducers/settings/actions";
@@ -16,7 +16,7 @@ const { app } = require("electron").remote;
 
 const MyAccountPrf = styled.div`
   width: 100%;
-  height: 500px;
+  height: 100%;
 `;
 
 const PersonalData = styled.div`
@@ -106,13 +106,9 @@ const ReleaseChannel = styled.div`
 `;
 
 const ParallelDownload = styled.div`
-  display: flex;
-  flex-direcyion: column;
-  text-align: left;
   margin-top: 10px;
   width: 100%;
-  height: 100px;
-
+  height: 70px;
   p {
     text-align: left;
     color: ${props => props.theme.palette.text.third};
@@ -122,28 +118,39 @@ const ParallelDownload = styled.div`
 const LauncherVersion = styled.div`
   margin-top: 30px;
   height: 150px;
-  text-align: left;
-  display: flex;
-  display-directions: column;
+
   p {
+    text-align: left;
     float: left;
     color: ${props => props.theme.palette.text.third};
     margin: 0 0 0 6px;
   }
 `;
 
+function copy(setCopied, copy) {
+  setCopied(true);
+  clipboard.writeText(copy);
+  setTimeout(() => {
+    setCopied(false);
+  }, 500);
+}
+
 const StyledButtons = styled(Button)``;
 
 export default function MyAccountPreferences() {
+  const currentAccount = useSelector(_getCurrentAccount);
+  const releaseC = useSelector(state => state.settings.releaseChannel);
+
+  const [releaseChannel, setReleaseChannel] = useState(0);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedUsername, setCopiedUsername] = useState(false);
+  const [concurrentDownloads, setConcurrentDownloads] = useState(1);
 
-  const currentAccount = useSelector(_getCurrentAccount);
-  const releaseChannel = useSelector(state => state.settings.releaseChannel);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    setReleaseChannel(releaseC);
     ipcRenderer.send("check-for-updates");
     ipcRenderer.on("update-available", () => {
       setUpdateAvailable(true);
@@ -176,10 +183,12 @@ export default function MyAccountPreferences() {
                 >
                   <FontAwesomeIcon
                     icon={faCopy}
-                    onClick={() => {
-                      clipboard.writeText(currentAccount.selectedProfile.name);
-                      setCopiedUsername(!copiedUsername);
-                    }}
+                    onClick={() =>
+                      copy(
+                        setCopiedUsername,
+                        currentAccount.selectedProfile.name
+                      )
+                    }
                   />
                 </div>
               </Tooltip>
@@ -202,10 +211,9 @@ export default function MyAccountPreferences() {
                 >
                   <FontAwesomeIcon
                     icon={faCopy}
-                    onClick={() => {
-                      clipboard.writeText(currentAccount.user.username);
-                      setCopiedEmail(!copiedEmail);
-                    }}
+                    onClick={() =>
+                      copy(setCopiedEmail, currentAccount.user.username)
+                    }
                   />
                 </div>
               </Tooltip>
@@ -227,7 +235,8 @@ export default function MyAccountPreferences() {
               right: 0px;
             `}
             onChange={e => dispatch(updateReleaseChannel(e.target.value))}
-            value={releaseChannel || 0}
+            value={releaseChannel}
+            defaultValue={releaseChannel}
           >
             <option value="1">Beta</option>
             <option value="0">Stable</option>
@@ -253,18 +262,26 @@ export default function MyAccountPreferences() {
         >
           Select the number of concurrent downloads
         </p>
-        <Slider
+
+        <Select
           css={`
-            margin-top: 70px;
-            margin-bottom: 30px;
-            width: 100%;
-            word-break: break-word;
+            float: right;
+            margin-top: 20px;
           `}
-          defaultValue={1}
-          min={1}
-          max={10}
-          valueLabelDisplay="auto"
-        />
+          onChange={e => setConcurrentDownloads(e.target.value)}
+          value={concurrentDownloads}
+        >
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </Select>
       </ParallelDownload>
       <Hr />
       <LauncherVersion>
@@ -277,7 +294,8 @@ export default function MyAccountPreferences() {
         >
           <div
             css={`
-              margin-left: -5px;
+              display: flex;
+              flex-direction: row;
             `}
           >
             <img
@@ -289,39 +307,49 @@ export default function MyAccountPreferences() {
             />
             <h1
               css={`
+                line-height: 1.5;
                 margin: 0;
-                float: right;
-                margin-left: 0px;
               `}
             >
               GDLauncher V 0.14.0
             </h1>
           </div>
-          <p>
-            You’re currently on the latest version. We automatically check for
-            updates and we will inform you whenever there is one
-          </p>
         </div>
+        <p>
+          You’re currently on the latest version. We automatically check for
+          updates and we will inform you whenever there is one
+        </p>
         <div
           css={`
-            position: absolute;
-            margin-top: 120px;
+            float: left;
+            margin-top: 20px;
+            height: 36px;
+            display: flex;
+            flex-direction: row;
           `}
         >
           {/* I've used the style instead of the css because the Button component doesn'p read css */}
           {updateAvailable ? (
             <StyledButtons
               onClick={() => dispatch(push("/autoUpdate"))}
-              style={{ marginRight: "10px" }}
+              css={`
+                margin-right: 10px;
+              `}
               color="primary"
             >
               Update &nbsp;
               <FontAwesomeIcon icon={faDownload} />
             </StyledButtons>
           ) : (
-            <StyledButtons style={{ marginRight: "10px" }}>
+            <div
+              css={`
+                width: 96px;
+                height: 36px;
+                padding: 6px 8px;
+              `}
+            >
               Up to date
-            </StyledButtons>
+            </div>
           )}
           <StyledButtons
             color="primary"

@@ -4,10 +4,13 @@ import { useSelector, useDispatch } from "react-redux";
 import fsa from "fs-extra";
 import path from "path";
 import { remote } from "electron";
-import Switch from "@material-ui/core/Switch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faFolder } from "@fortawesome/free-solid-svg-icons";
-import { Button, Input } from "../../../../ui";
+import {
+  faTrash,
+  faFolder,
+  faLevelDownAlt
+} from "@fortawesome/free-solid-svg-icons";
+import { Button, Input, Switch } from "../../../../ui";
 import { _getInstancesPath } from "../../../utils/selectors";
 import { META_PATH } from "../../../utils/constants";
 import { updateInstancesPath } from "../../../reducers/settings/actions";
@@ -26,12 +29,12 @@ const AutodetectPath = styled.div`
 
 const OverridePath = styled.div`
   width: 100%;
-  height: 90px;
+  height: 70px;
 `;
 
 const InstanceCustomPath = styled.div`
   width: 100%;
-  height: 120px;
+  height: 40px;
 `;
 
 const Title = styled.h3`
@@ -115,18 +118,32 @@ export default function MyAccountPreferences() {
           Deletes all the shared files between instances. Doing this will result
           in the complete loss of the instances data
         </Paragraph>
-        <StyledButtons
-          onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
-          disabled={deletingInstances}
-          css={`
-            position: absolute;
-            top: 110px;
-            right: 0px;
-          `}
-          color="primary"
-        >
-          Clear
-        </StyledButtons>
+        {deletingInstances ? (
+          <StyledButtons
+            onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
+            disabled
+            css={`
+              position: absolute;
+              top: 110px;
+              right: 0px;
+            `}
+            color="primary"
+          >
+            Clear
+          </StyledButtons>
+        ) : (
+          <StyledButtons
+            onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
+            css={`
+              position: absolute;
+              top: 110px;
+              right: 0px;
+            `}
+            color="primary"
+          >
+            Clear
+          </StyledButtons>
+        )}
       </AutodetectPath>
       <Hr />
       <OverridePath>
@@ -149,50 +166,46 @@ export default function MyAccountPreferences() {
           to restart the launcher for this settings to applay
         </Paragraph>
         <Switch
-          css={`
-            float: right;
-            margin-top: 20px;
-          `}
+          style={{
+            float: "right",
+            marginTop: "20px"
+          }}
           color="primary"
           onChange={e => setOverrideInstancesPath(e.target.checked)}
           checked={overrideInstancesPath}
         />
       </OverridePath>
-      <Hr />
       {overrideInstancesPath && (
         <InstanceCustomPath>
-          <Title>Instance Custom Path</Title>
-          <Paragraph
+          <div
             css={`
-              position: absolute;
-              top: 340px;
+              margin-top: 20px;
+              width: 100%;
             `}
           >
-            Select the preferred Path to install you instances
-          </Paragraph>
-          <Input
-            style={{
-              position: "absolute",
-              top: "400px",
-              left: 0,
-              width: "80%"
-            }}
-            onChange={e => dispatch(updateInstancesPath(e.target.value))}
-            value={InstancesP}
-          />
-          <StyledButtons
-            css={`
-              position: absolute;
-              top: 400px;
-              right: 0px;
-            `}
-            color="primary"
-            onClick={() =>
-              openFolderDialog(InstancesPath, dispatch, updateInstancesPath)
-            }
-          >
-            <FontAwesomeIcon icon={faFolder} />
-          </StyledButtons>
+            <FontAwesomeIcon
+              icon={faLevelDownAlt}
+              flip="horizontal"
+              transform={{ rotate: 90 }}
+            />
+            <Input
+              css={`
+                width: 75%;
+                margin-right: 10px;
+                margin-left: 10px;
+              `}
+              onChange={e => dispatch(updateInstancesPath(e.target.value))}
+              value={InstancesP || InstancesPath}
+            />
+            <StyledButtons
+              color="primary"
+              onClick={() =>
+                openFolderDialog(InstancesPath, dispatch, updateInstancesPath)
+              }
+            >
+              <FontAwesomeIcon icon={faFolder} />
+            </StyledButtons>
+          </div>
         </InstanceCustomPath>
       )}
     </Instances>
