@@ -32,6 +32,7 @@ const Wrapper = styled.div`
 function DesktopRoot() {
   const dispatch = useDispatch();
   const currentAccount = useSelector(_getCurrentAccount);
+  const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
 
   // Handle already logged in account redirect
   useDidMount(() => {
@@ -59,7 +60,9 @@ function DesktopRoot() {
         load(features.mcAuthentication, dispatch(loginThroughNativeLauncher()))
       ).catch(console.error);
     }
-    ipcRenderer.send("init-discord-rpc");
+    if (shouldShowDiscordRPC) {
+      ipcRenderer.send("init-discord-rpc");
+    }
   });
 
   return (

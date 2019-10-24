@@ -56,6 +56,15 @@ function concurrentDownloads(state = 3, action) {
   }
 }
 
+function discordRPC(state = true, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_DISCORD_RPC:
+      return action.active;
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path: null,
@@ -82,5 +91,6 @@ export default combineReducers({
   instancesPath,
   releaseChannel,
   concurrentDownloads,
+  discordRPC,
   java
 });

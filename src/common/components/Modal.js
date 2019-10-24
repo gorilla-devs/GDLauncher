@@ -14,7 +14,7 @@ const HeaderComponent = styled.div`
   width: calc(100% - 20px);
   padding: 0 10px;
   height: 40px;
-  background: var(--secondary-color-2);
+  background: ${props => props.theme.palette.grey[700]};
   border-radius: 4px;
 `;
 
@@ -69,6 +69,7 @@ const Modal = ({
           padding: ${props =>
             props.header === undefined || props.header === true ? 20 : 0}px;
           overflow-y: auto;
+          overflow-x: hidden;
         `}
       >
         <span onClick={() => dispatch(closeModal())}>

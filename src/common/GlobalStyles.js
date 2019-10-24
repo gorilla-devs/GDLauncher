@@ -72,4 +72,69 @@ export default createGlobalStyle`
     user-select: none;
     cursor: default;
   }
+
+  .react-contextmenu {
+    background: ${props => props.theme.palette.grey[700]};
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    color: ${props => props.theme.palette.text.primary};
+    font-size: 16px;
+    min-width: 180px;
+    outline: none;
+    transform: scale(0);
+    transform-origin: top left;
+    pointer-events: none;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    text-align: center;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 100ms;
+  }
+  
+  .react-contextmenu.react-contextmenu--visible {
+    transition: transform 100ms;
+    transform: scale(1);
+    pointer-events: auto;
+    z-index: 9999;
+  }
+  
+  .react-contextmenu-item {
+    background: 0 0;
+    color: ${props => props.theme.palette.text.primary};
+    cursor: pointer;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 4px 10px;
+    text-align: left;
+    white-space: nowrap;
+    span {
+      color: ${props => props.theme.palette.text.primary};
+      width: 25px;
+  
+    }
+  }
+  
+  .react-contextmenu-item.react-contextmenu-item--active,
+  .react-contextmenu-item.react-contextmenu-item--selected,
+  .react-contextmenu-item:hover{
+    background-color: ${props => props.theme.palette.grey[800]};
+    text-decoration: none;
+  }
+
+  .react-contextmenu-item:focus {
+    outline: none;
+  }
+  
+  .react-contextmenu-item.react-contextmenu-item--disabled,
+  .react-contextmenu-item.react-contextmenu-item--disabled:hover {
+    background-color: transparent;
+    color: ${props => props.theme.palette.text.disabled};
+  }
+  
+  .react-contextmenu-item--divider {
+    border-bottom: 1px solid ${props => props.theme.palette.grey[300]};
+    cursor: inherit;
+    margin-bottom: 3px;
+    padding: 2px 0;
+  }
 `;

@@ -362,9 +362,9 @@ export const getJVMArguments113 = async (
   for (let i = 0; i < args.length; i += 1) {
     if (typeof args[i] === "object" && args[i].rules) {
       if (typeof args[i].value === "string") {
-        args[i] = args[i].value;
+        args[i] = `"${args[i].value}"`;
       } else if (typeof args[i].value === "object") {
-        args.splice(i, 1, ...args[i].value);
+        args.splice(i, 1, ...args[i].value.map(v => `"${v}"`));
       }
       i -= 1;
     } else if (typeof args[i] === "string") {
@@ -426,7 +426,7 @@ export const getJVMArguments113 = async (
           default:
             break;
         }
-        if (val != null) {
+        if (val !== null) {
           args[i] = val;
         }
       }

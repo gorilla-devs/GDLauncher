@@ -42,6 +42,7 @@ import {
   copyAssetsToResources,
   getJVMArguments113
 } from "../../app/desktop/utils";
+import { openModal, closeModal } from "./modals/actions";
 import {
   downloadFile,
   downloadInstanceFiles
@@ -199,6 +200,7 @@ export function downloadJava() {
       app: { launcherManifest }
     } = getState();
     const mcOs = convertOSToMCFormat(process.platform);
+    dispatch(openModal("JavaDownload"));
     const { version, url } = launcherManifest[mcOs][64].jre;
     const javaBaseFolder = path.join(remote.app.getPath("userData"), "java");
     const tempFolder = path.join(remote.app.getPath("userData"), "temp");
@@ -250,6 +252,8 @@ export function downloadJava() {
 
     ipcRenderer.send("update-progress-bar", -1);
     dispatch(updateJavaStatus("downloaded"));
+    dispatch(updateJavaStatus("downloaded"));
+    dispatch(closeModal());
   };
 }
 
