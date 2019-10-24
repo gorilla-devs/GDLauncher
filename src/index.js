@@ -2,16 +2,15 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { ThemeProvider as StyledThemeProvider } from "styled-components";
-import { StylesProvider } from "@material-ui/styles";
-import { MuiThemeProvider } from "@material-ui/core/styles";
 import { PersistGate } from "redux-persist/integration/react";
 import { ConnectedRouter } from "connected-react-router";
 import { configureStore, history } from "./common/store/configureStore";
-import { theme } from "./ui";
+import theme from "./ui/theme";
 import RootDev from "./Root-Dev";
 import RootWeb from "./Root-Web";
 import RootElectron from "./Root-Electron";
 import ModalsManager from "./common/components/ModalsManager";
+import "./common/styles.css";
 
 const Root =
   // eslint-disable-next-line no-nested-ternary
@@ -22,13 +21,7 @@ const Root =
     : RootElectron;
 
 const ThemeProvider = ({ theme, children }) => {
-  return (
-    <StylesProvider injectFirst>
-      <StyledThemeProvider theme={theme}>
-        <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
-      </StyledThemeProvider>
-    </StylesProvider>
-  );
+  return <StyledThemeProvider theme={theme}>{children}</StyledThemeProvider>;
 };
 
 const { store, persistor } = configureStore();

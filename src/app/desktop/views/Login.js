@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { push } from "connected-react-router";
 import styled from "styled-components";
+import { Input, Checkbox, Button } from "antd";
 import { login } from "../../../common/reducers/actions";
 import { load } from "../../../common/reducers/loading/actions";
 import features from "../../../common/reducers/loading/features";
 import background from "../../../common/assets/fullHdBackground.jpg";
-import { Input, CheckBox, Button } from "../../../ui";
 
 const Background = styled.div`
   background-image: url("${background}");
@@ -80,7 +79,6 @@ const Login = () => {
             `}
           >
             <Button
-              variant="contained"
               color="primary"
               // loading={isAuthLoading}
               // disabled={isAuthLoading || !email || !password}
@@ -91,50 +89,9 @@ const Login = () => {
             >
               Login
             </Button>
-            <CheckBox color="primary" />
+            <Checkbox color="primary" />
           </div>
-          {/* {nativeLauncherProfiles && (
-            <Button
-              icon="forward"
-              loading={isAuthLoading}
-              size="large"
-              color="primary"
-              onClick={tryLoginFromNativeLauncher}
-            >
-              <span>
-                Login As&nbsp;
-                <span
-                  css={`
-                    font-style: italic;
-                    text-decoration: underline;
-                  `}
-                >
-                  {nativeLauncherProfiles}
-                </span>
-              </span>
-            </Button>
-          )} */}
         </Form>
-        <button type="button" onClick={() => dispatch(push("/home"))}>
-          TEST
-        </button>
-        {/* <div
-          css={`
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100vw;
-            height: 100vh;
-          `}
-        >
-          <div>
-            <input name="username" {...username} />
-            <input type="password" name="password" {...password} />
-            <button type="button" onClick={authenticate}>
-              Login
-            </button>
-          </div>
-        </div> */}
       </Overlay>
     </Background>
   );

@@ -11,6 +11,7 @@ import {
 } from "../../../../common/utils/selectors";
 import { launchInstance } from "../../../../common/reducers/actions";
 import { openModal } from "../../../../common/reducers/modals/actions";
+import instanceDefaultBackground from "../../../../common/assets/instance_default.png";
 
 const Container = styled.div`
   display: flex;
@@ -20,7 +21,9 @@ const Container = styled.div`
   text-align: center;
   width: 180px;
   height: 100px;
-  background: ${p => p.theme.palette.grey[500]};
+  background: linear-gradient(0deg,rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url("${instanceDefaultBackground}");
+  background-position: center;
+  background-size: cover;
   border-radius: 4px;
   margin: 10px;
   cursor: pointer;
@@ -40,7 +43,7 @@ const Container = styled.div`
     opacity: 0;
     backdrop-filter: blur(4px);
     will-change: opacity;
-    background: ${p => transparentize(0.4, p.theme.palette.grey[700])};
+    background: ${p => transparentize(0.5, p.theme.palette.grey[800])};
     content: "PLAY";
   }
   &:hover {
@@ -49,6 +52,13 @@ const Container = styled.div`
       opacity: 1;
     }
   }
+`;
+
+const MCVersion = styled.div`
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  font-size: 11px;
 `;
 
 const Instance = ({ instanceName }) => {
@@ -67,7 +77,10 @@ const Instance = ({ instanceName }) => {
   return (
     <>
       <ContextMenuTrigger id={instance.name}>
-        <Container onClick={startInstance}>{instance.name}</Container>
+        <Container onClick={startInstance}>
+          <MCVersion>{instance.mcVersion}</MCVersion>
+          {instance.name}
+        </Container>
       </ContextMenuTrigger>
       <ContextMenu id={instance.name}>
         <MenuItem>Manage</MenuItem>

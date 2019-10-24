@@ -10,8 +10,7 @@ import {
   faUndo,
   faLevelDownAlt
 } from "@fortawesome/free-solid-svg-icons";
-
-import { Slider, Button, Input, Switch } from "../../../../ui";
+import { Slider, Button, Input, Switch } from "antd";
 import {
   updateJavaArguments,
   updateJavaMemory,

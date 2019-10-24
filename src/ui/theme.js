@@ -1,6 +1,4 @@
-import { createMuiTheme } from "@material-ui/core/styles";
-
-export default createMuiTheme({
+export default {
   palette: {
     common: {
       black: "#000",
@@ -71,4 +69,4 @@ export default createMuiTheme({
       navbar: "36px"
     }
   }
-});
+};

@@ -3,7 +3,7 @@ const electron = require("electron");
 const { app, BrowserWindow, ipcMain } = electron;
 const path = require("path");
 
-const discordRPC = require("./discordRPC");
+// const discordRPC = require("./discordRPC");
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
@@ -59,14 +59,14 @@ ipcMain.on("update-progress-bar", (event, p) => {
   mainWindow.setProgressBar(p);
 });
 
-ipcMain.on("init-discord-rpc", () => {
-  discordRPC.initRPC();
-});
+// ipcMain.on("init-discord-rpc", () => {
+//   discordRPC.initRPC();
+// });
 
-ipcMain.on("update-discord-rpc", (event, p) => {
-  discordRPC.updateDetails(p);
-});
+// ipcMain.on("update-discord-rpc", (event, p) => {
+//   discordRPC.updateDetails(p);
+// });
 
-ipcMain.on("shutdown-discord-rpc", () => {
-  discordRPC.shutdownRPC();
-});
+// ipcMain.on("shutdown-discord-rpc", () => {
+//   discordRPC.shutdownRPC();
+// });

@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import fse from "fs-extra";
 import path from "path";
+import { Button, Progress } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import Modal from "../components/Modal";
-import { Button } from "../../ui";
 import { _getInstancesPath } from "../utils/selectors";
-import { CircularProgress } from "@material-ui/core";
 import { closeModal } from "../reducers/modals/actions";
 
 const InstanceDeleteConfirmation = ({ instanceName }) => {
@@ -17,6 +16,7 @@ const InstanceDeleteConfirmation = ({ instanceName }) => {
     await fse.remove(path.join(instancesPath, instanceName));
     dispatch(closeModal());
   };
+  const closeModalWindow = () => dispatch(closeModal());
   return (
     <Modal
       css={`
@@ -49,11 +49,15 @@ const InstanceDeleteConfirmation = ({ instanceName }) => {
             justify-content: space-between;
           `}
         >
-          <Button variant="contained" color="primary">
+          <Button
+            onClick={closeModalWindow}
+            variant="contained"
+            color="primary"
+          >
             No, Abort
           </Button>
           {loading ? (
-            <CircularProgress />
+            <Progress type="circle" />
           ) : (
             <Button onClick={deleteInstance}>Yes, Delete</Button>
           )}

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import LinearProgress from "@material-ui/core/LinearProgress";
+import { Progress } from "antd";
 import Modal from "../components/Modal";
 
 const JavaDownload = () => {
@@ -25,16 +25,11 @@ const JavaDownload = () => {
         <div>
           <h1>Updating Java</h1>
           <h3>Hold on...</h3>
-          <LinearProgress
+          <Progress
             css={`
               margin-top: 70px;
             `}
-            variant={
-              progress !== null && progress !== "done"
-                ? "determinate"
-                : "indeterminate"
-            }
-            value={progress}
+            percent={progress}
           />
         </div>
       </div>

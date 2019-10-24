@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { Button } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../components/Modal";
 import MyAccountPrf from "./components/MyAccount_preferences";
 import Java from "./components/Java";
 import Instances from "./components/Instances";
-import { Button } from "../../../ui";
 
 const Container = styled.div`
   display: flex;

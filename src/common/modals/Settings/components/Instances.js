@@ -4,13 +4,13 @@ import { useSelector, useDispatch } from "react-redux";
 import fsa from "fs-extra";
 import path from "path";
 import { remote } from "electron";
+import { Button, Input, Switch } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTrash,
   faFolder,
   faLevelDownAlt
 } from "@fortawesome/free-solid-svg-icons";
-import { Button, Input, Switch } from "../../../../ui";
 import { _getInstancesPath } from "../../../utils/selectors";
 import { META_PATH } from "../../../utils/constants";
 import { updateInstancesPath } from "../../../reducers/settings/actions";

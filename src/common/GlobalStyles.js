@@ -10,6 +10,7 @@ export default createGlobalStyle`
     overflow: hidden;
     margin: 0;
     display: flex;
+    -webkit-transform:translate3d(0,0,0);
   }
   
   #root {
@@ -30,6 +31,8 @@ export default createGlobalStyle`
   a:hover {
     text-decoration: none;
   }
+
+  :focus { outline: none; }
 
   hr {
     border-width: 1px 0 0;

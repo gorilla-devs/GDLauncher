@@ -4,10 +4,10 @@ import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { ipcRenderer } from "electron";
+import { Button } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog } from "@fortawesome/free-solid-svg-icons";
 import logo from "../../../common/assets/logo.png";
-import { Button } from "../../../ui/index";
 
 import { openModal } from "../../../common/reducers/modals/actions";
 
@@ -169,9 +169,7 @@ const Navbar = () => {
       {updateAvailable && (
         <UpdateButton>
           <Link to="/autoUpdate">
-            <Button type="primary" size="small" style={{ marginLeft: 5 }}>
-              Update Available
-            </Button>
+            <Button type="primary">Update Available</Button>
           </Link>
         </UpdateButton>
       )}
