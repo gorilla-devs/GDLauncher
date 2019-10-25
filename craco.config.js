@@ -6,9 +6,12 @@
 //   ui: path.resolve("./src/ui/")
 // };
 
+const CracoAntDesignPlugin = require("craco-antd");
+
 module.exports = ({ env }) => {
   const isEnvDevelopment = env === "development";
   const isEnvProduction = env === "production";
+
   return {
     babel: {
       presets: [
@@ -65,6 +68,11 @@ module.exports = ({ env }) => {
             : isEnvDevelopment && "static/js/[name].chunk.js"
         }
       }
-    }
+    },
+    plugins: [
+      {
+        plugin: CracoAntDesignPlugin
+      }
+    ]
   };
 };

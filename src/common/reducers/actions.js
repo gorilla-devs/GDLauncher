@@ -48,6 +48,7 @@ import {
   downloadInstanceFiles
 } from "../../app/desktop/utils/downloader";
 import { updateJavaPath } from "./settings/actions";
+import { removeDuplicates } from "../utils";
 
 export function initManifests() {
   return async dispatch => {
@@ -66,7 +67,7 @@ export function initManifests() {
       type: ActionTypes.UPDATE_LAUNCHER_MANIFEST,
       data: launcher
     });
-    const forge = (await getForgeManifest()).data;
+    const forge = removeDuplicates((await getForgeManifest()).data, "name");
     const forgeVersions = {};
     // Looping over vanilla versions, create a new entry in forge object
     // and add to it all correct versions
@@ -591,7 +592,6 @@ export const launchInstance = instanceName => {
       path.join(_getMinecraftVersionsPath(state), `${mcVersion}.json`)
     );
     const libraries = librariesMapper(mcJson.libraries, librariesPath);
-    console.log(libraries);
     await extractNatives(libraries, instancePath);
 
     const mcMainFile = {
@@ -612,8 +612,6 @@ export const launchInstance = instanceName => {
       mcJson,
       account
     );
-
-    console.log(jvmArguments.join(" "));
 
     await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`);
   };

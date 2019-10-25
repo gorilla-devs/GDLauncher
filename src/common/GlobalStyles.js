@@ -21,7 +21,6 @@ export default createGlobalStyle`
     margin: 0;
     display: flex;
     box-sizing: border-box;
-    color: ${props => props.theme.palette.text.primary};
   }
 
   a {

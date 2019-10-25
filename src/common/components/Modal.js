@@ -11,7 +11,7 @@ const HeaderComponent = styled.div`
   align-items: center;
   font-size: 16px;
   justify-content: space-between;
-  width: calc(100% - 20px);
+  width: calc(100%);
   padding: 0 10px;
   height: 40px;
   background: ${props => props.theme.palette.grey[700]};

@@ -10,7 +10,8 @@ import RootDev from "./Root-Dev";
 import RootWeb from "./Root-Web";
 import RootElectron from "./Root-Electron";
 import ModalsManager from "./common/components/ModalsManager";
-import "./common/styles.css";
+
+import "typeface-roboto";
 
 const Root =
   // eslint-disable-next-line no-nested-ternary

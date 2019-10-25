@@ -71,7 +71,7 @@ export const getForgeManifest = () => {
 };
 
 export const getFabricManifest = () => {
-  const url = `${FABRIC_APIS}/v2/versions/loader`;
+  const url = `${FABRIC_APIS}/v2/versions`;
   return axios.get(url);
 };
 

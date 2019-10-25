@@ -1,32 +1,114 @@
 /* eslint-disable */
 import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { MenuItem, Checkbox, TextField } from "antd";
+import { MenuItem, Checkbox, TextField, Cascader } from "antd";
 import Modal from "../components/Modal";
 
 const AddInstance = () => {
-  const [includeSnapshots, setIncludeSnapshots] = useState(false);
-  const [includeBetas, setIncludeBetas] = useState(false);
-  const [includeAlphas, setIncludeAlphas] = useState(false);
-  const [selectedVersion, setSelectedVersion] = useState("");
-  const [selectOpen, setSelectOpen] = useState(false);
-
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
+  const fabricManifest = useSelector(state => state.app.fabricManifest);
+  const forgeManifest = useSelector(state => state.app.forgeManifest);
 
   const filteredVersions = useMemo(() => {
-    let { versions } = vanillaManifest;
-    if (includeBetas) {
-      versions = versions.concat(
-        vanillaManifest.versions.filter(v => v.type === "old_beta")
-      );
-    }
-    if (includeAlphas) {
-      versions = versions.concat(
-        vanillaManifest.versions.filter(v => v.type === "old_alpha")
-      );
-    }
+    const snapshots = vanillaManifest.versions
+      .filter(v => v.type === "snapshot")
+      .map(v => v.id);
+    const versions = [
+      {
+        value: "vanilla",
+        label: "Vanilla",
+        children: [
+          {
+            value: "release",
+            label: "Releases",
+            children: vanillaManifest.versions
+              .filter(v => v.type === "release")
+              .map(v => ({
+                value: v.id,
+                label: v.id
+              }))
+          },
+          {
+            value: "snapshot",
+            label: "Snapshots",
+            children: vanillaManifest.versions
+              .filter(v => v.type === "snapshot")
+              .map(v => ({
+                value: v.id,
+                label: v.id
+              }))
+          },
+          {
+            value: "old_beta",
+            label: "Old Beta",
+            children: vanillaManifest.versions
+              .filter(v => v.type === "old_beta")
+              .map(v => ({
+                value: v.id,
+                label: v.id
+              }))
+          },
+          {
+            value: "old_alpha",
+            label: "Old Alpha",
+            children: vanillaManifest.versions
+              .filter(v => v.type === "old_alpha")
+              .map(v => ({
+                value: v.id,
+                label: v.id
+              }))
+          }
+        ]
+      },
+      {
+        value: "forge",
+        label: "Forge",
+        children: Object.entries(forgeManifest).map(([k, v]) => ({
+          value: k,
+          label: k,
+          children: v.map(child => ({
+            value: child,
+            label: child
+          }))
+        }))
+      },
+      {
+        value: "fabric",
+        label: "Fabric",
+        children: [
+          {
+            value: "release",
+            label: "Releases",
+            children: fabricManifest.mappings
+              .filter(v => !snapshots.includes(v.gameVersion))
+              .map(v => ({
+                value: v.version,
+                label: v.version,
+                children: fabricManifest.loader.map(c => ({
+                  value: c.version,
+                  label: c.version
+                }))
+              }))
+          },
+          {
+            value: "snapshot",
+            label: "Snapshots",
+            children: fabricManifest.mappings
+              .filter(v => snapshots.includes(v.gameVersion))
+              .map(v => ({
+                value: v.version,
+                label: v.version,
+                children: fabricManifest.loader.map(c => ({
+                  value: c.version,
+                  label: c.version
+                }))
+              }))
+          }
+        ]
+      }
+    ];
     return versions;
-  }, [vanillaManifest, includeSnapshots]);
+  }, [vanillaManifest, fabricManifest, forgeManifest]);
 
   return (
     <Modal
@@ -41,36 +123,10 @@ const AddInstance = () => {
         css={`
           width: 100%;
           display: flex;
-          align-items: center;
           justify-content: center;
         `}
       >
-        <div
-          css={`
-            height: 100px;
-            width: 100px;
-          `}
-        >
-          Vanilla version
-          <Checkbox
-            css={`
-              position: relative;
-              top: 20px;
-              margin-left: 25px;
-            `}
-            color="primary"
-            onClick={() => setIncludeSnapshots(!includeSnapshots)}
-          />
-          <div
-            css={`
-              position: relative;
-              top: 25px;
-              margin-left: 15px;
-            `}
-          >
-            Snapshots
-          </div>
-        </div>
+        <Cascader options={filteredVersions} placeholder="Select a version" />
       </div>
     </Modal>
   );
