@@ -7,7 +7,8 @@ import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import { useSelector, useDispatch } from "react-redux";
 import {
   _getInstance,
-  _getInstancesPath
+  _getInstancesPath,
+  _getDownloadQueue
 } from "../../../../common/utils/selectors";
 import { launchInstance } from "../../../../common/reducers/actions";
 import { openModal } from "../../../../common/reducers/modals/actions";
@@ -40,14 +41,14 @@ const Container = styled.div`
     transition: opacity 150ms ease-in-out;
     width: 100%;
     height: 100%;
-    opacity: 0;
+    opacity: ${p => (p.installing ? "1" : "0")};
     backdrop-filter: blur(4px);
     will-change: opacity;
     background: ${p => transparentize(0.5, p.theme.palette.grey[800])};
-    content: "PLAY";
+    content: "${p => (p.installing || {}).percentage || "PLAY"}";
   }
   &:hover {
-    transform: scale3d(1.1, 1.1, 1.1);
+    ${p => (p.installing ? "" : "transform: scale3d(1.1, 1.1, 1.1);")}
     &:after {
       opacity: 1;
     }
@@ -64,6 +65,8 @@ const MCVersion = styled.div`
 const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const downloadQueue = useSelector(_getDownloadQueue);
+  const isInQueue = downloadQueue[instanceName];
   const instancesPath = useSelector(_getInstancesPath);
   const startInstance = () => {
     dispatch(launchInstance(instanceName));
@@ -77,7 +80,7 @@ const Instance = ({ instanceName }) => {
   return (
     <>
       <ContextMenuTrigger id={instance.name}>
-        <Container onClick={startInstance}>
+        <Container installing={isInQueue} onClick={startInstance}>
           <MCVersion>{instance.mcVersion}</MCVersion>
           {instance.name}
         </Container>

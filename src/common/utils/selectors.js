@@ -31,6 +31,13 @@ export const _getCurrentAccount = createSelector(
     accounts.find(account => account.selectedProfile.id === currentAccountId)
 );
 
+export const _getDownloadQueue = createSelector(
+  _downloadQueue,
+  downloadQueue => {
+    return downloadQueue;
+  }
+);
+
 export const _getCurrentDownloadItem = createSelector(
   _currentDownload,
   _downloadQueue,

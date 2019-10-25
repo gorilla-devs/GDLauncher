@@ -11,7 +11,7 @@ const HeaderComponent = styled.div`
   align-items: center;
   font-size: 16px;
   justify-content: space-between;
-  width: calc(100%);
+  width: 100%;
   padding: 0 10px;
   height: 40px;
   background: ${props => props.theme.palette.grey[700]};
@@ -64,7 +64,7 @@ const Modal = ({
         header={header}
         css={`
           height: ${header === undefined || header === true
-            ? "calc(100% - 40px - 40px)"
+            ? "calc(100% - 40px)"
             : "100%"};
           padding: ${props =>
             props.header === undefined || props.header === true ? 20 : 0}px;

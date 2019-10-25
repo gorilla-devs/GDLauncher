@@ -1,10 +1,9 @@
 /* eslint-disable */
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { MenuItem, Checkbox, TextField, Cascader } from "antd";
-import Modal from "../components/Modal";
+import { Cascader } from "antd";
 
-const AddInstance = () => {
+const NewInstance = ({ setVersion }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
@@ -111,25 +110,14 @@ const AddInstance = () => {
   }, [vanillaManifest, fabricManifest, forgeManifest]);
 
   return (
-    <Modal
-      css={`
-        height: 70%;
-        width: 70%;
-        max-width: 1500px;
-      `}
-      title="Add New Instance"
-    >
-      <div
-        css={`
-          width: 100%;
-          display: flex;
-          justify-content: center;
-        `}
-      >
-        <Cascader options={filteredVersions} placeholder="Select a version" />
-      </div>
-    </Modal>
+    <div>
+      <Cascader
+        options={filteredVersions}
+        onChange={setVersion}
+        placeholder="Select a version"
+      />
+    </div>
   );
 };
 
-export default React.memo(AddInstance);
+export default React.memo(NewInstance);
