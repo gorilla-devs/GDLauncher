@@ -708,9 +708,13 @@ export const launchInstance = instanceName => {
       account
     );
 
+    ipcRenderer.send("hide-window");
+
     await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`, {
       cwd: instancePath,
       shell: true
     });
+
+    ipcRenderer.send("show-window");
   };
 };

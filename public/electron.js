@@ -1,6 +1,6 @@
 const electron = require("electron");
 
-const { app, BrowserWindow, ipcMain } = electron;
+const { app, BrowserWindow, ipcMain, Tray, Menu } = electron;
 const path = require("path");
 
 // const discordRPC = require("./discordRPC");
@@ -11,6 +11,7 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 const isDev = process.env.NODE_ENV === "development";
 
 let mainWindow;
+let tray;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -18,6 +19,7 @@ function createWindow() {
     height: 800,
     minWidth: 1100,
     minHeight: 800,
+    backgroundColor: "#fff",
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
@@ -25,6 +27,24 @@ function createWindow() {
     }
   });
   mainWindow.removeMenu();
+
+  tray = new Tray(path.join(__dirname, "../src/common/assets/logo.png"));
+  const trayMenuTemplate = [
+    {
+      label: "GDLauncher",
+      enabled: false
+    },
+    {
+      label: "Show Dev Tools",
+      click: () => mainWindow.webContents.openDevTools()
+    }
+  ];
+
+  const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+  tray.setContextMenu(trayMenu);
+  tray.setToolTip("GDLauncher");
+  tray.on("double-click", () => mainWindow.show());
+
   mainWindow.loadURL(
     isDev
       ? "http://localhost:3000"
@@ -33,9 +53,10 @@ function createWindow() {
       userAgent: "GDLauncher"
     }
   );
-  // if (isDev) {
-  mainWindow.webContents.openDevTools();
-  // }
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  }
+
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
@@ -57,6 +78,19 @@ app.on("activate", () => {
 
 ipcMain.on("update-progress-bar", (event, p) => {
   mainWindow.setProgressBar(p);
+});
+
+ipcMain.on("hide-window", () => {
+  if (mainWindow) {
+    mainWindow.hide();
+  }
+});
+
+ipcMain.on("show-window", () => {
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.focus();
+  }
 });
 
 // ipcMain.on("init-discord-rpc", () => {

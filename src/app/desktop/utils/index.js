@@ -360,6 +360,9 @@ export const getJVMArguments113 = async (
 
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
 
+  args.push(`--title "${path.basename(instancePath)}"`);
+  args.push(`--icon ${path.join(instancePath, "icon.png")}`);
+
   for (let i = 0; i < args.length; i += 1) {
     if (typeof args[i] === "object" && args[i].rules) {
       if (typeof args[i].value === "string") {
