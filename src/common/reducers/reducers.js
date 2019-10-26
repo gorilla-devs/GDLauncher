@@ -37,7 +37,10 @@ function downloadQueue(state = {}, action) {
           percentage: 0,
           mcVersion: action.mcVersion,
           modloader: action.modloader,
-          addonID: action.addonID
+          addonID: action.addonID,
+          status: null,
+          currentPhase: 1,
+          totalPhases: action.phases
         }
       };
     case ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE:
@@ -48,6 +51,14 @@ function downloadQueue(state = {}, action) {
         [action.instanceName]: {
           ...state[action.instanceName],
           percentage: action.percentage
+        }
+      };
+    case ActionTypes.UPDATE_DOWNLOAD_STATUS:
+      return {
+        ...state,
+        [action.instanceName]: {
+          ...state[action.instanceName],
+          status: action.status
         }
       };
     default:

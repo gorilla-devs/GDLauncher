@@ -15,43 +15,54 @@ import { openModal } from "../../../../common/reducers/modals/actions";
 import instanceDefaultBackground from "../../../../common/assets/instance_default.png";
 
 const Container = styled.div`
-  display: flex;
   position: relative;
+  width: 180px;
+  height: 100px;
+  transform: scale3d(1, 1, 1);
+  margin-right: 20px;
+  margin-top: 20px;
+  transition: transform 150ms ease-in-out;
+  &:hover {
+    ${p => (p.installing ? "" : "transform: scale3d(1.1, 1.1, 1.1);")}
+  }
+`;
+
+const InstanceContainer = styled.div`
+  display: flex;
+  position: absolute;
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 180px;
-  height: 100px;
+  width: 100%;
+  font-size: 16px;
+  height: 100%;
   background: linear-gradient(0deg,rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url("${instanceDefaultBackground}");
   background-position: center;
   background-size: cover;
   border-radius: 4px;
   margin: 10px;
+  `;
+
+const HoverContainer = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
-  transform: scale3d(1, 1, 1);
-  transition: transform 150ms ease-in-out;
-  &:after {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 18px;
-    font-weight: 800;
-    border-radius: 4px;
-    transition: opacity 150ms ease-in-out;
-    width: 100%;
-    height: 100%;
-    opacity: ${p => (p.installing ? "1" : "0")};
-    backdrop-filter: blur(4px);
-    will-change: opacity;
-    background: ${p => transparentize(0.5, p.theme.palette.grey[800])};
-    content: "${p => (p.installing || {}).percentage || "PLAY"}";
-  }
+  font-size: 18px;
+  margin: 10px;
+  font-weight: 800;
+  border-radius: 4px;
+  transition: opacity 150ms ease-in-out;
+  width: 100%;
+  height: 100%;
+  opacity: ${p => (p.installing ? "1" : "0")};
+  backdrop-filter: blur(4px);
+  will-change: opacity;
+  background: ${p => transparentize(0.5, p.theme.palette.grey[800])};
   &:hover {
-    ${p => (p.installing ? "" : "transform: scale3d(1.1, 1.1, 1.1);")}
-    &:after {
-      opacity: 1;
-    }
+    opacity: 1;
   }
 `;
 
@@ -66,9 +77,11 @@ const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const downloadQueue = useSelector(_getDownloadQueue);
+  const currentDownload = useSelector(state => state.currentDownload);
   const isInQueue = downloadQueue[instanceName];
   const instancesPath = useSelector(_getInstancesPath);
   const startInstance = () => {
+    if (isInQueue) return;
     dispatch(launchInstance(instanceName));
   };
   const openFolder = () => {
@@ -81,8 +94,26 @@ const Instance = ({ instanceName }) => {
     <>
       <ContextMenuTrigger id={instance.name}>
         <Container installing={isInQueue} onClick={startInstance}>
-          <MCVersion>{instance.mcVersion}</MCVersion>
-          {instance.name}
+          <InstanceContainer installing={isInQueue}>
+            <MCVersion>{instance.mcVersion}</MCVersion>
+            {instance.name}
+          </InstanceContainer>
+          <HoverContainer installing={isInQueue}>
+            {currentDownload === instanceName ? (
+              <>
+                <div
+                  css={`
+                    font-size: 14px;
+                  `}
+                >
+                  {isInQueue ? isInQueue.status : null}
+                </div>
+                {`${isInQueue.percentage}%`}
+              </>
+            ) : (
+              (isInQueue && "In Queue") || "PLAY"
+            )}
+          </HoverContainer>
         </Container>
       </ContextMenuTrigger>
       <ContextMenu id={instance.name}>

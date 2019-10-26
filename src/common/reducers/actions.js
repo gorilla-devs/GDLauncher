@@ -20,7 +20,8 @@ import {
   getMcManifest,
   getForgeManifest,
   mcValidate,
-  getLauncherManifest
+  getLauncherManifest,
+  getFabricJson
 } from "../api";
 import {
   _getCurrentAccount,
@@ -441,14 +442,42 @@ export function removeDownloadFromQueue(instanceName) {
   };
 }
 
-export function addToQueue(instanceName, mcVersion) {
+export function updateDownloadStatus(instanceName, status) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_DOWNLOAD_STATUS,
+      status,
+      instanceName
+    });
+  };
+}
+
+export function updateDownloadCurrentPhase(instanceName, status) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_DOWNLOAD_STATUS,
+      status,
+      instanceName
+    });
+  };
+}
+
+export function addToQueue(instanceName, mcVersion, modloader) {
   return (dispatch, getState) => {
     const { currentDownload } = getState();
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,
-      mcVersion
+      mcVersion,
+      modloader
     });
+    fse.outputJson(
+      path.join(_getInstancesPath(getState()), instanceName, "config.json"),
+      {
+        mcVersion,
+        timePlayed: 0
+      }
+    );
     if (!currentDownload) {
       dispatch(updateCurrentDownload(instanceName));
       dispatch(downloadInstance(instanceName));
@@ -467,6 +496,42 @@ export function addNextInstanceToCurrentDownload() {
   };
 }
 
+export function downloadFabric(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { modloader } = _getCurrentDownloadItem(state);
+
+    dispatch(updateDownloadStatus(instanceName, "Downloading fabric files"));
+
+    let fabricJson;
+    const fabricJsonPath = path.join(
+      _getLibrariesPath(state),
+      "net",
+      "fabricmc",
+      modloader[1],
+      modloader[2],
+      "fabric.json"
+    );
+    try {
+      fabricJson = await fse.readJson(fabricJsonPath);
+    } catch (err) {
+      fabricJson = (await getFabricJson(modloader)).data;
+      await fse.outputJson(fabricJsonPath, fabricJson);
+    }
+
+    const libraries = librariesMapper(
+      fabricJson.libraries,
+      _getLibrariesPath(state)
+    );
+
+    const updatePercentage = downloaded => {
+      dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
+    };
+
+    await downloadInstanceFiles(libraries, updatePercentage);
+  };
+}
+
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -476,7 +541,9 @@ export function downloadInstance(instanceName) {
       }
     } = state;
 
-    const { mcVersion } = _getCurrentDownloadItem(state);
+    dispatch(updateDownloadStatus(instanceName, "Downloading game files"));
+
+    const { mcVersion, modloader } = _getCurrentDownloadItem(state);
 
     let mcJson;
 
@@ -553,6 +620,7 @@ export function downloadInstance(instanceName) {
       path.join(_getInstancesPath(state), instanceName, "config.json"),
       {
         mcVersion,
+        ...(modloader && { modloader }),
         timePlayed
       }
     );
@@ -574,6 +642,10 @@ export function downloadInstance(instanceName) {
       await copyAssetsToResources(assets);
     }
 
+    if (modloader[0] === "fabric") {
+      await dispatch(downloadFabric(instanceName));
+    }
+
     dispatch(removeDownloadFromQueue(instanceName));
     dispatch(addNextInstanceToCurrentDownload());
   };
@@ -587,18 +659,41 @@ export const launchInstance = instanceName => {
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
     const instancePath = path.join(_getInstancesPath(state), instanceName);
-    const { mcVersion } = await readConfig(instancePath);
+    const { mcVersion, modloader } = await readConfig(instancePath);
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${mcVersion}.json`)
     );
-    const libraries = librariesMapper(mcJson.libraries, librariesPath);
-    await extractNatives(libraries, instancePath);
-
+    let libraries = [];
     const mcMainFile = {
       url: mcJson.downloads.client.url,
       sha1: mcJson.downloads.client.sha1,
       path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
     };
+
+    if (modloader && modloader[0] === "fabric") {
+      const fabricJsonPath = path.join(
+        _getLibrariesPath(state),
+        "net",
+        "fabricmc",
+        modloader[1],
+        modloader[2],
+        "fabric.json"
+      );
+      const fabricJson = await fse.readJson(fabricJsonPath);
+      const fabricLibraries = librariesMapper(
+        fabricJson.libraries,
+        librariesPath
+      );
+      libraries = libraries.concat(fabricLibraries);
+      // Replace classname
+      mcJson.mainClass = fabricJson.mainClass;
+    }
+
+    libraries = libraries.concat(
+      librariesMapper(mcJson.libraries, librariesPath)
+    );
+
+    await extractNatives(libraries, instancePath);
 
     const getJvmArguments = semver.gte(coerce(mcJson.assets), coerce("1.13"))
       ? getJVMArguments113
@@ -613,8 +708,9 @@ export const launchInstance = instanceName => {
       account
     );
 
-    await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`);
+    await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`, {
+      cwd: instancePath,
+      shell: true
+    });
   };
 };
-
-window.launch = launchInstance;

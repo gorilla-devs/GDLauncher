@@ -353,6 +353,7 @@ export const getJVMArguments113 = async (
 
   args.push("-Xmx3096m");
   args.push("-Xms128m");
+  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   args.push(...jvmOptions);
 
   args.push(mcJson.mainClass);

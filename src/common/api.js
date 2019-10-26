@@ -80,6 +80,14 @@ export const getLauncherManifest = () => {
   return axios.get(url);
 };
 
+export const getFabricJson = ([, yarn, loader]) => {
+  return axios.get(
+    `https://fabricmc.net/download/technic/?yarn=${encodeURIComponent(
+      yarn
+    )}&loader=${encodeURIComponent(loader)}`
+  );
+};
+
 // FORGE ADDONS
 
 export const getAddon = addonID => {

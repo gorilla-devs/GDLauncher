@@ -18,6 +18,8 @@ const AddInstance = () => {
   const [version, setVersion] = useState(null);
   const [instanceName, setInstanceName] = useState("");
   const dispatch = useDispatch();
+  const fabricManifest = useSelector(state => state.app.fabricManifest);
+
   let pages = [
     <NewInstance setVersion={setVersion} />,
     <TwitchModpacks setVersion={setVersion} />,
@@ -25,10 +27,25 @@ const AddInstance = () => {
   ];
 
   const createInstance = () => {
-    if (!version) return;
+    if (!version || !instanceName) return;
     const isVanilla = version[0] === "vanilla";
+    const isFabric = version[0] === "fabric";
+    const isForge = version[0] === "forge";
     if (isVanilla) {
       dispatch(addToQueue(instanceName, version[2]));
+    } else if (isFabric) {
+      const mappedItem = fabricManifest.mappings.find(
+        v => v.version === version[2]
+      );
+      const splitItem = version[2].split(mappedItem.separator);
+      dispatch(
+        addToQueue(instanceName, splitItem[0], [
+          "fabric",
+          version[2],
+          version[3]
+        ])
+      );
+    } else if (isForge) {
     }
     dispatch(closeModal());
   };
