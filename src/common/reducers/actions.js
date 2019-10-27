@@ -711,7 +711,7 @@ export const launchInstance = instanceName => {
       path.join(_getMinecraftVersionsPath(state), `${mcVersion}.json`)
     );
     let libraries = [];
-    let mcMainFile = {
+    const mcMainFile = {
       url: mcJson.downloads.client.url,
       sha1: mcJson.downloads.client.sha1,
       path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
