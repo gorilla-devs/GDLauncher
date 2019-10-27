@@ -3,10 +3,11 @@ import fse from "fs-extra";
 import crypto from "crypto";
 import { extractFull } from "node-7z";
 import makeDir from "make-dir";
+import jarAnalyzer from "jarfile";
 import { promisify } from "util";
 import { remote } from "electron";
 import path from "path";
-import { exec } from "child_process";
+import { exec, spawn } from "child_process";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
 import { removeDuplicates } from "../../../common/utils";
 
@@ -117,15 +118,16 @@ export const librariesMapper = (libraries, librariesPath) => {
             natives: true
           });
         }
-
-        tempArr.push({
-          url: `${lib.url || `${MC_LIBRARIES_URL}/`}${mavenToArray(
-            lib.name,
-            native && `-${native}`
-          ).join("/")}`,
-          path: path.join(librariesPath, ...mavenToArray(lib.name, native)),
-          ...(native && { natives: true })
-        });
+        if (tempArr.length === 0) {
+          tempArr.push({
+            url: `${lib.url || `${MC_LIBRARIES_URL}/`}${mavenToArray(
+              lib.name,
+              native && `-${native}`
+            ).join("/")}`,
+            path: path.join(librariesPath, ...mavenToArray(lib.name, native)),
+            ...(native && { natives: true })
+          });
+        }
         return acc.concat(tempArr);
       }, []),
     "url"
@@ -252,6 +254,19 @@ export const copyAssetsToResources = async assets => {
   );
 };
 
+export const copyAssetsToLegacy = async assets => {
+  await Promise.all(
+    assets.map(async asset => {
+      try {
+        await fs.access(asset.legacyPath);
+      } catch {
+        await makeDir(path.dirname(asset.legacyPath));
+        await fs.copyFile(asset.path, asset.legacyPath);
+      }
+    })
+  );
+};
+
 export const getJVMArguments112 = async (
   libraries,
   mcjar,
@@ -304,7 +319,7 @@ export const getJVMArguments112 = async (
           val = `"${assetsPath}"`;
           break;
         case "game_assets":
-          val = `"${path.join(assetsPath, "virtual", "pre-1.6")}"`;
+          val = `"${path.join(assetsPath, "virtual", "legacy")}"`;
           break;
         case "assets_index_name":
           val = mcJson.assets;
@@ -366,9 +381,6 @@ export const getJVMArguments113 = async (
   args.push(mcJson.mainClass);
 
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
-
-  args.push(`--title "${path.basename(instancePath)}"`);
-  args.push(`--icon ${path.join(instancePath, "icon.png")}`);
 
   for (let i = 0; i < args.length; i += 1) {
     if (typeof args[i] === "object" && args[i].rules) {
@@ -449,4 +461,89 @@ export const getJVMArguments113 = async (
   });
 
   return args;
+};
+
+export const patchForge113 = async (
+  installProfileJson,
+  mainJar,
+  librariesPath,
+  javaPath
+) => {
+  console.log(mainJar);
+  const { processors } = installProfileJson;
+  const replaceIfPossible = arg => {
+    const finalArg = arg.replace("{", "").replace("}", "");
+    if (installProfileJson.data[finalArg]) {
+      // Handle special case
+      if (finalArg === "BINPATCH") {
+        return `"${path
+          .join(librariesPath, ...mavenToArray(installProfileJson.path))
+          .replace(".jar", "-clientdata.lzma")}"`;
+      }
+      // Return replaced string
+      return installProfileJson.data[finalArg].client;
+    }
+    // Return original string (checking for MINECRAFT_JAR)
+    return arg.replace("{MINECRAFT_JAR}", `"${mainJar}"`);
+  };
+  const computePathIfPossible = arg => {
+    if (arg[0] === "[") {
+      return `"${path.join(
+        librariesPath,
+        ...mavenToArray(arg.replace("[", "").replace("]", ""))
+      )}"`;
+    }
+    return arg;
+  };
+
+  /* eslint-disable no-await-in-loop, no-restricted-syntax */
+  for (const key in processors) {
+    if (Object.prototype.hasOwnProperty.call(processors, key)) {
+      const p = processors[key];
+      const filePath = path.join(librariesPath, ...mavenToArray(p.jar));
+      const args = p.args
+        .map(arg => replaceIfPossible(arg))
+        .map(arg => computePathIfPossible(arg));
+
+      const classPaths = p.classpath.map(cp =>
+        path.join(librariesPath, ...mavenToArray(cp))
+      );
+
+      const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
+      const mainClass = jarFile.valueForManifestEntry("Main-Class");
+
+      await new Promise(resolve => {
+        console.log(p);
+        const ps = spawn(
+          javaPath,
+          [
+            "-classpath",
+            [filePath, ...classPaths].join(
+              process.platform === "win32" ? ";" : ":"
+            ),
+            mainClass,
+            ...args
+          ],
+          { shell: true }
+        );
+
+        ps.stdout.on("data", data => {
+          console.log(data.toString());
+        });
+
+        ps.stderr.on("data", data => {
+          console.error(`ps stderr: ${data}`);
+        });
+
+        ps.on("close", code => {
+          if (code !== 0) {
+            console.log(`process exited with code ${code}`);
+            resolve();
+          }
+          resolve();
+        });
+      });
+    }
+  }
+  /* eslint-enable no-await-in-loop, no-restricted-syntax */
 };

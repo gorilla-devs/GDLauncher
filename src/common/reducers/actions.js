@@ -7,8 +7,7 @@ import semver, { coerce } from "semver";
 import omitBy from "lodash.omitby";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
-import { promisify } from "util";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
 import { NEWS_URL, MC_RESOURCES_URL } from "../utils/constants";
@@ -42,7 +41,10 @@ import {
   extractNatives,
   getJVMArguments112,
   copyAssetsToResources,
-  getJVMArguments113
+  getJVMArguments113,
+  patchForge113,
+  mavenToArray,
+  copyAssetsToLegacy
 } from "../../app/desktop/utils";
 import { openModal, closeModal } from "./modals/actions";
 import {
@@ -554,15 +556,42 @@ export function downloadForge(instanceName) {
     );
     try {
       forgeJson = await fse.readJson(forgeJsonPath);
+      await fse.readFile(
+        path.join(
+          _getLibrariesPath(state),
+          ...mavenToArray(forgeJson.mavenVersionString)
+        )
+      );
     } catch (err) {
-      forgeJson = JSON.parse((await getForgeJson(modloader)).data.versionJson);
+      forgeJson = (await getForgeJson(modloader)).data;
+      forgeJson.versionJson = JSON.parse(forgeJson.versionJson);
+      if (forgeJson.installProfileJson) {
+        forgeJson.installProfileJson = JSON.parse(forgeJson.installProfileJson);
+      }
       await fse.outputJson(forgeJsonPath, forgeJson);
     }
 
     const libraries = librariesMapper(
-      forgeJson.libraries,
+      forgeJson.versionJson.libraries,
       _getLibrariesPath(state)
     );
+
+    if (forgeJson.installProfileJson) {
+      const installLibraries = librariesMapper(
+        forgeJson.installProfileJson.libraries,
+        _getLibrariesPath(state)
+      );
+      await downloadInstanceFiles(installLibraries, () => {});
+      await patchForge113(
+        forgeJson.installProfileJson,
+        path.join(
+          _getMinecraftVersionsPath(state),
+          `${forgeJson.versionJson.inheritsFrom}.jar`
+        ),
+        _getLibrariesPath(state),
+        _getJavaPath(state)
+      );
+    }
 
     const updatePercentage = downloaded => {
       dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
@@ -636,6 +665,12 @@ export function downloadInstance(instanceName) {
           instanceName,
           "resources",
           assetKey
+        ),
+        legacyPath: path.join(
+          _getAssetsPath(state),
+          "virtual",
+          "legacy",
+          assetKey
         )
       })
     );
@@ -685,6 +720,9 @@ export function downloadInstance(instanceName) {
 
     if (assetsJson.map_to_resources) {
       await copyAssetsToResources(assets);
+    }
+    if (mcJson.assets === "legacy") {
+      await copyAssetsToLegacy(assets);
     }
 
     if (modloader && modloader[0] === "fabric") {
@@ -744,14 +782,18 @@ export const launchInstance = instanceName => {
       );
       const forgeJson = await fse.readJson(forgeJsonPath);
       const forgeLibraries = librariesMapper(
-        forgeJson.libraries,
+        forgeJson.versionJson.libraries,
         librariesPath
       );
       libraries = libraries.concat(forgeLibraries);
       // Replace classname
-      mcJson.mainClass = forgeJson.mainClass;
-      if (forgeJson.minecraftArguments) {
-        mcJson.minecraftArguments = forgeJson.minecraftArguments;
+      mcJson.mainClass = forgeJson.versionJson.mainClass;
+      if (forgeJson.versionJson.minecraftArguments) {
+        mcJson.minecraftArguments = forgeJson.versionJson.minecraftArguments;
+      } else if (forgeJson.versionJson.arguments.game) {
+        mcJson.arguments.game = mcJson.arguments.game.concat(
+          forgeJson.versionJson.arguments.game
+        );
       }
     }
     libraries = removeDuplicates(
@@ -778,15 +820,24 @@ export const launchInstance = instanceName => {
 
     ipcRenderer.send("hide-window");
 
-    try {
-      await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`, {
-        cwd: instancePath,
-        shell: true
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
+    const process = spawn(javaPath, jvmArguments, {
+      cwd: instancePath,
+      shell: true
+    });
+
+    process.stdout.on("data", data => {
+      console.log(data.toString());
+    });
+
+    process.stderr.on("data", data => {
+      console.error(`ps stderr: ${data}`);
+    });
+
+    process.on("close", code => {
       ipcRenderer.send("show-window");
-    }
+      if (code !== 0) {
+        console.log(`process exited with code ${code}`);
+      }
+    });
   };
 };
