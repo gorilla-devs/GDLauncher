@@ -11,3 +11,4 @@ export const UPDATE_JAVA_PATH = "settings/UPDATE_JAVA_PATH";
 export const UPDATE_JAVA_MEMORY = "settings/UPDATE_JAVA_MEMORY";
 export const UPDATE_JAVA_ARGUMENTS = "settings/UPDATE_JAVA_ARGUMENTS";
 export const UPDATE_DISCORD_RPC = "settings/UPDATE_DISCORD_RPC";
+export const HIDE_WINDOW_ON_GAME_LAUNCH = "settings/HIDE_WINDOW_ON_GAME_LAUNCH";

@@ -65,6 +65,15 @@ function discordRPC(state = true, action) {
   }
 }
 
+function hideWindowOnGameLaunch(state = true, action) {
+  switch (action.type) {
+    case ActionTypes.HIDE_WINDOW_ON_GAME_LAUNCH:
+      return action.hideWindow;
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path: null,
@@ -92,5 +101,6 @@ export default combineReducers({
   releaseChannel,
   concurrentDownloads,
   discordRPC,
+  hideWindowOnGameLaunch,
   java
 });

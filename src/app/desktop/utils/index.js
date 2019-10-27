@@ -96,7 +96,11 @@ export const librariesMapper = (libraries, librariesPath) => {
           });
         }
         const native =
-          lib.natives && lib.natives[convertOSToMCFormat(process.platform)];
+          lib.natives &&
+          lib.natives[convertOSToMCFormat(process.platform)].replace(
+            "${arch}", // eslint-disable-line no-template-curly-in-string
+            "64"
+          );
         // Vanilla native libs
         if (
           lib.downloads &&
@@ -261,7 +265,7 @@ export const getJVMArguments112 = async (
   args.push("-cp");
 
   args.push(
-    [mcjar, ...libraries]
+    [...libraries, mcjar]
       .filter(l => !l.natives)
       .map(l => `"${l.path}"`)
       .join(process.platform === "win32" ? ";" : ":")
@@ -319,6 +323,9 @@ export const getJVMArguments112 = async (
           break;
         case "version_type":
           val = mcJson.type;
+          break;
+        case "user_properties":
+          val = "{}";
           break;
         default:
           break;
@@ -422,7 +429,7 @@ export const getJVMArguments113 = async (
             val = args[i].replace(argDiscovery, "1.0");
             break;
           case "classpath":
-            val = [mcjar, ...libraries]
+            val = [...libraries, mcjar]
               .filter(l => !l.natives)
               .map(l => `"${l.path}"`)
               .join(process.platform === "win32" ? ";" : ":");

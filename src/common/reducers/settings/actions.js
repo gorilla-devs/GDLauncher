@@ -27,6 +27,15 @@ export function updateDataPath(path) {
   };
 }
 
+export function updateHideWindowOnGameLaunch(hideWindow) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.HIDE_WINDOW_ON_GAME_LAUNCH,
+      hideWindow
+    });
+  };
+}
+
 export function updateInstancesPath(path) {
   return dispatch => {
     dispatch({

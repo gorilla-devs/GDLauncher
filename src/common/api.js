@@ -88,6 +88,12 @@ export const getFabricJson = ([, yarn, loader]) => {
   );
 };
 
+export const getForgeJson = ([, , forgeVersion]) => {
+  return axios.get(
+    `https://addons-ecs.forgesvc.net/api/v2/minecraft/modloader/forge-${forgeVersion}`
+  );
+};
+
 // FORGE ADDONS
 
 export const getAddon = addonID => {

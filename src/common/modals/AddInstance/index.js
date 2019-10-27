@@ -46,6 +46,7 @@ const AddInstance = () => {
         ])
       );
     } else if (isForge) {
+      dispatch(addToQueue(instanceName, version[1], version));
     }
     dispatch(closeModal());
   };

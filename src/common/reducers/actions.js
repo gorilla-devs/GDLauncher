@@ -21,7 +21,8 @@ import {
   getForgeManifest,
   mcValidate,
   getLauncherManifest,
-  getFabricJson
+  getFabricJson,
+  getForgeJson
 } from "../api";
 import {
   _getCurrentAccount,
@@ -74,7 +75,11 @@ export function initManifests() {
     // and add to it all correct versions
     mc.versions.forEach(v => {
       forgeVersions[v.id] = forge
-        .filter(ver => ver.gameVersion === v.id)
+        .filter(
+          ver =>
+            ver.gameVersion === v.id &&
+            semver.gte(coerce(ver.gameVersion), coerce("1.6.4"))
+        )
         .map(ver => ver.name.replace("forge-", ""));
     });
 
@@ -532,6 +537,41 @@ export function downloadFabric(instanceName) {
   };
 }
 
+export function downloadForge(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { modloader } = _getCurrentDownloadItem(state);
+
+    dispatch(updateDownloadStatus(instanceName, "Downloading forge files"));
+
+    let forgeJson;
+    const forgeJsonPath = path.join(
+      _getLibrariesPath(state),
+      "net",
+      "minecraftforge",
+      modloader[2],
+      `${modloader[2]}.json`
+    );
+    try {
+      forgeJson = await fse.readJson(forgeJsonPath);
+    } catch (err) {
+      forgeJson = JSON.parse((await getForgeJson(modloader)).data.versionJson);
+      await fse.outputJson(forgeJsonPath, forgeJson);
+    }
+
+    const libraries = librariesMapper(
+      forgeJson.libraries,
+      _getLibrariesPath(state)
+    );
+
+    const updatePercentage = downloaded => {
+      dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
+    };
+
+    await downloadInstanceFiles(libraries, updatePercentage);
+  };
+}
+
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -638,12 +678,19 @@ export function downloadInstance(instanceName) {
       updatePercentage
     );
 
+    await extractNatives(
+      libraries,
+      path.join(_getInstancesPath(state), instanceName)
+    );
+
     if (assetsJson.map_to_resources) {
       await copyAssetsToResources(assets);
     }
 
-    if (modloader[0] === "fabric") {
+    if (modloader && modloader[0] === "fabric") {
       await dispatch(downloadFabric(instanceName));
+    } else if (modloader && modloader[0] === "forge") {
+      await dispatch(downloadForge(instanceName));
     }
 
     dispatch(removeDownloadFromQueue(instanceName));
@@ -664,7 +711,7 @@ export const launchInstance = instanceName => {
       path.join(_getMinecraftVersionsPath(state), `${mcVersion}.json`)
     );
     let libraries = [];
-    const mcMainFile = {
+    let mcMainFile = {
       url: mcJson.downloads.client.url,
       sha1: mcJson.downloads.client.sha1,
       path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
@@ -687,17 +734,36 @@ export const launchInstance = instanceName => {
       libraries = libraries.concat(fabricLibraries);
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
+    } else if (modloader && modloader[0] === "forge") {
+      const forgeJsonPath = path.join(
+        _getLibrariesPath(state),
+        "net",
+        "minecraftforge",
+        modloader[2],
+        `${modloader[2]}.json`
+      );
+      const forgeJson = await fse.readJson(forgeJsonPath);
+      const forgeLibraries = librariesMapper(
+        forgeJson.libraries,
+        librariesPath
+      );
+      libraries = libraries.concat(forgeLibraries);
+      // Replace classname
+      mcJson.mainClass = forgeJson.mainClass;
+      if (forgeJson.minecraftArguments) {
+        mcJson.minecraftArguments = forgeJson.minecraftArguments;
+      }
     }
-
-    libraries = libraries.concat(
-      librariesMapper(mcJson.libraries, librariesPath)
+    libraries = removeDuplicates(
+      libraries.concat(librariesMapper(mcJson.libraries, librariesPath)),
+      "url"
     );
 
-    await extractNatives(libraries, instancePath);
-
-    const getJvmArguments = semver.gte(coerce(mcJson.assets), coerce("1.13"))
-      ? getJVMArguments113
-      : getJVMArguments112;
+    const getJvmArguments =
+      mcJson.assets !== "legacy" &&
+      semver.gte(coerce(mcJson.assets), coerce("1.13"))
+        ? getJVMArguments113
+        : getJVMArguments112;
 
     const jvmArguments = await getJvmArguments(
       libraries,
@@ -708,13 +774,19 @@ export const launchInstance = instanceName => {
       account
     );
 
+    console.log(`"${javaPath}" ${jvmArguments.join(" ")}`);
+
     ipcRenderer.send("hide-window");
 
-    await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`, {
-      cwd: instancePath,
-      shell: true
-    });
-
-    ipcRenderer.send("show-window");
+    try {
+      await promisify(exec)(`"${javaPath}" ${jvmArguments.join(" ")}`, {
+        cwd: instancePath,
+        shell: true
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      ipcRenderer.send("show-window");
+    }
   };
 };
