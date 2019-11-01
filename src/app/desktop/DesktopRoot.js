@@ -1,17 +1,18 @@
 import React from "react";
 import { useDidMount } from "rooks";
 import styled from "styled-components";
-import { push } from "connected-react-router";
 import { Switch } from "react-router";
 import { ipcRenderer } from "electron";
 import { useSelector, useDispatch } from "react-redux";
+import { push } from "connected-react-router";
 import RouteWithSubRoutes from "../../common/components/RouteWithSubRoutes";
 import {
   loginWithAccessToken,
   initManifests,
   initNews,
   loginThroughNativeLauncher,
-  downloadJava
+  downloadJava,
+  switchToFirstValidAccount
 } from "../../common/reducers/actions";
 import { load, received } from "../../common/reducers/loading/actions";
 import features from "../../common/reducers/loading/features";
@@ -49,12 +50,15 @@ function DesktopRoot() {
       .catch(console.error);
     dispatch(initNews());
     if (process.env.NODE_ENV === "development" && currentAccount) {
-      dispatch(received(features.accountAuthentication));
+      dispatch(received(features.mcAuthentication));
       dispatch(push("/home"));
     } else if (currentAccount) {
       dispatch(
         load(features.mcAuthentication, dispatch(loginWithAccessToken()))
-      ).catch(console.error);
+      ).catch(async err => {
+        console.error(err);
+        dispatch(switchToFirstValidAccount());
+      });
     } else {
       dispatch(
         load(features.mcAuthentication, dispatch(loginThroughNativeLauncher()))

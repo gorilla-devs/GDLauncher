@@ -7,6 +7,8 @@ const path = require("path");
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
+app.commandLine.appendSwitch("disable-web-security");
+Menu.setApplicationMenu();
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -22,11 +24,10 @@ function createWindow() {
     backgroundColor: "#fff",
     webPreferences: {
       experimentalFeatures: true,
-      nodeIntegration: true,
-      webSecurity: false
+      nodeIntegration: true
+      // webSecurity: false
     }
   });
-  mainWindow.removeMenu();
 
   tray = new Tray(path.join(__dirname, "../src/common/assets/logo.png"));
   const trayMenuTemplate = [

@@ -10,6 +10,7 @@ import { faCog } from "@fortawesome/free-solid-svg-icons";
 import logo from "../../../common/assets/logo.png";
 
 import { openModal } from "../../../common/reducers/modals/actions";
+import { _getCurrentAccount } from "../../../common/utils/selectors";
 
 export const Container = styled.div`
   width: 100vw;
@@ -88,11 +89,15 @@ export const NavigationElement = styled.li`
 `;
 
 const ProfileSettings = styled.div`
+  display: flex;
+  justify-content: flex-left;
+  align-items: center;
   width: 255px;
   border-radius: 4px;
+  cursor: pointer;
   transition: background 0.2s ease-in-out;
   &&:hover {
-    background: ${props => props.theme.palette.secondary.main};
+    background: ${props => props.theme.palette.grey[500]};
   }
 `;
 
@@ -101,19 +106,12 @@ const ProfileImg = styled.div`
   height: 30px;
   background: ${props => props.theme.palette.grey[100]};
   border-radius: 50%;
-  margin-top: 4px;
-`;
-
-const ProfileName = styled.p`
-  float: right;
-  margin: 0;
-  position: absolute;
-  right: 27px;
-  top: 12px;
+  margin-right: 10px;
 `;
 
 const Navbar = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const account = useSelector(_getCurrentAccount);
   const location = useSelector(state => state.router.location.pathname);
   const dispatch = useDispatch();
 
@@ -162,9 +160,9 @@ const Navbar = () => {
           `}
         />
       </SettingsButton>
-      <ProfileSettings onClick={() => dispatch(openModal("ProfileSettings"))}>
+      <ProfileSettings onClick={() => dispatch(openModal("AccountsManager"))}>
         <ProfileImg />
-        <ProfileName>xXPeppino2310Xx</ProfileName>
+        {account && account.selectedProfile.name}
       </ProfileSettings>
       {updateAvailable && (
         <UpdateButton>

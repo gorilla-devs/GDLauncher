@@ -10,7 +10,11 @@ import { push } from "connected-react-router";
 import { spawn } from "child_process";
 import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
-import { NEWS_URL, MC_RESOURCES_URL } from "../utils/constants";
+import {
+  NEWS_URL,
+  MC_RESOURCES_URL,
+  GDL_LEGACYJAVAFIXER_MOD_URL
+} from "../utils/constants";
 import {
   mcAuthenticate,
   mcRefresh,
@@ -30,7 +34,8 @@ import {
   _getMinecraftVersionsPath,
   _getAssetsPath,
   _getInstancesPath,
-  _getLibrariesPath
+  _getLibrariesPath,
+  _getAccounts
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -146,22 +151,48 @@ export function updateAccount(uuidVal, account) {
       id: uuidVal,
       account
     });
-    dispatch(updateCurrentAccountId(uuidVal));
+  };
+}
+
+export function switchToFirstValidAccount(id) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const accounts = _getAccounts(state);
+    const currentAccountId = id || state.app.currentAccountId;
+    let found = null;
+    for (let i = 0; i < accounts.length; i += 1) {
+      if (found || accounts[i].selectedProfile.id === currentAccountId)
+        continue; //eslint-disable-line
+      try {
+        dispatch(updateCurrentAccountId(accounts[i].selectedProfile.id));
+        // eslint-disable-next-line no-await-in-loop
+        await dispatch(loginWithAccessToken());
+        found = accounts[i].selectedProfile.id;
+      } catch {
+        dispatch(
+          updateAccount(accounts[i].selectedProfile.id, {
+            ...accounts[i],
+            accessToken: accounts[i].accessToken
+          })
+        );
+        console.error(`Failed to validate ${accounts[i].selectedProfile.id}`);
+      }
+    }
+    if (!found) {
+      dispatch(updateCurrentAccountId(null));
+    }
+    return found;
   };
 }
 
 export function removeAccount(id) {
-  return async (dispatch, getState) => {
+  return async dispatch => {
+    const newAccount = await dispatch(switchToFirstValidAccount(id));
     dispatch({
       type: ActionTypes.REMOVE_ACCOUNT,
       id
     });
-    const { app } = getState();
-    if (app.accounts.length > 0) {
-      dispatch(updateCurrentAccountId(app.accounts[0].selectedProfile.id));
-    } else {
-      dispatch(updateCurrentAccountId(null));
-    }
+    return newAccount;
   };
 }
 
@@ -266,7 +297,7 @@ export function downloadJava() {
   };
 }
 
-export function login(username, password) {
+export function login(username, password, redirect = true) {
   return async (dispatch, getState) => {
     const {
       app: { isNewUser, clientToken }
@@ -277,12 +308,17 @@ export function login(username, password) {
     try {
       const { data } = await mcAuthenticate(username, password, clientToken);
       dispatch(updateAccount(data.selectedProfile.id, data));
+      dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
       if (!isNewUser) {
-        dispatch(push("/home"));
+        if (redirect) {
+          dispatch(push("/home"));
+        }
       } else {
         dispatch(updateIsNewUser(false));
-        dispatch(push("/onboarding"));
+        if (redirect) {
+          dispatch(push("/onboarding"));
+        }
       }
     } catch (err) {
       console.error(err);
@@ -291,12 +327,11 @@ export function login(username, password) {
   };
 }
 
-export function loginWithAccessToken() {
+export function loginWithAccessToken(redirect = true) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { accessToken, selectedProfile, clientToken } = _getCurrentAccount(
-      state
-    );
+    const { accessToken, clientToken } = _getCurrentAccount(state);
+    if (!accessToken) throw new Error();
     try {
       await mcValidate(accessToken, clientToken);
       dispatch(push("/home"));
@@ -307,15 +342,21 @@ export function loginWithAccessToken() {
         try {
           const { data } = await mcRefresh(accessToken, clientToken);
           dispatch(updateAccount(data.selectedProfile.id, data));
-          dispatch(push("/home"));
+          dispatch(updateCurrentAccountId(data.selectedProfile.id));
+          if (redirect) {
+            dispatch(push("/home"));
+          }
         } catch (nestedError) {
           console.error(error, nestedError);
-          dispatch(removeAccount(selectedProfile.id));
-          dispatch(push("/"));
+          if (redirect) {
+            dispatch(push("/"));
+          }
           throw new Error();
         }
       } else if (error.message === "Network Error") {
-        dispatch(push("/home"));
+        if (redirect) {
+          dispatch(push("/home"));
+        }
       }
     }
   };
@@ -349,6 +390,7 @@ export function loginThroughNativeLauncher() {
       );
 
       dispatch(updateAccount(data.selectedProfile.id, data));
+      dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
       if (isNewUser) {
         dispatch(updateIsNewUser(false));
@@ -575,6 +617,13 @@ export function downloadForge(instanceName) {
       forgeJson.versionJson.libraries,
       _getLibrariesPath(state)
     );
+
+    if (semver.lt(coerce(modloader[2]), coerce("10.13.1.1217"))) {
+      await downloadFile(
+        path.join(_getInstancesPath(state), instanceName, "mods", "LJF.jar"),
+        GDL_LEGACYJAVAFIXER_MOD_URL
+      );
+    }
 
     if (forgeJson.installProfileJson) {
       const installLibraries = librariesMapper(

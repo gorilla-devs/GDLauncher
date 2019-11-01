@@ -7,8 +7,9 @@ import styled from "styled-components";
 import AddInstance from "../modals/AddInstance";
 import Settings from "../modals/Settings/Settings";
 import InstanceDeleteConfirmation from "../modals/InstanceDeleteConfirmation";
-import ProfileSettings from "../modals/ProfileSettings";
+import AccountsManager from "../modals/AccountsManager";
 import JavaDownload from "../modals/JavaDownload";
+import AddAccount from "../modals/AddAccount";
 import { closeModal } from "../reducers/modals/actions";
 
 const Overlay = styled.div`
@@ -43,10 +44,11 @@ const modalsComponentLookupTable = {
   // Changelog,
   // LoginHelper
   AddInstance,
-  ProfileSettings,
+  AccountsManager,
   Settings,
   JavaDownload,
-  InstanceDeleteConfirmation
+  InstanceDeleteConfirmation,
+  AddAccount
 };
 
 const ModalContainer = ({ unmounting, children }) => {

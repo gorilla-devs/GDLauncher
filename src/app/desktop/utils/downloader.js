@@ -30,7 +30,10 @@ export const downloadInstanceFiles = async (
         counter += 1;
       } while (!res && counter < 3);
       downloaded += 1;
-      if (downloaded % 5 === 0 || downloaded === arr.length)
+      if (
+        (updatePercentage && downloaded % 5 === 0) ||
+        downloaded === arr.length
+      )
         updatePercentage(downloaded);
     },
     { concurrency: threads }
@@ -89,7 +92,9 @@ export const downloadFile = async (fileName, url, onProgress) => {
     req.on("data", chunk => {
       // Update the received bytes
       receivedBytes += chunk.length;
-      onProgress(((receivedBytes * 100) / totalBytes).toFixed(1));
+      if (onProgress) {
+        onProgress(((receivedBytes * 100) / totalBytes).toFixed(1));
+      }
     });
 
     req.on("end", () => {
