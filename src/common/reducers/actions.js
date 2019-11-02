@@ -186,13 +186,18 @@ export function switchToFirstValidAccount(id) {
 }
 
 export function removeAccount(id) {
-  return async dispatch => {
-    const newAccount = await dispatch(switchToFirstValidAccount(id));
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { currentAccountId } = state.app;
+    let newId = id;
+    if (currentAccountId === id) {
+      newId = await dispatch(switchToFirstValidAccount(id));
+    }
     dispatch({
       type: ActionTypes.REMOVE_ACCOUNT,
       id
     });
-    return newAccount;
+    return newId;
   };
 }
 

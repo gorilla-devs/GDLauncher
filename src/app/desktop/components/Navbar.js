@@ -96,7 +96,7 @@ const ProfileSettings = styled.div`
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.2s ease-in-out;
-  &&:hover {
+  &:hover {
     background: ${props => props.theme.palette.grey[500]};
   }
 `;
@@ -104,7 +104,7 @@ const ProfileSettings = styled.div`
 const ProfileImg = styled.div`
   width: 30px;
   height: 30px;
-  background: ${props => props.theme.palette.grey[100]};
+  background: ${props => props.theme.palette.grey[900]};
   border-radius: 50%;
   margin-right: 10px;
 `;
@@ -144,11 +144,11 @@ const Navbar = () => {
         `}
       />
       <NavigationContainer>
-        <NavigationElement>
+        {/* <NavigationElement>
           <Link to="/home" draggable="false">
             <Button selected={isLocation("/home")}>Home</Button>
           </Link>
-        </NavigationElement>
+        </NavigationElement> */}
       </NavigationContainer>
       <SettingsButton>
         <FontAwesomeIcon

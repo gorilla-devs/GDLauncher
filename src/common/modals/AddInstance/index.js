@@ -54,8 +54,8 @@ const AddInstance = () => {
   return (
     <Modal
       css={`
-        height: 70%;
-        width: 70%;
+        height: 85%;
+        width: 85%;
         max-width: 1500px;
       `}
       title="Add New Instance"
