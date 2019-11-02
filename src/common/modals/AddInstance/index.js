@@ -9,6 +9,7 @@ import Import from "./Import";
 import NewInstance from "./NewInstance";
 import { addToQueue } from "../../reducers/actions";
 import { closeModal } from "../../reducers/modals/actions";
+import InstanceName from "./InstanceName";
 
 const AddInstance = () => {
   // 0 -> default
@@ -17,6 +18,7 @@ const AddInstance = () => {
   const [page, setPage] = useState(0);
   const [version, setVersion] = useState(null);
   const [instanceName, setInstanceName] = useState("");
+  const [step, setStep] = useState(0);
   const dispatch = useDispatch();
   const fabricManifest = useSelector(state => state.app.fabricManifest);
 
@@ -108,10 +110,11 @@ const AddInstance = () => {
               value={instanceName}
               onChange={e => setInstanceName(e.target.value)}
             />
-            <Button onClick={createInstance}>Create Instance</Button>
+            <Button onClick={() => setStep(1)}>Create Instance</Button>
           </div>
         </div>
       </div>
+      <InstanceName in={step === 1} setStep={setStep} />
     </Modal>
   );
 };
