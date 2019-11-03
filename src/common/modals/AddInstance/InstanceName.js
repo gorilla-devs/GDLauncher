@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import styled from "styled-components";
 import { Transition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLongArrowAltLeft } from "@fortawesome/free-solid-svg-icons";
+import { faLongArrowAltLeft, faLongArrowAltRight } from "@fortawesome/free-solid-svg-icons";
 import { transparentize } from "polished";
 import { Input } from "antd";
 
@@ -15,7 +15,6 @@ const InstanceName = ({ in: inProp, setStep }) => {
           <div
             css={`
               flex: 1;
-              margin: 0 20px;
               transition: 0.1s ease-in-out;
               display: flex;
               justify-content: center;
@@ -33,9 +32,12 @@ const InstanceName = ({ in: inProp, setStep }) => {
           <div
             css={`
               flex: 10;
+              align-self: center;
               font-size: 30px;
               display: flex;
+              flex-direction: column;
               justify-content: center;
+              align-items: center;
             `}
           >
             <Input
@@ -46,6 +48,23 @@ const InstanceName = ({ in: inProp, setStep }) => {
                 }
               `}
             />
+          </div>
+          <div
+            css={`
+              flex: 1;
+              transition: 0.1s ease-in-out;
+              display: flex;
+              justify-content: center;
+              border-radius: 4px;
+              font-size: 40px;
+              cursor: pointer;
+              &:hover {
+                background-color: ${props => props.theme.palette.primary.light};
+              }
+            `}
+            onClick={() => setStep(0)}
+          >
+            <FontAwesomeIcon icon={faLongArrowAltRight} />
           </div>
         </Animation>
       )}
@@ -60,16 +79,16 @@ const Animation = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
+  z-index: 100000;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  padding: 20px;
   background: ${props => props.theme.palette.primary.main};
   will-change: transform;
   transform: translateX(
-    ${({ state }) => (state === "entering" || state === "entered" ? 0 : -101)}%
+    ${({ state }) => (state === "entering" || state === "entered" ? 0 : 101)}%
   );
 `;
