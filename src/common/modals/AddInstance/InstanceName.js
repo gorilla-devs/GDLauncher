@@ -1,13 +1,49 @@
 /* eslint-disable */
-import React, { useMemo } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import { useSelector, useDispatch } from "react-redux";
 import { Transition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLongArrowAltLeft, faLongArrowAltRight } from "@fortawesome/free-solid-svg-icons";
-import { transparentize } from "polished";
+import {
+  faLongArrowAltLeft,
+  faLongArrowAltRight
+} from "@fortawesome/free-solid-svg-icons";
+import { addToQueue } from "../../reducers/actions";
+import { closeModal } from "../../reducers/modals/actions";
 import { Input } from "antd";
 
-const InstanceName = ({ in: inProp, setStep }) => {
+const InstanceName = ({ in: inProp, setStep, version }) => {
+  const dispatch = useDispatch();
+  const fabricManifest = useSelector(state => state.app.fabricManifest);
+  const [instanceName, setInstanceName] = useState("");
+
+  const createInstance = () => {
+    if (!version || !instanceName) return;
+    const isVanilla = version[0] === "vanilla";
+    const isFabric = version[0] === "fabric";
+    const isForge = version[0] === "forge";
+    const isTwitchModpack = version[0] === "twitchModpack";
+    if (isVanilla) {
+      dispatch(addToQueue(instanceName, version[2]));
+    } else if (isFabric) {
+      const mappedItem = fabricManifest.mappings.find(
+        v => v.version === version[2]
+      );
+      const splitItem = version[2].split(mappedItem.separator);
+      dispatch(
+        addToQueue(instanceName, splitItem[0], [
+          "fabric",
+          version[2],
+          version[3]
+        ])
+      );
+    } else if (isForge) {
+      dispatch(addToQueue(instanceName, version[1], version));
+    } else if (isTwitchModpack) {
+    }
+    dispatch(closeModal());
+  };
+
   return (
     <Transition in={inProp} timeout={200}>
       {state => (
@@ -42,6 +78,7 @@ const InstanceName = ({ in: inProp, setStep }) => {
           >
             <Input
               placeholder="Instance Name"
+              onChange={e => setInstanceName(e.target.value)}
               css={`
                 && {
                   width: 300px;
@@ -62,7 +99,7 @@ const InstanceName = ({ in: inProp, setStep }) => {
                 background-color: ${props => props.theme.palette.primary.light};
               }
             `}
-            onClick={() => setStep(0)}
+            onClick={() => createInstance()}
           >
             <FontAwesomeIcon icon={faLongArrowAltRight} />
           </div>

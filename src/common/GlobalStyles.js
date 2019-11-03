@@ -11,6 +11,7 @@ export default createGlobalStyle`
     margin: 0;
     display: flex;
     -webkit-transform:translate3d(0,0,0);
+    -webkit-font-smoothing: antialiased;
   }
   
   #root {

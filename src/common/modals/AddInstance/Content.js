@@ -13,7 +13,14 @@ import TwitchModpacks from "./TwitchModpacks";
 import Import from "./Import";
 import NewInstance from "./NewInstance";
 
-const Content = ({ in: inProp, setStep, page, setPage, setVersion }) => {
+const Content = ({
+  in: inProp,
+  setStep,
+  page,
+  setPage,
+  setVersion,
+  version
+}) => {
   let pages = [
     <NewInstance setVersion={setVersion} />,
     <TwitchModpacks setVersion={setVersion} setStep={setStep} />,
@@ -47,13 +54,31 @@ const Content = ({ in: inProp, setStep, page, setPage, setVersion }) => {
                 height: 100%;
               `}
             >
-              <MenuItem active={page === 0} onClick={() => setPage(0)}>
+              <MenuItem
+                active={page === 0}
+                onClick={() => {
+                  setVersion(null);
+                  setPage(0);
+                }}
+              >
                 Create New Instance
               </MenuItem>
-              <MenuItem active={page === 1} onClick={() => setPage(1)}>
+              <MenuItem
+                active={page === 1}
+                onClick={() => {
+                  setVersion(null);
+                  setPage(1);
+                }}
+              >
                 Browse Twitch Modpacks
               </MenuItem>
-              <MenuItem active={page === 2} onClick={() => setPage(2)}>
+              <MenuItem
+                active={page === 2}
+                onClick={() => {
+                  setVersion(null);
+                  setPage(2);
+                }}
+              >
                 Import from other Launchers
               </MenuItem>
               <div
@@ -64,6 +89,7 @@ const Content = ({ in: inProp, setStep, page, setPage, setVersion }) => {
                 `}
               >
                 <div
+                  version={version}
                   css={`
                     width: 70px;
                     height: 40px;
@@ -72,13 +98,23 @@ const Content = ({ in: inProp, setStep, page, setPage, setVersion }) => {
                     justify-content: center;
                     border-radius: 4px;
                     font-size: 40px;
-                    cursor: pointer;
+                    color: ${props =>
+                      props.version
+                        ? props.theme.palette.text.icon
+                        : props.theme.palette.text.disabled};
+                    ${props => (props.version ? "cursor: pointer;" : "")}
                     &:hover {
                       background-color: ${props =>
-                        props.theme.palette.grey[500]};
+                        props.version
+                          ? props.theme.palette.grey[500]
+                          : "transparent"};
                     }
                   `}
-                  onClick={() => setStep(1)}
+                  onClick={() => {
+                    if (version) {
+                      setStep(1);
+                    }
+                  }}
                 >
                   <FontAwesomeIcon icon={faLongArrowAltRight} />
                 </div>

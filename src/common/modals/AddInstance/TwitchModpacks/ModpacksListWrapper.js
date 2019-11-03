@@ -1,10 +1,10 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, memo } from "react";
 import styled from "styled-components";
 import { FixedSizeList as List } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import { transparentize } from "polished";
 
-export default function ExampleWrapper({
+const ModpacksListWrapper = ({
   // Are there more items to load?
   // (This information comes from the most recent API request.)
   hasNextPage,
@@ -21,9 +21,11 @@ export default function ExampleWrapper({
   width,
 
   setStep,
+
+  setVersion,
   // Callback function responsible for loading the next page of items.
   loadNextPage
-}) {
+}) => {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 1 : items.length;
 
@@ -34,13 +36,14 @@ export default function ExampleWrapper({
   const isItemLoaded = index => !hasNextPage || index < items.length;
 
   // Render an item or a loading indicator.
-  const Item = ({ index, style }) => {
+  const Item = memo(({ index, style }) => {
     let content;
     const modpack = items[index];
     if (!isItemLoaded(index)) {
       content = <div css={style}>Loading...</div>;
     }
     if (!modpack) return null;
+    console.log(modpack);
 
     const primaryImage = modpack.attachments.find(v => v.isDefault);
     content = (
@@ -57,14 +60,25 @@ export default function ExampleWrapper({
           <div>{modpack.name}</div>
         </Modpack>
         <ModpackHover>
-          <div onClick={() => setStep(1)}>Download</div>
+          <div
+            onClick={() => {
+              setVersion([
+                "twitchModpack",
+                modpack.id,
+                modpack.latestFiles[modpack.latestFiles.length - 1]
+              ]);
+              setStep(1);
+            }}
+          >
+            Download
+          </div>
           <div>Explore</div>
         </ModpackHover>
       </ModpackContainer>
     );
 
     return content;
-  };
+  });
 
   const innerElementType = forwardRef(({ style, ...rest }, ref) => (
     <div
@@ -83,7 +97,7 @@ export default function ExampleWrapper({
     <InfiniteLoader
       isItemLoaded={isItemLoaded}
       itemCount={itemCount}
-      loadMoreItems={loadMoreItems}
+      loadMoreItems={() => loadMoreItems(false)}
     >
       {({ onItemsRendered, ref }) => (
         <List
@@ -100,7 +114,9 @@ export default function ExampleWrapper({
       )}
     </InfiniteLoader>
   );
-}
+};
+
+export default memo(ModpacksListWrapper);
 
 const ModpackContainer = styled.div`
   position: relative;
@@ -131,8 +147,7 @@ const ModpackHover = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  backdrop-filter: blur(4px);
-  background: ${props => transparentize(0.7, props.theme.palette.grey[700])};
+  background: ${props => transparentize(0.4, props.theme.palette.grey[900])};
   opacity: 0;
   padding-left: 40%;
   will-change: opacity;

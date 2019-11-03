@@ -2,28 +2,40 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Select, Input } from "antd";
-import { transparentize } from "polished";
+import { useDebounce } from "rooks";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { getSearch } from "../../../api";
 import ModpacksListWrapper from "./ModpacksListWrapper";
 
-const TwitchModpacks = ({ setStep }) => {
+const TwitchModpacks = ({ setStep, setVersion }) => {
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState("Featured");
+  const [searchText, setSearchText] = useState("");
   const [hasNextPage, setHasNextPage] = useState(false);
-  const loadMoreModpacks = async () => {
+
+  useEffect(() => {
+    updateModpacks();
+  }, [searchText, sortBy]);
+
+  const updateModpacks = useDebounce(() => {
+    loadMoreModpacks(true);
+  }, 500);
+
+  const loadMoreModpacks = async (reset = false) => {
     setLoading(true);
     const { data } = await getSearch(
       "modpacks",
-      "",
+      searchText,
       40,
-      modpacks.length,
-      "Featured",
+      reset ? 0 : modpacks.length,
+      sortBy,
       true
     );
+    const newModpacks = reset ? data : [...modpacks, ...data];
     setLoading(false);
-    setHasNextPage([...modpacks, ...data].length % 40 === 0);
-    setModpacks([...modpacks, ...data]);
+    setHasNextPage(newModpacks.length % 40 === 0);
+    setModpacks(newModpacks);
   };
 
   useEffect(() => {
@@ -34,10 +46,22 @@ const TwitchModpacks = ({ setStep }) => {
     <Container>
       <HeaderContainer>
         <StyledSelect placeholder="Minecraft Version" />
-        <StyledSelect placeholder="Sort by" />
+        <StyledSelect
+          placeholder="Sort by"
+          defaultValue="Featured"
+          onChange={setSortBy}
+        >
+          <Select.Option value="Featured">Featured</Select.Option>
+          <Select.Option value="Popularity">Popularity</Select.Option>
+          <Select.Option value="LastUpdated">Last Updated</Select.Option>
+          <Select.Option value="Name">Name</Select.Option>
+          <Select.Option value="Author">Author</Select.Option>
+          <Select.Option value="TotalDownloads">Total Downloads</Select.Option>
+        </StyledSelect>
         <StyledInput
           placeholder="Search..."
-          onSearch={value => console.log(value)}
+          onSearch={setSearchText}
+          onChange={e => setSearchText(e.target.value)}
           style={{ width: 200 }}
         />
       </HeaderContainer>
@@ -52,6 +76,7 @@ const TwitchModpacks = ({ setStep }) => {
               width={width}
               height={height}
               setStep={setStep}
+              setVersion={setVersion}
             />
           )}
         </AutoSizer>
