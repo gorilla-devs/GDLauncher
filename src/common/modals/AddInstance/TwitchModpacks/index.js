@@ -7,6 +7,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { getSearch } from "../../../api";
 import ModpacksListWrapper from "./ModpacksListWrapper";
 
+let lastRequest;
 const TwitchModpacks = ({ setStep, setVersion }) => {
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,8 @@ const TwitchModpacks = ({ setStep, setVersion }) => {
   }, 500);
 
   const loadMoreModpacks = async (reset = false) => {
+    const reqObj = {};
+    lastRequest = reqObj;
     setLoading(true);
     const { data } = await getSearch(
       "modpacks",
@@ -34,8 +37,10 @@ const TwitchModpacks = ({ setStep, setVersion }) => {
     );
     const newModpacks = reset ? data : [...modpacks, ...data];
     setLoading(false);
-    setHasNextPage(newModpacks.length % 40 === 0);
-    setModpacks(newModpacks);
+    if (lastRequest === reqObj) {
+      setHasNextPage(newModpacks.length % 40 === 0);
+      setModpacks(newModpacks);
+    }
   };
 
   useEffect(() => {
