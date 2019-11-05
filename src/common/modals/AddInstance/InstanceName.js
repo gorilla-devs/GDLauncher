@@ -11,18 +11,23 @@ import {
 import { addToQueue } from "../../reducers/actions";
 import { closeModal } from "../../reducers/modals/actions";
 import { Input } from "antd";
+import { getAddonFile } from "../../api";
+import { downloadAddonFile } from "../../../app/desktop/utils";
+import { _getAddonsPath } from "../../utils/selectors";
 
 const InstanceName = ({ in: inProp, setStep, version }) => {
   const dispatch = useDispatch();
+  const addonsPath = useSelector(_getAddonsPath);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const [instanceName, setInstanceName] = useState("");
 
-  const createInstance = () => {
+  const createInstance = async () => {
     if (!version || !instanceName) return;
     const isVanilla = version[0] === "vanilla";
     const isFabric = version[0] === "fabric";
     const isForge = version[0] === "forge";
     const isTwitchModpack = version[0] === "twitchModpack";
+    console.log(version)
     if (isVanilla) {
       dispatch(addToQueue(instanceName, version[2]));
     } else if (isFabric) {
@@ -40,6 +45,7 @@ const InstanceName = ({ in: inProp, setStep, version }) => {
     } else if (isForge) {
       dispatch(addToQueue(instanceName, version[1], version));
     } else if (isTwitchModpack) {
+      await downloadAddonFile(version[1], version[2], addonsPath);
     }
     dispatch(closeModal());
   };

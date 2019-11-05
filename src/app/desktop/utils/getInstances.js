@@ -1,11 +1,15 @@
 import makeDir from "make-dir";
 import path from "path";
-import { getDirectories, readConfig } from ".";
+import fse from "fs-extra";
+import { getDirectories } from ".";
 
 const getInstances = async instancesPath => {
   const mapFolderToInstance = async instance => {
     try {
-      const config = await readConfig(path.join(instancesPath, instance));
+      const configPath = path.join(
+        path.join(instancesPath, instance, "config.json")
+      );
+      const config = fse.readJSON(configPath);
       return { name: instance, mcVersion: config.mcVersion };
     } catch (err) {
       console.error(err);

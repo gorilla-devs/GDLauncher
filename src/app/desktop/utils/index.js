@@ -10,6 +10,8 @@ import path from "path";
 import { exec, spawn } from "child_process";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
 import { removeDuplicates } from "../../../common/utils";
+import { getAddonFile } from "../../../common/api";
+import { downloadFile } from "./downloader";
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -22,12 +24,6 @@ export const getDirectories = async source => {
       .filter(isDirectory)
       .map(dir => path.basename(dir))
   );
-};
-
-export const readConfig = async instancePath => {
-  const configPath = path.join(instancePath, "config.json");
-  const file = await fs.readFile(configPath);
-  return JSON.parse(file);
 };
 
 export const mavenToArray = (s, nativeString) => {
@@ -467,9 +463,9 @@ export const patchForge113 = async (
   installProfileJson,
   mainJar,
   librariesPath,
-  javaPath
+  javaPath,
+  updatePercentage
 ) => {
-  console.log(mainJar);
   const { processors } = installProfileJson;
   const replaceIfPossible = arg => {
     const finalArg = arg.replace("{", "").replace("}", "");
@@ -496,6 +492,7 @@ export const patchForge113 = async (
     return arg;
   };
 
+  let counter = 1;
   /* eslint-disable no-await-in-loop, no-restricted-syntax */
   for (const key in processors) {
     if (Object.prototype.hasOwnProperty.call(processors, key)) {
@@ -543,7 +540,28 @@ export const patchForge113 = async (
           resolve();
         });
       });
+      updatePercentage(counter, processors.length);
+      counter += 1;
     }
   }
   /* eslint-enable no-await-in-loop, no-restricted-syntax */
+};
+
+export const downloadAddonFile = async (id, fileId, addonsPath) => {
+  const { data } = await getAddonFile(id, fileId);
+  const addonPath = path.join(addonsPath, id.toString(), fileId.toString());
+  const zipFile = path.join(addonPath, path.basename(data.downloadUrl));
+  await downloadFile(zipFile, data.downloadUrl);
+  const extraction = extractFull(zipFile, addonPath, {
+    $bin: get7zPath()
+  });
+  await new Promise((resolve, reject) => {
+    extraction.on("end", () => {
+      resolve();
+    });
+    extraction.on("error", err => {
+      reject(err);
+    });
+  });
+  fse.remove(zipFile);
 };

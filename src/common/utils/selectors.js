@@ -84,6 +84,11 @@ export const _getLibrariesPath = createSelector(
   datastorePath => path.join(datastorePath, "libraries")
 );
 
+export const _getAddonsPath = createSelector(
+  _getDataStorePath,
+  datastorePath => path.join(datastorePath, "addons")
+);
+
 export const _getMinecraftVersionsPath = createSelector(
   _getLibrariesPath,
   librariesPath => path.join(librariesPath, "net", "minecraft")

@@ -29,7 +29,7 @@ const JavaDownload = () => {
             css={`
               margin-top: 70px;
             `}
-            percent={progress}
+            percent={progress || 0}
           />
         </div>
       </div>

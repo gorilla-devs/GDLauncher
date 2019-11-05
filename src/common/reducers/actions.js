@@ -41,7 +41,6 @@ import {
   librariesMapper,
   convertOSToMCFormat,
   get7zPath,
-  readConfig,
   fixFilePermissions,
   extractNatives,
   getJVMArguments112,
@@ -630,7 +629,14 @@ export function downloadForge(instanceName) {
       );
     }
 
+    const updatePercentage = downloaded => {
+      dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
+    };
+
+    await downloadInstanceFiles(libraries, updatePercentage);
+
     if (forgeJson.installProfileJson) {
+      dispatch(updateDownloadStatus(instanceName, "Patching forge..."));
       const installLibraries = librariesMapper(
         forgeJson.installProfileJson.libraries,
         _getLibrariesPath(state)
@@ -643,15 +649,10 @@ export function downloadForge(instanceName) {
           `${forgeJson.versionJson.inheritsFrom}.jar`
         ),
         _getLibrariesPath(state),
-        _getJavaPath(state)
+        _getJavaPath(state),
+        (d, t) => dispatch(updateDownloadProgress((d * 100) / t))
       );
     }
-
-    const updatePercentage = downloaded => {
-      dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
-    };
-
-    await downloadInstanceFiles(libraries, updatePercentage);
   };
 }
 
@@ -737,8 +738,8 @@ export function downloadInstance(instanceName) {
     let timePlayed = 0;
 
     try {
-      const prevConfig = await readConfig(
-        path.join(_getInstancesPath(state), instanceName)
+      const prevConfig = await fse.readJson(
+        path.join(_getInstancesPath(state), instanceName, "config.json")
       );
       timePlayed = prevConfig.timePlayed;
     } catch {
@@ -798,7 +799,9 @@ export const launchInstance = instanceName => {
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
     const instancePath = path.join(_getInstancesPath(state), instanceName);
-    const { mcVersion, modloader } = await readConfig(instancePath);
+    const { mcVersion, modloader } = await fse.readJson(
+      path.join(instancePath, "config.json")
+    );
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${mcVersion}.json`)
     );

@@ -43,7 +43,6 @@ const ModpacksListWrapper = ({
       content = <div css={style}>Loading...</div>;
     }
     if (!modpack) return null;
-    console.log(modpack);
 
     const primaryImage = modpack.attachments.find(v => v.isDefault);
     content = (
@@ -65,7 +64,7 @@ const ModpacksListWrapper = ({
               setVersion([
                 "twitchModpack",
                 modpack.id,
-                modpack.latestFiles[modpack.latestFiles.length - 1]
+                modpack.latestFiles[modpack.latestFiles.length - 1].id
               ]);
               setStep(1);
             }}

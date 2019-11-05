@@ -65,7 +65,7 @@ const middleware = store => next => action => {
         return null;
       })
       .catch(console.error);
-  } else if (listener && dataPathChanged) {
+  } else if (dataPathChanged) {
     // If the path changed, close the previous listener and start a new one
     if (!listener.isClosed()) {
       listener.close();
