@@ -510,7 +510,6 @@ export const patchForge113 = async (
       const mainClass = jarFile.valueForManifestEntry("Main-Class");
 
       await new Promise(resolve => {
-        console.log(p);
         const ps = spawn(
           javaPath,
           [
@@ -553,7 +552,9 @@ export const downloadAddonFile = async (id, fileId, addonsPath) => {
   const zipFile = path.join(addonPath, path.basename(data.downloadUrl));
   await downloadFile(zipFile, data.downloadUrl);
   const extraction = extractFull(zipFile, addonPath, {
-    $bin: get7zPath()
+    $bin: get7zPath(),
+    recursive: true,
+    yes: true
   });
   await new Promise((resolve, reject) => {
     extraction.on("end", () => {
