@@ -1,6 +1,5 @@
-import fss, { promises as fs } from "fs";
+import { promises as fs } from "fs";
 import fse from "fs-extra";
-import crypto from "crypto";
 import { extractFull } from "node-7z";
 import makeDir from "make-dir";
 import jarAnalyzer from "jarfile";
@@ -195,25 +194,6 @@ export const extract7z = async () => {
 
   await fse.copy(zipLocationAsar, get7zPath());
   await fixFilePermissions(get7zPath());
-};
-
-export const getFileHash = (filename, algorithm = "sha1") => {
-  return new Promise((resolve, reject) => {
-    const shasum = crypto.createHash(algorithm);
-    try {
-      const s = fss.ReadStream(filename);
-      s.on("data", data => {
-        shasum.update(data);
-      });
-      // making digest
-      s.on("end", () => {
-        const hash = shasum.digest("hex");
-        return resolve(hash);
-      });
-    } catch (error) {
-      return reject(new Error("calc fail"));
-    }
-  });
 };
 
 export const extractNatives = async (libraries, instancePath) => {
