@@ -9,6 +9,7 @@ import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import { spawn } from "child_process";
 import makeDir from "make-dir";
+import pMap from "p-map";
 import * as ActionTypes from "./actionTypes";
 import {
   NEWS_URL,
@@ -59,7 +60,6 @@ import {
 } from "../../app/desktop/utils/downloader";
 import { updateJavaPath } from "./settings/actions";
 import { removeDuplicates } from "../utils";
-import pMap from "p-map";
 
 export function initManifests() {
   return async dispatch => {
