@@ -67,7 +67,7 @@ const middleware = store => next => action => {
       .catch(console.error);
   } else if (dataPathChanged) {
     // If the path changed, close the previous listener and start a new one
-    if (!listener.isClosed()) {
+    if (listener && !listener.isClosed()) {
       listener.close();
     }
     getInstances(instancesPath)
