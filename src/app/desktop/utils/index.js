@@ -546,23 +546,28 @@ export const patchForge113 = async (
   /* eslint-enable no-await-in-loop, no-restricted-syntax */
 };
 
-export const downloadAddonFile = async (id, fileId, addonsPath) => {
+export const downloadAddonZip = async (id, fileId, addonsPath) => {
   const { data } = await getAddonFile(id, fileId);
   const addonPath = path.join(addonsPath, id.toString(), fileId.toString());
-  const zipFile = path.join(addonPath, path.basename(data.downloadUrl));
+  const zipFile = path.join(addonPath, "addon.zip");
   await downloadFile(zipFile, data.downloadUrl);
+  // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
+  await new Promise(resolve => {
+    setTimeout(() => resolve(), 500);
+  });
   const extraction = extractFull(zipFile, addonPath, {
     $bin: get7zPath(),
-    recursive: true,
-    yes: true
+    yes: true,
+    $cherryPick: "manifest.json"
   });
   await new Promise((resolve, reject) => {
     extraction.on("end", () => {
       resolve();
     });
     extraction.on("error", err => {
-      reject(err);
+      reject(err.stderr);
     });
   });
-  fse.remove(zipFile);
+  const manifest = await fse.readJson(path.join(addonPath, "manifest.json"));
+  return manifest;
 };

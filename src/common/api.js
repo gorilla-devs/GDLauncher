@@ -80,7 +80,7 @@ export const getLauncherManifest = () => {
   return axios.get(url);
 };
 
-export const getFabricJson = ([, yarn, loader]) => {
+export const getFabricJson = ([, , yarn, loader]) => {
   return axios.get(
     `https://fabricmc.net/download/technic/?yarn=${encodeURIComponent(
       yarn

@@ -9,8 +9,8 @@ const getInstances = async instancesPath => {
       const configPath = path.join(
         path.join(instancesPath, instance, "config.json")
       );
-      const config = fse.readJSON(configPath);
-      return { name: instance, mcVersion: config.mcVersion };
+      const config = await fse.readJSON(configPath);
+      return { name: instance, modloader: config.modloader };
     } catch (err) {
       console.error(err);
     }

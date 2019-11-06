@@ -95,7 +95,7 @@ const Instance = ({ instanceName }) => {
       <ContextMenuTrigger id={instance.name}>
         <Container installing={isInQueue} onClick={startInstance}>
           <InstanceContainer installing={isInQueue}>
-            <MCVersion>{instance.mcVersion}</MCVersion>
+            <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
             {instance.name}
           </InstanceContainer>
           <HoverContainer installing={isInQueue}>

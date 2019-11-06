@@ -12,7 +12,7 @@ import { addToQueue } from "../../reducers/actions";
 import { closeModal } from "../../reducers/modals/actions";
 import { Input } from "antd";
 import { getAddonFile } from "../../api";
-import { downloadAddonFile } from "../../../app/desktop/utils";
+import { downloadAddonZip } from "../../../app/desktop/utils";
 import { _getAddonsPath } from "../../utils/selectors";
 
 const InstanceName = ({ in: inProp, setStep, version }) => {
@@ -27,25 +27,39 @@ const InstanceName = ({ in: inProp, setStep, version }) => {
     const isFabric = version[0] === "fabric";
     const isForge = version[0] === "forge";
     const isTwitchModpack = version[0] === "twitchModpack";
-    console.log(version)
     if (isVanilla) {
-      dispatch(addToQueue(instanceName, version[2]));
+      dispatch(addToQueue(instanceName, [version[0], version[2]]));
     } else if (isFabric) {
       const mappedItem = fabricManifest.mappings.find(
         v => v.version === version[2]
       );
       const splitItem = version[2].split(mappedItem.separator);
       dispatch(
-        addToQueue(instanceName, splitItem[0], [
+        addToQueue(instanceName, [
           "fabric",
+          splitItem[0],
           version[2],
           version[3]
         ])
       );
     } else if (isForge) {
-      dispatch(addToQueue(instanceName, version[1], version));
+      dispatch(addToQueue(instanceName, version));
     } else if (isTwitchModpack) {
-      await downloadAddonFile(version[1], version[2], addonsPath);
+      const manifest = await downloadAddonZip(
+        version[1],
+        version[2],
+        addonsPath
+      );
+      const modloader = [
+        version[0],
+        manifest.minecraft.version,
+        manifest.minecraft.modLoaders
+          .find(v => v.primary)
+          .id.replace("forge-", ""),
+        version[1],
+        version[2]
+      ];
+      dispatch(addToQueue(instanceName, modloader, manifest));
     }
     dispatch(closeModal());
   };

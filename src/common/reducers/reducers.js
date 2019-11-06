@@ -35,12 +35,11 @@ function downloadQueue(state = {}, action) {
         ...state,
         [action.instanceName]: {
           percentage: 0,
-          mcVersion: action.mcVersion,
           modloader: action.modloader,
-          addonID: action.addonID,
           status: null,
           currentPhase: 1,
-          totalPhases: action.phases
+          totalPhases: action.phases,
+          manifest: action.manifest
         }
       };
     case ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE:

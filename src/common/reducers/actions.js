@@ -25,7 +25,8 @@ import {
   mcValidate,
   getLauncherManifest,
   getFabricJson,
-  getForgeJson
+  getForgeJson,
+  getAddonFile
 } from "../api";
 import {
   _getCurrentAccount,
@@ -35,7 +36,8 @@ import {
   _getAssetsPath,
   _getInstancesPath,
   _getLibrariesPath,
-  _getAccounts
+  _getAccounts,
+  _getAddonsPath
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -57,6 +59,7 @@ import {
 } from "../../app/desktop/utils/downloader";
 import { updateJavaPath } from "./settings/actions";
 import { removeDuplicates } from "../utils";
+import pMap from "p-map";
 
 export function initManifests() {
   return async dispatch => {
@@ -515,20 +518,31 @@ export function updateDownloadCurrentPhase(instanceName, status) {
   };
 }
 
-export function addToQueue(instanceName, mcVersion, modloader) {
-  return (dispatch, getState) => {
-    const { currentDownload } = getState();
+export function addToQueue(instanceName, modloader, manifest) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { currentDownload } = state;
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,
-      mcVersion,
-      modloader
+      modloader,
+      manifest
     });
+    let timePlayed = 0;
+
+    try {
+      const prevConfig = await fse.readJson(
+        path.join(_getInstancesPath(state), instanceName, "config.json")
+      );
+      timePlayed = prevConfig.timePlayed;
+    } catch {
+      // Do nothing
+    }
     fse.outputJson(
       path.join(_getInstancesPath(getState()), instanceName, "config.json"),
       {
-        mcVersion,
-        timePlayed: 0
+        modloader,
+        timePlayed
       }
     );
     if (!currentDownload) {
@@ -555,6 +569,7 @@ export function downloadFabric(instanceName) {
     const { modloader } = _getCurrentDownloadItem(state);
 
     dispatch(updateDownloadStatus(instanceName, "Downloading fabric files"));
+    dispatch(updateDownloadProgress(0));
 
     let fabricJson;
     const fabricJsonPath = path.join(
@@ -591,6 +606,7 @@ export function downloadForge(instanceName) {
     const { modloader } = _getCurrentDownloadItem(state);
 
     dispatch(updateDownloadStatus(instanceName, "Downloading forge files"));
+    dispatch(updateDownloadProgress(0));
 
     let forgeJson;
     const forgeJsonPath = path.join(
@@ -656,6 +672,90 @@ export function downloadForge(instanceName) {
   };
 }
 
+export function downloadForgeManifestFiles(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { modloader, manifest } = _getCurrentDownloadItem(state);
+
+    dispatch(updateDownloadStatus(instanceName, "Downloading mods"));
+    dispatch(updateDownloadProgress(0));
+
+    let downloaded = 0;
+    await pMap(
+      manifest.files,
+      async item => {
+        const file = (await getAddonFile(item.projectID, item.fileID)).data;
+        await fse.outputJson(
+          path.join(
+            _getAddonsPath(state),
+            item.projectID.toString(),
+            item.fileID.toString(),
+            "modManifest.json"
+          ),
+          file
+        );
+        const srcFile = path.join(
+          _getAddonsPath(state),
+          item.projectID.toString(),
+          item.fileID.toString(),
+          file.fileName
+        );
+        const destFile = path.join(
+          _getInstancesPath(state),
+          instanceName,
+          "mods",
+          file.fileName
+        );
+        await downloadFile(srcFile, file.downloadUrl);
+        await fse.copy(srcFile, destFile);
+        downloaded += 1;
+        dispatch(
+          updateDownloadProgress((downloaded * 100) / manifest.files.length - 1)
+        );
+      },
+      { concurrency: 2 }
+    );
+
+    dispatch(updateDownloadStatus(instanceName, "Copying overrides"));
+    const addonPathZip = path.join(
+      _getAddonsPath(state),
+      modloader[3].toString(),
+      modloader[4].toString(),
+      "addon.zip"
+    );
+    const extraction = extractFull(
+      addonPathZip,
+      path.join(_getInstancesPath(state), instanceName),
+      {
+        recursive: true,
+        $bin: get7zPath(),
+        yes: true,
+        $cherryPick: "overrides",
+        $progress: true
+      }
+    );
+    await new Promise((resolve, reject) => {
+      extraction.on("progress", ({ percent }) => {
+        dispatch(updateDownloadProgress(percent));
+      });
+      extraction.on("end", () => {
+        resolve();
+      });
+      extraction.on("error", err => {
+        reject(err.stderr);
+      });
+    });
+    dispatch(updateDownloadStatus(instanceName, "Finalizing overrides"));
+    await fse.copy(
+      path.join(_getInstancesPath(state), instanceName, "overrides"),
+      path.join(_getInstancesPath(state), instanceName)
+    );
+    await fse.remove(
+      path.join(_getInstancesPath(state), instanceName, "overrides")
+    );
+  };
+}
+
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -667,7 +767,8 @@ export function downloadInstance(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, "Downloading game files"));
 
-    const { mcVersion, modloader } = _getCurrentDownloadItem(state);
+    const { modloader } = _getCurrentDownloadItem(state);
+    const mcVersion = modloader[1];
 
     let mcJson;
 
@@ -735,26 +836,6 @@ export function downloadInstance(instanceName) {
       _getLibrariesPath(state)
     );
 
-    let timePlayed = 0;
-
-    try {
-      const prevConfig = await fse.readJson(
-        path.join(_getInstancesPath(state), instanceName, "config.json")
-      );
-      timePlayed = prevConfig.timePlayed;
-    } catch {
-      // Do nothing
-    }
-
-    await fse.outputJson(
-      path.join(_getInstancesPath(state), instanceName, "config.json"),
-      {
-        mcVersion,
-        ...(modloader && { modloader }),
-        timePlayed
-      }
-    );
-
     const updatePercentage = downloaded => {
       dispatch(
         updateDownloadProgress(
@@ -784,6 +865,9 @@ export function downloadInstance(instanceName) {
       await dispatch(downloadFabric(instanceName));
     } else if (modloader && modloader[0] === "forge") {
       await dispatch(downloadForge(instanceName));
+    } else if (modloader && modloader[0] === "twitchModpack") {
+      await dispatch(downloadForge(instanceName));
+      await dispatch(downloadForgeManifestFiles(instanceName));
     }
 
     dispatch(removeDownloadFromQueue(instanceName));
@@ -799,11 +883,11 @@ export const launchInstance = instanceName => {
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
     const instancePath = path.join(_getInstancesPath(state), instanceName);
-    const { mcVersion, modloader } = await fse.readJson(
+    const { modloader } = await fse.readJson(
       path.join(instancePath, "config.json")
     );
     const mcJson = await fse.readJson(
-      path.join(_getMinecraftVersionsPath(state), `${mcVersion}.json`)
+      path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
     );
     let libraries = [];
     const mcMainFile = {
@@ -829,7 +913,10 @@ export const launchInstance = instanceName => {
       libraries = libraries.concat(fabricLibraries);
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
-    } else if (modloader && modloader[0] === "forge") {
+    } else if (
+      modloader &&
+      (modloader[0] === "forge" || modloader[0] === "twitchModpack")
+    ) {
       const forgeJsonPath = path.join(
         _getLibrariesPath(state),
         "net",
