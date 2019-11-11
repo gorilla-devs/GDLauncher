@@ -1,6 +1,7 @@
 /* eslint-disable */
 import React, { useState } from "react";
 import styled from "styled-components";
+import path from "path";
 import { useSelector, useDispatch } from "react-redux";
 import { Transition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,11 +14,11 @@ import { closeModal } from "../../reducers/modals/actions";
 import { Input } from "antd";
 import { getAddonFile } from "../../api";
 import { downloadAddonZip } from "../../../app/desktop/utils";
-import { _getAddonsPath } from "../../utils/selectors";
+import { _getInstancesPath } from "../../utils/selectors";
 
 const InstanceName = ({ in: inProp, setStep, version }) => {
   const dispatch = useDispatch();
-  const addonsPath = useSelector(_getAddonsPath);
+  const instancesPath = useSelector(_getInstancesPath);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const [instanceName, setInstanceName] = useState("");
 
@@ -48,7 +49,7 @@ const InstanceName = ({ in: inProp, setStep, version }) => {
       const manifest = await downloadAddonZip(
         version[1],
         version[2],
-        addonsPath
+        path.join(instancesPath, instanceName)
       );
       const modloader = [
         version[0],

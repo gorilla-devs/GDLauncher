@@ -250,6 +250,7 @@ export const getJVMArguments112 = async (
   assetsPath,
   mcJson,
   account,
+  memory,
   jvmOptions = []
 ) => {
   const args = [];
@@ -267,8 +268,8 @@ export const getJVMArguments112 = async (
   //   args.push("-Xdock:icon=instanceicon");
   // }
 
-  args.push("-Xmx1024m");
-  args.push("-Xms128m");
+  args.push(`-Xmx${memory}m`);
+  args.push(`-Xms${memory}m`);
   args.push(...jvmOptions);
   args.push(`-Djava.library.path="${path.join(instancePath, "natives")}"`);
 
@@ -339,6 +340,7 @@ export const getJVMArguments113 = async (
   assetsPath,
   mcJson,
   account,
+  memory,
   jvmOptions = []
 ) => {
   const argDiscovery = /\${*(.*)}/;
@@ -349,8 +351,8 @@ export const getJVMArguments113 = async (
   //   args.push("-Xdock:icon=instanceicon");
   // }
 
-  args.push("-Xmx3096m");
-  args.push("-Xms128m");
+  args.push(`-Xmx${memory}m`);
+  args.push(`-Xms${memory}m`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   args.push(...jvmOptions);
 
@@ -526,16 +528,16 @@ export const patchForge113 = async (
   /* eslint-enable no-await-in-loop, no-restricted-syntax */
 };
 
-export const downloadAddonZip = async (id, fileId, addonsPath) => {
+export const downloadAddonZip = async (id, fileId, instancePath) => {
   const { data } = await getAddonFile(id, fileId);
-  const addonPath = path.join(addonsPath, id.toString(), fileId.toString());
-  const zipFile = path.join(addonPath, "addon.zip");
+  const instanceManifest = path.join(instancePath, "manifest.json");
+  const zipFile = path.join(instancePath, "temp", "addon.zip");
   await downloadFile(zipFile, data.downloadUrl);
   // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
   await new Promise(resolve => {
     setTimeout(() => resolve(), 500);
   });
-  const extraction = extractFull(zipFile, addonPath, {
+  const extraction = extractFull(zipFile, instancePath, {
     $bin: get7zPath(),
     yes: true,
     $cherryPick: "manifest.json"
@@ -548,6 +550,6 @@ export const downloadAddonZip = async (id, fileId, addonsPath) => {
       reject(err.stderr);
     });
   });
-  const manifest = await fse.readJson(path.join(addonPath, "manifest.json"));
+  const manifest = await fse.readJson(instanceManifest);
   return manifest;
 };

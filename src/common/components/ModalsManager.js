@@ -10,6 +10,7 @@ import InstanceDeleteConfirmation from "../modals/InstanceDeleteConfirmation";
 import AccountsManager from "../modals/AccountsManager";
 import JavaDownload from "../modals/JavaDownload";
 import AddAccount from "../modals/AddAccount";
+import ModpackDescription from "../modals/ModpackDescription";
 import { closeModal } from "../reducers/modals/actions";
 
 const Overlay = styled.div`
@@ -48,7 +49,8 @@ const modalsComponentLookupTable = {
   Settings,
   JavaDownload,
   InstanceDeleteConfirmation,
-  AddAccount
+  AddAccount,
+  ModpackDescription
 };
 
 const ModalContainer = ({ unmounting, children }) => {

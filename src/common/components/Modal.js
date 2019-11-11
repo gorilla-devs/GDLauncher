@@ -1,8 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
+import CloseButton from "./CloseButton";
 import { closeModal } from "../reducers/modals/actions";
 
 const HeaderComponent = styled.div`
@@ -16,17 +15,6 @@ const HeaderComponent = styled.div`
   height: 40px;
   background: ${props => props.theme.palette.grey[700]};
   border-radius: 4px;
-`;
-
-const CloseButton = styled.div`
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-  &:hover {
-    color: ${props => props.theme.red};
-  }
 `;
 
 const Modal = ({
@@ -55,9 +43,7 @@ const Modal = ({
       {(header === undefined || header === true) && (
         <HeaderComponent>
           <h3>{title || "Modal"}</h3>
-          <CloseButton onClick={() => dispatch(closeModal())}>
-            <FontAwesomeIcon icon={faWindowClose} />
-          </CloseButton>
+          <CloseButton onClick={() => dispatch(closeModal())} />
         </HeaderComponent>
       )}
       <div

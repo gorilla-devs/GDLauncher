@@ -1,8 +1,10 @@
 import React, { forwardRef, memo } from "react";
 import styled from "styled-components";
+import { useDispatch } from "react-redux";
 import { FixedSizeList as List } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import { transparentize } from "polished";
+import { openModal } from "../../../reducers/modals/actions";
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -26,6 +28,7 @@ const ModpacksListWrapper = ({
   // Callback function responsible for loading the next page of items.
   loadNextPage
 }) => {
+  const dispatch = useDispatch();
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 1 : items.length;
 
@@ -71,7 +74,13 @@ const ModpacksListWrapper = ({
           >
             Download
           </div>
-          <div>Explore</div>
+          <div
+            onClick={() => {
+              dispatch(openModal("ModpackDescription", { modpack }));
+            }}
+          >
+            Explore
+          </div>
         </ModpackHover>
       </ModpackContainer>
     );
@@ -118,7 +127,7 @@ const ModpacksListWrapper = ({
 export default memo(ModpacksListWrapper);
 
 const ModpackContainer = styled.div`
-  position: relative;
+  position: absolute;
   width: 100%;
   background: url('${props => props.bg}');
   background-repeat: no-repeat;

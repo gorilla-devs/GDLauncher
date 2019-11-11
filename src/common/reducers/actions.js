@@ -2,7 +2,6 @@ import axios from "axios";
 import path from "path";
 import { remote, ipcRenderer } from "electron";
 import uuid from "uuid/v1";
-import { promises as fs } from "fs";
 import fse from "fs-extra";
 import semver, { coerce } from "semver";
 import omitBy from "lodash.omitby";
@@ -38,8 +37,7 @@ import {
   _getAssetsPath,
   _getInstancesPath,
   _getLibrariesPath,
-  _getAccounts,
-  _getAddonsPath
+  _getAccounts
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -675,54 +673,28 @@ export function downloadForge(instanceName) {
 export function downloadForgeManifestFiles(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { modloader, manifest } = _getCurrentDownloadItem(state);
+    const { manifest } = _getCurrentDownloadItem(state);
 
     dispatch(updateDownloadStatus(instanceName, "Downloading mods..."));
 
-    let downloaded = 0;
+    let modManifests = [];
     await pMap(
       manifest.files,
       async item => {
-        const manifestPath = path.join(
-          _getAddonsPath(state),
-          item.projectID.toString(),
-          item.fileID.toString(),
-          "modManifest.json"
-        );
-        let modManifest;
-        try {
-          // Try to read the file
-          modManifest = await fse.readJson(manifestPath);
-        } catch {
-          // Download a new copy if it's not good
-          modManifest = (await getAddonFile(item.projectID, item.fileID)).data;
-          await fse.outputJson(manifestPath, modManifest);
-        }
-
-        const srcFile = path.join(
-          _getAddonsPath(state),
-          item.projectID.toString(),
-          item.fileID.toString(),
-          modManifest.fileName
-        );
+        const modManifest = (await getAddonFile(item.projectID, item.fileID))
+          .data;
         const destFile = path.join(
           _getInstancesPath(state),
           instanceName,
           "mods",
           modManifest.fileName
         );
-        try {
-          const fileLength = (await fs.stat(srcFile)).size;
-          if (fileLength !== modManifest.fileLength) {
-            throw new Error("Wrong mod size. Need to download again");
-          }
-        } catch {
-          await downloadFile(srcFile, modManifest.downloadUrl);
-        }
-        await fse.copy(srcFile, destFile);
-        downloaded += 1;
+        await downloadFile(destFile, modManifest.downloadUrl);
+        modManifests = modManifests.concat(modManifest);
         dispatch(
-          updateDownloadProgress((downloaded * 100) / manifest.files.length - 1)
+          updateDownloadProgress(
+            (modManifests.length * 100) / manifest.files.length - 1
+          )
         );
       },
       { concurrency: 3 }
@@ -730,14 +702,14 @@ export function downloadForgeManifestFiles(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, "Copying overrides..."));
     const addonPathZip = path.join(
-      _getAddonsPath(state),
-      modloader[3].toString(),
-      modloader[4].toString(),
+      _getInstancesPath(state),
+      instanceName,
+      "temp",
       "addon.zip"
     );
     const extraction = extractFull(
       addonPathZip,
-      path.join(_getInstancesPath(state), instanceName),
+      path.join(_getInstancesPath(state), instanceName, "temp"),
       {
         recursive: true,
         $bin: get7zPath(),
@@ -761,15 +733,14 @@ export function downloadForgeManifestFiles(instanceName) {
         reject(err.stderr);
       });
     });
+
     dispatch(updateDownloadStatus(instanceName, "Finalizing overrides..."));
     await fse.copy(
-      path.join(_getInstancesPath(state), instanceName, "overrides"),
+      path.join(_getInstancesPath(state), instanceName, "temp", "overrides"),
       path.join(_getInstancesPath(state), instanceName),
       { overwrite: true }
     );
-    await fse.remove(
-      path.join(_getInstancesPath(state), instanceName, "overrides")
-    );
+    await fse.remove(path.join(_getInstancesPath(state), instanceName, "temp"));
   };
 }
 
@@ -899,6 +870,7 @@ export const launchInstance = instanceName => {
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
+    const { memory } = state.settings.java;
     const instancePath = path.join(_getInstancesPath(state), instanceName);
     const { modloader } = await fse.readJson(
       path.join(instancePath, "config.json")
@@ -974,7 +946,8 @@ export const launchInstance = instanceName => {
       instancePath,
       assetsPath,
       mcJson,
-      account
+      account,
+      memory
     );
 
     console.log(`"${javaPath}" ${jvmArguments.join(" ")}`);
