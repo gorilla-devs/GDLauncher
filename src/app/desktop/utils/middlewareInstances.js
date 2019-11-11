@@ -1,6 +1,7 @@
 import watch from "node-watch";
 import makeDir from "make-dir";
 import path from "path";
+import { debounce } from "lodash";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 
@@ -15,6 +16,16 @@ const middleware = store => next => action => {
   const instancesPath = path.join(nextState.settings.dataPath, "instances");
 
   const startListener = () => {
+    const updateInstances = debounce(
+      instances => {
+        dispatch({
+          type: ActionTypes.UPDATE_INSTANCES,
+          instances
+        });
+      },
+      500,
+      { maxWait: 1500 }
+    );
     return watch(
       instancesPath,
       {
@@ -24,10 +35,7 @@ const middleware = store => next => action => {
       () => {
         getInstances(instancesPath)
           .then(instances => {
-            dispatch({
-              type: ActionTypes.UPDATE_INSTANCES,
-              instances
-            });
+            updateInstances(instances);
             return instances;
           })
           .catch(console.error);
