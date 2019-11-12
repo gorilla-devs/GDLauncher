@@ -1,10 +1,10 @@
 import { createStore, applyMiddleware, compose } from "redux";
-import thunk from "redux-thunk";
 import { createHashHistory } from "history";
 import { routerMiddleware, routerActions } from "connected-react-router";
 import { persistReducer, persistStore } from "redux-persist";
 import { createLogger } from "redux-logger";
 import isElectron from "is-electron";
+import thunk from "./thunkEnhancer";
 import middlewareInstances from "../../app/desktop/utils/middlewareInstances";
 import middlewareApp from "../../app/desktop/utils/middlewareApp";
 import createRootReducer from "../reducers";
@@ -16,13 +16,11 @@ const rootReducer = createRootReducer(history);
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const configureStore = initialState => {
+const configureStore = () => {
   // Redux Configuration
   const middleware = [];
-  const enhancers = [];
+  const enhancers = [thunk];
 
-  // Thunk Middleware
-  middleware.push(thunk);
 
   const logger = createLogger({
     // We need to hide the UPDATE_PROGRESS dispatches, since they are just too many and they slow down the execution
@@ -67,7 +65,7 @@ const configureStore = initialState => {
   const enhancer = composeEnhancers(...enhancers);
 
   // Create Store
-  const store = createStore(persistedReducer, initialState, enhancer);
+  const store = createStore(persistedReducer, enhancer);
   const persistor = persistStore(store);
 
   if (module.hot) {

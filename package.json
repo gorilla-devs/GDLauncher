@@ -227,7 +227,6 @@
     "redux": "^4.0.4",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^2.3.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "reselect": "^4.0.0",

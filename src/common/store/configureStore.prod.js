@@ -1,9 +1,9 @@
-import { createStore, applyMiddleware } from "redux";
-import thunk from "redux-thunk";
+import { createStore, applyMiddleware, compose } from "redux";
 import { createHashHistory } from "history";
 import { persistReducer, persistStore } from "redux-persist";
 import { routerMiddleware } from "connected-react-router";
 import isElectron from "is-electron";
+import thunk from "./thunkEnhancer";
 import createRootReducer from "../reducers";
 import middlewareInstances from "../../app/desktop/utils/middlewareInstances";
 import middlewareApp from "../../app/desktop/utils/middlewareApp";
@@ -15,15 +15,17 @@ const rootReducer = createRootReducer(history);
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const router = routerMiddleware(history);
-const enhancer = applyMiddleware(
+const enhancer = compose(
   thunk,
-  router,
-  isElectron() ? middlewareApp : undefined,
-  isElectron() ? middlewareInstances : undefined
+  applyMiddleware(
+    router,
+    isElectron() ? middlewareApp : undefined,
+    isElectron() ? middlewareInstances : undefined
+  )
 );
 
-function configureStore(initialState) {
-  const store = createStore(persistedReducer, initialState, enhancer);
+function configureStore() {
+  const store = createStore(persistedReducer, enhancer);
   const persistor = persistStore(store);
   return { store, persistor };
 }
