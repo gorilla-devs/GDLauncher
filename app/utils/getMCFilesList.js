@@ -201,13 +201,13 @@ function parseLibRules(rules) {
     rules.forEach(({ action, os }) => {
       if (
         action === 'allow' &&
-        ((os && SysOS.name === convertOSToMCFormat(SysOS.type())) || !os)
+        ((os && os.name === convertOSToMCFormat(SysOS.type())) || !os)
       ) {
         skip = false;
       }
       if (
         action === 'disallow' &&
-        ((os && SysOS.name === convertOSToMCFormat(SysOS.type())) || !os)
+        ((os && os.name === convertOSToMCFormat(SysOS.type())) || !os)
       ) {
         skip = true;
       }
