@@ -54,7 +54,7 @@ const MyAccount = props => {
           onChange={props.setSounds}
         />
         <SelectSetting
-          mainText={<span>{t('ReleaseChannel', 'Release Channel')}</span>}
+          mainText={<span>{t('ReleaseChannel', 'GDLauncher Release Channel')}</span>}
           description={t('ReleaseChannelDescription', 'Stable updates once a month, beta does update more often but it may have more bugs.')}
           icon="rocket"
           onChange={v => {
