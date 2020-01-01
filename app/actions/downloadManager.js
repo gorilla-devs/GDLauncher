@@ -481,10 +481,11 @@ export function downloadPack(pack, isRepair = false) {
           // Handle special case
           if (finalArg === 'BINPATCH') {
             return path
-              .join(
+              .join('"',
                 INSTANCES_PATH,
                 'libraries',
-                ...arraify(installProfileJson.path)
+                ...arraify(installProfileJson.path),
+                '"'
               )
               .replace('.jar', '-clientdata.lzma');
           }
@@ -531,7 +532,9 @@ export function downloadPack(pack, isRepair = false) {
           { maxBuffer: 10000000000 }
         );
 
+        if (stderr) {}
         log.error(stderr);
+        log.info('Was there an error?')
         dispatch(updateDownloadProgress(90, 10, i, processors.length));
       }
     }

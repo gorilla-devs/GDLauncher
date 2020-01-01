@@ -47,9 +47,7 @@ export const extractVanillaLibs = async json => {
         }
         if ('classifiers' in lib.downloads) {
           MC_OS_Lookup[SysOS.type()].forEach(os_type => {
-            console.log(os_type);
             if (`natives-${os_type}` in lib.downloads.classifiers) {
-              console.log(`natives-${os_type}`);
               libs.push({
                 url:
                   lib.downloads.classifiers[
