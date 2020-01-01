@@ -44,6 +44,7 @@ export default class Home extends Component<Props> {
   /* eslint-enable */
 
   render() {
+    var SuggestMCVersion = '1.15.1'
     return (
       <div>
         <main className={styles.content}>
@@ -106,9 +107,9 @@ export default class Home extends Component<Props> {
                   marginTop: 15,
                   textAlign: 'center'
                 }}
-                title="Try out the new v1.13.2"
+                title={`Welcome ${SuggestMCVersion} to GDLauncher`}
               >
-                V1.13.2 has just been released. Wanna try it out?
+                V1.15.1 has just been released. Wanna try it out?
                 {this.state.latestBtnClicked || this.state.latestInstalled ? (
                   <Link
                     to="/dmanager"
@@ -122,11 +123,11 @@ export default class Home extends Component<Props> {
                     loading={this.props.packCreationLoading}
                     style={{ display: 'block', margin: '35px auto' }}
                     onClick={() => {
-                      this.props.createPack('1.13.2', '1.13.2');
+                      this.props.createPack(`${SuggestMCVersion}`, `${SuggestMCVersion}`);
                       this.setState({ latestBtnClicked: true });
                     }}
                   >
-                    Install and Start v1.13.2
+                    Install and Start {SuggestMCVersion}
                   </Button>
                 )}
               </Card>

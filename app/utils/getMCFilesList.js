@@ -25,6 +25,12 @@ export const extractMainJar = async json => {
 
 export const extractVanillaLibs = async json => {
   const libs = [];
+  const MC_OS_Lookup = {
+    // Mojang gave osx different names in parts of different versions..
+    Darwin: ['osx', 'macos'],
+    Windows: ['windows', 'windows-64'],
+    Linux: ['linux']
+  };
   await Promise.all(
     json.libraries
       .filter(lib => !parseLibRules(lib.rules))
@@ -39,24 +45,26 @@ export const extractVanillaLibs = async json => {
             )
           });
         }
-        if (
-          'classifiers' in lib.downloads &&
-          `natives-${convertOSToMCFormat(SysOS.type())}` in
-          lib.downloads.classifiers
-        ) {
-          libs.push({
-            url:
-              lib.downloads.classifiers[
-                `natives-${convertOSToMCFormat(SysOS.type())}`
-              ].url,
-            path: path.join(
-              INSTANCES_PATH,
-              'libraries',
-              lib.downloads.classifiers[
-                `natives-${convertOSToMCFormat(SysOS.type())}`
-              ].path
-            ),
-            natives: true
+        if ('classifiers' in lib.downloads) {
+          MC_OS_Lookup[SysOS.type()].forEach(os_type => {
+            console.log(os_type);
+            if (`natives-${os_type}` in lib.downloads.classifiers) {
+              console.log(`natives-${os_type}`);
+              libs.push({
+                url:
+                  lib.downloads.classifiers[
+                    `natives-${os_type}`
+                  ].url,
+                path: path.join(
+                  INSTANCES_PATH,
+                  'libraries',
+                  lib.downloads.classifiers[
+                    `natives-${os_type}`
+                  ].path
+                ),
+                natives: true
+              });
+            }
           });
         }
       })

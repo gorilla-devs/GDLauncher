@@ -57,6 +57,11 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
     os.release().substr(0, 2) === 10
       ? '"-Dos.name=Windows 10" -Dos.version=10.0 '
       : '';
+  // If OSX and 1.13+ then we need something special to be added.
+  const OSX_XstartOnFirstThread = 
+    os.type() === 'Darwin' && vanillaJSON.arguments
+      ? '-XstartOnFirstThread'
+      : '';
   // It concatenates vanilla and forge libraries. If the instance does not contain forge, it concatenates an empty array
   const libs = await computeVanillaAndForgeLibraries(vanillaJSON, forgeJSON);
   const Arguments = getMCArguments(
@@ -73,11 +78,13 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
     await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
   );
 
+  // TODO -- Change how -Djava.library.path is being used so it works the same as -cp.
+  // Store all natives in folder struc and just call it so it's no longer required in the instance folders.
   const completeCMD = `
 
 "${javaPath}" ${config.overrideArgs ||
     javaArguments} -Xmx${instanceConfigJSON.overrideMemory ||
-    settings.java.memory}m ${dosName} -Djava.library.path="${path.join(
+    settings.java.memory}m ${dosName} ${OSX_XstartOnFirstThread} -Djava.library.path="${path.join(
       PACKS_PATH,
       packName,
       'natives'
