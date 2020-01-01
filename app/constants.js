@@ -20,6 +20,7 @@ export const INSTANCES_FOLDER = 'instances';
 export const SERVERS_PATH = path.join(DATAPATH, 'servers');
 export const INSTANCES_PATH = (store.has('settings') && store.get('settings').instancesPath) ? store.get('settings').instancesPath : path.join(DATAPATH, INSTANCES_FOLDER);
 export const PACKS_PATH = path.join(INSTANCES_PATH, 'packs');
+// TODO Move meta folder withinstances folder when changing where instances folder is stored in the settings.
 export const META_PATH = path.join(DATAPATH, 'meta');
 export const GAME_VERSIONS_URL =
   'https://launchermeta.mojang.com/mc/game/version_manifest.json';

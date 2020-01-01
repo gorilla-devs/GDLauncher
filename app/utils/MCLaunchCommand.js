@@ -95,10 +95,10 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
       vanillaJSON.id,
       `${vanillaJSON.id}.jar`
     )}"
- -cp ${libs
+ -cp "${libs
       .filter(lib => !lib.natives)
-      .map(lib => `"${lib.path}"`)
-      .join(CLASSPATH_DIVIDER_CHAR)}${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
+      .map(lib => `${lib.path}`)
+      .join(CLASSPATH_DIVIDER_CHAR)}"${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
         INSTANCES_PATH,
         'versions',
         vanillaJSON.id,
