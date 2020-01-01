@@ -524,7 +524,7 @@ export function downloadPack(pack, isRepair = false) {
         const mainClass = jarFile.valueForManifestEntry('Main-Class');
 
         var currentProcess = (processors[p].jar).split(':')[1]
-        log.info(`Forge installer [${i}/${processors.length}]: ${currentProcess} - starting`);
+        log.info(`Forge installer [${i}/${processors.length}]: ${currentProcess} - starting.`);
 
         const { stderr, stdout } = await promisify(exec)(
           `"${javaPath}" -classpath "${filePath}${CLASSPATH_DIVIDER_CHAR}${classPaths.join(
