@@ -6,6 +6,7 @@ import makeDir from 'make-dir';
 import SysOS from 'os';
 import { promisify } from 'util';
 import compressing from 'compressing';
+import log from 'electron-log';
 import {
   INSTANCES_PATH,
   PACKS_PATH,
@@ -24,11 +25,12 @@ export const extractMainJar = async json => {
 };
 
 export const extractVanillaLibs = async json => {
+  log.info("Parsing json version for libraries");
   const libs = [];
   const MC_OS_Lookup = {
     // Mojang gave osx different names in parts of different versions..
     Darwin: ['osx', 'macos'],
-    Windows: ['windows', 'windows-64'],
+    Windows_NT: ['windows', 'windows-64'],
     Linux: ['linux']
   };
   await Promise.all(
