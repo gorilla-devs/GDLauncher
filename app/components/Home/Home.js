@@ -109,7 +109,7 @@ export default class Home extends Component<Props> {
                 }}
                 title={`Try out the new ${suggestedMCVersion}`}
               >
-                V1.15.1 has just been released. Wanna try it out?
+                V{suggestedMCVersion} has just been released. Wanna try it out?
                 {this.state.latestBtnClicked || this.state.latestInstalled ? (
                   <Link
                     to="/dmanager"
