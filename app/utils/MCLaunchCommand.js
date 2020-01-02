@@ -78,8 +78,6 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
     await promisify(fs.readFile)(path.join(PACKS_PATH, packName, 'config.json'))
   );
 
-  // TODO -- Change how -Djava.library.path is being used so it works the same as -cp.
-  // Store all natives in folder struc and just call it so it's no longer required in the instance folders.
   const completeCMD = `
 
 "${javaPath}" ${config.overrideArgs ||
