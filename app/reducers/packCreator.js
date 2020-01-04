@@ -7,6 +7,7 @@ import {
 
 const initialState = {
   versionsManifest: [],
+  latestMCVersions: [],
   forgeManifest: {},
   loading: false
 };
@@ -16,7 +17,8 @@ export default function packManager(state = initialState, action) {
     case `${GET_MC_VANILLA_VERSIONS}`:
       return {
         ...state,
-        versionsManifest: action.payload.versions
+        versionsManifest: action.payload.versions,
+        latestMCVersions: action.payload.latest
       };
     case `${GET_FORGE_MANIFEST}`:
       return {

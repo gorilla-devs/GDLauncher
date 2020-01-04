@@ -29,15 +29,17 @@ export default class Home extends Component<Props> {
   }
 
   componentDidMount = async () => {
-    try {
-      await promisify(fs.access)(path.join(PACKS_PATH, '1.13.2'));
-      this.setState({ latestInstalled: true });
-    } catch (e) {
-      this.setState({ latestInstalled: false });
-    }
     // Downloads the versions list just the first time
     if (this.props.versionsManifest.length === 0) {
       this.props.getVanillaMCVersions();
+    }
+    if (this.props.latestMCVersions.release) {
+      try {
+        await promisify(fs.access)(path.join(PACKS_PATH, this.props.latestMCVersions.release));
+        this.setState({ latestInstalled: true });
+      } catch (e) {
+        this.setState({ latestInstalled: false });
+      }
     }
   };
 
@@ -106,28 +108,33 @@ export default class Home extends Component<Props> {
                   marginTop: 15,
                   textAlign: 'center'
                 }}
-                title="Try out the new v1.13.2"
+                title={`Try out the newest release of minecraft`}
               >
-                V1.13.2 has just been released. Wanna try it out?
                 {this.state.latestBtnClicked || this.state.latestInstalled ? (
-                  <Link
-                    to="/dmanager"
-                    style={{ display: 'block', margin: '35px auto' }}
-                  >
-                    Go to your instances
-                  </Link>
+                  <div>
+                    <p>&nbsp;</p>
+                    <Link
+                      to="/dmanager"
+                      style={{ display: 'block', margin: '35px auto' }}
+                    >
+                      Latest installed, go to instances to start playing.
+                    </Link>
+                  </div>
                 ) : (
-                  <Button
-                    type="primary"
-                    loading={this.props.packCreationLoading}
-                    style={{ display: 'block', margin: '35px auto' }}
-                    onClick={() => {
-                      this.props.createPack('1.13.2', '1.13.2');
-                      this.setState({ latestBtnClicked: true });
-                    }}
-                  >
-                    Install and Start v1.13.2
-                  </Button>
+                  <div>
+                    <p>{this.props.latestMCVersions.release} has just been released. Wanna try it out?</p>
+                    <Button
+                      type="primary"
+                      loading={this.props.packCreationLoading}
+                      style={{ display: 'block', margin: '35px auto' }}
+                      onClick={() => {
+                        this.props.createPack(this.props.latestMCVersions.release, this.props.latestMCVersions.release);
+                        this.setState({ latestBtnClicked: true });
+                      }}
+                    >
+                      Install {this.props.latestMCVersions.release}
+                    </Button>
+                  </div>
                 )}
               </Card>
             </div>

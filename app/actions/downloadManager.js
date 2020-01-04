@@ -480,13 +480,12 @@ export function downloadPack(pack, isRepair = false) {
         if (installProfileJson.data[finalArg]) {
           // Handle special case
           if (finalArg === 'BINPATCH') {
-            return path
-              .join(
-                INSTANCES_PATH,
+            return '"' + path
+              .join(INSTANCES_PATH,
                 'libraries',
-                ...arraify(installProfileJson.path)
+                ...arraify(installProfileJson.path),
               )
-              .replace('.jar', '-clientdata.lzma');
+              .replace('.jar', '-clientdata.lzma') + '"';
           }
           // Return replaced string
           return installProfileJson.data[finalArg].client;
@@ -524,6 +523,9 @@ export function downloadPack(pack, isRepair = false) {
         const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
         const mainClass = jarFile.valueForManifestEntry('Main-Class');
 
+        var currentProcess = (processors[p].jar).split(':')[1]
+        log.info(`Forge installer [${i}/${processors.length}]: ${currentProcess} - starting.`);
+
         const { stderr, stdout } = await promisify(exec)(
           `"${javaPath}" -classpath "${filePath}${CLASSPATH_DIVIDER_CHAR}${classPaths.join(
             CLASSPATH_DIVIDER_CHAR
@@ -531,7 +533,12 @@ export function downloadPack(pack, isRepair = false) {
           { maxBuffer: 10000000000 }
         );
 
-        log.error(stderr);
+        if (stderr) {
+          log.info(`Forge installer [${i}/${processors.length}]: ${currentProcess} - Finished with error.`);
+          log.error(stderr);
+        } else {
+          log.info(`Forge installer [${i}/${processors.length}]: ${currentProcess} - Finished.`);
+        }
         dispatch(updateDownloadProgress(90, 10, i, processors.length));
       }
     }

@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -47,6 +47,7 @@
     "package-ci": "yarn postinstall && yarn build && cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder --publish onTag",
     "package-linux": "yarn build && cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder build --linux",
     "package-win": "yarn build && cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder build --win --x64",
+    "package-osx": "yarn build && cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder build --mac",
     "postinstall": "yarn flow-typed && cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder install-app-deps package.json && yarn build-dll",
     "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{js,jsx,json,html,css,less,scss,yml}'",
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",

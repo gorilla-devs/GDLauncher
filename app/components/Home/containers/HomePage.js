@@ -11,7 +11,8 @@ function mapStateToProps(state) {
     newUser: state.auth.newUser,
     news: state.news,
     packCreationLoading: state.packCreator.loading,
-    versionsManifest: state.packCreator.versionsManifest
+    versionsManifest: state.packCreator.versionsManifest,
+    latestMCVersions: state.packCreator.latestMCVersions
   };
 }
 

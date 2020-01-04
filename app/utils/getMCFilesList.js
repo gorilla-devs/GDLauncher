@@ -6,6 +6,7 @@ import makeDir from 'make-dir';
 import SysOS from 'os';
 import { promisify } from 'util';
 import compressing from 'compressing';
+import log from 'electron-log';
 import {
   INSTANCES_PATH,
   PACKS_PATH,
@@ -24,7 +25,14 @@ export const extractMainJar = async json => {
 };
 
 export const extractVanillaLibs = async json => {
+  log.info("Parsing json version for libraries");
   const libs = [];
+  const MC_OS_Lookup = {
+    // Mojang gave osx different names in parts of different versions..
+    Darwin: ['osx', 'macos'],
+    Windows_NT: ['windows', 'windows-64'],
+    Linux: ['linux']
+  };
   await Promise.all(
     json.libraries
       .filter(lib => !parseLibRules(lib.rules))
@@ -39,24 +47,24 @@ export const extractVanillaLibs = async json => {
             )
           });
         }
-        if (
-          'classifiers' in lib.downloads &&
-          `natives-${convertOSToMCFormat(SysOS.type())}` in
-          lib.downloads.classifiers
-        ) {
-          libs.push({
-            url:
-              lib.downloads.classifiers[
-                `natives-${convertOSToMCFormat(SysOS.type())}`
-              ].url,
-            path: path.join(
-              INSTANCES_PATH,
-              'libraries',
-              lib.downloads.classifiers[
-                `natives-${convertOSToMCFormat(SysOS.type())}`
-              ].path
-            ),
-            natives: true
+        if ('classifiers' in lib.downloads) {
+          MC_OS_Lookup[SysOS.type()].forEach(os_type => {
+            if (`natives-${os_type}` in lib.downloads.classifiers) {
+              libs.push({
+                url:
+                  lib.downloads.classifiers[
+                    `natives-${os_type}`
+                  ].url,
+                path: path.join(
+                  INSTANCES_PATH,
+                  'libraries',
+                  lib.downloads.classifiers[
+                    `natives-${os_type}`
+                  ].path
+                ),
+                natives: true
+              });
+            }
           });
         }
       })
@@ -201,13 +209,13 @@ function parseLibRules(rules) {
     rules.forEach(({ action, os }) => {
       if (
         action === 'allow' &&
-        ((os && SysOS.name === convertOSToMCFormat(SysOS.type())) || !os)
+        ((os && os.name === convertOSToMCFormat(SysOS.type())) || !os)
       ) {
         skip = false;
       }
       if (
         action === 'disallow' &&
-        ((os && SysOS.name === convertOSToMCFormat(SysOS.type())) || !os)
+        ((os && os.name === convertOSToMCFormat(SysOS.type())) || !os)
       ) {
         skip = true;
       }

@@ -57,6 +57,11 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
     os.release().substr(0, 2) === 10
       ? '"-Dos.name=Windows 10" -Dos.version=10.0 '
       : '';
+  // If OSX and 1.13+ then we need something special to be added.
+  const OSX_XstartOnFirstThread = 
+    os.type() === 'Darwin' && vanillaJSON.arguments
+      ? '-XstartOnFirstThread'
+      : '';
   // It concatenates vanilla and forge libraries. If the instance does not contain forge, it concatenates an empty array
   const libs = await computeVanillaAndForgeLibraries(vanillaJSON, forgeJSON);
   const Arguments = getMCArguments(
@@ -77,7 +82,7 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
 
 "${javaPath}" ${config.overrideArgs ||
     javaArguments} -Xmx${instanceConfigJSON.overrideMemory ||
-    settings.java.memory}m ${dosName} -Djava.library.path="${path.join(
+    settings.java.memory}m ${dosName} ${OSX_XstartOnFirstThread} -Djava.library.path="${path.join(
       PACKS_PATH,
       packName,
       'natives'
@@ -88,10 +93,10 @@ const getStartCommand = async (packName, userData, settings, javaArguments) => {
       vanillaJSON.id,
       `${vanillaJSON.id}.jar`
     )}"
- -cp ${libs
+ -cp "${libs
       .filter(lib => !lib.natives)
-      .map(lib => `"${lib.path}"`)
-      .join(CLASSPATH_DIVIDER_CHAR)}${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
+      .map(lib => `${lib.path}`)
+      .join(CLASSPATH_DIVIDER_CHAR)}"${CLASSPATH_DIVIDER_CHAR}${`"${path.join(
         INSTANCES_PATH,
         'versions',
         vanillaJSON.id,
