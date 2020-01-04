@@ -34,7 +34,7 @@ export const getAddonFiles = async (addonID: number | string) => {
 
 export const getAddonDescription = async (addonID: number | string) => {
   const url = `${CURSEMETA_API_URL}/addon/${addonID}/description`;
-  return makeRequest(url);
+  return makeRequest(url).then(data => data.replace(/\/linkout\?remoteUrl\=/g,'').replace(/%252f/g, '/').replace(/%253a/g, ':').replace(/%253f/g, '?').replace(/%253d/g, '\='));
 };
 
 export const getAddonFile = async (
@@ -50,7 +50,7 @@ export const getAddonFileChangelog = async (
   fileID: number | string
 ) => {
   const url = `${CURSEMETA_API_URL}/addon/${addonID}/file/${fileID}/changelog`;
-  return makeRequest(url);
+  return makeRequest(url).then(data => data.replace(/\/linkout\?remoteUrl\=/g,'').replace(/%252f/g, '/').replace(/%253a/g, ':').replace(/%253f/g, '?').replace(/%253d/g, '\='));
 };
 
 export const getAddonFileIDFromVersion = async (
