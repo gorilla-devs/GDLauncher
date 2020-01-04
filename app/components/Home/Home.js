@@ -128,7 +128,7 @@ export default class Home extends Component<Props> {
                       loading={this.props.packCreationLoading}
                       style={{ display: 'block', margin: '35px auto' }}
                       onClick={() => {
-                        this.props.createPack(`${this.props.latestMCVersions.release}`, `${this.props.latestMCVersions.release}`);
+                        this.props.createPack(this.props.latestMCVersions.release, this.props.latestMCVersions.release);
                         this.setState({ latestBtnClicked: true });
                       }}
                     >
