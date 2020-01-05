@@ -10,11 +10,16 @@ const HeaderComponent = styled.div`
   align-items: center;
   font-size: 16px;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   padding: 0 10px;
   height: 40px;
   background: ${props => props.theme.palette.grey[700]};
   border-radius: 4px;
+  h3 {
+    line-height: 40px;
+    margin: 0;
+  }
 `;
 
 const Modal = ({

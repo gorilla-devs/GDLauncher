@@ -62,7 +62,7 @@ const Content = ({
                   setPage(0);
                 }}
               >
-                Create New Instance
+                Create Empty Instance
               </MenuItem>
               <MenuItem
                 active={page === 1}

@@ -10,16 +10,18 @@ import { getAddonDescription, getAddonFiles } from "../api";
 import CloseButton from "../components/CloseButton";
 import { closeModal } from "../reducers/modals/actions";
 
-const AddInstance = ({ modpack }) => {
+const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
   const [files, setFiles] = useState(null);
+  const [selectedId, setSelectedId] = useState(false);
 
   useEffect(() => {
     getAddonDescription(modpack.id).then(data => setDescription(data.data));
     getAddonFiles(modpack.id).then(data => setFiles(data.data));
   }, []);
 
+  const handleChange = value => setSelectedId(value);
 
   const primaryImage = modpack.attachments.find(v => v.isDefault);
   return (
@@ -42,13 +44,30 @@ const AddInstance = ({ modpack }) => {
           <Content>{ReactHtmlParser(description)}</Content>
         </Container>
         <Footer>
-          <StyledSelect placeholder="Select a version">
+          <StyledSelect placeholder="Select a version" onChange={handleChange}>
             {(files || []).map(file => (
-              <Select.Option title={file.displayName} key={file.id} value={file.id}>
+              <Select.Option
+                title={file.displayName}
+                key={file.id}
+                value={file.id}
+              >
                 {file.displayName}
               </Select.Option>
             ))}
           </StyledSelect>
+          <Button
+            type="primary"
+            disabled={!selectedId}
+            onClick={() => {
+              const modpackFile = files.find(file => file.id === selectedId);
+              dispatch(closeModal());
+              setVersion(["twitchModpack", modpack.id, modpackFile.id]);
+              setModpack(modpack);
+              setStep(1);
+            }}
+          >
+            Download
+          </Button>
         </Footer>
       </>
     </Modal>
@@ -128,6 +147,7 @@ const Footer = styled.div`
   position: absolute;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   bottom: 0;
   left: 0;
   height: 70px;

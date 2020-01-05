@@ -149,6 +149,7 @@ const InstanceName = ({
                   </ModpackName>
                   <Input
                     state={state1}
+                    size="large"
                     placeholder="Instance Name"
                     onChange={e => setInstanceName(e.target.value)}
                     css={`

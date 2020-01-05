@@ -79,7 +79,14 @@ const ModpacksListWrapper = ({
           </div>
           <div
             onClick={() => {
-              dispatch(openModal("ModpackDescription", { modpack }));
+              dispatch(
+                openModal("ModpackDescription", {
+                  modpack,
+                  setVersion,
+                  setModpack,
+                  setStep
+                })
+              );
             }}
           >
             Explore

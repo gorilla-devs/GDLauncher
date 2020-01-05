@@ -2,6 +2,7 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Cascader } from "antd";
+import styled from "styled-components";
 
 const NewInstance = ({ setVersion }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -110,14 +111,27 @@ const NewInstance = ({ setVersion }) => {
   }, [vanillaManifest, fabricManifest, forgeManifest]);
 
   return (
-    <div>
+    <Container>
       <Cascader
         options={filteredVersions}
         onChange={setVersion}
         placeholder="Select a version"
+        size="large"
+        css={`
+          && {
+            width: 400px;
+          }
+        `}
       />
-    </div>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+`;
 
 export default React.memo(NewInstance);

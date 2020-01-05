@@ -112,6 +112,6 @@ const HeaderContainer = styled.div``;
 
 const ModpacksContainer = styled.div`
   height: calc(100% - 15px);
-  overflow-y: auto;
+  overflow: hidden;
   padding: 10px 0;
 `;

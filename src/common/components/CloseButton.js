@@ -16,7 +16,6 @@ export default CloseButton;
 const CloseIcon = styled.div`
   font-size: 20px;
   width: 20px;
-  height: 20px;
   cursor: pointer;
   transition: all 0.15s ease-in-out;
   &:hover {
