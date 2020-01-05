@@ -16,6 +16,7 @@ import { getAddonFile } from "../../api";
 import { downloadAddonZip } from "../../../app/desktop/utils";
 import { _getInstancesPath } from "../../utils/selectors";
 import { transparentize } from "polished";
+import bgImage from "../../../common/assets/mcCube.jpg";
 
 const InstanceName = ({
   in: inProp,
@@ -31,6 +32,12 @@ const InstanceName = ({
   const [instanceName, setInstanceName] = useState("");
   const [clicked, setClicked] = useState(false);
 
+  const wait = s => {
+    return new Promise(resolve => {
+      setTimeout(() => resolve(), s * 1000);
+    });
+  };
+
   const createInstance = async () => {
     if (!version || !instanceName) return;
     const isVanilla = version[0] === "vanilla";
@@ -39,6 +46,7 @@ const InstanceName = ({
     const isTwitchModpack = version[0] === "twitchModpack";
     if (isVanilla) {
       dispatch(addToQueue(instanceName, [version[0], version[2]]));
+      await wait(2);
     } else if (isFabric) {
       const mappedItem = fabricManifest.mappings.find(
         v => v.version === version[2]
@@ -52,8 +60,10 @@ const InstanceName = ({
           version[3]
         ])
       );
+      await wait(2);
     } else if (isForge) {
       dispatch(addToQueue(instanceName, version));
+      await wait(2);
     } else if (isTwitchModpack) {
       const manifest = await downloadAddonZip(
         version[1],
@@ -79,7 +89,10 @@ const InstanceName = ({
       {state => (
         <Animation
           state={state}
-          bg={modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl}
+          bg={
+            modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl ||
+            bgImage
+          }
         >
           <Transition in={clicked} timeout={200}>
             {state1 => (
@@ -126,8 +139,13 @@ const InstanceName = ({
                     z-index: 100001;
                   `}
                 >
-                  <ModpackName state={state1} name={modpack?.name}>
-                    {modpack?.name}
+                  <ModpackName
+                    state={state1}
+                    name={
+                      modpack?.name || (version && `Minecraft ${version[0]}`)
+                    }
+                  >
+                    {modpack?.name || (version && `Minecraft ${version[0]}`)}
                   </ModpackName>
                   <Input
                     state={state1}
@@ -274,6 +292,7 @@ const ModpackName = styled.span`
     0.2s ease-in-out forwards;
   box-sizing: border-box;
   overflow: hidden;
+  text-transform: capitalize;
   padding: 20px;
   &:before,
   &:after {
