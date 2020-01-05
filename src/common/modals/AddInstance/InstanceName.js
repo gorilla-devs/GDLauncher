@@ -126,7 +126,9 @@ const InstanceName = ({
                     z-index: 100001;
                   `}
                 >
-                  <ModpackName state={state1}>{modpack?.name}</ModpackName>
+                  <ModpackName state={state1} name={modpack?.name}>
+                    {modpack?.name}
+                  </ModpackName>
                   <Input
                     state={state1}
                     placeholder="Instance Name"
@@ -211,7 +213,7 @@ const BackgroundOverlay = styled.div`
   background: ${props => transparentize(0.4, props.theme.palette.grey[900])};
 `;
 
-const ModpackNameKeyframe = keyframes`
+const ModpackNameKeyframe = props => keyframes`
   from {
     transform: scale(1) translateY(0);
   }
@@ -221,7 +223,7 @@ const ModpackNameKeyframe = keyframes`
   }
 
   to {
-    transform: scale(2) translateY(80%);
+    transform: scale(${props.name.length < 16 ? 2 : 1}) translateY(80%);
   }
 `;
 
