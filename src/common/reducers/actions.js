@@ -3,7 +3,9 @@ import path from "path";
 import { remote, ipcRenderer } from "electron";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
-import semver, { coerce } from "semver";
+import coerce from "semver/functions/coerce";
+import gte from 'semver/functions/gte';
+import lt from 'semver/functions/lt';
 import omitBy from "lodash.omitby";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
@@ -86,7 +88,7 @@ export function initManifests() {
         .filter(
           ver =>
             ver.gameVersion === v.id &&
-            semver.gte(coerce(ver.gameVersion), coerce("1.6.4"))
+            gte(coerce(ver.gameVersion), coerce("1.6.4"))
         )
         .map(ver => ver.name.replace("forge-", ""));
     });
@@ -636,7 +638,7 @@ export function downloadForge(instanceName) {
       _getLibrariesPath(state)
     );
 
-    if (semver.lt(coerce(modloader[2]), coerce("10.13.1.1217"))) {
+    if (lt(coerce(modloader[2]), coerce("10.13.1.1217"))) {
       await downloadFile(
         path.join(_getInstancesPath(state), instanceName, "mods", "LJF.jar"),
         GDL_LEGACYJAVAFIXER_MOD_URL
@@ -936,7 +938,7 @@ export const launchInstance = instanceName => {
 
     const getJvmArguments =
       mcJson.assets !== "legacy" &&
-      semver.gte(coerce(mcJson.assets), coerce("1.13"))
+      gte(coerce(mcJson.assets), coerce("1.13"))
         ? getJVMArguments113
         : getJVMArguments112;
 
