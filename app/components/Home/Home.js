@@ -122,7 +122,7 @@ export default class Home extends Component<Props> {
                   </div>
                 ) : (
                   <div>
-                    <p>{this.props.latestMCVersions.release} has just been released. Wanna try it out?</p>
+                    <p>{this.props.latestMCVersions.release} is now released. Want to try it out?</p>
                     <Button
                       type="primary"
                       loading={this.props.packCreationLoading}
