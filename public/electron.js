@@ -29,7 +29,11 @@ function createWindow() {
     }
   });
 
-  tray = new Tray(path.join(__dirname, "../src/common/assets/logo.png"));
+  tray = new Tray(
+    isDev
+      ? path.join(__dirname, "./logo.png")
+      : path.join(__dirname, "../build/logo.png")
+  );
   const trayMenuTemplate = [
     {
       label: "GDLauncher",

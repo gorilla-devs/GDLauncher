@@ -32,7 +32,14 @@ const AddInstance = () => {
         version={version}
         setModpack={setModpack}
       />
-      <InstanceName version={version} in={step === 1} setStep={setStep} modpack={modpack} />
+      <InstanceName
+        version={version}
+        in={step === 1}
+        setStep={setStep}
+        modpack={modpack}
+        setVersion={setVersion}
+        setModpack={setModpack}
+      />
     </Modal>
   );
 };

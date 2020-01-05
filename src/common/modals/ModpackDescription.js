@@ -3,20 +3,23 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import ReactHtmlParser from "react-html-parser";
-import { Checkbox, TextField, Cascader, Button, Input } from "antd";
+import { Checkbox, TextField, Cascader, Button, Input, Select } from "antd";
 import Modal from "../components/Modal";
 import { transparentize } from "polished";
-import { getAddonDescription } from "../api";
+import { getAddonDescription, getAddonFiles } from "../api";
 import CloseButton from "../components/CloseButton";
 import { closeModal } from "../reducers/modals/actions";
 
 const AddInstance = ({ modpack }) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
+  const [files, setFiles] = useState(null);
 
   useEffect(() => {
     getAddonDescription(modpack.id).then(data => setDescription(data.data));
+    getAddonFiles(modpack.id).then(data => setFiles(data.data));
   }, []);
+
 
   const primaryImage = modpack.attachments.find(v => v.isDefault);
   return (
@@ -38,13 +41,27 @@ const AddInstance = ({ modpack }) => {
           </Parallax>
           <Content>{ReactHtmlParser(description)}</Content>
         </Container>
-        <Footer></Footer>
+        <Footer>
+          <StyledSelect placeholder="Select a version">
+            {(files || []).map(file => (
+              <Select.Option title={file.displayName} key={file.id} value={file.id}>
+                {file.displayName}
+              </Select.Option>
+            ))}
+          </StyledSelect>
+        </Footer>
       </>
     </Modal>
   );
 };
 
 export default React.memo(AddInstance);
+
+const StyledSelect = styled(Select)`
+  && {
+    width: 170px;
+  }
+`;
 
 const StyledCloseButton = styled.div`
   position: absolute;
@@ -109,9 +126,14 @@ const Content = styled.div`
 
 const Footer = styled.div`
   position: absolute;
+  display: flex;
+  align-items: center;
   bottom: 0;
   left: 0;
   height: 70px;
   width: 100%;
   background: ${props => props.theme.palette.grey[700]};
+  && > * {
+    margin: 0 10px;
+  }
 `;
