@@ -13,15 +13,10 @@ const _downloadQueue = state => state.downloadQueue;
 const _launcherManifest = state => state.app.launcherManifest;
 const _dataPath = state => state.settings.dataPath;
 
-export const _getInstances = createSelector(
-  _instances,
-  instances => instances
-);
+export const _getInstances = createSelector(_instances, instances => instances);
 
-export const _getInstance = createSelector(
-  _instances,
-  instances =>
-    memoize(instance => instances.list.find(v => v.name === instance))
+export const _getInstance = createSelector(_instances, instances =>
+  memoize(instance => instances.list.find(v => v.name === instance))
 );
 
 export const _getCurrentAccount = createSelector(
@@ -31,10 +26,7 @@ export const _getCurrentAccount = createSelector(
     accounts.find(account => account.selectedProfile.id === currentAccountId)
 );
 
-export const _getAccounts = createSelector(
-  _accounts,
-  accounts => accounts
-);
+export const _getAccounts = createSelector(_accounts, accounts => accounts);
 
 export const _getDownloadQueue = createSelector(
   _downloadQueue,
@@ -69,14 +61,12 @@ export const _getJavaPath = createSelector(
   }
 );
 
-export const _getInstancesPath = createSelector(
-  _dataPath,
-  dataPath => path.join(dataPath, "instances")
+export const _getInstancesPath = createSelector(_dataPath, dataPath =>
+  path.join(dataPath, "instances")
 );
 
-export const _getDataStorePath = createSelector(
-  _dataPath,
-  dataPath => path.join(dataPath, "datastore")
+export const _getDataStorePath = createSelector(_dataPath, dataPath =>
+  path.join(dataPath, "datastore")
 );
 
 export const _getLibrariesPath = createSelector(
@@ -89,7 +79,6 @@ export const _getMinecraftVersionsPath = createSelector(
   librariesPath => path.join(librariesPath, "net", "minecraft")
 );
 
-export const _getAssetsPath = createSelector(
-  _getDataStorePath,
-  datastorePath => path.join(datastorePath, "assets")
+export const _getAssetsPath = createSelector(_getDataStorePath, datastorePath =>
+  path.join(datastorePath, "assets")
 );

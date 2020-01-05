@@ -26,7 +26,9 @@ const ModpacksListWrapper = ({
 
   setVersion,
   // Callback function responsible for loading the next page of items.
-  loadNextPage
+  loadNextPage,
+
+  setModpack
 }) => {
   const dispatch = useDispatch();
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
@@ -69,6 +71,7 @@ const ModpacksListWrapper = ({
                 modpack.id,
                 modpack.latestFiles[modpack.latestFiles.length - 1].id
               ]);
+              setModpack(modpack);
               setStep(1);
             }}
           >
@@ -105,7 +108,7 @@ const ModpacksListWrapper = ({
     <InfiniteLoader
       isItemLoaded={isItemLoaded}
       itemCount={itemCount}
-      loadMoreItems={() => loadMoreItems(false)}
+      loadMoreItems={() => loadMoreItems()}
     >
       {({ onItemsRendered, ref }) => (
         <List

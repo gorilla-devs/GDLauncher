@@ -4,8 +4,8 @@ import { remote, ipcRenderer } from "electron";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
 import coerce from "semver/functions/coerce";
-import gte from 'semver/functions/gte';
-import lt from 'semver/functions/lt';
+import gte from "semver/functions/gte";
+import lt from "semver/functions/lt";
 import omitBy from "lodash.omitby";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
@@ -937,8 +937,7 @@ export const launchInstance = instanceName => {
     );
 
     const getJvmArguments =
-      mcJson.assets !== "legacy" &&
-      gte(coerce(mcJson.assets), coerce("1.13"))
+      mcJson.assets !== "legacy" && gte(coerce(mcJson.assets), coerce("1.13"))
         ? getJVMArguments113
         : getJVMArguments112;
 

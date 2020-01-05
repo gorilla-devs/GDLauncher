@@ -12,6 +12,7 @@ const AddInstance = () => {
   const [page, setPage] = useState(0);
   const [version, setVersion] = useState(null);
   const [step, setStep] = useState(0);
+  const [modpack, setModpack] = useState(null);
 
   return (
     <Modal
@@ -29,8 +30,9 @@ const AddInstance = () => {
         setStep={setStep}
         setVersion={setVersion}
         version={version}
+        setModpack={setModpack}
       />
-      <InstanceName version={version} in={step === 1} setStep={setStep} />
+      <InstanceName version={version} in={step === 1} setStep={setStep} modpack={modpack} />
     </Modal>
   );
 };

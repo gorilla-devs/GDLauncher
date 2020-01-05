@@ -19,12 +19,13 @@ const Content = ({
   page,
   setPage,
   setVersion,
-  version
+  version,
+  setModpack
 }) => {
   let pages = [
-    <NewInstance setVersion={setVersion} />,
-    <TwitchModpacks setVersion={setVersion} setStep={setStep} />,
-    <Import setVersion={setVersion} />
+    <NewInstance setVersion={setVersion} setModpack={setModpack} />,
+    <TwitchModpacks setVersion={setVersion} setStep={setStep} setModpack={setModpack} />,
+    <Import setVersion={setVersion} setModpack={setModpack} />
   ];
 
   return (
@@ -113,6 +114,7 @@ const Content = ({
                   onClick={() => {
                     if (version) {
                       setStep(1);
+                      setModpack(null);
                     }
                   }}
                 >

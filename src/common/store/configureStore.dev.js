@@ -21,7 +21,6 @@ const configureStore = () => {
   const middleware = [];
   const enhancers = [thunk];
 
-
   const logger = createLogger({
     // We need to hide the UPDATE_PROGRESS dispatches, since they are just too many and they slow down the execution
     predicate: (getState, action) => action.type !== UPDATE_DOWNLOAD_PROGRESS,

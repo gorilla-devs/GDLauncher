@@ -8,7 +8,7 @@ import { getSearch } from "../../../api";
 import ModpacksListWrapper from "./ModpacksListWrapper";
 
 let lastRequest;
-const TwitchModpacks = ({ setStep, setVersion }) => {
+const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState("Featured");
@@ -24,6 +24,7 @@ const TwitchModpacks = ({ setStep, setVersion }) => {
   }, 500);
 
   const loadMoreModpacks = async (reset = false) => {
+    if ((reset && modpacks.length === 0) || loading) return;
     const reqObj = {};
     lastRequest = reqObj;
     setLoading(true);
@@ -82,6 +83,7 @@ const TwitchModpacks = ({ setStep, setVersion }) => {
               height={height}
               setStep={setStep}
               setVersion={setVersion}
+              setModpack={setModpack}
             />
           )}
         </AutoSizer>

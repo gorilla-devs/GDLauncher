@@ -15,8 +15,9 @@ import { Input } from "antd";
 import { getAddonFile } from "../../api";
 import { downloadAddonZip } from "../../../app/desktop/utils";
 import { _getInstancesPath } from "../../utils/selectors";
+import { transparentize } from "polished";
 
-const InstanceName = ({ in: inProp, setStep, version }) => {
+const InstanceName = ({ in: inProp, setStep, version, modpack }) => {
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
@@ -68,7 +69,11 @@ const InstanceName = ({ in: inProp, setStep, version }) => {
   return (
     <Transition in={inProp} timeout={200}>
       {state => (
-        <Animation state={state}>
+        <Animation
+          state={state}
+          bg={modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl}
+        >
+          <BackgroundOverlay />
           <div
             css={`
               flex: 1;
@@ -78,6 +83,8 @@ const InstanceName = ({ in: inProp, setStep, version }) => {
               border-radius: 4px;
               font-size: 40px;
               cursor: pointer;
+              z-index: 100001;
+              margin: 20px;
               &:hover {
                 background-color: ${props => props.theme.palette.primary.light};
               }
@@ -95,14 +102,17 @@ const InstanceName = ({ in: inProp, setStep, version }) => {
               flex-direction: column;
               justify-content: center;
               align-items: center;
+              z-index: 100001;
             `}
           >
+            <ModpackName>{modpack?.name}</ModpackName>
             <Input
               placeholder="Instance Name"
               onChange={e => setInstanceName(e.target.value)}
               css={`
                 && {
                   width: 300px;
+                  margin: 150px;
                 }
               `}
             />
@@ -116,6 +126,8 @@ const InstanceName = ({ in: inProp, setStep, version }) => {
               border-radius: 4px;
               font-size: 40px;
               cursor: pointer;
+              z-index: 100001;
+              margin: 20px;
               &:hover {
                 background-color: ${props => props.theme.palette.primary.light};
               }
@@ -143,10 +155,24 @@ const Animation = styled.div`
   align-items: flex-end;
   top: 0;
   left: 0;
-  padding: 20px;
-  background: ${props => props.theme.palette.primary.main};
+  background: url(${props => props.bg});
+  background-repeat: no-repeat;
+  background-size: cover;
   will-change: transform;
   transform: translateX(
     ${({ state }) => (state === "entering" || state === "entered" ? 0 : 101)}%
   );
+`;
+
+const BackgroundOverlay = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(12px);
+  background: ${props => transparentize(0.4, props.theme.palette.grey[900])};
+`;
+
+const ModpackName = styled.span`
+  font-weight: bold;
+  font-size: 45px;
 `;
