@@ -91,7 +91,7 @@ const InstanceName = ({
           state={state}
           bg={
             modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl ||
-            bgImage
+            (version && version[0] !== "twitchModpack" && bgImage)
           }
         >
           <Transition in={clicked} timeout={200}>
