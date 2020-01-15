@@ -83,6 +83,7 @@ const ThirdStep = props => {
         ]
       },
       manifestType: 'minecraftModpack',
+      overrides: "overrides",
       manifestVersion: 1,
       version: config.modpackVersion,
       author: config.projectID ? data.primaryAuthorName : props.username,
