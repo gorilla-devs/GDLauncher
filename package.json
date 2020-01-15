@@ -292,13 +292,15 @@
     },
     "win": {
       "target": [
-        "nsis"
+        "nsis",
+        "zip"
       ],
       "artifactName": "${productName}-win-setup.${ext}"
     },
     "linux": {
       "target": [
-        "AppImage"
+        "AppImage",
+        "zip"
       ],
       "category": "Game",
       "artifactName": "${productName}-linux-setup.${ext}"
