@@ -41,7 +41,7 @@ const Title = styled.h3`
   position: absolute;
   font-size: 15px;
   font-weight: 700;
-  color: ${props => props.theme.palette.text.main};
+  color: ${props => props.theme.palette.text.primary};
 `;
 
 const Paragraph = styled.p`
@@ -53,6 +53,10 @@ const Paragraph = styled.p`
 const Hr = styled.hr`
   opacity: 0.29;
   background: ${props => props.theme.palette.secondary.light};
+`;
+
+const H1 = styled.h1`
+  color: ${props => props.theme.palette.text.primary};
 `;
 
 const StyledButtons = styled(Button)``;
@@ -92,14 +96,14 @@ export default function MyAccountPreferences() {
 
   return (
     <Instances>
-      <h1
+      <H1
         css={`
           float: left;
           margin: 0;
         `}
       >
         Instances
-      </h1>
+      </H1>
       <AutodetectPath>
         <Title
           css={`
@@ -123,9 +127,8 @@ export default function MyAccountPreferences() {
             onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
             disabled
             css={`
-              position: absolute;
-              top: 110px;
-              right: 0px;
+              margin-top: 70px;
+              float: right;
             `}
             color="primary"
           >
@@ -135,9 +138,8 @@ export default function MyAccountPreferences() {
           <StyledButtons
             onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
             css={`
-              position: absolute;
-              top: 110px;
-              right: 0px;
+              margin-top: 70px;
+              float: right;
             `}
             color="primary"
           >
@@ -171,7 +173,7 @@ export default function MyAccountPreferences() {
             marginTop: "20px"
           }}
           color="primary"
-          onChange={e => setOverrideInstancesPath(e.target.checked)}
+          onChange={e => setOverrideInstancesPath(e)}
           checked={overrideInstancesPath}
         />
       </OverridePath>
@@ -179,8 +181,8 @@ export default function MyAccountPreferences() {
         <InstanceCustomPath>
           <div
             css={`
-              margin-top: 20px;
-              width: 100%;
+              margin-top: 20px !important;
+              width: 100% !important;
             `}
           >
             <FontAwesomeIcon
@@ -190,9 +192,9 @@ export default function MyAccountPreferences() {
             />
             <Input
               css={`
-                width: 75%;
-                margin-right: 10px;
-                margin-left: 10px;
+                width: 75% !important;
+                margin-right: 10px !important;
+                margin-left: 10px !important;
               `}
               onChange={e => dispatch(updateInstancesPath(e.target.value))}
               value={InstancesP || InstancesPath}

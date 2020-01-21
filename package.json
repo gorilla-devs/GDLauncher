@@ -192,6 +192,7 @@
     "bluebird": "^3.7.2",
     "connected-react-router": "^6.6.1",
     "craco-antd": "^1.14.1",
+    "directory-tree": "^2.2.4",
     "discord-rpc": "^3.1.0",
     "electron-is-dev": "^1.1.0",
     "fs-extra": "^8.1.0",
@@ -234,6 +235,7 @@
     "semver": "^7.1.1",
     "styled-components": "^4.4.1",
     "typeface-roboto": "^0.0.75",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "yazl": "^2.5.1"
   }
 }

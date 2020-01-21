@@ -119,6 +119,14 @@ const Instance = ({ instanceName }) => {
       <ContextMenu id={instance.name}>
         <MenuItem>Manage</MenuItem>
         <MenuItem onClick={openFolder}>Open Folder</MenuItem>
+        <MenuItem
+          onClick={() =>
+            dispatch(openModal("ExportInstances", { instanceName }))
+          }
+        >
+          {" "}
+          Export
+        </MenuItem>
         <MenuItem divider />
         <MenuItem onClick={openConfirmationDeleteModal}>Delete</MenuItem>
       </ContextMenu>

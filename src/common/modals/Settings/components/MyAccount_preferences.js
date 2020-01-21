@@ -15,6 +15,7 @@ const { app } = require("electron").remote;
 const MyAccountPrf = styled.div`
   width: 100%;
   height: 100%;
+  overflow: auto;
 `;
 
 const PersonalData = styled.div`
@@ -27,7 +28,7 @@ const Title = styled.div`
   position: absolute;
   font-size: 15px;
   font-weight: 700;
-  color: ${props => props.theme.palette.text.main};
+  color: ${props => props.theme.palette.text.primary};
   z-index: 1;
 `;
 
@@ -122,6 +123,10 @@ const LauncherVersion = styled.div`
     float: left;
     color: ${props => props.theme.palette.text.third};
     margin: 0 0 0 6px;
+  }
+
+  h1 {
+    color: ${props => props.theme.palette.text.primary};
   }
 `;
 
@@ -228,9 +233,8 @@ export default function MyAccountPreferences() {
           have more bugs.
           <Select
             css={`
-              position: absolute;
-              top: 250px;
-              right: 0px;
+              margin-top: 250px;
+              float: right;
             `}
             onChange={e => dispatch(updateReleaseChannel(e.target.value))}
             value={releaseChannel}
@@ -263,8 +267,8 @@ export default function MyAccountPreferences() {
 
         <Select
           css={`
-            float: right;
-            margin-top: 20px;
+            margin-left: 219px !important;
+            margin-top: 20px !important;
           `}
           onChange={e => setConcurrentDownloads(e.target.value)}
           value={concurrentDownloads}

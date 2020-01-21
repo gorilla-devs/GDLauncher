@@ -44,7 +44,7 @@ const Title = styled.h3`
   position: absolute;
   font-size: 15px;
   font-weight: 700;
-  color: ${props => props.theme.palette.text.main};
+  color: ${props => props.theme.palette.text.secondary};
 `;
 
 const Paragraph = styled.p`
@@ -56,6 +56,10 @@ const Paragraph = styled.p`
 const Hr = styled.hr`
   opacity: 0.29;
   background: ${props => props.theme.palette.secondary.light};
+`;
+
+const H1 = styled.h1`
+  color: ${props => props.theme.palette.text.primary};
 `;
 
 const StyledButtons = styled(Button)``;
@@ -108,14 +112,14 @@ export default function MyAccountPreferences() {
 
   return (
     <JavaSettings>
-      <h1
+      <H1
         css={`
           float: left;
           margin: 0;
         `}
       >
         Java
-      </h1>
+      </H1>
       <AutodetectPath>
         <Title
           css={`
@@ -139,7 +143,7 @@ export default function MyAccountPreferences() {
             marginTop: "65px"
           }}
           color="primary"
-          onChange={c => setAutodetectJavaPath(c.target.checked)}
+          onChange={c => setAutodetectJavaPath(c)}
           checked={autodetectJavaPath}
         />
       </AutodetectPath>
@@ -164,9 +168,9 @@ export default function MyAccountPreferences() {
               />
               <Input
                 css={`
-                  width: 75%;
-                  margin-right: 10px;
-                  margin-left: 10px;
+                  width: 75% !important;
+                  margin-right: 10px !important;
+                  margin-left: 10px !important;
                 `}
                 onChange={e => dispatch(updateJavaPath(e.target.value))}
                 value={javaPath}
@@ -213,7 +217,7 @@ export default function MyAccountPreferences() {
         </p>
         <Slider
           css={`
-            margin-top: 20px;
+            margin-top: 20px !important;
           `}
           onChangeCommitted={(e, val) => dispatch(updateJavaMemory(val))}
           onChange={(e, val) => setMemory(val)}
@@ -233,8 +237,8 @@ export default function MyAccountPreferences() {
             top: 0;
             width: 100%;
             margin-top: 0px;
-            height: 8px;
-            text-align: left;
+            height: 8px !important;
+            text-align: left !important;
           `}
         >
           Java Custom Arguments
@@ -242,8 +246,8 @@ export default function MyAccountPreferences() {
         <p
           css={`
             marin-top: 20px;
-            width: 100%;
-            margin: 0;
+            width: 100% !important;
+            margin: 0 !important;
             text-align: left;
           `}
         >
@@ -252,16 +256,16 @@ export default function MyAccountPreferences() {
         <div
           css={`
             margin-top: 20px;
-            width: 100%;
+            width: 100% !important;
           `}
         >
           <Input
             onChange={e => dispatch(updateJavaArguments(e.target.value))}
             value={javaArgs}
             css={`
-              width: 83%;
-              height: 26px;
-              margin-right: 10px;
+              width: 83% !important;
+              height: 26px !important;
+              margin-right: 10px !important;
             `}
           />
           <StyledButtons

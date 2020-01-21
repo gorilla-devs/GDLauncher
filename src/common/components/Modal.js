@@ -22,6 +22,10 @@ const HeaderComponent = styled.div`
   }
 `;
 
+const Title = styled.h3`
+  color: ${props => props.theme.palette.text.primary};
+`;
+
 const Modal = ({
   transparentBackground,
   header,
@@ -47,7 +51,7 @@ const Modal = ({
     >
       {(header === undefined || header === true) && (
         <HeaderComponent>
-          <h3>{title || "Modal"}</h3>
+          <Title>{title || "Modal"}</Title>
           <CloseButton onClick={() => dispatch(closeModal())} />
         </HeaderComponent>
       )}
