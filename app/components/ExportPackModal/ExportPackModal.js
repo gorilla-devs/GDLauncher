@@ -17,6 +17,7 @@ const ExportPack = props => {
   const [unMount, setUnMount] = useState(false);
   // const [loading, setLoading] = useState(false);
   const [filePath, setFilePath] = useState(null);
+  const [packVersion, setPackVersion] =useState("0.1.0");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [actualStep, setActualStep] = useState(0);
   // const [packType, setPackType] = useState('Twitch');
@@ -64,6 +65,8 @@ const ExportPack = props => {
           filePath={filePath}
           showFileDialog={showFileDialog}
           setActualStep={setActualStep}
+          setPackVersion={setPackVersion}
+          packVersion={packVersion}
         />
       )}
       {actualStep === 1 && (
@@ -82,6 +85,7 @@ const ExportPack = props => {
           instanceName={props.match.params.instanceName}
           selectedFiles={selectedFiles}
           setUnMount={setUnMount}
+          packVersion={packVersion}
         />
       )}
     </Modal>

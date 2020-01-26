@@ -85,9 +85,9 @@ const ThirdStep = props => {
       manifestType: 'minecraftModpack',
       overrides: "overrides",
       manifestVersion: 1,
-      version: config.modpackVersion,
-      author: config.projectID ? data.primaryAuthorName : props.username,
-      projectID: config.projectID,
+      version: props.packVersion,
+      author: config.projectID ? data.authors[0].name : props.username,
+      projectID: config.projectID ? parseInt(config.projectID, 10) : undefined,
       name: instanceName,
       files: config.mods.map(mod => ({
         projectID: mod.projectID,

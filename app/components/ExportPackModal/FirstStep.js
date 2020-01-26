@@ -23,6 +23,12 @@ export default function FirstStep(props) {
               : path.basename(props.filePath)}
           </Button>
         </div>
+        <div>
+          <h2>What is the pack version number going to be?</h2>
+          <label>
+            <input type="text" name="inputPackVersion" defaultValue={props.packVersion} style={{color: "black"}} onChange={e => props.setPackVersion(e.target.value)} />
+          </label>
+        </div>
       </div>
       <ContinueButton
         filePath={props.filePath}
