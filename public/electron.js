@@ -2,7 +2,6 @@ const electron = require("electron");
 
 const { app, BrowserWindow, ipcMain, Tray, Menu } = electron;
 const path = require("path");
-const palette = require("../src/ui/theme");
 
 // const discordRPC = require("./discordRPC");
 
@@ -20,7 +19,7 @@ function createWindow() {
     height: 800,
     minWidth: 1100,
     minHeight: 800,
-    backgroundColor: palette.palette.secondary.main,
+    backgroundColor: "#353E48",
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
@@ -37,6 +36,8 @@ function createWindow() {
       delete details.responseHeaders["Access-Control-Allow-Origin"];
       // eslint-disable-next-line
       delete details.responseHeaders["access-control-allow-origin"];
+      // eslint-disable-next-line
+      details.responseHeaders["Access-Control-Allow-Origin"] = ["*"];
       callback({
         cancel: false,
         responseHeaders: details.responseHeaders
