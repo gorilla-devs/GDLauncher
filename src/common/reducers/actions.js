@@ -944,7 +944,7 @@ export const launchInstance = instanceName => {
         ? getJVMArguments113
         : getJVMArguments112;
 
-    const jvmArguments = await getJvmArguments(
+    const jvmArguments = getJvmArguments(
       libraries,
       mcMainFile,
       instancePath,
@@ -954,7 +954,18 @@ export const launchInstance = instanceName => {
       memory
     );
 
-    console.log(`"${javaPath}" ${jvmArguments.join(" ")}`);
+    console.log(
+      `"${javaPath}" ${getJvmArguments(
+        libraries,
+        mcMainFile,
+        instancePath,
+        assetsPath,
+        mcJson,
+        account,
+        memory,
+        true
+      ).join(" ")}`
+    );
 
     await ipcRenderer.invoke("hide-window");
 

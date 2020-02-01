@@ -246,7 +246,8 @@ export const copyAssetsToLegacy = async assets => {
   );
 };
 
-export const getJVMArguments112 = async (
+const hiddenToken = "__HIDDEN_TOKEN__";
+export const getJVMArguments112 = (
   libraries,
   mcjar,
   instancePath,
@@ -254,6 +255,7 @@ export const getJVMArguments112 = async (
   mcJson,
   account,
   memory,
+  hideAccessToken,
   jvmOptions = []
 ) => {
   const args = [];
@@ -308,10 +310,10 @@ export const getJVMArguments112 = async (
           val = account.selectedProfile.id.trim();
           break;
         case "auth_access_token":
-          val = account.accessToken;
+          val = hideAccessToken ? hiddenToken : account.accessToken;
           break;
         case "auth_session":
-          val = account.accessToken;
+          val = hideAccessToken ? hiddenToken : account.accessToken;
           break;
         case "user_type":
           val = "mojang";
@@ -336,7 +338,7 @@ export const getJVMArguments112 = async (
   return args;
 };
 
-export const getJVMArguments113 = async (
+export const getJVMArguments113 = (
   libraries,
   mcjar,
   instancePath,
@@ -344,6 +346,7 @@ export const getJVMArguments113 = async (
   mcJson,
   account,
   memory,
+  hideAccessToken,
   jvmOptions = []
 ) => {
   const argDiscovery = /\${*(.*)}/;
@@ -395,7 +398,7 @@ export const getJVMArguments113 = async (
             val = account.selectedProfile.id.trim();
             break;
           case "auth_access_token":
-            val = account.accessToken;
+            val = hideAccessToken ? hiddenToken : account.accessToken;
             break;
           case "user_type":
             val = "mojang";
