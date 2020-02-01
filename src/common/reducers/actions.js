@@ -266,8 +266,9 @@ export function downloadJava() {
     });
     await makeDir(path.join(javaBaseFolder, version));
 
+    const sevenZipPath = await get7zPath();
     const firstExtraction = extractFull(downloadLocation, tempFolder, {
-      $bin: get7zPath()
+      $bin: sevenZipPath
     });
     await new Promise((resolve, reject) => {
       firstExtraction.on("end", () => {
@@ -282,7 +283,7 @@ export function downloadJava() {
       path.join(tempFolder, path.basename(url, ".lzma")),
       path.join(javaBaseFolder, version),
       {
-        $bin: get7zPath()
+        $bin: sevenZipPath
       }
     );
     await new Promise((resolve, reject) => {
@@ -710,12 +711,13 @@ export function downloadForgeManifestFiles(instanceName) {
       "temp",
       "addon.zip"
     );
+    const sevenZipPath = await get7zPath();
     const extraction = extractFull(
       addonPathZip,
       path.join(_getInstancesPath(state), instanceName, "temp"),
       {
         recursive: true,
-        $bin: get7zPath(),
+        $bin: sevenZipPath,
         yes: true,
         $cherryPick: "overrides",
         $progress: true
