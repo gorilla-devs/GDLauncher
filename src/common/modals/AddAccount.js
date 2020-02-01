@@ -39,11 +39,13 @@ const AddAccount = ({ username }) => {
           </h1>
           <StyledInput
             disabled={!!username}
+            placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
           <StyledInput
             type="password"
+            placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
