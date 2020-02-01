@@ -4750,6 +4750,15 @@ electron-is-dev@^1.1.0:
   resolved "https://registry.yarnpkg.com/electron-is-dev/-/electron-is-dev-1.1.0.tgz#b15a2a600bdc48a51a857d460e05f15b19a2522c"
   integrity sha512-Z1qA/1oHNowGtSBIcWk0pcLEqYT/j+13xUw/MYOrBUOL4X7VN0i0KCTf5SqyvMPmW5pSPKbo28wkxMxzZ20YnQ==
 
+electron-nightly@^9.0.0-nightly.20200121:
+  version "9.0.0-nightly.20200121"
+  resolved "https://registry.yarnpkg.com/electron-nightly/-/electron-nightly-9.0.0-nightly.20200121.tgz#5da87650810f81bb8f5dcbf90728dbf9295c9789"
+  integrity sha512-nfqkjEy+V0gZR6ykhxgJ7hY9yyb2LyeL/OiVa/Cifpn8Iwb+L30PPrGiyxW77b3i4VKxaONfKfaD+yjMJb3Opw==
+  dependencies:
+    "@electron/get" "^1.0.1"
+    "@types/node" "^12.0.12"
+    extract-zip "^1.0.3"
+
 electron-publish@22.3.2:
   version "22.3.2"
   resolved "https://registry.yarnpkg.com/electron-publish/-/electron-publish-22.3.2.tgz#d2e60caf7a9643fe57e501c20acaf32c737b1c50"
@@ -4781,15 +4790,6 @@ electron-to-chromium@^1.3.341:
   version "1.3.344"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.344.tgz#f1397a633c35e726730c24be1084cd25c3ee8148"
   integrity sha512-tvbx2Wl8WBR+ym3u492D0L6/jH+8NoQXqe46+QhbWH3voVPauGuZYeb1QAXYoOAWuiP2dbSvlBx0kQ1F3hu/Mw==
-
-electron@^7.1.11:
-  version "7.1.11"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-7.1.11.tgz#3a95e35804af083d58b590513afea5e2290c4b66"
-  integrity sha512-YDXfnovKY+8iZ5ISQh1kRqYIRKbpOSxGXCx2WVxPFPutEQ7Q/Xzr3h4GePEY25/NXMytMfhKaAZAYjtWUm3r9Q==
-  dependencies:
-    "@electron/get" "^1.0.1"
-    "@types/node" "^12.0.12"
-    extract-zip "^1.0.3"
 
 elliptic@^6.0.0:
   version "6.5.2"
