@@ -10,8 +10,6 @@ import logo from "../../../assets/logo.png";
 import { _getCurrentAccount } from "../../../utils/selectors";
 import { updateReleaseChannel } from "../../../reducers/settings/actions";
 
-const { app } = require("electron").remote;
-
 const MyAccountPrf = styled.div`
   width: 100%;
   height: 100%;
@@ -352,8 +350,7 @@ export default function MyAccountPreferences() {
           <StyledButtons
             color="primary"
             onClick={() => {
-              app.relaunch();
-              app.exit(0);
+              ipcRenderer.invoke("appRestart");
             }}
           >
             Restart

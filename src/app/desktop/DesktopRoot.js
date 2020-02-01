@@ -22,6 +22,7 @@ import Navbar from "./components/Navbar";
 import routes from "./utils/routes";
 import { _getCurrentAccount } from "../../common/utils/selectors";
 import { isLatestJavaDownloaded, extract7z } from "./utils";
+import { updateDataPath } from "../../common/reducers/settings/actions";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -37,6 +38,10 @@ function DesktopRoot() {
 
   // Handle already logged in account redirect
   useDidMount(() => {
+    ipcRenderer
+      .invoke("getUserDataPath")
+      .then(res => dispatch(updateDataPath(res)))
+      .catch(console.error);
     dispatch(initManifests())
       .then(async data => {
         await extract7z();

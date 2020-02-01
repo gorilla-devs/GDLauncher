@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import fsa from "fs-extra";
 import path from "path";
-import { remote } from "electron";
+import { ipcRenderer } from "electron";
 import { Button, Input, Switch } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -12,7 +12,6 @@ import {
   faLevelDownAlt
 } from "@fortawesome/free-solid-svg-icons";
 import { _getInstancesPath } from "../../../utils/selectors";
-import { META_PATH } from "../../../utils/constants";
 import { updateInstancesPath } from "../../../reducers/settings/actions";
 
 const Instances = styled.div`
@@ -66,21 +65,20 @@ async function clearSharedData(InstancesPath, setDeletingInstances) {
     await fsa.emptyDir(path.join(InstancesPath, "assets"));
     await fsa.emptyDir(path.join(InstancesPath, "versions"));
     await fsa.emptyDir(path.join(InstancesPath, "temp"));
-    await fsa.emptyDir(META_PATH);
+    // await fsa.emptyDir(META_PATH);
     setDeletingInstances(false);
   } catch (e) {
     console.log(e);
   }
 }
 
-const openFolderDialog = (InstancesPath, dispatch, updateInstancesPath) => {
-  remote.dialog.showOpenDialog(
-    {
-      properties: ["openDirectory"],
-      defaultPath: path.dirname(InstancesPath)
-    },
-    paths => dispatch(updateInstancesPath(paths[0]))
-  );
+const openFolderDialog = async (
+  InstancesPath,
+  dispatch,
+  updateInstancesPath
+) => {
+  const paths = await ipcRenderer.invoke("openFolderDialog", InstancesPath);
+  dispatch(updateInstancesPath(paths[0]));
 };
 
 export default function MyAccountPreferences() {

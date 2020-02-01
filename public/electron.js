@@ -1,6 +1,6 @@
 const electron = require("electron");
 
-const { app, BrowserWindow, ipcMain, Tray, Menu } = electron;
+const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = electron;
 const path = require("path");
 
 // const discordRPC = require("./discordRPC");
@@ -100,21 +100,58 @@ app.on("activate", () => {
   }
 });
 
-ipcMain.on("update-progress-bar", (event, p) => {
+ipcMain.handle("update-progress-bar", (event, p) => {
   mainWindow.setProgressBar(p);
 });
 
-ipcMain.on("hide-window", () => {
+ipcMain.handle("hide-window", () => {
   if (mainWindow) {
     mainWindow.hide();
   }
 });
 
-ipcMain.on("show-window", () => {
+ipcMain.handle("show-window", () => {
   if (mainWindow) {
     mainWindow.show();
     mainWindow.focus();
   }
+});
+
+ipcMain.handle("getUserDataPath", () => {
+  return app.getPath("userData");
+});
+
+ipcMain.handle("getAppPath", () => {
+  return app.getAppPath();
+});
+
+ipcMain.handle("openFolderDialog", (e, path) => {
+  return new Promise(resolve => {
+    dialog.showOpenDialog(
+      {
+        properties: ["openDirectory"],
+        defaultPath: path.dirname(path)
+      },
+      paths => resolve(paths)
+    );
+  });
+});
+
+ipcMain.handle("openFileDialog", (e, path) => {
+  return new Promise(resolve => {
+    dialog.showOpenDialog(
+      {
+        properties: ["openFile"],
+        defaultPath: path.dirname(path)
+      },
+      paths => resolve(paths)
+    );
+  });
+});
+
+ipcMain.handle("appRestart", () => {
+  app.relaunch();
+  app.exit(0);
 });
 
 // ipcMain.on("init-discord-rpc", () => {

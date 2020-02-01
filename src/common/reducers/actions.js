@@ -1,6 +1,6 @@
 import axios from "axios";
 import path from "path";
-import { remote, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
 import coerce from "semver/functions/coerce";
@@ -250,8 +250,9 @@ export function downloadJava() {
     const mcOs = convertOSToMCFormat(process.platform);
     dispatch(openModal("JavaDownload"));
     const { version, url } = launcherManifest[mcOs][64].jre;
-    const javaBaseFolder = path.join(remote.app.getPath("userData"), "java");
-    const tempFolder = path.join(remote.app.getPath("userData"), "temp");
+    const userDataPath = await ipcRenderer.invoke("getUserDataPath");
+    const javaBaseFolder = path.join(userDataPath, "java");
+    const tempFolder = path.join(userDataPath, "temp");
     await fse.remove(javaBaseFolder);
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
@@ -376,7 +377,7 @@ export function loginThroughNativeLauncher() {
       app: { isNewUser }
     } = getState();
 
-    const homedir = remote.app.getPath("appData");
+    const homedir = await ipcRenderer.invoke("userDataPath");
     const mcFolder = process.platform === "darwin" ? "minecraft" : ".minecraft";
     const vanillaMCPath = path.join(homedir, mcFolder);
     const vnlJson = await fse.readJson(

@@ -1,5 +1,4 @@
 import { createSelector } from "reselect";
-import { remote } from "electron";
 import path from "path";
 import memoize from "lodash.memoize";
 import { convertOSToMCFormat } from "../../app/desktop/utils";
@@ -46,18 +45,13 @@ export const _getCurrentDownloadItem = createSelector(
 export const _getJavaPath = createSelector(
   _launcherManifest,
   _java,
-  (launcherManifest, java) => {
+  _dataPath,
+  (launcherManifest, java, dataPath) => {
     if (java.path) return java.path;
     const mcOs = convertOSToMCFormat(process.platform);
     const { version } = launcherManifest[mcOs][64].jre;
     const filename = process.platform === "win32" ? "java.exe" : "java";
-    return path.join(
-      remote.app.getPath("userData"),
-      "java",
-      version,
-      "bin",
-      filename
-    );
+    return path.join(dataPath, "java", version, "bin", filename);
   }
 );
 
