@@ -22,6 +22,8 @@ function createWindow() {
     height: 800,
     minWidth: 1100,
     minHeight: 800,
+    show: true,
+    frame: false,
     backgroundColor: "#353E48",
     webPreferences: {
       experimentalFeatures: true,
@@ -84,6 +86,14 @@ function createWindow() {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+
+  mainWindow.on("maximize", () => {
+    mainWindow.webContents.send("window-maximized");
+  });
+
+  mainWindow.on("unmaximize", () => {
+    mainWindow.webContents.send("window-minimized");
+  });
 }
 
 app.on("ready", createWindow);
@@ -110,6 +120,18 @@ ipcMain.handle("hide-window", () => {
   }
 });
 
+ipcMain.handle("min-max-window", () => {
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+  } else if (mainWindow.maximizable) {
+    mainWindow.maximize();
+  }
+});
+
+ipcMain.handle("minimize-window", () => {
+  mainWindow.minimize();
+});
+
 ipcMain.handle("show-window", () => {
   if (mainWindow) {
     mainWindow.show();
@@ -117,12 +139,24 @@ ipcMain.handle("show-window", () => {
   }
 });
 
+ipcMain.handle("quit-app", () => {
+  app.quit();
+});
+
 ipcMain.handle("getUserDataPath", () => {
   return app.getPath("userData");
 });
 
+ipcMain.handle("getAppdataPath", () => {
+  return app.getPath("appData");
+});
+
 ipcMain.handle("getAppPath", () => {
   return app.getAppPath();
+});
+
+ipcMain.handle("getIsWindowMaximized", () => {
+  return !mainWindow.maximizable;
 });
 
 ipcMain.handle("openFolderDialog", (e, path) => {

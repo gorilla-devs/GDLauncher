@@ -378,7 +378,7 @@ export function loginThroughNativeLauncher() {
       app: { isNewUser }
     } = getState();
 
-    const homedir = await ipcRenderer.invoke("userDataPath");
+    const homedir = await ipcRenderer.invoke("getAppdataPath");
     const mcFolder = process.platform === "darwin" ? "minecraft" : ".minecraft";
     const vanillaMCPath = path.join(homedir, mcFolder);
     const vnlJson = await fse.readJson(
@@ -956,7 +956,7 @@ export const launchInstance = instanceName => {
 
     console.log(`"${javaPath}" ${jvmArguments.join(" ")}`);
 
-    ipcRenderer.send("hide-window");
+    await ipcRenderer.invoke("hide-window");
 
     const process = spawn(javaPath, jvmArguments, {
       cwd: instancePath,
@@ -972,7 +972,7 @@ export const launchInstance = instanceName => {
     });
 
     process.on("close", code => {
-      ipcRenderer.send("show-window");
+      ipcRenderer.invoke("show-window");
       if (code !== 0) {
         console.log(`process exited with code ${code}`);
       }

@@ -62,11 +62,11 @@ module.exports = {
   spacing: factor => [0, 4, 8, 16, 32, 64][factor],
   sizes: {
     width: {
-      sidebar: "172px"
+      sidebar: 172
     },
     height: {
-      systemNavbar: "23px",
-      navbar: "36px"
+      systemNavbar: 23,
+      navbar: 36
     }
   }
 };

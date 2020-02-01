@@ -90,25 +90,32 @@
         }
       ]
     },
-    "squirrelWindows": {
-      "iconUrl": "./public/favicon.ico"
+    "nsis": {
+      "oneClick": false,
+      "installerIcon": "./resources/logo.ico",
+      "uninstallerIcon": "./resources/logo.ico",
+      "installerHeader": "./resources/installerHeader.bmp",
+      "installerSidebar": "./resources/installerSidebar.bmp",
+      "installerHeaderIcon": "./resources/logo.ico",
+      "deleteAppDataOnUninstall": true,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": true
     },
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ],
       "artifactName": "${productName}-mac-setup.${ext}"
     },
     "win": {
       "target": [
-        "zip"
+        "nsis"
       ],
       "artifactName": "${productName}-win-setup.${ext}"
     },
     "linux": {
       "target": [
-        "AppImage"
+        "appImage"
       ],
       "category": "Game",
       "artifactName": "${productName}-linux-setup.${ext}"
