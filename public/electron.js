@@ -2,12 +2,11 @@ const electron = require("electron");
 
 const { app, BrowserWindow, ipcMain, Tray, Menu } = electron;
 const path = require("path");
+const palette = require("../src/ui/theme");
 
 // const discordRPC = require("./discordRPC");
 
-// This gets rid of this: https://github.com/electron/electron/issues/13186
-process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
-app.commandLine.appendSwitch("disable-web-security");
+app.commandLine.appendSwitch("disable-gpu-vsync=gpu");
 Menu.setApplicationMenu();
 
 const isDev = process.env.NODE_ENV === "development";
@@ -21,13 +20,29 @@ function createWindow() {
     height: 800,
     minWidth: 1100,
     minHeight: 800,
-    backgroundColor: "#fff",
+    backgroundColor: palette.palette.secondary.main,
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
-      webSecurity: false
+      webSecurity: true
     }
   });
+
+  mainWindow.webContents.session.webRequest.onHeadersReceived(
+    {
+      urls: ["https://*/*"]
+    },
+    (details, callback) => {
+      // eslint-disable-next-line
+      delete details.responseHeaders["Access-Control-Allow-Origin"];
+      // eslint-disable-next-line
+      delete details.responseHeaders["access-control-allow-origin"];
+      callback({
+        cancel: false,
+        responseHeaders: details.responseHeaders
+      });
+    }
+  );
 
   tray = new Tray(
     isDev

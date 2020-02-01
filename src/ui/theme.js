@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   palette: {
     common: {
       black: "#000",
