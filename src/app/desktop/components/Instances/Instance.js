@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { transparentize } from "polished";
 import styled from "styled-components";
 import path from "path";
@@ -18,7 +18,8 @@ const Container = styled.div`
   position: relative;
   width: 180px;
   height: 100px;
-  transform: scale3d(1, 1, 1);
+  transform: ${p =>
+    p.isHovered ? "scale3d(1.1, 1.1, 1.1)" : "scale3d(1, 1, 1)"};
   margin-right: 20px;
   margin-top: 20px;
   transition: transform 150ms ease-in-out;
@@ -57,7 +58,7 @@ const HoverContainer = styled.div`
   transition: opacity 150ms ease-in-out;
   width: 100%;
   height: 100%;
-  opacity: ${p => (p.installing ? "1" : "0")};
+  opacity: ${p => (p.installing || p.isHovered ? "1" : "0")};
   backdrop-filter: blur(4px);
   will-change: opacity;
   background: ${p => transparentize(0.5, p.theme.palette.grey[800])};
@@ -75,6 +76,7 @@ const MCVersion = styled.div`
 
 const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
+  const [isHovered, setIsHovered] = useState(false);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const downloadQueue = useSelector(_getDownloadQueue);
   const currentDownload = useSelector(state => state.currentDownload);
@@ -93,12 +95,16 @@ const Instance = ({ instanceName }) => {
   return (
     <>
       <ContextMenuTrigger id={instance.name}>
-        <Container installing={isInQueue} onClick={startInstance}>
+        <Container
+          installing={isInQueue}
+          onClick={startInstance}
+          isHovered={isHovered}
+        >
           <InstanceContainer installing={isInQueue}>
             <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
             {instance.name}
           </InstanceContainer>
-          <HoverContainer installing={isInQueue}>
+          <HoverContainer installing={isInQueue} isHovered={isHovered}>
             {currentDownload === instanceName ? (
               <>
                 <div
@@ -116,7 +122,11 @@ const Instance = ({ instanceName }) => {
           </HoverContainer>
         </Container>
       </ContextMenuTrigger>
-      <ContextMenu id={instance.name}>
+      <ContextMenu
+        id={instance.name}
+        onShow={() => setIsHovered(true)}
+        onHide={() => setIsHovered(false)}
+      >
         <MenuItem>Manage</MenuItem>
         <MenuItem onClick={openFolder}>Open Folder</MenuItem>
         <MenuItem divider />
