@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { transparentize } from "polished";
 import styled from "styled-components";
 import path from "path";
-import { shell } from "electron";
+import { ipcRenderer } from "electron";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -87,7 +87,7 @@ const Instance = ({ instanceName }) => {
     dispatch(launchInstance(instanceName));
   };
   const openFolder = () => {
-    shell.openItem(path.join(instancesPath, instance.name));
+    ipcRenderer.invoke("openFolder", path.join(instancesPath, instance.name));
   };
   const openConfirmationDeleteModal = () => {
     dispatch(openModal("InstanceDeleteConfirmation", { instanceName }));

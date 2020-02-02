@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, Menu, dialog, shell } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
 
@@ -156,6 +156,10 @@ ipcMain.handle("getAppPath", () => {
 
 ipcMain.handle("getIsWindowMaximized", () => {
   return !mainWindow.maximizable;
+});
+
+ipcMain.handle("openFolder", (e, path) => {
+  shell.openPath(path);
 });
 
 ipcMain.handle("openFolderDialog", (e, path) => {
