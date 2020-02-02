@@ -10,13 +10,35 @@ const Container = styled.div`
   width: 100%;
 `;
 
+const NoInstance = styled.div`
+  width: 100%;
+  text-align: center;
+  font-size: 25px;
+  margin-top: 100px;
+`;
+
+const SubNoInstance = styled.div`
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  margin-top: 20px;
+`;
+
 const Instances = () => {
   const instances = useSelector(_getInstances);
+  console.log(instances);
   return (
     <Container>
-      {instances.list.map(i => (
-        <Instance key={i.name} instanceName={i.name} />
-      ))}
+      {instances.list.length > 0 ? (
+        instances.list.map(i => <Instance key={i.name} instanceName={i.name} />)
+      ) : (
+        <NoInstance>
+          No Instance has been installed
+          <SubNoInstance>
+            Click on the icon in the bottom left corner to add new instances
+          </SubNoInstance>
+        </NoInstance>
+      )}
     </Container>
   );
 };

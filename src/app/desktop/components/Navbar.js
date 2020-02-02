@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 import { ipcRenderer } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog, faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -48,28 +47,25 @@ export const UpdateButton = styled.div`
   align-items: center;
   margin-right: ${({ theme }) => theme.spacing(3)}px;
   font-size: 22px;
+  color: ${props => props.theme.palette.colors.green};
   path {
     cursor: pointer;
-  }
-  a {
-    text-decoration: none;
-    display: block;
-    color: ${props => props.theme.palette.colors.green};
   }
 `;
 
 const Navbar = () => {
-  const [updateAvailable, setUpdateAvailable] = useState(true);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
   const location = useSelector(state => state.router.location.pathname);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "development") {
-      ipcRenderer.send("check-for-updates");
-      ipcRenderer.on("update-available", () => {
+    // Check every 10 minutes
+    setInterval(() => {
+      ipcRenderer.invoke("checkForUpdates");
+      ipcRenderer.on("updateAvailable", () => {
         setUpdateAvailable(true);
       });
-    }
+    }, 600000);
   }, []);
 
   const isLocation = loc => {
@@ -94,9 +90,7 @@ const Navbar = () => {
       <div>
         {updateAvailable && (
           <UpdateButton>
-            <Link to="/autoUpdate">
-              <FontAwesomeIcon icon={faDownload} />
-            </Link>
+            <FontAwesomeIcon icon={faDownload} />
           </UpdateButton>
         )}
         <SettingsButton>

@@ -1,7 +1,6 @@
-const electron = require("electron");
-
-const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = electron;
+const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = require("electron");
 const path = require("path");
+const { autoUpdater } = require("electron-updater");
 
 // const discordRPC = require("./discordRPC");
 
@@ -186,6 +185,26 @@ ipcMain.handle("openFileDialog", (e, path) => {
 ipcMain.handle("appRestart", () => {
   app.relaunch();
   app.exit(0);
+});
+
+// AutoUpdater
+
+autoUpdater.autoDownload = false;
+
+autoUpdater.on("update-available", () => {
+  autoUpdater.downloadUpdate();
+});
+
+autoUpdater.on("update-downloaded", () => {
+  mainWindow.webContents.send("updateAvailable");
+});
+
+ipcMain.handle("checkForUpdates", () => {
+  autoUpdater.checkForUpdates();
+});
+
+ipcMain.handle("installUpdateAndRestart", () => {
+  autoUpdater.quitAndInstall(true, true);
 });
 
 // ipcMain.on("init-discord-rpc", () => {

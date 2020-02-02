@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -72,7 +72,6 @@
     "productName": "GDLauncher",
     "appId": "org.gorilladevs.GDLauncher",
     "files": [
-      "!node_modules/**/*",
       "build/**/*",
       "package.json"
     ],
@@ -97,7 +96,7 @@
       "installerHeader": "./resources/installerHeader.bmp",
       "installerSidebar": "./resources/installerSidebar.bmp",
       "installerHeaderIcon": "./resources/logo.ico",
-      "deleteAppDataOnUninstall": true,
+      "deleteAppDataOnUninstall": false,
       "allowToChangeInstallationDirectory": true,
       "perMachine": true
     },
@@ -201,6 +200,7 @@
     "craco-antd": "^1.14.1",
     "discord-rpc": "^3.1.0",
     "electron-is-dev": "^1.1.0",
+    "electron-updater": "^4.2.0",
     "fs-extra": "^8.1.0",
     "history": "^4.10.1",
     "husky": "^4.2.1",
