@@ -1,6 +1,4 @@
 import { combineReducers } from "redux";
-import { remote } from "electron";
-import isElectron from "is-electron";
 import * as ActionTypes from "./actionTypes";
 import {
   DEFAULT_JAVA_ARGS,
@@ -16,9 +14,7 @@ function sounds(state = true, action) {
   }
 }
 
-const defaultPath = isElectron() ? remote.app.getPath("userData") : null;
-
-function dataPath(state = defaultPath, action) {
+function dataPath(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_DATA_PATH:
       return action.path;

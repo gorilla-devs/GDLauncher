@@ -12,7 +12,7 @@ const middleware = store => next => action => {
   const result = next(action);
   const nextState = store.getState();
   const { dispatch } = store;
-
+  if (!nextState.settings.dataPath) return;
   const instancesPath = path.join(nextState.settings.dataPath, "instances");
 
   const startListener = () => {

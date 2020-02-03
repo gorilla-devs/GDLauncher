@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import path from "path";
-import { remote } from "electron";
+import { ipcRenderer } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMemory,
@@ -68,19 +67,14 @@ function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const openFolderDialog = (
+const openFolderDialog = async (
   javaPath,
   updateJavaArguments,
   updateJavaPath,
   dispatch
 ) => {
-  remote.dialog.showOpenDialog(
-    {
-      properties: ["openFile"],
-      defaultPath: path.dirname(javaPath)
-    },
-    paths => dispatch(updateJavaPath(paths[0]))
-  );
+  const paths = await ipcRenderer.invoke("openFolderDialog", javaPath);
+  dispatch(updateJavaPath(paths[0]));
 };
 
 const marks = [

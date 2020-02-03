@@ -8,7 +8,6 @@ export default createGlobalStyle`
   body {
     height: 100%;   
     overflow: hidden;
-    margin: 0;
     display: flex;
     -webkit-transform:translate3d(0,0,0);
     -webkit-font-smoothing: antialiased;

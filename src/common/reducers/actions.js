@@ -1,6 +1,6 @@
 import axios from "axios";
 import path from "path";
-import { remote, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
 import coerce from "semver/functions/coerce";
@@ -250,8 +250,9 @@ export function downloadJava() {
     const mcOs = convertOSToMCFormat(process.platform);
     dispatch(openModal("JavaDownload"));
     const { version, url } = launcherManifest[mcOs][64].jre;
-    const javaBaseFolder = path.join(remote.app.getPath("userData"), "java");
-    const tempFolder = path.join(remote.app.getPath("userData"), "temp");
+    const userDataPath = await ipcRenderer.invoke("getUserDataPath");
+    const javaBaseFolder = path.join(userDataPath, "java");
+    const tempFolder = path.join(userDataPath, "temp");
     await fse.remove(javaBaseFolder);
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
@@ -265,8 +266,9 @@ export function downloadJava() {
     });
     await makeDir(path.join(javaBaseFolder, version));
 
+    const sevenZipPath = await get7zPath();
     const firstExtraction = extractFull(downloadLocation, tempFolder, {
-      $bin: get7zPath()
+      $bin: sevenZipPath
     });
     await new Promise((resolve, reject) => {
       firstExtraction.on("end", () => {
@@ -281,7 +283,7 @@ export function downloadJava() {
       path.join(tempFolder, path.basename(url, ".lzma")),
       path.join(javaBaseFolder, version),
       {
-        $bin: get7zPath()
+        $bin: sevenZipPath
       }
     );
     await new Promise((resolve, reject) => {
@@ -376,7 +378,7 @@ export function loginThroughNativeLauncher() {
       app: { isNewUser }
     } = getState();
 
-    const homedir = remote.app.getPath("appData");
+    const homedir = await ipcRenderer.invoke("getAppdataPath");
     const mcFolder = process.platform === "darwin" ? "minecraft" : ".minecraft";
     const vanillaMCPath = path.join(homedir, mcFolder);
     const vnlJson = await fse.readJson(
@@ -709,12 +711,13 @@ export function downloadForgeManifestFiles(instanceName) {
       "temp",
       "addon.zip"
     );
+    const sevenZipPath = await get7zPath();
     const extraction = extractFull(
       addonPathZip,
       path.join(_getInstancesPath(state), instanceName, "temp"),
       {
         recursive: true,
-        $bin: get7zPath(),
+        $bin: sevenZipPath,
         yes: true,
         $cherryPick: "overrides",
         $progress: true
@@ -941,7 +944,7 @@ export const launchInstance = instanceName => {
         ? getJVMArguments113
         : getJVMArguments112;
 
-    const jvmArguments = await getJvmArguments(
+    const jvmArguments = getJvmArguments(
       libraries,
       mcMainFile,
       instancePath,
@@ -951,9 +954,20 @@ export const launchInstance = instanceName => {
       memory
     );
 
-    console.log(`"${javaPath}" ${jvmArguments.join(" ")}`);
+    console.log(
+      `"${javaPath}" ${getJvmArguments(
+        libraries,
+        mcMainFile,
+        instancePath,
+        assetsPath,
+        mcJson,
+        account,
+        memory,
+        true
+      ).join(" ")}`
+    );
 
-    ipcRenderer.send("hide-window");
+    await ipcRenderer.invoke("hide-window");
 
     const process = spawn(javaPath, jvmArguments, {
       cwd: instancePath,
@@ -969,7 +983,7 @@ export const launchInstance = instanceName => {
     });
 
     process.on("close", code => {
-      ipcRenderer.send("show-window");
+      ipcRenderer.invoke("show-window");
       if (code !== 0) {
         console.log(`process exited with code ${code}`);
       }

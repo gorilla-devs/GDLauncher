@@ -22,9 +22,18 @@ import Navbar from "./components/Navbar";
 import routes from "./utils/routes";
 import { _getCurrentAccount } from "../../common/utils/selectors";
 import { isLatestJavaDownloaded, extract7z } from "./utils";
+import { updateDataPath } from "../../common/reducers/settings/actions";
+import SystemNavbar from "./components/SystemNavbar";
 
 const Wrapper = styled.div`
-  height: 100%;
+  height: 100vh;
+  width: 100vw;
+`;
+
+const Container = styled.div`
+  position: absolute;
+  top: ${props => props.theme.sizes.height.systemNavbar}px;
+  height: calc(100vh - ${props => props.theme.sizes.height.systemNavbar}px);
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -37,6 +46,10 @@ function DesktopRoot() {
 
   // Handle already logged in account redirect
   useDidMount(() => {
+    ipcRenderer
+      .invoke("getUserDataPath")
+      .then(res => dispatch(updateDataPath(res)))
+      .catch(console.error);
     dispatch(initManifests())
       .then(async data => {
         await extract7z();
@@ -71,14 +84,17 @@ function DesktopRoot() {
 
   return (
     <Wrapper>
-      <GlobalStyles />
-      <RouteBackground />
-      <Navbar />
-      <Switch>
-        {routes.map((route, i) => (
-          <RouteWithSubRoutes key={i} {...route} /> // eslint-disable-line
-        ))}
-      </Switch>
+      <SystemNavbar />
+      <Container>
+        <GlobalStyles />
+        <RouteBackground />
+        <Navbar />
+        <Switch>
+          {routes.map((route, i) => (
+            <RouteWithSubRoutes key={i} {...route} /> // eslint-disable-line
+          ))}
+        </Switch>
+      </Container>
     </Wrapper>
   );
 }

@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Instances from "../components/Instances";
 import News from "../components/News";
 import { openModal } from "../../../common/reducers/modals/actions";
+import { _getCurrentAccount } from "../../../common/utils/selectors";
 
 const AddInstanceIcon = styled(Button)`
   && {
@@ -16,12 +17,27 @@ const AddInstanceIcon = styled(Button)`
   }
 `;
 
+const AccountContainer = styled(Button)`
+  && {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+  }
+`;
+
 const Home = () => {
   const dispatch = useDispatch();
+  const account = useSelector(_getCurrentAccount);
   const news = useSelector(state => state.news);
 
   const openAddInstanceModal = () => {
     dispatch(openModal("AddInstance"));
+  };
+
+  const openAccountModal = () => {
+    dispatch(openModal("AccountsManager"));
   };
 
   return (
@@ -31,6 +47,18 @@ const Home = () => {
       <AddInstanceIcon color="primary" onClick={openAddInstanceModal}>
         <FontAwesomeIcon icon={faPlus} />
       </AddInstanceIcon>
+      <AccountContainer color="primary" onClick={openAccountModal}>
+        <div
+          css={`
+            width: 15px;
+            height: 15px;
+            background: ${props => props.theme.palette.grey[100]};
+            border-radius: 50%;
+            margin-right: 10px;
+          `}
+        />
+        {account && account.selectedProfile.name}
+      </AccountContainer>
     </div>
   );
 };

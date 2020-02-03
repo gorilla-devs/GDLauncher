@@ -1,7 +1,6 @@
-const electron = require("electron");
-
-const { app, BrowserWindow, ipcMain, Tray, Menu } = electron;
+const { app, BrowserWindow, ipcMain, Tray, Menu, dialog, shell } = require("electron");
 const path = require("path");
+const { autoUpdater } = require("electron-updater");
 
 // const discordRPC = require("./discordRPC");
 
@@ -22,6 +21,8 @@ function createWindow() {
     height: 800,
     minWidth: 1100,
     minHeight: 800,
+    show: true,
+    frame: false,
     backgroundColor: "#353E48",
     webPreferences: {
       experimentalFeatures: true,
@@ -84,6 +85,14 @@ function createWindow() {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+
+  mainWindow.on("maximize", () => {
+    mainWindow.webContents.send("window-maximized");
+  });
+
+  mainWindow.on("unmaximize", () => {
+    mainWindow.webContents.send("window-minimized");
+  });
 }
 
 app.on("ready", createWindow);
@@ -100,21 +109,106 @@ app.on("activate", () => {
   }
 });
 
-ipcMain.on("update-progress-bar", (event, p) => {
+ipcMain.handle("update-progress-bar", (event, p) => {
   mainWindow.setProgressBar(p);
 });
 
-ipcMain.on("hide-window", () => {
+ipcMain.handle("hide-window", () => {
   if (mainWindow) {
     mainWindow.hide();
   }
 });
 
-ipcMain.on("show-window", () => {
+ipcMain.handle("min-max-window", () => {
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+  } else if (mainWindow.maximizable) {
+    mainWindow.maximize();
+  }
+});
+
+ipcMain.handle("minimize-window", () => {
+  mainWindow.minimize();
+});
+
+ipcMain.handle("show-window", () => {
   if (mainWindow) {
     mainWindow.show();
     mainWindow.focus();
   }
+});
+
+ipcMain.handle("quit-app", () => {
+  app.quit();
+});
+
+ipcMain.handle("getUserDataPath", () => {
+  return app.getPath("userData");
+});
+
+ipcMain.handle("getAppdataPath", () => {
+  return app.getPath("appData");
+});
+
+ipcMain.handle("getAppPath", () => {
+  return app.getAppPath();
+});
+
+ipcMain.handle("getIsWindowMaximized", () => {
+  return !mainWindow.maximizable;
+});
+
+ipcMain.handle("openFolder", (e, path) => {
+  shell.openPath(path);
+});
+
+ipcMain.handle("openFolderDialog", (e, path) => {
+  return new Promise(resolve => {
+    dialog.showOpenDialog(
+      {
+        properties: ["openDirectory"],
+        defaultPath: path.dirname(path)
+      },
+      paths => resolve(paths)
+    );
+  });
+});
+
+ipcMain.handle("openFileDialog", (e, path) => {
+  return new Promise(resolve => {
+    dialog.showOpenDialog(
+      {
+        properties: ["openFile"],
+        defaultPath: path.dirname(path)
+      },
+      paths => resolve(paths)
+    );
+  });
+});
+
+ipcMain.handle("appRestart", () => {
+  app.relaunch();
+  app.exit(0);
+});
+
+// AutoUpdater
+
+autoUpdater.autoDownload = false;
+
+autoUpdater.on("update-available", () => {
+  autoUpdater.downloadUpdate();
+});
+
+autoUpdater.on("update-downloaded", () => {
+  mainWindow.webContents.send("updateAvailable");
+});
+
+ipcMain.handle("checkForUpdates", () => {
+  autoUpdater.checkForUpdates();
+});
+
+ipcMain.handle("installUpdateAndRestart", () => {
+  autoUpdater.quitAndInstall(true, true);
 });
 
 // ipcMain.on("init-discord-rpc", () => {

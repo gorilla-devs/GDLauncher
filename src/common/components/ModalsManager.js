@@ -16,7 +16,7 @@ import { closeModal } from "../reducers/modals/actions";
 
 const Overlay = styled.div`
   position: absolute;
-  top: 0;
+  top: ${props => props.theme.sizes.height.systemNavbar}px;
   left: 0;
   bottom: 0;
   right: 0;
@@ -28,7 +28,7 @@ const Overlay = styled.div`
 
 const Modal = styled.div`
   position: absolute;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
   display: flex;
   flex-direction: column;

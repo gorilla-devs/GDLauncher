@@ -4,7 +4,7 @@ import { extractFull } from "node-7z";
 import makeDir from "make-dir";
 import jarAnalyzer from "jarfile";
 import { promisify } from "util";
-import { remote } from "electron";
+import { ipcRenderer } from "electron";
 import path from "path";
 import { exec, spawn } from "child_process";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
@@ -131,8 +131,9 @@ export const librariesMapper = (libraries, librariesPath) => {
 
 export const isLatestJavaDownloaded = async meta => {
   const mcOs = convertOSToMCFormat(process.platform);
+  const userDataPath = await ipcRenderer.invoke("getUserDataPath");
   const javaFolder = path.join(
-    remote.app.getPath("userData"),
+    userDataPath,
     "java",
     meta[mcOs][64].jre.version
   );
@@ -160,8 +161,8 @@ export const isLatestJavaDownloaded = async meta => {
   return isValid;
 };
 
-export const get7zPath = () => {
-  const baseDir = remote.app.getPath("userData");
+export const get7zPath = async () => {
+  const baseDir = await ipcRenderer.invoke("getUserDataPath");
   if (process.platform === "darwin") {
     return path.join(baseDir, "7za-osx");
   }
@@ -179,8 +180,9 @@ export const fixFilePermissions = async filePath => {
 };
 
 export const extract7z = async () => {
+  const appPath = await ipcRenderer.invoke("getAppPath");
   const baseDir = path.join(
-    remote.app.getAppPath(),
+    appPath,
     process.env.NODE_ENV === "development" ? "public" : "build",
     "7z"
   );
@@ -191,19 +193,20 @@ export const extract7z = async () => {
   if (process.platform === "win32") {
     zipLocationAsar = path.join(baseDir, "7za.exe");
   }
-
-  await fse.copy(zipLocationAsar, get7zPath());
-  await fixFilePermissions(get7zPath());
+  const sevenZipPath = await get7zPath();
+  await fse.copy(zipLocationAsar, sevenZipPath);
+  await fixFilePermissions(sevenZipPath);
 };
 
 export const extractNatives = async (libraries, instancePath) => {
   const extractLocation = path.join(instancePath, "natives");
+  const sevenZipPath = await get7zPath();
   await Promise.all(
     libraries
       .filter(l => l.natives)
       .map(async l => {
         const extraction = extractFull(l.path, extractLocation, {
-          $bin: get7zPath()
+          $bin: sevenZipPath
         });
         await new Promise((resolve, reject) => {
           extraction.on("end", () => {
@@ -243,7 +246,8 @@ export const copyAssetsToLegacy = async assets => {
   );
 };
 
-export const getJVMArguments112 = async (
+const hiddenToken = "__HIDDEN_TOKEN__";
+export const getJVMArguments112 = (
   libraries,
   mcjar,
   instancePath,
@@ -251,6 +255,7 @@ export const getJVMArguments112 = async (
   mcJson,
   account,
   memory,
+  hideAccessToken,
   jvmOptions = []
 ) => {
   const args = [];
@@ -305,10 +310,10 @@ export const getJVMArguments112 = async (
           val = account.selectedProfile.id.trim();
           break;
         case "auth_access_token":
-          val = account.accessToken;
+          val = hideAccessToken ? hiddenToken : account.accessToken;
           break;
         case "auth_session":
-          val = account.accessToken;
+          val = hideAccessToken ? hiddenToken : account.accessToken;
           break;
         case "user_type":
           val = "mojang";
@@ -333,7 +338,7 @@ export const getJVMArguments112 = async (
   return args;
 };
 
-export const getJVMArguments113 = async (
+export const getJVMArguments113 = (
   libraries,
   mcjar,
   instancePath,
@@ -341,6 +346,7 @@ export const getJVMArguments113 = async (
   mcJson,
   account,
   memory,
+  hideAccessToken,
   jvmOptions = []
 ) => {
   const argDiscovery = /\${*(.*)}/;
@@ -392,7 +398,7 @@ export const getJVMArguments113 = async (
             val = account.selectedProfile.id.trim();
             break;
           case "auth_access_token":
-            val = account.accessToken;
+            val = hideAccessToken ? hiddenToken : account.accessToken;
             break;
           case "user_type":
             val = "mojang";
@@ -537,8 +543,9 @@ export const downloadAddonZip = async (id, fileId, instancePath) => {
   await new Promise(resolve => {
     setTimeout(() => resolve(), 500);
   });
+  const sevenZipPath = await get7zPath();
   const extraction = extractFull(zipFile, instancePath, {
-    $bin: get7zPath(),
+    $bin: sevenZipPath,
     yes: true,
     $cherryPick: "manifest.json"
   });
