@@ -10,15 +10,6 @@ function news(state = [], action) {
   }
 }
 
-function isUpdateAvailable(state = false, action) {
-  switch (action.type) {
-    case ActionTypes.UPDATE_IS_UPDATE_AVAILABLE:
-      return action.isUpdateAvailable;
-    default:
-      return state;
-  }
-}
-
 function javaDownloadStatus(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_JAVA_DOWNLOAD:
@@ -107,41 +98,12 @@ function selectedInstance(state = null, action) {
   }
 }
 
-function modpacks(
-  state = { list: [], filter: "Featured", search: "" },
-  action
-) {
-  switch (action.type) {
-    case ActionTypes.ADD_MODPACKS:
-      return {
-        ...state,
-        list: [...state.list, action.modpacks]
-      };
-    case ActionTypes.UPDATE_MODPACKS_FILTER:
-      return {
-        ...state,
-        filter: action.filter,
-        list: []
-      };
-    case ActionTypes.UPDATE_MODPACKS_SEARCH:
-      return {
-        ...state,
-        search: action.search,
-        list: []
-      };
-    default:
-      return state;
-  }
-}
-
 export default {
   news,
-  isUpdateAvailable,
   downloadQueue,
   currentDownload,
   javaDownloadStatus,
   instances,
   startedInstances,
-  selectedInstance,
-  modpacks
+  selectedInstance
 };

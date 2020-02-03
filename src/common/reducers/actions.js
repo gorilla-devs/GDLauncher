@@ -39,7 +39,8 @@ import {
   _getAssetsPath,
   _getInstancesPath,
   _getLibrariesPath,
-  _getAccounts
+  _getAccounts,
+  _getTempPath
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -135,15 +136,6 @@ export function initNews() {
         console.error(err.message);
       }
     }
-  };
-}
-
-export function updateIsUpdateAvailable(isUpdateAvailable) {
-  return dispatch => {
-    dispatch({
-      type: ActionTypes.UPDATE_IS_UPDATE_AVAILABLE,
-      isUpdateAvailable
-    });
   };
 }
 
@@ -522,6 +514,22 @@ export function updateDownloadCurrentPhase(instanceName, status) {
   };
 }
 
+export function updateInstanceConfig(instanceName, updateFunction) {
+  return async (_, getState) => {
+    const state = getState();
+    const configPath = path.join(
+      _getInstancesPath(state),
+      instanceName,
+      "config.json"
+    );
+    const prevConfig = await fse.readJson(configPath);
+
+    const newConfig = await updateFunction(prevConfig);
+
+    await fse.outputJson(configPath, newConfig);
+  };
+}
+
 export function addToQueue(instanceName, modloader, manifest) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -674,6 +682,29 @@ export function downloadForge(instanceName) {
   };
 }
 
+export function downloadMod(instanceName, projectID, fileID) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const modManifest = (await getAddonFile(projectID, fileID)).data;
+    const destFile = path.join(
+      _getInstancesPath(state),
+      instanceName,
+      "mods",
+      modManifest.fileName
+    );
+    await downloadFile(destFile, modManifest.downloadUrl);
+    await dispatch(
+      updateInstanceConfig(instanceName, config => {
+        return {
+          ...config,
+          mods: { ...(config.mods || {}), [projectID]: fileID }
+        };
+      })
+    );
+    return modManifest;
+  };
+}
+
 export function downloadForgeManifestFiles(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -682,47 +713,31 @@ export function downloadForgeManifestFiles(instanceName) {
     dispatch(updateDownloadStatus(instanceName, "Downloading mods..."));
 
     let modManifests = [];
+    console.log(manifest, modManifests);
     await pMap(
       manifest.files,
       async item => {
-        const modManifest = (await getAddonFile(item.projectID, item.fileID))
-          .data;
-        const destFile = path.join(
-          _getInstancesPath(state),
-          instanceName,
-          "mods",
-          modManifest.fileName
+        const modManifest = await dispatch(
+          downloadMod(instanceName, item.projectID, item.fileID)
         );
-        await downloadFile(destFile, modManifest.downloadUrl);
         modManifests = modManifests.concat(modManifest);
-        dispatch(
-          updateDownloadProgress(
-            (modManifests.length * 100) / manifest.files.length - 1
-          )
-        );
+        const percentage =
+          (modManifests.length * 100) / manifest.files.length - 1;
+        dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
       },
-      { concurrency: 3 }
+      { concurrency: 1 }
     );
 
     dispatch(updateDownloadStatus(instanceName, "Copying overrides..."));
-    const addonPathZip = path.join(
-      _getInstancesPath(state),
-      instanceName,
-      "temp",
-      "addon.zip"
-    );
+    const addonPathZip = path.join(_getTempPath(state), "addon.zip");
     const sevenZipPath = await get7zPath();
-    const extraction = extractFull(
-      addonPathZip,
-      path.join(_getInstancesPath(state), instanceName, "temp"),
-      {
-        recursive: true,
-        $bin: sevenZipPath,
-        yes: true,
-        $cherryPick: "overrides",
-        $progress: true
-      }
-    );
+    const extraction = extractFull(addonPathZip, _getTempPath(state), {
+      recursive: true,
+      $bin: sevenZipPath,
+      yes: true,
+      $cherryPick: "overrides",
+      $progress: true
+    });
     await new Promise((resolve, reject) => {
       let progress = 0;
       extraction.on("progress", ({ percent }) => {
@@ -741,11 +756,13 @@ export function downloadForgeManifestFiles(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, "Finalizing overrides..."));
     await fse.copy(
-      path.join(_getInstancesPath(state), instanceName, "temp", "overrides"),
+      path.join(_getTempPath(state), instanceName, "overrides"),
       path.join(_getInstancesPath(state), instanceName),
       { overwrite: true }
     );
-    await fse.remove(path.join(_getInstancesPath(state), instanceName, "temp"));
+    await fse.remove(path.join(_getTempPath(state), instanceName));
+    await fse.remove(addonPathZip);
+    await fse.remove(path.join(_getTempPath(state), "addon"));
   };
 }
 

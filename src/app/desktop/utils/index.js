@@ -534,10 +534,10 @@ export const patchForge113 = async (
   /* eslint-enable no-await-in-loop, no-restricted-syntax */
 };
 
-export const downloadAddonZip = async (id, fileId, instancePath) => {
+export const downloadAddonZip = async (id, fileId, instancePath, tempPath) => {
   const { data } = await getAddonFile(id, fileId);
   const instanceManifest = path.join(instancePath, "manifest.json");
-  const zipFile = path.join(instancePath, "temp", "addon.zip");
+  const zipFile = path.join(tempPath, "addon.zip");
   await downloadFile(zipFile, data.downloadUrl);
   // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
   await new Promise(resolve => {

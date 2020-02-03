@@ -2,19 +2,21 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import path from "path";
+import fse from "fs-extra";
 import { useSelector, useDispatch } from "react-redux";
 import { Transition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLongArrowAltLeft,
-  faLongArrowAltRight
+  faLongArrowAltRight,
+  faSearch
 } from "@fortawesome/free-solid-svg-icons";
 import { addToQueue } from "../../reducers/actions";
 import { closeModal } from "../../reducers/modals/actions";
 import { Input } from "antd";
 import { getAddonFile } from "../../api";
 import { downloadAddonZip } from "../../../app/desktop/utils";
-import { _getInstancesPath } from "../../utils/selectors";
+import { _getInstancesPath, _getTempPath } from "../../utils/selectors";
 import { transparentize } from "polished";
 import bgImage from "../../../common/assets/mcCube.jpg";
 
@@ -24,10 +26,12 @@ const InstanceName = ({
   version,
   modpack,
   setVersion,
-  setModpack
+  setModpack,
+  isImport
 }) => {
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
+  const tempPath = useSelector(_getTempPath);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const [instanceName, setInstanceName] = useState("");
   const [clicked, setClicked] = useState(false);
@@ -65,11 +69,19 @@ const InstanceName = ({
       dispatch(addToQueue(instanceName, version));
       await wait(2);
     } else if (isTwitchModpack) {
-      const manifest = await downloadAddonZip(
-        version[1],
-        version[2],
-        path.join(instancesPath, instanceName)
-      );
+      let manifest;
+      if (isImport) {
+        manifest = await fse.readJson(
+          path.join(tempPath, "addon", "manifest.json")
+        );
+      } else {
+        manifest = await downloadAddonZip(
+          version[1],
+          version[2],
+          path.join(instancesPath, instanceName),
+          tempPath
+        );
+      }
       const modloader = [
         version[0],
         manifest.minecraft.version,
@@ -83,7 +95,6 @@ const InstanceName = ({
     }
     dispatch(closeModal());
   };
-
   return (
     <Transition in={inProp} timeout={200}>
       {state => (
@@ -119,10 +130,6 @@ const InstanceName = ({
                   `}
                   onClick={() => {
                     setStep(0);
-                    if (modpack) {
-                      setVersion(null);
-                      setModpack(null);
-                    }
                   }}
                 >
                   {clicked ? "" : <FontAwesomeIcon icon={faLongArrowAltLeft} />}

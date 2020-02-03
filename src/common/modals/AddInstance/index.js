@@ -13,7 +13,9 @@ const AddInstance = () => {
   const [version, setVersion] = useState(null);
   const [step, setStep] = useState(0);
   const [modpack, setModpack] = useState(null);
+  const [isImport, setIsImport] = useState(null);
 
+  console.log(version, modpack);
   return (
     <Modal
       css={`
@@ -31,6 +33,8 @@ const AddInstance = () => {
         setVersion={setVersion}
         version={version}
         setModpack={setModpack}
+        modpack={modpack}
+        setIsImport={setIsImport}
       />
       <InstanceName
         version={version}
@@ -39,6 +43,7 @@ const AddInstance = () => {
         modpack={modpack}
         setVersion={setVersion}
         setModpack={setModpack}
+        isImport={isImport}
       />
     </Modal>
   );

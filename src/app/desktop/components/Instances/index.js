@@ -26,7 +26,6 @@ const SubNoInstance = styled.div`
 
 const Instances = () => {
   const instances = useSelector(_getInstances);
-  console.log(instances);
   return (
     <Container>
       {instances.list.length > 0 ? (
