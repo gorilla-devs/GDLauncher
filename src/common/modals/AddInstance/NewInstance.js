@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Cascader } from "antd";
 import styled from "styled-components";
 
-const NewInstance = ({ setVersion }) => {
+const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
@@ -114,7 +114,10 @@ const NewInstance = ({ setVersion }) => {
     <Container>
       <Cascader
         options={filteredVersions}
-        onChange={setVersion}
+        onChange={v => {
+          setVersion(v);
+          setModpack(null);
+        }}
         placeholder="Select a version"
         size="large"
         css={`

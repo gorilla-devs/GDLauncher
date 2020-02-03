@@ -10,14 +10,15 @@ const getInstances = async instancesPath => {
         path.join(instancesPath, instance, "config.json")
       );
       const config = await fse.readJSON(configPath);
-      return { name: instance, modloader: config.modloader };
+
+      return { name: instance, modloader: config.modloader, mods: config.mods };
     } catch (err) {
       console.error(err);
     }
     return null;
   };
   // If folder doesn't exist, create it
-  makeDir(instancesPath);
+  await makeDir(instancesPath);
   const folders = await getDirectories(instancesPath);
   const instances = await Promise.all(folders.map(mapFolderToInstance));
   return instances.filter(_ => _);

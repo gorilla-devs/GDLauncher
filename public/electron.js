@@ -1,4 +1,12 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu, dialog, shell } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Tray,
+  Menu,
+  dialog,
+  shell
+} = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
 
@@ -174,15 +182,9 @@ ipcMain.handle("openFolderDialog", (e, path) => {
   });
 });
 
-ipcMain.handle("openFileDialog", (e, path) => {
-  return new Promise(resolve => {
-    dialog.showOpenDialog(
-      {
-        properties: ["openFile"],
-        defaultPath: path.dirname(path)
-      },
-      paths => resolve(paths)
-    );
+ipcMain.handle("openFileDialog", () => {
+  return dialog.showOpenDialog(mainWindow, {
+    properties: ["openFile"]
   });
 });
 

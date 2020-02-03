@@ -59,6 +59,10 @@ export const _getInstancesPath = createSelector(_dataPath, dataPath =>
   path.join(dataPath, "instances")
 );
 
+export const _getTempPath = createSelector(_dataPath, dataPath =>
+  path.join(dataPath, "temp")
+);
+
 export const _getDataStorePath = createSelector(_dataPath, dataPath =>
   path.join(dataPath, "datastore")
 );

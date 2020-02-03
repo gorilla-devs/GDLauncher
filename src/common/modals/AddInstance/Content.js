@@ -20,12 +20,18 @@ const Content = ({
   setPage,
   setVersion,
   version,
-  setModpack
+  setModpack,
+  modpack,
+  setIsImport
 }) => {
   let pages = [
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
-    <TwitchModpacks setVersion={setVersion} setStep={setStep} setModpack={setModpack} />,
-    <Import setVersion={setVersion} setModpack={setModpack} />
+    <TwitchModpacks
+      setVersion={setVersion}
+      setStep={setStep}
+      setModpack={setModpack}
+    />,
+    <Import setVersion={setVersion} setModpack={setModpack} modpack={modpack} />
   ];
 
   return (
@@ -59,6 +65,8 @@ const Content = ({
                 active={page === 0}
                 onClick={() => {
                   setVersion(null);
+                  setIsImport(null);
+                  setModpack(null);
                   setPage(0);
                 }}
               >
@@ -68,6 +76,8 @@ const Content = ({
                 active={page === 1}
                 onClick={() => {
                   setVersion(null);
+                  setIsImport(null);
+                  setModpack(null);
                   setPage(1);
                 }}
               >
@@ -77,6 +87,8 @@ const Content = ({
                 active={page === 2}
                 onClick={() => {
                   setVersion(null);
+                  setIsImport(null);
+                  setModpack(null);
                   setPage(2);
                 }}
               >
@@ -114,7 +126,6 @@ const Content = ({
                   onClick={() => {
                     if (version) {
                       setStep(1);
-                      setModpack(null);
                     }
                   }}
                 >

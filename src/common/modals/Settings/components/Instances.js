@@ -61,7 +61,6 @@ async function clearSharedData(InstancesPath, setDeletingInstances) {
   try {
     setDeletingInstances(true);
     await fsa.emptyDir(path.join(InstancesPath, "libraries"));
-    await fsa.emptyDir(path.join(InstancesPath, "packs"));
     await fsa.emptyDir(path.join(InstancesPath, "assets"));
     await fsa.emptyDir(path.join(InstancesPath, "versions"));
     await fsa.emptyDir(path.join(InstancesPath, "temp"));

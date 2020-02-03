@@ -4,6 +4,7 @@ import path from "path";
 import { debounce } from "lodash";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
+import checkModsIntegrity from "./checkModsIntegrity";
 
 let listener;
 
@@ -23,8 +24,8 @@ const middleware = store => next => action => {
           instances
         });
       },
-      500,
-      { maxWait: 1500 }
+      1000,
+      { maxWait: 2500 }
     );
     return watch(
       instancesPath,
@@ -61,6 +62,7 @@ const middleware = store => next => action => {
         return instances;
       })
       .then(() => {
+        checkModsIntegrity(instancesPath);
         listener = startListener();
         listener.on("error", async () => {
           // Check if the folder exists and create it if it doesn't
