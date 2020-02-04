@@ -26,7 +26,7 @@ export const SettingsButton = styled.div`
   color: white;
   cursor: pointer;
   align-items: center;
-  margin-right: ${({ theme }) => theme.spacing(1)}px;
+  margin-right: ${({ theme }) => theme.spacing(3)}px;
   transition: all 0.2s ease-in-out;
   &:hover {
     color: white;
@@ -45,7 +45,7 @@ export const UpdateButton = styled.div`
   z-index: 10;
   cursor: pointer;
   align-items: center;
-  margin-right: ${({ theme }) => theme.spacing(3)}px;
+  margin-right: ${({ theme }) => theme.spacing(5)}px;
   font-size: 22px;
   color: ${props => props.theme.palette.colors.green};
   path {

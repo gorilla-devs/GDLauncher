@@ -10,9 +10,12 @@ import logo from "../../../assets/logo.png";
 import { _getCurrentAccount } from "../../../utils/selectors";
 import { updateReleaseChannel } from "../../../reducers/settings/actions";
 
+const { app } = require("electron").remote;
+
 const MyAccountPrf = styled.div`
   width: 100%;
   height: 100%;
+  overflow: auto;
 `;
 
 const PersonalData = styled.div`
@@ -25,7 +28,7 @@ const Title = styled.div`
   position: absolute;
   font-size: 15px;
   font-weight: 700;
-  color: ${props => props.theme.palette.text.main};
+  color: ${props => props.theme.palette.text.primary};
   z-index: 1;
 `;
 
@@ -121,6 +124,10 @@ const LauncherVersion = styled.div`
     color: ${props => props.theme.palette.text.third};
     margin: 0 0 0 6px;
   }
+
+  h1 {
+    color: ${props => props.theme.palette.text.primary};
+  }
 `;
 
 function copy(setCopied, copy) {
@@ -137,7 +144,7 @@ export default function MyAccountPreferences() {
   const currentAccount = useSelector(_getCurrentAccount);
   const releaseC = useSelector(state => state.settings.releaseChannel);
 
-  const [releaseChannel, setReleaseChannel] = useState(0);
+  const [releaseChannel, setReleaseChannel] = useState(0 ? "Release" : "Beta");
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedUsername, setCopiedUsername] = useState(false);
@@ -226,16 +233,17 @@ export default function MyAccountPreferences() {
           have more bugs.
           <Select
             css={`
-              position: absolute;
-              top: 250px;
-              right: 0px;
+              float: right;
             `}
-            onChange={e => dispatch(updateReleaseChannel(e.target.value))}
+            onChange={e => {
+              setReleaseChannel(e);
+              dispatch(updateReleaseChannel(e));
+            }}
             value={releaseChannel}
             defaultValue={releaseChannel}
           >
-            <option value="1">Beta</option>
-            <option value="0">Stable</option>
+            <Select.Option value="1">Beta</Select.Option>
+            <Select.Option value="0">Stable</Select.Option>
           </Select>
         </div>
       </ReleaseChannel>
@@ -261,22 +269,22 @@ export default function MyAccountPreferences() {
 
         <Select
           css={`
-            float: right;
+            margin-left: 219px;
             margin-top: 20px;
           `}
-          onChange={e => setConcurrentDownloads(e.target.value)}
+          onChange={e => setConcurrentDownloads(e)}
           value={concurrentDownloads}
         >
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
+          <Select.Option value="1">1</Select.Option>
+          <Select.Option value="2">2</Select.Option>
+          <Select.Option value="3">3</Select.Option>
+          <Select.Option value="4">4</Select.Option>
+          <Select.Option value="5">5</Select.Option>
+          <Select.Option value="6">6</Select.Option>
+          <Select.Option value="7">7</Select.Option>
+          <Select.Option value="8">8</Select.Option>
+          <Select.Option value="9">9</Select.Option>
+          <Select.Option value="10">10</Select.Option>
         </Select>
       </ParallelDownload>
       <Hr />
@@ -350,7 +358,8 @@ export default function MyAccountPreferences() {
           <StyledButtons
             color="primary"
             onClick={() => {
-              ipcRenderer.invoke("appRestart");
+              app.relaunch();
+              app.exit(0);
             }}
           >
             Restart

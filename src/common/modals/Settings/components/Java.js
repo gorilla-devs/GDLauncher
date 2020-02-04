@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import { ipcRenderer } from "electron";
+import path from "path";
+import { remote } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMemory,
@@ -43,7 +44,7 @@ const Title = styled.h3`
   position: absolute;
   font-size: 15px;
   font-weight: 700;
-  color: ${props => props.theme.palette.text.main};
+  color: ${props => props.theme.palette.text.secondary};
 `;
 
 const Paragraph = styled.p`
@@ -57,40 +58,37 @@ const Hr = styled.hr`
   background: ${props => props.theme.palette.secondary.light};
 `;
 
+const H1 = styled.h1`
+  color: ${props => props.theme.palette.text.primary};
+`;
+
 const StyledButtons = styled(Button)``;
 
 function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const openFolderDialog = async (
+const openFolderDialog = (
   javaPath,
   updateJavaArguments,
   updateJavaPath,
   dispatch
 ) => {
-  const paths = await ipcRenderer.invoke("openFolderDialog", javaPath);
-  dispatch(updateJavaPath(paths[0]));
+  remote.dialog.showOpenDialog(
+    {
+      properties: ["openFile"],
+      defaultPath: path.dirname(javaPath)
+    },
+    paths => dispatch(updateJavaPath(paths[0]))
+  );
 };
 
-const marks = [
-  {
-    value: 2048,
-    label: "2048 mb"
-  },
-  {
-    value: 4096,
-    label: "4096 mb"
-  },
-  {
-    value: 8192,
-    label: "8192 mb"
-  },
-  {
-    value: 16384,
-    label: "16384 mb"
-  }
-];
+const marks = {
+  2048: "2048 mb",
+  4096: "4096 mb",
+  8192: "8192 mb",
+  16384: "16384 mb"
+};
 
 export default function MyAccountPreferences() {
   const javaArgs = useSelector(state => state.settings.java.args);
@@ -102,14 +100,14 @@ export default function MyAccountPreferences() {
 
   return (
     <JavaSettings>
-      <h1
+      <H1
         css={`
           float: left;
           margin: 0;
         `}
       >
         Java
-      </h1>
+      </H1>
       <AutodetectPath>
         <Title
           css={`
@@ -133,7 +131,7 @@ export default function MyAccountPreferences() {
             marginTop: "65px"
           }}
           color="primary"
-          onChange={c => setAutodetectJavaPath(c.target.checked)}
+          onChange={c => setAutodetectJavaPath(c)}
           checked={autodetectJavaPath}
         />
       </AutodetectPath>
@@ -159,7 +157,7 @@ export default function MyAccountPreferences() {
               <Input
                 css={`
                   width: 75%;
-                  margin-right: 10px;
+                  margin-right: 10px ;
                   margin-left: 10px;
                 `}
                 onChange={e => dispatch(updateJavaPath(e.target.value))}
@@ -209,8 +207,10 @@ export default function MyAccountPreferences() {
           css={`
             margin-top: 20px;
           `}
-          onChangeCommitted={(e, val) => dispatch(updateJavaMemory(val))}
-          onChange={(e, val) => setMemory(val)}
+          onChange={e => {
+            dispatch(updateJavaMemory(e));
+            setMemory(e);
+          }}
           defaultValue={memory}
           min={1024}
           max={16384}

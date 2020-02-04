@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import fsa from "fs-extra";
 import path from "path";
-import { ipcRenderer } from "electron";
+import { remote } from "electron";
 import { Button, Input, Switch } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -40,7 +40,7 @@ const Title = styled.h3`
   position: absolute;
   font-size: 15px;
   font-weight: 700;
-  color: ${props => props.theme.palette.text.main};
+  color: ${props => props.theme.palette.text.primary};
 `;
 
 const Paragraph = styled.p`
@@ -54,6 +54,10 @@ const Hr = styled.hr`
   background: ${props => props.theme.palette.secondary.light};
 `;
 
+const H1 = styled.h1`
+  color: ${props => props.theme.palette.text.primary};
+`;
+
 const StyledButtons = styled(Button)``;
 
 async function clearSharedData(InstancesPath, setDeletingInstances) {
@@ -61,23 +65,26 @@ async function clearSharedData(InstancesPath, setDeletingInstances) {
   try {
     setDeletingInstances(true);
     await fsa.emptyDir(path.join(InstancesPath, "libraries"));
+    await fsa.emptyDir(path.join(InstancesPath, "packs"));
     await fsa.emptyDir(path.join(InstancesPath, "assets"));
     await fsa.emptyDir(path.join(InstancesPath, "versions"));
     await fsa.emptyDir(path.join(InstancesPath, "temp"));
-    // await fsa.emptyDir(META_PATH);
+    await fsa.emptyDir(path.join(InstancesPath, "datastore"));
+    await fsa.emptyDir(path.join(InstancesPath, "instances"));
     setDeletingInstances(false);
   } catch (e) {
     console.log(e);
   }
 }
 
-const openFolderDialog = async (
-  InstancesPath,
-  dispatch,
-  updateInstancesPath
-) => {
-  const paths = await ipcRenderer.invoke("openFolderDialog", InstancesPath);
-  dispatch(updateInstancesPath(paths[0]));
+const openFolderDialog = (InstancesPath, dispatch, updateInstancesPath) => {
+  remote.dialog.showOpenDialog(
+    {
+      properties: ["openDirectory"],
+      defaultPath: path.dirname(InstancesPath)
+    },
+    paths => dispatch(updateInstancesPath(paths[0]))
+  );
 };
 
 export default function MyAccountPreferences() {
@@ -89,14 +96,14 @@ export default function MyAccountPreferences() {
 
   return (
     <Instances>
-      <h1
+      <H1
         css={`
           float: left;
           margin: 0;
         `}
       >
         Instances
-      </h1>
+      </H1>
       <AutodetectPath>
         <Title
           css={`
@@ -120,9 +127,8 @@ export default function MyAccountPreferences() {
             onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
             disabled
             css={`
-              position: absolute;
-              top: 110px;
-              right: 0px;
+              margin-top: 70px;
+              float: right;
             `}
             color="primary"
           >
@@ -132,9 +138,8 @@ export default function MyAccountPreferences() {
           <StyledButtons
             onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
             css={`
-              position: absolute;
-              top: 110px;
-              right: 0px;
+              margin-top: 70px;
+              float: right;
             `}
             color="primary"
           >
@@ -168,7 +173,7 @@ export default function MyAccountPreferences() {
             marginTop: "20px"
           }}
           color="primary"
-          onChange={e => setOverrideInstancesPath(e.target.checked)}
+          onChange={e => setOverrideInstancesPath(e)}
           checked={overrideInstancesPath}
         />
       </OverridePath>

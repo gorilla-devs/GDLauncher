@@ -51,7 +51,19 @@ const SettingsButton = styled(Button)`
   border-radius: 4px 0 0 4px;
   font-size: 12px;
   white-space: nowrap;
+  background: transparent;
+  border: 0px;
+  text-align: left;
+  animation-duration: 0s;
   color: ${props => props.theme.palette.text.primary};
+  &:hover {
+    color: ${props => props.theme.palette.text.primary};
+    background: ${props => props.theme.palette.grey[700]};
+  }
+  &:focus {
+    color: ${props => props.theme.palette.text.primary};
+    background: ${props => props.theme.palette.grey[600]};
+  }
 `;
 
 const SettingsTitle = styled.div`
