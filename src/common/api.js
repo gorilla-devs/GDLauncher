@@ -119,6 +119,11 @@ export const getAddonFile = (addonID, fileID) => {
   return axios.get(url);
 };
 
+export const getAddonsByFingerprint = fingerprints => {
+  const url = `${FORGESVC_URL}/fingerprint`;
+  return axios.post(url, fingerprints);
+};
+
 export const getAddonFileChangelog = (addonID, fileID) => {
   const url = `${FORGESVC_URL}/addon/${addonID}/file/${fileID}/changelog`;
   return axios.get(url);

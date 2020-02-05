@@ -692,12 +692,13 @@ export function downloadMod(instanceName, projectID, fileID) {
       "mods",
       modManifest.fileName
     );
-    await downloadFile(destFile, modManifest.downloadUrl);
+    const fileExists = await fse.pathExists(destFile);
+    if (!fileExists) await downloadFile(destFile, modManifest.downloadUrl);
     await dispatch(
       updateInstanceConfig(instanceName, config => {
         return {
           ...config,
-          mods: { ...(config.mods || {}), [projectID]: fileID }
+          mods: [...(config.mods || []), modManifest]
         };
       })
     );
@@ -756,13 +757,12 @@ export function downloadForgeManifestFiles(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, "Finalizing overrides..."));
     await fse.copy(
-      path.join(_getTempPath(state), instanceName, "overrides"),
+      path.join(_getTempPath(state), "overrides"),
       path.join(_getInstancesPath(state), instanceName),
       { overwrite: true }
     );
-    await fse.remove(path.join(_getTempPath(state), instanceName));
     await fse.remove(addonPathZip);
-    await fse.remove(path.join(_getTempPath(state), "addon"));
+    await fse.remove(path.join(_getTempPath(state)));
   };
 }
 

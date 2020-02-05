@@ -19,7 +19,9 @@ const Container = styled.div`
   width: 180px;
   height: 100px;
   transform: ${p =>
-    p.isHovered ? "scale3d(1.1, 1.1, 1.1)" : "scale3d(1, 1, 1)"};
+    p.isHovered && !p.installing
+      ? "scale3d(1.1, 1.1, 1.1)"
+      : "scale3d(1, 1, 1)"};
   margin-right: 20px;
   margin-top: 20px;
   transition: transform 150ms ease-in-out;
@@ -127,10 +129,12 @@ const Instance = ({ instanceName }) => {
         onShow={() => setIsHovered(true)}
         onHide={() => setIsHovered(false)}
       >
-        <MenuItem>Manage</MenuItem>
+        <MenuItem disabled={isInQueue}>Manage</MenuItem>
         <MenuItem onClick={openFolder}>Open Folder</MenuItem>
         <MenuItem divider />
-        <MenuItem onClick={openConfirmationDeleteModal}>Delete</MenuItem>
+        <MenuItem disabled={isInQueue} onClick={openConfirmationDeleteModal}>
+          Delete
+        </MenuItem>
       </ContextMenu>
     </>
   );
