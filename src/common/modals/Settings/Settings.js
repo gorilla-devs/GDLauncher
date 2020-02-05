@@ -124,7 +124,7 @@ export default function Settings() {
         <SideMenu>
           <SettingsTitle>General</SettingsTitle>
           <SettingsButton onClick={() => setPage("MyAccountPrf")}>
-            My Account Preferences
+            General
           </SettingsButton>
           <SettingsButton onClick={() => setPage("Java")}>Java</SettingsButton>
           <SettingsButton onClick={() => setPage("Instances")}>

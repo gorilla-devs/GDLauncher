@@ -80,3 +80,12 @@ export function updateJavaArguments(args) {
     });
   };
 }
+
+export function updateDiscordRpc(val) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_DISCORD_RPC,
+      val
+    });
+  };
+}

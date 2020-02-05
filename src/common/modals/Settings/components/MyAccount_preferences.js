@@ -5,10 +5,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { push } from "connected-react-router";
 import { faCopy, faDownload } from "@fortawesome/free-solid-svg-icons";
-import { Select, Tooltip, Button } from "antd";
+import { Select, Tooltip, Button, Switch } from "antd";
 import logo from "../../../assets/logo.png";
 import { _getCurrentAccount } from "../../../utils/selectors";
-import { updateReleaseChannel } from "../../../reducers/settings/actions";
+import {
+  updateReleaseChannel,
+  updateDiscordRpc
+} from "../../../reducers/settings/actions";
 
 const MyAccountPrf = styled.div`
   width: 100%;
@@ -141,6 +144,7 @@ const StyledButtons = styled(Button)``;
 export default function MyAccountPreferences() {
   const currentAccount = useSelector(_getCurrentAccount);
   const releaseC = useSelector(state => state.settings.releaseChannel);
+  const DiscordRPC = useSelector(state => state.settings.discordRPC);
 
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -159,7 +163,7 @@ export default function MyAccountPreferences() {
   return (
     <MyAccountPrf>
       <PersonalData>
-        <Title>My Account Preferences</Title>
+        <Title>General</Title>
         <PersonalDataContainer>
           <ProfileImage />
           <UsernameContainer>
@@ -281,6 +285,42 @@ export default function MyAccountPreferences() {
           <Select.Option value="9">9</Select.Option>
           <Select.Option value="10">10</Select.Option>
         </Select>
+      </ParallelDownload>
+      <Hr />
+      <ParallelDownload>
+        <Title
+          css={`
+            margin-top: 0px;
+          `}
+        >
+          Discord RPC
+        </Title>
+        <p
+          css={`
+            margin-top: 25px;
+            width: 200px;
+            position: absolute;
+            left: 0;
+          `}
+        >
+          Enable or Disable Discord RPC
+        </p>
+
+        <Switch
+          style={{
+            float: "right",
+            marginTop: "20px"
+          }}
+          color="primary"
+          onChange={e => {
+            dispatch(updateDiscordRpc(e));
+            // eslint-disable-next-line
+            DiscordRPC
+              ? ipcRenderer.send("init-discord-rpc")
+              : ipcRenderer.send("shutdown-discord-rpc");
+          }}
+          checked={DiscordRPC}
+        />
       </ParallelDownload>
       <Hr />
       <LauncherVersion>
