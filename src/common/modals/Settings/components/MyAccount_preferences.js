@@ -142,7 +142,6 @@ export default function MyAccountPreferences() {
   const currentAccount = useSelector(_getCurrentAccount);
   const releaseC = useSelector(state => state.settings.releaseChannel);
 
-  const [releaseChannel, setReleaseChannel] = useState(releaseC);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedUsername, setCopiedUsername] = useState(false);
@@ -151,7 +150,6 @@ export default function MyAccountPreferences() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setReleaseChannel(releaseC);
     ipcRenderer.send("check-for-updates");
     ipcRenderer.on("update-available", () => {
       setUpdateAvailable(true);
@@ -234,11 +232,10 @@ export default function MyAccountPreferences() {
               float: right;
             `}
             onChange={e => {
-              setReleaseChannel(e);
               dispatch(updateReleaseChannel(e));
             }}
-            value={releaseChannel}
-            defaultValue={!releaseChannel ? "Stable" : "Beta"}
+            value={releaseC}
+            defaultValue={!releaseC ? "Stable" : "Beta"}
           >
             <Select.Option value="1">Beta</Select.Option>
             <Select.Option value="0">Stable</Select.Option>
@@ -355,7 +352,7 @@ export default function MyAccountPreferences() {
           )}
           <StyledButtons
             color="primary"
-            onClick={() => ipcRenderer.invoke("restart")}
+            onClick={() => ipcRenderer.invoke("appRestart")}
           >
             Restart
           </StyledButtons>

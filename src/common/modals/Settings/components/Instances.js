@@ -54,7 +54,7 @@ const Hr = styled.hr`
   background: ${props => props.theme.palette.secondary.light};
 `;
 
-const H1 = styled.h1`
+const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
 `;
 
@@ -78,11 +78,7 @@ const openFolderDialog = async (
   dispatch,
   updateInstancesPath
 ) => {
-  const paths = await ipcRenderer.invoke(
-    "openFolderDialog",
-    InstancesPath,
-    updateInstancesPath
-  );
+  const paths = await ipcRenderer.invoke("openFolderDialog", InstancesPath);
   dispatch(updateInstancesPath(paths[0]));
 };
 
@@ -95,14 +91,14 @@ export default function MyAccountPreferences() {
 
   return (
     <Instances>
-      <H1
+      <MainTitle
         css={`
           float: left;
           margin: 0;
         `}
       >
         Instances
-      </H1>
+      </MainTitle>
       <AutodetectPath>
         <Title
           css={`
@@ -172,7 +168,7 @@ export default function MyAccountPreferences() {
             marginTop: "20px"
           }}
           color="primary"
-          onChange={e => setOverrideInstancesPath(e)}
+          onChange={setOverrideInstancesPath}
           checked={overrideInstancesPath}
         />
       </OverridePath>

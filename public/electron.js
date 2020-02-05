@@ -127,11 +127,6 @@ ipcMain.handle("hide-window", () => {
   }
 });
 
-ipcMain.handle("restart", () => {
-  app.relaunch();
-  app.exit(0);
-});
-
 ipcMain.handle("min-max-window", () => {
   if (mainWindow.isMaximized()) {
     mainWindow.unmaximize();
@@ -175,12 +170,12 @@ ipcMain.handle("openFolder", (e, path) => {
   shell.openPath(path);
 });
 
-ipcMain.handle("openFolderDialog", (e, path) => {
+ipcMain.handle("openFolderDialog", (e, dirPath) => {
   return new Promise(resolve => {
     dialog.showOpenDialog(
       {
         properties: ["openDirectory"],
-        defaultPath: path.dirname(path)
+        defaultPath: path.dirname(dirPath)
       },
       paths => resolve(paths)
     );
