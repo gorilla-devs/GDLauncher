@@ -171,15 +171,10 @@ ipcMain.handle("openFolder", (e, path) => {
   shell.openPath(path);
 });
 
-ipcMain.handle("openFolderDialog", (e, path) => {
-  return new Promise(resolve => {
-    dialog.showOpenDialog(
-      {
-        properties: ["openDirectory"],
-        defaultPath: path.dirname(path)
-      },
-      paths => resolve(paths)
-    );
+ipcMain.handle("openFolderDialog", (e, defaultPath) => {
+  return dialog.showOpenDialog({
+    properties: ["openDirectory"],
+    defaultPath: path.dirname(defaultPath)
   });
 });
 
