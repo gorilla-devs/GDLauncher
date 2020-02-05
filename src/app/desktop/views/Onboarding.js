@@ -1,17 +1,17 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLongArrowAltRight } from "@fortawesome/free-solid-svg-icons";
 import logo from "../../../common/assets/logo.png";
+import { _getCurrentAccount } from "../../../common/utils/selectors";
 
 const Background = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 100;
-  background: #0f7173;
+  background: ${props => props.theme.palette.colors.darkBlue};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,26 +25,28 @@ const Box = styled.div`
   word-wrap: break-word;
 `;
 
-const ButtonToHome = styled(FontAwesomeIcon)`
+const ButtonToHome = styled.div`
   position: absolute;
   right: 0;
   bottom: 0;
   transition: 0.1s ease-in-out;
   display: flex;
   justify-content: center;
+  align-items: center;
   border-radius: 4px;
-  font-size: 50px;
+  font-size: 40px;
   cursor: pointer;
-  z-index: 100001;
-  padding: 5px;
   margin: 20px;
-  background-color: transparent;
+  width: 70px;
+  height: 40px;
+  color: ${props => props.theme.palette.text.icon};
   &:hover {
-    color: ${props => props.theme.palette.secondary.dark};
+    background: ${props => props.theme.action.hover};
   }
 `;
 const Home = () => {
   const dispatch = useDispatch();
+  const account = useSelector(_getCurrentAccount);
 
   return (
     <Background>
@@ -55,7 +57,7 @@ const Home = () => {
           right: 20px;
         `}
         src="https://discordapp.com/widget?id=398091532881756161&theme=dark"
-        width="200"
+        width="270"
         height="410"
         allowTransparency="true"
         frameBorder="0"
@@ -65,7 +67,7 @@ const Home = () => {
         <img
           css={`
             margin-left: 25%;
-            margin-bottomo: 30px;
+            margin-bottom: 30px;
             max-width: 256px;
           `}
           src={logo}
@@ -80,7 +82,7 @@ const Home = () => {
             line-height: 42px;
           `}
         >
-          Welcome To GDLauncher!
+          Welcome to GDLauncher {account.selectedProfile.name}!
         </p>
         <p
           css={`
@@ -91,9 +93,21 @@ const Home = () => {
             text-align: center;
           `}
         >
-          GDLauncher is free and open source, it wouldn&#39;t exist without its
-          community. If you find any bug or have any suggestion, tell us on
-          Discord!
+          GDLauncher is free and open source, and is led by only a couple of
+          developers, who invest a lot of their time into building it. If you
+          enjoy GDLauncher, please consider showing it to the devs by donating a
+          dollar
+        </p>
+        <p>
+          <a href="https://www.patreon.com/gorilladevs">
+            <img
+              css={`
+                cursor: pointer;
+              `}
+              alt="Become a Patron"
+              src="https://gdevs.io/img/become_a_patron_button.png"
+            />
+          </a>
         </p>
         <p
           css={`
@@ -105,14 +119,15 @@ const Home = () => {
             text-align: center;
           `}
         >
-          Happy Gaming, Ladvace!
+          Have fun!
         </p>
       </Box>
-      <ButtonToHome
-        icon={faLongArrowAltRight}
-        type="button"
-        onClick={() => dispatch(push("/home"))}
-      />
+      <ButtonToHome>
+        <FontAwesomeIcon
+          icon={faLongArrowAltRight}
+          onClick={() => dispatch(push("/home"))}
+        />
+      </ButtonToHome>
     </Background>
   );
 };
