@@ -57,7 +57,7 @@ const Hr = styled.hr`
   background: ${props => props.theme.palette.secondary.light};
 `;
 
-const H1 = styled.h1`
+const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
 `;
 
@@ -94,14 +94,14 @@ export default function MyAccountPreferences() {
 
   return (
     <JavaSettings>
-      <H1
+      <MainTitle
         css={`
           float: left;
           margin: 0;
         `}
       >
         Java
-      </H1>
+      </MainTitle>
       <AutodetectPath>
         <Title
           css={`
