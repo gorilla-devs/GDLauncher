@@ -18,7 +18,7 @@ const Background = styled.div`
 `;
 
 const Box = styled.div`
-  max-width: 256px;
+  max-width: 505px;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -38,9 +38,9 @@ const ButtonToHome = styled(FontAwesomeIcon)`
   z-index: 100001;
   padding: 5px;
   margin: 20px;
-  background-color: ${props => props.theme.palette.primary.light};
+  background-color: transparent;
   &:hover {
-    background-color: ${props => props.theme.palette.primary.dark};
+    color: ${props => props.theme.palette.secondary.dark};
   }
 `;
 const Home = () => {
@@ -48,24 +48,47 @@ const Home = () => {
 
   return (
     <Background>
+      <iframe
+        css={`
+          position: absolute;
+          top: 20px;
+          right: 20px;
+        `}
+        src="https://discordapp.com/widget?id=398091532881756161&theme=dark"
+        width="200"
+        height="410"
+        allowTransparency="true"
+        frameBorder="0"
+        title="discordFrame"
+      />
       <Box>
         <img
           css={`
-            margin-bottom: 20px;
+            margin-left: 25%;
+            margin-bottomo: 30px;
+            max-width: 256px;
           `}
           src={logo}
           alt="logo"
         />
         <p
           css={`
-            font-weight: 600;
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: bold;
+            font-size: 36px;
+            line-height: 42px;
           `}
         >
           Welcome To GDLauncher!
         </p>
         <p
           css={`
-            font-weight: 200;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 24px;
+            line-height: 28px;
+            text-align: center;
           `}
         >
           GDLauncher is free and open source, it wouldn&#39;t exist without its
@@ -74,7 +97,12 @@ const Home = () => {
         </p>
         <p
           css={`
-            font-weight: 200;
+            margin-top: 40px;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 24px;
+            line-height: 28px;
+            text-align: center;
           `}
         >
           Happy Gaming, Ladvace!
