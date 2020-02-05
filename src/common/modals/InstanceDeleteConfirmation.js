@@ -1,20 +1,30 @@
 import React, { useState } from "react";
 import fse from "fs-extra";
 import path from "path";
-import { Button, Progress } from "antd";
+import { Button } from "antd";
+import { useInterval } from "rooks";
 import { useSelector, useDispatch } from "react-redux";
 import Modal from "../components/Modal";
-import { _getInstancesPath } from "../utils/selectors";
+import { _getInstancesPath, _getInstances } from "../utils/selectors";
 import { closeModal } from "../reducers/modals/actions";
 
 const InstanceDeleteConfirmation = ({ instanceName }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const instancesPath = useSelector(_getInstancesPath);
+  const instances = useSelector(_getInstances);
+
+  const { start, stop } = useInterval(() => {
+    if (!instances.list.find(instance => instance.name === instanceName)) {
+      stop();
+      dispatch(closeModal());
+    }
+  }, 200);
+
   const deleteInstance = async () => {
     setLoading(true);
-    await fse.remove(path.join(instancesPath, instanceName));
-    dispatch(closeModal());
+    start();
+    fse.remove(path.join(instancesPath, instanceName));
   };
   const closeModalWindow = () => dispatch(closeModal());
   return (
@@ -33,7 +43,6 @@ const InstanceDeleteConfirmation = ({ instanceName }) => {
         <h4
           css={`
             font-style: italic;
-            font-weight: 100;
             color: ${props => props.theme.palette.error.main};
           `}
         >
@@ -53,14 +62,13 @@ const InstanceDeleteConfirmation = ({ instanceName }) => {
             onClick={closeModalWindow}
             variant="contained"
             color="primary"
+            disabled={loading}
           >
             No, Abort
           </Button>
-          {loading ? (
-            <Progress type="circle" />
-          ) : (
-            <Button onClick={deleteInstance}>Yes, Delete</Button>
-          )}
+          <Button onClick={deleteInstance} loading={loading}>
+            Yes, Delete
+          </Button>
         </div>
       </div>
     </Modal>

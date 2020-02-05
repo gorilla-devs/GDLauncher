@@ -15,7 +15,6 @@ const AddInstance = () => {
   const [modpack, setModpack] = useState(null);
   const [isImport, setIsImport] = useState(null);
 
-  console.log(version, modpack);
   return (
     <Modal
       css={`
