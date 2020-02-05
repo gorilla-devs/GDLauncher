@@ -81,7 +81,7 @@ export function updateJavaArguments(args) {
   };
 }
 
-export function updateDiscordRpc(val) {
+export function updateDiscordRPC(val) {
   return dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_DISCORD_RPC,

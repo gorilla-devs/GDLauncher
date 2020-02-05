@@ -10,7 +10,7 @@ import logo from "../../../assets/logo.png";
 import { _getCurrentAccount } from "../../../utils/selectors";
 import {
   updateReleaseChannel,
-  updateDiscordRpc
+  updateDiscordRPC
 } from "../../../reducers/settings/actions";
 
 const MyAccountPrf = styled.div`
@@ -313,7 +313,7 @@ export default function MyAccountPreferences() {
           }}
           color="primary"
           onChange={e => {
-            dispatch(updateDiscordRpc(e));
+            dispatch(updateDiscordRPC(e));
             // eslint-disable-next-line
             DiscordRPC
               ? ipcRenderer.send("init-discord-rpc")
