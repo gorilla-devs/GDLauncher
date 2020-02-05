@@ -127,6 +127,11 @@ ipcMain.handle("hide-window", () => {
   }
 });
 
+ipcMain.handle("restart", () => {
+  app.relaunch();
+  app.exit(0);
+});
+
 ipcMain.handle("min-max-window", () => {
   if (mainWindow.isMaximized()) {
     mainWindow.unmaximize();

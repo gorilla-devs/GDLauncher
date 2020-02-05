@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
-import path from "path";
-import { remote } from "electron";
+import { ipcRenderer } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMemory,
@@ -68,26 +67,21 @@ function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const openFolderDialog = (
+const openFolderDialog = async (
   javaPath,
   updateJavaArguments,
   updateJavaPath,
   dispatch
 ) => {
-  remote.dialog.showOpenDialog(
-    {
-      properties: ["openFile"],
-      defaultPath: path.dirname(javaPath)
-    },
-    paths => dispatch(updateJavaPath(paths[0]))
-  );
+  const paths = await ipcRenderer.invoke("openFolderDialog", javaPath);
+  dispatch(updateJavaPath(paths[0]));
 };
 
 const marks = {
-  2048: "2048 mb",
-  4096: "4096 mb",
-  8192: "8192 mb",
-  16384: "16384 mb"
+  2048: "2048 MB",
+  4096: "4096 MB",
+  8192: "8192 MB",
+  16384: "16384 MB"
 };
 
 export default function MyAccountPreferences() {
@@ -157,7 +151,7 @@ export default function MyAccountPreferences() {
               <Input
                 css={`
                   width: 75%;
-                  margin-right: 10px ;
+                  margin-right: 10px;
                   margin-left: 10px;
                 `}
                 onChange={e => dispatch(updateJavaPath(e.target.value))}

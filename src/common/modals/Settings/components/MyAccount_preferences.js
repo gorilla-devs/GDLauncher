@@ -10,8 +10,6 @@ import logo from "../../../assets/logo.png";
 import { _getCurrentAccount } from "../../../utils/selectors";
 import { updateReleaseChannel } from "../../../reducers/settings/actions";
 
-const { app } = require("electron").remote;
-
 const MyAccountPrf = styled.div`
   width: 100%;
   height: 100%;
@@ -144,7 +142,7 @@ export default function MyAccountPreferences() {
   const currentAccount = useSelector(_getCurrentAccount);
   const releaseC = useSelector(state => state.settings.releaseChannel);
 
-  const [releaseChannel, setReleaseChannel] = useState(0 ? "Release" : "Beta");
+  const [releaseChannel, setReleaseChannel] = useState(releaseC);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedUsername, setCopiedUsername] = useState(false);
@@ -240,7 +238,7 @@ export default function MyAccountPreferences() {
               dispatch(updateReleaseChannel(e));
             }}
             value={releaseChannel}
-            defaultValue={releaseChannel}
+            defaultValue={!releaseChannel ? "Stable" : "Beta"}
           >
             <Select.Option value="1">Beta</Select.Option>
             <Select.Option value="0">Stable</Select.Option>
@@ -357,10 +355,7 @@ export default function MyAccountPreferences() {
           )}
           <StyledButtons
             color="primary"
-            onClick={() => {
-              app.relaunch();
-              app.exit(0);
-            }}
+            onClick={() => ipcRenderer.invoke("restart")}
           >
             Restart
           </StyledButtons>
