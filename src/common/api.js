@@ -61,17 +61,17 @@ export const mcInvalidate = (accessToken, clientToken) => {
 };
 
 export const getMcManifest = () => {
-  const url = MC_MANIFEST_URL;
+  const url = `${MC_MANIFEST_URL}?timestamp=${new Date().getTime()}`;
   return axios.get(url);
 };
 
 export const getForgeManifest = () => {
-  const url = `${FORGESVC_URL}/minecraft/modloader`;
+  const url = `${FORGESVC_URL}/minecraft/modloader?timestamp=${new Date().getTime()}`;
   return axios.get(url);
 };
 
 export const getFabricManifest = () => {
-  const url = `${FABRIC_APIS}/v2/versions`;
+  const url = `${FABRIC_APIS}/v2/versions?timestamp=${new Date().getTime()}`;
   return axios.get(url);
 };
 
