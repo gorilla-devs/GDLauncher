@@ -40,7 +40,7 @@ const Title = styled.h3`
   position: absolute;
   font-size: 15px;
   font-weight: 700;
-  color: ${props => props.theme.palette.text.main};
+  color: ${props => props.theme.palette.text.primary};
 `;
 
 const Paragraph = styled.p`
@@ -54,17 +54,19 @@ const Hr = styled.hr`
   background: ${props => props.theme.palette.secondary.light};
 `;
 
+const MainTitle = styled.h1`
+  color: ${props => props.theme.palette.text.primary};
+`;
+
 const StyledButtons = styled(Button)``;
 
 async function clearSharedData(InstancesPath, setDeletingInstances) {
   setDeletingInstances(true);
   try {
     setDeletingInstances(true);
-    await fsa.emptyDir(path.join(InstancesPath, "libraries"));
-    await fsa.emptyDir(path.join(InstancesPath, "assets"));
-    await fsa.emptyDir(path.join(InstancesPath, "versions"));
     await fsa.emptyDir(path.join(InstancesPath, "temp"));
-    // await fsa.emptyDir(META_PATH);
+    await fsa.emptyDir(path.join(InstancesPath, "datastore"));
+    await fsa.emptyDir(path.join(InstancesPath, "instances"));
     setDeletingInstances(false);
   } catch (e) {
     console.log(e);
@@ -89,14 +91,14 @@ export default function MyAccountPreferences() {
 
   return (
     <Instances>
-      <h1
+      <MainTitle
         css={`
           float: left;
           margin: 0;
         `}
       >
         Instances
-      </h1>
+      </MainTitle>
       <AutodetectPath>
         <Title
           css={`
@@ -120,9 +122,8 @@ export default function MyAccountPreferences() {
             onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
             disabled
             css={`
-              position: absolute;
-              top: 110px;
-              right: 0px;
+              margin-top: 70px;
+              float: right;
             `}
             color="primary"
           >
@@ -132,9 +133,8 @@ export default function MyAccountPreferences() {
           <StyledButtons
             onClick={() => clearSharedData(InstancesPath, setDeletingInstances)}
             css={`
-              position: absolute;
-              top: 110px;
-              right: 0px;
+              margin-top: 70px;
+              float: right;
             `}
             color="primary"
           >
@@ -168,7 +168,7 @@ export default function MyAccountPreferences() {
             marginTop: "20px"
           }}
           color="primary"
-          onChange={e => setOverrideInstancesPath(e.target.checked)}
+          onChange={setOverrideInstancesPath}
           checked={overrideInstancesPath}
         />
       </OverridePath>

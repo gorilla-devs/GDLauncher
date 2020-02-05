@@ -43,7 +43,7 @@ const Title = styled.h3`
   position: absolute;
   font-size: 15px;
   font-weight: 700;
-  color: ${props => props.theme.palette.text.main};
+  color: ${props => props.theme.palette.text.secondary};
 `;
 
 const Paragraph = styled.p`
@@ -55,6 +55,10 @@ const Paragraph = styled.p`
 const Hr = styled.hr`
   opacity: 0.29;
   background: ${props => props.theme.palette.secondary.light};
+`;
+
+const MainTitle = styled.h1`
+  color: ${props => props.theme.palette.text.primary};
 `;
 
 const StyledButtons = styled(Button)``;
@@ -73,24 +77,12 @@ const openFolderDialog = async (
   dispatch(updateJavaPath(paths[0]));
 };
 
-const marks = [
-  {
-    value: 2048,
-    label: "2048 mb"
-  },
-  {
-    value: 4096,
-    label: "4096 mb"
-  },
-  {
-    value: 8192,
-    label: "8192 mb"
-  },
-  {
-    value: 16384,
-    label: "16384 mb"
-  }
-];
+const marks = {
+  2048: "2048 MB",
+  4096: "4096 MB",
+  8192: "8192 MB",
+  16384: "16384 MB"
+};
 
 export default function MyAccountPreferences() {
   const javaArgs = useSelector(state => state.settings.java.args);
@@ -102,14 +94,14 @@ export default function MyAccountPreferences() {
 
   return (
     <JavaSettings>
-      <h1
+      <MainTitle
         css={`
           float: left;
           margin: 0;
         `}
       >
         Java
-      </h1>
+      </MainTitle>
       <AutodetectPath>
         <Title
           css={`
@@ -133,7 +125,7 @@ export default function MyAccountPreferences() {
             marginTop: "65px"
           }}
           color="primary"
-          onChange={c => setAutodetectJavaPath(c.target.checked)}
+          onChange={c => setAutodetectJavaPath(c)}
           checked={autodetectJavaPath}
         />
       </AutodetectPath>
@@ -209,8 +201,10 @@ export default function MyAccountPreferences() {
           css={`
             margin-top: 20px;
           `}
-          onChangeCommitted={(e, val) => dispatch(updateJavaMemory(val))}
-          onChange={(e, val) => setMemory(val)}
+          onChange={e => {
+            dispatch(updateJavaMemory(e));
+            setMemory(e);
+          }}
           defaultValue={memory}
           min={1024}
           max={16384}
