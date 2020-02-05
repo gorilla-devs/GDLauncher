@@ -731,15 +731,23 @@ export function downloadForgeManifestFiles(instanceName) {
     );
 
     dispatch(updateDownloadStatus(instanceName, "Copying overrides..."));
-    const addonPathZip = path.join(_getTempPath(state), "addon.zip");
+    const addonPathZip = path.join(
+      _getTempPath(state),
+      instanceName,
+      "addon.zip"
+    );
     const sevenZipPath = await get7zPath();
-    const extraction = extractFull(addonPathZip, _getTempPath(state), {
-      recursive: true,
-      $bin: sevenZipPath,
-      yes: true,
-      $cherryPick: "overrides",
-      $progress: true
-    });
+    const extraction = extractFull(
+      addonPathZip,
+      path.join(_getTempPath(state), instanceName),
+      {
+        recursive: true,
+        $bin: sevenZipPath,
+        yes: true,
+        $cherryPick: "overrides",
+        $progress: true
+      }
+    );
     await new Promise((resolve, reject) => {
       let progress = 0;
       extraction.on("progress", ({ percent }) => {
@@ -758,12 +766,12 @@ export function downloadForgeManifestFiles(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, "Finalizing overrides..."));
     await fse.copy(
-      path.join(_getTempPath(state), "overrides"),
+      path.join(_getTempPath(state), instanceName, "overrides"),
       path.join(_getInstancesPath(state), instanceName),
       { overwrite: true }
     );
     await fse.remove(addonPathZip);
-    await fse.remove(path.join(_getTempPath(state)));
+    await fse.remove(path.join(_getTempPath(state), instanceName));
   };
 }
 

@@ -38,11 +38,13 @@ const InstanceContainer = styled.div`
   align-items: center;
   text-align: center;
   width: 100%;
-  font-size: 18px;
+  font-size: 20px;
   height: 100%;
-  background: linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url("${props =>
+  background: linear-gradient(0deg,rgba(0,0,0,0.7),rgba(0,0,0,0.7)),url("${props =>
     props.background}") center no-repeat;
   background-position: center;
+  color: ${props => props.theme.palette.text.secondary};
+  font-weight: 600;
   background-size: cover;
   border-radius: 4px;
   margin: 10px;
@@ -74,13 +76,6 @@ const HoverContainer = styled.div`
 const MCVersion = styled.div`
   position: absolute;
   right: 5px;
-  top: 5px;
-  font-size: 11px;
-`;
-
-const MCType = styled.div`
-  position: absolute;
-  left: 5px;
   top: 5px;
   font-size: 11px;
 `;
@@ -131,7 +126,6 @@ const Instance = ({ instanceName }) => {
         >
           <InstanceContainer installing={isInQueue} background={background}>
             <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
-            <MCType>{(instance.modloader || [])[0]}</MCType>
             {instance.name}
           </InstanceContainer>
           <HoverContainer installing={isInQueue} isHovered={isHovered}>

@@ -90,14 +90,14 @@ const InstanceName = ({
       let manifest;
       if (isImport) {
         manifest = await fse.readJson(
-          path.join(tempPath, "addon", "manifest.json")
+          path.join(tempPath, localInstanceName, "addon", "manifest.json")
         );
       } else {
         manifest = await downloadAddonZip(
           version[1],
           version[2],
           path.join(instancesPath, localInstanceName),
-          tempPath
+          path.join(tempPath, localInstanceName)
         );
       }
       await downloadFile(
@@ -157,8 +157,7 @@ const InstanceName = ({
                     z-index: 100001;
                     margin: 20px;
                     &:hover {
-                      background-color: ${props =>
-                        props.theme.action.hover};
+                      background-color: ${props => props.theme.action.hover};
                     }
                   `}
                   onClick={() => {
@@ -238,8 +237,7 @@ const InstanceName = ({
                     z-index: 100001;
                     margin: 20px;
                     &:hover {
-                      background-color: ${props =>
-                        props.theme.action.hover};
+                      background-color: ${props => props.theme.action.hover};
                     }
                   `}
                   onClick={() => {
