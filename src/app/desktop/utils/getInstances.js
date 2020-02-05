@@ -11,7 +11,12 @@ const getInstances = async instancesPath => {
       );
       const config = await fse.readJSON(configPath);
 
-      return { name: instance, modloader: config.modloader, mods: config.mods };
+      return {
+        name: instance,
+        modloader: config.modloader,
+        mods: config.mods,
+        background: config.background
+      };
     } catch (err) {
       console.error(err);
     }

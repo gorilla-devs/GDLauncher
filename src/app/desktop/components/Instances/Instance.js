@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { transparentize } from "polished";
 import styled from "styled-components";
+import { promises as fs } from "fs";
 import path from "path";
 import { ipcRenderer } from "electron";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
@@ -37,9 +38,10 @@ const InstanceContainer = styled.div`
   align-items: center;
   text-align: center;
   width: 100%;
-  font-size: 16px;
+  font-size: 18px;
   height: 100%;
-  background: linear-gradient(0deg,rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url("${instanceDefaultBackground}");
+  background: linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url("${props =>
+    props.background}") center no-repeat;
   background-position: center;
   background-size: cover;
   border-radius: 4px;
@@ -76,14 +78,35 @@ const MCVersion = styled.div`
   font-size: 11px;
 `;
 
+const MCType = styled.div`
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  font-size: 11px;
+`;
+
 const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+  const [background, setBackground] = useState(`${instanceDefaultBackground}`);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const downloadQueue = useSelector(_getDownloadQueue);
   const currentDownload = useSelector(state => state.currentDownload);
-  const isInQueue = downloadQueue[instanceName];
   const instancesPath = useSelector(_getInstancesPath);
+  const isInQueue = downloadQueue[instanceName];
+
+  useEffect(() => {
+    if (instance.background) {
+      fs.readFile(path.join(instancesPath, instanceName, instance.background))
+        .then(res =>
+          setBackground(`data:image/png;base64,${res.toString("base64")}`)
+        )
+        .catch(console.error);
+    } else {
+      setBackground(`${instanceDefaultBackground}`);
+    }
+  }, [instance.background]);
+
   const startInstance = () => {
     if (isInQueue) return;
     dispatch(launchInstance(instanceName));
@@ -94,6 +117,10 @@ const Instance = ({ instanceName }) => {
   const openConfirmationDeleteModal = () => {
     dispatch(openModal("InstanceDeleteConfirmation", { instanceName }));
   };
+  const manageInstance = () => {
+    dispatch(openModal("InstanceManager", { instanceName }));
+  };
+
   return (
     <>
       <ContextMenuTrigger id={instance.name}>
@@ -102,8 +129,9 @@ const Instance = ({ instanceName }) => {
           onClick={startInstance}
           isHovered={isHovered}
         >
-          <InstanceContainer installing={isInQueue}>
+          <InstanceContainer installing={isInQueue} background={background}>
             <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
+            <MCType>{(instance.modloader || [])[0]}</MCType>
             {instance.name}
           </InstanceContainer>
           <HoverContainer installing={isInQueue} isHovered={isHovered}>
@@ -129,7 +157,9 @@ const Instance = ({ instanceName }) => {
         onShow={() => setIsHovered(true)}
         onHide={() => setIsHovered(false)}
       >
-        <MenuItem disabled={isInQueue}>Manage</MenuItem>
+        <MenuItem disabled={isInQueue} onClick={manageInstance}>
+          Manage
+        </MenuItem>
         <MenuItem onClick={openFolder}>Open Folder</MenuItem>
         <MenuItem divider />
         <MenuItem disabled={isInQueue} onClick={openConfirmationDeleteModal}>

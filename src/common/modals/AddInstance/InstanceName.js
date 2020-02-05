@@ -19,6 +19,7 @@ import { downloadAddonZip } from "../../../app/desktop/utils";
 import { _getInstancesPath, _getTempPath } from "../../utils/selectors";
 import { transparentize } from "polished";
 import bgImage from "../../../common/assets/mcCube.jpg";
+import { downloadFile } from "../../../app/desktop/utils/downloader";
 
 const InstanceName = ({
   in: inProp,
@@ -35,6 +36,10 @@ const InstanceName = ({
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const [instanceName, setInstanceName] = useState("");
   const [clicked, setClicked] = useState(false);
+
+  const thumbnailURL = modpack?.attachments?.find(v => v.isDefault)
+    ?.thumbnailUrl;
+  const imageURL = modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
 
   const wait = s => {
     return new Promise(resolve => {
@@ -82,6 +87,14 @@ const InstanceName = ({
           tempPath
         );
       }
+      await downloadFile(
+        path.join(
+          instancesPath,
+          instanceName,
+          `background${path.extname(imageURL)}`
+        ),
+        imageURL
+      );
       const modloader = [
         version[0],
         manifest.minecraft.version,
@@ -91,7 +104,14 @@ const InstanceName = ({
         version[1],
         version[2]
       ];
-      dispatch(addToQueue(instanceName, modloader, manifest));
+      dispatch(
+        addToQueue(
+          instanceName,
+          modloader,
+          manifest,
+          `background${path.extname(imageURL)}`
+        )
+      );
     }
     dispatch(closeModal());
   };
@@ -101,7 +121,7 @@ const InstanceName = ({
         <Animation
           state={state}
           bg={
-            modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl ||
+            thumbnailURL ||
             (version && version[0] !== "twitchModpack" && bgImage)
           }
         >

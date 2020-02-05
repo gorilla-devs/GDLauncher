@@ -10,6 +10,7 @@ import InstanceDeleteConfirmation from "../modals/InstanceDeleteConfirmation";
 import AccountsManager from "../modals/AccountsManager";
 import JavaDownload from "../modals/JavaDownload";
 import AddAccount from "../modals/AddAccount";
+import InstanceManager from "../modals/InstanceManager";
 import ModpackDescription from "../modals/ModpackDescription";
 import { closeModal } from "../reducers/modals/actions";
 
@@ -41,7 +42,6 @@ const Modal = styled.div`
 `;
 
 const modalsComponentLookupTable = {
-  // Settings,
   // Changelog,
   // LoginHelper
   AddInstance,
@@ -50,7 +50,8 @@ const modalsComponentLookupTable = {
   JavaDownload,
   InstanceDeleteConfirmation,
   AddAccount,
-  ModpackDescription
+  ModpackDescription,
+  InstanceManager
 };
 
 const ModalContainer = ({ unmounting, children }) => {

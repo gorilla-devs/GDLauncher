@@ -530,7 +530,7 @@ export function updateInstanceConfig(instanceName, updateFunction) {
   };
 }
 
-export function addToQueue(instanceName, modloader, manifest) {
+export function addToQueue(instanceName, modloader, manifest, background) {
   return async (dispatch, getState) => {
     const state = getState();
     const { currentDownload } = state;
@@ -538,7 +538,8 @@ export function addToQueue(instanceName, modloader, manifest) {
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,
       modloader,
-      manifest
+      manifest,
+      background
     });
     let timePlayed = 0;
 
@@ -554,7 +555,8 @@ export function addToQueue(instanceName, modloader, manifest) {
       path.join(_getInstancesPath(getState()), instanceName, "config.json"),
       {
         modloader,
-        timePlayed
+        timePlayed,
+        background
       }
     );
     if (!currentDownload) {
@@ -714,7 +716,6 @@ export function downloadForgeManifestFiles(instanceName) {
     dispatch(updateDownloadStatus(instanceName, "Downloading mods..."));
 
     let modManifests = [];
-    console.log(manifest, modManifests);
     await pMap(
       manifest.files,
       async item => {
