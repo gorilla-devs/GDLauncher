@@ -5,12 +5,13 @@ const {
   Tray,
   Menu,
   dialog,
-  shell
+  shell,
+  screen
 } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
 
-// const discordRPC = require("./discordRPC");
+const discordRPC = require("./discordRPC");
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
@@ -193,6 +194,10 @@ ipcMain.handle("appRestart", () => {
   app.exit(0);
 });
 
+ipcMain.handle("getPrimaryDisplaySizes", () => {
+  return screen.getPrimaryDisplay().bounds;
+});
+
 // AutoUpdater
 
 autoUpdater.autoDownload = false;
@@ -213,14 +218,14 @@ ipcMain.handle("installUpdateAndRestart", () => {
   autoUpdater.quitAndInstall(true, true);
 });
 
-// ipcMain.on("init-discord-rpc", () => {
-//   discordRPC.initRPC();
-// });
+ipcMain.on("init-discord-rpc", () => {
+  discordRPC.initRPC();
+});
 
-// ipcMain.on("update-discord-rpc", (event, p) => {
-//   discordRPC.updateDetails(p);
-// });
+ipcMain.on("update-discord-rpc", (event, p) => {
+  discordRPC.updateDetails(p);
+});
 
-// ipcMain.on("shutdown-discord-rpc", () => {
-//   discordRPC.shutdownRPC();
-// });
+ipcMain.on("shutdown-discord-rpc", () => {
+  discordRPC.shutdownRPC();
+});
