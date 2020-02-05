@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDidMount } from "rooks";
 import styled from "styled-components";
 import { Switch } from "react-router";
@@ -12,13 +12,15 @@ import {
   initNews,
   loginThroughNativeLauncher,
   downloadJava,
-  switchToFirstValidAccount
+  switchToFirstValidAccount,
+  checkClientToken
 } from "../../common/reducers/actions";
 import { load, received } from "../../common/reducers/loading/actions";
 import features from "../../common/reducers/loading/features";
 import GlobalStyles from "../../common/GlobalStyles";
 import RouteBackground from "../../common/components/RouteBackground";
 import Navbar from "./components/Navbar";
+import ga from "../../common/utils/analytics";
 import routes from "./utils/routes";
 import { _getCurrentAccount } from "../../common/utils/selectors";
 import { isLatestJavaDownloaded, extract7z } from "./utils";
@@ -42,6 +44,8 @@ const Container = styled.div`
 function DesktopRoot() {
   const dispatch = useDispatch();
   const currentAccount = useSelector(_getCurrentAccount);
+  const clientToken = useSelector(state => state.app.clientToken);
+  const location = useSelector(state => state.router.location);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
 
   // Handle already logged in account redirect
@@ -50,6 +54,7 @@ function DesktopRoot() {
       .invoke("getUserDataPath")
       .then(res => dispatch(updateDataPath(res)))
       .catch(console.error);
+    dispatch(checkClientToken());
     dispatch(initManifests())
       .then(async data => {
         await extract7z();
@@ -81,6 +86,13 @@ function DesktopRoot() {
       ipcRenderer.send("init-discord-rpc");
     }
   });
+
+  useEffect(() => {
+    if (clientToken && process.env.NODE_ENV !== "development") {
+      ga.setUserId(clientToken);
+      ga.trackPage(location.pathname);
+    }
+  }, [location.pathname, clientToken]);
 
   return (
     <Wrapper>

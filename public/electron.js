@@ -5,12 +5,13 @@ const {
   Tray,
   Menu,
   dialog,
-  shell
+  shell,
+  screen
 } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
 
-// const discordRPC = require("./discordRPC");
+const discordRPC = require("./discordRPC");
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
@@ -170,15 +171,10 @@ ipcMain.handle("openFolder", (e, path) => {
   shell.openPath(path);
 });
 
-ipcMain.handle("openFolderDialog", (e, dirPath) => {
-  return new Promise(resolve => {
-    dialog.showOpenDialog(
-      {
-        properties: ["openDirectory"],
-        defaultPath: path.dirname(dirPath)
-      },
-      paths => resolve(paths)
-    );
+ipcMain.handle("openFolderDialog", (e, defaultPath) => {
+  return dialog.showOpenDialog({
+    properties: ["openDirectory"],
+    defaultPath: path.dirname(defaultPath)
   });
 });
 
@@ -191,6 +187,10 @@ ipcMain.handle("openFileDialog", () => {
 ipcMain.handle("appRestart", () => {
   app.relaunch();
   app.exit(0);
+});
+
+ipcMain.handle("getPrimaryDisplaySizes", () => {
+  return screen.getPrimaryDisplay().bounds;
 });
 
 // AutoUpdater
@@ -213,14 +213,14 @@ ipcMain.handle("installUpdateAndRestart", () => {
   autoUpdater.quitAndInstall(true, true);
 });
 
-// ipcMain.on("init-discord-rpc", () => {
-//   discordRPC.initRPC();
-// });
+ipcMain.on("init-discord-rpc", () => {
+  discordRPC.initRPC();
+});
 
-// ipcMain.on("update-discord-rpc", (event, p) => {
-//   discordRPC.updateDetails(p);
-// });
+ipcMain.on("update-discord-rpc", (event, p) => {
+  discordRPC.updateDetails(p);
+});
 
-// ipcMain.on("shutdown-discord-rpc", () => {
-//   discordRPC.shutdownRPC();
-// });
+ipcMain.on("shutdown-discord-rpc", () => {
+  discordRPC.shutdownRPC();
+});
