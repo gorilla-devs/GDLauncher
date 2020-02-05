@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import path from "path";
 import fse from "fs-extra";
@@ -28,14 +28,27 @@ const InstanceName = ({
   modpack,
   setVersion,
   setModpack,
-  isImport
+  isImport,
+  step
 }) => {
+  const mcName = modpack?.name || (version && `Minecraft ${version[0]}`);
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const tempPath = useSelector(_getTempPath);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
-  const [instanceName, setInstanceName] = useState("");
+  const [instanceName, setInstanceName] = useState(mcName);
+  const [alreadyExists, setAlreadyExists] = useState(false);
   const [clicked, setClicked] = useState(false);
+
+  useEffect(() => {
+    if (instanceName || mcName) {
+      fse
+        .pathExists(path.join(instancesPath, instanceName || mcName))
+        .then(exists => {
+          setAlreadyExists(exists);
+        });
+    }
+  }, [instanceName, step]);
 
   const thumbnailURL = modpack?.attachments?.find(v => v.isDefault)
     ?.thumbnailUrl;
@@ -47,14 +60,14 @@ const InstanceName = ({
     });
   };
 
-  const createInstance = async () => {
-    if (!version || !instanceName) return;
+  const createInstance = async localInstanceName => {
+    if (!version || !localInstanceName) return;
     const isVanilla = version[0] === "vanilla";
     const isFabric = version[0] === "fabric";
     const isForge = version[0] === "forge";
     const isTwitchModpack = version[0] === "twitchModpack";
     if (isVanilla) {
-      dispatch(addToQueue(instanceName, [version[0], version[2]]));
+      dispatch(addToQueue(localInstanceName, [version[0], version[2]]));
       await wait(2);
     } else if (isFabric) {
       const mappedItem = fabricManifest.mappings.find(
@@ -62,7 +75,7 @@ const InstanceName = ({
       );
       const splitItem = version[2].split(mappedItem.separator);
       dispatch(
-        addToQueue(instanceName, [
+        addToQueue(localInstanceName, [
           "fabric",
           splitItem[0],
           version[2],
@@ -71,7 +84,7 @@ const InstanceName = ({
       );
       await wait(2);
     } else if (isForge) {
-      dispatch(addToQueue(instanceName, version));
+      dispatch(addToQueue(localInstanceName, version));
       await wait(2);
     } else if (isTwitchModpack) {
       let manifest;
@@ -83,14 +96,14 @@ const InstanceName = ({
         manifest = await downloadAddonZip(
           version[1],
           version[2],
-          path.join(instancesPath, instanceName),
+          path.join(instancesPath, localInstanceName),
           tempPath
         );
       }
       await downloadFile(
         path.join(
           instancesPath,
-          instanceName,
+          localInstanceName,
           `background${path.extname(imageURL)}`
         ),
         imageURL
@@ -106,7 +119,7 @@ const InstanceName = ({
       ];
       dispatch(
         addToQueue(
-          instanceName,
+          localInstanceName,
           modloader,
           manifest,
           `background${path.extname(imageURL)}`
@@ -145,7 +158,7 @@ const InstanceName = ({
                     margin: 20px;
                     &:hover {
                       background-color: ${props =>
-                        props.theme.palette.primary.light};
+                        props.theme.action.hover};
                     }
                   `}
                   onClick={() => {
@@ -166,29 +179,49 @@ const InstanceName = ({
                     z-index: 100001;
                   `}
                 >
-                  <ModpackName
-                    state={state1}
-                    name={
-                      modpack?.name || (version && `Minecraft ${version[0]}`)
-                    }
-                  >
-                    {modpack?.name || (version && `Minecraft ${version[0]}`)}
+                  <ModpackName state={state1} name={mcName}>
+                    {mcName}
                   </ModpackName>
-                  <Input
-                    state={state1}
-                    size="large"
-                    placeholder="Instance Name"
-                    onChange={e => setInstanceName(e.target.value)}
+                  <div
                     css={`
-                      && {
-                        opacity: ${({ state }) =>
-                          state === "entering" || state === "entered" ? 0 : 1};
-                        transition: 0.1s ease-in-out;
-                        width: 300px;
-                        margin: 150px;
-                      }
+                      margin: 150px;
                     `}
-                  />
+                  >
+                    <Input
+                      state={state1}
+                      size="large"
+                      placeholder={mcName}
+                      onChange={e => setInstanceName(e.target.value)}
+                      css={`
+                        && {
+                          opacity: ${({ state }) =>
+                            state === "entering" || state === "entered"
+                              ? 0
+                              : 1};
+                          transition: 0.1s ease-in-out;
+                          width: 300px;
+                        }
+                      `}
+                    />
+                    <div
+                      alreadyExists={alreadyExists}
+                      css={`
+                        opacity: ${props => (props.alreadyExists ? 1 : 0)};
+                        color: ${props => props.theme.palette.error.main};
+                        font-weight: 700;
+                        font-size: 14px;
+                        padding: 3px;
+                        margin-top: 20px;
+                        text-align: center;
+                        border-radius: ${props =>
+                          props.theme.shape.borderRadius};
+                        background: ${props =>
+                          transparentize(0.7, props.theme.palette.grey[700])};
+                      `}
+                    >
+                      An instance with this name already exists!
+                    </div>
+                  </div>
                 </div>
                 <div
                   state={state1}
@@ -206,15 +239,15 @@ const InstanceName = ({
                     margin: 20px;
                     &:hover {
                       background-color: ${props =>
-                        props.theme.palette.primary.light};
+                        props.theme.action.hover};
                     }
                   `}
                   onClick={() => {
-                    createInstance();
+                    createInstance(instanceName || mcName);
                     setClicked(true);
                   }}
                 >
-                  {clicked || instanceName.length === 0 ? (
+                  {clicked || alreadyExists ? (
                     ""
                   ) : (
                     <FontAwesomeIcon icon={faLongArrowAltRight} />

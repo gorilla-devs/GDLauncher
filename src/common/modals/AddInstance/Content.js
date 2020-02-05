@@ -119,7 +119,7 @@ const Content = ({
                     &:hover {
                       background-color: ${props =>
                         props.version
-                          ? props.theme.palette.grey[500]
+                          ? props.theme.action.hover
                           : "transparent"};
                     }
                   `}

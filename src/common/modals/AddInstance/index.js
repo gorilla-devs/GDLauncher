@@ -43,6 +43,7 @@ const AddInstance = () => {
         setVersion={setVersion}
         setModpack={setModpack}
         isImport={isImport}
+        step={step}
       />
     </Modal>
   );
