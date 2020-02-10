@@ -33,9 +33,11 @@
     "start": "cross-env-shell NODE_ENV=development craco start",
     "start-electron": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "build-web": "cross-env-shell APP_TYPE=web craco build",
-    "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron craco build",
+    "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron craco build && yarn build-electron",
     "test": "craco test",
     "eject": "craco eject",
+    "build-electron": "cross-env-shell NODE_ENV=production webpack --config ./scripts/electronWebpackConfig.js --colors",
+    "moveBuildEntryPoint": "node ./scripts/moveBuildEntryPoint.js",
     "lint": "eslint .",
     "dev": "cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none \"yarn start-electron\"",
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web yarn start",
@@ -72,8 +74,10 @@
     "productName": "GDLauncher",
     "appId": "org.gorilladevs.GDLauncher",
     "files": [
+      "!node_modules/**/*",
       "build/**/*",
-      "package.json"
+      "package.json",
+      "public/logo.png"
     ],
     "dmg": {
       "contents": [
@@ -189,7 +193,10 @@
     "prettier": "^1.19.1",
     "terser-webpack-plugin": "^2.3.4",
     "wait-on": "^4.0.0",
-    "webpack-bundle-analyzer": "^3.6.0"
+    "webpack": "^4.41.5",
+    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-cli": "^3.3.10",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "@loadable/babel-plugin": "^5.12.0",
