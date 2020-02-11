@@ -28,7 +28,8 @@ const Modal = ({
   title,
   backBtn,
   children,
-  className
+  className,
+  removePadding
 }) => {
   const dispatch = useDispatch();
   return (
@@ -53,12 +54,16 @@ const Modal = ({
       )}
       <div
         header={header}
+        removePadding={removePadding}
         css={`
           height: ${header === undefined || header === true
             ? "calc(100% - 40px)"
             : "100%"};
           padding: ${props =>
-            props.header === undefined || props.header === true ? 20 : 0}px;
+            (props.header === undefined || props.header === true) &&
+            !props.removePadding
+              ? 20
+              : 0}px;
           overflow-y: auto;
           overflow-x: hidden;
           position: relative;
