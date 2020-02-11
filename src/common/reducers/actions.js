@@ -719,15 +719,32 @@ export function downloadForgeManifestFiles(instanceName) {
     await pMap(
       manifest.files,
       async item => {
-        const modManifest = await dispatch(
-          downloadMod(instanceName, item.projectID, item.fileID)
+        const modManifest = (await getAddonFile(item.projectID, item.fileID))
+          .data;
+        const destFile = path.join(
+          _getInstancesPath(state),
+          instanceName,
+          "mods",
+          modManifest.fileName
         );
+        const fileExists = await fse.pathExists(destFile);
+        if (!fileExists) await downloadFile(destFile, modManifest.downloadUrl);
+
         modManifests = modManifests.concat(modManifest);
         const percentage =
           (modManifests.length * 100) / manifest.files.length - 1;
         dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
       },
-      { concurrency: 1 }
+      { concurrency: 4 }
+    );
+
+    await dispatch(
+      updateInstanceConfig(instanceName, config => {
+        return {
+          ...config,
+          mods: [...(config.mods || []), ...modManifests]
+        };
+      })
     );
 
     dispatch(updateDownloadStatus(instanceName, "Copying overrides..."));

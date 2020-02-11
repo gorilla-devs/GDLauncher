@@ -29,7 +29,7 @@ const checkModsIntegrity = async instancesPath => {
         const stat = await fs.lstat(completeFilePath);
         if (stat.isFile()) {
           // Check if file is in config
-          if (!config.mods.find(mod => mod.fileName === file)) {
+          if (!config?.mods.find(mod => mod.fileName === file)) {
             const binary = await fs.readFile(completeFilePath);
             const murmurHash = getFileMurmurHash2(binary);
             console.log("Local mod not found in config", file, murmurHash);
