@@ -534,6 +534,37 @@ export const patchForge113 = async (
   /* eslint-enable no-await-in-loop, no-restricted-syntax */
 };
 
+export const importAddonZip = async (
+  zipPath,
+  instancePath,
+  instanceTempPath
+) => {
+  const tempZipFile = path.join(instanceTempPath, "addon.zip");
+  await makeDir(instanceTempPath);
+  await fse.copyFile(zipPath, tempZipFile);
+  const instanceManifest = path.join(instancePath, "manifest.json");
+  // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
+  await new Promise(resolve => {
+    setTimeout(() => resolve(), 500);
+  });
+  const sevenZipPath = await get7zPath();
+  const extraction = extractFull(tempZipFile, instancePath, {
+    $bin: sevenZipPath,
+    yes: true,
+    $cherryPick: "manifest.json"
+  });
+  await new Promise((resolve, reject) => {
+    extraction.on("end", () => {
+      resolve();
+    });
+    extraction.on("error", err => {
+      reject(err.stderr);
+    });
+  });
+  const manifest = await fse.readJson(instanceManifest);
+  return manifest;
+};
+
 export const downloadAddonZip = async (id, fileId, instancePath, tempPath) => {
   const { data } = await getAddonFile(id, fileId);
   const instanceManifest = path.join(instancePath, "manifest.json");

@@ -15,11 +15,12 @@ import { addToQueue } from "../../reducers/actions";
 import { closeModal } from "../../reducers/modals/actions";
 import { Input } from "antd";
 import { getAddonFile } from "../../api";
-import { downloadAddonZip } from "../../../app/desktop/utils";
+import { downloadAddonZip, importAddonZip } from "../../../app/desktop/utils";
 import { _getInstancesPath, _getTempPath } from "../../utils/selectors";
 import { transparentize } from "polished";
 import bgImage from "../../../common/assets/mcCube.jpg";
 import { downloadFile } from "../../../app/desktop/utils/downloader";
+import makeDir from "make-dir";
 
 const InstanceName = ({
   in: inProp,
@@ -28,7 +29,7 @@ const InstanceName = ({
   modpack,
   setVersion,
   setModpack,
-  isImport,
+  importZipPath,
   step
 }) => {
   const mcName = modpack?.name || (version && `Minecraft ${version[0]}`);
@@ -88,9 +89,11 @@ const InstanceName = ({
       await wait(2);
     } else if (isTwitchModpack) {
       let manifest;
-      if (isImport) {
-        manifest = await fse.readJson(
-          path.join(tempPath, localInstanceName, "addon", "manifest.json")
+      if (importZipPath) {
+        manifest = await importAddonZip(
+          importZipPath,
+          path.join(instancesPath, localInstanceName),
+          path.join(tempPath, localInstanceName)
         );
       } else {
         manifest = await downloadAddonZip(

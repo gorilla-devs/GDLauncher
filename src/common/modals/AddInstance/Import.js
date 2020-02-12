@@ -11,23 +11,23 @@ import { _getTempPath } from "../../utils/selectors";
 import { useSelector } from "react-redux";
 import { getAddon } from "../../api";
 
-const Import = ({ setModpack, setVersion, modpack }) => {
+const Import = ({ setModpack, setVersion, modpack, setImportZipPath }) => {
   const tempPath = useSelector(_getTempPath);
   const [zipName, setZipName] = useState(null);
   const [progress, setProgress] = useState(0);
   const openFileDialog = async () => {
     const dialog = await ipcRenderer.invoke("openFileDialog");
     if (dialog.canceled) return;
+    setImportZipPath(dialog.filePaths[0]);
     setZipName(path.basename(dialog.filePaths[0]));
     const sevenZipPath = await get7zPath();
-    const specificTempPath = path.join(tempPath, "addon");
-    fse.copyFile(dialog.filePaths[0], path.join(tempPath, "addon.zip"));
-    const extraction = extractFull(dialog.filePaths[0], specificTempPath, {
+    const extraction = extractFull(dialog.filePaths[0], tempPath, {
       recursive: true,
       $bin: sevenZipPath,
       yes: true,
       $cherryPick: "manifest.json",
-      $progress: true
+      $progress: true,
+      overwrite: true
     });
     await new Promise((resolve, reject) => {
       extraction.on("progress", ({ percent }) => {
@@ -41,9 +41,8 @@ const Import = ({ setModpack, setVersion, modpack }) => {
         reject(err.stderr);
       });
     });
-    const manifest = await fse.readJson(
-      path.join(specificTempPath, "manifest.json")
-    );
+    const manifest = await fse.readJson(path.join(tempPath, "manifest.json"));
+    await fse.remove(path.join(tempPath, "manifest.json"));
     const { data: addon } = await getAddon(manifest.projectID);
     setModpack(addon);
     setVersion([

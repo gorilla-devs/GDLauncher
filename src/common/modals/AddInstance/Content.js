@@ -22,7 +22,7 @@ const Content = ({
   version,
   setModpack,
   modpack,
-  setIsImport
+  setImportZipPath
 }) => {
   let pages = [
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
@@ -31,7 +31,12 @@ const Content = ({
       setStep={setStep}
       setModpack={setModpack}
     />,
-    <Import setVersion={setVersion} setModpack={setModpack} modpack={modpack} />
+    <Import
+      setVersion={setVersion}
+      setModpack={setModpack}
+      modpack={modpack}
+      setImportZipPath={setImportZipPath}
+    />
   ];
 
   return (
@@ -65,7 +70,7 @@ const Content = ({
                 active={page === 0}
                 onClick={() => {
                   setVersion(null);
-                  setIsImport(null);
+                  setImportZipPath(null);
                   setModpack(null);
                   setPage(0);
                 }}
@@ -76,7 +81,7 @@ const Content = ({
                 active={page === 1}
                 onClick={() => {
                   setVersion(null);
-                  setIsImport(null);
+                  setImportZipPath(null);
                   setModpack(null);
                   setPage(1);
                 }}
@@ -87,7 +92,7 @@ const Content = ({
                 active={page === 2}
                 onClick={() => {
                   setVersion(null);
-                  setIsImport(null);
+                  setImportZipPath(null);
                   setModpack(null);
                   setPage(2);
                 }}
