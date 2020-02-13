@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Button } from "antd";
 import Modal from "../../components/Modal";
 import Overview from "./Overview";
+import Notes from "./Notes";
 import Mods from "./Mods";
 
 const SideMenu = styled.div`
@@ -65,7 +66,7 @@ const InstanceManager = () => {
     overview: { name: "Overview", component: Overview },
     mods: { name: "Mods", component: Mods },
     modpack: { name: "Modpack", component: Overview },
-    notes: { name: "Notes", component: Overview },
+    notes: { name: "Notes", component: Notes },
     resourcePacks: { name: "Resource Packs", component: Overview },
     worlds: { name: "Worlds", component: Overview },
     screenshots: { name: "Screenshots", component: Overview },
