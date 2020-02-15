@@ -90,7 +90,7 @@ const InstanceManager = () => {
         <SideMenuContainer>
           <SideMenu>
             {Object.entries(menuEntries).map(([k, tab]) => (
-              <SettingsButton onClick={e => setPage(k)} active={k === page}>
+              <SettingsButton key={tab.name} onClick={e => setPage(k)} active={k === page}>
                 {tab.name}
               </SettingsButton>
             ))}

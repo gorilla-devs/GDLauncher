@@ -1,7 +1,7 @@
 import { createSelector } from "reselect";
 import path from "path";
 import memoize from "lodash.memoize";
-import { convertOSToMCFormat } from "../../app/desktop/utils";
+import { convertOSToJavaFormat } from "../../app/desktop/utils";
 
 const _instances = state => state.instances;
 const _accounts = state => state.app.accounts;
@@ -9,7 +9,7 @@ const _java = state => state.settings.java;
 const _currentAccountId = state => state.app.currentAccountId;
 const _currentDownload = state => state.currentDownload;
 const _downloadQueue = state => state.downloadQueue;
-const _launcherManifest = state => state.app.launcherManifest;
+const _javaManifest = state => state.app.javaManifest;
 const _dataPath = state => state.settings.dataPath;
 
 export const _getInstances = createSelector(_instances, instances => instances);
@@ -43,13 +43,19 @@ export const _getCurrentDownloadItem = createSelector(
 );
 
 export const _getJavaPath = createSelector(
-  _launcherManifest,
+  _javaManifest,
   _java,
   _dataPath,
-  (launcherManifest, java, dataPath) => {
+  (javaManifest, java, dataPath) => {
     if (java.path) return java.path;
-    const mcOs = convertOSToMCFormat(process.platform);
-    const { version } = launcherManifest[mcOs][64].jre;
+    const javaOs = convertOSToJavaFormat(process.platform);
+    const javaMeta = javaManifest.find(
+      v =>
+        v.os === javaOs && v.architecture === "x64" && v.binary_type === "jre"
+    );
+    const {
+      version_data: { openjdk_version: version }
+    } = javaMeta;
     const filename = process.platform === "win32" ? "java.exe" : "java";
     return path.join(dataPath, "java", version, "bin", filename);
   }
