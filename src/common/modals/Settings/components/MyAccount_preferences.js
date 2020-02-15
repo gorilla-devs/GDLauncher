@@ -314,10 +314,11 @@ export default function MyAccountPreferences() {
           color="primary"
           onChange={e => {
             dispatch(updateDiscordRPC(e));
-            // eslint-disable-next-line
-            DiscordRPC
-              ? ipcRenderer.send("init-discord-rpc")
-              : ipcRenderer.send("shutdown-discord-rpc");
+            if (e) {
+              ipcRenderer.invoke("init-discord-rpc");
+            } else {
+              ipcRenderer.invoke("shutdown-discord-rpc");
+            }
           }}
           checked={DiscordRPC}
         />

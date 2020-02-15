@@ -213,14 +213,14 @@ ipcMain.handle("installUpdateAndRestart", () => {
   autoUpdater.quitAndInstall(true, true);
 });
 
-ipcMain.on("init-discord-rpc", () => {
+ipcMain.handle("init-discord-rpc", () => {
   discordRPC.initRPC();
 });
 
-ipcMain.on("update-discord-rpc", (event, p) => {
+ipcMain.handle("update-discord-rpc", (event, p) => {
   discordRPC.updateDetails(p);
 });
 
-ipcMain.on("shutdown-discord-rpc", () => {
+ipcMain.handle("shutdown-discord-rpc", () => {
   discordRPC.shutdownRPC();
 });

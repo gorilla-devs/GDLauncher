@@ -84,7 +84,7 @@ function DesktopRoot() {
       ).catch(console.error);
     }
     if (shouldShowDiscordRPC) {
-      ipcRenderer.send("init-discord-rpc");
+      ipcRenderer.invoke("init-discord-rpc");
     }
   });
 
