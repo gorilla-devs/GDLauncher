@@ -26,3 +26,6 @@ jobs:
       - name: yarn install
         run: |
           yarn install
+      - name: yarn package
+        run: |
+          yarn package
