@@ -1,4 +1,4 @@
-name: GDLauncher-Next-CI
+name: GDLauncher Next CI
 
 on: [push, pull_request]
 
