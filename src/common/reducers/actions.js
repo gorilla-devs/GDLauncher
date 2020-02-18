@@ -299,7 +299,6 @@ export function downloadJava() {
     );
 
     await fse.remove(tempFolder);
-    await fse.remove(path.join(javaBaseFolder, `${releaseName}-jre`));
 
     await fixFilePermissions(_getJavaPath(state));
 
