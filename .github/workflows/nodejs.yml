@@ -1,10 +1,9 @@
-name: Electron CD
+name: GDLauncher-Next-CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -26,6 +25,9 @@ jobs:
       - name: yarn install
         run: |
           yarn install
+      - name: yarn lint
+        run: |
+          yarn lint
       - name: yarn release
         run: |
           yarn release
