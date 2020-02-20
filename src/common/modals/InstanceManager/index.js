@@ -61,7 +61,7 @@ const Content = styled.div`
   padding: 10px;
 `;
 
-const InstanceManager = () => {
+const InstanceManager = ({ instanceName }) => {
   const menuEntries = {
     overview: { name: "Overview", component: Overview },
     mods: { name: "Mods", component: Mods },
@@ -98,7 +98,7 @@ const InstanceManager = () => {
           </SideMenu>
         </SideMenuContainer>
         <Content>
-          <ContentComponent />
+          <ContentComponent instanceName={instanceName} />
         </Content>
       </Container>
     </Modal>

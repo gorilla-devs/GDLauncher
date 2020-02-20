@@ -14,7 +14,7 @@ const Overview = () => {
       <Options>
         <div>Bold</div>
       </Options>
-      <textarea placeholder="Type here your notes!"></textarea>
+      <textarea placeholder="Type here your notes!" />
     </>
   );
 };

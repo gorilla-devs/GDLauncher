@@ -212,6 +212,7 @@
     "history": "^4.10.1",
     "husky": "^4.2.1",
     "is-electron": "^2.2.0",
+    "is-hotkey": "^0.1.6",
     "jarfile": "^2.0.0",
     "lodash": "^4.17.15",
     "lodash.debounce": "^4.0.8",
@@ -246,6 +247,9 @@
     "reselect": "^4.0.0",
     "rooks": "^3.6.0",
     "semver": "^7.1.2",
+    "slate": "^0.57.1",
+    "slate-history": "^0.57.1",
+    "slate-react": "^0.57.1",
     "styled-components": "^5.0.1",
     "typeface-roboto": "^0.0.75",
     "uuid": "^3.4.0"
