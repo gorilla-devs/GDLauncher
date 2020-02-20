@@ -11,7 +11,7 @@ import { login } from "../../../common/reducers/actions";
 import { load, requesting } from "../../../common/reducers/loading/actions";
 import features from "../../../common/reducers/loading/features";
 import backgroundVideo from "../../../common/assets/background.webm";
-import logo from "../../../common/assets/logo.png";
+import HorizontalLogo from "../../../ui/HorizontalLogo";
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
@@ -88,11 +88,6 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const Logo = styled.img`
-  height: 80px;
-  width: 80px;
-`;
-
 const Footer = styled.div`
   position: absolute;
   bottom: 0;
@@ -158,8 +153,7 @@ const Login = () => {
         <Container>
           <LeftSide transitionState={transitionState}>
             <Header>
-              <Logo src={logo} alt="logo" draggable="false" />
-              <h2>GDLauncher</h2>
+              <HorizontalLogo size={200} />
             </Header>
             Sign in with your Mojang Account
             <Form>
