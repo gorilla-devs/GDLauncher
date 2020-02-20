@@ -7,8 +7,8 @@ export const GDL_LEGACYJAVAFIXER_MOD_URL =
 export const FABRIC_DOWNLOAD_URL =
   "https://fabricmc.net/download/multimc/?yarn=19w42a%2Bbuild.1&loader=0.6.3%2Bbuild.167&format=patchJson";
 export const MOJANG_APIS = "https://authserver.mojang.com";
-export const LAUNCHER_META_URL =
-  "https://launchermeta.mojang.com/mc/launcher.json";
+export const JAVA_MANIFEST_URL =
+  "https://api.adoptopenjdk.net/v2/latestAssets/releases/openjdk8?&arch=x64&heap_size=normal&openjdk_impl=hotspot&type=jre";
 export const MAVEN_REPO = "http://central.maven.org/maven2";
 export const MC_LIBRARIES_URL = "https://libraries.minecraft.net";
 export const FORGESVC_URL = "https://addons-ecs.forgesvc.net/api/v2";

@@ -19,6 +19,9 @@ const middleware = store => next => action => {
   const startListener = () => {
     const updateInstances = debounce(
       instances => {
+        // if (checkMods) {
+        //   checkModsSync(instancesPath);
+        // }
         dispatch({
           type: ActionTypes.UPDATE_INSTANCES,
           instances
@@ -33,10 +36,11 @@ const middleware = store => next => action => {
         recursive: true,
         filter: f => true || /(config\.json)|(mods)/.test(f)
       },
-      () => {
+      (e, file) => {
         getInstances(instancesPath)
           .then(instances => {
-            updateInstances(instances);
+            const checkMods = file.includes("mods");
+            updateInstances(instances, checkMods);
             return instances;
           })
           .catch(console.error);

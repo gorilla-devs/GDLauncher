@@ -45,6 +45,7 @@ function DesktopRoot() {
   const dispatch = useDispatch();
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
+  const javaPath = useSelector(state => state.settings.java.path);
   const location = useSelector(state => state.router.location);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
 
@@ -60,7 +61,7 @@ function DesktopRoot() {
         await extract7z();
         return data;
       })
-      .then(({ launcher }) => isLatestJavaDownloaded(launcher))
+      .then(({ java }) => javaPath || isLatestJavaDownloaded(java))
       .then(res => {
         if (!res) dispatch(downloadJava());
         return res;
@@ -83,7 +84,7 @@ function DesktopRoot() {
       ).catch(console.error);
     }
     if (shouldShowDiscordRPC) {
-      ipcRenderer.send("init-discord-rpc");
+      ipcRenderer.invoke("init-discord-rpc");
     }
   });
 

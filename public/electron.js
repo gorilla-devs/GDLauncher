@@ -6,7 +6,8 @@ const {
   Menu,
   dialog,
   shell,
-  screen
+  screen,
+  globalShortcut
 } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
@@ -26,10 +27,10 @@ let tray;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1100,
-    height: 800,
-    minWidth: 1100,
-    minHeight: 800,
+    width: 1000,
+    height: 550,
+    minWidth: 1000,
+    minHeight: 550,
     show: true,
     frame: false,
     backgroundColor: "#353E48",
@@ -38,6 +39,14 @@ function createWindow() {
       nodeIntegration: true,
       webSecurity: false
     }
+  });
+
+  globalShortcut.register("CommandOrControl+R", () => {
+    mainWindow.reload();
+  });
+
+  globalShortcut.register("F5", () => {
+    mainWindow.reload();
   });
 
   // mainWindow.webContents.session.webRequest.onHeadersReceived(
@@ -60,8 +69,8 @@ function createWindow() {
 
   tray = new Tray(
     isDev
-      ? path.join(__dirname, "./logo.png")
-      : path.join(__dirname, "../build/logo.png")
+      ? path.join(__dirname, "./icon.png")
+      : path.join(__dirname, "../build/icon.png")
   );
   const trayMenuTemplate = [
     {
@@ -163,6 +172,10 @@ ipcMain.handle("getAppPath", () => {
   return app.getAppPath();
 });
 
+ipcMain.handle("getAppVersion", () => {
+  return app.getVersion();
+});
+
 ipcMain.handle("getIsWindowMaximized", () => {
   return !mainWindow.maximizable;
 });
@@ -213,14 +226,14 @@ ipcMain.handle("installUpdateAndRestart", () => {
   autoUpdater.quitAndInstall(true, true);
 });
 
-ipcMain.on("init-discord-rpc", () => {
+ipcMain.handle("init-discord-rpc", () => {
   discordRPC.initRPC();
 });
 
-ipcMain.on("update-discord-rpc", (event, p) => {
+ipcMain.handle("update-discord-rpc", (event, p) => {
   discordRPC.updateDetails(p);
 });
 
-ipcMain.on("shutdown-discord-rpc", () => {
+ipcMain.handle("shutdown-discord-rpc", () => {
   discordRPC.shutdownRPC();
 });

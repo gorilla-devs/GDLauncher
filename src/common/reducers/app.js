@@ -56,9 +56,9 @@ function forgeManifest(state = [], action) {
   }
 }
 
-function launcherManifest(state = {}, action) {
+function javaManifest(state = {}, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_LAUNCHER_MANIFEST:
+    case ActionTypes.UPDATE_JAVA_MANIFEST:
       return action.data;
     default:
       return state;
@@ -112,7 +112,7 @@ export default combineReducers({
   vanillaManifest,
   forgeManifest,
   fabricManifest,
-  launcherManifest,
+  javaManifest,
   modsManifests,
   clientToken,
   isNewUser,

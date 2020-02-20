@@ -54,6 +54,19 @@ export const convertOSToMCFormat = ElectronFormat => {
   }
 };
 
+export const convertOSToJavaFormat = ElectronFormat => {
+  switch (ElectronFormat) {
+    case "win32":
+      return "windows";
+    case "darwin":
+      return "mac";
+    case "linux":
+      return "linux";
+    default:
+      return false;
+  }
+};
+
 export const skipLibrary = lib => {
   let skip = false;
   if (lib.rules) {
@@ -130,30 +143,25 @@ export const librariesMapper = (libraries, librariesPath) => {
 };
 
 export const isLatestJavaDownloaded = async meta => {
-  const mcOs = convertOSToMCFormat(process.platform);
+  const javaOs = convertOSToJavaFormat(process.platform);
+  const javaMeta = meta.find(v => v.os === javaOs);
   const userDataPath = await ipcRenderer.invoke("getUserDataPath");
   const javaFolder = path.join(
     userDataPath,
     "java",
-    meta[mcOs][64].jre.version
+    javaMeta.version_data.openjdk_version
   );
   // Check if it's downloaded, if it's latest version and if it's a valid download
   let isValid = true;
   try {
     await fs.access(javaFolder);
-    const { stdout, stderr } = await promisify(exec)(
+    await promisify(exec)(
       `"${path.join(
         javaFolder,
         "bin",
-        `java${mcOs === "windows" ? ".exe" : ""}`
+        `java${javaOs === "windows" ? ".exe" : ""}`
       )}" -version`
     );
-    if (
-      !stderr.includes(meta[mcOs][64].jre.version) &&
-      !stdout.includes(meta[mcOs][64].jre.version)
-    ) {
-      throw new Error("Java corrupted");
-    }
   } catch (err) {
     console.log(err);
     isValid = false;

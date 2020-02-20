@@ -10,7 +10,6 @@ import omitBy from "lodash.omitby";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import { spawn } from "child_process";
-import makeDir from "make-dir";
 import pMap from "p-map";
 import * as ActionTypes from "./actionTypes";
 import {
@@ -26,10 +25,10 @@ import {
   getMcManifest,
   getForgeManifest,
   mcValidate,
-  getLauncherManifest,
   getFabricJson,
   getForgeJson,
-  getAddonFile
+  getAddonFile,
+  getJavaManifest
 } from "../api";
 import {
   _getCurrentAccount,
@@ -40,11 +39,11 @@ import {
   _getInstancesPath,
   _getLibrariesPath,
   _getAccounts,
-  _getTempPath
+  _getTempPath,
+  _getInstance
 } from "../utils/selectors";
 import {
   librariesMapper,
-  convertOSToMCFormat,
   get7zPath,
   fixFilePermissions,
   extractNatives,
@@ -53,14 +52,14 @@ import {
   getJVMArguments113,
   patchForge113,
   mavenToArray,
-  copyAssetsToLegacy
+  copyAssetsToLegacy,
+  convertOSToJavaFormat
 } from "../../app/desktop/utils";
 import { openModal, closeModal } from "./modals/actions";
 import {
   downloadFile,
   downloadInstanceFiles
 } from "../../app/desktop/utils/downloader";
-import { updateJavaPath } from "./settings/actions";
 import { removeDuplicates } from "../utils";
 
 export function initManifests() {
@@ -75,10 +74,10 @@ export function initManifests() {
       type: ActionTypes.UPDATE_FABRIC_MANIFEST,
       data: fabric
     });
-    const launcher = (await getLauncherManifest()).data;
+    const java = (await getJavaManifest()).data;
     dispatch({
-      type: ActionTypes.UPDATE_LAUNCHER_MANIFEST,
-      data: launcher
+      type: ActionTypes.UPDATE_JAVA_MANIFEST,
+      data: java
     });
     const forge = removeDuplicates((await getForgeManifest()).data, "name");
     const forgeVersions = {};
@@ -101,7 +100,7 @@ export function initManifests() {
     return {
       mc,
       fabric,
-      launcher,
+      java,
       forge
     };
   };
@@ -236,12 +235,18 @@ export function updateDownloadProgress(percentage) {
 
 export function downloadJava() {
   return async (dispatch, getState) => {
+    const state = getState();
     const {
-      app: { launcherManifest }
-    } = getState();
-    const mcOs = convertOSToMCFormat(process.platform);
+      app: { javaManifest }
+    } = state;
+    const javaOs = convertOSToJavaFormat(process.platform);
+    const javaMeta = javaManifest.find(v => v.os === javaOs);
     dispatch(openModal("JavaDownload"));
-    const { version, url } = launcherManifest[mcOs][64].jre;
+    const {
+      version_data: { openjdk_version: version },
+      binary_link: url,
+      release_name: releaseName
+    } = javaMeta;
     const userDataPath = await ipcRenderer.invoke("getUserDataPath");
     const javaBaseFolder = path.join(userDataPath, "java");
     const tempFolder = path.join(userDataPath, "temp");
@@ -256,10 +261,9 @@ export function downloadJava() {
       }
       i += 1;
     });
-    await makeDir(path.join(javaBaseFolder, version));
 
     const sevenZipPath = await get7zPath();
-    const firstExtraction = extractFull(downloadLocation, tempFolder, {
+    const firstExtraction = extractFull(downloadLocation, javaBaseFolder, {
       $bin: sevenZipPath
     });
     await new Promise((resolve, reject) => {
@@ -271,29 +275,17 @@ export function downloadJava() {
       });
     });
 
-    const secondExtraction = extractFull(
-      path.join(tempFolder, path.basename(url, ".lzma")),
-      path.join(javaBaseFolder, version),
-      {
-        $bin: sevenZipPath
-      }
+    await fse.copy(
+      path.join(javaBaseFolder, `${releaseName}-jre`),
+      path.join(javaBaseFolder, version)
     );
-    await new Promise((resolve, reject) => {
-      secondExtraction.on("end", () => {
-        resolve();
-      });
-      secondExtraction.on("error", err => {
-        reject(err);
-      });
-    });
+
     await fse.remove(tempFolder);
+    await fse.remove(path.join(javaBaseFolder, `${releaseName}-jre`));
 
-    await fixFilePermissions(_getJavaPath(getState()));
-
-    dispatch(updateJavaPath(_getJavaPath(getState())));
+    await fixFilePermissions(_getJavaPath(state));
 
     ipcRenderer.send("update-progress-bar", -1);
-    dispatch(updateJavaStatus("downloaded"));
     dispatch(updateJavaStatus("downloaded"));
     dispatch(closeModal());
   };
@@ -517,16 +509,19 @@ export function updateDownloadCurrentPhase(instanceName, status) {
 export function updateInstanceConfig(instanceName, updateFunction) {
   return async (_, getState) => {
     const state = getState();
-    const configPath = path.join(
-      _getInstancesPath(state),
-      instanceName,
-      "config.json"
-    );
-    const prevConfig = await fse.readJson(configPath);
+    const instance = _getInstance(state)(instanceName);
+    await instance.queue.add(async () => {
+      const configPath = path.join(
+        _getInstancesPath(state),
+        instanceName,
+        "config.json"
+      );
+      const prevConfig = await fse.readJson(configPath);
 
-    const newConfig = await updateFunction(prevConfig);
+      const newConfig = await updateFunction(prevConfig);
 
-    await fse.outputJson(configPath, newConfig);
+      await fse.outputJson(configPath, newConfig);
+    });
   };
 }
 

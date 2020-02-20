@@ -26,7 +26,15 @@ const getInstances = async instancesPath => {
   await makeDir(instancesPath);
   const folders = await getDirectories(instancesPath);
   const instances = await Promise.all(folders.map(mapFolderToInstance));
-  return instances.filter(_ => _);
+  const hashMap = {};
+  // eslint-disable-next-line
+  for (const instance of instances) {
+    // eslint-disable-next-line
+    if (!instance) continue;
+    hashMap[instance.name] = instance;
+  }
+
+  return hashMap;
 };
 
 export default getInstances;

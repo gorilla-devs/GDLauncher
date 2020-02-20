@@ -28,8 +28,8 @@ const Instances = () => {
   const instances = useSelector(_getInstances);
   return (
     <Container>
-      {instances.list.length > 0 ? (
-        instances.list.map(i => <Instance key={i.name} instanceName={i.name} />)
+      {instances.length > 0 ? (
+        instances.map(i => <Instance key={i.name} instanceName={i.name} />)
       ) : (
         <NoInstance>
           No Instance has been installed

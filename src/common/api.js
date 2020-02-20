@@ -5,7 +5,7 @@ import {
   FORGESVC_URL,
   MC_MANIFEST_URL,
   FABRIC_APIS,
-  LAUNCHER_META_URL
+  JAVA_MANIFEST_URL
 } from "./utils/constants";
 import { sortByDate } from "./utils";
 
@@ -75,8 +75,8 @@ export const getFabricManifest = () => {
   return axios.get(url);
 };
 
-export const getLauncherManifest = () => {
-  const url = LAUNCHER_META_URL;
+export const getJavaManifest = () => {
+  const url = JAVA_MANIFEST_URL;
   return axios.get(url);
 };
 
