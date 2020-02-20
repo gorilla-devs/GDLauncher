@@ -5,7 +5,6 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import Instances from "../components/Instances";
-import News from "../components/News";
 import { openModal } from "../../../common/reducers/modals/actions";
 import { _getCurrentAccount } from "../../../common/utils/selectors";
 
@@ -30,7 +29,6 @@ const AccountContainer = styled(Button)`
 const Home = () => {
   const dispatch = useDispatch();
   const account = useSelector(_getCurrentAccount);
-  const news = useSelector(state => state.news);
 
   const openAddInstanceModal = () => {
     dispatch(openModal("AddInstance"));
@@ -42,7 +40,6 @@ const Home = () => {
 
   return (
     <div>
-      <News news={news} />
       <Instances />
       <AddInstanceIcon color="primary" onClick={openAddInstanceModal}>
         <FontAwesomeIcon icon={faPlus} />

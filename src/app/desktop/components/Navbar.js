@@ -80,11 +80,12 @@ const Navbar = () => {
     <Container>
       <img
         src={logo}
-        height="36px"
+        height="30px"
         alt="logo"
         draggable="false"
         css={`
           z-index: 1;
+          margin-left: 8px;
         `}
       />
       <div>

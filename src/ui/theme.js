@@ -5,9 +5,9 @@ module.exports = {
       white: "#fff"
     },
     primary: {
-      light: "#3f8d8f",
-      main: "#0F7173",
-      dark: "#0a4f50"
+      light: "#43727F",
+      main: "#1A5363",
+      dark: "#164452"
     },
     secondary: {
       light: "#353E48",
