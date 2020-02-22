@@ -68,7 +68,9 @@ const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
 `;
 
-const StyledButtons = styled(Button)``;
+const StyledButtons = styled(Button)`
+  float: right;
+`;
 
 async function clearSharedData(InstancesPath, setDeletingInstances) {
   setDeletingInstances(true);
