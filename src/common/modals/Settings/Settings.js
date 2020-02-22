@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Button } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch } from "react-redux";
 import Modal from "../../components/Modal";
 import MyAccountPrf from "./components/MyAccount_preferences";
 import Java from "./components/Java";
 import Instances from "./components/Instances";
+import CloseButton from "../../components/CloseButton";
+import { closeModal } from "../../reducers/modals/actions";
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
   height: 100%;
-  overflow-y: auto;
   text-align: center;
 `;
 const SideMenu = styled.div`
@@ -33,13 +33,17 @@ const SettingsContainer = styled.div`
 `;
 
 const SettingsColumn = styled.div`
+  margin-left: 50px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
+const StyledCloseButton = styled.div`
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 476px;
-  height: "100%";
-  background: transparent;
-  left: 30%;
+  top: 30px;
+  right: 30px;
+  z-index: 1;
 `;
 
 const SettingsButton = styled(Button)`
@@ -97,6 +101,7 @@ function Page(page) {
 
 export default function Settings() {
   const [page, setPage] = useState("MyAccountPrf");
+  const dispatch = useDispatch();
   return (
     <Modal
       css={`
@@ -104,23 +109,11 @@ export default function Settings() {
         width: 100%;
       `}
       header="false"
-      backBtn={
-        <FontAwesomeIcon
-          icon={faWindowClose}
-          css={`
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            cursor: pointer;
-            transition: color 0.1s ease-in-out;
-            &:hover {
-              color: ${props => props.theme.palette.colors.red};
-            }
-          `}
-        />
-      }
     >
       <Container>
+        <StyledCloseButton>
+          <CloseButton onClick={() => dispatch(closeModal())} />
+        </StyledCloseButton>
         <SideMenu>
           <SettingsTitle>General</SettingsTitle>
           <SettingsButton onClick={() => setPage("MyAccountPrf")}>
@@ -138,7 +131,17 @@ export default function Settings() {
           <SettingsButton>Sound Settings</SettingsButton>
         </SideMenu>
         <SettingsContainer>
-          <SettingsColumn>{Page(page)}</SettingsColumn>
+          <SettingsColumn>
+            <div
+              css={`
+                max-width: 600px;
+                overflow-y: hidden;
+                overflow-x: hidden;
+              `}
+            >
+              {Page(page)}
+            </div>
+          </SettingsColumn>
         </SettingsContainer>
       </Container>
     </Modal>

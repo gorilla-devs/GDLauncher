@@ -20,13 +20,15 @@ import { _getJavaPath } from "../../../utils/selectors";
 
 const JavaSettings = styled.div`
   width: 100%;
-  height: 500px;
+  height: 400px;
 `;
 
 const AutodetectPath = styled.div`
-  margin-top: 38px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   width: 100%;
-  height: 100px;
+  height: 40px;
 `;
 
 const SelectMemory = styled.div`
@@ -40,14 +42,12 @@ const JavaCustomArguments = styled.div`
 `;
 
 const Title = styled.h3`
-  position: absolute;
   font-size: 15px;
   font-weight: 700;
   color: ${props => props.theme.palette.text.secondary};
 `;
 
 const Paragraph = styled.p`
-  text-align: left;
   color: ${props => props.theme.palette.text.third};
   width: 300px;
 `;
@@ -59,9 +59,13 @@ const Hr = styled.hr`
 
 const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
+  width: 80px;
+  margin: 30px 0 20px 0;
 `;
 
-const StyledButtons = styled(Button)``;
+const StyledButtons = styled(Button)`
+  float: right;
+`;
 
 function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
@@ -94,36 +98,24 @@ export default function MyAccountPreferences() {
 
   return (
     <JavaSettings>
-      <MainTitle
+      <MainTitle>Java</MainTitle>
+      <Title
         css={`
-          float: left;
-          margin: 0;
+          width: 200px;
+          text-align: left;
         `}
       >
-        Java
-      </MainTitle>
+        Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+      </Title>
       <AutodetectPath>
-        <Title
-          css={`
-            position: absolute;
-            top: 80px;
-          `}
-        >
-          Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faFolder} />
-        </Title>
         <Paragraph
           css={`
-            position: absolute;
-            top: 100px;
+            text-align: left;
           `}
         >
           If enable, Java path will be autodetected
         </Paragraph>
         <Switch
-          style={{
-            float: "right",
-            marginTop: "65px"
-          }}
           color="primary"
           onChange={c => setAutodetectJavaPath(c)}
           checked={autodetectJavaPath}
@@ -134,12 +126,10 @@ export default function MyAccountPreferences() {
           <div
             css={`
               height: 40px;
-              margin-top: 30px;
             `}
           >
             <div
               css={`
-                margin-top: 20px;
                 width: 100%;
               `}
             >
@@ -178,12 +168,11 @@ export default function MyAccountPreferences() {
       <SelectMemory>
         <Title
           css={`
-            position: relative;
-            top: 0;
             width: 100%;
             margin-top: 0px;
             height: 8px;
             text-align: left;
+            margin-bottom: 20px;
           `}
         >
           Java Memory&nbsp; <FontAwesomeIcon icon={faMemory} />
@@ -199,7 +188,7 @@ export default function MyAccountPreferences() {
         </p>
         <Slider
           css={`
-            margin-top: 20px;
+            margin: 20px 20px 20px 0;
           `}
           onChange={e => {
             dispatch(updateJavaMemory(e));
@@ -213,16 +202,19 @@ export default function MyAccountPreferences() {
           valueLabelDisplay="auto"
         />
       </SelectMemory>
-      <Hr />
+      <Hr
+        css={`
+          margin-top: 40px;
+        `}
+      />
       <JavaCustomArguments>
         <Title
           css={`
-            position: relative;
-            top: 0;
             width: 100%;
             margin-top: 0px;
             height: 8px;
             text-align: left;
+            margin-bottom: 20px;
           `}
         >
           Java Custom Arguments
@@ -231,11 +223,10 @@ export default function MyAccountPreferences() {
           css={`
             marin-top: 20px;
             width: 100%;
-            margin: 0;
             text-align: left;
           `}
         >
-          Select the preferred amount of memory to use when lauching the game
+          Select the preferred custom arguments to use when lauching the game
         </p>
         <div
           css={`
@@ -248,8 +239,8 @@ export default function MyAccountPreferences() {
             value={javaArgs}
             css={`
               width: 83%;
-              height: 26px;
-              margin-right: 10px;
+              height: 32px;
+              float: left;
             `}
           />
           <StyledButtons

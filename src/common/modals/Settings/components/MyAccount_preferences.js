@@ -16,42 +16,44 @@ import {
 const MyAccountPrf = styled.div`
   width: 100%;
   height: 100%;
-  overflow: auto;
 `;
 
 const PersonalData = styled.div`
   margin-top: 38px;
   width: 100%;
-  height: 120px;
+`;
+
+const MainTitle = styled.h1`
+  color: ${props => props.theme.palette.text.primary};
+  margin: 0 500px 20px 0;
+  margin-bottom: 20px;
 `;
 
 const Title = styled.div`
-  position: absolute;
   font-size: 15px;
   font-weight: 700;
   color: ${props => props.theme.palette.text.primary};
   z-index: 1;
+  float: left;
 `;
 
 const ProfileImage = styled.div`
+  position: relative;
+  top: 10px;
+  left: 10px;
   border-radius: 50%;
   background: #212b36;
   width: 50px;
   height: 50px;
-  margin: 10px 0px 0px 10px;
 `;
 const UsernameContainer = styled.div`
-  position: absolute;
-  top: 10px;
-  left: 70px;
+  float: left;
   display: inline-block;
   text-align: left;
 `;
 
 const EmailContainer = styled.div`
-  position: absolute;
-  top: 50px;
-  left: 70px;
+  float: left;
   display: inline-block;
   text-align: left;
 `;
@@ -69,8 +71,8 @@ const Email = styled.div`
 `;
 
 const PersonalDataContainer = styled.div`
-  margin: 20px 0px 0px 0;
-  position: absolute;
+  display: flex;
+  flex-direction: row;
   width: 476px;
   height: 100px;
   background: ${props => props.theme.palette.grey[900]};
@@ -86,9 +88,8 @@ const ReleaseChannel = styled.div`
   display: flex;
   flex-direction: column;
   text-align: left;
-  margin-top: 50px;
-  width: 400px;
-  height: 100px;
+  width: 100%;
+  height: 90px;
   color: ${props => props.theme.palette.text.third};
   p {
     margin-bottom: 7px;
@@ -106,9 +107,23 @@ const ReleaseChannel = styled.div`
 `;
 
 const ParallelDownload = styled.div`
-  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   width: 100%;
-  height: 70px;
+  height: 60px;
+  p {
+    text-align: left;
+    color: ${props => props.theme.palette.text.third};
+  }
+`;
+
+const DiscordRpc = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
   p {
     text-align: left;
     color: ${props => props.theme.palette.text.third};
@@ -116,9 +131,8 @@ const ParallelDownload = styled.div`
 `;
 
 const LauncherVersion = styled.div`
-  margin-top: 30px;
+  margin: 30px 0 30px 0;
   height: 150px;
-
   p {
     text-align: left;
     float: left;
@@ -163,77 +177,101 @@ export default function MyAccountPreferences() {
   return (
     <MyAccountPrf>
       <PersonalData>
-        <Title>General</Title>
+        <MainTitle>General</MainTitle>
         <PersonalDataContainer>
           <ProfileImage />
-          <UsernameContainer>
-            Username
-            <br />
-            <Username>
-              {currentAccount.selectedProfile.name}{" "}
-              <Tooltip
-                title={copiedUsername ? "copied" : "copy"}
-                placement="top"
-              >
-                <div
-                  css={`
-                    width: 13px;
-                    height: 14px;
-                    margin: 0;
-                    margin-left: 4px;
-                    float: right;
-                  `}
+          <div
+            css={`
+              display: inline-block;
+              margin-left: 20px;
+              width: 250px;
+            `}
+          >
+            <UsernameContainer>
+              Username
+              <br />
+              <Username>
+                {currentAccount.selectedProfile.name}{" "}
+                <Tooltip
+                  title={copiedUsername ? "copied" : "copy"}
+                  placement="top"
                 >
-                  <FontAwesomeIcon
-                    icon={faCopy}
-                    onClick={() =>
-                      copy(
-                        setCopiedUsername,
-                        currentAccount.selectedProfile.name
-                      )
-                    }
-                  />
-                </div>
-              </Tooltip>
-            </Username>
-          </UsernameContainer>
-          <EmailContainer>
-            Email
-            <br />
-            <Email>
-              {currentAccount.user.username}{" "}
-              <Tooltip title={copiedEmail ? "copied" : "copy"} placement="top">
-                <div
-                  css={`
-                    width: 13px;
-                    height: 14px;
-                    margin: 0;
-                    margin-left: 4px;
-                    float: right;
-                  `}
+                  <div
+                    css={`
+                      width: 13px;
+                      height: 14px;
+                      margin: 0;
+                      margin-left: 4px;
+                      float: right;
+                    `}
+                  >
+                    <FontAwesomeIcon
+                      icon={faCopy}
+                      onClick={() =>
+                        copy(
+                          setCopiedUsername,
+                          currentAccount.selectedProfile.name
+                        )
+                      }
+                    />
+                  </div>
+                </Tooltip>
+              </Username>
+            </UsernameContainer>
+            <EmailContainer>
+              Email
+              <br />
+              <Email>
+                {currentAccount.user.username}{" "}
+                <Tooltip
+                  title={copiedEmail ? "copied" : "copy"}
+                  placement="top"
                 >
-                  <FontAwesomeIcon
-                    icon={faCopy}
-                    onClick={() =>
-                      copy(setCopiedEmail, currentAccount.user.username)
-                    }
-                  />
-                </div>
-              </Tooltip>
-            </Email>
-          </EmailContainer>
+                  <div
+                    css={`
+                      width: 13px;
+                      height: 14px;
+                      margin: 0;
+                      margin-left: 4px;
+                      float: right;
+                    `}
+                  >
+                    <FontAwesomeIcon
+                      icon={faCopy}
+                      onClick={() =>
+                        copy(setCopiedEmail, currentAccount.user.username)
+                      }
+                    />
+                  </div>
+                </Tooltip>
+              </Email>
+            </EmailContainer>
+          </div>
         </PersonalDataContainer>
       </PersonalData>
       <Hr />
-      <Title>Preferences</Title>
+      <Title
+        css={`
+          margin-bottom: 20px;
+        `}
+      >
+        Preferences
+      </Title>
       <ReleaseChannel>
-        <p>Release Channel</p>
+        <h3>Release Channel</h3>
         <div>
-          Stable updates once a month, beta does update more often but it may
-          have more bugs.
+          <div
+            css={`
+              width: 400px;
+            `}
+          >
+            Stable updates once a month, beta does update more often but it may
+            have more bugs.
+          </div>
           <Select
             css={`
-              float: right;
+              position: relative;
+              right: 0;
             `}
             onChange={e => {
               dispatch(updateReleaseChannel(e));
@@ -247,20 +285,18 @@ export default function MyAccountPreferences() {
         </div>
       </ReleaseChannel>
       <Hr />
+      <Title
+        css={`
+          margin-top: 0px;
+        `}
+      >
+        Concurrent Downloads
+      </Title>
       <ParallelDownload>
-        <Title
-          css={`
-            margin-top: 0px;
-          `}
-        >
-          Concurrent Downloads
-        </Title>
         <p
           css={`
-            margin-top: 25px;
+            margin: 0;
             width: 200px;
-            position: absolute;
-            left: 0;
           `}
         >
           Select the number of concurrent downloads
@@ -268,8 +304,8 @@ export default function MyAccountPreferences() {
 
         <Select
           css={`
-            margin-left: 219px;
-            margin-top: 20px;
+            position: relative;
+            right: 0;
           `}
           onChange={e => setConcurrentDownloads(e)}
           value={concurrentDownloads}
@@ -287,30 +323,29 @@ export default function MyAccountPreferences() {
         </Select>
       </ParallelDownload>
       <Hr />
-      <ParallelDownload>
-        <Title
-          css={`
-            margin-top: 0px;
-          `}
-        >
-          Discord RPC
-        </Title>
+      <Title
+        css={`
+          margin-top: 0px;
+        `}
+      >
+        Discord RPC
+      </Title>
+      <DiscordRpc>
         <p
           css={`
-            margin-top: 25px;
-            width: 200px;
-            position: absolute;
-            left: 0;
+            margin: 0;
+            height: 40px;
+            width: 250px;
           `}
         >
           Enable or Disable Discord RPC
         </p>
 
         <Switch
-          style={{
-            float: "right",
-            marginTop: "20px"
-          }}
+          css={`
+            position: relative;
+            right: 0;
+          `}
           color="primary"
           onChange={e => {
             dispatch(updateDiscordRPC(e));
@@ -322,7 +357,7 @@ export default function MyAccountPreferences() {
           }}
           checked={DiscordRPC}
         />
-      </ParallelDownload>
+      </DiscordRpc>
       <Hr />
       <LauncherVersion>
         <div

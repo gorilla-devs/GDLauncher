@@ -66,7 +66,6 @@ const Modal = ({
               : 0}px;
           overflow-y: auto;
           overflow-x: hidden;
-          position: relative;
         `}
       >
         <span onClick={() => dispatch(closeModal())}>
