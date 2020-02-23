@@ -91,7 +91,8 @@ const openFolderDialog = async (
   updateInstancesPath
 ) => {
   const paths = await ipcRenderer.invoke("openFolderDialog", InstancesPath);
-  dispatch(updateInstancesPath(paths[0]));
+  console.log(paths.filePaths[0]);
+  dispatch(updateInstancesPath(paths.filePaths[0]));
 };
 
 export default function MyAccountPreferences() {
@@ -198,7 +199,9 @@ export default function MyAccountPreferences() {
                 margin-right: 10px;
                 margin-left: 10px;
               `}
-              onChange={e => dispatch(updateInstancesPath(e.target.value))}
+              onChange={e => {
+                dispatch(updateInstancesPath(e.target.value));
+              }}
               value={InstancesP || InstancesPath}
             />
             <StyledButtons
