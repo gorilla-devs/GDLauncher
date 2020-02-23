@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Button } from "antd";
 import Modal from "../../components/Modal";
 import Overview from "./Overview";
+import ScreenShot from "./ScreenShot";
 import Notes from "./Notes";
 import Mods from "./Mods";
 
@@ -69,7 +70,7 @@ const InstanceManager = ({ instanceName }) => {
     notes: { name: "Notes", component: Notes },
     resourcePacks: { name: "Resource Packs", component: Overview },
     worlds: { name: "Worlds", component: Overview },
-    screenshots: { name: "Screenshots", component: Overview },
+    screenshots: { name: "Screenshots", component: ScreenShot },
     settings: { name: "Settings", component: Overview },
     servers: { name: "Servers", component: Overview }
   };
@@ -91,7 +92,11 @@ const InstanceManager = ({ instanceName }) => {
         <SideMenuContainer>
           <SideMenu>
             {Object.entries(menuEntries).map(([k, tab]) => (
-              <SettingsButton key={tab.name} onClick={e => setPage(k)} active={k === page}>
+              <SettingsButton
+                key={tab.name}
+                onClick={e => setPage(k)}
+                active={k === page}
+              >
                 {tab.name}
               </SettingsButton>
             ))}

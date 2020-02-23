@@ -49,7 +49,8 @@ const RichTextExample = ({ instanceName }) => {
   const configPath = path.join(InstancePath, instanceName, "config.json");
 
   const getNotes = async () => {
-    const notes = JSON.parse(await fs.readFile(configPath)).value;
+
+    const notes = JSON.parse(await fs.readFile(configPath));
     console.log("notes", JSON.parse(await fs.readFile(configPath)));
     setValue(notes ? notes : initialValue);
   };
@@ -69,6 +70,10 @@ const RichTextExample = ({ instanceName }) => {
       `}
     >
       <Slate
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
         editor={editor}
         value={value}
         onChange={value => {
@@ -88,9 +93,6 @@ const RichTextExample = ({ instanceName }) => {
           <MarkButton format="italic" icon={faItalic} />
           <MarkButton format="underline" icon={faUnderline} />
           <MarkButton format="code" icon={faCode} />
-          {/* <BlockButton format="heading-one" icon="looks_one" />
-        <BlockButton format="heading-two" icon="looks_two" />
-        <BlockButton format="block-quote" icon="format_quote" /> */}
           <BlockButton format="numbered-list" icon={faListOl} />
           <BlockButton format="bulleted-list" icon={faList} />
         </Toolbar>
@@ -105,17 +107,17 @@ const RichTextExample = ({ instanceName }) => {
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           placeholder="Enter some rich text…"
-          spellCheck
+          // spellCheck
           autoFocus
-          onKeyDown={event => {
-            for (const hotkey in HOTKEYS) {
-              if (isHotkey(hotkey, event)) {
-                event.preventDefault();
-                const mark = HOTKEYS[hotkey];
-                toggleMark(editor, mark);
-              }
-            }
-          }}
+          // onKeyDown={event => {
+          //   for (const hotkey in HOTKEYS) {
+          //     if (isHotkey(hotkey, event)) {
+          //       event.preventDefault();
+          //       const mark = HOTKEYS[hotkey];
+          //       toggleMark(editor, mark);
+          //     }
+          //   }
+          // }}
         />
       </Slate>
     </div>
