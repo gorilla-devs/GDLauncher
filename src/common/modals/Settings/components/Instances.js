@@ -199,9 +199,7 @@ export default function MyAccountPreferences() {
                 margin-right: 10px;
                 margin-left: 10px;
               `}
-              onChange={e => {
-                dispatch(updateInstancesPath(e.target.value));
-              }}
+              onChange={e => dispatch(updateInstancesPath(e.target.value))}
               value={InstancesP || InstancesPath}
             />
             <StyledButtons
