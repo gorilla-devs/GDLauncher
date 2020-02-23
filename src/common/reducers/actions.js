@@ -39,7 +39,8 @@ import {
   _getInstancesPath,
   _getLibrariesPath,
   _getAccounts,
-  _getTempPath
+  _getTempPath,
+  _getInstance
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -508,16 +509,19 @@ export function updateDownloadCurrentPhase(instanceName, status) {
 export function updateInstanceConfig(instanceName, updateFunction) {
   return async (_, getState) => {
     const state = getState();
-    const configPath = path.join(
-      _getInstancesPath(state),
-      instanceName,
-      "config.json"
-    );
-    const prevConfig = await fse.readJson(configPath);
+    const instance = _getInstance(state)(instanceName);
+    await instance.queue.add(async () => {
+      const configPath = path.join(
+        _getInstancesPath(state),
+        instanceName,
+        "config.json"
+      );
+      const prevConfig = await fse.readJson(configPath);
 
-    const newConfig = await updateFunction(prevConfig);
+      const newConfig = await updateFunction(prevConfig);
 
-    await fse.outputJson(configPath, newConfig);
+      await fse.outputJson(configPath, newConfig);
+    });
   };
 }
 
