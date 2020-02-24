@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect } from "react";
 import { promises as fs } from "fs";
 import path from "path";
@@ -47,7 +48,7 @@ const Photo = styled.div`
   border-radius: 5px;
 `;
 
-const calcDate = async ScreenShotsDir => {
+const calcDate = async (ScreenShotsDir, sortedScreens) => {
   const screens = await fs.readdir(ScreenShotsDir);
   try {
     await Promise.all(
@@ -62,9 +63,20 @@ const calcDate = async ScreenShotsDir => {
         const totalMinutes = parseInt(Math.floor(totalSeconds / 60), 10);
         const totalHours = parseInt(Math.floor(totalMinutes / 60), 10);
         const days = parseInt(Math.floor(totalHours / 24), 10);
-        console.log(days, date, screenTime);
+        sortedScreens = sortedScreens.concat({ name: element, days: days });
+        sortedScreens = sortedScreens.sort((a, b) => {
+          let comparison = 0;
+          if (a.days > b.days) {
+            comparison = 1;
+          } else if (a.days < b.days) {
+            comparison = -1;
+          }
+          return comparison;
+        });
+        console.log(days);
       })
     );
+    console.log(sortedScreens);
   } catch (e) {
     console.log(e);
   }
@@ -73,14 +85,16 @@ const calcDate = async ScreenShotsDir => {
 const ScreenShot = ({ instanceName }) => {
   const InstancePath = useSelector(_getInstancesPath);
   const ScreenShotsDir = path.join(InstancePath, instanceName, "screenshots");
-  // const date = new Date();
+
+  let sortedScreens = [];
 
   useEffect(() => {
-    calcDate(ScreenShotsDir);
+    calcDate(ScreenShotsDir, sortedScreens);
   }, []);
 
   return (
     <Container>
+      {sortedScreens}
       <DateSection>
         <TitleDataSection>Today</TitleDataSection>
         <PhotoRow>
@@ -89,45 +103,6 @@ const ScreenShot = ({ instanceName }) => {
           <Photo />
         </PhotoRow>
         <PhotoRow>
-          <Photo />
-          <Photo />
-        </PhotoRow>
-        <PhotoRow>
-          <Photo />
-          <Photo />
-          <Photo />
-          <Photo />
-        </PhotoRow>
-      </DateSection>
-      <DateSection>
-        <TitleDataSection>Yesterday</TitleDataSection>
-        <PhotoRow>
-          <Photo />
-          <Photo />
-          <Photo />
-        </PhotoRow>
-        <PhotoRow>
-          <Photo />
-          <Photo />
-          <Photo />
-          <Photo />
-        </PhotoRow>
-        <PhotoRow>
-          <Photo />
-          <Photo />
-          <Photo />
-          <Photo />
-        </PhotoRow>
-      </DateSection>
-      <DateSection>
-        <TitleDataSection>2 Days ago</TitleDataSection>
-        <PhotoRow>
-          <Photo />
-          <Photo />
-          <Photo />
-        </PhotoRow>
-        <PhotoRow>
-          <Photo />
           <Photo />
           <Photo />
         </PhotoRow>
