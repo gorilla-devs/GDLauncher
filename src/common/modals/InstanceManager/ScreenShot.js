@@ -47,6 +47,9 @@ const Photo = styled.img`
   margin: 10px;
   background: green;
   border-radius: 5px;
+  &&:hover{
+    scale(1)
+  }
 `;
 
 const calcDate = async ScreenShotsDir => {
@@ -75,11 +78,9 @@ const calcDate = async ScreenShotsDir => {
           }
           return comparison;
         });
-        console.log("b", days);
       })
     );
     return sortedScreens;
-    console.log("a", sortedScreens);
   } catch (e) {
     console.log(e);
   }
@@ -93,15 +94,12 @@ const ScreenShot = ({ instanceName }) => {
   useEffect(() => {
     calcDate(ScreenShotsDir).then(sortedScreens => {
       setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
-      console.log("T", _.groupBy(sortedScreens, "days"));
     });
-    console.log("TEST", groupedSortedPhotos);
   }, []);
 
   return (
     <Container>
       {Object.entries(groupedSortedPhotos).map((key, value) => {
-        console.log("CIAO", key[1], value);
         return (
           <>
             <TitleDataSection>Today</TitleDataSection>
