@@ -283,7 +283,7 @@ export function downloadJava() {
     });
 
     const sevenZipPath = await get7zPath();
-    const firstExtraction = extractFull(downloadLocation, javaBaseFolder, {
+    const firstExtraction = extractFull(downloadLocation, tempFolder, {
       $bin: sevenZipPath
     });
     await new Promise((resolve, reject) => {
@@ -295,13 +295,31 @@ export function downloadJava() {
       });
     });
 
-    await fse.copy(
-      path.join(javaBaseFolder, `${releaseName}-jre`),
+    // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
+    if (process.platform !== "win32") {
+      const tempTarName = path.join(
+        tempFolder,
+        path.basename(url).replace(".tar.gz", ".tar")
+      );
+      const secondExtraction = extractFull(tempTarName, tempFolder, {
+        $bin: sevenZipPath
+      });
+      await new Promise((resolve, reject) => {
+        secondExtraction.on("end", () => {
+          resolve();
+        });
+        secondExtraction.on("error", err => {
+          reject(err);
+        });
+      });
+    }
+
+    await fse.move(
+      path.join(tempFolder, `${releaseName}-jre`),
       path.join(javaBaseFolder, version)
     );
 
     await fse.remove(tempFolder);
-    await fse.remove(path.join(javaBaseFolder, `${releaseName}-jre`));
 
     await fixFilePermissions(_getJavaPath(state));
 
