@@ -28,8 +28,7 @@ import {
   getFabricJson,
   getForgeJson,
   getAddonFile,
-  getJavaManifest,
-  mcGetPlayerSkin
+  getJavaManifest
 } from "../api";
 import {
   _getCurrentAccount,
