@@ -16,6 +16,14 @@ const middleware = store => next => action => {
     dispatch(push("/"));
   }
 
+  if (currState.settings.potatoPcMode !== nextState.settings.potatoPcMode) {
+    if (nextState.settings.potatoPcMode) {
+      document.getElementById("root").classList.add("disable-animations");
+    } else {
+      document.getElementById("root").classList.remove("disable-animations");
+    }
+  }
+
   return result;
 };
 

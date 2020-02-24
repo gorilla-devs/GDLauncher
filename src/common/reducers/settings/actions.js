@@ -36,11 +36,11 @@ export function updateHideWindowOnGameLaunch(hideWindow) {
   };
 }
 
-export function updateInstancesPath(path) {
+export function updatePotatoPcMode(value) {
   return dispatch => {
     dispatch({
-      type: ActionTypes.UPDATE_INSTANCES_PATH,
-      path
+      type: ActionTypes.UPDATE_POTATO_PC_MODE,
+      value
     });
   };
 }

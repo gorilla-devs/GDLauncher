@@ -27,10 +27,10 @@ let tray;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 550,
-    minWidth: 1000,
-    minHeight: 550,
+    width: 1100,
+    height: 700,
+    minWidth: 1100,
+    minHeight: 700,
     show: true,
     frame: false,
     backgroundColor: "#353E48",

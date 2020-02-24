@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { ipcRenderer } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faJava } from "@fortawesome/free-brands-svg-icons";
 import {
   faMemory,
   faFolder,
   faUndo,
-  faLevelDownAlt
+  faLevelDownAlt,
+  faList
 } from "@fortawesome/free-solid-svg-icons";
 import { Slider, Button, Input, Switch } from "antd";
 import {
@@ -49,7 +51,6 @@ const Title = styled.h3`
 
 const Paragraph = styled.p`
   color: ${props => props.theme.palette.text.third};
-  width: 300px;
 `;
 
 const Hr = styled.hr`
@@ -71,13 +72,9 @@ function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const openFolderDialog = async (
-  javaPath,
-  updateJavaArguments,
-  updateJavaPath,
-  dispatch
-) => {
-  const paths = await ipcRenderer.invoke("openFolderDialog", javaPath);
+const openFolderDialog = async (javaPath, updateJavaPath, dispatch) => {
+  const paths = await ipcRenderer.invoke("openFileDialog", javaPath);
+  if (!paths[0]) return;
   dispatch(updateJavaPath(paths[0]));
 };
 
@@ -92,8 +89,7 @@ export default function MyAccountPreferences() {
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
   const javaPath = useSelector(_getJavaPath);
-  const [autodetectJavaPath, setAutodetectJavaPath] = useState(true);
-  const [memory, setMemory] = useState(javaMemory);
+  const customJavaPath = useSelector(state => state.settings.java.path);
   const dispatch = useDispatch();
 
   return (
@@ -105,7 +101,7 @@ export default function MyAccountPreferences() {
           text-align: left;
         `}
       >
-        Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+        Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faJava} />
       </Title>
       <AutodetectPath>
         <Paragraph
@@ -113,15 +109,22 @@ export default function MyAccountPreferences() {
             text-align: left;
           `}
         >
-          If enable, Java path will be autodetected
+          Disable this to specify a custom java path to use instead of using
+          openJDK shipped with GDLauncher. Please select the java.exe binary
         </Paragraph>
         <Switch
           color="primary"
-          onChange={c => setAutodetectJavaPath(c)}
-          checked={autodetectJavaPath}
+          onChange={c => {
+            if (c) {
+              dispatch(updateJavaPath(null));
+            } else {
+              dispatch(updateJavaPath(javaPath));
+            }
+          }}
+          checked={!customJavaPath}
         />
       </AutodetectPath>
-      {!autodetectJavaPath && (
+      {customJavaPath && (
         <>
           <div
             css={`
@@ -131,6 +134,7 @@ export default function MyAccountPreferences() {
             <div
               css={`
                 width: 100%;
+                margin: 20px 0;
               `}
             >
               <FontAwesomeIcon
@@ -141,21 +145,15 @@ export default function MyAccountPreferences() {
               <Input
                 css={`
                   width: 75%;
-                  margin-right: 10px;
-                  margin-left: 10px;
+                  margin: 0 10px;
                 `}
                 onChange={e => dispatch(updateJavaPath(e.target.value))}
-                value={javaPath}
+                value={customJavaPath}
               />
               <StyledButtons
                 color="primary"
                 onClick={() =>
-                  openFolderDialog(
-                    javaPath,
-                    updateJavaArguments,
-                    updateJavaPath,
-                    dispatch
-                  )
+                  openFolderDialog(customJavaPath, updateJavaPath, dispatch)
                 }
               >
                 <FontAwesomeIcon icon={faFolder} />
@@ -177,7 +175,7 @@ export default function MyAccountPreferences() {
         >
           Java Memory&nbsp; <FontAwesomeIcon icon={faMemory} />
         </Title>
-        <p
+        <Paragraph
           css={`
             width: 100%;
             text-align: left;
@@ -185,16 +183,15 @@ export default function MyAccountPreferences() {
           `}
         >
           Select the preferred amount of memory to use when lauching the game
-        </p>
+        </Paragraph>
         <Slider
           css={`
             margin: 20px 20px 20px 0;
           `}
           onChange={e => {
             dispatch(updateJavaMemory(e));
-            setMemory(e);
           }}
-          defaultValue={memory}
+          defaultValue={javaMemory}
           min={1024}
           max={16384}
           step={512}
@@ -211,23 +208,19 @@ export default function MyAccountPreferences() {
         <Title
           css={`
             width: 100%;
-            margin-top: 0px;
-            height: 8px;
             text-align: left;
             margin-bottom: 20px;
           `}
         >
-          Java Custom Arguments
+          Java Custom Arguments &nbsp; <FontAwesomeIcon icon={faList} />
         </Title>
-        <p
+        <Paragraph
           css={`
-            marin-top: 20px;
-            width: 100%;
             text-align: left;
           `}
         >
           Select the preferred custom arguments to use when lauching the game
-        </p>
+        </Paragraph>
         <div
           css={`
             margin-top: 20px;

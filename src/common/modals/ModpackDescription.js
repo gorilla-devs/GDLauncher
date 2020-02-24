@@ -78,7 +78,7 @@ export default React.memo(AddInstance);
 
 const StyledSelect = styled(Select)`
   && {
-    width: 170px;
+    width: 250px;
   }
 `;
 

@@ -39,6 +39,7 @@ const InstanceContainer = styled.div`
   text-align: center;
   width: 100%;
   font-size: 20px;
+  overflow: hidden;
   height: 100%;
   background: linear-gradient(0deg,rgba(0,0,0,0.7),rgba(0,0,0,0.7)),url("${props =>
     props.background}") center no-repeat;

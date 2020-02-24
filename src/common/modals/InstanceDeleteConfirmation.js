@@ -43,6 +43,7 @@ const InstanceDeleteConfirmation = ({ instanceName }) => {
         <h4
           css={`
             font-style: italic;
+            font-weight: 700;
             color: ${props => props.theme.palette.error.main};
           `}
         >

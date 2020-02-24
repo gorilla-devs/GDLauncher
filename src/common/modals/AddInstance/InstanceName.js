@@ -32,21 +32,33 @@ const InstanceName = ({
   importZipPath,
   step
 }) => {
-  const mcName = modpack?.name || (version && `Minecraft ${version[0]}`);
+  const mcName =
+    modpack?.name.replace(/\W/g, "") || (version && `Minecraft ${version[0]}`);
+  const originalMcName =
+    modpack?.name || (version && `Minecraft ${version[0]}`);
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const tempPath = useSelector(_getTempPath);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const [instanceName, setInstanceName] = useState(mcName);
   const [alreadyExists, setAlreadyExists] = useState(false);
+  const [invalidName, setInvalidName] = useState(true);
   const [clicked, setClicked] = useState(false);
 
   useEffect(() => {
     if (instanceName || mcName) {
+      if (
+        !(instanceName || mcName).match("^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$")
+      ) {
+        setInvalidName(true);
+        setAlreadyExists(false);
+        return;
+      }
       fse
         .pathExists(path.join(instancesPath, instanceName || mcName))
         .then(exists => {
           setAlreadyExists(exists);
+          setInvalidName(false);
         });
     }
   }, [instanceName, step]);
@@ -171,6 +183,7 @@ const InstanceName = ({
                 </div>
                 <div
                   css={`
+                    position: relative;
                     flex: 10;
                     align-self: center;
                     font-size: 30px;
@@ -182,11 +195,14 @@ const InstanceName = ({
                   `}
                 >
                   <ModpackName state={state1} name={mcName}>
-                    {mcName}
+                    {originalMcName}
                   </ModpackName>
                   <div
                     css={`
-                      margin: 150px;
+                      margin-top: 150px;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: center;
                     `}
                   >
                     <Input
@@ -202,18 +218,20 @@ const InstanceName = ({
                               : 1};
                           transition: 0.1s ease-in-out;
                           width: 300px;
+                          align-self: center;
                         }
                       `}
                     />
                     <div
-                      alreadyExists={alreadyExists}
+                      show={invalidName || alreadyExists}
                       css={`
-                        opacity: ${props => (props.alreadyExists ? 1 : 0)};
+                        opacity: ${props => (props.show ? 1 : 0)};
                         color: ${props => props.theme.palette.error.main};
                         font-weight: 700;
                         font-size: 14px;
                         padding: 3px;
-                        margin-top: 20px;
+                        height: 30px;
+                        margin-top: 10px;
                         text-align: center;
                         border-radius: ${props =>
                           props.theme.shape.borderRadius};
@@ -221,7 +239,10 @@ const InstanceName = ({
                           transparentize(0.7, props.theme.palette.grey[700])};
                       `}
                     >
-                      An instance with this name already exists!
+                      {invalidName &&
+                        "Instance name is not valid. Please try another one"}
+                      {alreadyExists &&
+                        "An instance with this name already exists!"}
                     </div>
                   </div>
                 </div>
@@ -248,7 +269,7 @@ const InstanceName = ({
                     setClicked(true);
                   }}
                 >
-                  {clicked || alreadyExists ? (
+                  {clicked || alreadyExists || invalidName ? (
                     ""
                   ) : (
                     <FontAwesomeIcon icon={faLongArrowAltRight} />
@@ -299,11 +320,11 @@ const ModpackNameKeyframe = props => keyframes`
   }
 
   35% {
-    transform: scale(1) translateY(80%);
+    transform: scale(1) translateY(65%);
   }
 
   to {
-    transform: scale(${props.name.length < 16 ? 2 : 1}) translateY(80%);
+    transform: scale(${props.name.length < 16 ? 2 : 1}) translateY(65%);
   }
 `;
 
@@ -353,6 +374,7 @@ const ModpackName = styled.span`
       state === "entering" || state === "entered" ? ModpackNameKeyframe : null}
     0.2s ease-in-out forwards;
   box-sizing: border-box;
+  text-align: center;
   overflow: hidden;
   text-transform: capitalize;
   padding: 20px;

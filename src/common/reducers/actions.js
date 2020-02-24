@@ -53,7 +53,8 @@ import {
   patchForge113,
   mavenToArray,
   copyAssetsToLegacy,
-  convertOSToJavaFormat
+  convertOSToJavaFormat,
+  getPlayerSkin
 } from "../../app/desktop/utils";
 import { openModal, closeModal } from "./modals/actions";
 import {
@@ -61,6 +62,7 @@ import {
   downloadInstanceFiles
 } from "../../app/desktop/utils/downloader";
 import { removeDuplicates } from "../utils";
+import { UPDATE_CONCURRENT_DOWNLOADS } from "./settings/actionTypes";
 
 export function initManifests() {
   return async dispatch => {
@@ -222,6 +224,24 @@ export function updateJavaStatus(status) {
   };
 }
 
+export function updateConcurrentDownloads(concurrentDownloads) {
+  return async dispatch => {
+    dispatch({
+      type: UPDATE_CONCURRENT_DOWNLOADS,
+      concurrentDownloads
+    });
+  };
+}
+
+export function updateUpdateAvailable(updateAvailable) {
+  return async dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_UPDATE_AVAILABLE,
+      updateAvailable
+    });
+  };
+}
+
 export function updateDownloadProgress(percentage) {
   return (dispatch, getState) => {
     const { currentDownload } = getState();
@@ -263,7 +283,7 @@ export function downloadJava() {
     });
 
     const sevenZipPath = await get7zPath();
-    const firstExtraction = extractFull(downloadLocation, javaBaseFolder, {
+    const firstExtraction = extractFull(downloadLocation, tempFolder, {
       $bin: sevenZipPath
     });
     await new Promise((resolve, reject) => {
@@ -275,13 +295,31 @@ export function downloadJava() {
       });
     });
 
-    await fse.copy(
-      path.join(javaBaseFolder, `${releaseName}-jre`),
+    // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
+    if (process.platform !== "win32") {
+      const tempTarName = path.join(
+        tempFolder,
+        path.basename(url).replace(".tar.gz", ".tar")
+      );
+      const secondExtraction = extractFull(tempTarName, tempFolder, {
+        $bin: sevenZipPath
+      });
+      await new Promise((resolve, reject) => {
+        secondExtraction.on("end", () => {
+          resolve();
+        });
+        secondExtraction.on("error", err => {
+          reject(err);
+        });
+      });
+    }
+
+    await fse.move(
+      path.join(tempFolder, `${releaseName}-jre`),
       path.join(javaBaseFolder, version)
     );
 
     await fse.remove(tempFolder);
-    await fse.remove(path.join(javaBaseFolder, `${releaseName}-jre`));
 
     await fixFilePermissions(_getJavaPath(state));
 
@@ -301,6 +339,10 @@ export function login(username, password, redirect = true) {
     }
     try {
       const { data } = await mcAuthenticate(username, password, clientToken);
+      const skinUrl = await getPlayerSkin(data.selectedProfile.id);
+      if (skinUrl) {
+        data.skin = skinUrl;
+      }
       dispatch(updateAccount(data.selectedProfile.id, data));
       dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
@@ -324,10 +366,20 @@ export function login(username, password, redirect = true) {
 export function loginWithAccessToken(redirect = true) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { accessToken, clientToken } = _getCurrentAccount(state);
+    const currentAccount = _getCurrentAccount(state);
+    const { accessToken, clientToken, selectedProfile } = currentAccount;
     if (!accessToken) throw new Error();
     try {
       await mcValidate(accessToken, clientToken);
+      const skinUrl = await getPlayerSkin(selectedProfile.id);
+      if (skinUrl) {
+        dispatch(
+          updateAccount(selectedProfile.id, {
+            ...currentAccount,
+            skin: skinUrl
+          })
+        );
+      }
       dispatch(push("/home"));
     } catch (error) {
       console.error(error);
@@ -335,6 +387,10 @@ export function loginWithAccessToken(redirect = true) {
       if (error.response && error.response.status === 403) {
         try {
           const { data } = await mcRefresh(accessToken, clientToken);
+          const skinUrl = await getPlayerSkin(data.selectedProfile.id);
+          if (skinUrl) {
+            data.skin = skinUrl;
+          }
           dispatch(updateAccount(data.selectedProfile.id, data));
           dispatch(updateCurrentAccountId(data.selectedProfile.id));
           if (redirect) {
@@ -375,6 +431,10 @@ export function loginThroughNativeLauncher() {
       const { accessToken } = vnlJson.authenticationDatabase[account];
 
       const { data } = await mcRefresh(accessToken, clientToken);
+      const skinUrl = await getPlayerSkin(data.selectedProfile.id);
+      if (skinUrl) {
+        data.skin = skinUrl;
+      }
 
       // We need to update the accessToken in launcher_profiles.json
       vnlJson.authenticationDatabase[account].accessToken = data.accessToken;

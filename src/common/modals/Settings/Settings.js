@@ -3,9 +3,8 @@ import styled from "styled-components";
 import { Button } from "antd";
 import { useDispatch } from "react-redux";
 import Modal from "../../components/Modal";
-import MyAccountPrf from "./components/MyAccount_preferences";
+import General from "./components/General";
 import Java from "./components/Java";
-import Instances from "./components/Instances";
 import CloseButton from "../../components/CloseButton";
 import { closeModal } from "../../reducers/modals/actions";
 
@@ -39,13 +38,6 @@ const SettingsColumn = styled.div`
   overflow-x: hidden;
 `;
 
-const StyledCloseButton = styled.div`
-  position: absolute;
-  top: 30px;
-  right: 30px;
-  z-index: 1;
-`;
-
 const SettingsButton = styled(Button)`
   align-items: left;
   justify-content: left;
@@ -55,7 +47,8 @@ const SettingsButton = styled(Button)`
   border-radius: 4px 0 0 4px;
   font-size: 12px;
   white-space: nowrap;
-  background: transparent;
+  background: ${props =>
+    props.active ? props.theme.palette.grey[600] : "transparent"};
   border: 0px;
   text-align: left;
   animation-duration: 0s;
@@ -86,21 +79,17 @@ const SettingsTitle = styled.div`
 
 function Page(page) {
   switch (page) {
-    case "MyAccountPrf":
-      return <MyAccountPrf />;
+    case "General":
+      return <General />;
     case "Java":
       return <Java />;
-    case "Instances":
-      return <Instances />;
-    case "User Interface":
-      return <div>User Interface</div>;
     default:
       return null;
   }
 }
 
 export default function Settings() {
-  const [page, setPage] = useState("MyAccountPrf");
+  const [page, setPage] = useState("General");
   const dispatch = useDispatch();
   return (
     <Modal
@@ -111,24 +100,34 @@ export default function Settings() {
       header="false"
     >
       <Container>
-        <StyledCloseButton>
-          <CloseButton onClick={() => dispatch(closeModal())} />
-        </StyledCloseButton>
+        <CloseButton
+          css={`
+            position: absolute;
+            top: 30px;
+            right: 30px;
+          `}
+          onClick={() => dispatch(closeModal())}
+        />
         <SideMenu>
           <SettingsTitle>General</SettingsTitle>
-          <SettingsButton onClick={() => setPage("MyAccountPrf")}>
+          <SettingsButton
+            active={page === "General"}
+            onClick={() => setPage("General")}
+          >
             General
           </SettingsButton>
-          <SettingsButton onClick={() => setPage("Java")}>Java</SettingsButton>
-          <SettingsButton onClick={() => setPage("Instances")}>
-            Instances
+          <SettingsButton
+            active={page === "Java"}
+            onClick={() => setPage("Java")}
+          >
+            Java
           </SettingsButton>
-          <SettingsButton onClick={() => setPage("User Interface")}>
+          {/* <SettingsButton onClick={() => setPage("User Interface")}>
             User Interface
           </SettingsButton>
           <SettingsTitle>Game Settings</SettingsTitle>
           <SettingsButton>Graphic Settings</SettingsButton>
-          <SettingsButton>Sound Settings</SettingsButton>
+          <SettingsButton>Sound Settings</SettingsButton> */}
         </SideMenu>
         <SettingsContainer>
           <SettingsColumn>

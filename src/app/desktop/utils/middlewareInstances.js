@@ -37,6 +37,7 @@ const middleware = store => next => action => {
         filter: f => true || /(config\.json)|(mods)/.test(f)
       },
       (e, file) => {
+        if (file.includes("config.json")) return;
         getInstances(instancesPath)
           .then(instances => {
             const checkMods = file.includes("mods");

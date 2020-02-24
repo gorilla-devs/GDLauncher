@@ -31,9 +31,7 @@ export const _getAccounts = createSelector(_accounts, accounts => accounts);
 
 export const _getDownloadQueue = createSelector(
   _downloadQueue,
-  downloadQueue => {
-    return downloadQueue;
-  }
+  downloadQueue => downloadQueue
 );
 
 export const _getCurrentDownloadItem = createSelector(

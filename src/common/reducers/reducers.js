@@ -114,6 +114,15 @@ function selectedInstance(state = null, action) {
   }
 }
 
+function updateAvailable(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_UPDATE_AVAILABLE:
+      return action.updateAvailable;
+    default:
+      return state;
+  }
+}
+
 export default {
   news,
   downloadQueue,
@@ -121,5 +130,6 @@ export default {
   javaDownloadStatus,
   instances,
   startedInstances,
-  selectedInstance
+  selectedInstance,
+  updateAvailable
 };
