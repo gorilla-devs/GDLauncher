@@ -12,7 +12,8 @@ import {
   faUndoAlt,
   faTachometerAlt,
   faTrash,
-  faPlay
+  faPlay,
+  faToilet
 } from "@fortawesome/free-solid-svg-icons";
 import { Select, Tooltip, Button, Switch, Input } from "antd";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
@@ -26,7 +27,8 @@ import {
   updateReleaseChannel,
   updateDiscordRPC,
   updateDataPath,
-  updateHideWindowOnGameLaunch
+  updateHideWindowOnGameLaunch,
+  updatePotatoPcMode
 } from "../../../reducers/settings/actions";
 import HorizontalLogo from "../../../../ui/HorizontalLogo";
 import { updateConcurrentDownloads } from "../../../reducers/actions";
@@ -209,6 +211,7 @@ const General = () => {
     state => state.settings.hideWindowOnGameLaunch
   );
   const DiscordRPC = useSelector(state => state.settings.discordRPC);
+  const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
   const concurrentDownloads = useSelector(
     state => state.settings.concurrentDownloads
   );
@@ -443,6 +446,34 @@ const General = () => {
             dispatch(updateHideWindowOnGameLaunch(e));
           }}
           checked={hideWindowOnGameLaunch}
+        />
+      </DiscordRpc>
+      <Hr />
+      <Title
+        css={`
+          margin-top: 0px;
+        `}
+      >
+        Potato PC Mode &nbsp; <FontAwesomeIcon icon={faToilet} />
+      </Title>
+      <DiscordRpc
+        css={`
+          margin-bottom: 30px;
+        `}
+      >
+        <p
+          css={`
+            width: 500px;
+          `}
+        >
+          You got a potato PC? Don&apos;t worry! We got you covered. Enable this
+          and all animations and special effects will be disabled
+        </p>
+        <Switch
+          onChange={e => {
+            dispatch(updatePotatoPcMode(e));
+          }}
+          checked={potatoPcMode}
         />
       </DiscordRpc>
       <Hr />

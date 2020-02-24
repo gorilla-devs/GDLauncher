@@ -61,6 +61,15 @@ function hideWindowOnGameLaunch(state = true, action) {
   }
 }
 
+function potatoPcMode(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_POTATO_PC_MODE:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path: null,
@@ -88,5 +97,6 @@ export default combineReducers({
   concurrentDownloads,
   discordRPC,
   hideWindowOnGameLaunch,
+  potatoPcMode,
   java
 });
