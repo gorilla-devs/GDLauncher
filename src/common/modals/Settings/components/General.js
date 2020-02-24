@@ -1,17 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import styled from "styled-components";
 import { ipcRenderer, clipboard } from "electron";
 import { useSelector, useDispatch } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { push } from "connected-react-router";
-import { faCopy, faDownload } from "@fortawesome/free-solid-svg-icons";
-import { Select, Tooltip, Button, Switch } from "antd";
-import logo from "../../../assets/logo.png";
-import { _getCurrentAccount } from "../../../utils/selectors";
+import fsa from "fs-extra";
+import {
+  faCopy,
+  faDownload,
+  faFolder,
+  faUndoAlt,
+  faTachometerAlt,
+  faTrash,
+  faPlay
+} from "@fortawesome/free-solid-svg-icons";
+import { Select, Tooltip, Button, Switch, Input } from "antd";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import {
+  _getCurrentAccount,
+  _getDataStorePath,
+  _getInstancesPath,
+  _getTempPath
+} from "../../../utils/selectors";
 import {
   updateReleaseChannel,
-  updateDiscordRPC
+  updateDiscordRPC,
+  updateDataPath,
+  updateHideWindowOnGameLaunch
 } from "../../../reducers/settings/actions";
+import HorizontalLogo from "../../../../ui/HorizontalLogo";
+import { updateConcurrentDownloads } from "../../../reducers/actions";
+import { extractFace } from "../../../../app/desktop/utils";
 
 const MyAccountPrf = styled.div`
   width: 100%;
@@ -34,18 +53,27 @@ const Title = styled.div`
   font-weight: 700;
   color: ${props => props.theme.palette.text.primary};
   z-index: 1;
-  float: left;
+  text-align: left;
 `;
 
-const ProfileImage = styled.div`
+const ProfileImage = styled.img`
   position: relative;
-  top: 10px;
-  left: 10px;
-  border-radius: 50%;
+  top: 20px;
+  left: 20px;
   background: #212b36;
   width: 50px;
   height: 50px;
 `;
+
+const ImagePlaceHolder = styled.div`
+  position: relative;
+  top: 20px;
+  left: 20px;
+  background: #212b36;
+  width: 50px;
+  height: 50px;
+`;
+
 const UsernameContainer = styled.div`
   float: left;
   display: inline-block;
@@ -73,8 +101,7 @@ const Email = styled.div`
 const PersonalDataContainer = styled.div`
   display: flex;
   flex-direction: row;
-  width: 476px;
-  height: 100px;
+  width: 100%;
   background: ${props => props.theme.palette.grey[900]};
   border-radius: ${props => props.theme.shape.borderRadius};
 `;
@@ -130,12 +157,26 @@ const DiscordRpc = styled.div`
   }
 `;
 
-const LauncherVersion = styled.div`
-  margin: 30px 0 30px 0;
-  height: 150px;
+const OverridePath = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   p {
     text-align: left;
-    float: left;
+    color: ${props => props.theme.palette.text.third};
+  }
+`;
+
+const DataPath = styled.div`
+  width: 100%;
+  height: 40px;
+`;
+
+const LauncherVersion = styled.div`
+  margin: 30px 0;
+  p {
+    text-align: left;
     color: ${props => props.theme.palette.text.third};
     margin: 0 0 0 6px;
   }
@@ -153,37 +194,76 @@ function copy(setCopied, copy) {
   }, 500);
 }
 
-const StyledButtons = styled(Button)``;
+const openFolderDialog = async (InstancesPath, dispatch) => {
+  const paths = await ipcRenderer.invoke("openFolderDialog", InstancesPath);
+  if (!paths.filePaths[0]) return;
+  dispatch(updateDataPath(paths.filePaths[0]));
+};
 
-export default function MyAccountPreferences() {
+const General = () => {
+  const [version, setVersion] = useState(null);
   const currentAccount = useSelector(_getCurrentAccount);
+  const dataPath = useSelector(state => state.settings.dataPath);
   const releaseC = useSelector(state => state.settings.releaseChannel);
+  const hideWindowOnGameLaunch = useSelector(
+    state => state.settings.hideWindowOnGameLaunch
+  );
   const DiscordRPC = useSelector(state => state.settings.discordRPC);
-
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const concurrentDownloads = useSelector(
+    state => state.settings.concurrentDownloads
+  );
+  const updateAvailable = useSelector(state => state.updateAvailable);
+  const dataStorePath = useSelector(_getDataStorePath);
+  const instancesPath = useSelector(_getInstancesPath);
+  const tempPath = useSelector(_getTempPath);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedUsername, setCopiedUsername] = useState(false);
-  const [concurrentDownloads, setConcurrentDownloads] = useState(1);
+  const [profileImage, setProfileImage] = useState(null);
+  const [deletingInstances, setDeletingInstances] = useState(false);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    ipcRenderer.send("check-for-updates");
-    ipcRenderer.on("update-available", () => {
-      setUpdateAvailable(true);
-    });
+    ipcRenderer
+      .invoke("getAppVersion")
+      .then(setVersion)
+      .catch(console.error);
+    extractFace(currentAccount.skin)
+      .then(setProfileImage)
+      .catch(console.error);
   }, []);
+
+  const clearSharedData = async () => {
+    setDeletingInstances(true);
+    try {
+      await fsa.emptyDir(dataStorePath);
+      await fsa.emptyDir(instancesPath);
+      await fsa.emptyDir(tempPath);
+    } catch (e) {
+      console.log(e);
+    }
+    setDeletingInstances(false);
+  };
+
+  const resetDataPath = async () => {
+    const appdataPath = await ipcRenderer.invoke("getUserDataPath");
+    dispatch(updateDataPath(appdataPath));
+  };
 
   return (
     <MyAccountPrf>
       <PersonalData>
         <MainTitle>General</MainTitle>
         <PersonalDataContainer>
-          <ProfileImage />
+          {profileImage ? (
+            <ProfileImage src={`data:image/jpeg;base64,${profileImage}`} />
+          ) : (
+            <ImagePlaceHolder />
+          )}
           <div
             css={`
               display: inline-block;
-              margin-left: 20px;
+              margin: 20px 20px 20px 40px;
               width: 250px;
             `}
           >
@@ -250,15 +330,8 @@ export default function MyAccountPreferences() {
         </PersonalDataContainer>
       </PersonalData>
       <Hr />
-      <Title
-        css={`
-          margin-bottom: 20px;
-        `}
-      >
-        Preferences
-      </Title>
       <ReleaseChannel>
-        <h3>Release Channel</h3>
+        <Title>Release Channel</Title>
         <div>
           <div
             css={`
@@ -270,8 +343,9 @@ export default function MyAccountPreferences() {
           </div>
           <Select
             css={`
-              position: relative;
-              right: 0;
+              && {
+                width: 100px;
+              }
             `}
             onChange={e => {
               dispatch(updateReleaseChannel(e));
@@ -285,41 +359,34 @@ export default function MyAccountPreferences() {
         </div>
       </ReleaseChannel>
       <Hr />
-      <Title
-        css={`
-          margin-top: 0px;
-        `}
-      >
-        Concurrent Downloads
+      <Title>
+        Concurrent Downloads &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
       </Title>
       <ParallelDownload>
         <p
           css={`
             margin: 0;
-            width: 200px;
+            width: 400px;
           `}
         >
-          Select the number of concurrent downloads
+          Select the number of concurrent downloads. If you have a slow
+          connection, select max 3
         </p>
 
         <Select
-          css={`
-            position: relative;
-            right: 0;
-          `}
-          onChange={e => setConcurrentDownloads(e)}
+          onChange={v => dispatch(updateConcurrentDownloads(v))}
           value={concurrentDownloads}
+          css={`
+            && {
+              width: 100px;
+            }
+          `}
         >
-          <Select.Option value="1">1</Select.Option>
-          <Select.Option value="2">2</Select.Option>
-          <Select.Option value="3">3</Select.Option>
-          <Select.Option value="4">4</Select.Option>
-          <Select.Option value="5">5</Select.Option>
-          <Select.Option value="6">6</Select.Option>
-          <Select.Option value="7">7</Select.Option>
-          <Select.Option value="8">8</Select.Option>
-          <Select.Option value="9">9</Select.Option>
-          <Select.Option value="10">10</Select.Option>
+          {[...Array(10).keys()]
+            .map(x => x + 1)
+            .map(x => (
+              <Select.Option value={x}>{x}</Select.Option>
+            ))}
         </Select>
       </ParallelDownload>
       <Hr />
@@ -328,25 +395,17 @@ export default function MyAccountPreferences() {
           margin-top: 0px;
         `}
       >
-        Discord RPC
+        Discord RPC &nbsp; <FontAwesomeIcon icon={faDiscord} />
       </Title>
       <DiscordRpc>
         <p
           css={`
-            margin: 0;
-            height: 40px;
-            width: 250px;
+            width: 350px;
           `}
         >
-          Enable or Disable Discord RPC
+          Enable / disable Discord RPC
         </p>
-
         <Switch
-          css={`
-            position: relative;
-            right: 0;
-          `}
-          color="primary"
           onChange={e => {
             dispatch(updateDiscordRPC(e));
             if (e) {
@@ -359,62 +418,161 @@ export default function MyAccountPreferences() {
         />
       </DiscordRpc>
       <Hr />
+      <Title
+        css={`
+          margin-top: 0px;
+        `}
+      >
+        Hide Launcher While Playing &nbsp; <FontAwesomeIcon icon={faPlay} />
+      </Title>
+      <DiscordRpc
+        css={`
+          margin-bottom: 30px;
+        `}
+      >
+        <p
+          css={`
+            width: 500px;
+          `}
+        >
+          Automatically hide the launcher when launching an instance. You will
+          still be able to open it from the icon tray
+        </p>
+        <Switch
+          onChange={e => {
+            dispatch(updateHideWindowOnGameLaunch(e));
+          }}
+          checked={hideWindowOnGameLaunch}
+        />
+      </DiscordRpc>
+      <Hr />
+      <Title
+        css={`
+          width: 300px;
+          float: left;
+        `}
+      >
+        Clear Shared Data&nbsp; <FontAwesomeIcon icon={faTrash} />
+      </Title>
+      <div
+        css={`
+          display: flex;
+          justify-content: space-between;
+          text-align: left;
+          width: 100%;
+          margin-bottom: 30px;
+          p {
+            text-align: left;
+            color: ${props => props.theme.palette.text.third};
+          }
+        `}
+      >
+        <p
+          css={`
+            margin: 0;
+            width: 500px;
+          `}
+        >
+          Deletes all the shared files between instances. Doing this will result
+          in the complete loss of the instances data
+        </p>
+        <Button onClick={clearSharedData} disabled={deletingInstances}>
+          Clear
+        </Button>
+      </div>
+      <Hr />
+      <Title
+        css={`
+          width: 250px;
+        `}
+      >
+        Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+      </Title>
+      <OverridePath>
+        <p
+          css={`
+            margin: 0;
+            height: 40px;
+            width: 100%;
+          `}
+        >
+          Select a custom data path. Most of the launcher data will be stored
+          here
+        </p>
+      </OverridePath>
+      <DataPath>
+        <div
+          css={`
+            margin-top: 20px;
+            width: 100%;
+            display: flex;
+
+            input {
+              margin-right: 5px;
+            }
+
+            button {
+              margin: 0 5px;
+            }
+          `}
+        >
+          <Input
+            onChange={e => dispatch(updateDataPath(e.target.value))}
+            value={dataPath}
+          />
+          <Button onClick={() => openFolderDialog(dataPath, dispatch)}>
+            <FontAwesomeIcon icon={faFolder} />
+          </Button>
+          <Button onClick={resetDataPath}>
+            <FontAwesomeIcon icon={faUndoAlt} />
+          </Button>
+        </div>
+      </DataPath>
+      <Hr />
       <LauncherVersion>
         <div
           css={`
-            height: 50px;
-            width: 350px;
-            margin: 0;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin: 10px 0;
           `}
         >
+          <HorizontalLogo size={200} />{" "}
           <div
             css={`
-              display: flex;
-              flex-direction: row;
+              margin-left: 10px;
             `}
           >
-            <img
-              src={logo}
-              css={`
-                height: 40px;
-              `}
-              alt="logo"
-            />
-            <h1
-              css={`
-                line-height: 1.5;
-                margin: 0;
-              `}
-            >
-              GDLauncher V 0.14.0
-            </h1>
+            v {version}
           </div>
         </div>
         <p>
-          You’re currently on the latest version. We automatically check for
-          updates and we will inform you whenever there is one
+          {updateAvailable
+            ? "There is an update available to be installed. Click on update to install it and restart the launcher"
+            : "You’re currently on the latest version. We automatically check for updates and we will inform you whenever there is one"}
         </p>
         <div
           css={`
-            float: left;
             margin-top: 20px;
             height: 36px;
             display: flex;
             flex-direction: row;
           `}
         >
-          {/* I've used the style instead of the css because the Button component doesn'p read css */}
           {updateAvailable ? (
-            <StyledButtons
+            <Button
               onClick={() => dispatch(push("/autoUpdate"))}
               css={`
-                margin-right: 10px;
+                && {
+                  margin-right: 10px;
+                }
               `}
-              color="primary"
+              type="primary"
             >
               Update &nbsp;
               <FontAwesomeIcon icon={faDownload} />
-            </StyledButtons>
+            </Button>
           ) : (
             <div
               css={`
@@ -426,14 +584,10 @@ export default function MyAccountPreferences() {
               Up to date
             </div>
           )}
-          <StyledButtons
-            color="primary"
-            onClick={() => ipcRenderer.invoke("appRestart")}
-          >
-            Restart
-          </StyledButtons>
         </div>
       </LauncherVersion>
     </MyAccountPrf>
   );
-}
+};
+
+export default memo(General);

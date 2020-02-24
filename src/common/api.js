@@ -49,6 +49,12 @@ export const mcRefresh = (accessToken, clientToken) => {
   );
 };
 
+export const mcGetPlayerSkin = uuid => {
+  return axios.get(
+    `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`
+  );
+};
+
 export const mcInvalidate = (accessToken, clientToken) => {
   return axios.post(
     `${MOJANG_APIS}/invalidate`,
