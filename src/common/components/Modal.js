@@ -64,7 +64,7 @@ const Modal = ({
             !props.removePadding
               ? 20
               : 0}px;
-          overflow-y: auto;
+          overflow-y: hidden;
           overflow-x: hidden;
           position: relative;
         `}

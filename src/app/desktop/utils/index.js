@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import fse from "fs-extra";
 import { extractFull } from "node-7z";
+import jimp from "jimp/es";
 import makeDir from "make-dir";
 import jarAnalyzer from "jarfile";
 import { promisify } from "util";
@@ -9,7 +10,7 @@ import path from "path";
 import { exec, spawn } from "child_process";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
 import { removeDuplicates } from "../../../common/utils";
-import { getAddonFile } from "../../../common/api";
+import { getAddonFile, mcGetPlayerSkin } from "../../../common/api";
 import { downloadFile } from "./downloader";
 
 export const isDirectory = source =>
@@ -598,4 +599,20 @@ export const downloadAddonZip = async (id, fileId, instancePath, tempPath) => {
   });
   const manifest = await fse.readJson(instanceManifest);
   return manifest;
+};
+
+export const getPlayerSkin = async uuid => {
+  const playerSkin = await mcGetPlayerSkin(uuid);
+  const { data } = playerSkin;
+  const base64 = data.properties[0].value;
+  const decoded = JSON.parse(Buffer.from(base64, "base64").toString());
+  return decoded?.textures?.SKIN?.url;
+};
+
+export const extractFace = async buffer => {
+  const image = await jimp.read(buffer);
+  image.crop(8, 8, 8, 8);
+  image.scale(10, jimp.RESIZE_NEAREST_NEIGHBOR);
+  const imageBuffer = await image.getBufferAsync(jimp.MIME_PNG);
+  return imageBuffer.toString("base64");
 };

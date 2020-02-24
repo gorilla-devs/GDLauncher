@@ -12,10 +12,8 @@ const getInstances = async instancesPath => {
       const config = await fse.readJSON(configPath);
 
       return {
-        name: instance,
-        modloader: config.modloader,
-        mods: config.mods,
-        background: config.background
+        ...config,
+        name: instance
       };
     } catch (err) {
       console.error(err);
@@ -26,7 +24,15 @@ const getInstances = async instancesPath => {
   await makeDir(instancesPath);
   const folders = await getDirectories(instancesPath);
   const instances = await Promise.all(folders.map(mapFolderToInstance));
-  return instances.filter(_ => _);
+  const hashMap = {};
+  // eslint-disable-next-line
+  for (const instance of instances) {
+    // eslint-disable-next-line
+    if (!instance) continue;
+    hashMap[instance.name] = instance;
+  }
+
+  return hashMap;
 };
 
 export default getInstances;

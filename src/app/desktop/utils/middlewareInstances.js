@@ -18,10 +18,10 @@ const middleware = store => next => action => {
 
   const startListener = () => {
     const updateInstances = debounce(
-      (instances, checkMods) => {
-        if (checkMods) {
-          checkModsSync(instancesPath);
-        }
+      instances => {
+        // if (checkMods) {
+        //   checkModsSync(instancesPath);
+        // }
         dispatch({
           type: ActionTypes.UPDATE_INSTANCES,
           instances
@@ -37,6 +37,7 @@ const middleware = store => next => action => {
         filter: f => true || /(config\.json)|(mods)/.test(f)
       },
       (e, file) => {
+        if (file.includes("config.json")) return;
         getInstances(instancesPath)
           .then(instances => {
             const checkMods = file.includes("mods");

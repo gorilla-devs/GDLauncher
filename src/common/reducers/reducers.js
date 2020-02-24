@@ -1,5 +1,6 @@
 import omit from "lodash.omit";
 import * as ActionTypes from "./actionTypes";
+import PromiseQueue from "../../app/desktop/utils/PromiseQueue";
 
 function news(state = [], action) {
   switch (action.type) {
@@ -65,9 +66,24 @@ function currentDownload(state = null, action) {
   }
 }
 
-function instances(state = { started: false, list: [] }, action) {
+function instances(state = { started: false, list: {} }, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_INSTANCES:
+      // eslint-disable-next-line
+      for (const instance1 in action.instances) {
+        const instance = action.instances[instance1];
+        if (
+          state.list[instance.name]?.queue &&
+          action.instances[instance.name]
+        ) {
+          // eslint-disable-next-line
+          action.instances[instance.name].queue =
+            state.list[instance.name].queue;
+        } else if (action.instances[instance.name]) {
+          // eslint-disable-next-line
+          action.instances[instance.name].queue = new PromiseQueue();
+        }
+      }
       return { ...state, list: action.instances };
     case ActionTypes.UPDATE_INSTANCES_STARTED:
       return { ...state, started: action.started };
@@ -98,6 +114,15 @@ function selectedInstance(state = null, action) {
   }
 }
 
+function updateAvailable(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_UPDATE_AVAILABLE:
+      return action.updateAvailable;
+    default:
+      return state;
+  }
+}
+
 export default {
   news,
   downloadQueue,
@@ -105,5 +130,6 @@ export default {
   javaDownloadStatus,
   instances,
   startedInstances,
-  selectedInstance
+  selectedInstance,
+  updateAvailable
 };

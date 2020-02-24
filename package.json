@@ -1,5 +1,5 @@
 {
-  "name": "gdlauncher",
+  "name": "gdlauncher_next",
   "version": "0.0.1",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
@@ -20,10 +20,10 @@
     "type": "git",
     "url": "git+https://github.com/gorilla-devs/GDLauncher.git"
   },
-  "license": "MIT",
+  "license": "GPL-3.0",
   "author": {
     "name": "GorillaDevs",
-    "email": "info@gdevs.io",
+    "email": "davide@gdevs.io",
     "url": "https://gdevs.io"
   },
   "private": false,
@@ -77,7 +77,7 @@
       "!node_modules/**/*",
       "build/**/*",
       "package.json",
-      "public/logo.png"
+      "public/icon.png"
     ],
     "dmg": {
       "contents": [
@@ -95,11 +95,11 @@
     },
     "nsis": {
       "oneClick": false,
-      "installerIcon": "./resources/logo.ico",
-      "uninstallerIcon": "./resources/logo.ico",
-      "installerHeader": "./resources/installerHeader.bmp",
-      "installerSidebar": "./resources/installerSidebar.bmp",
-      "installerHeaderIcon": "./resources/logo.ico",
+      "installerIcon": "./public/icon.ico",
+      "uninstallerIcon": "./public/icon.ico",
+      "installerHeader": "./public/installerHeader.bmp",
+      "installerSidebar": "./public/installerSidebar.bmp",
+      "installerHeaderIcon": "./public/icon.ico",
       "deleteAppDataOnUninstall": false,
       "allowToChangeInstallationDirectory": true,
       "perMachine": true
@@ -124,7 +124,7 @@
       "artifactName": "${productName}-linux-setup.${ext}"
     },
     "directories": {
-      "buildResources": "resources",
+      "buildResources": "public",
       "output": "release"
     },
     "publish": {
@@ -162,6 +162,8 @@
     "@babel/runtime": "^7.8.4",
     "@craco/craco": "^5.6.3",
     "@fortawesome/fontawesome-svg-core": "^1.2.27",
+    "@fortawesome/free-brands-svg-icons": "^5.12.1",
+    "@fortawesome/free-regular-svg-icons": "^5.12.1",
     "@fortawesome/free-solid-svg-icons": "^5.12.1",
     "@fortawesome/react-fontawesome": "^0.1.8",
     "babel-core": "^6.26.3",
@@ -212,7 +214,9 @@
     "history": "^4.10.1",
     "husky": "^4.2.1",
     "is-electron": "^2.2.0",
+    "is-hotkey": "^0.1.6",
     "jarfile": "^2.0.0",
+    "jimp": "^0.9.3",
     "lodash": "^4.17.15",
     "lodash.debounce": "^4.0.8",
     "lodash.memoize": "^4.1.2",
@@ -246,6 +250,9 @@
     "reselect": "^4.0.0",
     "rooks": "^3.6.0",
     "semver": "^7.1.2",
+    "slate": "^0.57.1",
+    "slate-history": "^0.57.1",
+    "slate-react": "^0.57.1",
     "styled-components": "^5.0.1",
     "typeface-roboto": "^0.0.75",
     "uuid": "^3.4.0"

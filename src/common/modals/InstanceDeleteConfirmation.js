@@ -15,7 +15,7 @@ const InstanceDeleteConfirmation = ({ instanceName }) => {
   const instances = useSelector(_getInstances);
 
   const { start, stop } = useInterval(() => {
-    if (!instances.list.find(instance => instance.name === instanceName)) {
+    if (!instances.find(instance => instance.name === instanceName)) {
       stop();
       dispatch(closeModal());
     }
@@ -43,6 +43,7 @@ const InstanceDeleteConfirmation = ({ instanceName }) => {
         <h4
           css={`
             font-style: italic;
+            font-weight: 700;
             color: ${props => props.theme.palette.error.main};
           `}
         >

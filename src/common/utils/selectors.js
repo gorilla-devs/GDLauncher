@@ -12,10 +12,12 @@ const _downloadQueue = state => state.downloadQueue;
 const _javaManifest = state => state.app.javaManifest;
 const _dataPath = state => state.settings.dataPath;
 
-export const _getInstances = createSelector(_instances, instances => instances);
+export const _getInstances = createSelector(_instances, instances =>
+  Object.values(instances.list)
+);
 
 export const _getInstance = createSelector(_instances, instances =>
-  memoize(instance => instances.list.find(v => v.name === instance))
+  memoize(instance => instances.list[instance])
 );
 
 export const _getCurrentAccount = createSelector(
@@ -29,9 +31,7 @@ export const _getAccounts = createSelector(_accounts, accounts => accounts);
 
 export const _getDownloadQueue = createSelector(
   _downloadQueue,
-  downloadQueue => {
-    return downloadQueue;
-  }
+  downloadQueue => downloadQueue
 );
 
 export const _getCurrentDownloadItem = createSelector(

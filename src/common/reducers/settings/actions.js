@@ -36,15 +36,6 @@ export function updateHideWindowOnGameLaunch(hideWindow) {
   };
 }
 
-export function updateInstancesPath(path) {
-  return dispatch => {
-    dispatch({
-      type: ActionTypes.UPDATE_INSTANCES_PATH,
-      path
-    });
-  };
-}
-
 export function updateShowChangelog(show) {
   return dispatch => {
     dispatch({

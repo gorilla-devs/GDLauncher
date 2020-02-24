@@ -1,19 +1,18 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Button } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch } from "react-redux";
 import Modal from "../../components/Modal";
-import MyAccountPrf from "./components/MyAccount_preferences";
+import General from "./components/General";
 import Java from "./components/Java";
-import Instances from "./components/Instances";
+import CloseButton from "../../components/CloseButton";
+import { closeModal } from "../../reducers/modals/actions";
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
   height: 100%;
-  overflow-y: auto;
   text-align: center;
 `;
 const SideMenu = styled.div`
@@ -33,13 +32,10 @@ const SettingsContainer = styled.div`
 `;
 
 const SettingsColumn = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 476px;
-  height: "100%";
-  background: transparent;
-  left: 30%;
+  margin-left: 50px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 const SettingsButton = styled(Button)`
@@ -51,7 +47,8 @@ const SettingsButton = styled(Button)`
   border-radius: 4px 0 0 4px;
   font-size: 12px;
   white-space: nowrap;
-  background: transparent;
+  background: ${props =>
+    props.active ? props.theme.palette.grey[600] : "transparent"};
   border: 0px;
   text-align: left;
   animation-duration: 0s;
@@ -82,21 +79,18 @@ const SettingsTitle = styled.div`
 
 function Page(page) {
   switch (page) {
-    case "MyAccountPrf":
-      return <MyAccountPrf />;
+    case "General":
+      return <General />;
     case "Java":
       return <Java />;
-    case "Instances":
-      return <Instances />;
-    case "User Interface":
-      return <div>User Interface</div>;
     default:
       return null;
   }
 }
 
 export default function Settings() {
-  const [page, setPage] = useState("MyAccountPrf");
+  const [page, setPage] = useState("General");
+  const dispatch = useDispatch();
   return (
     <Modal
       css={`
@@ -104,41 +98,49 @@ export default function Settings() {
         width: 100%;
       `}
       header="false"
-      backBtn={
-        <FontAwesomeIcon
-          icon={faWindowClose}
-          css={`
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            cursor: pointer;
-            transition: color 0.1s ease-in-out;
-            &:hover {
-              color: ${props => props.theme.palette.colors.red};
-            }
-          `}
-        />
-      }
     >
       <Container>
+        <CloseButton
+          css={`
+            position: absolute;
+            top: 30px;
+            right: 30px;
+          `}
+          onClick={() => dispatch(closeModal())}
+        />
         <SideMenu>
           <SettingsTitle>General</SettingsTitle>
-          <SettingsButton onClick={() => setPage("MyAccountPrf")}>
+          <SettingsButton
+            active={page === "General"}
+            onClick={() => setPage("General")}
+          >
             General
           </SettingsButton>
-          <SettingsButton onClick={() => setPage("Java")}>Java</SettingsButton>
-          <SettingsButton onClick={() => setPage("Instances")}>
-            Instances
+          <SettingsButton
+            active={page === "Java"}
+            onClick={() => setPage("Java")}
+          >
+            Java
           </SettingsButton>
-          <SettingsButton onClick={() => setPage("User Interface")}>
+          {/* <SettingsButton onClick={() => setPage("User Interface")}>
             User Interface
           </SettingsButton>
           <SettingsTitle>Game Settings</SettingsTitle>
           <SettingsButton>Graphic Settings</SettingsButton>
-          <SettingsButton>Sound Settings</SettingsButton>
+          <SettingsButton>Sound Settings</SettingsButton> */}
         </SideMenu>
         <SettingsContainer>
-          <SettingsColumn>{Page(page)}</SettingsColumn>
+          <SettingsColumn>
+            <div
+              css={`
+                max-width: 600px;
+                overflow-y: hidden;
+                overflow-x: hidden;
+              `}
+            >
+              {Page(page)}
+            </div>
+          </SettingsColumn>
         </SettingsContainer>
       </Container>
     </Modal>

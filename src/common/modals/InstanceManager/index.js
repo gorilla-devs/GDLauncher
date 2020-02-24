@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Button } from "antd";
 import Modal from "../../components/Modal";
 import Overview from "./Overview";
+import Notes from "./Notes";
 import Mods from "./Mods";
 
 const SideMenu = styled.div`
@@ -60,12 +61,12 @@ const Content = styled.div`
   padding: 10px;
 `;
 
-const InstanceManager = () => {
+const InstanceManager = ({ instanceName }) => {
   const menuEntries = {
     overview: { name: "Overview", component: Overview },
     mods: { name: "Mods", component: Mods },
     modpack: { name: "Modpack", component: Overview },
-    notes: { name: "Notes", component: Overview },
+    notes: { name: "Notes", component: Notes },
     resourcePacks: { name: "Resource Packs", component: Overview },
     worlds: { name: "Worlds", component: Overview },
     screenshots: { name: "Screenshots", component: Overview },
@@ -97,7 +98,7 @@ const InstanceManager = () => {
           </SideMenu>
         </SideMenuContainer>
         <Content>
-          <ContentComponent />
+          <ContentComponent instanceName={instanceName} />
         </Content>
       </Container>
     </Modal>
