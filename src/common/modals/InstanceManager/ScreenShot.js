@@ -1,27 +1,32 @@
 /* eslint-disable */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { promises as fs } from "fs";
 import path from "path";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { _getInstancesPath } from "../../utils/selectors";
+import _ from "lodash";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   width: 100%;
   background: ${props => props.theme.palette.secondary.main};
   overflow-y: auto;
+  overflow-x: hidden;
+  &&:first-child {
+    margin-top: 0;
+  }
 `;
 
 const DateSection = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 10px;
+  flex-direction: row;
+  flex-wrap: wrap-reverse;
+  padding: 50px 10px 20px 10px;
   background: ${props => props.theme.palette.secondary.dark};
-  max-height: 520px;
+  max-height: 600px;
   margin: 10px 0 10px 0;
   &&:first-child {
     margin-top: 0;
@@ -29,27 +34,24 @@ const DateSection = styled.div`
 `;
 
 const TitleDataSection = styled.h2`
-  margin: 5px;
+  position: relative;
+  top: 65px;
+  left: 20px;
 `;
 
-const PhotoRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-`;
-
-const Photo = styled.div`
+const Photo = styled.img`
   height: 100px;
   max-height: 100px;
   width: 100px;
-  max-width: 100px;
+  max-width: 200px;
   margin: 10px;
   background: green;
   border-radius: 5px;
 `;
 
-const calcDate = async (ScreenShotsDir, sortedScreens) => {
+const calcDate = async ScreenShotsDir => {
   const screens = await fs.readdir(ScreenShotsDir);
+  let sortedScreens = [];
   try {
     await Promise.all(
       screens.map(async element => {
@@ -73,10 +75,11 @@ const calcDate = async (ScreenShotsDir, sortedScreens) => {
           }
           return comparison;
         });
-        console.log(days);
+        console.log("b", days);
       })
     );
-    console.log(sortedScreens);
+    return sortedScreens;
+    console.log("a", sortedScreens);
   } catch (e) {
     console.log(e);
   }
@@ -85,34 +88,31 @@ const calcDate = async (ScreenShotsDir, sortedScreens) => {
 const ScreenShot = ({ instanceName }) => {
   const InstancePath = useSelector(_getInstancesPath);
   const ScreenShotsDir = path.join(InstancePath, instanceName, "screenshots");
-
-  let sortedScreens = [];
+  const [groupedSortedPhotos, setGroupedStortedPhoto] = useState([]);
 
   useEffect(() => {
-    calcDate(ScreenShotsDir, sortedScreens);
+    calcDate(ScreenShotsDir).then(sortedScreens => {
+      setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
+      console.log("T", _.groupBy(sortedScreens, "days"));
+    });
+    console.log("TEST", groupedSortedPhotos);
   }, []);
 
   return (
     <Container>
-      {sortedScreens}
-      <DateSection>
-        <TitleDataSection>Today</TitleDataSection>
-        <PhotoRow>
-          <Photo />
-          <Photo />
-          <Photo />
-        </PhotoRow>
-        <PhotoRow>
-          <Photo />
-          <Photo />
-        </PhotoRow>
-        <PhotoRow>
-          <Photo />
-          <Photo />
-          <Photo />
-          <Photo />
-        </PhotoRow>
-      </DateSection>
+      {Object.entries(groupedSortedPhotos).map((key, value) => {
+        console.log("CIAO", key[1], value);
+        return (
+          <>
+            <TitleDataSection>Today</TitleDataSection>
+            <DateSection>
+              {key[1].map(value => (
+                <Photo src={path.join(ScreenShotsDir, value.name)} />
+              ))}
+            </DateSection>
+          </>
+        );
+      })}
     </Container>
   );
 };
