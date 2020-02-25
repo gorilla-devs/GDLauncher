@@ -1065,7 +1065,9 @@ export const launchInstance = instanceName => {
       ).join(" ")}`
     );
 
-    await ipcRenderer.invoke("hide-window");
+    if (state.settings.hideWindowOnGameLaunch) {
+      await ipcRenderer.invoke("hide-window");
+    }
 
     const process = spawn(javaPath, jvmArguments, {
       cwd: instancePath,
