@@ -77,7 +77,7 @@ const Navbar = () => {
     return false;
   };
 
-  if (isLocation("/")) return null;
+  if (isLocation("/") || isLocation("/onboarding")) return null;
   return (
     <Container>
       <img
