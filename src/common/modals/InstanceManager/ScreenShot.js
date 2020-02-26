@@ -1,9 +1,11 @@
 /* eslint-disable */
 import React, { useEffect, useState } from "react";
 import { promises as fs } from "fs";
+import { clipboard } from "electron";
 import fse from "fs-extra";
 import path from "path";
 import styled from "styled-components";
+import { Checkbox } from "antd";
 import { useSelector } from "react-redux";
 import request from "request";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
@@ -21,9 +23,12 @@ const Container = styled.div`
   background: ${props => props.theme.palette.secondary.main};
   overflow-y: auto;
   overflow-x: hidden;
-  &&:first-child {
-    margin-top: 0;
-  }
+`;
+
+const Bar = styled.div`
+  height: 50px;
+  width: 100%;
+  background: ${props => props.theme.palette.secondary.main};
 `;
 
 const DateSection = styled.div`
@@ -154,6 +159,18 @@ const startListener = async ScreenShotsDir => {
   });
 };
 
+const selectAll = async (
+  setSelectedScreens,
+  ScreenShotsDir,
+  selectedScreens
+) => {
+  const screens = await fs.readdir(ScreenShotsDir);
+
+  if (screens.sort().join(",") === selectedScreens.sort().join(",")) {
+    setSelectedScreens([]);
+  } else setSelectedScreens(screens);
+};
+
 const ScreenShot = ({ instanceName }) => {
   const InstancePath = useSelector(_getInstancesPath);
   const ScreenShotsDir = path.join(InstancePath, instanceName, "screenshots");
@@ -179,69 +196,107 @@ const ScreenShot = ({ instanceName }) => {
   }, []);
 
   return (
-    <Container>
-      {Object.entries(groupedSortedPhotos).map(([key, value]) => {
-        return (
-          <span key={key}>
-            <TitleDataSection>{calcDateTitle(key.toString())}</TitleDataSection>
-            <DateSection>
-              {value.map(file => (
-                <span key={file.name}>
-                  <ContextMenuTrigger id={file.name}>
-                    <Photo
-                      onClick={() => {
-                        console.log(
-                          selectedScreens,
-                          file.name,
+    <div
+      css={`
+        display: flex;
+        flex-direction: column;
+      `}
+    >
+      <Bar>
+        <Checkbox
+          onChange={() =>
+            selectAll(setSelectedScreens, ScreenShotsDir, selectedScreens)
+          }
+          css={`
+            vertical-align: middle;
+          `}
+        />
+      </Bar>
+      <Container>
+        {Object.entries(groupedSortedPhotos).map(([key, value]) => {
+          return (
+            <span
+              key={key}
+              css={`
+                &&:first-child {
+                  margin-top: -45px;
+                }
+              `}
+            >
+              <TitleDataSection>
+                {calcDateTitle(key.toString())}
+              </TitleDataSection>
+              <DateSection>
+                {value.map(file => (
+                  <span key={file.name}>
+                    <ContextMenuTrigger id={file.name}>
+                      <Photo
+                        onClick={() => {
+                          console.log(
+                            selectedScreens,
+                            file.name,
+                            selectedScreens.indexOf(file.name) > -1
+                          );
                           selectedScreens.indexOf(file.name) > -1
-                        );
-                        selectedScreens.indexOf(file.name) > -1
-                          ? setSelectedScreens(
-                              selectedScreens.filter(x => x != file.name)
-                            )
-                          : setSelectedScreens([...selectedScreens, file.name]);
+                            ? setSelectedScreens(
+                                selectedScreens.filter(x => x != file.name)
+                              )
+                            : setSelectedScreens([
+                                ...selectedScreens,
+                                file.name
+                              ]);
+                        }}
+                        selected={selectedScreens.indexOf(file.name) > -1}
+                        isHoveredName={isHoveredName}
+                        name={file.name}
+                        isHovered={isHovered}
+                        src={path.join(ScreenShotsDir, file.name)}
+                      />
+                    </ContextMenuTrigger>
+                    <ContextMenu
+                      id={file.name}
+                      onShow={() => {
+                        setIsHoveredName(file.name);
+                        setIsHovered(true);
                       }}
-                      selected={selectedScreens.indexOf(file.name) > -1}
-                      isHoveredName={isHoveredName}
-                      name={file.name}
-                      isHovered={isHovered}
-                      src={path.join(ScreenShotsDir, file.name)}
-                    />
-                  </ContextMenuTrigger>
-                  <ContextMenu
-                    id={file.name}
-                    onShow={() => {
-                      setIsHoveredName(file.name);
-                      setIsHovered(true);
-                    }}
-                    onHide={() => {
-                      setIsHoveredName("");
-                      setIsHovered(false);
-                    }}
-                  >
-                    <MenuItem
-                      onClick={() =>
-                        deleteFile(InstancePath, instanceName, file.name)
-                      }
-                    >
-                      Delete&nbsp;
-                      <FontAwesomeIcon icon={faTrash} />
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        imgurShare(path.join(ScreenShotsDir, file.name));
+                      onHide={() => {
+                        setIsHoveredName("");
+                        setIsHovered(false);
                       }}
                     >
-                      Copy the image
-                    </MenuItem>
-                  </ContextMenu>
-                </span>
-              ))}
-            </DateSection>
-          </span>
-        );
-      })}
-    </Container>
+                      <MenuItem
+                        onClick={() =>
+                          deleteFile(InstancePath, instanceName, file.name)
+                        }
+                      >
+                        Delete&nbsp;
+                        <FontAwesomeIcon icon={faTrash} />
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          clipboard.writeImage(
+                            path.join(ScreenShotsDir, file.name)
+                          );
+                        }}
+                      >
+                        Copy the image
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          imgurShare(path.join(ScreenShotsDir, file.name));
+                        }}
+                      >
+                        Copy the image via url
+                      </MenuItem>
+                    </ContextMenu>
+                  </span>
+                ))}
+              </DateSection>
+            </span>
+          );
+        })}
+      </Container>
+    </div>
   );
 };
 
