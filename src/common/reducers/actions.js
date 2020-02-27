@@ -992,7 +992,7 @@ export const launchInstance = instanceName => {
     const assetsPath = _getAssetsPath(state);
     const { memory } = state.settings.java;
     const { modloader } = _getInstance(state)(instanceName);
-    const instancePath = _getInstance(state)(instanceName);
+    const instancePath = path.join(_getInstancesPath(state), instanceName);
 
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)

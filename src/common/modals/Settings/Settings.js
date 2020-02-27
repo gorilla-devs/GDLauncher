@@ -48,7 +48,9 @@ const SettingsButton = styled(Button)`
   font-size: 12px;
   white-space: nowrap;
   background: ${props =>
-    props.active ? props.theme.palette.grey[600] : "transparent"};
+    props.active
+      ? props.theme.palette.grey[600]
+      : props.theme.palette.grey[800]};
   border: 0px;
   text-align: left;
   animation-duration: 0s;

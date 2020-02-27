@@ -27,20 +27,20 @@ const SettingsButton = styled(Button)`
   align-items: left;
   justify-content: left;
   text-align: left;
-  width: 150px;
-  height: 30px;
+  width: 170px;
+  height: 40px;
   border-radius: 4px 0 0 4px;
-  font-size: 12px;
+  font-size: 13px;
+  transition: all 0.2s ease-in-out;
   white-space: nowrap;
   background: ${props =>
     props.active ? props.theme.palette.grey[600] : "transparent"};
   border: 0px;
   text-align: left;
-  animation-duration: 0s;
   color: ${props => props.theme.palette.text.primary};
   &:hover {
     color: ${props => props.theme.palette.text.primary};
-    background: ${props => props.theme.palette.grey[props.active ? 600 : 700]};
+    background: ${props => props.theme.palette.grey[props.active ? 600 : 800]};
   }
   &:focus {
     color: ${props => props.theme.palette.text.primary};
@@ -56,9 +56,11 @@ const Container = styled.div`
 
 const Content = styled.div`
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   padding: 10px;
+  position: relative;
 `;
 
 const InstanceManager = ({ instanceName }) => {
