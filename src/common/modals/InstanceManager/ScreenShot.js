@@ -5,6 +5,7 @@ import { clipboard } from "electron";
 import fse from "fs-extra";
 import path from "path";
 import styled from "styled-components";
+import makeDir from "make-dir";
 import { Checkbox } from "antd";
 import { useSelector } from "react-redux";
 import request from "request";
@@ -23,6 +24,7 @@ const Container = styled.div`
   background: ${props => props.theme.palette.secondary.main};
   overflow-y: auto;
   overflow-x: hidden;
+  height: ${props => (props.screenNum ? "auto" : "100%")};
 `;
 
 const Bar = styled.div`
@@ -178,7 +180,6 @@ const startListener = (
   setGroupedStortedPhoto
 ) => {
   watch(ScreenShotsDir, (event, filename) => {
-    console.log("piripicchio");
     if (filename) {
       calcDate(ScreenShotsDir).then(sortedScreens => {
         setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
@@ -187,8 +188,6 @@ const startListener = (
     }
   });
 };
-
-const updateState = (ScreenShotsDir, selectedScreens, setSelectedScreens) => {};
 
 const selectAll = async (
   setSelectedScreens,
@@ -211,15 +210,15 @@ const ScreenShot = ({ instanceName }) => {
   const [selectedScreens, setSelectedScreens] = useState([]);
 
   useEffect(() => {
-    calcDate(ScreenShotsDir).then(sortedScreens => {
-      setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
-    });
-    startListener(ScreenShotsDir, selectedScreens, setGroupedStortedPhoto);
+    try {
+      calcDate(ScreenShotsDir).then(sortedScreens => {
+        setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
+      });
+      startListener(ScreenShotsDir, selectedScreens, setGroupedStortedPhoto);
+    } catch {
+      makeDir(ScreenShotsDir);
+    }
   }, []);
-
-  useEffect(() => {
-    console.log("selectedScreens", selectedScreens);
-  }, [selectedScreens]);
 
   return (
     <div
@@ -253,116 +252,132 @@ const ScreenShot = ({ instanceName }) => {
           icon={faTrash}
         />
       </Bar>
-      <Container>
-        {Object.entries(groupedSortedPhotos).map(([key, value]) => {
-          return (
-            <span
-              key={key}
-              css={`
-                &&:first-child {
-                  margin-top: -45px;
-                }
-              `}
-            >
-              <TitleDataSection>
-                {calcDateTitle(key.toString())}
-              </TitleDataSection>
-              <DateSection>
-                {value.map(file => (
-                  <span key={file.name}>
-                    <ContextMenuTrigger id={file.name}>
-                      <Photo
-                        onClick={() => {
-                          console.log(
-                            selectedScreens,
-                            file.name,
+      <Container screenNum={Object.entries(groupedSortedPhotos).length > 0}>
+        {Object.entries(groupedSortedPhotos).length > 0 ? (
+          Object.entries(groupedSortedPhotos).map(([key, value]) => {
+            return (
+              <span
+                key={key}
+                css={`
+                  &&:first-child {
+                    margin-top: -45px;
+                  }
+                `}
+              >
+                <TitleDataSection>
+                  {calcDateTitle(key.toString())}
+                </TitleDataSection>
+                <DateSection
+                  screenNum={Object.entries(groupedSortedPhotos).length > 0}
+                >
+                  {value.map(file => (
+                    <span key={file.name}>
+                      <ContextMenuTrigger id={file.name}>
+                        <Photo
+                          onClick={() => {
+                            console.log(
+                              selectedScreens,
+                              file.name,
+                              selectedScreens.indexOf(file.name) > -1
+                            );
                             selectedScreens.indexOf(file.name) > -1
-                          );
-                          selectedScreens.indexOf(file.name) > -1
-                            ? setSelectedScreens(
-                                selectedScreens.filter(x => x != file.name)
-                              )
-                            : setSelectedScreens([
-                                ...selectedScreens,
-                                file.name
-                              ]);
+                              ? setSelectedScreens(
+                                  selectedScreens.filter(x => x != file.name)
+                                )
+                              : setSelectedScreens([
+                                  ...selectedScreens,
+                                  file.name
+                                ]);
+                          }}
+                          selected={selectedScreens.indexOf(file.name) > -1}
+                          isHoveredName={isHoveredName}
+                          name={file.name}
+                          isHovered={isHovered}
+                          src={path.join(ScreenShotsDir, file.name)}
+                        />
+                      </ContextMenuTrigger>
+                      <ContextMenu
+                        id={file.name}
+                        onShow={() => {
+                          setIsHoveredName(file.name);
+                          setIsHovered(true);
                         }}
-                        selected={selectedScreens.indexOf(file.name) > -1}
-                        isHoveredName={isHoveredName}
-                        name={file.name}
-                        isHovered={isHovered}
-                        src={path.join(ScreenShotsDir, file.name)}
-                      />
-                    </ContextMenuTrigger>
-                    <ContextMenu
-                      id={file.name}
-                      onShow={() => {
-                        setIsHoveredName(file.name);
-                        setIsHovered(true);
-                      }}
-                      onHide={() => {
-                        setIsHoveredName("");
-                        setIsHovered(false);
-                      }}
-                    >
-                      {selectedScreens.length > 1 ? (
-                        <DeletAllButton
+                        onHide={() => {
+                          setIsHoveredName("");
+                          setIsHovered(false);
+                        }}
+                      >
+                        {selectedScreens.length > 1 ? (
+                          <DeletAllButton
+                            onClick={() =>
+                              deleteFile(
+                                InstancePath,
+                                instanceName,
+                                file.name,
+                                true,
+                                selectedScreens,
+                                setSelectedScreens
+                              )
+                            }
+                          >
+                            Delete All&nbsp;
+                            <FontAwesomeIcon icon={faTrash} />
+                          </DeletAllButton>
+                        ) : null}
+
+                        <MenuItem
                           onClick={() =>
                             deleteFile(
                               InstancePath,
                               instanceName,
                               file.name,
-                              true,
+                              false,
                               selectedScreens,
                               setSelectedScreens
                             )
                           }
                         >
-                          Delete All&nbsp;
+                          Delete&nbsp;
                           <FontAwesomeIcon icon={faTrash} />
-                        </DeletAllButton>
-                      ) : null}
-
-                      <MenuItem
-                        onClick={() =>
-                          deleteFile(
-                            InstancePath,
-                            instanceName,
-                            file.name,
-                            false,
-                            selectedScreens,
-                            setSelectedScreens
-                          )
-                        }
-                      >
-                        Delete&nbsp;
-                        <FontAwesomeIcon icon={faTrash} />
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          clipboard.writeImage(
-                            path.join(ScreenShotsDir, file.name)
-                          );
-                        }}
-                      >
-                        Copy the image&nbsp;
-                        <FontAwesomeIcon icon={faCopy} />
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          imgurShare(path.join(ScreenShotsDir, file.name));
-                        }}
-                      >
-                        Share the image via url&nbsp;
-                        <FontAwesomeIcon icon={faLink} />
-                      </MenuItem>
-                    </ContextMenu>
-                  </span>
-                ))}
-              </DateSection>
-            </span>
-          );
-        })}
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            clipboard.writeImage(
+                              path.join(ScreenShotsDir, file.name)
+                            );
+                          }}
+                        >
+                          Copy the image&nbsp;
+                          <FontAwesomeIcon icon={faCopy} />
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            imgurShare(path.join(ScreenShotsDir, file.name));
+                          }}
+                        >
+                          Share the image via url&nbsp;
+                          <FontAwesomeIcon icon={faLink} />
+                        </MenuItem>
+                      </ContextMenu>
+                    </span>
+                  ))}
+                </DateSection>
+              </span>
+            );
+          })
+        ) : (
+          <div
+            css={`
+              && {
+                height: 100%;
+                text-align: center;
+                padding-top: 25%;
+              }
+            `}
+          >
+            No ScreensShots Available
+          </div>
+        )}
       </Container>
     </div>
   );
