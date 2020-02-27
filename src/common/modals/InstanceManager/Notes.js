@@ -6,8 +6,6 @@ import { Editable, withReact, useSlate, Slate } from "slate-react";
 import { Editor, Transforms, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Button } from "antd";
-import { promises as fs } from "fs";
-import path from "path";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -23,8 +21,22 @@ import { _getInstancesPath, _getInstance } from "../../utils/selectors";
 
 const Toolbar = styled.div`
   height: 40px;
-  width: 500px;
-  self-align: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+`;
+
+const StyledEditable = styled(Editable)`
+  display: flex;
+  justify-content: center;
+  min-height: 300px;
+  max-height: 600px;
+  min-width: 400px;
+  max-width: 600px;
+  margin-top: 20px;
+  overflow: hidden;
+  background: ${props => props.theme.palette.grey[900]};
+  border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
 `;
 
 const HOTKEYS = {
@@ -42,14 +54,10 @@ const Notes = ({ instanceName }) => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const dispatch = useDispatch();
-  const InstancePath = useSelector(_getInstancesPath);
-  const configPath = path.join(InstancePath, instanceName, "config.json");
   const instance = useSelector(state => _getInstance(state)(instanceName));
 
   const getNotes = async () => {
-    // const notes = JSON.parse(await fs.readFile(configPath)).value;
     const notes = instance.value;
-    console;
     if (!notes) {
       dispatch(
         updateInstanceConfig(instanceName, config => {
@@ -60,71 +68,77 @@ const Notes = ({ instanceName }) => {
         })
       );
     } else setValue(notes);
-    console.log("notes", notes);
   };
 
   useEffect(() => {
-    // setValue();
     getNotes();
   }, []);
 
   return (
     <div
       css={`
-        && {
-          display: flex;
-          flex-direction: column;
-        }
+        width: 100%;
       `}
     >
-      <Slate
-        editor={editor}
-        value={value}
-        onChange={value => {
-          setValue(value), console.log(value);
-          dispatch(
-            updateInstanceConfig(instanceName, config => {
-              return {
-                ...config,
-                value
-              };
-            })
-          );
-        }}
+      <div
+        css={`
+          && {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+          }
+        `}
       >
-        <Toolbar>
-          <MarkButton format="bold" icon={faBold} />
-          <MarkButton format="italic" icon={faItalic} />
-          <MarkButton format="underline" icon={faUnderline} />
-          <MarkButton format="code" icon={faCode} />
-          <BlockButton format="numbered-list" icon={faListOl} />
-          <BlockButton format="bulleted-list" icon={faList} />
-        </Toolbar>
-        <Editable
-          css={`
-            min-height: 300px;
-            max-height: 600px;
-            max-width: 600px;
-            margin-top: 20px;
-            overflow: hidden;
-            border: solid 1px white;
-          `}
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder="Enter some Notes"
-          spellCheck
-          autoFocus
-          onKeyDown={event => {
-            for (const hotkey in HOTKEYS) {
-              if (isHotkey(hotkey, event)) {
-                event.preventDefault();
-                const mark = HOTKEYS[hotkey];
-                toggleMark(editor, mark);
-              }
-            }
+        <Slate
+          editor={editor}
+          value={value}
+          onChange={value => {
+            setValue(value),
+              dispatch(
+                updateInstanceConfig(instanceName, config => {
+                  return {
+                    ...config,
+                    value
+                  };
+                })
+              );
           }}
-        />
-      </Slate>
+        >
+          <Toolbar>
+            <MarkButton format="bold" icon={faBold} />
+            <MarkButton format="italic" icon={faItalic} />
+            <MarkButton format="underline" icon={faUnderline} />
+            <MarkButton format="code" icon={faCode} />
+            <BlockButton format="numbered-list" icon={faListOl} />
+            <BlockButton format="bulleted-list" icon={faList} />
+          </Toolbar>
+          <div
+            css={`
+              width: 100%;
+              display: flex;
+              justify-content: center;
+            `}
+          >
+            <StyledEditable
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              placeholder="Enter some Notes"
+              autoFocus
+              spellCheck={false}
+              onKeyDown={event => {
+                for (const hotkey in HOTKEYS) {
+                  if (isHotkey(hotkey, event)) {
+                    event.preventDefault();
+                    const mark = HOTKEYS[hotkey];
+                    toggleMark(editor, mark);
+                  }
+                }
+              }}
+            />
+          </div>
+        </Slate>
+      </div>
     </div>
   );
 };
@@ -214,6 +228,10 @@ const BlockButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
     <Button
+      css={`
+        border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+        margin: 2px;
+      `}
       active={isBlockActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
@@ -229,6 +247,10 @@ const MarkButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
     <Button
+      css={`
+        border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+        margin: 2px;
+      `}
       active={isMarkActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
@@ -236,7 +258,6 @@ const MarkButton = ({ format, icon }) => {
       }}
     >
       <FontAwesomeIcon icon={icon} />
-      {/* <Icon>{icon}</Icon> */}
     </Button>
   );
 };
