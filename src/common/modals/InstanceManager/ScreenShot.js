@@ -39,13 +39,15 @@ const DateSection = styled.div`
   flex-wrap: wrap-reverse;
   padding: 50px 10px 20px 10px;
   background: ${props => props.theme.palette.secondary.dark};
-  margin: 10px 0 10px 0;
+  &&: {
+    margin: ${props => (props.screenNum ? "10px 0 10px 0" : "10px 0 0px 0")};
+  }
 `;
 
 const DeleteButton = styled(FontAwesomeIcon)`
   margin-left: 10px;
   transition: color 0.3s ease-in-out;
-  &&:hover {
+  &:hover {
     path {
       color: ${props => props.theme.palette.colors.red};
     }
@@ -56,7 +58,7 @@ const DeletAllButton = styled(MenuItem)`
   && {
     background: ${props => props.theme.palette.colors.red};
   }
-  &&:hover {
+  &:hover {
     background: ${props => props.theme.palette.colors.red};
     filter: brightness(80%);
   }
@@ -82,7 +84,7 @@ const Photo = styled.img`
     props.selected ? `solid 2px ${props.theme.palette.colors.blue}` : ""};
   transform: ${x =>
     x.isHovered && x.name == x.isHoveredName ? "scale(1.2)" : "scale(1)"};
-  &&:hover {
+  &:hover {
     transform: scale(1.2);
   }
 `;
@@ -157,10 +159,7 @@ const imgurShare = async image => {
   });
 
   if (res.status == 200) {
-    console.log(res.data.data.link);
     clipboard.writeText(res.data.data.link);
-  } else {
-    console.error;
   }
 };
 
@@ -184,7 +183,6 @@ const startListener = (
       calcDate(ScreenShotsDir).then(sortedScreens => {
         setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
       });
-      console.log(`${filename} file Changed`);
     }
   });
 };
@@ -196,7 +194,16 @@ const selectAll = async (
 ) => {
   const screens = await fs.readdir(ScreenShotsDir);
 
-  if (screens.sort().join(",") === selectedScreens.sort().join(",")) {
+  if (
+    screens
+      .slice()
+      .sort()
+      .join(",") ===
+    selectedScreens
+      .slice()
+      .sort()
+      .join(",")
+  ) {
     setSelectedScreens([]);
   } else setSelectedScreens(screens);
 };
@@ -210,14 +217,12 @@ const ScreenShot = ({ instanceName }) => {
   const [selectedScreens, setSelectedScreens] = useState([]);
 
   useEffect(() => {
-    try {
+    if (fse.pathExists(ScreenShotsDir)) {
       calcDate(ScreenShotsDir).then(sortedScreens => {
         setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
+        startListener(ScreenShotsDir, selectedScreens, setGroupedStortedPhoto);
       });
-      startListener(ScreenShotsDir, selectedScreens, setGroupedStortedPhoto);
-    } catch {
-      makeDir(ScreenShotsDir);
-    }
+    } else makeDir(ScreenShotsDir);
   }, []);
 
   return (
@@ -259,7 +264,7 @@ const ScreenShot = ({ instanceName }) => {
               <span
                 key={key}
                 css={`
-                  &&:first-child {
+                  &:first-child {
                     margin-top: -45px;
                   }
                 `}
@@ -275,11 +280,6 @@ const ScreenShot = ({ instanceName }) => {
                       <ContextMenuTrigger id={file.name}>
                         <Photo
                           onClick={() => {
-                            console.log(
-                              selectedScreens,
-                              file.name,
-                              selectedScreens.indexOf(file.name) > -1
-                            );
                             selectedScreens.indexOf(file.name) > -1
                               ? setSelectedScreens(
                                   selectedScreens.filter(x => x != file.name)
@@ -368,11 +368,9 @@ const ScreenShot = ({ instanceName }) => {
         ) : (
           <div
             css={`
-              && {
-                height: 100%;
-                text-align: center;
-                padding-top: 25%;
-              }
+              height: 100%;
+              text-align: center;
+              padding-top: 25%;
             `}
           >
             No ScreensShots Available
