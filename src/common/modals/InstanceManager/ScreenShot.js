@@ -54,7 +54,7 @@ const DeleteButton = styled(FontAwesomeIcon)`
   }
 `;
 
-const DeletAllButton = styled(MenuItem)`
+const DeleteAllButton = styled(MenuItem)`
   && {
     background: ${props => props.theme.palette.colors.red};
   }
@@ -79,6 +79,7 @@ const Photo = styled.img`
   background: ${props => props.theme.palette.secondary.light};
   border-radius: 5px;
   transition: transform 0.2s ease-in-out;
+  filter: brightness(80%);
   height: 100px;
   border: ${props =>
     props.selected ? `solid 2px ${props.theme.palette.colors.blue}` : ""};
@@ -308,7 +309,7 @@ const ScreenShot = ({ instanceName }) => {
                         }}
                       >
                         {selectedScreens.length > 1 ? (
-                          <DeletAllButton
+                          <DeleteAllButton
                             onClick={() =>
                               deleteFile(
                                 InstancePath,
@@ -322,7 +323,7 @@ const ScreenShot = ({ instanceName }) => {
                           >
                             Delete All&nbsp;
                             <FontAwesomeIcon icon={faTrash} />
-                          </DeletAllButton>
+                          </DeleteAllButton>
                         ) : null}
 
                         <MenuItem
