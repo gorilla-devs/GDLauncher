@@ -41,7 +41,7 @@ import {
   _getLibrariesPath,
   _getAccounts,
   _getTempPath,
-  _getInstance,
+  _getInstance
 } from "../utils/selectors";
 import {
   librariesMapper,

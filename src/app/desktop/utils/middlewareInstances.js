@@ -1,7 +1,7 @@
-import watch from "node-watch";
+// import watch from "node-watch";
 import makeDir from "make-dir";
 import path from "path";
-import { debounce } from "lodash";
+// import { debounce } from "lodash";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 
@@ -16,36 +16,36 @@ const middleware = store => next => action => {
   const instancesPath = path.join(nextState.settings.dataPath, "instances");
 
   const startListener = () => {
-    const updateInstances = debounce(
-      instances => {
-        dispatch({
-          type: ActionTypes.UPDATE_INSTANCES,
-          instances
-        });
-      },
-      1000,
-      { maxWait: 2500 }
-    );
-    return watch(
-      instancesPath,
-      {
-        recursive: true,
-        filter: f =>
-          true ||
-          /(^(\/|\\)(?:[^/]*)$)|(mods)|(resoucepacks)|(screenshots)/.test(f)
-      },
-      (e, file) => {
-        // const relativePath = file.replace(instancesPath, "");
-        // console.log(relativePath);
-        // getInstances(instancesPath)
-        //   .then(instances => {
-        //     const checkMods = file.includes("mods");
-        //     updateInstances(instances, checkMods);
-        //     return instances;
-        //   })
-        //   .catch(console.error);
-      }
-    );
+    // const updateInstances = debounce(
+    //   instances => {
+    //     dispatch({
+    //       type: ActionTypes.UPDATE_INSTANCES,
+    //       instances
+    //     });
+    //   },
+    //   1000,
+    //   { maxWait: 2500 }
+    // );
+    // return watch(
+    //   instancesPath,
+    //   {
+    //     recursive: true,
+    //     filter: f =>
+    //       true ||
+    //       /(^(\/|\\)(?:[^/]*)$)|(mods)|(resoucepacks)|(screenshots)/.test(f)
+    //   },
+    //   (e, file) => {
+    // const relativePath = file.replace(instancesPath, "");
+    // console.log(relativePath);
+    // getInstances(instancesPath)
+    //   .then(instances => {
+    //     const checkMods = file.includes("mods");
+    //     updateInstances(instances, checkMods);
+    //     return instances;
+    //   })
+    //   .catch(console.error);
+    // }
+    // );
   };
 
   const startInstancesListener = async () => {
