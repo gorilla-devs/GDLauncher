@@ -7,6 +7,7 @@ import coerce from "semver/functions/coerce";
 import gte from "semver/functions/gte";
 import lt from "semver/functions/lt";
 import omitBy from "lodash.omitby";
+import omit from "lodash.omit";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import { spawn } from "child_process";
@@ -567,20 +568,32 @@ export function updateDownloadCurrentPhase(instanceName, status) {
 }
 
 export function updateInstanceConfig(instanceName, updateFunction) {
-  return async (_, getState) => {
+  return async (dispatch, getState) => {
     const state = getState();
-    const instance = _getInstance(state)(instanceName);
-    await instance.queue.add(async () => {
+    const instance = _getInstance(state)(instanceName) || {};
+    const update = async () => {
       const configPath = path.join(
         _getInstancesPath(state),
         instanceName,
         "config.json"
       );
-      const prevConfig = await fse.readJson(configPath);
-
-      const newConfig = await updateFunction(prevConfig);
+      // Remove queue and name, they are augmented in the reducer and we don't want them in the config file
+      const newConfig = updateFunction(omit(instance, ["queue", "name"]));
 
       await fse.outputJson(configPath, newConfig);
+    };
+    if (instance?.queue) {
+      // Add it to the instance promise queue
+      await instance.queue.add(update);
+    } else {
+      await update();
+    }
+    dispatch({
+      type: ActionTypes.UPDATE_INSTANCES,
+      instances: {
+        ...state.instances.list,
+        [instanceName]: updateFunction(instance)
+      }
     });
   };
 }
@@ -596,23 +609,13 @@ export function addToQueue(instanceName, modloader, manifest, background) {
       manifest,
       background
     });
-    let timePlayed = 0;
 
-    try {
-      const prevConfig = await fse.readJson(
-        path.join(_getInstancesPath(state), instanceName, "config.json")
-      );
-      timePlayed = prevConfig.timePlayed;
-    } catch {
-      // Do nothing
-    }
-    fse.outputJson(
-      path.join(_getInstancesPath(getState()), instanceName, "config.json"),
-      {
+    dispatch(
+      updateInstanceConfig(instanceName, prev => ({
         modloader,
-        timePlayed,
+        timePlayed: prev.timePlayed || 0,
         background
-      }
+      }))
     );
     if (!currentDownload) {
       dispatch(updateCurrentDownload(instanceName));
@@ -974,10 +977,9 @@ export const launchInstance = instanceName => {
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
     const { memory } = state.settings.java;
-    const instancePath = path.join(_getInstancesPath(state), instanceName);
-    const { modloader } = await fse.readJson(
-      path.join(instancePath, "config.json")
-    );
+    const { modloader } = _getInstance(state)(instanceName);
+    const instancePath = _getInstance(state)(instanceName);
+
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
     );

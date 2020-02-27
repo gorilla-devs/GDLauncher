@@ -243,7 +243,7 @@ const General = () => {
       await fsa.emptyDir(instancesPath);
       await fsa.emptyDir(tempPath);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     setDeletingInstances(false);
   };

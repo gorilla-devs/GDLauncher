@@ -1,6 +1,6 @@
-import makeDir from "make-dir";
 import path from "path";
 import fse from "fs-extra";
+import pMap from "p-map";
 import { getDirectories } from ".";
 
 const getInstances = async instancesPath => {
@@ -20,10 +20,10 @@ const getInstances = async instancesPath => {
     }
     return null;
   };
-  // If folder doesn't exist, create it
-  await makeDir(instancesPath);
   const folders = await getDirectories(instancesPath);
-  const instances = await Promise.all(folders.map(mapFolderToInstance));
+  const instances = await pMap(folders, mapFolderToInstance, {
+    concurrency: 5
+  });
   const hashMap = {};
   // eslint-disable-next-line
   for (const instance of instances) {
