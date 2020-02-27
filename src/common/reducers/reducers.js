@@ -72,16 +72,18 @@ function instances(state = { started: false, list: {} }, action) {
       // eslint-disable-next-line
       for (const instance1 in action.instances) {
         const instance = action.instances[instance1];
-        if (
-          state.list[instance.name]?.queue &&
-          action.instances[instance.name]
-        ) {
+        // eslint-disable-next-line
+        if (!instance) continue;
+        if (!instance.name) {
           // eslint-disable-next-line
-          action.instances[instance.name].queue =
-            state.list[instance.name].queue;
-        } else if (action.instances[instance.name]) {
+          instance.name = instance1;
+        }
+        if (state.list[instance.name]?.queue) {
           // eslint-disable-next-line
-          action.instances[instance.name].queue = new PromiseQueue();
+          instance.queue = state.list[instance.name].queue;
+        } else {
+          // eslint-disable-next-line
+          instance.queue = new PromiseQueue();
         }
       }
       return { ...state, list: action.instances };
