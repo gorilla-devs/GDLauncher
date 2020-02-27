@@ -15,14 +15,11 @@ import {
   faItalic,
   faUnderline,
   faCode,
-  faQuoteRight,
   faListOl,
   faList
 } from "@fortawesome/free-solid-svg-icons";
 import { updateInstanceConfig } from "../../reducers/actions";
-import { _getInstancesPath } from "../../utils/selectors";
-
-// import { Button, Icon, Toolbar } from '../components'
+import { _getInstancesPath, _getInstance } from "../../utils/selectors";
 
 const Toolbar = styled.div`
   height: 40px;
@@ -39,7 +36,7 @@ const HOTKEYS = {
 
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
-const RichTextExample = ({ instanceName }) => {
+const Notes = ({ instanceName }) => {
   const [value, setValue] = useState(initialValue);
   const renderElement = useCallback(props => <Element {...props} />, []);
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
@@ -47,11 +44,23 @@ const RichTextExample = ({ instanceName }) => {
   const dispatch = useDispatch();
   const InstancePath = useSelector(_getInstancesPath);
   const configPath = path.join(InstancePath, instanceName, "config.json");
+  const instance = useSelector(state => _getInstance(state)(instanceName));
 
   const getNotes = async () => {
-    const notes = JSON.parse(await fs.readFile(configPath)).value;
-    console.log("notes", JSON.parse(await fs.readFile(configPath)));
-    setValue(notes ? notes : initialValue);
+    // const notes = JSON.parse(await fs.readFile(configPath)).value;
+    const notes = instance.value;
+    console;
+    if (!notes) {
+      dispatch(
+        updateInstanceConfig(instanceName, config => {
+          return {
+            ...config,
+            initialValue
+          };
+        })
+      );
+    } else setValue(notes);
+    console.log("notes", notes);
   };
 
   useEffect(() => {
@@ -72,15 +81,15 @@ const RichTextExample = ({ instanceName }) => {
         editor={editor}
         value={value}
         onChange={value => {
-          setValue(value),
-            dispatch(
-              updateInstanceConfig(instanceName, config => {
-                return {
-                  ...config,
-                  value
-                };
-              })
-            );
+          setValue(value), console.log(value);
+          dispatch(
+            updateInstanceConfig(instanceName, config => {
+              return {
+                ...config,
+                value
+              };
+            })
+          );
         }}
       >
         <Toolbar>
@@ -88,14 +97,12 @@ const RichTextExample = ({ instanceName }) => {
           <MarkButton format="italic" icon={faItalic} />
           <MarkButton format="underline" icon={faUnderline} />
           <MarkButton format="code" icon={faCode} />
-          {/* <BlockButton format="heading-one" icon="looks_one" />
-        <BlockButton format="heading-two" icon="looks_two" />
-        <BlockButton format="block-quote" icon="format_quote" /> */}
           <BlockButton format="numbered-list" icon={faListOl} />
           <BlockButton format="bulleted-list" icon={faList} />
         </Toolbar>
         <Editable
           css={`
+            min-height: 300px;
             max-height: 600px;
             max-width: 600px;
             margin-top: 20px;
@@ -104,7 +111,7 @@ const RichTextExample = ({ instanceName }) => {
           `}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
-          placeholder="Enter some rich text…"
+          placeholder="Enter some Notes"
           spellCheck
           autoFocus
           onKeyDown={event => {
@@ -234,6 +241,11 @@ const MarkButton = ({ format, icon }) => {
   );
 };
 
-const initialValue = [];
+const initialValue = [
+  {
+    type: "paragraph",
+    children: [{ text: "" }]
+  }
+];
 
-export default RichTextExample;
+export default Notes;
