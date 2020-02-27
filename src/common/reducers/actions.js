@@ -7,6 +7,7 @@ import coerce from "semver/functions/coerce";
 import gte from "semver/functions/gte";
 import lt from "semver/functions/lt";
 import omitBy from "lodash.omitby";
+import lockfile from "lockfile";
 import omit from "lodash.omit";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
@@ -534,7 +535,13 @@ export function updateSelectedInstance(name) {
 }
 
 export function removeDownloadFromQueue(instanceName) {
-  return dispatch => {
+  return (dispatch, getState) => {
+    lockfile.unlock(
+      path.join(_getInstancesPath(getState()), instanceName, "installing.lock"),
+      err => {
+        if (err) console.log(err);
+      }
+    );
     dispatch({
       type: ActionTypes.UPDATE_CURRENT_DOWNLOAD,
       instanceName: null
@@ -609,6 +616,13 @@ export function addToQueue(instanceName, modloader, manifest, background) {
       manifest,
       background
     });
+
+    lockfile.lock(
+      path.join(_getInstancesPath(state), instanceName, "installing.lock"),
+      err => {
+        if (err) console.error(err);
+      }
+    );
 
     dispatch(
       updateInstanceConfig(instanceName, prev => ({

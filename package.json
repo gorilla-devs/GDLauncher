@@ -217,6 +217,7 @@
     "is-hotkey": "^0.1.6",
     "jarfile": "^2.0.0",
     "jimp": "^0.9.3",
+    "lockfile": "^1.0.4",
     "lodash": "^4.17.15",
     "lodash.debounce": "^4.0.8",
     "lodash.memoize": "^4.1.2",
