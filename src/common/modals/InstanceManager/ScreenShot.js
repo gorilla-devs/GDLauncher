@@ -38,9 +38,6 @@ const DateSection = styled.div`
   padding: 50px 10px 20px 10px;
   background: ${props => props.theme.palette.secondary.dark};
   margin: 10px 0 10px 0;
-  &&:first-child {
-    margin-top: 0;
-  }
 `;
 
 const DeleteButton = styled(FontAwesomeIcon)`
@@ -93,30 +90,21 @@ const deleteFile = async (
   instanceName,
   fileName,
   multipleOrNot,
-  selectedScreens,
-  setSelectedScreens
+  selectedScreens
 ) => {
-  console.log("LOLL11", selectedScreens);
   if (!multipleOrNot) {
     await fse.remove(
       path.join(InstancePath, instanceName, "screenshots", fileName)
     );
-    setSelectedScreens([
-      selectedScreens.splice(selectedScreens.indexOf(fileName), 1)
-    ]);
   } else {
     Promise.all(
       selectedScreens.map(async screenShot => {
         await fse.remove(
           path.join(InstancePath, instanceName, "screenshots", screenShot)
         );
-        setSelectedScreens([
-          selectedScreens.splice(selectedScreens.indexOf(fileName), 1)
-        ]);
       })
     );
   }
-  console.log("LOLL", selectedScreens);
 };
 
 const calcDate = async ScreenShotsDir => {
@@ -184,11 +172,17 @@ const calcDateTitle = days => {
   else if (parsedDays >= 365) return `${Math.floor(days / 365)} years ago`;
 };
 
-const startListener = (ScreenShotsDir, selectedScreens, setSelectedScreens) => {
+const startListener = (
+  ScreenShotsDir,
+  selectedScreens,
+  setGroupedStortedPhoto
+) => {
   watch(ScreenShotsDir, (event, filename) => {
     console.log("piripicchio");
     if (filename) {
-      updateState(ScreenShotsDir, selectedScreens, setSelectedScreens);
+      calcDate(ScreenShotsDir).then(sortedScreens => {
+        setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
+      });
       console.log(`${filename} file Changed`);
     }
   });
@@ -220,17 +214,12 @@ const ScreenShot = ({ instanceName }) => {
     calcDate(ScreenShotsDir).then(sortedScreens => {
       setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
     });
-    startListener(ScreenShotsDir, selectedScreens, setSelectedScreens);
-
-    // listener.on("error", async () => {
-    //   // Check if the folder exists and create it if it doesn't
-    //   await makeDir(ScreenShotsDir);
-    //   if (!listener.isClosed()) {
-    //     listener.close();
-    //   }
-    //   startListener();
-    // });
+    startListener(ScreenShotsDir, selectedScreens, setGroupedStortedPhoto);
   }, []);
+
+  useEffect(() => {
+    console.log("selectedScreens", selectedScreens);
+  }, [selectedScreens]);
 
   return (
     <div
@@ -323,7 +312,7 @@ const ScreenShot = ({ instanceName }) => {
                               InstancePath,
                               instanceName,
                               file.name,
-                              false,
+                              true,
                               selectedScreens,
                               setSelectedScreens
                             )
