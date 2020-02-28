@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from "react-redux";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { _getInstance } from "../../utils/selectors";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
+import { _getInstance } from "../../utils/selectors";
 
 const Header = styled.div`
   height: 40px;
