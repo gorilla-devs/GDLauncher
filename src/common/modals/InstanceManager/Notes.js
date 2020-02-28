@@ -27,12 +27,10 @@ const Toolbar = styled.div`
 `;
 
 const StyledEditable = styled(Editable)`
-  display: flex;
-  justify-content: center;
-  min-height: 300px;
-  max-height: 600px;
-  min-width: 400px;
-  max-width: 600px;
+  min-height: 400px;
+  max-height: 90%;
+  min-width: 70%;
+  max-width: 90%%;
   margin-top: 20px;
   overflow: hidden;
   background: ${props => props.theme.palette.grey[900]};
