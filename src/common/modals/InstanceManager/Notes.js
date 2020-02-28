@@ -14,7 +14,8 @@ import {
   faUnderline,
   faCode,
   faListOl,
-  faList
+  faList,
+  faQuoteRight
 } from "@fortawesome/free-solid-svg-icons";
 import { updateInstanceConfig } from "../../reducers/actions";
 import { _getInstancesPath, _getInstance } from "../../utils/selectors";
@@ -23,15 +24,16 @@ const Toolbar = styled.div`
   height: 40px;
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 10px;
 `;
 
 const StyledEditable = styled(Editable)`
   min-height: 400px;
-  max-height: 90%;
-  min-width: 70%;
-  max-width: 90%%;
+  max-height: 95%;
+  min-width: 98%;
+  max-width: 98%;
   margin-top: 20px;
+  padding: 5px;
   overflow: hidden;
   background: ${props => props.theme.palette.grey[900]};
   border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
@@ -47,60 +49,41 @@ const HOTKEYS = {
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
 const Notes = ({ instanceName }) => {
-  const [value, setValue] = useState(initialValue);
   const renderElement = useCallback(props => <Element {...props} />, []);
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const dispatch = useDispatch();
   const instance = useSelector(state => _getInstance(state)(instanceName));
-
-  const getNotes = async () => {
-    const notes = instance.value;
-    if (!notes) {
-      dispatch(
-        updateInstanceConfig(instanceName, config => {
-          return {
-            ...config,
-            initialValue
-          };
-        })
-      );
-    } else setValue(notes);
-  };
-
-  useEffect(() => {
-    getNotes();
-  }, []);
+  const notes = instance.notes || initialValue;
 
   return (
     <div
       css={`
         width: 100%;
+        height: 100%;
       `}
     >
       <div
         css={`
-          && {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-          }
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
         `}
       >
         <Slate
           editor={editor}
-          value={value}
-          onChange={value => {
-            setValue(value),
-              dispatch(
-                updateInstanceConfig(instanceName, config => {
-                  return {
-                    ...config,
-                    value
-                  };
-                })
-              );
+          value={notes}
+          onChange={notes => {
+            dispatch(
+              updateInstanceConfig(instanceName, config => {
+                return {
+                  ...config,
+                  notes
+                };
+              })
+            );
           }}
         >
           <Toolbar>
@@ -108,12 +91,16 @@ const Notes = ({ instanceName }) => {
             <MarkButton format="italic" icon={faItalic} />
             <MarkButton format="underline" icon={faUnderline} />
             <MarkButton format="code" icon={faCode} />
+            <BlockButton format="heading-one" icon="H1" />
+            <BlockButton format="heading-two" icon="H2" />
+            <BlockButton format="block-quote" icon={faQuoteRight} />
             <BlockButton format="numbered-list" icon={faListOl} />
             <BlockButton format="bulleted-list" icon={faList} />
           </Toolbar>
           <div
             css={`
               width: 100%;
+              height: 100%;
               display: flex;
               justify-content: center;
             `}
@@ -227,6 +214,8 @@ const BlockButton = ({ format, icon }) => {
   return (
     <Button
       css={`
+        height: 36px;
+        padding: 5px 10px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
         margin: 2px;
       `}
@@ -236,7 +225,16 @@ const BlockButton = ({ format, icon }) => {
         toggleBlock(editor, format);
       }}
     >
-      <FontAwesomeIcon icon={icon} />
+      {typeof icon === "string" ? (
+        icon
+      ) : (
+        <FontAwesomeIcon
+          css={`
+            margin: 0;
+          `}
+          icon={icon}
+        />
+      )}
     </Button>
   );
 };
@@ -246,6 +244,8 @@ const MarkButton = ({ format, icon }) => {
   return (
     <Button
       css={`
+        height: 36px;
+        padding: 5px 10px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
         margin: 2px;
       `}
@@ -255,7 +255,12 @@ const MarkButton = ({ format, icon }) => {
         toggleMark(editor, format);
       }}
     >
-      <FontAwesomeIcon icon={icon} />
+      <FontAwesomeIcon
+        css={`
+          margin: 0;
+        `}
+        icon={icon}
+      />
     </Button>
   );
 };

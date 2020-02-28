@@ -589,12 +589,6 @@ export function updateInstanceConfig(instanceName, updateFunction) {
 
       await fse.outputJson(configPath, newConfig);
     };
-    if (instance?.queue) {
-      // Add it to the instance promise queue
-      await instance.queue.add(update);
-    } else {
-      await update();
-    }
     dispatch({
       type: ActionTypes.UPDATE_INSTANCES,
       instances: {
@@ -602,6 +596,12 @@ export function updateInstanceConfig(instanceName, updateFunction) {
         [instanceName]: updateFunction(instance)
       }
     });
+    if (instance?.queue) {
+      // Add it to the instance promise queue
+      await instance.queue.add(update);
+    } else {
+      await update();
+    }
   };
 }
 
