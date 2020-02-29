@@ -56,7 +56,6 @@ const middleware = store => next => action => {
             )
         },
         (e, fileName) => {
-          console.log(fileName);
           events.push([e, fileName]);
           updateInstances(instancesPath).catch(console.error);
         }
