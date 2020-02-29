@@ -211,7 +211,12 @@ ipcMain.handle("getPrimaryDisplaySizes", () => {
 autoUpdater.autoDownload = false;
 
 autoUpdater.on("update-available", () => {
-  autoUpdater.downloadUpdate();
+  if (process.env.NODE_ENV !== "development") {
+    autoUpdater.downloadUpdate();
+  } else {
+    // Fake update
+    mainWindow.webContents.send("updateAvailable");
+  }
 });
 
 autoUpdater.on("update-downloaded", () => {

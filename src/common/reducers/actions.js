@@ -262,7 +262,8 @@ export function downloadJava() {
   return async (dispatch, getState) => {
     const state = getState();
     const {
-      app: { javaManifest }
+      app: { javaManifest },
+      settings: { dataPath }
     } = state;
     const javaOs = convertOSToJavaFormat(process.platform);
     const javaMeta = javaManifest.find(v => v.os === javaOs);
@@ -272,9 +273,8 @@ export function downloadJava() {
       binary_link: url,
       release_name: releaseName
     } = javaMeta;
-    const userDataPath = await ipcRenderer.invoke("getUserDataPath");
-    const javaBaseFolder = path.join(userDataPath, "java");
-    const tempFolder = path.join(userDataPath, "temp");
+    const javaBaseFolder = path.join(dataPath, "java");
+    const tempFolder = _getTempPath(state);
     await fse.remove(javaBaseFolder);
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
