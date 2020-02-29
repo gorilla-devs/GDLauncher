@@ -9,9 +9,11 @@ import lt from "semver/functions/lt";
 import omitBy from "lodash.omitby";
 import lockfile from "lockfile";
 import omit from "lodash.omit";
+import watch from "node-watch";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import { spawn } from "child_process";
+import { promises as fs } from "fs";
 import pMap from "p-map";
 import * as ActionTypes from "./actionTypes";
 import {
@@ -33,7 +35,8 @@ import {
   getFabricJson,
   getForgeJson,
   getAddonFile,
-  getJavaManifest
+  getJavaManifest,
+  getAddonsByFingerprint
 } from "../api";
 import {
   _getCurrentAccount,
@@ -45,7 +48,8 @@ import {
   _getLibrariesPath,
   _getAccounts,
   _getTempPath,
-  _getInstance
+  _getInstance,
+  _getInstances
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -66,7 +70,7 @@ import {
   downloadFile,
   downloadInstanceFiles
 } from "../../app/desktop/utils/downloader";
-import { removeDuplicates } from "../utils";
+import { removeDuplicates, getFileMurmurHash2 } from "../utils";
 import { UPDATE_CONCURRENT_DOWNLOADS } from "./settings/actionTypes";
 
 export function initManifests() {
@@ -577,7 +581,11 @@ export function updateDownloadCurrentPhase(instanceName, status) {
   };
 }
 
-export function updateInstanceConfig(instanceName, updateFunction) {
+export function updateInstanceConfig(
+  instanceName,
+  updateFunction,
+  forceWrite = false
+) {
   return async (dispatch, getState) => {
     const state = getState();
     const instance = _getInstance(state)(instanceName) || {};
@@ -589,8 +597,15 @@ export function updateInstanceConfig(instanceName, updateFunction) {
       );
       // Remove queue and name, they are augmented in the reducer and we don't want them in the config file
       const newConfig = updateFunction(omit(instance, ["queue", "name"]));
+      try {
+        await fs.lstat(configPath);
 
-      await fse.outputJson(configPath, newConfig);
+        await fse.outputJson(configPath, newConfig);
+      } catch {
+        if (forceWrite) {
+          await fse.outputJson(configPath, newConfig);
+        }
+      }
     };
 
     dispatch({
@@ -635,12 +650,16 @@ export function addToQueue(instanceName, modloader, manifest, background) {
       modloader[0] === FABRIC;
 
     dispatch(
-      updateInstanceConfig(instanceName, prev => ({
-        modloader,
-        timePlayed: prev.timePlayed || 0,
-        background,
-        ...(addMods && { mods: [] })
-      }))
+      updateInstanceConfig(
+        instanceName,
+        prev => ({
+          modloader,
+          timePlayed: prev.timePlayed || 0,
+          background,
+          ...(addMods && { mods: [] })
+        }),
+        true
+      )
     );
     if (!currentDownload) {
       dispatch(updateCurrentDownload(instanceName));
@@ -1010,6 +1029,117 @@ export function downloadInstance(instanceName) {
     dispatch(addNextInstanceToCurrentDownload());
   };
 }
+
+export const startListener = () => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const instancesPath = _getInstancesPath(state);
+    return watch(
+      instancesPath,
+      {
+        recursive: true,
+        filter: f =>
+          /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))?)?$/.test(
+            f.replace(instancesPath, "")
+          )
+      },
+      async (action, fileName) => {
+        const newState = getState();
+        const tempFolder = _getTempPath(newState);
+        const isMod = /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*)))$/.test(
+          fileName.replace(instancesPath, "")
+        );
+        const instanceName = fileName
+          .replace(instancesPath, "")
+          .substr(1)
+          .split(path.sep)[0];
+        const instance = _getInstance(newState)(instanceName);
+
+        const isLocked = await new Promise((resolve, reject) => {
+          lockfile.check(
+            path.join(instancesPath, instanceName, "installing.lock"),
+            (err, locked) => {
+              if (err) reject(err);
+              resolve(locked);
+            }
+          );
+        });
+        if (isLocked) return;
+
+        if (isMod) {
+          const isInConfig = instance.mods.find(
+            mod => mod.fileName === path.basename(fileName)
+          );
+          if (action === "update") {
+            // New mod on disk -> check if it's on the config
+            const stat = await fs.lstat(fileName);
+            if (!isInConfig && stat.isFile()) {
+              // get murmur hash
+              const murmurHash = await getFileMurmurHash2(fileName, tempFolder);
+              const { data } = await getAddonsByFingerprint([murmurHash]);
+              const exactMatch = (data.exactMatches || [])[0];
+              const notMatch = (data.unmatchedFingerprints || [])[0];
+              let mod = {};
+              if (exactMatch) {
+                mod = exactMatch.file;
+                mod.fileName = path.basename(fileName);
+              } else if (notMatch) {
+                mod = {
+                  fileName: path.basename(fileName),
+                  displayName: path.basename(fileName),
+                  packageFingerprint: murmurHash
+                };
+              }
+              const updatedInstance = _getInstance(getState())(instanceName);
+              const isStillNotInConfig = !updatedInstance.mods.find(
+                m => m.fileName === path.basename(fileName)
+              );
+              if (isStillNotInConfig) {
+                dispatch(
+                  updateInstanceConfig(instanceName, prev => ({
+                    ...prev,
+                    mods: [...prev.mods, mod]
+                  }))
+                );
+              }
+            }
+          } else if (isMod && action === "remove" && isInConfig) {
+            // Mod removed from disk -> remove it from disk if necessary
+            dispatch(
+              updateInstanceConfig(instanceName, prev => ({
+                ...prev,
+                mods: prev.mods.filter(
+                  m => m.fileName !== path.basename(fileName)
+                )
+              }))
+            );
+          }
+        } else if (!isMod && action === "update") {
+          const instances = _getInstances(newState);
+          const configPath = path.join(
+            instancesPath,
+            instanceName,
+            "config.json"
+          );
+          const config = await fse.readJSON(configPath);
+          dispatch({
+            type: ActionTypes.UPDATE_INSTANCES,
+            instances: {
+              ...instances,
+              [instanceName]: { ...config, name: instanceName }
+            }
+          });
+        } else if (!isMod && action === "remove") {
+          const instances = _getInstances(newState);
+          dispatch({
+            type: ActionTypes.UPDATE_INSTANCES,
+            instances: instances.filter(i => i.name !== instanceName)
+          });
+        }
+      }
+    );
+  };
+};
 
 export const launchInstance = instanceName => {
   return async (dispatch, getState) => {

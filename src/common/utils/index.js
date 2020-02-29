@@ -29,6 +29,17 @@ const isWhitespaceCharacter = b => {
   return b === 9 || b === 10 || b === 13 || b === 32;
 };
 
+export const generateRandomString = () => {
+  return (
+    Math.random()
+      .toString(36)
+      .substring(2, 15) +
+    Math.random()
+      .toString(36)
+      .substring(2, 15)
+  );
+};
+
 // Create the murmur hash of a mod
 export const getFileMurmurHash2 = async (filePath, tempPath) => {
   const stat = await fs.lstat(filePath);
@@ -38,15 +49,7 @@ export const getFileMurmurHash2 = async (filePath, tempPath) => {
     return murmur.murmur2(bin2string(file), 1);
   }
   return new Promise((resolve, reject) => {
-    const tempFileName = path.join(
-      tempPath,
-      `${Math.random()
-        .toString(36)
-        .substring(2, 15) +
-        Math.random()
-          .toString(36)
-          .substring(2, 15)}.temp`
-    );
+    const tempFileName = path.join(tempPath, `${generateRandomString()}.temp`);
     const ws = createWriteStream(tempFileName);
     createReadStream(filePath)
       .on("data", data => {

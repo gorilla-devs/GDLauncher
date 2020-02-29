@@ -1,25 +1,14 @@
-const createThunkSubscribeEnhancer = extraArgument => {
-  return createStore => {
-    return (reducer, initialState) => {
-      const store = createStore(reducer, initialState);
-      const { dispatch } = store;
-      store.dispatch = action => {
-        if (typeof action === "function") {
-          return action(
-            store.dispatch,
-            store.getState,
-            store.subscribe,
-            extraArgument
-          );
-        }
-        return dispatch(action);
-      };
-      return store;
-    };
+function createThunkMiddleware(extraArgument) {
+  return ({ dispatch, getState }) => next => action => {
+    if (typeof action === "function") {
+      return action(dispatch, getState, extraArgument);
+    }
+
+    return next(action);
   };
-};
+}
 
-const thunkSubscribeEnhancer = createThunkSubscribeEnhancer();
-thunkSubscribeEnhancer.withExtraArgument = createThunkSubscribeEnhancer;
+const thunk = createThunkMiddleware();
+thunk.withExtraArgument = createThunkMiddleware;
 
-export default thunkSubscribeEnhancer;
+export default thunk;

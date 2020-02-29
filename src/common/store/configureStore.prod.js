@@ -16,8 +16,8 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const router = routerMiddleware(history);
 const enhancer = compose(
-  thunk,
   applyMiddleware(
+    thunk,
     router,
     isElectron() ? middlewareApp : undefined,
     isElectron() ? middlewareInstances : undefined

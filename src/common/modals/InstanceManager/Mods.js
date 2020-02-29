@@ -33,6 +33,36 @@ const deleteMod = async (instanceName, instancePath, mod, dispatch) => {
   await fse.remove(path.join(instancePath, "mods", mod.fileName));
 };
 
+const toggleModDisabled = async (
+  c,
+  instanceName,
+  instancePath,
+  mod,
+  dispatch
+) => {
+  const destFileName = c
+    ? mod.fileName.replace(".disabled", "")
+    : `${mod.fileName}.disabled`;
+  await dispatch(
+    updateInstanceConfig(instanceName, prev => ({
+      ...prev,
+      mods: prev.mods.map(m => {
+        if (m.fileName === mod.fileName) {
+          return {
+            ...m,
+            fileName: destFileName
+          };
+        }
+        return m;
+      })
+    }))
+  );
+  await fse.move(
+    path.join(instancePath, "mods", mod.fileName),
+    path.join(instancePath, "mods", destFileName)
+  );
+};
+
 const Row = memo(({ index, style, data }) => {
   const { items, instanceName, instancePath } = data;
   const dispatch = useDispatch();
@@ -87,6 +117,16 @@ const Row = memo(({ index, style, data }) => {
       >
         <Switch
           size="small"
+          checked={path.extname(items[index].fileName) !== ".disabled"}
+          onChange={c =>
+            toggleModDisabled(
+              c,
+              instanceName,
+              instancePath,
+              items[index],
+              dispatch
+            )
+          }
           css={`
             margin-right: 15px;
           `}
@@ -130,7 +170,6 @@ const filter = (arr, search) =>
 
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
-  console.log(instance?.name);
   const instancesPath = useSelector(_getInstancesPath);
   const [mods, setMods] = useState(sort(instance.mods));
   const [search, setSearch] = useState("");
