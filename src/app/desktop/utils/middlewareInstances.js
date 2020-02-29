@@ -3,6 +3,7 @@ import makeDir from "make-dir";
 import path from "path";
 import { debounce } from "lodash";
 import watch from "node-watch";
+import { _getTempPath } from "../../../common/utils/selectors";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 import modsFingerprintsScan from "./modsFingerprintsScan";
@@ -31,7 +32,11 @@ const middleware = store => next => action => {
             type: ActionTypes.UPDATE_INSTANCES,
             instances
           });
-          const instances1 = await modsFingerprintsScan(instancesPath, events);
+          const instances1 = await modsFingerprintsScan(
+            instancesPath,
+            _getTempPath(nextState),
+            events
+          );
           dispatch({
             type: ActionTypes.UPDATE_INSTANCES,
             instances: instances1
@@ -67,7 +72,10 @@ const middleware = store => next => action => {
         type: ActionTypes.UPDATE_INSTANCES,
         instances
       });
-      const instances1 = await modsFingerprintsScan(instancesPath);
+      const instances1 = await modsFingerprintsScan(
+        instancesPath,
+        _getTempPath(nextState)
+      );
       dispatch({
         type: ActionTypes.UPDATE_INSTANCES,
         instances: instances1

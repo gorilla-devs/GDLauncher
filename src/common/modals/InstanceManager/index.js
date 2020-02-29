@@ -6,6 +6,9 @@ import Modal from "../../components/Modal";
 import Overview from "./Overview";
 import Notes from "./Notes";
 import Mods from "./Mods";
+import { useSelector } from "react-redux";
+import { _getInstance } from "../../utils/selectors";
+import { TWITCH_MODPACK, FORGE, FABRIC } from "../../utils/constants";
 
 const SideMenu = styled.div`
   display: flex;
@@ -77,6 +80,7 @@ const InstanceManager = ({ instanceName }) => {
   };
 
   const [page, setPage] = useState(Object.keys(menuEntries)[0]);
+  const instance = useSelector(state => _getInstance(state)(instanceName));
   const ContentComponent = menuEntries[page].component;
 
   return (
@@ -92,11 +96,27 @@ const InstanceManager = ({ instanceName }) => {
       <Container>
         <SideMenuContainer>
           <SideMenu>
-            {Object.entries(menuEntries).map(([k, tab]) => (
-              <SettingsButton key={tab.name} onClick={e => setPage(k)} active={k === page}>
-                {tab.name}
-              </SettingsButton>
-            ))}
+            {Object.entries(menuEntries).map(([k, tab]) => {
+              if (
+                (tab.name === menuEntries.mods.name &&
+                  instance?.modloader[0] !== TWITCH_MODPACK &&
+                  instance?.modloader[0] !== FORGE &&
+                  instance?.modloader[0] !== FABRIC) ||
+                (tab.name === menuEntries.modpack.name &&
+                  instance?.modloader[0] !== TWITCH_MODPACK)
+              ) {
+                return null;
+              }
+              return (
+                <SettingsButton
+                  key={tab.name}
+                  onClick={e => setPage(k)}
+                  active={k === page}
+                >
+                  {tab.name}
+                </SettingsButton>
+              );
+            })}
           </SideMenu>
         </SideMenuContainer>
         <Content>

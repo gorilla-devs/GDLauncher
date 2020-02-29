@@ -17,7 +17,10 @@ import * as ActionTypes from "./actionTypes";
 import {
   NEWS_URL,
   MC_RESOURCES_URL,
-  GDL_LEGACYJAVAFIXER_MOD_URL
+  GDL_LEGACYJAVAFIXER_MOD_URL,
+  TWITCH_MODPACK,
+  FORGE,
+  FABRIC
 } from "../utils/constants";
 import {
   mcAuthenticate,
@@ -589,12 +592,7 @@ export function updateInstanceConfig(instanceName, updateFunction) {
 
       await fse.outputJson(configPath, newConfig);
     };
-    if (instance?.queue) {
-      // Add it to the instance promise queue
-      await instance.queue.add(update);
-    } else {
-      await update();
-    }
+
     dispatch({
       type: ActionTypes.UPDATE_INSTANCES,
       instances: {
@@ -602,6 +600,13 @@ export function updateInstanceConfig(instanceName, updateFunction) {
         [instanceName]: updateFunction(instance)
       }
     });
+
+    if (instance?.queue) {
+      // Add it to the instance promise queue
+      await instance.queue.add(update);
+    } else {
+      await update();
+    }
   };
 }
 
@@ -624,11 +629,17 @@ export function addToQueue(instanceName, modloader, manifest, background) {
       }
     );
 
+    const addMods =
+      modloader[0] === TWITCH_MODPACK ||
+      modloader[0] === FORGE ||
+      modloader[0] === FABRIC;
+
     dispatch(
       updateInstanceConfig(instanceName, prev => ({
         modloader,
         timePlayed: prev.timePlayed || 0,
-        background
+        background,
+        ...(addMods && { mods: [] })
       }))
     );
     if (!currentDownload) {
@@ -681,7 +692,11 @@ export function downloadFabric(instanceName) {
       dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
     };
 
-    await downloadInstanceFiles(libraries, updatePercentage);
+    await downloadInstanceFiles(
+      libraries,
+      updatePercentage,
+      state.settings.concurrentDownloads
+    );
   };
 }
 
@@ -733,7 +748,11 @@ export function downloadForge(instanceName) {
       dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
     };
 
-    await downloadInstanceFiles(libraries, updatePercentage);
+    await downloadInstanceFiles(
+      libraries,
+      updatePercentage,
+      state.settings.concurrentDownloads
+    );
 
     if (forgeJson.installProfileJson) {
       dispatch(updateDownloadStatus(instanceName, "Patching forge..."));
@@ -741,7 +760,11 @@ export function downloadForge(instanceName) {
         forgeJson.installProfileJson.libraries,
         _getLibrariesPath(state)
       );
-      await downloadInstanceFiles(installLibraries, () => {});
+      await downloadInstanceFiles(
+        installLibraries,
+        () => {},
+        state.settings.concurrentDownloads
+      );
       await patchForge113(
         forgeJson.installProfileJson,
         path.join(
@@ -784,6 +807,7 @@ export function downloadForgeManifestFiles(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const { manifest } = _getCurrentDownloadItem(state);
+    const concurrency = state.settings.concurrentDownloads;
 
     dispatch(updateDownloadStatus(instanceName, "Downloading mods..."));
 
@@ -802,12 +826,15 @@ export function downloadForgeManifestFiles(instanceName) {
         const fileExists = await fse.pathExists(destFile);
         if (!fileExists) await downloadFile(destFile, modManifest.downloadUrl);
 
+        // Augment with projectID since it's missing in the response
+        modManifest.projectID = item.projectID;
+
         modManifests = modManifests.concat(modManifest);
         const percentage =
           (modManifests.length * 100) / manifest.files.length - 1;
         dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
       },
-      { concurrency: 4 }
+      { concurrency }
     );
 
     await dispatch(
@@ -954,7 +981,8 @@ export function downloadInstance(instanceName) {
 
     await downloadInstanceFiles(
       [...libraries, ...assets, mcMainFile],
-      updatePercentage
+      updatePercentage,
+      state.settings.concurrentDownloads
     );
 
     await extractNatives(

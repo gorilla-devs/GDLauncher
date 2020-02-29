@@ -7,7 +7,7 @@ import { getDirectories } from ".";
 import { getFileMurmurHash2 } from "../../../common/utils";
 import { getAddonsByFingerprint } from "../../../common/api";
 
-const modsFingerprintsScan = async (instancesPath, events) => {
+const modsFingerprintsScan = async (instancesPath, tempFolder, events) => {
   const mapFolderToInstance = async instance => {
     try {
       const configPath = path.join(
@@ -24,19 +24,24 @@ const modsFingerprintsScan = async (instancesPath, events) => {
           }
         );
       });
+      const modsFolder = path.join(instancesPath, instance, "mods");
+      const modsFolderExists = await fse.pathExists(modsFolder);
 
-      if (isLocked) return { ...config, name: instance };
+      if (isLocked || !modsFolderExists) return { ...config, name: instance };
 
       // Check if config.mods has a different number of mods than the actual number of mods
-
-      const modsFolder = path.join(instancesPath, instance, "mods");
 
       const mapEventFiles = ev => {
         return (
           Array.isArray(events) &&
           events.length !== 0 &&
           events
-            .filter(event => event[0] === ev && event[1].includes(modsFolder))
+            .filter(
+              event =>
+                event[0] === ev &&
+                event[1].includes(modsFolder) &&
+                event[1] !== modsFolder
+            )
             .map(event => path.basename(event[1]))
         );
       };
@@ -54,27 +59,18 @@ const modsFingerprintsScan = async (instancesPath, events) => {
         const completeFilePath = path.join(modsFolder, file);
         const stat = await fs.lstat(completeFilePath);
         if (stat.isFile()) {
-          // 15728640 = 15mb
-          if (stat.size < 15728640) {
-            // Check if file is in config
-            if (!(config?.mods || []).find(mod => mod.fileName === file)) {
-              const binary = await fs.readFile(completeFilePath);
-              const murmurHash = getFileMurmurHash2(binary);
-              console.log(
-                "[MODS SCANNER] Local mod not found in config",
-                file,
-                murmurHash
-              );
-              missingMods[file] = murmurHash;
-            }
-          } else {
-            console.warn(
-              `[MODS SCANNER] Local mod too big (${Number.parseInt(
-                stat.size / 1024 / 1024,
-                10
-              )}MB). Cannot analyze. If you manually copied it in the mods folder, please delete it and install it from GDLauncher instead.`,
-              file
+          // Check if file is in config
+          if (!(config?.mods || []).find(mod => mod.fileName === file)) {
+            const murmurHash = await getFileMurmurHash2(
+              completeFilePath,
+              tempFolder
             );
+            console.log(
+              "[MODS SCANNER] Local mod not found in config",
+              file,
+              murmurHash
+            );
+            missingMods[file] = murmurHash;
           }
         }
       }
@@ -133,11 +129,14 @@ const modsFingerprintsScan = async (instancesPath, events) => {
       };
 
       const updatedConfig = await fse.readJSON(configPath);
-      if (JSON.stringify(updatedConfig) === JSON.stringify(config)) {
+      if (
+        JSON.stringify(updatedConfig) === JSON.stringify(config) &&
+        JSON.stringify(config) !== JSON.stringify(newConfig)
+      ) {
         await fse.outputJson(configPath, newConfig);
         return { ...newConfig, name: instance };
       }
-      return updatedConfig;
+      return { ...updatedConfig, name: instance };
     } catch (err) {
       console.error(err);
     }

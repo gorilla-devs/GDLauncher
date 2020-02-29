@@ -1,4 +1,7 @@
 import murmur from "murmurhash-js";
+import { promises as fs, createWriteStream, createReadStream } from "fs";
+import fse from "fs-extra";
+import path from "path";
 
 export const sortByDate = (a, b) => {
   const dateA = new Date(a.fileDate);
@@ -27,8 +30,42 @@ const isWhitespaceCharacter = b => {
 };
 
 // Create the murmur hash of a mod
-export const getFileMurmurHash2 = file => {
-  return murmur.murmur2(bin2string(file), 1);
+export const getFileMurmurHash2 = async (filePath, tempPath) => {
+  const stat = await fs.lstat(filePath);
+  // 15mb
+  if (stat.size < 15728640) {
+    const file = await fs.readFile(filePath);
+    return murmur.murmur2(bin2string(file), 1);
+  }
+  return new Promise((resolve, reject) => {
+    const tempFileName = path.join(
+      tempPath,
+      `${Math.random()
+        .toString(36)
+        .substring(2, 15) +
+        Math.random()
+          .toString(36)
+          .substring(2, 15)}.temp`
+    );
+    const ws = createWriteStream(tempFileName);
+    createReadStream(filePath)
+      .on("data", data => {
+        let res = "";
+        for (let i = 0; i < data.length; i += 1) {
+          if (!isWhitespaceCharacter(data[i]))
+            res += String.fromCharCode(data[i]);
+        }
+        ws.write(res);
+      })
+      .on("end", async () => {
+        ws.end();
+        const file = await fs.readFile(tempFileName);
+        // No need to wait for this to be removed
+        fse.remove(tempFileName);
+        resolve(murmur.murmur2(file.toString(), 1));
+      })
+      .on("error", err => reject(err));
+  });
 };
 
 export const numberToRoundedWord = number => {

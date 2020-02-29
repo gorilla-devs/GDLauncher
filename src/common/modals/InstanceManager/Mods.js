@@ -1,13 +1,17 @@
 import React, { memo, useState, useEffect } from "react";
 import styled from "styled-components";
+import memoize from "memoize-one";
+import path from "path";
 import { FixedSizeList as List, areEqual } from "react-window";
 import { Checkbox, Input, Button, Switch } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faDownload } from "@fortawesome/free-solid-svg-icons";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { _getInstance } from "../../utils/selectors";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
+import fse from "fs-extra";
+import { _getInstance, _getInstancesPath } from "../../utils/selectors";
+import { updateInstanceConfig } from "../../reducers/actions";
 
 const Header = styled.div`
   height: 40px;
@@ -19,8 +23,20 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
-const Row = memo(
-  ({ index, style, data }) => (
+const deleteMod = async (instanceName, instancePath, mod, dispatch) => {
+  await dispatch(
+    updateInstanceConfig(instanceName, prev => ({
+      ...prev,
+      mods: prev.mods.filter(m => m.fileName !== mod.fileName)
+    }))
+  );
+  await fse.remove(path.join(instancePath, "mods", mod.fileName));
+};
+
+const Row = memo(({ index, style, data }) => {
+  const { items, instanceName, instancePath } = data;
+  const dispatch = useDispatch();
+  return (
     <div
       index={index}
       css={`
@@ -52,7 +68,7 @@ const Row = memo(
           }
         `}
       >
-        {data[index].id && (
+        {items[index].id && (
           <FontAwesomeIcon
             css={`
               margin-right: 10px;
@@ -60,7 +76,7 @@ const Row = memo(
             icon={faTwitch}
           />
         )}
-        {data[index].fileName}
+        {items[index].fileName}
       </div>
       <div
         css={`
@@ -76,6 +92,9 @@ const Row = memo(
           `}
         />
         <FontAwesomeIcon
+          onClick={() =>
+            deleteMod(instanceName, instancePath, items[index], dispatch)
+          }
           css={`
             &:hover {
               cursor: pointer;
@@ -90,9 +109,14 @@ const Row = memo(
         />
       </div>
     </div>
-  ),
-  areEqual
-);
+  );
+}, areEqual);
+
+const createItemData = memoize((items, instanceName, instancePath) => ({
+  items,
+  instanceName,
+  instancePath
+}));
 
 const sort = arr =>
   arr.slice().sort((a, b) => a.fileName.localeCompare(b.fileName));
@@ -106,12 +130,20 @@ const filter = (arr, search) =>
 
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  console.log(instance?.name);
+  const instancesPath = useSelector(_getInstancesPath);
   const [mods, setMods] = useState(sort(instance.mods));
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
   }, [search, instance.mods]);
+
+  const itemData = createItemData(
+    mods,
+    instanceName,
+    path.join(instancesPath, instanceName)
+  );
 
   return (
     <div
@@ -169,7 +201,7 @@ const Mods = ({ instanceName }) => {
           {({ height, width }) => (
             <List
               height={height}
-              itemData={mods}
+              itemData={itemData}
               itemCount={mods.length}
               itemSize={60}
               width={width}
