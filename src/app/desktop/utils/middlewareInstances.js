@@ -51,11 +51,12 @@ const middleware = store => next => action => {
         {
           recursive: true,
           filter: f =>
-            /^(\\|\/)([\w\d-.{}()[\]@#$%^&!])+((\\|\/)mods((\\|\/)(.*))?)?$/.test(
+            /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))?)?$/.test(
               f.replace(instancesPath, "")
             )
         },
         (e, fileName) => {
+          console.log(fileName);
           events.push([e, fileName]);
           updateInstances(instancesPath).catch(console.error);
         }
