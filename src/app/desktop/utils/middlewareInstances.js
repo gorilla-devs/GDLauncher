@@ -23,8 +23,8 @@ const middleware = store => next => action => {
   // If not initialized yet, start listener and do a first-time read
   if (!nextState.instances.started || dataPathChanged) {
     const startInstancesListener = async () => {
-      if (listener && !listener.isClosed()) {
-        listener.close();
+      if (listener) {
+        await listener.close();
       }
       await makeDir(instancesPath);
       const instances = await getInstances(instancesPath);
@@ -44,11 +44,11 @@ const middleware = store => next => action => {
         listener = await dispatch(startListener());
       } catch {
         // Check if the folder exists and create it if it doesn't
-        if (!listener.isClosed()) {
-          listener.close();
+        if (listener) {
+          await listener.close();
         }
         await makeDir(instancesPath);
-        listener = dispatch(startListener());
+        listener = await dispatch(startListener());
       }
     };
 

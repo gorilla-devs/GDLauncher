@@ -1,5 +1,5 @@
 // This class is used to create a queue of operations when working with instances configs, to avoid data corruption.
-// Each instance will have its own queue
+// Each instance will have its own queue. This can also be used in more generic situations where a queue structure is needed
 class PromiseQueue {
   constructor() {
     this.queue = [];

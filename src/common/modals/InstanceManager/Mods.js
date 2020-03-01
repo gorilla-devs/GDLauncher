@@ -64,6 +64,7 @@ const toggleModDisabled = async (
 };
 
 const Row = memo(({ index, style, data }) => {
+  const [loading, setLoading] = useState(false);
   const { items, instanceName, instancePath } = data;
   const dispatch = useDispatch();
   return (
@@ -118,15 +119,18 @@ const Row = memo(({ index, style, data }) => {
         <Switch
           size="small"
           checked={path.extname(items[index].fileName) !== ".disabled"}
-          onChange={c =>
-            toggleModDisabled(
+          disabled={loading}
+          onChange={async c => {
+            setLoading(true);
+            await toggleModDisabled(
               c,
               instanceName,
               instancePath,
               items[index],
               dispatch
-            )
-          }
+            );
+            setTimeout(() => setLoading(false), 300);
+          }}
           css={`
             margin-right: 15px;
           `}

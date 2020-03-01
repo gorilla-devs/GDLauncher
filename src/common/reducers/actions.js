@@ -9,7 +9,7 @@ import lt from "semver/functions/lt";
 import omitBy from "lodash.omitby";
 import lockfile from "lockfile";
 import omit from "lodash.omit";
-import watch from "node-watch";
+import chokidar from "chokidar";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import { spawn } from "child_process";
@@ -48,8 +48,7 @@ import {
   _getLibrariesPath,
   _getAccounts,
   _getTempPath,
-  _getInstance,
-  _getInstances
+  _getInstance
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -72,6 +71,7 @@ import {
 } from "../../app/desktop/utils/downloader";
 import { removeDuplicates, getFileMurmurHash2 } from "../utils";
 import { UPDATE_CONCURRENT_DOWNLOADS } from "./settings/actionTypes";
+import PromiseQueue from "../../app/desktop/utils/PromiseQueue";
 
 export function initManifests() {
   return async dispatch => {
@@ -606,15 +606,14 @@ export function updateInstanceConfig(
           await fse.outputJson(configPath, newConfig);
         }
       }
+      dispatch({
+        type: ActionTypes.UPDATE_INSTANCES,
+        instances: {
+          ...state.instances.list,
+          [instanceName]: updateFunction(instance)
+        }
+      });
     };
-
-    dispatch({
-      type: ActionTypes.UPDATE_INSTANCES,
-      instances: {
-        ...state.instances.list,
-        [instanceName]: updateFunction(instance)
-      }
-    });
 
     if (instance?.queue) {
       // Add it to the instance promise queue
@@ -1034,110 +1033,168 @@ export const startListener = () => {
   return async (dispatch, getState) => {
     const state = getState();
     const instancesPath = _getInstancesPath(state);
-    return watch(
-      instancesPath,
-      {
-        recursive: true,
-        filter: f =>
-          /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))?)?$/.test(
-            f.replace(instancesPath, "")
-          )
-      },
-      async (action, fileName) => {
-        const newState = getState();
-        const tempFolder = _getTempPath(newState);
-        const isMod = /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*)))$/.test(
-          fileName.replace(instancesPath, "")
+    const tempFolder = _getTempPath(state);
+    const Queue = new PromiseQueue();
+
+    const isMod = fileName =>
+      /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*)))$/.test(
+        fileName.replace(instancesPath, "")
+      );
+
+    const isValidPath = f =>
+      /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))?)?$/.test(
+        f.replace(instancesPath, "")
+      );
+
+    const watcher = chokidar.watch(instancesPath, {
+      recursive: true,
+      ignoreInitial: true,
+      awaitWriteFinish: true
+    });
+
+    watcher.on("add", async fileName => {
+      if (!isValidPath(fileName)) return;
+      const instanceName = fileName
+        .replace(instancesPath, "")
+        .substr(1)
+        .split(path.sep)[0];
+      const isLocked = await new Promise((resolve, reject) => {
+        lockfile.check(
+          path.join(instancesPath, instanceName, "installing.lock"),
+          (err, locked) => {
+            if (err) reject(err);
+            resolve(locked);
+          }
         );
-        const instanceName = fileName
-          .replace(instancesPath, "")
-          .substr(1)
-          .split(path.sep)[0];
+      });
+      if (isLocked || !isMod(fileName) || !_getInstance(state)(instanceName)) {
+        return;
+      }
+
+      const processChange = async () => {
+        const newState = getState();
         const instance = _getInstance(newState)(instanceName);
+        const isInConfig = instance.mods.find(
+          mod => mod.fileName === path.basename(fileName)
+        );
+        const stat = await fs.lstat(fileName);
 
-        const isLocked = await new Promise((resolve, reject) => {
-          lockfile.check(
-            path.join(instancesPath, instanceName, "installing.lock"),
-            (err, locked) => {
-              if (err) reject(err);
-              resolve(locked);
-            }
+        if (!isInConfig && stat.isFile() && instance) {
+          // get murmur hash
+          const murmurHash = await getFileMurmurHash2(fileName, tempFolder);
+          const { data } = await getAddonsByFingerprint([murmurHash]);
+          const exactMatch = (data.exactMatches || [])[0];
+          const notMatch = (data.unmatchedFingerprints || [])[0];
+          let mod = {};
+          if (exactMatch) {
+            mod = exactMatch.file;
+            mod.fileName = path.basename(fileName);
+          } else if (notMatch) {
+            mod = {
+              fileName: path.basename(fileName),
+              displayName: path.basename(fileName),
+              packageFingerprint: murmurHash
+            };
+          }
+          const updatedInstance = _getInstance(getState())(instanceName);
+          const isStillNotInConfig = !(updatedInstance?.mods || []).find(
+            m => m.fileName === path.basename(fileName)
           );
-        });
-        if (isLocked) return;
-
-        if (isMod) {
-          const isInConfig = instance.mods.find(
-            mod => mod.fileName === path.basename(fileName)
-          );
-          if (action === "update") {
-            // New mod on disk -> check if it's on the config
-            const stat = await fs.lstat(fileName);
-            if (!isInConfig && stat.isFile()) {
-              // get murmur hash
-              const murmurHash = await getFileMurmurHash2(fileName, tempFolder);
-              const { data } = await getAddonsByFingerprint([murmurHash]);
-              const exactMatch = (data.exactMatches || [])[0];
-              const notMatch = (data.unmatchedFingerprints || [])[0];
-              let mod = {};
-              if (exactMatch) {
-                mod = exactMatch.file;
-                mod.fileName = path.basename(fileName);
-              } else if (notMatch) {
-                mod = {
-                  fileName: path.basename(fileName),
-                  displayName: path.basename(fileName),
-                  packageFingerprint: murmurHash
-                };
-              }
-              const updatedInstance = _getInstance(getState())(instanceName);
-              const isStillNotInConfig = !updatedInstance.mods.find(
-                m => m.fileName === path.basename(fileName)
-              );
-              if (isStillNotInConfig) {
-                dispatch(
-                  updateInstanceConfig(instanceName, prev => ({
-                    ...prev,
-                    mods: [...prev.mods, mod]
-                  }))
-                );
-              }
-            }
-          } else if (isMod && action === "remove" && isInConfig) {
-            // Mod removed from disk -> remove it from disk if necessary
-            dispatch(
+          if (isStillNotInConfig && updatedInstance) {
+            console.log("ADDING", fileName, instanceName);
+            await dispatch(
               updateInstanceConfig(instanceName, prev => ({
                 ...prev,
-                mods: prev.mods.filter(
-                  m => m.fileName !== path.basename(fileName)
-                )
+                mods: [...(prev.mods || []), mod]
               }))
             );
           }
-        } else if (!isMod && action === "update") {
-          const instances = _getInstances(newState);
-          const configPath = path.join(
-            instancesPath,
-            instanceName,
-            "config.json"
-          );
-          const config = await fse.readJSON(configPath);
-          dispatch({
-            type: ActionTypes.UPDATE_INSTANCES,
-            instances: {
-              ...instances,
-              [instanceName]: { ...config, name: instanceName }
-            }
-          });
-        } else if (!isMod && action === "remove") {
-          const instances = _getInstances(newState);
-          dispatch({
-            type: ActionTypes.UPDATE_INSTANCES,
-            instances: instances.filter(i => i.name !== instanceName)
-          });
         }
+      };
+      Queue.add(processChange);
+    });
+
+    watcher.on("unlink", async fileName => {
+      if (!isValidPath(fileName)) return;
+      const instanceName = fileName
+        .replace(instancesPath, "")
+        .substr(1)
+        .split(path.sep)[0];
+      const isLocked = await new Promise((resolve, reject) => {
+        lockfile.check(
+          path.join(instancesPath, instanceName, "installing.lock"),
+          (err, locked) => {
+            if (err) reject(err);
+            resolve(locked);
+          }
+        );
+      });
+      if (isLocked || !isMod(fileName) || !_getInstance(state)(instanceName)) {
+        return;
       }
-    );
+
+      const processChange = async () => {
+        const newState = getState();
+        const instance = _getInstance(newState)(instanceName);
+        const isInConfig = instance.mods.find(
+          mod => mod.fileName === path.basename(fileName)
+        );
+        if (isInConfig) {
+          console.log("REMOVING", fileName, instanceName);
+          await dispatch(
+            updateInstanceConfig(instanceName, prev => ({
+              ...prev,
+              mods: (prev.mods || []).filter(
+                m => m.fileName !== path.basename(fileName)
+              )
+            }))
+          );
+        }
+      };
+      Queue.add(processChange);
+    });
+
+    watcher.on("addDir", async fileName => {
+      if (!isValidPath(fileName)) return;
+      const newState = getState();
+      const instanceName = fileName
+        .replace(instancesPath, "")
+        .substr(1)
+        .split(path.sep)[0];
+      const instance = _getInstance(newState)(instanceName);
+      if (!isMod(fileName) && !instance) {
+        const configPath = path.join(
+          instancesPath,
+          instanceName,
+          "config.json"
+        );
+        const config = await fse.readJSON(configPath);
+        dispatch({
+          type: ActionTypes.UPDATE_INSTANCES,
+          instances: {
+            ...newState.instances.list,
+            [instanceName]: { ...config, name: instanceName }
+          }
+        });
+      }
+    });
+
+    watcher.on("unlinkDir", fileName => {
+      if (!isValidPath(fileName)) return;
+      const newState = getState();
+      const instanceName = fileName
+        .replace(instancesPath, "")
+        .substr(1)
+        .split(path.sep)[0];
+      if (!isMod(fileName) && _getInstance(newState)(instanceName)) {
+        dispatch({
+          type: ActionTypes.UPDATE_INSTANCES,
+          instances: omit(newState.instances.list, [instanceName])
+        });
+      }
+    });
+
+    return watcher;
   };
 };
 
