@@ -1,3 +1,5 @@
+/*eslint-disable*/
+
 import axios from "axios";
 import path from "path";
 import { ipcRenderer } from "electron";
@@ -35,7 +37,7 @@ import {
   getForgeJson,
   getAddonFile,
   getJavaManifest,
-  getAddonsByFingerprint
+  getOptifineHomePage
 } from "../api";
 import {
   _getCurrentAccount,
@@ -61,7 +63,8 @@ import {
   mavenToArray,
   copyAssetsToLegacy,
   convertOSToJavaFormat,
-  getPlayerSkin
+  getPlayerSkin,
+  parseOptifineVersions
 } from "../../app/desktop/utils";
 import { openModal, closeModal } from "./modals/actions";
 import {
@@ -89,6 +92,7 @@ export function initManifests() {
       type: ActionTypes.UPDATE_JAVA_MANIFEST,
       data: java
     });
+    dispatch(initOptifine());
     const forge = removeDuplicates((await getForgeManifest()).data, "name");
     const forgeVersions = {};
     // Looping over vanilla versions, create a new entry in forge object
@@ -113,6 +117,14 @@ export function initManifests() {
       java,
       forge
     };
+  };
+}
+
+export function initOptifine() {
+  return async (dispatch, getState) => {
+    const html = await getOptifineHomePage();
+    const versions = parseOptifineVersions(html);
+    console.log("versions", versions);
   };
 }
 
