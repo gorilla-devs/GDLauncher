@@ -226,6 +226,7 @@
     "lodash.omit": "^4.5.0",
     "lodash.omitby": "^4.6.0",
     "make-dir": "^3.0.0",
+    "memoize-one": "^5.1.1",
     "murmurhash-js": "^1.0.0",
     "node-7z": "^2.0.5",
     "nsfw": "^1.2.7",
