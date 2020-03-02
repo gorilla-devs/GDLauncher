@@ -1,13 +1,12 @@
 // import watch from "node-watch";
 import makeDir from "make-dir";
 import path from "path";
+import { ipcRenderer } from "electron";
 import { _getTempPath } from "../../../common/utils/selectors";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 import modsFingerprintsScan from "./modsFingerprintsScan";
 import { startListener } from "../../../common/reducers/actions";
-
-let listener;
 
 const middleware = store => next => action => {
   const currState = store.getState();
@@ -23,9 +22,7 @@ const middleware = store => next => action => {
   // If not initialized yet, start listener and do a first-time read
   if (!nextState.instances.started || dataPathChanged) {
     const startInstancesListener = async () => {
-      if (listener) {
-        await listener.close();
-      }
+      await ipcRenderer.invoke("stop-listener");
       await makeDir(instancesPath);
       const instances = await getInstances(instancesPath);
       dispatch({
@@ -41,14 +38,13 @@ const middleware = store => next => action => {
         instances: instances1
       });
       try {
-        listener = await dispatch(startListener());
-      } catch {
+        await dispatch(startListener());
+      } catch (err) {
+        console.error(err);
         // Check if the folder exists and create it if it doesn't
-        if (listener) {
-          await listener.close();
-        }
+        await ipcRenderer.invoke("stop-listener");
         await makeDir(instancesPath);
-        listener = await dispatch(startListener());
+        await dispatch(startListener());
       }
     };
 

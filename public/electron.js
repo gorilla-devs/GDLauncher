@@ -11,6 +11,7 @@ const {
 } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
+const nsfw = require("nsfw");
 
 const discordRPC = require("./discordRPC");
 
@@ -24,6 +25,7 @@ const isDev = process.env.NODE_ENV === "development";
 
 let mainWindow;
 let tray;
+let watcher;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -241,4 +243,17 @@ ipcMain.handle("update-discord-rpc", (event, p) => {
 
 ipcMain.handle("shutdown-discord-rpc", () => {
   discordRPC.shutdownRPC();
+});
+
+ipcMain.handle("start-listener", async (e, dirPath) => {
+  watcher = await nsfw(dirPath, events => {
+    mainWindow.webContents.send("listener-events", events);
+  });
+  watcher.start();
+});
+
+ipcMain.handle("stop-listener", async () => {
+  if (watcher) {
+    await watcher.stop();
+  }
 });
