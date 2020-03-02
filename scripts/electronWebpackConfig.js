@@ -14,6 +14,10 @@ const baseConfig = {
   module: {
     rules: [
       {
+        test: /\.node$/,
+        use: "node-loader"
+      },
+      {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: {

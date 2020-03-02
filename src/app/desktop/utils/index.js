@@ -143,12 +143,11 @@ export const librariesMapper = (libraries, librariesPath) => {
   );
 };
 
-export const isLatestJavaDownloaded = async meta => {
+export const isLatestJavaDownloaded = async (meta, dataPath) => {
   const javaOs = convertOSToJavaFormat(process.platform);
   const javaMeta = meta.find(v => v.os === javaOs);
-  const userDataPath = await ipcRenderer.invoke("getUserDataPath");
   const javaFolder = path.join(
-    userDataPath,
+    dataPath,
     "java",
     javaMeta.version_data.openjdk_version
   );

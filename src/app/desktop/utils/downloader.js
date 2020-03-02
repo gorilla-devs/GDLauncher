@@ -4,8 +4,7 @@ import reqCall from "request";
 import pMap from "p-map";
 import path from "path";
 import request from "request-promise-native";
-import getFileHash from "./getFileHash";
-// import { getFileHash } from ".";
+import computeFileHash from "./computeFileHash";
 
 const fs = fss.promises;
 
@@ -47,8 +46,8 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
     try {
       await fs.access(fileName);
       if (legacyPath) await fs.access(legacyPath);
-      const checksum = await getFileHash(fileName);
-      const legacyChecksum = legacyPath && (await getFileHash(legacyPath));
+      const checksum = await computeFileHash(fileName);
+      const legacyChecksum = legacyPath && (await computeFileHash(legacyPath));
       if (checksum === sha1 && (!legacyPath || legacyChecksum === sha1)) {
         return true;
       }

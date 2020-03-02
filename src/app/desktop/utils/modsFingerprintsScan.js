@@ -1,65 +1,43 @@
 import path from "path";
 import { promises as fs } from "fs";
 import fse from "fs-extra";
-import lockfile from "lockfile";
 import pMap from "p-map";
 import { getDirectories } from ".";
 import { getFileMurmurHash2 } from "../../../common/utils";
 import { getAddonsByFingerprint } from "../../../common/api";
 
-const modsFingerprintsScan = async (instancesPath, events) => {
+const modsFingerprintsScan = async (instancesPath, tempFolder) => {
   const mapFolderToInstance = async instance => {
     try {
       const configPath = path.join(
         path.join(instancesPath, instance, "config.json")
       );
       const config = await fse.readJSON(configPath);
+      const modsFolder = path.join(instancesPath, instance, "mods");
+      const modsFolderExists = await fse.pathExists(modsFolder);
 
-      const isLocked = await new Promise((resolve, reject) => {
-        lockfile.check(
-          path.join(instancesPath, instance, "installing.lock"),
-          (err, locked) => {
-            if (err) reject(err);
-            resolve(locked);
-          }
-        );
-      });
-
-      if (isLocked) return { ...config, name: instance };
+      if (!modsFolderExists) return { ...config, name: instance };
 
       // Check if config.mods has a different number of mods than the actual number of mods
 
-      const modsFolder = path.join(instancesPath, instance, "mods");
-
-      const mapEventFiles = ev => {
-        return (
-          Array.isArray(events) &&
-          events.length !== 0 &&
-          events
-            .filter(event => event[0] === ev && event[1].includes(modsFolder))
-            .map(event => path.basename(event[1]))
-        );
-      };
-
-      const eventFiles = mapEventFiles("update");
-
       // Count the actual mods inside the folder
-      const files = eventFiles || (await fs.readdir(modsFolder));
+      const files = await fs.readdir(modsFolder);
 
-      const fileNamesToRemove = mapEventFiles("remove") || [];
+      const fileNamesToRemove = [];
       const missingMods = {};
       /* eslint-disable */
       // Check for new mods in local storage that are not present in config
       for (const file of files) {
-        const completeFilePath = path.join(modsFolder, file);
-        const stat = await fs.lstat(completeFilePath);
-        if (stat.isFile()) {
-          // 15728640 = 15mb
-          if (stat.size < 15728640) {
+        try {
+          const completeFilePath = path.join(modsFolder, file);
+          const stat = await fs.lstat(completeFilePath);
+          if (stat.isFile()) {
             // Check if file is in config
             if (!(config?.mods || []).find(mod => mod.fileName === file)) {
-              const binary = await fs.readFile(completeFilePath);
-              const murmurHash = getFileMurmurHash2(binary);
+              const murmurHash = await getFileMurmurHash2(
+                completeFilePath,
+                tempFolder
+              );
               console.log(
                 "[MODS SCANNER] Local mod not found in config",
                 file,
@@ -67,24 +45,15 @@ const modsFingerprintsScan = async (instancesPath, events) => {
               );
               missingMods[file] = murmurHash;
             }
-          } else {
-            console.warn(
-              `[MODS SCANNER] Local mod too big (${Number.parseInt(
-                stat.size / 1024 / 1024,
-                10
-              )}MB). Cannot analyze. If you manually copied it in the mods folder, please delete it and install it from GDLauncher instead.`,
-              file
-            );
           }
-        }
+        } catch {}
       }
 
       // Check for old mods in config that are not present on local storage
-      if (!eventFiles) {
-        for (const configMod of config?.mods || []) {
-          if (!files.includes(configMod.fileName)) {
-            fileNamesToRemove.push(configMod.fileName);
-          }
+      for (const configMod of config?.mods || []) {
+        if (!files.includes(configMod.fileName)) {
+          fileNamesToRemove.push(configMod.fileName);
+          console.log(`[MODS SCANNER] Removing ${configMod.fileName}`);
         }
       }
       /* eslint-enable */
@@ -132,12 +101,11 @@ const modsFingerprintsScan = async (instancesPath, events) => {
         mods: filterMods
       };
 
-      const updatedConfig = await fse.readJSON(configPath);
-      if (JSON.stringify(updatedConfig) === JSON.stringify(config)) {
+      if (JSON.stringify(config) !== JSON.stringify(newConfig)) {
         await fse.outputJson(configPath, newConfig);
         return { ...newConfig, name: instance };
       }
-      return updatedConfig;
+      return { ...config, name: instance };
     } catch (err) {
       console.error(err);
     }

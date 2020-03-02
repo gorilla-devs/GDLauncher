@@ -8,19 +8,17 @@ import { Transition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLongArrowAltLeft,
-  faLongArrowAltRight,
-  faSearch
+  faLongArrowAltRight
 } from "@fortawesome/free-solid-svg-icons";
 import { addToQueue } from "../../reducers/actions";
 import { closeModal } from "../../reducers/modals/actions";
 import { Input } from "antd";
-import { getAddonFile } from "../../api";
 import { downloadAddonZip, importAddonZip } from "../../../app/desktop/utils";
 import { _getInstancesPath, _getTempPath } from "../../utils/selectors";
 import { transparentize } from "polished";
 import bgImage from "../../../common/assets/mcCube.jpg";
 import { downloadFile } from "../../../app/desktop/utils/downloader";
-import makeDir from "make-dir";
+import { TWITCH_MODPACK, FABRIC, VANILLA, FORGE } from "../../utils/constants";
 
 const InstanceName = ({
   in: inProp,
@@ -75,10 +73,10 @@ const InstanceName = ({
 
   const createInstance = async localInstanceName => {
     if (!version || !localInstanceName) return;
-    const isVanilla = version[0] === "vanilla";
-    const isFabric = version[0] === "fabric";
-    const isForge = version[0] === "forge";
-    const isTwitchModpack = version[0] === "twitchModpack";
+    const isVanilla = version[0] === VANILLA;
+    const isFabric = version[0] === FABRIC;
+    const isForge = version[0] === FORGE;
+    const isTwitchModpack = version[0] === TWITCH_MODPACK;
     if (isVanilla) {
       dispatch(addToQueue(localInstanceName, [version[0], version[2]]));
       await wait(2);
@@ -89,7 +87,7 @@ const InstanceName = ({
       const splitItem = version[2].split(mappedItem.separator);
       dispatch(
         addToQueue(localInstanceName, [
-          "fabric",
+          FABRIC,
           splitItem[0],
           version[2],
           version[3]
@@ -150,7 +148,7 @@ const InstanceName = ({
           state={state}
           bg={
             thumbnailURL ||
-            (version && version[0] !== "twitchModpack" && bgImage)
+            (version && version[0] !== TWITCH_MODPACK && bgImage)
           }
         >
           <Transition in={clicked} timeout={200}>

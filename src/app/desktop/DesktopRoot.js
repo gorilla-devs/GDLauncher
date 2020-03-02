@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import { useDidMount } from "rooks";
 import styled from "styled-components";
 import { Switch } from "react-router";
@@ -62,7 +62,7 @@ function DesktopRoot() {
         await extract7z();
         return data;
       })
-      .then(({ java }) => javaPath || isLatestJavaDownloaded(java))
+      .then(({ java }) => javaPath || isLatestJavaDownloaded(java, dataPath))
       .then(res => {
         if (!res) dispatch(downloadJava());
         return res;
@@ -113,4 +113,4 @@ function DesktopRoot() {
   );
 }
 
-export default DesktopRoot;
+export default memo(DesktopRoot);

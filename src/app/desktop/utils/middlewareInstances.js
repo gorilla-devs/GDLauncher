@@ -1,13 +1,12 @@
 // import watch from "node-watch";
 import makeDir from "make-dir";
 import path from "path";
-import { debounce } from "lodash";
-import watch from "node-watch";
+import { ipcRenderer } from "electron";
+import { _getTempPath } from "../../../common/utils/selectors";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 import modsFingerprintsScan from "./modsFingerprintsScan";
-
-let listener;
+import { startListener } from "../../../common/reducers/actions";
 
 const middleware = store => next => action => {
   const currState = store.getState();
@@ -22,64 +21,31 @@ const middleware = store => next => action => {
 
   // If not initialized yet, start listener and do a first-time read
   if (!nextState.instances.started || dataPathChanged) {
-    const startListener = () => {
-      let events = [];
-      const updateInstances = debounce(
-        async instancesPath => {
-          const instances = await getInstances(instancesPath, events);
-          dispatch({
-            type: ActionTypes.UPDATE_INSTANCES,
-            instances
-          });
-          const instances1 = await modsFingerprintsScan(instancesPath, events);
-          dispatch({
-            type: ActionTypes.UPDATE_INSTANCES,
-            instances: instances1
-          });
-          events = [];
-        },
-        1000,
-        { maxWait: 2500, leading: true, trailing: false }
-      );
-      return watch(
-        instancesPath,
-        {
-          recursive: true,
-          filter: f =>
-            /^(\\|\/)([\w\d-.{}()[\]@#$%^&!])+((\\|\/)mods((\\|\/)(.*))?)?$/.test(
-              f.replace(instancesPath, "")
-            )
-        },
-        (e, fileName) => {
-          events.push([e, fileName]);
-          updateInstances(instancesPath).catch(console.error);
-        }
-      );
-    };
-
     const startInstancesListener = async () => {
-      if (listener && !listener.isClosed()) {
-        listener.close();
-      }
+      await ipcRenderer.invoke("stop-listener");
       await makeDir(instancesPath);
       const instances = await getInstances(instancesPath);
       dispatch({
         type: ActionTypes.UPDATE_INSTANCES,
         instances
       });
-      const instances1 = await modsFingerprintsScan(instancesPath);
+      const instances1 = await modsFingerprintsScan(
+        instancesPath,
+        _getTempPath(nextState)
+      );
       dispatch({
         type: ActionTypes.UPDATE_INSTANCES,
         instances: instances1
       });
-      listener = startListener();
-      listener.on("error", async () => {
+      try {
+        await dispatch(startListener());
+      } catch (err) {
+        console.error(err);
         // Check if the folder exists and create it if it doesn't
-        if (!listener.isClosed()) {
-          listener.close();
-        }
-        listener = startListener();
-      });
+        await ipcRenderer.invoke("stop-listener");
+        await makeDir(instancesPath);
+        await dispatch(startListener());
+      }
     };
 
     dispatch({
