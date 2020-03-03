@@ -10,12 +10,18 @@ import { Checkbox } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import _ from "lodash";
 import axios from "axios";
-import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
+import {
+  ContextMenuTrigger,
+  ContextMenu,
+  MenuItem,
+  hideMenu
+} from "react-contextmenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faCopy, faLink } from "@fortawesome/free-solid-svg-icons";
 import { _getInstancesPath } from "../../utils/selectors";
 import { openModal } from "../../reducers/modals/actions";
 import { imgurPost } from "../../api";
+import { size } from "polished";
 
 const Container = styled.div`
   display: flex;
@@ -152,9 +158,8 @@ const calcDate = async ScreenShotsDir => {
   try {
     await Promise.all(
       screens.map(async element => {
-        const screenTime = (await fs.stat(path.join(ScreenShotsDir, element)))
-          .birthtimeMs;
-        const date = new Date(screenTime);
+        const screenStats = await fs.stat(path.join(ScreenShotsDir, element));
+        const date = new Date(screenStats.birthtimeMs);
         const timeDiff = Date.now() - date;
         const totalSeconds = parseInt(Math.floor(timeDiff / 1000), 10);
         const totalMinutes = parseInt(Math.floor(totalSeconds / 60), 10);
@@ -163,7 +168,8 @@ const calcDate = async ScreenShotsDir => {
         sortedScreens = sortedScreens.concat({
           name: element,
           days,
-          timestamp: date
+          timestamp: date,
+          size: screenStats.size
         });
         sortedScreens.sort((a, b) => {
           return a.timestamp - b.timestamp;
@@ -176,14 +182,22 @@ const calcDate = async ScreenShotsDir => {
   }
 };
 
-const imgurShare = async image => {
+const imgurShare = async (image, setUploadProgress) => {
+  const uploadProgress = progressEvent => {
+    setUploadProgress(
+      Math.round((progressEvent.loaded * 100) / progressEvent.total)
+    );
+    console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+  };
+
   let screenShot = await fs.readFile(image);
 
-  let b64Img = screenShot.toString("base64");
-  const res = await imgurPost(b64Img);
+  if ((await fs.stat(image)) > 10485760) {
+    const res = await imgurPost(screenShot, uploadProgress);
 
-  if (res.status == 200) {
-    clipboard.writeText(res.data.data.link);
+    if (res.status == 200) {
+      clipboard.writeText(res.data.data.link);
+    }
   }
 };
 
@@ -228,6 +242,7 @@ const ScreenShot = ({ instanceName }) => {
   const [isHoveredName, setIsHoveredName] = useState([]);
   const [selectedScreens, setSelectedScreens] = useState([]);
   const [screensNum, setScreensNum] = useState(0);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const dispatch = useDispatch();
 
   const startListener = () => {
@@ -399,8 +414,13 @@ const ScreenShot = ({ instanceName }) => {
                               )
                             }
                           >
-                            Delete All&nbsp;
-                            <FontAwesomeIcon icon={faTrash} />
+                            <FontAwesomeIcon
+                              icon={faTrash}
+                              css={`
+                                margin: 0 7px 0 0;
+                              `}
+                            />
+                            Delete All
                           </DeleteAllButton>
                         ) : null}
                         {selectedScreens.length < 2 ? (
@@ -417,8 +437,13 @@ const ScreenShot = ({ instanceName }) => {
                                 )
                               }
                             >
-                              Delete&nbsp;
-                              <FontAwesomeIcon icon={faTrash} />
+                              <FontAwesomeIcon
+                                icon={faTrash}
+                                css={`
+                                  margin: 0 7px 0 0;
+                                `}
+                              />
+                              Delete
                             </MenuItem>
                             <MenuItem
                               onClick={() => {
@@ -427,19 +452,49 @@ const ScreenShot = ({ instanceName }) => {
                                 );
                               }}
                             >
-                              Copy the image&nbsp;
-                              <FontAwesomeIcon icon={faCopy} />
+                              <FontAwesomeIcon
+                                icon={faCopy}
+                                css={`
+                                  margin: 0 7px 0 0;
+                                `}
+                              />
+                              Copy the image
                             </MenuItem>
                             <MenuItem
-                              onClick={() => {
-                                imgurShare(
-                                  path.join(ScreenShotsDir, file.name)
+                              preventClose
+                              onClick={async () => {
+                                console.log(
+                                  "PPP",
+                                  groupedSortedPhotos[0].filter(
+                                    x => x.name === file.name
+                                  )[0].size
                                 );
+                                await imgurShare(
+                                  path.join(ScreenShotsDir, file.name),
+                                  setUploadProgress
+                                );
+                                hideMenu();
                               }}
                             >
-                              Share the image via url&nbsp;
-                              <FontAwesomeIcon icon={faLink} />
-                            </MenuItem>{" "}
+                              <FontAwesomeIcon
+                                icon={faLink}
+                                css={`
+                                  margin: 0 7px 0 0;
+                                `}
+                              />
+                              {groupedSortedPhotos[0].filter(
+                                x => x.name === file.name
+                              )[0].size < 10485760
+                                ? "Share the image via url"
+                                : `Image too big... ${Math.floor(
+                                    groupedSortedPhotos[0].filter(
+                                      x => x.name === file.name
+                                    )[0].size /
+                                      1024 /
+                                      1024
+                                  )}MB`}
+                              {/* {uploadProgress} */}
+                            </MenuItem>
                           </>
                         ) : (
                           ""
