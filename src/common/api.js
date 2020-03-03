@@ -5,7 +5,8 @@ import {
   FORGESVC_URL,
   MC_MANIFEST_URL,
   FABRIC_APIS,
-  JAVA_MANIFEST_URL
+  JAVA_MANIFEST_URL,
+  CLIENT_ID
 } from "./utils/constants";
 import { sortByDate } from "./utils";
 
@@ -53,6 +54,18 @@ export const mcGetPlayerSkin = uuid => {
   return axios.get(
     `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`
   );
+};
+
+export const imgurPost = b64Img => {
+  const bodyFormData = new FormData();
+  bodyFormData.append("image", b64Img);
+
+  const res = axios.post("https://api.imgur.com/3/image", bodyFormData, {
+    headers: {
+      Authorization: `Client-ID ${CLIENT_ID}`
+    }
+  });
+  return res;
 };
 
 export const mcInvalidate = (accessToken, clientToken) => {

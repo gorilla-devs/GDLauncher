@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faCopy, faLink } from "@fortawesome/free-solid-svg-icons";
 import { _getInstancesPath } from "../../utils/selectors";
 import { openModal } from "../../reducers/modals/actions";
-import { CLIENT_ID } from "../../utils/constants";
+import { imgurPost } from "../../api";
 
 const Container = styled.div`
   display: flex;
@@ -129,14 +129,13 @@ const deleteFile = async (
   InstancePath,
   instanceName,
   fileName,
-  multipleOrNot,
   selectedScreens
 ) => {
-  if (!multipleOrNot) {
+  if (selectedScreens.length === 1) {
     await fse.remove(
       path.join(InstancePath, instanceName, "screenshots", fileName)
     );
-  } else {
+  } else if (selectedScreens.length > 1) {
     Promise.all(
       selectedScreens.map(async screenShot => {
         await fse.remove(
@@ -181,15 +180,7 @@ const imgurShare = async image => {
   let screenShot = await fs.readFile(image);
 
   let b64Img = screenShot.toString("base64");
-
-  var bodyFormData = new FormData();
-  bodyFormData.append("image", b64Img);
-
-  const res = await axios.post("https://api.imgur.com/3/image", bodyFormData, {
-    headers: {
-      Authorization: `Client-ID ${CLIENT_ID}`
-    }
-  });
+  const res = await imgurPost(b64Img);
 
   if (res.status == 200) {
     clipboard.writeText(res.data.data.link);
@@ -207,16 +198,6 @@ const calcDateTitle = days => {
 };
 
 let watcher;
-
-const startListener = (ScreenShotsDir, setGroupedStortedPhoto) => {
-  watcher = watch(ScreenShotsDir, (event, filename) => {
-    if (filename) {
-      calcDate(ScreenShotsDir).then(sortedScreens => {
-        setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
-      });
-    }
-  });
-};
 
 const selectAll = async (
   setSelectedScreens,
@@ -249,6 +230,16 @@ const ScreenShot = ({ instanceName }) => {
   const [screensNum, setScreensNum] = useState(0);
   const dispatch = useDispatch();
 
+  const startListener = () => {
+    watcher = watch(ScreenShotsDir, (event, filename) => {
+      if (filename) {
+        calcDate(ScreenShotsDir).then(sortedScreens => {
+          setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
+        });
+      }
+    });
+  };
+
   const createDir = async ScreenShotsDir => {
     await makeDir(ScreenShotsDir);
   };
@@ -258,11 +249,11 @@ const ScreenShot = ({ instanceName }) => {
     if (fse.pathExists(ScreenShotsDir)) {
       calcDate(ScreenShotsDir).then(sortedScreens => {
         setGroupedStortedPhoto(_.groupBy(sortedScreens, "days"));
-        startListener(ScreenShotsDir, selectedScreens, setGroupedStortedPhoto);
+        startListener();
       });
     } else {
       createDir();
-      startListener(ScreenShotsDir, selectedScreens, setGroupedStortedPhoto);
+      startListener();
     }
     return () => {
       if (watcher) {
@@ -302,7 +293,6 @@ const ScreenShot = ({ instanceName }) => {
               InstancePath,
               instanceName,
               "",
-              true,
               selectedScreens,
               setSelectedScreens
             )
@@ -404,7 +394,6 @@ const ScreenShot = ({ instanceName }) => {
                                 InstancePath,
                                 instanceName,
                                 file.name,
-                                true,
                                 selectedScreens,
                                 setSelectedScreens
                               )
@@ -423,7 +412,6 @@ const ScreenShot = ({ instanceName }) => {
                                   InstancePath,
                                   instanceName,
                                   file.name,
-                                  false,
                                   selectedScreens,
                                   setSelectedScreens
                                 )
