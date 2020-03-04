@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { promises as fs, watch } from "fs";
-import { clipboard } from "electron";
+import { clipboard, ipcRenderer } from "electron";
 import fse from "fs-extra";
 import path from "path";
 import styled from "styled-components";
@@ -16,7 +16,12 @@ import {
   hideMenu
 } from "react-contextmenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faCopy, faLink } from "@fortawesome/free-solid-svg-icons";
+import {
+  faTrash,
+  faCopy,
+  faLink,
+  faFolder
+} from "@fortawesome/free-solid-svg-icons";
 import { _getInstancesPath } from "../../utils/selectors";
 import { openModal } from "../../reducers/modals/actions";
 import { imgurPost } from "../../api";
@@ -61,6 +66,10 @@ const getImgurLink = async (imagePath, fileSize, setProgressUpdate) => {
       clipboard.writeText(res.data.data.link);
     }
   }
+};
+
+const openFolder = screenshotsPath => {
+  ipcRenderer.invoke("openFolder", screenshotsPath);
 };
 
 const getTitle = days => {
@@ -173,9 +182,20 @@ const Screenshots = ({ instanceName }) => {
         <div>{`${selectedItems.length} selected`}</div>
 
         <DeleteButton
-          onClick={() => deleteFile()}
+          onClick={() => {
+            dispatch(
+              openModal("ConfirmationModal", {
+                message: "Are you sure you want to delete this images?",
+                confirmCallback: deleteFile
+              })
+            );
+          }}
           selectedItems={selectedItems}
           icon={faTrash}
+        />
+        <OpenFolderButton
+          onClick={() => openFolder(screenshotsPath)}
+          icon={faFolder}
         />
       </Bar>
       <Container groupsCount={Object.entries(dateGroups).length}>
@@ -246,7 +266,16 @@ const Screenshots = ({ instanceName }) => {
                         selectedItems.length <
                           getScreenshotsCount(dateGroups) ? (
                           <DeleteAllButton
-                            onClick={() => deleteFile(file.name)}
+                            onClick={() => {
+                              dispatch(
+                                openModal("ConfirmationModal", {
+                                  message:
+                                    "Are you sure you want to delete this image?",
+                                  fileName: file.name,
+                                  confirmCallback: deleteFile
+                                })
+                              );
+                            }}
                           >
                             <FontAwesomeIcon icon={faTrash} />
                             {`Delete ${selectedItems.length} items`}
@@ -255,7 +284,16 @@ const Screenshots = ({ instanceName }) => {
                           selectedItems.length ===
                             getScreenshotsCount(dateGroups) && (
                             <DeleteAllButton
-                              onClick={() => deleteFile(file.name)}
+                              onClick={() => {
+                                dispatch(
+                                  openModal("ConfirmationModal", {
+                                    message:
+                                      "Are you sure you want to delete this image?",
+                                    fileName: file.name,
+                                    confirmCallback: deleteFile
+                                  })
+                                );
+                              }}
                             >
                               <FontAwesomeIcon icon={faTrash} />
                               Delete all
@@ -265,7 +303,17 @@ const Screenshots = ({ instanceName }) => {
 
                         {selectedItems.length < 2 && (
                           <>
-                            <MenuItem onClick={() => deleteFile(file.name)}>
+                            <MenuItem
+                              onClick={() => {
+                                dispatch(
+                                  openModal("ConfirmationModal", {
+                                    message: "CIAOOO",
+                                    fileName: file.name,
+                                    confirmCallback: deleteFile
+                                  })
+                                );
+                              }}
+                            >
                               <FontAwesomeIcon icon={faTrash} />
                               Delete
                             </MenuItem>
@@ -394,6 +442,13 @@ const DeleteButton = styled(FontAwesomeIcon)`
     }
   }
   cursor: ${props => (props.selectedItems.length > 0 ? "pointer" : "")};
+`;
+
+const OpenFolderButton = styled(FontAwesomeIcon)`
+  float: right;
+  margin-left: 20px;
+  transition: color 0.3s ease-in-out;
+  cursor: pointer;
 `;
 
 const DeleteAllButton = styled(MenuItem)`
