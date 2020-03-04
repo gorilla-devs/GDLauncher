@@ -57,7 +57,6 @@ export const mcGetPlayerSkin = uuid => {
 };
 
 export const imgurPost = (image, onProgress) => {
-
   const bodyFormData = new FormData();
   bodyFormData.append("image", image);
 
