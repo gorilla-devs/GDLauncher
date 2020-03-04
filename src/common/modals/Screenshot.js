@@ -16,10 +16,9 @@ const Img = styled.img`
   height: 100%;
 `;
 
-export default function ShowScreenShot({ ScreenShotsDir, file }) {
-  const image = path.join(ScreenShotsDir, file.name);
+export default function Screenshot({ screenshotsPath, file }) {
+  const image = path.join(screenshotsPath, file.name);
 
-  console.log(ScreenShotsDir, file.name);
   return (
     <Modal
       css={`

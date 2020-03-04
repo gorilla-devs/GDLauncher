@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Button } from "antd";
 import Modal from "../../components/Modal";
 import Overview from "./Overview";
-import ScreenShot from "./ScreenShot";
+import Screenshots from "./Screenshots";
 import Notes from "./Notes";
 import Mods from "./Mods";
 import { useSelector } from "react-redux";
@@ -75,7 +75,7 @@ const InstanceManager = ({ instanceName }) => {
     notes: { name: "Notes", component: Notes },
     resourcePacks: { name: "Resource Packs", component: Overview },
     worlds: { name: "Worlds", component: Overview },
-    screenshots: { name: "Screenshots", component: ScreenShot },
+    screenshots: { name: "Screenshots", component: Screenshots },
     settings: { name: "Settings", component: Overview },
     servers: { name: "Servers", component: Overview }
   };
