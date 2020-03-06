@@ -152,11 +152,10 @@ export const parseOptifineVersions = html => {
     ...Object.values($("table.downloads > tbody > tr> td").children())
   ];
   const hashMap = {};
-  const arr = [];
 
   for (const element of minecraftVersionsList) {
     if (element.name === "h2") {
-      hashMap[element.children[0].data.split(" ")[1]] = {};
+      hashMap[element.children[0].data.split(" ")[1]] = [];
 
       Object.values($("table.downloadTable").children())
         .slice(1)
@@ -172,26 +171,28 @@ export const parseOptifineVersions = html => {
         })[0]
         .children.filter(x => x.name === "tr")
         .map(x => {
-          hashMap[element.children[0].data.split(" ")[1]][
-            x.children[1].children[0].data
-          ] = {
-            download: x.children[5].children[0].attribs.href,
-            changelog: x.children[7].children[0].attribs.href.includes(
-              "https://optifine.net"
-            )
-              ? x.children[7].children[0].attribs.href
-              : "https://optifine.net/" +
-                x.children[7].children[0].attribs.href,
-            data: x.children[9].children[0].data
-          };
+          hashMap[element.children[0].data.split(" ")[1]] = [
+            ...hashMap[element.children[0].data.split(" ")[1]],
+            {
+              name: x.children[1].children[0].data,
+              download: x.children[5].children[0].attribs.href,
+              changelog: x.children[7].children[0].attribs.href.includes(
+                "https://optifine.net"
+              )
+                ? x.children[7].children[0].attribs.href
+                : "https://optifine.net/" +
+                  x.children[7].children[0].attribs.href,
+              data: x.children[9].children[0].data
+            }
+          ];
         });
 
-      console.log(hashMap);
     }
   }
+  return hashMap;
 };
 
-export const isLatestJavaDownloaded = async meta => {
+export const isLatestJavaDownloaded = async (meta, dataPath) => {
   const javaOs = convertOSToJavaFormat(process.platform);
   const javaMeta = meta.find(v => v.os === javaOs);
   const javaFolder = path.join(
