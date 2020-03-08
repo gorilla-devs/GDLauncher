@@ -6,7 +6,9 @@ import styled from "styled-components";
 // import LoginHelper from "components/modals/LoginHelper";
 import AddInstance from "../modals/AddInstance";
 import Settings from "../modals/Settings/Settings";
+import Screenshot from "../modals/Screenshot";
 import InstanceDeleteConfirmation from "../modals/InstanceDeleteConfirmation";
+import ActionConfirmation from "../modals/ActionConfirmation";
 import AccountsManager from "../modals/AccountsManager";
 import JavaDownload from "../modals/JavaDownload";
 import AddAccount from "../modals/AddAccount";
@@ -47,8 +49,10 @@ const modalsComponentLookupTable = {
   AddInstance,
   AccountsManager,
   Settings,
+  Screenshot,
   JavaDownload,
   InstanceDeleteConfirmation,
+  ActionConfirmation,
   AddAccount,
   ModpackDescription,
   InstanceManager
