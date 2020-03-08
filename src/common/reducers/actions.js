@@ -47,7 +47,8 @@ import {
   _getLibrariesPath,
   _getAccounts,
   _getTempPath,
-  _getInstance
+  _getInstance,
+  _getDataStorePath
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -98,7 +99,7 @@ export function initManifests() {
         .filter(
           ver =>
             ver.gameVersion === v.id &&
-            gte(coerce(ver.gameVersion), coerce("1.6.4"))
+            gte(coerce(ver.gameVersion), coerce("1.6.1"))
         )
         .map(ver => ver.name.replace("forge-", ""));
     });
@@ -258,6 +259,16 @@ export function updateDownloadProgress(percentage) {
       instanceName: currentDownload,
       percentage: Number(percentage.toFixed())
     });
+  };
+}
+
+export function downloadJavaLegacyFixer() {
+  return async (dispatch, getState) => {
+    const state = getState();
+    await downloadFile(
+      path.join(_getDataStorePath(state), "__JLF__.jar"),
+      GDL_LEGACYJAVAFIXER_MOD_URL
+    );
   };
 }
 
@@ -754,13 +765,6 @@ export function downloadForge(instanceName) {
       _getLibrariesPath(state)
     );
 
-    if (lt(coerce(modloader[2]), coerce("10.13.1.1217"))) {
-      await downloadFile(
-        path.join(_getInstancesPath(state), instanceName, "mods", "LJF.jar"),
-        GDL_LEGACYJAVAFIXER_MOD_URL
-      );
-    }
-
     const updatePercentage = downloaded => {
       dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
     };
@@ -1180,7 +1184,9 @@ export const startListener = () => {
         if (
           (!isMod(completePath) && !isInstanceFolderPath(completePath)) ||
           // When renaming, an ADD action is dispatched too. Try to discard that
-          (event.action === 0 && changesTracker[completePath])
+          (event.action === 0 && changesTracker[completePath]) ||
+          // Ignore java legacy fixer
+          path.basename(completePath) === "__JLF__.jar"
         ) {
           return;
         }
@@ -1272,6 +1278,13 @@ export const launchInstance = instanceName => {
     const { modloader } = _getInstance(state)(instanceName);
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
+    const instanceJLFPath = path.join(
+      _getInstancesPath(state),
+      instanceName,
+      "mods",
+      "__JLF__.jar"
+    );
+
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
     );
@@ -1303,6 +1316,30 @@ export const launchInstance = instanceName => {
       modloader &&
       (modloader[0] === "forge" || modloader[0] === "twitchModpack")
     ) {
+      const getForceLastVer = ver =>
+        Number.parseInt(ver.split(".")[ver.split(".").length - 1], 10);
+
+      if (
+        lt(coerce(modloader[2]), coerce("10.13.1")) &&
+        gte(coerce(modloader[2]), coerce("9.11.1")) &&
+        getForceLastVer(modloader[2]) < 1217 &&
+        getForceLastVer(modloader[2]) > 935
+      ) {
+        const moveJavaLegacyFixerToInstance = async () => {
+          await fs.lstat(path.join(_getDataStorePath(state), "__JLF__.jar"));
+          await fse.move(
+            path.join(_getDataStorePath(state), "__JLF__.jar"),
+            instanceJLFPath
+          );
+        };
+        try {
+          await moveJavaLegacyFixerToInstance();
+        } catch {
+          await dispatch(downloadJavaLegacyFixer(modloader));
+          await moveJavaLegacyFixerToInstance();
+        }
+      }
+
       const forgeJsonPath = path.join(
         _getLibrariesPath(state),
         "net",
@@ -1378,6 +1415,7 @@ export const launchInstance = instanceName => {
 
     process.on("close", code => {
       ipcRenderer.invoke("show-window");
+      fse.remove(instanceJLFPath);
       if (code !== 0) {
         console.log(`process exited with code ${code}`);
       }
