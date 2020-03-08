@@ -522,7 +522,7 @@ const SelectCheckBox = styled(Checkbox)`
 const ImgurShareMenuItem = styled(MenuItem)`
   overflow: hidden;
   position: relative;
-  padding: 0 ;
+  padding: 0;
 `;
 
 const MenuShareLink = styled(MenuItem)`

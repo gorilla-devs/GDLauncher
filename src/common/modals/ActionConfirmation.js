@@ -23,18 +23,18 @@ const Buttons = styled.div`
 
 const applyChoice = async (
   choiceType,
-  func,
+  callback,
   fileName,
   dispatch,
   delay = 500
 ) => {
   if (choiceType === "abort") {
-    if (func) {
-      func();
+    if (callback) {
+      callback();
       setTimeout(() => dispatch(closeModal()), delay);
     } else dispatch(closeModal());
   } else {
-    func(fileName);
+    callback(fileName);
     setTimeout(() => dispatch(closeModal()), delay);
   }
 };
