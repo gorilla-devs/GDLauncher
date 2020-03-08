@@ -184,9 +184,10 @@ const Screenshots = ({ instanceName }) => {
         <DeleteButton
           onClick={() => {
             dispatch(
-              openModal("ConfirmationModal", {
+              openModal("ActionConfirmation", {
                 message: "Are you sure you want to delete this images?",
-                confirmCallback: deleteFile
+                confirmCallback: deleteFile,
+                title: "Confirm"
               })
             );
           }}
@@ -268,11 +269,12 @@ const Screenshots = ({ instanceName }) => {
                           <DeleteAllButton
                             onClick={() => {
                               dispatch(
-                                openModal("ConfirmationModal", {
+                                openModal("ActionConfirmation", {
                                   message:
                                     "Are you sure you want to delete this image?",
                                   fileName: file.name,
-                                  confirmCallback: deleteFile
+                                  confirmCallback: deleteFile,
+                                  title: "Confirm"
                                 })
                               );
                             }}
@@ -286,11 +288,12 @@ const Screenshots = ({ instanceName }) => {
                             <DeleteAllButton
                               onClick={() => {
                                 dispatch(
-                                  openModal("ConfirmationModal", {
+                                  openModal("ActionConfirmation", {
                                     message:
                                       "Are you sure you want to delete this image?",
                                     fileName: file.name,
-                                    confirmCallback: deleteFile
+                                    confirmCallback: deleteFile,
+                                    title: "Confirm"
                                   })
                                 );
                               }}
@@ -306,10 +309,12 @@ const Screenshots = ({ instanceName }) => {
                             <MenuItem
                               onClick={() => {
                                 dispatch(
-                                  openModal("ConfirmationModal", {
-                                    message: "CIAOOO",
+                                  openModal("ActionConfirmation", {
+                                    message:
+                                      "Are you sure you want to delete this image?",
                                     fileName: file.name,
-                                    confirmCallback: deleteFile
+                                    confirmCallback: deleteFile,
+                                    title: "Confirm"
                                   })
                                 );
                               }}
@@ -370,7 +375,7 @@ const Screenshots = ({ instanceName }) => {
             );
           })
         ) : (
-          <NoScreenAvailable>No ScreensShots Available</NoScreenAvailable>
+          <NoScreenAvailable>No Screenshots Available</NoScreenAvailable>
         )}
       </Container>
     </ExternalContainer>
@@ -493,14 +498,13 @@ const Photo = styled.img`
   border-radius: 5px;
   transition: transform 0.2s ease-in-out;
   filter: brightness(80%);
-  height: 100px;
   border: ${props =>
     props.selected ? `solid 2px ${props.theme.palette.colors.blue}` : ""};
 `;
 
 const SelectCheckBoxContainer = styled.div`
   height: 10px;
-  width; 10px;
+  width: 10px;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -511,14 +515,14 @@ const SelectCheckBox = styled(Checkbox)`
   position: absolute;
   top: 10px;
   left: 15px;
-  z-index: 1000;
+  z-index: 2;
   opacity: ${props => (props.selected ? 1 : 0)};
 `;
 
 const ImgurShareMenuItem = styled(MenuItem)`
   overflow: hidden;
   position: relative;
-  padding: 0 !important;
+  padding: 0 ;
 `;
 
 const MenuShareLink = styled(MenuItem)`
@@ -541,7 +545,6 @@ const PhotoContainer = styled.div`
   filter: brightness(80%);
   transform: ${props =>
     props.selectedItems.indexOf(props.name) > -1 ? "scale(1.1)" : "scale(1)"};
-  height: 100px;
   &:hover {
     transform: scale(1.1);
     ${SelectCheckBox} {

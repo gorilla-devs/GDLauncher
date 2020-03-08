@@ -21,14 +21,14 @@ const Buttons = styled.div`
   justify-content: space-between;
 `;
 
-const applyChoise = async (
-  choiseType,
+const applyChoice = async (
+  choiceType,
   func,
   fileName,
   dispatch,
   delay = 500
 ) => {
-  if (choiseType === "abort") {
+  if (choiceType === "abort") {
     if (func) {
       func();
       setTimeout(() => dispatch(closeModal()), delay);
@@ -39,12 +39,13 @@ const applyChoise = async (
   }
 };
 
-export default function ConfirmationModal({
-  message,
+export default function ActionConfirmation({
   confirmCallback,
-  fileName,
   abortCallback,
-  delay
+  message,
+  fileName,
+  delay,
+  title
 }) {
   const dispatch = useDispatch();
   return (
@@ -56,21 +57,21 @@ export default function ConfirmationModal({
         max-height: 260px;
         overflow: hidden;
       `}
-      title="Confirm"
+      title={title}
     >
       <Container>
         {message}
         <Buttons>
           <Button
             onClick={() => {
-              applyChoise("abort", abortCallback, fileName, dispatch, delay);
+              applyChoice("abort", abortCallback, fileName, dispatch, delay);
             }}
           >
             Abort
           </Button>
           <Button
             onClick={() =>
-              applyChoise("confirm", confirmCallback, fileName, dispatch, delay)
+              applyChoice("confirm", confirmCallback, fileName, dispatch, delay)
             }
           >
             Confirm
