@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import { useDidMount } from "rooks";
 import styled from "styled-components";
 import { Switch } from "react-router";
@@ -46,6 +46,7 @@ function DesktopRoot() {
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
   const javaPath = useSelector(state => state.settings.java.path);
+  const dataPath = useSelector(state => state.settings.dataPath);
   const location = useSelector(state => state.router.location);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
 
@@ -53,7 +54,7 @@ function DesktopRoot() {
   useDidMount(() => {
     ipcRenderer
       .invoke("getUserDataPath")
-      .then(res => dispatch(updateDataPath(res)))
+      .then(res => dataPath || dispatch(updateDataPath(res)))
       .catch(console.error);
     dispatch(checkClientToken());
     dispatch(initManifests())
@@ -61,7 +62,7 @@ function DesktopRoot() {
         await extract7z();
         return data;
       })
-      .then(({ java }) => javaPath || isLatestJavaDownloaded(java))
+      .then(({ java }) => javaPath || isLatestJavaDownloaded(java, dataPath))
       .then(res => {
         if (!res) dispatch(downloadJava());
         return res;
@@ -112,4 +113,4 @@ function DesktopRoot() {
   );
 }
 
-export default DesktopRoot;
+export default memo(DesktopRoot);

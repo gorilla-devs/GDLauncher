@@ -10,10 +10,10 @@
 @html-selector: html;
 
 // -------- Colors -----------
-@primary-color: #1A5363;
-@info-color: #1A5363;
+@primary-color: #406e8e;
+@info-color: #406e8e;
 @success-color: @green-6;
-@processing-color: #1A5363;
+@processing-color: #406e8e;
 @error-color: @red-5;
 @highlight-color: @red-5;
 @warning-color: @gold-6;
@@ -130,9 +130,9 @@
 @background-color-base: hsv(0, 0, 15%); // Default grey background color
 
 // Disabled states
-@disabled-color: fade(#000, 25%);
+@disabled-color: fade(#fff, 25%);
 @disabled-bg: @background-color-base;
-@disabled-color-dark: fade(#000, 35%);
+@disabled-color-dark: fade(#fff, 35%);
 
 // Shadow
 @shadow-color: rgba(0, 0, 0, 0.15);
@@ -642,7 +642,7 @@
 @switch-sm-checked-margin-left: -(@switch-sm-height - 3px);
 @switch-disabled-opacity: 0.4;
 @switch-color: @primary-color;
-@switch-bg: @component-background;
+@switch-bg: @white;
 @switch-shadow-color: fade(#00230b, 20%);
 
 // Pagination
@@ -680,11 +680,11 @@
 // ---
 @slider-margin: 10px 6px 10px;
 @slider-rail-background-color: @background-color-base;
-@slider-rail-background-color-hover: #e1e1e1;
-@slider-track-background-color: @primary-3;
-@slider-track-background-color-hover: @primary-4;
+@slider-rail-background-color-hover: @background-color-base;
+@slider-track-background-color: @primary-color;
+@slider-track-background-color-hover: @primary-color;
 @slider-handle-border-width: 2px;
-@slider-handle-background-color: @component-background;
+@slider-handle-background-color: @white;
 @slider-handle-color: @primary-3;
 @slider-handle-color-hover: @primary-4;
 @slider-handle-color-focus: tint(@primary-color, 20%);

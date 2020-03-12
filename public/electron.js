@@ -11,6 +11,7 @@ const {
 } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
+const nsfw = require("nsfw");
 
 const discordRPC = require("./discordRPC");
 
@@ -24,13 +25,14 @@ const isDev = process.env.NODE_ENV === "development";
 
 let mainWindow;
 let tray;
+let watcher;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 550,
-    minWidth: 1000,
-    minHeight: 550,
+    width: 1100,
+    height: 700,
+    minWidth: 1100,
+    minHeight: 700,
     show: true,
     frame: false,
     backgroundColor: "#353E48",
@@ -211,7 +213,12 @@ ipcMain.handle("getPrimaryDisplaySizes", () => {
 autoUpdater.autoDownload = false;
 
 autoUpdater.on("update-available", () => {
-  autoUpdater.downloadUpdate();
+  if (process.env.NODE_ENV !== "development") {
+    autoUpdater.downloadUpdate();
+  } else {
+    // Fake update
+    mainWindow.webContents.send("updateAvailable");
+  }
 });
 
 autoUpdater.on("update-downloaded", () => {
@@ -236,4 +243,17 @@ ipcMain.handle("update-discord-rpc", (event, p) => {
 
 ipcMain.handle("shutdown-discord-rpc", () => {
   discordRPC.shutdownRPC();
+});
+
+ipcMain.handle("start-listener", async (e, dirPath) => {
+  watcher = await nsfw(dirPath, events => {
+    mainWindow.webContents.send("listener-events", events);
+  });
+  watcher.start();
+});
+
+ipcMain.handle("stop-listener", async () => {
+  if (watcher) {
+    await watcher.stop();
+  }
 });

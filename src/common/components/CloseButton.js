@@ -3,9 +3,10 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
 
-const CloseButton = ({ onClick }) => {
+const CloseButton = props => {
   return (
-    <CloseIcon onClick={onClick}>
+    // eslint-disable-next-line
+    <CloseIcon {...props}>
       <FontAwesomeIcon icon={faWindowClose} />
     </CloseIcon>
   );

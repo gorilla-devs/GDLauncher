@@ -18,8 +18,8 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const configureStore = () => {
   // Redux Configuration
-  const middleware = [];
-  const enhancers = [thunk];
+  const middleware = [thunk];
+  const enhancers = [];
 
   const logger = createLogger({
     // We need to hide the UPDATE_PROGRESS dispatches, since they are just too many and they slow down the execution

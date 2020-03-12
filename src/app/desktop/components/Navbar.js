@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { ipcRenderer } from "electron";
@@ -8,6 +8,7 @@ import { faCog, faDownload } from "@fortawesome/free-solid-svg-icons";
 import logo from "../../../common/assets/logo.png";
 
 import { openModal } from "../../../common/reducers/modals/actions";
+import { updateUpdateAvailable } from "../../../common/reducers/actions";
 
 export const Container = styled.div`
   width: 100vw;
@@ -54,17 +55,18 @@ export const UpdateButton = styled.div`
 `;
 
 const Navbar = () => {
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const updateAvailable = useSelector(state => state.updateAvailable);
   const location = useSelector(state => state.router.location.pathname);
   const dispatch = useDispatch();
 
   useEffect(() => {
     // Check every 10 minutes
+    ipcRenderer.invoke("checkForUpdates");
+    ipcRenderer.on("updateAvailable", () => {
+      dispatch(updateUpdateAvailable(true));
+    });
     setInterval(() => {
       ipcRenderer.invoke("checkForUpdates");
-      ipcRenderer.on("updateAvailable", () => {
-        setUpdateAvailable(true);
-      });
     }, 600000);
   }, []);
 
@@ -75,7 +77,7 @@ const Navbar = () => {
     return false;
   };
 
-  if (isLocation("/")) return null;
+  if (isLocation("/") || isLocation("/onboarding")) return null;
   return (
     <Container>
       <img

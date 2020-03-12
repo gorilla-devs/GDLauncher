@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { ipcRenderer } from "electron";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faJava } from "@fortawesome/free-brands-svg-icons";
 import {
   faMemory,
   faFolder,
   faUndo,
-  faLevelDownAlt
+  faLevelDownAlt,
+  faList
 } from "@fortawesome/free-solid-svg-icons";
 import { Slider, Button, Input, Switch } from "antd";
 import {
@@ -20,13 +22,15 @@ import { _getJavaPath } from "../../../utils/selectors";
 
 const JavaSettings = styled.div`
   width: 100%;
-  height: 500px;
+  height: 400px;
 `;
 
 const AutodetectPath = styled.div`
-  margin-top: 38px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   width: 100%;
-  height: 100px;
+  height: 40px;
 `;
 
 const SelectMemory = styled.div`
@@ -40,16 +44,13 @@ const JavaCustomArguments = styled.div`
 `;
 
 const Title = styled.h3`
-  position: absolute;
   font-size: 15px;
   font-weight: 700;
   color: ${props => props.theme.palette.text.secondary};
 `;
 
 const Paragraph = styled.p`
-  text-align: left;
   color: ${props => props.theme.palette.text.third};
-  width: 300px;
 `;
 
 const Hr = styled.hr`
@@ -59,21 +60,21 @@ const Hr = styled.hr`
 
 const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
+  width: 80px;
+  margin: 30px 0 20px 0;
 `;
 
-const StyledButtons = styled(Button)``;
+const StyledButtons = styled(Button)`
+  float: right;
+`;
 
 function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const openFolderDialog = async (
-  javaPath,
-  updateJavaArguments,
-  updateJavaPath,
-  dispatch
-) => {
-  const paths = await ipcRenderer.invoke("openFolderDialog", javaPath);
+const openFolderDialog = async (javaPath, updateJavaPath, dispatch) => {
+  const paths = await ipcRenderer.invoke("openFileDialog", javaPath);
+  if (!paths[0]) return;
   dispatch(updateJavaPath(paths[0]));
 };
 
@@ -88,59 +89,52 @@ export default function MyAccountPreferences() {
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
   const javaPath = useSelector(_getJavaPath);
-  const [autodetectJavaPath, setAutodetectJavaPath] = useState(true);
-  const [memory, setMemory] = useState(javaMemory);
+  const customJavaPath = useSelector(state => state.settings.java.path);
   const dispatch = useDispatch();
 
   return (
     <JavaSettings>
-      <MainTitle
+      <MainTitle>Java</MainTitle>
+      <Title
         css={`
-          float: left;
-          margin: 0;
+          width: 200px;
+          text-align: left;
         `}
       >
-        Java
-      </MainTitle>
+        Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faJava} />
+      </Title>
       <AutodetectPath>
-        <Title
-          css={`
-            position: absolute;
-            top: 80px;
-          `}
-        >
-          Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faFolder} />
-        </Title>
         <Paragraph
           css={`
-            position: absolute;
-            top: 100px;
+            text-align: left;
           `}
         >
-          If enable, Java path will be autodetected
+          Disable this to specify a custom java path to use instead of using
+          openJDK shipped with GDLauncher. Please select the java.exe binary
         </Paragraph>
         <Switch
-          style={{
-            float: "right",
-            marginTop: "65px"
-          }}
           color="primary"
-          onChange={c => setAutodetectJavaPath(c)}
-          checked={autodetectJavaPath}
+          onChange={c => {
+            if (c) {
+              dispatch(updateJavaPath(null));
+            } else {
+              dispatch(updateJavaPath(javaPath));
+            }
+          }}
+          checked={!customJavaPath}
         />
       </AutodetectPath>
-      {!autodetectJavaPath && (
+      {customJavaPath && (
         <>
           <div
             css={`
               height: 40px;
-              margin-top: 30px;
             `}
           >
             <div
               css={`
-                margin-top: 20px;
                 width: 100%;
+                margin: 20px 0;
               `}
             >
               <FontAwesomeIcon
@@ -151,21 +145,15 @@ export default function MyAccountPreferences() {
               <Input
                 css={`
                   width: 75%;
-                  margin-right: 10px;
-                  margin-left: 10px;
+                  margin: 0 10px;
                 `}
                 onChange={e => dispatch(updateJavaPath(e.target.value))}
-                value={javaPath}
+                value={customJavaPath}
               />
               <StyledButtons
                 color="primary"
                 onClick={() =>
-                  openFolderDialog(
-                    javaPath,
-                    updateJavaArguments,
-                    updateJavaPath,
-                    dispatch
-                  )
+                  openFolderDialog(customJavaPath, updateJavaPath, dispatch)
                 }
               >
                 <FontAwesomeIcon icon={faFolder} />
@@ -178,17 +166,16 @@ export default function MyAccountPreferences() {
       <SelectMemory>
         <Title
           css={`
-            position: relative;
-            top: 0;
             width: 100%;
             margin-top: 0px;
             height: 8px;
             text-align: left;
+            margin-bottom: 20px;
           `}
         >
           Java Memory&nbsp; <FontAwesomeIcon icon={faMemory} />
         </Title>
-        <p
+        <Paragraph
           css={`
             width: 100%;
             text-align: left;
@@ -196,16 +183,15 @@ export default function MyAccountPreferences() {
           `}
         >
           Select the preferred amount of memory to use when lauching the game
-        </p>
+        </Paragraph>
         <Slider
           css={`
-            margin-top: 20px;
+            margin: 20px 20px 20px 0;
           `}
           onChange={e => {
             dispatch(updateJavaMemory(e));
-            setMemory(e);
           }}
-          defaultValue={memory}
+          defaultValue={javaMemory}
           min={1024}
           max={16384}
           step={512}
@@ -213,30 +199,28 @@ export default function MyAccountPreferences() {
           valueLabelDisplay="auto"
         />
       </SelectMemory>
-      <Hr />
+      <Hr
+        css={`
+          margin-top: 40px;
+        `}
+      />
       <JavaCustomArguments>
         <Title
           css={`
-            position: relative;
-            top: 0;
             width: 100%;
-            margin-top: 0px;
-            height: 8px;
             text-align: left;
+            margin-bottom: 20px;
           `}
         >
-          Java Custom Arguments
+          Java Custom Arguments &nbsp; <FontAwesomeIcon icon={faList} />
         </Title>
-        <p
+        <Paragraph
           css={`
-            marin-top: 20px;
-            width: 100%;
-            margin: 0;
             text-align: left;
           `}
         >
-          Select the preferred amount of memory to use when lauching the game
-        </p>
+          Select the preferred custom arguments to use when lauching the game
+        </Paragraph>
         <div
           css={`
             margin-top: 20px;
@@ -248,8 +232,8 @@ export default function MyAccountPreferences() {
             value={javaArgs}
             css={`
               width: 83%;
-              height: 26px;
-              margin-right: 10px;
+              height: 32px;
+              float: left;
             `}
           />
           <StyledButtons

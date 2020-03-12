@@ -4,8 +4,12 @@ import styled from "styled-components";
 import { Button } from "antd";
 import Modal from "../../components/Modal";
 import Overview from "./Overview";
+import Screenshots from "./Screenshots";
 import Notes from "./Notes";
 import Mods from "./Mods";
+import { useSelector } from "react-redux";
+import { _getInstance } from "../../utils/selectors";
+import { TWITCH_MODPACK, FORGE, FABRIC } from "../../utils/constants";
 
 const SideMenu = styled.div`
   display: flex;
@@ -27,20 +31,20 @@ const SettingsButton = styled(Button)`
   align-items: left;
   justify-content: left;
   text-align: left;
-  width: 150px;
-  height: 30px;
+  width: 170px;
+  height: 40px;
   border-radius: 4px 0 0 4px;
-  font-size: 12px;
+  font-size: 13px;
+  transition: all 0.2s ease-in-out;
   white-space: nowrap;
   background: ${props =>
     props.active ? props.theme.palette.grey[600] : "transparent"};
   border: 0px;
   text-align: left;
-  animation-duration: 0s;
   color: ${props => props.theme.palette.text.primary};
   &:hover {
     color: ${props => props.theme.palette.text.primary};
-    background: ${props => props.theme.palette.grey[props.active ? 600 : 700]};
+    background: ${props => props.theme.palette.grey[props.active ? 600 : 800]};
   }
   &:focus {
     color: ${props => props.theme.palette.text.primary};
@@ -56,9 +60,11 @@ const Container = styled.div`
 
 const Content = styled.div`
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   padding: 10px;
+  position: relative;
 `;
 
 const InstanceManager = ({ instanceName }) => {
@@ -69,12 +75,13 @@ const InstanceManager = ({ instanceName }) => {
     notes: { name: "Notes", component: Notes },
     resourcePacks: { name: "Resource Packs", component: Overview },
     worlds: { name: "Worlds", component: Overview },
-    screenshots: { name: "Screenshots", component: Overview },
+    screenshots: { name: "Screenshots", component: Screenshots },
     settings: { name: "Settings", component: Overview },
     servers: { name: "Servers", component: Overview }
   };
 
   const [page, setPage] = useState(Object.keys(menuEntries)[0]);
+  const instance = useSelector(state => _getInstance(state)(instanceName));
   const ContentComponent = menuEntries[page].component;
 
   return (
@@ -90,11 +97,27 @@ const InstanceManager = ({ instanceName }) => {
       <Container>
         <SideMenuContainer>
           <SideMenu>
-            {Object.entries(menuEntries).map(([k, tab]) => (
-              <SettingsButton key={tab.name} onClick={e => setPage(k)} active={k === page}>
-                {tab.name}
-              </SettingsButton>
-            ))}
+            {Object.entries(menuEntries).map(([k, tab]) => {
+              if (
+                (tab.name === menuEntries.mods.name &&
+                  instance?.modloader[0] !== TWITCH_MODPACK &&
+                  instance?.modloader[0] !== FORGE &&
+                  instance?.modloader[0] !== FABRIC) ||
+                (tab.name === menuEntries.modpack.name &&
+                  instance?.modloader[0] !== TWITCH_MODPACK)
+              ) {
+                return null;
+              }
+              return (
+                <SettingsButton
+                  key={tab.name}
+                  onClick={e => setPage(k)}
+                  active={k === page}
+                >
+                  {tab.name}
+                </SettingsButton>
+              );
+            })}
           </SideMenu>
         </SideMenuContainer>
         <Content>

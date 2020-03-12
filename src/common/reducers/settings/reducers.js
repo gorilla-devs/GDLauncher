@@ -23,15 +23,6 @@ function dataPath(state = null, action) {
   }
 }
 
-function instancesPath(state = null, action) {
-  switch (action.type) {
-    case ActionTypes.UPDATE_INSTANCES_PATH:
-      return action.path;
-    default:
-      return state;
-  }
-}
-
 // 0 is stable, 1 is beta
 function releaseChannel(state = 0, action) {
   switch (action.type) {
@@ -70,6 +61,15 @@ function hideWindowOnGameLaunch(state = true, action) {
   }
 }
 
+function potatoPcMode(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_POTATO_PC_MODE:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path: null,
@@ -93,10 +93,10 @@ function java(
 export default combineReducers({
   sounds,
   dataPath,
-  instancesPath,
   releaseChannel,
   concurrentDownloads,
   discordRPC,
   hideWindowOnGameLaunch,
+  potatoPcMode,
   java
 });

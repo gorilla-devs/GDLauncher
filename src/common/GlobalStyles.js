@@ -49,6 +49,14 @@ export default createGlobalStyle`
     box-sizing: border-box;
   }
 
+.disable-animations *,
+.disable-animations *::before,
+.disable-animations *::after {
+  transition: none !important;
+  animation: none !important;
+  backdrop-filter: none !important;
+}
+
   a {
     -webkit-user-drag: none;
   }
