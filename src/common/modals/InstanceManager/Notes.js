@@ -20,22 +20,7 @@ import {
   faList
 } from "@fortawesome/free-solid-svg-icons";
 import { updateInstanceConfig } from "../../reducers/actions";
-import { _getInstancesPath } from "../../utils/selectors";
-
-// import { Button, Icon, Toolbar } from '../components'
-
-const Toolbar = styled.div`
-  height: 40px;
-  width: 500px;
-  self-align: center;
-`;
-
-const HOTKEYS = {
-  "mod+b": "bold",
-  "mod+i": "italic",
-  "mod+u": "underline",
-  "mod+`": "code"
-};
+import { _getInstancesPath, _getInstance } from "../../utils/selectors";
 
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
@@ -46,79 +31,78 @@ const RichTextExample = ({ instanceName }) => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const dispatch = useDispatch();
   const InstancePath = useSelector(_getInstancesPath);
-  const configPath = path.join(InstancePath, instanceName, "config.json");
+  // const configPath = path.join(InstancePath, instanceName, "config.json");
+
+  const instance = useSelector(state => _getInstance(state)(instanceName));
 
   const getNotes = async () => {
-    const notes = JSON.parse(await fs.readFile(configPath)).value;
-    console.log("notes", JSON.parse(await fs.readFile(configPath)));
-    setValue(notes ? notes : initialValue);
+    // const notes = JSON.parse(await fs.readFile(configPath)).value;
+    // console.log("notes", JSON.parse(await fs.readFile(configPath)));
+    console.log("instance", instance, value);
+    setValue(instance.notes ? instance.notes : initialValue);
   };
 
   useEffect(() => {
-    // setValue();
     getNotes();
   }, []);
 
   return (
-    <div
-      css={`
-        && {
-          display: flex;
-          flex-direction: column;
-        }
-      `}
-    >
-      <Slate
-        editor={editor}
-        value={value}
-        onChange={value => {
-          setValue(value),
+    <MainContainer>
+      <Container>
+        <Slate
+          editor={editor}
+          value={value}
+          onChange={notes => {
+            console.log("value", notes);
+            // [
+            //   {
+            //     type: "paragraph",
+            //     children: [{ text: "" }]
+            //   }
+            // ]
             dispatch(
               updateInstanceConfig(instanceName, config => {
+                console.log("config", config);
                 return {
                   ...config,
-                  value
+                  notes: [...config.notes, notes]
                 };
               })
             );
-        }}
-      >
-        <Toolbar>
-          <MarkButton format="bold" icon={faBold} />
-          <MarkButton format="italic" icon={faItalic} />
-          <MarkButton format="underline" icon={faUnderline} />
-          <MarkButton format="code" icon={faCode} />
-          {/* <BlockButton format="heading-one" icon="looks_one" />
-        <BlockButton format="heading-two" icon="looks_two" />
-        <BlockButton format="block-quote" icon="format_quote" /> */}
-          <BlockButton format="numbered-list" icon={faListOl} />
-          <BlockButton format="bulleted-list" icon={faList} />
-        </Toolbar>
-        <Editable
-          css={`
-            max-height: 600px;
-            max-width: 600px;
-            margin-top: 20px;
-            overflow: hidden;
-            border: solid 1px white;
-          `}
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder="Enter some rich text…"
-          spellCheck
-          autoFocus
-          onKeyDown={event => {
-            for (const hotkey in HOTKEYS) {
-              if (isHotkey(hotkey, event)) {
-                event.preventDefault();
-                const mark = HOTKEYS[hotkey];
-                toggleMark(editor, mark);
-              }
-            }
           }}
-        />
-      </Slate>
-    </div>
+        >
+          <Toolbar>
+            <MarkButton format="bold" icon={faBold} />
+            <MarkButton format="italic" icon={faItalic} />
+            <MarkButton format="underline" icon={faUnderline} />
+            <MarkButton format="code" icon={faCode} />
+            <BlockButton format="heading-one" icon="h1" />
+            <BlockButton format="heading-two" icon="h2" />
+            <BlockButton format="block-quote" icon={faQuoteRight} />
+            <BlockButton format="numbered-list" icon={faListOl} />
+            <BlockButton format="bulleted-list" icon={faList} />
+          </Toolbar>
+          <TextEditoContainer>
+            <TextEditor
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              placeholder="Enter some notes..."
+              spellCheck
+              autoFocus
+              onKeyDown={event => {
+                for (const hotkey in HOTKEYS) {
+                  if (isHotkey(hotkey, event)) {
+                    event.preventDefault();
+                    const mark = HOTKEYS[hotkey];
+                    toggleMark(editor, mark);
+                  }
+                }
+              }}
+            />
+          </TextEditoContainer>
+        </Slate>
+      </Container>
+    </MainContainer>
   );
 };
 
@@ -207,13 +191,21 @@ const BlockButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
     <Button
+      css={`
+        margin: 0 2px;
+        border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+      `}
       active={isBlockActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
         toggleBlock(editor, format);
       }}
     >
-      <FontAwesomeIcon icon={icon} />
+      {typeof icon === "string" ? (
+        <div>{icon}</div>
+      ) : (
+        <FontAwesomeIcon icon={icon} />
+      )}
     </Button>
   );
 };
@@ -222,6 +214,10 @@ const MarkButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
     <Button
+      css={`
+        margin: 0 2px;
+        border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+      `}
       active={isMarkActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
@@ -229,11 +225,59 @@ const MarkButton = ({ format, icon }) => {
       }}
     >
       <FontAwesomeIcon icon={icon} />
-      {/* <Icon>{icon}</Icon> */}
     </Button>
   );
 };
 
-const initialValue = [];
+const initialValue = [
+  {
+    type: "paragraph",
+    children: [{ text: "" }]
+  }
+];
 
 export default RichTextExample;
+
+const MainContainer = styled.div`
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+`;
+
+const Toolbar = styled.div`
+  height: 40px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const TextEditoContainer = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const TextEditor = styled(Editable)`
+  width: 100%;
+  margin-top: 20px;
+  overflow: hidden;
+  border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+`;
+
+const HOTKEYS = {
+  "mod+b": "bold",
+  "mod+i": "italic",
+  "mod+u": "underline",
+  "mod+`": "code"
+};
