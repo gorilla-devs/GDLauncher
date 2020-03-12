@@ -19,8 +19,8 @@ const AddInstance = ({ defaultPage }) => {
     <Modal
       css={`
         height: 85%;
-        width: 85%;
-        max-width: 1500px;
+        width: 65%;
+        max-width: 1000px;
         overflow: hidden;
       `}
       title="Add New Instance"
