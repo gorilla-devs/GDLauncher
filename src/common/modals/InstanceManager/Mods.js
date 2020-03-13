@@ -12,6 +12,7 @@ import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import fse from "fs-extra";
 import { _getInstance, _getInstancesPath } from "../../utils/selectors";
 import { updateInstanceConfig } from "../../reducers/actions";
+import { openModal } from "../../reducers/modals/actions";
 
 const Header = styled.div`
   height: 40px;
@@ -65,7 +66,7 @@ const toggleModDisabled = async (
 
 const Row = memo(({ index, style, data }) => {
   const [loading, setLoading] = useState(false);
-  const { items, instanceName, instancePath } = data;
+  const { items, instanceName, instancePath, gameVersion } = data;
   const dispatch = useDispatch();
   return (
     <div
@@ -86,6 +87,15 @@ const Row = memo(({ index, style, data }) => {
         <Checkbox />
       </div>
       <div
+        onClick={() =>
+          dispatch(
+            openModal("ModOverview", {
+              projectID: items[index].projectID,
+              fileID: items[index].id,
+              gameVersion
+            })
+          )
+        }
         css={`
           flex: 1;
           height: 100%;
@@ -156,11 +166,14 @@ const Row = memo(({ index, style, data }) => {
   );
 }, areEqual);
 
-const createItemData = memoize((items, instanceName, instancePath) => ({
-  items,
-  instanceName,
-  instancePath
-}));
+const createItemData = memoize(
+  (items, instanceName, instancePath, gameVersion) => ({
+    items,
+    instanceName,
+    instancePath,
+    gameVersion
+  })
+);
 
 const sort = arr =>
   arr.slice().sort((a, b) => a.fileName.localeCompare(b.fileName));
@@ -185,7 +198,8 @@ const Mods = ({ instanceName }) => {
   const itemData = createItemData(
     mods,
     instanceName,
-    path.join(instancesPath, instanceName)
+    path.join(instancesPath, instanceName),
+    instance.modloader[1]
   );
 
   return (

@@ -88,6 +88,7 @@ export default createGlobalStyle`
 
   ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
     border-radius: 1px;
   }
 

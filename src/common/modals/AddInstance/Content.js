@@ -60,82 +60,41 @@ const Content = ({
               {pages[page]}
             </div>
             <div
+              page={page}
               css={`
-                flex: 2;
-                position: relative;
-                height: 100%;
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+                opacity: ${props => (props.page === 0 ? 1 : 0)};
               `}
             >
-              <MenuItem
-                active={page === 0}
-                onClick={() => {
-                  setVersion(null);
-                  setImportZipPath(null);
-                  setModpack(null);
-                  setPage(0);
-                }}
-              >
-                Create Empty Instance
-              </MenuItem>
-              <MenuItem
-                active={page === 1}
-                onClick={() => {
-                  setVersion(null);
-                  setImportZipPath(null);
-                  setModpack(null);
-                  setPage(1);
-                }}
-              >
-                Browse Twitch Modpacks
-              </MenuItem>
-              <MenuItem
-                active={page === 2}
-                onClick={() => {
-                  setVersion(null);
-                  setImportZipPath(null);
-                  setModpack(null);
-                  setPage(2);
-                }}
-              >
-                Import from other Launchers
-              </MenuItem>
               <div
+                version={version}
                 css={`
-                  position: absolute;
-                  bottom: 0;
-                  right: 0;
+                  width: 70px;
+                  height: 40px;
+                  transition: 0.1s ease-in-out;
+                  display: flex;
+                  justify-content: center;
+                  border-radius: 4px;
+                  font-size: 40px;
+                  color: ${props =>
+                    props.version
+                      ? props.theme.palette.text.icon
+                      : props.theme.palette.text.disabled};
+                  ${props => (props.version ? "cursor: pointer;" : "")}
+                  &:hover {
+                    background-color: ${props =>
+                      props.version ? props.theme.action.hover : "transparent"};
+                  }
                 `}
+                onClick={() => {
+                  if (version) {
+                    setStep(1);
+                  }
+                }}
               >
-                <div
-                  version={version}
-                  css={`
-                    width: 70px;
-                    height: 40px;
-                    transition: 0.1s ease-in-out;
-                    display: flex;
-                    justify-content: center;
-                    border-radius: 4px;
-                    font-size: 40px;
-                    color: ${props =>
-                      props.version
-                        ? props.theme.palette.text.icon
-                        : props.theme.palette.text.disabled};
-                    ${props => (props.version ? "cursor: pointer;" : "")}
-                    &:hover {
-                      background-color: ${props =>
-                        props.version
-                          ? props.theme.action.hover
-                          : "transparent"};
-                    }
-                  `}
-                  onClick={() => {
-                    if (version) {
-                      setStep(1);
-                    }
-                  }}
-                >
-                  <FontAwesomeIcon icon={faLongArrowAltRight} />
-                </div>
+                <FontAwesomeIcon icon={faLongArrowAltRight} />
               </div>
             </div>
           </div>
