@@ -1006,6 +1006,9 @@ export function downloadInstance(instanceName) {
       state.settings.concurrentDownloads
     );
 
+    // Wait 400ms to avoid "The process cannot access the file because it is being used by another process."
+    await new Promise(resolve => setTimeout(() => resolve(), 400));
+
     await extractNatives(
       libraries,
       path.join(_getInstancesPath(state), instanceName)
@@ -1053,41 +1056,45 @@ export const startListener = () => {
       const processChange = async () => {
         const newState = getState();
         const instance = _getInstance(newState)(instanceName);
-        const isInConfig = instance.mods.find(
+        const isInConfig = (instance?.mods || []).find(
           mod => mod.fileName === path.basename(fileName)
         );
-        const stat = await fs.lstat(fileName);
+        try {
+          const stat = await fs.lstat(fileName);
 
-        if (!isInConfig && stat.isFile() && instance) {
-          // get murmur hash
-          const murmurHash = await getFileMurmurHash2(fileName, tempFolder);
-          const { data } = await getAddonsByFingerprint([murmurHash]);
-          const exactMatch = (data.exactMatches || [])[0];
-          const notMatch = (data.unmatchedFingerprints || [])[0];
-          let mod = {};
-          if (exactMatch) {
-            mod = exactMatch.file;
-            mod.fileName = path.basename(fileName);
-          } else if (notMatch) {
-            mod = {
-              fileName: path.basename(fileName),
-              displayName: path.basename(fileName),
-              packageFingerprint: murmurHash
-            };
-          }
-          const updatedInstance = _getInstance(getState())(instanceName);
-          const isStillNotInConfig = !(updatedInstance?.mods || []).find(
-            m => m.fileName === path.basename(fileName)
-          );
-          if (isStillNotInConfig && updatedInstance) {
-            console.log("[RTS] ADDING MOD", fileName, instanceName);
-            await dispatch(
-              updateInstanceConfig(instanceName, prev => ({
-                ...prev,
-                mods: [...(prev.mods || []), mod]
-              }))
+          if (instance?.mods && !isInConfig && stat.isFile() && instance) {
+            // get murmur hash
+            const murmurHash = await getFileMurmurHash2(fileName, tempFolder);
+            const { data } = await getAddonsByFingerprint([murmurHash]);
+            const exactMatch = (data.exactMatches || [])[0];
+            const notMatch = (data.unmatchedFingerprints || [])[0];
+            let mod = {};
+            if (exactMatch) {
+              mod = exactMatch.file;
+              mod.fileName = path.basename(fileName);
+            } else if (notMatch) {
+              mod = {
+                fileName: path.basename(fileName),
+                displayName: path.basename(fileName),
+                packageFingerprint: murmurHash
+              };
+            }
+            const updatedInstance = _getInstance(getState())(instanceName);
+            const isStillNotInConfig = !(updatedInstance?.mods || []).find(
+              m => m.fileName === path.basename(fileName)
             );
+            if (isStillNotInConfig && updatedInstance) {
+              console.log("[RTS] ADDING MOD", fileName, instanceName);
+              await dispatch(
+                updateInstanceConfig(instanceName, prev => ({
+                  ...prev,
+                  mods: [...(prev.mods || []), mod]
+                }))
+              );
+            }
           }
+        } catch (err) {
+          console.error(err);
         }
       };
       Queue.add(processChange);
@@ -1095,8 +1102,7 @@ export const startListener = () => {
 
     const processRemovedFile = async (fileName, instanceName) => {
       const processChange = async () => {
-        const newState = getState();
-        const instance = _getInstance(newState)(instanceName);
+        const instance = getState().instances.list[instanceName];
         const isInConfig = (instance?.mods || []).find(
           mod => mod.fileName === path.basename(fileName)
         );
@@ -1115,7 +1121,7 @@ export const startListener = () => {
       Queue.add(processChange);
     };
 
-    const processAddedInstance = async (fileName, instanceName) => {
+    const processAddedInstance = async instanceName => {
       const newState = getState();
       const instance = _getInstance(newState)(instanceName);
       if (!instance) {
@@ -1125,7 +1131,7 @@ export const startListener = () => {
           "config.json"
         );
         const config = await fse.readJSON(configPath);
-        console.log("[RTS] ADDING INSTANCE", fileName, instanceName);
+        console.log("[RTS] ADDING INSTANCE", instanceName);
         dispatch({
           type: ActionTypes.UPDATE_INSTANCES,
           instances: {
@@ -1136,10 +1142,10 @@ export const startListener = () => {
       }
     };
 
-    const processRemovedInstance = async (fileName, instanceName) => {
+    const processRemovedInstance = instanceName => {
       const newState = getState();
       if (_getInstance(newState)(instanceName)) {
-        console.log("[RTS] REMOVING INSTANCE", fileName, instanceName);
+        console.log("[RTS] REMOVING INSTANCE", instanceName);
         dispatch({
           type: ActionTypes.UPDATE_INSTANCES,
           instances: omit(newState.instances.list, [instanceName])
@@ -1212,6 +1218,36 @@ export const startListener = () => {
         }
       });
 
+      // Handle edge case where MOD-REMOVE is called before INSTANCE-REMOVE
+      Object.entries(changesTracker).forEach(
+        async ([fileName, { action, count }]) => {
+          if (
+            isInstanceFolderPath(fileName) &&
+            action === 1 &&
+            (count === 3 || count === 1)
+          ) {
+            const instanceName = fileName
+              .replace(instancesPath, "")
+              .substr(1)
+              .split(path.sep)[0];
+            // Check if we can find any other action with this instance name
+            Object.entries(changesTracker).forEach(
+              ([file, { action: act }]) => {
+                if (isMod(file) && act === 1) {
+                  const instName = file
+                    .replace(instancesPath, "")
+                    .substr(1)
+                    .split(path.sep)[0];
+                  if (instanceName === instName) {
+                    delete changesTracker[file];
+                  }
+                }
+              }
+            );
+          }
+        }
+      );
+
       Object.entries(changesTracker).map(
         async ([fileName, { action, count, newFilePath }]) => {
           const filePath = newFilePath || fileName;
@@ -1227,6 +1263,7 @@ export const startListener = () => {
               .replace(instancesPath, "")
               .substr(1)
               .split(path.sep)[0];
+
             // If we're installing a modpack we don't want to process anything
             const isLocked = await new Promise((resolve, reject) => {
               lockfile.check(
@@ -1249,9 +1286,9 @@ export const startListener = () => {
               }
             } else if (isInstanceFolderPath(filePath)) {
               if (action === 0) {
-                processAddedInstance(filePath, instanceName);
+                processAddedInstance(instanceName);
               } else if (action === 1) {
-                processRemovedInstance(filePath, instanceName);
+                processRemovedInstance(instanceName);
               } else if (action === 3) {
                 const oldInstanceName = fileName
                   .replace(instancesPath, "")
