@@ -151,6 +151,7 @@
   },
   "devDependencies": {
     "7zip-bin": "^5.0.3",
+    "@ant-design/icons": "^4.0.2",
     "@babel/cli": "^7.8.4",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-export-default-from": "^7.8.3",
@@ -175,9 +176,9 @@
     "babel-preset-minify": "^0.5.1",
     "concurrently": "^5.1.0",
     "cross-env": "^7.0.2",
+    "electron": "^8.1.1",
     "electron-builder": "^22.4.1",
     "electron-builder-squirrel-windows": "^22.4.1",
-    "electron": "^8.1.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.10.0",
@@ -195,6 +196,7 @@
     "prettier": "^1.19.1",
     "terser-webpack-plugin": "^2.3.5",
     "wait-on": "^4.0.1",
+    "webpack": "^4.41.5",
     "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "^3.3.10",
     "webpack-merge": "^4.2.2"
