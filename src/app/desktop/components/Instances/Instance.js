@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { transparentize } from "polished";
 import styled from "styled-components";
 import { promises as fs } from "fs";
+import { LoadingOutlined } from "@ant-design/icons";
 import path from "path";
 import { ipcRenderer } from "electron";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
@@ -97,7 +98,7 @@ const Instance = ({ instanceName }) => {
         .then(res =>
           setBackground(`data:image/png;base64,${res.toString("base64")}`)
         )
-        .catch(console.error);
+        .catch(console.warning);
     } else {
       setBackground(`${instanceDefaultBackground}`);
     }
@@ -140,6 +141,13 @@ const Instance = ({ instanceName }) => {
                   {isInQueue ? isInQueue.status : null}
                 </div>
                 {`${isInQueue.percentage}%`}
+                <LoadingOutlined
+                  css={`
+                    position: absolute;
+                    bottom: 8px;
+                    right: 8px;
+                  `}
+                />
               </>
             ) : (
               (isInQueue && "In Queue") || "PLAY"
