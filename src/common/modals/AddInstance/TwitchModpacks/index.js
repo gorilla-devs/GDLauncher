@@ -100,10 +100,8 @@ const Container = styled.div`
 `;
 
 const StyledSelect = styled(Select)`
-  && {
-    width: 170px;
-    margin-right: 20px;
-  }
+  width: 170px;
+  margin-right: 20px;
 `;
 
 const StyledInput = styled(Input.Search)``;
