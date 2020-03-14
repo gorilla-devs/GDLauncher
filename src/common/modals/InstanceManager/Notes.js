@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import isHotkey from "is-hotkey";
 import { Editable, withReact, useSlate, Slate } from "slate-react";
 import { Editor, Transforms, createEditor } from "slate";
+import { useDebouncedCallback } from "use-debounce";
 import { withHistory } from "slate-history";
 import { Button } from "antd";
 import { promises as fs } from "fs";
@@ -25,7 +26,6 @@ import { _getInstancesPath, _getInstance } from "../../utils/selectors";
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
 const RichTextExample = ({ instanceName }) => {
-  const [value, setValue] = useState(initialValue);
   const renderElement = useCallback(props => <Element {...props} />, []);
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
@@ -34,17 +34,22 @@ const RichTextExample = ({ instanceName }) => {
   // const configPath = path.join(InstancePath, instanceName, "config.json");
 
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const [value, setValue] = useState(instance.notes || initialValue);
 
-  const getNotes = async () => {
-    // const notes = JSON.parse(await fs.readFile(configPath)).value;
-    // console.log("notes", JSON.parse(await fs.readFile(configPath)));
-    console.log("instance", instance, value);
-    setValue(instance.notes ? instance.notes : initialValue);
-  };
-
-  useEffect(() => {
-    getNotes();
-  }, []);
+  const [updateNotes] = useDebouncedCallback(
+    v => {
+      dispatch(
+        updateInstanceConfig(instanceName, config => {
+          return {
+            ...config,
+            notes: v
+          };
+        })
+      );
+    },
+    300,
+    { maxWait: 600 }
+  );
 
   return (
     <MainContainer>
@@ -53,22 +58,8 @@ const RichTextExample = ({ instanceName }) => {
           editor={editor}
           value={value}
           onChange={notes => {
-            console.log("value", notes);
-            // [
-            //   {
-            //     type: "paragraph",
-            //     children: [{ text: "" }]
-            //   }
-            // ]
-            dispatch(
-              updateInstanceConfig(instanceName, config => {
-                console.log("config", config);
-                return {
-                  ...config,
-                  notes: [...config.notes, notes]
-                };
-              })
-            );
+            setValue(notes);
+            updateNotes(notes);
           }}
         >
           <Toolbar>
@@ -89,15 +80,6 @@ const RichTextExample = ({ instanceName }) => {
               placeholder="Enter some notes..."
               spellCheck
               autoFocus
-              onKeyDown={event => {
-                for (const hotkey in HOTKEYS) {
-                  if (isHotkey(hotkey, event)) {
-                    event.preventDefault();
-                    const mark = HOTKEYS[hotkey];
-                    toggleMark(editor, mark);
-                  }
-                }
-              }}
             />
           </TextEditoContainer>
         </Slate>
@@ -239,8 +221,12 @@ const initialValue = [
 export default RichTextExample;
 
 const MainContainer = styled.div`
+  height: 93%;
+  max-height: 93%;
   margin-top: 20px;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -263,21 +249,17 @@ const Toolbar = styled.div`
 
 const TextEditoContainer = styled.div`
   height: 100%;
+  max-height: 100%;
   display: flex;
   flex-direction: row;
   justify-content: center;
+  overflow-x: hidden;
 `;
 
 const TextEditor = styled(Editable)`
   width: 100%;
+  max-width: 100%;
   margin-top: 20px;
   overflow: hidden;
   border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
 `;
-
-const HOTKEYS = {
-  "mod+b": "bold",
-  "mod+i": "italic",
-  "mod+u": "underline",
-  "mod+`": "code"
-};
