@@ -1,9 +1,11 @@
 /* eslint-disable */
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { promises as fs, watch } from "fs";
+import { promises as fs, watch, createReadStream } from "fs";
 import { clipboard, ipcRenderer } from "electron";
 import fse from "fs-extra";
 import path from "path";
+import base64 from "base64-stream";
+import getStream from "get-stream";
 import styled from "styled-components";
 import makeDir from "make-dir";
 import { Checkbox } from "antd";
@@ -57,10 +59,13 @@ const getImgurLink = async (imagePath, fileSize, setProgressUpdate) => {
     );
   };
 
-  const image = await fs.readFile(imagePath);
+  const image = createReadStream(imagePath);
+  const encoder = new base64.Base64Encode();
+  const b64s = image.pipe(encoder);
+  const strBase64 = await getStream(b64s);
 
   if (fileSize < 10485760) {
-    const res = await imgurPost(image, updateProgress);
+    const res = await imgurPost(strBase64, updateProgress);
 
     if (res.status == 200) {
       clipboard.writeText(res.data.data.link);
@@ -99,8 +104,22 @@ const Screenshots = ({ instanceName }) => {
   const [uploadingFileName, setUploadingFileName] = useState(null);
   const [uploadCompleted, setUploadCompleted] = useState(false);
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
-
   const dispatch = useDispatch();
+
+  const isImageCopied = progressUpdate => {
+    if (
+      progressUpdate === 100 &&
+      uploadingFileName !== null &&
+      selectedItems.includes(uploadingFileName)
+    ) {
+      return "Image copied to clipboard!";
+    } else if (
+      uploadingFileName != null &&
+      selectedItems[0] != uploadingFileName
+    ) {
+      return "Busy! Wait before uploading another image";
+    } else return "Share the image via url";
+  };
 
   const containerRef = useRef(null);
 
@@ -267,6 +286,7 @@ const Screenshots = ({ instanceName }) => {
                         selectedItems.length <
                           getScreenshotsCount(dateGroups) ? (
                           <DeleteAllButton
+                            preventClose
                             onClick={() => {
                               dispatch(
                                 openModal("ActionConfirmation", {
@@ -284,8 +304,10 @@ const Screenshots = ({ instanceName }) => {
                           </DeleteAllButton>
                         ) : (
                           selectedItems.length ===
-                            getScreenshotsCount(dateGroups) && (
+                            getScreenshotsCount(dateGroups) &&
+                          getScreenshotsCount(dateGroups) > 1 && (
                             <DeleteAllButton
+                              preventClose
                               onClick={() => {
                                 dispatch(
                                   openModal("ActionConfirmation", {
@@ -307,6 +329,7 @@ const Screenshots = ({ instanceName }) => {
                         {selectedItems.length < 2 && (
                           <>
                             <MenuItem
+                              preventClose
                               onClick={() => {
                                 dispatch(
                                   openModal("ActionConfirmation", {
@@ -333,6 +356,10 @@ const Screenshots = ({ instanceName }) => {
                               Copy the image
                             </MenuItem>
                             <ImgurShareMenuItem
+                              disabled={
+                                uploadingFileName != null &&
+                                selectedItems.includes(uploadingFileName)
+                              }
                               preventClose
                               onClick={async () => {
                                 if (file.size < 10485760) {
@@ -349,20 +376,32 @@ const Screenshots = ({ instanceName }) => {
                                     setUploadingFileName(null);
                                   }
                                 }
-                                hideMenu();
+                                setTimeout(() => {
+                                  hideMenu();
+                                }, 1000);
                               }}
                             >
                               <MenuShareLink>
                                 <FontAwesomeIcon icon={faLink} />
-
                                 {file.size < 10485760
-                                  ? "Share the image via url"
+                                  ? isImageCopied(
+                                      progressUpdate,
+                                      uploadingFileName,
+                                      selectedItems
+                                    )
                                   : `Image too big... ${Math.floor(
                                       file.size / 1024 / 1024
                                     )}MB`}
                               </MenuShareLink>
                               <LoadingSlider
-                                translateAmount={-(100 - progressUpdate)}
+                                selectedItems={selectedItems}
+                                uploadingFileName={uploadingFileName}
+                                translateAmount={
+                                  uploadingFileName != null &&
+                                  selectedItems.includes(uploadingFileName)
+                                    ? -(100 - progressUpdate)
+                                    : -100
+                                }
                               />
                             </ImgurShareMenuItem>
                           </>
@@ -483,9 +522,15 @@ const LoadingSlider = styled.div`
   z-index: -1;
   width: 100%;
   height: 100%;
-  transform: ${props => `translate(${props.translateAmount}%)`};
+  transform: ${props =>
+    props.uploadingFileName != null
+      ? `translate(${props.translateAmount}%)`
+      : "translate(-100%)"};
   transition: transform 0.1s ease-in-out;
   background: ${props => props.theme.palette.primary.main};
+  &:hover {
+    background: ;
+  }
 `;
 
 const Photo = styled.img`
@@ -522,10 +567,10 @@ const SelectCheckBox = styled(Checkbox)`
 const ImgurShareMenuItem = styled(MenuItem)`
   overflow: hidden;
   position: relative;
-  padding: 0;
+  padding: 0 !important;
 `;
 
-const MenuShareLink = styled(MenuItem)`
+const MenuShareLink = styled.div`
   padding: 4px 10px;
   position: relative;
   svg {
