@@ -260,6 +260,7 @@
     "slate-react": "^0.57.1",
     "styled-components": "^5.0.1",
     "typeface-roboto": "^0.0.75",
+    "use-debounce": "^3.4.0",
     "uuid": "^7.0.2"
   }
 }
