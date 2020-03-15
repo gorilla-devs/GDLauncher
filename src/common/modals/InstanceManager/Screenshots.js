@@ -59,13 +59,13 @@ const getImgurLink = async (imagePath, fileSize, setProgressUpdate) => {
     );
   };
 
-  const image = createReadStream(imagePath);
-  const encoder = new base64.Base64Encode();
-  const b64s = image.pipe(encoder);
-  const strBase64 = await getStream(b64s);
+  const imageReadStream = createReadStream(imagePath);
+  const encodedData = new base64.Base64Encode();
+  const b64s = imageReadStream.pipe(encodedData);
+  const base64String = await getStream(b64s);
 
   if (fileSize < 10485760) {
-    const res = await imgurPost(strBase64, updateProgress);
+    const res = await imgurPost(base64String, updateProgress);
 
     if (res.status == 200) {
       clipboard.writeText(res.data.data.link);
@@ -286,7 +286,6 @@ const Screenshots = ({ instanceName }) => {
                         selectedItems.length <
                           getScreenshotsCount(dateGroups) ? (
                           <DeleteAllButton
-                            preventClose
                             onClick={() => {
                               dispatch(
                                 openModal("ActionConfirmation", {
@@ -307,7 +306,6 @@ const Screenshots = ({ instanceName }) => {
                             getScreenshotsCount(dateGroups) &&
                           getScreenshotsCount(dateGroups) > 1 && (
                             <DeleteAllButton
-                              preventClose
                               onClick={() => {
                                 dispatch(
                                   openModal("ActionConfirmation", {
@@ -329,7 +327,6 @@ const Screenshots = ({ instanceName }) => {
                         {selectedItems.length < 2 && (
                           <>
                             <MenuItem
-                              preventClose
                               onClick={() => {
                                 dispatch(
                                   openModal("ActionConfirmation", {
@@ -528,9 +525,6 @@ const LoadingSlider = styled.div`
       : "translate(-100%)"};
   transition: transform 0.1s ease-in-out;
   background: ${props => props.theme.palette.primary.main};
-  &:hover {
-    background: ;
-  }
 `;
 
 const Photo = styled.img`
