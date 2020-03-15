@@ -147,7 +147,6 @@ export const librariesMapper = (libraries, librariesPath) => {
 export const parseOptifineVersions = html => {
   /* eslint-disable */
   const $ = cheerio.load(html.data);
-  // console.log(html.data);
   const minecraftVersionsList = [
     ...Object.values($("table.downloads > tbody > tr> td").children())
   ];
