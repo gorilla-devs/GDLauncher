@@ -5,13 +5,14 @@ import path from "path";
 import { FixedSizeList as List, areEqual } from "react-window";
 import { Checkbox, Input, Button, Switch } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useSelector, useDispatch } from "react-redux";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import fse from "fs-extra";
 import { _getInstance, _getInstancesPath } from "../../utils/selectors";
 import { updateInstanceConfig } from "../../reducers/actions";
+import { openModal } from "../../reducers/modals/actions";
 
 const Header = styled.div`
   height: 40px;
@@ -23,6 +24,51 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
+const RowContainer = styled.div.attrs(props => ({
+  style: props.override
+}))`
+  width: 100%;
+  background: ${props => props.theme.palette.grey[props.index % 2 ? 700 : 800]};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  padding: 0 10px;
+  .rowCenterContent {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: color 0.1s ease-in-out;
+    cursor: pointer;
+    svg {
+      margin-right: 10px;
+    }
+    &:hover {
+      color: ${props => props.theme.palette.primary.main};
+    }
+  }
+  .rightPartContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button {
+      margin-right: 15px;
+    }
+    svg {
+      &:hover {
+        cursor: pointer;
+        path {
+          cursor: pointer;
+          transition: all 0.1s ease-in-out;
+          color: ${props => props.theme.palette.error.main};
+        }
+      }
+    }
+  }
+`;
+
 const deleteMod = async (instanceName, instancePath, mod, dispatch) => {
   await dispatch(
     updateInstanceConfig(instanceName, prev => ({
@@ -31,6 +77,25 @@ const deleteMod = async (instanceName, instancePath, mod, dispatch) => {
     }))
   );
   await fse.remove(path.join(instancePath, "mods", mod.fileName));
+};
+
+const deleteMods = async (
+  instanceName,
+  instancePath,
+  selectedMods,
+  dispatch
+) => {
+  await dispatch(
+    updateInstanceConfig(instanceName, prev => ({
+      ...prev,
+      mods: prev.mods.filter(m => !selectedMods.includes(m.fileName))
+    }))
+  );
+  await Promise.all(
+    selectedMods.map(fileName =>
+      fse.remove(path.join(instancePath, "mods", fileName))
+    )
+  );
 };
 
 const toggleModDisabled = async (
@@ -65,60 +130,50 @@ const toggleModDisabled = async (
 
 const Row = memo(({ index, style, data }) => {
   const [loading, setLoading] = useState(false);
-  const { items, instanceName, instancePath } = data;
+  const {
+    items,
+    instanceName,
+    instancePath,
+    gameVersion,
+    selectedMods,
+    setSelectedMods
+  } = data;
+  const item = items[index];
   const dispatch = useDispatch();
   return (
-    <div
-      index={index}
-      css={`
-        ${style}
-        width: 100%;
-        background: ${props =>
-          props.theme.palette.grey[props.index % 2 ? 700 : 800]};
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 16px;
-        padding: 0 10px;
-      `}
-    >
+    <RowContainer index={index} override={style}>
       <div>
-        <Checkbox />
+        <Checkbox
+          checked={selectedMods.includes(item.fileName)}
+          onChange={e => {
+            if (e.target.checked) {
+              setSelectedMods([...selectedMods, item.fileName]);
+            } else {
+              setSelectedMods(selectedMods.filter(v => v !== item.fileName));
+            }
+          }}
+        />
       </div>
       <div
-        css={`
-          flex: 1;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          transition: color 0.1s ease-in-out;
-          cursor: pointer;
-          &:hover {
-            color: ${props => props.theme.palette.primary.main};
-          }
-        `}
+        onClick={() =>
+          dispatch(
+            openModal("ModOverview", {
+              projectID: item.projectID,
+              fileID: item.id,
+              gameVersion,
+              instanceName
+            })
+          )
+        }
+        className="rowCenterContent"
       >
-        {items[index].id && (
-          <FontAwesomeIcon
-            css={`
-              margin-right: 10px;
-            `}
-            icon={faTwitch}
-          />
-        )}
-        {items[index].fileName}
+        {item.id && <FontAwesomeIcon icon={faTwitch} />}
+        {item.fileName}
       </div>
-      <div
-        css={`
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        `}
-      >
+      <div className="rightPartContent">
         <Switch
           size="small"
-          checked={path.extname(items[index].fileName) !== ".disabled"}
+          checked={path.extname(item.fileName) !== ".disabled"}
           disabled={loading}
           onChange={async c => {
             setLoading(true);
@@ -126,41 +181,38 @@ const Row = memo(({ index, style, data }) => {
               c,
               instanceName,
               instancePath,
-              items[index],
+              item,
               dispatch
             );
             setTimeout(() => setLoading(false), 300);
           }}
-          css={`
-            margin-right: 15px;
-          `}
         />
         <FontAwesomeIcon
-          onClick={() =>
-            deleteMod(instanceName, instancePath, items[index], dispatch)
-          }
-          css={`
-            &:hover {
-              cursor: pointer;
-              path {
-                cursor: pointer;
-                transition: all 0.1s ease-in-out;
-                color: ${props => props.theme.palette.error.main};
-              }
-            }
-          `}
+          onClick={() => deleteMod(instanceName, instancePath, item, dispatch)}
           icon={faTrash}
         />
       </div>
-    </div>
+    </RowContainer>
   );
 }, areEqual);
 
-const createItemData = memoize((items, instanceName, instancePath) => ({
-  items,
-  instanceName,
-  instancePath
-}));
+const createItemData = memoize(
+  (
+    items,
+    instanceName,
+    instancePath,
+    gameVersion,
+    selectedMods,
+    setSelectedMods
+  ) => ({
+    items,
+    instanceName,
+    instancePath,
+    gameVersion,
+    selectedMods,
+    setSelectedMods
+  })
+);
 
 const sort = arr =>
   arr.slice().sort((a, b) => a.fileName.localeCompare(b.fileName));
@@ -176,7 +228,9 @@ const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
   const [mods, setMods] = useState(sort(instance.mods));
+  const [selectedMods, setSelectedMods] = useState([]);
   const [search, setSearch] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
@@ -185,7 +239,10 @@ const Mods = ({ instanceName }) => {
   const itemData = createItemData(
     mods,
     instanceName,
-    path.join(instancesPath, instanceName)
+    path.join(instancesPath, instanceName),
+    instance.modloader[1],
+    selectedMods,
+    setSelectedMods
   );
 
   return (
@@ -202,27 +259,68 @@ const Mods = ({ instanceName }) => {
             align-items: center;
           `}
         >
-          <Checkbox>Select All</Checkbox>
+          <Checkbox
+            checked={
+              selectedMods.length === mods.length && selectedMods.length !== 0
+            }
+            indeterminate={
+              selectedMods.length !== 0 && selectedMods.length !== mods.length
+            }
+            onChange={() =>
+              selectedMods.length !== mods.length
+                ? setSelectedMods(mods.map(v => v.fileName))
+                : setSelectedMods([])
+            }
+          >
+            Select All
+          </Checkbox>
           <FontAwesomeIcon
+            onClick={async () => {
+              if (selectedMods.length === 0) return;
+              await deleteMods(
+                instanceName,
+                path.join(instancesPath, instanceName),
+                selectedMods,
+                dispatch
+              );
+              setSelectedMods([]);
+            }}
+            selectedMods={selectedMods}
             css={`
               margin-left: 10px;
+              ${props =>
+                props.selectedMods.length > 0 &&
+                `&:hover {
+                cursor: pointer;
+                path {
+                  cursor: pointer;
+                  transition: all 0.1s ease-in-out;
+                  color: ${props.theme.palette.error.main};
+                }
+              }`}
             `}
             icon={faTrash}
           />
-          <Switch
-            size="small"
-            css={`
-              margin-left: 10px;
-            `}
-          />
-          <FontAwesomeIcon
+          {/* <FontAwesomeIcon
             css={`
               margin-left: 10px;
             `}
             icon={faDownload}
-          />
+          /> */}
         </div>
-        <Button type="primary">Add Mod</Button>
+        <Button
+          type="primary"
+          onClick={() => {
+            dispatch(
+              openModal("ModsBrowser", {
+                gameVersion: instance.modloader[1],
+                instanceName
+              })
+            );
+          }}
+        >
+          Add Mod
+        </Button>
         <Input
           allowClear
           value={search}

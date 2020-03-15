@@ -183,7 +183,7 @@ ipcMain.handle("getIsWindowMaximized", () => {
 });
 
 ipcMain.handle("openFolder", (e, path) => {
-  shell.openPath(path);
+  shell.openItem(path);
 });
 
 ipcMain.handle("openFolderDialog", (e, defaultPath) => {

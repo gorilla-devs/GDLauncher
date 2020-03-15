@@ -30,8 +30,11 @@ const InstanceName = ({
   importZipPath,
   step
 }) => {
-  const mcName =
-    modpack?.name.replace(/\W/g, "") || (version && `Minecraft ${version[0]}`);
+  const mcName = (
+    modpack?.name.replace(/\W/g, " ") ||
+    (version && `Minecraft ${version[0]}`) ||
+    ""
+  ).trim();
   const originalMcName =
     modpack?.name || (version && `Minecraft ${version[0]}`);
   const dispatch = useDispatch();
@@ -45,8 +48,11 @@ const InstanceName = ({
 
   useEffect(() => {
     if (instanceName || mcName) {
+      const regex = /^[\sa-zA-Z0-9_.-]+$/;
+      const finalWhiteSpace = /[^\s]$/;
       if (
-        !(instanceName || mcName).match("^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$")
+        !regex.test(instanceName || mcName) ||
+        !finalWhiteSpace.test(instanceName || mcName)
       ) {
         setInvalidName(true);
         setAlreadyExists(false);
@@ -322,7 +328,7 @@ const ModpackNameKeyframe = props => keyframes`
   }
 
   to {
-    transform: scale(${props.name.length < 16 ? 2 : 1}) translateY(65%);
+    transform: scale(${props.name.length < 13 ? 2 : 1}) translateY(65%);
   }
 `;
 

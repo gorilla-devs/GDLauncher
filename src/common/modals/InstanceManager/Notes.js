@@ -6,8 +6,6 @@ import { Editable, withReact, useSlate, Slate } from "slate-react";
 import { Editor, Transforms, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Button } from "antd";
-import { promises as fs } from "fs";
-import path from "path";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,19 +13,30 @@ import {
   faItalic,
   faUnderline,
   faCode,
-  faQuoteRight,
   faListOl,
-  faList
+  faList,
+  faQuoteRight
 } from "@fortawesome/free-solid-svg-icons";
 import { updateInstanceConfig } from "../../reducers/actions";
-import { _getInstancesPath } from "../../utils/selectors";
-
-// import { Button, Icon, Toolbar } from '../components'
+import { _getInstancesPath, _getInstance } from "../../utils/selectors";
 
 const Toolbar = styled.div`
   height: 40px;
-  width: 500px;
-  self-align: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+`;
+
+const StyledEditable = styled(Editable)`
+  min-height: 400px;
+  max-height: 95%;
+  min-width: 98%;
+  max-width: 98%;
+  margin-top: 20px;
+  padding: 5px;
+  overflow: hidden;
+  background: ${props => props.theme.palette.grey[900]};
+  border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
 `;
 
 const HOTKEYS = {
@@ -39,85 +48,82 @@ const HOTKEYS = {
 
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
-const RichTextExample = ({ instanceName }) => {
-  const [value, setValue] = useState(initialValue);
+const Notes = ({ instanceName }) => {
   const renderElement = useCallback(props => <Element {...props} />, []);
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const dispatch = useDispatch();
-  const InstancePath = useSelector(_getInstancesPath);
-  const configPath = path.join(InstancePath, instanceName, "config.json");
-
-  const getNotes = async () => {
-    const notes = JSON.parse(await fs.readFile(configPath)).value;
-    console.log("notes", JSON.parse(await fs.readFile(configPath)));
-    setValue(notes ? notes : initialValue);
-  };
-
-  useEffect(() => {
-    // setValue();
-    getNotes();
-  }, []);
+  const instance = useSelector(state => _getInstance(state)(instanceName));
+  const notes = instance.notes || initialValue;
 
   return (
     <div
       css={`
-        && {
-          display: flex;
-          flex-direction: column;
-        }
+        width: 100%;
+        height: 100%;
       `}
     >
-      <Slate
-        editor={editor}
-        value={value}
-        onChange={value => {
-          setValue(value),
+      <div
+        css={`
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+        `}
+      >
+        <Slate
+          editor={editor}
+          value={notes}
+          onChange={notes => {
             dispatch(
               updateInstanceConfig(instanceName, config => {
                 return {
                   ...config,
-                  value
+                  notes
                 };
               })
             );
-        }}
-      >
-        <Toolbar>
-          <MarkButton format="bold" icon={faBold} />
-          <MarkButton format="italic" icon={faItalic} />
-          <MarkButton format="underline" icon={faUnderline} />
-          <MarkButton format="code" icon={faCode} />
-          {/* <BlockButton format="heading-one" icon="looks_one" />
-        <BlockButton format="heading-two" icon="looks_two" />
-        <BlockButton format="block-quote" icon="format_quote" /> */}
-          <BlockButton format="numbered-list" icon={faListOl} />
-          <BlockButton format="bulleted-list" icon={faList} />
-        </Toolbar>
-        <Editable
-          css={`
-            max-height: 600px;
-            max-width: 600px;
-            margin-top: 20px;
-            overflow: hidden;
-            border: solid 1px white;
-          `}
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder="Enter some rich text…"
-          spellCheck
-          autoFocus
-          onKeyDown={event => {
-            for (const hotkey in HOTKEYS) {
-              if (isHotkey(hotkey, event)) {
-                event.preventDefault();
-                const mark = HOTKEYS[hotkey];
-                toggleMark(editor, mark);
-              }
-            }
           }}
-        />
-      </Slate>
+        >
+          <Toolbar>
+            <MarkButton format="bold" icon={faBold} />
+            <MarkButton format="italic" icon={faItalic} />
+            <MarkButton format="underline" icon={faUnderline} />
+            <MarkButton format="code" icon={faCode} />
+            <BlockButton format="heading-one" icon="H1" />
+            <BlockButton format="heading-two" icon="H2" />
+            <BlockButton format="block-quote" icon={faQuoteRight} />
+            <BlockButton format="numbered-list" icon={faListOl} />
+            <BlockButton format="bulleted-list" icon={faList} />
+          </Toolbar>
+          <div
+            css={`
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+            `}
+          >
+            <StyledEditable
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              placeholder="Enter some Notes"
+              autoFocus
+              spellCheck={false}
+              onKeyDown={event => {
+                for (const hotkey in HOTKEYS) {
+                  if (isHotkey(hotkey, event)) {
+                    event.preventDefault();
+                    const mark = HOTKEYS[hotkey];
+                    toggleMark(editor, mark);
+                  }
+                }
+              }}
+            />
+          </div>
+        </Slate>
+      </div>
     </div>
   );
 };
@@ -207,13 +213,28 @@ const BlockButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
     <Button
+      css={`
+        height: 36px;
+        padding: 5px 10px;
+        border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+        margin: 2px;
+      `}
       active={isBlockActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
         toggleBlock(editor, format);
       }}
     >
-      <FontAwesomeIcon icon={icon} />
+      {typeof icon === "string" ? (
+        icon
+      ) : (
+        <FontAwesomeIcon
+          css={`
+            margin: 0;
+          `}
+          icon={icon}
+        />
+      )}
     </Button>
   );
 };
@@ -222,18 +243,33 @@ const MarkButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
     <Button
+      css={`
+        height: 36px;
+        padding: 5px 10px;
+        border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+        margin: 2px;
+      `}
       active={isMarkActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
         toggleMark(editor, format);
       }}
     >
-      <FontAwesomeIcon icon={icon} />
-      {/* <Icon>{icon}</Icon> */}
+      <FontAwesomeIcon
+        css={`
+          margin: 0;
+        `}
+        icon={icon}
+      />
     </Button>
   );
 };
 
-const initialValue = [];
+const initialValue = [
+  {
+    type: "paragraph",
+    children: [{ text: "" }]
+  }
+];
 
-export default RichTextExample;
+export default Notes;
