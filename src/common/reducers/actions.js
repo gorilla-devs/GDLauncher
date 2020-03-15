@@ -125,7 +125,6 @@ export function initOptifine() {
   return async (dispatch, getState) => {
     const html = await getOptifineHomePage();
     const versions = parseOptifineVersions(html);
-    console.log("versions", versions);
   };
 }
 
