@@ -1,14 +1,11 @@
 /* eslint-disable */
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import isHotkey from "is-hotkey";
 import { Editable, withReact, useSlate, Slate } from "slate-react";
 import { Editor, Transforms, createEditor } from "slate";
 import { useDebouncedCallback } from "use-debounce";
 import { withHistory } from "slate-history";
 import { Button } from "antd";
-import { promises as fs } from "fs";
-import path from "path";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -31,7 +28,6 @@ const RichTextExample = ({ instanceName }) => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const dispatch = useDispatch();
   const InstancePath = useSelector(_getInstancesPath);
-  // const configPath = path.join(InstancePath, instanceName, "config.json");
 
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const [value, setValue] = useState(instance.notes || initialValue);
@@ -221,8 +217,7 @@ const initialValue = [
 export default RichTextExample;
 
 const MainContainer = styled.div`
-  height: 93%;
-  max-height: 93%;
+  height: 100%;
   margin-top: 20px;
   width: 100%;
   max-width: 100%;
@@ -259,7 +254,9 @@ const TextEditoContainer = styled.div`
 const TextEditor = styled(Editable)`
   width: 100%;
   max-width: 100%;
+  display: inline-block;
   margin-top: 20px;
   overflow: hidden;
+  word-break: break-word;
   border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
 `;
