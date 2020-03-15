@@ -22,7 +22,7 @@ import { _getInstancesPath, _getInstance } from "../../utils/selectors";
 
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
-const RichTextExample = ({ instanceName }) => {
+const Notes = ({ instanceName }) => {
   const renderElement = useCallback(props => <Element {...props} />, []);
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
@@ -32,20 +32,12 @@ const RichTextExample = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const [value, setValue] = useState(instance.notes || initialValue);
 
-  const [updateNotes] = useDebouncedCallback(
-    v => {
-      dispatch(
-        updateInstanceConfig(instanceName, config => {
-          return {
-            ...config,
-            notes: v
-          };
-        })
-      );
-    },
-    300,
-    { maxWait: 600 }
-  );
+  const [updateNotes] = useDebouncedCallback(v => {
+    dispatch(
+      updateInstanceConfig(instanceName, config => ({ ...config, notes: v }))
+    );
+    300, { maxWait: 600 };
+  });
 
   return (
     <MainContainer>
@@ -69,7 +61,7 @@ const RichTextExample = ({ instanceName }) => {
             <BlockButton format="numbered-list" icon={faListOl} />
             <BlockButton format="bulleted-list" icon={faList} />
           </Toolbar>
-          <TextEditoContainer>
+          <TextEditorContainer>
             <TextEditor
               renderElement={renderElement}
               renderLeaf={renderLeaf}
@@ -77,7 +69,7 @@ const RichTextExample = ({ instanceName }) => {
               spellCheck
               autoFocus
             />
-          </TextEditoContainer>
+          </TextEditorContainer>
         </Slate>
       </Container>
     </MainContainer>
@@ -214,7 +206,7 @@ const initialValue = [
   }
 ];
 
-export default RichTextExample;
+export default Notes;
 
 const MainContainer = styled.div`
   height: 100%;
@@ -242,7 +234,7 @@ const Toolbar = styled.div`
   justify-content: center;
 `;
 
-const TextEditoContainer = styled.div`
+const TextEditorContainer = styled.div`
   height: 100%;
   max-height: 100%;
   display: flex;

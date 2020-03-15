@@ -217,7 +217,6 @@
     "history": "^4.10.1",
     "husky": "^4.2.3",
     "is-electron": "^2.2.0",
-    "is-hotkey": "^0.1.6",
     "jarfile": "^2.0.0",
     "jimp": "^0.9.5",
     "lockfile": "^1.0.4",
