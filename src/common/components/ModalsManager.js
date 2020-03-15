@@ -58,7 +58,6 @@ const modalsComponentLookupTable = {
   AddAccount,
   ModpackDescription,
   InstanceManager,
-  ModOverview
   ModOverview,
   ModsBrowser
 };
