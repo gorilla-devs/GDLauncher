@@ -12,6 +12,12 @@ const {
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
 const nsfw = require("nsfw");
+const murmur = require("murmur2-calculator");
+
+murmur.fibonacci(1000000, (err, result) => {
+  console.log("async result:");
+  console.log(result);
+});
 
 const discordRPC = require("./discordRPC");
 

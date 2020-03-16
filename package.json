@@ -41,7 +41,8 @@
     "lint": "eslint .",
     "dev": "cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none \"yarn start-electron\"",
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web yarn start",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps && yarn rebuild",
+    "rebuild": "electron-build-env neon build murmur2-calculator --release",
     "release": "cross-env-shell NODE_ENV=production APP_TYPE=electron \"yarn build\" && electron-builder build --publish never"
   },
   "husky": {
@@ -178,6 +179,7 @@
     "concurrently": "^5.1.0",
     "cross-env": "^7.0.2",
     "electron": "^8.1.1",
+    "electron-build-env": "^0.2.0",
     "electron-builder": "^22.4.1",
     "electron-builder-squirrel-windows": "^22.4.1",
     "eslint": "^6.8.0",
@@ -193,6 +195,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-react-hooks": "^2.3.0",
+    "neon-cli": "^0.3.3",
     "node-loader": "^0.6.0",
     "prettier": "^1.19.1",
     "terser-webpack-plugin": "^2.3.5",
@@ -229,6 +232,7 @@
     "lodash.omitby": "^4.6.0",
     "make-dir": "^3.0.2",
     "memoize-one": "^5.1.1",
+    "murmur2-calculator": "https://github.com/gorilla-devs/murmur2-calculator",
     "murmurhash-js": "^1.0.0",
     "node-7z": "^2.1.1",
     "nsfw": "^1.2.7",
