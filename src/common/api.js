@@ -60,14 +60,12 @@ export const imgurPost = (image, onProgress) => {
   const bodyFormData = new FormData();
   bodyFormData.append("image", image);
 
-  const res = axios.post("https://api.imgur.com/3/image", bodyFormData, {
+  return axios.post("https://api.imgur.com/3/image", bodyFormData, {
     headers: {
       Authorization: `Client-ID ${CLIENT_ID}`
     },
     ...(onProgress && { onUploadProgress: onProgress })
   });
-
-  return res;
 };
 
 export const mcInvalidate = (accessToken, clientToken) => {
