@@ -83,6 +83,11 @@ export const _getMinecraftVersionsPath = createSelector(
   librariesPath => path.join(librariesPath, "net", "minecraft")
 );
 
+export const _getOptifineVersionsPath = createSelector(
+  _getLibrariesPath,
+  librariesPath => path.join(librariesPath, "net", "optifine")
+);
+
 export const _getAssetsPath = createSelector(_getDataStorePath, datastorePath =>
   path.join(datastorePath, "assets")
 );

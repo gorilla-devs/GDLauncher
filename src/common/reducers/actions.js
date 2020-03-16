@@ -93,7 +93,12 @@ export function initManifests() {
       type: ActionTypes.UPDATE_JAVA_MANIFEST,
       data: java
     });
-    dispatch(initOptifine());
+    const html = await getOptifineHomePage();
+    const versions = parseOptifineVersions(html);
+    dispatch({
+      type: ActionTypes.UPDATE_OPTIFINE_MANIFEST,
+      versions: versions
+    });
     const forge = removeDuplicates((await getForgeManifest()).data, "name");
     const forgeVersions = {};
     // Looping over vanilla versions, create a new entry in forge object
@@ -118,13 +123,6 @@ export function initManifests() {
       java,
       forge
     };
-  };
-}
-
-export function initOptifine() {
-  return async (dispatch, getState) => {
-    const html = await getOptifineHomePage();
-    const versions = parseOptifineVersions(html);
   };
 }
 

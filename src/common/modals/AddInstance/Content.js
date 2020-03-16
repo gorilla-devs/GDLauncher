@@ -25,7 +25,11 @@ const Content = ({
   setImportZipPath
 }) => {
   let pages = [
-    <NewInstance setVersion={setVersion} setModpack={setModpack} />,
+    <NewInstance
+      setVersion={setVersion}
+      version={version}
+      setModpack={setModpack}
+    />,
     <TwitchModpacks
       setVersion={setVersion}
       setStep={setStep}
