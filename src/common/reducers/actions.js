@@ -23,7 +23,8 @@ import {
   GDL_LEGACYJAVAFIXER_MOD_URL,
   TWITCH_MODPACK,
   FORGE,
-  FABRIC
+  FABRIC,
+  VANILLA
 } from "../utils/constants";
 import {
   mcAuthenticate,
@@ -50,7 +51,8 @@ import {
   _getAccounts,
   _getTempPath,
   _getInstance,
-  _getDataStorePath
+  _getDataStorePath,
+  _getOptifineVersionsPath
 } from "../utils/selectors";
 import {
   librariesMapper,
@@ -643,16 +645,18 @@ export function updateInstanceConfig(
   };
 }
 
-export function addToQueue(instanceName, modloader, manifest, background) {
+export function addToQueue(instanceName, options) {
   return async (dispatch, getState) => {
     const state = getState();
+    const { modloader, manifest, background, optifine } = options;
     const { currentDownload } = state;
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,
       modloader,
       manifest,
-      background
+      background,
+      optifine
     });
 
     lockfile.lock(
@@ -674,7 +678,8 @@ export function addToQueue(instanceName, modloader, manifest, background) {
           modloader,
           timePlayed: prev.timePlayed || 0,
           background,
-          ...(addMods && { mods: [] })
+          ...(addMods && { mods: [] }),
+          ...(optifine && modloader[0] === VANILLA && { optifine })
         }),
         true
       )
@@ -996,6 +1001,36 @@ export function downloadInstance(instanceName) {
       })
     );
 
+    const optifine = async () => {
+      const state = getState();
+      const {
+        downloadQueue: {
+          [instanceName]: { optifine: optifineVersionName }
+        }
+      } = state;
+      const optifineVersionsPath = _getOptifineVersionsPath(state);
+      const optifineHomePage = await getOptifineHomePage();
+      const optifineManifest = parseOptifineVersions(optifineHomePage);
+      const url = optifineManifest[optifineVersionName.split(" ")[1]].filter(
+        x => x.name === optifineVersionName
+      )[0].download;
+      const html = await axios.get(url);
+      const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
+      console.log(
+        "pippo",
+        "https://optifine.net/downloadx?" + ret[1],
+        ret[1],
+        path.join(optifineVersionsPath, `${optifineVersionName}.jar`)
+      );
+      if (ret && ret[1]) {
+        return {
+          url: "https://optifine.net/downloadx?" + ret[1],
+          path: path.join(optifineVersionsPath, `${optifineVersionName}.jar`)
+        };
+      }
+    };
+
+
     const libraries = librariesMapper(
       mcJson.libraries,
       _getLibrariesPath(state)
@@ -1009,8 +1044,12 @@ export function downloadInstance(instanceName) {
       );
     };
 
+    //parseOptifineVersions
+
+    const optifineObj = await optifine();
+
     await downloadInstanceFiles(
-      [...libraries, ...assets, mcMainFile],
+      [...libraries, ...assets, mcMainFile, optifineObj],
       updatePercentage,
       state.settings.concurrentDownloads
     );
@@ -1029,8 +1068,8 @@ export function downloadInstance(instanceName) {
     if (mcJson.assets === "legacy") {
       await copyAssetsToLegacy(assets);
     }
-
-    if (modloader && modloader[0] === "fabric") {
+    if (modloader && modloader[0] === VANILLA) {
+    } else if (modloader && modloader[0] === "fabric") {
       await dispatch(downloadFabric(instanceName));
     } else if (modloader && modloader[0] === "forge") {
       await dispatch(downloadForge(instanceName));

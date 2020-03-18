@@ -56,7 +56,7 @@ function forgeManifest(state = [], action) {
   }
 }
 
-function optfineManifest(state = {}, action) {
+function optifineManifest(state = {}, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_OPTIFINE_MANIFEST:
       return action.versions;
@@ -120,7 +120,7 @@ export default combineReducers({
   currentAccountId,
   vanillaManifest,
   forgeManifest,
-  optfineManifest,
+  optifineManifest,
   fabricManifest,
   javaManifest,
   modsManifests,

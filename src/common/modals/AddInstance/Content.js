@@ -22,13 +22,17 @@ const Content = ({
   version,
   setModpack,
   modpack,
-  setImportZipPath
+  setImportZipPath,
+  setOptifineVersion,
+  optifineVersion
 }) => {
   let pages = [
     <NewInstance
       setVersion={setVersion}
       version={version}
       setModpack={setModpack}
+      setOptifineVersion={setOptifineVersion}
+      optifineVersion={optifineVersion}
     />,
     <TwitchModpacks
       setVersion={setVersion}

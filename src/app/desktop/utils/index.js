@@ -7,6 +7,7 @@ import jarAnalyzer from "jarfile";
 import { promisify } from "util";
 import { ipcRenderer } from "electron";
 import path from "path";
+import axios from "axios";
 import { exec, spawn } from "child_process";
 import cheerio from "cheerio";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
@@ -185,7 +186,6 @@ export const parseOptifineVersions = html => {
             }
           ];
         });
-
     }
   }
   return hashMap;
@@ -646,6 +646,25 @@ export const downloadAddonZip = async (id, fileId, instancePath, tempPath) => {
   });
   const manifest = await fse.readJson(instanceManifest);
   return manifest;
+};
+
+export const downloadOptifine = async (
+  optifineVersionName,
+  optifineVersionsPath,
+  optifineManifest
+) => {
+  await makeDir(optifineVersionsPath);
+  const url = optifineManifest[optifineVersionName.split(" ")[1]].filter(
+    x => x.name === optifineVersionName
+  )[0].download;
+  const html = await axios.get(url);
+  const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
+  if (ret && ret[1]) {
+    downloadFile(
+      path.join(optifineVersionsPath, `${optifineVersionName}.jar`),
+      "https://optifine.net/downloadx?" + ret[1]
+    );
+  }
 };
 
 export const getPlayerSkin = async uuid => {

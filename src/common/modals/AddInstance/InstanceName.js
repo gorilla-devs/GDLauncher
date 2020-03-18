@@ -13,8 +13,17 @@ import {
 import { addToQueue } from "../../reducers/actions";
 import { closeModal } from "../../reducers/modals/actions";
 import { Input } from "antd";
-import { downloadAddonZip, importAddonZip } from "../../../app/desktop/utils";
-import { _getInstancesPath, _getTempPath } from "../../utils/selectors";
+import {
+  downloadAddonZip,
+  importAddonZip,
+  downloadOptifine
+} from "../../../app/desktop/utils";
+
+import {
+  _getInstancesPath,
+  _getTempPath,
+  _getOptifineVersionsPath
+} from "../../utils/selectors";
 import { transparentize } from "polished";
 import bgImage from "../../../common/assets/mcCube.jpg";
 import { downloadFile } from "../../../app/desktop/utils/downloader";
@@ -28,7 +37,8 @@ const InstanceName = ({
   setVersion,
   setModpack,
   importZipPath,
-  step
+  step,
+  optifineVersion
 }) => {
   const mcName = (
     modpack?.name.replace(/\W/g, " ") ||
@@ -40,6 +50,8 @@ const InstanceName = ({
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const tempPath = useSelector(_getTempPath);
+  const optifineVersionsPath = useSelector(_getOptifineVersionsPath);
+  const optifineManifest = useSelector(state => state.app.optifineManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const [instanceName, setInstanceName] = useState(mcName);
   const [alreadyExists, setAlreadyExists] = useState(false);
@@ -78,13 +90,25 @@ const InstanceName = ({
   };
 
   const createInstance = async localInstanceName => {
+    console.log(
+      "PP",
+      version,
+      optifineVersion,
+      optifineVersionsPath,
+      optifineManifest
+    );
     if (!version || !localInstanceName) return;
     const isVanilla = version[0] === VANILLA;
     const isFabric = version[0] === FABRIC;
     const isForge = version[0] === FORGE;
     const isTwitchModpack = version[0] === TWITCH_MODPACK;
     if (isVanilla) {
-      dispatch(addToQueue(localInstanceName, [version[0], version[2]]));
+      dispatch(
+        addToQueue(localInstanceName, {
+          modloader: [version[0], version[2]],
+          optifine: optifineVersion,
+        })
+      );
       await wait(2);
     } else if (isFabric) {
       const mappedItem = fabricManifest.mappings.find(
@@ -92,16 +116,20 @@ const InstanceName = ({
       );
       const splitItem = version[2].split(mappedItem.separator);
       dispatch(
-        addToQueue(localInstanceName, [
-          FABRIC,
-          splitItem[0],
-          version[2],
-          version[3]
-        ])
+        addToQueue(localInstanceName, {
+          modloader: [FABRIC, splitItem[0], version[2], version[3]]
+        })
       );
+      // if (optifineVersion) {
+      //   downloadOptifine(
+      //     optifineVersion,
+      //     optifineVersionsPath,
+      //     optifineManifest
+      //   );
+      // }
       await wait(2);
     } else if (isForge) {
-      dispatch(addToQueue(localInstanceName, version));
+      dispatch(addToQueue(localInstanceName, { version }));
       await wait(2);
     } else if (isTwitchModpack) {
       let manifest;
@@ -137,12 +165,11 @@ const InstanceName = ({
         version[2]
       ];
       dispatch(
-        addToQueue(
-          localInstanceName,
-          modloader,
+        addToQueue(localInstanceName, {
+          modloader: modloader,
           manifest,
-          `background${path.extname(imageURL)}`
-        )
+          background: `background${path.extname(imageURL)}`
+        })
       );
     }
     dispatch(closeModal());

@@ -9,14 +9,20 @@ import axios from "axios";
 import { downloadFile } from "../../../app/desktop/utils/downloader";
 import { _getOptifineVersionsPath } from "../../utils/selectors";
 
-const NewInstance = ({ setVersion, setModpack, version }) => {
+const NewInstance = ({
+  setVersion,
+  setModpack,
+  version,
+  setOptifineVersion,
+  optifineVersion
+}) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
-  const optifineManifest = useSelector(state => state.app.optfineManifest);
+  const optifineManifest = useSelector(state => state.app.optifineManifest);
   const [minecraftVersion, setMinecraftVersion] = useState(null);
   const [optifineSwitch, setOptifineSwitch] = useState(false);
-  const [optfineVersion, setOptifineVersion] = useState(null);
+  const [optifineDefaultValue, setOptifineDefaultValue] = useState(null);
 
   const optifineVersionsPath = useSelector(_getOptifineVersionsPath);
 
@@ -27,32 +33,35 @@ const NewInstance = ({ setVersion, setModpack, version }) => {
       minecraftVersion[1] === "release"
     ) {
       if (optifineManifest[minecraftVersion[2]]) {
+        setOptifineDefaultValue(optifineManifest[minecraftVersion[2]][0].name);
         setOptifineVersion(optifineManifest[minecraftVersion[2]][0].name);
       }
     } else if (minecraftVersion && minecraftVersion[0] === "forge") {
       if (optifineManifest[minecraftVersion[1]]) {
+        setOptifineDefaultValue(optifineManifest[minecraftVersion[1]][0].name);
         setOptifineVersion(optifineManifest[minecraftVersion[1]][0].name);
       }
     }
   }, [minecraftVersion]);
 
-  const downloadOptifine = async optifineVersionName => {
-    await makeDir(optifineVersionsPath);
-    const url = optifineManifest[optifineVersionName.split(" ")[1]].filter(
-      x => x.name === optifineVersionName
-    )[0].download;
-    const html = await axios.get(url);
-    const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
-    console.log(ret);
-    if (ret && ret[1]) {
-      downloadFile(
-        path.join(optifineVersionsPath, `${optifineVersionName}.jar`),
-        "https://optifine.net/downloadx?" + ret[1]
-      );
-    }
-  };
+  // const downloadOptifine = async optifineVersionName => {
+  //   await makeDir(optifineVersionsPath);
+  //   const url = optifineManifest[optifineVersionName.split(" ")[1]].filter(
+  //     x => x.name === optifineVersionName
+  //   )[0].download;
+  //   const html = await axios.get(url);
+  //   const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
+  //   console.log(ret);
+  //   if (ret && ret[1]) {
+  //     downloadFile(
+  //       path.join(optifineVersionsPath, `${optifineVersionName}.jar`),
+  //       "https://optifine.net/downloadx?" + ret[1]
+  //     );
+  //   }
+  // };
 
   const filterOptifineVersione = () => {
+    // console.log("P", minecraftVersion, optifineManifest);
     if (
       minecraftVersion &&
       minecraftVersion[0] === "vanilla" &&
@@ -215,11 +224,15 @@ const NewInstance = ({ setVersion, setModpack, version }) => {
           {optifineSwitch && (
             <Select
               onChange={v => {
-                downloadOptifine(v);
+                // downloadOptifine(v);
+                if (!v) {
+                  setOptifineVersion(optifineDefaultValue);
+                } else setOptifineVersion(v);
+                console.log("version", v, optifineDefaultValue);
               }}
               value={
-                optfineVersion
-                  ? optfineVersion
+                optifineDefaultValue
+                  ? optifineDefaultValue
                   : "No optifine available for this version"
               }
               placeholder="Select an optifine version"
