@@ -1,7 +1,6 @@
 import { OPEN_MODAL, CLOSE_MODAL, UNMOUNTING_MODAL } from "./actionTypes";
 
-export function 
-openModal(modalType, modalProps = {}) {
+export function openModal(modalType, modalProps = {}) {
   return dispatch => {
     dispatch({
       type: OPEN_MODAL,

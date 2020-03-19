@@ -666,6 +666,8 @@ export function addToQueue(instanceName, options) {
       }
     );
 
+    console.log("modloader", modloader);
+
     const addMods =
       modloader[0] === TWITCH_MODPACK ||
       modloader[0] === FORGE ||
@@ -1008,6 +1010,7 @@ export function downloadInstance(instanceName) {
           [instanceName]: { optifine: optifineVersionName }
         }
       } = state;
+      console.log("pippo", optifineVersionName);
       const optifineVersionsPath = _getOptifineVersionsPath(state);
       const optifineHomePage = await getOptifineHomePage();
       const optifineManifest = parseOptifineVersions(optifineHomePage);
@@ -1016,12 +1019,6 @@ export function downloadInstance(instanceName) {
       )[0].download;
       const html = await axios.get(url);
       const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
-      console.log(
-        "pippo",
-        "https://optifine.net/downloadx?" + ret[1],
-        ret[1],
-        path.join(optifineVersionsPath, `${optifineVersionName}.jar`)
-      );
       if (ret && ret[1]) {
         return {
           url: "https://optifine.net/downloadx?" + ret[1],
@@ -1030,6 +1027,7 @@ export function downloadInstance(instanceName) {
       }
     };
 
+    optifine();
 
     const libraries = librariesMapper(
       mcJson.libraries,

@@ -106,7 +106,7 @@ const InstanceName = ({
       dispatch(
         addToQueue(localInstanceName, {
           modloader: [version[0], version[2]],
-          optifine: optifineVersion,
+          optifine: optifineVersion
         })
       );
       await wait(2);
@@ -129,7 +129,12 @@ const InstanceName = ({
       // }
       await wait(2);
     } else if (isForge) {
-      dispatch(addToQueue(localInstanceName, { version }));
+      dispatch(
+        addToQueue(localInstanceName, {
+          modloader: version,
+          optifine: optifineVersion
+        })
+      );
       await wait(2);
     } else if (isTwitchModpack) {
       let manifest;
