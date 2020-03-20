@@ -83,6 +83,33 @@ import { removeDuplicates, getFileMurmurHash2 } from "../utils";
 import { UPDATE_CONCURRENT_DOWNLOADS } from "./settings/actionTypes";
 import PromiseQueue from "../../app/desktop/utils/PromiseQueue";
 
+const optifine = async () => {
+  return async (dispatch, getState) => {
+    const state = getState();
+
+    const {
+      downloadQueue: {
+        [instanceName]: { optifine: optifineVersionName }
+      }
+    } = state;
+
+    const optifineHomePage = await getOptifineHomePage();
+    const optifineManifest = parseOptifineVersions(optifineHomePage);
+    const optifineVersionsPath = _getOptifineVersionsPath(state);
+    const url = optifineManifest[optifineVersionName.split(" ")[1]].filter(
+      x => x.name === optifineVersionName
+    )[0].download;
+    const html = await axios.get(url);
+    const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
+    if (ret && ret[1]) {
+      return {
+        url: "https://optifine.net/downloadx?" + ret[1],
+        path: path.join(optifineVersionsPath, `${optifineVersionName}.jar`)
+      };
+    }
+  };
+};
+
 export function initManifests() {
   return async dispatch => {
     const mc = (await getMcManifest()).data;
@@ -671,8 +698,6 @@ export function addToQueue(instanceName, options) {
       }
     );
 
-    console.log("modloader", modloader);
-
     const addMods =
       modloader[0] === TWITCH_MODPACK ||
       modloader[0] === FORGE ||
@@ -686,7 +711,8 @@ export function addToQueue(instanceName, options) {
           timePlayed: prev.timePlayed || 0,
           background,
           ...(addMods && { mods: [] }),
-          ...(optifine && modloader[0] === VANILLA && { optifine })
+          ...((optifine && modloader[0] === VANILLA) ||
+            (modloader[0] === FORGE && { optifine }))
         }),
         true
       )
@@ -990,25 +1016,6 @@ export function downloadInstance(instanceName) {
       }
     } = state;
 
-    const optifine = async () => {
-      const state = getState();
-      console.log("pippo", optifineVersionName);
-      const optifineVersionsPath = _getOptifineVersionsPath(state);
-      const optifineHomePage = await getOptifineHomePage();
-      const optifineManifest = parseOptifineVersions(optifineHomePage);
-      const url = optifineManifest[optifineVersionName.split(" ")[1]].filter(
-        x => x.name === optifineVersionName
-      )[0].download;
-      const html = await axios.get(url);
-      const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
-      if (ret && ret[1]) {
-        return {
-          url: "https://optifine.net/downloadx?" + ret[1],
-          path: path.join(optifineVersionsPath, `${optifineVersionName}.jar`)
-        };
-      }
-    };
-
     const libraries = librariesMapper(
       mcJson.libraries,
       _getLibrariesPath(state)
@@ -1062,17 +1069,6 @@ export function downloadInstance(instanceName) {
       await dispatch(downloadFabric(instanceName));
     } else if (modloader && modloader[0] === "forge") {
       await dispatch(downloadForge(instanceName));
-      await makeDir(path.join(_getInstancesPath(state), instanceName, "mods"));
-
-      await fse.copy(
-        optifineObj.path,
-        path.join(
-          _getInstancesPath(state),
-          instanceName,
-          "mods",
-          `${optifineVersionName}.jar`
-        )
-      );
     } else if (modloader && modloader[0] === "twitchModpack") {
       await dispatch(downloadForge(instanceName));
 
@@ -1400,6 +1396,14 @@ export function launchInstance(instanceName) {
     const { memory } = state.settings.java;
     const { modloader } = _getInstance(state)(instanceName);
     const instancePath = path.join(_getInstancesPath(state), instanceName);
+    const instancesPath = _getInstancesPath(state);
+    const optifineVersionsPath = _getOptifineVersionsPath(state);
+
+    const configPath = path.join(
+      path.join(instancesPath, instanceName, "config.json")
+    );
+
+    const config = await fse.readJSON(configPath);
 
     const instanceJLFPath = path.join(
       _getInstancesPath(state),
@@ -1442,6 +1446,29 @@ export function launchInstance(instanceName) {
       const getForceLastVer = ver =>
         Number.parseInt(ver.split(".")[ver.split(".").length - 1], 10);
 
+      await makeDir(path.join(_getInstancesPath(state), instanceName, "mods"));
+
+      console.log(
+        "BERTO",
+        config,
+        path.join(optifineVersionsPath, `${config.optifine}.jar`),
+        path.join(
+          _getInstancesPath(state),
+          instanceName,
+          "mods",
+          `${config.optifine}.jar`
+        )
+      );
+
+      await fse.copy(
+        path.join(optifineVersionsPath, `${config.optifine}.jar`),
+        path.join(
+          _getInstancesPath(state),
+          instanceName,
+          "mods",
+          `${config.optifine}.jar`
+        )
+      );
       if (
         lt(coerce(modloader[2]), coerce("10.13.1")) &&
         gte(coerce(modloader[2]), coerce("9.11.1")) &&
