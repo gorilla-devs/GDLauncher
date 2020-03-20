@@ -1214,12 +1214,11 @@ export const startListener = () => {
             event.action === 2
           ) {
             try {
+              await new Promise(resolve => setTimeout(resolve, 300));
               await fs.open(completePath, "r+");
               changesTracker[completePath].completed = true;
-              console.log(`${completePath} READY`);
             } catch {
               // Do nothing, simply not completed..
-              console.warn(`${completePath} NOT READY`);
             }
           } else if (event.action !== 2 && !changesTracker[completePath]) {
             // If we cannot find it in the hash table, it's a new event
