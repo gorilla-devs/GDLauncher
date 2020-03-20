@@ -5,6 +5,7 @@ import path from "path";
 import { ipcRenderer } from "electron";
 import uuid from "uuid/v1";
 import fse from "fs-extra";
+import makeDir from "make-dir";
 import coerce from "semver/functions/coerce";
 import gte from "semver/functions/gte";
 import lt from "semver/functions/lt";
@@ -1003,13 +1004,14 @@ export function downloadInstance(instanceName) {
       })
     );
 
+    const {
+      downloadQueue: {
+        [instanceName]: { optifine: optifineVersionName }
+      }
+    } = state;
+
     const optifine = async () => {
       const state = getState();
-      const {
-        downloadQueue: {
-          [instanceName]: { optifine: optifineVersionName }
-        }
-      } = state;
       console.log("pippo", optifineVersionName);
       const optifineVersionsPath = _getOptifineVersionsPath(state);
       const optifineHomePage = await getOptifineHomePage();
@@ -1027,8 +1029,6 @@ export function downloadInstance(instanceName) {
       }
     };
 
-    optifine();
-
     const libraries = librariesMapper(
       mcJson.libraries,
       _getLibrariesPath(state)
@@ -1045,6 +1045,17 @@ export function downloadInstance(instanceName) {
     //parseOptifineVersions
 
     const optifineObj = await optifine();
+
+    console.log(
+      "GIORGIO",
+      optifineObj.path,
+      path.join(
+        _getInstancesPath(state),
+        instanceName,
+        "mods",
+        `${optifineVersionName}.jar`
+      )
+    );
 
     await downloadInstanceFiles(
       [...libraries, ...assets, mcMainFile, optifineObj],
@@ -1071,8 +1082,20 @@ export function downloadInstance(instanceName) {
       await dispatch(downloadFabric(instanceName));
     } else if (modloader && modloader[0] === "forge") {
       await dispatch(downloadForge(instanceName));
+      await makeDir(path.join(_getInstancesPath(state), instanceName, "mods"));
+
+      await fse.copy(
+        optifineObj.path,
+        path.join(
+          _getInstancesPath(state),
+          instanceName,
+          "mods",
+          `${optifineVersionName}.jar`
+        )
+      );
     } else if (modloader && modloader[0] === "twitchModpack") {
       await dispatch(downloadForge(instanceName));
+
       await dispatch(downloadForgeManifestFiles(instanceName));
     }
 
