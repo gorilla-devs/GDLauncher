@@ -234,11 +234,11 @@ autoUpdater.on("update-downloaded", () => {
 });
 
 ipcMain.handle("checkForUpdates", () => {
-  autoUpdater.checkForUpdates();
+  // autoUpdater.checkForUpdates();
 });
 
 ipcMain.handle("installUpdateAndRestart", () => {
-  autoUpdater.quitAndInstall(true, true);
+  // autoUpdater.quitAndInstall(true, true);
 });
 
 ipcMain.handle("init-discord-rpc", () => {
