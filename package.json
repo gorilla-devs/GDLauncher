@@ -32,6 +32,7 @@
   "scripts": {
     "start": "cross-env-shell NODE_ENV=development craco start",
     "start-electron": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "start-prod": "electron .",
     "build-web": "cross-env-shell APP_TYPE=web craco build",
     "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron craco build && yarn build-electron",
     "test": "craco test",

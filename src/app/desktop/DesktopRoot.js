@@ -47,29 +47,25 @@ function DesktopRoot() {
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
   const javaPath = useSelector(state => state.settings.java.path);
-  const dataPath = useSelector(state => state.settings.dataPath);
+  const dataPathFromStore = useSelector(state => state.settings.dataPath);
   const location = useSelector(state => state.router.location);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
 
-  // Handle already logged in account redirect
-  useDidMount(() => {
-    ipcRenderer
-      .invoke("getUserDataPath")
-      .then(res => dataPath || dispatch(updateDataPath(res)))
-      .catch(console.error);
+  const init = async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const dataPathStatic = await ipcRenderer.invoke("getUserDataPath");
+    const dataPath =
+      dataPathFromStore || dispatch(updateDataPath(dataPathStatic));
     dispatch(checkClientToken());
-    dispatch(initManifests())
-      .then(async data => {
-        await extract7z();
-        return data;
-      })
-      .then(({ java }) => javaPath || isLatestJavaDownloaded(java, dataPath))
-      .then(res => {
-        if (!res) dispatch(downloadJava());
-        return res;
-      })
-      .catch(console.error);
     dispatch(initNews());
+    const manifests = await dispatch(initManifests());
+    await extract7z();
+    const isLatestJava = await isLatestJavaDownloaded(manifests.java, dataPath);
+    const isJavaOK = javaPath || isLatestJava;
+    if (!isJavaOK) {
+      dispatch(downloadJava());
+    }
+
     if (process.env.NODE_ENV === "development" && currentAccount) {
       dispatch(received(features.mcAuthentication));
       dispatch(push("/home"));
@@ -88,7 +84,10 @@ function DesktopRoot() {
     if (shouldShowDiscordRPC) {
       ipcRenderer.invoke("init-discord-rpc");
     }
-  });
+  };
+
+  // Handle already logged in account redirect
+  useDidMount(init);
 
   useEffect(() => {
     if (clientToken && process.env.NODE_ENV !== "development") {
