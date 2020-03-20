@@ -18,7 +18,7 @@ const discordRPC = require("./discordRPC");
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
-app.commandLine.appendSwitch("disable-web-security");
+// app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch("disable-gpu-vsync=gpu");
 Menu.setApplicationMenu();
 
@@ -40,7 +40,7 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
-      webSecurity: false
+      webSecurity: !isDev
     }
   });
 
@@ -52,23 +52,30 @@ function createWindow() {
     mainWindow.reload();
   });
 
-  // mainWindow.webContents.session.webRequest.onHeadersReceived(
-  //   {
-  //     urls: []
-  //   },
-  //   (details, callback) => {
-  //     // eslint-disable-next-line
-  //     delete details.responseHeaders["Access-Control-Allow-Origin"];
-  //     // eslint-disable-next-line
-  //     delete details.responseHeaders["access-control-allow-origin"];
-  //     // eslint-disable-next-line
-  //     details.responseHeaders["Access-Control-Allow-Origin"] = ["*"];
-  //     callback({
-  //       cancel: false,
-  //       responseHeaders: details.responseHeaders
-  //     });
-  //   }
-  // );
+  mainWindow.webContents.session.webRequest.onHeadersReceived(
+    {
+      urls: ["http://*/*", "https://*/*"]
+    },
+    (details, callback) => {
+      // eslint-disable-next-line
+      delete details.responseHeaders["Access-Control-Allow-Origin"];
+      // eslint-disable-next-line
+      delete details.responseHeaders["access-control-allow-origin"];
+      if (details.url.includes("www.google-analytics.com")) {
+        // eslint-disable-next-line
+        details.responseHeaders["Access-Control-Allow-Origin"] = [
+          "http://localhost:3000"
+        ];
+      } else {
+        // eslint-disable-next-line
+        details.responseHeaders["Access-Control-Allow-Origin"] = ["*"];
+      }
+      callback({
+        cancel: false,
+        responseHeaders: details.responseHeaders
+      });
+    }
+  );
 
   tray = new Tray(
     isDev
@@ -227,11 +234,11 @@ autoUpdater.on("update-downloaded", () => {
 });
 
 ipcMain.handle("checkForUpdates", () => {
-  autoUpdater.checkForUpdates();
+  // autoUpdater.checkForUpdates();
 });
 
 ipcMain.handle("installUpdateAndRestart", () => {
-  autoUpdater.quitAndInstall(true, true);
+  // autoUpdater.quitAndInstall(true, true);
 });
 
 ipcMain.handle("init-discord-rpc", () => {

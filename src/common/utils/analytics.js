@@ -12,20 +12,7 @@ function queue(...args) {
 class GAnalytics {
   constructor() {
     this.curPage = "N/A";
-    // Try to set screen size
-    try {
-      const { width, height } = ipcRenderer.invoke("getPrimaryDisplaySizes");
-      this.setProperties({
-        sr: `${width}x${height}`,
-        vp: `${window.innerWidth}x${window.innerHeight}`,
-        ds: "app"
-      });
-    } catch (err) {
-      console.error(err);
-    }
-    this.setProperties({
-      appVersion: version
-    });
+    this.userId = null;
   }
 
   trackPage(page) {
@@ -33,9 +20,16 @@ class GAnalytics {
     this.setProperties({ "&dl": page });
     queue("send", {
       hitType: "pageview",
-      page,
-      dimension1: `${type()} - ${release()} - ${arch()}`
+      page
     });
+  }
+
+  idle(page) {
+    if (this.userId) {
+      this.curPage = page;
+      queue("set", "page", page);
+      queue("send", "event", "idleForFiveMinutes", page);
+    }
   }
 
   /* eslint-disable */
@@ -45,8 +39,31 @@ class GAnalytics {
     }
   }
 
-  setUserId(userId) {
+  async setUserId(userId) {
     queue("set", "userId", userId);
+    // Try to set screen size
+    try {
+      const { width, height } = await ipcRenderer.invoke(
+        "getPrimaryDisplaySizes"
+      );
+      this.setProperties({
+        sr: `${width}x${height}`,
+        ds: "app"
+      });
+      queue("send", "event", "screenSize", `${width}x${height}`);
+      queue(
+        "send",
+        "event",
+        "operatingSystem",
+        `${type()} - ${release()} - ${arch()}`
+      );
+    } catch (err) {
+      console.error(err);
+    }
+    this.setProperties({
+      appVersion: version
+    });
+    this.userId = userId;
   }
   /* eslint-enable */
 }

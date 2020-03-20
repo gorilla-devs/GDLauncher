@@ -26,6 +26,7 @@ import { _getCurrentAccount } from "../../common/utils/selectors";
 import { isLatestJavaDownloaded, extract7z } from "./utils";
 import { updateDataPath } from "../../common/reducers/settings/actions";
 import SystemNavbar from "./components/SystemNavbar";
+import useTrackIdle from "./utils/useTrackIdle";
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -91,10 +92,13 @@ function DesktopRoot() {
 
   useEffect(() => {
     if (clientToken && process.env.NODE_ENV !== "development") {
-      ga.setUserId(clientToken);
-      ga.trackPage(location.pathname);
+      ga.setUserId(clientToken)
+        .then(() => ga.trackPage(location.pathname))
+        .catch(console.error);
     }
   }, [location.pathname, clientToken]);
+
+  useTrackIdle(location.pathname);
 
   return (
     <Wrapper>

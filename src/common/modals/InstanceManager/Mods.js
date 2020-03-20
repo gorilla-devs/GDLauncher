@@ -34,6 +34,14 @@ const RowContainer = styled.div.attrs(props => ({
   align-items: center;
   font-size: 16px;
   padding: 0 10px;
+  .leftPartContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    & > * {
+      margin-right: 12px;
+    }
+  }
   .rowCenterContent {
     flex: 1;
     height: 100%;
@@ -142,7 +150,7 @@ const Row = memo(({ index, style, data }) => {
   const dispatch = useDispatch();
   return (
     <RowContainer index={index} override={style}>
-      <div>
+      <div className="leftPartContent">
         <Checkbox
           checked={selectedMods.includes(item.fileName)}
           onChange={e => {
@@ -153,6 +161,7 @@ const Row = memo(({ index, style, data }) => {
             }
           }}
         />
+        {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
       </div>
       <div
         onClick={() => {
@@ -169,7 +178,6 @@ const Row = memo(({ index, style, data }) => {
         }}
         className="rowCenterContent"
       >
-        {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
         {item.fileName}
       </div>
       <div className="rightPartContent">
@@ -186,7 +194,7 @@ const Row = memo(({ index, style, data }) => {
               item,
               dispatch
             );
-            setTimeout(() => setLoading(false), 1000);
+            setTimeout(() => setLoading(false), 500);
           }}
         />
         <FontAwesomeIcon

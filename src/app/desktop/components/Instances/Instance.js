@@ -102,7 +102,7 @@ const Instance = ({ instanceName }) => {
     } else {
       setBackground(`${instanceDefaultBackground}`);
     }
-  }, [instance.background]);
+  }, [instance.background, instancesPath, instanceName]);
 
   const startInstance = () => {
     if (isInQueue) return;

@@ -595,13 +595,23 @@ export function updateSelectedInstance(name) {
 }
 
 export function removeDownloadFromQueue(instanceName) {
-  return (dispatch, getState) => {
-    lockfile.unlock(
-      path.join(_getInstancesPath(getState()), instanceName, "installing.lock"),
-      err => {
-        if (err) console.log(err);
-      }
+  return async (dispatch, getState) => {
+    const lockFilePath = path.join(
+      _getInstancesPath(getState()),
+      instanceName,
+      "installing.lock"
     );
+    const isLocked = await new Promise((resolve, reject) => {
+      lockfile.check(lockFilePath, (err, locked) => {
+        if (err) reject(err);
+        resolve(locked);
+      });
+    });
+    if (isLocked) {
+      lockfile.unlock(lockFilePath, err => {
+        if (err) console.log(err);
+      });
+    }
     dispatch({
       type: ActionTypes.UPDATE_CURRENT_DOWNLOAD,
       instanceName: null
@@ -925,6 +935,15 @@ export function downloadForgeManifestFiles(instanceName) {
     });
 
     dispatch(updateDownloadStatus(instanceName, "Finalizing overrides..."));
+
+    // Force premature unlock to let our listener catch mods from override
+    lockfile.unlock(
+      path.join(_getInstancesPath(getState()), instanceName, "installing.lock"),
+      err => {
+        if (err) console.log(err);
+      }
+    );
+
     await fse.copy(
       path.join(_getTempPath(state), instanceName, "overrides"),
       path.join(_getInstancesPath(state), instanceName),
@@ -1075,7 +1094,9 @@ export function downloadInstance(instanceName) {
       await dispatch(downloadForgeManifestFiles(instanceName));
     }
 
-    dispatch(removeDownloadFromQueue(instanceName));
+    // Be aware that from this line the installer lock might be unlocked!
+
+    await dispatch(removeDownloadFromQueue(instanceName));
     dispatch(addNextInstanceToCurrentDownload());
   };
 }
