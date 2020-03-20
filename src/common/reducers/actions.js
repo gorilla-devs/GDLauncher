@@ -796,7 +796,7 @@ export function downloadForge(instanceName) {
       );
       await downloadInstanceFiles(
         installLibraries,
-        () => { },
+        () => {},
         state.settings.concurrentDownloads
       );
       await patchForge113(
@@ -1221,7 +1221,9 @@ export const startListener = () => {
           const isRename = event.newFile && event.oldFile;
 
           if (
-            (!isMod(completePath) && !isInstanceFolderPath(completePath) && !isRename) ||
+            (!isMod(completePath) &&
+              !isInstanceFolderPath(completePath) &&
+              !isRename) ||
             // When renaming, an ADD action is dispatched too. Try to discard that
             (event.action !== 2 && changesTracker[completePath]) ||
             // Ignore java legacy fixer
@@ -1309,21 +1311,37 @@ export const startListener = () => {
             });
             if (isLocked) return;
 
-            if (isMod(fileName) && _getInstance(getState())(instanceName) && action !== 3) {
+            if (
+              isMod(fileName) &&
+              _getInstance(getState())(instanceName) &&
+              action !== 3
+            ) {
               if (action === 0) {
                 processAddedFile(filePath, instanceName);
               } else if (action === 1) {
                 processRemovedFile(filePath, instanceName);
               }
-            } else if (action === 3 && !isInstanceFolderPath(fileName) && !isInstanceFolderPath(newFilePath)) {
+            } else if (
+              action === 3 &&
+              !isInstanceFolderPath(fileName) &&
+              !isInstanceFolderPath(newFilePath)
+            ) {
               // Infer the instance name from the full path
               const oldInstanceName = fileName
                 .replace(instancesPath, "")
                 .substr(1)
                 .split(path.sep)[0];
-              if (oldInstanceName === instanceName && isMod(newFilePath) && isMod(fileName)) {
+              if (
+                oldInstanceName === instanceName &&
+                isMod(newFilePath) &&
+                isMod(fileName)
+              ) {
                 processRenamedFile(fileName, instanceName, newFilePath);
-              } else if (oldInstanceName !== instanceName && isMod(newFilePath) && isMod(fileName)) {
+              } else if (
+                oldInstanceName !== instanceName &&
+                isMod(newFilePath) &&
+                isMod(fileName)
+              ) {
                 processRemovedFile(fileName, oldInstanceName);
                 processAddedFile(newFilePath, instanceName);
               } else if (!isMod(newFilePath) && isMod(fileName)) {
