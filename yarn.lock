@@ -9264,7 +9264,7 @@ multicast-dns@^6.0.1:
 
 "murmur2-calculator@https://github.com/gorilla-devs/murmur2-calculator":
   version "0.1.0"
-  resolved "https://github.com/gorilla-devs/murmur2-calculator#937695571669acd2feec81a7d946356eb07be096"
+  resolved "https://github.com/gorilla-devs/murmur2-calculator#be77da227c28fd502e2b5f05b6daef085c22ecc3"
   dependencies:
     neon-cli "^0.3.3"
 

@@ -14,11 +14,6 @@ const { autoUpdater } = require("electron-updater");
 const nsfw = require("nsfw");
 const murmur = require("murmur2-calculator");
 
-murmur.fibonacci(1000000, (err, result) => {
-  console.log("async result:");
-  console.log(result);
-});
-
 const discordRPC = require("./discordRPC");
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -262,4 +257,13 @@ ipcMain.handle("stop-listener", async () => {
   if (watcher) {
     await watcher.stop();
   }
+});
+
+ipcMain.handle("calculateMurmur2FromPath", (e, filePath) => {
+  return new Promise((resolve, reject) => {
+    return murmur(filePath).then(v => {
+      if (v.toString().length === 0) reject();
+      return resolve(v);
+    });
+  });
 });

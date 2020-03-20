@@ -6,7 +6,7 @@ import { getDirectories, normalizeModData } from ".";
 import { getFileMurmurHash2 } from "../../../common/utils";
 import { getAddonsByFingerprint, getAddon } from "../../../common/api";
 
-const modsFingerprintsScan = async (instancesPath, tempFolder) => {
+const modsFingerprintsScan = async instancesPath => {
   const mapFolderToInstance = async instance => {
     try {
       const configPath = path.join(
@@ -34,10 +34,7 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
           if (stat.isFile()) {
             // Check if file is in config
             if (!(config?.mods || []).find(mod => mod.fileName === file)) {
-              const murmurHash = await getFileMurmurHash2(
-                completeFilePath,
-                tempFolder
-              );
+              const murmurHash = await getFileMurmurHash2(completeFilePath);
               console.log(
                 "[MODS SCANNER] Local mod not found in config",
                 file,

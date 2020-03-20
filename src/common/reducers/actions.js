@@ -1019,7 +1019,6 @@ export const startListener = () => {
     // Real Time Scanner
     const state = getState();
     const instancesPath = _getInstancesPath(state);
-    const tempFolder = _getTempPath(state);
     const Queue = new PromiseQueue();
     const changesTracker = {};
 
@@ -1043,7 +1042,7 @@ export const startListener = () => {
 
           if (instance?.mods && !isInConfig && stat.isFile() && instance) {
             // get murmur hash
-            const murmurHash = await getFileMurmurHash2(fileName, tempFolder);
+            const murmurHash = await getFileMurmurHash2(fileName);
             const { data } = await getAddonsByFingerprint([murmurHash]);
             const exactMatch = (data.exactMatches || [])[0];
             const notMatch = (data.unmatchedFingerprints || [])[0];
