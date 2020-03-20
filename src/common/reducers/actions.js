@@ -35,7 +35,9 @@ import {
   getForgeJson,
   getAddonFile,
   getJavaManifest,
-  getAddonsByFingerprint
+  getAddonsByFingerprint,
+  getAddonFiles,
+  getAddon
 } from "../api";
 import {
   _getCurrentAccount,
@@ -62,7 +64,8 @@ import {
   mavenToArray,
   copyAssetsToLegacy,
   convertOSToJavaFormat,
-  getPlayerSkin
+  getPlayerSkin,
+  normalizeModData
 } from "../../app/desktop/utils";
 import { openModal, closeModal } from "./modals/actions";
 import {
@@ -800,30 +803,6 @@ export function downloadForge(instanceName) {
   };
 }
 
-export function downloadMod(instanceName, projectID, fileID) {
-  return async (dispatch, getState) => {
-    const state = getState();
-    const modManifest = (await getAddonFile(projectID, fileID)).data;
-    const destFile = path.join(
-      _getInstancesPath(state),
-      instanceName,
-      "mods",
-      modManifest.fileName
-    );
-    const fileExists = await fse.pathExists(destFile);
-    if (!fileExists) await downloadFile(destFile, modManifest.downloadUrl);
-    await dispatch(
-      updateInstanceConfig(instanceName, config => {
-        return {
-          ...config,
-          mods: [...(config.mods || []), modManifest]
-        };
-      })
-    );
-    return modManifest;
-  };
-}
-
 export function downloadForgeManifestFiles(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -836,6 +815,7 @@ export function downloadForgeManifestFiles(instanceName) {
     await pMap(
       manifest.files,
       async item => {
+        const { data: addon } = await getAddon(item.projectID);
         const modManifest = (await getAddonFile(item.projectID, item.fileID))
           .data;
         const destFile = path.join(
@@ -847,10 +827,9 @@ export function downloadForgeManifestFiles(instanceName) {
         const fileExists = await fse.pathExists(destFile);
         if (!fileExists) await downloadFile(destFile, modManifest.downloadUrl);
 
-        // Augment with projectID since it's missing in the response
-        modManifest.projectID = item.projectID;
-
-        modManifests = modManifests.concat(modManifest);
+        modManifests = modManifests.concat(
+          normalizeModData(modManifest, item.projectID, addon.name)
+        );
         const percentage =
           (modManifests.length * 100) / manifest.files.length - 1;
         dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
@@ -1070,7 +1049,13 @@ export const startListener = () => {
             const notMatch = (data.unmatchedFingerprints || [])[0];
             let mod = {};
             if (exactMatch) {
-              mod = exactMatch.file;
+              const { data: addon } = await getAddon(exactMatch.file.projectId);
+
+              mod = normalizeModData(
+                exactMatch.file,
+                exactMatch.file.projectId,
+                addon.name
+              );
               mod.fileName = path.basename(fileName);
             } else if (notMatch) {
               mod = {
@@ -1119,6 +1104,32 @@ export const startListener = () => {
         }
       };
       Queue.add(processChange);
+    };
+
+    const processRenamedFile = async (
+      fileName,
+      oldInstanceName,
+      newFilePath
+    ) => {
+      const newState = getState();
+      const instances = newState.instances.list;
+      const modData = instances[oldInstanceName].mods.find(
+        m => m.fileName === path.basename(fileName)
+      );
+      if (modData) {
+        console.log("[RTS] RENAMING MOD", fileName, newFilePath, modData);
+        await dispatch(
+          updateInstanceConfig(oldInstanceName, prev => ({
+            ...prev,
+            mods: [
+              ...(prev.mods || []).filter(
+                m => m.fileName !== path.basename(fileName)
+              ),
+              { ...modData, fileName: path.basename(newFilePath) }
+            ]
+          }))
+        );
+      }
     };
 
     const processAddedInstance = async instanceName => {
@@ -1177,55 +1188,57 @@ export const startListener = () => {
     };
 
     ipcRenderer.invoke("start-listener", instancesPath);
-    ipcRenderer.on("listener-events", (e, events) => {
-      events.forEach(event => {
-        // Using oldFile instead of newFile is intentional.
-        // This is used to discard the ADD action dispatched alongside
-        // the rename action.
-        const completePath = path.join(
-          event.directory,
-          event.file || event.oldFile
-        );
+    ipcRenderer.on("listener-events", async (e, events) => {
+      await Promise.all(
+        events.map(async event => {
+          // Using oldFile instead of newFile is intentional.
+          // This is used to discard the ADD action dispatched alongside
+          // the rename action.
+          const completePath = path.join(
+            event.directory,
+            event.file || event.oldFile
+          );
 
-        if (
-          (!isMod(completePath) && !isInstanceFolderPath(completePath)) ||
-          // When renaming, an ADD action is dispatched too. Try to discard that
-          (event.action === 0 && changesTracker[completePath]) ||
-          // Ignore java legacy fixer
-          path.basename(completePath) === "__JLF__.jar"
-        ) {
-          return;
-        }
+          if (
+            (!isMod(completePath) && !isInstanceFolderPath(completePath)) ||
+            // When renaming, an ADD action is dispatched too. Try to discard that
+            (event.action !== 2 && changesTracker[completePath]) ||
+            // Ignore java legacy fixer
+            path.basename(completePath) === "__JLF__.jar"
+          ) {
+            return;
+          }
 
-        // Each action mostly dispatches 3 events. We use this info
-        // to try to infer when the action is completed, to not analyze
-        // partial data.
-        // If we can find the event in the hash table, add 1 (up to 3)
-        if (
-          changesTracker[completePath] &&
-          changesTracker[completePath].count !== 3
-        ) {
-          changesTracker[completePath].count += 1;
-        } else if (event.action !== 2) {
-          // If we cannot find it in the hash table, it's a new event
-          changesTracker[completePath] = {
-            action: event.action,
-            count: event.action === 1 || event.action === 3 ? 3 : 1,
-            ...(event.action === 3 && {
-              newFilePath: path.join(event.newDirectory, event.newFile)
-            })
-          };
-        }
-      });
+          if (
+            changesTracker[completePath] &&
+            !changesTracker[completePath].completed &&
+            event.action === 2
+          ) {
+            try {
+              await fs.open(completePath, "r+");
+              changesTracker[completePath].completed = true;
+              console.log(`${completePath} READY`);
+            } catch {
+              // Do nothing, simply not completed..
+              console.warn(`${completePath} NOT READY`);
+            }
+          } else if (event.action !== 2 && !changesTracker[completePath]) {
+            // If we cannot find it in the hash table, it's a new event
+            changesTracker[completePath] = {
+              action: event.action,
+              completed: event.action !== 0,
+              ...(event.action === 3 && {
+                newFilePath: path.join(event.newDirectory, event.newFile)
+              })
+            };
+          }
+        })
+      );
 
       // Handle edge case where MOD-REMOVE is called before INSTANCE-REMOVE
       Object.entries(changesTracker).forEach(
-        async ([fileName, { action, count }]) => {
-          if (
-            isInstanceFolderPath(fileName) &&
-            action === 1 &&
-            (count === 3 || count === 1)
-          ) {
+        async ([fileName, { action, completed }]) => {
+          if (isInstanceFolderPath(fileName) && action === 1 && completed) {
             const instanceName = fileName
               .replace(instancesPath, "")
               .substr(1)
@@ -1249,11 +1262,11 @@ export const startListener = () => {
       );
 
       Object.entries(changesTracker).map(
-        async ([fileName, { action, count, newFilePath }]) => {
+        async ([fileName, { action, completed, newFilePath }]) => {
           const filePath = newFilePath || fileName;
           // Events are dispatched 3 times. Wait for 3 dispatches to be sure
           // that the action was completely executed
-          if (count === 3 || count === 1) {
+          if (completed) {
             // Remove the current file from the tracker.
             // Using fileName instead of filePath is intentional for the RENAME/ADD issue
             delete changesTracker[fileName];
@@ -1276,13 +1289,18 @@ export const startListener = () => {
             });
             if (isLocked) return;
 
-            if (isMod(filePath) && _getInstance(state)(instanceName)) {
+            if (isMod(fileName) && _getInstance(getState())(instanceName)) {
               if (action === 0) {
                 processAddedFile(filePath, instanceName);
               } else if (action === 1) {
                 processRemovedFile(filePath, instanceName);
               } else if (action === 3) {
-                console.log("RENAMED", filePath);
+                // Infer the instance name from the full path
+                const oldInstanceName = fileName
+                  .replace(instancesPath, "")
+                  .substr(1)
+                  .split(path.sep)[0];
+                processRenamedFile(fileName, oldInstanceName, newFilePath);
               }
             } else if (isInstanceFolderPath(filePath)) {
               if (action === 0) {
@@ -1304,7 +1322,7 @@ export const startListener = () => {
   };
 };
 
-export const launchInstance = instanceName => {
+export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const javaPath = _getJavaPath(state);
@@ -1458,4 +1476,60 @@ export const launchInstance = instanceName => {
       }
     });
   };
-};
+}
+
+export function installMod(
+  projectID,
+  fileID,
+  instanceName,
+  gameVersion,
+  installDeps = true
+) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const instancesPath = _getInstancesPath(state);
+    const instancePath = path.join(instancesPath, instanceName);
+    const mainModData = await getAddonFile(projectID, fileID);
+    const { data: addon } = await getAddon(projectID);
+    mainModData.data.projectID = projectID;
+
+    const destFile = path.join(instancePath, "mods", mainModData.data.fileName);
+
+    await dispatch(
+      updateInstanceConfig(instanceName, prev => ({
+        ...prev,
+        mods: [
+          ...prev.mods,
+          normalizeModData(mainModData.data, projectID, addon.name)
+        ]
+      }))
+    );
+    await downloadFile(destFile, mainModData.data.downloadUrl);
+    if (installDeps) {
+      await pMap(mainModData.data.dependencies, async dep => {
+        // type 1: embedded
+        // type 2: optional
+        // type 3: required
+        // type 4: tool
+        // type 5: incompatible
+        // type 6: include
+
+        if (dep.type === 3) {
+          const depList = await getAddonFiles(dep.addonId);
+          const depData = depList.data.find(v =>
+            v.gameVersion.includes(gameVersion)
+          );
+          await dispatch(
+            installMod(
+              dep.addonId,
+              depData.id,
+              instanceName,
+              gameVersion,
+              installDeps
+            )
+          );
+        }
+      });
+    }
+  };
+}

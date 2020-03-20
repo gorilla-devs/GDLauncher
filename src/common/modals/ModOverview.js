@@ -1,21 +1,34 @@
 /* eslint-disable */
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ReactHtmlParser from "react-html-parser";
+import path from "path";
 import { Checkbox, TextField, Cascader, Button, Input, Select } from "antd";
 import Modal from "../components/Modal";
 import { transparentize } from "polished";
 import { getAddonDescription, getAddonFiles, getAddon } from "../api";
 import CloseButton from "../components/CloseButton";
 import { closeModal } from "../reducers/modals/actions";
+import { installMod, updateInstanceConfig } from "../reducers/actions";
+import { remove } from "fs-extra";
+import { _getInstancesPath } from "../utils/selectors";
 
-const ModOverview = ({ projectID, fileID, gameVersion }) => {
+const ModOverview = ({
+  projectID,
+  fileID,
+  gameVersion,
+  instanceName,
+  fileName
+}) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
   const [addon, setAddon] = useState(null);
-  const [files, setFiles] = useState(null);
-  const [selectedId, setSelectedId] = useState(fileID);
+  const [files, setFiles] = useState([]);
+  const [selectedItem, setSelectedItem] = useState({ fileID, fileName });
+  const [installedData, setInstalledData] = useState({ fileID, fileName });
+  const [loading, setLoading] = useState(false);
+  const instancesPath = useSelector(_getInstancesPath);
   useEffect(() => {
     getAddon(projectID).then(data => setAddon(data.data));
     getAddonDescription(projectID).then(data => setDescription(data.data));
@@ -26,7 +39,7 @@ const ModOverview = ({ projectID, fileID, gameVersion }) => {
     });
   }, []);
 
-  const handleChange = value => setSelectedId(value);
+  const handleChange = value => setSelectedItem(JSON.parse(value));
 
   const primaryImage = (addon?.attachments || []).find(v => v.isDefault);
   return (
@@ -49,16 +62,36 @@ const ModOverview = ({ projectID, fileID, gameVersion }) => {
           <Content>{ReactHtmlParser(description)}</Content>
         </Container>
         <Footer>
+          {installedData.fileID &&
+            files.length !== 0 &&
+            !files.find(v => v.id === installedData.fileID) && (
+              <div
+                css={`
+                  color: ${props => props.theme.palette.colors.yellow};
+                  font-weight: 700;
+                `}
+              >
+                The installed version of this mod has been removed from twitch,
+                so you will only be able to get it as part of legacy modpacks.
+              </div>
+            )}
           <StyledSelect
             placeholder="Select a version"
-            value={selectedId}
+            value={
+              files.length !== 0 &&
+              files.find(v => v.id === installedData.fileID) &&
+              JSON.stringify(selectedItem)
+            }
             onChange={handleChange}
           >
             {(files || []).map(file => (
               <Select.Option
                 title={file.displayName}
                 key={file.id}
-                value={file.id}
+                value={JSON.stringify({
+                  fileID: file.id,
+                  fileName: file.fileName
+                })}
               >
                 {file.displayName}
               </Select.Option>
@@ -66,16 +99,45 @@ const ModOverview = ({ projectID, fileID, gameVersion }) => {
           </StyledSelect>
           <Button
             type="primary"
-            disabled={!selectedId || fileID === selectedId}
-            onClick={() => {
-              //   const modpackFile = files.find(file => file.id === selectedId);
-              //   dispatch(closeModal());
-              //   setVersion(["twitchModpack", modpack.id, modpackFile.id]);
-              //   setModpack(modpack);
-              //   setStep(1);
+            disabled={
+              !selectedItem.fileID ||
+              installedData.fileID === selectedItem.fileID
+            }
+            loading={loading}
+            onClick={async () => {
+              setLoading(true)
+              if (installedData.fileID) {
+                await dispatch(
+                  updateInstanceConfig(instanceName, prev => ({
+                    ...prev,
+                    mods: prev.mods.filter(
+                      v => v.fileID !== installedData.fileID
+                    )
+                  }))
+                );
+                await remove(
+                  path.join(
+                    instancesPath,
+                    instanceName,
+                    "mods",
+                    installedData.fileName
+                  )
+                );
+              }
+              await dispatch(
+                installMod(
+                  projectID,
+                  selectedItem.fileID,
+                  instanceName,
+                  gameVersion,
+                  !installedData.fileID
+                )
+              );
+              setInstalledData(selectedItem);
+              setLoading(false);
             }}
           >
-            {fileID ? "Switch Version" : "Download"}
+            {installedData.fileID ? "Switch Version" : "Download"}
           </Button>
         </Footer>
       </>
@@ -86,9 +148,8 @@ const ModOverview = ({ projectID, fileID, gameVersion }) => {
 export default React.memo(ModOverview);
 
 const StyledSelect = styled(Select)`
-  && {
-    width: 250px;
-  }
+  width: 300px;
+  min-width: 300px;
 `;
 
 const StyledCloseButton = styled.div`
@@ -128,6 +189,9 @@ const ParallaxContent = styled.div`
   align-items: center;
   font-weight: bold;
   font-size: 60px;
+  color: ${props => props.theme.palette.text.secondary};
+  font-weight: 700;
+  padding: 0 30px;
   text-align: center;
   background: rgba(0, 0, 0, 0.8);
 `;

@@ -155,19 +155,21 @@ const Row = memo(({ index, style, data }) => {
         />
       </div>
       <div
-        onClick={() =>
+        onClick={() => {
+          if (!item.fileID) return;
           dispatch(
             openModal("ModOverview", {
               projectID: item.projectID,
-              fileID: item.id,
+              fileID: item.fileID,
+              fileName: item.fileName,
               gameVersion,
               instanceName
             })
-          )
-        }
+          );
+        }}
         className="rowCenterContent"
       >
-        {item.id && <FontAwesomeIcon icon={faTwitch} />}
+        {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
         {item.fileName}
       </div>
       <div className="rightPartContent">
@@ -184,7 +186,7 @@ const Row = memo(({ index, style, data }) => {
               item,
               dispatch
             );
-            setTimeout(() => setLoading(false), 300);
+            setTimeout(() => setLoading(false), 1000);
           }}
         />
         <FontAwesomeIcon

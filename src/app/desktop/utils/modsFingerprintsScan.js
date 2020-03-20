@@ -2,9 +2,9 @@ import path from "path";
 import { promises as fs } from "fs";
 import fse from "fs-extra";
 import pMap from "p-map";
-import { getDirectories } from ".";
+import { getDirectories, normalizeModData } from ".";
 import { getFileMurmurHash2 } from "../../../common/utils";
-import { getAddonsByFingerprint } from "../../../common/api";
+import { getAddonsByFingerprint, getAddon } from "../../../common/api";
 
 const modsFingerprintsScan = async (instancesPath, tempFolder) => {
   const mapFolderToInstance = async instance => {
@@ -53,7 +53,9 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
       for (const configMod of config?.mods || []) {
         if (!files.includes(configMod.fileName)) {
           fileNamesToRemove.push(configMod.fileName);
-          console.log(`[MODS SCANNER] Removing ${configMod.fileName}`);
+          console.log(
+            `[MODS SCANNER] Removing ${configMod.fileName} from config`
+          );
         }
       }
       /* eslint-enable */
@@ -65,9 +67,8 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
           Object.values(missingMods)
         );
 
-        newMods = [
-          ...newMods,
-          ...Object.entries(missingMods).map(([fileName, hash]) => {
+        const matches = await Promise.all(
+          Object.entries(missingMods).map(async ([fileName, hash]) => {
             const exactMatch = (data.exactMatches || []).find(
               v => v.file.packageFingerprint === hash
             );
@@ -75,8 +76,13 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
               v => v === hash
             );
             if (exactMatch) {
+              const { data } = await getAddon(exactMatch.file.projectId);
               return {
-                ...exactMatch.file,
+                ...normalizeModData(
+                  exactMatch.file,
+                  exactMatch.file.projectId,
+                  data.name
+                ),
                 fileName
               };
             }
@@ -89,7 +95,9 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
             }
             return null;
           })
-        ];
+        );
+
+        newMods = [...newMods, ...matches];
       }
 
       const filterMods = newMods
