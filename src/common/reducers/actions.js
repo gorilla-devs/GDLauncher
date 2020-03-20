@@ -796,7 +796,7 @@ export function downloadForge(instanceName) {
       );
       await downloadInstanceFiles(
         installLibraries,
-        () => {},
+        () => { },
         state.settings.concurrentDownloads
       );
       await patchForge113(
@@ -1207,7 +1207,6 @@ export const startListener = () => {
       }
     };
 
-    ipcRenderer.invoke("start-listener", instancesPath);
     ipcRenderer.on("listener-events", async (e, events) => {
       await Promise.all(
         events.map(async event => {
@@ -1219,8 +1218,10 @@ export const startListener = () => {
             event.file || event.oldFile
           );
 
+          const isRename = event.newFile && event.oldFile;
+
           if (
-            (!isMod(completePath) && !isInstanceFolderPath(completePath)) ||
+            (!isMod(completePath) && !isInstanceFolderPath(completePath) && !isRename) ||
             // When renaming, an ADD action is dispatched too. Try to discard that
             (event.action !== 2 && changesTracker[completePath]) ||
             // Ignore java legacy fixer
@@ -1308,18 +1309,27 @@ export const startListener = () => {
             });
             if (isLocked) return;
 
-            if (isMod(fileName) && _getInstance(getState())(instanceName)) {
+            if (isMod(fileName) && _getInstance(getState())(instanceName) && action !== 3) {
               if (action === 0) {
                 processAddedFile(filePath, instanceName);
               } else if (action === 1) {
                 processRemovedFile(filePath, instanceName);
-              } else if (action === 3) {
-                // Infer the instance name from the full path
-                const oldInstanceName = fileName
-                  .replace(instancesPath, "")
-                  .substr(1)
-                  .split(path.sep)[0];
-                processRenamedFile(fileName, oldInstanceName, newFilePath);
+              }
+            } else if (action === 3 && !isInstanceFolderPath(fileName) && !isInstanceFolderPath(newFilePath)) {
+              // Infer the instance name from the full path
+              const oldInstanceName = fileName
+                .replace(instancesPath, "")
+                .substr(1)
+                .split(path.sep)[0];
+              if (oldInstanceName === instanceName && isMod(newFilePath) && isMod(fileName)) {
+                processRenamedFile(fileName, instanceName, newFilePath);
+              } else if (oldInstanceName !== instanceName && isMod(newFilePath) && isMod(fileName)) {
+                processRemovedFile(fileName, oldInstanceName);
+                processAddedFile(newFilePath, instanceName);
+              } else if (!isMod(newFilePath) && isMod(fileName)) {
+                processRemovedFile(fileName, oldInstanceName);
+              } else if (isMod(newFilePath) && !isMod(fileName)) {
+                processAddedFile(newFilePath, instanceName);
               }
             } else if (isInstanceFolderPath(filePath)) {
               if (action === 0) {
@@ -1338,6 +1348,7 @@ export const startListener = () => {
         }
       );
     });
+    await ipcRenderer.invoke("start-listener", instancesPath);
   };
 };
 

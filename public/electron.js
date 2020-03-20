@@ -254,10 +254,16 @@ ipcMain.handle("shutdown-discord-rpc", () => {
 });
 
 ipcMain.handle("start-listener", async (e, dirPath) => {
-  watcher = await nsfw(dirPath, events => {
-    mainWindow.webContents.send("listener-events", events);
-  });
-  watcher.start();
+  console.log(dirPath)
+  try {
+    watcher = await nsfw(dirPath, events => {
+      mainWindow.webContents.send("listener-events", events);
+    });
+    return watcher.start();
+  } catch(err) {
+    console.error(err);
+    return Promise.reject(err);
+  }
 });
 
 ipcMain.handle("stop-listener", async () => {

@@ -20,14 +20,17 @@ export const downloadInstanceFiles = async (
       let counter = 0;
       let res = false;
       do {
-        // eslint-disable-next-line no-await-in-loop
-        res = await downloadFileInstance(
-          item.path,
-          item.url,
-          item.sha1,
-          item.legacyPath
-        );
-        counter += 1;
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          res = await downloadFileInstance(
+            item.path,
+            item.url,
+            item.sha1,
+            item.legacyPath
+          );
+        } catch {
+          counter += 1;
+        }
       } while (!res && counter < 3);
       downloaded += 1;
       if (
