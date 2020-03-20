@@ -2,7 +2,6 @@
 import makeDir from "make-dir";
 import path from "path";
 import { ipcRenderer } from "electron";
-import { _getTempPath } from "../../../common/utils/selectors";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 import modsFingerprintsScan from "./modsFingerprintsScan";
@@ -29,10 +28,7 @@ const middleware = store => next => action => {
         type: ActionTypes.UPDATE_INSTANCES,
         instances
       });
-      const instances1 = await modsFingerprintsScan(
-        instancesPath,
-        _getTempPath(nextState)
-      );
+      const instances1 = await modsFingerprintsScan(instancesPath);
       dispatch({
         type: ActionTypes.UPDATE_INSTANCES,
         instances: instances1

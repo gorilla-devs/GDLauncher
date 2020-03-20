@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Select, Input } from "antd";
-import { useDebounce } from "rooks";
+import { useDebouncedCallback } from "use-debounce";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { getSearch } from "../../../api";
 import ModpacksListWrapper from "./ModpacksListWrapper";
@@ -19,7 +19,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
     updateModpacks();
   }, [searchText, sortBy]);
 
-  const updateModpacks = useDebounce(() => {
+  const [updateModpacks] = useDebouncedCallback(() => {
     loadMoreModpacks(true);
   }, 500);
 

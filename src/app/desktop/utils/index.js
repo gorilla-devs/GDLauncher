@@ -682,3 +682,17 @@ export const extractFace = async buffer => {
   const imageBuffer = await image.getBufferAsync(jimp.MIME_PNG);
   return imageBuffer.toString("base64");
 };
+
+export const normalizeModData = (data, projectID, modName) => {
+  const temp = data;
+  temp.name = modName;
+  if (data.projectID && data.fileID) return temp;
+  if (data.id) {
+    temp.projectID = projectID;
+    temp.fileID = data.id;
+    delete temp.id;
+    delete temp.projectId;
+    delete temp.fileId;
+  }
+  return temp;
+};

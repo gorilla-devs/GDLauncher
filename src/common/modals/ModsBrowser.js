@@ -2,9 +2,9 @@ import React, { memo, useEffect, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import styled from "styled-components";
 import InfiniteLoader from "react-window-infinite-loader";
-import { Input, Select } from "antd";
+import { Input, Select, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { useDebounce } from "rooks";
+import { useDebouncedCallback } from "use-debounce";
 import { FixedSizeGrid as Grid } from "react-window";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +12,7 @@ import Modal from "../components/Modal";
 import { getSearch } from "../api";
 import { openModal } from "../reducers/modals/actions";
 import { _getInstance } from "../utils/selectors";
+import { installMod } from "../reducers/actions";
 
 const CellContainer = styled.div.attrs(props => ({
   style: props.override
@@ -52,20 +53,6 @@ const CellContainer = styled.div.attrs(props => ({
         font-weight: 700;
         transition: all 150ms ease-in-out;
         color: ${props => props.theme.palette.text.primary};
-        &:last-child {
-          font-size: 18px;
-          width: 100px;
-          height: 30px;
-          padding: 0 10px;
-          margin-bottom: 20px;
-          border-radius: 4px;
-          color: ${props => props.theme.palette.text.third};
-        }
-
-        &:last-child:hover {
-          background: ${props => props.theme.palette.primary.main};
-          color: ${props => props.theme.palette.text.primary};
-        }
       }
       &:hover {
         opacity: 1;
@@ -81,8 +68,10 @@ const Cell = ({
   isNextPageLoading,
   items,
   version,
-  installedMods
+  installedMods,
+  instanceName
 }) => {
+  const [loading, setLoading] = useState([]);
   const dispatch = useDispatch();
   if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
     return <div />;
@@ -92,18 +81,7 @@ const Cell = ({
   const isInstalled = installedMods.find(v => v.projectID === mod?.id);
 
   return (
-    <CellContainer
-      mod={mod}
-      override={style}
-      onClick={() => {
-        dispatch(
-          openModal("ModOverview", {
-            gameVersion: version,
-            projectID: mod.id
-          })
-        );
-      }}
-    >
+    <CellContainer mod={mod} override={style}>
       {isInstalled && (
         <FontAwesomeIcon
           icon={faCheck}
@@ -117,6 +95,17 @@ const Cell = ({
         />
       )}
       <div
+        onClick={() => {
+          dispatch(
+            openModal("ModOverview", {
+              gameVersion: version,
+              projectID: mod.id,
+              ...(isInstalled && { fileID: isInstalled.fileID }),
+              ...(isInstalled && { fileName: isInstalled.fileName }),
+              instanceName
+            })
+          );
+        }}
         // eslint-disable-next-line
         style={{
           background: `linear-gradient(
@@ -129,13 +118,30 @@ const Cell = ({
       >
         <div className="hoverContainer">
           <div>{mod?.name}</div>
-          <div
-            onClick={e => {
-              e.stopPropagation();
-            }}
-          >
-            INSTALL
-          </div>
+          {!isInstalled && (
+            <Button
+              type="primary"
+              loading={loading.includes(mod?.id)}
+              onClick={async e => {
+                setLoading(loading.concat(mod.id));
+                e.stopPropagation();
+                const latestFile = mod.gameVersionLatestFiles.find(
+                  v => v.gameVersion === version
+                );
+                await dispatch(
+                  installMod(
+                    mod.id,
+                    latestFile.projectFileId,
+                    instanceName,
+                    version
+                  )
+                );
+                setLoading(loading.filter(v => v !== mod.id));
+              }}
+            >
+              INSTALL
+            </Button>
+          )}
         </div>
         {mod?.name}
       </div>
@@ -164,7 +170,8 @@ const ModsListWrapper = ({
   height,
   instance,
   version,
-  installedMods
+  installedMods,
+  instanceName
 }) => {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
@@ -237,6 +244,7 @@ const ModsListWrapper = ({
               isItemLoaded={isItemLoaded}
               isNextPageLoading={isNextPageLoading}
               installedMods={installedMods}
+              instanceName={instanceName}
               // eslint-disable-next-line
               {...p}
             />
@@ -260,9 +268,13 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
 
   const installedMods = instance?.mods;
 
-  const loadMoreModsDebounced = useDebounce(s => {
-    loadMoreMods(s);
-  }, 500);
+  const [loadMoreModsDebounced] = useDebouncedCallback(
+    (s, reset) => {
+      loadMoreMods(s, reset);
+    },
+    500,
+    { leading: false, trailing: true }
+  );
 
   useEffect(() => {
     loadMoreMods(searchQuery, true);
@@ -325,7 +337,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
-              loadMoreMods(e.target.value, true);
+              loadMoreModsDebounced(e.target.value, true);
             }}
             allowClear
           />
@@ -338,10 +350,11 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
               items={mods}
               width={width}
               height={height - 50}
-              loadNextPage={loadMoreModsDebounced}
+              loadNextPage={loadMoreMods}
               searchQuery={searchQuery}
               version={gameVersion}
               installedMods={installedMods}
+              instanceName={instanceName}
             />
           )}
         </AutoSizer>
