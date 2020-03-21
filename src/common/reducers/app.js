@@ -56,6 +56,15 @@ function forgeManifest(state = [], action) {
   }
 }
 
+function curseforgeCategories(state = [], action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_CURSEFORGE_CATEGORIES_MANIFEST:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function javaManifest(state = {}, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_JAVA_MANIFEST:
@@ -114,6 +123,7 @@ export default combineReducers({
   fabricManifest,
   javaManifest,
   modsManifests,
+  curseforgeCategories,
   clientToken,
   isNewUser,
   showChangelogs

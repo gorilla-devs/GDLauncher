@@ -6,7 +6,8 @@ import {
   MC_MANIFEST_URL,
   FABRIC_APIS,
   JAVA_MANIFEST_URL,
-  CLIENT_ID
+  CLIENT_ID,
+  FORGESVC_CATEGORIES
 } from "./utils/constants";
 import { sortByDate } from "./utils";
 
@@ -148,6 +149,10 @@ export const getAddonFileChangelog = (addonID, fileID) => {
   return axios.get(url);
 };
 
+export const getAddonCategories = () => {
+  return axios.get(FORGESVC_CATEGORIES);
+};
+
 export const getSearch = (
   type,
   searchFilter,
@@ -155,20 +160,20 @@ export const getSearch = (
   index,
   sort,
   isSortDescending,
-  gameVersion
+  gameVersion,
+  categoryId
 ) => {
   const url = `${FORGESVC_URL}/addon/search`;
   const params = {
     gameId: 432,
     sectionId: type === "mods" ? 6 : 4471,
-    categoryId: 0,
+    categoryId: categoryId || 0,
     pageSize,
     sort,
     isSortDescending,
     index,
     searchFilter,
-    gameVersion:
-      gameVersion !== undefined && gameVersion !== null ? gameVersion : ""
+    gameVersion: gameVersion || ""
   };
   return axios.get(url, { params });
 };

@@ -19,7 +19,7 @@ const AddInstance = ({ defaultPage }) => {
     <Modal
       css={`
         height: 85%;
-        width: 65%;
+        width: 80%;
         max-width: 1000px;
         overflow: hidden;
       `}

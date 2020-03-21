@@ -75,7 +75,7 @@ const ModpacksListWrapper = ({
               setStep(1);
             }}
           >
-            Download
+            Download Latest
           </div>
           <div
             onClick={() => {
@@ -89,7 +89,7 @@ const ModpacksListWrapper = ({
               );
             }}
           >
-            Explore
+            Explore / Versions
           </div>
         </ModpackHover>
       </ModpackContainer>
@@ -122,7 +122,7 @@ const ModpacksListWrapper = ({
           height={height}
           width={width}
           itemCount={itemCount}
-          itemSize={80}
+          itemSize={100}
           onItemsRendered={onItemsRendered}
           innerElementType={innerElementType}
           ref={ref}
@@ -142,6 +142,7 @@ const ModpackContainer = styled.div`
   background: url('${props => props.bg}');
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center;
   margin: 10px 0;
   transition: height 0.2s ease-in-out;
   border-radius: 4px;

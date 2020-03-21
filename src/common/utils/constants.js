@@ -12,6 +12,8 @@ export const JAVA_MANIFEST_URL =
 export const MAVEN_REPO = "http://central.maven.org/maven2";
 export const MC_LIBRARIES_URL = "https://libraries.minecraft.net";
 export const FORGESVC_URL = "https://addons-ecs.forgesvc.net/api/v2";
+export const FORGESVC_CATEGORIES =
+  "https://addons-ecs.forgesvc.net/api/v2/category?gameId=432";
 export const NEWS_URL =
   "https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/culture,minecraft:article/insider,minecraft:article/merch,minecraft:article/news&propResPath=/content/minecraft-net/language-masters/it-it/jcr:content/root/generic-container/par/grid&count=2000&pageSize=10&tag=ALL";
 export const CLIENT_ID = "509a564cf4466c9";

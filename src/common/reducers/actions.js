@@ -38,7 +38,8 @@ import {
   getJavaManifest,
   getAddonsByFingerprint,
   getAddonFiles,
-  getAddon
+  getAddon,
+  getAddonCategories
 } from "../api";
 import {
   _getCurrentAccount,
@@ -66,7 +67,8 @@ import {
   copyAssetsToLegacy,
   convertOSToJavaFormat,
   getPlayerSkin,
-  normalizeModData
+  normalizeModData,
+  reflect
 } from "../../app/desktop/utils";
 import {
   downloadFile,
@@ -77,45 +79,78 @@ import { UPDATE_CONCURRENT_DOWNLOADS } from "./settings/actionTypes";
 import PromiseQueue from "../../app/desktop/utils/PromiseQueue";
 
 export function initManifests() {
-  return async dispatch => {
-    const mc = (await getMcManifest()).data;
-    dispatch({
-      type: ActionTypes.UPDATE_VANILLA_MANIFEST,
-      data: mc
-    });
-    const fabric = (await getFabricManifest()).data;
-    dispatch({
-      type: ActionTypes.UPDATE_FABRIC_MANIFEST,
-      data: fabric
-    });
-    const java = (await getJavaManifest()).data;
-    dispatch({
-      type: ActionTypes.UPDATE_JAVA_MANIFEST,
-      data: java
-    });
-    const forge = removeDuplicates((await getForgeManifest()).data, "name");
-    const forgeVersions = {};
-    // Looping over vanilla versions, create a new entry in forge object
-    // and add to it all correct versions
-    mc.versions.forEach(v => {
-      forgeVersions[v.id] = forge
-        .filter(
-          ver =>
-            ver.gameVersion === v.id &&
-            gte(coerce(ver.gameVersion), coerce("1.6.1"))
-        )
-        .map(ver => ver.name.replace("forge-", ""));
-    });
+  return async (dispatch, getState) => {
+    const { app } = getState();
+    let mc = null;
+    try {
+      mc = (await getMcManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_VANILLA_MANIFEST,
+        data: mc
+      });
+    } catch (err) {
+      console.error(err);
+    }
 
-    dispatch({
-      type: ActionTypes.UPDATE_FORGE_MANIFEST,
-      data: omitBy(forgeVersions, v => v.length === 0)
-    });
+    const getFabricVersions = async () => {
+      const fabric = (await getFabricManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_FABRIC_MANIFEST,
+        data: fabric
+      });
+      return fabric;
+    };
+    const getJavaManifestVersions = async () => {
+      const java = (await getJavaManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_JAVA_MANIFEST,
+        data: java
+      });
+      return java;
+    };
+    const getAddonCategoriesVersions = async () => {
+      const curseforgeCategories = (await getAddonCategories()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_CURSEFORGE_CATEGORIES_MANIFEST,
+        data: curseforgeCategories
+      });
+      return curseforgeCategories;
+    };
+    const getForgeVersions = async () => {
+      const forge = removeDuplicates((await getForgeManifest()).data, "name");
+      const forgeVersions = {};
+      // Looping over vanilla versions, create a new entry in forge object
+      // and add to it all correct versions
+      mc.versions.forEach(v => {
+        forgeVersions[v.id] = forge
+          .filter(
+            ver =>
+              ver.gameVersion === v.id &&
+              gte(coerce(ver.gameVersion), coerce("1.6.1"))
+          )
+          .map(ver => ver.name.replace("forge-", ""));
+      });
+
+      dispatch({
+        type: ActionTypes.UPDATE_FORGE_MANIFEST,
+        data: omitBy(forgeVersions, v => v.length === 0)
+      });
+      return omitBy(forgeVersions, v => v.length === 0);
+    };
+    // Using reflect to avoid rejection
+    const [fabric, java, categories, forge] = await Promise.all([
+      reflect(getFabricVersions()),
+      reflect(getJavaManifestVersions()),
+      reflect(getAddonCategoriesVersions()),
+      reflect(getForgeVersions())
+    ]);
+
     return {
-      mc,
-      fabric,
-      java,
-      forge
+      mc: mc.status ? mc.v : app.vanillaManifest,
+      fabric: fabric.status ? fabric.v : app.fabricManifest,
+      java: java.status ? java.v : app.javaManifest,
+      categories: categories.status ? categories.v : app.curseforgeCategories,
+      forge: forge.status ? forge.v : app.forgeManifest
     };
   };
 }

@@ -629,3 +629,9 @@ export const normalizeModData = (data, projectID, modName) => {
   }
   return temp;
 };
+
+export const reflect = p =>
+  p.then(
+    v => ({ v, status: true }),
+    e => ({ e, status: false })
+  );
