@@ -604,6 +604,25 @@ export function updateSelectedInstance(name) {
   };
 }
 
+export function addStartedInstance(instance) {
+  console.log(instance);
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.ADD_STARTED_INSTANCE,
+      instance
+    });
+  };
+}
+
+export function removeStartedInstance(instanceName) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.REMOVE_STARTED_INSTANCE,
+      instanceName
+    });
+  };
+}
+
 export function removeDownloadFromQueue(instanceName) {
   return async (dispatch, getState) => {
     const lockFilePath = path.join(
@@ -1580,6 +1599,17 @@ export function launchInstance(instanceName) {
       shell: true
     });
 
+    const playTimer = setInterval(() => {
+      dispatch(
+        updateInstanceConfig(instanceName, prev => ({
+          ...prev,
+          timePlayed: (Number(prev.timePlayed) || 0) + 1
+        }))
+      );
+    }, 60 * 1000);
+
+    dispatch(addStartedInstance({ instanceName, pid: process.pid }));
+
     process.stdout.on("data", data => {
       console.log(data.toString());
     });
@@ -1591,8 +1621,10 @@ export function launchInstance(instanceName) {
     process.on("close", code => {
       ipcRenderer.invoke("show-window");
       fse.remove(instanceJLFPath);
+      dispatch(removeStartedInstance(instanceName));
+      clearInterval(playTimer);
       if (code !== 0) {
-        console.log(`process exited with code ${code}`);
+        console.log(`Process exited with code ${code}. Not too good..`);
       }
     });
   };

@@ -5,6 +5,9 @@ import { promises as fs } from "fs";
 import { LoadingOutlined } from "@ant-design/icons";
 import path from "path";
 import { ipcRenderer } from "electron";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay, faClock } from "@fortawesome/free-solid-svg-icons";
+import psTree from "ps-tree";
 import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -80,6 +83,27 @@ const MCVersion = styled.div`
   right: 5px;
   top: 5px;
   font-size: 11px;
+  color: ${props => props.theme.palette.text.third};
+`;
+
+const TimePlayed = styled.div`
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  font-size: 11px;
+  color: ${props => props.theme.palette.text.third};
+`;
+
+const MenuInstanceName = styled.div`
+  background: ${props => props.theme.palette.grey[900]};
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: ${props => props.theme.palette.text.primary};
+  padding: 0 20px;
+  font-weight: 700;
 `;
 
 const Instance = ({ instanceName }) => {
@@ -89,8 +113,13 @@ const Instance = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const downloadQueue = useSelector(_getDownloadQueue);
   const currentDownload = useSelector(state => state.currentDownload);
+  const startedInstances = useSelector(state => state.startedInstances);
   const instancesPath = useSelector(_getInstancesPath);
   const isInQueue = downloadQueue[instanceName];
+
+  const isPlaying = startedInstances.find(
+    inst => inst.instanceName === instanceName
+  );
 
   useEffect(() => {
     if (instance.background) {
@@ -105,7 +134,7 @@ const Instance = ({ instanceName }) => {
   }, [instance.background, instancesPath, instanceName]);
 
   const startInstance = () => {
-    if (isInQueue) return;
+    if (isInQueue || isPlaying) return;
     dispatch(launchInstance(instanceName));
   };
   const openFolder = () => {
@@ -117,20 +146,39 @@ const Instance = ({ instanceName }) => {
   const manageInstance = () => {
     dispatch(openModal("InstanceManager", { instanceName }));
   };
+  const killProcess = () => {
+    psTree(isPlaying.pid, (err, children) => {
+      children.forEach(el => {
+        process.kill(el.PID);
+      });
+    });
+  };
 
   return (
     <>
-      <ContextMenuTrigger id={instance.name}>
+      <ContextMenuTrigger id={instanceName}>
         <Container
           installing={isInQueue}
           onClick={startInstance}
-          isHovered={isHovered}
+          isHovered={isHovered || isPlaying}
         >
           <InstanceContainer installing={isInQueue} background={background}>
+            <TimePlayed>
+              <FontAwesomeIcon
+                icon={faClock}
+                css={`
+                  margin-right: 5px;
+                `}
+              />
+              {instance.timePlayed} minutes
+            </TimePlayed>
             <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
-            {instance.name}
+            {instanceName}
           </InstanceContainer>
-          <HoverContainer installing={isInQueue} isHovered={isHovered}>
+          <HoverContainer
+            installing={isInQueue}
+            isHovered={isHovered || isPlaying}
+          >
             {currentDownload === instanceName ? (
               <>
                 <div
@@ -150,7 +198,19 @@ const Instance = ({ instanceName }) => {
                 />
               </>
             ) : (
-              (isInQueue && "In Queue") || "PLAY"
+              <>
+                {isPlaying && (
+                  <FontAwesomeIcon
+                    css={`
+                      color: ${({ theme }) => theme.palette.colors.green};
+                      font-size: 27px;
+                    `}
+                    icon={faPlay}
+                  />
+                )}
+                {isInQueue && "In Queue"}
+                {!isInQueue && !isPlaying && "PLAY"}
+              </>
             )}
           </HoverContainer>
         </Container>
@@ -160,6 +220,8 @@ const Instance = ({ instanceName }) => {
         onShow={() => setIsHovered(true)}
         onHide={() => setIsHovered(false)}
       >
+        <MenuInstanceName>{instanceName}</MenuInstanceName>
+        {isPlaying && <MenuItem onClick={killProcess}>Kill</MenuItem>}
         <MenuItem disabled={isInQueue} onClick={manageInstance}>
           Manage
         </MenuItem>

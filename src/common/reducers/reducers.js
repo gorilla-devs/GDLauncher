@@ -88,7 +88,10 @@ function instances(state = { started: false, list: {} }, action) {
 function startedInstances(state = [], action) {
   switch (action.type) {
     case ActionTypes.ADD_STARTED_INSTANCE:
-      return [...state, { instanceName: action.instanceName, pid: action.pid }];
+      return [
+        ...state,
+        { instanceName: action.instance.instanceName, pid: action.instance.pid }
+      ];
     case ActionTypes.REMOVE_STARTED_INSTANCE:
       return state.filter(
         instance => instance.instanceName !== action.instanceName

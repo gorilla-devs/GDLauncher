@@ -239,6 +239,7 @@
     "nsfw": "^1.2.7",
     "p-map": "^4.0.0",
     "polished": "^3.4.4",
+    "ps-tree": "^1.2.0",
     "react": "^16.13.0",
     "react-beautiful-dnd": "^13.0.0",
     "react-content-loader": "^5.0.2",

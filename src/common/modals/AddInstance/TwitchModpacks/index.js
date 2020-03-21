@@ -80,7 +80,26 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
             .filter(v => v?.rootGameCategoryId === 4471)
             .sort((a, b) => a?.name.localeCompare(b?.name))
             .map(v => (
-              <Select.Option value={v?.id}>{v?.name}</Select.Option>
+              <Select.Option value={v?.id}>
+                <div
+                  css={`
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                    height: 100%;
+                  `}
+                >
+                  <img
+                    src={v?.avatarUrl}
+                    css={`
+                    height: 16px;
+                    width: 16px;
+                    margin-right: 10px;
+                  `}
+                  />
+                  {v?.name}
+                </div>
+              </Select.Option>
             ))}
         </StyledSelect>
         <StyledSelect

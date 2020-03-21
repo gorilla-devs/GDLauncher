@@ -52,7 +52,7 @@ function discordRPC(state = true, action) {
   }
 }
 
-function hideWindowOnGameLaunch(state = true, action) {
+function hideWindowOnGameLaunch(state = false, action) {
   switch (action.type) {
     case ActionTypes.HIDE_WINDOW_ON_GAME_LAUNCH:
       return action.hideWindow;
