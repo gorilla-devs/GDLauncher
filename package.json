@@ -44,7 +44,7 @@
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web yarn start",
     "postinstall": "electron-builder install-app-deps && yarn rebuild",
     "rebuild": "electron-build-env neon build murmur2-calculator --release",
-    "release": "cross-env-shell NODE_ENV=production APP_TYPE=electron \"yarn build\" && electron-builder build --publish never"
+    "release": "cross-env-shell NODE_ENV=production APP_TYPE=electron \"yarn build\" && electron-builder build --x64 --publish never"
   },
   "husky": {
     "hooks": {

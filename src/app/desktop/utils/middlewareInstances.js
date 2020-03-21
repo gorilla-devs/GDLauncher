@@ -34,13 +34,14 @@ const middleware = store => next => action => {
         instances: instances1
       });
       try {
+        await makeDir(instancesPath);
         await dispatch(startListener());
       } catch (err) {
         console.error(err);
-        // Check if the folder exists and create it if it doesn't
-        await ipcRenderer.invoke("stop-listener");
-        await makeDir(instancesPath);
-        await dispatch(startListener());
+        // eslint-disable-next-line
+        new Notification("Error starting NSFW", {
+          body: "Could not initialize Node Sentinel File Watcher"
+        });
       }
     };
 

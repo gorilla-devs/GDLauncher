@@ -58,15 +58,8 @@ function DesktopRoot() {
       dataPathFromStore || dispatch(updateDataPath(dataPathStatic));
     dispatch(checkClientToken());
     dispatch(initNews());
-    const manifests = await dispatch(initManifests());
-    await extract7z();
-    const isLatestJava = await isLatestJavaDownloaded(manifests.java, dataPath);
-    const isJavaOK = javaPath || isLatestJava;
-    if (!isJavaOK) {
-      dispatch(downloadJava());
-    }
 
-    if (process.env.NODE_ENV === "development" && currentAccount) {
+    if (process.env.NODE_ENV !== "development" && currentAccount) {
       dispatch(received(features.mcAuthentication));
       dispatch(push("/home"));
     } else if (currentAccount) {
@@ -80,6 +73,14 @@ function DesktopRoot() {
       dispatch(
         load(features.mcAuthentication, dispatch(loginThroughNativeLauncher()))
       ).catch(console.error);
+    }
+
+    const manifests = await dispatch(initManifests());
+    await extract7z();
+    const isLatestJava = await isLatestJavaDownloaded(manifests.java, dataPath);
+    const isJavaOK = javaPath || isLatestJava;
+    if (!isJavaOK) {
+      dispatch(downloadJava());
     }
     if (shouldShowDiscordRPC) {
       ipcRenderer.invoke("init-discord-rpc");

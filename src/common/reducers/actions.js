@@ -14,6 +14,7 @@ import { push } from "connected-react-router";
 import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import pMap from "p-map";
+import { notification } from "antd";
 import * as ActionTypes from "./actionTypes";
 import {
   NEWS_URL,
@@ -67,7 +68,6 @@ import {
   getPlayerSkin,
   normalizeModData
 } from "../../app/desktop/utils";
-import { openModal, closeModal } from "./modals/actions";
 import {
   downloadFile,
   downloadInstanceFiles
@@ -227,15 +227,6 @@ export function updateCurrentAccountId(id) {
   };
 }
 
-export function updateJavaStatus(status) {
-  return async dispatch => {
-    dispatch({
-      type: ActionTypes.UPDATE_JAVA_DOWNLOAD,
-      status
-    });
-  };
-}
-
 export function updateConcurrentDownloads(concurrentDownloads) {
   return async dispatch => {
     dispatch({
@@ -284,7 +275,6 @@ export function downloadJava() {
     } = state;
     const javaOs = convertOSToJavaFormat(process.platform);
     const javaMeta = javaManifest.find(v => v.os === javaOs);
-    dispatch(openModal("JavaDownload"));
     const {
       version_data: { openjdk_version: version },
       binary_link: url,
@@ -295,15 +285,32 @@ export function downloadJava() {
     await fse.remove(javaBaseFolder);
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
+    const notificationObj = {
+      key: "javaDownload",
+      message: "Preparing Java",
+      top: 47,
+      duration: 0,
+      closeIcon: []
+    };
+
     let i = 0;
     await downloadFile(downloadLocation, url, p => {
       if (i % 4 === 0) {
-        ipcRenderer.send("update-progress-bar", parseInt(p, 10) / 100);
-        dispatch(updateJavaStatus(p));
+        ipcRenderer.invoke("update-progress-bar", parseInt(p, 10) / 100);
+        notification.open({
+          ...notificationObj,
+          description: `Downloading: ${parseInt(p, 10)}%`
+        });
       }
       i += 1;
     });
 
+    const totalSteps = process.platform !== "win32" ? 2 : 1;
+
+    notification.open({
+      ...notificationObj,
+      description: `Extracting (1 / ${totalSteps})`
+    });
     const sevenZipPath = await get7zPath();
     const firstExtraction = extractFull(downloadLocation, tempFolder, {
       $bin: sevenZipPath
@@ -319,6 +326,10 @@ export function downloadJava() {
 
     // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
     if (process.platform !== "win32") {
+      notification.open({
+        ...notificationObj,
+        description: `Extracting (2 / ${totalSteps})`
+      });
       const tempTarName = path.join(
         tempFolder,
         path.basename(url).replace(".tar.gz", ".tar")
@@ -345,9 +356,13 @@ export function downloadJava() {
 
     await fixFilePermissions(_getJavaPath(state));
 
-    ipcRenderer.send("update-progress-bar", -1);
-    dispatch(updateJavaStatus("downloaded"));
-    dispatch(closeModal());
+    ipcRenderer.invoke("update-progress-bar", -1);
+
+    notification.open({
+      ...notificationObj,
+      description: "Java is ready!"
+    });
+    setTimeout(() => notification.close("javaDownload"), 2000);
   };
 }
 
@@ -1231,10 +1246,21 @@ export const startListener = () => {
           ) {
             return;
           }
+          if (event.action !== 2 && !changesTracker[completePath]) {
+            // If we cannot find it in the hash table, it's a new event
+            changesTracker[completePath] = {
+              action: event.action,
+              completed: event.action !== 0,
+              ...(event.action === 3 && {
+                newFilePath: path.join(event.newDirectory, event.newFile)
+              })
+            };
+          }
 
           if (
-            changesTracker[completePath] &&
-            !changesTracker[completePath].completed &&
+            (changesTracker[completePath] &&
+              !changesTracker[completePath].completed &&
+              event.action === 2) ||
             event.action === 2
           ) {
             try {
@@ -1244,15 +1270,6 @@ export const startListener = () => {
             } catch {
               // Do nothing, simply not completed..
             }
-          } else if (event.action !== 2 && !changesTracker[completePath]) {
-            // If we cannot find it in the hash table, it's a new event
-            changesTracker[completePath] = {
-              action: event.action,
-              completed: event.action !== 0,
-              ...(event.action === 3 && {
-                newFilePath: path.join(event.newDirectory, event.newFile)
-              })
-            };
           }
         })
       );
