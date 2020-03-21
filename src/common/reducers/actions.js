@@ -840,24 +840,43 @@ export function downloadForgeManifestFiles(instanceName) {
     await pMap(
       manifest.files,
       async item => {
-        const { data: addon } = await getAddon(item.projectID);
-        const modManifest = (await getAddonFile(item.projectID, item.fileID))
-          .data;
-        const destFile = path.join(
-          _getInstancesPath(state),
-          instanceName,
-          "mods",
-          modManifest.fileName
-        );
-        const fileExists = await fse.pathExists(destFile);
-        if (!fileExists) await downloadFile(destFile, modManifest.downloadUrl);
+        let ok = false;
+        let tries = 0;
+        /* eslint-disable no-await-in-loop */
+        do {
+          tries += 1;
+          if (tries !== 1) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+          try {
+            const { data: addon } = await getAddon(item.projectID);
+            const modManifest = (
+              await getAddonFile(item.projectID, item.fileID)
+            ).data;
+            const destFile = path.join(
+              _getInstancesPath(state),
+              instanceName,
+              "mods",
+              modManifest.fileName
+            );
+            const fileExists = await fse.pathExists(destFile);
+            if (!fileExists) {
+              await downloadFile(destFile, modManifest.downloadUrl);
+            }
 
-        modManifests = modManifests.concat(
-          normalizeModData(modManifest, item.projectID, addon.name)
-        );
-        const percentage =
-          (modManifests.length * 100) / manifest.files.length - 1;
-        dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+            modManifests = modManifests.concat(
+              normalizeModData(modManifest, item.projectID, addon.name)
+            );
+          } catch (err) {
+            console.error(err);
+          }
+
+          const percentage =
+            (modManifests.length * 100) / manifest.files.length - 1;
+          dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+          ok = true;
+        } while (!ok && tries <= 3);
+        /* eslint-enable no-await-in-loop */
       },
       { concurrency }
     );
