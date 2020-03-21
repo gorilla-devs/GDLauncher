@@ -45,7 +45,7 @@ const InstanceContainer = styled.div`
   font-size: 20px;
   overflow: hidden;
   height: 100%;
-  background: linear-gradient(0deg,rgba(0,0,0,0.7),rgba(0,0,0,0.7)),url("${props =>
+  background: linear-gradient(0deg,rgba(0,0,0,0.8),rgba(0,0,0,0.8)),url("${props =>
     props.background}") center no-repeat;
   background-position: center;
   color: ${props => props.theme.palette.text.secondary};
@@ -222,12 +222,15 @@ const Instance = ({ instanceName }) => {
       >
         <MenuInstanceName>{instanceName}</MenuInstanceName>
         {isPlaying && <MenuItem onClick={killProcess}>Kill</MenuItem>}
-        <MenuItem disabled={isInQueue} onClick={manageInstance}>
+        <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
           Manage
         </MenuItem>
         <MenuItem onClick={openFolder}>Open Folder</MenuItem>
         <MenuItem divider />
-        <MenuItem disabled={isInQueue} onClick={openConfirmationDeleteModal}>
+        <MenuItem
+          disabled={Boolean(isInQueue)}
+          onClick={openConfirmationDeleteModal}
+        >
           Delete
         </MenuItem>
       </ContextMenu>

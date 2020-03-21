@@ -328,7 +328,7 @@ const ModpackNameKeyframe = props => keyframes`
   }
 
   to {
-    transform: scale(${props.name.length < 13 ? 2 : 1}) translateY(65%);
+    transform: scale(${props.name.length < 17 ? 2 : 1}) translateY(65%);
   }
 `;
 

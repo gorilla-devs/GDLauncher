@@ -146,7 +146,7 @@ const ModpackContainer = styled.div`
   margin: 10px 0;
   transition: height 0.2s ease-in-out;
   border-radius: 4px;
-`;
+  `;
 
 const Modpack = styled.div`
   width: 100%;
@@ -154,9 +154,10 @@ const Modpack = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 16px;
+  font-size: 20px;
   padding: 0 10px;
-  background: ${props => transparentize(0.4, props.theme.palette.grey[700])};
+  font-weight: 700;
+  background: ${props => transparentize(0.2, props.theme.palette.grey[700])};
 `;
 
 const ModpackHover = styled.div`

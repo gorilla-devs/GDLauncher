@@ -11,21 +11,17 @@ import { _getCurrentAccount } from "../../../common/utils/selectors";
 import { extractFace } from "../utils";
 
 const AddInstanceIcon = styled(Button)`
-  && {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-  }
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
 `;
 
 const AccountContainer = styled(Button)`
-  && {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    align-items: center;
-  }
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
 `;
 
 const Home = () => {
@@ -54,7 +50,7 @@ const Home = () => {
         Empty Instance
       </Menu.Item>
       <Menu.Item key="1" onClick={() => openAddInstanceModal(1)}>
-        Twitch Instance
+        Modpack Instance
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="2" onClick={() => openAddInstanceModal(2)}>

@@ -15,13 +15,54 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const [description, setDescription] = useState(null);
   const [files, setFiles] = useState(null);
   const [selectedId, setSelectedId] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     getAddonDescription(modpack.id).then(data => setDescription(data.data));
-    getAddonFiles(modpack.id).then(data => setFiles(data.data));
+    getAddonFiles(modpack.id).then(data => {
+      setFiles(data.data);
+      setLoading(false);
+    });
   }, []);
 
   const handleChange = value => setSelectedId(value);
+
+  const getReleaseType = id => {
+    switch (id) {
+      case 1:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.green};
+            `}
+          >
+            [Stable]
+          </span>
+        );
+      case 2:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.yellow};
+            `}
+          >
+            [Beta]
+          </span>
+        );
+      case 3:
+      default:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.red};
+            `}
+          >
+            [Alpha]
+          </span>
+        );
+    }
+  };
 
   const primaryImage = modpack.attachments.find(v => v.isDefault);
   return (
@@ -44,17 +85,68 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
           <Content>{ReactHtmlParser(description)}</Content>
         </Container>
         <Footer>
-          <StyledSelect placeholder="Select a version" onChange={handleChange}>
-            {(files || []).map(file => (
-              <Select.Option
-                title={file.displayName}
-                key={file.id}
-                value={file.id}
-              >
-                {file.displayName}
-              </Select.Option>
-            ))}
-          </StyledSelect>
+          <div
+            css={`
+              flex: 1;
+              display: flex;
+              justify-content: center;
+            `}
+          >
+            <StyledSelect
+              placeholder="Select a version"
+              onChange={handleChange}
+              listItemHeight={50}
+              listHeight={400}
+              loading={loading}
+            >
+              {(files || []).map(file => (
+                <Select.Option
+                  title={file.displayName}
+                  key={file.id}
+                  value={file.id}
+                >
+                  <div
+                    css={`
+                      display: flex;
+                      height: 50px;
+                    `}
+                  >
+                    <div
+                      css={`
+                        flex: 7;
+                        display: flex;
+                        align-items: center;
+                      `}
+                    >
+                      {file.displayName}
+                    </div>
+                    <div
+                      css={`
+                        flex: 2;
+                        display: flex;
+                        align-items: center;
+                        flex-direction: column;
+                      `}
+                    >
+                      <div>{file.gameVersion[0]}</div>
+                      <div>{getReleaseType(file.releaseType)}</div>
+                    </div>
+                    <div
+                      css={`
+                        flex: 2;
+                        display: flex;
+                        align-items: center;
+                      `}
+                    >
+                      <div>
+                        {new Date(file.fileDate).toLocaleDateString("it-IT")}
+                      </div>
+                    </div>
+                  </div>
+                </Select.Option>
+              ))}
+            </StyledSelect>
+          </div>
           <Button
             type="primary"
             disabled={!selectedId}
@@ -77,8 +169,27 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
 export default React.memo(AddInstance);
 
 const StyledSelect = styled(Select)`
-  && {
-    width: 250px;
+  width: 650px;
+  height: 50px;
+  .ant-select-selection-placeholder {
+    height: 50px !important;
+    line-height: 50px !important;
+  }
+  .ant-select-selector {
+    height: 50px !important;
+    cursor: pointer !important;
+  }
+  .ant-select-selection-item {
+    flex: 1;
+    cursor: pointer;
+    & > div {
+      & > div:nth-child(2) {
+        & > div:last-child {
+          height: 10px;
+          line-height: 5px;
+        }
+      }
+    }
   }
 `;
 
