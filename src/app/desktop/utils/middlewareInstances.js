@@ -2,11 +2,11 @@
 import makeDir from "make-dir";
 import path from "path";
 import { ipcRenderer } from "electron";
+import { notification } from "antd";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 import modsFingerprintsScan from "./modsFingerprintsScan";
 import { startListener } from "../../../common/reducers/actions";
-import { notification } from "antd";
 
 const middleware = store => next => action => {
   const currState = store.getState();
