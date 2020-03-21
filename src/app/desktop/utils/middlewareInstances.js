@@ -6,6 +6,7 @@ import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 import modsFingerprintsScan from "./modsFingerprintsScan";
 import { startListener } from "../../../common/reducers/actions";
+import { notification } from "antd";
 
 const middleware = store => next => action => {
   const currState = store.getState();
@@ -39,8 +40,12 @@ const middleware = store => next => action => {
       } catch (err) {
         console.error(err);
         // eslint-disable-next-line
-        new Notification("Error starting NSFW", {
-          body: "Could not initialize Node Sentinel File Watcher"
+        notification.open({
+          key: "nsfwNotWorking",
+          message: "NSFW Error",
+          description: "Node Sentinel File Watcher could not be initialized",
+          top: 47,
+          duration: 10
         });
       }
     };

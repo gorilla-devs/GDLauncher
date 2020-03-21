@@ -1250,7 +1250,9 @@ export const startListener = () => {
             // If we cannot find it in the hash table, it's a new event
             changesTracker[completePath] = {
               action: event.action,
-              completed: event.action !== 0,
+              completed:
+                event.action !== 0 ||
+                (event.action === 0 && isInstanceFolderPath(completePath)),
               ...(event.action === 3 && {
                 newFilePath: path.join(event.newDirectory, event.newFile)
               })
@@ -1258,10 +1260,9 @@ export const startListener = () => {
           }
 
           if (
-            (changesTracker[completePath] &&
-              !changesTracker[completePath].completed &&
-              event.action === 2) ||
-            event.action === 2
+            changesTracker[completePath] &&
+            !changesTracker[completePath].completed &&
+            (event.action === 2 || event.action === 0 || event.action === 1)
           ) {
             try {
               await new Promise(resolve => setTimeout(resolve, 300));
