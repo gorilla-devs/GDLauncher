@@ -15,6 +15,7 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import pMap from "p-map";
 import { notification } from "antd";
+import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
 import {
   NEWS_URL,
@@ -79,7 +80,6 @@ import {
 import { removeDuplicates, getFileMurmurHash2 } from "../utils";
 import { UPDATE_CONCURRENT_DOWNLOADS } from "./settings/actionTypes";
 import PromiseQueue from "../../app/desktop/utils/PromiseQueue";
-import makeDir from "make-dir";
 
 export function initManifests() {
   return async (dispatch, getState) => {
