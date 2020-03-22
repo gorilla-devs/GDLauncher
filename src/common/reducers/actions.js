@@ -79,6 +79,7 @@ import {
 import { removeDuplicates, getFileMurmurHash2 } from "../utils";
 import { UPDATE_CONCURRENT_DOWNLOADS } from "./settings/actionTypes";
 import PromiseQueue from "../../app/desktop/utils/PromiseQueue";
+import makeDir from "make-dir";
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -737,7 +738,7 @@ export function addToQueue(instanceName, modloader, manifest, background) {
       manifest,
       background
     });
-
+    await makeDir(path.join(_getInstancesPath(state), instanceName));
     lockfile.lock(
       path.join(_getInstancesPath(state), instanceName, "installing.lock"),
       err => {
@@ -1251,15 +1252,19 @@ export const startListener = () => {
           instanceName,
           "config.json"
         );
-        const config = await fse.readJSON(configPath);
-        console.log("[RTS] ADDING INSTANCE", instanceName);
-        dispatch({
-          type: ActionTypes.UPDATE_INSTANCES,
-          instances: {
-            ...newState.instances.list,
-            [instanceName]: { ...config, name: instanceName }
-          }
-        });
+        try {
+          const config = await fse.readJSON(configPath);
+          console.log("[RTS] ADDING INSTANCE", instanceName);
+          dispatch({
+            type: ActionTypes.UPDATE_INSTANCES,
+            instances: {
+              ...newState.instances.list,
+              [instanceName]: { ...config, name: instanceName }
+            }
+          });
+        } catch (err) {
+          console.warn(err);
+        }
       }
     };
 

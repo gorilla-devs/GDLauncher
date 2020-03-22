@@ -515,7 +515,8 @@ const General = () => {
         </p>
         <Button
           onClick={clearSharedData}
-          disabled={deletingInstances || disableInstancesActions}
+          disabled={disableInstancesActions}
+          loading={deletingInstances}
         >
           Clear
         </Button>
