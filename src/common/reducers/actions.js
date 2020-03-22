@@ -72,7 +72,8 @@ import {
   convertOSToJavaFormat,
   parseOptifineVersions,
   getPlayerSkin,
-  normalizeModData
+  normalizeModData,
+  isOptifine
 } from "../../app/desktop/utils";
 import { openModal, closeModal } from "./modals/actions";
 import {
@@ -1083,7 +1084,7 @@ export function downloadInstance(instanceName) {
     if (mcJson.assets === "legacy") {
       await copyAssetsToLegacy(assets);
     }
-    if (modloader && modloader[0] === VANILLA) {
+    if (modloader && modloader[0] === "vanilla") {
     } else if (modloader && modloader[0] === "fabric") {
       await dispatch(downloadFabric(instanceName));
     } else if (modloader && modloader[0] === "forge") {
@@ -1419,6 +1420,7 @@ export function launchInstance(instanceName) {
     const instancePath = path.join(_getInstancesPath(state), instanceName);
     const instancesPath = _getInstancesPath(state);
     const optifineVersionsPath = _getOptifineVersionsPath(state);
+    const libraryPath = _getLibrariesPath(state);
 
     const configPath = path.join(
       path.join(instancesPath, instanceName, "config.json")
@@ -1433,6 +1435,13 @@ export function launchInstance(instanceName) {
       "__JLF__.jar"
     );
 
+    const optifinePath = path.join(
+      _getInstancesPath(state),
+      instanceName,
+      "mods",
+      `${config.optifine}.jar`
+    );
+
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
     );
@@ -1443,7 +1452,44 @@ export function launchInstance(instanceName) {
       path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
     };
 
-    if (modloader && modloader[0] === "fabric") {
+    if (modloader && modloader[0] === "vanilla") {
+      //libraryPath
+      const tempFolder = _getTempPath(state);
+      const sevenZipPath = await get7zPath();
+      // path.join(optifineVersionsPath, `${config.optifine}.jar`),
+
+      const launchwrapperTxtExtraction = extractFull(
+        path.join(optifineVersionsPath, `${config.optifine}.jar`),
+        tempFolder,
+        {
+          $bin: sevenZipPath,
+          $cherryPick: "launchwrapper-of.txt"
+        }
+      );
+      const launchwrapperTxtPath = path.join(
+        tempFolder,
+        "launchwrapper-of.txt"
+      );
+      const version = await fse.readJSON(launchwrapperTxtPath);
+
+      console.log("version", version);
+
+      await makeDir(path.join(libraryPath, "optifine"));
+
+      const optifineExtraction = extractFull(
+        path.join(optifineVersionsPath, `${config.optifine}.jar`),
+        path.join(libraryPath, "optifine", "launchwrapper-of"),
+        {
+          $bin: sevenZipPath,
+          $cherryPick: "*.jar"
+        }
+      );
+
+      await fse.copy(
+        path.join(optifineVersionsPath, `${config.optifine}.jar`),
+        path.join(libraryPath, "optifine", "Optifine", `${config.optifine}.jar`)
+      );
+    } else if (modloader && modloader[0] === "fabric") {
       const fabricJsonPath = path.join(
         _getLibrariesPath(state),
         "net",
@@ -1539,10 +1585,55 @@ export function launchInstance(instanceName) {
       "url"
     );
 
+    //BERTO
+    //path.join(optifineVersionsPath, `${config.optifine}.jar`),
+    // path.join(libraryPath, "optifine", "launchwrapper-of", `launchwrapper-of-${version}.jar` ),
+
+    const tempFolder = _getTempPath(state);
+    const launchwrapperTxtPath = path.join(tempFolder, "launchwrapper-of.txt");
+    const version = await fse.readJSON(launchwrapperTxtPath);
+
+    const existLauncherWrapper = await fs.lstat(
+      path.join(
+        libraryPath,
+        "optifine",
+        "launchwrapper-of",
+        `launchwrapper-of-${version}.jar`
+      )
+    );
+    const existOptifine = await fs.lstat(
+      path.join(optifineVersionsPath, `${config.optifine}.jar`)
+    );
+
+    if (existLauncherWrapper && existOptifine) {
+      libraries = libraries.concat(
+        {
+          path: path.join(
+            libraryPath,
+            "optifine",
+            "launchwrapper-of",
+            `launchwrapper-of-${version}.jar`
+          )
+        },
+        { path: path.join(optifineVersionsPath, `${config.optifine}.jar`) }
+      );
+    }
+
+    const optifineVersionNameFixedFormat = `${
+      config.optifine.split(" ")[1]
+    }-Optifine_${config.optifine.split(" ")[2]}_${config.optifine
+      .split(" ")
+      .slice(3, 5)
+      .join("_")}`;
+
+    const tweakClassArg = await isOptifine(instancesPath, instanceName);
+
     const getJvmArguments =
       mcJson.assets !== "legacy" && gte(coerce(mcJson.assets), coerce("1.13"))
         ? getJVMArguments113
         : getJVMArguments112;
+
+    console.log("gotham", optifineVersionNameFixedFormat);
 
     const jvmArguments = getJvmArguments(
       libraries,
@@ -1551,8 +1642,9 @@ export function launchInstance(instanceName) {
       assetsPath,
       mcJson,
       account,
-      memory
-    );
+      memory,
+      optifineVersionNameFixedFormat
+    ).concat(tweakClassArg);
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
@@ -1563,13 +1655,25 @@ export function launchInstance(instanceName) {
         mcJson,
         account,
         memory,
-        true
-      ).join(" ")}`
+        true,
+        optifineVersionNameFixedFormat
+      ).concat(tweakClassArg)}`
     );
 
     if (state.settings.hideWindowOnGameLaunch) {
       await ipcRenderer.invoke("hide-window");
     }
+
+    // const configPath = path.join(
+    //   path.join(instancesPath, instanceName, "config.json")
+    // );
+
+    // const config = await fse.readJSON(configPath);
+
+    const optifineJar = path.join(
+      optifineVersionsPath,
+      `${config.optifine}.jar`
+    );
 
     const process = spawn(javaPath, jvmArguments, {
       cwd: instancePath,
@@ -1587,6 +1691,7 @@ export function launchInstance(instanceName) {
     process.on("close", code => {
       ipcRenderer.invoke("show-window");
       fse.remove(instanceJLFPath);
+      fse.remove(optifinePath);
       if (code !== 0) {
         console.log(`process exited with code ${code}`);
       }

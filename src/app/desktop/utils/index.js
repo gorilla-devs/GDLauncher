@@ -7,7 +7,7 @@ import jarAnalyzer from "jarfile";
 import { promisify } from "util";
 import { ipcRenderer } from "electron";
 import path from "path";
-import axios from "axios";
+// import axios from "axios";
 import { exec, spawn } from "child_process";
 import cheerio from "cheerio";
 import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
@@ -302,6 +302,18 @@ export const copyAssetsToLegacy = async assets => {
   );
 };
 
+export const isOptifine = async (instancesPath, instanceName) => {
+  const configPath = path.join(
+    path.join(instancesPath, instanceName, "config.json")
+  );
+
+  const config = await fse.readJSON(configPath);
+
+  if (config.modloader[0] === "vanilla" && config.optifine) {
+    return " --tweakClass optifine.OptiFineTweaker";
+  } else return "";
+};
+
 const hiddenToken = "__HIDDEN_TOKEN__";
 export const getJVMArguments112 = (
   libraries,
@@ -312,8 +324,10 @@ export const getJVMArguments112 = (
   account,
   memory,
   hideAccessToken,
-  jvmOptions = []
+  jvmOptions = [],
+  optifineVersion
 ) => {
+  console.log("DIO", optifineVersion, mcjar, mcJson);
   const args = [];
   args.push("-cp");
 
@@ -346,8 +360,10 @@ export const getJVMArguments112 = (
       switch (identifier) {
         case "auth_player_name":
           val = account.selectedProfile.name.trim();
+
           break;
         case "version_name":
+          // val = optifineVersion ? mcJson.id : ` --version ${optifineVersion}`;
           val = mcJson.id;
           break;
         case "game_directory":
@@ -403,8 +419,10 @@ export const getJVMArguments113 = (
   account,
   memory,
   hideAccessToken,
-  jvmOptions = []
+  jvmOptions = [],
+  optifineVersion
 ) => {
+  console.log("DIO", optifineVersion, mcjar, mcJson);
   const argDiscovery = /\${*(.*)}/;
   let args = mcJson.arguments.jvm.filter(v => !skipLibrary(v));
 
@@ -439,6 +457,7 @@ export const getJVMArguments113 = (
             val = account.selectedProfile.name.trim();
             break;
           case "version_name":
+            // val = optifineVersion ? mcJson.id : ` --version ${optifineVersion}`;
             val = mcJson.id;
             break;
           case "game_directory":
@@ -648,24 +667,24 @@ export const downloadAddonZip = async (id, fileId, instancePath, tempPath) => {
   return manifest;
 };
 
-export const downloadOptifine = async (
-  optifineVersionName,
-  optifineVersionsPath,
-  optifineManifest
-) => {
-  await makeDir(optifineVersionsPath);
-  const url = optifineManifest[optifineVersionName.split(" ")[1]].filter(
-    x => x.name === optifineVersionName
-  )[0].download;
-  const html = await axios.get(url);
-  const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
-  if (ret && ret[1]) {
-    downloadFile(
-      path.join(optifineVersionsPath, `${optifineVersionName}.jar`),
-      "https://optifine.net/downloadx?" + ret[1]
-    );
-  }
-};
+// export const downloadOptifine = async (
+//   optifineVersionName,
+//   optifineVersionsPath,
+//   optifineManifest
+// ) => {
+//   await makeDir(optifineVersionsPath);
+//   const url = optifineManifest[optifineVersionName.split(" ")[1]].filter(
+//     x => x.name === optifineVersionName
+//   )[0].download;
+//   const html = await axios.get(url);
+//   const ret = /<a href='downloadx\?(.+?)'/.exec(html.data);
+//   if (ret && ret[1]) {
+//     downloadFile(
+//       path.join(optifineVersionsPath, `${optifineVersionName}.jar`),
+//       "https://optifine.net/downloadx?" + ret[1]
+//     );
+//   }
+// };
 
 export const getPlayerSkin = async uuid => {
   const playerSkin = await mcGetPlayerSkin(uuid);
