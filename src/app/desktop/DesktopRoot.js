@@ -5,6 +5,7 @@ import { Switch } from "react-router";
 import { ipcRenderer } from "electron";
 import { useSelector, useDispatch } from "react-redux";
 import { push } from "connected-react-router";
+import { message } from "antd";
 import RouteWithSubRoutes from "../../common/components/RouteWithSubRoutes";
 import {
   loginWithAccessToken,
@@ -27,7 +28,6 @@ import { isLatestJavaDownloaded, extract7z } from "./utils";
 import { updateDataPath } from "../../common/reducers/settings/actions";
 import SystemNavbar from "./components/SystemNavbar";
 import useTrackIdle from "./utils/useTrackIdle";
-import { message } from "antd";
 
 const Wrapper = styled.div`
   height: 100vh;
