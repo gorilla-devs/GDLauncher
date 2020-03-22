@@ -4,6 +4,7 @@ class PromiseQueue {
   constructor() {
     this.queue = [];
     this.isPending = false;
+    this.listeners = {};
   }
 
   add(promise) {
@@ -17,7 +18,28 @@ class PromiseQueue {
     });
   }
 
+  on(eventName, handler) {
+    switch (eventName) {
+      case "executed":
+        this.listeners.executed = () => handler(this.queue.length + 1);
+        break;
+      case "start":
+        this.listeners.start = () => handler(this.queue.length + 1);
+        break;
+      case "end":
+        this.listeners.end = handler;
+        break;
+      default:
+        return null;
+    }
+    return null;
+  }
+
   async execute() {
+    const startHandler = this.listeners.start;
+    if (startHandler) {
+      setTimeout(startHandler, 0);
+    }
     if (this.isPending) return false;
     while (this.queue[0]) {
       const item = this.queue.shift();
@@ -25,11 +47,19 @@ class PromiseQueue {
       try {
         // eslint-disable-next-line
         const value = await item.promise();
+        const executedHandler = this.listeners.executed;
+        if (executedHandler) {
+          setTimeout(executedHandler, 0);
+        }
         item.resolve(value);
       } catch (e) {
         item.reject(e);
       }
       this.isPending = false;
+    }
+    const endHandler = this.listeners.end;
+    if (endHandler) {
+      setTimeout(endHandler, 0);
     }
   }
 }

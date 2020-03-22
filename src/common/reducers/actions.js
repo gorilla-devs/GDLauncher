@@ -14,7 +14,7 @@ import { push } from "connected-react-router";
 import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import pMap from "p-map";
-import { notification } from "antd";
+import { notification, message } from "antd";
 import makeDir from "make-dir";
 import * as ActionTypes from "./actionTypes";
 import {
@@ -1140,6 +1140,34 @@ export const startListener = () => {
     const state = getState();
     const instancesPath = _getInstancesPath(state);
     const Queue = new PromiseQueue();
+
+    const notificationObj = {
+      key: "RTSAction",
+      duration: 0
+    };
+
+    let closeMessage;
+
+    Queue.on("start", queueLength => {
+      closeMessage = message.loading({
+        ...notificationObj,
+        content: `Syncronizing files. ${queueLength} left.`
+      });
+    });
+
+    Queue.on("executed", queueLength => {
+      closeMessage = message.loading({
+        ...notificationObj,
+        content: `Syncronizing files. ${queueLength} left.`
+      });
+    });
+
+    Queue.on("end", () => {
+      setTimeout(() => {
+        closeMessage();
+      }, 500);
+    });
+
     const changesTracker = {};
 
     const processAddedFile = async (fileName, instanceName) => {

@@ -12,7 +12,7 @@ const AddInstance = ({ defaultPage }) => {
   const [version, setVersion] = useState(null);
   const [step, setStep] = useState(0);
   const [modpack, setModpack] = useState(null);
-  const [importZipPath, setImportZipPath] = useState(null);
+  const [importZipPath, setImportZipPath] = useState("");
 
   return (
     <Modal
@@ -33,6 +33,7 @@ const AddInstance = ({ defaultPage }) => {
         setModpack={setModpack}
         modpack={modpack}
         setImportZipPath={setImportZipPath}
+        importZipPath={importZipPath}
       />
       <InstanceName
         version={version}

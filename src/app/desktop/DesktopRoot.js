@@ -27,6 +27,7 @@ import { isLatestJavaDownloaded, extract7z } from "./utils";
 import { updateDataPath } from "../../common/reducers/settings/actions";
 import SystemNavbar from "./components/SystemNavbar";
 import useTrackIdle from "./utils/useTrackIdle";
+import { message } from "antd";
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -50,6 +51,10 @@ function DesktopRoot() {
   const dataPathFromStore = useSelector(state => state.settings.dataPath);
   const location = useSelector(state => state.router.location);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
+
+  message.config({
+    top: 26
+  });
 
   const init = async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
