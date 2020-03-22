@@ -2,6 +2,7 @@
 import makeDir from "make-dir";
 import path from "path";
 import { ipcRenderer } from "electron";
+import { notification } from "antd";
 import * as ActionTypes from "../../../common/reducers/actionTypes";
 import getInstances from "./getInstances";
 import modsFingerprintsScan from "./modsFingerprintsScan";
@@ -34,13 +35,18 @@ const middleware = store => next => action => {
         instances: instances1
       });
       try {
+        await makeDir(instancesPath);
         await dispatch(startListener());
       } catch (err) {
         console.error(err);
-        // Check if the folder exists and create it if it doesn't
-        await ipcRenderer.invoke("stop-listener");
-        await makeDir(instancesPath);
-        await dispatch(startListener());
+        // eslint-disable-next-line
+        notification.open({
+          key: "nsfwNotWorking",
+          message: "NSFW Error",
+          description: "Node Sentinel File Watcher could not be initialized",
+          top: 47,
+          duration: 10
+        });
       }
     };
 

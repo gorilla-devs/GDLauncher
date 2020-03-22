@@ -19,15 +19,27 @@ export const downloadInstanceFiles = async (
     async item => {
       let counter = 0;
       let res = false;
+      if (!item.path || !item.url) {
+        console.warn("Skipping", item);
+        return;
+      }
       do {
-        // eslint-disable-next-line no-await-in-loop
-        res = await downloadFileInstance(
-          item.path,
-          item.url,
-          item.sha1,
-          item.legacyPath
-        );
         counter += 1;
+        if (counter !== 1) {
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          res = await downloadFileInstance(
+            item.path,
+            item.url,
+            item.sha1,
+            item.legacyPath
+          );
+        } catch {
+          // Do nothing
+        }
       } while (!res && counter < 3);
       downloaded += 1;
       if (

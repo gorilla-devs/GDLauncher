@@ -191,6 +191,7 @@ const NewInstance = ({
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          width: 400px;
         `}
       >
         <Cascader

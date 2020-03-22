@@ -24,6 +24,7 @@ export function updateDataPath(path) {
       type: ActionTypes.UPDATE_DATA_PATH,
       path
     });
+    return path;
   };
 }
 

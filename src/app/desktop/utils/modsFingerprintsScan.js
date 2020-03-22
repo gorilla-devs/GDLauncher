@@ -2,7 +2,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import fse from "fs-extra";
 import pMap from "p-map";
-import { getDirectories, normalizeModData } from ".";
+import { getDirectories, normalizeModData, isMod } from ".";
 import { getFileMurmurHash2 } from "../../../common/utils";
 import { getAddonsByFingerprint, getAddon } from "../../../common/api";
 
@@ -31,7 +31,7 @@ const modsFingerprintsScan = async instancesPath => {
         try {
           const completeFilePath = path.join(modsFolder, file);
           const stat = await fs.lstat(completeFilePath);
-          if (stat.isFile()) {
+          if (stat.isFile() && isMod(completeFilePath, instancesPath)) {
             // Check if file is in config
             if (!(config?.mods || []).find(mod => mod.fileName === file)) {
               const murmurHash = await getFileMurmurHash2(completeFilePath);

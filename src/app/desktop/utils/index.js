@@ -715,3 +715,17 @@ export const normalizeModData = (data, projectID, modName) => {
   }
   return temp;
 };
+
+export const reflect = p =>
+  p.then(
+    v => ({ v, status: true }),
+    e => ({ e, status: false })
+  );
+
+export const isMod = (fileName, instancesPath) =>
+  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
+    fileName.replace(instancesPath, "")
+  );
+
+export const isInstanceFolderPath = (f, instancesPath) =>
+  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(f.replace(instancesPath, ""));

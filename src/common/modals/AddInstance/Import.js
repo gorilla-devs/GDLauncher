@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import path from "path";
 import fse from "fs-extra";
+import { promises as fs } from "fs";
 import { extractFull } from "node-7z";
 import { get7zPath } from "../../../app/desktop/utils";
 import { ipcRenderer } from "electron";
@@ -21,13 +22,17 @@ const Import = ({ setModpack, setVersion, modpack, setImportZipPath }) => {
     setImportZipPath(dialog.filePaths[0]);
     setZipName(path.basename(dialog.filePaths[0]));
     const sevenZipPath = await get7zPath();
+    try {
+      await fs.access(path.join(tempPath, "manifest.json"));
+    } catch {
+      await fse.remove(path.join(tempPath, "manifest.json"));
+    }
     const extraction = extractFull(dialog.filePaths[0], tempPath, {
       recursive: true,
       $bin: sevenZipPath,
       yes: true,
       $cherryPick: "manifest.json",
-      $progress: true,
-      overwrite: true
+      $progress: true
     });
     await new Promise((resolve, reject) => {
       extraction.on("progress", ({ percent }) => {

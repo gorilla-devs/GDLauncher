@@ -17,6 +17,7 @@ import { push } from "connected-react-router";
 import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import pMap from "p-map";
+import { notification } from "antd";
 import * as ActionTypes from "./actionTypes";
 import {
   NEWS_URL,
@@ -42,7 +43,8 @@ import {
   getOptifineHomePage,
   getAddonsByFingerprint,
   getAddonFiles,
-  getAddon
+  getAddon,
+  getAddonCategories
 } from "../api";
 import {
   _getCurrentAccount,
@@ -73,9 +75,11 @@ import {
   parseOptifineVersions,
   getPlayerSkin,
   normalizeModData,
-  isOptifine
+  isOptifine,
+  reflect,
+  isMod,
+  isInstanceFolderPath
 } from "../../app/desktop/utils";
-import { openModal, closeModal } from "./modals/actions";
 import {
   downloadFile,
   downloadInstanceFiles
@@ -112,51 +116,90 @@ const optifine = async () => {
 };
 
 export function initManifests() {
-  return async dispatch => {
-    const mc = (await getMcManifest()).data;
-    dispatch({
-      type: ActionTypes.UPDATE_VANILLA_MANIFEST,
-      data: mc
-    });
-    const fabric = (await getFabricManifest()).data;
-    dispatch({
-      type: ActionTypes.UPDATE_FABRIC_MANIFEST,
-      data: fabric
-    });
-    const java = (await getJavaManifest()).data;
-    dispatch({
-      type: ActionTypes.UPDATE_JAVA_MANIFEST,
-      data: java
-    });
-    const html = await getOptifineHomePage();
-    const versions = parseOptifineVersions(html);
-    dispatch({
-      type: ActionTypes.UPDATE_OPTIFINE_MANIFEST,
-      versions: versions
-    });
-    const forge = removeDuplicates((await getForgeManifest()).data, "name");
-    const forgeVersions = {};
-    // Looping over vanilla versions, create a new entry in forge object
-    // and add to it all correct versions
-    mc.versions.forEach(v => {
-      forgeVersions[v.id] = forge
-        .filter(
-          ver =>
-            ver.gameVersion === v.id &&
-            gte(coerce(ver.gameVersion), coerce("1.6.1"))
-        )
-        .map(ver => ver.name.replace("forge-", ""));
-    });
+  return async (dispatch, getState) => {
+    const { app } = getState();
+    let mc = null;
+    try {
+      mc = (await getMcManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_VANILLA_MANIFEST,
+        data: mc
+      });
+    } catch (err) {
+      console.error(err);
+    }
 
-    dispatch({
-      type: ActionTypes.UPDATE_FORGE_MANIFEST,
-      data: omitBy(forgeVersions, v => v.length === 0)
-    });
+    const getFabricVersions = async () => {
+      const fabric = (await getFabricManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_FABRIC_MANIFEST,
+        data: fabric
+      });
+      return fabric;
+    };
+    const getJavaManifestVersions = async () => {
+      const java = (await getJavaManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_JAVA_MANIFEST,
+        data: java
+      });
+      return java;
+    };
+    const getAddonCategoriesVersions = async () => {
+      const curseforgeCategories = (await getAddonCategories()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_CURSEFORGE_CATEGORIES_MANIFEST,
+        data: curseforgeCategories
+      });
+      return curseforgeCategories;
+    };
+    const getForgeVersions = async () => {
+      const forge = removeDuplicates((await getForgeManifest()).data, "name");
+      const forgeVersions = {};
+      // Looping over vanilla versions, create a new entry in forge object
+      // and add to it all correct versions
+      mc.versions.forEach(v => {
+        forgeVersions[v.id] = forge
+          .filter(
+            ver =>
+              ver.gameVersion === v.id &&
+              gte(coerce(ver.gameVersion), coerce("1.6.1"))
+          )
+          .map(ver => ver.name.replace("forge-", ""));
+      });
+
+      dispatch({
+        type: ActionTypes.UPDATE_FORGE_MANIFEST,
+        data: omitBy(forgeVersions, v => v.length === 0)
+      });
+      return omitBy(forgeVersions, v => v.length === 0);
+    };
+
+    const getOptifineVersions = async () => {
+      const html = await getOptifineHomePage();
+      const versions = parseOptifineVersions(html);
+      dispatch({
+        type: ActionTypes.UPDATE_OPTIFINE_MANIFEST,
+        versions: versions
+      });
+    };
+    
+    // Using reflect to avoid rejection
+    const [fabric, java, categories, forge, optifine] = await Promise.all([
+      reflect(getFabricVersions()),
+      reflect(getJavaManifestVersions()),
+      reflect(getAddonCategoriesVersions()),
+      reflect(getForgeVersions()),
+      reflect(getOptifineVersions)
+    ]);
+
     return {
-      mc,
-      fabric,
-      java,
-      forge
+      mc: mc.status ? mc.v : app.vanillaManifest,
+      fabric: fabric.status ? fabric.v : app.fabricManifest,
+      java: java.status ? java.v : app.javaManifest,
+      categories: categories.status ? categories.v : app.curseforgeCategories,
+      forge: forge.status ? forge.v : app.forgeManifest,
+      optifine: optifine.status ? optifine.v : app.optifineManifest
     };
   };
 }
@@ -268,15 +311,6 @@ export function updateCurrentAccountId(id) {
   };
 }
 
-export function updateJavaStatus(status) {
-  return async dispatch => {
-    dispatch({
-      type: ActionTypes.UPDATE_JAVA_DOWNLOAD,
-      status
-    });
-  };
-}
-
 export function updateConcurrentDownloads(concurrentDownloads) {
   return async dispatch => {
     dispatch({
@@ -325,7 +359,6 @@ export function downloadJava() {
     } = state;
     const javaOs = convertOSToJavaFormat(process.platform);
     const javaMeta = javaManifest.find(v => v.os === javaOs);
-    dispatch(openModal("JavaDownload"));
     const {
       version_data: { openjdk_version: version },
       binary_link: url,
@@ -336,15 +369,32 @@ export function downloadJava() {
     await fse.remove(javaBaseFolder);
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
+    const notificationObj = {
+      key: "javaDownload",
+      message: "Preparing Java",
+      top: 47,
+      duration: 0,
+      closeIcon: []
+    };
+
     let i = 0;
     await downloadFile(downloadLocation, url, p => {
       if (i % 4 === 0) {
-        ipcRenderer.send("update-progress-bar", parseInt(p, 10) / 100);
-        dispatch(updateJavaStatus(p));
+        ipcRenderer.invoke("update-progress-bar", parseInt(p, 10) / 100);
+        notification.open({
+          ...notificationObj,
+          description: `Downloading: ${parseInt(p, 10)}%`
+        });
       }
       i += 1;
     });
 
+    const totalSteps = process.platform !== "win32" ? 2 : 1;
+
+    notification.open({
+      ...notificationObj,
+      description: `Extracting (1 / ${totalSteps})`
+    });
     const sevenZipPath = await get7zPath();
     const firstExtraction = extractFull(downloadLocation, tempFolder, {
       $bin: sevenZipPath
@@ -360,6 +410,10 @@ export function downloadJava() {
 
     // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
     if (process.platform !== "win32") {
+      notification.open({
+        ...notificationObj,
+        description: `Extracting (2 / ${totalSteps})`
+      });
       const tempTarName = path.join(
         tempFolder,
         path.basename(url).replace(".tar.gz", ".tar")
@@ -386,9 +440,13 @@ export function downloadJava() {
 
     await fixFilePermissions(_getJavaPath(state));
 
-    ipcRenderer.send("update-progress-bar", -1);
-    dispatch(updateJavaStatus("downloaded"));
-    dispatch(closeModal());
+    ipcRenderer.invoke("update-progress-bar", -1);
+
+    notification.open({
+      ...notificationObj,
+      description: "Java is ready!"
+    });
+    setTimeout(() => notification.close("javaDownload"), 2000);
   };
 }
 
@@ -595,6 +653,33 @@ export function updateSelectedInstance(name) {
   };
 }
 
+export function addStartedInstance(instance) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.ADD_STARTED_INSTANCE,
+      instance
+    });
+  };
+}
+
+export function updateStartedInstance(instance) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_STARTED_INSTANCE,
+      instance
+    });
+  };
+}
+
+export function removeStartedInstance(instanceName) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.REMOVE_STARTED_INSTANCE,
+      instanceName
+    });
+  };
+}
+
 export function removeDownloadFromQueue(instanceName) {
   return async (dispatch, getState) => {
     const lockFilePath = path.join(
@@ -701,7 +786,7 @@ export function addToQueue(instanceName, options) {
       background,
       optifine
     });
-
+    await makeDir(path.join(_getInstancesPath(state), instanceName));
     lockfile.lock(
       path.join(_getInstancesPath(state), instanceName, "installing.lock"),
       err => {
@@ -870,24 +955,43 @@ export function downloadForgeManifestFiles(instanceName) {
     await pMap(
       manifest.files,
       async item => {
-        const { data: addon } = await getAddon(item.projectID);
-        const modManifest = (await getAddonFile(item.projectID, item.fileID))
-          .data;
-        const destFile = path.join(
-          _getInstancesPath(state),
-          instanceName,
-          "mods",
-          modManifest.fileName
-        );
-        const fileExists = await fse.pathExists(destFile);
-        if (!fileExists) await downloadFile(destFile, modManifest.downloadUrl);
+        let ok = false;
+        let tries = 0;
+        /* eslint-disable no-await-in-loop */
+        do {
+          tries += 1;
+          if (tries !== 1) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+          try {
+            const { data: addon } = await getAddon(item.projectID);
+            const modManifest = (
+              await getAddonFile(item.projectID, item.fileID)
+            ).data;
+            const destFile = path.join(
+              _getInstancesPath(state),
+              instanceName,
+              "mods",
+              modManifest.fileName
+            );
+            const fileExists = await fse.pathExists(destFile);
+            if (!fileExists) {
+              await downloadFile(destFile, modManifest.downloadUrl);
+            }
 
-        modManifests = modManifests.concat(
-          normalizeModData(modManifest, item.projectID, addon.name)
-        );
-        const percentage =
-          (modManifests.length * 100) / manifest.files.length - 1;
-        dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+            modManifests = modManifests.concat(
+              normalizeModData(modManifest, item.projectID, addon.name)
+            );
+          } catch (err) {
+            console.error(err);
+          }
+
+          const percentage =
+            (modManifests.length * 100) / manifest.files.length - 1;
+          dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+          ok = true;
+        } while (!ok && tries <= 3);
+        /* eslint-enable no-await-in-loop */
       },
       { concurrency }
     );
@@ -1110,14 +1214,6 @@ export const startListener = () => {
     const Queue = new PromiseQueue();
     const changesTracker = {};
 
-    const isMod = fileName =>
-      /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
-        fileName.replace(instancesPath, "")
-      );
-
-    const isInstanceFolderPath = f =>
-      /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(f.replace(instancesPath, ""));
-
     const processAddedFile = async (fileName, instanceName) => {
       const processChange = async () => {
         const newState = getState();
@@ -1228,15 +1324,19 @@ export const startListener = () => {
           instanceName,
           "config.json"
         );
-        const config = await fse.readJSON(configPath);
-        console.log("[RTS] ADDING INSTANCE", instanceName);
-        dispatch({
-          type: ActionTypes.UPDATE_INSTANCES,
-          instances: {
-            ...newState.instances.list,
-            [instanceName]: { ...config, name: instanceName }
-          }
-        });
+        try {
+          const config = await fse.readJSON(configPath);
+          console.log("[RTS] ADDING INSTANCE", instanceName);
+          dispatch({
+            type: ActionTypes.UPDATE_INSTANCES,
+            instances: {
+              ...newState.instances.list,
+              [instanceName]: { ...config, name: instanceName }
+            }
+          });
+        } catch (err) {
+          console.warn(err);
+        }
       }
     };
 
@@ -1274,7 +1374,6 @@ export const startListener = () => {
       }
     };
 
-    ipcRenderer.invoke("start-listener", instancesPath);
     ipcRenderer.on("listener-events", async (e, events) => {
       await Promise.all(
         events.map(async event => {
@@ -1286,8 +1385,12 @@ export const startListener = () => {
             event.file || event.oldFile
           );
 
+          const isRename = event.newFile && event.oldFile;
+
           if (
-            (!isMod(completePath) && !isInstanceFolderPath(completePath)) ||
+            (!isMod(completePath, instancesPath) &&
+              !isInstanceFolderPath(completePath, instancesPath) &&
+              !isRename) ||
             // When renaming, an ADD action is dispatched too. Try to discard that
             (event.action !== 2 && changesTracker[completePath]) ||
             // Ignore java legacy fixer
@@ -1295,11 +1398,24 @@ export const startListener = () => {
           ) {
             return;
           }
+          if (event.action !== 2 && !changesTracker[completePath]) {
+            // If we cannot find it in the hash table, it's a new event
+            changesTracker[completePath] = {
+              action: event.action,
+              completed:
+                event.action !== 0 ||
+                (event.action === 0 &&
+                  isInstanceFolderPath(completePath, instancesPath)),
+              ...(event.action === 3 && {
+                newFilePath: path.join(event.newDirectory, event.newFile)
+              })
+            };
+          }
 
           if (
             changesTracker[completePath] &&
             !changesTracker[completePath].completed &&
-            event.action === 2
+            (event.action === 2 || event.action === 0 || event.action === 1)
           ) {
             try {
               await new Promise(resolve => setTimeout(resolve, 300));
@@ -1308,15 +1424,6 @@ export const startListener = () => {
             } catch {
               // Do nothing, simply not completed..
             }
-          } else if (event.action !== 2 && !changesTracker[completePath]) {
-            // If we cannot find it in the hash table, it's a new event
-            changesTracker[completePath] = {
-              action: event.action,
-              completed: event.action !== 0,
-              ...(event.action === 3 && {
-                newFilePath: path.join(event.newDirectory, event.newFile)
-              })
-            };
           }
         })
       );
@@ -1324,7 +1431,11 @@ export const startListener = () => {
       // Handle edge case where MOD-REMOVE is called before INSTANCE-REMOVE
       Object.entries(changesTracker).forEach(
         async ([fileName, { action, completed }]) => {
-          if (isInstanceFolderPath(fileName) && action === 1 && completed) {
+          if (
+            isInstanceFolderPath(fileName, instancesPath) &&
+            action === 1 &&
+            completed
+          ) {
             const instanceName = fileName
               .replace(instancesPath, "")
               .substr(1)
@@ -1332,7 +1443,7 @@ export const startListener = () => {
             // Check if we can find any other action with this instance name
             Object.entries(changesTracker).forEach(
               ([file, { action: act }]) => {
-                if (isMod(file) && act === 1) {
+                if (isMod(file, instancesPath) && act === 1) {
                   const instName = file
                     .replace(instancesPath, "")
                     .substr(1)
@@ -1375,20 +1486,51 @@ export const startListener = () => {
             });
             if (isLocked) return;
 
-            if (isMod(fileName) && _getInstance(getState())(instanceName)) {
+            if (
+              isMod(fileName, instancesPath) &&
+              _getInstance(getState())(instanceName) &&
+              action !== 3
+            ) {
               if (action === 0) {
                 processAddedFile(filePath, instanceName);
               } else if (action === 1) {
                 processRemovedFile(filePath, instanceName);
-              } else if (action === 3) {
-                // Infer the instance name from the full path
-                const oldInstanceName = fileName
-                  .replace(instancesPath, "")
-                  .substr(1)
-                  .split(path.sep)[0];
-                processRenamedFile(fileName, oldInstanceName, newFilePath);
               }
-            } else if (isInstanceFolderPath(filePath)) {
+            } else if (
+              action === 3 &&
+              !isInstanceFolderPath(fileName, instancesPath) &&
+              !isInstanceFolderPath(newFilePath, instancesPath)
+            ) {
+              // Infer the instance name from the full path
+              const oldInstanceName = fileName
+                .replace(instancesPath, "")
+                .substr(1)
+                .split(path.sep)[0];
+              if (
+                oldInstanceName === instanceName &&
+                isMod(newFilePath, instancesPath) &&
+                isMod(fileName, instancesPath)
+              ) {
+                processRenamedFile(fileName, instanceName, newFilePath);
+              } else if (
+                oldInstanceName !== instanceName &&
+                isMod(newFilePath, instancesPath) &&
+                isMod(fileName, instancesPath)
+              ) {
+                processRemovedFile(fileName, oldInstanceName);
+                processAddedFile(newFilePath, instanceName);
+              } else if (
+                !isMod(newFilePath, instancesPath) &&
+                isMod(fileName, instancesPath)
+              ) {
+                processRemovedFile(fileName, oldInstanceName);
+              } else if (
+                isMod(newFilePath, instancesPath) &&
+                !isMod(fileName, instancesPath)
+              ) {
+                processAddedFile(newFilePath, instanceName);
+              }
+            } else if (isInstanceFolderPath(filePath, instancesPath)) {
               if (action === 0) {
                 processAddedInstance(instanceName);
               } else if (action === 1) {
@@ -1405,6 +1547,7 @@ export const startListener = () => {
         }
       );
     });
+    await ipcRenderer.invoke("start-listener", instancesPath);
   };
 };
 
@@ -1680,8 +1823,21 @@ export function launchInstance(instanceName) {
       shell: true
     });
 
+    const playTimer = setInterval(() => {
+      dispatch(
+        updateInstanceConfig(instanceName, prev => ({
+          ...prev,
+          timePlayed: (Number(prev.timePlayed) || 0) + 1
+        }))
+      );
+    }, 60 * 1000);
+    dispatch(addStartedInstance({ instanceName, pid: process.pid }));
+
     process.stdout.on("data", data => {
       console.log(data.toString());
+      if (data.toString().includes("Setting user:")) {
+        dispatch(updateStartedInstance({ instanceName, initialized: true }));
+      }
     });
 
     process.stderr.on("data", data => {
@@ -1691,9 +1847,11 @@ export function launchInstance(instanceName) {
     process.on("close", code => {
       ipcRenderer.invoke("show-window");
       fse.remove(instanceJLFPath);
+      dispatch(removeStartedInstance(instanceName));
+      clearInterval(playTimer);
       fse.remove(optifinePath);
       if (code !== 0) {
-        console.log(`process exited with code ${code}`);
+        console.log(`Process exited with code ${code}. Not too good..`);
       }
     });
   };

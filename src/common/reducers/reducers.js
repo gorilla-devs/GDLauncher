@@ -11,15 +11,6 @@ function news(state = [], action) {
   }
 }
 
-function javaDownloadStatus(state = null, action) {
-  switch (action.type) {
-    case ActionTypes.UPDATE_JAVA_DOWNLOAD:
-      return action.status;
-    default:
-      return state;
-  }
-}
-
 function downloadQueue(state = {}, action) {
   switch (action.type) {
     case ActionTypes.ADD_DOWNLOAD_TO_QUEUE:
@@ -95,14 +86,26 @@ function instances(state = { started: false, list: {} }, action) {
   }
 }
 
-function startedInstances(state = [], action) {
+function startedInstances(state = {}, action) {
   switch (action.type) {
     case ActionTypes.ADD_STARTED_INSTANCE:
-      return [...state, { instanceName: action.instanceName, pid: action.pid }];
+      return {
+        ...state,
+        [action.instance.instanceName]: {
+          pid: action.instance.pid,
+          initialized: false
+        }
+      };
+    case ActionTypes.UPDATE_STARTED_INSTANCE:
+      return {
+        ...state,
+        [action.instance.instanceName]: {
+          ...state[action.instance.instanceName],
+          initialized: true
+        }
+      };
     case ActionTypes.REMOVE_STARTED_INSTANCE:
-      return state.filter(
-        instance => instance.instanceName !== action.instanceName
-      );
+      return omit(state, [action.instanceName]);
     default:
       return state;
   }
@@ -130,7 +133,6 @@ export default {
   news,
   downloadQueue,
   currentDownload,
-  javaDownloadStatus,
   instances,
   startedInstances,
   selectedInstance,

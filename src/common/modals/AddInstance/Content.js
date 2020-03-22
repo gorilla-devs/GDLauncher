@@ -17,7 +17,6 @@ const Content = ({
   in: inProp,
   setStep,
   page,
-  setPage,
   setVersion,
   version,
   setModpack,
@@ -73,7 +72,8 @@ const Content = ({
                 position: absolute;
                 bottom: 20px;
                 right: 20px;
-                opacity: ${props => (props.page === 0 ? 1 : 0)};
+                opacity: ${props =>
+                  props.page === 0 || props.page === 2 ? 1 : 0};
               `}
             >
               <div
@@ -131,20 +131,4 @@ const Animation = styled.div`
   transform: translateX(
     ${({ state }) => (state === "exiting" || state === "exited" ? -100 : 0)}%
   );
-`;
-
-const MenuItem = styled.div`
-  display: flex;
-  align-items: center;
-  height: 40px;
-  color: white;
-  border-radius: 4px;
-  padding: 0 4px;
-  cursor: pointer;
-  ${props =>
-    props.active ? `background: ${props.theme.palette.grey[500]};` : ""}
-  transition: background 0.1s ease-in-out;
-  &:hover {
-    background: ${props => props.theme.palette.grey[500]};
-  }
 `;

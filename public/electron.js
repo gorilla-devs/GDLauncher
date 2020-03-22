@@ -202,7 +202,7 @@ ipcMain.handle("openFolderDialog", (e, defaultPath) => {
 });
 
 ipcMain.handle("openFileDialog", () => {
-  return dialog.showOpenDialog(mainWindow, {
+  return dialog.showOpenDialog({
     properties: ["openFile"]
   });
 });
@@ -254,10 +254,15 @@ ipcMain.handle("shutdown-discord-rpc", () => {
 });
 
 ipcMain.handle("start-listener", async (e, dirPath) => {
-  watcher = await nsfw(dirPath, events => {
-    mainWindow.webContents.send("listener-events", events);
-  });
-  watcher.start();
+  try {
+    watcher = await nsfw(dirPath, events => {
+      mainWindow.webContents.send("listener-events", events);
+    });
+    return watcher.start();
+  } catch (err) {
+    console.error(err);
+    return Promise.reject(err);
+  }
 });
 
 ipcMain.handle("stop-listener", async () => {

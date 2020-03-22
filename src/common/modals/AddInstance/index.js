@@ -9,7 +9,6 @@ import InstanceName from "./InstanceName";
 import Content from "./Content";
 
 const AddInstance = ({ defaultPage }) => {
-  const [page, setPage] = useState(defaultPage || 0);
   const [version, setVersion] = useState(null);
   const [step, setStep] = useState(0);
   const [modpack, setModpack] = useState(null);
@@ -20,7 +19,7 @@ const AddInstance = ({ defaultPage }) => {
     <Modal
       css={`
         height: 85%;
-        width: 65%;
+        width: 80%;
         max-width: 1000px;
         overflow: hidden;
       `}
@@ -28,8 +27,7 @@ const AddInstance = ({ defaultPage }) => {
     >
       <Content
         in={step === 0}
-        page={page}
-        setPage={setPage}
+        page={defaultPage}
         setStep={setStep}
         setVersion={setVersion}
         version={version}

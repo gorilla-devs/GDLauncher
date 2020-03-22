@@ -32,6 +32,7 @@
   "scripts": {
     "start": "cross-env-shell NODE_ENV=development craco start",
     "start-electron": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "start-prod": "electron .",
     "build-web": "cross-env-shell APP_TYPE=web craco build",
     "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron craco build && yarn build-electron",
     "test": "craco test",
@@ -43,7 +44,7 @@
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web yarn start",
     "postinstall": "electron-builder install-app-deps && yarn rebuild",
     "rebuild": "electron-build-env neon build murmur2-calculator --release",
-    "release": "cross-env-shell NODE_ENV=production APP_TYPE=electron \"yarn build\" && electron-builder build --publish never"
+    "release": "cross-env-shell NODE_ENV=production APP_TYPE=electron \"yarn build\" && electron-builder build --x64 --publish never"
   },
   "husky": {
     "hooks": {
@@ -238,6 +239,7 @@
     "nsfw": "^1.2.7",
     "p-map": "^4.0.0",
     "polished": "^3.4.4",
+    "ps-tree": "^1.2.0",
     "react": "^16.13.0",
     "react-beautiful-dnd": "^13.0.0",
     "react-content-loader": "^5.0.2",
