@@ -68,7 +68,9 @@ import {
   convertOSToJavaFormat,
   getPlayerSkin,
   normalizeModData,
-  reflect
+  reflect,
+  isMod,
+  isInstanceFolderPath
 } from "../../app/desktop/utils";
 import {
   downloadFile,
@@ -1139,14 +1141,6 @@ export const startListener = () => {
     const Queue = new PromiseQueue();
     const changesTracker = {};
 
-    const isMod = fileName =>
-      /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
-        fileName.replace(instancesPath, "")
-      );
-
-    const isInstanceFolderPath = f =>
-      /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(f.replace(instancesPath, ""));
-
     const processAddedFile = async (fileName, instanceName) => {
       const processChange = async () => {
         const newState = getState();
@@ -1317,8 +1311,8 @@ export const startListener = () => {
           const isRename = event.newFile && event.oldFile;
 
           if (
-            (!isMod(completePath) &&
-              !isInstanceFolderPath(completePath) &&
+            (!isMod(completePath, instancesPath) &&
+              !isInstanceFolderPath(completePath, instancesPath) &&
               !isRename) ||
             // When renaming, an ADD action is dispatched too. Try to discard that
             (event.action !== 2 && changesTracker[completePath]) ||
@@ -1333,7 +1327,8 @@ export const startListener = () => {
               action: event.action,
               completed:
                 event.action !== 0 ||
-                (event.action === 0 && isInstanceFolderPath(completePath)),
+                (event.action === 0 &&
+                  isInstanceFolderPath(completePath, instancesPath)),
               ...(event.action === 3 && {
                 newFilePath: path.join(event.newDirectory, event.newFile)
               })
@@ -1359,7 +1354,11 @@ export const startListener = () => {
       // Handle edge case where MOD-REMOVE is called before INSTANCE-REMOVE
       Object.entries(changesTracker).forEach(
         async ([fileName, { action, completed }]) => {
-          if (isInstanceFolderPath(fileName) && action === 1 && completed) {
+          if (
+            isInstanceFolderPath(fileName, instancesPath) &&
+            action === 1 &&
+            completed
+          ) {
             const instanceName = fileName
               .replace(instancesPath, "")
               .substr(1)
@@ -1367,7 +1366,7 @@ export const startListener = () => {
             // Check if we can find any other action with this instance name
             Object.entries(changesTracker).forEach(
               ([file, { action: act }]) => {
-                if (isMod(file) && act === 1) {
+                if (isMod(file, instancesPath) && act === 1) {
                   const instName = file
                     .replace(instancesPath, "")
                     .substr(1)
@@ -1411,7 +1410,7 @@ export const startListener = () => {
             if (isLocked) return;
 
             if (
-              isMod(fileName) &&
+              isMod(fileName, instancesPath) &&
               _getInstance(getState())(instanceName) &&
               action !== 3
             ) {
@@ -1422,8 +1421,8 @@ export const startListener = () => {
               }
             } else if (
               action === 3 &&
-              !isInstanceFolderPath(fileName) &&
-              !isInstanceFolderPath(newFilePath)
+              !isInstanceFolderPath(fileName, instancesPath) &&
+              !isInstanceFolderPath(newFilePath, instancesPath)
             ) {
               // Infer the instance name from the full path
               const oldInstanceName = fileName
@@ -1432,23 +1431,29 @@ export const startListener = () => {
                 .split(path.sep)[0];
               if (
                 oldInstanceName === instanceName &&
-                isMod(newFilePath) &&
-                isMod(fileName)
+                isMod(newFilePath, instancesPath) &&
+                isMod(fileName, instancesPath)
               ) {
                 processRenamedFile(fileName, instanceName, newFilePath);
               } else if (
                 oldInstanceName !== instanceName &&
-                isMod(newFilePath) &&
-                isMod(fileName)
+                isMod(newFilePath, instancesPath) &&
+                isMod(fileName, instancesPath)
               ) {
                 processRemovedFile(fileName, oldInstanceName);
                 processAddedFile(newFilePath, instanceName);
-              } else if (!isMod(newFilePath) && isMod(fileName)) {
+              } else if (
+                !isMod(newFilePath, instancesPath) &&
+                isMod(fileName, instancesPath)
+              ) {
                 processRemovedFile(fileName, oldInstanceName);
-              } else if (isMod(newFilePath) && !isMod(fileName)) {
+              } else if (
+                isMod(newFilePath, instancesPath) &&
+                !isMod(fileName, instancesPath)
+              ) {
                 processAddedFile(newFilePath, instanceName);
               }
-            } else if (isInstanceFolderPath(filePath)) {
+            } else if (isInstanceFolderPath(filePath, instancesPath)) {
               if (action === 0) {
                 processAddedInstance(instanceName);
               } else if (action === 1) {

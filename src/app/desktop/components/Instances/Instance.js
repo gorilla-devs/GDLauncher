@@ -262,7 +262,7 @@ const Instance = ({ instanceName }) => {
         <MenuItem onClick={openFolder}>Open Folder</MenuItem>
         <MenuItem divider />
         <MenuItem
-          disabled={Boolean(isInQueue)}
+          disabled={Boolean(isInQueue) || Boolean(isPlaying)}
           onClick={openConfirmationDeleteModal}
         >
           Delete

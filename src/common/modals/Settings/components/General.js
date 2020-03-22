@@ -218,6 +218,8 @@ const General = () => {
   const updateAvailable = useSelector(state => state.updateAvailable);
   const dataStorePath = useSelector(_getDataStorePath);
   const instancesPath = useSelector(_getInstancesPath);
+  const isPlaying = useSelector(state => state.startedInstances);
+  const queuedInstances = useSelector(state => state.downloadQueue);
   const tempPath = useSelector(_getTempPath);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedUsername, setCopiedUsername] = useState(false);
@@ -225,6 +227,10 @@ const General = () => {
   const [deletingInstances, setDeletingInstances] = useState(false);
 
   const dispatch = useDispatch();
+
+  const disableInstancesActions =
+    Object.keys(queuedInstances).length > 0 ||
+    Object.keys(isPlaying).length > 0;
 
   useEffect(() => {
     ipcRenderer
@@ -305,7 +311,7 @@ const General = () => {
               Email
               <br />
               <Email>
-                {currentAccount.user.username}{" "}
+                {currentAccount.user.username}
                 <Tooltip
                   title={copiedEmail ? "copied" : "copy"}
                   placement="top"
@@ -507,7 +513,10 @@ const General = () => {
           Deletes all the shared files between instances. Doing this will result
           in the complete loss of the instances data
         </p>
-        <Button onClick={clearSharedData} disabled={deletingInstances}>
+        <Button
+          onClick={clearSharedData}
+          disabled={deletingInstances || disableInstancesActions}
+        >
           Clear
         </Button>
       </div>
@@ -550,11 +559,15 @@ const General = () => {
           <Input
             onChange={e => dispatch(updateDataPath(e.target.value))}
             value={dataPath}
+            disabled={disableInstancesActions}
           />
-          <Button onClick={() => openFolderDialog(dataPath, dispatch)}>
+          <Button
+            onClick={() => openFolderDialog(dataPath, dispatch)}
+            disabled={disableInstancesActions}
+          >
             <FontAwesomeIcon icon={faFolder} />
           </Button>
-          <Button onClick={resetDataPath}>
+          <Button onClick={resetDataPath} disabled={disableInstancesActions}>
             <FontAwesomeIcon icon={faUndoAlt} />
           </Button>
         </div>
