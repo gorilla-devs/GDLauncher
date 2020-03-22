@@ -68,7 +68,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.red};
+          background: ${props => props.theme.palette.grey[700]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -109,7 +109,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.yellow};
+          background: ${props => props.theme.palette.grey[800]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -133,7 +133,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.green};
+          background: ${props => props.theme.palette.grey[700]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -159,7 +159,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.blue};
+          background: ${props => props.theme.palette.grey[800]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -199,7 +199,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.purple};
+          background: ${props => props.theme.palette.grey[700]};
           display: flex;
           flex-direction: column;
           justify-content: center;

@@ -202,7 +202,7 @@ ipcMain.handle("openFolderDialog", (e, defaultPath) => {
 });
 
 ipcMain.handle("openFileDialog", () => {
-  return dialog.showOpenDialog(mainWindow, {
+  return dialog.showOpenDialog({
     properties: ["openFile"]
   });
 });

@@ -605,10 +605,18 @@ export function updateSelectedInstance(name) {
 }
 
 export function addStartedInstance(instance) {
-  console.log(instance);
   return dispatch => {
     dispatch({
       type: ActionTypes.ADD_STARTED_INSTANCE,
+      instance
+    });
+  };
+}
+
+export function updateStartedInstance(instance) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_STARTED_INSTANCE,
       instance
     });
   };
@@ -1607,11 +1615,13 @@ export function launchInstance(instanceName) {
         }))
       );
     }, 60 * 1000);
-
     dispatch(addStartedInstance({ instanceName, pid: process.pid }));
 
     process.stdout.on("data", data => {
       console.log(data.toString());
+      if (data.toString().includes("Setting user:")) {
+        dispatch(updateStartedInstance({ instanceName, initialized: true }));
+      }
     });
 
     process.stderr.on("data", data => {

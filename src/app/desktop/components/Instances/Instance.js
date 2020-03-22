@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { transparentize } from "polished";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { promises as fs } from "fs";
 import { LoadingOutlined } from "@ant-design/icons";
 import path from "path";
@@ -35,6 +35,15 @@ const Container = styled.div`
   }
 `;
 
+const Spinner = keyframes`
+  0% {
+    transform: translate3d(-50%, -50%, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(-50%, -50%, 0) rotate(360deg);
+  }
+`;
+
 const InstanceContainer = styled.div`
   display: flex;
   position: absolute;
@@ -53,7 +62,7 @@ const InstanceContainer = styled.div`
   background-size: cover;
   border-radius: 4px;
   margin: 10px;
-  `;
+`;
 
 const HoverContainer = styled.div`
   position: absolute;
@@ -75,6 +84,22 @@ const HoverContainer = styled.div`
   background: ${p => transparentize(0.5, p.theme.palette.grey[800])};
   &:hover {
     opacity: 1;
+  }
+
+  .spinner:before {
+    animation: 1.5s linear infinite ${Spinner};
+    animation-play-state: inherit;
+    border: solid 3px transparent;
+    border-bottom-color: ${props => props.theme.palette.colors.green};
+    border-radius: 50%;
+    content: "";
+    height: 60px;
+    width: 60px;
+    position: absolute;
+    top: 13px;
+    left: 9px;
+    transform: translate3d(-50%, -50%, 0);
+    will-change: transform;
   }
 `;
 
@@ -117,9 +142,7 @@ const Instance = ({ instanceName }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const isInQueue = downloadQueue[instanceName];
 
-  const isPlaying = startedInstances.find(
-    inst => inst.instanceName === instanceName
-  );
+  const isPlaying = startedInstances[instanceName];
 
   useEffect(() => {
     if (instance.background) {
@@ -200,13 +223,24 @@ const Instance = ({ instanceName }) => {
             ) : (
               <>
                 {isPlaying && (
-                  <FontAwesomeIcon
+                  <div
                     css={`
-                      color: ${({ theme }) => theme.palette.colors.green};
-                      font-size: 27px;
+                      position: relative;
+                      width: 20px;
+                      height: 20px;
+                      margin-top: -8px;
                     `}
-                    icon={faPlay}
-                  />
+                  >
+                    <FontAwesomeIcon
+                      css={`
+                        color: ${({ theme }) => theme.palette.colors.green};
+                        font-size: 27px;
+                        position: absolute;
+                      `}
+                      icon={faPlay}
+                    />
+                    {!isPlaying.initialized && <div className="spinner" />}
+                  </div>
                 )}
                 {isInQueue && "In Queue"}
                 {!isInQueue && !isPlaying && "PLAY"}
