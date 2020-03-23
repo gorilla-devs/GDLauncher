@@ -1627,11 +1627,13 @@ export function launchInstance(instanceName) {
     const symLinkDirPath = path.join(dataPath.split("\\")[0], "_gdl");
 
     const replaceRegex = [
-      new RegExp(dataPath.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1"), "g"),
+      process.platform === "win32"
+        ? new RegExp(dataPath.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1"), "g")
+        : null,
       symLinkDirPath
     ];
 
-    await symlink(dataPath, "C:\\_gdl");
+    if (process.platform === "win32") await symlink(dataPath, "C:\\_gdl");
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
@@ -1650,7 +1652,7 @@ export function launchInstance(instanceName) {
       await ipcRenderer.invoke("hide-window");
     }
 
-    const process = spawn(
+    const ps = spawn(
       `"${javaPath.replace(...replaceRegex)}"`,
       jvmArguments.map(v => v.replace(...replaceRegex)),
       {
@@ -1667,20 +1669,20 @@ export function launchInstance(instanceName) {
         }))
       );
     }, 60 * 1000);
-    dispatch(addStartedInstance({ instanceName, pid: process.pid }));
+    dispatch(addStartedInstance({ instanceName, pid: ps.pid }));
 
-    process.stdout.on("data", data => {
+    ps.stdout.on("data", data => {
       console.log(data.toString());
       if (data.toString().includes("Setting user:")) {
         dispatch(updateStartedInstance({ instanceName, initialized: true }));
       }
     });
 
-    process.stderr.on("data", data => {
+    ps.stderr.on("data", data => {
       console.error(`ps stderr: ${data}`);
     });
 
-    process.on("close", code => {
+    ps.on("close", code => {
       ipcRenderer.invoke("show-window");
       fse.remove(instanceJLFPath);
       dispatch(removeStartedInstance(instanceName));
