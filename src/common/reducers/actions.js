@@ -1633,7 +1633,7 @@ export function launchInstance(instanceName) {
       symLinkDirPath
     ];
 
-    if (process.platform === "win32") await symlink(dataPath, "C:\\_gdl");
+    if (process.platform === "win32") await symlink(dataPath, symLinkDirPath);
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
