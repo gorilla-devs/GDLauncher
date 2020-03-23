@@ -1152,22 +1152,26 @@ export const startListener = () => {
     let closeMessage;
 
     Queue.on("start", queueLength => {
-      closeMessage = message.loading({
-        ...notificationObj,
-        content: `Syncronizing files. ${queueLength} left.`
-      });
+      if (queueLength > 1) {
+        closeMessage = message.loading({
+          ...notificationObj,
+          content: `Syncronizing files. ${queueLength} left.`
+        });
+      }
     });
 
     Queue.on("executed", queueLength => {
-      closeMessage = message.loading({
-        ...notificationObj,
-        content: `Syncronizing files. ${queueLength} left.`
-      });
+      if (queueLength > 1) {
+        closeMessage = message.loading({
+          ...notificationObj,
+          content: `Syncronizing files. ${queueLength} left.`
+        });
+      }
     });
 
     Queue.on("end", () => {
       setTimeout(() => {
-        closeMessage();
+        if (closeMessage) closeMessage();
       }, 500);
     });
 
@@ -1234,15 +1238,19 @@ export const startListener = () => {
           mod => mod.fileName === path.basename(fileName)
         );
         if (isInConfig) {
-          console.log("[RTS] REMOVING MOD", fileName, instanceName);
-          await dispatch(
-            updateInstanceConfig(instanceName, prev => ({
-              ...prev,
-              mods: (prev.mods || []).filter(
-                m => m.fileName !== path.basename(fileName)
-              )
-            }))
-          );
+          try {
+            console.log("[RTS] REMOVING MOD", fileName, instanceName);
+            await dispatch(
+              updateInstanceConfig(instanceName, prev => ({
+                ...prev,
+                mods: (prev.mods || []).filter(
+                  m => m.fileName !== path.basename(fileName)
+                )
+              }))
+            );
+          } catch (err) {
+            console.error(err);
+          }
         }
       };
       Queue.add(processChange);
@@ -1259,18 +1267,22 @@ export const startListener = () => {
         m => m.fileName === path.basename(fileName)
       );
       if (modData) {
-        console.log("[RTS] RENAMING MOD", fileName, newFilePath, modData);
-        await dispatch(
-          updateInstanceConfig(oldInstanceName, prev => ({
-            ...prev,
-            mods: [
-              ...(prev.mods || []).filter(
-                m => m.fileName !== path.basename(fileName)
-              ),
-              { ...modData, fileName: path.basename(newFilePath) }
-            ]
-          }))
-        );
+        try {
+          console.log("[RTS] RENAMING MOD", fileName, newFilePath, modData);
+          await dispatch(
+            updateInstanceConfig(oldInstanceName, prev => ({
+              ...prev,
+              mods: [
+                ...(prev.mods || []).filter(
+                  m => m.fileName !== path.basename(fileName)
+                ),
+                { ...modData, fileName: path.basename(newFilePath) }
+              ]
+            }))
+          );
+        } catch (err) {
+          console.error(err);
+        }
       }
     };
 
@@ -1314,22 +1326,26 @@ export const startListener = () => {
       const newState = getState();
       const instance = _getInstance(newState)(newInstanceName);
       if (!instance) {
-        const configPath = path.join(
-          instancesPath,
-          newInstanceName,
-          "config.json"
-        );
-        const config = await fse.readJSON(configPath);
-        console.log(
-          `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
-        );
-        dispatch({
-          type: ActionTypes.UPDATE_INSTANCES,
-          instances: {
-            ...omit(newState.instances.list, [oldInstanceName]),
-            [newInstanceName]: { ...config, name: newInstanceName }
-          }
-        });
+        try {
+          const configPath = path.join(
+            instancesPath,
+            newInstanceName,
+            "config.json"
+          );
+          const config = await fse.readJSON(configPath);
+          console.log(
+            `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
+          );
+          dispatch({
+            type: ActionTypes.UPDATE_INSTANCES,
+            instances: {
+              ...omit(newState.instances.list, [oldInstanceName]),
+              [newInstanceName]: { ...config, name: newInstanceName }
+            }
+          });
+        } catch (err) {
+          console.error(err);
+        }
       }
     };
 
@@ -1685,10 +1701,11 @@ export function launchInstance(instanceName) {
     ps.on("close", code => {
       ipcRenderer.invoke("show-window");
       fse.remove(instanceJLFPath);
+      if (process.platform === "win32") fse.remove(symLinkDirPath);
       dispatch(removeStartedInstance(instanceName));
       clearInterval(playTimer);
       if (code !== 0) {
-        console.log(`Process exited with code ${code}. Not too good..`);
+        console.warn(`Process exited with code ${code}. Not too good..`);
       }
     });
   };

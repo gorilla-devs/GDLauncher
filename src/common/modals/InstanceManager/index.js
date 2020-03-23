@@ -73,11 +73,11 @@ const InstanceManager = ({ instanceName }) => {
     mods: { name: "Mods", component: Mods },
     modpack: { name: "Modpack", component: Overview },
     notes: { name: "Notes", component: Notes },
-    resourcePacks: { name: "Resource Packs", component: Overview },
-    worlds: { name: "Worlds", component: Overview },
+    // resourcePacks: { name: "Resource Packs", component: Overview },
+    // worlds: { name: "Worlds", component: Overview },
     screenshots: { name: "Screenshots", component: Screenshots },
-    settings: { name: "Settings", component: Overview },
-    servers: { name: "Servers", component: Overview }
+    // settings: { name: "Settings", component: Overview },
+    // servers: { name: "Servers", component: Overview }
   };
 
   const [page, setPage] = useState(Object.keys(menuEntries)[0]);
@@ -103,8 +103,7 @@ const InstanceManager = ({ instanceName }) => {
                   instance?.modloader[0] !== FORGE &&
                   instance?.modloader[0] !== FABRIC) ||
                 (tab.name === menuEntries.modpack.name &&
-                  instance?.modloader[3] &&
-                  instance?.modloader[4])
+                  (!instance?.modloader[3] || !instance?.modloader[4]))
               ) {
                 return null;
               }

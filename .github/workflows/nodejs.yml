@@ -31,3 +31,6 @@ jobs:
       - name: yarn release
         run: |
           yarn release
+      - uses: actions/upload-artifact@v1
+        with:
+          path: $GITHUB_WORKSPACE/release/*
