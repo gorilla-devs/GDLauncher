@@ -28,22 +28,47 @@ const NewInstance = ({
 
   useEffect(() => {
     if (
-      optifineSwitch &&
       minecraftVersion &&
       minecraftVersion[0] === "vanilla" &&
       minecraftVersion[1] === "release"
     ) {
       if (optifineManifest[minecraftVersion[2]]) {
         setOptifineDefaultValue(optifineManifest[minecraftVersion[2]][0].name);
-        setOptifineVersion(optifineManifest[minecraftVersion[2]][0].name);
+        if (optifineSwitch) {
+          setOptifineVersion(optifineManifest[minecraftVersion[2]][0].name);
+        }
       }
     } else if (minecraftVersion && minecraftVersion[0] === "forge") {
       if (optifineManifest[minecraftVersion[1]]) {
         setOptifineDefaultValue(optifineManifest[minecraftVersion[1]][0].name);
-        setOptifineVersion(optifineManifest[minecraftVersion[1]][0].name);
+        if (optifineSwitch) {
+          setOptifineVersion(optifineManifest[minecraftVersion[1]][0].name);
+        }
       }
     }
   }, [minecraftVersion]);
+
+  useEffect(() => {
+    if (
+      minecraftVersion &&
+      minecraftVersion[0] === "vanilla" &&
+      minecraftVersion[1] === "release"
+    ) {
+      if (optifineManifest[minecraftVersion[2]]) {
+        setOptifineDefaultValue(optifineManifest[minecraftVersion[2]][0].name);
+        if (optifineSwitch) {
+          setOptifineVersion(optifineManifest[minecraftVersion[2]][0].name);
+        }
+      }
+    } else if (minecraftVersion && minecraftVersion[0] === "forge") {
+      if (optifineManifest[minecraftVersion[1]]) {
+        setOptifineDefaultValue(optifineManifest[minecraftVersion[1]][0].name);
+        if (optifineSwitch) {
+          setOptifineVersion(optifineManifest[minecraftVersion[1]][0].name);
+        }
+      }
+    }
+  }, [optifineSwitch]);
 
   // const downloadOptifine = async optifineVersionName => {
   //   await makeDir(optifineVersionsPath);
@@ -62,7 +87,6 @@ const NewInstance = ({
   // };
 
   const filterOptifineVersione = () => {
-    // console.log("P", minecraftVersion, optifineManifest);
     if (
       minecraftVersion &&
       minecraftVersion[0] === "vanilla" &&
@@ -70,13 +94,21 @@ const NewInstance = ({
     ) {
       if (optifineManifest[minecraftVersion[2]]) {
         return optifineManifest[minecraftVersion[2]].map(x => {
-          return <Option value={x.name}>{x.name}</Option>;
+          return (
+            <Option key={x.name} value={x.name}>
+              {x.name}
+            </Option>
+          );
         });
       }
     } else if (minecraftVersion && minecraftVersion[0] === "forge") {
       if (optifineManifest[minecraftVersion[1]]) {
         return optifineManifest[minecraftVersion[1]].map(x => {
-          return <Option value={x.name}>{x.name}</Option>;
+          return (
+            <Option key={x.name} value={x.name}>
+              {x.name}
+            </Option>
+          );
         });
       }
     }
@@ -199,6 +231,7 @@ const NewInstance = ({
           options={filteredVersions}
           onChange={v => {
             setVersion(v);
+            console.log(v);
             setMinecraftVersion(v);
             setModpack(null);
           }}
@@ -233,7 +266,7 @@ const NewInstance = ({
                 console.log("version", v, optifineDefaultValue);
               }}
               value={
-                optifineDefaultValue
+                optifineDefaultValue && optifineManifest[minecraftVersion[2]]
                   ? optifineDefaultValue
                   : "No optifine available for this version"
               }

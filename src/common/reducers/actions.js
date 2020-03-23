@@ -1578,6 +1578,7 @@ export function launchInstance(instanceName) {
     const { memory } = state.settings.java;
     const { modloader } = _getInstance(state)(instanceName);
     const instancePath = path.join(_getInstancesPath(state), instanceName);
+    const instanceConfig = _getInstance(state)(instanceName);
     const instancesPath = _getInstancesPath(state);
     const optifineVersionsPath = _getOptifineVersionsPath(state);
     const libraryPath = _getLibrariesPath(state);
@@ -1620,16 +1621,16 @@ export function launchInstance(instanceName) {
 
       // console.log("version", version);
 
-      console.log("ROBERT", instancePath);
+      console.log("ROBERT", instanceConfig);
       // const existOptifine = await fs.lstat(
       //   path.join(optifineVersionsPath, `${config.optifine}.jar`)
       // );
 
-      if (instancePath.optifine) {
+      if (instanceConfig.optifine) {
         await makeDir(path.join(libraryPath, "optifine"));
 
         const optifineExtraction = extractFull(
-          path.join(optifineVersionsPath, `${instancePath.optifine}.jar`),
+          path.join(optifineVersionsPath, `${instanceConfig.optifine}.jar`),
           path.join(libraryPath, "optifine", "launchwrapper-of"),
           {
             $bin: sevenZipPath,
@@ -1638,12 +1639,12 @@ export function launchInstance(instanceName) {
         );
 
         await fse.copy(
-          path.join(optifineVersionsPath, `${instancePath.optifine}.jar`),
+          path.join(optifineVersionsPath, `${instanceConfig.optifine}.jar`),
           path.join(
             libraryPath,
             "optifine",
             "Optifine",
-            `${instancePath.optifine}.jar`
+            `${instanceConfig.optifine}.jar`
           )
         );
       }
@@ -1675,23 +1676,23 @@ export function launchInstance(instanceName) {
 
       console.log(
         "BERTO",
-        instancePath,
-        path.join(optifineVersionsPath, `${instancePath.optifine}.jar`),
+        instanceConfig,
+        path.join(optifineVersionsPath, `${instanceConfig.optifine}.jar`),
         path.join(
           _getInstancesPath(state),
           instanceName,
           "mods",
-          `${instancePath.optifine}.jar`
+          `${instanceConfig.optifine}.jar`
         )
       );
 
       await fse.copy(
-        path.join(optifineVersionsPath, `${instancePath.optifine}.jar`),
+        path.join(optifineVersionsPath, `${instanceConfig.optifine}.jar`),
         path.join(
           _getInstancesPath(state),
           instanceName,
           "mods",
-          `${instancePath.optifine}.jar`
+          `${instanceConfig.optifine}.jar`
         )
       );
       if (
@@ -1756,9 +1757,9 @@ export function launchInstance(instanceName) {
       )
     );
 
-    if (instancePath.optifine) {
+    if (instanceConfig.optifine) {
       const existOptifine = await fs.lstat(
-        path.join(optifineVersionsPath, `${instancePath.optifine}.jar`)
+        path.join(optifineVersionsPath, `${instanceConfig.optifine}.jar`)
       );
 
       if (existLauncherWrapper && existOptifine) {
@@ -1774,7 +1775,7 @@ export function launchInstance(instanceName) {
           {
             path: path.join(
               optifineVersionsPath,
-              `${instancePath.optifine}.jar`
+              `${instanceConfig.optifine}.jar`
             )
           }
         );
@@ -1782,10 +1783,10 @@ export function launchInstance(instanceName) {
     }
 
     const optifineVersionNameFixedFormat =
-      instancePath.optifine &&
-      `${instancePath.optifine.split(" ")[1]}-Optifine_${
-        instancePath.optifine.split(" ")[2]
-      }_${instancePath.optifine
+      instanceConfig.optifine &&
+      `${instanceConfig.optifine.split(" ")[1]}-Optifine_${
+        instanceConfig.optifine.split(" ")[2]
+      }_${instanceConfig.optifine
         .split(" ")
         .slice(3, 5)
         .join("_")}`;
@@ -1797,7 +1798,7 @@ export function launchInstance(instanceName) {
         ? getJVMArguments113
         : getJVMArguments112;
 
-    console.log("gotham", optifineVersionNameFixedFormat);
+    console.log("gotham", optifineVersionNameFixedFormat, instanceConfig);
 
     const jvmArguments = getJvmArguments(
       libraries,
@@ -1842,12 +1843,12 @@ export function launchInstance(instanceName) {
       _getInstancesPath(state),
       instanceName,
       "mods",
-      `${instancePath.optifine}.jar`
+      `${instanceConfig.optifine}.jar`
     );
 
     const optifineJar = path.join(
       optifineVersionsPath,
-      `${instancePath.optifine}.jar`
+      `${instanceConfig.optifine}.jar`
     );
 
     const process = spawn(javaPath, jvmArguments, {

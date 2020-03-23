@@ -442,6 +442,7 @@ export const getJVMArguments113 = (
   args.push(...jvmOptions);
 
   if (optifineVersion && modloader[0] === "vanilla") {
+    console.log("boiade");
     args.push(" net.minecraft.launchwrapper.Launch ");
   } else args.push(mcJson.mainClass);
 
