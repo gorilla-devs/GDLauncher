@@ -1623,24 +1623,15 @@ export function launchInstance(instanceName) {
       memory
     );
 
-    console.log(
-      `"${javaPath}" ${getJvmArguments(
-        libraries,
-        mcMainFile,
-        instancePath,
-        assetsPath,
-        mcJson,
-        account,
-        memory,
-        true
-      ).join(" ")}`
-    );
+    const startCommand = [`"${javaPath}"`, jvmArguments.join(" ")].join(" ");
+
+    console.log(startCommand);
 
     if (state.settings.hideWindowOnGameLaunch) {
       await ipcRenderer.invoke("hide-window");
     }
 
-    const process = spawn(javaPath, jvmArguments, {
+    const process = spawn(startCommand, {
       cwd: instancePath,
       shell: true
     });

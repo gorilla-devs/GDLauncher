@@ -505,19 +505,20 @@ export const patchForge113 = async (
       const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
       const mainClass = jarFile.valueForManifestEntry("Main-Class");
 
+      const patchCommand = [
+        `"${javaPath}"`,
+        "-classpath",
+        `"${[filePath, ...classPaths].join(
+          process.platform === "win32" ? ";" : ":"
+        )}"`,
+        mainClass,
+        ...args
+      ].join(" ");
+
+      console.log(patchCommand);
+
       await new Promise(resolve => {
-        const ps = spawn(
-          javaPath,
-          [
-            "-classpath",
-            [filePath, ...classPaths].join(
-              process.platform === "win32" ? ";" : ":"
-            ),
-            mainClass,
-            ...args
-          ],
-          { shell: true }
-        );
+        const ps = spawn(patchCommand, { shell: true });
 
         ps.stdout.on("data", data => {
           console.log(data.toString());
