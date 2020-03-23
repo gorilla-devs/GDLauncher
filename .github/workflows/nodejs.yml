@@ -35,17 +35,17 @@ jobs:
       - uses: actions/upload-artifact@v1
         if: matrix.os == 'macos-latest'
         with:
-          name: GDLauncher-mac-setup.dmg
-          path: release
+          name: MacOs Release
+          path: release/GDLauncher-mac-setup.dmg
 
       - uses: actions/upload-artifact@v1
         if: matrix.os == 'windows-latest'
         with:
-          name: GDLauncher-win-setup.exe
-          path: release
+          name: Windows Release
+          path: release/GDLauncher-win-setup.exe
 
       - uses: actions/upload-artifact@v1
         if: matrix.os == 'ubuntu-latest'
         with:
-          name: GDLauncher-linux-setup.AppImage
-          path: release
+          name: Linux Release
+          path: release/GDLauncher-linux-setup.AppImage
