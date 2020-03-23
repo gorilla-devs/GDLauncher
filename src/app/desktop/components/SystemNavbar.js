@@ -62,10 +62,16 @@ const Container = styled.div`
     height: 100%;
     display: flex;
     justify-content: center;
+    cursor: pointer;
     align-items: center;
     transition: background 0.1s ease-in-out;
     &:hover {
       background: ${({ theme }) => theme.palette.grey[700]};
+    }
+  }
+  & > *:last-child {
+    &:hover {
+      background: ${({ theme }) => theme.palette.colors.red};
     }
   }
 `;

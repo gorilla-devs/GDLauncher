@@ -12,6 +12,7 @@ import omit from "lodash.omit";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import { spawn } from "child_process";
+import symlink from "symlink-dir";
 import { promises as fs } from "fs";
 import pMap from "p-map";
 import { notification, message } from "antd";
@@ -21,7 +22,6 @@ import {
   NEWS_URL,
   MC_RESOURCES_URL,
   GDL_LEGACYJAVAFIXER_MOD_URL,
-  TWITCH_MODPACK,
   FORGE,
   FABRIC
 } from "../utils/constants";
@@ -751,10 +751,7 @@ export function addToQueue(instanceName, modloader, manifest, background) {
       }
     );
 
-    const addMods =
-      modloader[0] === TWITCH_MODPACK ||
-      modloader[0] === FORGE ||
-      modloader[0] === FABRIC;
+    const addMods = modloader[0] === FORGE || modloader[0] === FABRIC;
 
     dispatch(
       updateInstanceConfig(
@@ -898,7 +895,7 @@ export function downloadForge(instanceName) {
   };
 }
 
-export function downloadForgeManifestFiles(instanceName) {
+export function processManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const { manifest } = _getCurrentDownloadItem(state);
@@ -1025,7 +1022,7 @@ export function downloadInstance(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, "Downloading game files..."));
 
-    const { modloader } = _getCurrentDownloadItem(state);
+    const { modloader, manifest } = _getCurrentDownloadItem(state);
     const mcVersion = modloader[1];
 
     let mcJson;
@@ -1123,13 +1120,14 @@ export function downloadInstance(instanceName) {
       await copyAssetsToLegacy(assets);
     }
 
-    if (modloader && modloader[0] === "fabric") {
+    if (modloader && modloader[0] === FABRIC) {
       await dispatch(downloadFabric(instanceName));
-    } else if (modloader && modloader[0] === "forge") {
+    } else if (modloader && modloader[0] === FORGE) {
       await dispatch(downloadForge(instanceName));
-    } else if (modloader && modloader[0] === "twitchModpack") {
-      await dispatch(downloadForge(instanceName));
-      await dispatch(downloadForgeManifestFiles(instanceName));
+    }
+
+    if (manifest) {
+      await dispatch(processManifest(instanceName));
     }
 
     // Be aware that from this line the installer lock might be unlocked!
@@ -1516,6 +1514,7 @@ export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const javaPath = _getJavaPath(state);
+    const { dataPath } = state.settings;
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
@@ -1557,10 +1556,7 @@ export function launchInstance(instanceName) {
       libraries = libraries.concat(fabricLibraries);
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
-    } else if (
-      modloader &&
-      (modloader[0] === "forge" || modloader[0] === "twitchModpack")
-    ) {
+    } else if (modloader && modloader[0] === "forge") {
       const getForceLastVer = ver =>
         Number.parseInt(ver.split(".")[ver.split(".").length - 1], 10);
 
@@ -1628,6 +1624,15 @@ export function launchInstance(instanceName) {
       memory
     );
 
+    const symLinkDirPath = path.join(dataPath.split("\\")[0], "_gdl");
+
+    const replaceRegex = [
+      new RegExp(dataPath.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1"), "g"),
+      symLinkDirPath
+    ];
+
+    await symlink(dataPath, "C:\\_gdl");
+
     console.log(
       `"${javaPath}" ${getJvmArguments(
         libraries,
@@ -1638,17 +1643,21 @@ export function launchInstance(instanceName) {
         account,
         memory,
         true
-      ).join(" ")}`
+      ).join(" ")}`.replace(...replaceRegex)
     );
 
     if (state.settings.hideWindowOnGameLaunch) {
       await ipcRenderer.invoke("hide-window");
     }
 
-    const process = spawn(`"${javaPath}"`, jvmArguments, {
-      cwd: instancePath,
-      shell: true
-    });
+    const process = spawn(
+      `"${javaPath.replace(...replaceRegex)}"`,
+      jvmArguments.map(v => v.replace(...replaceRegex)),
+      {
+        cwd: instancePath,
+        shell: true
+      }
+    );
 
     const playTimer = setInterval(() => {
       dispatch(
@@ -1699,42 +1708,67 @@ export function installMod(
     mainModData.data.projectID = projectID;
 
     const destFile = path.join(instancePath, "mods", mainModData.data.fileName);
-
+    let needToAddMod = true;
     await dispatch(
-      updateInstanceConfig(instanceName, prev => ({
-        ...prev,
-        mods: [
-          ...prev.mods,
-          normalizeModData(mainModData.data, projectID, addon.name)
-        ]
-      }))
+      updateInstanceConfig(instanceName, prev => {
+        needToAddMod = !prev.mods.find(
+          v => v.fileID === fileID && v.projectID === projectID
+        );
+        return {
+          ...prev,
+          mods: [
+            ...prev.mods,
+            ...(needToAddMod
+              ? [normalizeModData(mainModData.data, projectID, addon.name)]
+              : [])
+          ]
+        };
+      })
     );
-    await downloadFile(destFile, mainModData.data.downloadUrl);
-    if (installDeps) {
-      await pMap(mainModData.data.dependencies, async dep => {
-        // type 1: embedded
-        // type 2: optional
-        // type 3: required
-        // type 4: tool
-        // type 5: incompatible
-        // type 6: include
 
-        if (dep.type === 3) {
-          const depList = await getAddonFiles(dep.addonId);
-          const depData = depList.data.find(v =>
-            v.gameVersion.includes(gameVersion)
-          );
-          await dispatch(
-            installMod(
-              dep.addonId,
-              depData.id,
-              instanceName,
-              gameVersion,
-              installDeps
-            )
-          );
-        }
-      });
+    if (!needToAddMod) {
+      return;
+    }
+
+    try {
+      await fse.open(destFile);
+      const murmur2 = await getFileMurmurHash2(destFile);
+      if (murmur2 !== mainModData.data.packageFingerprint) {
+        await downloadFile(destFile, mainModData.data.downloadUrl);
+      }
+    } catch {
+      await downloadFile(destFile, mainModData.data.downloadUrl);
+    }
+
+    if (installDeps) {
+      await pMap(
+        mainModData.data.dependencies,
+        async dep => {
+          // type 1: embedded
+          // type 2: optional
+          // type 3: required
+          // type 4: tool
+          // type 5: incompatible
+          // type 6: include
+
+          if (dep.type === 3) {
+            const depList = await getAddonFiles(dep.addonId);
+            const depData = depList.data.find(v =>
+              v.gameVersion.includes(gameVersion)
+            );
+            await dispatch(
+              installMod(
+                dep.addonId,
+                depData.id,
+                instanceName,
+                gameVersion,
+                installDeps
+              )
+            );
+          }
+        },
+        { concurrency: 2 }
+      );
     }
   };
 }

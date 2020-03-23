@@ -9,10 +9,16 @@ import { FixedSizeGrid as Grid } from "react-window";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../components/Modal";
-import { getSearch } from "../api";
+import { getSearch, getAddonFiles } from "../api";
 import { openModal } from "../reducers/modals/actions";
 import { _getInstance } from "../utils/selectors";
 import { installMod } from "../reducers/actions";
+import { FABRIC, FORGE } from "../utils/constants";
+import {
+  getFirstReleaseCandidate,
+  filterFabricFilesByVersion,
+  filterForgeFilesByVersion
+} from "../../app/desktop/utils";
 
 const CellContainer = styled.div.attrs(props => ({
   style: props.override
@@ -69,9 +75,11 @@ const Cell = ({
   items,
   version,
   installedMods,
-  instanceName
+  instanceName,
+  modloader
 }) => {
-  const [loading, setLoading] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
     return <div />;
@@ -118,30 +126,47 @@ const Cell = ({
       >
         <div className="hoverContainer">
           <div>{mod?.name}</div>
-          {!isInstalled && (
-            <Button
-              type="primary"
-              loading={loading.includes(mod?.id)}
-              onClick={async e => {
-                setLoading(loading.concat(mod.id));
-                e.stopPropagation();
-                const latestFile = mod.gameVersionLatestFiles.find(
-                  v => v.gameVersion === version
-                );
-                await dispatch(
-                  installMod(
-                    mod.id,
-                    latestFile.projectFileId,
-                    instanceName,
-                    version
-                  )
-                );
-                setLoading(loading.filter(v => v !== mod.id));
-              }}
-            >
-              INSTALL
-            </Button>
-          )}
+          {!isInstalled &&
+            (error || (
+              <Button
+                type="primary"
+                loading={loading}
+                onClick={async e => {
+                  setLoading(true);
+                  e.stopPropagation();
+                  const files = (await getAddonFiles(mod?.id)).data;
+
+                  const isFabric = modloader[0] === FABRIC;
+                  const isForge = modloader[0] === FORGE;
+
+                  let filteredFiles = [];
+
+                  if (isFabric) {
+                    filteredFiles = filterFabricFilesByVersion(files, version);
+                  } else if (isForge) {
+                    filteredFiles = filterForgeFilesByVersion(files, version);
+                  }
+
+                  const latestFile = getFirstReleaseCandidate(filteredFiles);
+
+                  if (latestFile === null) {
+                    setLoading(false);
+                    setError("Mod Not Available");
+                    console.error(
+                      `Could not find any release candidate for addon: ${mod?.id} / ${version}`
+                    );
+                    return;
+                  }
+
+                  await dispatch(
+                    installMod(mod?.id, latestFile?.id, instanceName, version)
+                  );
+                  setLoading(false);
+                }}
+              >
+                INSTALL
+              </Button>
+            ))}
         </div>
         {mod?.name}
       </div>
@@ -171,7 +196,8 @@ const ModsListWrapper = ({
   instance,
   version,
   installedMods,
-  instanceName
+  instanceName,
+  modloader
 }) => {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
@@ -245,6 +271,7 @@ const ModsListWrapper = ({
               isNextPageLoading={isNextPageLoading}
               installedMods={installedMods}
               instanceName={instanceName}
+              modloader={modloader}
               // eslint-disable-next-line
               {...p}
             />
@@ -296,7 +323,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
       isReset ? 0 : mods.length,
       filterType,
       filterType !== "Author" && filterType !== "Name",
-      gameVersion
+      gameVersion,
+      instance.modloader[0] === FABRIC ? 4780 : null
     );
     const newMods = reset ? data : mods.concat(data);
     if (lastRequest === reqObj) {
@@ -355,6 +383,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
               version={gameVersion}
               installedMods={installedMods}
               instanceName={instanceName}
+              modloader={instance.modloader}
             />
           )}
         </AutoSizer>

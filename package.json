@@ -266,6 +266,7 @@
     "slate-history": "^0.57.1",
     "slate-react": "^0.57.1",
     "styled-components": "^5.0.1",
+    "symlink-dir": "^3.1.2",
     "typeface-roboto": "^0.0.75",
     "use-debounce": "^3.4.0",
     "uuid": "^7.0.2"

@@ -9,6 +9,7 @@ import { transparentize } from "polished";
 import { getAddonDescription, getAddonFiles } from "../api";
 import CloseButton from "../components/CloseButton";
 import { closeModal } from "../reducers/modals/actions";
+import { FORGE } from "../utils/constants";
 
 const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
@@ -93,11 +94,12 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
             `}
           >
             <StyledSelect
-              placeholder="Select a version"
+              placeholder={loading ? "Loading Versions" : "Select a version"}
               onChange={handleChange}
               listItemHeight={50}
               listHeight={400}
               loading={loading}
+              disabled={loading}
             >
               {(files || []).map(file => (
                 <Select.Option
@@ -153,7 +155,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
             onClick={() => {
               const modpackFile = files.find(file => file.id === selectedId);
               dispatch(closeModal());
-              setVersion(["twitchModpack", modpack.id, modpackFile.id]);
+              setVersion([FORGE, modpack.id, modpackFile.id]);
               setModpack(modpack);
               setStep(1);
             }}

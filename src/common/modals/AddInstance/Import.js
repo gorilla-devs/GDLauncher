@@ -5,13 +5,14 @@ import path from "path";
 import fse from "fs-extra";
 import { promises as fs } from "fs";
 import { extractFull } from "node-7z";
-import { get7zPath } from "../../../app/desktop/utils";
+import { get7zPath, isMod } from "../../../app/desktop/utils";
 import { ipcRenderer } from "electron";
 import { Button, Input } from "antd";
 import { _getTempPath } from "../../utils/selectors";
 import { useSelector } from "react-redux";
 import { getAddon } from "../../api";
 import { downloadFile } from "../../../app/desktop/utils/downloader";
+import { FABRIC, FORGE } from "../../utils/constants";
 
 const Import = ({
   setModpack,
@@ -22,6 +23,7 @@ const Import = ({
 }) => {
   const tempPath = useSelector(_getTempPath);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
   const openFileDialog = async () => {
     const dialog = await ipcRenderer.invoke("openFileDialog");
     if (dialog.canceled) return;
@@ -29,6 +31,8 @@ const Import = ({
   };
 
   const onClick = async () => {
+    if (loading) return;
+    setLoading(true);
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
     const isUrlRegex = urlRegex.test(importZipPath);
 
@@ -78,14 +82,32 @@ const Import = ({
     });
     const manifest = await fse.readJson(path.join(tempPath, "manifest.json"));
     await fse.remove(path.join(tempPath, "manifest.json"));
-    const { data: addon } = await getAddon(manifest.projectID);
-    setModpack(addon);
+    let addon = null;
+    if (manifest.projectID) {
+      const { data } = await getAddon(manifest.projectID);
+      addon = data;
+      setModpack(addon);
+    }
+    const isForge = (manifest?.minecraft?.modLoaders || []).find(
+      v => v.id.includes("forge") && v.primary
+    );
+
+    const isFabric = (manifest?.minecraft?.modLoaders || []).find(
+      v => v.id.includes("fabric") && v.primary
+    );
+
+    if (!isForge && !isFabric) return;
+
     setVersion([
-      "twitchModpack",
-      addon.id,
-      addon.latestFiles[addon.latestFiles.length - 1].id
+      isForge ? FORGE : FABRIC,
+      manifest.projectID,
+      // FIXME -> Cannot assume this version
+      (addon?.latestFiles || [])[(addon?.latestFiles?.length || -1) - 1]?.id
     ]);
-    setImportZipPath(tempFilePath);
+    if (isUrlRegex) {
+      setImportZipPath(tempFilePath);
+    }
+    setLoading(false);
   };
 
   setOverrideNextStepOnClick(() => onClick);
@@ -101,6 +123,7 @@ const Import = ({
           `}
         >
           <Input
+            disabled={loading}
             placeholder="http://"
             value={importZipPath}
             onChange={e => setImportZipPath(e.target.value)}
@@ -109,7 +132,7 @@ const Import = ({
               margin-right: 10px;
             `}
           />
-          <Button type="primary" onClick={openFileDialog}>
+          <Button disabled={loading} type="primary" onClick={openFileDialog}>
             Browse
           </Button>
         </div>
