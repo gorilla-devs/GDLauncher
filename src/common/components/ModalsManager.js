@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import styled from "styled-components";
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
 // import Settings from "components/modals/Settings";
 // import Changelog from "components/modals/Changelog";
 // import LoginHelper from "components/modals/LoginHelper";
-import AddInstance from "../modals/AddInstance";
-import Settings from "../modals/Settings/Settings";
-import Screenshot from "../modals/Screenshot";
-import InstanceDeleteConfirmation from "../modals/InstanceDeleteConfirmation";
-import ActionConfirmation from "../modals/ActionConfirmation";
-import AccountsManager from "../modals/AccountsManager";
-import AddAccount from "../modals/AddAccount";
-import InstanceManager from "../modals/InstanceManager";
-import ModsBrowser from "../modals/ModsBrowser";
-import ModpackDescription from "../modals/ModpackDescription";
-import Onboarding from "../modals/Onboarding";
-import ModOverview from "../modals/ModOverview";
-import { closeModal } from "../reducers/modals/actions";
+import AddInstance from '../modals/AddInstance';
+import Settings from '../modals/Settings/Settings';
+import Screenshot from '../modals/Screenshot';
+import InstanceDeleteConfirmation from '../modals/InstanceDeleteConfirmation';
+import ActionConfirmation from '../modals/ActionConfirmation';
+import AccountsManager from '../modals/AccountsManager';
+import AddAccount from '../modals/AddAccount';
+import InstanceManager from '../modals/InstanceManager';
+import ModsBrowser from '../modals/ModsBrowser';
+import ModpackDescription from '../modals/ModpackDescription';
+import Onboarding from '../modals/Onboarding';
+import ModOverview from '../modals/ModOverview';
+import { closeModal } from '../reducers/modals/actions';
 
 const Overlay = styled.div`
   position: absolute;
@@ -64,11 +64,11 @@ const modalsComponentLookupTable = {
 
 const ModalContainer = ({ unmounting, children }) => {
   const [modalStyle, setModalStyle] = useState({
-    transform: "scale(0.8)",
+    transform: 'scale(0.8)',
     opacity: 0
   });
   const [bgStyle, setBgStyle] = useState({
-    background: "rgba(0, 0, 0, 0.70)",
+    background: 'rgba(0, 0, 0, 0.70)',
     opacity: 0
   });
 
@@ -90,11 +90,11 @@ const ModalContainer = ({ unmounting, children }) => {
   const unMountStyle = () => {
     // css for unmount animation
     setModalStyle({
-      transform: "scale(0.8)",
+      transform: 'scale(0.8)',
       opacity: 0
     });
     setBgStyle({
-      background: "rgba(0, 0, 0, 0.70)",
+      background: 'rgba(0, 0, 0, 0.70)',
       opacity: 0
     });
   };
@@ -102,12 +102,12 @@ const ModalContainer = ({ unmounting, children }) => {
   const mountStyle = () => {
     // css for mount animation
     setModalStyle({
-      transform: "scale(1)",
+      transform: 'scale(1)',
       opacity: 1
     });
 
     setBgStyle({
-      background: "rgba(0, 0, 0, 0.70)",
+      background: 'rgba(0, 0, 0, 0.70)',
       opacity: 1
     });
   };

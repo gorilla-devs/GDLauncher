@@ -20,13 +20,13 @@ class PromiseQueue {
 
   on(eventName, handler) {
     switch (eventName) {
-      case "executed":
+      case 'executed':
         this.listeners.executed = () => handler(this.queue.length + 1);
         break;
-      case "start":
+      case 'start':
         this.listeners.start = () => handler(this.queue.length + 1);
         break;
-      case "end":
+      case 'end':
         this.listeners.end = handler;
         break;
       default:
@@ -61,6 +61,7 @@ class PromiseQueue {
     if (endHandler) {
       setTimeout(endHandler, 0);
     }
+    return null;
   }
 }
 

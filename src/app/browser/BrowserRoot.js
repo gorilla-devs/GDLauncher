@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 function BrowserRoot() {
   return <div>This is a browser app</div>;

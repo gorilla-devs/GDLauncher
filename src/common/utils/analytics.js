@@ -1,9 +1,9 @@
-import { ipcRenderer } from "electron";
-import { release, arch, type } from "os";
-import { version } from "../../../package.json";
+import { ipcRenderer } from 'electron';
+import { release, arch, type } from 'os';
+import { version } from '../../../package.json';
 
 function queue(...args) {
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     return window.ga ? window.ga(...args) : null;
   }
   return null;
@@ -11,15 +11,15 @@ function queue(...args) {
 
 class GAnalytics {
   constructor() {
-    this.curPage = "N/A";
+    this.curPage = 'N/A';
     this.userId = null;
   }
 
   trackPage(page) {
     this.curPage = page;
-    this.setProperties({ "&dl": page });
-    queue("send", {
-      hitType: "pageview",
+    this.setProperties({ '&dl': page });
+    queue('send', {
+      hitType: 'pageview',
       page
     });
   }
@@ -27,8 +27,8 @@ class GAnalytics {
   idle(page) {
     if (this.userId) {
       this.curPage = page;
-      queue("set", "page", page);
-      queue("send", "event", "idleForFiveMinutes", page);
+      queue('set', 'page', page);
+      queue('send', 'event', 'idleForFiveMinutes', page);
     }
   }
 

@@ -1,18 +1,18 @@
-import React, { memo, useState, useEffect } from "react";
-import styled from "styled-components";
-import memoize from "memoize-one";
-import path from "path";
-import { FixedSizeList as List, areEqual } from "react-window";
-import { Checkbox, Input, Button, Switch } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useSelector, useDispatch } from "react-redux";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { faTwitch } from "@fortawesome/free-brands-svg-icons";
-import fse from "fs-extra";
-import { _getInstance, _getInstancesPath } from "../../utils/selectors";
-import { updateInstanceConfig } from "../../reducers/actions";
-import { openModal } from "../../reducers/modals/actions";
+import React, { memo, useState, useEffect } from 'react';
+import styled from 'styled-components';
+import memoize from 'memoize-one';
+import path from 'path';
+import { FixedSizeList as List, areEqual } from 'react-window';
+import { Checkbox, Input, Button, Switch } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useSelector, useDispatch } from 'react-redux';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { faTwitch } from '@fortawesome/free-brands-svg-icons';
+import fse from 'fs-extra';
+import { _getInstance, _getInstancesPath } from '../../utils/selectors';
+import { updateInstanceConfig } from '../../reducers/actions';
+import { openModal } from '../../reducers/modals/actions';
 
 const Header = styled.div`
   height: 40px;
@@ -84,7 +84,7 @@ const deleteMod = async (instanceName, instancePath, mod, dispatch) => {
       mods: prev.mods.filter(m => m.fileName !== mod.fileName)
     }))
   );
-  await fse.remove(path.join(instancePath, "mods", mod.fileName));
+  await fse.remove(path.join(instancePath, 'mods', mod.fileName));
 };
 
 const deleteMods = async (
@@ -101,7 +101,7 @@ const deleteMods = async (
   );
   await Promise.all(
     selectedMods.map(fileName =>
-      fse.remove(path.join(instancePath, "mods", fileName))
+      fse.remove(path.join(instancePath, 'mods', fileName))
     )
   );
 };
@@ -114,7 +114,7 @@ const toggleModDisabled = async (
   dispatch
 ) => {
   const destFileName = c
-    ? mod.fileName.replace(".disabled", "")
+    ? mod.fileName.replace('.disabled', '')
     : `${mod.fileName}.disabled`;
   await dispatch(
     updateInstanceConfig(instanceName, prev => ({
@@ -131,8 +131,8 @@ const toggleModDisabled = async (
     }))
   );
   await fse.move(
-    path.join(instancePath, "mods", mod.fileName),
-    path.join(instancePath, "mods", destFileName)
+    path.join(instancePath, 'mods', mod.fileName),
+    path.join(instancePath, 'mods', destFileName)
   );
 };
 
@@ -167,7 +167,7 @@ const Row = memo(({ index, style, data }) => {
         onClick={() => {
           if (!item.fileID) return;
           dispatch(
-            openModal("ModOverview", {
+            openModal('ModOverview', {
               projectID: item.projectID,
               fileID: item.fileID,
               fileName: item.fileName,
@@ -183,7 +183,7 @@ const Row = memo(({ index, style, data }) => {
       <div className="rightPartContent">
         <Switch
           size="small"
-          checked={path.extname(item.fileName) !== ".disabled"}
+          checked={path.extname(item.fileName) !== '.disabled'}
           disabled={loading}
           onChange={async c => {
             setLoading(true);
@@ -239,7 +239,7 @@ const Mods = ({ instanceName }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const [mods, setMods] = useState(sort(instance.mods));
   const [selectedMods, setSelectedMods] = useState([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -322,7 +322,7 @@ const Mods = ({ instanceName }) => {
           type="primary"
           onClick={() => {
             dispatch(
-              openModal("ModsBrowser", {
+              openModal('ModsBrowser', {
                 gameVersion: instance.modloader[1],
                 instanceName
               })

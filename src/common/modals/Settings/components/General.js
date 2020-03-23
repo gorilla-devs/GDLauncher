@@ -1,10 +1,10 @@
-import React, { useState, useEffect, memo } from "react";
-import styled from "styled-components";
-import { ipcRenderer, clipboard } from "electron";
-import { useSelector, useDispatch } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { push } from "connected-react-router";
-import fsa from "fs-extra";
+import React, { useState, useEffect, memo } from 'react';
+import styled from 'styled-components';
+import { ipcRenderer, clipboard } from 'electron';
+import { useSelector, useDispatch } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { push } from 'connected-react-router';
+import fsa from 'fs-extra';
 import {
   faCopy,
   faDownload,
@@ -14,25 +14,25 @@ import {
   faTrash,
   faPlay,
   faToilet
-} from "@fortawesome/free-solid-svg-icons";
-import { Select, Tooltip, Button, Switch, Input } from "antd";
-import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+} from '@fortawesome/free-solid-svg-icons';
+import { Select, Tooltip, Button, Switch, Input } from 'antd';
+import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import {
   _getCurrentAccount,
   _getDataStorePath,
   _getInstancesPath,
   _getTempPath
-} from "../../../utils/selectors";
+} from '../../../utils/selectors';
 import {
   updateReleaseChannel,
   updateDiscordRPC,
   updateDataPath,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode
-} from "../../../reducers/settings/actions";
-import HorizontalLogo from "../../../../ui/HorizontalLogo";
-import { updateConcurrentDownloads } from "../../../reducers/actions";
-import { extractFace } from "../../../../app/desktop/utils";
+} from '../../../reducers/settings/actions';
+import HorizontalLogo from '../../../../ui/HorizontalLogo';
+import { updateConcurrentDownloads } from '../../../reducers/actions';
+import { extractFace } from '../../../../app/desktop/utils';
 
 const MyAccountPrf = styled.div`
   width: 100%;
@@ -188,16 +188,16 @@ const LauncherVersion = styled.div`
   }
 `;
 
-function copy(setCopied, copy) {
+function copy(setCopied, copyText) {
   setCopied(true);
-  clipboard.writeText(copy);
+  clipboard.writeText(copyText);
   setTimeout(() => {
     setCopied(false);
   }, 500);
 }
 
 const openFolderDialog = async (InstancesPath, dispatch) => {
-  const paths = await ipcRenderer.invoke("openFolderDialog", InstancesPath);
+  const paths = await ipcRenderer.invoke('openFolderDialog', InstancesPath);
   if (!paths.filePaths[0]) return;
   dispatch(updateDataPath(paths.filePaths[0]));
 };
@@ -233,13 +233,8 @@ const General = () => {
     Object.keys(isPlaying).length > 0;
 
   useEffect(() => {
-    ipcRenderer
-      .invoke("getAppVersion")
-      .then(setVersion)
-      .catch(console.error);
-    extractFace(currentAccount.skin)
-      .then(setProfileImage)
-      .catch(console.error);
+    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
+    extractFace(currentAccount.skin).then(setProfileImage).catch(console.error);
   }, []);
 
   const clearSharedData = async () => {
@@ -255,7 +250,7 @@ const General = () => {
   };
 
   const resetDataPath = async () => {
-    const appdataPath = await ipcRenderer.invoke("getUserDataPath");
+    const appdataPath = await ipcRenderer.invoke('getUserDataPath');
     dispatch(updateDataPath(appdataPath));
   };
 
@@ -280,9 +275,9 @@ const General = () => {
               Username
               <br />
               <Username>
-                {currentAccount.selectedProfile.name}{" "}
+                {currentAccount.selectedProfile.name}{' '}
                 <Tooltip
-                  title={copiedUsername ? "copied" : "copy"}
+                  title={copiedUsername ? 'copied' : 'copy'}
                   placement="top"
                 >
                   <div
@@ -313,7 +308,7 @@ const General = () => {
               <Email>
                 {currentAccount.user.username}
                 <Tooltip
-                  title={copiedEmail ? "copied" : "copy"}
+                  title={copiedEmail ? 'copied' : 'copy'}
                   placement="top"
                 >
                   <div
@@ -360,7 +355,7 @@ const General = () => {
               dispatch(updateReleaseChannel(e));
             }}
             value={releaseC}
-            defaultValue={!releaseC ? "Stable" : "Beta"}
+            defaultValue={!releaseC ? 'Stable' : 'Beta'}
           >
             <Select.Option value="1">Beta</Select.Option>
             <Select.Option value="0">Stable</Select.Option>
@@ -416,9 +411,9 @@ const General = () => {
           onChange={e => {
             dispatch(updateDiscordRPC(e));
             if (e) {
-              ipcRenderer.invoke("init-discord-rpc");
+              ipcRenderer.invoke('init-discord-rpc');
             } else {
-              ipcRenderer.invoke("shutdown-discord-rpc");
+              ipcRenderer.invoke('shutdown-discord-rpc');
             }
           }}
           checked={DiscordRPC}
@@ -581,7 +576,7 @@ const General = () => {
             margin: 10px 0;
           `}
         >
-          <HorizontalLogo size={200} />{" "}
+          <HorizontalLogo size={200} />{' '}
           <div
             css={`
               margin-left: 10px;
@@ -592,8 +587,8 @@ const General = () => {
         </div>
         <p>
           {updateAvailable
-            ? "There is an update available to be installed. Click on update to install it and restart the launcher"
-            : "You’re currently on the latest version. We automatically check for updates and we will inform you whenever there is one"}
+            ? 'There is an update available to be installed. Click on update to install it and restart the launcher'
+            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever there is one'}
         </p>
         <div
           css={`
@@ -605,7 +600,7 @@ const General = () => {
         >
           {updateAvailable ? (
             <Button
-              onClick={() => dispatch(push("/autoUpdate"))}
+              onClick={() => dispatch(push('/autoUpdate'))}
               css={`
                 && {
                   margin-right: 10px;

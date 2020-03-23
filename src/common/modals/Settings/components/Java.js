@@ -1,24 +1,24 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import styled from "styled-components";
-import { ipcRenderer } from "electron";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faJava } from "@fortawesome/free-brands-svg-icons";
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
+import { ipcRenderer } from 'electron';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faJava } from '@fortawesome/free-brands-svg-icons';
 import {
   faMemory,
   faFolder,
   faUndo,
   faLevelDownAlt,
   faList
-} from "@fortawesome/free-solid-svg-icons";
-import { Slider, Button, Input, Switch } from "antd";
+} from '@fortawesome/free-solid-svg-icons';
+import { Slider, Button, Input, Switch } from 'antd';
 import {
   updateJavaArguments,
   updateJavaMemory,
   updateJavaPath
-} from "../../../reducers/settings/actions";
-import { DEFAULT_JAVA_ARGS } from "../../../../app/desktop/utils/constants";
-import { _getJavaPath } from "../../../utils/selectors";
+} from '../../../reducers/settings/actions';
+import { DEFAULT_JAVA_ARGS } from '../../../../app/desktop/utils/constants';
+import { _getJavaPath } from '../../../utils/selectors';
 
 const JavaSettings = styled.div`
   width: 100%;
@@ -72,17 +72,17 @@ function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const openFolderDialog = async (javaPath, updateJavaPath, dispatch) => {
-  const paths = await ipcRenderer.invoke("openFileDialog", javaPath);
+const openFolderDialog = async (javaPath, dispatch) => {
+  const paths = await ipcRenderer.invoke('openFileDialog', javaPath);
   if (!paths[0]) return;
   dispatch(updateJavaPath(paths[0]));
 };
 
 const marks = {
-  2048: "2048 MB",
-  4096: "4096 MB",
-  8192: "8192 MB",
-  16384: "16384 MB"
+  2048: '2048 MB',
+  4096: '4096 MB',
+  8192: '8192 MB',
+  16384: '16384 MB'
 };
 
 export default function MyAccountPreferences() {
@@ -152,9 +152,7 @@ export default function MyAccountPreferences() {
               />
               <StyledButtons
                 color="primary"
-                onClick={() =>
-                  openFolderDialog(customJavaPath, updateJavaPath, dispatch)
-                }
+                onClick={() => openFolderDialog(customJavaPath, dispatch)}
               >
                 <FontAwesomeIcon icon={faFolder} />
               </StyledButtons>

@@ -1,12 +1,12 @@
-import React, { useEffect, memo } from "react";
-import { useDidMount } from "rooks";
-import styled from "styled-components";
-import { Switch } from "react-router";
-import { ipcRenderer } from "electron";
-import { useSelector, useDispatch } from "react-redux";
-import { push } from "connected-react-router";
-import { message } from "antd";
-import RouteWithSubRoutes from "../../common/components/RouteWithSubRoutes";
+import React, { useEffect, memo } from 'react';
+import { useDidMount } from 'rooks';
+import styled from 'styled-components';
+import { Switch } from 'react-router';
+import { ipcRenderer } from 'electron';
+import { useSelector, useDispatch } from 'react-redux';
+import { push } from 'connected-react-router';
+import { message } from 'antd';
+import RouteWithSubRoutes from '../../common/components/RouteWithSubRoutes';
 import {
   loginWithAccessToken,
   initManifests,
@@ -15,19 +15,19 @@ import {
   downloadJava,
   switchToFirstValidAccount,
   checkClientToken
-} from "../../common/reducers/actions";
-import { load, received } from "../../common/reducers/loading/actions";
-import features from "../../common/reducers/loading/features";
-import GlobalStyles from "../../common/GlobalStyles";
-import RouteBackground from "../../common/components/RouteBackground";
-import Navbar from "./components/Navbar";
-import ga from "../../common/utils/analytics";
-import routes from "./utils/routes";
-import { _getCurrentAccount } from "../../common/utils/selectors";
-import { isLatestJavaDownloaded, extract7z } from "./utils";
-import { updateDataPath } from "../../common/reducers/settings/actions";
-import SystemNavbar from "./components/SystemNavbar";
-import useTrackIdle from "./utils/useTrackIdle";
+} from '../../common/reducers/actions';
+import { load, received } from '../../common/reducers/loading/actions';
+import features from '../../common/reducers/loading/features';
+import GlobalStyles from '../../common/GlobalStyles';
+import RouteBackground from '../../common/components/RouteBackground';
+import Navbar from './components/Navbar';
+import ga from '../../common/utils/analytics';
+import routes from './utils/routes';
+import { _getCurrentAccount } from '../../common/utils/selectors';
+import { isLatestJavaDownloaded, extract7z } from './utils';
+import { updateDataPath } from '../../common/reducers/settings/actions';
+import SystemNavbar from './components/SystemNavbar';
+import useTrackIdle from './utils/useTrackIdle';
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -58,15 +58,15 @@ function DesktopRoot() {
 
   const init = async () => {
     await new Promise(resolve => setTimeout(resolve, 300));
-    const dataPathStatic = await ipcRenderer.invoke("getUserDataPath");
+    const dataPathStatic = await ipcRenderer.invoke('getUserDataPath');
     const dataPath =
       dataPathFromStore || dispatch(updateDataPath(dataPathStatic));
     dispatch(checkClientToken());
     dispatch(initNews());
 
-    if (process.env.NODE_ENV === "development" && currentAccount) {
+    if (process.env.NODE_ENV === 'development' && currentAccount) {
       dispatch(received(features.mcAuthentication));
-      dispatch(push("/home"));
+      dispatch(push('/home'));
     } else if (currentAccount) {
       dispatch(
         load(features.mcAuthentication, dispatch(loginWithAccessToken()))
@@ -88,7 +88,7 @@ function DesktopRoot() {
       dispatch(downloadJava());
     }
     if (shouldShowDiscordRPC) {
-      ipcRenderer.invoke("init-discord-rpc");
+      ipcRenderer.invoke('init-discord-rpc');
     }
   };
 
@@ -96,7 +96,7 @@ function DesktopRoot() {
   useDidMount(init);
 
   useEffect(() => {
-    if (clientToken && process.env.NODE_ENV !== "development") {
+    if (clientToken && process.env.NODE_ENV !== 'development') {
       ga.setUserId(clientToken)
         .then(() => ga.trackPage(location.pathname))
         .catch(console.error);

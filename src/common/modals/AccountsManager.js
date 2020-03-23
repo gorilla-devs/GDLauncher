@@ -1,20 +1,20 @@
-import React from "react";
-import styled from "styled-components";
-import { Spin, message } from "antd";
-import { useSelector, useDispatch } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../components/Modal";
-import { _getAccounts, _getCurrentAccount } from "../utils/selectors";
-import { openModal, closeModal } from "../reducers/modals/actions";
+import React from 'react';
+import styled from 'styled-components';
+import { Spin, message } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import Modal from '../components/Modal';
+import { _getAccounts, _getCurrentAccount } from '../utils/selectors';
+import { openModal, closeModal } from '../reducers/modals/actions';
 import {
   updateCurrentAccountId,
   loginWithAccessToken,
   updateAccount,
   removeAccount
-} from "../reducers/actions";
-import { load } from "../reducers/loading/actions";
-import features from "../reducers/loading/features";
+} from '../reducers/actions';
+import { load } from '../reducers/loading/actions';
+import features from '../reducers/loading/features';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
@@ -66,25 +66,25 @@ const ProfileSettings = () => {
                           accessToken: null
                         })
                       );
-                      message.error("Account not valid");
+                      message.error('Account not valid');
                     });
                   }}
                 >
                   <div>
-                    {account.selectedProfile.name}{" "}
+                    {account.selectedProfile.name}{' '}
                     <span
                       css={`
                         color: ${props => props.theme.palette.error.main};
                       `}
                     >
-                      {!account.accessToken && "(EXPIRED)"}
+                      {!account.accessToken && '(EXPIRED)'}
                     </span>
                   </div>
                   {!account.accessToken && (
                     <HoverContainer
                       onClick={() =>
                         dispatch(
-                          openModal("AddAccount", {
+                          openModal('AddAccount', {
                             username: account.user.username
                           })
                         )
@@ -126,7 +126,7 @@ const ProfileSettings = () => {
           })}
         </AccountsContainer>
         <AccountContainer>
-          <AccountItem onClick={() => dispatch(openModal("AddAccount"))}>
+          <AccountItem onClick={() => dispatch(openModal('AddAccount'))}>
             Add Account
           </AccountItem>
         </AccountContainer>
@@ -157,11 +157,11 @@ const AccountItem = styled.div`
   border-radius: 4px;
   cursor: pointer;
   ${props =>
-    props.active ? `background: ${props.theme.palette.primary.main};` : ""}
+    props.active ? `background: ${props.theme.palette.primary.main};` : ''}
   transition: background 0.1s ease-in-out;
   &:hover {
     ${props =>
-      props.active ? "" : `background: ${props.theme.palette.grey[500]};`}
+      props.active ? '' : `background: ${props.theme.palette.grey[500]};`}
   }
 `;
 

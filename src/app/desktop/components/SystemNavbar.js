@@ -1,35 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { ipcRenderer } from "electron";
-import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from 'react';
+import { ipcRenderer } from 'electron';
+import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faWindowMinimize,
   faWindowMaximize,
   faWindowRestore,
   faTimes
-} from "@fortawesome/free-solid-svg-icons";
+} from '@fortawesome/free-solid-svg-icons';
 
 const SystemNavbar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
   useEffect(() => {
     ipcRenderer
-      .invoke("getIsWindowMaximized")
+      .invoke('getIsWindowMaximized')
       .then(setIsMaximized)
       .catch(console.error);
-    ipcRenderer.on("window-maximized", () => {
+    ipcRenderer.on('window-maximized', () => {
       setIsMaximized(true);
     });
-    ipcRenderer.on("window-minimized", () => {
+    ipcRenderer.on('window-minimized', () => {
       setIsMaximized(false);
     });
   }, []);
 
   return (
     <Container>
-      <div onClick={() => ipcRenderer.invoke("minimize-window")}>
+      <div onClick={() => ipcRenderer.invoke('minimize-window')}>
         <FontAwesomeIcon icon={faWindowMinimize} />
       </div>
-      <div onClick={() => ipcRenderer.invoke("min-max-window")}>
+      <div onClick={() => ipcRenderer.invoke('min-max-window')}>
         <FontAwesomeIcon
           icon={isMaximized ? faWindowRestore : faWindowMaximize}
         />
@@ -38,7 +38,7 @@ const SystemNavbar = () => {
         css={`
           font-size: 18px;
         `}
-        onClick={() => ipcRenderer.invoke("quit-app")}
+        onClick={() => ipcRenderer.invoke('quit-app')}
       >
         <FontAwesomeIcon icon={faTimes} />
       </div>

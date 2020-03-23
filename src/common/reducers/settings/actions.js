@@ -1,4 +1,4 @@
-import * as ActionTypes from "./actionTypes";
+import * as ActionTypes from './actionTypes';
 
 export function updateSoundsSetting(sounds) {
   return dispatch => {

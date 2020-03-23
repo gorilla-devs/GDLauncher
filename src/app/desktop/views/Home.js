@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Button, Dropdown, Menu } from "antd";
-import { useSelector, useDispatch } from "react-redux";
-import Instances from "../components/Instances";
-import News from "../components/News";
-import { openModal } from "../../../common/reducers/modals/actions";
-import { _getCurrentAccount } from "../../../common/utils/selectors";
-import { extractFace } from "../utils";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { Button, Dropdown, Menu } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import Instances from '../components/Instances';
+import News from '../components/News';
+import { openModal } from '../../../common/reducers/modals/actions';
+import { _getCurrentAccount } from '../../../common/utils/selectors';
+import { extractFace } from '../utils';
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
@@ -30,18 +30,16 @@ const Home = () => {
   const news = useSelector(state => state.news);
 
   const openAddInstanceModal = defaultPage => {
-    dispatch(openModal("AddInstance", { defaultPage }));
+    dispatch(openModal('AddInstance', { defaultPage }));
   };
 
   const openAccountModal = () => {
-    dispatch(openModal("AccountsManager"));
+    dispatch(openModal('AccountsManager'));
   };
   const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
-    extractFace(account.skin)
-      .then(setProfileImage)
-      .catch(console.error);
+    extractFace(account.skin).then(setProfileImage).catch(console.error);
   }, [account]);
 
   const menu = (
@@ -63,7 +61,7 @@ const Home = () => {
     <div>
       <News news={news} />
       <Instances />
-      <Dropdown overlay={menu} trigger={["click"]}>
+      <Dropdown overlay={menu} trigger={['click']}>
         <AddInstanceIcon color="primary">
           <FontAwesomeIcon icon={faPlus} />
         </AddInstanceIcon>

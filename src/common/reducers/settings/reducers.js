@@ -1,9 +1,9 @@
-import { combineReducers } from "redux";
-import * as ActionTypes from "./actionTypes";
+import { combineReducers } from 'redux';
+import * as ActionTypes from './actionTypes';
 import {
   DEFAULT_JAVA_ARGS,
   DEFAULT_MEMORY
-} from "../../../app/desktop/utils/constants";
+} from '../../../app/desktop/utils/constants';
 
 function sounds(state = true, action) {
   switch (action.type) {

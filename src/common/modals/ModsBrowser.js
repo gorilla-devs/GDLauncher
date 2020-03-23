@@ -1,24 +1,24 @@
-import React, { memo, useEffect, useState } from "react";
-import AutoSizer from "react-virtualized-auto-sizer";
-import styled from "styled-components";
-import InfiniteLoader from "react-window-infinite-loader";
-import { Input, Select, Button } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { useDebouncedCallback } from "use-debounce";
-import { FixedSizeGrid as Grid } from "react-window";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../components/Modal";
-import { getSearch, getAddonFiles } from "../api";
-import { openModal } from "../reducers/modals/actions";
-import { _getInstance } from "../utils/selectors";
-import { installMod } from "../reducers/actions";
-import { FABRIC, FORGE } from "../utils/constants";
+import React, { memo, useEffect, useState } from 'react';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import styled from 'styled-components';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { Input, Select, Button } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce';
+import { FixedSizeGrid as Grid } from 'react-window';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import Modal from '../components/Modal';
+import { getSearch, getAddonFiles } from '../api';
+import { openModal } from '../reducers/modals/actions';
+import { _getInstance } from '../utils/selectors';
+import { installMod } from '../reducers/actions';
+import { FABRIC, FORGE } from '../utils/constants';
 import {
   getFirstReleaseCandidate,
   filterFabricFilesByVersion,
   filterForgeFilesByVersion
-} from "../../app/desktop/utils";
+} from '../../app/desktop/utils';
 
 const CellContainer = styled.div.attrs(props => ({
   style: props.override
@@ -105,7 +105,7 @@ const Cell = ({
       <div
         onClick={() => {
           dispatch(
-            openModal("ModOverview", {
+            openModal('ModOverview', {
               gameVersion: version,
               projectID: mod.id,
               ...(isInstalled && { fileID: isInstalled.fileID }),
@@ -120,8 +120,8 @@ const Cell = ({
             rgba(0, 0, 0, 0.9),
             rgba(0, 0, 0, 0.9)
             ), url('${primaryImage?.thumbnailUrl}')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center"
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
         }}
       >
         <div className="hoverContainer">
@@ -151,7 +151,7 @@ const Cell = ({
 
                   if (latestFile === null) {
                     setLoading(false);
-                    setError("Mod Not Available");
+                    setError('Mod Not Available');
                     console.error(
                       `Could not find any release candidate for addon: ${mod?.id} / ${version}`
                     );
@@ -288,8 +288,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
 
   const [mods, setMods] = useState([]);
   const [areModsLoading, setAreModsLoading] = useState(false);
-  const [filterType, setFilterType] = useState("Featured");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState('Featured');
+  const [searchQuery, setSearchQuery] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
   const instance = useSelector(state => _getInstance(state)(instanceName));
 
@@ -311,18 +311,18 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
     loadMoreMods();
   }, []);
 
-  const loadMoreMods = async (searchP = "", reset) => {
+  const loadMoreMods = async (searchP = '', reset) => {
     const reqObj = {};
     lastRequest = reqObj;
     const isReset = reset !== undefined ? reset : false;
     setAreModsLoading(true);
     const { data } = await getSearch(
-      "mods",
+      'mods',
       searchP,
       itemsNumber,
       isReset ? 0 : mods.length,
       filterType,
-      filterType !== "Author" && filterType !== "Name",
+      filterType !== 'Author' && filterType !== 'Name',
       gameVersion,
       instance.modloader[0] === FABRIC ? 4780 : null
     );

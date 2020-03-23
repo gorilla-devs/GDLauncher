@@ -1,6 +1,6 @@
-import omit from "lodash.omit";
-import * as ActionTypes from "./actionTypes";
-import PromiseQueue from "../../app/desktop/utils/PromiseQueue";
+import omit from 'lodash.omit';
+import * as ActionTypes from './actionTypes';
+import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 
 function news(state = [], action) {
   switch (action.type) {
