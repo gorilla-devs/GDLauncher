@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import styled from "styled-components";
 import { Transition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,8 +23,10 @@ const Content = ({
   modpack,
   setImportZipPath,
   setOptifineVersion,
-  optifineVersion
+  optifineVersion,
+  importZipPath,
 }) => {
+  const [overrideNextStepOnClick, setOverrideNextStepOnClick] = useState(null);
   let pages = [
     <NewInstance
       setVersion={setVersion}
@@ -41,8 +43,9 @@ const Content = ({
     <Import
       setVersion={setVersion}
       setModpack={setModpack}
-      modpack={modpack}
+      importZipPath={importZipPath}
       setImportZipPath={setImportZipPath}
+      setOverrideNextStepOnClick={setOverrideNextStepOnClick}
     />
   ];
 
@@ -78,6 +81,7 @@ const Content = ({
             >
               <div
                 version={version}
+                importZipPath={importZipPath}
                 css={`
                   width: 70px;
                   height: 40px;
@@ -87,17 +91,25 @@ const Content = ({
                   border-radius: 4px;
                   font-size: 40px;
                   color: ${props =>
-                    props.version
+                    props.version || props.importZipPath
                       ? props.theme.palette.text.icon
                       : props.theme.palette.text.disabled};
-                  ${props => (props.version ? "cursor: pointer;" : "")}
+                  ${props =>
+                    props.version || props.importZipPath
+                      ? "cursor: pointer;"
+                      : ""}
                   &:hover {
                     background-color: ${props =>
-                      props.version ? props.theme.action.hover : "transparent"};
+                      props.version || props.importZipPath
+                        ? props.theme.action.hover
+                        : "transparent"};
                   }
                 `}
-                onClick={() => {
-                  if (version) {
+                onClick={async () => {
+                  if (overrideNextStepOnClick) {
+                    await overrideNextStepOnClick();
+                  }
+                  if (version || importZipPath) {
                     setStep(1);
                   }
                 }}

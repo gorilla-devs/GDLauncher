@@ -15,15 +15,15 @@ import omit from "lodash.omit";
 import { extractFull } from "node-7z";
 import { push } from "connected-react-router";
 import { spawn } from "child_process";
+import symlink from "symlink-dir";
 import { promises as fs } from "fs";
 import pMap from "p-map";
-import { notification } from "antd";
+import { notification, message } from "antd";
 import * as ActionTypes from "./actionTypes";
 import {
   NEWS_URL,
   MC_RESOURCES_URL,
   GDL_LEGACYJAVAFIXER_MOD_URL,
-  TWITCH_MODPACK,
   FORGE,
   FABRIC,
   VANILLA
@@ -442,14 +442,19 @@ export function downloadJava() {
       });
     }
 
-    await fse.move(
-      path.join(tempFolder, `${releaseName}-jre`),
-      path.join(javaBaseFolder, version)
-    );
+    const directoryToMove =
+      process.platform === "darwin"
+        ? path.join(tempFolder, `${releaseName}-jre`, "Contents", "Home")
+        : path.join(tempFolder, `${releaseName}-jre`);
+
+    await fse.move(directoryToMove, path.join(javaBaseFolder, version));
 
     await fse.remove(tempFolder);
 
-    await fixFilePermissions(_getJavaPath(state));
+    const ext = process.platform === "win32" ? ".exe" : "";
+    await fixFilePermissions(
+      path.join(javaBaseFolder, version, "bin", `java${ext}`)
+    );
 
     ipcRenderer.invoke("update-progress-bar", -1);
 
@@ -806,10 +811,7 @@ export function addToQueue(instanceName, options) {
       }
     );
 
-    const addMods =
-      modloader[0] === TWITCH_MODPACK ||
-      modloader[0] === FORGE ||
-      modloader[0] === FABRIC;
+    const addMods = modloader[0] === FORGE || modloader[0] === FABRIC;
 
     dispatch(
       updateInstanceConfig(
@@ -958,7 +960,7 @@ export function downloadForge(instanceName) {
   };
 }
 
-export function downloadForgeManifestFiles(instanceName) {
+export function processManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const { manifest } = _getCurrentDownloadItem(state);
@@ -1085,7 +1087,7 @@ export function downloadInstance(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, "Downloading game files..."));
 
-    const { modloader } = _getCurrentDownloadItem(state);
+    const { modloader, manifest } = _getCurrentDownloadItem(state);
     const mcVersion = modloader[1];
 
     let mcJson;
@@ -1205,15 +1207,15 @@ export function downloadInstance(instanceName) {
     if (mcJson.assets === "legacy") {
       await copyAssetsToLegacy(assets);
     }
-    if (modloader && modloader[0] === "vanilla") {
-    } else if (modloader && modloader[0] === "fabric") {
+    if (modloader && modloader[0] === VANILLA) {
+    } else if (modloader && modloader[0] === FABRIC) {
       await dispatch(downloadFabric(instanceName));
-    } else if (modloader && modloader[0] === "forge") {
+    } else if (modloader && modloader[0] === FORGE) {
       await dispatch(downloadForge(instanceName));
-    } else if (modloader && modloader[0] === "twitchModpack") {
-      await dispatch(downloadForge(instanceName));
+    }
 
-      await dispatch(downloadForgeManifestFiles(instanceName));
+    if (manifest) {
+      await dispatch(processManifest(instanceName));
     }
 
     // Be aware that from this line the installer lock might be unlocked!
@@ -1229,6 +1231,38 @@ export const startListener = () => {
     const state = getState();
     const instancesPath = _getInstancesPath(state);
     const Queue = new PromiseQueue();
+
+    const notificationObj = {
+      key: "RTSAction",
+      duration: 0
+    };
+
+    let closeMessage;
+
+    Queue.on("start", queueLength => {
+      if (queueLength > 1) {
+        closeMessage = message.loading({
+          ...notificationObj,
+          content: `Syncronizing files. ${queueLength} left.`
+        });
+      }
+    });
+
+    Queue.on("executed", queueLength => {
+      if (queueLength > 1) {
+        closeMessage = message.loading({
+          ...notificationObj,
+          content: `Syncronizing files. ${queueLength} left.`
+        });
+      }
+    });
+
+    Queue.on("end", () => {
+      setTimeout(() => {
+        if (closeMessage) closeMessage();
+      }, 500);
+    });
+
     const changesTracker = {};
 
     const processAddedFile = async (fileName, instanceName) => {
@@ -1292,15 +1326,19 @@ export const startListener = () => {
           mod => mod.fileName === path.basename(fileName)
         );
         if (isInConfig) {
-          console.log("[RTS] REMOVING MOD", fileName, instanceName);
-          await dispatch(
-            updateInstanceConfig(instanceName, prev => ({
-              ...prev,
-              mods: (prev.mods || []).filter(
-                m => m.fileName !== path.basename(fileName)
-              )
-            }))
-          );
+          try {
+            console.log("[RTS] REMOVING MOD", fileName, instanceName);
+            await dispatch(
+              updateInstanceConfig(instanceName, prev => ({
+                ...prev,
+                mods: (prev.mods || []).filter(
+                  m => m.fileName !== path.basename(fileName)
+                )
+              }))
+            );
+          } catch (err) {
+            console.error(err);
+          }
         }
       };
       Queue.add(processChange);
@@ -1317,18 +1355,22 @@ export const startListener = () => {
         m => m.fileName === path.basename(fileName)
       );
       if (modData) {
-        console.log("[RTS] RENAMING MOD", fileName, newFilePath, modData);
-        await dispatch(
-          updateInstanceConfig(oldInstanceName, prev => ({
-            ...prev,
-            mods: [
-              ...(prev.mods || []).filter(
-                m => m.fileName !== path.basename(fileName)
-              ),
-              { ...modData, fileName: path.basename(newFilePath) }
-            ]
-          }))
-        );
+        try {
+          console.log("[RTS] RENAMING MOD", fileName, newFilePath, modData);
+          await dispatch(
+            updateInstanceConfig(oldInstanceName, prev => ({
+              ...prev,
+              mods: [
+                ...(prev.mods || []).filter(
+                  m => m.fileName !== path.basename(fileName)
+                ),
+                { ...modData, fileName: path.basename(newFilePath) }
+              ]
+            }))
+          );
+        } catch (err) {
+          console.error(err);
+        }
       }
     };
 
@@ -1372,22 +1414,26 @@ export const startListener = () => {
       const newState = getState();
       const instance = _getInstance(newState)(newInstanceName);
       if (!instance) {
-        const configPath = path.join(
-          instancesPath,
-          newInstanceName,
-          "config.json"
-        );
-        const config = await fse.readJSON(configPath);
-        console.log(
-          `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
-        );
-        dispatch({
-          type: ActionTypes.UPDATE_INSTANCES,
-          instances: {
-            ...omit(newState.instances.list, [oldInstanceName]),
-            [newInstanceName]: { ...config, name: newInstanceName }
-          }
-        });
+        try {
+          const configPath = path.join(
+            instancesPath,
+            newInstanceName,
+            "config.json"
+          );
+          const config = await fse.readJSON(configPath);
+          console.log(
+            `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
+          );
+          dispatch({
+            type: ActionTypes.UPDATE_INSTANCES,
+            instances: {
+              ...omit(newState.instances.list, [oldInstanceName]),
+              [newInstanceName]: { ...config, name: newInstanceName }
+            }
+          });
+        } catch (err) {
+          console.error(err);
+        }
       }
     };
 
@@ -1572,6 +1618,7 @@ export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const javaPath = _getJavaPath(state);
+    const { dataPath } = state.settings;
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
@@ -1665,10 +1712,7 @@ export function launchInstance(instanceName) {
       libraries = libraries.concat(fabricLibraries);
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
-    } else if (
-      modloader &&
-      (modloader[0] === "forge" || modloader[0] === "twitchModpack")
-    ) {
+    } else if (modloader && modloader[0] === "forge") {
       const getForceLastVer = ver =>
         Number.parseInt(ver.split(".")[ver.split(".").length - 1], 10);
 
@@ -1812,6 +1856,17 @@ export function launchInstance(instanceName) {
       modloader
     ).concat(tweakClassArg);
 
+    const symLinkDirPath = path.join(dataPath.split("\\")[0], "_gdl");
+
+    const replaceRegex = [
+      process.platform === "win32"
+        ? new RegExp(dataPath.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1"), "g")
+        : null,
+      symLinkDirPath
+    ];
+
+    if (process.platform === "win32") await symlink(dataPath, symLinkDirPath);
+
     console.log(
       `"${javaPath}" ${getJvmArguments(
         libraries,
@@ -1826,18 +1881,12 @@ export function launchInstance(instanceName) {
         true
       )
         .concat(tweakClassArg)
-        .join(" ")}`
+        .join(" ")}`.replace(...replaceRegex)
     );
 
     if (state.settings.hideWindowOnGameLaunch) {
       await ipcRenderer.invoke("hide-window");
     }
-
-    // const configPath = path.join(
-    //   path.join(instancesPath, instanceName, "config.json")
-    // );
-
-    // const config = await fse.readJSON(configPath);
 
     const optifinePath = path.join(
       _getInstancesPath(state),
@@ -1845,16 +1894,18 @@ export function launchInstance(instanceName) {
       "mods",
       `${instanceConfig.optifine}.jar`
     );
-
     const optifineJar = path.join(
       optifineVersionsPath,
       `${instanceConfig.optifine}.jar`
     );
-
-    const process = spawn(javaPath, jvmArguments, {
-      cwd: instancePath,
-      shell: true
-    });
+    const ps = spawn(
+      `"${javaPath.replace(...replaceRegex)}"`,
+      jvmArguments.map(v => v.replace(...replaceRegex)),
+      {
+        cwd: instancePath,
+        shell: true
+      }
+    );
 
     const playTimer = setInterval(() => {
       dispatch(
@@ -1864,27 +1915,28 @@ export function launchInstance(instanceName) {
         }))
       );
     }, 60 * 1000);
-    dispatch(addStartedInstance({ instanceName, pid: process.pid }));
+    dispatch(addStartedInstance({ instanceName, pid: ps.pid }));
 
-    process.stdout.on("data", data => {
+    ps.stdout.on("data", data => {
       console.log(data.toString());
       if (data.toString().includes("Setting user:")) {
         dispatch(updateStartedInstance({ instanceName, initialized: true }));
       }
     });
 
-    process.stderr.on("data", data => {
+    ps.stderr.on("data", data => {
       console.error(`ps stderr: ${data}`);
     });
 
-    process.on("close", code => {
+    ps.on("close", code => {
       ipcRenderer.invoke("show-window");
       fse.remove(instanceJLFPath);
+      if (process.platform === "win32") fse.remove(symLinkDirPath);
       dispatch(removeStartedInstance(instanceName));
       clearInterval(playTimer);
       fse.remove(optifinePath);
       if (code !== 0) {
-        console.log(`Process exited with code ${code}. Not too good..`);
+        console.warn(`Process exited with code ${code}. Not too good..`);
       }
     });
   };
@@ -1906,42 +1958,67 @@ export function installMod(
     mainModData.data.projectID = projectID;
 
     const destFile = path.join(instancePath, "mods", mainModData.data.fileName);
-
+    let needToAddMod = true;
     await dispatch(
-      updateInstanceConfig(instanceName, prev => ({
-        ...prev,
-        mods: [
-          ...prev.mods,
-          normalizeModData(mainModData.data, projectID, addon.name)
-        ]
-      }))
+      updateInstanceConfig(instanceName, prev => {
+        needToAddMod = !prev.mods.find(
+          v => v.fileID === fileID && v.projectID === projectID
+        );
+        return {
+          ...prev,
+          mods: [
+            ...prev.mods,
+            ...(needToAddMod
+              ? [normalizeModData(mainModData.data, projectID, addon.name)]
+              : [])
+          ]
+        };
+      })
     );
-    await downloadFile(destFile, mainModData.data.downloadUrl);
-    if (installDeps) {
-      await pMap(mainModData.data.dependencies, async dep => {
-        // type 1: embedded
-        // type 2: optional
-        // type 3: required
-        // type 4: tool
-        // type 5: incompatible
-        // type 6: include
 
-        if (dep.type === 3) {
-          const depList = await getAddonFiles(dep.addonId);
-          const depData = depList.data.find(v =>
-            v.gameVersion.includes(gameVersion)
-          );
-          await dispatch(
-            installMod(
-              dep.addonId,
-              depData.id,
-              instanceName,
-              gameVersion,
-              installDeps
-            )
-          );
-        }
-      });
+    if (!needToAddMod) {
+      return;
+    }
+
+    try {
+      await fse.open(destFile);
+      const murmur2 = await getFileMurmurHash2(destFile);
+      if (murmur2 !== mainModData.data.packageFingerprint) {
+        await downloadFile(destFile, mainModData.data.downloadUrl);
+      }
+    } catch {
+      await downloadFile(destFile, mainModData.data.downloadUrl);
+    }
+
+    if (installDeps) {
+      await pMap(
+        mainModData.data.dependencies,
+        async dep => {
+          // type 1: embedded
+          // type 2: optional
+          // type 3: required
+          // type 4: tool
+          // type 5: incompatible
+          // type 6: include
+
+          if (dep.type === 3) {
+            const depList = await getAddonFiles(dep.addonId);
+            const depData = depList.data.find(v =>
+              v.gameVersion.includes(gameVersion)
+            );
+            await dispatch(
+              installMod(
+                dep.addonId,
+                depData.id,
+                instanceName,
+                gameVersion,
+                installDeps
+              )
+            );
+          }
+        },
+        { concurrency: 2 }
+      );
     }
   };
 }

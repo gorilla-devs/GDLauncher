@@ -5,6 +5,7 @@ import { FixedSizeList as List } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import { transparentize } from "polished";
 import { openModal } from "../../../reducers/modals/actions";
+import { FORGE } from "../../../utils/constants";
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -67,7 +68,7 @@ const ModpacksListWrapper = ({
           <div
             onClick={() => {
               setVersion([
-                "twitchModpack",
+                FORGE,
                 modpack.id,
                 modpack.latestFiles[modpack.latestFiles.length - 1].id
               ]);

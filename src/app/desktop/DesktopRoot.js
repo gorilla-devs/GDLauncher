@@ -5,6 +5,7 @@ import { Switch } from "react-router";
 import { ipcRenderer } from "electron";
 import { useSelector, useDispatch } from "react-redux";
 import { push } from "connected-react-router";
+import { message } from "antd";
 import RouteWithSubRoutes from "../../common/components/RouteWithSubRoutes";
 import {
   loginWithAccessToken,
@@ -50,6 +51,10 @@ function DesktopRoot() {
   const dataPathFromStore = useSelector(state => state.settings.dataPath);
   const location = useSelector(state => state.router.location);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
+
+  message.config({
+    top: 26
+  });
 
   const init = async () => {
     await new Promise(resolve => setTimeout(resolve, 300));

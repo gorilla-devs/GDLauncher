@@ -12,7 +12,12 @@ import CloseButton from "../components/CloseButton";
 import { closeModal } from "../reducers/modals/actions";
 import { installMod, updateInstanceConfig } from "../reducers/actions";
 import { remove } from "fs-extra";
-import { _getInstancesPath } from "../utils/selectors";
+import { _getInstancesPath, _getInstance } from "../utils/selectors";
+import { FABRIC, FORGE } from "../utils/constants";
+import {
+  filterFabricFilesByVersion,
+  filterForgeFilesByVersion
+} from "../../app/desktop/utils";
 
 const ModOverview = ({
   projectID,
@@ -28,16 +33,73 @@ const ModOverview = ({
   const [selectedItem, setSelectedItem] = useState({ fileID, fileName });
   const [installedData, setInstalledData] = useState({ fileID, fileName });
   const [loading, setLoading] = useState(false);
+  const [loadingFiles, setLoadingFiles] = useState(true);
   const instancesPath = useSelector(_getInstancesPath);
+  const instance = useSelector(state => _getInstance(state)(instanceName));
+
   useEffect(() => {
+    setLoadingFiles(true);
     getAddon(projectID).then(data => setAddon(data.data));
     getAddonDescription(projectID).then(data => setDescription(data.data));
     getAddonFiles(projectID).then(data => {
-      setFiles(
-        data.data.filter(file => file.gameVersion.includes(gameVersion))
-      );
+      const isFabric = instance.modloader[0] === FABRIC;
+      const isForge = instance.modloader[0] === FORGE;
+      let filteredFiles = [];
+      if (isFabric) {
+        filteredFiles = filterFabricFilesByVersion(data.data, gameVersion);
+      } else if (isForge) {
+        filteredFiles = filterForgeFilesByVersion(data.data, gameVersion);
+      }
+      setFiles(filteredFiles);
+      setLoadingFiles(false);
     });
   }, []);
+
+  const getPlaceholderText = () => {
+    if (loadingFiles) {
+      return "Loading Files";
+    } else if (files.length === 0 && !loadingFiles) {
+      return "Mod Not Available";
+    } else {
+      return "Select A Version";
+    }
+  };
+
+  const getReleaseType = id => {
+    switch (id) {
+      case 1:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.green};
+            `}
+          >
+            [Stable]
+          </span>
+        );
+      case 2:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.yellow};
+            `}
+          >
+            [Beta]
+          </span>
+        );
+      case 3:
+      default:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.red};
+            `}
+          >
+            [Alpha]
+          </span>
+        );
+    }
+  };
 
   const handleChange = value => setSelectedItem(JSON.parse(value));
 
@@ -76,13 +138,18 @@ const ModOverview = ({
               </div>
             )}
           <StyledSelect
-            placeholder="Select a version"
+            placeholder={getPlaceholderText()}
+            loading={loadingFiles}
+            disabled={loadingFiles}
             value={
-              files.length !== 0 &&
-              files.find(v => v.id === installedData.fileID) &&
-              JSON.stringify(selectedItem)
+              (files.length !== 0 &&
+                files.find(v => v.id === installedData.fileID) &&
+                JSON.stringify(selectedItem)) ||
+              undefined
             }
             onChange={handleChange}
+            listItemHeight={50}
+            listHeight={400}
           >
             {(files || []).map(file => (
               <Select.Option
@@ -93,7 +160,44 @@ const ModOverview = ({
                   fileName: file.fileName
                 })}
               >
-                {file.displayName}
+                <div
+                  css={`
+                    display: flex;
+                    height: 50px;
+                  `}
+                >
+                  <div
+                    css={`
+                      flex: 7;
+                      display: flex;
+                      align-items: center;
+                    `}
+                  >
+                    {file.displayName}
+                  </div>
+                  <div
+                    css={`
+                      flex: 2;
+                      display: flex;
+                      align-items: center;
+                      flex-direction: column;
+                    `}
+                  >
+                    <div>{gameVersion}</div>
+                    <div>{getReleaseType(file.releaseType)}</div>
+                  </div>
+                  <div
+                    css={`
+                      flex: 2;
+                      display: flex;
+                      align-items: center;
+                    `}
+                  >
+                    <div>
+                      {new Date(file.fileDate).toLocaleDateString("it-IT")}
+                    </div>
+                  </div>
+                </div>
               </Select.Option>
             ))}
           </StyledSelect>
@@ -105,7 +209,7 @@ const ModOverview = ({
             }
             loading={loading}
             onClick={async () => {
-              setLoading(true)
+              setLoading(true);
               if (installedData.fileID) {
                 await dispatch(
                   updateInstanceConfig(instanceName, prev => ({
@@ -148,8 +252,28 @@ const ModOverview = ({
 export default React.memo(ModOverview);
 
 const StyledSelect = styled(Select)`
-  width: 300px;
-  min-width: 300px;
+  width: 650px;
+  height: 50px;
+  .ant-select-selection-placeholder {
+    height: 50px !important;
+    line-height: 50px !important;
+  }
+  .ant-select-selector {
+    height: 50px !important;
+    cursor: pointer !important;
+  }
+  .ant-select-selection-item {
+    flex: 1;
+    cursor: pointer;
+    & > div {
+      & > div:nth-child(2) {
+        & > div:last-child {
+          height: 10px;
+          line-height: 5px;
+        }
+      }
+    }
+  }
 `;
 
 const StyledCloseButton = styled.div`

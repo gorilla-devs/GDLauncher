@@ -107,18 +107,18 @@ export const librariesMapper = (libraries, librariesPath) => {
             sha1: lib.downloads.artifact.sha1
           });
         }
-        const native =
-          lib.natives &&
-          lib.natives[convertOSToMCFormat(process.platform)].replace(
-            "${arch}", // eslint-disable-line no-template-curly-in-string
-            "64"
-          );
+
+        const native = (
+          (lib?.natives &&
+            lib?.natives[convertOSToMCFormat(process.platform)]) ||
+          ""
+        ).replace(
+          "${arch}", // eslint-disable-line no-template-curly-in-string
+          "64"
+        );
+
         // Vanilla native libs
-        if (
-          lib.downloads &&
-          lib.downloads.classifiers &&
-          lib.downloads.classifiers[native]
-        ) {
+        if (native && lib?.downloads?.classifiers[native]) {
           tempArr.push({
             url: lib.downloads.classifiers[native].url,
             path: path.join(
@@ -262,7 +262,8 @@ export const extractNatives = async (libraries, instancePath) => {
       .filter(l => l.natives)
       .map(async l => {
         const extraction = extractFull(l.path, extractLocation, {
-          $bin: sevenZipPath
+          $bin: sevenZipPath,
+          $raw: ["-xr!META-INF"]
         });
         await new Promise((resolve, reject) => {
           extraction.on("end", () => {
@@ -573,8 +574,8 @@ export const patchForge113 = async (
         .map(arg => replaceIfPossible(arg))
         .map(arg => computePathIfPossible(arg));
 
-      const classPaths = p.classpath.map(cp =>
-        path.join(librariesPath, ...mavenToArray(cp))
+      const classPaths = p.classpath.map(
+        cp => `"${path.join(librariesPath, ...mavenToArray(cp))}"`
       );
 
       const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
@@ -582,10 +583,10 @@ export const patchForge113 = async (
 
       await new Promise(resolve => {
         const ps = spawn(
-          javaPath,
+          `"${javaPath}"`,
           [
             "-classpath",
-            [filePath, ...classPaths].join(
+            [`"${filePath}"`, ...classPaths].join(
               process.platform === "win32" ? ";" : ":"
             ),
             mainClass,
@@ -620,11 +621,16 @@ export const patchForge113 = async (
 export const importAddonZip = async (
   zipPath,
   instancePath,
-  instanceTempPath
+  instanceTempPath,
+  tempPath
 ) => {
   const tempZipFile = path.join(instanceTempPath, "addon.zip");
   await makeDir(instanceTempPath);
-  await fse.copyFile(zipPath, tempZipFile);
+  if (zipPath.includes(tempPath)) {
+    await fse.move(zipPath, tempZipFile);
+  } else {
+    await fse.copyFile(zipPath, tempZipFile);
+  }
   const instanceManifest = path.join(instancePath, "manifest.json");
   // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
   await new Promise(resolve => {
@@ -737,3 +743,45 @@ export const isMod = (fileName, instancesPath) =>
 
 export const isInstanceFolderPath = (f, instancesPath) =>
   /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(f.replace(instancesPath, ""));
+
+export const isFileModFabric = file => {
+  return (
+    (file.gameVersion.includes("Fabric") ||
+      file.modules.find(v => v.foldername === "fabric.mod.json")) &&
+    !file.gameVersion.includes("Forge")
+  );
+};
+
+export const filterFabricFilesByVersion = (files, version) => {
+  return files.filter(v => {
+    if (Array.isArray(v.gameVersion)) {
+      return v.gameVersion.includes(version) && isFileModFabric(v);
+    }
+    return v.gameVersion === version;
+  });
+};
+
+export const filterForgeFilesByVersion = (files, version) => {
+  return files.filter(v => {
+    if (Array.isArray(v.gameVersion)) {
+      return (
+        v.gameVersion.includes(version) && !v.gameVersion.includes("Fabric")
+      );
+    }
+    return v.gameVersion === version;
+  });
+};
+
+export const getFirstReleaseCandidate = files => {
+  let latestFile = null;
+  let counter = 1;
+  while (counter <= 3 && !latestFile) {
+    const c = counter;
+    const latest = files.find(v => v.releaseType === c);
+    if (latest) {
+      latestFile = latest;
+    }
+    counter += 1;
+  }
+  return latestFile;
+};

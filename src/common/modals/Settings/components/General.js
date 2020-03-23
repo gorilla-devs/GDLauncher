@@ -386,12 +386,10 @@ const General = () => {
           onChange={v => dispatch(updateConcurrentDownloads(v))}
           value={concurrentDownloads}
           css={`
-            && {
-              width: 100px;
-            }
+            width: 100px;
           `}
         >
-          {[...Array(10).keys()]
+          {[...Array(20).keys()]
             .map(x => x + 1)
             .map(x => (
               <Select.Option value={x}>{x}</Select.Option>

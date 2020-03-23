@@ -27,7 +27,7 @@ import {
 import { transparentize } from "polished";
 import bgImage from "../../../common/assets/mcCube.jpg";
 import { downloadFile } from "../../../app/desktop/utils/downloader";
-import { TWITCH_MODPACK, FABRIC, VANILLA, FORGE } from "../../utils/constants";
+import { FABRIC, VANILLA, FORGE } from "../../utils/constants";
 
 const InstanceName = ({
   in: inProp,
@@ -101,48 +101,16 @@ const InstanceName = ({
     const isVanilla = version[0] === VANILLA;
     const isFabric = version[0] === FABRIC;
     const isForge = version[0] === FORGE;
-    const isTwitchModpack = version[0] === TWITCH_MODPACK;
-    if (isVanilla) {
-      dispatch(
-        addToQueue(localInstanceName, {
-          modloader: [version[0], version[2]],
-          optifine: optifineVersion
-        })
-      );
-      await wait(2);
-    } else if (isFabric) {
-      const mappedItem = fabricManifest.mappings.find(
-        v => v.version === version[2]
-      );
-      const splitItem = version[2].split(mappedItem.separator);
-      dispatch(
-        addToQueue(localInstanceName, {
-          modloader: [FABRIC, splitItem[0], version[2], version[3]]
-        })
-      );
-      // if (optifineVersion) {
-      //   downloadOptifine(
-      //     optifineVersion,
-      //     optifineVersionsPath,
-      //     optifineManifest
-      //   );
-      // }
-      await wait(2);
-    } else if (isForge) {
-      dispatch(
-        addToQueue(localInstanceName, {
-          modloader: version,
-          optifine: optifineVersion
-        })
-      );
-      await wait(2);
-    } else if (isTwitchModpack) {
-      let manifest;
+    const isTwitchModpack = Boolean(modpack);
+    let manifest;
+    console.log(isTwitchModpack, importZipPath);
+    if (isTwitchModpack) {
       if (importZipPath) {
         manifest = await importAddonZip(
           importZipPath,
           path.join(instancesPath, localInstanceName),
-          path.join(tempPath, localInstanceName)
+          path.join(tempPath, localInstanceName),
+          tempPath
         );
       } else {
         manifest = await downloadAddonZip(
@@ -176,6 +144,51 @@ const InstanceName = ({
           background: `background${path.extname(imageURL)}`
         })
       );
+    } else if (importZipPath) {
+      manifest = await importAddonZip(
+        importZipPath,
+        path.join(instancesPath, localInstanceName),
+        path.join(tempPath, localInstanceName),
+        tempPath
+      );
+      const modloader = [
+        version[0],
+        manifest.minecraft.version,
+        manifest.minecraft.modLoaders
+          .find(v => v.primary)
+          .id.replace("forge-", "")
+      ];
+      dispatch(addToQueue(localInstanceName, modloader, manifest));
+    } else if (isVanilla) {
+             dispatch(
+        addToQueue(localInstanceName, {
+          modloader: [version[0], version[2]],
+          optifine: optifineVersion
+        })
+      );
+      await wait(2);
+    } else if (isFabric) {
+      const mappedItem = fabricManifest.mappings.find(
+        v => v.version === version[2]
+      );
+      const splitItem = version[2].split(mappedItem.separator);
+      dispatch(
+        addToQueue(localInstanceName, [
+          FABRIC,
+          splitItem[0],
+          version[2],
+          version[3]
+        ])
+      );
+      await wait(2);
+    } else if (isForge) {
+         dispatch(
+        addToQueue(localInstanceName, {
+          modloader: version,
+          optifine: optifineVersion
+        })
+      );
+      await wait(2);
     }
     dispatch(closeModal());
   };
@@ -184,10 +197,7 @@ const InstanceName = ({
       {state => (
         <Animation
           state={state}
-          bg={
-            thumbnailURL ||
-            (version && version[0] !== TWITCH_MODPACK && bgImage)
-          }
+          bg={thumbnailURL || bgImage}
         >
           <Transition in={clicked} timeout={200}>
             {state1 => (

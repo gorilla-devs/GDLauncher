@@ -9,7 +9,7 @@ import Notes from "./Notes";
 import Mods from "./Mods";
 import { useSelector } from "react-redux";
 import { _getInstance } from "../../utils/selectors";
-import { TWITCH_MODPACK, FORGE, FABRIC } from "../../utils/constants";
+import { FORGE, FABRIC } from "../../utils/constants";
 
 const SideMenu = styled.div`
   display: flex;
@@ -73,11 +73,11 @@ const InstanceManager = ({ instanceName }) => {
     mods: { name: "Mods", component: Mods },
     modpack: { name: "Modpack", component: Overview },
     notes: { name: "Notes", component: Notes },
-    resourcePacks: { name: "Resource Packs", component: Overview },
-    worlds: { name: "Worlds", component: Overview },
+    // resourcePacks: { name: "Resource Packs", component: Overview },
+    // worlds: { name: "Worlds", component: Overview },
     screenshots: { name: "Screenshots", component: Screenshots },
-    settings: { name: "Settings", component: Overview },
-    servers: { name: "Servers", component: Overview }
+    // settings: { name: "Settings", component: Overview },
+    // servers: { name: "Servers", component: Overview }
   };
 
   const [page, setPage] = useState(Object.keys(menuEntries)[0]);
@@ -100,11 +100,10 @@ const InstanceManager = ({ instanceName }) => {
             {Object.entries(menuEntries).map(([k, tab]) => {
               if (
                 (tab.name === menuEntries.mods.name &&
-                  instance?.modloader[0] !== TWITCH_MODPACK &&
                   instance?.modloader[0] !== FORGE &&
                   instance?.modloader[0] !== FABRIC) ||
                 (tab.name === menuEntries.modpack.name &&
-                  instance?.modloader[0] !== TWITCH_MODPACK)
+                  (!instance?.modloader[3] || !instance?.modloader[4]))
               ) {
                 return null;
               }
