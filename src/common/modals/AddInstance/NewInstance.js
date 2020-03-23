@@ -28,6 +28,7 @@ const NewInstance = ({
 
   useEffect(() => {
     if (
+      optifineSwitch &&
       minecraftVersion &&
       minecraftVersion[0] === "vanilla" &&
       minecraftVersion[1] === "release"

@@ -323,11 +323,12 @@ export const getJVMArguments112 = (
   mcJson,
   account,
   memory,
+  optifineVersion,
+  modloader,
   hideAccessToken,
-  jvmOptions = [],
-  optifineVersion
+  jvmOptions = []
 ) => {
-  console.log("DIO", optifineVersion, mcjar, mcJson);
+  console.log("dio", optifineVersion, modloader);
   const args = [];
   args.push("-cp");
 
@@ -348,7 +349,9 @@ export const getJVMArguments112 = (
   args.push(...jvmOptions);
   args.push(`-Djava.library.path="${path.join(instancePath, "natives")}"`);
 
-  args.push(mcJson.mainClass);
+  if (optifineVersion && modloader[0] === "vanilla") {
+    args.push(" net.minecraft.launchwrapper.Launch ");
+  } else args.push(mcJson.mainClass);
 
   const mcArgs = mcJson.minecraftArguments.split(" ");
   const argDiscovery = /\${*(.*)}/;
@@ -363,8 +366,8 @@ export const getJVMArguments112 = (
 
           break;
         case "version_name":
-          // val = optifineVersion ? mcJson.id : ` --version ${optifineVersion}`;
-          val = mcJson.id;
+          val = optifineVersion ? `${optifineVersion}` : mcJson.id;
+          // val = mcJson.id;
           break;
         case "game_directory":
           val = `"${instancePath}"`;
@@ -418,11 +421,13 @@ export const getJVMArguments113 = (
   mcJson,
   account,
   memory,
+  optifineVersion,
+  modloader,
   hideAccessToken,
-  jvmOptions = [],
-  optifineVersion
+  jvmOptions = []
 ) => {
-  console.log("DIO", optifineVersion, mcjar, mcJson);
+  console.log("dionano", optifineVersion, mcJson.mainClass, modloader);
+
   const argDiscovery = /\${*(.*)}/;
   let args = mcJson.arguments.jvm.filter(v => !skipLibrary(v));
 
@@ -436,7 +441,9 @@ export const getJVMArguments113 = (
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   args.push(...jvmOptions);
 
-  args.push(mcJson.mainClass);
+  if (optifineVersion && modloader[0] === "vanilla") {
+    args.push(" net.minecraft.launchwrapper.Launch ");
+  } else args.push(mcJson.mainClass);
 
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
 
@@ -457,8 +464,8 @@ export const getJVMArguments113 = (
             val = account.selectedProfile.name.trim();
             break;
           case "version_name":
-            // val = optifineVersion ? mcJson.id : ` --version ${optifineVersion}`;
-            val = mcJson.id;
+            val = optifineVersion ? `${optifineVersion}` : mcJson.id;
+            // val = mcJson.id;
             break;
           case "game_directory":
             val = `"${instancePath}"`;
