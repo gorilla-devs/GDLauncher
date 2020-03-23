@@ -31,6 +31,21 @@ jobs:
       - name: yarn release
         run: |
           yarn release
+
       - uses: actions/upload-artifact@v1
+        if: matrix.os == 'macos-latest'
         with:
-          path: $GITHUB_WORKSPACE/release/*
+          name: GDLauncher-mac-setup.dmg
+          path: release
+
+      - uses: actions/upload-artifact@v1
+        if: matrix.os == 'windows-latest'
+        with:
+          name: GDLauncher-win-setup.exe
+          path: release
+
+      - uses: actions/upload-artifact@v1
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: GDLauncher-linux-setup.AppImage
+          path: release
