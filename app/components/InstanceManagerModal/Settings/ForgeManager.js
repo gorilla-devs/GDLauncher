@@ -16,6 +16,7 @@ import {
   GDL_LEGACYJAVAFIXER_MOD_URL
 } from '../../../constants';
 import vCompare from '../../../utils/versionsCompare';
+import vSort from 'version-sort';
 import colors from '../../../style/theme/colors.scss';
 import styles from './ForgeManager.scss';
 
@@ -127,7 +128,7 @@ class Instances extends Component<Props> {
           >
             {this.props.forgeVersions[this.props.data.version] &&
               _.reverse(
-                this.props.forgeVersions[this.props.data.version].slice()
+                vSort(this.props.forgeVersions[this.props.data.version]).slice()
               ).map(ver => (
                 <Select.Option key={ver} value={ver}>
                   {ver}
