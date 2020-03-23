@@ -385,14 +385,19 @@ export function downloadJava() {
       });
     }
 
-    await fse.move(
-      path.join(tempFolder, `${releaseName}-jre`),
-      path.join(javaBaseFolder, version)
-    );
+    const directoryToMove =
+      process.platform === "darwin"
+        ? path.join(tempFolder, `${releaseName}-jre`, "Contents", "Home")
+        : path.join(tempFolder, `${releaseName}-jre`);
+
+    await fse.move(directoryToMove, path.join(javaBaseFolder, version));
 
     await fse.remove(tempFolder);
 
-    await fixFilePermissions(_getJavaPath(state));
+    const ext = process.platform === "win32" ? ".exe" : "";
+    await fixFilePermissions(
+      path.join(javaBaseFolder, version, "bin", `java${ext}`)
+    );
 
     ipcRenderer.invoke("update-progress-bar", -1);
 
@@ -1640,7 +1645,7 @@ export function launchInstance(instanceName) {
       await ipcRenderer.invoke("hide-window");
     }
 
-    const process = spawn(javaPath, jvmArguments, {
+    const process = spawn(`"${javaPath}"`, jvmArguments, {
       cwd: instancePath,
       shell: true
     });

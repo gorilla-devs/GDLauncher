@@ -92,6 +92,7 @@ export const skipLibrary = lib => {
 };
 
 export const librariesMapper = (libraries, librariesPath) => {
+  console.log(libraries);
   return removeDuplicates(
     libraries
       .filter(v => !skipLibrary(v))
@@ -105,18 +106,18 @@ export const librariesMapper = (libraries, librariesPath) => {
             sha1: lib.downloads.artifact.sha1
           });
         }
-        const native =
-          lib.natives &&
-          lib.natives[convertOSToMCFormat(process.platform)].replace(
-            "${arch}", // eslint-disable-line no-template-curly-in-string
-            "64"
-          );
+
+        const native = (
+          (lib?.natives &&
+            lib?.natives[convertOSToMCFormat(process.platform)]) ||
+          ""
+        ).replace(
+          "${arch}", // eslint-disable-line no-template-curly-in-string
+          "64"
+        );
+
         // Vanilla native libs
-        if (
-          lib.downloads &&
-          lib.downloads.classifiers &&
-          lib.downloads.classifiers[native]
-        ) {
+        if (native && lib?.downloads?.classifiers[native]) {
           tempArr.push({
             url: lib.downloads.classifiers[native].url,
             path: path.join(
@@ -498,8 +499,8 @@ export const patchForge113 = async (
         .map(arg => replaceIfPossible(arg))
         .map(arg => computePathIfPossible(arg));
 
-      const classPaths = p.classpath.map(cp =>
-        path.join(librariesPath, ...mavenToArray(cp))
+      const classPaths = p.classpath.map(
+        cp => `"${path.join(librariesPath, ...mavenToArray(cp))}"`
       );
 
       const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
@@ -507,10 +508,10 @@ export const patchForge113 = async (
 
       await new Promise(resolve => {
         const ps = spawn(
-          javaPath,
+          `"${javaPath}"`,
           [
             "-classpath",
-            [filePath, ...classPaths].join(
+            [`"${filePath}"`, ...classPaths].join(
               process.platform === "win32" ? ";" : ":"
             ),
             mainClass,
