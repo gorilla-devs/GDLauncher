@@ -1,7 +1,7 @@
-import { createSelector } from "reselect";
-import path from "path";
-import memoize from "lodash.memoize";
-import { convertOSToJavaFormat } from "../../app/desktop/utils";
+import { createSelector } from 'reselect';
+import path from 'path';
+import memoize from 'lodash.memoize';
+import { convertOSToJavaFormat } from '../../app/desktop/utils';
 
 const _instances = state => state.instances;
 const _accounts = state => state.app.accounts;
@@ -51,38 +51,38 @@ export const _getJavaPath = createSelector(
     const javaOs = convertOSToJavaFormat(process.platform);
     const javaMeta = javaManifest.find(
       v =>
-        v.os === javaOs && v.architecture === "x64" && v.binary_type === "jre"
+        v.os === javaOs && v.architecture === 'x64' && v.binary_type === 'jre'
     );
     const {
       version_data: { openjdk_version: version }
     } = javaMeta;
-    const filename = process.platform === "win32" ? "java.exe" : "java";
-    return path.join(dataPath, "java", version, "bin", filename);
+    const filename = process.platform === 'win32' ? 'java.exe' : 'java';
+    return path.join(dataPath, 'java', version, 'bin', filename);
   }
 );
 
 export const _getInstancesPath = createSelector(_dataPath, dataPath =>
-  path.join(dataPath, "instances")
+  path.join(dataPath, 'instances')
 );
 
 export const _getTempPath = createSelector(_dataPath, dataPath =>
-  path.join(dataPath, "temp")
+  path.join(dataPath, 'temp')
 );
 
 export const _getDataStorePath = createSelector(_dataPath, dataPath =>
-  path.join(dataPath, "datastore")
+  path.join(dataPath, 'datastore')
 );
 
 export const _getLibrariesPath = createSelector(
   _getDataStorePath,
-  datastorePath => path.join(datastorePath, "libraries")
+  datastorePath => path.join(datastorePath, 'libraries')
 );
 
 export const _getMinecraftVersionsPath = createSelector(
   _getLibrariesPath,
-  librariesPath => path.join(librariesPath, "net", "minecraft")
+  librariesPath => path.join(librariesPath, 'net', 'minecraft')
 );
 
 export const _getAssetsPath = createSelector(_getDataStorePath, datastorePath =>
-  path.join(datastorePath, "assets")
+  path.join(datastorePath, 'assets')
 );

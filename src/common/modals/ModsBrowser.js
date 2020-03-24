@@ -1,17 +1,24 @@
-import React, { memo, useEffect, useState } from "react";
-import AutoSizer from "react-virtualized-auto-sizer";
-import styled from "styled-components";
-import InfiniteLoader from "react-window-infinite-loader";
-import { Input, Select } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { useDebounce } from "rooks";
-import { FixedSizeGrid as Grid } from "react-window";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../components/Modal";
-import { getSearch } from "../api";
-import { openModal } from "../reducers/modals/actions";
-import { _getInstance } from "../utils/selectors";
+import React, { memo, useEffect, useState } from 'react';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import styled from 'styled-components';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { Input, Select, Button } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { useDebouncedCallback } from 'use-debounce';
+import { FixedSizeGrid as Grid } from 'react-window';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import Modal from '../components/Modal';
+import { getSearch, getAddonFiles } from '../api';
+import { openModal } from '../reducers/modals/actions';
+import { _getInstance } from '../utils/selectors';
+import { installMod } from '../reducers/actions';
+import { FABRIC, FORGE } from '../utils/constants';
+import {
+  getFirstReleaseCandidate,
+  filterFabricFilesByVersion,
+  filterForgeFilesByVersion
+} from '../../app/desktop/utils';
 
 const CellContainer = styled.div.attrs(props => ({
   style: props.override
@@ -52,20 +59,6 @@ const CellContainer = styled.div.attrs(props => ({
         font-weight: 700;
         transition: all 150ms ease-in-out;
         color: ${props => props.theme.palette.text.primary};
-        &:last-child {
-          font-size: 18px;
-          width: 100px;
-          height: 30px;
-          padding: 0 10px;
-          margin-bottom: 20px;
-          border-radius: 4px;
-          color: ${props => props.theme.palette.text.third};
-        }
-
-        &:last-child:hover {
-          background: ${props => props.theme.palette.primary.main};
-          color: ${props => props.theme.palette.text.primary};
-        }
       }
       &:hover {
         opacity: 1;
@@ -81,8 +74,12 @@ const Cell = ({
   isNextPageLoading,
   items,
   version,
-  installedMods
+  installedMods,
+  instanceName,
+  modloader
 }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   if (3 * rowIndex + columnIndex >= items.length && !isNextPageLoading)
     return <div />;
@@ -92,18 +89,7 @@ const Cell = ({
   const isInstalled = installedMods.find(v => v.projectID === mod?.id);
 
   return (
-    <CellContainer
-      mod={mod}
-      override={style}
-      onClick={() => {
-        dispatch(
-          openModal("ModOverview", {
-            gameVersion: version,
-            projectID: mod.id
-          })
-        );
-      }}
-    >
+    <CellContainer mod={mod} override={style}>
       {isInstalled && (
         <FontAwesomeIcon
           icon={faCheck}
@@ -117,25 +103,70 @@ const Cell = ({
         />
       )}
       <div
+        onClick={() => {
+          dispatch(
+            openModal('ModOverview', {
+              gameVersion: version,
+              projectID: mod.id,
+              ...(isInstalled && { fileID: isInstalled.fileID }),
+              ...(isInstalled && { fileName: isInstalled.fileName }),
+              instanceName
+            })
+          );
+        }}
         // eslint-disable-next-line
         style={{
           background: `linear-gradient(
             rgba(0, 0, 0, 0.9),
             rgba(0, 0, 0, 0.9)
             ), url('${primaryImage?.thumbnailUrl}')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center"
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
         }}
       >
         <div className="hoverContainer">
           <div>{mod?.name}</div>
-          <div
-            onClick={e => {
-              e.stopPropagation();
-            }}
-          >
-            INSTALL
-          </div>
+          {!isInstalled &&
+            (error || (
+              <Button
+                type="primary"
+                loading={loading}
+                onClick={async e => {
+                  setLoading(true);
+                  e.stopPropagation();
+                  const files = (await getAddonFiles(mod?.id)).data;
+
+                  const isFabric = modloader[0] === FABRIC;
+                  const isForge = modloader[0] === FORGE;
+
+                  let filteredFiles = [];
+
+                  if (isFabric) {
+                    filteredFiles = filterFabricFilesByVersion(files, version);
+                  } else if (isForge) {
+                    filteredFiles = filterForgeFilesByVersion(files, version);
+                  }
+
+                  const latestFile = getFirstReleaseCandidate(filteredFiles);
+
+                  if (latestFile === null) {
+                    setLoading(false);
+                    setError('Mod Not Available');
+                    console.error(
+                      `Could not find any release candidate for addon: ${mod?.id} / ${version}`
+                    );
+                    return;
+                  }
+
+                  await dispatch(
+                    installMod(mod?.id, latestFile?.id, instanceName, version)
+                  );
+                  setLoading(false);
+                }}
+              >
+                INSTALL
+              </Button>
+            ))}
         </div>
         {mod?.name}
       </div>
@@ -164,7 +195,9 @@ const ModsListWrapper = ({
   height,
   instance,
   version,
-  installedMods
+  installedMods,
+  instanceName,
+  modloader
 }) => {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
@@ -237,6 +270,8 @@ const ModsListWrapper = ({
               isItemLoaded={isItemLoaded}
               isNextPageLoading={isNextPageLoading}
               installedMods={installedMods}
+              instanceName={instanceName}
+              modloader={modloader}
               // eslint-disable-next-line
               {...p}
             />
@@ -253,16 +288,20 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
 
   const [mods, setMods] = useState([]);
   const [areModsLoading, setAreModsLoading] = useState(false);
-  const [filterType, setFilterType] = useState("Featured");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState('Featured');
+  const [searchQuery, setSearchQuery] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
   const instance = useSelector(state => _getInstance(state)(instanceName));
 
   const installedMods = instance?.mods;
 
-  const loadMoreModsDebounced = useDebounce(s => {
-    loadMoreMods(s);
-  }, 500);
+  const [loadMoreModsDebounced] = useDebouncedCallback(
+    (s, reset) => {
+      loadMoreMods(s, reset);
+    },
+    500,
+    { leading: false, trailing: true }
+  );
 
   useEffect(() => {
     loadMoreMods(searchQuery, true);
@@ -272,19 +311,20 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
     loadMoreMods();
   }, []);
 
-  const loadMoreMods = async (searchP = "", reset) => {
+  const loadMoreMods = async (searchP = '', reset) => {
     const reqObj = {};
     lastRequest = reqObj;
     const isReset = reset !== undefined ? reset : false;
     setAreModsLoading(true);
     const { data } = await getSearch(
-      "mods",
+      'mods',
       searchP,
       itemsNumber,
       isReset ? 0 : mods.length,
       filterType,
-      filterType !== "Author" && filterType !== "Name",
-      gameVersion
+      filterType !== 'Author' && filterType !== 'Name',
+      gameVersion,
+      instance.modloader[0] === FABRIC ? 4780 : null
     );
     const newMods = reset ? data : mods.concat(data);
     if (lastRequest === reqObj) {
@@ -325,7 +365,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
-              loadMoreMods(e.target.value, true);
+              loadMoreModsDebounced(e.target.value, true);
             }}
             allowClear
           />
@@ -338,10 +378,12 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
               items={mods}
               width={width}
               height={height - 50}
-              loadNextPage={loadMoreModsDebounced}
+              loadNextPage={loadMoreMods}
               searchQuery={searchQuery}
               version={gameVersion}
               installedMods={installedMods}
+              instanceName={instanceName}
+              modloader={instance.modloader}
             />
           )}
         </AutoSizer>

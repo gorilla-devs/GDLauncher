@@ -2,29 +2,34 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Select, Input } from "antd";
-import { useDebounce } from "rooks";
+import { useDebouncedCallback } from "use-debounce";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { getSearch } from "../../../api";
 import ModpacksListWrapper from "./ModpacksListWrapper";
+import { useSelector } from "react-redux";
 
 let lastRequest;
 const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
+  const mcVersions = useSelector(state => state.app.vanillaManifest?.versions);
+  const categories = useSelector(state => state.app.curseforgeCategories);
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [minecraftVersion, setMinecraftVersion] = useState(null);
+  const [categoryId, setCategoryId] = useState(null);
   const [sortBy, setSortBy] = useState("Featured");
   const [searchText, setSearchText] = useState("");
   const [hasNextPage, setHasNextPage] = useState(false);
 
   useEffect(() => {
     updateModpacks();
-  }, [searchText, sortBy]);
+  }, [searchText, sortBy, minecraftVersion, categoryId]);
 
-  const updateModpacks = useDebounce(() => {
+  const [updateModpacks] = useDebouncedCallback(() => {
     loadMoreModpacks(true);
   }, 500);
 
   const loadMoreModpacks = async (reset = false) => {
-    if ((reset && modpacks.length === 0) || loading) return;
+    if (loading) return;
     const reqObj = {};
     lastRequest = reqObj;
     setLoading(true);
@@ -34,7 +39,9 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
       40,
       reset ? 0 : modpacks.length,
       sortBy,
-      true
+      true,
+      minecraftVersion,
+      categoryId
     );
     const newModpacks = reset ? data : [...modpacks, ...data];
     setLoading(false);
@@ -51,7 +58,50 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   return (
     <Container>
       <HeaderContainer>
-        <StyledSelect placeholder="Minecraft Version" />
+        <StyledSelect
+          placeholder="Minecraft Version"
+          onChange={setMinecraftVersion}
+          defaultValue={null}
+        >
+          <Select.Option value={null}>All Versions</Select.Option>
+          {(mcVersions || [])
+            .filter(v => v?.type === "release")
+            .map(v => (
+              <Select.Option value={v?.id}>{v?.id}</Select.Option>
+            ))}
+        </StyledSelect>
+        <StyledSelect
+          placeholder="Minecraft Category"
+          onChange={setCategoryId}
+          defaultValue={null}
+        >
+          <Select.Option value={null}>All Categories</Select.Option>
+          {(categories || [])
+            .filter(v => v?.rootGameCategoryId === 4471)
+            .sort((a, b) => a?.name.localeCompare(b?.name))
+            .map(v => (
+              <Select.Option value={v?.id}>
+                <div
+                  css={`
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                    height: 100%;
+                  `}
+                >
+                  <img
+                    src={v?.avatarUrl}
+                    css={`
+                    height: 16px;
+                    width: 16px;
+                    margin-right: 10px;
+                  `}
+                  />
+                  {v?.name}
+                </div>
+              </Select.Option>
+            ))}
+        </StyledSelect>
         <StyledSelect
           placeholder="Sort by"
           defaultValue="Featured"
@@ -106,7 +156,10 @@ const StyledSelect = styled(Select)`
 
 const StyledInput = styled(Input.Search)``;
 
-const HeaderContainer = styled.div``;
+const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
 
 const ModpacksContainer = styled.div`
   height: calc(100% - 15px);

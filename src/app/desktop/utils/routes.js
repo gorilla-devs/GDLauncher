@@ -1,23 +1,23 @@
-import { lazy } from "react";
-import AsyncComponent from "../../../common/components/AsyncComponent";
-import withScroll from "./withScroll";
+import { lazy } from 'react';
+import AsyncComponent from '../../../common/components/AsyncComponent';
+import withScroll from './withScroll';
 
-const Login = lazy(() => import("../views/Login"));
-const Home = lazy(() => import("../views/Home"));
-const Onboarding = lazy(() => import("../views/Onboarding"));
+const Login = lazy(() => import('../views/Login'));
+const Home = lazy(() => import('../views/Home'));
+const Onboarding = lazy(() => import('../views/Onboarding'));
 
 const routes = [
   {
-    path: "/",
+    path: '/',
     exact: true,
     component: AsyncComponent(Login)
   },
   {
-    path: "/home",
+    path: '/home',
     component: withScroll(AsyncComponent(Home))
   },
   {
-    path: "/onboarding",
+    path: '/onboarding',
     component: AsyncComponent(Onboarding)
   }
 ];

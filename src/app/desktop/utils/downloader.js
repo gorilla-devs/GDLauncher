@@ -1,10 +1,10 @@
-import makeDir from "make-dir";
-import fss from "fs";
-import reqCall from "request";
-import pMap from "p-map";
-import path from "path";
-import request from "request-promise-native";
-import computeFileHash from "./computeFileHash";
+import makeDir from 'make-dir';
+import fss from 'fs';
+import reqCall from 'request';
+import pMap from 'p-map';
+import path from 'path';
+import request from 'request-promise-native';
+import computeFileHash from './computeFileHash';
 
 const fs = fss.promises;
 
@@ -19,15 +19,27 @@ export const downloadInstanceFiles = async (
     async item => {
       let counter = 0;
       let res = false;
+      if (!item.path || !item.url) {
+        console.warn('Skipping', item);
+        return;
+      }
       do {
-        // eslint-disable-next-line no-await-in-loop
-        res = await downloadFileInstance(
-          item.path,
-          item.url,
-          item.sha1,
-          item.legacyPath
-        );
         counter += 1;
+        if (counter !== 1) {
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          res = await downloadFileInstance(
+            item.path,
+            item.url,
+            item.sha1,
+            item.legacyPath
+          );
+        } catch {
+          // Do nothing
+        }
       } while (!res && counter < 3);
       downloaded += 1;
       if (
@@ -56,10 +68,10 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
       if (legacyPath) await makeDir(path.dirname(legacyPath));
     }
 
-    const file = await request(url, { encoding: "binary" });
-    await fs.writeFile(fileName, file, "binary");
+    const file = await request(url, { encoding: 'binary' });
+    await fs.writeFile(fileName, file, 'binary');
     if (legacyPath) {
-      await fs.writeFile(legacyPath, file, "binary");
+      await fs.writeFile(legacyPath, file, 'binary');
     }
     return true;
   } catch (e) {
@@ -78,18 +90,18 @@ export const downloadFile = async (fileName, url, onProgress) => {
     let totalBytes = 0;
 
     const req = reqCall({
-      method: "GET",
+      method: 'GET',
       uri: url
     });
     const out = fss.createWriteStream(fileName);
     req.pipe(out);
 
-    req.on("response", data => {
+    req.on('response', data => {
       // Change the total bytes value to get progress later.
-      totalBytes = parseInt(data.headers["content-length"], 10);
+      totalBytes = parseInt(data.headers['content-length'], 10);
     });
 
-    req.on("data", chunk => {
+    req.on('data', chunk => {
       // Update the received bytes
       receivedBytes += chunk.length;
       if (onProgress) {
@@ -97,11 +109,11 @@ export const downloadFile = async (fileName, url, onProgress) => {
       }
     });
 
-    req.on("end", () => {
+    req.on('end', () => {
       resolve();
     });
 
-    req.on("error", () => {
+    req.on('error', () => {
       reject();
     });
   });

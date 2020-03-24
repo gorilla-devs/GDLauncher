@@ -1,8 +1,8 @@
-import React from "react";
-import styled from "styled-components";
-import { useSelector } from "react-redux";
-import { _getInstances } from "../../../../common/utils/selectors";
-import Instance from "./Instance";
+import React from 'react';
+import styled from 'styled-components';
+import { useSelector } from 'react-redux';
+import { _getInstances } from '../../../../common/utils/selectors';
+import Instance from './Instance';
 
 const Container = styled.div`
   display: flex;

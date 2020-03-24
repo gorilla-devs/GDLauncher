@@ -1,31 +1,27 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Button, Dropdown, Menu } from "antd";
-import { useSelector, useDispatch } from "react-redux";
-import Instances from "../components/Instances";
-import News from "../components/News";
-import { openModal } from "../../../common/reducers/modals/actions";
-import { _getCurrentAccount } from "../../../common/utils/selectors";
-import { extractFace } from "../utils";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { Button, Dropdown, Menu } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import Instances from '../components/Instances';
+import News from '../components/News';
+import { openModal } from '../../../common/reducers/modals/actions';
+import { _getCurrentAccount } from '../../../common/utils/selectors';
+import { extractFace } from '../utils';
 
 const AddInstanceIcon = styled(Button)`
-  && {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-  }
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
 `;
 
 const AccountContainer = styled(Button)`
-  && {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    align-items: center;
-  }
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
 `;
 
 const Home = () => {
@@ -34,18 +30,16 @@ const Home = () => {
   const news = useSelector(state => state.news);
 
   const openAddInstanceModal = defaultPage => {
-    dispatch(openModal("AddInstance", { defaultPage }));
+    dispatch(openModal('AddInstance', { defaultPage }));
   };
 
   const openAccountModal = () => {
-    dispatch(openModal("AccountsManager"));
+    dispatch(openModal('AccountsManager'));
   };
   const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
-    extractFace(account.skin)
-      .then(setProfileImage)
-      .catch(console.error);
+    extractFace(account.skin).then(setProfileImage).catch(console.error);
   }, [account]);
 
   const menu = (
@@ -54,7 +48,7 @@ const Home = () => {
         Empty Instance
       </Menu.Item>
       <Menu.Item key="1" onClick={() => openAddInstanceModal(1)}>
-        Twitch Instance
+        Modpack Instance
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="2" onClick={() => openAddInstanceModal(2)}>
@@ -67,7 +61,7 @@ const Home = () => {
     <div>
       <News news={news} />
       <Instances />
-      <Dropdown overlay={menu} trigger={["click"]}>
+      <Dropdown overlay={menu} trigger={['click']}>
         <AddInstanceIcon color="primary">
           <FontAwesomeIcon icon={faPlus} />
         </AddInstanceIcon>
