@@ -44,8 +44,9 @@ This is an example of the time that GDLauncher takes to install a modpack in com
 - GDLauncher: `0:52m`
 - Twitch Launcher: `2.25m`
 
-<div align="center">
-<video src="https://gdevs.io/comparison.mp4" width="500" height="auto" controls preload></video></div>
+<p align="center">
+    <img width="800" height="auto" src="https://gdevs.io/comparison.gif" alt="GDLauncher" />
+</p>
 
 ## 🚀 Getting Started
 
