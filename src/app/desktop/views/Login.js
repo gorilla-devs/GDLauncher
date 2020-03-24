@@ -141,7 +141,10 @@ const Login = () => {
   useKey(['Enter'], authenticate);
 
   useEffect(() => {
-    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
+    ipcRenderer
+      .invoke('getAppVersion')
+      .then(setVersion)
+      .catch(console.error);
   }, []);
 
   return (

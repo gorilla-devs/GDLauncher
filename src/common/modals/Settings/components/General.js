@@ -233,8 +233,13 @@ const General = () => {
     Object.keys(isPlaying).length > 0;
 
   useEffect(() => {
-    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
-    extractFace(currentAccount.skin).then(setProfileImage).catch(console.error);
+    ipcRenderer
+      .invoke('getAppVersion')
+      .then(setVersion)
+      .catch(console.error);
+    extractFace(currentAccount.skin)
+      .then(setProfileImage)
+      .catch(console.error);
   }, []);
 
   const clearSharedData = async () => {

@@ -39,7 +39,9 @@ const Home = () => {
   const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
-    extractFace(account.skin).then(setProfileImage).catch(console.error);
+    extractFace(account.skin)
+      .then(setProfileImage)
+      .catch(console.error);
   }, [account]);
 
   const menu = (
