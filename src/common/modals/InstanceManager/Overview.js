@@ -1,8 +1,9 @@
 /* eslint-disable */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
 import path from 'path';
+import omit from 'lodash.omit';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUndo } from '@fortawesome/free-solid-svg-icons';
@@ -79,6 +80,42 @@ const Overview = ({ instanceName }) => {
   const [JavaArgumentsSwitch, setJavaArgumentsSwitch] = useState(false);
   const [newName, setNewName] = useState(instanceName);
 
+  useEffect(() => {
+    if (!JavaMemorySwitch) {
+      dispatch(
+        updateInstanceConfig(instanceName, prev =>
+          omit(prev, config.javaMemory)
+        )
+      );
+    } else {
+      if (!config.javaMemory) {
+        dispatch(
+          updateInstanceConfig(instanceName, prev => ({
+            ...prev,
+            javaMemory: '4096'
+          }))
+        );
+      }
+    }
+  }, [JavaMemorySwitch]);
+
+  useEffect(() => {
+    if (!JavaArgumentsSwitch) {
+      dispatch(
+        updateInstanceConfig(instanceName, prev => omit(prev, config.javaArgs))
+      );
+    } else {
+      if (!config.javaArgs) {
+        dispatch(
+          updateInstanceConfig(instanceName, prev => ({
+            ...prev,
+            javaArgs: DEFAULT_JAVA_ARGS
+          }))
+        );
+      }
+    }
+  }, [JavaArgumentsSwitch]);
+
   const dispatch = useDispatch();
 
   const rename = () => {
@@ -88,8 +125,8 @@ const Overview = ({ instanceName }) => {
     );
   };
 
-  async function resetJavaArguments() {
-    await dispatch(
+  function resetJavaArguments() {
+    dispatch(
       updateInstanceConfig(instanceName, prev => ({
         ...prev,
         javaArgs: DEFAULT_JAVA_ARGS
@@ -97,8 +134,8 @@ const Overview = ({ instanceName }) => {
     );
   }
 
-  const updateJavaMemory = async e => {
-    await dispatch(
+  const updateJavaMemory = e => {
+    dispatch(
       updateInstanceConfig(instanceName, prev => ({
         ...prev,
         javaMemory: e
@@ -150,7 +187,7 @@ const Overview = ({ instanceName }) => {
             </div>
           )}
           <JavaManagerRow>
-            <div>Java Arguments</div>{' '}
+            <div>Java Arguments</div>
             <Switch
               value={JavaArgumentsSwitch}
               onChange={e => setJavaArgumentsSwitch(e)}
