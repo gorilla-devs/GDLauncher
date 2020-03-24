@@ -1,9 +1,9 @@
 /* eslint-disable */
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import isHotkey from "is-hotkey";
 import { Editable, withReact, useSlate, Slate } from "slate-react";
 import { Editor, Transforms, createEditor } from "slate";
+import { useDebouncedCallback } from "use-debounce";
 import { withHistory } from "slate-history";
 import { Button } from "antd";
 import styled from "styled-components";
@@ -13,38 +13,12 @@ import {
   faItalic,
   faUnderline,
   faCode,
+  faQuoteRight,
   faListOl,
-  faList,
-  faQuoteRight
+  faList
 } from "@fortawesome/free-solid-svg-icons";
 import { updateInstanceConfig } from "../../reducers/actions";
 import { _getInstancesPath, _getInstance } from "../../utils/selectors";
-
-const Toolbar = styled.div`
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-`;
-
-const StyledEditable = styled(Editable)`
-  min-height: 400px;
-  max-height: 95%;
-  min-width: 98%;
-  max-width: 98%;
-  margin-top: 20px;
-  padding: 5px;
-  overflow: hidden;
-  background: ${props => props.theme.palette.grey[900]};
-  border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
-`;
-
-const HOTKEYS = {
-  "mod+b": "bold",
-  "mod+i": "italic",
-  "mod+u": "underline",
-  "mod+`": "code"
-};
 
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
@@ -53,37 +27,27 @@ const Notes = ({ instanceName }) => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const dispatch = useDispatch();
+  const InstancePath = useSelector(_getInstancesPath);
+
   const instance = useSelector(state => _getInstance(state)(instanceName));
-  const notes = instance.notes || initialValue;
+  const [value, setValue] = useState(instance.notes || initialValue);
+
+  const [updateNotes] = useDebouncedCallback(v => {
+    dispatch(
+      updateInstanceConfig(instanceName, config => ({ ...config, notes: v }))
+    );
+    300, { maxWait: 600 };
+  });
 
   return (
-    <div
-      css={`
-        width: 100%;
-        height: 100%;
-      `}
-    >
-      <div
-        css={`
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          width: 100%;
-          height: 100%;
-        `}
-      >
+    <MainContainer>
+      <Container>
         <Slate
           editor={editor}
-          value={notes}
+          value={value}
           onChange={notes => {
-            dispatch(
-              updateInstanceConfig(instanceName, config => {
-                return {
-                  ...config,
-                  notes
-                };
-              })
-            );
+            setValue(notes);
+            updateNotes(notes);
           }}
         >
           <Toolbar>
@@ -91,40 +55,24 @@ const Notes = ({ instanceName }) => {
             <MarkButton format="italic" icon={faItalic} />
             <MarkButton format="underline" icon={faUnderline} />
             <MarkButton format="code" icon={faCode} />
-            <BlockButton format="heading-one" icon="H1" />
-            <BlockButton format="heading-two" icon="H2" />
+            <BlockButton format="heading-one" icon="h1" />
+            <BlockButton format="heading-two" icon="h2" />
             <BlockButton format="block-quote" icon={faQuoteRight} />
             <BlockButton format="numbered-list" icon={faListOl} />
             <BlockButton format="bulleted-list" icon={faList} />
           </Toolbar>
-          <div
-            css={`
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-            `}
-          >
-            <StyledEditable
+          <TextEditorContainer>
+            <TextEditor
               renderElement={renderElement}
               renderLeaf={renderLeaf}
-              placeholder="Enter some Notes"
+              placeholder="Enter some notes..."
+              spellCheck
               autoFocus
-              spellCheck={false}
-              onKeyDown={event => {
-                for (const hotkey in HOTKEYS) {
-                  if (isHotkey(hotkey, event)) {
-                    event.preventDefault();
-                    const mark = HOTKEYS[hotkey];
-                    toggleMark(editor, mark);
-                  }
-                }
-              }}
             />
-          </div>
+          </TextEditorContainer>
         </Slate>
-      </div>
-    </div>
+      </Container>
+    </MainContainer>
   );
 };
 
@@ -214,10 +162,8 @@ const BlockButton = ({ format, icon }) => {
   return (
     <Button
       css={`
-        height: 36px;
-        padding: 5px 10px;
+        margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
-        margin: 2px;
       `}
       active={isBlockActive(editor, format)}
       onMouseDown={event => {
@@ -226,14 +172,9 @@ const BlockButton = ({ format, icon }) => {
       }}
     >
       {typeof icon === "string" ? (
-        icon
+        <div>{icon}</div>
       ) : (
-        <FontAwesomeIcon
-          css={`
-            margin: 0;
-          `}
-          icon={icon}
-        />
+        <FontAwesomeIcon icon={icon} />
       )}
     </Button>
   );
@@ -244,10 +185,8 @@ const MarkButton = ({ format, icon }) => {
   return (
     <Button
       css={`
-        height: 36px;
-        padding: 5px 10px;
+        margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
-        margin: 2px;
       `}
       active={isMarkActive(editor, format)}
       onMouseDown={event => {
@@ -255,12 +194,7 @@ const MarkButton = ({ format, icon }) => {
         toggleMark(editor, format);
       }}
     >
-      <FontAwesomeIcon
-        css={`
-          margin: 0;
-        `}
-        icon={icon}
-      />
+      <FontAwesomeIcon icon={icon} />
     </Button>
   );
 };
@@ -273,3 +207,48 @@ const initialValue = [
 ];
 
 export default Notes;
+
+const MainContainer = styled.div`
+  height: 100%;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+`;
+
+const Toolbar = styled.div`
+  height: 40px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const TextEditorContainer = styled.div`
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  overflow-x: hidden;
+`;
+
+const TextEditor = styled(Editable)`
+  width: 100%;
+  max-width: 100%;
+  display: inline-block;
+  margin-top: 20px;
+  overflow: hidden;
+  word-break: break-word;
+  border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+`;

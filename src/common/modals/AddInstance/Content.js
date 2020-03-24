@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import styled from "styled-components";
 import { Transition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,13 +17,13 @@ const Content = ({
   in: inProp,
   setStep,
   page,
-  setPage,
   setVersion,
   version,
   setModpack,
-  modpack,
+  importZipPath,
   setImportZipPath
 }) => {
+  const [overrideNextStepOnClick, setOverrideNextStepOnClick] = useState(null);
   let pages = [
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
     <TwitchModpacks
@@ -34,8 +34,9 @@ const Content = ({
     <Import
       setVersion={setVersion}
       setModpack={setModpack}
-      modpack={modpack}
+      importZipPath={importZipPath}
       setImportZipPath={setImportZipPath}
+      setOverrideNextStepOnClick={setOverrideNextStepOnClick}
     />
   ];
 
@@ -65,11 +66,13 @@ const Content = ({
                 position: absolute;
                 bottom: 20px;
                 right: 20px;
-                opacity: ${props => (props.page === 0 ? 1 : 0)};
+                opacity: ${props =>
+                  props.page === 0 || props.page === 2 ? 1 : 0};
               `}
             >
               <div
                 version={version}
+                importZipPath={importZipPath}
                 css={`
                   width: 70px;
                   height: 40px;
@@ -79,17 +82,25 @@ const Content = ({
                   border-radius: 4px;
                   font-size: 40px;
                   color: ${props =>
-                    props.version
+                    props.version || props.importZipPath
                       ? props.theme.palette.text.icon
                       : props.theme.palette.text.disabled};
-                  ${props => (props.version ? "cursor: pointer;" : "")}
+                  ${props =>
+                    props.version || props.importZipPath
+                      ? "cursor: pointer;"
+                      : ""}
                   &:hover {
                     background-color: ${props =>
-                      props.version ? props.theme.action.hover : "transparent"};
+                      props.version || props.importZipPath
+                        ? props.theme.action.hover
+                        : "transparent"};
                   }
                 `}
-                onClick={() => {
-                  if (version) {
+                onClick={async () => {
+                  if (overrideNextStepOnClick) {
+                    await overrideNextStepOnClick();
+                  }
+                  if (version || importZipPath) {
                     setStep(1);
                   }
                 }}
@@ -123,20 +134,4 @@ const Animation = styled.div`
   transform: translateX(
     ${({ state }) => (state === "exiting" || state === "exited" ? -100 : 0)}%
   );
-`;
-
-const MenuItem = styled.div`
-  display: flex;
-  align-items: center;
-  height: 40px;
-  color: white;
-  border-radius: 4px;
-  padding: 0 4px;
-  cursor: pointer;
-  ${props =>
-    props.active ? `background: ${props.theme.palette.grey[500]};` : ""}
-  transition: background 0.1s ease-in-out;
-  &:hover {
-    background: ${props => props.theme.palette.grey[500]};
-  }
 `;

@@ -1,5 +1,5 @@
-import React from "react";
-import { Route } from "react-router";
+import React from 'react';
+import { Route } from 'react-router';
 
 function RouteWithSubRoutes(route) {
   return (

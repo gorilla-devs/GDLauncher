@@ -1,8 +1,8 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import styled from "styled-components";
-import CloseButton from "./CloseButton";
-import { closeModal } from "../reducers/modals/actions";
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
+import CloseButton from './CloseButton';
+import { closeModal } from '../reducers/modals/actions';
 
 const HeaderComponent = styled.div`
   position: relative;
@@ -40,7 +40,7 @@ const Modal = ({
       css={`
         background: ${props =>
           props.transparentBackground
-            ? "transparent"
+            ? 'transparent'
             : props.theme.palette.grey[800]};
         position: absolute;
         border-radius: 4px;
@@ -48,7 +48,7 @@ const Modal = ({
     >
       {(header === undefined || header === true) && (
         <HeaderComponent>
-          <h3>{title || "Modal"}</h3>
+          <h3>{title || 'Modal'}</h3>
           <CloseButton onClick={() => dispatch(closeModal())} />
         </HeaderComponent>
       )}
@@ -57,8 +57,8 @@ const Modal = ({
         removePadding={removePadding}
         css={`
           height: ${header === undefined || header === true
-            ? "calc(100% - 40px)"
-            : "100%"};
+            ? 'calc(100% - 40px)'
+            : '100%'};
           padding: ${props =>
             (props.header === undefined || props.header === true) &&
             !props.removePadding

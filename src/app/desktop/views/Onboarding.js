@@ -1,15 +1,15 @@
-import React, { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { push } from "connected-react-router";
-import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { push } from 'connected-react-router';
+import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faLongArrowAltRight,
   faLongArrowAltUp,
   faLongArrowAltDown
-} from "@fortawesome/free-solid-svg-icons";
-import { _getCurrentAccount } from "../../../common/utils/selectors";
-import Logo from "../../../ui/Logo";
+} from '@fortawesome/free-solid-svg-icons';
+import { _getCurrentAccount } from '../../../common/utils/selectors';
+import Logo from '../../../ui/Logo';
 
 const Background = styled.div`
   position: absolute;
@@ -20,7 +20,7 @@ const Background = styled.div`
 `;
 
 const scrollToRef = ref =>
-  ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -68,7 +68,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.red};
+          background: ${props => props.theme.palette.grey[700]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -109,7 +109,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.yellow};
+          background: ${props => props.theme.palette.grey[800]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -133,7 +133,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.green};
+          background: ${props => props.theme.palette.grey[700]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -159,7 +159,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.blue};
+          background: ${props => props.theme.palette.grey[800]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -199,7 +199,7 @@ const Home = () => {
         css={`
           height: 100%;
           width: 100%;
-          background: ${props => props.theme.palette.colors.purple};
+          background: ${props => props.theme.palette.grey[700]};
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -305,7 +305,7 @@ const Home = () => {
         `}
         onClick={() => {
           if (currentSlide === 5) {
-            dispatch(push("/home"));
+            dispatch(push('/home'));
           } else {
             executeScroll(1);
           }

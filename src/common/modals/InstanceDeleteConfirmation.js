@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import fse from "fs-extra";
-import path from "path";
-import { Button } from "antd";
-import { useInterval } from "rooks";
-import { useSelector, useDispatch } from "react-redux";
-import Modal from "../components/Modal";
-import { _getInstancesPath, _getInstances } from "../utils/selectors";
-import { closeModal } from "../reducers/modals/actions";
+import React, { useState } from 'react';
+import fse from 'fs-extra';
+import path from 'path';
+import { Button } from 'antd';
+import { useInterval } from 'rooks';
+import { useSelector, useDispatch } from 'react-redux';
+import Modal from '../components/Modal';
+import { _getInstancesPath, _getInstances } from '../utils/selectors';
+import { closeModal } from '../reducers/modals/actions';
 
 const InstanceDeleteConfirmation = ({ instanceName }) => {
   const dispatch = useDispatch();

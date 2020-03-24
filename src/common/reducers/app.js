@@ -1,5 +1,5 @@
-import { combineReducers } from "redux";
-import * as ActionTypes from "./actionTypes";
+import { combineReducers } from 'redux';
+import * as ActionTypes from './actionTypes';
 
 function accounts(state = [], action) {
   const index = state.findIndex(
@@ -50,6 +50,15 @@ function fabricManifest(state = [], action) {
 function forgeManifest(state = [], action) {
   switch (action.type) {
     case ActionTypes.UPDATE_FORGE_MANIFEST:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
+function curseforgeCategories(state = [], action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_CURSEFORGE_CATEGORIES_MANIFEST:
       return action.data;
     default:
       return state;
@@ -114,6 +123,7 @@ export default combineReducers({
   fabricManifest,
   javaManifest,
   modsManifests,
+  curseforgeCategories,
   clientToken,
   isNewUser,
   showChangelogs

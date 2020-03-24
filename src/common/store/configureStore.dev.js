@@ -1,15 +1,15 @@
-import { createStore, applyMiddleware, compose } from "redux";
-import { createHashHistory } from "history";
-import { routerMiddleware, routerActions } from "connected-react-router";
-import { persistReducer, persistStore } from "redux-persist";
-import { createLogger } from "redux-logger";
-import isElectron from "is-electron";
-import thunk from "./thunkEnhancer";
-import middlewareInstances from "../../app/desktop/utils/middlewareInstances";
-import middlewareApp from "../../app/desktop/utils/middlewareApp";
-import createRootReducer from "../reducers";
-import persistConfig from "./persistConfig";
-import { UPDATE_DOWNLOAD_PROGRESS } from "../reducers/actionTypes";
+import { createStore, applyMiddleware, compose } from 'redux';
+import { createHashHistory } from 'history';
+import { routerMiddleware, routerActions } from 'connected-react-router';
+import { persistReducer, persistStore } from 'redux-persist';
+import { createLogger } from 'redux-logger';
+import isElectron from 'is-electron';
+import thunk from './thunkEnhancer';
+import middlewareInstances from '../../app/desktop/utils/middlewareInstances';
+import middlewareApp from '../../app/desktop/utils/middlewareApp';
+import createRootReducer from '../reducers';
+import persistConfig from './persistConfig';
+import { UPDATE_DOWNLOAD_PROGRESS } from '../reducers/actionTypes';
 
 const history = createHashHistory();
 const rootReducer = createRootReducer(history);
@@ -27,11 +27,11 @@ const configureStore = () => {
     collapsed: true,
     duration: true,
     colors: {
-      title: () => "#8e44ad",
-      prevState: () => "#9E9E9E",
-      action: () => "#03A9F4",
-      nextState: () => "#4CAF50",
-      error: () => "#F20404"
+      title: () => '#8e44ad',
+      prevState: () => '#9E9E9E',
+      action: () => '#03A9F4',
+      nextState: () => '#4CAF50',
+      error: () => '#F20404'
     }
   });
   middleware.push(logger);
@@ -69,8 +69,8 @@ const configureStore = () => {
 
   if (module.hot) {
     module.hot.accept(
-      "../reducers",
-      () => store.replaceReducer(require("../reducers")).default // eslint-disable-line global-require
+      '../reducers',
+      () => store.replaceReducer(require('../reducers')).default // eslint-disable-line global-require
     );
   }
 

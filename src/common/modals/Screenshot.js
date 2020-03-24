@@ -1,7 +1,7 @@
-import React from "react";
-import path from "path";
-import styled from "styled-components";
-import Modal from "../components/Modal";
+import React from 'react';
+import path from 'path';
+import styled from 'styled-components';
+import Modal from '../components/Modal';
 
 const Container = styled.div`
   display: flex;
