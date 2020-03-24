@@ -27,6 +27,12 @@ const NewInstance = ({
   const optifineVersionsPath = useSelector(_getOptifineVersionsPath);
 
   useEffect(() => {
+    console.log(
+      "SARA",
+      optifineDefaultValue,
+      optifineManifest,
+      minecraftVersion
+    );
     if (
       minecraftVersion &&
       minecraftVersion[0] === "vanilla" &&
@@ -85,6 +91,18 @@ const NewInstance = ({
   //     );
   //   }
   // };
+
+  const optifDefaultValue = () => {
+    if (minecraftVersion[0] === "vanilla") {
+      if (optifineDefaultValue && optifineManifest[minecraftVersion[2]]) {
+        return optifineDefaultValue;
+      } else "No optifine available for this version";
+    } else if (minecraftVersion[0] === "forge") {
+      if (optifineDefaultValue && optifineManifest[minecraftVersion[1]]) {
+        return optifineDefaultValue;
+      } else "No optifine available for this version";
+    }
+  };
 
   const filterOptifineVersione = () => {
     if (
@@ -265,11 +283,12 @@ const NewInstance = ({
                 } else setOptifineVersion(v);
                 console.log("version", v, optifineDefaultValue);
               }}
-              value={
-                optifineDefaultValue && optifineManifest[minecraftVersion[2]]
-                  ? optifineDefaultValue
-                  : "No optifine available for this version"
-              }
+              value={optifDefaultValue()}
+
+              // optifineDefaultValue && optifineManifest[minecraftVersion[2]]
+              // ? optifineDefaultValue
+              // : "No optifine available for this version"
+
               placeholder="Select an optifine version"
               size="large"
               css={`

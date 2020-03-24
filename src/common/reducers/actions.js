@@ -1739,6 +1739,7 @@ export function launchInstance(instanceName) {
           `${instanceConfig.optifine}.jar`
         )
       );
+      
       if (
         lt(coerce(modloader[2]), coerce("10.13.1")) &&
         gte(coerce(modloader[2]), coerce("9.11.1")) &&
