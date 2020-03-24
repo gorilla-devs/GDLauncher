@@ -163,7 +163,7 @@ This project started as a way for me to learn programming and get better at it. 
  After a while, I didn't really like the language, so I just started it again from scratch in React and Electron.
 It was here that a community started gathering around the project. In the meanwhile I also found a job where I could learn even more about best practices, data structures and more.
 
- This is why I decided to rewrite it completely one more time, applying all the knowledge I gained in that time, and that made possible to implement a lot of really cool features, that were really complicated to code from a technical point of view.
+ This is why I decided to rewrite it completely one more time, applying all the knowledge I gained in that time, and that made it possible to implement a lot of really cool features, that were really complicated to code from a technical point of view.
 
  Here you can find the previous versions of the code:
  - [Original C# Code](https://www.github.com/gorilla-devs/GDLauncher)
