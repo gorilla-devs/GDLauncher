@@ -27,6 +27,7 @@ const AddAccount = ({ username }) => {
         height: 400px;
         width: 400px;
       `}
+      title=" "
     >
       <Container>
         <FormContainer>
