@@ -1,4 +1,4 @@
-import * as ActionTypes from "./actionTypes";
+import * as ActionTypes from './actionTypes';
 
 export function reset(feature) {
   return {
@@ -21,7 +21,7 @@ export function received(feature) {
   };
 }
 export function catchError(feature, errorValue) {
-  const isErrorObject = typeof errorValue === "object" && errorValue !== null;
+  const isErrorObject = typeof errorValue === 'object' && errorValue !== null;
   const error = isErrorObject ? errorValue.message || errorValue : errorValue;
   return {
     type: ActionTypes.CATCH_ERROR,

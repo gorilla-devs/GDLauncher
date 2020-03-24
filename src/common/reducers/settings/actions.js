@@ -1,4 +1,4 @@
-import * as ActionTypes from "./actionTypes";
+import * as ActionTypes from './actionTypes';
 
 export function updateSoundsSetting(sounds) {
   return dispatch => {
@@ -24,6 +24,7 @@ export function updateDataPath(path) {
       type: ActionTypes.UPDATE_DATA_PATH,
       path
     });
+    return path;
   };
 }
 

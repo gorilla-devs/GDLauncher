@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import ContentLoader from "react-content-loader";
-import styled, { ThemeContext } from "styled-components";
-import { shell } from "electron";
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import ContentLoader from 'react-content-loader';
+import styled, { ThemeContext } from 'styled-components';
+import { shell } from 'electron';
 
 const Carousel = styled.div`
   width: 100%;

@@ -1,4 +1,4 @@
-import { push } from "connected-react-router";
+import { push } from 'connected-react-router';
 
 const middleware = store => next => action => {
   const currState = store.getState();
@@ -13,14 +13,14 @@ const middleware = store => next => action => {
     currState.app.currentAccountId !== nextState.app.currentAccountId;
 
   if (currentAccountIdChanged && !nextState.app.currentAccountId) {
-    dispatch(push("/"));
+    dispatch(push('/'));
   }
 
   if (currState.settings.potatoPcMode !== nextState.settings.potatoPcMode) {
     if (nextState.settings.potatoPcMode) {
-      document.getElementById("root").classList.add("disable-animations");
+      document.getElementById('root').classList.add('disable-animations');
     } else {
-      document.getElementById("root").classList.remove("disable-animations");
+      document.getElementById('root').classList.remove('disable-animations');
     }
   }
 

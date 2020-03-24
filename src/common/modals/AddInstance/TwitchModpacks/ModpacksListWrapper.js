@@ -1,10 +1,11 @@
-import React, { forwardRef, memo } from "react";
-import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { FixedSizeList as List } from "react-window";
-import InfiniteLoader from "react-window-infinite-loader";
-import { transparentize } from "polished";
-import { openModal } from "../../../reducers/modals/actions";
+import React, { forwardRef, memo } from 'react';
+import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import { FixedSizeList as List } from 'react-window';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { transparentize } from 'polished';
+import { openModal } from '../../../reducers/modals/actions';
+import { FORGE } from '../../../utils/constants';
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -67,7 +68,7 @@ const ModpacksListWrapper = ({
           <div
             onClick={() => {
               setVersion([
-                "twitchModpack",
+                FORGE,
                 modpack.id,
                 modpack.latestFiles[modpack.latestFiles.length - 1].id
               ]);
@@ -75,12 +76,12 @@ const ModpacksListWrapper = ({
               setStep(1);
             }}
           >
-            Download
+            Download Latest
           </div>
           <div
             onClick={() => {
               dispatch(
-                openModal("ModpackDescription", {
+                openModal('ModpackDescription', {
                   modpack,
                   setVersion,
                   setModpack,
@@ -89,7 +90,7 @@ const ModpacksListWrapper = ({
               );
             }}
           >
-            Explore
+            Explore / Versions
           </div>
         </ModpackHover>
       </ModpackContainer>
@@ -122,7 +123,7 @@ const ModpacksListWrapper = ({
           height={height}
           width={width}
           itemCount={itemCount}
-          itemSize={80}
+          itemSize={100}
           onItemsRendered={onItemsRendered}
           innerElementType={innerElementType}
           ref={ref}
@@ -142,10 +143,11 @@ const ModpackContainer = styled.div`
   background: url('${props => props.bg}');
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center;
   margin: 10px 0;
   transition: height 0.2s ease-in-out;
   border-radius: 4px;
-`;
+  `;
 
 const Modpack = styled.div`
   width: 100%;
@@ -153,9 +155,10 @@ const Modpack = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 16px;
+  font-size: 20px;
   padding: 0 10px;
-  background: ${props => transparentize(0.4, props.theme.palette.grey[700])};
+  font-weight: 700;
+  background: ${props => transparentize(0.2, props.theme.palette.grey[700])};
 `;
 
 const ModpackHover = styled.div`

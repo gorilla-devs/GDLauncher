@@ -1,32 +1,107 @@
 /* eslint-disable */
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ReactHtmlParser from "react-html-parser";
+import path from "path";
 import { Checkbox, TextField, Cascader, Button, Input, Select } from "antd";
 import Modal from "../components/Modal";
 import { transparentize } from "polished";
 import { getAddonDescription, getAddonFiles, getAddon } from "../api";
 import CloseButton from "../components/CloseButton";
 import { closeModal } from "../reducers/modals/actions";
+import { installMod, updateInstanceConfig } from "../reducers/actions";
+import { remove } from "fs-extra";
+import { _getInstancesPath, _getInstance } from "../utils/selectors";
+import { FABRIC, FORGE } from "../utils/constants";
+import {
+  filterFabricFilesByVersion,
+  filterForgeFilesByVersion
+} from "../../app/desktop/utils";
 
-const ModOverview = ({ projectID, fileID, gameVersion }) => {
+const ModOverview = ({
+  projectID,
+  fileID,
+  gameVersion,
+  instanceName,
+  fileName
+}) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
   const [addon, setAddon] = useState(null);
-  const [files, setFiles] = useState(null);
-  const [selectedId, setSelectedId] = useState(fileID);
+  const [files, setFiles] = useState([]);
+  const [selectedItem, setSelectedItem] = useState({ fileID, fileName });
+  const [installedData, setInstalledData] = useState({ fileID, fileName });
+  const [loading, setLoading] = useState(false);
+  const [loadingFiles, setLoadingFiles] = useState(true);
+  const instancesPath = useSelector(_getInstancesPath);
+  const instance = useSelector(state => _getInstance(state)(instanceName));
+
   useEffect(() => {
+    setLoadingFiles(true);
     getAddon(projectID).then(data => setAddon(data.data));
     getAddonDescription(projectID).then(data => setDescription(data.data));
     getAddonFiles(projectID).then(data => {
-      setFiles(
-        data.data.filter(file => file.gameVersion.includes(gameVersion))
-      );
+      const isFabric = instance.modloader[0] === FABRIC;
+      const isForge = instance.modloader[0] === FORGE;
+      let filteredFiles = [];
+      if (isFabric) {
+        filteredFiles = filterFabricFilesByVersion(data.data, gameVersion);
+      } else if (isForge) {
+        filteredFiles = filterForgeFilesByVersion(data.data, gameVersion);
+      }
+      setFiles(filteredFiles);
+      setLoadingFiles(false);
     });
   }, []);
 
-  const handleChange = value => setSelectedId(value);
+  const getPlaceholderText = () => {
+    if (loadingFiles) {
+      return "Loading Files";
+    } else if (files.length === 0 && !loadingFiles) {
+      return "Mod Not Available";
+    } else {
+      return "Select A Version";
+    }
+  };
+
+  const getReleaseType = id => {
+    switch (id) {
+      case 1:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.green};
+            `}
+          >
+            [Stable]
+          </span>
+        );
+      case 2:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.yellow};
+            `}
+          >
+            [Beta]
+          </span>
+        );
+      case 3:
+      default:
+        return (
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.red};
+            `}
+          >
+            [Alpha]
+          </span>
+        );
+    }
+  };
+
+  const handleChange = value => setSelectedItem(JSON.parse(value));
 
   const primaryImage = (addon?.attachments || []).find(v => v.isDefault);
   return (
@@ -49,33 +124,124 @@ const ModOverview = ({ projectID, fileID, gameVersion }) => {
           <Content>{ReactHtmlParser(description)}</Content>
         </Container>
         <Footer>
+          {installedData.fileID &&
+            files.length !== 0 &&
+            !files.find(v => v.id === installedData.fileID) && (
+              <div
+                css={`
+                  color: ${props => props.theme.palette.colors.yellow};
+                  font-weight: 700;
+                `}
+              >
+                The installed version of this mod has been removed from twitch,
+                so you will only be able to get it as part of legacy modpacks.
+              </div>
+            )}
           <StyledSelect
-            placeholder="Select a version"
-            value={selectedId}
+            placeholder={getPlaceholderText()}
+            loading={loadingFiles}
+            disabled={loadingFiles}
+            value={
+              (files.length !== 0 &&
+                files.find(v => v.id === installedData.fileID) &&
+                JSON.stringify(selectedItem)) ||
+              undefined
+            }
             onChange={handleChange}
+            listItemHeight={50}
+            listHeight={400}
           >
             {(files || []).map(file => (
               <Select.Option
                 title={file.displayName}
                 key={file.id}
-                value={file.id}
+                value={JSON.stringify({
+                  fileID: file.id,
+                  fileName: file.fileName
+                })}
               >
-                {file.displayName}
+                <div
+                  css={`
+                    display: flex;
+                    height: 50px;
+                  `}
+                >
+                  <div
+                    css={`
+                      flex: 7;
+                      display: flex;
+                      align-items: center;
+                    `}
+                  >
+                    {file.displayName}
+                  </div>
+                  <div
+                    css={`
+                      flex: 2;
+                      display: flex;
+                      align-items: center;
+                      flex-direction: column;
+                    `}
+                  >
+                    <div>{gameVersion}</div>
+                    <div>{getReleaseType(file.releaseType)}</div>
+                  </div>
+                  <div
+                    css={`
+                      flex: 2;
+                      display: flex;
+                      align-items: center;
+                    `}
+                  >
+                    <div>
+                      {new Date(file.fileDate).toLocaleDateString("it-IT")}
+                    </div>
+                  </div>
+                </div>
               </Select.Option>
             ))}
           </StyledSelect>
           <Button
             type="primary"
-            disabled={!selectedId || fileID === selectedId}
-            onClick={() => {
-              //   const modpackFile = files.find(file => file.id === selectedId);
-              //   dispatch(closeModal());
-              //   setVersion(["twitchModpack", modpack.id, modpackFile.id]);
-              //   setModpack(modpack);
-              //   setStep(1);
+            disabled={
+              !selectedItem.fileID ||
+              installedData.fileID === selectedItem.fileID
+            }
+            loading={loading}
+            onClick={async () => {
+              setLoading(true);
+              if (installedData.fileID) {
+                await dispatch(
+                  updateInstanceConfig(instanceName, prev => ({
+                    ...prev,
+                    mods: prev.mods.filter(
+                      v => v.fileID !== installedData.fileID
+                    )
+                  }))
+                );
+                await remove(
+                  path.join(
+                    instancesPath,
+                    instanceName,
+                    "mods",
+                    installedData.fileName
+                  )
+                );
+              }
+              await dispatch(
+                installMod(
+                  projectID,
+                  selectedItem.fileID,
+                  instanceName,
+                  gameVersion,
+                  !installedData.fileID
+                )
+              );
+              setInstalledData(selectedItem);
+              setLoading(false);
             }}
           >
-            {fileID ? "Switch Version" : "Download"}
+            {installedData.fileID ? "Switch Version" : "Download"}
           </Button>
         </Footer>
       </>
@@ -86,8 +252,27 @@ const ModOverview = ({ projectID, fileID, gameVersion }) => {
 export default React.memo(ModOverview);
 
 const StyledSelect = styled(Select)`
-  && {
-    width: 250px;
+  width: 650px;
+  height: 50px;
+  .ant-select-selection-placeholder {
+    height: 50px !important;
+    line-height: 50px !important;
+  }
+  .ant-select-selector {
+    height: 50px !important;
+    cursor: pointer !important;
+  }
+  .ant-select-selection-item {
+    flex: 1;
+    cursor: pointer;
+    & > div {
+      & > div:nth-child(2) {
+        & > div:last-child {
+          height: 10px;
+          line-height: 5px;
+        }
+      }
+    }
   }
 `;
 
@@ -128,6 +313,9 @@ const ParallaxContent = styled.div`
   align-items: center;
   font-weight: bold;
   font-size: 60px;
+  color: ${props => props.theme.palette.text.secondary};
+  font-weight: 700;
+  padding: 0 30px;
   text-align: center;
   background: rgba(0, 0, 0, 0.8);
 `;

@@ -17,18 +17,20 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <script>
       (function() {
-        window.ga =
-          window.ga ||
-          function() {
-            (ga.q = ga.q || []).push(arguments);
-          };
-        ga.l = +new Date();
-        ga("create", "UA-147631204-1", "auto");
-        ga("set", "transport", "xhr");
-        ga("set", "appName", "GDLauncher");
-        ga("set", "checkProtocolTask", null);
-        ga("set", "checkStorageTask", null);
-        ga("send", "pageview");
+        if (process.env.NODE_ENV !== "development") {
+          window.ga =
+            window.ga ||
+            function() {
+              (ga.q = ga.q || []).push(arguments);
+            };
+          ga.l = +new Date();
+          ga("create", "UA-147631204-1", "auto");
+          ga("set", "transport", "xhr");
+          ga("set", "appName", "GDLauncher");
+          ga("set", "checkProtocolTask", null);
+          ga("set", "checkStorageTask", null);
+          ga("send", "pageview");
+        }
       })();
     </script>
     <script async src="https://www.google-analytics.com/analytics.js"></script>

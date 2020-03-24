@@ -1,5 +1,5 @@
-import * as ActionTypes from "./actionTypes";
-import features from "./features";
+import * as ActionTypes from './actionTypes';
+import features from './features';
 
 const FEATURES = Object.values(features);
 

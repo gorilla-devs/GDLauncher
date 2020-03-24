@@ -121,9 +121,7 @@ const NewInstance = ({ setVersion, setModpack }) => {
         placeholder="Select a version"
         size="large"
         css={`
-          && {
-            width: 400px;
-          }
+          width: 400px;
         `}
       />
     </Container>

@@ -1,30 +1,30 @@
-const { Client } = require("discord-rpc");
+const { Client } = require('discord-rpc');
 
 let client;
 let activity;
 
 exports.initRPC = () => {
-  client = new Client({ transport: "ipc" });
+  client = new Client({ transport: 'ipc' });
 
   activity = {
-    details: "Playing GDLauncher",
-    state: "Idle",
+    details: 'Playing GDLauncher',
+    state: 'Idle',
     startTimestamp: Math.floor(Date.now() / 1000),
-    largeImageKey: "default_big",
-    largeImageText: "GDLauncher - A Custom Minecraft Launcher",
+    largeImageKey: 'default_big',
+    largeImageText: 'GDLauncher - A Custom Minecraft Launcher',
     instance: false
   };
 
-  client.on("ready", () => {
-    console.log("Discord RPC Connected");
+  client.on('ready', () => {
+    console.log('Discord RPC Connected');
     client.setActivity(activity);
   });
 
-  client.login({ clientId: "555898932467597312" }).catch(error => {
-    if (error.message.includes("ENOENT")) {
-      console.log("Unable to initialize Discord RPC, no client detected.");
+  client.login({ clientId: '555898932467597312' }).catch(error => {
+    if (error.message.includes('ENOENT')) {
+      console.log('Unable to initialize Discord RPC, no client detected.');
     } else {
-      console.log("Unable to initialize Discord RPC:", error);
+      console.log('Unable to initialize Discord RPC:', error);
     }
   });
 };

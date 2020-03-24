@@ -1,19 +1,19 @@
-import path from "path";
-import { promises as fs } from "fs";
-import fse from "fs-extra";
-import pMap from "p-map";
-import { getDirectories } from ".";
-import { getFileMurmurHash2 } from "../../../common/utils";
-import { getAddonsByFingerprint } from "../../../common/api";
+import path from 'path';
+import { promises as fs } from 'fs';
+import fse from 'fs-extra';
+import pMap from 'p-map';
+import { getDirectories, normalizeModData, isMod } from '.';
+import { getFileMurmurHash2 } from '../../../common/utils';
+import { getAddonsByFingerprint, getAddon } from '../../../common/api';
 
-const modsFingerprintsScan = async (instancesPath, tempFolder) => {
+const modsFingerprintsScan = async instancesPath => {
   const mapFolderToInstance = async instance => {
     try {
       const configPath = path.join(
-        path.join(instancesPath, instance, "config.json")
+        path.join(instancesPath, instance, 'config.json')
       );
       const config = await fse.readJSON(configPath);
-      const modsFolder = path.join(instancesPath, instance, "mods");
+      const modsFolder = path.join(instancesPath, instance, 'mods');
       const modsFolderExists = await fse.pathExists(modsFolder);
 
       if (!modsFolderExists) return { ...config, name: instance };
@@ -31,15 +31,12 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
         try {
           const completeFilePath = path.join(modsFolder, file);
           const stat = await fs.lstat(completeFilePath);
-          if (stat.isFile()) {
+          if (stat.isFile() && isMod(completeFilePath, instancesPath)) {
             // Check if file is in config
             if (!(config?.mods || []).find(mod => mod.fileName === file)) {
-              const murmurHash = await getFileMurmurHash2(
-                completeFilePath,
-                tempFolder
-              );
+              const murmurHash = await getFileMurmurHash2(completeFilePath);
               console.log(
-                "[MODS SCANNER] Local mod not found in config",
+                '[MODS SCANNER] Local mod not found in config',
                 file,
                 murmurHash
               );
@@ -53,7 +50,9 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
       for (const configMod of config?.mods || []) {
         if (!files.includes(configMod.fileName)) {
           fileNamesToRemove.push(configMod.fileName);
-          console.log(`[MODS SCANNER] Removing ${configMod.fileName}`);
+          console.log(
+            `[MODS SCANNER] Removing ${configMod.fileName} from config`
+          );
         }
       }
       /* eslint-enable */
@@ -65,9 +64,8 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
           Object.values(missingMods)
         );
 
-        newMods = [
-          ...newMods,
-          ...Object.entries(missingMods).map(([fileName, hash]) => {
+        const matches = await Promise.all(
+          Object.entries(missingMods).map(async ([fileName, hash]) => {
             const exactMatch = (data.exactMatches || []).find(
               v => v.file.packageFingerprint === hash
             );
@@ -75,8 +73,15 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
               v => v === hash
             );
             if (exactMatch) {
+              const { data: addonData } = await getAddon(
+                exactMatch.file.projectId
+              );
               return {
-                ...exactMatch.file,
+                ...normalizeModData(
+                  exactMatch.file,
+                  exactMatch.file.projectId,
+                  addonData.name
+                ),
                 fileName
               };
             }
@@ -89,7 +94,9 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
             }
             return null;
           })
-        ];
+        );
+
+        newMods = [...newMods, ...matches];
       }
 
       const filterMods = newMods
@@ -109,6 +116,7 @@ const modsFingerprintsScan = async (instancesPath, tempFolder) => {
     } catch (err) {
       console.error(err);
     }
+    return null;
   };
 
   const folders = await getDirectories(instancesPath);
