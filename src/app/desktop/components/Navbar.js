@@ -80,7 +80,9 @@ const Navbar = () => {
   if (isLocation('/') || isLocation('/onboarding')) return null;
   return (
     <Container>
-      <img
+     <a href="https://github.com/gorilla-devs/GDLauncher" target="_blank">
+      <input
+	type="image"
         src={logo}
         height="30px"
         alt="logo"
@@ -90,6 +92,7 @@ const Navbar = () => {
           margin-left: 8px;
         `}
       />
+     </a>
       <div>
         {updateAvailable && (
           <UpdateButton>
