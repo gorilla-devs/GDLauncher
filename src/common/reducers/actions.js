@@ -79,6 +79,7 @@ import {
 } from '../../app/desktop/utils/downloader';
 import { removeDuplicates, getFileMurmurHash2 } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
+import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 
 export function initManifests() {
@@ -1325,6 +1326,7 @@ export const startListener = () => {
     const processRenamedInstance = async (oldInstanceName, newInstanceName) => {
       const newState = getState();
       const instance = _getInstance(newState)(newInstanceName);
+
       if (!instance) {
         try {
           const configPath = path.join(
@@ -1343,6 +1345,76 @@ export const startListener = () => {
               [newInstanceName]: { ...config, name: newInstanceName }
             }
           });
+
+          const instanceManagerModalIndex = newState.modals.findIndex(
+            x =>
+              x.modalType === 'InstanceManager' &&
+              x.modalProps.instanceName === oldInstanceName
+          );
+
+          const firstPartSplittedArr = newState.modals.slice(
+            instanceManagerModalIndex
+          );
+
+          const lastPartSplittedArr2 = newState.modals.slice(
+            instanceManagerModalIndex + 1,
+            newState.modals.length
+          );
+
+          if (instanceManagerModalIndex >= 0) {
+            if (newState.modals.length === 1) {
+              dispatch({
+                type: UPDATE_MODAL,
+                modals: [
+                  {
+                    modalType: 'InstanceManager',
+                    modalProps: { instanceName: newInstanceName }
+                  }
+                ]
+              });
+            } else if (newState.modals.length === 2) {
+              if (instanceManagerModalIndex === newState.modals.length) {
+                dispatch({
+                  type: UPDATE_MODAL,
+                  modals: [
+                    ...newState.modals,
+                    {
+                      modalType: 'InstanceManager',
+                      modalProps: { instanceName: newInstanceName }
+                    }
+                  ]
+                });
+              } else {
+                dispatch({
+                  type: UPDATE_MODAL,
+                  modals: [
+                    {
+                      modalType: 'InstanceManager',
+                      modalProps: { instanceName: newInstanceName }
+                    },
+                    newState.modals[1]
+                  ]
+                });
+              }
+            } else if (instanceManagerModalIndex !== newState.modals.length) {
+              dispatch({
+                type: UPDATE_MODAL,
+                modals: [
+                  ...firstPartSplittedArr,
+                  newState.modals[instanceManagerModalIndex],
+                  ...lastPartSplittedArr2
+                ]
+              });
+            } else {
+              dispatch({
+                type: UPDATE_MODAL,
+                modals: [
+                  ...firstPartSplittedArr,
+                  newState.modals[instanceManagerModalIndex]
+                ]
+              });
+            }
+          }
         } catch (err) {
           console.error(err);
         }

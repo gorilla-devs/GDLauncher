@@ -7,6 +7,8 @@ export default function modals(state = [], action) {
         modalType: action.modalType,
         modalProps: action.modalProps
       });
+    case ActionTypes.UPDATE_MODAL:
+      return action.modals;
     case ActionTypes.UNMOUNTING_MODAL:
       return [
         ...state.slice(0, state.length - 1),
