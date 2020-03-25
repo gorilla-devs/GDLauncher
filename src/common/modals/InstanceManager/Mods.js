@@ -2,8 +2,10 @@ import React, { memo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import path from 'path';
+import pMap from 'p-map';
 import { FixedSizeList as List, areEqual } from 'react-window';
-import { Checkbox, Input, Button, Switch } from 'antd';
+import { Checkbox, Input, Button, Switch, Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
@@ -286,7 +288,10 @@ const Mods = ({ instanceName }) => {
   const [selectedMods, setSelectedMods] = useState([]);
   const [search, setSearch] = useState('');
   const [fileDrag, setFileDrag] = useState(false);
+  const [fileDrop, setFileDrop] = useState(false);
   const dispatch = useDispatch();
+
+  const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
@@ -308,22 +313,34 @@ const Mods = ({ instanceName }) => {
   };
 
   const onDrop = async e => {
-    const fileName = e.dataTransfer.files[0].name;
-    const fileType = fileName.split('.')[1];
-    console.log('onDrop', e.dataTransfer.files[0].name.split('.'), fileType);
-    if (fileType === 'jar') {
-      await fse.copy(
-        e.dataTransfer.files[0].path,
-        path.join(instancesPath, instanceName, 'mods', fileName)
-      );
-    } else console.warn('This File is not a mod!');
+    setFileDrop(true);
+    const { files } = e.dataTransfer;
+    console.log('onDrop', files);
+    await pMap(
+      Object.values(files),
+      async file => {
+        const fileName = file.name;
+        const fileType = fileName.split('.')[1];
 
+        const { path: filePath } = file;
+        if (fileType === 'jar' || fileType === 'disabled') {
+          await fse.copy(
+            filePath,
+            path.join(instancesPath, instanceName, 'mods', fileName)
+          );
+        } else console.error('This File is not a mod!');
+      },
+      { concurrency: 10 }
+    );
+    setFileDrop(false);
+    setFileDrag(false);
     // e.preventDefault();
   };
 
   const onDragEnter = e => {
     setFileDrag(true);
     e.preventDefault();
+    e.stopPropagation();
   };
 
   const onDragLeave = () => {
@@ -433,7 +450,11 @@ const Mods = ({ instanceName }) => {
               fileDrag={fileDrag}
               onDragOver={onDragOver}
             >
-              <DragArrow icon={faArrowDown} size="3x" />
+              {fileDrop ? (
+                <Spin indicator={antIcon} />
+              ) : (
+                <DragArrow icon={faArrowDown} size="3x" />
+              )}
             </DragEnterEffect>
           )}
         </Transition>
