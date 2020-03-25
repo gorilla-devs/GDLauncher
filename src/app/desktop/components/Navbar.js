@@ -81,7 +81,7 @@ const Navbar = () => {
   return (
     <Container>
       <a href="https://github.com/gorilla-devs/GDLauncher" target="_blank" rel="noopener noreferrer">
-      <input
+        <input
           type="image"
           src={logo}
           height="30px"
