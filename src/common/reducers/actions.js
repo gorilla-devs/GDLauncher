@@ -1352,69 +1352,17 @@ export const startListener = () => {
               x.modalProps.instanceName === oldInstanceName
           );
 
-          const firstPartSplittedArr = newState.modals.slice(
-            instanceManagerModalIndex
-          );
-
-          const lastPartSplittedArr2 = newState.modals.slice(
-            instanceManagerModalIndex + 1,
-            newState.modals.length
-          );
-
-          if (instanceManagerModalIndex >= 0) {
-            if (newState.modals.length === 1) {
-              dispatch({
-                type: UPDATE_MODAL,
-                modals: [
-                  {
-                    modalType: 'InstanceManager',
-                    modalProps: { instanceName: newInstanceName }
-                  }
-                ]
-              });
-            } else if (newState.modals.length === 2) {
-              if (instanceManagerModalIndex === newState.modals.length) {
-                dispatch({
-                  type: UPDATE_MODAL,
-                  modals: [
-                    ...newState.modals,
-                    {
-                      modalType: 'InstanceManager',
-                      modalProps: { instanceName: newInstanceName }
-                    }
-                  ]
-                });
-              } else {
-                dispatch({
-                  type: UPDATE_MODAL,
-                  modals: [
-                    {
-                      modalType: 'InstanceManager',
-                      modalProps: { instanceName: newInstanceName }
-                    },
-                    newState.modals[1]
-                  ]
-                });
-              }
-            } else if (instanceManagerModalIndex !== newState.modals.length) {
-              dispatch({
-                type: UPDATE_MODAL,
-                modals: [
-                  ...firstPartSplittedArr,
-                  newState.modals[instanceManagerModalIndex],
-                  ...lastPartSplittedArr2
-                ]
-              });
-            } else {
-              dispatch({
-                type: UPDATE_MODAL,
-                modals: [
-                  ...firstPartSplittedArr,
-                  newState.modals[instanceManagerModalIndex]
-                ]
-              });
-            }
-          }
+          dispatch({
+            type: UPDATE_MODAL,
+            modals: [
+              ...newState.modals.slice(0, instanceManagerModalIndex),
+              {
+                modalType: 'InstanceManager',
+                modalProps: { instanceName: newInstanceName }
+              },
+              ...newState.modals.slice(instanceManagerModalIndex + 1)
+            ]
+          });
         } catch (err) {
           console.error(err);
         }

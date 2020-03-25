@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
@@ -7,10 +6,10 @@ import omit from 'lodash.omit';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUndo } from '@fortawesome/free-solid-svg-icons';
-import { Input, Button, Card, Switch, Select, Slider } from 'antd';
-import { _getInstancesPath } from '../../utils/selectors';
+import { Input, Button, Card, Switch, Slider } from 'antd';
+import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import { DEFAULT_JAVA_ARGS } from '../../../app/desktop/utils/constants';
-import { _getInstance } from '../../../common/utils/selectors';
+
 import { updateInstanceConfig } from '../../reducers/actions';
 
 const Container = styled.div`
@@ -73,12 +72,13 @@ const marks = {
 };
 
 const Overview = ({ instanceName }) => {
-  const javaArgs = useSelector(state => state.settings.java.args);
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
   const [JavaMemorySwitch, setJavaMemorySwitch] = useState(false);
   const [JavaArgumentsSwitch, setJavaArgumentsSwitch] = useState(false);
   const [newName, setNewName] = useState(instanceName);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!JavaMemorySwitch) {
@@ -87,15 +87,8 @@ const Overview = ({ instanceName }) => {
           omit(prev, config.javaMemory)
         )
       );
-    } else {
-      if (!config.javaMemory) {
-        dispatch(
-          updateInstanceConfig(instanceName, prev => ({
-            ...prev,
-            javaMemory: '4096'
-          }))
-        );
-      }
+    } else if (!config.javaMemory) {
+      updateJavaMemory('4096');
     }
   }, [JavaMemorySwitch]);
 
@@ -104,21 +97,12 @@ const Overview = ({ instanceName }) => {
       dispatch(
         updateInstanceConfig(instanceName, prev => omit(prev, config.javaArgs))
       );
-    } else {
-      if (!config.javaArgs) {
-        dispatch(
-          updateInstanceConfig(instanceName, prev => ({
-            ...prev,
-            javaArgs: DEFAULT_JAVA_ARGS
-          }))
-        );
-      }
+    } else if (!config.javaArgs) {
+      resetJavaArguments();
     }
   }, [JavaArgumentsSwitch]);
 
-  const dispatch = useDispatch();
-
-  const rename = () => {
+  const renameInstance = () => {
     fss.rename(
       path.join(instancesPath, instanceName),
       path.join(instancesPath, newName)
@@ -158,7 +142,7 @@ const Overview = ({ instanceName }) => {
         <MainTitle>Overview</MainTitle>
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
-          <RenameButton onClick={() => rename()} type="primary">
+          <RenameButton onClick={() => renameInstance()} type="primary">
             Rename&nbsp;
             <FontAwesomeIcon icon={faSave} />
           </RenameButton>
@@ -174,9 +158,7 @@ const Overview = ({ instanceName }) => {
           {JavaMemorySwitch && (
             <div>
               <JavaMemorySlider
-                onChange={e => {
-                  updateJavaMemory(e);
-                }}
+                onChange={updateJavaMemory}
                 defaultValue={config.javaMemory}
                 min={1024}
                 max={16384}
@@ -190,7 +172,7 @@ const Overview = ({ instanceName }) => {
             <div>Java Arguments</div>
             <Switch
               value={JavaArgumentsSwitch}
-              onChange={e => setJavaArgumentsSwitch(e)}
+              onChange={setJavaArgumentsSwitch}
             />
           </JavaManagerRow>
           {JavaArgumentsSwitch && (

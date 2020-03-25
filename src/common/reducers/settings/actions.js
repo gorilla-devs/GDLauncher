@@ -64,12 +64,11 @@ export function updateJavaPath(path) {
   };
 }
 
-export function updateJavaMemory(memory, instanceName) {
+export function updateJavaMemory(memory) {
   return dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_JAVA_MEMORY,
-      memory,
-      instanceName
+      memory
     });
   };
 }
