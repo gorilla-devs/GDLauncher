@@ -17,7 +17,7 @@ export default function modals(state = [], action) {
           }
         ];
       }
-      break;
+      return state;
     case ActionTypes.CLOSE_MODAL:
       if (state.length > 0) {
         return state.slice(0, state.length - 1);
