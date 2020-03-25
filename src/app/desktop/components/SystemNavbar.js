@@ -33,7 +33,7 @@ const SystemNavbar = () => {
 
   return !osx ? (
     <MainContainer>
-      <TerminalButton onClick={() => openDevTools}>
+      <TerminalButton onClick={openDevTools}>
         <FontAwesomeIcon icon={faTerminal} />
       </TerminalButton>
       <Container os={osx}>

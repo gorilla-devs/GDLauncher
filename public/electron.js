@@ -196,6 +196,7 @@ ipcMain.handle('openFolder', (e, folderPath) => {
 });
 
 ipcMain.handle('open-devTools', () => {
+  console.log('CIAO');
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
 });
 
