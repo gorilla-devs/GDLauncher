@@ -76,7 +76,7 @@ const SystemNavbar = () => {
         </div>
       </Container>
 
-      <TerminalButton onClick={() => openDevTools}>
+      <TerminalButton onClick={openDevTools}>
         <FontAwesomeIcon icon={faTerminal} />
       </TerminalButton>
     </OsxMainContainer>
