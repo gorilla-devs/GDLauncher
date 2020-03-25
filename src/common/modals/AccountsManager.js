@@ -28,6 +28,7 @@ const ProfileSettings = () => {
         width: 400px;
         max-height: 700px;
       `}
+      title="Account Manager"
     >
       <Container>
         <AccountsContainer>
