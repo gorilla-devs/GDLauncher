@@ -10,7 +10,7 @@ import {
   faTerminal
 } from '@fortawesome/free-solid-svg-icons';
 
-const osx = process.platform === 'darwin';
+const isOsx = process.platform === 'darwin';
 
 const SystemNavbar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
@@ -28,15 +28,19 @@ const SystemNavbar = () => {
   }, []);
 
   const openDevTools = () => {
-    ipcRenderer.invoke('open-devTools');
+    ipcRenderer.invoke('open-devtools');
   };
 
-  return !osx ? (
+  const DevtoolButton = () => (
+    <TerminalButton onClick={openDevTools}>
+      <FontAwesomeIcon icon={faTerminal} />
+    </TerminalButton>
+  );
+
+  return !isOsx ? (
     <MainContainer>
-      <TerminalButton onClick={openDevTools}>
-        <FontAwesomeIcon icon={faTerminal} />
-      </TerminalButton>
-      <Container os={osx}>
+      <DevtoolButton />
+      <Container os={isOsx}>
         <div onClick={() => ipcRenderer.invoke('minimize-window')}>
           <FontAwesomeIcon icon={faWindowMinimize} />
         </div>
@@ -56,8 +60,8 @@ const SystemNavbar = () => {
       </Container>
     </MainContainer>
   ) : (
-    <OsxMainContainer>
-      <Container os={osx}>
+    <MainContainer>
+      <Container os={isOsx}>
         <div
           css={`
             font-size: 18px;
@@ -76,10 +80,8 @@ const SystemNavbar = () => {
         </div>
       </Container>
 
-      <TerminalButton onClick={openDevTools}>
-        <FontAwesomeIcon icon={faTerminal} />
-      </TerminalButton>
-    </OsxMainContainer>
+      <DevtoolButton />
+    </MainContainer>
   );
 };
 
@@ -101,26 +103,6 @@ const MainContainer = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: background 0.1s ease-in-out;
-  }
-`;
-
-const OsxMainContainer = styled.div`
-  width: 100%;
-  height: ${({ theme }) => theme.sizes.height.systemNavbar}px;
-  background: ${({ theme }) => theme.palette.grey[900]};
-  -webkit-app-region: drag;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  & > * {
-    -webkit-app-region: no-drag;
-    width: 35px;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    cursor: pointer;
-    align-items: center;
     transition: background 0.1s ease-in-out;
   }
 `;

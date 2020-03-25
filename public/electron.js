@@ -195,8 +195,7 @@ ipcMain.handle('openFolder', (e, folderPath) => {
   shell.openItem(folderPath);
 });
 
-ipcMain.handle('open-devTools', () => {
-  console.log('CIAO');
+ipcMain.handle('open-devtools', () => {
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
 });
 
