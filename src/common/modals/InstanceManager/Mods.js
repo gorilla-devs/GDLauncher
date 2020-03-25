@@ -85,13 +85,15 @@ const DragEnterEffect = styled.div`
   justify-content: center;
   align-items: center;
   border: solid 5px ${props => props.theme.palette.primary.main};
-  opacity: ${props => (props.fileDrag ? '1' : '0')};
   transition: opacity 0.2s ease-in-out;
   border-radius: 3px;
   width: 100%;
   height: 100%;
   margin-top: 3px;
-  z-index: 2;
+  z-index: ${props =>
+    props.transitionState !== 'entering' && props.transitionState !== 'entered'
+      ? -1
+      : 2};
   backdrop-filter: blur(4px);
   background: linear-gradient(
     0deg,
@@ -287,10 +289,6 @@ const Mods = ({ instanceName }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('fileDrag', fileDrag);
-  }, [fileDrag]);
-
-  useEffect(() => {
     setMods(filter(sort(instance.mods), search));
   }, [search, instance.mods]);
 
@@ -303,22 +301,33 @@ const Mods = ({ instanceName }) => {
     setSelectedMods
   );
 
-  // const onDragOver = e => {
-  //   console.log('hover', e);
-  //   setFileDrag(true);
-  //   // e.preventDefault();
-  // };
-
-  const onDragEnter = e => {
-    console.log('draggato', e);
+  const onDragOver = e => {
+    console.log('hover', e);
     setFileDrag(true);
+    e.preventDefault();
+  };
+
+  const onDrop = async e => {
+    const fileName = e.dataTransfer.files[0].name;
+    const fileType = fileName.split('.')[1];
+    console.log('onDrop', e.dataTransfer.files[0].name.split('.'), fileType);
+    if (fileType === 'jar') {
+      await fse.copy(
+        e.dataTransfer.files[0].path,
+        path.join(instancesPath, instanceName, 'mods', fileName)
+      );
+    } else console.warn('This File is not a mod!');
+
     // e.preventDefault();
   };
 
-  const onDragLeave = e => {
-    console.log('drag leave', e);
+  const onDragEnter = e => {
+    setFileDrag(true);
+    e.preventDefault();
+  };
+
+  const onDragLeave = () => {
     setFileDrag(false);
-    // e.preventDefault();
   };
 
   return (
@@ -416,28 +425,18 @@ const Mods = ({ instanceName }) => {
         `}
       >
         <Transition timeout={300} in={fileDrag}>
-          {transitionState =>
-            fileDrag && (
-              <DragEnterEffect
-                transitionState={transitionState}
-                onDragLeave={onDragLeave}
-                fileDrag={fileDrag}
-                // onDragOver={onDragOver}
-                // onDrop={onDragLeave}
-              >
-                <DragArrow icon={faArrowDown} size="3x" />
-              </DragEnterEffect>
-            )
-          }
+          {transitionState => (
+            <DragEnterEffect
+              onDrop={onDrop}
+              transitionState={transitionState}
+              onDragLeave={onDragLeave}
+              fileDrag={fileDrag}
+              onDragOver={onDragOver}
+            >
+              <DragArrow icon={faArrowDown} size="3x" />
+            </DragEnterEffect>
+          )}
         </Transition>
-        {/* {fileDrag && (
-          <DragEnterEffect
-            onDragLeave={onDragLeave}
-            fileDrag={fileDrag}
-            // onDragOver={onDragOver}
-            // onDrop={onDragLeave}
-          />
-        )} */}
         <AutoSizer>
           {({ height, width }) => (
             <List
