@@ -5,8 +5,9 @@ import path from 'path';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import { Checkbox, Input, Button, Switch } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
+import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
@@ -73,6 +74,48 @@ const RowContainer = styled.div.attrs(props => ({
           color: ${props => props.theme.palette.error.main};
         }
       }
+    }
+  }
+`;
+
+const DragEnterEffect = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction; row;
+  justify-content: center;
+  align-items: center;
+  border: solid 5px ${props => props.theme.palette.primary.main};
+  opacity: ${props => (props.fileDrag ? '1' : '0')};
+  transition: opacity 0.2s ease-in-out;
+  border-radius: 3px;
+  width: 100%;
+  height: 100%;
+  margin-top: 3px;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, .3) 40%,
+    rgba(0, 0, 0, .3) 40%
+  );
+  opacity: ${({ transitionState }) =>
+    transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
+`;
+
+const DragArrow = styled(FontAwesomeIcon)`
+  ${props =>
+    props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
+
+  color: ${props => props.theme.palette.primary.main};
+
+  animation: MoveUpDown 1.5s linear infinite;
+
+  @keyframes MoveUpDown {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-15px);
     }
   }
 `;
@@ -240,7 +283,12 @@ const Mods = ({ instanceName }) => {
   const [mods, setMods] = useState(sort(instance.mods));
   const [selectedMods, setSelectedMods] = useState([]);
   const [search, setSearch] = useState('');
+  const [fileDrag, setFileDrag] = useState(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log('fileDrag', fileDrag);
+  }, [fileDrag]);
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
@@ -254,6 +302,24 @@ const Mods = ({ instanceName }) => {
     selectedMods,
     setSelectedMods
   );
+
+  // const onDragOver = e => {
+  //   console.log('hover', e);
+  //   setFileDrag(true);
+  //   // e.preventDefault();
+  // };
+
+  const onDragEnter = e => {
+    console.log('draggato', e);
+    setFileDrag(true);
+    // e.preventDefault();
+  };
+
+  const onDragLeave = e => {
+    console.log('drag leave', e);
+    setFileDrag(false);
+    // e.preventDefault();
+  };
 
   return (
     <div
@@ -343,11 +409,35 @@ const Mods = ({ instanceName }) => {
         />
       </Header>
       <div
+        onDragEnter={onDragEnter}
         css={`
           width: 100%;
           height: calc(100% - 40px);
         `}
       >
+        <Transition timeout={300} in={fileDrag}>
+          {transitionState =>
+            fileDrag && (
+              <DragEnterEffect
+                transitionState={transitionState}
+                onDragLeave={onDragLeave}
+                fileDrag={fileDrag}
+                // onDragOver={onDragOver}
+                // onDrop={onDragLeave}
+              >
+                <DragArrow icon={faArrowDown} size="3x" />
+              </DragEnterEffect>
+            )
+          }
+        </Transition>
+        {/* {fileDrag && (
+          <DragEnterEffect
+            onDragLeave={onDragLeave}
+            fileDrag={fileDrag}
+            // onDragOver={onDragOver}
+            // onDrop={onDragLeave}
+          />
+        )} */}
         <AutoSizer>
           {({ height, width }) => (
             <List
