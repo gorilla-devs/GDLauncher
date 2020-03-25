@@ -72,7 +72,7 @@ To download the latest version, you can either click [here](https://github.com/g
 - Import modpacks from other launchers
 - Keep track of the time you played each instance
 - Add instances to the download queue, they will automatically download one after the other
-- Manage your minecraft skin directly from the launcher
+- Manage your Minecraft skin directly from the launcher
 
 #### Some of the features we are still working on are:
 
@@ -88,7 +88,7 @@ These are the steps to compile it yourself.
 
 ### ⚙️ Requirements
 
-You need the following softwares installed:
+You need the following software installed:
 
 - [NodeJS](https://nodejs.org/en/download/) (> v1.13.9 x64)
 - yarn (`npm i -g yarn`)
