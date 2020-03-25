@@ -80,10 +80,7 @@ const Navbar = () => {
   if (isLocation('/') || isLocation('/onboarding')) return null;
   return (
     <Container>
-      <a
-        href="https://gdevs.io/"
-        rel="noopener noreferrer"
-      >
+      <a href="https://gdevs.io/" rel="noopener noreferrer">
         <img
           src={logo}
           height="30px"
