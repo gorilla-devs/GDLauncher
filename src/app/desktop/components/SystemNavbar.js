@@ -37,50 +37,51 @@ const SystemNavbar = () => {
     </TerminalButton>
   );
 
-  return !isOsx ? (
+  return (
     <MainContainer>
-      <DevtoolButton />
+      {!isOsx && <DevtoolButton />}
       <Container os={isOsx}>
-        <div onClick={() => ipcRenderer.invoke('minimize-window')}>
-          <FontAwesomeIcon icon={faWindowMinimize} />
-        </div>
-        <div onClick={() => ipcRenderer.invoke('min-max-window')}>
-          <FontAwesomeIcon
-            icon={isMaximized ? faWindowRestore : faWindowMaximize}
-          />
-        </div>
-        <div
-          css={`
-            font-size: 18px;
-          `}
-          onClick={() => ipcRenderer.invoke('quit-app')}
-        >
-          <FontAwesomeIcon icon={faTimes} />
-        </div>
+        {!isOsx ? (
+          <>
+            <div onClick={() => ipcRenderer.invoke('minimize-window')}>
+              <FontAwesomeIcon icon={faWindowMinimize} />
+            </div>
+            <div onClick={() => ipcRenderer.invoke('min-max-window')}>
+              <FontAwesomeIcon
+                icon={isMaximized ? faWindowRestore : faWindowMaximize}
+              />
+            </div>
+            <div
+              css={`
+                font-size: 18px;
+              `}
+              onClick={() => ipcRenderer.invoke('quit-app')}
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              css={`
+                font-size: 18px;
+              `}
+              onClick={() => ipcRenderer.invoke('quit-app')}
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </div>
+            <div onClick={() => ipcRenderer.invoke('minimize-window')}>
+              <FontAwesomeIcon icon={faWindowMinimize} />
+            </div>
+            <div onClick={() => ipcRenderer.invoke('min-max-window')}>
+              <FontAwesomeIcon
+                icon={isMaximized ? faWindowRestore : faWindowMaximize}
+              />
+            </div>
+          </>
+        )}
       </Container>
-    </MainContainer>
-  ) : (
-    <MainContainer>
-      <Container os={isOsx}>
-        <div
-          css={`
-            font-size: 18px;
-          `}
-          onClick={() => ipcRenderer.invoke('quit-app')}
-        >
-          <FontAwesomeIcon icon={faTimes} />
-        </div>
-        <div onClick={() => ipcRenderer.invoke('minimize-window')}>
-          <FontAwesomeIcon icon={faWindowMinimize} />
-        </div>
-        <div onClick={() => ipcRenderer.invoke('min-max-window')}>
-          <FontAwesomeIcon
-            icon={isMaximized ? faWindowRestore : faWindowMaximize}
-          />
-        </div>
-      </Container>
-
-      <DevtoolButton />
+      {isOsx && <DevtoolButton />}
     </MainContainer>
   );
 };
