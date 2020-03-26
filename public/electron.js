@@ -122,6 +122,16 @@ function createWindow() {
   mainWindow.on('unmaximize', () => {
     mainWindow.webContents.send('window-minimized');
   });
+
+  const handleRedirect = (e, url) => {
+    if (url !== mainWindow.webContents.getURL()) {
+      e.preventDefault();
+      shell.openExternal(url);
+    }
+  };
+
+  mainWindow.webContents.on('will-navigate', handleRedirect);
+  mainWindow.webContents.on('new-window', handleRedirect);
 }
 
 app.on('ready', createWindow);
