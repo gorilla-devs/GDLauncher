@@ -80,16 +80,19 @@ const Navbar = () => {
   if (isLocation('/') || isLocation('/onboarding')) return null;
   return (
     <Container>
-      <img
-        src={logo}
-        height="30px"
-        alt="logo"
-        draggable="false"
-        css={`
-          z-index: 1;
-          margin-left: 8px;
-        `}
-      />
+      <a href="https://gdevs.io/" rel="noopener noreferrer">
+        <img
+          src={logo}
+          height="30px"
+          alt="logo"
+          draggable="false"
+          css={`
+            z-index: 1;
+            cursor: pointer;
+            margin-left: 8px;
+          `}
+        />
+      </a>
       <div>
         {updateAvailable && (
           <UpdateButton>

@@ -248,7 +248,7 @@ const TextEditor = styled(Editable)`
   max-width: 100%;
   display: inline-block;
   margin-top: 20px;
-  overflow: hidden;
+  overflow-x: auto;
   word-break: break-word;
   border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
 `;
