@@ -47,7 +47,6 @@ const PersonalData = styled.div`
 const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
   margin: 0 500px 20px 0;
-  margin-bottom: 20px;
 `;
 
 const Title = styled.div`
@@ -86,17 +85,14 @@ const EmailContainer = styled.div`
   float: left;
   display: inline-block;
   text-align: left;
+  margin-left: 8px;
 `;
 
 const Username = styled.div`
-  text-size: 5px;
-  text-weight: 200;
   color: ${props => props.theme.palette.grey[100]};
 `;
 
 const Email = styled.div`
-  text-size: 5px;
-  text-weight: 200;
   color: ${props => props.theme.palette.grey[100]};
 `;
 
@@ -128,10 +124,6 @@ const ReleaseChannel = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-  }
-  select {
-    margin-left: auto;
-    self-align: end;
   }
 `;
 

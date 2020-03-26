@@ -1156,7 +1156,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         closeMessage = message.loading({
           ...notificationObj,
-          content: `Syncronizing files. ${queueLength} left.`
+          content: `Synchronizing files. ${queueLength} left.`
         });
       }
     });
@@ -1165,7 +1165,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         closeMessage = message.loading({
           ...notificationObj,
-          content: `Syncronizing files. ${queueLength} left.`
+          content: `Synchronizing files. ${queueLength} left.`
         });
       }
     });

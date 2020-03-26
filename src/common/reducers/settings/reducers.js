@@ -33,7 +33,6 @@ function releaseChannel(state = 0, action) {
   }
 }
 
-// 0 is stable, 1 is beta
 function concurrentDownloads(state = 3, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CONCURRENT_DOWNLOADS:

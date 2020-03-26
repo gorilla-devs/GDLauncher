@@ -13,13 +13,11 @@ import ModalsManager from './common/components/ModalsManager';
 
 import 'typeface-roboto';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 const Root =
   // eslint-disable-next-line no-nested-ternary
-  process.env.NODE_ENV === 'development'
-    ? RootDev
-    : process.env.APP_TYPE === 'web'
-    ? RootWeb
-    : RootElectron;
+  isDev ? RootDev : process.env.APP_TYPE === 'web' ? RootWeb : RootElectron;
 
 const ThemeProvider = ({ theme: themeUI, children }) => {
   return <StyledThemeProvider theme={themeUI}>{children}</StyledThemeProvider>;
@@ -27,7 +25,7 @@ const ThemeProvider = ({ theme: themeUI, children }) => {
 
 const { store, persistor } = configureStore();
 
-if (process.env.NODE_ENV === 'development') window.__store = store;
+if (isDev) window.__store = store;
 
 ReactDOM.render(
   <Provider store={store}>

@@ -56,7 +56,6 @@ const InstanceContainer = styled.div`
   height: 100%;
   background: linear-gradient(0deg,rgba(0,0,0,0.8),rgba(0,0,0,0.8)),url("${props =>
     props.background}") center no-repeat;
-  background-position: center;
   color: ${props => props.theme.palette.text.secondary};
   font-weight: 600;
   background-size: cover;
@@ -131,7 +130,12 @@ const MenuInstanceName = styled.div`
   font-weight: 700;
 `;
 
-const Instance = ({ instanceName }) => {
+const Instance = ({
+  instanceName,
+  handleDragStart,
+  handleDragOver,
+  handleDragEnd
+}) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
   const [background, setBackground] = useState(`${instanceDefaultBackground}`);
@@ -184,6 +188,10 @@ const Instance = ({ instanceName }) => {
           installing={isInQueue}
           onClick={startInstance}
           isHovered={isHovered || isPlaying}
+          draggable
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
         >
           <InstanceContainer installing={isInQueue} background={background}>
             <TimePlayed>

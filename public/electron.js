@@ -109,6 +109,20 @@ function createWindow() {
   );
   if (isDev) {
     mainWindow.webContents.openDevTools();
+
+    const {
+      default: installExtension,
+      REACT_DEVELOPER_TOOLS,
+      REDUX_DEVTOOLS
+      // eslint-disable-next-line global-require
+    } = require('electron-devtools-installer');
+
+    Promise.all([
+      installExtension(REACT_DEVELOPER_TOOLS),
+      installExtension(REDUX_DEVTOOLS)
+    ]).catch(err => {
+      console.log('An error occurred: ', err);
+    });
   }
 
   mainWindow.on('closed', () => {

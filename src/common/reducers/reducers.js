@@ -78,6 +78,16 @@ function instances(state = { started: false, list: {} }, action) {
         }
       }
       return { ...state, list: action.instances };
+    case ActionTypes.REORDER_INSTANCES:
+      if (Array.isArray(action.instances)) {
+        const instanceMap = action.instances.reduce((map, i) => {
+          // eslint-disable-next-line no-param-reassign
+          map[i.name] = i;
+          return map;
+        }, {});
+        return { ...state, list: instanceMap };
+      }
+      return { ...state, list: action.instances };
     case ActionTypes.UPDATE_INSTANCES_STARTED:
       return { ...state, started: action.started };
     default:
