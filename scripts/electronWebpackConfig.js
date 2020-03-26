@@ -74,7 +74,7 @@ module.exports = merge.smart(baseConfig, {
     minimizer: [
       new TerserPlugin({
         parallel: true,
-        sourceMap: false,
+        sourceMap: true,
         cache: true
       })
     ]
