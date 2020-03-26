@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import ContentLoader from 'react-content-loader';
 import styled, { ThemeContext } from 'styled-components';
 import { shell } from 'electron';
+import { useSelector } from 'react-redux';
 
 const Carousel = styled.div`
   width: 100%;
@@ -200,6 +201,7 @@ function useInterval(callback, delay) {
 function News({ style, news }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const ContextTheme = useContext(ThemeContext);
+  const showNews = useSelector(state => state.settings.showNews);
 
   useInterval(() => {
     if (currentImageIndex < 9) {
@@ -207,31 +209,36 @@ function News({ style, news }) {
     } else setCurrentImageIndex(0);
   }, 5000);
 
-  return news.length !== 0 ? (
-    <Carousel style={style}>
-      <SelectNews
-        news={news}
-        setCurrentImageIndex={setCurrentImageIndex}
-        currentImageIndex={currentImageIndex}
-      />
-      <ImageList news={news} currentImageIndex={currentImageIndex} />
-    </Carousel>
-  ) : (
-    <StyledContentLoader
-      primaryColor={ContextTheme.shade11}
-      secondaryColor={ContextTheme.shade10}
-    >
-      <rect
-        rx="0"
-        ry="0"
-        width="830"
-        height="158"
-        css={`
-          border-radius: 2px;
-        `}
-      />
-    </StyledContentLoader>
-  );
+  if (showNews) {
+    return news.length !== 0 ? (
+      <Carousel style={style}>
+        <SelectNews
+          news={news}
+          setCurrentImageIndex={setCurrentImageIndex}
+          currentImageIndex={currentImageIndex}
+        />
+        <ImageList news={news} currentImageIndex={currentImageIndex} />
+      </Carousel>
+    ) : (
+      <StyledContentLoader
+        primaryColor={ContextTheme.shade11}
+        secondaryColor={ContextTheme.shade10}
+      >
+        <rect
+          rx="0"
+          ry="0"
+          width="830"
+          height="158"
+          css={`
+            border-radius: 2px;
+          `}
+        />
+      </StyledContentLoader>
+    );
+    // eslint-disable-next-line no-else-return
+  } else {
+    return '';
+  }
 }
 
 export default News;

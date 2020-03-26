@@ -37,6 +37,15 @@ export function updateHideWindowOnGameLaunch(hideWindow) {
   };
 }
 
+export function updateShowNews(value) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_SHOW_NEWS,
+      value
+    });
+  };
+}
+
 export function updatePotatoPcMode(value) {
   return dispatch => {
     dispatch({
