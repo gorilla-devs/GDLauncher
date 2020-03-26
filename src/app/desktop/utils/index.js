@@ -670,9 +670,7 @@ export const filterFabricFilesByVersion = (files, version) => {
 export const filterForgeFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersion)) {
-      return (
-        v.gameVersion.includes(version) && !v.gameVersion.includes('Fabric')
-      );
+      return v.gameVersion.includes(version) && !isFileModFabric(v);
     }
     return v.gameVersion === version;
   });
