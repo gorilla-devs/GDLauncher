@@ -1554,8 +1554,10 @@ export function launchInstance(instanceName) {
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
-    const { memory } = state.settings.java;
-    const { modloader } = _getInstance(state)(instanceName);
+    const { memory, args } = state.settings.java;
+    const { modloader, javaArgs, javaMemory } = _getInstance(state)(
+      instanceName
+    );
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
     const instanceJLFPath = path.join(
@@ -1650,6 +1652,9 @@ export function launchInstance(instanceName) {
         ? getJVMArguments113
         : getJVMArguments112;
 
+    const javaArguments = (javaArgs !== undefined ? javaArgs : args).split(' ');
+    const javaMem = javaMemory !== undefined ? javaMemory : memory;
+
     const jvmArguments = getJvmArguments(
       libraries,
       mcMainFile,
@@ -1657,7 +1662,9 @@ export function launchInstance(instanceName) {
       assetsPath,
       mcJson,
       account,
-      memory
+      javaMem,
+      false,
+      javaArguments
     );
 
     const symLinkDirPath = path.join(dataPath.split('\\')[0], '_gdl');
@@ -1679,8 +1686,9 @@ export function launchInstance(instanceName) {
         assetsPath,
         mcJson,
         account,
-        memory,
-        true
+        javaMem,
+        true,
+        javaArguments
       ).join(' ')}`.replace(...replaceRegex)
     );
 
