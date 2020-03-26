@@ -1,15 +1,15 @@
 /* eslint-disable */
-import React, { useState } from "react";
-import styled from "styled-components";
-import { Button } from "antd";
-import Modal from "../../components/Modal";
-import Overview from "./Overview";
-import Screenshots from "./Screenshots";
-import Notes from "./Notes";
-import Mods from "./Mods";
-import { useSelector } from "react-redux";
-import { _getInstance } from "../../utils/selectors";
-import { FORGE, FABRIC } from "../../utils/constants";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { Button } from 'antd';
+import Modal from '../../components/Modal';
+import Overview from './Overview';
+import Screenshots from './Screenshots';
+import Notes from './Notes';
+import Mods from './Mods';
+import { useSelector } from 'react-redux';
+import { _getInstance } from '../../utils/selectors';
+import { FORGE, FABRIC } from '../../utils/constants';
 
 const SideMenu = styled.div`
   display: flex;
@@ -38,7 +38,7 @@ const SettingsButton = styled(Button)`
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
   background: ${props =>
-    props.active ? props.theme.palette.grey[600] : "transparent"};
+    props.active ? props.theme.palette.grey[600] : 'transparent'};
   border: 0px;
   text-align: left;
   color: ${props => props.theme.palette.text.primary};
@@ -69,13 +69,13 @@ const Content = styled.div`
 
 const InstanceManager = ({ instanceName }) => {
   const menuEntries = {
-    overview: { name: "Overview", component: Overview },
-    mods: { name: "Mods", component: Mods },
-    modpack: { name: "Modpack", component: Overview },
-    notes: { name: "Notes", component: Notes },
+    overview: { name: 'Overview', component: Overview },
+    mods: { name: 'Mods', component: Mods },
+    modpack: { name: 'Modpack', component: Overview },
+    notes: { name: 'Notes', component: Notes },
     // resourcePacks: { name: "Resource Packs", component: Overview },
     // worlds: { name: "Worlds", component: Overview },
-    screenshots: { name: "Screenshots", component: Screenshots },
+    screenshots: { name: 'Screenshots', component: Screenshots }
     // settings: { name: "Settings", component: Overview },
     // servers: { name: "Servers", component: Overview }
   };
@@ -91,7 +91,7 @@ const InstanceManager = ({ instanceName }) => {
         width: 85%;
         max-width: 1500px;
       `}
-      title="Instance Manager"
+      title={`Instance Manager - ${instanceName}`}
       removePadding
     >
       <Container>

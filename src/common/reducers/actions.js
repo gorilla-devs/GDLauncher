@@ -79,6 +79,7 @@ import {
 } from '../../app/desktop/utils/downloader';
 import { removeDuplicates, getFileMurmurHash2 } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
+import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 
 export function initManifests() {
@@ -1325,6 +1326,7 @@ export const startListener = () => {
     const processRenamedInstance = async (oldInstanceName, newInstanceName) => {
       const newState = getState();
       const instance = _getInstance(newState)(newInstanceName);
+
       if (!instance) {
         try {
           const configPath = path.join(
@@ -1342,6 +1344,24 @@ export const startListener = () => {
               ...omit(newState.instances.list, [oldInstanceName]),
               [newInstanceName]: { ...config, name: newInstanceName }
             }
+          });
+
+          const instanceManagerModalIndex = newState.modals.findIndex(
+            x =>
+              x.modalType === 'InstanceManager' &&
+              x.modalProps.instanceName === oldInstanceName
+          );
+
+          dispatch({
+            type: UPDATE_MODAL,
+            modals: [
+              ...newState.modals.slice(0, instanceManagerModalIndex),
+              {
+                modalType: 'InstanceManager',
+                modalProps: { instanceName: newInstanceName }
+              },
+              ...newState.modals.slice(instanceManagerModalIndex + 1)
+            ]
           });
         } catch (err) {
           console.error(err);
