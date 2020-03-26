@@ -2311,10 +2311,10 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
     "@types/color-name" "^1.1.1"
     color-convert "^2.0.1"
 
-antd@4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/antd/-/antd-4.0.2.tgz#84e7356322ef3620a24cee56a281d910178cbd4e"
-  integrity sha512-0IBy/a4v1zCUqn8w9DRs7BHO8HsjLKt6QKt5zM/h2uUfIe3hALj5dG7M1mWrG1uu6JR2RxUfDyaCYZZGaijv/g==
+antd@4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/antd/-/antd-4.0.4.tgz#fe7bf58151e069226941a4febe429f1e2f6c596f"
+  integrity sha512-wPcUzQBDDEFrA2L7b1HOHcVhXZk11nl773XQHb6wtQR6NANY11T8xNJ3GRZ/yB3sfzsWqXYCBGBui/12Dmu3nQ==
   dependencies:
     "@ant-design/icons" "^4.0.0"
     "@ant-design/react-slick" "~0.25.5"
@@ -2345,12 +2345,12 @@ antd@4.0.2:
     rc-rate "~2.5.1"
     rc-resize-observer "^0.1.0"
     rc-select "~10.0.0"
-    rc-slider "~9.2.1"
+    rc-slider "~9.2.3"
     rc-steps "~3.5.0"
     rc-switch "~1.9.0"
-    rc-table "~7.2.0"
+    rc-table "~7.3.0"
     rc-tabs "~10.0.0"
-    rc-tooltip "~4.0.0"
+    rc-tooltip "~4.0.2"
     rc-tree "~3.0.0"
     rc-tree-select "~3.0.0"
     rc-trigger "~4.0.0"
@@ -5317,10 +5317,10 @@ electron-updater@^4.2.5:
     pako "^1.0.11"
     semver "^7.1.3"
 
-electron@^8.1.1:
-  version "8.1.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-8.1.1.tgz#737a5af03c7b4af60b49dff7bfe1203fcbd5bf89"
-  integrity sha512-t+5zzFo7VOgckJc9YpImHJkpqeWxwpmEjywWbAa4IT5MULS7h1XU52H9gMswK/y8xc5lBNwxLhJSty/15+gi1A==
+electron@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-8.2.0.tgz#f3e3de23a6178b5ad7baa70f4814d6332a3212c2"
+  integrity sha512-mnV43gKCrCUMHLmGws/DU/l8LhaxrFD53A4ofwtthdCqOZWGIdk1+eMphiVumXR5a3lC64XVvmXQ2k28i7F/zw==
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^12.0.12"
@@ -11138,10 +11138,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.1.tgz#3f00ac71263be34684b2b2c8d7e7f63737592dac"
-  integrity sha512-piXGBcY1zoFOG0MvHpNE5reAGseLmaCRifQ/fmfF49BcYkInEs/naD/unxGNAeOKFA5+JxVrPyMvMlpzcd20UA==
+prettier@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.2.tgz#1ba8f3eb92231e769b7fcd7cb73ae1b6b74ade08"
+  integrity sha512-5xJQIPT8BraI7ZnaDwSbu5zLrB6vvi8hVV58yHQ+QK64qrY40dULy0HSRlQ2/2IdzeBpjhDkqdcFBnFeDEMVdg==
 
 pretty-bytes@^5.1.0:
   version "5.3.0"
@@ -11585,13 +11585,22 @@ rc-rate@~2.5.1:
     rc-util "^4.3.0"
     react-lifecycles-compat "^3.0.4"
 
-rc-resize-observer@^0.1.0, rc-resize-observer@^0.1.2:
+rc-resize-observer@^0.1.0:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/rc-resize-observer/-/rc-resize-observer-0.1.3.tgz#097191f9c3ab186ed907b553ba6ef565df11c249"
   integrity sha512-uzOQEwx83xdQSFOkOAM7x7GHIQKYnrDV4dWxtCxyG1BS1pkfJ4EvDeMfsvAJHSYkQXVBu+sgRHGbRtLG3qiuUg==
   dependencies:
     classnames "^2.2.1"
     rc-util "^4.13.0"
+    resize-observer-polyfill "^1.5.1"
+
+rc-resize-observer@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/rc-resize-observer/-/rc-resize-observer-0.2.0.tgz#c3281bdef1859268ef4d5abd52730404e0ba4e14"
+  integrity sha512-DaYFWQM+qb8tjVnR2qiz0kAgteRUiTm7mulPgzMql6JFQnqX5WY5Hmv92ipNsmHMXjRMjyMdJixde97V4ePFtw==
+  dependencies:
+    classnames "^2.2.1"
+    rc-util "^4.14.0"
     resize-observer-polyfill "^1.5.1"
 
 rc-select@~10.0.0:
@@ -11606,7 +11615,7 @@ rc-select@~10.0.0:
     rc-virtual-list "^1.0.0"
     warning "^4.0.3"
 
-rc-slider@~9.2.1:
+rc-slider@~9.2.3:
   version "9.2.4"
   resolved "https://registry.yarnpkg.com/rc-slider/-/rc-slider-9.2.4.tgz#92e2b58c53def9921ae0fc2822727ab5785b9ed0"
   integrity sha512-wSr7vz+WtzzGqsGU2rTQ4mmLz9fkuIDMPYMYm8ygYFvxQ2Rh4uRhOWHYI0R8krNK5k1bGycckYxmQqUIvLAh3w==
@@ -11637,10 +11646,10 @@ rc-switch@~1.9.0:
     prop-types "^15.5.6"
     react-lifecycles-compat "^3.0.4"
 
-rc-table@~7.2.0:
-  version "7.2.2"
-  resolved "https://registry.yarnpkg.com/rc-table/-/rc-table-7.2.2.tgz#1a18806396b81296b1f6a8481a5e81ee89635c70"
-  integrity sha512-92RGM0UWb+dqmfX42obDkNyzZvysLyWoojmI2NVSIJDmDO3jLQFfi0rt1ME9j720pU7by3wbikfNiB36I9KXdg==
+rc-table@~7.3.0:
+  version "7.3.12"
+  resolved "https://registry.yarnpkg.com/rc-table/-/rc-table-7.3.12.tgz#b87872f83c6326a4307eed60d7bdf42bf40936a1"
+  integrity sha512-eJhB0oWmTWPoFa8LX3Oad1R1K1CB8oObbEtRyHy6VSFYwxcHAKuryZCPW8BpTakudsZ2TpMdI4GNB6Is3haNeQ==
   dependencies:
     classnames "^2.2.5"
     component-classes "^1.2.6"
@@ -11648,7 +11657,7 @@ rc-table@~7.2.0:
     mini-store "^2.0.0"
     prop-types "^15.5.8"
     raf "^3.4.1"
-    rc-resize-observer "^0.1.2"
+    rc-resize-observer "^0.2.0"
     rc-util "^4.20.1"
     react-lifecycles-compat "^3.0.2"
     shallowequal "^1.1.0"
@@ -11668,7 +11677,7 @@ rc-tabs@~10.0.0:
     resize-observer-polyfill "^1.5.1"
     warning "^4.0.3"
 
-rc-tooltip@^4.0.0, rc-tooltip@~4.0.0:
+rc-tooltip@^4.0.0, rc-tooltip@~4.0.2:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/rc-tooltip/-/rc-tooltip-4.0.3.tgz#728b760863643ec2e85827a2e7fb28d961b3b759"
   integrity sha512-HNyBh9/fPdds0DXja8JQX0XTIHmZapB3lLzbdn74aNSxXG1KUkt+GK4X1aOTRY5X9mqm4uUKdeFrn7j273H8gw==
@@ -11717,7 +11726,7 @@ rc-upload@~3.0.0:
     babel-runtime "6.x"
     classnames "^2.2.5"
 
-rc-util@^4.0.4, rc-util@^4.11.0, rc-util@^4.12.0, rc-util@^4.13.0, rc-util@^4.15.3, rc-util@^4.16.1, rc-util@^4.17.0, rc-util@^4.20.0, rc-util@^4.20.1, rc-util@^4.3.0, rc-util@^4.5.1, rc-util@^4.6.0, rc-util@^4.8.0, rc-util@^4.9.0:
+rc-util@^4.0.4, rc-util@^4.11.0, rc-util@^4.12.0, rc-util@^4.13.0, rc-util@^4.14.0, rc-util@^4.15.3, rc-util@^4.16.1, rc-util@^4.17.0, rc-util@^4.20.0, rc-util@^4.20.1, rc-util@^4.3.0, rc-util@^4.5.1, rc-util@^4.6.0, rc-util@^4.8.0, rc-util@^4.9.0:
   version "4.20.1"
   resolved "https://registry.yarnpkg.com/rc-util/-/rc-util-4.20.1.tgz#a5976eabfc3198ed9b8e79ffb8c53c231db36e77"
   integrity sha512-EGlDg9KPN0POzmAR2hk9ZyFc3DmJIrXwlC8NoDxJguX2LTINnVqwadLIVauLfYgYISMiFYFrSHiFW+cqUhZ5dA==

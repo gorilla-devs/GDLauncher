@@ -102,7 +102,6 @@ const Screenshots = ({ instanceName }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [progressUpdate, setProgressUpdate] = useState(null);
   const [uploadingFileName, setUploadingFileName] = useState(null);
-  const [uploadCompleted, setUploadCompleted] = useState(false);
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
   const dispatch = useDispatch();
 
@@ -196,7 +195,7 @@ const Screenshots = ({ instanceName }) => {
             selectedItems.length > 0 &&
             selectedItems.length < getScreenshotsCount(dateGroups)
           }
-          checked={getScreenshotsCount(dateGroups) === selectedItems.length}
+          checked={getScreenshotsCount(dateGroups) > 0  && getScreenshotsCount(dateGroups) === selectedItems.length}
         />
         <div>{`${selectedItems.length} selected`}</div>
 
@@ -360,7 +359,7 @@ const Screenshots = ({ instanceName }) => {
                               preventClose
                               onClick={async () => {
                                 if (file.size < 10485760) {
-                                  setUploadCompleted(false);
+      
                                   setUploadingFileName(file.name);
                                   try {
                                     await getImgurLink(
@@ -369,7 +368,7 @@ const Screenshots = ({ instanceName }) => {
                                       setProgressUpdate
                                     );
                                   } finally {
-                                    setUploadCompleted(true);
+                                    
                                     setUploadingFileName(null);
                                   }
                                 }
