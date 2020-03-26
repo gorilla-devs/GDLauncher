@@ -83,7 +83,7 @@ const RowContainer = styled.div.attrs(props => ({
 const DragEnterEffect = styled.div`
   position: absolute;
   display: flex;
-  flex-direction; row;
+  flex-direction; column;
   justify-content: center;
   align-items: center;
   border: solid 5px ${props => props.theme.palette.primary.main};
@@ -107,6 +107,24 @@ const DragEnterEffect = styled.div`
 `;
 
 const DragArrow = styled(FontAwesomeIcon)`
+  ${props =>
+    props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
+
+  color: ${props => props.theme.palette.primary.main};
+
+  animation: MoveUpDown 1.5s linear infinite;
+
+  @keyframes MoveUpDown {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+  }
+`;
+
+const CopyTitle = styled.h1`
   ${props =>
     props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
 
@@ -289,9 +307,29 @@ const Mods = ({ instanceName }) => {
   const [search, setSearch] = useState('');
   const [fileDrag, setFileDrag] = useState(false);
   const [fileDrop, setFileDrop] = useState(false);
+  const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
+  const [dragCompleted, setDragCompleted] = useState({});
+  const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
+
   const dispatch = useDispatch();
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
+  useEffect(() => {
+    const modList = instance.mods;
+
+    if (dragCompletedPopulated) {
+      const AllFilesAreCompleted = Object.keys(dragCompleted).every(x =>
+        modList.find(y => y.fileName === x)
+      );
+      setNumOfDraggedFiles(numOfDraggedFiles - 1);
+
+      if (AllFilesAreCompleted) {
+        setFileDrop(false);
+        setFileDrag(false);
+      }
+    }
+  }, [dragCompleted, instance.mods]);
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
@@ -307,20 +345,23 @@ const Mods = ({ instanceName }) => {
   );
 
   const onDragOver = e => {
-    console.log('hover', e);
     setFileDrag(true);
     e.preventDefault();
   };
 
   const onDrop = async e => {
     setFileDrop(true);
+    const dragComp = {};
     const { files } = e.dataTransfer;
-    console.log('onDrop', files);
     await pMap(
       Object.values(files),
       async file => {
         const fileName = file.name;
         const fileType = fileName.split('.')[1];
+
+        dragComp[fileName] = false;
+
+        setNumOfDraggedFiles(files.length);
 
         const { path: filePath } = file;
         if (fileType === 'jar' || fileType === 'disabled') {
@@ -328,13 +369,13 @@ const Mods = ({ instanceName }) => {
             filePath,
             path.join(instancesPath, instanceName, 'mods', fileName)
           );
+          dragComp[fileName] = true;
         } else console.error('This File is not a mod!');
       },
       { concurrency: 10 }
     );
-    setFileDrop(false);
-    setFileDrag(false);
-    // e.preventDefault();
+    setDragCompletedPopulated(files.length === Object.values(dragComp).length);
+    setDragCompleted(dragComp);
   };
 
   const onDragEnter = e => {
@@ -451,9 +492,26 @@ const Mods = ({ instanceName }) => {
               onDragOver={onDragOver}
             >
               {fileDrop ? (
-                <Spin indicator={antIcon} />
+                <Spin
+                  indicator={antIcon}
+                  css={`
+                    width: 30px;
+                  `}
+                >
+                  {numOfDraggedFiles > 0 ? numOfDraggedFiles : 1}
+                </Spin>
               ) : (
-                <DragArrow icon={faArrowDown} size="3x" />
+                <div
+                  css={`
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                  `}
+                  onDragLeave={e => e.stopPropagation()}
+                >
+                  <CopyTitle>copy</CopyTitle>
+                  <DragArrow icon={faArrowDown} size="3x" />
+                </div>
               )}
             </DragEnterEffect>
           )}
