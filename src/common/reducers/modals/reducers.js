@@ -22,7 +22,7 @@ export default function modals(state = [], action) {
       if (state.length > 0) {
         return state.slice(0, state.length - 1);
       }
-      break;
+      return state;
     default:
       return state;
   }
