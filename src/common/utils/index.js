@@ -6,6 +6,24 @@ export const sortByDate = (a, b) => {
   return dateB - dateA;
 };
 
+export function sortByForgeVersionDesc(a, b) {
+  if (typeof a === 'string' && typeof b === 'string') {
+    const versionA = a.split('.');
+    const versionB = b.split('.');
+
+    for (let i = 0; i < versionA.length; i += 1) {
+      const verNumA = Number(versionA[i]) || 0;
+      const verNumB = Number(versionB[i]) || 0;
+
+      if (verNumA !== verNumB) {
+        return verNumB - verNumA;
+      }
+    }
+  }
+
+  return 0;
+}
+
 export const getForgeFileIDFromAddonVersion = async (files, addonVersion) => {
   const foundID = files.find(a => a.fileName.includes(addonVersion));
   return foundID ? foundID.id : null;

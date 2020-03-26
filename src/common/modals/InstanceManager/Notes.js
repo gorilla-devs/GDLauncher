@@ -1,13 +1,13 @@
 /* eslint-disable */
-import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Editable, withReact, useSlate, Slate } from "slate-react";
-import { Editor, Transforms, createEditor } from "slate";
-import { useDebouncedCallback } from "use-debounce";
-import { withHistory } from "slate-history";
-import { Button } from "antd";
-import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Editable, withReact, useSlate, Slate } from 'slate-react';
+import { Editor, Transforms, createEditor } from 'slate';
+import { useDebouncedCallback } from 'use-debounce';
+import { withHistory } from 'slate-history';
+import { Button } from 'antd';
+import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBold,
   faItalic,
@@ -16,28 +16,30 @@ import {
   faQuoteRight,
   faListOl,
   faList
-} from "@fortawesome/free-solid-svg-icons";
-import { updateInstanceConfig } from "../../reducers/actions";
-import { _getInstancesPath, _getInstance } from "../../utils/selectors";
+} from '@fortawesome/free-solid-svg-icons';
+import { updateInstanceConfig } from '../../reducers/actions';
+import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 
-const LIST_TYPES = ["numbered-list", "bulleted-list"];
+const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 
 const Notes = ({ instanceName }) => {
   const renderElement = useCallback(props => <Element {...props} />, []);
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const dispatch = useDispatch();
-  const InstancePath = useSelector(_getInstancesPath);
 
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const [value, setValue] = useState(instance.notes || initialValue);
 
-  const [updateNotes] = useDebouncedCallback(v => {
-    dispatch(
-      updateInstanceConfig(instanceName, config => ({ ...config, notes: v }))
-    );
-    300, { maxWait: 600 };
-  });
+  const [updateNotes] = useDebouncedCallback(
+    v => {
+      dispatch(
+        updateInstanceConfig(instanceName, config => ({ ...config, notes: v }))
+      );
+    },
+    1500,
+    { maxWait: 4000 }
+  );
 
   return (
     <MainContainer>
@@ -86,7 +88,7 @@ const toggleBlock = (editor, format) => {
   });
 
   Transforms.setNodes(editor, {
-    type: isActive ? "paragraph" : isList ? "list-item" : format
+    type: isActive ? 'paragraph' : isList ? 'list-item' : format
   });
 
   if (!isActive && isList) {
@@ -120,17 +122,17 @@ const isMarkActive = (editor, format) => {
 
 const Element = ({ attributes, children, element }) => {
   switch (element.type) {
-    case "block-quote":
+    case 'block-quote':
       return <blockquote {...attributes}>{children}</blockquote>;
-    case "bulleted-list":
+    case 'bulleted-list':
       return <ul {...attributes}>{children}</ul>;
-    case "heading-one":
+    case 'heading-one':
       return <h1 {...attributes}>{children}</h1>;
-    case "heading-two":
+    case 'heading-two':
       return <h2 {...attributes}>{children}</h2>;
-    case "list-item":
+    case 'list-item':
       return <li {...attributes}>{children}</li>;
-    case "numbered-list":
+    case 'numbered-list':
       return <ol {...attributes}>{children}</ol>;
     default:
       return <p {...attributes}>{children}</p>;
@@ -171,7 +173,7 @@ const BlockButton = ({ format, icon }) => {
         toggleBlock(editor, format);
       }}
     >
-      {typeof icon === "string" ? (
+      {typeof icon === 'string' ? (
         <div>{icon}</div>
       ) : (
         <FontAwesomeIcon icon={icon} />
@@ -201,8 +203,8 @@ const MarkButton = ({ format, icon }) => {
 
 const initialValue = [
   {
-    type: "paragraph",
-    children: [{ text: "" }]
+    type: 'paragraph',
+    children: [{ text: '' }]
   }
 ];
 

@@ -79,6 +79,7 @@ import {
 } from '../../app/desktop/utils/downloader';
 import { removeDuplicates, getFileMurmurHash2 } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
+import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 
 export function initManifests() {
@@ -1325,6 +1326,7 @@ export const startListener = () => {
     const processRenamedInstance = async (oldInstanceName, newInstanceName) => {
       const newState = getState();
       const instance = _getInstance(newState)(newInstanceName);
+
       if (!instance) {
         try {
           const configPath = path.join(
@@ -1342,6 +1344,24 @@ export const startListener = () => {
               ...omit(newState.instances.list, [oldInstanceName]),
               [newInstanceName]: { ...config, name: newInstanceName }
             }
+          });
+
+          const instanceManagerModalIndex = newState.modals.findIndex(
+            x =>
+              x.modalType === 'InstanceManager' &&
+              x.modalProps.instanceName === oldInstanceName
+          );
+
+          dispatch({
+            type: UPDATE_MODAL,
+            modals: [
+              ...newState.modals.slice(0, instanceManagerModalIndex),
+              {
+                modalType: 'InstanceManager',
+                modalProps: { instanceName: newInstanceName }
+              },
+              ...newState.modals.slice(instanceManagerModalIndex + 1)
+            ]
           });
         } catch (err) {
           console.error(err);
@@ -1534,8 +1554,10 @@ export function launchInstance(instanceName) {
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
-    const { memory } = state.settings.java;
-    const { modloader } = _getInstance(state)(instanceName);
+    const { memory, args } = state.settings.java;
+    const { modloader, javaArgs, javaMemory } = _getInstance(state)(
+      instanceName
+    );
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
     const instanceJLFPath = path.join(
@@ -1630,6 +1652,9 @@ export function launchInstance(instanceName) {
         ? getJVMArguments113
         : getJVMArguments112;
 
+    const javaArguments = (javaArgs !== undefined ? javaArgs : args).split(' ');
+    const javaMem = javaMemory !== undefined ? javaMemory : memory;
+
     const jvmArguments = getJvmArguments(
       libraries,
       mcMainFile,
@@ -1637,7 +1662,9 @@ export function launchInstance(instanceName) {
       assetsPath,
       mcJson,
       account,
-      memory
+      javaMem,
+      false,
+      javaArguments
     );
 
     const symLinkDirPath = path.join(dataPath.split('\\')[0], '_gdl');
@@ -1659,8 +1686,9 @@ export function launchInstance(instanceName) {
         assetsPath,
         mcJson,
         account,
-        memory,
-        true
+        javaMem,
+        true,
+        javaArguments
       ).join(' ')}`.replace(...replaceRegex)
     );
 
