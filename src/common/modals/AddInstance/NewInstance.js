@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Cascader } from "antd";
 import styled from "styled-components";
+import { sortByForgeVersionDesc } from "../../utils";
 
 const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -66,7 +67,7 @@ const NewInstance = ({ setVersion, setModpack }) => {
         children: Object.entries(forgeManifest).map(([k, v]) => ({
           value: k,
           label: k,
-          children: v.map(child => ({
+          children: v.sort(sortByForgeVersionDesc).map(child => ({
             value: child,
             label: child
           }))

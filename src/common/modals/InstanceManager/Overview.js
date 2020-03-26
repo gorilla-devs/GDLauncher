@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
 import path from 'path';
 import omit from 'lodash.omit';
+import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUndo } from '@fortawesome/free-solid-svg-icons';
@@ -74,33 +75,50 @@ const marks = {
 const Overview = ({ instanceName }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
-  const [JavaMemorySwitch, setJavaMemorySwitch] = useState(false);
-  const [JavaArgumentsSwitch, setJavaArgumentsSwitch] = useState(false);
+  const [JavaMemorySwitch, setJavaMemorySwitch] = useState(
+    config?.javaMemory !== undefined
+  );
+  const [JavaArgumentsSwitch, setJavaArgumentsSwitch] = useState(
+    config?.javaArgs !== undefined
+  );
+  const [javaLocalMemory, setJavaLocalMemory] = useState(config?.javaMemory);
+  const [javaLocalArguments, setJavaLocalArguments] = useState(
+    config?.javaArgs
+  );
   const [newName, setNewName] = useState(instanceName);
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (!JavaMemorySwitch) {
-      dispatch(
-        updateInstanceConfig(instanceName, prev =>
-          omit(prev, config.javaMemory)
-        )
-      );
-    } else if (!config.javaMemory) {
-      updateJavaMemory('4096');
-    }
-  }, [JavaMemorySwitch]);
+  const updateJavaMemory = v => {
+    dispatch(
+      updateInstanceConfig(instanceName, prev => ({
+        ...prev,
+        javaMemory: v
+      }))
+    );
+  };
 
-  useEffect(() => {
-    if (!JavaArgumentsSwitch) {
-      dispatch(
-        updateInstanceConfig(instanceName, prev => omit(prev, config.javaArgs))
-      );
-    } else if (!config.javaArgs) {
-      resetJavaArguments();
-    }
-  }, [JavaArgumentsSwitch]);
+  const updateJavaArguments = v => {
+    dispatch(
+      updateInstanceConfig(instanceName, prev => ({
+        ...prev,
+        javaArgs: v
+      }))
+    );
+  };
+
+  const [debouncedArgumentsUpdate] = useDebouncedCallback(
+    v => {
+      updateJavaArguments(v);
+    },
+    400,
+    { maxWait: 700, leading: false }
+  );
+
+  const resetJavaArguments = () => {
+    setJavaLocalArguments(DEFAULT_JAVA_ARGS);
+    updateJavaArguments(DEFAULT_JAVA_ARGS);
+  };
 
   const renameInstance = () => {
     fss.rename(
@@ -108,34 +126,6 @@ const Overview = ({ instanceName }) => {
       path.join(instancesPath, newName)
     );
   };
-
-  function resetJavaArguments() {
-    dispatch(
-      updateInstanceConfig(instanceName, prev => ({
-        ...prev,
-        javaArgs: DEFAULT_JAVA_ARGS
-      }))
-    );
-  }
-
-  const updateJavaMemory = e => {
-    dispatch(
-      updateInstanceConfig(instanceName, prev => ({
-        ...prev,
-        javaMemory: e
-      }))
-    );
-  };
-
-  const updateJavaArguments = async e => {
-    await dispatch(
-      updateInstanceConfig(instanceName, prev => ({
-        ...prev,
-        javaArgs: e
-      }))
-    );
-  };
-
   return (
     <Container>
       <Column>
@@ -151,15 +141,29 @@ const Overview = ({ instanceName }) => {
           <JavaManagerRow>
             <div>Java Memory</div>
             <Switch
-              value={JavaMemorySwitch}
-              onChange={e => setJavaMemorySwitch(e)}
+              checked={JavaMemorySwitch}
+              onChange={v => {
+                setJavaMemorySwitch(v);
+
+                if (!v) {
+                  dispatch(
+                    updateInstanceConfig(instanceName, prev =>
+                      omit(prev, ['javaMemory'])
+                    )
+                  );
+                } else if (v) {
+                  setJavaLocalMemory(4096);
+                  updateJavaMemory(4096);
+                }
+              }}
             />
           </JavaManagerRow>
           {JavaMemorySwitch && (
             <div>
               <JavaMemorySlider
-                onChange={updateJavaMemory}
-                defaultValue={config.javaMemory}
+                onAfterChange={updateJavaMemory}
+                onChange={setJavaLocalMemory}
+                value={javaLocalMemory}
                 min={1024}
                 max={16384}
                 step={512}
@@ -171,17 +175,32 @@ const Overview = ({ instanceName }) => {
           <JavaManagerRow>
             <div>Java Arguments</div>
             <Switch
-              value={JavaArgumentsSwitch}
-              onChange={setJavaArgumentsSwitch}
+              checked={JavaArgumentsSwitch}
+              onChange={v => {
+                setJavaArgumentsSwitch(v);
+
+                if (!v) {
+                  dispatch(
+                    updateInstanceConfig(instanceName, prev =>
+                      omit(prev, ['javaArgs'])
+                    )
+                  );
+                } else if (v) {
+                  resetJavaArguments();
+                }
+              }}
             />
           </JavaManagerRow>
           {JavaArgumentsSwitch && (
             <JavaManagerRow>
               <Input
-                value={config.javaArgs}
-                onChange={e => updateJavaArguments(e.target.value)}
+                value={javaLocalArguments}
+                onChange={e => {
+                  setJavaLocalArguments(e.target.value);
+                  debouncedArgumentsUpdate(e.target.value);
+                }}
               />
-              <JavaArgumentsResetButton onClick={() => resetJavaArguments()}>
+              <JavaArgumentsResetButton onClick={resetJavaArguments}>
                 <FontAwesomeIcon icon={faUndo} />
               </JavaArgumentsResetButton>
             </JavaManagerRow>
