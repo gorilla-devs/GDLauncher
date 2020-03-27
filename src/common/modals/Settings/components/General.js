@@ -129,6 +129,7 @@ const ReleaseChannel = styled.div`
   div {
     display: flex;
     flex-direction: row;
+    align-items: center;
     justify-content: space-between;
   }
   select {
@@ -141,6 +142,7 @@ const ParallelDownload = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   height: 60px;
   p {
