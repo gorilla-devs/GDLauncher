@@ -13,7 +13,8 @@ import {
   faTachometerAlt,
   faTrash,
   faPlay,
-  faToilet
+  faToilet,
+  faNewspaper
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch, Input } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
@@ -28,7 +29,8 @@ import {
   updateDiscordRPC,
   updateDataPath,
   updateHideWindowOnGameLaunch,
-  updatePotatoPcMode
+  updatePotatoPcMode,
+  updateShowNews
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
@@ -241,6 +243,7 @@ const General = () => {
   const [copiedUsername, setCopiedUsername] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [deletingInstances, setDeletingInstances] = useState(false);
+  const showNews = useSelector(state => state.settings.showNews);
 
   const dispatch = useDispatch();
 
@@ -433,6 +436,29 @@ const General = () => {
             }
           }}
           checked={DiscordRPC}
+        />
+      </DiscordRpc>
+      <Hr />
+      <Title
+        css={`
+          margin-top: 0px;
+        `}
+      >
+        Minecraft News &nbsp; <FontAwesomeIcon icon={faNewspaper} />
+      </Title>
+      <DiscordRpc>
+        <p
+          css={`
+            width: 350px;
+          `}
+        >
+          Enable / disable Minecraft news.
+        </p>
+        <Switch
+          onChange={e => {
+            dispatch(updateShowNews(e));
+          }}
+          checked={showNews}
         />
       </DiscordRpc>
       <Hr />
