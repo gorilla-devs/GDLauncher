@@ -205,6 +205,10 @@ ipcMain.handle('openFolder', (e, folderPath) => {
   shell.openItem(folderPath);
 });
 
+ipcMain.handle('open-devtools', () => {
+  mainWindow.webContents.openDevTools({ mode: 'undocked' });
+});
+
 ipcMain.handle('openFolderDialog', (e, defaultPath) => {
   return dialog.showOpenDialog({
     properties: ['openDirectory'],
