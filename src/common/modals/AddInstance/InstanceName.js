@@ -1,33 +1,24 @@
 /* eslint-disable */
-import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
-import path from "path";
-import fse from "fs-extra";
-import { useSelector, useDispatch } from "react-redux";
-import { Transition } from "react-transition-group";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
+import path from 'path';
+import fse from 'fs-extra';
+import { useSelector, useDispatch } from 'react-redux';
+import { Transition } from 'react-transition-group';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faLongArrowAltLeft,
   faLongArrowAltRight
-} from "@fortawesome/free-solid-svg-icons";
-import { addToQueue } from "../../reducers/actions";
-import { closeModal } from "../../reducers/modals/actions";
-import { Input } from "antd";
-import {
-  downloadAddonZip,
-  importAddonZip,
-  downloadOptifine
-} from "../../../app/desktop/utils";
-
-import {
-  _getInstancesPath,
-  _getTempPath,
-  _getOptifineVersionsPath
-} from "../../utils/selectors";
-import { transparentize } from "polished";
-import bgImage from "../../../common/assets/mcCube.jpg";
-import { downloadFile } from "../../../app/desktop/utils/downloader";
-import { FABRIC, VANILLA, FORGE } from "../../utils/constants";
+} from '@fortawesome/free-solid-svg-icons';
+import { addToQueue } from '../../reducers/actions';
+import { closeModal } from '../../reducers/modals/actions';
+import { Input } from 'antd';
+import { downloadAddonZip, importAddonZip,   downloadOptifine } from '../../../app/desktop/utils';
+import { _getInstancesPath, _getTempPath, _getOptifineVersionsPath } from '../../utils/selectors';
+import { transparentize } from 'polished';
+import bgImage from '../../../common/assets/mcCube.jpg';
+import { downloadFile } from '../../../app/desktop/utils/downloader';
+import { FABRIC, VANILLA, FORGE } from '../../utils/constants';
 
 const InstanceName = ({
   in: inProp,
@@ -41,9 +32,9 @@ const InstanceName = ({
   optifineVersion
 }) => {
   const mcName = (
-    modpack?.name.replace(/\W/g, " ") ||
+    modpack?.name.replace(/\W/g, ' ') ||
     (version && `Minecraft ${version[0]}`) ||
-    ""
+    ''
   ).trim();
   const originalMcName =
     modpack?.name || (version && `Minecraft ${version[0]}`);
@@ -64,7 +55,8 @@ const InstanceName = ({
       const finalWhiteSpace = /[^\s]$/;
       if (
         !regex.test(instanceName || mcName) ||
-        !finalWhiteSpace.test(instanceName || mcName)
+        !finalWhiteSpace.test(instanceName || mcName) ||
+        (instanceName || mcName).length >= 35
       ) {
         setInvalidName(true);
         setAlreadyExists(false);
@@ -103,7 +95,6 @@ const InstanceName = ({
     const isForge = version[0] === FORGE;
     const isTwitchModpack = Boolean(modpack);
     let manifest;
-    console.log(isTwitchModpack, importZipPath);
     if (isTwitchModpack) {
       if (importZipPath) {
         manifest = await importAddonZip(
@@ -133,7 +124,7 @@ const InstanceName = ({
         manifest.minecraft.version,
         manifest.minecraft.modLoaders
           .find(v => v.primary)
-          .id.replace("forge-", ""),
+          .id.replace('forge-', ''),
         version[1],
         version[2]
       ];
@@ -156,7 +147,7 @@ const InstanceName = ({
         manifest.minecraft.version,
         manifest.minecraft.modLoaders
           .find(v => v.primary)
-          .id.replace("forge-", "")
+          .id.replace('forge-', '')
       ];
       dispatch(addToQueue(localInstanceName, modloader, manifest));
     } else if (isVanilla) {
@@ -195,10 +186,7 @@ const InstanceName = ({
   return (
     <Transition in={inProp} timeout={200}>
       {state => (
-        <Animation
-          state={state}
-          bg={thumbnailURL || bgImage}
-        >
+        <Animation state={state} bg={thumbnailURL || bgImage}>
           <Transition in={clicked} timeout={200}>
             {state1 => (
               <>
@@ -207,7 +195,7 @@ const InstanceName = ({
                   state={state1}
                   css={`
                     opacity: ${({ state }) =>
-                      state === "entering" || state === "entered" ? 0 : 1};
+                      state === 'entering' || state === 'entered' ? 0 : 1};
                     flex: 1;
                     transition: 0.1s ease-in-out;
                     display: flex;
@@ -225,7 +213,7 @@ const InstanceName = ({
                     setStep(0);
                   }}
                 >
-                  {clicked ? "" : <FontAwesomeIcon icon={faLongArrowAltLeft} />}
+                  {clicked ? '' : <FontAwesomeIcon icon={faLongArrowAltLeft} />}
                 </div>
                 <div
                   css={`
@@ -257,15 +245,11 @@ const InstanceName = ({
                       placeholder={mcName}
                       onChange={e => setInstanceName(e.target.value)}
                       css={`
-                        && {
-                          opacity: ${({ state }) =>
-                            state === "entering" || state === "entered"
-                              ? 0
-                              : 1};
-                          transition: 0.1s ease-in-out;
-                          width: 300px;
-                          align-self: center;
-                        }
+                        opacity: ${({ state }) =>
+                          state === 'entering' || state === 'entered' ? 0 : 1};
+                        transition: 0.1s ease-in-out;
+                        width: 300px;
+                        align-self: center;
                       `}
                     />
                     <div
@@ -286,9 +270,9 @@ const InstanceName = ({
                       `}
                     >
                       {invalidName &&
-                        "Instance name is not valid. Please try another one"}
+                        'Instance name is not valid or too long. Please try another one'}
                       {alreadyExists &&
-                        "An instance with this name already exists!"}
+                        'An instance with this name already exists!'}
                     </div>
                   </div>
                 </div>
@@ -296,7 +280,7 @@ const InstanceName = ({
                   state={state1}
                   css={`
                     opacity: ${({ state }) =>
-                      state === "entering" || state === "entered" ? 0 : 1};
+                      state === 'entering' || state === 'entered' ? 0 : 1};
                     flex: 1;
                     transition: 0.1s ease-in-out;
                     display: flex;
@@ -316,7 +300,7 @@ const InstanceName = ({
                   }}
                 >
                   {clicked || alreadyExists || invalidName ? (
-                    ""
+                    ''
                   ) : (
                     <FontAwesomeIcon icon={faLongArrowAltRight} />
                   )}
@@ -348,7 +332,7 @@ const Animation = styled.div`
   background-size: cover;
   will-change: transform;
   transform: translateX(
-    ${({ state }) => (state === "entering" || state === "entered" ? 0 : 101)}%
+    ${({ state }) => (state === 'entering' || state === 'entered' ? 0 : 101)}%
   );
 `;
 
@@ -417,7 +401,7 @@ const ModpackName = styled.span`
   font-weight: bold;
   font-size: 45px;
   animation: ${({ state }) =>
-      state === "entering" || state === "entered" ? ModpackNameKeyframe : null}
+      state === 'entering' || state === 'entered' ? ModpackNameKeyframe : null}
     0.2s ease-in-out forwards;
   box-sizing: border-box;
   text-align: center;
@@ -426,11 +410,11 @@ const ModpackName = styled.span`
   padding: 20px;
   &:before,
   &:after {
-    content: "";
+    content: '';
     box-sizing: border-box;
     position: absolute;
     border: ${({ state }) =>
-        state === "entering" || state === "entered" ? 4 : 0}px
+        state === 'entering' || state === 'entered' ? 4 : 0}px
       solid transparent;
     width: 0;
     height: 0;
@@ -441,7 +425,7 @@ const ModpackName = styled.span`
     border-top-color: white;
     border-right-color: white;
     animation: ${({ state }) =>
-        state === "entering" || state === "entered"
+        state === 'entering' || state === 'entered'
           ? ModpackNameBorderKeyframe
           : null}
       2s infinite;
@@ -450,12 +434,12 @@ const ModpackName = styled.span`
     bottom: 0;
     right: 0;
     animation: ${({ state }) =>
-          state === "entering" || state === "entered"
+          state === 'entering' || state === 'entered'
             ? ModpackNameBorderKeyframe
             : null}
         2s 1s infinite,
       ${({ state }) =>
-          state === "entering" || state === "entered"
+          state === 'entering' || state === 'entered'
             ? ModpackNameBorderColorKeyframe
             : null}
         2s 1s infinite;

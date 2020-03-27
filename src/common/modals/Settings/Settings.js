@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { Button } from "antd";
-import { useDispatch } from "react-redux";
-import Modal from "../../components/Modal";
-import General from "./components/General";
-import Java from "./components/Java";
-import CloseButton from "../../components/CloseButton";
-import { closeModal } from "../../reducers/modals/actions";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { Button } from 'antd';
+import { useDispatch } from 'react-redux';
+import Modal from '../../components/Modal';
+import General from './components/General';
+import Java from './components/Java';
+import CloseButton from '../../components/CloseButton';
+import { closeModal } from '../../reducers/modals/actions';
 
 const Container = styled.div`
   display: flex;
@@ -81,9 +81,9 @@ const SettingsTitle = styled.div`
 
 function Page(page) {
   switch (page) {
-    case "General":
+    case 'General':
       return <General />;
-    case "Java":
+    case 'Java':
       return <Java />;
     default:
       return null;
@@ -91,7 +91,7 @@ function Page(page) {
 }
 
 export default function Settings() {
-  const [page, setPage] = useState("General");
+  const [page, setPage] = useState('General');
   const dispatch = useDispatch();
   return (
     <Modal
@@ -113,14 +113,14 @@ export default function Settings() {
         <SideMenu>
           <SettingsTitle>General</SettingsTitle>
           <SettingsButton
-            active={page === "General"}
-            onClick={() => setPage("General")}
+            active={page === 'General'}
+            onClick={() => setPage('General')}
           >
             General
           </SettingsButton>
           <SettingsButton
-            active={page === "Java"}
-            onClick={() => setPage("Java")}
+            active={page === 'Java'}
+            onClick={() => setPage('Java')}
           >
             Java
           </SettingsButton>

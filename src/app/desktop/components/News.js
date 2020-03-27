@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import ContentLoader from "react-content-loader";
-import styled, { ThemeContext } from "styled-components";
-import { shell } from "electron";
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import ContentLoader from 'react-content-loader';
+import styled, { ThemeContext } from 'styled-components';
+import { shell } from 'electron';
+import { useSelector } from 'react-redux';
 
 const Carousel = styled.div`
   width: 100%;
@@ -200,13 +201,18 @@ function useInterval(callback, delay) {
 function News({ style, news }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const ContextTheme = useContext(ThemeContext);
+  const showNews = useSelector(state => state.settings.showNews);
 
-  useInterval(() => {
-    if (currentImageIndex < 9) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    } else setCurrentImageIndex(0);
-  }, 5000);
+  useInterval(
+    () => {
+      if (currentImageIndex < 9) {
+        setCurrentImageIndex(currentImageIndex + 1);
+      } else setCurrentImageIndex(0);
+    },
+    showNews ? 5000 : null
+  );
 
+  if (!showNews) return null;
   return news.length !== 0 ? (
     <Carousel style={style}>
       <SelectNews

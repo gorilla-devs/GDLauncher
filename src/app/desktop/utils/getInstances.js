@@ -1,13 +1,13 @@
-import path from "path";
-import fse from "fs-extra";
-import pMap from "p-map";
-import { getDirectories } from ".";
+import path from 'path';
+import fse from 'fs-extra';
+import pMap from 'p-map';
+import { getDirectories } from '.';
 
 const getInstances = async instancesPath => {
   const mapFolderToInstance = async instance => {
     try {
       const configPath = path.join(
-        path.join(instancesPath, instance, "config.json")
+        path.join(instancesPath, instance, 'config.json')
       );
       const config = await fse.readJSON(configPath);
 

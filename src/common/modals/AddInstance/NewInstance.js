@@ -5,6 +5,7 @@ import { Cascader, Checkbox, Select } from "antd";
 import makeDir from "make-dir";
 import path from "path";
 import styled from "styled-components";
+import { sortByForgeVersionDesc } from "../../utils";
 import axios from "axios";
 import { downloadFile } from "../../../app/desktop/utils/downloader";
 import { _getOptifineVersionsPath } from "../../utils/selectors";
@@ -191,7 +192,7 @@ const NewInstance = ({
         children: Object.entries(forgeManifest).map(([k, v]) => ({
           value: k,
           label: k,
-          children: v.map(child => ({
+          children: v.sort(sortByForgeVersionDesc).map(child => ({
             value: child,
             label: child
           }))

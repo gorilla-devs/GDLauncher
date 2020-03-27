@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { Input, Button } from "antd";
-import Modal from "../components/Modal";
-import { load } from "../reducers/loading/actions";
-import features from "../reducers/loading/features";
-import { login } from "../reducers/actions";
-import { closeModal } from "../reducers/modals/actions";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import { Input, Button } from 'antd';
+import Modal from '../components/Modal';
+import { load } from '../reducers/loading/actions';
+import features from '../reducers/loading/features';
+import { login } from '../reducers/actions';
+import { closeModal } from '../reducers/modals/actions';
 
 const AddAccount = ({ username }) => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState(username || "");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(username || '');
+  const [password, setPassword] = useState('');
 
   const addAccount = () => {
     dispatch(
@@ -27,6 +27,7 @@ const AddAccount = ({ username }) => {
         height: 400px;
         width: 400px;
       `}
+      title=" "
     >
       <Container>
         <FormContainer>

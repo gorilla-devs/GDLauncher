@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { transparentize } from "polished";
-import styled, { keyframes } from "styled-components";
-import { promises as fs } from "fs";
-import { LoadingOutlined } from "@ant-design/icons";
-import path from "path";
-import { ipcRenderer } from "electron";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faClock } from "@fortawesome/free-solid-svg-icons";
-import psTree from "ps-tree";
-import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import { transparentize } from 'polished';
+import styled, { keyframes } from 'styled-components';
+import { promises as fs } from 'fs';
+import { LoadingOutlined } from '@ant-design/icons';
+import path from 'path';
+import { ipcRenderer } from 'electron';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay, faClock } from '@fortawesome/free-solid-svg-icons';
+import psTree from 'ps-tree';
+import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   _getInstance,
   _getInstancesPath,
   _getDownloadQueue
-} from "../../../../common/utils/selectors";
-import { launchInstance } from "../../../../common/reducers/actions";
-import { openModal } from "../../../../common/reducers/modals/actions";
-import instanceDefaultBackground from "../../../../common/assets/instance_default.png";
+} from '../../../../common/utils/selectors';
+import { launchInstance } from '../../../../common/reducers/actions';
+import { openModal } from '../../../../common/reducers/modals/actions';
+import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 
 const Container = styled.div`
   position: relative;
@@ -25,13 +25,13 @@ const Container = styled.div`
   height: 100px;
   transform: ${p =>
     p.isHovered && !p.installing
-      ? "scale3d(1.1, 1.1, 1.1)"
-      : "scale3d(1, 1, 1)"};
+      ? 'scale3d(1.1, 1.1, 1.1)'
+      : 'scale3d(1, 1, 1)'};
   margin-right: 20px;
   margin-top: 20px;
   transition: transform 150ms ease-in-out;
   &:hover {
-    ${p => (p.installing ? "" : "transform: scale3d(1.1, 1.1, 1.1);")}
+    ${p => (p.installing ? '' : 'transform: scale3d(1.1, 1.1, 1.1);')}
   }
 `;
 
@@ -78,7 +78,7 @@ const HoverContainer = styled.div`
   transition: opacity 150ms ease-in-out;
   width: 100%;
   height: 100%;
-  opacity: ${p => (p.installing || p.isHovered ? "1" : "0")};
+  opacity: ${p => (p.installing || p.isHovered ? '1' : '0')};
   backdrop-filter: blur(4px);
   will-change: opacity;
   background: ${p => transparentize(0.5, p.theme.palette.grey[800])};
@@ -92,7 +92,7 @@ const HoverContainer = styled.div`
     border: solid 3px transparent;
     border-bottom-color: ${props => props.theme.palette.colors.green};
     border-radius: 50%;
-    content: "";
+    content: '';
     height: 60px;
     width: 60px;
     position: absolute;
@@ -148,7 +148,7 @@ const Instance = ({ instanceName }) => {
     if (instance.background) {
       fs.readFile(path.join(instancesPath, instanceName, instance.background))
         .then(res =>
-          setBackground(`data:image/png;base64,${res.toString("base64")}`)
+          setBackground(`data:image/png;base64,${res.toString('base64')}`)
         )
         .catch(console.warning);
     } else {
@@ -161,13 +161,13 @@ const Instance = ({ instanceName }) => {
     dispatch(launchInstance(instanceName));
   };
   const openFolder = () => {
-    ipcRenderer.invoke("openFolder", path.join(instancesPath, instance.name));
+    ipcRenderer.invoke('openFolder', path.join(instancesPath, instance.name));
   };
   const openConfirmationDeleteModal = () => {
-    dispatch(openModal("InstanceDeleteConfirmation", { instanceName }));
+    dispatch(openModal('InstanceDeleteConfirmation', { instanceName }));
   };
   const manageInstance = () => {
-    dispatch(openModal("InstanceManager", { instanceName }));
+    dispatch(openModal('InstanceManager', { instanceName }));
   };
   const killProcess = () => {
     psTree(isPlaying.pid, (err, children) => {
@@ -242,8 +242,8 @@ const Instance = ({ instanceName }) => {
                     {!isPlaying.initialized && <div className="spinner" />}
                   </div>
                 )}
-                {isInQueue && "In Queue"}
-                {!isInQueue && !isPlaying && "PLAY"}
+                {isInQueue && 'In Queue'}
+                {!isInQueue && !isPlaying && 'PLAY'}
               </>
             )}
           </HoverContainer>

@@ -1,4 +1,4 @@
-import * as ActionTypes from "./actionTypes";
+import * as ActionTypes from './actionTypes';
 
 export function updateSoundsSetting(sounds) {
   return dispatch => {
@@ -33,6 +33,15 @@ export function updateHideWindowOnGameLaunch(hideWindow) {
     dispatch({
       type: ActionTypes.HIDE_WINDOW_ON_GAME_LAUNCH,
       hideWindow
+    });
+  };
+}
+
+export function updateShowNews(value) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_SHOW_NEWS,
+      value
     });
   };
 }

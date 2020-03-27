@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense } from 'react';
 
 function WaitingComponent(MyComponent) {
   return props => (

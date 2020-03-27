@@ -1,9 +1,9 @@
-import React from "react";
-import { Button } from "antd";
-import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import Modal from "../components/Modal";
-import { closeModal } from "../reducers/modals/actions";
+import React from 'react';
+import { Button } from 'antd';
+import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import Modal from '../components/Modal';
+import { closeModal } from '../reducers/modals/actions';
 
 const Container = styled.div`
   display: flex;
@@ -28,7 +28,7 @@ const applyChoice = async (
   dispatch,
   delay = 500
 ) => {
-  if (choiceType === "abort") {
+  if (choiceType === 'abort') {
     if (callback) {
       callback();
       setTimeout(() => dispatch(closeModal()), delay);
@@ -64,14 +64,14 @@ export default function ActionConfirmation({
         <Buttons>
           <Button
             onClick={() => {
-              applyChoice("abort", abortCallback, fileName, dispatch, delay);
+              applyChoice('abort', abortCallback, fileName, dispatch, delay);
             }}
           >
             Abort
           </Button>
           <Button
             onClick={() =>
-              applyChoice("confirm", confirmCallback, fileName, dispatch, delay)
+              applyChoice('confirm', confirmCallback, fileName, dispatch, delay)
             }
           >
             Confirm

@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 const Options = styled.div`
   position: relative;
@@ -14,7 +14,7 @@ const Overview = () => {
       <Options>
         <div>Bold</div>
       </Options>
-      <textarea placeholder="Type here your notes!" />
+      <textarea placeholder="Type your notes here!!" />
     </>
   );
 };

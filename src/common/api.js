@@ -1,5 +1,5 @@
 // @flow
-import axios from "axios";
+import axios from 'axios';
 import {
   MOJANG_APIS,
   FORGESVC_URL,
@@ -8,15 +8,15 @@ import {
   JAVA_MANIFEST_URL,
   CLIENT_ID,
   FORGESVC_CATEGORIES
-} from "./utils/constants";
-import { sortByDate } from "./utils";
+} from './utils/constants';
+import { sortByDate } from './utils';
 
 export const mcAuthenticate = (username, password, clientToken) => {
   return axios.post(
     `${MOJANG_APIS}/authenticate`,
     {
       agent: {
-        name: "Minecraft",
+        name: 'Minecraft',
         version: 1
       },
       username,
@@ -24,7 +24,7 @@ export const mcAuthenticate = (username, password, clientToken) => {
       clientToken,
       requestUser: true
     },
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { 'Content-Type': 'application/json' } }
   );
 };
 
@@ -35,7 +35,7 @@ export const mcValidate = (accessToken, clientToken) => {
       accessToken,
       clientToken
     },
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { 'Content-Type': 'application/json' } }
   );
 };
 
@@ -47,7 +47,7 @@ export const mcRefresh = (accessToken, clientToken) => {
       clientToken,
       requestUser: true
     },
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { 'Content-Type': 'application/json' } }
   );
 };
 
@@ -59,9 +59,9 @@ export const mcGetPlayerSkin = uuid => {
 
 export const imgurPost = (image, onProgress) => {
   const bodyFormData = new FormData();
-  bodyFormData.append("image", image);
+  bodyFormData.append('image', image);
 
-  return axios.post("https://api.imgur.com/3/image", bodyFormData, {
+  return axios.post('https://api.imgur.com/3/image', bodyFormData, {
     headers: {
       Authorization: `Client-ID ${CLIENT_ID}`
     },
@@ -76,7 +76,7 @@ export const mcInvalidate = (accessToken, clientToken) => {
       accessToken,
       clientToken
     },
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { 'Content-Type': 'application/json' } }
   );
 };
 
@@ -166,18 +166,18 @@ export const getSearch = (
   const url = `${FORGESVC_URL}/addon/search`;
   const params = {
     gameId: 432,
-    sectionId: type === "mods" ? 6 : 4471,
+    sectionId: type === 'mods' ? 6 : 4471,
     categoryId: categoryId || 0,
     pageSize,
     sort,
     isSortDescending,
     index,
     searchFilter,
-    gameVersion: gameVersion || ""
+    gameVersion: gameVersion || ''
   };
   return axios.get(url, { params });
 };
 
 export const getOptifineHomePage = () => {
-  return axios.get("https://optifine.net/downloads");
+  return axios.get('https://optifine.net/downloads');
 };

@@ -1,14 +1,14 @@
 // @flow
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import styled from "styled-components";
-import { ipcRenderer } from "electron";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCog, faDownload } from "@fortawesome/free-solid-svg-icons";
-import logo from "../../../common/assets/logo.png";
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
+import { ipcRenderer } from 'electron';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog, faDownload } from '@fortawesome/free-solid-svg-icons';
+import logo from '../../../common/assets/logo.png';
 
-import { openModal } from "../../../common/reducers/modals/actions";
-import { updateUpdateAvailable } from "../../../common/reducers/actions";
+import { openModal } from '../../../common/reducers/modals/actions';
+import { updateUpdateAvailable } from '../../../common/reducers/actions';
 
 export const Container = styled.div`
   width: 100vw;
@@ -61,12 +61,12 @@ const Navbar = () => {
 
   useEffect(() => {
     // Check every 10 minutes
-    ipcRenderer.invoke("checkForUpdates");
-    ipcRenderer.on("updateAvailable", () => {
+    ipcRenderer.invoke('checkForUpdates');
+    ipcRenderer.on('updateAvailable', () => {
       dispatch(updateUpdateAvailable(true));
     });
     setInterval(() => {
-      ipcRenderer.invoke("checkForUpdates");
+      ipcRenderer.invoke('checkForUpdates');
     }, 600000);
   }, []);
 
@@ -77,19 +77,22 @@ const Navbar = () => {
     return false;
   };
 
-  if (isLocation("/") || isLocation("/onboarding")) return null;
+  if (isLocation('/') || isLocation('/onboarding')) return null;
   return (
     <Container>
-      <img
-        src={logo}
-        height="30px"
-        alt="logo"
-        draggable="false"
-        css={`
-          z-index: 1;
-          margin-left: 8px;
-        `}
-      />
+      <a href="https://gdevs.io/" rel="noopener noreferrer">
+        <img
+          src={logo}
+          height="30px"
+          alt="logo"
+          draggable="false"
+          css={`
+            z-index: 1;
+            cursor: pointer;
+            margin-left: 8px;
+          `}
+        />
+      </a>
       <div>
         {updateAvailable && (
           <UpdateButton>
@@ -99,7 +102,7 @@ const Navbar = () => {
         <SettingsButton>
           <FontAwesomeIcon
             icon={faCog}
-            onClick={() => dispatch(openModal("Settings"))}
+            onClick={() => dispatch(openModal('Settings'))}
           />
         </SettingsButton>
       </div>

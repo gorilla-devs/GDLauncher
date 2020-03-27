@@ -1,11 +1,11 @@
-import React, { forwardRef, memo } from "react";
-import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { FixedSizeList as List } from "react-window";
-import InfiniteLoader from "react-window-infinite-loader";
-import { transparentize } from "polished";
-import { openModal } from "../../../reducers/modals/actions";
-import { FORGE } from "../../../utils/constants";
+import React, { forwardRef, memo } from 'react';
+import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import { FixedSizeList as List } from 'react-window';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { transparentize } from 'polished';
+import { openModal } from '../../../reducers/modals/actions';
+import { FORGE } from '../../../utils/constants';
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -81,7 +81,7 @@ const ModpacksListWrapper = ({
           <div
             onClick={() => {
               dispatch(
-                openModal("ModpackDescription", {
+                openModal('ModpackDescription', {
                   modpack,
                   setVersion,
                   setModpack,

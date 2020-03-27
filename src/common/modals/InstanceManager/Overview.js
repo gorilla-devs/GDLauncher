@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { useDispatch, useSelector } from "react-redux";
-import { promises as fs } from "fs";
-import path from "path";
-import { Card, Slider, Button, Input, Switch, Select } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faUndoAlt } from "@fortawesome/free-solid-svg-icons";
-import { _getInstancesPath } from "../../utils/selectors";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { useDispatch, useSelector } from 'react-redux';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { Card, Slider, Button, Input, Switch, Select } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave, faUndoAlt } from '@fortawesome/free-solid-svg-icons';
+import { _getInstancesPath } from '../../utils/selectors';
 import {
   updateJavaArguments,
   updateJavaMemory
-} from "../../reducers/settings/actions";
-import { DEFAULT_JAVA_ARGS } from "../../../app/desktop/utils/constants";
+} from '../../reducers/settings/actions';
+import { DEFAULT_JAVA_ARGS } from '../../../app/desktop/utils/constants';
 // import { downloadForge } from "../../reducers/actions";
 
 const Container = styled.div`
@@ -117,10 +117,10 @@ const ForgeVersionSelect = styled(Select)`
 `;
 
 const marks = {
-  2048: "2048 MB",
-  4096: "4096 MB",
-  8192: "8192 MB",
-  16384: "16384 MB"
+  2048: '2048 MB',
+  4096: '4096 MB',
+  8192: '8192 MB',
+  16384: '16384 MB'
 };
 
 const Overview = ({ instanceName }) => {
@@ -140,7 +140,7 @@ const Overview = ({ instanceName }) => {
     await fs.rename(instancePath, newInstanceName);
   };
 
-  function resetJavaArguments(dispatch) {
+  function resetJavaArguments() {
     dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
   }
 
@@ -173,7 +173,7 @@ const Overview = ({ instanceName }) => {
           </ForgeManagerCard>
           <JavaManagerCard title="Java Manager Override">
             <JavaManagerOptionContainer>
-              JavaMemory{" "}
+              JavaMemory{' '}
               <Switch
                 value={javaMemorySwitch}
                 onChange={e => setJavaMemorySwitch(e)}
@@ -196,7 +196,7 @@ const Overview = ({ instanceName }) => {
             )}
 
             <JavaManagerOptionContainer>
-              JavaArguments{" "}
+              JavaArguments{' '}
               <Switch
                 value={javaArgumentswitch}
                 onChange={e => setJavaArgumentswitch(e)}

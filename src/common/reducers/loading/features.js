@@ -1,5 +1,5 @@
 export default {
-  mcAuthentication: "accountAuthentication",
-  mcNews: "minecraftNews",
-  manifests: "vanillaForgeManifests"
+  mcAuthentication: 'accountAuthentication',
+  mcNews: 'minecraftNews',
+  manifests: 'vanillaForgeManifests'
 };

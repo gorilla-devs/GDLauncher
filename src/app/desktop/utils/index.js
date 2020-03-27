@@ -1,19 +1,18 @@
-import { promises as fs } from "fs";
-import fse from "fs-extra";
-import { extractFull } from "node-7z";
-import jimp from "jimp/es";
-import makeDir from "make-dir";
-import jarAnalyzer from "jarfile";
-import { promisify } from "util";
-import { ipcRenderer } from "electron";
-import path from "path";
-// import axios from "axios";
-import { exec, spawn } from "child_process";
-import cheerio from "cheerio";
-import { MC_LIBRARIES_URL } from "../../../common/utils/constants";
-import { removeDuplicates } from "../../../common/utils";
-import { getAddonFile, mcGetPlayerSkin } from "../../../common/api";
-import { downloadFile } from "./downloader";
+import { promises as fs } from 'fs';
+import fse from 'fs-extra';
+import { extractFull } from 'node-7z';
+import jimp from 'jimp/es';
+import makeDir from 'make-dir';
+import jarAnalyzer from 'jarfile';
+import { promisify } from 'util';
+import { ipcRenderer } from 'electron';
+import path from 'path';
+import { exec, spawn } from 'child_process';
+import cheerio from 'cheerio';
+import { MC_LIBRARIES_URL } from '../../../common/utils/constants';
+import { removeDuplicates } from '../../../common/utils';
+import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
+import { downloadFile } from './downloader';
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -29,29 +28,29 @@ export const getDirectories = async source => {
 };
 
 export const mavenToArray = (s, nativeString) => {
-  const pathSplit = s.split(":");
+  const pathSplit = s.split(':');
   const fileName = pathSplit[3]
     ? `${pathSplit[2]}-${pathSplit[3]}`
     : pathSplit[2];
-  const finalFileName = fileName.includes("@")
-    ? fileName.replace("@", ".")
-    : `${fileName}${nativeString || ""}.jar`;
+  const finalFileName = fileName.includes('@')
+    ? fileName.replace('@', '.')
+    : `${fileName}${nativeString || ''}.jar`;
   const initPath = pathSplit[0]
-    .split(".")
+    .split('.')
     .concat(pathSplit[1])
-    .concat(pathSplit[2].split("@")[0])
+    .concat(pathSplit[2].split('@')[0])
     .concat(`${pathSplit[1]}-${finalFileName}`);
   return initPath;
 };
 
 export const convertOSToMCFormat = ElectronFormat => {
   switch (ElectronFormat) {
-    case "win32":
-      return "windows";
-    case "darwin":
-      return "osx";
-    case "linux":
-      return "linux";
+    case 'win32':
+      return 'windows';
+    case 'darwin':
+      return 'osx';
+    case 'linux':
+      return 'linux';
     default:
       return false;
   }
@@ -59,12 +58,12 @@ export const convertOSToMCFormat = ElectronFormat => {
 
 export const convertOSToJavaFormat = ElectronFormat => {
   switch (ElectronFormat) {
-    case "win32":
-      return "windows";
-    case "darwin":
-      return "mac";
-    case "linux":
-      return "linux";
+    case 'win32':
+      return 'windows';
+    case 'darwin':
+      return 'mac';
+    case 'linux':
+      return 'linux';
     default:
       return false;
   }
@@ -77,13 +76,13 @@ export const skipLibrary = lib => {
     lib.rules.forEach(({ action, os, features }) => {
       if (features) return true;
       if (
-        action === "allow" &&
+        action === 'allow' &&
         ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
       ) {
         skip = false;
       }
       if (
-        action === "disallow" &&
+        action === 'disallow' &&
         ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
       ) {
         skip = true;
@@ -111,10 +110,10 @@ export const librariesMapper = (libraries, librariesPath) => {
         const native = (
           (lib?.natives &&
             lib?.natives[convertOSToMCFormat(process.platform)]) ||
-          ""
+          ''
         ).replace(
-          "${arch}", // eslint-disable-line no-template-curly-in-string
-          "64"
+          '${arch}', // eslint-disable-line no-template-curly-in-string
+          '64'
         );
 
         // Vanilla native libs
@@ -134,14 +133,14 @@ export const librariesMapper = (libraries, librariesPath) => {
             url: `${lib.url || `${MC_LIBRARIES_URL}/`}${mavenToArray(
               lib.name,
               native && `-${native}`
-            ).join("/")}`,
+            ).join('/')}`,
             path: path.join(librariesPath, ...mavenToArray(lib.name, native)),
             ...(native && { natives: true })
           });
         }
         return acc.concat(tempArr);
       }, []),
-    "url"
+    'url'
   );
 };
 
@@ -196,7 +195,7 @@ export const isLatestJavaDownloaded = async (meta, dataPath) => {
   const javaMeta = meta.find(v => v.os === javaOs);
   const javaFolder = path.join(
     dataPath,
-    "java",
+    'java',
     javaMeta.version_data.openjdk_version
   );
   // Check if it's downloaded, if it's latest version and if it's a valid download
@@ -206,8 +205,8 @@ export const isLatestJavaDownloaded = async (meta, dataPath) => {
     await promisify(exec)(
       `"${path.join(
         javaFolder,
-        "bin",
-        `java${javaOs === "windows" ? ".exe" : ""}`
+        'bin',
+        `java${javaOs === 'windows' ? '.exe' : ''}`
       )}" -version`
     );
   } catch (err) {
@@ -218,36 +217,36 @@ export const isLatestJavaDownloaded = async (meta, dataPath) => {
 };
 
 export const get7zPath = async () => {
-  const baseDir = await ipcRenderer.invoke("getUserDataPath");
-  if (process.platform === "darwin") {
-    return path.join(baseDir, "7za-osx");
+  const baseDir = await ipcRenderer.invoke('getUserDataPath');
+  if (process.platform === 'darwin') {
+    return path.join(baseDir, '7za-osx');
   }
-  if (process.platform === "win32") {
-    return path.join(baseDir, "7za.exe");
+  if (process.platform === 'win32') {
+    return path.join(baseDir, '7za.exe');
   }
-  return path.join(baseDir, "7za-linux");
+  return path.join(baseDir, '7za-linux');
 };
 
 export const fixFilePermissions = async filePath => {
-  if (process.platform === "linux" || process.platform === "darwin") {
+  if (process.platform === 'linux' || process.platform === 'darwin') {
     await promisify(exec)(`chmod +x "${filePath}"`);
     await promisify(exec)(`chmod 755 "${filePath}"`);
   }
 };
 
 export const extract7z = async () => {
-  const appPath = await ipcRenderer.invoke("getAppPath");
+  const appPath = await ipcRenderer.invoke('getAppPath');
   const baseDir = path.join(
     appPath,
-    process.env.NODE_ENV === "development" ? "public" : "build",
-    "7z"
+    process.env.NODE_ENV === 'development' ? 'public' : 'build',
+    '7z'
   );
-  let zipLocationAsar = path.join(baseDir, "7za-linux");
-  if (process.platform === "darwin") {
-    zipLocationAsar = path.join(baseDir, "7za-osx");
+  let zipLocationAsar = path.join(baseDir, '7za-linux');
+  if (process.platform === 'darwin') {
+    zipLocationAsar = path.join(baseDir, '7za-osx');
   }
-  if (process.platform === "win32") {
-    zipLocationAsar = path.join(baseDir, "7za.exe");
+  if (process.platform === 'win32') {
+    zipLocationAsar = path.join(baseDir, '7za.exe');
   }
   const sevenZipPath = await get7zPath();
   await fse.copy(zipLocationAsar, sevenZipPath);
@@ -255,7 +254,7 @@ export const extract7z = async () => {
 };
 
 export const extractNatives = async (libraries, instancePath) => {
-  const extractLocation = path.join(instancePath, "natives");
+  const extractLocation = path.join(instancePath, 'natives');
   const sevenZipPath = await get7zPath();
   await Promise.all(
     libraries
@@ -263,13 +262,13 @@ export const extractNatives = async (libraries, instancePath) => {
       .map(async l => {
         const extraction = extractFull(l.path, extractLocation, {
           $bin: sevenZipPath,
-          $raw: ["-xr!META-INF"]
+          $raw: ['-xr!META-INF']
         });
         await new Promise((resolve, reject) => {
-          extraction.on("end", () => {
+          extraction.on('end', () => {
             resolve();
           });
-          extraction.on("error", err => {
+          extraction.on('error', err => {
             reject(err);
           });
         });
@@ -303,6 +302,7 @@ export const copyAssetsToLegacy = async assets => {
   );
 };
 
+const hiddenToken = '__HIDDEN_TOKEN__';
 export const isOptifine = async (instancesPath, instanceName) => {
   const configPath = path.join(
     path.join(instancesPath, instanceName, "config.json")
@@ -315,7 +315,6 @@ export const isOptifine = async (instancesPath, instanceName) => {
   } else return "";
 };
 
-const hiddenToken = "__HIDDEN_TOKEN__";
 export const getJVMArguments112 = (
   libraries,
   mcjar,
@@ -331,13 +330,13 @@ export const getJVMArguments112 = (
 ) => {
   console.log("dio", optifineVersion, modloader);
   const args = [];
-  args.push("-cp");
+  args.push('-cp');
 
   args.push(
     [...libraries, mcjar]
       .filter(l => !l.natives)
       .map(l => `"${l.path}"`)
-      .join(process.platform === "win32" ? ";" : ":")
+      .join(process.platform === 'win32' ? ';' : ':')
   );
 
   // if (process.platform === "darwin") {
@@ -348,13 +347,13 @@ export const getJVMArguments112 = (
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(...jvmOptions);
-  args.push(`-Djava.library.path="${path.join(instancePath, "natives")}"`);
+  args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
 
   if (optifineVersion && modloader[0] === "vanilla") {
     args.push(" net.minecraft.launchwrapper.Launch ");
   } else args.push(mcJson.mainClass);
 
-  const mcArgs = mcJson.minecraftArguments.split(" ");
+  const mcArgs = mcJson.minecraftArguments.split(' ');
   const argDiscovery = /\${*(.*)}/;
 
   for (let i = 0; i < mcArgs.length; i += 1) {
@@ -362,7 +361,7 @@ export const getJVMArguments112 = (
       const identifier = mcArgs[i].match(argDiscovery)[1];
       let val = null;
       switch (identifier) {
-        case "auth_player_name":
+        case 'auth_player_name':
           val = account.selectedProfile.name.trim();
 
           break;
@@ -370,35 +369,35 @@ export const getJVMArguments112 = (
           val = optifineVersion ? `${optifineVersion}` : mcJson.id;
           // val = mcJson.id;
           break;
-        case "game_directory":
+        case 'game_directory':
           val = `"${instancePath}"`;
           break;
-        case "assets_root":
+        case 'assets_root':
           val = `"${assetsPath}"`;
           break;
-        case "game_assets":
-          val = `"${path.join(assetsPath, "virtual", "legacy")}"`;
+        case 'game_assets':
+          val = `"${path.join(assetsPath, 'virtual', 'legacy')}"`;
           break;
-        case "assets_index_name":
+        case 'assets_index_name':
           val = mcJson.assets;
           break;
-        case "auth_uuid":
+        case 'auth_uuid':
           val = account.selectedProfile.id.trim();
           break;
-        case "auth_access_token":
+        case 'auth_access_token':
           val = hideAccessToken ? hiddenToken : account.accessToken;
           break;
-        case "auth_session":
+        case 'auth_session':
           val = hideAccessToken ? hiddenToken : account.accessToken;
           break;
-        case "user_type":
-          val = "mojang";
+        case 'user_type':
+          val = 'mojang';
           break;
-        case "version_type":
+        case 'version_type':
           val = mcJson.type;
           break;
-        case "user_properties":
-          val = "{}";
+        case 'user_properties':
+          val = '{}';
           break;
         default:
           break;
@@ -450,69 +449,69 @@ export const getJVMArguments113 = (
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
 
   for (let i = 0; i < args.length; i += 1) {
-    if (typeof args[i] === "object" && args[i].rules) {
-      if (typeof args[i].value === "string") {
+    if (typeof args[i] === 'object' && args[i].rules) {
+      if (typeof args[i].value === 'string') {
         args[i] = `"${args[i].value}"`;
-      } else if (typeof args[i].value === "object") {
+      } else if (typeof args[i].value === 'object') {
         args.splice(i, 1, ...args[i].value.map(v => `"${v}"`));
       }
       i -= 1;
-    } else if (typeof args[i] === "string") {
+    } else if (typeof args[i] === 'string') {
       if (argDiscovery.test(args[i])) {
         const identifier = args[i].match(argDiscovery)[1];
         let val = null;
         switch (identifier) {
-          case "auth_player_name":
+          case 'auth_player_name':
             val = account.selectedProfile.name.trim();
             break;
           case "version_name":
             val = optifineVersion ? `${optifineVersion}` : mcJson.id;
             // val = mcJson.id;
             break;
-          case "game_directory":
+          case 'game_directory':
             val = `"${instancePath}"`;
             break;
-          case "assets_root":
+          case 'assets_root':
             val = `"${assetsPath}"`;
             break;
-          case "assets_index_name":
+          case 'assets_index_name':
             val = mcJson.assets;
             break;
-          case "auth_uuid":
+          case 'auth_uuid':
             val = account.selectedProfile.id.trim();
             break;
-          case "auth_access_token":
+          case 'auth_access_token':
             val = hideAccessToken ? hiddenToken : account.accessToken;
             break;
-          case "user_type":
-            val = "mojang";
+          case 'user_type':
+            val = 'mojang';
             break;
-          case "version_type":
+          case 'version_type':
             val = mcJson.type;
             break;
-          case "resolution_width":
+          case 'resolution_width':
             val = 800;
             break;
-          case "resolution_height":
+          case 'resolution_height':
             val = 600;
             break;
-          case "natives_directory":
+          case 'natives_directory':
             val = args[i].replace(
               argDiscovery,
-              `"${path.join(instancePath, "natives")}"`
+              `"${path.join(instancePath, 'natives')}"`
             );
             break;
-          case "launcher_name":
-            val = args[i].replace(argDiscovery, "GDLauncher");
+          case 'launcher_name':
+            val = args[i].replace(argDiscovery, 'GDLauncher');
             break;
-          case "launcher_version":
-            val = args[i].replace(argDiscovery, "1.0");
+          case 'launcher_version':
+            val = args[i].replace(argDiscovery, '1.0');
             break;
-          case "classpath":
+          case 'classpath':
             val = [...libraries, mcjar]
               .filter(l => !l.natives)
               .map(l => `"${l.path}"`)
-              .join(process.platform === "win32" ? ";" : ":");
+              .join(process.platform === 'win32' ? ';' : ':');
             break;
           default:
             break;
@@ -540,25 +539,25 @@ export const patchForge113 = async (
 ) => {
   const { processors } = installProfileJson;
   const replaceIfPossible = arg => {
-    const finalArg = arg.replace("{", "").replace("}", "");
+    const finalArg = arg.replace('{', '').replace('}', '');
     if (installProfileJson.data[finalArg]) {
       // Handle special case
-      if (finalArg === "BINPATCH") {
+      if (finalArg === 'BINPATCH') {
         return `"${path
           .join(librariesPath, ...mavenToArray(installProfileJson.path))
-          .replace(".jar", "-clientdata.lzma")}"`;
+          .replace('.jar', '-clientdata.lzma')}"`;
       }
       // Return replaced string
       return installProfileJson.data[finalArg].client;
     }
     // Return original string (checking for MINECRAFT_JAR)
-    return arg.replace("{MINECRAFT_JAR}", `"${mainJar}"`);
+    return arg.replace('{MINECRAFT_JAR}', `"${mainJar}"`);
   };
   const computePathIfPossible = arg => {
-    if (arg[0] === "[") {
+    if (arg[0] === '[') {
       return `"${path.join(
         librariesPath,
-        ...mavenToArray(arg.replace("[", "").replace("]", ""))
+        ...mavenToArray(arg.replace('[', '').replace(']', ''))
       )}"`;
     }
     return arg;
@@ -579,15 +578,15 @@ export const patchForge113 = async (
       );
 
       const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
-      const mainClass = jarFile.valueForManifestEntry("Main-Class");
+      const mainClass = jarFile.valueForManifestEntry('Main-Class');
 
       await new Promise(resolve => {
         const ps = spawn(
           `"${javaPath}"`,
           [
-            "-classpath",
+            '-classpath',
             [`"${filePath}"`, ...classPaths].join(
-              process.platform === "win32" ? ";" : ":"
+              process.platform === 'win32' ? ';' : ':'
             ),
             mainClass,
             ...args
@@ -595,15 +594,15 @@ export const patchForge113 = async (
           { shell: true }
         );
 
-        ps.stdout.on("data", data => {
+        ps.stdout.on('data', data => {
           console.log(data.toString());
         });
 
-        ps.stderr.on("data", data => {
+        ps.stderr.on('data', data => {
           console.error(`ps stderr: ${data}`);
         });
 
-        ps.on("close", code => {
+        ps.on('close', code => {
           if (code !== 0) {
             console.log(`process exited with code ${code}`);
             resolve();
@@ -624,14 +623,14 @@ export const importAddonZip = async (
   instanceTempPath,
   tempPath
 ) => {
-  const tempZipFile = path.join(instanceTempPath, "addon.zip");
+  const tempZipFile = path.join(instanceTempPath, 'addon.zip');
   await makeDir(instanceTempPath);
   if (zipPath.includes(tempPath)) {
     await fse.move(zipPath, tempZipFile);
   } else {
     await fse.copyFile(zipPath, tempZipFile);
   }
-  const instanceManifest = path.join(instancePath, "manifest.json");
+  const instanceManifest = path.join(instancePath, 'manifest.json');
   // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
   await new Promise(resolve => {
     setTimeout(() => resolve(), 500);
@@ -640,13 +639,13 @@ export const importAddonZip = async (
   const extraction = extractFull(tempZipFile, instancePath, {
     $bin: sevenZipPath,
     yes: true,
-    $cherryPick: "manifest.json"
+    $cherryPick: 'manifest.json'
   });
   await new Promise((resolve, reject) => {
-    extraction.on("end", () => {
+    extraction.on('end', () => {
       resolve();
     });
-    extraction.on("error", err => {
+    extraction.on('error', err => {
       reject(err.stderr);
     });
   });
@@ -656,8 +655,8 @@ export const importAddonZip = async (
 
 export const downloadAddonZip = async (id, fileId, instancePath, tempPath) => {
   const { data } = await getAddonFile(id, fileId);
-  const instanceManifest = path.join(instancePath, "manifest.json");
-  const zipFile = path.join(tempPath, "addon.zip");
+  const instanceManifest = path.join(instancePath, 'manifest.json');
+  const zipFile = path.join(tempPath, 'addon.zip');
   await downloadFile(zipFile, data.downloadUrl);
   // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
   await new Promise(resolve => {
@@ -667,13 +666,13 @@ export const downloadAddonZip = async (id, fileId, instancePath, tempPath) => {
   const extraction = extractFull(zipFile, instancePath, {
     $bin: sevenZipPath,
     yes: true,
-    $cherryPick: "manifest.json"
+    $cherryPick: 'manifest.json'
   });
   await new Promise((resolve, reject) => {
-    extraction.on("end", () => {
+    extraction.on('end', () => {
       resolve();
     });
-    extraction.on("error", err => {
+    extraction.on('error', err => {
       reject(err.stderr);
     });
   });
@@ -704,7 +703,7 @@ export const getPlayerSkin = async uuid => {
   const playerSkin = await mcGetPlayerSkin(uuid);
   const { data } = playerSkin;
   const base64 = data.properties[0].value;
-  const decoded = JSON.parse(Buffer.from(base64, "base64").toString());
+  const decoded = JSON.parse(Buffer.from(base64, 'base64').toString());
   return decoded?.textures?.SKIN?.url;
 };
 
@@ -713,7 +712,7 @@ export const extractFace = async buffer => {
   image.crop(8, 8, 8, 8);
   image.scale(10, jimp.RESIZE_NEAREST_NEIGHBOR);
   const imageBuffer = await image.getBufferAsync(jimp.MIME_PNG);
-  return imageBuffer.toString("base64");
+  return imageBuffer.toString('base64');
 };
 
 export const normalizeModData = (data, projectID, modName) => {
@@ -738,17 +737,17 @@ export const reflect = p =>
 
 export const isMod = (fileName, instancesPath) =>
   /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
-    fileName.replace(instancesPath, "")
+    fileName.replace(instancesPath, '')
   );
 
 export const isInstanceFolderPath = (f, instancesPath) =>
-  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(f.replace(instancesPath, ""));
+  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(f.replace(instancesPath, ''));
 
 export const isFileModFabric = file => {
   return (
-    (file.gameVersion.includes("Fabric") ||
-      file.modules.find(v => v.foldername === "fabric.mod.json")) &&
-    !file.gameVersion.includes("Forge")
+    (file.gameVersion.includes('Fabric') ||
+      file.modules.find(v => v.foldername === 'fabric.mod.json')) &&
+    !file.gameVersion.includes('Forge')
   );
 };
 
@@ -764,9 +763,7 @@ export const filterFabricFilesByVersion = (files, version) => {
 export const filterForgeFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersion)) {
-      return (
-        v.gameVersion.includes(version) && !v.gameVersion.includes("Fabric")
-      );
+      return v.gameVersion.includes(version) && !isFileModFabric(v);
     }
     return v.gameVersion === version;
   });

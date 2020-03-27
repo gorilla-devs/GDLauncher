@@ -1,9 +1,9 @@
-import { combineReducers } from "redux";
-import * as ActionTypes from "./actionTypes";
+import { combineReducers } from 'redux';
+import * as ActionTypes from './actionTypes';
 import {
   DEFAULT_JAVA_ARGS,
   DEFAULT_MEMORY
-} from "../../../app/desktop/utils/constants";
+} from '../../../app/desktop/utils/constants';
 
 function sounds(state = true, action) {
   switch (action.type) {
@@ -70,6 +70,15 @@ function potatoPcMode(state = false, action) {
   }
 }
 
+function showNews(state = true, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_SHOW_NEWS:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path: null,
@@ -98,5 +107,6 @@ export default combineReducers({
   discordRPC,
   hideWindowOnGameLaunch,
   potatoPcMode,
+  showNews,
   java
 });

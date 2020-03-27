@@ -1,19 +1,19 @@
-import path from "path";
-import { promises as fs } from "fs";
-import fse from "fs-extra";
-import pMap from "p-map";
-import { getDirectories, normalizeModData, isMod } from ".";
-import { getFileMurmurHash2 } from "../../../common/utils";
-import { getAddonsByFingerprint, getAddon } from "../../../common/api";
+import path from 'path';
+import { promises as fs } from 'fs';
+import fse from 'fs-extra';
+import pMap from 'p-map';
+import { getDirectories, normalizeModData, isMod } from '.';
+import { getFileMurmurHash2 } from '../../../common/utils';
+import { getAddonsByFingerprint, getAddon } from '../../../common/api';
 
 const modsFingerprintsScan = async instancesPath => {
   const mapFolderToInstance = async instance => {
     try {
       const configPath = path.join(
-        path.join(instancesPath, instance, "config.json")
+        path.join(instancesPath, instance, 'config.json')
       );
       const config = await fse.readJSON(configPath);
-      const modsFolder = path.join(instancesPath, instance, "mods");
+      const modsFolder = path.join(instancesPath, instance, 'mods');
       const modsFolderExists = await fse.pathExists(modsFolder);
 
       if (!modsFolderExists) return { ...config, name: instance };
@@ -36,7 +36,7 @@ const modsFingerprintsScan = async instancesPath => {
             if (!(config?.mods || []).find(mod => mod.fileName === file)) {
               const murmurHash = await getFileMurmurHash2(completeFilePath);
               console.log(
-                "[MODS SCANNER] Local mod not found in config",
+                '[MODS SCANNER] Local mod not found in config',
                 file,
                 murmurHash
               );
@@ -73,12 +73,14 @@ const modsFingerprintsScan = async instancesPath => {
               v => v === hash
             );
             if (exactMatch) {
-              const { data } = await getAddon(exactMatch.file.projectId);
+              const { data: addonData } = await getAddon(
+                exactMatch.file.projectId
+              );
               return {
                 ...normalizeModData(
                   exactMatch.file,
                   exactMatch.file.projectId,
-                  data.name
+                  addonData.name
                 ),
                 fileName
               };
@@ -114,6 +116,7 @@ const modsFingerprintsScan = async instancesPath => {
     } catch (err) {
       console.error(err);
     }
+    return null;
   };
 
   const folders = await getDirectories(instancesPath);

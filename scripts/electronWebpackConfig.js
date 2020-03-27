@@ -2,11 +2,11 @@
  * Webpack config for production electron main process
  */
 
-const path = require("path");
-const webpack = require("webpack");
-const merge = require("webpack-merge");
-const TerserPlugin = require("terser-webpack-plugin");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+const path = require('path');
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+const TerserPlugin = require('terser-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const baseConfig = {
   externals: [],
@@ -15,13 +15,16 @@ const baseConfig = {
     rules: [
       {
         test: /\.node$/,
-        use: "node-loader"
+        loader: 'native-ext-loader',
+        options: {
+          basePath: []
+        }
       },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
           options: {
             cacheDirectory: true
           }
@@ -31,22 +34,22 @@ const baseConfig = {
   },
 
   output: {
-    path: path.join(__dirname, "..", "build"),
+    path: path.join(__dirname, '..', 'build'),
     // https://github.com/webpack/webpack/issues/1114
-    libraryTarget: "commonjs2"
+    libraryTarget: 'commonjs2'
   },
 
   /**
    * Determine the array of extensions that should be used to resolve modules.
    */
   resolve: {
-    extensions: [".js", ".jsx", ".json"],
-    modules: [path.join(__dirname, "..", "build"), "node_modules"]
+    extensions: ['.js', '.jsx', '.json'],
+    modules: [path.join(__dirname, '..', 'build'), 'node_modules']
   },
 
   plugins: [
     new webpack.EnvironmentPlugin({
-      NODE_ENV: "production"
+      NODE_ENV: 'production'
     }),
 
     new webpack.NamedModulesPlugin()
@@ -54,24 +57,24 @@ const baseConfig = {
 };
 
 module.exports = merge.smart(baseConfig, {
-  devtool: "nosources-source-map",
+  devtool: 'nosources-source-map',
 
-  mode: "production",
+  mode: 'production',
 
-  target: "electron-main",
+  target: 'electron-main',
 
-  entry: "./public/electron.js",
+  entry: './public/electron.js',
 
   output: {
-    path: path.join(__dirname, ".."),
-    filename: "./build/electron.js"
+    path: path.join(__dirname, '..'),
+    filename: './build/electron.js'
   },
 
   optimization: {
     minimizer: [
       new TerserPlugin({
         parallel: true,
-        sourceMap: false,
+        sourceMap: true,
         cache: true
       })
     ]
@@ -80,8 +83,8 @@ module.exports = merge.smart(baseConfig, {
   plugins: [
     new BundleAnalyzerPlugin({
       analyzerMode:
-        process.env.OPEN_ANALYZER === "true" ? "server" : "disabled",
-      openAnalyzer: process.env.OPEN_ANALYZER === "true"
+        process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
+      openAnalyzer: process.env.OPEN_ANALYZER === 'true'
     }),
 
     /**
@@ -94,7 +97,7 @@ module.exports = merge.smart(baseConfig, {
      * development checks
      */
     new webpack.EnvironmentPlugin({
-      NODE_ENV: "production",
+      NODE_ENV: 'production',
       DEBUG_PROD: false,
       START_MINIMIZED: false
     })

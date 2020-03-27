@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { ipcRenderer } from "electron";
-import styled from "styled-components";
-import { Transition } from "react-transition-group";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowAltCircleRight } from "@fortawesome/free-solid-svg-icons";
-import { Input, Button } from "antd";
-import { useKey } from "rooks";
-import { login } from "../../../common/reducers/actions";
-import { load, requesting } from "../../../common/reducers/loading/actions";
-import features from "../../../common/reducers/loading/features";
-import backgroundVideo from "../../../common/assets/background.webm";
-import HorizontalLogo from "../../../ui/HorizontalLogo";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ipcRenderer } from 'electron';
+import styled from 'styled-components';
+import { Transition } from 'react-transition-group';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { Input, Button } from 'antd';
+import { useKey } from 'rooks';
+import { login } from '../../../common/reducers/actions';
+import { load, requesting } from '../../../common/reducers/loading/actions';
+import features from '../../../common/reducers/loading/features';
+import backgroundVideo from '../../../common/assets/background.webm';
+import HorizontalLogo from '../../../ui/HorizontalLogo';
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
   font-size: 22px;
   background: ${props =>
-    props.active ? props.theme.palette.grey[600] : "transparent"};
+    props.active ? props.theme.palette.grey[600] : 'transparent'};
   border: 0;
   height: auto;
   margin-top: 40px;
@@ -48,7 +48,7 @@ const LeftSide = styled.div`
   transition: 0.3s ease-in-out;
   transform: translateX(
     ${({ transitionState }) =>
-      transitionState === "entering" || transitionState === "entered"
+      transitionState === 'entering' || transitionState === 'entered'
         ? -300
         : 0}px
   );
@@ -72,7 +72,7 @@ const Background = styled.div`
     transition: 0.3s ease-in-out;
     transform: translateX(
       ${({ transitionState }) =>
-        transitionState === "entering" || transitionState === "entered"
+        transitionState === 'entering' || transitionState === 'entered'
           ? -300
           : 0}px
     );
@@ -113,7 +113,7 @@ const Loading = styled.div`
   font-size: 40px;
   transition: 0.3s ease-in-out;
   opacity: ${({ transitionState }) =>
-    transitionState === "entering" || transitionState === "entered" ? 1 : 0};
+    transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
 `;
 
 const Login = () => {
@@ -127,7 +127,7 @@ const Login = () => {
 
   const authenticate = () => {
     if (!email || !password) return;
-    dispatch(requesting("accountAuthentication"));
+    dispatch(requesting('accountAuthentication'));
     setTimeout(() => {
       dispatch(
         load(features.mcAuthentication, dispatch(login(email, password)))
@@ -138,13 +138,10 @@ const Login = () => {
     }, 1000);
   };
 
-  useKey(["Enter"], authenticate);
+  useKey(['Enter'], authenticate);
 
   useEffect(() => {
-    ipcRenderer
-      .invoke("getAppVersion")
-      .then(setVersion)
-      .catch(console.error);
+    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
   }, []);
 
   return (
