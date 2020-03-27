@@ -203,42 +203,41 @@ function News({ style, news }) {
   const ContextTheme = useContext(ThemeContext);
   const showNews = useSelector(state => state.settings.showNews);
 
-  useInterval(() => {
-    if (currentImageIndex < 9) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    } else setCurrentImageIndex(0);
-  }, 5000);
+  useInterval(
+    () => {
+      if (currentImageIndex < 9) {
+        setCurrentImageIndex(currentImageIndex + 1);
+      } else setCurrentImageIndex(0);
+    },
+    showNews ? 5000 : null
+  );
 
-  if (showNews) {
-    return news.length !== 0 ? (
-      <Carousel style={style}>
-        <SelectNews
-          news={news}
-          setCurrentImageIndex={setCurrentImageIndex}
-          currentImageIndex={currentImageIndex}
-        />
-        <ImageList news={news} currentImageIndex={currentImageIndex} />
-      </Carousel>
-    ) : (
-      <StyledContentLoader
-        primaryColor={ContextTheme.shade11}
-        secondaryColor={ContextTheme.shade10}
-      >
-        <rect
-          rx="0"
-          ry="0"
-          width="830"
-          height="158"
-          css={`
-            border-radius: 2px;
-          `}
-        />
-      </StyledContentLoader>
-    );
-    // eslint-disable-next-line no-else-return
-  } else {
-    return '';
-  }
+  if (!showNews) return null;
+  return news.length !== 0 ? (
+    <Carousel style={style}>
+      <SelectNews
+        news={news}
+        setCurrentImageIndex={setCurrentImageIndex}
+        currentImageIndex={currentImageIndex}
+      />
+      <ImageList news={news} currentImageIndex={currentImageIndex} />
+    </Carousel>
+  ) : (
+    <StyledContentLoader
+      primaryColor={ContextTheme.shade11}
+      secondaryColor={ContextTheme.shade10}
+    >
+      <rect
+        rx="0"
+        ry="0"
+        width="830"
+        height="158"
+        css={`
+          border-radius: 2px;
+        `}
+      />
+    </StyledContentLoader>
+  );
 }
 
 export default News;
