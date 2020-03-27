@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
 import path from 'path';
 import pMap from 'p-map';
@@ -106,22 +106,23 @@ const DragEnterEffect = styled.div`
     transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
 `;
 
+export const keyFrameMoveUpDown = keyframes`
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+
+`;
+
 const DragArrow = styled(FontAwesomeIcon)`
   ${props =>
     props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
 
   color: ${props => props.theme.palette.primary.main};
 
-  animation: MoveUpDown 1.5s linear infinite;
-
-  @keyframes MoveUpDown {
-    0% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-15px);
-    }
-  }
+  animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
 `;
 
 const CopyTitle = styled.h1`
@@ -130,16 +131,7 @@ const CopyTitle = styled.h1`
 
   color: ${props => props.theme.palette.primary.main};
 
-  animation: MoveUpDown 1.5s linear infinite;
-
-  @keyframes MoveUpDown {
-    0% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-15px);
-    }
-  }
+  animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
 `;
 
 const deleteMod = async (instanceName, instancePath, mod, dispatch) => {
@@ -313,7 +305,14 @@ const Mods = ({ instanceName }) => {
 
   const dispatch = useDispatch();
 
-  const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+  const antIcon = (
+    <LoadingOutlined
+      css={`
+        font-size: 24px;
+      `}
+      spin
+    />
+  );
 
   useEffect(() => {
     const modList = instance.mods;
