@@ -84,21 +84,21 @@ const UsernameContainer = styled.div`
   text-align: left;
 `;
 
-const EmailContainer = styled.div`
+const UuidContainer = styled.div`
   float: left;
   display: inline-block;
   text-align: left;
 `;
 
 const Username = styled.div`
-  text-size: 5px;
-  text-weight: 200;
+  font-size: smaller;
+  font-weight: 200;
   color: ${props => props.theme.palette.grey[100]};
 `;
 
-const Email = styled.div`
-  text-size: 5px;
-  text-weight: 200;
+const Uuid = styled.div`
+  font-size: smaller;
+  font-weight: 200;
   color: ${props => props.theme.palette.grey[100]};
 `;
 
@@ -198,6 +198,22 @@ function copy(setCopied, copyText) {
   }, 500);
 }
 
+function dashUuid(UUID) {
+  // UUID is segmented into: 8 - 4 - 4 - 4 - 12
+  // Then dashes are added between.
+
+  // eslint-disable-next-line
+  return (
+    `${
+    UUID.substring(0, 8)}-${ 
+    UUID.substring(8, 12)}-${ 
+    UUID.substring(12, 16)}-${ 
+    UUID.substring(16, 20)}-${ 
+    UUID.substring(20, 32)}`
+  );
+  
+}
+
 const openFolderDialog = async (InstancesPath, dispatch) => {
   const paths = await ipcRenderer.invoke('openFolderDialog', InstancesPath);
   if (!paths.filePaths[0]) return;
@@ -223,7 +239,7 @@ const General = () => {
   const isPlaying = useSelector(state => state.startedInstances);
   const queuedInstances = useSelector(state => state.downloadQueue);
   const tempPath = useSelector(_getTempPath);
-  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedUuid, setCopiedUuid] = useState(false);
   const [copiedUsername, setCopiedUsername] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [deletingInstances, setDeletingInstances] = useState(false);
@@ -271,7 +287,7 @@ const General = () => {
             css={`
               display: inline-block;
               margin: 20px 20px 20px 40px;
-              width: 250px;
+              width: 330px;
             `}
           >
             <UsernameContainer>
@@ -305,15 +321,12 @@ const General = () => {
                 </Tooltip>
               </Username>
             </UsernameContainer>
-            <EmailContainer>
-              Email
+            <UuidContainer>
+              UUID
               <br />
-              <Email>
-                {currentAccount.user.username}
-                <Tooltip
-                  title={copiedEmail ? 'copied' : 'copy'}
-                  placement="top"
-                >
+              <Uuid>
+                {dashUuid(currentAccount.selectedProfile.id)}
+                <Tooltip title={copiedUuid ? 'copied' : 'copy'} placement="top">
                   <div
                     css={`
                       width: 13px;
@@ -326,13 +339,16 @@ const General = () => {
                     <FontAwesomeIcon
                       icon={faCopy}
                       onClick={() =>
-                        copy(setCopiedEmail, currentAccount.user.username)
+                        copy(
+                          setCopiedUuid,
+                          dashUuid(currentAccount.selectedProfile.id)
+                        )
                       }
                     />
                   </div>
                 </Tooltip>
-              </Email>
-            </EmailContainer>
+              </Uuid>
+            </UuidContainer>
           </div>
         </PersonalDataContainer>
       </PersonalData>
