@@ -357,6 +357,10 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
       <Container>
         <Header>
           <Select
+            css={`
+              width: 130px;
+              margin: 0 10px;
+            `}
             defaultValue={filterType}
             onChange={setFilterType}
             disabled={areModsLoading}
@@ -414,11 +418,7 @@ const Header = styled.div`
   width: 100%;
   height: 50px;
   display: flex;
+  flex-direction: row;
+  justify-content: space-around;
   align-items: center;
-  *:not(:last-child) {
-    margin-right: 15px;
-  }
-  *:first-child {
-    margin-left: 5px;
-  }
 `;
