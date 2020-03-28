@@ -15,6 +15,7 @@ import InstanceManager from '../modals/InstanceManager';
 import ModsBrowser from '../modals/ModsBrowser';
 import ModpackDescription from '../modals/ModpackDescription';
 import Onboarding from '../modals/Onboarding';
+import JavaSetup from '../modals/JavaSetup';
 import ModOverview from '../modals/ModOverview';
 import { closeModal } from '../reducers/modals/actions';
 
@@ -59,10 +60,11 @@ const modalsComponentLookupTable = {
   InstanceManager,
   Onboarding,
   ModOverview,
-  ModsBrowser
+  ModsBrowser,
+  JavaSetup
 };
 
-const ModalContainer = ({ unmounting, children }) => {
+const ModalContainer = ({ unmounting, children, preventClose }) => {
   const [modalStyle, setModalStyle] = useState({
     transform: 'scale(0.8)',
     opacity: 0
@@ -84,6 +86,7 @@ const ModalContainer = ({ unmounting, children }) => {
 
   const back = e => {
     e.stopPropagation();
+    if (preventClose) return;
     dispatch(closeModal());
   };
 
@@ -129,7 +132,11 @@ const ModalsManager = () => {
     const ModalComponent = modalsComponentLookupTable[modalType];
 
     return (
-      <ModalContainer unmounting={unmounting} key={modalType}>
+      <ModalContainer
+        unmounting={unmounting}
+        key={modalType}
+        preventClose={modalProps.preventClose}
+      >
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <ModalComponent {...modalProps} />
       </ModalContainer>
