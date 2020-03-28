@@ -1873,9 +1873,9 @@ export function launchInstance(instanceName) {
       assetsPath,
       mcJson,
       account,
+      javaMem,
       optifineVersionNameFixedFormat,
       modloader,
-      javaMem,
       false,
       javaArguments
     );
@@ -1900,8 +1900,8 @@ export function launchInstance(instanceName) {
         mcJson,
         account,
         javaMem,
-        modloader,
         optifineVersionNameFixedFormat,
+        modloader,
         true,
         javaArguments
       ).join(' ')}`.replace(...replaceRegex)
