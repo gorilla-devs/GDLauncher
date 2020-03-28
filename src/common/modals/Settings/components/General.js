@@ -79,14 +79,10 @@ const ImagePlaceHolder = styled.div`
 `;
 
 const UsernameContainer = styled.div`
-  float: left;
-  display: inline-block;
   text-align: left;
 `;
 
 const UuidContainer = styled.div`
-  float: left;
-  display: inline-block;
   text-align: left;
 `;
 
@@ -285,7 +281,6 @@ const General = () => {
           )}
           <div
             css={`
-              display: inline-block;
               margin: 20px 20px 20px 40px;
               width: 330px;
             `}
