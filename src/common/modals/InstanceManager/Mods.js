@@ -355,6 +355,7 @@ const Mods = ({ instanceName }) => {
     await pMap(
       Object.values(files),
       async file => {
+        console.log('CIAO', file);
         const fileName = file.name;
         const fileType = fileName.split('.')[1];
 
@@ -369,7 +370,11 @@ const Mods = ({ instanceName }) => {
             path.join(instancesPath, instanceName, 'mods', fileName)
           );
           dragComp[fileName] = true;
-        } else console.error('This File is not a mod!');
+        } else {
+          console.error('This File is not a mod!');
+          setFileDrop(false);
+          setFileDrag(false);
+        }
       },
       { concurrency: 10 }
     );
