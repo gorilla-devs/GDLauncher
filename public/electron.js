@@ -216,9 +216,10 @@ ipcMain.handle('openFolderDialog', (e, defaultPath) => {
   });
 });
 
-ipcMain.handle('openFileDialog', () => {
+ipcMain.handle('openFileDialog', (e, filters) => {
   return dialog.showOpenDialog({
-    properties: ['openFile']
+    properties: ['openFile'],
+    filters
   });
 });
 
