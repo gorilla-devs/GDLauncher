@@ -129,49 +129,7 @@ const ModalContainer = ({ unmounting, children, preventClose }) => {
 
   return (
     <Overlay onClick={back} style={bgStyle}>
-      <Modal
-        // css={`
-        //   @keyframes shake {
-        //     0% {
-        //       transform: translate(1px, 1px) rotate(0deg);
-        //     }
-        //     10% {
-        //       transform: translate(-1px, -2px) rotate(-1deg);
-        //     }
-        //     20% {
-        //       transform: translate(-3px, 0px) rotate(1deg);
-        //     }
-        //     30% {
-        //       transform: translate(3px, 2px) rotate(0deg);
-        //     }
-        //     40% {
-        //       transform: translate(1px, -1px) rotate(1deg);
-        //     }
-        //     50% {
-        //       transform: translate(-1px, 2px) rotate(-1deg);
-        //     }
-        //     60% {
-        //       transform: translate(-3px, 1px) rotate(0deg);
-        //     }
-        //     70% {
-        //       transform: translate(3px, 1px) rotate(-1deg);
-        //     }
-        //     80% {
-        //       transform: translate(-1px, -1px) rotate(1deg);
-        //     }
-        //     90% {
-        //       transform: translate(1px, 2px) rotate(0deg);
-        //     }
-        //     100% {
-        //       transform: translate(1px, -2px) rotate(-1deg);
-        //     }
-        //   }
-
-        //   animation: shake 0.3s linear infinite;
-        // `}
-        style={modalStyle}
-        onClick={back}
-      >
+      <Modal style={modalStyle} onClick={back}>
         {children}
       </Modal>
     </Overlay>
