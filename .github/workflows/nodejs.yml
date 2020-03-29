@@ -48,7 +48,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         with:
           name: Linux Release
-          path: release/GDLauncher-linux-setup.AppImage
+          path: release/GDLauncher-linux.AppImage
 
       - uses: actions/setup-ruby@v1
       - name: Send Webhook Notification

@@ -115,12 +115,16 @@ const Loading = styled.div`
   opacity: ${({ transitionState }) =>
     transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
 `;
+const LoginFailMessage = styled.div`
+  color: ${props => props.theme.palette.colors.red};
+`;
 
 const Login = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [version, setVersion] = useState(null);
+  const [loginFailed, setLoginFailed] = useState(false);
   const loading = useSelector(
     state => state.loading.accountAuthentication.isRequesting
   );
@@ -133,6 +137,7 @@ const Login = () => {
         load(features.mcAuthentication, dispatch(login(email, password)))
       ).catch(e => {
         console.error(e);
+        setLoginFailed(true);
         setPassword(null);
       });
     }, 1000);
@@ -169,6 +174,9 @@ const Login = () => {
                   onChange={({ target: { value } }) => setPassword(value)}
                 />
               </div>
+              {loginFailed && (
+                <LoginFailMessage>Invalid email or password. </LoginFailMessage>
+              )}
               <LoginButton color="primary" onClick={authenticate}>
                 SIGN IN
                 <FontAwesomeIcon
