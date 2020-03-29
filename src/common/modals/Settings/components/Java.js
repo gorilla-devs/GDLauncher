@@ -19,6 +19,7 @@ import {
 } from '../../../reducers/settings/actions';
 import { DEFAULT_JAVA_ARGS } from '../../../../app/desktop/utils/constants';
 import { _getJavaPath } from '../../../utils/selectors';
+import { openModal } from '../../../reducers/modals/actions';
 
 const JavaSettings = styled.div`
   width: 100%;
@@ -72,12 +73,6 @@ function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const openFolderDialog = async (javaPath, dispatch) => {
-  const paths = await ipcRenderer.invoke('openFileDialog', javaPath);
-  if (!paths[0]) return;
-  dispatch(updateJavaPath(paths[0]));
-};
-
 const marks = {
   2048: '2048 MB',
   4096: '4096 MB',
@@ -97,11 +92,21 @@ export default function MyAccountPreferences() {
       <MainTitle>Java</MainTitle>
       <Title
         css={`
-          width: 200px;
+          width: 500px;
           text-align: left;
         `}
       >
         Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faJava} />
+        <a
+          css={`
+            margin-left: 30px;
+          `}
+          onClick={() => {
+            dispatch(openModal('JavaSetup'));
+          }}
+        >
+          Run Java Setup again
+        </a>
       </Title>
       <AutodetectPath>
         <Paragraph
@@ -152,7 +157,14 @@ export default function MyAccountPreferences() {
               />
               <StyledButtons
                 color="primary"
-                onClick={() => openFolderDialog(customJavaPath, dispatch)}
+                onClick={async () => {
+                  const { filePaths, canceled } = await ipcRenderer.invoke(
+                    'openFileDialog',
+                    javaPath
+                  );
+                  if (!filePaths[0] || canceled) return;
+                  dispatch(updateJavaPath(filePaths[0]));
+                }}
               >
                 <FontAwesomeIcon icon={faFolder} />
               </StyledButtons>
