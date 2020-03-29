@@ -293,6 +293,16 @@ export function updateDownloadProgress(percentage) {
   };
 }
 
+export function updateAppPath(appPath) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_APP_PATH,
+      path: appPath
+    });
+    return appPath;
+  };
+}
+
 export function downloadJavaLegacyFixer() {
   return async (dispatch, getState) => {
     const state = getState();
@@ -1443,7 +1453,7 @@ export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const javaPath = _getJavaPath(state);
-    const { dataPath } = state.settings;
+    const { appPath } = state;
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
@@ -1560,16 +1570,16 @@ export function launchInstance(instanceName) {
       javaArguments
     );
 
-    const symLinkDirPath = path.join(dataPath.split('\\')[0], '_gdl');
+    const symLinkDirPath = path.join(appPath.split('\\')[0], '_gdl');
 
     const replaceRegex = [
       process.platform === 'win32'
-        ? new RegExp(dataPath.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
+        ? new RegExp(appPath.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
       symLinkDirPath
     ];
 
-    if (process.platform === 'win32') await symlink(dataPath, symLinkDirPath);
+    if (process.platform === 'win32') await symlink(appPath, symLinkDirPath);
 
     console.log(
       `"${javaPath}" ${getJvmArguments(

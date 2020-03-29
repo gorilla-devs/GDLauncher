@@ -23,6 +23,8 @@ app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
 
+app.setPath('userData', path.join(process.cwd(), 'data'));
+
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
@@ -179,10 +181,6 @@ ipcMain.handle('show-window', () => {
 
 ipcMain.handle('quit-app', () => {
   app.quit();
-});
-
-ipcMain.handle('getUserDataPath', () => {
-  return app.getPath('userData');
 });
 
 ipcMain.handle('getAppdataPath', () => {

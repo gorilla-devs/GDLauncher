@@ -1,5 +1,5 @@
 {
-  "name": "gdlauncher_next",
+  "name": "gdlauncher",
   "version": "0.0.1",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
@@ -71,6 +71,9 @@
       "git add"
     ]
   },
+  "engines": {
+    "node": ">=13.9.0"
+  },
   "build": {
     "generateUpdatesFilesForAllChannels": true,
     "productName": "GDLauncher",
@@ -102,7 +105,7 @@
       "installerHeader": "./public/installerHeader.bmp",
       "installerSidebar": "./public/installerSidebar.bmp",
       "installerHeaderIcon": "./public/icon.ico",
-      "deleteAppDataOnUninstall": false,
+      "deleteAppDataOnUninstall": true,
       "allowToChangeInstallationDirectory": true,
       "perMachine": false
     },
