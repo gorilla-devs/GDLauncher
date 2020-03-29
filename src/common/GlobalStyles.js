@@ -174,4 +174,13 @@ export default createGlobalStyle`
     margin-bottom: 3px;
     padding: 2px 0;
   }
+
+
+  @keyframes modalShake {
+    0% { transform: scale(1.01) }
+    30% { transform: scale(0.99) }
+    60% { transform: scale(1.01) }
+    90% { transform: scale(0.99)}
+    100% {transform: scale(1) }
+
 `;

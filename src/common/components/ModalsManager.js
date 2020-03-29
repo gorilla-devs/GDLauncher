@@ -86,7 +86,19 @@ const ModalContainer = ({ unmounting, children, preventClose }) => {
 
   const back = e => {
     e.stopPropagation();
-    if (preventClose) return;
+
+    if (preventClose) {
+      setModalStyle({
+        animation: `modalShake 0.25s linear infinite`
+      });
+
+      setTimeout(() => {
+        setModalStyle({
+          transform: 'scale(1)'
+        });
+      }, 500);
+      return;
+    }
     dispatch(closeModal());
   };
 
