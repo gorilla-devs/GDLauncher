@@ -15,7 +15,7 @@ import { spawn } from 'child_process';
 import symlink from 'symlink-dir';
 import { promises as fs } from 'fs';
 import pMap from 'p-map';
-import { notification, message } from 'antd';
+import { message } from 'antd';
 import makeDir from 'make-dir';
 import * as ActionTypes from './actionTypes';
 import {
@@ -58,7 +58,6 @@ import {
 import {
   librariesMapper,
   get7zPath,
-  fixFilePermissions,
   extractNatives,
   getJVMArguments112,
   copyAssetsToResources,
@@ -66,7 +65,6 @@ import {
   patchForge113,
   mavenToArray,
   copyAssetsToLegacy,
-  convertOSToJavaFormat,
   getPlayerSkin,
   normalizeModData,
   reflect,
@@ -302,111 +300,6 @@ export function downloadJavaLegacyFixer() {
       path.join(_getDataStorePath(state), '__JLF__.jar'),
       GDL_LEGACYJAVAFIXER_MOD_URL
     );
-  };
-}
-
-export function downloadJava() {
-  return async (dispatch, getState) => {
-    const state = getState();
-    const {
-      app: { javaManifest },
-      settings: { dataPath }
-    } = state;
-    const javaOs = convertOSToJavaFormat(process.platform);
-    const javaMeta = javaManifest.find(v => v.os === javaOs);
-    const {
-      version_data: { openjdk_version: version },
-      binary_link: url,
-      release_name: releaseName
-    } = javaMeta;
-    const javaBaseFolder = path.join(dataPath, 'java');
-    const tempFolder = _getTempPath(state);
-    await fse.remove(javaBaseFolder);
-    const downloadLocation = path.join(tempFolder, path.basename(url));
-
-    const notificationObj = {
-      key: 'javaDownload',
-      message: 'Preparing Java',
-      top: 47,
-      duration: 0,
-      closeIcon: []
-    };
-
-    let i = 0;
-    await downloadFile(downloadLocation, url, p => {
-      if (i % 4 === 0) {
-        ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
-        notification.open({
-          ...notificationObj,
-          description: `Downloading: ${parseInt(p, 10)}%`
-        });
-      }
-      i += 1;
-    });
-
-    const totalSteps = process.platform !== 'win32' ? 2 : 1;
-
-    notification.open({
-      ...notificationObj,
-      description: `Extracting (1 / ${totalSteps})`
-    });
-    const sevenZipPath = await get7zPath();
-    const firstExtraction = extractFull(downloadLocation, tempFolder, {
-      $bin: sevenZipPath
-    });
-    await new Promise((resolve, reject) => {
-      firstExtraction.on('end', () => {
-        resolve();
-      });
-      firstExtraction.on('error', err => {
-        reject(err);
-      });
-    });
-
-    // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
-    if (process.platform !== 'win32') {
-      notification.open({
-        ...notificationObj,
-        description: `Extracting (2 / ${totalSteps})`
-      });
-      const tempTarName = path.join(
-        tempFolder,
-        path.basename(url).replace('.tar.gz', '.tar')
-      );
-      const secondExtraction = extractFull(tempTarName, tempFolder, {
-        $bin: sevenZipPath
-      });
-      await new Promise((resolve, reject) => {
-        secondExtraction.on('end', () => {
-          resolve();
-        });
-        secondExtraction.on('error', err => {
-          reject(err);
-        });
-      });
-    }
-
-    const directoryToMove =
-      process.platform === 'darwin'
-        ? path.join(tempFolder, `${releaseName}-jre`, 'Contents', 'Home')
-        : path.join(tempFolder, `${releaseName}-jre`);
-
-    await fse.move(directoryToMove, path.join(javaBaseFolder, version));
-
-    await fse.remove(tempFolder);
-
-    const ext = process.platform === 'win32' ? '.exe' : '';
-    await fixFilePermissions(
-      path.join(javaBaseFolder, version, 'bin', `java${ext}`)
-    );
-
-    ipcRenderer.invoke('update-progress-bar', -1);
-
-    notification.open({
-      ...notificationObj,
-      description: 'Java is ready!'
-    });
-    setTimeout(() => notification.close('javaDownload'), 2000);
   };
 }
 

@@ -12,11 +12,14 @@ import {
   initManifests,
   initNews,
   loginThroughNativeLauncher,
-  downloadJava,
   switchToFirstValidAccount,
   checkClientToken
 } from '../../common/reducers/actions';
-import { load, received } from '../../common/reducers/loading/actions';
+import {
+  load,
+  received,
+  requesting
+} from '../../common/reducers/loading/actions';
 import features from '../../common/reducers/loading/features';
 import GlobalStyles from '../../common/GlobalStyles';
 import RouteBackground from '../../common/components/RouteBackground';
@@ -28,6 +31,7 @@ import { isLatestJavaDownloaded, extract7z } from './utils';
 import { updateDataPath } from '../../common/reducers/settings/actions';
 import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
+import { openModal } from '../../common/reducers/modals/actions';
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -64,6 +68,16 @@ function DesktopRoot() {
     dispatch(checkClientToken());
     dispatch(initNews());
 
+    dispatch(requesting(features.mcAuthentication));
+
+    const manifests = await dispatch(initManifests());
+    await extract7z();
+    const isLatestJava = await isLatestJavaDownloaded(manifests.java, dataPath);
+    const isJavaOK = javaPath || isLatestJava;
+    if (!isJavaOK) {
+      dispatch(openModal('JavaSetup', { preventClose: true }));
+    }
+
     if (process.env.NODE_ENV === 'development' && currentAccount) {
       dispatch(received(features.mcAuthentication));
       dispatch(push('/home'));
@@ -80,13 +94,6 @@ function DesktopRoot() {
       ).catch(console.error);
     }
 
-    const manifests = await dispatch(initManifests());
-    await extract7z();
-    const isLatestJava = await isLatestJavaDownloaded(manifests.java, dataPath);
-    const isJavaOK = javaPath || isLatestJava;
-    if (!isJavaOK) {
-      dispatch(downloadJava());
-    }
     if (shouldShowDiscordRPC) {
       ipcRenderer.invoke('init-discord-rpc');
     }
