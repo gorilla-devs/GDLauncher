@@ -146,6 +146,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                           month: 'long',
                           day: 'numeric'
                         })}
+                        
                       </div>
                     </div>
                   </div>
