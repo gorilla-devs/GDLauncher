@@ -44,7 +44,7 @@ jobs:
           yarn release && node ./scripts/uploadRelease.js $ACCESS_TOKEN
       - name: yarn release without upload
         if: |
-          (github.event_name == 'push' && !contains(github.event.ref, '/deploy'))
+            (github.event_name == 'push' && !contains(github.event.ref, '/deploy'))
         run: |
           yarn release
 
