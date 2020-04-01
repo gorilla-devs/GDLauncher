@@ -19,26 +19,36 @@ const main = async () => {
     path.resolve(__dirname, '../', 'package.json')
   );
 
-  let data = null;
+  let uploadUrl = null;
 
   try {
-    data = (
-      await axios.default.get(
-        `https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/tags/v${version}`
-      )
-    ).data;
-  } catch {
-    data = (
-      await axios.default.post(
-        'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases',
-        { tag_name: `v${version}`, name: `v${version}`, draft: true },
-        {
-          headers: {
-            Authorization: `token ${process.argv[2]}`
-          }
+    const { data: releasesList } = await axios.default.get(
+      `https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases`,
+      {
+        headers: {
+          Authorization: `token ${process.argv[2]}`
         }
-      )
-    ).data;
+      }
+    );
+
+    const lastRelease = releasesList.find(v => v.tag_name === `v${version}`);
+
+    if (lastRelease) {
+      uploadUrl = lastRelease.upload_url;
+    } else {
+      throw new Error();
+    }
+  } catch (err) {
+    const { data: newRelease } = await axios.default.post(
+      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases',
+      { tag_name: `v${version}`, name: `v${version}`, draft: true },
+      {
+        headers: {
+          Authorization: `token ${process.argv[2]}`
+        }
+      }
+    );
+    uploadUrl = newRelease.upload_url;
   }
 
   const deployFiles = await readdir(deployFolder);
@@ -46,10 +56,7 @@ const main = async () => {
   await pMap(
     deployFiles,
     async file => {
-      const uploadUrl = data.upload_url.replace(
-        '{?name,label}',
-        `?name=${file}`
-      );
+      const fileUploadUrl = uploadUrl.replace('{?name,label}', `?name=${file}`);
       const stats = await stat(path.join(deployFolder, file));
       const buffer = await fs.promises.readFile(path.join(deployFolder, file));
 
@@ -70,7 +77,7 @@ const main = async () => {
       }
 
       try {
-        await axios.default.post(uploadUrl, buffer, {
+        await axios.default.post(fileUploadUrl, buffer, {
           headers: {
             'Content-Length': stats.size,
             'Content-Type': contentType,
