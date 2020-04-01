@@ -144,6 +144,28 @@ const Instance = ({ instanceName }) => {
 
   const isPlaying = startedInstances[instanceName];
 
+  const calcTime = minutes => {
+    const days = Math.floor(minutes / 1440); // 60*24
+    const hours = Math.floor((minutes - days * 1440) / 60);
+    const min = Math.round(minutes % 60);
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(weeks / 4);
+
+    if (days < 7) {
+      if (days > 0) {
+        return days + ' d, ' + hours + ' h, ' + min + ' m';
+      } else {
+        if (hours > 0) {
+          return hours + ' h, ' + min + ' m';
+        } else return min + ' minutes';
+      }
+    } else {
+      if (months > 0) {
+        return months + ' months';
+      } else return weeks + ' weeks';
+    }
+  };
+
   useEffect(() => {
     if (instance.background) {
       fs.readFile(path.join(instancesPath, instanceName, instance.background))
@@ -193,7 +215,8 @@ const Instance = ({ instanceName }) => {
                   margin-right: 5px;
                 `}
               />
-              {instance.timePlayed} minutes
+
+              {calcTime(instance.timePlayed)}
             </TimePlayed>
             <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
             {instanceName}
