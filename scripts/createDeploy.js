@@ -197,10 +197,8 @@ const main = async () => {
   const releasesFolder = path.resolve(__dirname, '../', './release');
   await fse.remove(releasesFolder);
   await makeDir(deployFolder);
-
+  await electronBuilder.build(commonConfig);
   if (process.platform !== 'darwin') {
-    // Build setup release
-    await electronBuilder.build(commonConfig);
     await createDeployFiles(type);
   }
 
