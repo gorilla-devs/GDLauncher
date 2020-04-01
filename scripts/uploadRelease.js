@@ -19,15 +19,28 @@ const main = async () => {
     path.resolve(__dirname, '../', 'package.json')
   );
 
-  const { data } = await axios.default.post(
-    'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases',
-    { tag_name: `v${version}`, name: `v${version}`, draft: true },
-    {
-      headers: {
-        Authorization: `token ${process.argv[2]}`
-      }
-    }
-  );
+  let data = null;
+
+  try {
+    data = (
+      await axios.default.get(
+        `https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/tags/v${version}`
+      )
+    ).data;
+  } catch {
+    data = (
+      await axios.default.post(
+        'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases',
+        { tag_name: `v${version}`, name: `v${version}`, draft: true },
+        {
+          headers: {
+            Authorization: `token ${process.argv[2]}`
+          }
+        }
+      )
+    ).data;
+  }
+
   const deployFiles = await readdir(deployFolder);
   let uploaded = 0;
   await pMap(

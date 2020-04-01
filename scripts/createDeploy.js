@@ -60,7 +60,6 @@ const createDeployFiles = async type => {
     files.map(async v => {
       // Compress
       const hash = await getSha1(v);
-      await makeDir(deployFolder);
 
       const gzip = zlib.createGzip();
       const source = fs.createReadStream(v);
@@ -197,6 +196,7 @@ const main = async () => {
 
   const releasesFolder = path.resolve(__dirname, '../', './release');
   await fse.remove(releasesFolder);
+  await makeDir(deployFolder);
 
   if (process.platform !== 'darwin') {
     // Build setup release
@@ -248,4 +248,4 @@ const main = async () => {
   await fse.remove(releasesFolder);
 };
 
-main().catch(console.error);
+main();
