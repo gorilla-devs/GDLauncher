@@ -197,20 +197,9 @@ const main = async () => {
   const releasesFolder = path.resolve(__dirname, '../', './release');
   await fse.remove(releasesFolder);
   await makeDir(deployFolder);
-
+  await electronBuilder.build(commonConfig);
   if (process.platform !== 'darwin') {
-    // Build setup release
-    await electronBuilder.build(commonConfig);
-
     await createDeployFiles(type);
-
-    console.log(await getFiles(path.resolve(__dirname)));
-    console.log();
-    console.log(await getFiles(path.resolve(__dirname, '../')));
-    console.log();
-    console.log(await getFiles(releaseFolder));
-    console.log();
-    console.log(await getFiles(deployFolder));
   }
 
   // Copy all other files to deploy folder
