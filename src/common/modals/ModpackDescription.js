@@ -1,15 +1,15 @@
 /* eslint-disable */
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import ReactHtmlParser from "react-html-parser";
-import { Checkbox, TextField, Cascader, Button, Input, Select } from "antd";
-import Modal from "../components/Modal";
-import { transparentize } from "polished";
-import { getAddonDescription, getAddonFiles } from "../api";
-import CloseButton from "../components/CloseButton";
-import { closeModal } from "../reducers/modals/actions";
-import { FORGE } from "../utils/constants";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import ReactHtmlParser from 'react-html-parser';
+import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
+import Modal from '../components/Modal';
+import { transparentize } from 'polished';
+import { getAddonDescription, getAddonFiles } from '../api';
+import CloseButton from '../components/CloseButton';
+import { closeModal } from '../reducers/modals/actions';
+import { FORGE } from '../utils/constants';
 
 const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
@@ -94,7 +94,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
             `}
           >
             <StyledSelect
-              placeholder={loading ? "Loading Versions" : "Select a version"}
+              placeholder={loading ? 'Loading Versions' : 'Select a version'}
               onChange={handleChange}
               listItemHeight={50}
               listHeight={400}
@@ -141,7 +141,11 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                       `}
                     >
                       <div>
-                        {new Date(file.fileDate).toLocaleDateString("it-IT")}
+                        {new Date(file.fileDate).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
                       </div>
                     </div>
                   </div>
