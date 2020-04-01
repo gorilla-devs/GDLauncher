@@ -66,6 +66,7 @@ function DesktopRoot() {
     const appPath = dispatch(updateAppPath(path.join(appPathStatic, 'data')));
     dispatch(checkClientToken());
     dispatch(initNews());
+    console.log(process.env);
 
     dispatch(requesting(features.mcAuthentication));
 

@@ -10,7 +10,7 @@ const {
   globalShortcut
 } = require('electron');
 const path = require('path');
-const { autoUpdater } = require('electron-updater');
+// const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
 
@@ -228,31 +228,6 @@ ipcMain.handle('appRestart', () => {
 
 ipcMain.handle('getPrimaryDisplaySizes', () => {
   return screen.getPrimaryDisplay().bounds;
-});
-
-// AutoUpdater
-
-autoUpdater.autoDownload = false;
-
-autoUpdater.on('update-available', () => {
-  if (process.env.NODE_ENV !== 'development') {
-    autoUpdater.downloadUpdate();
-  } else {
-    // Fake update
-    mainWindow.webContents.send('updateAvailable');
-  }
-});
-
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('updateAvailable');
-});
-
-ipcMain.handle('checkForUpdates', () => {
-  // autoUpdater.checkForUpdates();
-});
-
-ipcMain.handle('installUpdateAndRestart', () => {
-  // autoUpdater.quitAndInstall(true, true);
 });
 
 ipcMain.handle('init-discord-rpc', () => {
