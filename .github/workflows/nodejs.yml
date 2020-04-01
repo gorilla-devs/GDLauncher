@@ -44,7 +44,7 @@ jobs:
         env:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          node ./scripts/uploadRelease.js $ACCESS_TOKEN
+          node ./scripts/uploadRelease.js
         shell: bash
 
       - uses: actions/setup-ruby@v1

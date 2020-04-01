@@ -11,7 +11,7 @@ const stat = promisify(fs.stat);
 const deployFolder = path.resolve(__dirname, '../', 'deploy');
 
 const main = async () => {
-  if (!process.argv[2]) {
+  if (!process.env.ACCESS_TOKEN) {
     console.warn('Skipping release upload. No auth token provided');
     return;
   }
@@ -26,7 +26,7 @@ const main = async () => {
       `https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases`,
       {
         headers: {
-          Authorization: `token ${process.argv[2]}`
+          Authorization: `token ${process.env.ACCESS_TOKEN}`
         }
       }
     );
@@ -44,7 +44,7 @@ const main = async () => {
       { tag_name: `v${version}`, name: `v${version}`, draft: true },
       {
         headers: {
-          Authorization: `token ${process.argv[2]}`
+          Authorization: `token ${process.env.ACCESS_TOKEN}`
         }
       }
     );
@@ -81,7 +81,7 @@ const main = async () => {
           headers: {
             'Content-Length': stats.size,
             'Content-Type': contentType,
-            Authorization: `token ${process.argv[2]}`
+            Authorization: `token ${process.env.ACCESS_TOKEN}`
           },
           maxContentLength: Infinity,
           maxBodyLength: Infinity
