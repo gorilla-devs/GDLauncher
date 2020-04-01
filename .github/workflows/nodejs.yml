@@ -1,7 +1,14 @@
 name: GDLauncher Next CI
 
-on: [push, pull_request]
-
+on:
+  push:
+    branches:
+      - next
+      - deploy
+  pull_request:
+    branches:
+      - next
+      - deploy
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -28,13 +35,13 @@ jobs:
       - name: yarn lint
         run: |
           yarn lint
-      - name: yarn release
+      - name: yarn release with upload
         if: |
-            (github.event_name == 'push' && contains(github.event.ref, '/deploy'))
+          (github.event_name == 'push' && contains(github.event.ref, '/deploy'))
         env:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          yarn release $ACCESS_TOKEN
+          yarn release && node ./scripts/uploadRelease.js $ACCESS_TOKEN
       - name: yarn release without upload
         if: |
             (github.event_name == 'push' && !contains(github.event.ref, '/deploy'))
