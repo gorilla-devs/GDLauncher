@@ -91,7 +91,7 @@ const main = async () => {
           maxBodyLength: Infinity
         });
       } catch (err) {
-        console.log(err);
+        console.log(err.message);
       }
       uploaded += 1;
       console.log(`Uploaded ${uploaded} / ${deployFiles.length} -- ${file}`);
