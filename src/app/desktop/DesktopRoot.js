@@ -61,7 +61,6 @@ function DesktopRoot() {
   });
 
   const init = async () => {
-    await new Promise(resolve => setTimeout(resolve, 300));
     const appPathStatic = process.cwd();
     const appPath = dispatch(updateAppPath(path.join(appPathStatic, 'data')));
     dispatch(checkClientToken());
