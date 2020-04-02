@@ -10,6 +10,7 @@ const {
   globalShortcut
 } = require('electron');
 const path = require('path');
+const { exec } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
@@ -183,6 +184,7 @@ ipcMain.handle('show-window', () => {
 
 ipcMain.handle('quit-app', () => {
   app.quit();
+  app.exit();
 });
 
 ipcMain.handle('getAppdataPath', () => {
@@ -225,7 +227,7 @@ ipcMain.handle('openFileDialog', (e, filters) => {
 
 ipcMain.handle('appRestart', () => {
   app.relaunch();
-  app.exit(0);
+  app.exit();
 });
 
 ipcMain.handle('getPrimaryDisplaySizes', () => {
@@ -299,10 +301,21 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   });
 }
 
-ipcMain.handle('installUpdateAndRestart', () => {
+ipcMain.handle('installUpdateAndRestart', async (e, updateTempFolder) => {
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
     autoUpdater.quitAndInstall(true, true);
   } else {
-    // To add
+    if (process.platform === 'win32') {
+      exec(
+        `timeout 1 > nul && robocopy "${updateTempFolder}" "." /MOV /E && "./${path.basename(
+          app.getPath('exe')
+        )}"`,
+        {
+          cwd: path.dirname(app.getPath('exe'))
+        }
+      );
+    }
+    app.quit();
+    app.exit();
   }
 });

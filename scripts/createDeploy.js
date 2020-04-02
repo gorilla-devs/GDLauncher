@@ -170,12 +170,6 @@ const commonConfig = {
       buildResources: 'public',
       output: 'release'
     },
-    publish: {
-      provider: 'github',
-      owner: 'gorilla-devs',
-      repo: 'GDLauncher',
-      private: false
-    },
     afterPack: async () => {
       console.log('Test if app starts');
     }
