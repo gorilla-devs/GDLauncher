@@ -18,12 +18,14 @@ export default createGlobalStyle`
     font-style: normal;
     font-weight: 500;
   }
+
   @font-face {
     font-family: "FF Mark W05";
     src: url(${FFMarkW05BoldWoff2}) format("woff2");
     font-style: normal;
     font-weight: 700;
   }
+  
   @font-face {
     font-family: "FF Mark W05";
     src: url(${FFMarkW05HeavyWoff2}) format("woff2");

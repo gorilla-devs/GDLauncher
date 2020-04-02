@@ -8,7 +8,10 @@ import { faCog, faDownload } from '@fortawesome/free-solid-svg-icons';
 import logo from '../../../common/assets/logo.png';
 
 import { openModal } from '../../../common/reducers/modals/actions';
-import { updateUpdateAvailable } from '../../../common/reducers/actions';
+import {
+  updateUpdateAvailable,
+  checkForPortableUpdates
+} from '../../../common/reducers/actions';
 
 export const Container = styled.div`
   width: 100vw;
@@ -60,14 +63,29 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Check every 10 minutes
-    ipcRenderer.invoke('checkForUpdates');
-    ipcRenderer.on('updateAvailable', () => {
-      dispatch(updateUpdateAvailable(true));
-    });
-    setInterval(() => {
-      ipcRenderer.invoke('checkForUpdates');
-    }, 600000);
+    setTimeout(() => {
+      if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+        // Check every 10 minutes
+        ipcRenderer.invoke('checkForUpdates');
+        ipcRenderer.on('updateAvailable', () => {
+          dispatch(updateUpdateAvailable(true));
+        });
+      } else {
+        dispatch(checkForPortableUpdates())
+          .then(() => dispatch(updateUpdateAvailable(true)))
+          .catch(console.error);
+      }
+
+      setInterval(() => {
+        if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+          ipcRenderer.invoke('checkForUpdates');
+        } else {
+          checkForPortableUpdates()
+            .then(val => dispatch(updateUpdateAvailable(val)))
+            .catch(console.error);
+        }
+      }, 600000);
+    }, 500);
   }, []);
 
   const isLocation = loc => {
@@ -95,7 +113,11 @@ const Navbar = () => {
       </a>
       <div>
         {updateAvailable && (
-          <UpdateButton>
+          <UpdateButton
+            onClick={() => {
+              ipcRenderer.invoke('installUpdateAndRestart');
+            }}
+          >
             <FontAwesomeIcon icon={faDownload} />
           </UpdateButton>
         )}
