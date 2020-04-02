@@ -43,11 +43,11 @@
     "dev": "cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none \"yarn start-electron\"",
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web yarn start",
     "postinstall": "electron-builder install-app-deps && yarn rebuild && ./node_modules/.bin/electron-rebuild",
-    "rebuild": "electron-build-env neon build murmur2-calculator --release",
+    "rebuild": "node ./scripts/buildNeonDeps.js",
     "deploy": "node ./scripts/createDeploy.js",
     "release:setup": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=setup \"yarn build\" && yarn deploy setup",
     "release:portable": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=portable \"yarn build\" && yarn deploy portable",
-    "release": "rimraf ./deploy && yarn release:setup && yarn release:portable && node ./scripts/uploadRelease.js"
+    "release": "rimraf ./deploy && yarn release:setup && yarn release:portable"
   },
   "husky": {
     "hooks": {

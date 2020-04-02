@@ -60,7 +60,6 @@ const createDeployFiles = async type => {
     files.map(async v => {
       // Compress
       const hash = await getSha1(v);
-      await makeDir(deployFolder);
 
       const gzip = zlib.createGzip();
       const source = fs.createReadStream(v);
@@ -71,7 +70,9 @@ const createDeployFiles = async type => {
 
       const destinationPath = path.join(
         deployFolder,
-        `${preFix}${osMap[process.platform]}_${path.basename(v)}.gz`
+        `${preFix}${process.platform}_${path
+          .relative(releaseFolder, v)
+          .replace(path.sep, '-')}.gz`
       );
       await makeDir(path.dirname(destinationPath));
       const destination = fs.createWriteStream(destinationPath);
@@ -96,16 +97,13 @@ const createDeployFiles = async type => {
       };
     })
   );
-  const { version } = await fse.readJson(
-    path.resolve(__dirname, '../', 'package.json')
-  );
 
   let prevFiles = [];
 
   try {
     prevFiles = (
       await fse.readJson(
-        path.join(deployFolder, `${osMap[process.platform]}_latest.json`)
+        path.join(deployFolder, `${process.platform}_latest.json`)
       )
     ).files.filter(v => !mappedFiles.find(k => k.sha1 === v.sha1));
   } catch {
@@ -114,13 +112,8 @@ const createDeployFiles = async type => {
 
   await fs.promises.writeFile(
     path.join(deployFolder, `${process.platform}_latest.json`),
-    JSON.stringify({
-      version,
-      files: [...mappedFiles, ...prevFiles]
-    })
+    JSON.stringify([...mappedFiles, ...prevFiles])
   );
-
-  // if (!process.argv[2]) return;
 };
 
 const commonConfig = {
@@ -159,7 +152,7 @@ const commonConfig = {
       perMachine: false
     },
     /* eslint-disable */
-    artifactName: `${'${productName}'}-${'${os}'}-${
+    artifactName: `${'${productName}'}-${'${platform}'}-${
       process.argv[2]
     }.${'${ext}'}`,
     /* eslint-enable */
@@ -197,10 +190,9 @@ const main = async () => {
 
   const releasesFolder = path.resolve(__dirname, '../', './release');
   await fse.remove(releasesFolder);
-
+  await makeDir(deployFolder);
+  await electronBuilder.build(commonConfig);
   if (process.platform !== 'darwin') {
-    // Build setup release
-    await electronBuilder.build(commonConfig);
     await createDeployFiles(type);
   }
 
@@ -208,7 +200,7 @@ const main = async () => {
 
   const { productName } = commonConfig.config;
 
-  const nameTemplate = `${productName}-${osMap[process.platform]}-${type}`;
+  const nameTemplate = `${productName}-${process.platform}-${type}`;
 
   const allFiles = {
     setup: {
@@ -248,4 +240,4 @@ const main = async () => {
   await fse.remove(releasesFolder);
 };
 
-main().catch(console.error);
+main();

@@ -689,3 +689,21 @@ export const getFirstReleaseCandidate = files => {
   }
   return latestFile;
 };
+
+export const getFileSha1 = async filePath => {
+  // Calculate sha1 on original file
+  const algorithm = 'sha1';
+  const shasum = crypto.createHash(algorithm);
+
+  const s = fs.ReadStream(filePath);
+  s.on('data', data => {
+    shasum.update(data);
+  });
+
+  const hash = await new Promise(resolve => {
+    s.on('end', () => {
+      resolve(shasum.digest('hex'));
+    });
+  });
+  return hash;
+};
