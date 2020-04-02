@@ -20,8 +20,11 @@ const discordRPC = require('./discordRPC');
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 // app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
+app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
+
+app.setPath('userData', path.join(process.cwd(), 'data'));
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -41,6 +44,7 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
+      // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
     }
   });
@@ -181,10 +185,6 @@ ipcMain.handle('quit-app', () => {
   app.quit();
 });
 
-ipcMain.handle('getUserDataPath', () => {
-  return app.getPath('userData');
-});
-
 ipcMain.handle('getAppdataPath', () => {
   return app.getPath('appData');
 });
@@ -232,31 +232,6 @@ ipcMain.handle('getPrimaryDisplaySizes', () => {
   return screen.getPrimaryDisplay().bounds;
 });
 
-// AutoUpdater
-
-autoUpdater.autoDownload = false;
-
-autoUpdater.on('update-available', () => {
-  if (process.env.NODE_ENV !== 'development') {
-    autoUpdater.downloadUpdate();
-  } else {
-    // Fake update
-    mainWindow.webContents.send('updateAvailable');
-  }
-});
-
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('updateAvailable');
-});
-
-ipcMain.handle('checkForUpdates', () => {
-  // autoUpdater.checkForUpdates();
-});
-
-ipcMain.handle('installUpdateAndRestart', () => {
-  // autoUpdater.quitAndInstall(true, true);
-});
-
 ipcMain.handle('init-discord-rpc', () => {
   discordRPC.initRPC();
 });
@@ -271,6 +246,10 @@ ipcMain.handle('shutdown-discord-rpc', () => {
 
 ipcMain.handle('start-listener', async (e, dirPath) => {
   try {
+    if (watcher) {
+      await watcher.stop();
+      watcher = null;
+    }
     watcher = await nsfw(dirPath, events => {
       mainWindow.webContents.send('listener-events', events);
     });
@@ -284,6 +263,7 @@ ipcMain.handle('start-listener', async (e, dirPath) => {
 ipcMain.handle('stop-listener', async () => {
   if (watcher) {
     await watcher.stop();
+    watcher = null;
   }
 });
 
@@ -294,4 +274,35 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
       return resolve(v);
     });
   });
+});
+
+// AutoUpdater
+
+if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+  autoUpdater.autoDownload = false;
+  autoUpdater.setFeedURL({
+    owner: 'gorilla-devs',
+    repo: 'GDLauncher-Releases',
+    provider: 'github'
+  });
+
+  autoUpdater.on('update-available', () => {
+    autoUpdater.downloadUpdate();
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('updateAvailable');
+  });
+
+  ipcMain.handle('checkForUpdates', () => {
+    autoUpdater.checkForUpdates();
+  });
+}
+
+ipcMain.handle('installUpdateAndRestart', () => {
+  if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+    autoUpdater.quitAndInstall(true, true);
+  } else {
+    // To add
+  }
 });

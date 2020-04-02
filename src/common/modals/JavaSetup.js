@@ -205,7 +205,7 @@ const AutomaticSetup = () => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
   const [currentStep, setCurrentStep] = useState('Downloading Java');
   const javaManifest = useSelector(state => state.app.javaManifest);
-  const dataPath = useSelector(state => state.settings.dataPath);
+  const appPath = useSelector(state => state.appPath);
   const tempFolder = useSelector(_getTempPath);
   const dispatch = useDispatch();
 
@@ -217,7 +217,7 @@ const AutomaticSetup = () => {
       binary_link: url,
       release_name: releaseName
     } = javaMeta;
-    const javaBaseFolder = path.join(dataPath, 'java');
+    const javaBaseFolder = path.join(appPath, 'java');
     await fse.remove(javaBaseFolder);
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
@@ -283,10 +283,9 @@ const AutomaticSetup = () => {
       process.platform === 'darwin'
         ? path.join(tempFolder, `${releaseName}-jre`, 'Contents', 'Home')
         : path.join(tempFolder, `${releaseName}-jre`);
-
     await fse.move(directoryToMove, path.join(javaBaseFolder, version));
 
-    await fse.remove(tempFolder);
+    await fse.remove(directoryToMove);
 
     const ext = process.platform === 'win32' ? '.exe' : '';
     await fixFilePermissions(

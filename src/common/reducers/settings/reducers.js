@@ -14,15 +14,6 @@ function sounds(state = true, action) {
   }
 }
 
-function dataPath(state = null, action) {
-  switch (action.type) {
-    case ActionTypes.UPDATE_DATA_PATH:
-      return action.path;
-    default:
-      return state;
-  }
-}
-
 // 0 is stable, 1 is beta
 function releaseChannel(state = 0, action) {
   switch (action.type) {
@@ -101,7 +92,6 @@ function java(
 
 export default combineReducers({
   sounds,
-  dataPath,
   releaseChannel,
   concurrentDownloads,
   discordRPC,

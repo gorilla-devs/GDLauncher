@@ -143,11 +143,11 @@ export const librariesMapper = (libraries, librariesPath) => {
   );
 };
 
-export const isLatestJavaDownloaded = async (meta, dataPath) => {
+export const isLatestJavaDownloaded = async (meta, appPath) => {
   const javaOs = convertOSToJavaFormat(process.platform);
   const javaMeta = meta.find(v => v.os === javaOs);
   const javaFolder = path.join(
-    dataPath,
+    appPath,
     'java',
     javaMeta.version_data.openjdk_version
   );
@@ -170,14 +170,14 @@ export const isLatestJavaDownloaded = async (meta, dataPath) => {
 };
 
 export const get7zPath = async () => {
-  const baseDir = await ipcRenderer.invoke('getUserDataPath');
+  const baseDir = process.cwd();
   if (process.platform === 'darwin') {
-    return path.join(baseDir, '7za-osx');
+    return path.join(baseDir, 'data', '7za-osx');
   }
   if (process.platform === 'win32') {
-    return path.join(baseDir, '7za.exe');
+    return path.join(baseDir, 'data', '7za.exe');
   }
-  return path.join(baseDir, '7za-linux');
+  return path.join(baseDir, 'data', '7za-linux');
 };
 
 export const fixFilePermissions = async filePath => {
@@ -688,4 +688,22 @@ export const getFirstReleaseCandidate = files => {
     counter += 1;
   }
   return latestFile;
+};
+
+export const getFileSha1 = async filePath => {
+  // Calculate sha1 on original file
+  const algorithm = 'sha1';
+  const shasum = crypto.createHash(algorithm);
+
+  const s = fs.ReadStream(filePath);
+  s.on('data', data => {
+    shasum.update(data);
+  });
+
+  const hash = await new Promise(resolve => {
+    s.on('end', () => {
+      resolve(shasum.digest('hex'));
+    });
+  });
+  return hash;
 };

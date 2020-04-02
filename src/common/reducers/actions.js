@@ -7,13 +7,15 @@ import coerce from 'semver/functions/coerce';
 import gte from 'semver/functions/gte';
 import lt from 'semver/functions/lt';
 import omitBy from 'lodash.omitby';
+import { pipeline } from 'stream';
+import zlib from 'zlib';
 import lockfile from 'lockfile';
 import omit from 'lodash.omit';
 import { extractFull } from 'node-7z';
 import { push } from 'connected-react-router';
 import { spawn } from 'child_process';
 import symlink from 'symlink-dir';
-import { promises as fs } from 'fs';
+import { promises as fs, createReadStream, createWriteStream } from 'fs';
 import pMap from 'p-map';
 import { message } from 'antd';
 import makeDir from 'make-dir';
@@ -69,7 +71,8 @@ import {
   normalizeModData,
   reflect,
   isMod,
-  isInstanceFolderPath
+  isInstanceFolderPath,
+  getFileSha1
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -290,6 +293,16 @@ export function updateDownloadProgress(percentage) {
       instanceName: currentDownload,
       percentage: Number(percentage.toFixed())
     });
+  };
+}
+
+export function updateAppPath(appPath) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_APP_PATH,
+      path: appPath
+    });
+    return appPath;
   };
 }
 
@@ -1443,7 +1456,7 @@ export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const javaPath = _getJavaPath(state);
-    const { dataPath } = state.settings;
+    const { appPath } = state;
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
@@ -1560,16 +1573,16 @@ export function launchInstance(instanceName) {
       javaArguments
     );
 
-    const symLinkDirPath = path.join(dataPath.split('\\')[0], '_gdl');
+    const symLinkDirPath = path.join(appPath.split('\\')[0], '_gdl');
 
     const replaceRegex = [
       process.platform === 'win32'
-        ? new RegExp(dataPath.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
+        ? new RegExp(appPath.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
       symLinkDirPath
     ];
 
-    if (process.platform === 'win32') await symlink(dataPath, symLinkDirPath);
+    if (process.platform === 'win32') await symlink(appPath, symLinkDirPath);
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
@@ -1712,3 +1725,92 @@ export function installMod(
     }
   };
 }
+
+export const checkForPortableUpdates = () => {
+  return async (dispatch, getState) => {
+    const state = getState();
+
+    const { data: latestRelease } = await axios.get(
+      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/latest'
+    );
+
+    const tempFolder = path.join(
+      _getTempPath(state),
+      `update-${latestRelease.tag_name}`
+    );
+
+    const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
+    const isUpdateAvailable = lt(
+      installedVersion,
+      coerce(latestRelease.tag_name)
+    );
+
+    const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher-Releases/releases/download/${latestRelease.tag_name}`;
+
+    const { data: latestManifest } = await axios.get(
+      `${baseAssetUrl}/${process.platform}_latest.json`
+    );
+
+    if (isUpdateAvailable) {
+      const baseFolder = process.cwd();
+      const filesToUpdate = await Promise.all(
+        latestManifest.files.filter(async file => {
+          const fileOnDisk = path.join(baseFolder, ...file.file);
+          let needsDownload = false;
+          try {
+            // Check if files exists
+            await fs.promises.access(fileOnDisk);
+
+            const fileOnDiskSha1 = await getFileSha1(fileOnDisk);
+
+            if (fileOnDiskSha1 !== file.sha1) {
+              throw new Error();
+            }
+          } catch {
+            needsDownload = true;
+          }
+
+          return needsDownload;
+        })
+      );
+
+      // Ensure temp folder
+      await makeDir(tempFolder);
+
+      await pMap(
+        filesToUpdate,
+        async file => {
+          try {
+            await downloadFile(
+              path.join(tempFolder, file.compressedFile),
+              `${baseAssetUrl}/${file.compressedFile}`
+            );
+
+            const gzip = zlib.createGunzip();
+            const source = createReadStream(
+              path.join(tempFolder, file.compressedFile)
+            );
+            const destinationPath = path.join(tempFolder, ...file.file);
+
+            await makeDir(path.dirname(destinationPath));
+            const destination = createWriteStream(destinationPath);
+
+            await new Promise((resolve, reject) => {
+              pipeline(source, gzip, destination, err => {
+                if (err) {
+                  reject();
+                }
+                resolve();
+              });
+            });
+
+            await fse.remove(path.join(tempFolder, file.compressedFile));
+          } catch (err) {
+            console.error(err, file, `${baseAssetUrl}/${file.compressedFile}`);
+          }
+        },
+        { concurrency: 5 }
+      );
+    }
+  };
+};

@@ -3,20 +3,17 @@ import styled from 'styled-components';
 import { ipcRenderer, clipboard } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { push } from 'connected-react-router';
 import fsa from 'fs-extra';
 import {
   faCopy,
   faDownload,
-  faFolder,
-  faUndoAlt,
   faTachometerAlt,
   faTrash,
   faPlay,
   faToilet,
   faNewspaper
 } from '@fortawesome/free-solid-svg-icons';
-import { Select, Tooltip, Button, Switch, Input } from 'antd';
+import { Select, Tooltip, Button, Switch } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import {
   _getCurrentAccount,
@@ -27,7 +24,6 @@ import {
 import {
   updateReleaseChannel,
   updateDiscordRPC,
-  updateDataPath,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
   updateShowNews
@@ -159,22 +155,6 @@ const DiscordRpc = styled.div`
   }
 `;
 
-const OverridePath = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  p {
-    text-align: left;
-    color: ${props => props.theme.palette.text.third};
-  }
-`;
-
-const DataPath = styled.div`
-  width: 100%;
-  height: 40px;
-`;
-
 const LauncherVersion = styled.div`
   margin: 30px 0;
   p {
@@ -201,27 +181,15 @@ function dashUuid(UUID) {
   // Then dashes are added between.
 
   // eslint-disable-next-line
-  return (
-    `${
-    UUID.substring(0, 8)}-${ 
-    UUID.substring(8, 12)}-${ 
-    UUID.substring(12, 16)}-${ 
-    UUID.substring(16, 20)}-${ 
-    UUID.substring(20, 32)}`
-  );
-  
+  return `${UUID.substring(0, 8)}-${UUID.substring(8, 12)}-${UUID.substring(
+    12,
+    16
+  )}-${UUID.substring(16, 20)}-${UUID.substring(20, 32)}`;
 }
-
-const openFolderDialog = async (InstancesPath, dispatch) => {
-  const paths = await ipcRenderer.invoke('openFolderDialog', InstancesPath);
-  if (!paths.filePaths[0]) return;
-  dispatch(updateDataPath(paths.filePaths[0]));
-};
 
 const General = () => {
   const [version, setVersion] = useState(null);
   const currentAccount = useSelector(_getCurrentAccount);
-  const dataPath = useSelector(state => state.settings.dataPath);
   const releaseC = useSelector(state => state.settings.releaseChannel);
   const hideWindowOnGameLaunch = useSelector(
     state => state.settings.hideWindowOnGameLaunch
@@ -264,11 +232,6 @@ const General = () => {
       console.error(e);
     }
     setDeletingInstances(false);
-  };
-
-  const resetDataPath = async () => {
-    const appdataPath = await ipcRenderer.invoke('getUserDataPath');
-    dispatch(updateDataPath(appdataPath));
   };
 
   return (
@@ -554,58 +517,6 @@ const General = () => {
         </Button>
       </div>
       <Hr />
-      <Title
-        css={`
-          width: 250px;
-        `}
-      >
-        Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
-      </Title>
-      <OverridePath>
-        <p
-          css={`
-            margin: 0;
-            height: 40px;
-            width: 100%;
-          `}
-        >
-          Select a custom data path. Most of the launcher data will be stored
-          here
-        </p>
-      </OverridePath>
-      <DataPath>
-        <div
-          css={`
-            margin-top: 20px;
-            width: 100%;
-            display: flex;
-
-            input {
-              margin-right: 5px;
-            }
-
-            button {
-              margin: 0 5px;
-            }
-          `}
-        >
-          <Input
-            onChange={e => dispatch(updateDataPath(e.target.value))}
-            value={dataPath}
-            disabled={disableInstancesActions}
-          />
-          <Button
-            onClick={() => openFolderDialog(dataPath, dispatch)}
-            disabled={disableInstancesActions}
-          >
-            <FontAwesomeIcon icon={faFolder} />
-          </Button>
-          <Button onClick={resetDataPath} disabled={disableInstancesActions}>
-            <FontAwesomeIcon icon={faUndoAlt} />
-          </Button>
-        </div>
-      </DataPath>
-      <Hr />
       <LauncherVersion>
         <div
           css={`
@@ -639,11 +550,9 @@ const General = () => {
         >
           {updateAvailable ? (
             <Button
-              onClick={() => dispatch(push('/autoUpdate'))}
+              onClick={() => ipcRenderer.invoke('installUpdateAndRestart')}
               css={`
-                && {
-                  margin-right: 10px;
-                }
+                margin-right: 10px;
               `}
               type="primary"
             >

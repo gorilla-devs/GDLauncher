@@ -8,9 +8,12 @@
 # testing
 /coverage
 
+/data
+
 # production
 /build
 /release
+/deploy
 
 # IDEs
 .idea
@@ -19,6 +22,8 @@
 # misc
 .DS_Store
 .env.local
+.env
+.electron-builder.env
 .env.development.local
 .env.test.local
 .env.production.local
