@@ -1780,33 +1780,42 @@ export const checkForPortableUpdates = () => {
       await pMap(
         filesToUpdate,
         async file => {
+          const compressedFile = path.join(tempFolder, file.compressedFile);
+          const destinationPath = path.join(tempFolder, ...file.file);
           try {
-            await downloadFile(
-              path.join(tempFolder, file.compressedFile),
-              `${baseAssetUrl}/${file.compressedFile}`
-            );
+            // Check if files exists
+            await fs.promises.access(destinationPath);
 
-            const gzip = zlib.createGunzip();
-            const source = createReadStream(
-              path.join(tempFolder, file.compressedFile)
-            );
-            const destinationPath = path.join(tempFolder, ...file.file);
+            const fileSha1 = await getFileSha1(destinationPath);
+            if (fileSha1 !== file.sha1) {
+              throw new Error();
+            }
+          } catch {
+            try {
+              await downloadFile(
+                compressedFile,
+                `${baseAssetUrl}/${file.compressedFile}`
+              );
 
-            await makeDir(path.dirname(destinationPath));
-            const destination = createWriteStream(destinationPath);
+              const gzip = zlib.createGunzip();
+              const source = createReadStream(compressedFile);
 
-            await new Promise((resolve, reject) => {
-              pipeline(source, gzip, destination, err => {
-                if (err) {
-                  reject();
-                }
-                resolve();
+              await makeDir(path.dirname(destinationPath));
+              const destination = createWriteStream(destinationPath);
+
+              await new Promise((resolve, reject) => {
+                pipeline(source, gzip, destination, err => {
+                  if (err) {
+                    reject();
+                  }
+                  resolve();
+                });
               });
-            });
 
-            await fse.remove(path.join(tempFolder, file.compressedFile));
-          } catch (err) {
-            console.error(err, file, `${baseAssetUrl}/${file.compressedFile}`);
+              await fse.remove(compressedFile);
+            } catch (err) {
+              console.error(err);
+            }
           }
         },
         { concurrency: 5 }
