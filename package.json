@@ -34,7 +34,7 @@
     "start-electron": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "start-prod": "electron .",
     "build-web": "cross-env-shell APP_TYPE=web craco build",
-    "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron craco build && yarn build-electron",
+    "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron CI=false craco build && yarn build-electron",
     "test": "craco test",
     "eject": "craco eject",
     "build-electron": "cross-env-shell NODE_ENV=production webpack --config ./scripts/electronWebpackConfig.js --colors && yarn moveBuildEntryPoint",
