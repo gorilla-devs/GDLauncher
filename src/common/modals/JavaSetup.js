@@ -283,10 +283,9 @@ const AutomaticSetup = () => {
       process.platform === 'darwin'
         ? path.join(tempFolder, `${releaseName}-jre`, 'Contents', 'Home')
         : path.join(tempFolder, `${releaseName}-jre`);
-
     await fse.move(directoryToMove, path.join(javaBaseFolder, version));
 
-    await fse.remove(tempFolder);
+    await fse.remove(directoryToMove);
 
     const ext = process.platform === 'win32' ? '.exe' : '';
     await fixFilePermissions(

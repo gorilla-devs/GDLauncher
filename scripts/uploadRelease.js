@@ -11,10 +11,6 @@ const stat = promisify(fs.stat);
 const deployFolder = path.resolve(__dirname, '../', 'deploy');
 
 const main = async () => {
-  console.log('Considering upload.');
-
-  console.log(await readdir(deployFolder));
-
   if (!process.env.ACCESS_TOKEN) {
     console.warn('Skipping release upload. No auth token provided');
     return;
