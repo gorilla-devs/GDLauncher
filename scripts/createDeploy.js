@@ -169,7 +169,8 @@ const commonConfig = {
     directories: {
       buildResources: 'public',
       output: 'release'
-    }
+    },
+    publish: 'never'
   }
 };
 
@@ -231,4 +232,6 @@ const main = async () => {
   await fse.remove(releasesFolder);
 };
 
-main();
+main().catch(err => {
+  throw new Error(err);
+});
