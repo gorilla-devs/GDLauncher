@@ -14,6 +14,7 @@ const { exec } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
+const Store = require('electron-store');
 
 const discordRPC = require('./discordRPC');
 
@@ -25,7 +26,15 @@ app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
 
-app.setPath('userData', path.join(process.cwd(), 'data'));
+if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
+  app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
+} else {
+  // this defaults to app.getPath('userData'), which is fine since we only use it for setup
+  const store = new Store();
+  if (store.has('userDataOverride')) {
+    app.setPath('userData', store.get('userDataOverride'));
+  }
+}
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -191,8 +200,17 @@ ipcMain.handle('getAppdataPath', () => {
   return app.getPath('appData');
 });
 
+// Returns path to app.asar
 ipcMain.handle('getAppPath', () => {
   return app.getAppPath();
+});
+
+ipcMain.handle('getUserData', () => {
+  return app.getPath('userData');
+});
+
+ipcMain.handle('getExecutablePath', () => {
+  return path.dirname(app.getPath('exe'));
 });
 
 ipcMain.handle('getAppVersion', () => {
@@ -301,15 +319,15 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   });
 }
 
-ipcMain.handle('installUpdateAndRestart', async (e, updateTempFolder) => {
+ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
     autoUpdater.quitAndInstall(true, true);
   } else {
     if (process.platform === 'win32') {
       exec(
-        `timeout 1 > nul && robocopy "${updateTempFolder}" "." /MOV /E && "./${path.basename(
-          app.getPath('exe')
-        )}"`,
+        `timeout 1 > nul && robocopy ".\\data\\temp\\update" "." /MOV /E${
+          quitAfterInstall ? '' : `&& ".\\${path.basename(app.getPath('exe'))}"`
+        } `,
         {
           cwd: path.dirname(app.getPath('exe'))
         }

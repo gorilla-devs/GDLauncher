@@ -169,9 +169,6 @@ const commonConfig = {
     directories: {
       buildResources: 'public',
       output: 'release'
-    },
-    afterPack: async () => {
-      console.log('Test if app starts');
     }
   }
 };

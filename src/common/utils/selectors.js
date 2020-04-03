@@ -10,7 +10,7 @@ const _currentAccountId = state => state.app.currentAccountId;
 const _currentDownload = state => state.currentDownload;
 const _downloadQueue = state => state.downloadQueue;
 const _javaManifest = state => state.app.javaManifest;
-const _appPath = state => state.appPath;
+const _userData = state => state.userData;
 
 export const _getInstances = createSelector(_instances, instances =>
   Object.values(instances.list)
@@ -45,8 +45,8 @@ export const _getCurrentDownloadItem = createSelector(
 export const _getJavaPath = createSelector(
   _javaManifest,
   _java,
-  _appPath,
-  (javaManifest, java, appPath) => {
+  _userData,
+  (javaManifest, java, userData) => {
     if (java.path) return java.path;
     const javaOs = convertOSToJavaFormat(process.platform);
     const javaMeta = javaManifest.find(
@@ -57,20 +57,20 @@ export const _getJavaPath = createSelector(
       version_data: { openjdk_version: version }
     } = javaMeta;
     const filename = process.platform === 'win32' ? 'java.exe' : 'java';
-    return path.join(appPath, 'java', version, 'bin', filename);
+    return path.join(userData, 'java', version, 'bin', filename);
   }
 );
 
-export const _getInstancesPath = createSelector(_appPath, appPath =>
-  path.join(appPath, 'instances_next')
+export const _getInstancesPath = createSelector(_userData, userData =>
+  path.join(userData, 'instances_next')
 );
 
-export const _getTempPath = createSelector(_appPath, appPath =>
-  path.join(appPath, 'temp')
+export const _getTempPath = createSelector(_userData, userData =>
+  path.join(userData, 'temp')
 );
 
-export const _getDataStorePath = createSelector(_appPath, appPath =>
-  path.join(appPath, 'datastore')
+export const _getDataStorePath = createSelector(_userData, userData =>
+  path.join(userData, 'datastore')
 );
 
 export const _getLibrariesPath = createSelector(

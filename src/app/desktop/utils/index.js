@@ -143,11 +143,11 @@ export const librariesMapper = (libraries, librariesPath) => {
   );
 };
 
-export const isLatestJavaDownloaded = async (meta, appPath) => {
+export const isLatestJavaDownloaded = async (meta, userData) => {
   const javaOs = convertOSToJavaFormat(process.platform);
   const javaMeta = meta.find(v => v.os === javaOs);
   const javaFolder = path.join(
-    appPath,
+    userData,
     'java',
     javaMeta.version_data.openjdk_version
   );
@@ -170,14 +170,15 @@ export const isLatestJavaDownloaded = async (meta, appPath) => {
 };
 
 export const get7zPath = async () => {
-  const baseDir = process.cwd();
+  // Get userData from ipc because we can't always get this from redux
+  const baseDir = await ipcRenderer.invoke('getUserData');
   if (process.platform === 'darwin') {
-    return path.join(baseDir, 'data', '7za-osx');
+    return path.join(baseDir, '7za-osx');
   }
   if (process.platform === 'win32') {
-    return path.join(baseDir, 'data', '7za.exe');
+    return path.join(baseDir, '7za.exe');
   }
-  return path.join(baseDir, 'data', '7za-linux');
+  return path.join(baseDir, '7za-linux');
 };
 
 export const fixFilePermissions = async filePath => {
@@ -706,4 +707,15 @@ export const getFileSha1 = async filePath => {
     });
   });
   return hash;
+};
+
+export const getFilesRecursive = async dir => {
+  const subdirs = await fs.readdir(dir);
+  const files = await Promise.all(
+    subdirs.map(async subdir => {
+      const res = path.resolve(dir, subdir);
+      return (await fs.stat(res)).isDirectory() ? getFilesRecursive(res) : res;
+    })
+  );
+  return files.reduce((a, f) => a.concat(f), []);
 };

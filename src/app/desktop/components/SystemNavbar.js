@@ -9,11 +9,12 @@ import {
   faTimes,
   faTerminal
 } from '@fortawesome/free-solid-svg-icons';
-
-const isOsx = process.platform === 'darwin';
+import { useSelector } from 'react-redux';
 
 const SystemNavbar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
+  const isUpdateAvailable = useSelector(state => state.updateAvailable);
+
   useEffect(() => {
     ipcRenderer
       .invoke('getIsWindowMaximized')
@@ -31,11 +32,21 @@ const SystemNavbar = () => {
     ipcRenderer.invoke('open-devtools');
   };
 
+  const isOsx = process.platform === 'darwin';
+
   const DevtoolButton = () => (
     <TerminalButton onClick={openDevTools}>
       <FontAwesomeIcon icon={faTerminal} />
     </TerminalButton>
   );
+
+  const quitApp = () => {
+    if (isUpdateAvailable) {
+      ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+    } else {
+      ipcRenderer.invoke('quit-app');
+    }
+  };
 
   return (
     <MainContainer>
@@ -55,7 +66,7 @@ const SystemNavbar = () => {
               css={`
                 font-size: 18px;
               `}
-              onClick={() => ipcRenderer.invoke('quit-app')}
+              onClick={quitApp}
             >
               <FontAwesomeIcon icon={faTimes} />
             </div>
@@ -66,7 +77,7 @@ const SystemNavbar = () => {
               css={`
                 font-size: 18px;
               `}
-              onClick={() => ipcRenderer.invoke('quit-app')}
+              onClick={quitApp}
             >
               <FontAwesomeIcon icon={faTimes} />
             </div>

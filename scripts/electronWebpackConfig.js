@@ -49,7 +49,8 @@ const baseConfig = {
 
   plugins: [
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production'
+      NODE_ENV: 'production',
+      REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE
     }),
 
     new webpack.NamedModulesPlugin()

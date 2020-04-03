@@ -550,7 +550,9 @@ const General = () => {
         >
           {updateAvailable ? (
             <Button
-              onClick={() => ipcRenderer.invoke('installUpdateAndRestart')}
+              onClick={() =>
+                ipcRenderer.invoke('installUpdateAndQuitOrRestart')
+              }
               css={`
                 margin-right: 10px;
               `}

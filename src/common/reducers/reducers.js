@@ -11,9 +11,9 @@ function news(state = [], action) {
   }
 }
 
-function appPath(state = null, action) {
+function userData(state = null, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_APP_PATH:
+    case ActionTypes.UPDATE_USERDATA:
       return action.path;
     default:
       return state;
@@ -138,7 +138,7 @@ function updateAvailable(state = false, action) {
 }
 
 export default {
-  appPath,
+  userData,
   news,
   downloadQueue,
   currentDownload,

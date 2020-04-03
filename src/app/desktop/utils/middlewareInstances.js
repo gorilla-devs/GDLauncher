@@ -13,13 +13,13 @@ const middleware = store => next => action => {
   const result = next(action);
   const nextState = store.getState();
   const { dispatch } = store;
-  if (!nextState.appPath) return result;
+  if (!nextState.userData) return result;
   const instancesPath = _getInstancesPath(nextState);
 
-  const appPathChanged = currState.appPath !== nextState.appPath;
+  const userDataChanged = currState.userData !== nextState.userData;
 
   // If not initialized yet, start listener and do a first-time read
-  if (!nextState.instances.started || appPathChanged) {
+  if (!nextState.instances.started || userDataChanged) {
     const startInstancesListener = async () => {
       await ipcRenderer.invoke('stop-listener');
       await makeDir(instancesPath);

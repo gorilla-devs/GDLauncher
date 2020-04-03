@@ -72,7 +72,8 @@ import {
   reflect,
   isMod,
   isInstanceFolderPath,
-  getFileSha1
+  getFileSha1,
+  getFilesRecursive
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -296,13 +297,13 @@ export function updateDownloadProgress(percentage) {
   };
 }
 
-export function updateAppPath(appPath) {
+export function updateUserData(userData) {
   return dispatch => {
     dispatch({
-      type: ActionTypes.UPDATE_APP_PATH,
-      path: appPath
+      type: ActionTypes.UPDATE_USERDATA,
+      path: userData
     });
-    return appPath;
+    return userData;
   };
 }
 
@@ -1456,7 +1457,7 @@ export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const javaPath = _getJavaPath(state);
-    const { appPath } = state;
+    const { userData } = state;
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
@@ -1573,16 +1574,16 @@ export function launchInstance(instanceName) {
       javaArguments
     );
 
-    const symLinkDirPath = path.join(appPath.split('\\')[0], '_gdl');
+    const symLinkDirPath = path.join(userData.split('\\')[0], '_gdl');
 
     const replaceRegex = [
       process.platform === 'win32'
-        ? new RegExp(appPath.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
+        ? new RegExp(userData.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
       symLinkDirPath
     ];
 
-    if (process.platform === 'win32') await symlink(appPath, symLinkDirPath);
+    if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
@@ -1729,15 +1730,13 @@ export function installMod(
 export const checkForPortableUpdates = () => {
   return async (dispatch, getState) => {
     const state = getState();
+    const baseFolder = await ipcRenderer.invoke('getExecutablePath');
 
     const { data: latestRelease } = await axios.get(
       'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/latest'
     );
 
-    const tempFolder = path.join(
-      _getTempPath(state),
-      `update-${latestRelease.tag_name}`
-    );
+    const tempFolder = path.join(_getTempPath(state), `update`);
 
     const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
     const isUpdateAvailable = lt(
@@ -1752,7 +1751,20 @@ export const checkForPortableUpdates = () => {
     );
 
     if (isUpdateAvailable) {
-      const baseFolder = process.cwd();
+      // Cleanup all files that are not required for the update
+      const tempFiles = await getFilesRecursive(tempFolder);
+      await Promise.all(
+        tempFiles.map(async tempFile => {
+          const tempFileRelativePath = path.relative(tempFile, tempFolder);
+          const isNeeded = latestManifest.files.find(
+            v => path.join(...v.file) === tempFileRelativePath
+          );
+          if (!isNeeded) {
+            await fse.remove(tempFile);
+          }
+        })
+      );
+
       const filesToUpdate = await Promise.all(
         latestManifest.files.filter(async file => {
           const fileOnDisk = path.join(baseFolder, ...file.file);

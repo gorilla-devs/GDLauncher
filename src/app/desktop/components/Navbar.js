@@ -115,7 +115,7 @@ const Navbar = () => {
         {updateAvailable && (
           <UpdateButton
             onClick={() => {
-              ipcRenderer.invoke('installUpdateAndRestart');
+              ipcRenderer.invoke('installUpdateAndQuitOrRestart');
             }}
           >
             <FontAwesomeIcon icon={faDownload} />
