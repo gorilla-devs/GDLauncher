@@ -10,7 +10,7 @@ const {
   globalShortcut
 } = require('electron');
 const path = require('path');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
@@ -324,12 +324,15 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
     autoUpdater.quitAndInstall(true, true);
   } else {
     if (process.platform === 'win32') {
-      exec(
-        `timeout 1 > nul && robocopy ".\\data\\temp\\update" "." /MOV /E${
-          quitAfterInstall ? '' : `&& ".\\${path.basename(app.getPath('exe'))}"`
-        } `,
+      spawn(
+        `robocopy ".\\data\\temp\\update" "." /MOV /E${
+          quitAfterInstall ? '' : ` & ".\\${path.basename(app.getPath('exe'))}"`
+        }`,
         {
-          cwd: path.dirname(app.getPath('exe'))
+          cwd: path.dirname(app.getPath('exe')),
+          detached: true,
+          shell: true,
+          windowsHide: true
         }
       );
     }

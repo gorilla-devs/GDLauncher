@@ -42,7 +42,7 @@ const SystemNavbar = () => {
 
   const quitApp = () => {
     if (isUpdateAvailable) {
-      ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+      ipcRenderer.invoke('installUpdateAndQuitOrRestart', true);
     } else {
       ipcRenderer.invoke('quit-app');
     }

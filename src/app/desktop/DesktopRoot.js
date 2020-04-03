@@ -81,8 +81,7 @@ function DesktopRoot() {
     } else if (currentAccount) {
       dispatch(
         load(features.mcAuthentication, dispatch(loginWithAccessToken()))
-      ).catch(async err => {
-        console.error(err);
+      ).catch(() => {
         dispatch(switchToFirstValidAccount());
       });
     } else {

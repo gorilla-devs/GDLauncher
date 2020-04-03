@@ -251,6 +251,8 @@ const AutomaticSetup = () => {
       });
     });
 
+    await fse.remove(downloadLocation);
+
     // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
     if (process.platform !== 'win32') {
       ipcRenderer.invoke('update-progress-bar', -1);
@@ -277,6 +279,7 @@ const AutomaticSetup = () => {
           reject(err);
         });
       });
+      await fse.remove(tempTarName);
     }
 
     const directoryToMove =
@@ -285,7 +288,7 @@ const AutomaticSetup = () => {
         : path.join(tempFolder, `${releaseName}-jre`);
     await fse.move(directoryToMove, path.join(javaBaseFolder, version));
 
-    await fse.remove(tempFolder);
+    await fse.remove(path.join(tempFolder, `${releaseName}-jre`));
 
     const ext = process.platform === 'win32' ? '.exe' : '';
     await fixFilePermissions(

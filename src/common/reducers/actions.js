@@ -15,7 +15,8 @@ import { extractFull } from 'node-7z';
 import { push } from 'connected-react-router';
 import { spawn } from 'child_process';
 import symlink from 'symlink-dir';
-import { promises as fs, createReadStream, createWriteStream } from 'fs';
+import { promises as fs } from 'fs';
+import originalFs from 'original-fs';
 import pMap from 'p-map';
 import { message } from 'antd';
 import makeDir from 'make-dir';
@@ -1752,11 +1753,38 @@ export const checkForPortableUpdates = () => {
 
     if (isUpdateAvailable) {
       // Cleanup all files that are not required for the update
+      await makeDir(tempFolder);
+
+      const filesToUpdate = (
+        await Promise.all(
+          latestManifest.map(async file => {
+            const fileOnDisk = path.join(baseFolder, ...file.file);
+            let needsDownload = false;
+            try {
+              // Check if files exists
+              await originalFs.promises.stat(fileOnDisk);
+
+              const fileOnDiskSha1 = await getFileSha1(fileOnDisk);
+
+              if (fileOnDiskSha1.toString() !== file.sha1) {
+                throw new Error('SHA1 Mismatch', file.compressedFile);
+              }
+            } catch (err) {
+              needsDownload = true;
+            }
+            if (needsDownload) {
+              return file;
+            }
+            return null;
+          })
+        )
+      ).filter(_ => _);
+
       const tempFiles = await getFilesRecursive(tempFolder);
       await Promise.all(
         tempFiles.map(async tempFile => {
-          const tempFileRelativePath = path.relative(tempFile, tempFolder);
-          const isNeeded = latestManifest.files.find(
+          const tempFileRelativePath = path.relative(tempFolder, tempFile);
+          const isNeeded = filesToUpdate.find(
             v => path.join(...v.file) === tempFileRelativePath
           );
           if (!isNeeded) {
@@ -1765,30 +1793,6 @@ export const checkForPortableUpdates = () => {
         })
       );
 
-      const filesToUpdate = await Promise.all(
-        latestManifest.files.filter(async file => {
-          const fileOnDisk = path.join(baseFolder, ...file.file);
-          let needsDownload = false;
-          try {
-            // Check if files exists
-            await fs.promises.access(fileOnDisk);
-
-            const fileOnDiskSha1 = await getFileSha1(fileOnDisk);
-
-            if (fileOnDiskSha1 !== file.sha1) {
-              throw new Error();
-            }
-          } catch {
-            needsDownload = true;
-          }
-
-          return needsDownload;
-        })
-      );
-
-      // Ensure temp folder
-      await makeDir(tempFolder);
-
       await pMap(
         filesToUpdate,
         async file => {
@@ -1796,11 +1800,10 @@ export const checkForPortableUpdates = () => {
           const destinationPath = path.join(tempFolder, ...file.file);
           try {
             // Check if files exists
-            await fs.promises.access(destinationPath);
-
+            await originalFs.promises.access(destinationPath);
             const fileSha1 = await getFileSha1(destinationPath);
-            if (fileSha1 !== file.sha1) {
-              throw new Error();
+            if (fileSha1.toString() !== file.sha1) {
+              throw new Error('SHA1 Mismatch', file.compressedFile);
             }
           } catch {
             try {
@@ -1810,15 +1813,15 @@ export const checkForPortableUpdates = () => {
               );
 
               const gzip = zlib.createGunzip();
-              const source = createReadStream(compressedFile);
+              const source = originalFs.createReadStream(compressedFile);
 
               await makeDir(path.dirname(destinationPath));
-              const destination = createWriteStream(destinationPath);
+              const destination = originalFs.createWriteStream(destinationPath);
 
               await new Promise((resolve, reject) => {
                 pipeline(source, gzip, destination, err => {
                   if (err) {
-                    reject();
+                    reject(err);
                   }
                   resolve();
                 });
@@ -1826,11 +1829,11 @@ export const checkForPortableUpdates = () => {
 
               await fse.remove(compressedFile);
             } catch (err) {
-              console.error(err);
+              throw new Error(err);
             }
           }
         },
-        { concurrency: 5 }
+        { concurrency: 3 }
       );
     }
   };

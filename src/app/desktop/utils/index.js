@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs';
+import originalFs from 'original-fs';
 import fse from 'fs-extra';
 import { extractFull } from 'node-7z';
 import jimp from 'jimp/es';
@@ -7,6 +8,7 @@ import jarAnalyzer from 'jarfile';
 import { promisify } from 'util';
 import { ipcRenderer } from 'electron';
 import path from 'path';
+import crypto from 'crypto';
 import { exec, spawn } from 'child_process';
 import { MC_LIBRARIES_URL } from '../../../common/utils/constants';
 import { removeDuplicates } from '../../../common/utils';
@@ -696,7 +698,7 @@ export const getFileSha1 = async filePath => {
   const algorithm = 'sha1';
   const shasum = crypto.createHash(algorithm);
 
-  const s = fs.ReadStream(filePath);
+  const s = originalFs.ReadStream(filePath);
   s.on('data', data => {
     shasum.update(data);
   });
@@ -710,11 +712,13 @@ export const getFileSha1 = async filePath => {
 };
 
 export const getFilesRecursive = async dir => {
-  const subdirs = await fs.readdir(dir);
+  const subdirs = await originalFs.promises.readdir(dir);
   const files = await Promise.all(
     subdirs.map(async subdir => {
       const res = path.resolve(dir, subdir);
-      return (await fs.stat(res)).isDirectory() ? getFilesRecursive(res) : res;
+      return (await originalFs.promises.stat(res)).isDirectory()
+        ? getFilesRecursive(res)
+        : res;
     })
   );
   return files.reduce((a, f) => a.concat(f), []);
