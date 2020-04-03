@@ -169,9 +169,9 @@ const commonConfig = {
     directories: {
       buildResources: 'public',
       output: 'release'
-    },
-    publish: 'never'
-  }
+    }
+  },
+  publish: 'never'
 };
 
 const main = async () => {
