@@ -15,6 +15,7 @@ const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
 const Store = require('electron-store');
+const fs = require('fs').promises;
 
 const discordRPC = require('./discordRPC');
 
@@ -324,15 +325,60 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
     autoUpdater.quitAndInstall(true, true);
   } else {
     if (process.platform === 'win32') {
-      spawn(
-        `robocopy ".\\data\\temp\\update" "." /MOV /E${
+      await fs.writeFile(
+        path.join(
+          path.dirname(app.getPath('exe')),
+          'data',
+          'temp',
+          'updateLauncher.bat'
+        ),
+        `robocopy "${path.join(
+          path.dirname(app.getPath('exe')),
+          'data',
+          'temp',
+          'update'
+        )}" "." /MOV /E${
           quitAfterInstall ? '' : ` & ".\\${path.basename(app.getPath('exe'))}"`
-        }`,
+        }
+        DEL "${path.join(
+          path.dirname(app.getPath('exe')),
+          'data',
+          'temp',
+          'launchBat.vbs'
+        )}"
+        DEL "%~f0"
+        `
+      );
+
+      await fs.writeFile(
+        path.join(
+          path.dirname(app.getPath('exe')),
+          'data',
+          'temp',
+          'launchBat.vbs'
+        ),
+        `Set WshShell = CreateObject("WScript.Shell") 
+          WshShell.Run chr(34) & "${path.join(
+            path.dirname(app.getPath('exe')),
+            'data',
+            'temp',
+            'updateLauncher.bat'
+          )}" & Chr(34), 0
+          Set WshShell = Nothing
+          `
+      );
+
+      spawn(
+        path.join(
+          path.dirname(app.getPath('exe')),
+          'data',
+          'temp',
+          'launchBat.vbs'
+        ),
         {
           cwd: path.dirname(app.getPath('exe')),
           detached: true,
-          shell: true,
-          windowsHide: true
+          shell: true
         }
       );
     }
