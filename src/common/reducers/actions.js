@@ -1803,14 +1803,39 @@ export const checkForPortableUpdates = () => {
             await originalFs.promises.access(destinationPath);
             const fileSha1 = await getFileSha1(destinationPath);
             if (fileSha1.toString() !== file.sha1) {
-              throw new Error('SHA1 Mismatch', file.compressedFile);
+              throw new Error('SHA1 mismatch', file.compressedFile);
             }
           } catch {
             try {
-              await downloadFile(
-                compressedFile,
-                `${baseAssetUrl}/${file.compressedFile}`
-              );
+              try {
+                await originalFs.promises.access(compressedFile);
+                const fileSha1 = await getFileSha1(compressedFile);
+                if (fileSha1.toString() === file.sha1) {
+                  return;
+                }
+              } catch {
+                // Nothing, just go ahead and download since sha1 mismatch
+              }
+
+              // Try to download 5 times
+              const maxTries = 5;
+              let sha1Matched = false;
+              while (maxTries <= 5 && !sha1Matched) {
+                // eslint-disable-next-line
+                await downloadFile(
+                  compressedFile,
+                  `${baseAssetUrl}/${file.compressedFile}`
+                );
+                // eslint-disable-next-line
+                const fileSha1 = await getFileSha1(compressedFile);
+                if (fileSha1.toString() === file.compressedSha1) {
+                  sha1Matched = true;
+                }
+              }
+
+              if (!sha1Matched) {
+                throw new Error(`Could not download ${file.compressedSha1}`);
+              }
 
               const gzip = zlib.createGunzip();
               const source = originalFs.createReadStream(compressedFile);
@@ -1836,5 +1861,6 @@ export const checkForPortableUpdates = () => {
         { concurrency: 3 }
       );
     }
+    return isUpdateAvailable;
   };
 };

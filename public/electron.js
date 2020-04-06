@@ -37,6 +37,8 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
   }
 }
 
+console.log(process.env.REACT_APP_RELEASE_TYPE);
+
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
@@ -321,60 +323,49 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
 }
 
 ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
+  const tempFolder = path.join(
+    path.dirname(app.getPath('exe')),
+    'data',
+    'temp'
+  );
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
     autoUpdater.quitAndInstall(true, true);
   } else {
     if (process.platform === 'win32') {
+      const updaterVbs = 'updater.vbs';
+      const updaterBat = 'updateLauncher.bat';
       await fs.writeFile(
-        path.join(
-          path.dirname(app.getPath('exe')),
-          'data',
-          'temp',
-          'updateLauncher.bat'
-        ),
-        `robocopy "${path.join(
-          path.dirname(app.getPath('exe')),
-          'data',
-          'temp',
-          'update'
-        )}" "." /MOV /E${
-          quitAfterInstall ? '' : ` & ".\\${path.basename(app.getPath('exe'))}"`
+        path.join(tempFolder, updaterBat),
+        `robocopy "${path.join(tempFolder, 'update')}" "." /MOV /E${
+          quitAfterInstall ? '' : ` & "${app.getPath('exe')}"`
         }
-        DEL "${path.join(
-          path.dirname(app.getPath('exe')),
-          'data',
-          'temp',
-          'launchBat.vbs'
-        )}"
+        DEL "${path.join(tempFolder, updaterVbs)}"
         DEL "%~f0"
         `
       );
 
       await fs.writeFile(
-        path.join(
-          path.dirname(app.getPath('exe')),
-          'data',
-          'temp',
-          'launchBat.vbs'
-        ),
+        path.join(tempFolder, updaterVbs),
         `Set WshShell = CreateObject("WScript.Shell") 
           WshShell.Run chr(34) & "${path.join(
-            path.dirname(app.getPath('exe')),
-            'data',
-            'temp',
-            'updateLauncher.bat'
+            tempFolder,
+            updaterBat
           )}" & Chr(34), 0
           Set WshShell = Nothing
           `
       );
 
+      spawn(path.join(tempFolder, updaterVbs), {
+        cwd: path.dirname(app.getPath('exe')),
+        detached: true,
+        shell: true
+      });
+    } else {
+      // Linux
       spawn(
-        path.join(
-          path.dirname(app.getPath('exe')),
-          'data',
-          'temp',
-          'launchBat.vbs'
-        ),
+        `mv -v "${path.join(tempFolder, 'update', '*')}" "."${
+          quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`
+        }`,
         {
           cwd: path.dirname(app.getPath('exe')),
           detached: true,
