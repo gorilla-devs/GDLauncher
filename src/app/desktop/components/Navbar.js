@@ -1,14 +1,16 @@
 // @flow
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog, faDownload } from '@fortawesome/free-solid-svg-icons';
 import logo from '../../../common/assets/logo.png';
-
 import { openModal } from '../../../common/reducers/modals/actions';
-import { updateUpdateAvailable } from '../../../common/reducers/actions';
+import {
+  updateUpdateAvailable,
+  checkForPortableUpdates
+} from '../../../common/reducers/actions';
 
 export const Container = styled.div`
   width: 100vw;
@@ -60,14 +62,31 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Check every 10 minutes
-    ipcRenderer.invoke('checkForUpdates');
-    ipcRenderer.on('updateAvailable', () => {
-      dispatch(updateUpdateAvailable(true));
-    });
-    setInterval(() => {
-      ipcRenderer.invoke('checkForUpdates');
-    }, 600000);
+    if (process.env.NODE_ENV === 'development') return;
+    setTimeout(() => {
+      console.log(process.env.REACT_APP_RELEASE_TYPE);
+      if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+        // Check every 10 minutes
+        ipcRenderer.invoke('checkForUpdates');
+        ipcRenderer.on('updateAvailable', () => {
+          dispatch(updateUpdateAvailable(true));
+        });
+      } else {
+        dispatch(checkForPortableUpdates())
+          .then(v => dispatch(updateUpdateAvailable(v)))
+          .catch(console.error);
+      }
+
+      setInterval(() => {
+        if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+          ipcRenderer.invoke('checkForUpdates');
+        } else {
+          checkForPortableUpdates()
+            .then(val => dispatch(updateUpdateAvailable(val)))
+            .catch(console.error);
+        }
+      }, 600000);
+    }, 500);
   }, []);
 
   const isLocation = loc => {
@@ -95,7 +114,11 @@ const Navbar = () => {
       </a>
       <div>
         {updateAvailable && (
-          <UpdateButton>
+          <UpdateButton
+            onClick={() => {
+              ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+            }}
+          >
             <FontAwesomeIcon icon={faDownload} />
           </UpdateButton>
         )}
@@ -110,4 +133,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

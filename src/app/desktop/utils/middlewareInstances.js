@@ -1,26 +1,25 @@
 // import watch from "node-watch";
 import makeDir from 'make-dir';
-import path from 'path';
 import { ipcRenderer } from 'electron';
 import { notification } from 'antd';
 import * as ActionTypes from '../../../common/reducers/actionTypes';
 import getInstances from './getInstances';
 import modsFingerprintsScan from './modsFingerprintsScan';
 import { startListener } from '../../../common/reducers/actions';
+import { _getInstancesPath } from '../../../common/utils/selectors';
 
 const middleware = store => next => action => {
   const currState = store.getState();
   const result = next(action);
   const nextState = store.getState();
   const { dispatch } = store;
-  if (!nextState.settings.dataPath) return result;
-  const instancesPath = path.join(nextState.settings.dataPath, 'instances');
+  if (!nextState.userData) return result;
+  const instancesPath = _getInstancesPath(nextState);
 
-  const dataPathChanged =
-    currState.settings.dataPath !== nextState.settings.dataPath;
+  const userDataChanged = currState.userData !== nextState.userData;
 
   // If not initialized yet, start listener and do a first-time read
-  if (!nextState.instances.started || dataPathChanged) {
+  if (!nextState.instances.started || userDataChanged) {
     const startInstancesListener = async () => {
       await ipcRenderer.invoke('stop-listener');
       await makeDir(instancesPath);

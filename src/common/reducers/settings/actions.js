@@ -18,16 +18,6 @@ export function updateReleaseChannel(releaseChannel) {
   };
 }
 
-export function updateDataPath(path) {
-  return dispatch => {
-    dispatch({
-      type: ActionTypes.UPDATE_DATA_PATH,
-      path
-    });
-    return path;
-  };
-}
-
 export function updateHideWindowOnGameLaunch(hideWindow) {
   return dispatch => {
     dispatch({

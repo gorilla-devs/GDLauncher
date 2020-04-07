@@ -11,6 +11,15 @@ function news(state = [], action) {
   }
 }
 
+function userData(state = null, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_USERDATA:
+      return action.path;
+    default:
+      return state;
+  }
+}
+
 function downloadQueue(state = {}, action) {
   switch (action.type) {
     case ActionTypes.ADD_DOWNLOAD_TO_QUEUE:
@@ -129,6 +138,7 @@ function updateAvailable(state = false, action) {
 }
 
 export default {
+  userData,
   news,
   downloadQueue,
   currentDownload,

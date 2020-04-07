@@ -110,6 +110,7 @@ export const downloadFile = async (fileName, url, onProgress) => {
     });
 
     req.on('end', () => {
+      req.end();
       resolve();
     });
 

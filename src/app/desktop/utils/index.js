@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs';
+import originalFs from 'original-fs';
 import fse from 'fs-extra';
 import { extractFull } from 'node-7z';
 import jimp from 'jimp/es';
@@ -7,6 +8,7 @@ import jarAnalyzer from 'jarfile';
 import { promisify } from 'util';
 import { ipcRenderer } from 'electron';
 import path from 'path';
+import crypto from 'crypto';
 import { exec, spawn } from 'child_process';
 import { MC_LIBRARIES_URL } from '../../../common/utils/constants';
 import { removeDuplicates } from '../../../common/utils';
@@ -143,11 +145,11 @@ export const librariesMapper = (libraries, librariesPath) => {
   );
 };
 
-export const isLatestJavaDownloaded = async (meta, dataPath) => {
+export const isLatestJavaDownloaded = async (meta, userData) => {
   const javaOs = convertOSToJavaFormat(process.platform);
   const javaMeta = meta.find(v => v.os === javaOs);
   const javaFolder = path.join(
-    dataPath,
+    userData,
     'java',
     javaMeta.version_data.openjdk_version
   );
@@ -170,7 +172,8 @@ export const isLatestJavaDownloaded = async (meta, dataPath) => {
 };
 
 export const get7zPath = async () => {
-  const baseDir = await ipcRenderer.invoke('getUserDataPath');
+  // Get userData from ipc because we can't always get this from redux
+  const baseDir = await ipcRenderer.invoke('getUserData');
   if (process.platform === 'darwin') {
     return path.join(baseDir, '7za-osx');
   }
@@ -688,4 +691,35 @@ export const getFirstReleaseCandidate = files => {
     counter += 1;
   }
   return latestFile;
+};
+
+export const getFileSha1 = async filePath => {
+  // Calculate sha1 on original file
+  const algorithm = 'sha1';
+  const shasum = crypto.createHash(algorithm);
+
+  const s = originalFs.ReadStream(filePath);
+  s.on('data', data => {
+    shasum.update(data);
+  });
+
+  const hash = await new Promise(resolve => {
+    s.on('end', () => {
+      resolve(shasum.digest('hex'));
+    });
+  });
+  return hash;
+};
+
+export const getFilesRecursive = async dir => {
+  const subdirs = await originalFs.promises.readdir(dir);
+  const files = await Promise.all(
+    subdirs.map(async subdir => {
+      const res = path.resolve(dir, subdir);
+      return (await originalFs.promises.stat(res)).isDirectory()
+        ? getFilesRecursive(res)
+        : res;
+    })
+  );
+  return files.reduce((a, f) => a.concat(f), []);
 };

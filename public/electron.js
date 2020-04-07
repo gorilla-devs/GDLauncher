@@ -10,9 +10,12 @@ const {
   globalShortcut
 } = require('electron');
 const path = require('path');
+const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
+const Store = require('electron-store');
+const fs = require('fs').promises;
 
 const discordRPC = require('./discordRPC');
 
@@ -20,8 +23,21 @@ const discordRPC = require('./discordRPC');
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 // app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
+app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
+
+if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
+  app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
+} else {
+  // this defaults to app.getPath('userData'), which is fine since we only use it for setup
+  const store = new Store();
+  if (store.has('userDataOverride')) {
+    app.setPath('userData', store.get('userDataOverride'));
+  }
+}
+
+console.log(process.env.REACT_APP_RELEASE_TYPE);
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -41,6 +57,7 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
+      // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
     }
   });
@@ -179,18 +196,24 @@ ipcMain.handle('show-window', () => {
 
 ipcMain.handle('quit-app', () => {
   app.quit();
-});
-
-ipcMain.handle('getUserDataPath', () => {
-  return app.getPath('userData');
+  app.exit();
 });
 
 ipcMain.handle('getAppdataPath', () => {
   return app.getPath('appData');
 });
 
+// Returns path to app.asar
 ipcMain.handle('getAppPath', () => {
   return app.getAppPath();
+});
+
+ipcMain.handle('getUserData', () => {
+  return app.getPath('userData');
+});
+
+ipcMain.handle('getExecutablePath', () => {
+  return path.dirname(app.getPath('exe'));
 });
 
 ipcMain.handle('getAppVersion', () => {
@@ -225,36 +248,11 @@ ipcMain.handle('openFileDialog', (e, filters) => {
 
 ipcMain.handle('appRestart', () => {
   app.relaunch();
-  app.exit(0);
+  app.exit();
 });
 
 ipcMain.handle('getPrimaryDisplaySizes', () => {
   return screen.getPrimaryDisplay().bounds;
-});
-
-// AutoUpdater
-
-autoUpdater.autoDownload = false;
-
-autoUpdater.on('update-available', () => {
-  if (process.env.NODE_ENV !== 'development') {
-    autoUpdater.downloadUpdate();
-  } else {
-    // Fake update
-    mainWindow.webContents.send('updateAvailable');
-  }
-});
-
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('updateAvailable');
-});
-
-ipcMain.handle('checkForUpdates', () => {
-  // autoUpdater.checkForUpdates();
-});
-
-ipcMain.handle('installUpdateAndRestart', () => {
-  // autoUpdater.quitAndInstall(true, true);
 });
 
 ipcMain.handle('init-discord-rpc', () => {
@@ -271,6 +269,10 @@ ipcMain.handle('shutdown-discord-rpc', () => {
 
 ipcMain.handle('start-listener', async (e, dirPath) => {
   try {
+    if (watcher) {
+      await watcher.stop();
+      watcher = null;
+    }
     watcher = await nsfw(dirPath, events => {
       mainWindow.webContents.send('listener-events', events);
     });
@@ -284,6 +286,7 @@ ipcMain.handle('start-listener', async (e, dirPath) => {
 ipcMain.handle('stop-listener', async () => {
   if (watcher) {
     await watcher.stop();
+    watcher = null;
   }
 });
 
@@ -294,4 +297,92 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
       return resolve(v);
     });
   });
+});
+
+// AutoUpdater
+
+if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+  autoUpdater.autoDownload = false;
+  autoUpdater.setFeedURL({
+    owner: 'gorilla-devs',
+    repo: 'GDLauncher-Releases',
+    provider: 'github'
+  });
+
+  autoUpdater.on('update-available', () => {
+    autoUpdater.downloadUpdate();
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('updateAvailable');
+  });
+
+  ipcMain.handle('checkForUpdates', () => {
+    autoUpdater.checkForUpdates();
+  });
+}
+
+ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
+  const tempFolder = path.join(
+    path.dirname(app.getPath('exe')),
+    'data',
+    'temp'
+  );
+  if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+    autoUpdater.quitAndInstall(true, true);
+  } else {
+    let updateSpawn;
+    if (process.platform === 'win32') {
+      const updaterVbs = 'updater.vbs';
+      const updaterBat = 'updateLauncher.bat';
+      await fs.writeFile(
+        path.join(tempFolder, updaterBat),
+        `robocopy "${path.join(tempFolder, 'update')}" "." /MOV /E${
+          quitAfterInstall ? '' : ` & "${app.getPath('exe')}"`
+        }
+        DEL "${path.join(tempFolder, updaterVbs)}"
+        DEL "%~f0"
+        `
+      );
+
+      await fs.writeFile(
+        path.join(tempFolder, updaterVbs),
+        `Set WshShell = CreateObject("WScript.Shell") 
+          WshShell.Run chr(34) & "${path.join(
+            tempFolder,
+            updaterBat
+          )}" & Chr(34), 0
+          Set WshShell = Nothing
+          `
+      );
+
+      updateSpawn = spawn(path.join(tempFolder, updaterVbs), {
+        cwd: path.dirname(app.getPath('exe')),
+        detached: true,
+        shell: true
+      });
+    } else {
+      // Linux
+      updateSpawn = spawn(
+        `sleep 1 && cp -lrf "${path.join(
+          tempFolder,
+          'update'
+        )}"/* "." && rm -rf "${path.join(
+          tempFolder,
+          'update'
+        )}" && chmod +x "${app.getPath('exe')}" && chmod 755 "${app.getPath(
+          'exe'
+        )}"${quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`}`,
+        {
+          cwd: path.dirname(app.getPath('exe')),
+          detached: true,
+          shell: true,
+          stdio: 'ignore'
+        }
+      );
+    }
+    updateSpawn.unref();
+    app.quit();
+    app.exit();
+  }
 });

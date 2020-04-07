@@ -3,6 +3,7 @@
  */
 
 const path = require('path');
+// eslint-disable-next-line
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -49,7 +50,8 @@ const baseConfig = {
 
   plugins: [
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production'
+      NODE_ENV: 'production',
+      REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE
     }),
 
     new webpack.NamedModulesPlugin()

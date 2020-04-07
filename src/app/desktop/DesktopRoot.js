@@ -13,7 +13,8 @@ import {
   initNews,
   loginThroughNativeLauncher,
   switchToFirstValidAccount,
-  checkClientToken
+  checkClientToken,
+  updateUserData
 } from '../../common/reducers/actions';
 import {
   load,
@@ -28,7 +29,6 @@ import ga from '../../common/utils/analytics';
 import routes from './utils/routes';
 import { _getCurrentAccount } from '../../common/utils/selectors';
 import { isLatestJavaDownloaded, extract7z } from './utils';
-import { updateDataPath } from '../../common/reducers/settings/actions';
 import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
 import { openModal } from '../../common/reducers/modals/actions';
@@ -52,7 +52,6 @@ function DesktopRoot() {
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
   const javaPath = useSelector(state => state.settings.java.path);
-  const dataPathFromStore = useSelector(state => state.settings.dataPath);
   const location = useSelector(state => state.router.location);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
 
@@ -61,10 +60,8 @@ function DesktopRoot() {
   });
 
   const init = async () => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const dataPathStatic = await ipcRenderer.invoke('getUserDataPath');
-    const dataPath =
-      dataPathFromStore || dispatch(updateDataPath(dataPathStatic));
+    const userDataStatic = await ipcRenderer.invoke('getUserData');
+    const userData = dispatch(updateUserData(userDataStatic));
     dispatch(checkClientToken());
     dispatch(initNews());
 
@@ -72,7 +69,7 @@ function DesktopRoot() {
 
     const manifests = await dispatch(initManifests());
     await extract7z();
-    const isLatestJava = await isLatestJavaDownloaded(manifests.java, dataPath);
+    const isLatestJava = await isLatestJavaDownloaded(manifests.java, userData);
     const isJavaOK = javaPath || isLatestJava;
     if (!isJavaOK) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
@@ -84,8 +81,7 @@ function DesktopRoot() {
     } else if (currentAccount) {
       dispatch(
         load(features.mcAuthentication, dispatch(loginWithAccessToken()))
-      ).catch(async err => {
-        console.error(err);
+      ).catch(() => {
         dispatch(switchToFirstValidAccount());
       });
     } else {

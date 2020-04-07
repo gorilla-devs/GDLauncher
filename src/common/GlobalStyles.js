@@ -18,12 +18,14 @@ export default createGlobalStyle`
     font-style: normal;
     font-weight: 500;
   }
+
   @font-face {
     font-family: "FF Mark W05";
     src: url(${FFMarkW05BoldWoff2}) format("woff2");
     font-style: normal;
     font-weight: 700;
   }
+  
   @font-face {
     font-family: "FF Mark W05";
     src: url(${FFMarkW05HeavyWoff2}) format("woff2");
@@ -174,4 +176,13 @@ export default createGlobalStyle`
     margin-bottom: 3px;
     padding: 2px 0;
   }
+
+
+  @keyframes modalShake {
+    0% { transform: scale(1.01) }
+    30% { transform: scale(0.99) }
+    60% { transform: scale(1.01) }
+    90% { transform: scale(0.99)}
+    100% {transform: scale(1) }
+
 `;
