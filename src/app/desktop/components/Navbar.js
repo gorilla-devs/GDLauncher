@@ -1,12 +1,11 @@
 // @flow
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog, faDownload } from '@fortawesome/free-solid-svg-icons';
 import logo from '../../../common/assets/logo.png';
-
 import { openModal } from '../../../common/reducers/modals/actions';
 import {
   updateUpdateAvailable,
@@ -63,7 +62,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (process.env.NODE_ENV === 'development') return;
     setTimeout(() => {
+      console.log(process.env.REACT_APP_RELEASE_TYPE);
       if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
         // Check every 10 minutes
         ipcRenderer.invoke('checkForUpdates');
@@ -72,7 +73,7 @@ const Navbar = () => {
         });
       } else {
         dispatch(checkForPortableUpdates())
-          .then(() => dispatch(updateUpdateAvailable(true)))
+          .then(v => dispatch(updateUpdateAvailable(v)))
           .catch(console.error);
       }
 
@@ -115,7 +116,7 @@ const Navbar = () => {
         {updateAvailable && (
           <UpdateButton
             onClick={() => {
-              ipcRenderer.invoke('installUpdateAndRestart');
+              ipcRenderer.invoke('installUpdateAndQuitOrRestart');
             }}
           >
             <FontAwesomeIcon icon={faDownload} />
@@ -132,4 +133,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

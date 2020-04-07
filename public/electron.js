@@ -10,9 +10,12 @@ const {
   globalShortcut
 } = require('electron');
 const path = require('path');
+const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
+const Store = require('electron-store');
+const fs = require('fs').promises;
 
 const discordRPC = require('./discordRPC');
 
@@ -24,7 +27,17 @@ app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
 
-app.setPath('userData', path.join(process.cwd(), 'data'));
+if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
+  app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
+} else {
+  // this defaults to app.getPath('userData'), which is fine since we only use it for setup
+  const store = new Store();
+  if (store.has('userDataOverride')) {
+    app.setPath('userData', store.get('userDataOverride'));
+  }
+}
+
+console.log(process.env.REACT_APP_RELEASE_TYPE);
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -183,14 +196,24 @@ ipcMain.handle('show-window', () => {
 
 ipcMain.handle('quit-app', () => {
   app.quit();
+  app.exit();
 });
 
 ipcMain.handle('getAppdataPath', () => {
   return app.getPath('appData');
 });
 
+// Returns path to app.asar
 ipcMain.handle('getAppPath', () => {
   return app.getAppPath();
+});
+
+ipcMain.handle('getUserData', () => {
+  return app.getPath('userData');
+});
+
+ipcMain.handle('getExecutablePath', () => {
+  return path.dirname(app.getPath('exe'));
 });
 
 ipcMain.handle('getAppVersion', () => {
@@ -225,7 +248,7 @@ ipcMain.handle('openFileDialog', (e, filters) => {
 
 ipcMain.handle('appRestart', () => {
   app.relaunch();
-  app.exit(0);
+  app.exit();
 });
 
 ipcMain.handle('getPrimaryDisplaySizes', () => {
@@ -299,10 +322,63 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   });
 }
 
-ipcMain.handle('installUpdateAndRestart', () => {
+ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
+  const tempFolder = path.join(
+    path.dirname(app.getPath('exe')),
+    'data',
+    'temp'
+  );
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
     autoUpdater.quitAndInstall(true, true);
   } else {
-    // To add
+    if (process.platform === 'win32') {
+      const updaterVbs = 'updater.vbs';
+      const updaterBat = 'updateLauncher.bat';
+      await fs.writeFile(
+        path.join(tempFolder, updaterBat),
+        `robocopy "${path.join(tempFolder, 'update')}" "." /MOV /E${
+          quitAfterInstall ? '' : ` & "${app.getPath('exe')}"`
+        }
+        DEL "${path.join(tempFolder, updaterVbs)}"
+        DEL "%~f0"
+        `
+      );
+
+      await fs.writeFile(
+        path.join(tempFolder, updaterVbs),
+        `Set WshShell = CreateObject("WScript.Shell") 
+          WshShell.Run chr(34) & "${path.join(
+            tempFolder,
+            updaterBat
+          )}" & Chr(34), 0
+          Set WshShell = Nothing
+          `
+      );
+
+      spawn(path.join(tempFolder, updaterVbs), {
+        cwd: path.dirname(app.getPath('exe')),
+        detached: true,
+        shell: true
+      });
+    } else {
+      // Linux
+      const updateScript = spawn(
+        `sleep 2 && cp -lrf "${path.join(
+          tempFolder,
+          'update'
+        )}"/* "." && rm -rf "${path.join(tempFolder, 'update')}"${
+          quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`
+        }`,
+        {
+          cwd: path.dirname(app.getPath('exe')),
+          detached: true,
+          shell: true,
+          stdio: 'ignore'
+        }
+      );
+      updateScript.unref();
+    }
+    app.quit();
+    app.exit();
   }
 });

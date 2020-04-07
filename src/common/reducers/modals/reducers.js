@@ -9,7 +9,7 @@ export default function modals(state = [], action) {
           modalProps: action.modalProps
         });
       }
-      console.error('A modal of the same type already exist!');
+      console.warn('A modal of the same type already exists!');
       return state;
     case ActionTypes.UPDATE_MODAL:
       return action.modals;

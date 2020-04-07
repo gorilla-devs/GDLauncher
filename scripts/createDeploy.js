@@ -169,17 +169,9 @@ const commonConfig = {
     directories: {
       buildResources: 'public',
       output: 'release'
-    },
-    publish: {
-      provider: 'github',
-      owner: 'gorilla-devs',
-      repo: 'GDLauncher',
-      private: false
-    },
-    afterPack: async () => {
-      console.log('Test if app starts');
     }
-  }
+  },
+  publish: 'never'
 };
 
 const main = async () => {
@@ -240,4 +232,6 @@ const main = async () => {
   await fse.remove(releasesFolder);
 };
 
-main();
+main().catch(err => {
+  throw new Error(err);
+});

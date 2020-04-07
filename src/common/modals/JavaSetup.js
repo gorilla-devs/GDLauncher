@@ -205,7 +205,7 @@ const AutomaticSetup = () => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
   const [currentStep, setCurrentStep] = useState('Downloading Java');
   const javaManifest = useSelector(state => state.app.javaManifest);
-  const appPath = useSelector(state => state.appPath);
+  const userData = useSelector(state => state.userData);
   const tempFolder = useSelector(_getTempPath);
   const dispatch = useDispatch();
 
@@ -217,7 +217,7 @@ const AutomaticSetup = () => {
       binary_link: url,
       release_name: releaseName
     } = javaMeta;
-    const javaBaseFolder = path.join(appPath, 'java');
+    const javaBaseFolder = path.join(userData, 'java');
     await fse.remove(javaBaseFolder);
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
@@ -251,6 +251,8 @@ const AutomaticSetup = () => {
       });
     });
 
+    await fse.remove(downloadLocation);
+
     // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
     if (process.platform !== 'win32') {
       ipcRenderer.invoke('update-progress-bar', -1);
@@ -277,6 +279,7 @@ const AutomaticSetup = () => {
           reject(err);
         });
       });
+      await fse.remove(tempTarName);
     }
 
     const directoryToMove =
@@ -285,7 +288,7 @@ const AutomaticSetup = () => {
         : path.join(tempFolder, `${releaseName}-jre`);
     await fse.move(directoryToMove, path.join(javaBaseFolder, version));
 
-    await fse.remove(directoryToMove);
+    await fse.remove(path.join(tempFolder, `${releaseName}-jre`));
 
     const ext = process.platform === 'win32' ? '.exe' : '';
     await fixFilePermissions(
