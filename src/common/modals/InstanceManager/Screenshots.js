@@ -1,32 +1,34 @@
 /* eslint-disable */
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { promises as fs, watch, createReadStream } from "fs";
-import { clipboard, ipcRenderer } from "electron";
-import fse from "fs-extra";
-import path from "path";
-import base64 from "base64-stream";
-import getStream from "get-stream";
-import styled from "styled-components";
-import makeDir from "make-dir";
-import { Checkbox } from "antd";
-import { useSelector, useDispatch } from "react-redux";
-import _ from "lodash";
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { promises as fs, watch, createReadStream } from 'fs';
+import { clipboard, ipcRenderer } from 'electron';
+import fse from 'fs-extra';
+import path from 'path';
+import base64 from 'base64-stream';
+import getStream from 'get-stream';
+import styled from 'styled-components';
+import makeDir from 'make-dir';
+import { Checkbox } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import groupBy from 'lodash.groupby';
+import isEqual from 'lodash.isequal';
+import sortBy from 'lodash.sortby';
 import {
   ContextMenuTrigger,
   ContextMenu,
   MenuItem,
   hideMenu
-} from "react-contextmenu";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+} from 'react-contextmenu';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTrash,
   faCopy,
   faLink,
   faFolder
-} from "@fortawesome/free-solid-svg-icons";
-import { _getInstancesPath } from "../../utils/selectors";
-import { openModal } from "../../reducers/modals/actions";
-import { imgurPost } from "../../api";
+} from '@fortawesome/free-solid-svg-icons';
+import { _getInstancesPath } from '../../utils/selectors';
+import { openModal } from '../../reducers/modals/actions';
+import { imgurPost } from '../../api';
 
 const getScreenshots = async screenshotsPath => {
   const files = await fs.readdir(screenshotsPath);
@@ -74,13 +76,13 @@ const getImgurLink = async (imagePath, fileSize, setProgressUpdate) => {
 };
 
 const openFolder = screenshotsPath => {
-  ipcRenderer.invoke("openFolder", screenshotsPath);
+  ipcRenderer.invoke('openFolder', screenshotsPath);
 };
 
 const getTitle = days => {
   const parsedDays = Number.parseInt(days, 10);
-  if (parsedDays === 0) return "Today";
-  else if (parsedDays === 1) return "Yesterday";
+  if (parsedDays === 0) return 'Today';
+  else if (parsedDays === 1) return 'Yesterday';
   else if (parsedDays > 1 && parsedDays < 30) return `${days} days ago`;
   else if (parsedDays >= 30 && parsedDays < 365)
     return `${Math.floor(days / 30)} months ago`;
@@ -97,7 +99,7 @@ let watcher;
 
 const Screenshots = ({ instanceName }) => {
   const instancesPath = useSelector(_getInstancesPath);
-  const screenshotsPath = path.join(instancesPath, instanceName, "screenshots");
+  const screenshotsPath = path.join(instancesPath, instanceName, 'screenshots');
   const [dateGroups, setDateGroups] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
   const [progressUpdate, setProgressUpdate] = useState(null);
@@ -111,22 +113,22 @@ const Screenshots = ({ instanceName }) => {
       uploadingFileName !== null &&
       selectedItems.includes(uploadingFileName)
     ) {
-      return "Image copied to clipboard!";
+      return 'Image copied to clipboard!';
     } else if (
       uploadingFileName != null &&
       selectedItems[0] != uploadingFileName
     ) {
-      return "Busy! Wait before uploading another image";
-    } else return "Share the image via url";
+      return 'Busy! Wait before uploading another image';
+    } else return 'Share the image via url';
   };
 
   const containerRef = useRef(null);
 
   const selectAll = useCallback(() => {
     if (
-      _.isEqual(
-        _.sortBy(getScreenshotsList(dateGroups).map(x => x.name)),
-        _.sortBy(selectedItems)
+      isEqual(
+        sortBy(getScreenshotsList(dateGroups).map(x => x.name)),
+        sortBy(selectedItems)
       )
     ) {
       setSelectedItems([]);
@@ -139,13 +141,13 @@ const Screenshots = ({ instanceName }) => {
     async fileName => {
       if (selectedItems.length === 1) {
         await fse.remove(
-          path.join(instancesPath, instanceName, "screenshots", fileName)
+          path.join(instancesPath, instanceName, 'screenshots', fileName)
         );
       } else if (selectedItems.length > 1) {
         Promise.all(
           selectedItems.map(async screenShot => {
             await fse.remove(
-              path.join(instancesPath, instanceName, "screenshots", screenShot)
+              path.join(instancesPath, instanceName, 'screenshots', screenShot)
             );
           })
         );
@@ -157,11 +159,11 @@ const Screenshots = ({ instanceName }) => {
   const startListener = async () => {
     await makeDir(screenshotsPath);
     const screenshots = await getScreenshots(screenshotsPath);
-    setDateGroups(_.groupBy(screenshots, "days"));
+    setDateGroups(groupBy(screenshots, 'days'));
     watcher = watch(screenshotsPath, async (event, filename) => {
       if (filename) {
         const sortedScreens = await getScreenshots(screenshotsPath);
-        setDateGroups(_.groupBy(sortedScreens, "days"));
+        setDateGroups(groupBy(sortedScreens, 'days'));
       }
     });
   };
@@ -180,9 +182,9 @@ const Screenshots = ({ instanceName }) => {
           containerRef.current.scrollTop = 0;
         }
       };
-      containerRef.current.addEventListener("wheel", eventHandler);
+      containerRef.current.addEventListener('wheel', eventHandler);
       return () =>
-        containerRef.current.removeEventListener("wheel", eventHandler);
+        containerRef.current.removeEventListener('wheel', eventHandler);
     }
   }, [containerRef.current, contextMenuOpen]);
 
@@ -195,17 +197,20 @@ const Screenshots = ({ instanceName }) => {
             selectedItems.length > 0 &&
             selectedItems.length < getScreenshotsCount(dateGroups)
           }
-          checked={getScreenshotsCount(dateGroups) > 0  && getScreenshotsCount(dateGroups) === selectedItems.length}
+          checked={
+            getScreenshotsCount(dateGroups) > 0 &&
+            getScreenshotsCount(dateGroups) === selectedItems.length
+          }
         />
         <div>{`${selectedItems.length} selected`}</div>
 
         <DeleteButton
           onClick={() => {
             dispatch(
-              openModal("ActionConfirmation", {
-                message: "Are you sure you want to delete this images?",
+              openModal('ActionConfirmation', {
+                message: 'Are you sure you want to delete this images?',
                 confirmCallback: deleteFile,
-                title: "Confirm"
+                title: 'Confirm'
               })
             );
           }}
@@ -247,7 +252,7 @@ const Screenshots = ({ instanceName }) => {
                           <Photo
                             onClick={() =>
                               dispatch(
-                                openModal("Screenshot", {
+                                openModal('Screenshot', {
                                   screenshotsPath,
                                   file
                                 })
@@ -287,12 +292,12 @@ const Screenshots = ({ instanceName }) => {
                           <DeleteAllButton
                             onClick={() => {
                               dispatch(
-                                openModal("ActionConfirmation", {
+                                openModal('ActionConfirmation', {
                                   message:
-                                    "Are you sure you want to delete this image?",
+                                    'Are you sure you want to delete this image?',
                                   fileName: file.name,
                                   confirmCallback: deleteFile,
-                                  title: "Confirm"
+                                  title: 'Confirm'
                                 })
                               );
                             }}
@@ -307,12 +312,12 @@ const Screenshots = ({ instanceName }) => {
                             <DeleteAllButton
                               onClick={() => {
                                 dispatch(
-                                  openModal("ActionConfirmation", {
+                                  openModal('ActionConfirmation', {
                                     message:
-                                      "Are you sure you want to delete this image?",
+                                      'Are you sure you want to delete this image?',
                                     fileName: file.name,
                                     confirmCallback: deleteFile,
-                                    title: "Confirm"
+                                    title: 'Confirm'
                                   })
                                 );
                               }}
@@ -328,12 +333,12 @@ const Screenshots = ({ instanceName }) => {
                             <MenuItem
                               onClick={() => {
                                 dispatch(
-                                  openModal("ActionConfirmation", {
+                                  openModal('ActionConfirmation', {
                                     message:
-                                      "Are you sure you want to delete this image?",
+                                      'Are you sure you want to delete this image?',
                                     fileName: file.name,
                                     confirmCallback: deleteFile,
-                                    title: "Confirm"
+                                    title: 'Confirm'
                                   })
                                 );
                               }}
@@ -359,7 +364,6 @@ const Screenshots = ({ instanceName }) => {
                               preventClose
                               onClick={async () => {
                                 if (file.size < 10485760) {
-      
                                   setUploadingFileName(file.name);
                                   try {
                                     await getImgurLink(
@@ -368,7 +372,6 @@ const Screenshots = ({ instanceName }) => {
                                       setProgressUpdate
                                     );
                                   } finally {
-                                    
                                     setUploadingFileName(null);
                                   }
                                 }
@@ -434,7 +437,7 @@ const Container = styled.div`
   background: ${props => props.theme.palette.secondary.main};
   overflow-y: auto;
   overflow-x: hidden;
-  height: ${props => (props.groupsCount !== 0 ? "auto" : "100%")};
+  height: ${props => (props.groupsCount !== 0 ? 'auto' : '100%')};
 `;
 
 const Bar = styled.div`
@@ -478,10 +481,10 @@ const DeleteButton = styled(FontAwesomeIcon)`
   &:hover {
     path {
       color: ${props =>
-        props.selectedItems.length > 0 ? props.theme.palette.colors.red : ""};
+        props.selectedItems.length > 0 ? props.theme.palette.colors.red : ''};
     }
   }
-  cursor: ${props => (props.selectedItems.length > 0 ? "pointer" : "")};
+  cursor: ${props => (props.selectedItems.length > 0 ? 'pointer' : '')};
 `;
 
 const OpenFolderButton = styled(FontAwesomeIcon)`
@@ -521,7 +524,7 @@ const LoadingSlider = styled.div`
   transform: ${props =>
     props.uploadingFileName != null
       ? `translate(${props.translateAmount}%)`
-      : "translate(-100%)"};
+      : 'translate(-100%)'};
   transition: transform 0.1s ease-in-out;
   background: ${props => props.theme.palette.primary.main};
 `;
@@ -537,7 +540,7 @@ const Photo = styled.img`
   transition: transform 0.2s ease-in-out;
   filter: brightness(80%);
   border: ${props =>
-    props.selected ? `solid 2px ${props.theme.palette.colors.blue}` : ""};
+    props.selected ? `solid 2px ${props.theme.palette.colors.blue}` : ''};
 `;
 
 const SelectCheckBoxContainer = styled.div`
@@ -582,7 +585,7 @@ const PhotoContainer = styled.div`
   transition: transform 0.2s ease-in-out;
   filter: brightness(80%);
   transform: ${props =>
-    props.selectedItems.indexOf(props.name) > -1 ? "scale(1.1)" : "scale(1)"};
+    props.selectedItems.indexOf(props.name) > -1 ? 'scale(1.1)' : 'scale(1)'};
   &:hover {
     transform: scale(1.1);
     ${SelectCheckBox} {

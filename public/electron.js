@@ -19,6 +19,14 @@ const fs = require('fs').promises;
 
 const discordRPC = require('./discordRPC');
 
+const gotTheLock = app.requestSingleInstanceLock();
+
+// Prevent multiple instances
+if (!gotTheLock) {
+  app.quit();
+  app.exit();
+}
+
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 // app.commandLine.appendSwitch("disable-web-security");
@@ -31,7 +39,7 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
   app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
 } else {
   // this defaults to app.getPath('userData'), which is fine since we only use it for setup
-  const store = new Store();
+  const store = new Store({ name: 'overrides' });
   if (store.has('userDataOverride')) {
     app.setPath('userData', store.get('userDataOverride'));
   }
@@ -62,13 +70,15 @@ function createWindow() {
     }
   });
 
-  globalShortcut.register('CommandOrControl+R', () => {
-    mainWindow.reload();
-  });
+  if (isDev) {
+    globalShortcut.register('CommandOrControl+R', () => {
+      mainWindow.reload();
+    });
 
-  globalShortcut.register('F5', () => {
-    mainWindow.reload();
-  });
+    globalShortcut.register('F5', () => {
+      mainWindow.reload();
+    });
+  }
 
   mainWindow.webContents.session.webRequest.onHeadersReceived(
     {
@@ -156,6 +166,14 @@ app.on('ready', createWindow);
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
+  }
+});
+
+app.on('second-instance', () => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
   }
 });
 

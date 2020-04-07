@@ -1,7 +1,7 @@
-import storage from 'redux-persist/lib/storage';
+import createElectronStorage from 'redux-persist-electron-storage';
 
 export default {
   key: 'root',
-  storage,
+  storage: createElectronStorage(),
   whitelist: ['settings', 'app']
 };
