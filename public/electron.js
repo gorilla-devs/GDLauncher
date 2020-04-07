@@ -331,6 +331,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
     autoUpdater.quitAndInstall(true, true);
   } else {
+    let updateSpawn;
     if (process.platform === 'win32') {
       const updaterVbs = 'updater.vbs';
       const updaterBat = 'updateLauncher.bat';
@@ -355,18 +356,23 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
           `
       );
 
-      spawn(path.join(tempFolder, updaterVbs), {
+      updateSpawn = spawn(path.join(tempFolder, updaterVbs), {
         cwd: path.dirname(app.getPath('exe')),
         detached: true,
         shell: true
       });
     } else {
       // Linux
-      const updateScript = spawn(
-        `sleep 2 && cp -lrf "${path.join(
+      updateSpawn = spawn(
+        `sleep 1 && cp -lrf "${path.join(
           tempFolder,
           'update'
-        )}"/* "." && rm -rf "${path.join(tempFolder, 'update')}"${
+        )}"/* "." && rm -rf "${path.join(
+          tempFolder,
+          'update'
+        )}" && chmod chmod +x "${app.getPath(
+          'exe'
+        )}" && chmod 755 "${app.getPath('exe')}"${
           quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`
         }`,
         {
@@ -376,8 +382,8 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
           stdio: 'ignore'
         }
       );
-      updateScript.unref();
     }
+    updateSpawn.unref();
     app.quit();
     app.exit();
   }
