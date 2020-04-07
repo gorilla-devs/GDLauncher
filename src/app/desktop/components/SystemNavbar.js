@@ -41,7 +41,7 @@ const SystemNavbar = () => {
   );
 
   const quitApp = () => {
-    if (isUpdateAvailable) {
+    if (isUpdateAvailable && process.env.NODE_ENV !== 'development') {
       ipcRenderer.invoke('installUpdateAndQuitOrRestart', true);
     } else {
       ipcRenderer.invoke('quit-app');

@@ -62,6 +62,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (process.env.NODE_ENV === 'development') return;
     setTimeout(() => {
       console.log(process.env.REACT_APP_RELEASE_TYPE);
       if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {

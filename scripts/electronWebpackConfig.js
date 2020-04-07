@@ -3,6 +3,7 @@
  */
 
 const path = require('path');
+// eslint-disable-next-line
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
