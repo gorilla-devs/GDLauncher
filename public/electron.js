@@ -363,7 +363,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
     } else {
       // Linux
       const updateScript = spawn(
-        `sleep 2 && cp -lrfv "${path.join(
+        `sleep 2 && cp -lrf "${path.join(
           tempFolder,
           'update'
         )}"/* "." && rm -rf "${path.join(tempFolder, 'update')}"${
