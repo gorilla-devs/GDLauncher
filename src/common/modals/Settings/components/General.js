@@ -361,6 +361,7 @@ const General = () => {
           value={concurrentDownloads}
           css={`
             width: 100px;
+            text-align: start;
           `}
         >
           {[...Array(20).keys()]
