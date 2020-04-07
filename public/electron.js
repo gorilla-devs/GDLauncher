@@ -362,16 +362,21 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
       });
     } else {
       // Linux
-      spawn(
-        `mv -v "${path.join(tempFolder, 'update', '*')}" "."${
+      const updateScript = spawn(
+        `sleep 2 && cp -lrf "${path.join(
+          tempFolder,
+          'update'
+        )}"/* "." && rm -rf "${path.join(tempFolder, 'update')}"${
           quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`
         }`,
         {
           cwd: path.dirname(app.getPath('exe')),
           detached: true,
-          shell: true
+          shell: true,
+          stdio: 'ignore'
         }
       );
+      updateScript.unref();
     }
     app.quit();
     app.exit();
