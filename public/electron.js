@@ -366,7 +366,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
         `sleep 2 && cp -lrfv "${path.join(
           tempFolder,
           'update'
-        )}"/* "." && rm -r "${path.join(tempFolder, 'update')}"${
+        )}"/* "." && rm -rf "${path.join(tempFolder, 'update')}"${
           quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`
         }`,
         {
