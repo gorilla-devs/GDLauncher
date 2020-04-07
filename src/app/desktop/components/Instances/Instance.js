@@ -153,19 +153,17 @@ const Instance = ({ instanceName }) => {
 
     if (days < 7) {
       if (days > 0) {
-        return days + ' d, ' + hours + ' h, ' + min + ' m';
-      } else {
-        if (hours > 0) {
-          return hours + ' h, ' + min + ' m';
-        }
-        return min + ' minutes';
+        return `${days} d, ${hours} h, ${min} m`;
       }
-    } else {
-      if (months > 0) {
-        return months + ' months';
+      if (hours > 0) {
+        return `${hours} h, ${min} m`;
       }
-      return weeks + ' weeks';
+      return `${min} minutes`;
     }
+    if (months > 0) {
+      return `${months} months`;
+    }
+    return `${weeks} weeks`;
   };
 
   useEffect(() => {
