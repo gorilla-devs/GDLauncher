@@ -157,12 +157,14 @@ const Instance = ({ instanceName }) => {
       } else {
         if (hours > 0) {
           return hours + ' h, ' + min + ' m';
-        } else return min + ' minutes';
+        }
+        return min + ' minutes';
       }
     } else {
       if (months > 0) {
         return months + ' months';
-      } else return weeks + ' weeks';
+      }
+      return weeks + ' weeks';
     }
   };
 
