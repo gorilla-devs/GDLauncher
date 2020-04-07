@@ -4,7 +4,6 @@ import withScroll from './withScroll';
 
 const Login = lazy(() => import('../views/Login'));
 const Home = lazy(() => import('../views/Home'));
-const Onboarding = lazy(() => import('../views/Onboarding'));
 
 const routes = [
   {
@@ -15,10 +14,6 @@ const routes = [
   {
     path: '/home',
     component: withScroll(AsyncComponent(Home))
-  },
-  {
-    path: '/onboarding',
-    component: AsyncComponent(Onboarding)
   }
 ];
 

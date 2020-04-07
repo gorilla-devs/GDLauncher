@@ -341,9 +341,6 @@ export function login(username, password, redirect = true) {
         }
       } else {
         dispatch(updateIsNewUser(false));
-        if (redirect) {
-          dispatch(push('/onboarding'));
-        }
       }
     } catch (err) {
       console.error(err);
@@ -437,7 +434,6 @@ export function loginThroughNativeLauncher() {
 
       if (isNewUser) {
         dispatch(updateIsNewUser(false));
-        dispatch(push('/onboarding'));
       } else {
         dispatch(push('/home'));
       }

@@ -28,9 +28,15 @@ const Home = () => {
   const dispatch = useDispatch();
   const account = useSelector(_getCurrentAccount);
   const news = useSelector(state => state.news);
+  const isNewUser = useSelector(state => state.app.isNewUser);
 
   const openAddInstanceModal = defaultPage => {
     dispatch(openModal('AddInstance', { defaultPage }));
+  };
+
+  const openWelcomePage = () => {
+    console.log('NEW', isNewUser);
+    dispatch(openModal('Onboarding'));
   };
 
   const openAccountModal = () => {
@@ -40,6 +46,11 @@ const Home = () => {
 
   useEffect(() => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
+
+    console.log('K', isNewUser);
+    if (isNewUser) {
+      openWelcomePage();
+    }
   }, [account]);
 
   const menu = (
