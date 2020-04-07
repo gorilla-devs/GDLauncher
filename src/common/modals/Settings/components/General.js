@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { ipcRenderer, clipboard } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { push } from 'connected-react-router';
 import fsa from 'fs-extra';
 import {
   faCopy,
@@ -551,11 +550,11 @@ const General = () => {
         >
           {updateAvailable ? (
             <Button
-              onClick={() => dispatch(push('/autoUpdate'))}
+              onClick={() =>
+                ipcRenderer.invoke('installUpdateAndQuitOrRestart')
+              }
               css={`
-                && {
-                  margin-right: 10px;
-                }
+                margin-right: 10px;
               `}
               type="primary"
             >

@@ -3,7 +3,6 @@ import { useDidMount } from 'rooks';
 import styled from 'styled-components';
 import { Switch } from 'react-router';
 import { ipcRenderer } from 'electron';
-import path from 'path';
 import { useSelector, useDispatch } from 'react-redux';
 import { push } from 'connected-react-router';
 import { message } from 'antd';
@@ -15,7 +14,7 @@ import {
   loginThroughNativeLauncher,
   switchToFirstValidAccount,
   checkClientToken,
-  updateAppPath
+  updateUserData
 } from '../../common/reducers/actions';
 import {
   load,
@@ -61,9 +60,8 @@ function DesktopRoot() {
   });
 
   const init = async () => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const appPathStatic = process.cwd();
-    const appPath = dispatch(updateAppPath(path.join(appPathStatic, 'data')));
+    const userDataStatic = await ipcRenderer.invoke('getUserData');
+    const userData = dispatch(updateUserData(userDataStatic));
     dispatch(checkClientToken());
     dispatch(initNews());
 
@@ -71,7 +69,7 @@ function DesktopRoot() {
 
     const manifests = await dispatch(initManifests());
     await extract7z();
-    const isLatestJava = await isLatestJavaDownloaded(manifests.java, appPath);
+    const isLatestJava = await isLatestJavaDownloaded(manifests.java, userData);
     const isJavaOK = javaPath || isLatestJava;
     if (!isJavaOK) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
@@ -83,8 +81,7 @@ function DesktopRoot() {
     } else if (currentAccount) {
       dispatch(
         load(features.mcAuthentication, dispatch(loginWithAccessToken()))
-      ).catch(async err => {
-        console.error(err);
+      ).catch(() => {
         dispatch(switchToFirstValidAccount());
       });
     } else {

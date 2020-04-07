@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -34,17 +34,21 @@
     "start-electron": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "start-prod": "electron .",
     "build-web": "cross-env-shell APP_TYPE=web craco build",
-    "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron craco build && yarn build-electron",
+    "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron CI=false craco build",
     "test": "craco test",
     "eject": "craco eject",
-    "build-electron": "cross-env-shell NODE_ENV=production webpack --config ./scripts/electronWebpackConfig.js --colors && yarn moveBuildEntryPoint",
+    "build-electron:portable": "cross-env-shell NODE_ENV=production REACT_APP_RELEASE_TYPE=portable ./node_modules/.bin/webpack --config ./scripts/electronWebpackConfig.js --colors && yarn moveBuildEntryPoint",
+    "build-electron:setup": "cross-env-shell NODE_ENV=production REACT_APP_RELEASE_TYPE=setup ./node_modules/.bin/webpack --config ./scripts/electronWebpackConfig.js --colors && yarn moveBuildEntryPoint",
     "moveBuildEntryPoint": "node ./scripts/moveNativesToBuild.js",
     "lint": "eslint .",
     "dev": "cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none \"yarn start-electron\"",
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web yarn start",
     "postinstall": "electron-builder install-app-deps && yarn rebuild && ./node_modules/.bin/electron-rebuild",
-    "rebuild": "electron-build-env neon build murmur2-calculator --release",
-    "release": "cross-env-shell NODE_ENV=production APP_TYPE=electron \"yarn build\" && electron-builder build --x64 --publish never"
+    "rebuild": "node ./scripts/buildNeonDeps.js",
+    "deploy": "node ./scripts/createDeploy.js",
+    "release:setup": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=setup \"yarn build\" && yarn build-electron:setup && yarn deploy setup",
+    "release:portable": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=portable \"yarn build\" && yarn build-electron:portable && yarn deploy portable",
+    "release": "rimraf ./deploy && yarn release:setup && yarn release:portable"
   },
   "husky": {
     "hooks": {
@@ -74,71 +78,6 @@
   "engines": {
     "node": ">=13.9.0"
   },
-  "build": {
-    "generateUpdatesFilesForAllChannels": true,
-    "productName": "GDLauncher",
-    "appId": "org.gorilladevs.GDLauncher",
-    "files": [
-      "!node_modules/**/*",
-      "build/**/*",
-      "package.json",
-      "public/icon.png"
-    ],
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "installerIcon": "./public/icon.ico",
-      "uninstallerIcon": "./public/icon.ico",
-      "installerHeader": "./public/installerHeader.bmp",
-      "installerSidebar": "./public/installerSidebar.bmp",
-      "installerHeaderIcon": "./public/icon.ico",
-      "deleteAppDataOnUninstall": true,
-      "allowToChangeInstallationDirectory": true,
-      "perMachine": false
-    },
-    "mac": {
-      "target": [
-        "dmg"
-      ],
-      "artifactName": "${productName}-mac-setup.${ext}"
-    },
-    "win": {
-      "target": [
-        "nsis"
-      ],
-      "artifactName": "${productName}-win-setup.${ext}"
-    },
-    "linux": {
-      "target": [
-        "appImage"
-      ],
-      "category": "Game",
-      "artifactName": "${productName}-linux.${ext}"
-    },
-    "directories": {
-      "buildResources": "public",
-      "output": "release"
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "gorilla-devs",
-      "repo": "GDLauncher",
-      "private": false
-    }
-  },
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -156,14 +95,14 @@
   },
   "devDependencies": {
     "7zip-bin": "^5.0.3",
-    "@ant-design/icons": "^4.0.3",
+    "@ant-design/icons": "^4.0.5",
     "@babel/cli": "^7.8.4",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-export-default-from": "^7.8.3",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
-    "@babel/preset-react": "^7.9.1",
+    "@babel/preset-react": "^7.9.4",
     "@babel/register": "^7.9.0",
     "@babel/runtime": "^7.9.2",
     "@craco/craco": "^5.6.4",
@@ -182,10 +121,10 @@
     "babel-preset-minify": "^0.5.1",
     "concurrently": "^5.1.0",
     "cross-env": "^7.0.2",
-    "electron": "^8.2.0",
+    "electron": "^8.2.1",
     "electron-build-env": "^0.2.0",
     "electron-builder": "^22.4.1",
-    "electron-builder-squirrel-windows": "^22.4.1",
+    "electron-builder-squirrel-windows": "^22.5.1",
     "electron-rebuild": "^1.10.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
@@ -194,25 +133,25 @@
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-webpack": "^0.12.1",
     "eslint-plugin-compat": "^3.5.1",
-    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-react-hooks": "^2.5.1",
+    "eslint-plugin-react-hooks": "^3.0.0",
     "native-ext-loader": "^2.3.0",
     "neon-cli": "^0.4.0",
-    "prettier": "^2.0.2",
+    "prettier": "^2.0.4",
+    "rimraf": "^3.0.2",
     "terser-webpack-plugin": "^2.3.5",
     "wait-on": "^4.0.1",
-    "webpack": "^4.41.5",
     "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "^3.3.11",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "@loadable/babel-plugin": "^5.12.0",
-    "antd": "4.0.4",
+    "antd": "4.1.1",
     "axios": "^0.19.2",
     "base64-stream": "^1.0.0",
     "bluebird": "^3.7.2",
@@ -220,7 +159,8 @@
     "connected-react-router": "^6.8.0",
     "craco-antd": "^1.14.1",
     "discord-rpc": "^3.1.0",
-    "electron-is-dev": "^1.1.0",
+    "electron-is-dev": "^1.2.0",
+    "electron-store": "^5.1.1",
     "electron-updater": "^4.2.5",
     "fs-extra": "^9.0.0",
     "get-stream": "^5.1.0",
@@ -228,7 +168,7 @@
     "husky": "^4.2.3",
     "is-electron": "^2.2.0",
     "jarfile": "^2.0.0",
-    "jimp": "^0.9.6",
+    "jimp": "^0.10.1",
     "lockfile": "^1.0.4",
     "lodash": "^4.17.15",
     "lodash.debounce": "^4.0.8",
@@ -239,13 +179,13 @@
     "memoize-one": "^5.1.1",
     "murmur2-calculator": "https://github.com/gorilla-devs/murmur2-calculator",
     "node-7z": "^2.1.1",
-    "nsfw": "^1.2.7",
+    "nsfw": "^1.2.8",
     "p-map": "^4.0.0",
     "polished": "^3.5.1",
     "ps-tree": "^1.2.0",
     "react": "^16.13.1",
     "react-beautiful-dnd": "^13.0.0",
-    "react-content-loader": "^5.0.2",
+    "react-content-loader": "^5.0.3",
     "react-contextmenu": "^2.13.0",
     "react-dom": "^16.13.1",
     "react-html-parser": "^2.0.2",
@@ -264,14 +204,14 @@
     "request-promise-native": "^1.0.8",
     "reselect": "^4.0.0",
     "rooks": "^3.6.0",
-    "semver": "^7.1.3",
+    "semver": "^7.2.1",
     "slate": "^0.57.1",
     "slate-history": "^0.57.1",
     "slate-react": "^0.57.1",
     "styled-components": "^5.0.1",
     "symlink-dir": "^3.1.2",
     "typeface-roboto": "^0.0.75",
-    "use-debounce": "^3.4.0",
-    "uuid": "^7.0.2"
+    "use-debounce": "^3.4.1",
+    "uuid": "^7.0.3"
   }
 }

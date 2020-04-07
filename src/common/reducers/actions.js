@@ -7,6 +7,8 @@ import coerce from 'semver/functions/coerce';
 import gte from 'semver/functions/gte';
 import lt from 'semver/functions/lt';
 import omitBy from 'lodash.omitby';
+import { pipeline } from 'stream';
+import zlib from 'zlib';
 import lockfile from 'lockfile';
 import omit from 'lodash.omit';
 import { extractFull } from 'node-7z';
@@ -14,6 +16,7 @@ import { push } from 'connected-react-router';
 import { spawn } from 'child_process';
 import symlink from 'symlink-dir';
 import { promises as fs } from 'fs';
+import originalFs from 'original-fs';
 import pMap from 'p-map';
 import { message } from 'antd';
 import makeDir from 'make-dir';
@@ -69,7 +72,9 @@ import {
   normalizeModData,
   reflect,
   isMod,
-  isInstanceFolderPath
+  isInstanceFolderPath,
+  getFileSha1,
+  getFilesRecursive
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -293,13 +298,13 @@ export function updateDownloadProgress(percentage) {
   };
 }
 
-export function updateAppPath(appPath) {
+export function updateUserData(userData) {
   return dispatch => {
     dispatch({
-      type: ActionTypes.UPDATE_APP_PATH,
-      path: appPath
+      type: ActionTypes.UPDATE_USERDATA,
+      path: userData
     });
-    return appPath;
+    return userData;
   };
 }
 
@@ -1453,7 +1458,7 @@ export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const javaPath = _getJavaPath(state);
-    const { appPath } = state;
+    const { userData } = state;
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
@@ -1570,16 +1575,16 @@ export function launchInstance(instanceName) {
       javaArguments
     );
 
-    const symLinkDirPath = path.join(appPath.split('\\')[0], '_gdl');
+    const symLinkDirPath = path.join(userData.split('\\')[0], '_gdl');
 
     const replaceRegex = [
       process.platform === 'win32'
-        ? new RegExp(appPath.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
+        ? new RegExp(userData.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
       symLinkDirPath
     ];
 
-    if (process.platform === 'win32') await symlink(appPath, symLinkDirPath);
+    if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
@@ -1722,3 +1727,140 @@ export function installMod(
     }
   };
 }
+
+export const checkForPortableUpdates = () => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const baseFolder = await ipcRenderer.invoke('getExecutablePath');
+
+    const { data: latestRelease } = await axios.get(
+      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/latest'
+    );
+
+    const tempFolder = path.join(_getTempPath(state), `update`);
+
+    const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
+    const isUpdateAvailable = lt(
+      installedVersion,
+      coerce(latestRelease.tag_name)
+    );
+
+    const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher-Releases/releases/download/${latestRelease.tag_name}`;
+
+    const { data: latestManifest } = await axios.get(
+      `${baseAssetUrl}/${process.platform}_latest.json`
+    );
+
+    if (isUpdateAvailable) {
+      // Cleanup all files that are not required for the update
+      await makeDir(tempFolder);
+
+      const filesToUpdate = (
+        await Promise.all(
+          latestManifest.map(async file => {
+            const fileOnDisk = path.join(baseFolder, ...file.file);
+            let needsDownload = false;
+            try {
+              // Check if files exists
+              await originalFs.promises.stat(fileOnDisk);
+
+              const fileOnDiskSha1 = await getFileSha1(fileOnDisk);
+
+              if (fileOnDiskSha1.toString() !== file.sha1) {
+                throw new Error('SHA1 Mismatch', file.compressedFile);
+              }
+            } catch (err) {
+              needsDownload = true;
+            }
+            if (needsDownload) {
+              return file;
+            }
+            return null;
+          })
+        )
+      ).filter(_ => _);
+
+      const tempFiles = await getFilesRecursive(tempFolder);
+      await Promise.all(
+        tempFiles.map(async tempFile => {
+          const tempFileRelativePath = path.relative(tempFolder, tempFile);
+          const isNeeded = filesToUpdate.find(
+            v => path.join(...v.file) === tempFileRelativePath
+          );
+          if (!isNeeded) {
+            await fse.remove(tempFile);
+          }
+        })
+      );
+
+      await pMap(
+        filesToUpdate,
+        async file => {
+          const compressedFile = path.join(tempFolder, file.compressedFile);
+          const destinationPath = path.join(tempFolder, ...file.file);
+          try {
+            // Check if files exists
+            await originalFs.promises.access(destinationPath);
+            const fileSha1 = await getFileSha1(destinationPath);
+            if (fileSha1.toString() !== file.sha1) {
+              throw new Error('SHA1 mismatch', file.compressedFile);
+            }
+          } catch {
+            try {
+              try {
+                await originalFs.promises.access(compressedFile);
+                const fileSha1 = await getFileSha1(compressedFile);
+                if (fileSha1.toString() === file.sha1) {
+                  return;
+                }
+              } catch {
+                // Nothing, just go ahead and download since sha1 mismatch
+              }
+
+              // Try to download 5 times
+              const maxTries = 5;
+              let sha1Matched = false;
+              while (maxTries <= 5 && !sha1Matched) {
+                // eslint-disable-next-line
+                await downloadFile(
+                  compressedFile,
+                  `${baseAssetUrl}/${file.compressedFile}`
+                );
+                // eslint-disable-next-line
+                const fileSha1 = await getFileSha1(compressedFile);
+                if (fileSha1.toString() === file.compressedSha1) {
+                  sha1Matched = true;
+                }
+              }
+
+              if (!sha1Matched) {
+                throw new Error(`Could not download ${file.compressedSha1}`);
+              }
+
+              const gzip = zlib.createGunzip();
+              const source = originalFs.createReadStream(compressedFile);
+
+              await makeDir(path.dirname(destinationPath));
+              const destination = originalFs.createWriteStream(destinationPath);
+
+              await new Promise((resolve, reject) => {
+                pipeline(source, gzip, destination, err => {
+                  if (err) {
+                    reject(err);
+                  }
+                  resolve();
+                });
+              });
+
+              await fse.remove(compressedFile);
+            } catch (err) {
+              throw new Error(err);
+            }
+          }
+        },
+        { concurrency: 3 }
+      );
+    }
+    return isUpdateAvailable;
+  };
+};
