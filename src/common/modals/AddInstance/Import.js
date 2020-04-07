@@ -1,18 +1,18 @@
 /* eslint-disable */
-import React, { useState } from "react";
-import styled from "styled-components";
-import path from "path";
-import fse from "fs-extra";
-import { promises as fs } from "fs";
-import { extractFull } from "node-7z";
-import { get7zPath, isMod } from "../../../app/desktop/utils";
-import { ipcRenderer } from "electron";
-import { Button, Input } from "antd";
-import { _getTempPath } from "../../utils/selectors";
-import { useSelector } from "react-redux";
-import { getAddon } from "../../api";
-import { downloadFile } from "../../../app/desktop/utils/downloader";
-import { FABRIC, FORGE } from "../../utils/constants";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import path from 'path';
+import fse from 'fs-extra';
+import { promises as fs } from 'fs';
+import { extractFull } from 'node-7z';
+import { get7zPath, isMod } from '../../../app/desktop/utils';
+import { ipcRenderer } from 'electron';
+import { Button, Input } from 'antd';
+import { _getTempPath } from '../../utils/selectors';
+import { useSelector } from 'react-redux';
+import { getAddon, getAddonFiles } from '../../api';
+import { downloadFile } from '../../../app/desktop/utils/downloader';
+import { FABRIC, FORGE } from '../../utils/constants';
 
 const Import = ({
   setModpack,
@@ -22,16 +22,15 @@ const Import = ({
   setOverrideNextStepOnClick
 }) => {
   const tempPath = useSelector(_getTempPath);
-  const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
   const openFileDialog = async () => {
-    const dialog = await ipcRenderer.invoke("openFileDialog");
+    const dialog = await ipcRenderer.invoke('openFileDialog');
     if (dialog.canceled) return;
     setImportZipPath(dialog.filePaths[0]);
   };
 
   const onClick = async () => {
-    if (loading) return;
+    if (loading || !importZipPath) return;
     setLoading(true);
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
     const isUrlRegex = urlRegex.test(importZipPath);
@@ -53,9 +52,9 @@ const Import = ({
 
     const sevenZipPath = await get7zPath();
     try {
-      await fs.access(path.join(tempPath, "manifest.json"));
+      await fs.access(path.join(tempPath, 'manifest.json'));
     } catch {
-      await fse.remove(path.join(tempPath, "manifest.json"));
+      await fse.remove(path.join(tempPath, 'manifest.json'));
     }
     const extraction = extractFull(
       isUrlRegex ? tempFilePath : importZipPath,
@@ -64,46 +63,46 @@ const Import = ({
         recursive: true,
         $bin: sevenZipPath,
         yes: true,
-        $cherryPick: "manifest.json",
+        $cherryPick: 'manifest.json',
         $progress: true
       }
     );
     await new Promise((resolve, reject) => {
-      extraction.on("progress", ({ percent }) => {
-        if (progress !== percent) setProgress(percent);
-      });
-      extraction.on("end", () => {
-        setProgress(100);
+      extraction.on('end', () => {
         resolve();
       });
-      extraction.on("error", err => {
+      extraction.on('error', err => {
         reject(err.stderr);
       });
     });
-    const manifest = await fse.readJson(path.join(tempPath, "manifest.json"));
-    await fse.remove(path.join(tempPath, "manifest.json"));
+    const manifest = await fse.readJson(path.join(tempPath, 'manifest.json'));
+    await fse.remove(path.join(tempPath, 'manifest.json'));
     let addon = null;
     if (manifest.projectID) {
       const { data } = await getAddon(manifest.projectID);
       addon = data;
       setModpack(addon);
+    } else {
+      setModpack({ name: manifest.name });
     }
     const isForge = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes("forge") && v.primary
+      v => v.id.includes('forge') && v.primary
     );
 
     const isFabric = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes("fabric") && v.primary
+      v => v.id.includes('fabric') && v.primary
     );
 
     if (!isForge && !isFabric) return;
 
-    setVersion([
-      isForge ? FORGE : FABRIC,
-      manifest.projectID,
-      // FIXME -> Cannot assume this version
-      (addon?.latestFiles || [])[(addon?.latestFiles?.length || -1) - 1]?.id
-    ]);
+    const modloader = [isForge ? FORGE : FABRIC];
+
+    if (manifest.projectID) {
+      modloader.push(manifest.projectID);
+      modloader.push(null);
+    }
+
+    setVersion(modloader);
     if (isUrlRegex) {
       setImportZipPath(tempFilePath);
     }

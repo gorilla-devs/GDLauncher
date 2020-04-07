@@ -1,17 +1,18 @@
 /* eslint-disable */
-import React, { useMemo, useState } from "react";
-import styled from "styled-components";
-import { Transition } from "react-transition-group";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useMemo, useState } from 'react';
+import styled from 'styled-components';
+import { Transition } from 'react-transition-group';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faLongArrowAltLeft,
   faLongArrowAltRight
-} from "@fortawesome/free-solid-svg-icons";
-import { transparentize } from "polished";
-import { Input } from "antd";
-import TwitchModpacks from "./TwitchModpacks";
-import Import from "./Import";
-import NewInstance from "./NewInstance";
+} from '@fortawesome/free-solid-svg-icons';
+import { LoadingOutlined } from '@ant-design/icons';
+import { transparentize } from 'polished';
+import { Input, Spin } from 'antd';
+import TwitchModpacks from './TwitchModpacks';
+import Import from './Import';
+import NewInstance from './NewInstance';
 
 const Content = ({
   in: inProp,
@@ -24,6 +25,7 @@ const Content = ({
   setImportZipPath
 }) => {
   const [overrideNextStepOnClick, setOverrideNextStepOnClick] = useState(null);
+  const [loading, setLoading] = useState(false);
   let pages = [
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
     <TwitchModpacks
@@ -79,6 +81,7 @@ const Content = ({
                   transition: 0.1s ease-in-out;
                   display: flex;
                   justify-content: center;
+                  align-items: center;
                   border-radius: 4px;
                   font-size: 40px;
                   color: ${props =>
@@ -87,25 +90,35 @@ const Content = ({
                       : props.theme.palette.text.disabled};
                   ${props =>
                     props.version || props.importZipPath
-                      ? "cursor: pointer;"
-                      : ""}
+                      ? 'cursor: pointer;'
+                      : ''}
                   &:hover {
                     background-color: ${props =>
                       props.version || props.importZipPath
                         ? props.theme.action.hover
-                        : "transparent"};
+                        : 'transparent'};
                   }
                 `}
                 onClick={async () => {
                   if (overrideNextStepOnClick) {
+                    setLoading(true);
                     await overrideNextStepOnClick();
+                    setLoading(false);
                   }
                   if (version || importZipPath) {
                     setStep(1);
                   }
                 }}
               >
-                <FontAwesomeIcon icon={faLongArrowAltRight} />
+                {loading ? (
+                  <Spin
+                    indicator={
+                      <LoadingOutlined style={{ fontSize: 24 }} spin />
+                    }
+                  />
+                ) : (
+                  <FontAwesomeIcon icon={faLongArrowAltRight} />
+                )}
               </div>
             </div>
           </div>
@@ -132,6 +145,6 @@ const Animation = styled.div`
   height: 100%;
   will-change: transform;
   transform: translateX(
-    ${({ state }) => (state === "exiting" || state === "exited" ? -100 : 0)}%
+    ${({ state }) => (state === 'exiting' || state === 'exited' ? -100 : 0)}%
   );
 `;

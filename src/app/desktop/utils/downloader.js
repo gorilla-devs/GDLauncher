@@ -91,7 +91,9 @@ export const downloadFile = async (fileName, url, onProgress) => {
 
     const req = reqCall({
       method: 'GET',
-      uri: url
+      uri: url,
+      followRedirect: true,
+      followAllRedirects: true
     });
     const out = fss.createWriteStream(fileName);
     req.pipe(out);
