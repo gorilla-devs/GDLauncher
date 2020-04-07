@@ -370,11 +370,9 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
         )}"/* "." && rm -rf "${path.join(
           tempFolder,
           'update'
-        )}" && chmod chmod +x "${app.getPath(
+        )}" && chmod +x "${app.getPath('exe')}" && chmod 755 "${app.getPath(
           'exe'
-        )}" && chmod 755 "${app.getPath('exe')}"${
-          quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`
-        }`,
+        )}"${quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`}`,
         {
           cwd: path.dirname(app.getPath('exe')),
           detached: true,
