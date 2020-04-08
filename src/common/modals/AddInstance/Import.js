@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import fse from 'fs-extra';
@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { getAddon, getAddonFiles } from '../../api';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
 import { FABRIC, FORGE } from '../../utils/constants';
+import { transparentize } from 'polished';
 
 const Import = ({
   setModpack,
@@ -21,21 +22,32 @@ const Import = ({
   setImportZipPath,
   setOverrideNextStepOnClick
 }) => {
+  const [localValue, setLocalValue] = useState(null);
   const tempPath = useSelector(_getTempPath);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setError(false);
+  }, [importZipPath]);
+
+  useEffect(() => {
+    setImportZipPath(localValue);
+  }, [localValue]);
+
   const openFileDialog = async () => {
     const dialog = await ipcRenderer.invoke('openFileDialog');
     if (dialog.canceled) return;
-    setImportZipPath(dialog.filePaths[0]);
+    setLocalValue(dialog.filePaths[0]);
   };
 
   const onClick = async () => {
-    if (loading || !importZipPath) return;
+    if (loading || !localValue) return;
     setLoading(true);
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
-    const isUrlRegex = urlRegex.test(importZipPath);
+    const isUrlRegex = urlRegex.test(localValue);
 
-    const tempFilePath = path.join(tempPath, path.basename(importZipPath));
+    const tempFilePath = path.join(tempPath, path.basename(localValue));
 
     if (isUrlRegex) {
       try {
@@ -44,9 +56,12 @@ const Import = ({
         await fse.remove(tempFilePath);
       }
       try {
-        await downloadFile(tempFilePath, importZipPath);
+        await downloadFile(tempFilePath, localValue);
       } catch (err) {
         console.error(err);
+        setError(true);
+        setLoading(false);
+        return;
       }
     }
 
@@ -57,14 +72,13 @@ const Import = ({
       await fse.remove(path.join(tempPath, 'manifest.json'));
     }
     const extraction = extractFull(
-      isUrlRegex ? tempFilePath : importZipPath,
+      isUrlRegex ? tempFilePath : localValue,
       tempPath,
       {
         recursive: true,
         $bin: sevenZipPath,
         yes: true,
-        $cherryPick: 'manifest.json',
-        $progress: true
+        $cherryPick: 'manifest.json'
       }
     );
     await new Promise((resolve, reject) => {
@@ -72,6 +86,8 @@ const Import = ({
         resolve();
       });
       extraction.on('error', err => {
+        setError(true);
+        setLoading(false);
         reject(err.stderr);
       });
     });
@@ -93,7 +109,11 @@ const Import = ({
       v => v.id.includes('fabric') && v.primary
     );
 
-    if (!isForge && !isFabric) return;
+    if (!isForge && !isFabric) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
 
     const modloader = [isForge ? FORGE : FABRIC];
 
@@ -107,6 +127,7 @@ const Import = ({
       setImportZipPath(tempFilePath);
     }
     setLoading(false);
+    setError(false);
   };
 
   setOverrideNextStepOnClick(() => onClick);
@@ -124,8 +145,8 @@ const Import = ({
           <Input
             disabled={loading}
             placeholder="http://"
-            value={importZipPath}
-            onChange={e => setImportZipPath(e.target.value)}
+            value={localValue}
+            onChange={e => setLocalValue(e.target.value)}
             css={`
               width: 400px;
               margin-right: 10px;
@@ -134,6 +155,24 @@ const Import = ({
           <Button disabled={loading} type="primary" onClick={openFileDialog}>
             Browse
           </Button>
+        </div>
+        <div
+          show={error}
+          css={`
+            opacity: ${props => (props.show ? 1 : 0)};
+            color: ${props => props.theme.palette.error.main};
+            font-weight: 700;
+            font-size: 14px;
+            padding: 3px;
+            height: 30px;
+            margin-top: 10px;
+            text-align: center;
+            border-radius: ${props => props.theme.shape.borderRadius};
+            background: ${props =>
+              transparentize(0.7, props.theme.palette.grey[700])};
+          `}
+        >
+          {error && 'There was an issue while importing.'}
         </div>
       </div>
     </Container>

@@ -1170,114 +1170,130 @@ export const startListener = () => {
       oldInstanceName,
       newFilePath
     ) => {
-      const newState = getState();
-      const instances = newState.instances.list;
-      const modData = instances[oldInstanceName].mods.find(
-        m => m.fileName === path.basename(fileName)
-      );
-      if (modData) {
-        try {
-          console.log('[RTS] RENAMING MOD', fileName, newFilePath, modData);
-          await dispatch(
-            updateInstanceConfig(oldInstanceName, prev => ({
-              ...prev,
-              mods: [
-                ...(prev.mods || []).filter(
-                  m => m.fileName !== path.basename(fileName)
-                ),
-                { ...modData, fileName: path.basename(newFilePath) }
-              ]
-            }))
-          );
-        } catch (err) {
-          console.error(err);
+      const processChange = async () => {
+        const newState = getState();
+        const instances = newState.instances.list;
+        const modData = instances[oldInstanceName].mods.find(
+          m => m.fileName === path.basename(fileName)
+        );
+        if (modData) {
+          try {
+            console.log('[RTS] RENAMING MOD', fileName, newFilePath, modData);
+            await dispatch(
+              updateInstanceConfig(oldInstanceName, prev => ({
+                ...prev,
+                mods: [
+                  ...(prev.mods || []).filter(
+                    m => m.fileName !== path.basename(fileName)
+                  ),
+                  { ...modData, fileName: path.basename(newFilePath) }
+                ]
+              }))
+            );
+          } catch (err) {
+            console.error(err);
+          }
         }
-      }
+      };
+      Queue.add(processChange);
     };
 
     const processAddedInstance = async instanceName => {
-      const newState = getState();
-      const instance = _getInstance(newState)(instanceName);
-      if (!instance) {
-        const configPath = path.join(
-          instancesPath,
-          instanceName,
-          'config.json'
-        );
-        try {
-          const config = await fse.readJSON(configPath);
-          console.log('[RTS] ADDING INSTANCE', instanceName);
-          dispatch({
-            type: ActionTypes.UPDATE_INSTANCES,
-            instances: {
-              ...newState.instances.list,
-              [instanceName]: { ...config, name: instanceName }
-            }
-          });
-        } catch (err) {
-          console.warn(err);
+      const processChange = async () => {
+        const newState = getState();
+        const instance = _getInstance(newState)(instanceName);
+        if (!instance) {
+          const configPath = path.join(
+            instancesPath,
+            instanceName,
+            'config.json'
+          );
+          try {
+            const config = await fse.readJSON(configPath);
+            console.log('[RTS] ADDING INSTANCE', instanceName);
+            dispatch({
+              type: ActionTypes.UPDATE_INSTANCES,
+              instances: {
+                ...newState.instances.list,
+                [instanceName]: { ...config, name: instanceName }
+              }
+            });
+          } catch (err) {
+            console.warn(err);
+          }
         }
-      }
+      };
+      Queue.add(processChange);
     };
 
     const processRemovedInstance = instanceName => {
-      const newState = getState();
-      if (_getInstance(newState)(instanceName)) {
-        console.log('[RTS] REMOVING INSTANCE', instanceName);
-        dispatch({
-          type: ActionTypes.UPDATE_INSTANCES,
-          instances: omit(newState.instances.list, [instanceName])
-        });
-      }
+      const processChange = async () => {
+        const newState = getState();
+        if (_getInstance(newState)(instanceName)) {
+          console.log('[RTS] REMOVING INSTANCE', instanceName);
+          dispatch({
+            type: ActionTypes.UPDATE_INSTANCES,
+            instances: omit(newState.instances.list, [instanceName])
+          });
+        }
+      };
+      Queue.add(processChange);
     };
 
     const processRenamedInstance = async (oldInstanceName, newInstanceName) => {
-      const newState = getState();
-      const instance = _getInstance(newState)(newInstanceName);
-
-      if (!instance) {
-        try {
-          const configPath = path.join(
-            instancesPath,
-            newInstanceName,
-            'config.json'
-          );
-          const config = await fse.readJSON(configPath);
-          console.log(
-            `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
-          );
-          dispatch({
-            type: ActionTypes.UPDATE_INSTANCES,
-            instances: {
-              ...omit(newState.instances.list, [oldInstanceName]),
-              [newInstanceName]: { ...config, name: newInstanceName }
-            }
-          });
-
-          const instanceManagerModalIndex = newState.modals.findIndex(
-            x =>
-              x.modalType === 'InstanceManager' &&
-              x.modalProps.instanceName === oldInstanceName
-          );
-
-          dispatch({
-            type: UPDATE_MODAL,
-            modals: [
-              ...newState.modals.slice(0, instanceManagerModalIndex),
-              {
-                modalType: 'InstanceManager',
-                modalProps: { instanceName: newInstanceName }
-              },
-              ...newState.modals.slice(instanceManagerModalIndex + 1)
-            ]
-          });
-        } catch (err) {
-          console.error(err);
+      const processChange = async () => {
+        const newState = getState();
+        const instance = _getInstance(newState)(newInstanceName);
+  
+        if (!instance) {
+          try {
+            const configPath = path.join(
+              instancesPath,
+              newInstanceName,
+              'config.json'
+            );
+            const config = await fse.readJSON(configPath);
+            console.log(
+              `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
+            );
+            dispatch({
+              type: ActionTypes.UPDATE_INSTANCES,
+              instances: {
+                ...omit(newState.instances.list, [oldInstanceName]),
+                [newInstanceName]: { ...config, name: newInstanceName }
+              }
+            });
+  
+            const instanceManagerModalIndex = newState.modals.findIndex(
+              x =>
+                x.modalType === 'InstanceManager' &&
+                x.modalProps.instanceName === oldInstanceName
+            );
+  
+            dispatch({
+              type: UPDATE_MODAL,
+              modals: [
+                ...newState.modals.slice(0, instanceManagerModalIndex),
+                {
+                  modalType: 'InstanceManager',
+                  modalProps: { instanceName: newInstanceName }
+                },
+                ...newState.modals.slice(instanceManagerModalIndex + 1)
+              ]
+            });
+          } catch (err) {
+            console.error(err);
+          }
         }
       }
+      Queue.add(processChange);
     };
 
     ipcRenderer.on('listener-events', async (e, events) => {
+      console.log(
+        JSON.parse(JSON.stringify(events)),
+        JSON.parse(JSON.stringify(changesTracker))
+      );
       await Promise.all(
         events.map(async event => {
           // Using oldFile instead of newFile is intentional.

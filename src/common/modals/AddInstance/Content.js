@@ -102,8 +102,11 @@ const Content = ({
                 onClick={async () => {
                   if (overrideNextStepOnClick) {
                     setLoading(true);
-                    await overrideNextStepOnClick();
-                    setLoading(false);
+                    try {
+                      await overrideNextStepOnClick();
+                    } finally {
+                      setLoading(false);
+                    }
                   }
                   if (version || importZipPath) {
                     setStep(1);
