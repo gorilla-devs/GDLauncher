@@ -1,12 +1,12 @@
 import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
-import { Select } from 'antd';
+import { Select, Button } from 'antd';
 import ReactHtmlParser from 'react-html-parser';
 import { getAddonFiles, getAddonFileChangelog } from '../../api';
 
 const Modpack = ({ modpackId }) => {
   const [files, setFiles] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const initData = async () => {
@@ -140,6 +140,9 @@ const Modpack = ({ modpackId }) => {
         {files[selectedIndex]?.changelog &&
           ReactHtmlParser(files[selectedIndex]?.changelog)}
       </Changelog>
+      <Button type="primary" disabled={selectedIndex === null}>
+        Switch Version
+      </Button>
     </Container>
   );
 };
@@ -148,11 +151,15 @@ export default memo(Modpack);
 
 const Container = styled.div`
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const StyledSelect = styled(Select)`
   width: 650px;
   height: 50px;
+  margin-top: 20px;
   .ant-select-selection-placeholder {
     height: 50px !important;
     line-height: 50px !important;
@@ -178,13 +185,13 @@ const StyledSelect = styled(Select)`
 const Changelog = styled.div`
   perspective: 1px;
   transform-style: preserve-3d;
-  height: calc(100% - 120px);
+  height: calc(100% - 160px);
   background: ${props => props.theme.palette.grey[900]};
   width: calc(100% - 80px);
   word-break: break-all;
   overflow-x: hidden;
   overflow-y: scroll;
-  margin: 40px;
+  margin: 20px 40px;
   padding: 20px;
   font-size: 20px;
   & > div:first-child {

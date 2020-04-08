@@ -167,7 +167,7 @@ const Overview = ({ instanceName }) => {
             <FontAwesomeIcon icon={faSave} />
           </RenameButton>
         </RenameRow>
-        <JavaManagerCard title="Java Manager">
+        <JavaManagerCard title="Override Java Settings">
           <JavaManagerRow>
             <div>Game Resolution</div>
             <Switch
