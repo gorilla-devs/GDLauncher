@@ -1,9 +1,9 @@
 import makeDir from 'make-dir';
 import fss from 'fs';
-import reqCall from 'request';
+import axios from 'axios';
 import pMap from 'p-map';
 import path from 'path';
-import request from 'request-promise-native';
+import adapter from 'axios/lib/adapters/http';
 import computeFileHash from './computeFileHash';
 
 const fs = fss.promises;
@@ -68,11 +68,38 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
       if (legacyPath) await makeDir(path.dirname(legacyPath));
     }
 
-    const file = await request(url, { encoding: 'binary' });
-    await fs.writeFile(fileName, file, 'binary');
+    const { data } = await axios.get(url, {
+      responseType: 'stream',
+      responseEncoding: null,
+      adapter
+    });
+    const wStream = fss.createWriteStream(fileName, {
+      encoding: null
+    });
+
+    data.pipe(wStream);
+    let wStreamLegacy;
     if (legacyPath) {
-      await fs.writeFile(legacyPath, file, 'binary');
+      wStreamLegacy = fss.createWriteStream(legacyPath, {
+        encoding: null
+      });
+      data.pipe(wStreamLegacy);
     }
+
+    await new Promise((resolve, reject) => {
+      data.on('error', err => {
+        console.error(err);
+        reject(err);
+      });
+
+      data.on('end', () => {
+        wStream.end();
+        if (legacyPath) {
+          wStreamLegacy.end();
+        }
+        resolve();
+      });
+    });
     return true;
   } catch (e) {
     console.error(
@@ -84,39 +111,34 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
 
 export const downloadFile = async (fileName, url, onProgress) => {
   await makeDir(path.dirname(fileName));
+
+  const { data, headers } = await axios.get(url, {
+    responseType: 'stream',
+    responseEncoding: null,
+    adapter
+  });
+  const out = fss.createWriteStream(fileName, { encoding: null });
+  data.pipe(out);
+
+  // Save variable to know progress
+  let receivedBytes = 0;
+  const totalBytes = parseInt(headers['content-length'], 10);
+
+  data.on('data', chunk => {
+    // Update the received bytes
+    receivedBytes += chunk.length;
+    if (onProgress) {
+      onProgress(((receivedBytes * 100) / totalBytes).toFixed(1));
+    }
+  });
+
   return new Promise((resolve, reject) => {
-    // Save variable to know progress
-    let receivedBytes = 0;
-    let totalBytes = 0;
-
-    const req = reqCall({
-      method: 'GET',
-      uri: url,
-      followRedirect: true,
-      followAllRedirects: true
-    });
-    const out = fss.createWriteStream(fileName);
-    req.pipe(out);
-
-    req.on('response', data => {
-      // Change the total bytes value to get progress later.
-      totalBytes = parseInt(data.headers['content-length'], 10);
-    });
-
-    req.on('data', chunk => {
-      // Update the received bytes
-      receivedBytes += chunk.length;
-      if (onProgress) {
-        onProgress(((receivedBytes * 100) / totalBytes).toFixed(1));
-      }
-    });
-
-    req.on('end', () => {
-      req.end();
+    data.on('end', () => {
+      out.end();
       resolve();
     });
 
-    req.on('error', () => {
+    data.on('error', () => {
       reject();
     });
   });

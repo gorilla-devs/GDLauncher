@@ -75,7 +75,6 @@ const Modpack = ({ modpackId }) => {
     <Container>
       <div
         css={`
-          flex: 1;
           display: flex;
           justify-content: center;
         `}
@@ -182,6 +181,7 @@ const Changelog = styled.div`
   height: calc(100% - 120px);
   background: ${props => props.theme.palette.grey[900]};
   width: calc(100% - 80px);
+  word-break: break-all;
   overflow-x: hidden;
   overflow-y: scroll;
   margin: 40px;

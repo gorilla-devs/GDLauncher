@@ -7,6 +7,7 @@
 // };
 
 const CracoAntDesignPlugin = require('craco-antd');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = ({ env }) => {
   const isEnvDevelopment = env === 'development';
@@ -67,6 +68,15 @@ module.exports = ({ env }) => {
             ? 'static/js/[name].chunk.js'
             : isEnvDevelopment && 'static/js/[name].chunk.js'
         }
+      },
+      optimization: {
+        minimizer: [
+          new TerserPlugin({
+            parallel: true,
+            sourceMap: true,
+            cache: true
+          })
+        ]
       }
     },
     plugins: [

@@ -32,7 +32,7 @@ const Import = ({
   }, [importZipPath]);
 
   useEffect(() => {
-    setImportZipPath(localValue);
+    setImportZipPath(localValue?.length > 0 ? localValue : null);
   }, [localValue]);
 
   const openFileDialog = async () => {

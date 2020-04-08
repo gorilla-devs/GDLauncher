@@ -32,6 +32,7 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 // app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
 
