@@ -85,6 +85,11 @@ function java(
       return { ...state, memory: action.memory };
     case ActionTypes.UPDATE_JAVA_PATH:
       return { ...state, path: action.path };
+    case ActionTypes.UPDATE_RESOLUTION:
+      return {
+        ...state,
+        resolution: action.resolution
+      };
     default:
       return state;
   }

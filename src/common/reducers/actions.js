@@ -1474,10 +1474,11 @@ export function launchInstance(instanceName) {
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
-    const { memory, args } = state.settings.java;
-    const { modloader, javaArgs, javaMemory } = _getInstance(state)(
+    const { memory, args, resolution: gameResolution } = state.settings.java;
+    const { modloader, javaArgs, javaMemory, resolution } = _getInstance(state)(
       instanceName
     );
+
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
     const instanceJLFPath = path.join(
@@ -1574,6 +1575,9 @@ export function launchInstance(instanceName) {
 
     const javaArguments = (javaArgs !== undefined ? javaArgs : args).split(' ');
     const javaMem = javaMemory !== undefined ? javaMemory : memory;
+    const resol = resolution !== undefined ? resolution : gameResolution;
+
+    console.log('REE', resol, resolution, javaMemory, gameResolution, memory);
 
     const jvmArguments = getJvmArguments(
       libraries,
@@ -1583,6 +1587,7 @@ export function launchInstance(instanceName) {
       mcJson,
       account,
       javaMem,
+      resol,
       false,
       javaArguments
     );
@@ -1607,6 +1612,7 @@ export function launchInstance(instanceName) {
         mcJson,
         account,
         javaMem,
+        resol,
         true,
         javaArguments
       ).join(' ')}`.replace(...replaceRegex)

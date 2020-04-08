@@ -65,6 +65,22 @@ const JavaArgumentsResetButton = styled(Button)`
   margin-left: 20px;
 `;
 
+const ResolutionInputContainer = styled.div`
+  margin: 10px 0 20px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  div {
+    width: 200px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+`;
+
 const marks = {
   2048: '2048 MB',
   4096: '4096 MB',
@@ -86,6 +102,11 @@ const Overview = ({ instanceName }) => {
     config?.javaArgs
   );
   const [newName, setNewName] = useState(instanceName);
+  const [height, setHeight] = useState(config?.resolution?.height);
+  const [width, setWidth] = useState(config?.resolution?.width);
+  const [gameResolutionSwitch, setGameResolutionSwitch] = useState(
+    config?.resolution?.height || config?.resolution?.width
+  );
 
   const dispatch = useDispatch();
 
@@ -103,6 +124,15 @@ const Overview = ({ instanceName }) => {
       updateInstanceConfig(instanceName, prev => ({
         ...prev,
         javaArgs: v
+      }))
+    );
+  };
+
+  const updateGameResolution = (h, w) => {
+    dispatch(
+      updateInstanceConfig(instanceName, prev => ({
+        ...prev,
+        resolution: { height: h, width: w }
       }))
     );
   };
@@ -138,6 +168,67 @@ const Overview = ({ instanceName }) => {
           </RenameButton>
         </RenameRow>
         <JavaManagerCard title="Java Manager">
+          <JavaManagerRow>
+            <div>Game Resolution</div>
+            <Switch
+              checked={gameResolutionSwitch}
+              onChange={v => {
+                setGameResolutionSwitch(v);
+                if (!v) {
+                  dispatch(
+                    updateInstanceConfig(instanceName, prev =>
+                      omit(prev, ['resolution'])
+                    )
+                  );
+                } else if (v) {
+                  updateGameResolution(800, 600);
+                  setHeight(800);
+                  setWidth(600);
+                }
+              }}
+            />
+          </JavaManagerRow>
+          {gameResolutionSwitch && (
+            <ResolutionInputContainer>
+              <div>
+                <Input
+                  placeholder="height"
+                  value={height}
+                  onChange={e => {
+                    const h = e.target.value;
+                    setHeight(h);
+                    dispatch(
+                      updateInstanceConfig(instanceName, prev => ({
+                        ...prev,
+                        resolution: {
+                          h,
+                          width
+                        }
+                      }))
+                    );
+                  }}
+                />
+                &nbsp;X&nbsp;
+                <Input
+                  placeholder="width"
+                  value={width}
+                  onChange={e => {
+                    const w = e.target.value;
+                    setWidth(w);
+                    dispatch(
+                      updateInstanceConfig(instanceName, prev => ({
+                        ...prev,
+                        resolution: {
+                          height,
+                          w
+                        }
+                      }))
+                    );
+                  }}
+                />
+              </div>
+            </ResolutionInputContainer>
+          )}
           <JavaManagerRow>
             <div>Java Memory</div>
             <Switch

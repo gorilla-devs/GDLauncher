@@ -54,6 +54,15 @@ export function updateShowChangelog(show) {
   };
 }
 
+export function updateResolution(resolution) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_RESOLUTION,
+      resolution
+    });
+  };
+}
+
 export function updateJavaPath(path) {
   return dispatch => {
     dispatch({
