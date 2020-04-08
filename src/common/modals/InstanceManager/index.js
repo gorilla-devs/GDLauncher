@@ -10,6 +10,7 @@ import Mods from './Mods';
 import { useSelector } from 'react-redux';
 import { _getInstance } from '../../utils/selectors';
 import { FORGE, FABRIC } from '../../utils/constants';
+import Modpack from './Modpack';
 
 const SideMenu = styled.div`
   display: flex;
@@ -71,7 +72,7 @@ const InstanceManager = ({ instanceName }) => {
   const menuEntries = {
     overview: { name: 'Overview', component: Overview },
     mods: { name: 'Mods', component: Mods },
-    modpack: { name: 'Modpack', component: Overview },
+    modpack: { name: 'Modpack', component: Modpack },
     notes: { name: 'Notes', component: Notes },
     // resourcePacks: { name: "Resource Packs", component: Overview },
     // worlds: { name: "Worlds", component: Overview },
@@ -103,7 +104,7 @@ const InstanceManager = ({ instanceName }) => {
                   instance?.modloader[0] !== FORGE &&
                   instance?.modloader[0] !== FABRIC) ||
                 (tab.name === menuEntries.modpack.name &&
-                  (!instance?.modloader[3] || !instance?.modloader[4]))
+                  !instance?.modloader[3])
               ) {
                 return null;
               }
@@ -120,7 +121,10 @@ const InstanceManager = ({ instanceName }) => {
           </SideMenu>
         </SideMenuContainer>
         <Content>
-          <ContentComponent instanceName={instanceName} />
+          <ContentComponent
+            instanceName={instanceName}
+            modpackId={instance?.modloader[3]}
+          />
         </Content>
       </Container>
     </Modal>

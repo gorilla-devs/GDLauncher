@@ -1244,7 +1244,7 @@ export const startListener = () => {
       const processChange = async () => {
         const newState = getState();
         const instance = _getInstance(newState)(newInstanceName);
-  
+
         if (!instance) {
           try {
             const configPath = path.join(
@@ -1263,13 +1263,13 @@ export const startListener = () => {
                 [newInstanceName]: { ...config, name: newInstanceName }
               }
             });
-  
+
             const instanceManagerModalIndex = newState.modals.findIndex(
               x =>
                 x.modalType === 'InstanceManager' &&
                 x.modalProps.instanceName === oldInstanceName
             );
-  
+
             dispatch({
               type: UPDATE_MODAL,
               modals: [
@@ -1285,15 +1285,11 @@ export const startListener = () => {
             console.error(err);
           }
         }
-      }
+      };
       Queue.add(processChange);
     };
 
     ipcRenderer.on('listener-events', async (e, events) => {
-      console.log(
-        JSON.parse(JSON.stringify(events)),
-        JSON.parse(JSON.stringify(changesTracker))
-      );
       await Promise.all(
         events.map(async event => {
           // Using oldFile instead of newFile is intentional.

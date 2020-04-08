@@ -135,7 +135,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                     </div>
                     <div
                       css={`
-                        flex: 2;
+                        flex: 3;
                         display: flex;
                         align-items: center;
                       `}
@@ -211,7 +211,7 @@ const Container = styled.div`
   perspective: 1px;
   transform-style: preserve-3d;
   height: calc(100% - 70px);
-  width; 100%;
+  width: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
 `;
