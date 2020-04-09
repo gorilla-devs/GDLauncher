@@ -28,14 +28,14 @@ export const getDirectories = async source => {
   );
 };
 
-export const mavenToArray = (s, nativeString) => {
+export const mavenToArray = (s, nativeString, forceExt) => {
   const pathSplit = s.split(':');
   const fileName = pathSplit[3]
     ? `${pathSplit[2]}-${pathSplit[3]}`
     : pathSplit[2];
   const finalFileName = fileName.includes('@')
     ? fileName.replace('@', '.')
-    : `${fileName}${nativeString || ''}.jar`;
+    : `${fileName}${nativeString || ''}${forceExt || '.jar'}`;
   const initPath = pathSplit[0]
     .split('.')
     .concat(pathSplit[1])
@@ -101,8 +101,15 @@ export const librariesMapper = (libraries, librariesPath) => {
         const tempArr = [];
         // Normal libs
         if (lib.downloads && lib.downloads.artifact) {
+          let { url } = lib.downloads.artifact;
+          // Handle special case for forge universal where the url is "".
+          if (lib.downloads.artifact.url === '') {
+            url = `https://files.minecraftforge.net/maven/${mavenToArray(
+              lib.name
+            ).join('/')}`;
+          }
           tempArr.push({
-            url: lib.downloads.artifact.url,
+            url,
             path: path.join(librariesPath, lib.downloads.artifact.path),
             sha1: lib.downloads.artifact.sha1
           });
@@ -460,24 +467,24 @@ export const getJVMArguments113 = (
 };
 
 export const patchForge113 = async (
-  installProfileJson,
+  forgeJson,
   mainJar,
   librariesPath,
   javaPath,
   updatePercentage
 ) => {
-  const { processors } = installProfileJson;
+  const { processors } = forgeJson;
   const replaceIfPossible = arg => {
     const finalArg = arg.replace('{', '').replace('}', '');
-    if (installProfileJson.data[finalArg]) {
+    if (forgeJson.data[finalArg]) {
       // Handle special case
       if (finalArg === 'BINPATCH') {
         return `"${path
-          .join(librariesPath, ...mavenToArray(installProfileJson.path))
+          .join(librariesPath, ...mavenToArray(forgeJson.path))
           .replace('.jar', '-clientdata.lzma')}"`;
       }
       // Return replaced string
-      return installProfileJson.data[finalArg].client;
+      return forgeJson.data[finalArg].client;
     }
     // Return original string (checking for MINECRAFT_JAR)
     return arg.replace('{MINECRAFT_JAR}', `"${mainJar}"`);
@@ -508,15 +515,12 @@ export const patchForge113 = async (
 
       const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
       const mainClass = jarFile.valueForManifestEntry('Main-Class');
-
       await new Promise(resolve => {
         const ps = spawn(
           `"${javaPath}"`,
           [
             '-classpath',
-            [`"${filePath}"`, ...classPaths].join(
-              process.platform === 'win32' ? ';' : ':'
-            ),
+            [`"${filePath}"`, ...classPaths].join(path.delimiter),
             mainClass,
             ...args
           ],

@@ -37,7 +37,6 @@ import {
   getForgeManifest,
   mcValidate,
   getFabricJson,
-  getForgeJson,
   getAddonFile,
   getJavaManifest,
   getAddonsByFingerprint,
@@ -124,18 +123,14 @@ export function initManifests() {
       return curseforgeCategories;
     };
     const getForgeVersions = async () => {
-      const forge = removeDuplicates((await getForgeManifest()).data, 'name');
+      const forge = (await getForgeManifest()).data;
       const forgeVersions = {};
       // Looping over vanilla versions, create a new entry in forge object
       // and add to it all correct versions
       mc.versions.forEach(v => {
-        forgeVersions[v.id] = forge
-          .filter(
-            ver =>
-              ver.gameVersion === v.id &&
-              gte(coerce(ver.gameVersion), coerce('1.6.1'))
-          )
-          .map(ver => ver.name.replace('forge-', ''));
+        if (forge[v.id] && gte(coerce(v.id), coerce('1.6.1'))) {
+          forgeVersions[v.id] = forge[v.id];
+        }
       });
 
       dispatch({
@@ -152,8 +147,12 @@ export function initManifests() {
       reflect(getForgeVersions())
     ]);
 
+    if (fabric.e || java.e || categories.e || forge.e) {
+      console.error(fabric, java, categories, forge);
+    }
+
     return {
-      mc: mc.status ? mc.v : app.vanillaManifest,
+      mc: mc || app.vanillaManifest,
       fabric: fabric.status ? fabric.v : app.fabricManifest,
       java: java.status ? java.v : app.javaManifest,
       categories: categories.status ? categories.v : app.curseforgeCategories,
@@ -293,7 +292,7 @@ export function updateDownloadProgress(percentage) {
     dispatch({
       type: ActionTypes.UPDATE_DOWNLOAD_PROGRESS,
       instanceName: currentDownload,
-      percentage: Number(percentage.toFixed())
+      percentage: Number(percentage).toFixed(0)
     });
   };
 }
@@ -427,7 +426,7 @@ export function loginThroughNativeLauncher() {
 
       // We need to update the accessToken in launcher_profiles.json
       vnlJson.authenticationDatabase[account].accessToken = data.accessToken;
-      await fse.writeJson(
+      await fse.outputJson(
         path.join(vanillaMCPath, 'launcher_profiles.json'),
         vnlJson
       );
@@ -737,9 +736,7 @@ export function downloadForge(instanceName) {
     const state = getState();
     const { modloader } = _getCurrentDownloadItem(state);
 
-    dispatch(updateDownloadStatus(instanceName, 'Downloading forge files...'));
-
-    let forgeJson;
+    const forgeJson = {};
     const forgeJsonPath = path.join(
       _getLibrariesPath(state),
       'net',
@@ -747,25 +744,122 @@ export function downloadForge(instanceName) {
       modloader[2],
       `${modloader[2]}.json`
     );
+
+    const sevenZipPath = await get7zPath();
+    const baseUrl =
+      'https://files.minecraftforge.net/maven/net/minecraftforge/forge';
+    const tempInstaller = path.join(_getTempPath(state), `${modloader[2]}.jar`);
+
+    const extractSpecificFile = async from => {
+      const extraction = extractFull(tempInstaller, _getTempPath(state), {
+        $bin: sevenZipPath,
+        yes: true,
+        $cherryPick: from
+      });
+      await new Promise((resolve, reject) => {
+        extraction.on('end', () => {
+          resolve();
+        });
+        extraction.on('error', error => {
+          reject(error.stderr);
+        });
+      });
+    };
+
     try {
-      forgeJson = await fse.readJson(forgeJsonPath);
-      await fse.readFile(
-        path.join(
-          _getLibrariesPath(state),
-          ...mavenToArray(forgeJson.mavenVersionString)
-        )
-      );
+      await fs.access(tempInstaller);
     } catch (err) {
-      forgeJson = (await getForgeJson(modloader)).data;
-      forgeJson.versionJson = JSON.parse(forgeJson.versionJson);
-      if (forgeJson.installProfileJson) {
-        forgeJson.installProfileJson = JSON.parse(forgeJson.installProfileJson);
-      }
-      await fse.outputJson(forgeJsonPath, forgeJson);
+      console.warn('No installer found in temp. Need to download it again.');
+      dispatch(
+        updateDownloadStatus(instanceName, 'Downloading forge installer...')
+      );
+
+      // Download installer jar and extract stuff
+      await downloadFile(
+        tempInstaller,
+        `${baseUrl}/${modloader[2]}/forge-${modloader[2]}-installer.jar`,
+        p => dispatch(updateDownloadProgress(p))
+      );
+
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
 
-    const libraries = librariesMapper(
-      forgeJson.versionJson.libraries,
+    // Extract version / install json, main jar, universal and client lzma
+    await extractSpecificFile('install_profile.json');
+    const installerJson = await fse.readJson(
+      path.join(_getTempPath(state), 'install_profile.json')
+    );
+
+    if (installerJson.install) {
+      forgeJson.install = installerJson.install;
+      forgeJson.version = installerJson.versionInfo;
+    } else {
+      forgeJson.install = installerJson;
+      await extractSpecificFile(path.basename(installerJson.json));
+      forgeJson.version = await fse.readJson(
+        path.join(_getTempPath(state), installerJson.json)
+      );
+      await fse.remove(path.join(_getTempPath(state), installerJson.json));
+    }
+
+    await fse.remove(path.join(_getTempPath(state), 'install_profile.json'));
+
+    await fse.outputJson(forgeJsonPath, forgeJson);
+
+    // Extract forge bin
+    if (forgeJson.install.filePath) {
+      await extractSpecificFile(forgeJson.install.filePath);
+
+      await fse.move(
+        path.join(_getTempPath(state), forgeJson.install.filePath),
+        path.join(
+          _getLibrariesPath(state),
+          ...mavenToArray(forgeJson.install.path)
+        ),
+        { overwrite: true }
+      );
+    } else {
+      // Move all files in maven
+      const forgeBinPathInsideZip = path.join(
+        'maven',
+        path.dirname(path.join(...mavenToArray(forgeJson.install.path)))
+      );
+      await extractSpecificFile(forgeBinPathInsideZip);
+
+      const filesToMove = await fs.readdir(
+        path.join(_getTempPath(state), forgeBinPathInsideZip)
+      );
+      await Promise.all(
+        filesToMove.map(async f => {
+          await fse.move(
+            path.join(_getTempPath(state), forgeBinPathInsideZip, f),
+            path.join(
+              _getLibrariesPath(state),
+              path.dirname(path.join(...mavenToArray(forgeJson.install.path))),
+              path.basename(f)
+            ),
+            { overwrite: true }
+          );
+        })
+      );
+
+      await fse.remove(path.join(_getTempPath(state), 'maven'));
+    }
+
+    dispatch(updateDownloadStatus(instanceName, 'Downloading forge files...'));
+
+    let { libraries } = forgeJson.version;
+
+    if (forgeJson.install.libraries) {
+      libraries = libraries.concat(forgeJson.install.libraries);
+    }
+
+    libraries = librariesMapper(
+      libraries.filter(
+        v =>
+          !v.name.includes('net.minecraftforge:forge:') &&
+          !v.name.includes('net.minecraftforge:minecraftforge:')
+      ),
       _getLibrariesPath(state)
     );
 
@@ -779,22 +873,28 @@ export function downloadForge(instanceName) {
       state.settings.concurrentDownloads
     );
 
-    if (forgeJson.installProfileJson) {
+    if (forgeJson.install?.processors?.length) {
       dispatch(updateDownloadStatus(instanceName, 'Patching forge...'));
-      const installLibraries = librariesMapper(
-        forgeJson.installProfileJson.libraries,
-        _getLibrariesPath(state)
+
+      // Extract client.lzma from installer
+
+      await extractSpecificFile(path.join('data', 'client.lzma'));
+
+      await fse.move(
+        path.join(_getTempPath(state), 'data', 'client.lzma'),
+        path.join(
+          _getLibrariesPath(state),
+          ...mavenToArray(forgeJson.install.path, '-clientdata', '.lzma')
+        ),
+        { overwrite: true }
       );
-      await downloadInstanceFiles(
-        installLibraries,
-        () => {},
-        state.settings.concurrentDownloads
-      );
+      await fse.remove(path.join(_getTempPath(state), 'data'));
+
       await patchForge113(
-        forgeJson.installProfileJson,
+        forgeJson.install,
         path.join(
           _getMinecraftVersionsPath(state),
-          `${forgeJson.versionJson.inheritsFrom}.jar`
+          `${forgeJson.install.minecraft}.jar`
         ),
         _getLibrariesPath(state),
         _getJavaPath(state),
@@ -1548,17 +1648,17 @@ export function launchInstance(instanceName) {
       );
       const forgeJson = await fse.readJson(forgeJsonPath);
       const forgeLibraries = librariesMapper(
-        forgeJson.versionJson.libraries,
+        forgeJson.version.libraries,
         librariesPath
       );
       libraries = libraries.concat(forgeLibraries);
       // Replace classname
-      mcJson.mainClass = forgeJson.versionJson.mainClass;
-      if (forgeJson.versionJson.minecraftArguments) {
-        mcJson.minecraftArguments = forgeJson.versionJson.minecraftArguments;
-      } else if (forgeJson.versionJson.arguments.game) {
+      mcJson.mainClass = forgeJson.version.mainClass;
+      if (forgeJson.version.minecraftArguments) {
+        mcJson.minecraftArguments = forgeJson.version.minecraftArguments;
+      } else if (forgeJson.version.arguments.game) {
         mcJson.arguments.game = mcJson.arguments.game.concat(
-          forgeJson.versionJson.arguments.game
+          forgeJson.version.arguments.game
         );
       }
     }

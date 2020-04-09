@@ -1,9 +1,9 @@
 /* eslint-disable */
-import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
-import { Cascader } from "antd";
-import styled from "styled-components";
-import { sortByForgeVersionDesc } from "../../utils";
+import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { Cascader } from 'antd';
+import styled from 'styled-components';
+import { sortByForgeVersionDesc } from '../../utils';
 
 const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -12,48 +12,48 @@ const NewInstance = ({ setVersion, setModpack }) => {
 
   const filteredVersions = useMemo(() => {
     const snapshots = vanillaManifest.versions
-      .filter(v => v.type === "snapshot")
+      .filter(v => v.type === 'snapshot')
       .map(v => v.id);
     const versions = [
       {
-        value: "vanilla",
-        label: "Vanilla",
+        value: 'vanilla',
+        label: 'Vanilla',
         children: [
           {
-            value: "release",
-            label: "Releases",
+            value: 'release',
+            label: 'Releases',
             children: vanillaManifest.versions
-              .filter(v => v.type === "release")
+              .filter(v => v.type === 'release')
               .map(v => ({
                 value: v.id,
                 label: v.id
               }))
           },
           {
-            value: "snapshot",
-            label: "Snapshots",
+            value: 'snapshot',
+            label: 'Snapshots',
             children: vanillaManifest.versions
-              .filter(v => v.type === "snapshot")
+              .filter(v => v.type === 'snapshot')
               .map(v => ({
                 value: v.id,
                 label: v.id
               }))
           },
           {
-            value: "old_beta",
-            label: "Old Beta",
+            value: 'old_beta',
+            label: 'Old Beta',
             children: vanillaManifest.versions
-              .filter(v => v.type === "old_beta")
+              .filter(v => v.type === 'old_beta')
               .map(v => ({
                 value: v.id,
                 label: v.id
               }))
           },
           {
-            value: "old_alpha",
-            label: "Old Alpha",
+            value: 'old_alpha',
+            label: 'Old Alpha',
             children: vanillaManifest.versions
-              .filter(v => v.type === "old_alpha")
+              .filter(v => v.type === 'old_alpha')
               .map(v => ({
                 value: v.id,
                 label: v.id
@@ -62,24 +62,24 @@ const NewInstance = ({ setVersion, setModpack }) => {
         ]
       },
       {
-        value: "forge",
-        label: "Forge",
+        value: 'forge',
+        label: 'Forge',
         children: Object.entries(forgeManifest).map(([k, v]) => ({
           value: k,
           label: k,
           children: v.sort(sortByForgeVersionDesc).map(child => ({
             value: child,
-            label: child
+            label: child.split('-')[1]
           }))
         }))
       },
       {
-        value: "fabric",
-        label: "Fabric",
+        value: 'fabric',
+        label: 'Fabric',
         children: [
           {
-            value: "release",
-            label: "Releases",
+            value: 'release',
+            label: 'Releases',
             children: fabricManifest.mappings
               .filter(v => !snapshots.includes(v.gameVersion))
               .map(v => ({
@@ -92,8 +92,8 @@ const NewInstance = ({ setVersion, setModpack }) => {
               }))
           },
           {
-            value: "snapshot",
-            label: "Snapshots",
+            value: 'snapshot',
+            label: 'Snapshots',
             children: fabricManifest.mappings
               .filter(v => snapshots.includes(v.gameVersion))
               .map(v => ({
