@@ -34,8 +34,7 @@ const Home = () => {
     dispatch(openModal('AddInstance', { defaultPage }));
   };
 
-  const openWelcomePage = () => {
-    console.log('NEW', isNewUser);
+  const openWelcomeModal = () => {
     dispatch(openModal('Onboarding'));
   };
 
@@ -46,10 +45,8 @@ const Home = () => {
 
   useEffect(() => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
-
-    console.log('K', isNewUser);
     if (isNewUser) {
-      openWelcomePage();
+      openWelcomeModal();
     }
   }, [account]);
 

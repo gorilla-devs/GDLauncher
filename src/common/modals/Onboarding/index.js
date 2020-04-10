@@ -66,10 +66,8 @@ const Onboarding = () => {
               <SectionButton
                 // active={page === 1}
                 onClick={() => {
-                  console.log('£££', i, page);
                   setPage(i);
                   if (i > page) {
-                    console.log('pippo ', page + i);
                     executeScroll(i - page);
                   } else executeScroll(i - page);
                 }}
@@ -158,7 +156,7 @@ const SideBar = styled.div`
   justify-content: space-evenly;
   align-items: flex-end;
   background: ${props => props.theme.palette.grey[800]};
-  padding-top: calc(${props => props.theme.sizes.height.systemNavbar} + 5px);
+  padding-top: calc(${props => props.theme.sizes.height.systemNavbar});
 `;
 
 const Content = styled.div`
