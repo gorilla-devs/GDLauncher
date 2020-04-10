@@ -188,7 +188,7 @@ const ModOverview = ({
                   </div>
                   <div
                     css={`
-                      flex: 2;
+                      flex: 3;
                       display: flex;
                       align-items: center;
                     `}

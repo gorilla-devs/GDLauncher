@@ -154,7 +154,7 @@
   "dependencies": {
     "@loadable/babel-plugin": "^5.12.0",
     "antd": "4.1.1",
-    "axios": "^0.19.2",
+    "axios": "https://github.com/gorilla-devs/axios.git#62786f2b6c4c813d4dc0159744bcdce7342e365d",
     "base64-stream": "^1.0.0",
     "connected-react-router": "^6.8.0",
     "craco-antd": "^1.14.1",
@@ -200,8 +200,6 @@
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
     "redux-persist-electron-storage": "^2.1.0",
-    "request": "^2.88.2",
-    "request-promise-native": "^1.0.8",
     "reselect": "^4.0.0",
     "rooks": "^3.6.0",
     "semver": "^7.2.1",

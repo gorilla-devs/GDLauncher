@@ -83,7 +83,7 @@ const InstanceName = ({
     const isVanilla = version[0] === VANILLA;
     const isFabric = version[0] === FABRIC;
     const isForge = version[0] === FORGE;
-    const isTwitchModpack = Boolean(modpack);
+    const isTwitchModpack = Boolean(modpack?.attachments);
     let manifest;
     if (isTwitchModpack) {
       if (importZipPath) {

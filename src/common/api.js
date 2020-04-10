@@ -86,7 +86,7 @@ export const getMcManifest = () => {
 };
 
 export const getForgeManifest = () => {
-  const url = `${FORGESVC_URL}/minecraft/modloader?timestamp=${new Date().getTime()}`;
+  const url = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.json?timestamp=${new Date().getTime()}`;
   return axios.get(url);
 };
 
@@ -105,12 +105,6 @@ export const getFabricJson = ([, , yarn, loader]) => {
     `https://fabricmc.net/download/technic/?yarn=${encodeURIComponent(
       yarn
     )}&loader=${encodeURIComponent(loader)}`
-  );
-};
-
-export const getForgeJson = ([, , forgeVersion]) => {
-  return axios.get(
-    `https://addons-ecs.forgesvc.net/api/v2/minecraft/modloader/forge-${forgeVersion}`
   );
 };
 

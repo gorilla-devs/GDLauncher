@@ -184,5 +184,4 @@ export default createGlobalStyle`
     60% { transform: scale(1.01) }
     90% { transform: scale(0.99)}
     100% {transform: scale(1) }
-
 `;
