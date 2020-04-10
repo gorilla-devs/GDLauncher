@@ -110,12 +110,20 @@ export default function MyAccountPreferences() {
   const javaMemory = useSelector(state => state.settings.java.memory);
   const javaPath = useSelector(_getJavaPath);
   const customJavaPath = useSelector(state => state.settings.java.path);
-  const customResolution = useSelector(state => state.settings.java.resolution);
+  const customResolution = useSelector(
+    state => state.settings.minecraftSettings
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (customResolution.height) setHeight(customResolution.height);
-    if (customResolution.width) setWidth(customResolution.width);
+    if (customResolution.width && customResolution.height) {
+      setWidth(customResolution.width);
+      setHeight(customResolution.height);
+    } else {
+      setWidth(800);
+      setHeight(600);
+      dispatch(updateResolution({ height: 600, width: 800 }));
+    }
   }, []);
 
   return (
@@ -231,9 +239,9 @@ export default function MyAccountPreferences() {
               placeholder="height"
               value={height}
               onChange={e => {
-                const h = e.target.value;
+                const h = parseInt(e.target.value, 10);
                 setHeight(h);
-                dispatch(updateResolution({ h, width }));
+                dispatch(updateResolution({ height: h, width }));
               }}
             />
             &nbsp;X&nbsp;
@@ -241,9 +249,9 @@ export default function MyAccountPreferences() {
               placeholder="width"
               value={width}
               onChange={e => {
-                const w = e.target.value;
+                const w = parseInt(e.target.value, 10);
                 setWidth(w);
-                dispatch(updateResolution({ height, w }));
+                dispatch(updateResolution({ height, pane: w }));
               }}
             />
           </div>

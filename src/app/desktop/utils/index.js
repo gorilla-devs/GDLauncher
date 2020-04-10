@@ -292,8 +292,10 @@ export const getJVMArguments112 = (
   args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
 
   args.push(mcJson.mainClass);
-  if (resolution)
-    args.push(` --width ${resolution.width} --height ${resolution.height}`);
+  if (resolution) {
+    args.push(`--width ${resolution.width}`);
+    args.push(`--height ${resolution.height}`);
+  }
 
   const mcArgs = mcJson.minecraftArguments.split(' ');
   const argDiscovery = /\${*(.*)}/;
@@ -372,7 +374,6 @@ export const getJVMArguments113 = (
   //   args.push("-Xdock:name=instancename");
   //   args.push("-Xdock:icon=instanceicon");
   // }
-  console.log('RES', resolution);
 
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
@@ -380,8 +381,11 @@ export const getJVMArguments113 = (
   args.push(...jvmOptions);
 
   args.push(mcJson.mainClass);
-  if (resolution)
-    args.push(` --width ${resolution.width} --height ${resolution.height}`);
+
+  if (resolution) {
+    args.push(`--width ${resolution.width}`);
+    args.push(`--height ${resolution.height}`);
+  }
 
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
 

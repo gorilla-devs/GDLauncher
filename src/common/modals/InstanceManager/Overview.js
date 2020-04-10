@@ -105,7 +105,7 @@ const Overview = ({ instanceName }) => {
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
   const [gameResolutionSwitch, setGameResolutionSwitch] = useState(
-    config?.resolution?.height || config?.resolution?.width
+    config?.resolution?.height && config?.resolution?.width
   );
 
   const dispatch = useDispatch();
@@ -181,9 +181,9 @@ const Overview = ({ instanceName }) => {
                     )
                   );
                 } else if (v) {
-                  updateGameResolution(800, 600);
-                  setHeight(800);
-                  setWidth(600);
+                  updateGameResolution(600, 800);
+                  setHeight(600);
+                  setWidth(800);
                 }
               }}
             />
@@ -195,13 +195,15 @@ const Overview = ({ instanceName }) => {
                   placeholder="height"
                   value={height}
                   onChange={e => {
-                    const h = e.target.value;
+                    const h = parseInt(e.target.value, 10);
                     setHeight(h);
+                    setWidth(width);
+
                     dispatch(
                       updateInstanceConfig(instanceName, prev => ({
                         ...prev,
                         resolution: {
-                          h,
+                          height: h,
                           width
                         }
                       }))
@@ -213,14 +215,15 @@ const Overview = ({ instanceName }) => {
                   placeholder="width"
                   value={width}
                   onChange={e => {
-                    const w = e.target.value;
+                    const w = parseInt(e.target.value, 10);
+                    setHeight(height);
                     setWidth(w);
                     dispatch(
                       updateInstanceConfig(instanceName, prev => ({
                         ...prev,
                         resolution: {
                           height,
-                          w
+                          width: w
                         }
                       }))
                     );

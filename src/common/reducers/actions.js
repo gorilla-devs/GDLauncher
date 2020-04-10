@@ -1474,10 +1474,16 @@ export function launchInstance(instanceName) {
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
-    const { memory, args, resolution: gameResolution } = state.settings.java;
-    const { modloader, javaArgs, javaMemory, resolution } = _getInstance(state)(
-      instanceName
-    );
+    const { memory, args } = state.settings.java;
+    const {
+      resolution: globalMinecraftResolution
+    } = state.settings.minecraftSettings;
+    const {
+      modloader,
+      javaArgs,
+      javaMemory,
+      resolution: instanceResolution
+    } = _getInstance(state)(instanceName);
 
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
@@ -1575,9 +1581,7 @@ export function launchInstance(instanceName) {
 
     const javaArguments = (javaArgs !== undefined ? javaArgs : args).split(' ');
     const javaMem = javaMemory !== undefined ? javaMemory : memory;
-    const resol = resolution !== undefined ? resolution : gameResolution;
-
-    console.log('REE', resol, resolution, javaMemory, gameResolution, memory);
+    const resol = instanceResolution || globalMinecraftResolution;
 
     const jvmArguments = getJvmArguments(
       libraries,

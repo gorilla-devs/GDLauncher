@@ -57,7 +57,7 @@ export function updateShowChangelog(show) {
 export function updateResolution(resolution) {
   return dispatch => {
     dispatch({
-      type: ActionTypes.UPDATE_RESOLUTION,
+      type: ActionTypes.UPDATE_MINECRAFT_RESOLUTION,
       resolution
     });
   };
