@@ -16,6 +16,7 @@ import ModsBrowser from '../modals/ModsBrowser';
 import ModpackDescription from '../modals/ModpackDescription';
 import Onboarding from '../modals/Onboarding';
 import JavaSetup from '../modals/JavaSetup';
+import ModsUpdater from '../modals/ModsUpdater';
 import ModOverview from '../modals/ModOverview';
 import { closeModal } from '../reducers/modals/actions';
 
@@ -61,7 +62,8 @@ const modalsComponentLookupTable = {
   Onboarding,
   ModOverview,
   ModsBrowser,
-  JavaSetup
+  JavaSetup,
+  ModsUpdater
 };
 
 const ModalContainer = ({ unmounting, children, preventClose }) => {

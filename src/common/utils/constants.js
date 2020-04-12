@@ -16,7 +16,10 @@ export const FORGESVC_CATEGORIES =
   'https://addons-ecs.forgesvc.net/api/v2/category?gameId=432';
 export const NEWS_URL =
   'https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/culture,minecraft:article/insider,minecraft:article/merch,minecraft:article/news&propResPath=/content/minecraft-net/language-masters/it-it/jcr:content/root/generic-container/par/grid&count=2000&pageSize=10&tag=ALL';
-export const CLIENT_ID = '509a564cf4466c9';
+export const FMLLIBS_OUR_BASE_URL = 'https://fmllibs.gdevs.io';
+export const FMLLIBS_FORGE_BASE_URL =
+  'https://files.minecraftforge.net/fmllibs';
+export const IMGUR_CLIENT_ID = '509a564cf4466c9';
 export const FABRIC = 'fabric';
 export const FORGE = 'forge';
 export const VANILLA = 'vanilla';

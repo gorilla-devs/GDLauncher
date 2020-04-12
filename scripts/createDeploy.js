@@ -149,7 +149,8 @@ const commonConfig = {
       installerHeaderIcon: './public/icon.ico',
       deleteAppDataOnUninstall: true,
       allowToChangeInstallationDirectory: true,
-      perMachine: false
+      perMachine: false,
+      differentialPackage: true
     },
     /* eslint-disable */
     artifactName: `${'${productName}'}-${'${platform}'}-${

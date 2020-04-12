@@ -1,20 +1,29 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
 import path from 'path';
 import pMap from 'p-map';
 import { FixedSizeList as List, areEqual } from 'react-window';
-import { Checkbox, Input, Button, Switch, Spin } from 'antd';
+import { Checkbox, Input, Button, Switch, Spin, Dropdown, Menu } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faTrash,
+  faArrowDown,
+  faDownload,
+  faEllipsisV
+} from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
-import { updateInstanceConfig } from '../../reducers/actions';
+import {
+  updateInstanceConfig,
+  deleteMod,
+  updateMod
+} from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 
 const Header = styled.div`
@@ -64,10 +73,20 @@ const RowContainer = styled.div.attrs(props => ({
     display: flex;
     justify-content: center;
     align-items: center;
-    button {
-      margin-right: 15px;
+    & > * {
+      margin-left: 10px;
     }
-    svg {
+    svg:first-child {
+      &:hover {
+        cursor: pointer;
+        path {
+          cursor: pointer;
+          transition: all 0.1s ease-in-out;
+          color: ${props => props.theme.palette.colors.green};
+        }
+      }
+    }
+    svg:last-child {
       &:hover {
         cursor: pointer;
         path {
@@ -106,6 +125,21 @@ const DragEnterEffect = styled.div`
     transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
 `;
 
+const StyledDropdown = styled.div`
+  width: 32px;
+  height: 32px;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease-in-out;
+  cursor: pointer;
+  &:hover {
+    background: ${props => props.theme.palette.grey[400]};
+  }
+`;
+
 export const keyFrameMoveUpDown = keyframes`
   0% {
     transform: translateY(0);
@@ -133,16 +167,6 @@ const CopyTitle = styled.h1`
 
   animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
 `;
-
-const deleteMod = async (instanceName, instancePath, mod, dispatch) => {
-  await dispatch(
-    updateInstanceConfig(instanceName, prev => ({
-      ...prev,
-      mods: prev.mods.filter(m => m.fileName !== mod.fileName)
-    }))
-  );
-  await fse.remove(path.join(instancePath, 'mods', mod.fileName));
-};
 
 const deleteMods = async (
   instanceName,
@@ -195,15 +219,22 @@ const toggleModDisabled = async (
 
 const Row = memo(({ index, style, data }) => {
   const [loading, setLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const {
     items,
     instanceName,
     instancePath,
     gameVersion,
     selectedMods,
-    setSelectedMods
+    setSelectedMods,
+    latestMods
   } = data;
   const item = items[index];
+  const latestMod = latestMods[item.projectID]?.find(
+    v => v.gameVersion === gameVersion
+  );
+  const isUpdateAvailable =
+    latestMod && latestMod.projectFileId !== item.fileID;
   const dispatch = useDispatch();
   return (
     <RowContainer index={index} override={style}>
@@ -238,6 +269,26 @@ const Row = memo(({ index, style, data }) => {
         {item.fileName}
       </div>
       <div className="rightPartContent">
+        {isUpdateAvailable &&
+          (updateLoading ? (
+            <LoadingOutlined />
+          ) : (
+            <FontAwesomeIcon
+              icon={faDownload}
+              onClick={async () => {
+                setUpdateLoading(true);
+                await dispatch(
+                  updateMod(
+                    instanceName,
+                    item,
+                    latestMod.projectFileId,
+                    gameVersion
+                  )
+                );
+                setUpdateLoading(false);
+              }}
+            />
+          ))}
         <Switch
           size="small"
           checked={path.extname(item.fileName) !== '.disabled'}
@@ -255,7 +306,7 @@ const Row = memo(({ index, style, data }) => {
           }}
         />
         <FontAwesomeIcon
-          onClick={() => deleteMod(instanceName, instancePath, item, dispatch)}
+          onClick={() => dispatch(deleteMod(instanceName, item))}
           icon={faTrash}
         />
       </div>
@@ -270,14 +321,16 @@ const createItemData = memoize(
     instancePath,
     gameVersion,
     selectedMods,
-    setSelectedMods
+    setSelectedMods,
+    latestMods
   ) => ({
     items,
     instanceName,
     instancePath,
     gameVersion,
     selectedMods,
-    setSelectedMods
+    setSelectedMods,
+    latestMods
   })
 );
 
@@ -294,9 +347,11 @@ const filter = (arr, search) =>
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
+  const latestMods = useSelector(state => state.latestModManifests);
   const [mods, setMods] = useState(sort(instance.mods));
   const [selectedMods, setSelectedMods] = useState([]);
   const [search, setSearch] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [fileDrag, setFileDrag] = useState(false);
   const [fileDrop, setFileDrop] = useState(false);
   const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
@@ -334,13 +389,25 @@ const Mods = ({ instanceName }) => {
     setMods(filter(sort(instance.mods), search));
   }, [search, instance.mods]);
 
+  const hasModUpdates = useMemo(() => {
+    return instance?.mods?.find(v => {
+      const latestMod = latestMods[v.projectID]?.find(
+        x => x.gameVersion === instance.modloader[1]
+      );
+      const isUpdateAvailable =
+        latestMod && latestMod.projectFileId !== v.fileID;
+      return isUpdateAvailable;
+    });
+  }, [instance.mods, latestMods]);
+
   const itemData = createItemData(
     mods,
     instanceName,
     path.join(instancesPath, instanceName),
     instance.modloader[1],
     selectedMods,
-    setSelectedMods
+    setSelectedMods,
+    latestMods
   );
 
   const onDragOver = e => {
@@ -378,7 +445,7 @@ const Mods = ({ instanceName }) => {
             );
             dragComp[fileName] = true;
           } else {
-            console.error('This File is not a mod!');
+            console.error('This file is not a mod!');
             setFileDrop(false);
             setFileDrag(false);
           }
@@ -417,6 +484,21 @@ const Mods = ({ instanceName }) => {
   const onDragLeave = () => {
     setFileDrag(false);
   };
+
+  const menu = (
+    <Menu>
+      <Menu.Item
+        key="0"
+        onClick={async () => {
+          dispatch(openModal('ModsUpdater', { instanceName }));
+          setIsMenuOpen(false);
+        }}
+        disabled={!hasModUpdates}
+      >
+        Update all mods
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <div
@@ -460,7 +542,7 @@ const Mods = ({ instanceName }) => {
             }}
             selectedMods={selectedMods}
             css={`
-              margin-left: 10px;
+              margin: 0 10px;
               ${props =>
                 props.selectedMods.length > 0 &&
                 `&:hover {
@@ -474,12 +556,22 @@ const Mods = ({ instanceName }) => {
             `}
             icon={faTrash}
           />
-          {/* <FontAwesomeIcon
-            css={`
-              margin-left: 10px;
-            `}
-            icon={faDownload}
-          /> */}
+          <StyledDropdown
+            onClick={() => {
+              if (!isMenuOpen) {
+                setIsMenuOpen(true);
+              }
+            }}
+          >
+            <Dropdown
+              overlay={menu}
+              visible={isMenuOpen}
+              onVisibleChange={setIsMenuOpen}
+              trigger={['click']}
+            >
+              <FontAwesomeIcon icon={faEllipsisV} />
+            </Dropdown>
+          </StyledDropdown>
         </div>
         <Button
           type="primary"

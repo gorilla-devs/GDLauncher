@@ -62,7 +62,7 @@ function DesktopRoot() {
   const init = async () => {
     const userDataStatic = await ipcRenderer.invoke('getUserData');
     const userData = dispatch(updateUserData(userDataStatic));
-    dispatch(checkClientToken());
+    await dispatch(checkClientToken());
     dispatch(initNews());
 
     dispatch(requesting(features.mcAuthentication));

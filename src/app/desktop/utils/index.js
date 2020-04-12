@@ -296,6 +296,7 @@ export const getJVMArguments112 = (
   args.push(`-Xms${memory}m`);
   args.push(...jvmOptions);
   args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
+  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
 
   args.push(mcJson.mainClass);
 
@@ -697,9 +698,8 @@ export const getFirstReleaseCandidate = files => {
   return latestFile;
 };
 
-export const getFileSha1 = async filePath => {
+export const getFileHash = async (filePath, algorithm = 'sha1') => {
   // Calculate sha1 on original file
-  const algorithm = 'sha1';
   const shasum = crypto.createHash(algorithm);
 
   const s = originalFs.ReadStream(filePath);
@@ -726,4 +726,16 @@ export const getFilesRecursive = async dir => {
     })
   );
   return files.reduce((a, f) => a.concat(f), []);
+};
+
+export const convertcurseForgeToCanonical = (
+  curseForge,
+  mcVersion,
+  forgeManifest
+) => {
+  const patchedCurseForge = curseForge.replace('forge-', '');
+  const forgeEquivalent = forgeManifest[mcVersion].find(v => {
+    return v.split('-')[1] === patchedCurseForge;
+  });
+  return forgeEquivalent;
 };
