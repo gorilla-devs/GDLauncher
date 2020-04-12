@@ -782,10 +782,14 @@ export function downloadForge(instanceName) {
       const { data: hashes } = await axios.get(
         `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${modloader[2]}/meta.json`
       );
+      console.log(hashes);
       const fileMd5 = await getFileHash(expectedInstaller, 'md5');
-      const expectedMd5 = pre152
-        ? hashes?.classifiers?.universal?.zip
-        : hashes?.classifiers?.installer?.jar;
+      let expectedMd5 = hashes?.classifiers?.installer?.jar;
+      if (pre132) {
+        expectedMd5 = hashes?.classifiers?.client?.zip;
+      } else if (pre152) {
+        expectedMd5 = hashes?.classifiers?.universal?.zip;
+      }
 
       if (fileMd5.toString() !== expectedMd5) {
         throw new Error('Installer hash mismatch');
