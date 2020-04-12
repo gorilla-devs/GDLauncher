@@ -777,7 +777,7 @@ export function downloadForge(instanceName) {
       // Download installer jar and extract stuff
       await downloadFile(
         tempInstaller,
-        `${baseUrl}/${modloader[2]}/forge-${modloader[2]}-installer.jar`,
+        `${baseUrl}/${modloader[1]}-${modloader[2]}/forge-${modloader[1]}-${modloader[2]}-installer.jar`,
         p => dispatch(updateDownloadProgress(p))
       );
 
