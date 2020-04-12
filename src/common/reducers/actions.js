@@ -889,7 +889,7 @@ export function downloadForge(instanceName) {
       }
 
       dispatch(
-        updateDownloadStatus(instanceName, 'Downloading forge files...')
+        updateDownloadStatus(instanceName, 'Downloading forge libraries...')
       );
 
       let { libraries } = forgeJson.version;
@@ -990,6 +990,9 @@ export function downloadForge(instanceName) {
         { concurrency: state.settings.concurrentDownloads }
       );
 
+      dispatch(updateDownloadStatus(instanceName, 'Injecting forge...'));
+      dispatch(updateDownloadProgress(0));
+
       // Perform forge injection
       const mcJarPath = path.join(
         _getMinecraftVersionsPath(state),
@@ -1022,10 +1025,14 @@ export function downloadForge(instanceName) {
         path.join(_getTempPath(state), modloader[2]),
         {
           $bin: sevenZipPath,
-          yes: true
+          yes: true,
+          $progress: true
         }
       );
       await new Promise((resolve, reject) => {
+        extraction.on('progress', ({ percent }) => {
+          dispatch(updateDownloadProgress(percent / 2));
+        });
         extraction.on('end', () => {
           resolve();
         });
@@ -1039,10 +1046,14 @@ export function downloadForge(instanceName) {
         `${path.join(_getTempPath(state), modloader[2])}/*`,
         {
           $bin: sevenZipPath,
-          yes: true
+          yes: true,
+          $progress: true
         }
       );
       await new Promise((resolve, reject) => {
+        updatedFiles.on('progress', ({ percent }) => {
+          dispatch(updateDownloadProgress(50 + percent / 2));
+        });
         updatedFiles.on('end', () => {
           resolve();
         });
@@ -1464,6 +1475,10 @@ export const startListener = () => {
           );
           try {
             const config = await fse.readJSON(configPath);
+
+            if (!config.modloader) {
+              throw new Error(`Config for ${instanceName} could not be parsed`);
+            }
             console.log('[RTS] ADDING INSTANCE', instanceName);
             dispatch({
               type: ActionTypes.UPDATE_INSTANCES,
@@ -1507,6 +1522,11 @@ export const startListener = () => {
               'config.json'
             );
             const config = await fse.readJSON(configPath);
+            if (!config.modloader) {
+              throw new Error(
+                `Config for ${newInstanceName} could not be parsed`
+              );
+            }
             console.log(
               `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
             );

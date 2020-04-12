@@ -73,6 +73,8 @@ const HoverContainer = styled.div`
   cursor: pointer;
   font-size: 18px;
   margin: 10px;
+  padding: 10px;
+  text-align: center;
   font-weight: 800;
   border-radius: 4px;
   transition: opacity 150ms ease-in-out;

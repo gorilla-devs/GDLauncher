@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { Progress } from 'antd';
-import pMap from 'p-map';
 import Modal from '../components/Modal';
 import { updateMod } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
@@ -26,10 +25,12 @@ const ModsUpdater = ({ instanceName }) => {
 
   const totalMods = useMemo(() => filterAvailableUpdates(), []);
 
-  const updateMods = async () => {
-    await pMap(
-      totalMods,
-      async mod => {
+  useEffect(() => {
+    let cancel = false;
+    const updateMods = async () => {
+      let i = 0;
+      while (!cancel && i < totalMods.length) {
+        const mod = totalMods[i];
         const latestMod = latestMods[mod.projectID]?.find(
           v => v.gameVersion === instance.modloader[1]
         );
@@ -39,18 +40,26 @@ const ModsUpdater = ({ instanceName }) => {
             mod,
             latestMod.projectFileId,
             instance.modloader[1],
-            p => setInstallProgress(p)
+            // eslint-disable-next-line
+            p => {
+              if (!cancel) setInstallProgress(p);
+            }
           )
         );
-        setComputedMods(p => p + 1);
-      },
-      { concurrency: 1 }
-    );
-    dispatch(closeModal());
-  };
+        if (!cancel) {
+          setComputedMods(p => p + 1);
+        }
+        i += 1;
+      }
+      if (!cancel) {
+        dispatch(closeModal());
+      }
+    };
 
-  useEffect(() => {
     updateMods();
+    return () => {
+      cancel = true;
+    };
   }, []);
 
   return (
