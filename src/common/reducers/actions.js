@@ -47,7 +47,8 @@ import {
   getAddonsByFingerprint,
   getAddonFiles,
   getAddon,
-  getAddonCategories
+  getAddonCategories,
+  getJavaManifestFromMirror
 } from '../api';
 import {
   _getCurrentAccount,
@@ -116,12 +117,21 @@ export function initManifests() {
       return fabric;
     };
     const getJavaManifestVersions = async () => {
-      const java = (await getJavaManifest()).data;
-      dispatch({
-        type: ActionTypes.UPDATE_JAVA_MANIFEST,
-        data: java
-      });
-      return java;
+      try {
+        const java = (await getJavaManifest()).data;
+        dispatch({
+          type: ActionTypes.UPDATE_JAVA_MANIFEST,
+          data: java
+        });
+        return java;
+      } catch {
+        const java = (await getJavaManifestFromMirror()).data;
+        dispatch({
+          type: ActionTypes.UPDATE_JAVA_MANIFEST,
+          data: java
+        });
+        return java;
+      }
     };
     const getAddonCategoriesVersions = async () => {
       const curseforgeCategories = (await getAddonCategories()).data;
@@ -368,14 +378,18 @@ export function loginWithAccessToken(redirect = true) {
     if (!accessToken) throw new Error();
     try {
       await mcValidate(accessToken, clientToken);
-      const skinUrl = await getPlayerSkin(selectedProfile.id);
-      if (skinUrl) {
-        dispatch(
-          updateAccount(selectedProfile.id, {
-            ...currentAccount,
-            skin: skinUrl
-          })
-        );
+      try {
+        const skinUrl = await getPlayerSkin(selectedProfile.id);
+        if (skinUrl) {
+          dispatch(
+            updateAccount(selectedProfile.id, {
+              ...currentAccount,
+              skin: skinUrl
+            })
+          );
+        }
+      } catch (err) {
+        console.warn('Could not fetch skin');
       }
       dispatch(push('/home'));
     } catch (error) {
@@ -1784,8 +1798,8 @@ export function launchInstance(instanceName) {
           Number.parseInt(ver.split('.')[ver.split('.').length - 1], 10);
 
         if (
-          lt(coerce(modloader[2]), coerce('10.13.1')) &&
-          gte(coerce(modloader[2]), coerce('9.11.1')) &&
+          lt(coerce(modloader[2].split('-')[1]), coerce('10.13.1')) &&
+          gte(coerce(modloader[2].split('-')[1]), coerce('9.11.1')) &&
           getForgeLastVer(modloader[2]) < 1217 &&
           getForgeLastVer(modloader[2]) > 935
         ) {

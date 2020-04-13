@@ -7,7 +7,8 @@ import {
   FABRIC_APIS,
   JAVA_MANIFEST_URL,
   IMGUR_CLIENT_ID,
-  FORGESVC_CATEGORIES
+  FORGESVC_CATEGORIES,
+  JAVA_MANIFEST_URL_MIRROR
 } from './utils/constants';
 import { sortByDate } from './utils';
 
@@ -97,6 +98,11 @@ export const getFabricManifest = () => {
 
 export const getJavaManifest = () => {
   const url = JAVA_MANIFEST_URL;
+  return axios.get(url);
+};
+
+export const getJavaManifestFromMirror = () => {
+  const url = JAVA_MANIFEST_URL_MIRROR;
   return axios.get(url);
 };
 

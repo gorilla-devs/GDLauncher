@@ -268,6 +268,7 @@ ipcMain.handle('openFileDialog', (e, filters) => {
 
 ipcMain.handle('appRestart', () => {
   app.relaunch();
+  app.quit();
   app.exit();
 });
 

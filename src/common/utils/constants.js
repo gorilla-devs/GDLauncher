@@ -9,6 +9,8 @@ export const FABRIC_DOWNLOAD_URL =
 export const MOJANG_APIS = 'https://authserver.mojang.com';
 export const JAVA_MANIFEST_URL =
   'https://api.adoptopenjdk.net/v2/latestAssets/releases/openjdk8?openjdk_impl=hotspot&type=jre&arch=x64&heap_size=normal';
+export const JAVA_MANIFEST_URL_MIRROR =
+  'https://cdn.assets-gdevs.com/openjdk8.json';
 export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const FORGESVC_URL = 'https://addons-ecs.forgesvc.net/api/v2';
