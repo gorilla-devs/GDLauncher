@@ -10,7 +10,11 @@ import { ipcRenderer } from 'electron';
 import path from 'path';
 import crypto from 'crypto';
 import { exec, spawn } from 'child_process';
-import { MC_LIBRARIES_URL } from '../../../common/utils/constants';
+import {
+  MC_LIBRARIES_URL,
+  FABRIC,
+  FORGE
+} from '../../../common/utils/constants';
 import { removeDuplicates } from '../../../common/utils';
 import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
@@ -738,4 +742,13 @@ export const convertcurseForgeToCanonical = (
     return v.split('-')[1] === patchedCurseForge;
   });
   return forgeEquivalent;
+};
+
+export const getPatchedInstanceType = instance => {
+  const isForge = instance.modloader[0] === FORGE;
+  const hasJumpLoader = (instance.mods || []).find(v => v.projectID === 361988);
+  if (isForge && !hasJumpLoader) {
+    return FORGE;
+  }
+  return FABRIC;
 };

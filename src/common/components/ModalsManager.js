@@ -28,7 +28,7 @@ const Overlay = styled.div`
   right: 0;
   backdrop-filter: blur(4px);
   will-change: opacity;
-  transition: opacity 220ms cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: opacity 300ms cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 1000;
 `;
 
@@ -41,7 +41,7 @@ const Modal = styled.div`
   justify-content: center;
   align-items: center;
   background: transparent;
-  transition: transform 220ms;
+  transition: transform 300ms;
   will-change: transform;
   transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 1001;
@@ -66,9 +66,9 @@ const modalsComponentLookupTable = {
   ModsUpdater
 };
 
-const ModalContainer = ({ unmounting, children, preventClose }) => {
+const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
   const [modalStyle, setModalStyle] = useState({
-    transform: 'scale(0.8)',
+    transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
     opacity: 0
   });
   const [bgStyle, setBgStyle] = useState({
@@ -107,8 +107,8 @@ const ModalContainer = ({ unmounting, children, preventClose }) => {
   const unMountStyle = () => {
     // css for unmount animation
     setModalStyle({
-      transform: 'scale(0.8)',
-      opacity: 0
+      transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
+      opacity: 1
     });
     setBgStyle({
       background: 'rgba(0, 0, 0, 0.70)',
@@ -150,6 +150,7 @@ const ModalsManager = () => {
         unmounting={unmounting}
         key={modalType}
         preventClose={modalProps.preventClose}
+        modalType={modalType}
       >
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <ModalComponent {...modalProps} />

@@ -10,12 +10,10 @@ import lt from 'semver/functions/lt';
 import lte from 'semver/functions/lte';
 import gt from 'semver/functions/gt';
 import omitBy from 'lodash/omitBy';
-import flatten from 'lodash/flatten';
 import { pipeline } from 'stream';
 import zlib from 'zlib';
 import lockfile from 'lockfile';
 import omit from 'lodash/omit';
-import chunk from 'lodash/chunk';
 import Seven, { extractFull } from 'node-7z';
 import { push } from 'connected-react-router';
 import { spawn } from 'child_process';
@@ -50,7 +48,6 @@ import {
   getAddonFiles,
   getAddon,
   getAddonCategories,
-  getMultipleAddons
 } from '../api';
 import {
   _getCurrentAccount,
@@ -81,7 +78,10 @@ import {
   isMod,
   isInstanceFolderPath,
   getFileHash,
-  getFilesRecursive
+  getFilesRecursive,
+  filterForgeFilesByVersion,
+  filterFabricFilesByVersion,
+  getPatchedInstanceType
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -2092,23 +2092,31 @@ export const initLatestMods = instanceName => {
       ?.map(v => v.projectID);
 
     // Check which mods need to be initialized
-    const modsToInit = modIds.filter(v => {
+    const modsToInit = modIds?.filter(v => {
       return !latestModManifests[v];
     });
 
-    if (modsToInit.length === 0) return;
+    if (!modsToInit || modsToInit?.length === 0) return;
 
     // Need to split in multiple requests
-    const chunks = chunk(modsToInit, 80);
-    const manifests = await Promise.all(
-      chunks.map(async c => {
-        const { data } = await getMultipleAddons(c);
-        return data;
-      })
+    const manifests = await pMap(
+      modsToInit,
+      async mod => {
+        const { data } = await getAddonFiles(mod);
+        return { projectID: mod, data };
+      },
+      { concurrency: 40 }
     );
     const manifestsObj = {};
-    flatten(manifests).map(v => {
-      manifestsObj[v.id] = v.gameVersionLatestFiles;
+    manifests.map(v => {
+      // Find latest version for each mod
+      const [latestMod] =
+        getPatchedInstanceType(instance) === FORGE || v.projectID === 361988
+          ? filterForgeFilesByVersion(v.data, instance.modloader[1])
+          : filterFabricFilesByVersion(v.data, instance.modloader[1]);
+      if (latestMod) {
+        manifestsObj[v.projectID] = latestMod;
+      }
       return null;
     });
 

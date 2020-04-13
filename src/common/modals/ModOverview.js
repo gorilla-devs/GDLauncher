@@ -16,7 +16,8 @@ import { _getInstancesPath, _getInstance } from '../utils/selectors';
 import { FABRIC, FORGE } from '../utils/constants';
 import {
   filterFabricFilesByVersion,
-  filterForgeFilesByVersion
+  filterForgeFilesByVersion,
+  getPatchedInstanceType
 } from '../../app/desktop/utils';
 
 const ModOverview = ({
@@ -42,8 +43,10 @@ const ModOverview = ({
     getAddon(projectID).then(data => setAddon(data.data));
     getAddonDescription(projectID).then(data => setDescription(data.data));
     getAddonFiles(projectID).then(data => {
-      const isFabric = instance.modloader[0] === FABRIC;
-      const isForge = instance.modloader[0] === FORGE;
+      const isFabric =
+        getPatchedInstanceType(instance) === FABRIC && projectID !== 361988;
+      const isForge =
+        getPatchedInstanceType(instance) === FORGE || projectID === 361988;
       let filteredFiles = [];
       if (isFabric) {
         filteredFiles = filterFabricFilesByVersion(data.data, gameVersion);

@@ -76,26 +76,6 @@ const RowContainer = styled.div.attrs(props => ({
     & > * {
       margin-left: 10px;
     }
-    svg:first-child {
-      &:hover {
-        cursor: pointer;
-        path {
-          cursor: pointer;
-          transition: all 0.1s ease-in-out;
-          color: ${props => props.theme.palette.colors.green};
-        }
-      }
-    }
-    svg:last-child {
-      &:hover {
-        cursor: pointer;
-        path {
-          cursor: pointer;
-          transition: all 0.1s ease-in-out;
-          color: ${props => props.theme.palette.error.main};
-        }
-      }
-    }
   }
 `;
 
@@ -230,12 +210,10 @@ const Row = memo(({ index, style, data }) => {
     latestMods
   } = data;
   const item = items[index];
-  const latestMod = latestMods[item.projectID]?.find(
-    v => v.gameVersion === gameVersion
-  );
   const isUpdateAvailable =
-    latestMod && latestMod.projectFileId !== item.fileID;
+    latestMods[item.projectID] && latestMods[item.projectID].id !== item.fileID;
   const dispatch = useDispatch();
+
   return (
     <RowContainer index={index} override={style}>
       <div className="leftPartContent">
@@ -274,6 +252,16 @@ const Row = memo(({ index, style, data }) => {
             <LoadingOutlined />
           ) : (
             <FontAwesomeIcon
+              css={`
+                &:hover {
+                  cursor: pointer;
+                  path {
+                    cursor: pointer;
+                    transition: all 0.1s ease-in-out;
+                    color: ${props => props.theme.palette.colors.green};
+                  }
+                }
+              `}
               icon={faDownload}
               onClick={async () => {
                 setUpdateLoading(true);
@@ -281,7 +269,7 @@ const Row = memo(({ index, style, data }) => {
                   updateMod(
                     instanceName,
                     item,
-                    latestMod.projectFileId,
+                    latestMods[item.projectID].id,
                     gameVersion
                   )
                 );
@@ -292,7 +280,7 @@ const Row = memo(({ index, style, data }) => {
         <Switch
           size="small"
           checked={path.extname(item.fileName) !== '.disabled'}
-          disabled={loading}
+          disabled={loading || updateLoading}
           onChange={async c => {
             setLoading(true);
             await toggleModDisabled(
@@ -306,7 +294,21 @@ const Row = memo(({ index, style, data }) => {
           }}
         />
         <FontAwesomeIcon
-          onClick={() => dispatch(deleteMod(instanceName, item))}
+          css={`
+            &:hover {
+              cursor: pointer;
+              path {
+                cursor: pointer;
+                transition: all 0.1s ease-in-out;
+                color: ${props => props.theme.palette.error.main};
+              }
+            }
+          `}
+          onClick={() => {
+            if (!loading && !updateLoading) {
+              dispatch(deleteMod(instanceName, item));
+            }
+          }}
           icon={faTrash}
         />
       </div>
@@ -391,11 +393,8 @@ const Mods = ({ instanceName }) => {
 
   const hasModUpdates = useMemo(() => {
     return instance?.mods?.find(v => {
-      const latestMod = latestMods[v.projectID]?.find(
-        x => x.gameVersion === instance.modloader[1]
-      );
       const isUpdateAvailable =
-        latestMod && latestMod.projectFileId !== v.fileID;
+        latestMods[v.projectID] && latestMods[v.projectID].id !== v.fileID;
       return isUpdateAvailable;
     });
   }, [instance.mods, latestMods]);

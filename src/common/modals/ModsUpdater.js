@@ -16,10 +16,9 @@ const ModsUpdater = ({ instanceName }) => {
 
   const filterAvailableUpdates = () => {
     return instance.mods.filter(mod => {
-      const latestMod = latestMods[mod.projectID]?.find(
-        v => v.gameVersion === instance.modloader[1]
+      return (
+        latestMods[mod.projectID] && latestMods[mod.projectID].id !== mod.fileID
       );
-      return latestMod && latestMod.projectFileId !== mod.fileID;
     });
   };
 
@@ -31,14 +30,11 @@ const ModsUpdater = ({ instanceName }) => {
       let i = 0;
       while (!cancel && i < totalMods.length) {
         const mod = totalMods[i];
-        const latestMod = latestMods[mod.projectID]?.find(
-          v => v.gameVersion === instance.modloader[1]
-        );
         await dispatch(
           updateMod(
             instanceName,
             mod,
-            latestMod.projectFileId,
+            latestMods[mod.projectID].id,
             instance.modloader[1],
             // eslint-disable-next-line
             p => {

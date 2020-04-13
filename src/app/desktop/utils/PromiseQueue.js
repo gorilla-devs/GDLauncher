@@ -27,7 +27,7 @@ class PromiseQueue {
         this.listeners.start = () => handler(this.queue.length + 1);
         break;
       case 'end':
-        this.listeners.end = handler;
+        this.listeners.end = () => handler();
         break;
       default:
         return null;

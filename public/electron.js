@@ -356,9 +356,10 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
       const updaterBat = 'updateLauncher.bat';
       await fs.writeFile(
         path.join(tempFolder, updaterBat),
-        `robocopy "${path.join(tempFolder, 'update')}" "." /MOV /E${
-          quitAfterInstall ? '' : ` & "${app.getPath('exe')}"`
-        }
+        `ping 127.0.0.1 -n 1 > nul & robocopy "${path.join(
+          tempFolder,
+          'update'
+        )}" "." /MOV /E${quitAfterInstall ? '' : ` & "${app.getPath('exe')}"`}
         DEL "${path.join(tempFolder, updaterVbs)}"
         DEL "%~f0"
         `
@@ -378,7 +379,12 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
       updateSpawn = spawn(path.join(tempFolder, updaterVbs), {
         cwd: path.dirname(app.getPath('exe')),
         detached: true,
-        shell: true
+        shell: true,
+        stdio: [
+          'ignore' /* stdin */,
+          'ignore' /* stdout */,
+          'ignore' /* stderr */
+        ]
       });
     } else {
       // Linux
@@ -396,7 +402,11 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
           cwd: path.dirname(app.getPath('exe')),
           detached: true,
           shell: true,
-          stdio: 'ignore'
+          stdio: [
+            'ignore' /* stdin */,
+            'ignore' /* stdout */,
+            'ignore' /* stderr */
+          ]
         }
       );
     }

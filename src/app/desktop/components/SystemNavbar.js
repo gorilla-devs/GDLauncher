@@ -7,13 +7,23 @@ import {
   faWindowMaximize,
   faWindowRestore,
   faTimes,
-  faTerminal
+  faTerminal,
+  faCog,
+  faDownload
 } from '@fortawesome/free-solid-svg-icons';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { openModal } from '../../../common/reducers/modals/actions';
+import logo from '../../../common/assets/logo.png';
+import {
+  checkForPortableUpdates,
+  updateUpdateAvailable
+} from '../../../common/reducers/actions';
 
 const SystemNavbar = () => {
+  const dispatch = useDispatch();
   const [isMaximized, setIsMaximized] = useState(false);
   const isUpdateAvailable = useSelector(state => state.updateAvailable);
+  const location = useSelector(state => state.router.location.pathname);
 
   useEffect(() => {
     ipcRenderer
@@ -28,6 +38,34 @@ const SystemNavbar = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') return;
+    setTimeout(() => {
+      console.log(process.env.REACT_APP_RELEASE_TYPE);
+      if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+        // Check every 10 minutes
+        ipcRenderer.invoke('checkForUpdates');
+        ipcRenderer.on('updateAvailable', () => {
+          dispatch(updateUpdateAvailable(true));
+        });
+      } else {
+        dispatch(checkForPortableUpdates())
+          .then(v => dispatch(updateUpdateAvailable(v)))
+          .catch(console.error);
+      }
+
+      setInterval(() => {
+        if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
+          ipcRenderer.invoke('checkForUpdates');
+        } else {
+          checkForPortableUpdates()
+            .then(val => dispatch(updateUpdateAvailable(val)))
+            .catch(console.error);
+        }
+      }, 600000);
+    }, 500);
+  }, []);
+
   const openDevTools = () => {
     ipcRenderer.invoke('open-devtools');
   };
@@ -35,8 +73,51 @@ const SystemNavbar = () => {
   const isOsx = process.platform === 'darwin';
 
   const DevtoolButton = () => (
-    <TerminalButton onClick={openDevTools}>
+    <TerminalButton
+      css={`
+        margin: 0 10px;
+      `}
+      onClick={openDevTools}
+    >
       <FontAwesomeIcon icon={faTerminal} />
+    </TerminalButton>
+  );
+
+  const SettingsButton = () => {
+    const modals = useSelector(state => state.modals);
+
+    const areSettingsOpen = modals.find(
+      v => v.modalType === 'Settings' && !v.unmounting
+    );
+    return (
+      <TerminalButton
+        areSettingsOpen={areSettingsOpen}
+        css={`
+          margin: 0 20px 0 10px;
+          ${props =>
+            props.areSettingsOpen
+              ? `background: ${props.theme.palette.grey[700]};`
+              : null}
+        `}
+        onClick={() => {
+          dispatch(openModal('Settings'));
+        }}
+      >
+        <FontAwesomeIcon icon={faCog} />
+      </TerminalButton>
+    );
+  };
+
+  const UpdateButton = () => (
+    <TerminalButton
+      onClick={() => {
+        ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+      }}
+      css={`
+        color: ${props => props.theme.palette.colors.green};
+      `}
+    >
+      <FontAwesomeIcon icon={faDownload} />
     </TerminalButton>
   );
 
@@ -48,12 +129,57 @@ const SystemNavbar = () => {
     }
   };
 
+  const isLocation = loc => {
+    if (loc === location) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <MainContainer>
-      {!isOsx && <DevtoolButton />}
+      {!isOsx && (
+        <div>
+          <a href="https://gdevs.io/" rel="noopener noreferrer">
+            <img
+              src={logo}
+              height="30px"
+              alt="logo"
+              draggable="false"
+              css={`
+                z-index: 1;
+                cursor: pointer;
+                margin-left: 8px;
+              `}
+            />
+          </a>
+          <DevtoolButton />
+        </div>
+      )}
+      {/* <div
+        css={`
+          height: 100%;
+          cursor: auto !important;
+        `}
+      >
+        Sponsored by
+        <img
+          src="EHEHEHHEH"
+          alt="Eheheh"
+          css={`
+            height: 100%;
+            transition: all 0.1s ease-in-out;
+            padding: 0 10px;
+          `}
+        />
+      </div> */}
       <Container os={isOsx}>
         {!isOsx ? (
           <>
+            {isUpdateAvailable && <UpdateButton />}
+            {!isLocation('/') && !isLocation('/onboarding') && (
+              <SettingsButton />
+            )}
             <div onClick={() => ipcRenderer.invoke('minimize-window')}>
               <FontAwesomeIcon icon={faWindowMinimize} />
             </div>
@@ -89,10 +215,31 @@ const SystemNavbar = () => {
                 icon={isMaximized ? faWindowRestore : faWindowMaximize}
               />
             </div>
+            {!isLocation('/') && !isLocation('/onboarding') && (
+              <SettingsButton />
+            )}
+            {isUpdateAvailable && <UpdateButton />}
           </>
         )}
       </Container>
-      {isOsx && <DevtoolButton />}
+      {isOsx && (
+        <div>
+          <DevtoolButton />
+          <a href="https://gdevs.io/" rel="noopener noreferrer">
+            <img
+              src={logo}
+              height="30px"
+              alt="logo"
+              draggable="false"
+              css={`
+                z-index: 1;
+                cursor: pointer;
+                margin-left: 8px;
+              `}
+            />
+          </a>
+        </div>
+      )}
     </MainContainer>
   );
 };
@@ -107,9 +254,10 @@ const MainContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 100000;
   & > * {
     -webkit-app-region: no-drag;
-    width: 35px;
     height: 100%;
     display: flex;
     justify-content: center;
@@ -123,10 +271,10 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 90px;
+  -webkit-app-region: drag;
   & > * {
     -webkit-app-region: no-drag;
-    width: 35px;
+    width: ${({ theme }) => theme.sizes.height.systemNavbar}px;
     height: 100%;
     display: flex;
     justify-content: center;
@@ -134,6 +282,9 @@ const Container = styled.div`
     align-items: center;
     &:hover {
       background: ${({ theme }) => theme.palette.grey[700]};
+    }
+    &:active {
+      background: ${({ theme }) => theme.palette.grey[600]};
     }
   }
   ${props => (props.os ? '& > *:first-child' : '& > *:last-child')} {
@@ -145,7 +296,16 @@ const Container = styled.div`
 
 const TerminalButton = styled.div`
   transition: background 0.1s ease-in-out;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  align-items: center;
+  width: ${({ theme }) => theme.sizes.height.systemNavbar}px;
+  height: 100%;
   &:hover {
     background: ${({ theme }) => theme.palette.grey[700]};
+  }
+  &:active {
+    background: ${({ theme }) => theme.palette.grey[600]};
   }
 `;
