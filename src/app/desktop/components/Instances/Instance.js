@@ -51,6 +51,17 @@ const Spinner = keyframes`
   }
 `;
 
+const PlayButtonAnimation = keyframes`
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
 const InstanceContainer = styled.div`
   display: flex;
   position: absolute;
@@ -99,11 +110,11 @@ const HoverContainer = styled.div`
     animation: 1.5s linear infinite ${Spinner};
     animation-play-state: inherit;
     border: solid 3px transparent;
-    border-bottom-color: ${props => props.theme.palette.colors.green};
+    border-bottom-color: ${props => props.theme.palette.colors.yellow};
     border-radius: 50%;
     content: '';
-    height: 60px;
-    width: 60px;
+    height: 30px;
+    width: 30px;
     position: absolute;
     top: 10px;
     transform: translate3d(-50%, -50%, 0);
@@ -261,16 +272,20 @@ const Instance = ({ instanceName }) => {
                       height: 20px;
                     `}
                   >
-                    <FontAwesomeIcon
-                      css={`
-                        color: ${({ theme }) => theme.palette.colors.green};
-                        font-size: 27px;
-                        position: absolute;
-                        margin-left: -6px;
-                        margin-top: -2px;
-                      `}
-                      icon={faPlay}
-                    />
+                    {isPlaying.initialized && (
+                      <FontAwesomeIcon
+                        css={`
+                          color: ${({ theme }) => theme.palette.colors.green};
+                          font-size: 27px;
+                          position: absolute;
+                          margin-left: -6px;
+                          margin-top: -2px;
+                          animation: ${PlayButtonAnimation} 0.5s
+                            cubic-bezier(0.75, -1.5, 0, 2.75);
+                        `}
+                        icon={faPlay}
+                      />
+                    )}
                     {!isPlaying.initialized && <div className="spinner" />}
                   </div>
                 )}
