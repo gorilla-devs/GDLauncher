@@ -6,7 +6,13 @@ import { LoadingOutlined } from '@ant-design/icons';
 import path from 'path';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faClock } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlay,
+  faClock,
+  faWrench,
+  faFolder,
+  faTrash
+} from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
 import { useSelector, useDispatch } from 'react-redux';
@@ -282,14 +288,35 @@ const Instance = ({ instanceName }) => {
         <MenuInstanceName>{instanceName}</MenuInstanceName>
         {isPlaying && <MenuItem onClick={killProcess}>Kill</MenuItem>}
         <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
+          <FontAwesomeIcon
+            icon={faWrench}
+            css={`
+              margin-right: 10px;
+            `}
+          />
           Manage
         </MenuItem>
-        <MenuItem onClick={openFolder}>Open Folder</MenuItem>
+        <MenuItem onClick={openFolder}>
+          {' '}
+          <FontAwesomeIcon
+            icon={faFolder}
+            css={`
+              margin-right: 10px;
+            `}
+          />
+          Open Folder
+        </MenuItem>
         <MenuItem divider />
         <MenuItem
           disabled={Boolean(isInQueue) || Boolean(isPlaying)}
           onClick={openConfirmationDeleteModal}
         >
+          <FontAwesomeIcon
+            icon={faTrash}
+            css={`
+              margin-right: 10px;
+            `}
+          />
           Delete
         </MenuItem>
       </ContextMenu>

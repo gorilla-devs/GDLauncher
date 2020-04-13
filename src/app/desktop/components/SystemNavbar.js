@@ -139,7 +139,12 @@ const SystemNavbar = () => {
   return (
     <MainContainer>
       {!isOsx && (
-        <div>
+        <div
+          css={`
+            cursor: auto !important;
+            -webkit-app-region: drag;
+          `}
+        >
           <a href="https://gdevs.io/" rel="noopener noreferrer">
             <img
               src={logo}
