@@ -11,7 +11,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { _getInstance } from '../../utils/selectors';
 import { FORGE, FABRIC } from '../../utils/constants';
 import Modpack from './Modpack';
-import { initLatestMods, clearLatestModManifests } from '../../reducers/actions';
+import {
+  initLatestMods,
+  clearLatestModManifests
+} from '../../reducers/actions';
 
 const SideMenu = styled.div`
   display: flex;
@@ -91,8 +94,10 @@ const InstanceManager = ({ instanceName }) => {
   }, []);
 
   useEffect(() => {
-    dispatch(initLatestMods(instance.name));
-  }, [instance.mods]);
+    if (instance?.name) {
+      dispatch(initLatestMods(instance.name));
+    }
+  }, [instance?.mods]);
 
   return (
     <Modal
