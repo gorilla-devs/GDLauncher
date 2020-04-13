@@ -47,7 +47,7 @@ import {
   getAddonsByFingerprint,
   getAddonFiles,
   getAddon,
-  getAddonCategories,
+  getAddonCategories
 } from '../api';
 import {
   _getCurrentAccount,
