@@ -11,7 +11,8 @@ import {
   faClock,
   faWrench,
   faFolder,
-  faTrash
+  faTrash,
+  faStop
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -104,8 +105,7 @@ const HoverContainer = styled.div`
     height: 60px;
     width: 60px;
     position: absolute;
-    top: 13px;
-    left: 9px;
+    top: 10px;
     transform: translate3d(-50%, -50%, 0);
     will-change: transform;
   }
@@ -259,7 +259,6 @@ const Instance = ({ instanceName }) => {
                       position: relative;
                       width: 20px;
                       height: 20px;
-                      margin-top: -8px;
                     `}
                   >
                     <FontAwesomeIcon
@@ -267,6 +266,8 @@ const Instance = ({ instanceName }) => {
                         color: ${({ theme }) => theme.palette.colors.green};
                         font-size: 27px;
                         position: absolute;
+                        margin-left: -6px;
+                        margin-top: -2px;
                       `}
                       icon={faPlay}
                     />
@@ -286,7 +287,17 @@ const Instance = ({ instanceName }) => {
         onHide={() => setIsHovered(false)}
       >
         <MenuInstanceName>{instanceName}</MenuInstanceName>
-        {isPlaying && <MenuItem onClick={killProcess}>Kill</MenuItem>}
+        {isPlaying && (
+          <MenuItem onClick={killProcess}>
+            <FontAwesomeIcon
+              icon={faStop}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Kill
+          </MenuItem>
+        )}
         <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
           <FontAwesomeIcon
             icon={faWrench}
@@ -297,7 +308,6 @@ const Instance = ({ instanceName }) => {
           Manage
         </MenuItem>
         <MenuItem onClick={openFolder}>
-          {' '}
           <FontAwesomeIcon
             icon={faFolder}
             css={`
