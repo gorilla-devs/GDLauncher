@@ -794,9 +794,7 @@ export function downloadForge(instanceName) {
       if (fileMd5.toString() !== expectedMd5) {
         throw new Error('Installer hash mismatch');
       }
-      if (!pre152) {
-        await fse.copy(expectedInstaller, tempInstaller, { overwrite: true });
-      }
+      await fse.copy(expectedInstaller, tempInstaller, { overwrite: true });
     } catch (err) {
       console.warn(
         'No installer found in temp or hash mismatch. Need to download it.'
@@ -958,7 +956,6 @@ export function downloadForge(instanceName) {
         async lib => {
           let ok = false;
           let tries = 0;
-          /* eslint-disable no-await-in-loop */
           do {
             tries += 1;
             if (tries !== 1) {
@@ -985,7 +982,6 @@ export function downloadForge(instanceName) {
               console.error(err);
             }
           } while (!ok && tries <= 3);
-          /* eslint-enable no-await-in-loop */
         },
         { concurrency: state.settings.concurrentDownloads }
       );
@@ -1025,14 +1021,10 @@ export function downloadForge(instanceName) {
         path.join(_getTempPath(state), modloader[2]),
         {
           $bin: sevenZipPath,
-          yes: true,
-          $progress: true
+          yes: true
         }
       );
       await new Promise((resolve, reject) => {
-        extraction.on('progress', ({ percent }) => {
-          dispatch(updateDownloadProgress(percent / 2));
-        });
         extraction.on('end', () => {
           resolve();
         });
@@ -1041,19 +1033,17 @@ export function downloadForge(instanceName) {
         });
       });
 
+      dispatch(updateDownloadProgress(50));
+
       const updatedFiles = Seven.add(
         mcJarForgePath,
         `${path.join(_getTempPath(state), modloader[2])}/*`,
         {
           $bin: sevenZipPath,
-          yes: true,
-          $progress: true
+          yes: true
         }
       );
       await new Promise((resolve, reject) => {
-        updatedFiles.on('progress', ({ percent }) => {
-          dispatch(updateDownloadProgress(50 + percent / 2));
-        });
         updatedFiles.on('end', () => {
           resolve();
         });
