@@ -167,6 +167,7 @@ app.on('ready', createWindow);
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
+    app.exit();
   }
 });
 
@@ -359,7 +360,9 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
         `ping 127.0.0.1 -n 1 > nul & robocopy "${path.join(
           tempFolder,
           'update'
-        )}" "." /MOV /E${quitAfterInstall ? '' : ` & "${app.getPath('exe')}"`}
+        )}" "." /MOV /E${
+          quitAfterInstall ? '' : ` & start "" "${app.getPath('exe')}"`
+        }
         DEL "${path.join(tempFolder, updaterVbs)}"
         DEL "%~f0"
         `
