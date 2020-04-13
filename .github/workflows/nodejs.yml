@@ -49,6 +49,24 @@ jobs:
           node ./scripts/uploadRelease.js
         shell: bash
 
+      - uses: actions/upload-artifact@v1
+        if: matrix.os == 'macos-latest'
+        with:
+          name: MacOs Release
+          path: deploy
+
+      - uses: actions/upload-artifact@v1
+        if: matrix.os == 'windows-latest'
+        with:
+          name: Windows Release
+          path: deploy
+
+      - uses: actions/upload-artifact@v1
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: Linux Release
+          path: deploy
+
       - uses: actions/setup-ruby@v1
       - name: Send Webhook Notification
         if: matrix.os == 'macos-latest'
