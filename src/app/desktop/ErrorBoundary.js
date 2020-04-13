@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'antd';
-import creeper from '../../common/assets/creeper.png';
 import { ipcRenderer } from 'electron';
+import creeper from '../../common/assets/creeper.png';
 
 const FFMarkW05MedWoff2 =
   'https://lolstatic-a.akamaihd.net/rso-login-page/2.2.20/assets/FFMarkW05-Medium.662fbc7901e31d6bee9c91d5f2cf42a1.woff2';
