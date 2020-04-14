@@ -1,4 +1,5 @@
 const { Client } = require('discord-rpc');
+const log = require('electron-log');
 
 let client;
 let activity;
@@ -16,15 +17,15 @@ exports.initRPC = () => {
   };
 
   client.on('ready', () => {
-    console.log('Discord RPC Connected');
+    log.log('Discord RPC Connected');
     client.setActivity(activity);
   });
 
   client.login({ clientId: '555898932467597312' }).catch(error => {
     if (error.message.includes('ENOENT')) {
-      console.log('Unable to initialize Discord RPC, no client detected.');
+      log.error('Unable to initialize Discord RPC, no client detected.');
     } else {
-      console.log('Unable to initialize Discord RPC:', error);
+      log.error('Unable to initialize Discord RPC:', error);
     }
   });
 };

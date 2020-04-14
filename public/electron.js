@@ -15,6 +15,7 @@ const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
 const Store = require('electron-store');
+const log = require('electron-log');
 const fs = require('fs').promises;
 
 const discordRPC = require('./discordRPC');
@@ -46,7 +47,7 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
   }
 }
 
-console.log(process.env.REACT_APP_RELEASE_TYPE);
+log.log(process.env.REACT_APP_RELEASE_TYPE);
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -139,10 +140,6 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
   mainWindow.on('maximize', () => {
     mainWindow.webContents.send('window-maximized');
   });
@@ -165,6 +162,7 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
+  log.log('Quitting app (window-all-closed)');
   if (process.platform !== 'darwin') {
     app.quit();
     app.exit();
@@ -215,8 +213,7 @@ ipcMain.handle('show-window', () => {
 });
 
 ipcMain.handle('quit-app', () => {
-  app.quit();
-  app.exit();
+  mainWindow.close();
 });
 
 ipcMain.handle('getAppdataPath', () => {
@@ -267,9 +264,9 @@ ipcMain.handle('openFileDialog', (e, filters) => {
 });
 
 ipcMain.handle('appRestart', () => {
+  log.log('Restarting app');
   app.relaunch();
-  app.quit();
-  app.exit();
+  mainWindow.close();
 });
 
 ipcMain.handle('getPrimaryDisplaySizes', () => {
@@ -290,22 +287,26 @@ ipcMain.handle('shutdown-discord-rpc', () => {
 
 ipcMain.handle('start-listener', async (e, dirPath) => {
   try {
+    log.log('Trying to start listener');
     if (watcher) {
       await watcher.stop();
       watcher = null;
     }
     watcher = await nsfw(dirPath, events => {
+      log.log('Received listener events', events.length);
       mainWindow.webContents.send('listener-events', events);
     });
+    log.log('Started listener');
     return watcher.start();
   } catch (err) {
-    console.error(err);
+    log.error(err);
     return Promise.reject(err);
   }
 });
 
 ipcMain.handle('stop-listener', async () => {
   if (watcher) {
+    log.log('Stopping listener');
     await watcher.stop();
     watcher = null;
   }
@@ -415,7 +416,6 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
       );
     }
     updateSpawn.unref();
-    app.quit();
-    app.exit();
+    mainWindow.close();
   }
 });
