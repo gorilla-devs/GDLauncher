@@ -150,7 +150,8 @@ const commonConfig = {
       deleteAppDataOnUninstall: true,
       allowToChangeInstallationDirectory: true,
       perMachine: false,
-      differentialPackage: true
+      differentialPackage: true,
+      include: 'public/installer.nsh'
     },
     /* eslint-disable */
     artifactName: `${'${productName}'}-${'${platform}'}-${
