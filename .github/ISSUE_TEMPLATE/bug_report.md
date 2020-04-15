@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a bug report to help us improve GDLauncher.
+about: Create a bug report to help improve GDLauncher.
 title: "[Bug] "
 labels: ''
 assignees: ''
