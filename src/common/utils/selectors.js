@@ -62,7 +62,7 @@ export const _getJavaPath = createSelector(
 );
 
 export const _getInstancesPath = createSelector(_userData, userData =>
-  path.join(userData, 'instances_next')
+  path.join(userData, 'instances')
 );
 
 export const _getTempPath = createSelector(_userData, userData =>
