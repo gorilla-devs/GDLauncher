@@ -1,17 +1,18 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-
+name: Feature Requests
+about: Suggest a feature to help improve GDLauncher.
+title: "[Feature] "
+labels: ''
+assignees: ''
+---
+### We are currently only taking Feature Requests for the Upcoming Next Release which will fix most of the legacy build's bugs.
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Describe the new feature you are requesting**
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Describe alternatives to this feature if Applicable**
+
+
+**Additional Inforomation**
