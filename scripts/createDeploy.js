@@ -211,7 +211,7 @@ const main = async () => {
       win32: [
         path.join('nsis-web', `${nameTemplate}.exe`),
         path.join('nsis-web', nsisWeb7z),
-        path.join('nsis-web', 'latest.yml'),
+        path.join('nsis-web', 'latest.yml')
       ],
       linux: [`${nameTemplate}.AppImage`, 'latest-linux.yml']
     },

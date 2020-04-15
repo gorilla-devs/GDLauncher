@@ -45,7 +45,10 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
   if (store.has('userDataOverride')) {
     app.setPath('userData', store.get('userDataOverride'));
   } else {
-    app.setPath('userData', path.join(app.getPath('appData'), "GDLauncher_Next"));
+    app.setPath(
+      'userData',
+      path.join(app.getPath('appData'), 'GDLauncher_Next')
+    );
   }
 }
 
@@ -65,7 +68,7 @@ function createWindow() {
     minHeight: 700,
     show: true,
     frame: false,
-    backgroundColor: '#353E48',
+    backgroundColor: '#212B36',
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
