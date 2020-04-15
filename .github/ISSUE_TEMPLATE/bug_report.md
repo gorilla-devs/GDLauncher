@@ -1,31 +1,34 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-
+name: Bug Report
+about: Create a bug report to help us improve GDLauncher.
+title: "[Bug] "
+labels: ''
+assignees: ''
+---
+### We are currently only taking Bug Reports for the Upcoming Next Release which will fix most of the legacy build's bugs.
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Operating System used:**
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
 
-**Possible solutions**
-Some ideas of how you would solve this issue, if possible
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Actual behavior:**
 
-**Operating System:**
- - OS: [e.g. Windows]
- - Version [e.g. 10]
 
-**Additional context**
-Add any other context about the problem here.
+
+
+**Steps to reproduce the behavior:**
+
+
+
+**Expected behavior:**
+
+
+
+**If applicable, add screenshots/videos to help explain:**
+
+
+
+**Additional context:**
+<!-- Add any other context about the problem if there is any. -->
