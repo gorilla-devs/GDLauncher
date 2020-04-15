@@ -212,13 +212,13 @@ const SystemNavbar = () => {
             >
               <FontAwesomeIcon icon={faTimes} />
             </div>
-            <div onClick={() => ipcRenderer.invoke('minimize-window')}>
-              <FontAwesomeIcon icon={faWindowMinimize} />
-            </div>
             <div onClick={() => ipcRenderer.invoke('min-max-window')}>
               <FontAwesomeIcon
                 icon={isMaximized ? faWindowRestore : faWindowMaximize}
               />
+            </div>
+            <div onClick={() => ipcRenderer.invoke('minimize-window')}>
+              <FontAwesomeIcon icon={faWindowMinimize} />
             </div>
             {!isLocation('/') && !isLocation('/onboarding') && (
               <SettingsButton />
@@ -239,7 +239,7 @@ const SystemNavbar = () => {
               css={`
                 z-index: 1;
                 cursor: pointer;
-                margin-left: 8px;
+                margin-right: 8px;
               `}
             />
           </a>
