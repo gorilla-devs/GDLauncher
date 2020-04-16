@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { closeModal } from '../reducers/modals/actions';
-import AsyncComponent from '../components/AsyncComponent';
+import AsyncComponent from './AsyncComponent';
 import AddInstance from '../modals/AddInstance';
 import Settings from '../modals/Settings';
 
