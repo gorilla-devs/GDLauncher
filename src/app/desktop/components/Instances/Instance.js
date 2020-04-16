@@ -211,10 +211,15 @@ const Instance = ({ instanceName }) => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
   const killProcess = () => {
+    console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
-      children.forEach(el => {
-        process.kill(el.PID);
-      });
+      if (children.length) {
+        children.forEach(el => {
+          process.kill(el.PID);
+        });
+      } else {
+        process.kill(isPlaying.pid);
+      }
     });
   };
 
