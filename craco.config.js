@@ -43,9 +43,9 @@ module.exports = ({ env }) => {
       ]
     },
     webpack: {
-      devtool: 'eval-cheap-source-map',
+      devtool: 'eval-cheap-module-source-map',
       configure: {
-        devtool: 'eval-cheap-source-map',
+        devtool: 'eval-cheap-module-source-map',
         target:
           process.env.APP_TYPE === 'electron' ? 'electron-renderer' : 'web',
         optimization: {

@@ -59,7 +59,7 @@ const baseConfig = {
 };
 
 module.exports = merge.smart(baseConfig, {
-  devtool: 'eval-cheap-source-map',
+  devtool: 'eval-cheap-module-source-map',
 
   mode: 'production',
 
