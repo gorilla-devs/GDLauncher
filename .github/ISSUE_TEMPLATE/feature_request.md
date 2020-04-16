@@ -2,7 +2,7 @@
 name: Feature Requests
 about: Suggest a feature to help improve GDLauncher.
 title: "[Feature] "
-labels: ''
+labels: 'Feature'
 assignees: ''
 ---
 ### We are currently only taking Feature Requests for the Upcoming Next Release which will fix most of the legacy build's bugs.
