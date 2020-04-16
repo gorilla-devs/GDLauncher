@@ -1,24 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-// import Settings from "components/modals/Settings";
-// import Changelog from "components/modals/Changelog";
-// import LoginHelper from "components/modals/LoginHelper";
-import AddInstance from '../modals/AddInstance';
-import Settings from '../modals/Settings/Settings';
-import Screenshot from '../modals/Screenshot';
-import InstanceDeleteConfirmation from '../modals/InstanceDeleteConfirmation';
-import ActionConfirmation from '../modals/ActionConfirmation';
-import AccountsManager from '../modals/AccountsManager';
-import AddAccount from '../modals/AddAccount';
-import InstanceManager from '../modals/InstanceManager';
-import ModsBrowser from '../modals/ModsBrowser';
-import ModpackDescription from '../modals/ModpackDescription';
-import Onboarding from '../modals/Onboarding';
-import JavaSetup from '../modals/JavaSetup';
-import ModsUpdater from '../modals/ModsUpdater';
-import ModOverview from '../modals/ModOverview';
 import { closeModal } from '../reducers/modals/actions';
+import AsyncComponent from '../components/AsyncComponent';
+import AddInstance from '../modals/AddInstance';
+import Settings from '../modals/Settings';
 
 const Overlay = styled.div`
   position: absolute;
@@ -48,22 +34,30 @@ const Modal = styled.div`
 `;
 
 const modalsComponentLookupTable = {
-  // Changelog,
-  // LoginHelper
   AddInstance,
-  AccountsManager,
+  AccountsManager: AsyncComponent(
+    lazy(() => import('../modals/AccountsManager'))
+  ),
   Settings,
-  Screenshot,
-  InstanceDeleteConfirmation,
-  ActionConfirmation,
-  AddAccount,
-  ModpackDescription,
-  InstanceManager,
-  Onboarding,
-  ModOverview,
-  ModsBrowser,
-  JavaSetup,
-  ModsUpdater
+  Screenshot: AsyncComponent(lazy(() => import('../modals/Screenshot'))),
+  InstanceDeleteConfirmation: AsyncComponent(
+    lazy(() => import('../modals/InstanceDeleteConfirmation'))
+  ),
+  ActionConfirmation: AsyncComponent(
+    lazy(() => import('../modals/ActionConfirmation'))
+  ),
+  AddAccount: AsyncComponent(lazy(() => import('../modals/AddAccount'))),
+  ModpackDescription: AsyncComponent(
+    lazy(() => import('../modals/ModpackDescription'))
+  ),
+  InstanceManager: AsyncComponent(
+    lazy(() => import('../modals/InstanceManager'))
+  ),
+  Onboarding: AsyncComponent(lazy(() => import('../modals/Onboarding'))),
+  ModOverview: AsyncComponent(lazy(() => import('../modals/ModOverview'))),
+  ModsBrowser: AsyncComponent(lazy(() => import('../modals/ModsBrowser'))),
+  JavaSetup: AsyncComponent(lazy(() => import('../modals/JavaSetup'))),
+  ModsUpdater: AsyncComponent(lazy(() => import('../modals/ModsUpdater')))
 };
 
 const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {

@@ -118,6 +118,12 @@ const createDeployFiles = async type => {
 
 const commonConfig = {
   config: {
+    publish: {
+      owner: 'gorilla-devs',
+      repo: 'GDLauncher-Releases',
+      provider: 'github',
+      private: false
+    },
     productName: 'GDLauncher',
     appId: 'org.gorilladevs.GDLauncher',
     files: [
@@ -172,8 +178,7 @@ const commonConfig = {
       buildResources: 'public',
       output: 'release'
     }
-  },
-  publish: 'never'
+  }
 };
 
 const main = async () => {

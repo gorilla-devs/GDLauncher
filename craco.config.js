@@ -43,19 +43,29 @@ module.exports = ({ env }) => {
       ]
     },
     webpack: {
+      devtool: 'eval-cheap-source-map',
       configure: {
+        devtool: 'eval-cheap-source-map',
         target:
           process.env.APP_TYPE === 'electron' ? 'electron-renderer' : 'web',
         optimization: {
           splitChunks: {
             name: false,
+            chunks: 'all',
+            maxInitialRequests: Infinity,
             cacheGroups: {
               vendor: {
-                // sync + async chunks
-                chunks: 'all',
-                name: 'vendor',
-                // import file path containing node_modules
-                test: /node_modules/
+                test: /[\\/]node_modules[\\/]!(antd)/,
+                name(module) {
+                  // get the name. E.g. node_modules/packageName/not/this/part.js
+                  // or node_modules/packageName
+                  const packageName = module.context.match(
+                    /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+                  )[1];
+
+                  // npm package names are URL-safe, but some servers don't like @ symbols
+                  return `npm.${packageName.replace('@', '')}`;
+                }
               }
             }
           }
