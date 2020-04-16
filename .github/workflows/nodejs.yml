@@ -38,6 +38,11 @@ jobs:
       - name: yarn release
         env:
           CI: false
+          TRAVIS_TAG: false
+          APPVEYOR_REPO_TAG_NAME: false
+          CIRCLE_TAG: false
+          BITRISE_GIT_TAG: false
+          CI_BUILD_TAG: false
         run: |
           yarn release
       - name: upload release to github
