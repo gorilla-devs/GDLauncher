@@ -2,7 +2,7 @@
 name: Bug Report
 about: Create a bug report to help improve GDLauncher.
 title: "[Bug] "
-labels: ''
+labels: 'Bug'
 assignees: ''
 ---
 ### We are currently only taking Bug Reports for the Upcoming Next Release which will fix most of the legacy build's bugs.
