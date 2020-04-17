@@ -6,16 +6,21 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { ConnectedRouter } from 'connected-react-router';
 import { configureStore, history } from './common/store/configureStore';
 import theme from './ui/theme';
+import RootDev from './Root-Dev';
+import RootWeb from './Root-Web';
+import RootElectron from './Root-Electron';
 import ModalsManager from './common/components/ModalsManager';
 
 import 'typeface-roboto';
 import ErrorBoundary from './app/desktop/ErrorBoundary';
 
-console.log(process.env.REACT_APP_TYPE);
 const Root =
-  process.env.REACT_APP_TYPE === 'web'
-    ? require('./Root-Web').default
-    : require('./Root-Electron').default;
+  // eslint-disable-next-line no-nested-ternary
+  process.env.NODE_ENV === 'development'
+    ? RootDev
+    : process.env.APP_TYPE === 'web'
+    ? RootWeb
+    : RootElectron;
 
 const ThemeProvider = ({ theme: themeUI, children }) => {
   return <StyledThemeProvider theme={themeUI}>{children}</StyledThemeProvider>;

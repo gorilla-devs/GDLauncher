@@ -5,6 +5,8 @@ import { persistReducer, persistStore } from 'redux-persist';
 import { createLogger } from 'redux-logger';
 import isElectron from 'is-electron';
 import thunk from './thunkEnhancer';
+import middlewareInstances from '../../app/desktop/utils/middlewareInstances';
+import middlewareApp from '../../app/desktop/utils/middlewareApp';
 import createRootReducer from '../reducers';
 import persistConfig from './persistConfig';
 import { UPDATE_DOWNLOAD_PROGRESS } from '../reducers/actionTypes';
@@ -39,10 +41,8 @@ const configureStore = () => {
   middleware.push(router);
 
   if (isElectron()) {
-    // eslint-disable-next-line
-    middleware.push(require('../../app/desktop/utils/middlewareApp'));
-    // eslint-disable-next-line
-    middleware.push(require('../../app/desktop/utils/middlewareInstances'));
+    middleware.push(middlewareApp);
+    middleware.push(middlewareInstances);
   }
 
   // Redux DevTools Configuration

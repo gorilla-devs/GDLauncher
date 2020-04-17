@@ -43,19 +43,11 @@ module.exports = ({ env }) => {
       ]
     },
     webpack: {
-      devtool:
-        process.env.REACT_APP_TYPE === 'web'
-          ? 'source-map'
-          : 'eval-cheap-module-source-map',
+      devtool: 'eval-cheap-module-source-map',
       configure: {
-        devtool:
-          process.env.REACT_APP_TYPE === 'web'
-            ? 'source-map'
-            : 'eval-cheap-module-source-map',
+        devtool: 'eval-cheap-module-source-map',
         target:
-          process.env.REACT_APP_TYPE === 'electron'
-            ? 'electron-renderer'
-            : 'web',
+          process.env.APP_TYPE === 'electron' ? 'electron-renderer' : 'web',
         optimization: {
           splitChunks: {
             name: false,

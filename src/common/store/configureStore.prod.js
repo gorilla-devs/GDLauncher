@@ -5,6 +5,8 @@ import { routerMiddleware } from 'connected-react-router';
 import isElectron from 'is-electron';
 import thunk from './thunkEnhancer';
 import createRootReducer from '../reducers';
+import middlewareInstances from '../../app/desktop/utils/middlewareInstances';
+import middlewareApp from '../../app/desktop/utils/middlewareApp';
 import persistConfig from './persistConfig';
 
 const history = createHashHistory();
@@ -17,10 +19,8 @@ const enhancer = compose(
   applyMiddleware(
     thunk,
     router,
-    isElectron() ? require('../../app/desktop/utils/middlewareApp') : undefined,
-    isElectron()
-      ? require('../../app/desktop/utils/middlewareInstances')
-      : undefined
+    isElectron() ? middlewareApp : undefined,
+    isElectron() ? middlewareInstances : undefined
   )
 );
 
