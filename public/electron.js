@@ -47,7 +47,7 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
   } else {
     app.setPath(
       'userData',
-      path.join(app.getPath('appData'), 'GDLauncher_Next')
+      path.join(app.getPath('appData'), 'gdlauncher_next')
     );
   }
 }
