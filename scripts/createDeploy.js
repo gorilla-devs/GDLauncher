@@ -230,7 +230,7 @@ const main = async () => {
     }
   };
 
-  if (process.env.RELEASE_TESTING) {
+  if (!process.env.RELEASE_TESTING) {
     const filesToMove = allFiles[type];
 
     await Promise.all(
