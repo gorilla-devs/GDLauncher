@@ -1,14 +1,17 @@
-import createElectronStorage from 'redux-persist-electron-storage';
+import isElectron from 'is-electron';
+import storage from 'redux-persist/lib/storage';
 
 export default {
   key: 'root',
-  storage: createElectronStorage({
-    electronStoreOpts: {
-      name: 'config',
-      // This is used to ensure integrity, not for security reasons
-      encryptionKey: 'GDLauncher',
-      fileExtension: ''
-    }
-  }),
+  storage: isElectron()
+    ? require('redux-persist-electron-storage')({
+        electronStoreOpts: {
+          name: 'config',
+          // This is used to ensure integrity, not for security reasons
+          encryptionKey: 'GDLauncher',
+          fileExtension: ''
+        }
+      })
+    : storage,
   whitelist: ['settings', 'app']
 };

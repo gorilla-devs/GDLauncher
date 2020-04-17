@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
-import { ipcRenderer } from 'electron';
+import isElectron from 'is-electron';
 import creeper from '../../common/assets/creeper.png';
 
 const FFMarkW05MedWoff2 =
@@ -102,7 +102,11 @@ export default class ErrorBoundary extends React.Component {
           <Button
             type="primary"
             onClick={() => {
-              ipcRenderer.invoke('appRestart');
+              if (isElectron()) {
+                // eslint-disable-next-line
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.invoke('appRestart');
+              }
             }}
             css={`
               margin-top: 30px;
