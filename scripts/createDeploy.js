@@ -182,6 +182,7 @@ const commonConfig = {
 };
 
 const main = async () => {
+  console.log(JSON.stringify(process.env));
   const type = process.argv[2];
   if (process.platform === 'darwin' && type === 'portable') {
     return null;
