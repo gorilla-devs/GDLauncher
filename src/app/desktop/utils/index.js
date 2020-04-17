@@ -654,13 +654,23 @@ export const reflect = p =>
     e => ({ e, status: false })
   );
 
+export const convertCompletePathToInstance = (f, instancesPath) => {
+  const escapeRegExp = stringToGoIntoTheRegex => {
+    return stringToGoIntoTheRegex.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  };
+
+  return f.replace(new RegExp(escapeRegExp(instancesPath), 'gi'), '');
+};
+
 export const isMod = (fileName, instancesPath) =>
   /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
-    fileName.replace(instancesPath, '')
+    convertCompletePathToInstance(fileName, instancesPath)
   );
 
 export const isInstanceFolderPath = (f, instancesPath) =>
-  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(f.replace(instancesPath, ''));
+  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(
+    convertCompletePathToInstance(f, instancesPath)
+  );
 
 export const isFileModFabric = file => {
   return (
