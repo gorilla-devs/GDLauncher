@@ -178,7 +178,10 @@ const commonConfig = {
       buildResources: 'public',
       output: 'release'
     }
-  }
+  },
+  linux: ['appimage:x64', 'zip:x64'],
+  win: ['nsis-web:x64', 'zip:x64'],
+  mac: ['dmg:x64']
 };
 
 const main = async () => {
@@ -227,18 +230,20 @@ const main = async () => {
     }
   };
 
-  const filesToMove = allFiles[type][process.platform];
+  const filesToMove = allFiles[type];
 
   await Promise.all(
-    filesToMove.map(async file => {
-      const stats = await fs.promises.stat(path.join(releasesFolder, file));
-      if (stats.isFile()) {
-        await fse.move(
-          path.join(releasesFolder, file),
-          path.join(deployFolder, file.replace('nsis-web', ''))
-        );
-      }
-    })
+    Object.values(filesToMove).map(target =>
+      target.map(async file => {
+        const stats = await fs.promises.stat(path.join(releasesFolder, file));
+        if (stats.isFile()) {
+          await fse.move(
+            path.join(releasesFolder, file),
+            path.join(deployFolder, file.replace('nsis-web', ''))
+          );
+        }
+      })
+    )
   );
 
   await fse.remove(releasesFolder);

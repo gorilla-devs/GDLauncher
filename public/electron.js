@@ -179,6 +179,7 @@ app.on('before-quit', async () => {
     watcher = null;
   }
   mainWindow.removeAllListeners('close');
+  mainWindow = null;
 });
 
 app.on('second-instance', () => {
