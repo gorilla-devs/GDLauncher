@@ -35,12 +35,13 @@ jobs:
           yarn lint
       - name: yarn release
         env:
-          CI: ""
-          TRAVIS_TAG: ""
-          APPVEYOR_REPO_TAG_NAME: ""
-          CIRCLE_TAG: ""
-          BITRISE_GIT_TAG: ""
-          CI_BUILD_TAG: ""
+          CI: ''
+          TRAVIS_TAG: ''
+          APPVEYOR_REPO_TAG_NAME: ''
+          CIRCLE_TAG: ''
+          BITRISE_GIT_TAG: ''
+          CI_BUILD_TAG: ''
+          RELEASE_TESTING: true
         run: |
           yarn release
       - uses: actions/upload-artifact@v1

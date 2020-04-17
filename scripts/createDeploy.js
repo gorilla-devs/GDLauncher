@@ -230,11 +230,27 @@ const main = async () => {
     }
   };
 
-  const filesToMove = allFiles[type];
+  if (process.env.RELEASE_TESTING) {
+    const filesToMove = allFiles[type];
 
-  await Promise.all(
-    Object.values(filesToMove).map(target =>
-      target.map(async file => {
+    await Promise.all(
+      Object.values(filesToMove).map(target =>
+        target.map(async file => {
+          const stats = await fs.promises.stat(path.join(releasesFolder, file));
+          if (stats.isFile()) {
+            await fse.move(
+              path.join(releasesFolder, file),
+              path.join(deployFolder, file.replace('nsis-web', ''))
+            );
+          }
+        })
+      )
+    );
+  } else {
+    const filesToMove = allFiles[type][process.platform];
+
+    await Promise.all(
+      filesToMove.map(async file => {
         const stats = await fs.promises.stat(path.join(releasesFolder, file));
         if (stats.isFile()) {
           await fse.move(
@@ -243,8 +259,8 @@ const main = async () => {
           );
         }
       })
-    )
-  );
+    );
+  }
 
   await fse.remove(releasesFolder);
 };
