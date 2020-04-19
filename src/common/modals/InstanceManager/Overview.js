@@ -98,18 +98,18 @@ const Overview = ({ instanceName }) => {
 
   const dispatch = useDispatch();
 
-  // const setBg = async () => {
-  //   const instancePath = path.join(instancesPath, instanceName);
-  //   const filePath = path.join(instancePath, `bg.png`);
-  //   const existFile = await fss.lstat(filePath);
-  //   if (existFile) {
-  //     setBackground(filePath);
-  //   }
-  // };
+  const setBg = async () => {
+    const instancePath = path.join(instancesPath, instanceName);
+    const filePath = path.join(instancePath, `bg.png`);
+    const existFile = await fss.lstat(filePath);
+    if (existFile) {
+      setBackground(filePath);
+    }
+  };
 
   useEffect(() => {
-    // setBg();
-  });
+    setBg();
+  }, [background]);
 
   const updateJavaMemory = v => {
     dispatch(
@@ -159,6 +159,7 @@ const Overview = ({ instanceName }) => {
   };
 
   const openFileDialog = async () => {
+    // const reader = new FileReader();
     const dialog = await ipcRenderer.invoke('openFileDialog');
     if (dialog.canceled) return;
     const instancePath = path.join(instancesPath, instanceName);
@@ -169,6 +170,7 @@ const Overview = ({ instanceName }) => {
     const filePath = path.join(instancePath, `bg.png`);
     await fss.copy(dialog.filePaths[0], filePath, { overwrite: true });
     setBackground(filePath);
+    // console.log(reader.readAsDataURL(dialog.filePaths[0]));
     updateBackGround(filePath);
   };
 

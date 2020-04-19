@@ -188,9 +188,7 @@ const Instance = ({ instanceName }) => {
   useEffect(() => {
     if (instance.background) {
       fs.readFile(path.join(instancesPath, instanceName, instance.background))
-        .then(res =>
-          setBackground(`data:image/png;base64,${res.toString('base64')}`)
-        )
+        .then(res => setBackground(`${res}`))
         .catch(console.warning);
     } else {
       setBackground(`${instanceDefaultBackground}`);
