@@ -20,7 +20,8 @@ import {
   _getCurrentAccount,
   _getDataStorePath,
   _getInstancesPath,
-  _getTempPath
+  _getTempPath,
+  _getModCachePath
 } from '../../../utils/selectors';
 import {
   updateReleaseChannel,
@@ -214,6 +215,7 @@ const General = () => {
   const [deletingInstances, setDeletingInstances] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
   const cacheMods = useSelector(state => state.settings.cacheMods);
+  const modCachePath = useSelector(_getModCachePath);
 
   const dispatch = useDispatch();
 
@@ -232,6 +234,16 @@ const General = () => {
       await fsa.emptyDir(dataStorePath);
       await fsa.emptyDir(instancesPath);
       await fsa.emptyDir(tempPath);
+    } catch (e) {
+      console.error(e);
+    }
+    setDeletingInstances(false);
+  };
+
+  const clearCachedMods = async () => {
+    setDeletingInstances(true);
+    try {
+      await fsa.emptyDir(modCachePath);
     } catch (e) {
       console.error(e);
     }
@@ -400,28 +412,69 @@ const General = () => {
       </DiscordRpc>
 
       <Hr />
-      <Title
-        css={`
-          margin-top: 0px;
-        `}
-      >
-        Cache Mods &nbsp; <FontAwesomeIcon icon={faHdd} />
-      </Title>
-      <DiscordRpc>
-        <p
+      <div>
+        <Title
           css={`
-            width: 350px;
+            margin-top: 0px;
           `}
         >
-          Enable / disable caching mods from curseforge.
-        </p>
-        <Switch
-          onChange={e => {
-            dispatch(updateCacheMods(e));
-          }}
-          checked={cacheMods}
-        />
-      </DiscordRpc>
+          Cache Mods &nbsp; <FontAwesomeIcon icon={faHdd} />
+        </Title>
+        <DiscordRpc>
+          <p
+            css={`
+              width: 350px;
+            `}
+          >
+            Enable / disable caching mods from curseforge.
+          </p>
+          <Switch
+            onChange={e => {
+              dispatch(updateCacheMods(e));
+            }}
+            checked={cacheMods}
+          />
+        </DiscordRpc>
+      </div>
+      <div>
+        <Title
+          css={`
+            width: 300px;
+            float: left;
+          `}
+        >
+          Clear Mod Cache&nbsp; <FontAwesomeIcon icon={faTrash} />
+        </Title>
+        <div
+          css={`
+            display: flex;
+            justify-content: space-between;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 30px;
+            p {
+              text-align: left;
+              color: ${props => props.theme.palette.text.third};
+            }
+          `}
+        >
+          <p
+            css={`
+              margin: 0;
+              width: 500px;
+            `}
+          >
+            Deletes all the mods in the cache. This connot be undone.
+          </p>
+          <Button
+            onClick={clearCachedMods}
+            disabled={disableInstancesActions}
+            loading={deletingInstances}
+          >
+            Clear
+          </Button>
+        </div>
+      </div>
 
       <Hr />
       <Title
