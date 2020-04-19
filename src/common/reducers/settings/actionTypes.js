@@ -12,3 +12,4 @@ export const UPDATE_DISCORD_RPC = 'settings/UPDATE_DISCORD_RPC';
 export const HIDE_WINDOW_ON_GAME_LAUNCH = 'settings/HIDE_WINDOW_ON_GAME_LAUNCH';
 export const UPDATE_POTATO_PC_MODE = 'settings/UPDATE_POTATO_PC_MODE';
 export const UPDATE_SHOW_NEWS = 'settings/UPDATE_SHOW_NEWS';
+export const UPDATE_CACHE_MODS = 'settings/UPDATE_CACHE_MODS';

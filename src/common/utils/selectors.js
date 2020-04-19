@@ -86,3 +86,7 @@ export const _getMinecraftVersionsPath = createSelector(
 export const _getAssetsPath = createSelector(_getDataStorePath, datastorePath =>
   path.join(datastorePath, 'assets')
 );
+
+export const _getCachePath = createSelector(_getDataStorePath, datastorePath =>
+  path.join(datastorePath, 'cache')
+);

@@ -11,7 +11,8 @@ import {
   faTrash,
   faPlay,
   faToilet,
-  faNewspaper
+  faNewspaper,
+  faHdd
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
@@ -26,7 +27,8 @@ import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
-  updateShowNews
+  updateShowNews,
+  updateCacheMods
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
@@ -211,6 +213,7 @@ const General = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [deletingInstances, setDeletingInstances] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
+  const cacheMods = useSelector(state => state.settings.cacheMods);
 
   const dispatch = useDispatch();
 
@@ -395,6 +398,31 @@ const General = () => {
           checked={showNews}
         />
       </DiscordRpc>
+
+      <Hr />
+      <Title
+        css={`
+          margin-top: 0px;
+        `}
+      >
+        Cache Mods &nbsp; <FontAwesomeIcon icon={faHdd} />
+      </Title>
+      <DiscordRpc>
+        <p
+          css={`
+            width: 350px;
+          `}
+        >
+          Enable / disable caching mods from curseforge.
+        </p>
+        <Switch
+          onChange={e => {
+            dispatch(updateCacheMods(e));
+          }}
+          checked={cacheMods}
+        />
+      </DiscordRpc>
+
       <Hr />
       <Title
         css={`

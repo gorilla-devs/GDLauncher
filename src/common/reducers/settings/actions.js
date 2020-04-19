@@ -89,3 +89,12 @@ export function updateDiscordRPC(val) {
     });
   };
 }
+
+export function updateCacheMods(bool) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_CACHE_MODS,
+      bool
+    });
+  };
+}
