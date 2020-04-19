@@ -87,6 +87,7 @@ export const _getAssetsPath = createSelector(_getDataStorePath, datastorePath =>
   path.join(datastorePath, 'assets')
 );
 
-export const _getCachePath = createSelector(_getDataStorePath, datastorePath =>
-  path.join(datastorePath, 'cache')
+export const _getModCachePath = createSelector(
+  _getDataStorePath,
+  datastorePath => path.join(datastorePath, 'modCache')
 );

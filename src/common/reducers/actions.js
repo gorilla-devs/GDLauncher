@@ -61,7 +61,8 @@ import {
   _getAccounts,
   _getTempPath,
   _getInstance,
-  _getDataStorePath
+  _getDataStorePath,
+  _getModCachePath
 } from '../utils/selectors';
 import {
   librariesMapper,
@@ -752,325 +753,344 @@ export function downloadForge(instanceName) {
     const state = getState();
     const { modloader } = _getCurrentDownloadItem(state);
 
-    const forgeJson = {};
-    const forgeJsonPath = path.join(
+    const completedForgeSkipFile = path.join(
       _getLibrariesPath(state),
       'net',
       'minecraftforge',
       modloader[2],
-      `${modloader[2]}.json`
+      `${modloader[2]}.complete`
     );
-
-    const sevenZipPath = await get7zPath();
-    const pre152 = lte(coerce(modloader[1]), coerce('1.5.2'));
-    const pre132 = lte(coerce(modloader[1]), coerce('1.3.2'));
-    const baseUrl =
-      'https://files.minecraftforge.net/maven/net/minecraftforge/forge';
-    const tempInstaller = path.join(_getTempPath(state), `${modloader[2]}.jar`);
-    const expectedInstaller = path.join(
-      _getDataStorePath(state),
-      'forgeInstallers',
-      `${modloader[2]}.jar`
-    );
-
-    const extractSpecificFile = async from => {
-      const extraction = extractFull(tempInstaller, _getTempPath(state), {
-        $bin: sevenZipPath,
-        yes: true,
-        $cherryPick: from
-      });
-      await new Promise((resolve, reject) => {
-        extraction.on('end', () => {
-          resolve();
-        });
-        extraction.on('error', error => {
-          reject(error.stderr);
-        });
-      });
-    };
-
-    try {
-      await fs.access(expectedInstaller);
-      if (!pre152) {
-        await fs.access(forgeJsonPath);
-      }
-      const { data: hashes } = await axios.get(
-        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${modloader[2]}/meta.json`
-      );
-      console.log(hashes);
-      const fileMd5 = await getFileHash(expectedInstaller, 'md5');
-      let expectedMd5 = hashes?.classifiers?.installer?.jar;
-      if (pre132) {
-        expectedMd5 = hashes?.classifiers?.client?.zip;
-      } else if (pre152) {
-        expectedMd5 = hashes?.classifiers?.universal?.zip;
-      }
-
-      if (fileMd5.toString() !== expectedMd5) {
-        throw new Error('Installer hash mismatch');
-      }
-      await fse.copy(expectedInstaller, tempInstaller, { overwrite: true });
-    } catch (err) {
-      console.warn(
-        'No installer found in temp or hash mismatch. Need to download it.'
-      );
-      dispatch(
-        updateDownloadStatus(instanceName, 'Downloading forge installer...')
+    const checkForgeSkip = await fse.pathExists(completedForgeSkipFile);
+    if (!checkForgeSkip) {
+      const forgeJson = {};
+      const forgeJsonPath = path.join(
+        _getLibrariesPath(state),
+        'net',
+        'minecraftforge',
+        modloader[2],
+        `${modloader[2]}.json`
       );
 
-      let urlTerminal = 'installer.jar';
-      if (pre132) {
-        urlTerminal = 'client.zip';
-      } else if (pre152) {
-        urlTerminal = 'universal.zip';
-      }
-
-      // Download installer jar and extract stuff
-      await downloadFile(
-        tempInstaller,
-        `${baseUrl}/${modloader[2]}/forge-${modloader[2]}-${urlTerminal}`,
-        p => dispatch(updateDownloadProgress(p))
-      );
-
-      await new Promise(resolve => setTimeout(resolve, 200));
-      await fse.copy(tempInstaller, expectedInstaller);
-    }
-
-    const installForgePost152 = async () => {
-      // Extract version / install json, main jar, universal and client lzma
-      await extractSpecificFile('install_profile.json');
-      const installerJson = await fse.readJson(
-        path.join(_getTempPath(state), 'install_profile.json')
-      );
-
-      if (installerJson.install) {
-        forgeJson.install = installerJson.install;
-        forgeJson.version = installerJson.versionInfo;
-      } else {
-        forgeJson.install = installerJson;
-        await extractSpecificFile(path.basename(installerJson.json));
-        forgeJson.version = await fse.readJson(
-          path.join(_getTempPath(state), installerJson.json)
-        );
-        await fse.remove(path.join(_getTempPath(state), installerJson.json));
-      }
-
-      await fse.remove(path.join(_getTempPath(state), 'install_profile.json'));
-
-      await fse.outputJson(forgeJsonPath, forgeJson);
-
-      // Extract forge bin
-      if (forgeJson.install.filePath) {
-        await extractSpecificFile(forgeJson.install.filePath);
-
-        await fse.move(
-          path.join(_getTempPath(state), forgeJson.install.filePath),
-          path.join(
-            _getLibrariesPath(state),
-            ...mavenToArray(forgeJson.install.path)
-          ),
-          { overwrite: true }
-        );
-      } else {
-        // Move all files in maven
-        const forgeBinPathInsideZip = path.join(
-          'maven',
-          path.dirname(path.join(...mavenToArray(forgeJson.install.path)))
-        );
-        await extractSpecificFile(forgeBinPathInsideZip);
-
-        const filesToMove = await fs.readdir(
-          path.join(_getTempPath(state), forgeBinPathInsideZip)
-        );
-        await Promise.all(
-          filesToMove.map(async f => {
-            await fse.move(
-              path.join(_getTempPath(state), forgeBinPathInsideZip, f),
-              path.join(
-                _getLibrariesPath(state),
-                path.dirname(
-                  path.join(...mavenToArray(forgeJson.install.path))
-                ),
-                path.basename(f)
-              ),
-              { overwrite: true }
-            );
-          })
-        );
-
-        await fse.remove(path.join(_getTempPath(state), 'maven'));
-      }
-
-      dispatch(
-        updateDownloadStatus(instanceName, 'Downloading forge libraries...')
-      );
-
-      let { libraries } = forgeJson.version;
-
-      if (forgeJson.install.libraries) {
-        libraries = libraries.concat(forgeJson.install.libraries);
-      }
-
-      libraries = librariesMapper(
-        libraries.filter(
-          v =>
-            !v.name.includes('net.minecraftforge:forge:') &&
-            !v.name.includes('net.minecraftforge:minecraftforge:')
-        ),
-        _getLibrariesPath(state)
-      );
-
-      const updatePercentage = downloaded => {
-        dispatch(updateDownloadProgress((downloaded * 100) / libraries.length));
-      };
-
-      await downloadInstanceFiles(
-        libraries,
-        updatePercentage,
-        state.settings.concurrentDownloads
-      );
-
-      // Patching
-      if (forgeJson.install?.processors?.length) {
-        dispatch(updateDownloadStatus(instanceName, 'Patching forge...'));
-
-        // Extract client.lzma from installer
-
-        await extractSpecificFile(path.join('data', 'client.lzma'));
-
-        await fse.move(
-          path.join(_getTempPath(state), 'data', 'client.lzma'),
-          path.join(
-            _getLibrariesPath(state),
-            ...mavenToArray(forgeJson.install.path, '-clientdata', '.lzma')
-          ),
-          { overwrite: true }
-        );
-        await fse.remove(path.join(_getTempPath(state), 'data'));
-
-        await patchForge113(
-          forgeJson.install,
-          path.join(
-            _getMinecraftVersionsPath(state),
-            `${forgeJson.install.minecraft}.jar`
-          ),
-          _getLibrariesPath(state),
-          _getJavaPath(state),
-          (d, t) => dispatch(updateDownloadProgress((d * 100) / t))
-        );
-      }
-    };
-
-    if (gt(coerce(modloader[1]), coerce('1.5.2'))) {
-      await installForgePost152();
-    } else {
-      // Download necessary libs
-      const fmllibs = fmlLibsMapping[modloader[1]];
-      await pMap(
-        fmllibs || [],
-        async lib => {
-          let ok = false;
-          let tries = 0;
-          do {
-            tries += 1;
-            if (tries !== 1) {
-              await new Promise(resolve => setTimeout(resolve, 5000));
-            }
-            try {
-              const fileName = path.join(
-                _getInstancesPath(state),
-                instanceName,
-                'lib',
-                lib[0]
-              );
-              const baseFmlUrl = lib[2]
-                ? FMLLIBS_OUR_BASE_URL
-                : FMLLIBS_FORGE_BASE_URL;
-              const url = `${baseFmlUrl}/${lib[0]}`;
-              await downloadFile(fileName, url);
-              const fileHash = await getFileHash(fileName);
-              if (lib[1] !== fileHash.toString()) {
-                throw new Error(`FMLLIB hash mismatch (${lib[0]})`);
-              }
-              ok = true;
-            } catch (err) {
-              console.error(err);
-            }
-          } while (!ok && tries <= 3);
-        },
-        { concurrency: state.settings.concurrentDownloads }
-      );
-
-      dispatch(updateDownloadStatus(instanceName, 'Injecting forge...'));
-      dispatch(updateDownloadProgress(0));
-
-      // Perform forge injection
-      const mcJarPath = path.join(
-        _getMinecraftVersionsPath(state),
-        `${modloader[1]}.jar`
-      );
-      const mcJarForgePath = path.join(
-        _getMinecraftVersionsPath(state),
+      const sevenZipPath = await get7zPath();
+      const pre152 = lte(coerce(modloader[1]), coerce('1.5.2'));
+      const pre132 = lte(coerce(modloader[1]), coerce('1.3.2'));
+      const baseUrl =
+        'https://files.minecraftforge.net/maven/net/minecraftforge/forge';
+      const tempInstaller = path.join(
+        _getTempPath(state),
         `${modloader[2]}.jar`
       );
-      await fse.copy(mcJarPath, mcJarForgePath);
+      const expectedInstaller = path.join(
+        _getDataStorePath(state),
+        'forgeInstallers',
+        `${modloader[2]}.jar`
+      );
 
-      const metaInfDeletion = Seven.delete(mcJarForgePath, 'META-INF', {
-        $bin: sevenZipPath,
-        yes: true
-      });
-      await new Promise((resolve, reject) => {
-        metaInfDeletion.on('end', () => {
-          resolve();
+      const extractSpecificFile = async from => {
+        const extraction = extractFull(tempInstaller, _getTempPath(state), {
+          $bin: sevenZipPath,
+          yes: true,
+          $cherryPick: from
         });
-        metaInfDeletion.on('error', error => {
-          reject(error.stderr);
+        await new Promise((resolve, reject) => {
+          extraction.on('end', () => {
+            resolve();
+          });
+          extraction.on('error', error => {
+            reject(error.stderr);
+          });
         });
-      });
+      };
 
-      await fse.remove(path.join(_getTempPath(state), modloader[2]));
+      try {
+        await fs.access(expectedInstaller);
+        if (!pre152) {
+          await fs.access(forgeJsonPath);
+        }
+        const { data: hashes } = await axios.get(
+          `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${modloader[2]}/meta.json`
+        );
+        console.log(hashes);
+        const fileMd5 = await getFileHash(expectedInstaller, 'md5');
+        let expectedMd5 = hashes?.classifiers?.installer?.jar;
+        if (pre132) {
+          expectedMd5 = hashes?.classifiers?.client?.zip;
+        } else if (pre152) {
+          expectedMd5 = hashes?.classifiers?.universal?.zip;
+        }
 
-      // This is garbage, need to use a stream somehow to directly inject data from/to jar
-      const extraction = extractFull(
-        tempInstaller,
-        path.join(_getTempPath(state), modloader[2]),
-        {
+        if (fileMd5.toString() !== expectedMd5) {
+          throw new Error('Installer hash mismatch');
+        }
+        await fse.copy(expectedInstaller, tempInstaller, { overwrite: true });
+      } catch (err) {
+        console.warn(
+          'No installer found in temp or hash mismatch. Need to download it.'
+        );
+        dispatch(
+          updateDownloadStatus(instanceName, 'Downloading forge installer...')
+        );
+
+        let urlTerminal = 'installer.jar';
+        if (pre132) {
+          urlTerminal = 'client.zip';
+        } else if (pre152) {
+          urlTerminal = 'universal.zip';
+        }
+
+        // Download installer jar and extract stuff
+        await downloadFile(
+          tempInstaller,
+          `${baseUrl}/${modloader[2]}/forge-${modloader[2]}-${urlTerminal}`,
+          p => dispatch(updateDownloadProgress(p))
+        );
+
+        await new Promise(resolve => setTimeout(resolve, 200));
+        await fse.copy(tempInstaller, expectedInstaller);
+      }
+
+      const installForgePost152 = async () => {
+        // Extract version / install json, main jar, universal and client lzma
+        await extractSpecificFile('install_profile.json');
+        const installerJson = await fse.readJson(
+          path.join(_getTempPath(state), 'install_profile.json')
+        );
+
+        if (installerJson.install) {
+          forgeJson.install = installerJson.install;
+          forgeJson.version = installerJson.versionInfo;
+        } else {
+          forgeJson.install = installerJson;
+          await extractSpecificFile(path.basename(installerJson.json));
+          forgeJson.version = await fse.readJson(
+            path.join(_getTempPath(state), installerJson.json)
+          );
+          await fse.remove(path.join(_getTempPath(state), installerJson.json));
+        }
+
+        await fse.remove(
+          path.join(_getTempPath(state), 'install_profile.json')
+        );
+
+        await fse.outputJson(forgeJsonPath, forgeJson);
+
+        // Extract forge bin
+        if (forgeJson.install.filePath) {
+          await extractSpecificFile(forgeJson.install.filePath);
+
+          await fse.move(
+            path.join(_getTempPath(state), forgeJson.install.filePath),
+            path.join(
+              _getLibrariesPath(state),
+              ...mavenToArray(forgeJson.install.path)
+            ),
+            { overwrite: true }
+          );
+        } else {
+          // Move all files in maven
+          const forgeBinPathInsideZip = path.join(
+            'maven',
+            path.dirname(path.join(...mavenToArray(forgeJson.install.path)))
+          );
+          await extractSpecificFile(forgeBinPathInsideZip);
+
+          const filesToMove = await fs.readdir(
+            path.join(_getTempPath(state), forgeBinPathInsideZip)
+          );
+          await Promise.all(
+            filesToMove.map(async f => {
+              await fse.move(
+                path.join(_getTempPath(state), forgeBinPathInsideZip, f),
+                path.join(
+                  _getLibrariesPath(state),
+                  path.dirname(
+                    path.join(...mavenToArray(forgeJson.install.path))
+                  ),
+                  path.basename(f)
+                ),
+                { overwrite: true }
+              );
+            })
+          );
+
+          await fse.remove(path.join(_getTempPath(state), 'maven'));
+        }
+
+        dispatch(
+          updateDownloadStatus(instanceName, 'Downloading forge libraries...')
+        );
+
+        let { libraries } = forgeJson.version;
+
+        if (forgeJson.install.libraries) {
+          libraries = libraries.concat(forgeJson.install.libraries);
+        }
+
+        libraries = librariesMapper(
+          libraries.filter(
+            v =>
+              !v.name.includes('net.minecraftforge:forge:') &&
+              !v.name.includes('net.minecraftforge:minecraftforge:')
+          ),
+          _getLibrariesPath(state)
+        );
+
+        const updatePercentage = downloaded => {
+          dispatch(
+            updateDownloadProgress((downloaded * 100) / libraries.length)
+          );
+        };
+
+        await downloadInstanceFiles(
+          libraries,
+          updatePercentage,
+          state.settings.concurrentDownloads
+        );
+
+        // Patching
+        if (forgeJson.install?.processors?.length) {
+          dispatch(updateDownloadStatus(instanceName, 'Patching forge...'));
+
+          // Extract client.lzma from installer
+
+          await extractSpecificFile(path.join('data', 'client.lzma'));
+
+          await fse.move(
+            path.join(_getTempPath(state), 'data', 'client.lzma'),
+            path.join(
+              _getLibrariesPath(state),
+              ...mavenToArray(forgeJson.install.path, '-clientdata', '.lzma')
+            ),
+            { overwrite: true }
+          );
+          await fse.remove(path.join(_getTempPath(state), 'data'));
+
+          await patchForge113(
+            forgeJson.install,
+            path.join(
+              _getMinecraftVersionsPath(state),
+              `${forgeJson.install.minecraft}.jar`
+            ),
+            _getLibrariesPath(state),
+            _getJavaPath(state),
+            (d, t) => dispatch(updateDownloadProgress((d * 100) / t))
+          );
+        }
+      };
+
+      if (gt(coerce(modloader[1]), coerce('1.5.2'))) {
+        await installForgePost152();
+      } else {
+        // Download necessary libs
+        const fmllibs = fmlLibsMapping[modloader[1]];
+        await pMap(
+          fmllibs || [],
+          async lib => {
+            let ok = false;
+            let tries = 0;
+            do {
+              tries += 1;
+              if (tries !== 1) {
+                await new Promise(resolve => setTimeout(resolve, 5000));
+              }
+              try {
+                const fileName = path.join(
+                  _getInstancesPath(state),
+                  instanceName,
+                  'lib',
+                  lib[0]
+                );
+                const baseFmlUrl = lib[2]
+                  ? FMLLIBS_OUR_BASE_URL
+                  : FMLLIBS_FORGE_BASE_URL;
+                const url = `${baseFmlUrl}/${lib[0]}`;
+                await downloadFile(fileName, url);
+                const fileHash = await getFileHash(fileName);
+                if (lib[1] !== fileHash.toString()) {
+                  throw new Error(`FMLLIB hash mismatch (${lib[0]})`);
+                }
+                ok = true;
+              } catch (err) {
+                console.error(err);
+              }
+            } while (!ok && tries <= 3);
+          },
+          { concurrency: state.settings.concurrentDownloads }
+        );
+
+        dispatch(updateDownloadStatus(instanceName, 'Injecting forge...'));
+        dispatch(updateDownloadProgress(0));
+
+        // Perform forge injection
+        const mcJarPath = path.join(
+          _getMinecraftVersionsPath(state),
+          `${modloader[1]}.jar`
+        );
+        const mcJarForgePath = path.join(
+          _getMinecraftVersionsPath(state),
+          `${modloader[2]}.jar`
+        );
+        await fse.copy(mcJarPath, mcJarForgePath);
+
+        const metaInfDeletion = Seven.delete(mcJarForgePath, 'META-INF', {
           $bin: sevenZipPath,
           yes: true
-        }
-      );
-      await new Promise((resolve, reject) => {
-        extraction.on('end', () => {
-          resolve();
         });
-        extraction.on('error', error => {
-          reject(error.stderr);
+        await new Promise((resolve, reject) => {
+          metaInfDeletion.on('end', () => {
+            resolve();
+          });
+          metaInfDeletion.on('error', error => {
+            reject(error.stderr);
+          });
         });
-      });
 
-      dispatch(updateDownloadProgress(50));
+        await fse.remove(path.join(_getTempPath(state), modloader[2]));
 
-      const updatedFiles = Seven.add(
-        mcJarForgePath,
-        `${path.join(_getTempPath(state), modloader[2])}/*`,
-        {
-          $bin: sevenZipPath,
-          yes: true
-        }
-      );
-      await new Promise((resolve, reject) => {
-        updatedFiles.on('end', () => {
-          resolve();
+        // This is garbage, need to use a stream somehow to directly inject data from/to jar
+        const extraction = extractFull(
+          tempInstaller,
+          path.join(_getTempPath(state), modloader[2]),
+          {
+            $bin: sevenZipPath,
+            yes: true
+          }
+        );
+        await new Promise((resolve, reject) => {
+          extraction.on('end', () => {
+            resolve();
+          });
+          extraction.on('error', error => {
+            reject(error.stderr);
+          });
         });
-        updatedFiles.on('error', error => {
-          reject(error.stderr);
-        });
-      });
 
-      await fse.remove(path.join(_getTempPath(state), modloader[2]));
+        dispatch(updateDownloadProgress(50));
+
+        const updatedFiles = Seven.add(
+          mcJarForgePath,
+          `${path.join(_getTempPath(state), modloader[2])}/*`,
+          {
+            $bin: sevenZipPath,
+            yes: true
+          }
+        );
+        await new Promise((resolve, reject) => {
+          updatedFiles.on('end', () => {
+            resolve();
+          });
+          updatedFiles.on('error', error => {
+            reject(error.stderr);
+          });
+        });
+
+        await fse.remove(path.join(_getTempPath(state), modloader[2]));
+      }
+
+      await fse.remove(tempInstaller);
+
+      await fse.outputFile(completedForgeSkipFile, '');
     }
-
-    await fse.remove(tempInstaller);
   };
 }
 
@@ -1079,8 +1099,17 @@ export function processManifest(instanceName) {
     const state = getState();
     const { manifest } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
+    const { cacheMods } = state.settings;
+    const manifestFile = 'manifest.json';
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading mods...'));
+
+    // If caching is enabled make sure mods folder exists.
+    if (cacheMods) {
+      await fse.ensureDir(
+        path.join(_getInstancesPath(state), instanceName, 'mods')
+      );
+    }
 
     let modManifests = [];
     await pMap(
@@ -1088,6 +1117,11 @@ export function processManifest(instanceName) {
       async item => {
         let ok = false;
         let tries = 0;
+        const cachedModFolder = path.join(
+          _getModCachePath(state),
+          item.projectID.toString(),
+          item.fileID.toString()
+        );
         /* eslint-disable no-await-in-loop */
         do {
           tries += 1;
@@ -1095,29 +1129,83 @@ export function processManifest(instanceName) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
           try {
-            const { data: addon } = await getAddon(item.projectID);
-            const modManifest = (
-              await getAddonFile(item.projectID, item.fileID)
-            ).data;
-            const destFile = path.join(
-              _getInstancesPath(state),
-              instanceName,
-              'mods',
-              modManifest.fileName
+            const cachedFileExists = await fse.pathExists(
+              path.join(cachedModFolder, manifestFile)
             );
-            const fileExists = await fse.pathExists(destFile);
-            if (!fileExists) {
-              await downloadFile(destFile, modManifest.downloadUrl);
+
+            // Copy from cache instead of downloading from curseforge.
+            if (cacheMods && cachedFileExists) {
+              const cachedManifest = await fse.readJSON(
+                path.join(cachedModFolder, manifestFile)
+              );
+              const destFile = path.join(
+                _getInstancesPath(state),
+                instanceName,
+                'mods',
+                cachedManifest.fileName
+              );
+              const destFileExists = await fse.pathExists(destFile);
+              if (!destFileExists) {
+                console.log(
+                  `[Mod Cache] Retrieved: ${cachedManifest.fileName}`
+                );
+                await fse.copyFile(
+                  path.join(cachedModFolder, cachedManifest.fileName),
+                  destFile
+                );
+              }
+
+              // manifest was already normalized so just append it to the array.
+              modManifests = modManifests.concat(cachedManifest);
+
+              const percentage =
+                (modManifests.length * 100) / manifest.files.length - 1;
+              dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+              ok = true;
+
+              // Download mod from curseforge.
+            } else {
+              const { data: addon } = await getAddon(item.projectID);
+              const modManifest = (
+                await getAddonFile(item.projectID, item.fileID)
+              ).data;
+              const destFile = path.join(
+                _getInstancesPath(state),
+                instanceName,
+                'mods',
+                modManifest.fileName
+              );
+              const fileExists = await fse.pathExists(destFile);
+              if (!fileExists) {
+                await downloadFile(destFile, modManifest.downloadUrl);
+              }
+
+              const newManifest = normalizeModData(
+                modManifest,
+                item.projectID,
+                addon.name
+              );
+
+              modManifests = modManifests.concat(newManifest);
+
+              if (cacheMods) {
+                console.log(`[Mod Cache] Caching: ${modManifest.fileName}`);
+                await fse.ensureDir(cachedModFolder);
+                await fse.copyFile(
+                  destFile,
+                  path.join(cachedModFolder, modManifest.fileName)
+                );
+                await fse.outputJson(
+                  path.join(cachedModFolder, manifestFile),
+                  newManifest
+                );
+              }
+
+              const percentage =
+                (modManifests.length * 100) / manifest.files.length - 1;
+              dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+              ok = true;
             }
-
-            modManifests = modManifests.concat(
-              normalizeModData(modManifest, item.projectID, addon.name)
-            );
-
-            const percentage =
-              (modManifests.length * 100) / manifest.files.length - 1;
-            dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
-            ok = true;
           } catch (err) {
             console.error(err);
           }
@@ -1206,113 +1294,153 @@ export function downloadInstance(instanceName) {
 
     let mcJson;
 
-    // DOWNLOAD MINECRAFT JSON
-    const mcJsonPath = path.join(
+    const skipFileVanilla = path.join(
       _getMinecraftVersionsPath(state),
-      `${mcVersion}.json`
+      `${mcVersion}.complete`
     );
-    try {
-      mcJson = await fse.readJson(mcJsonPath);
-    } catch (err) {
-      const versionURL = mcVersions.find(v => v.id === mcVersion).url;
-      mcJson = (await axios.get(versionURL)).data;
-      await fse.outputJson(mcJsonPath, mcJson);
-    }
-
-    // COMPUTING MC ASSETS
-    let assetsJson;
-    const assetsFile = path.join(
-      _getAssetsPath(state),
-      'indexes',
-      `${mcJson.assets}.json`
-    );
-    try {
-      assetsJson = await fse.readJson(assetsFile);
-    } catch (e) {
-      assetsJson = (await axios.get(mcJson.assetIndex.url)).data;
-      await fse.outputJson(assetsFile, assetsJson);
-    }
-
-    const mcMainFile = {
-      url: mcJson.downloads.client.url,
-      sha1: mcJson.downloads.client.sha1,
-      path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
-    };
-
-    const assets = Object.entries(assetsJson.objects).map(
-      ([assetKey, { hash }]) => ({
-        url: `${MC_RESOURCES_URL}/${hash.substring(0, 2)}/${hash}`,
-        type: 'asset',
-        sha1: hash,
-        path: path.join(
-          _getAssetsPath(state),
-          'objects',
-          hash.substring(0, 2),
-          hash
-        ),
-        resourcesPath: path.join(
-          _getInstancesPath(state),
-          instanceName,
-          'resources',
-          assetKey
-        ),
-        legacyPath: path.join(
-          _getAssetsPath(state),
-          'virtual',
-          'legacy',
-          assetKey
-        )
-      })
-    );
-
-    const libraries = librariesMapper(
-      mcJson.libraries,
-      _getLibrariesPath(state)
-    );
-
-    const updatePercentage = downloaded => {
-      dispatch(
-        updateDownloadProgress(
-          (downloaded * 100) / (assets.length + libraries.length + 1)
-        )
+    const skipInstallVanilla = await fse.pathExists(skipFileVanilla);
+    console.log(`skipping downlaod phase: ${skipInstallVanilla}`);
+    if (skipInstallVanilla) {
+      // Read Manifest and extra natives.
+      const mcJsonPath = path.join(
+        _getMinecraftVersionsPath(state),
+        `${mcVersion}.json`
       );
-    };
+      mcJson = await fse.readJson(mcJsonPath);
+      const libraries = librariesMapper(
+        mcJson.libraries,
+        _getLibrariesPath(state)
+      );
+      await extractNatives(
+        libraries,
+        path.join(_getInstancesPath(state), instanceName)
+      );
 
-    await downloadInstanceFiles(
-      [...libraries, ...assets, mcMainFile],
-      updatePercentage,
-      state.settings.concurrentDownloads
-    );
+      if (modloader && modloader[0] === FABRIC) {
+        await dispatch(downloadFabric(instanceName));
+      } else if (modloader && modloader[0] === FORGE) {
+        await dispatch(downloadForge(instanceName));
+      }
 
-    // Wait 400ms to avoid "The process cannot access the file because it is being used by another process."
-    await new Promise(resolve => setTimeout(() => resolve(), 400));
+      if (manifest) {
+        await dispatch(processManifest(instanceName));
+      }
 
-    await extractNatives(
-      libraries,
-      path.join(_getInstancesPath(state), instanceName)
-    );
+      // Be aware that from this line the installer lock might be unlocked!
 
-    if (assetsJson.map_to_resources) {
-      await copyAssetsToResources(assets);
+      await dispatch(removeDownloadFromQueue(instanceName));
+      dispatch(addNextInstanceToCurrentDownload());
+    } else {
+      // DOWNLOAD MINECRAFT JSON
+      const mcJsonPath = path.join(
+        _getMinecraftVersionsPath(state),
+        `${mcVersion}.json`
+      );
+      try {
+        mcJson = await fse.readJson(mcJsonPath);
+      } catch (err) {
+        const versionURL = mcVersions.find(v => v.id === mcVersion).url;
+        mcJson = (await axios.get(versionURL)).data;
+        await fse.outputJson(mcJsonPath, mcJson);
+      }
+
+      // COMPUTING MC ASSETS
+      let assetsJson;
+      const assetsFile = path.join(
+        _getAssetsPath(state),
+        'indexes',
+        `${mcJson.assets}.json`
+      );
+      try {
+        assetsJson = await fse.readJson(assetsFile);
+      } catch (e) {
+        assetsJson = (await axios.get(mcJson.assetIndex.url)).data;
+        await fse.outputJson(assetsFile, assetsJson);
+      }
+
+      const mcMainFile = {
+        url: mcJson.downloads.client.url,
+        sha1: mcJson.downloads.client.sha1,
+        path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
+      };
+
+      const assets = Object.entries(assetsJson.objects).map(
+        ([assetKey, { hash }]) => ({
+          url: `${MC_RESOURCES_URL}/${hash.substring(0, 2)}/${hash}`,
+          type: 'asset',
+          sha1: hash,
+          path: path.join(
+            _getAssetsPath(state),
+            'objects',
+            hash.substring(0, 2),
+            hash
+          ),
+          resourcesPath: path.join(
+            _getInstancesPath(state),
+            instanceName,
+            'resources',
+            assetKey
+          ),
+          legacyPath: path.join(
+            _getAssetsPath(state),
+            'virtual',
+            'legacy',
+            assetKey
+          )
+        })
+      );
+
+      const libraries = librariesMapper(
+        mcJson.libraries,
+        _getLibrariesPath(state)
+      );
+
+      const updatePercentage = downloaded => {
+        dispatch(
+          updateDownloadProgress(
+            (downloaded * 100) / (assets.length + libraries.length + 1)
+          )
+        );
+      };
+
+      await downloadInstanceFiles(
+        [...libraries, ...assets, mcMainFile],
+        updatePercentage,
+        state.settings.concurrentDownloads
+      );
+
+      // Wait 400ms to avoid "The process cannot access the file because it is being used by another process."
+      await new Promise(resolve => setTimeout(() => resolve(), 400));
+
+      await extractNatives(
+        libraries,
+        path.join(_getInstancesPath(state), instanceName)
+      );
+
+      if (assetsJson.map_to_resources) {
+        await copyAssetsToResources(assets);
+      }
+      if (mcJson.assets === 'legacy') {
+        await copyAssetsToLegacy(assets);
+      }
+
+      await fse.outputFile(skipFileVanilla, '');
+
+      if (modloader && modloader[0] === FABRIC) {
+        await dispatch(downloadFabric(instanceName));
+      } else if (modloader && modloader[0] === FORGE) {
+        await dispatch(downloadForge(instanceName));
+      }
+
+      if (manifest) {
+        await dispatch(processManifest(instanceName));
+      }
+
+      // Be aware that from this line the installer lock might be unlocked!
+
+      await dispatch(removeDownloadFromQueue(instanceName));
+      dispatch(addNextInstanceToCurrentDownload());
     }
-    if (mcJson.assets === 'legacy') {
-      await copyAssetsToLegacy(assets);
-    }
-
-    if (modloader && modloader[0] === FABRIC) {
-      await dispatch(downloadFabric(instanceName));
-    } else if (modloader && modloader[0] === FORGE) {
-      await dispatch(downloadForge(instanceName));
-    }
-
-    if (manifest) {
-      await dispatch(processManifest(instanceName));
-    }
-
-    // Be aware that from this line the installer lock might be unlocked!
-
-    await dispatch(removeDownloadFromQueue(instanceName));
-    dispatch(addNextInstanceToCurrentDownload());
   };
 }
 
@@ -1970,17 +2098,99 @@ export function installMod(
     const state = getState();
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
+    let needToAddMod = true;
+    const { cacheMods } = state.settings;
+    const manifestFile = 'manifest.json';
+
+    // Check cache for mod first.
+    const cachedModFolder = path.join(
+      _getModCachePath(state),
+      projectID.toString(),
+      fileID.toString()
+    );
+    const cachedFileExists = await fse.pathExists(
+      path.join(cachedModFolder, manifestFile)
+    );
+    if (cacheMods && cachedFileExists) {
+      const cachedManifest = await fse.readJSON(
+        path.join(cachedModFolder, manifestFile)
+      );
+      const destFile = path.join(
+        _getInstancesPath(state),
+        instanceName,
+        'mods',
+        cachedManifest.fileName
+      );
+      const destFileExists = await fse.pathExists(destFile);
+      if (!destFileExists) {
+        console.log(`[Mod Cache] Retrieved: ${cachedManifest.fileName}`);
+        await fse.copyFile(
+          path.join(cachedModFolder, cachedManifest.fileName),
+          destFile
+        );
+      }
+      // manifest was already normalized so just append it to the array.
+      await dispatch(
+        updateInstanceConfig(instanceName, prev => {
+          needToAddMod = !prev.mods.find(
+            v => v.fileID === fileID && v.projectID === projectID
+          );
+          return {
+            ...prev,
+            mods: [...prev.mods, ...(needToAddMod ? [cachedManifest] : [])]
+          };
+        })
+      );
+      if (installDeps) {
+        await pMap(
+          cachedManifest.dependencies,
+          async dep => {
+            // type 1: embedded
+            // type 2: optional
+            // type 3: required
+            // type 4: tool
+            // type 5: incompatible
+            // type 6: include
+
+            if (dep.type === 3) {
+              const depList = await getAddonFiles(dep.addonId);
+              const depData = depList.data.find(v =>
+                v.gameVersion.includes(gameVersion)
+              );
+              await dispatch(
+                installMod(
+                  dep.addonId,
+                  depData.id,
+                  instanceName,
+                  gameVersion,
+                  installDeps,
+                  onProgress,
+                  useTempMiddleware
+                )
+              );
+            }
+          },
+          { concurrency: 2 }
+        );
+      }
+      return;
+    }
+
     const mainModData = await getAddonFile(projectID, fileID);
     const { data: addon } = await getAddon(projectID);
     mainModData.data.projectID = projectID;
     const destFile = path.join(instancePath, 'mods', mainModData.data.fileName);
     const tempFile = path.join(_getTempPath(state), mainModData.data.fileName);
+    const newModManifest = normalizeModData(
+      mainModData.data,
+      projectID,
+      addon.name
+    );
 
     if (useTempMiddleware) {
       await downloadFile(tempFile, mainModData.data.downloadUrl, onProgress);
     }
 
-    let needToAddMod = true;
     await dispatch(
       updateInstanceConfig(instanceName, prev => {
         needToAddMod = !prev.mods.find(
@@ -1988,12 +2198,7 @@ export function installMod(
         );
         return {
           ...prev,
-          mods: [
-            ...prev.mods,
-            ...(needToAddMod
-              ? [normalizeModData(mainModData.data, projectID, addon.name)]
-              : [])
-          ]
+          mods: [...prev.mods, ...(needToAddMod ? [newModManifest] : [])]
         };
       })
     );
@@ -2021,6 +2226,19 @@ export function installMod(
       }
     } else {
       await fse.move(tempFile, destFile, { overwrite: true });
+    }
+
+    if (cacheMods) {
+      console.log(`[Mod Cache] Caching: ${mainModData.data.fileName}`);
+      await fse.ensureDir(cachedModFolder);
+      await fse.copyFile(
+        destFile,
+        path.join(cachedModFolder, mainModData.data.fileName)
+      );
+      await fse.outputJson(
+        path.join(cachedModFolder, manifestFile),
+        newModManifest
+      );
     }
 
     if (installDeps) {
