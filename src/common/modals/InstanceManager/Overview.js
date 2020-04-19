@@ -1,19 +1,22 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
+import { createReadStream, promises as fs } from 'fs';
 import path from 'path';
 import { ipcRenderer } from 'electron';
 import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
+import base64 from 'base64-stream';
+import getStream from 'get-stream';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faUndo, faCross } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Card, Switch, Slider } from 'antd';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import { DEFAULT_JAVA_ARGS } from '../../../app/desktop/utils/constants';
 
 import { updateInstanceConfig } from '../../reducers/actions';
-
 const Container = styled.div`
   margin-left: 50px;
   height: 100%;
@@ -22,7 +25,7 @@ const Container = styled.div`
 `;
 
 const Column = styled.div`
-  max-width: 800px;
+  max-width: 600px;
 `;
 
 const InstanceBackground = styled.img`
@@ -31,6 +34,10 @@ const InstanceBackground = styled.img`
   border-radius: 50%;
   background: ${props => props.theme.palette.primary.dark};
 `;
+// background: ${props =>
+//   props.imagePath
+//     ? `url(${props.imagePath}) center no-repeat`
+//     : props.theme.palette.primary.dark};
 
 const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
@@ -99,17 +106,15 @@ const Overview = ({ instanceName }) => {
   const dispatch = useDispatch();
 
   const setBg = async () => {
-    const instancePath = path.join(instancesPath, instanceName);
-    const filePath = path.join(instancePath, `bg.png`);
-    const existFile = await fss.lstat(filePath);
-    if (existFile) {
-      setBackground(filePath);
+    if (config?.background) {
+      setBackground(path.join(instancesPath, instanceName, config?.background));
     }
   };
 
   useEffect(() => {
     setBg();
-  }, [background]);
+    console.log('background', background);
+  }, []);
 
   const updateJavaMemory = v => {
     dispatch(
@@ -159,25 +164,44 @@ const Overview = ({ instanceName }) => {
   };
 
   const openFileDialog = async () => {
-    // const reader = new FileReader();
-    const dialog = await ipcRenderer.invoke('openFileDialog');
+    const dialog = await ipcRenderer.invoke('openFileDialog', [
+      { name: 'Image', extensions: ['png', 'jpg', 'jpeg'] }
+    ]);
     if (dialog.canceled) return;
     const instancePath = path.join(instancesPath, instanceName);
-    // const ext = path.basename(
-    //   dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
-    // );
-    // const filePath = path.join(instancePath, `bg.${ext}`);
-    const filePath = path.join(instancePath, `bg.png`);
-    await fss.copy(dialog.filePaths[0], filePath, { overwrite: true });
+    const fileName = path.basename(dialog.filePaths[0]);
+    const ext = path.basename(
+      dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
+    );
+    const filePath = path.join(instancePath, `icon.${ext}`);
+    await fss.copy(dialog.filePaths[0], filePath);
+
+    // const imageReadStream = createReadStream(dialog.filePaths[0]);
+    // const encodedData = new base64.Base64Encode();
+    // const b64s = imageReadStream.pipe(encodedData);
+    // const base64String = await getStream(b64s);
+    updateBackGround(`icon.${ext}`);
+
+    // fs.readFile(filePath)
+    //   .then(res =>
+    //     setBackground(`data:image/png;base64,${res.toString('base64')}`)
+    //   )
+    //   .catch(console.warning);
     setBackground(filePath);
-    // console.log(reader.readAsDataURL(dialog.filePaths[0]));
-    updateBackGround(filePath);
   };
 
   return (
     <Container>
       <Column>
-        <InstanceBackground onClick={openFileDialog} src={background} />
+        <InstanceBackground
+          onClick={openFileDialog}
+          imagePath={background}
+          src={background}
+          key={background}
+          alt={background}
+        >
+          {/* <FontAwesomeIcon icon={faCross} /> */}
+        </InstanceBackground>
         <MainTitle>Overview</MainTitle>
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />

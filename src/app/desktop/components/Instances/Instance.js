@@ -186,14 +186,17 @@ const Instance = ({ instanceName }) => {
   };
 
   useEffect(() => {
+    console.log('background', instance, instance.background);
     if (instance.background) {
       fs.readFile(path.join(instancesPath, instanceName, instance.background))
-        .then(res => setBackground(`${res}`))
+        .then(res =>
+          setBackground(`data:image/png;base64,${res.toString('base64')}`)
+        )
         .catch(console.warning);
     } else {
       setBackground(`${instanceDefaultBackground}`);
     }
-  }, [instance.background, instancesPath, instanceName]);
+  }, [instance, instancesPath, instanceName]);
 
   const startInstance = () => {
     if (isInQueue || isPlaying) return;
