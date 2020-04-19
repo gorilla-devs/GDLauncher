@@ -21,7 +21,14 @@ const Container = styled.div`
 `;
 
 const Column = styled.div`
-  max-width: 600px;
+  max-width: 800px;
+`;
+
+const instanceBackground = styled.div`
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: red;
 `;
 
 const MainTitle = styled.h1`
@@ -129,6 +136,9 @@ const Overview = ({ instanceName }) => {
   return (
     <Container>
       <Column>
+      <instanceBackground>
+        ciao
+      </instanceBackground>
         <MainTitle>Overview</MainTitle>
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
