@@ -2111,6 +2111,12 @@ export function installMod(
     const cachedFileExists = await fse.pathExists(
       path.join(cachedModFolder, manifestFile)
     );
+    // If caching is enabled make sure mods folder exists.
+    if (cacheMods) {
+      await fse.ensureDir(
+        path.join(_getInstancesPath(state), instanceName, 'mods')
+      );
+    }
     if (cacheMods && cachedFileExists) {
       const cachedManifest = await fse.readJSON(
         path.join(cachedModFolder, manifestFile)
