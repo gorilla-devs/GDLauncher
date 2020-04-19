@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
 import path from 'path';
+import { ipcRenderer } from 'electron';
 import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
@@ -24,11 +25,11 @@ const Column = styled.div`
   max-width: 800px;
 `;
 
-const instanceBackground = styled.div`
-  width: 200px;
-  height: 200px;
+const InstanceBackground = styled.img`
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  background: red;
+  background: ${props => props.theme.palette.primary.dark};
 `;
 
 const MainTitle = styled.h1`
@@ -93,8 +94,22 @@ const Overview = ({ instanceName }) => {
     config?.javaArgs
   );
   const [newName, setNewName] = useState(instanceName);
+  const [background, setBackground] = useState(config?.background);
 
   const dispatch = useDispatch();
+
+  // const setBg = async () => {
+  //   const instancePath = path.join(instancesPath, instanceName);
+  //   const filePath = path.join(instancePath, `bg.png`);
+  //   const existFile = await fss.lstat(filePath);
+  //   if (existFile) {
+  //     setBackground(filePath);
+  //   }
+  // };
+
+  useEffect(() => {
+    // setBg();
+  });
 
   const updateJavaMemory = v => {
     dispatch(
@@ -110,6 +125,15 @@ const Overview = ({ instanceName }) => {
       updateInstanceConfig(instanceName, prev => ({
         ...prev,
         javaArgs: v
+      }))
+    );
+  };
+
+  const updateBackGround = v => {
+    dispatch(
+      updateInstanceConfig(instanceName, prev => ({
+        ...prev,
+        background: v
       }))
     );
   };
@@ -133,12 +157,25 @@ const Overview = ({ instanceName }) => {
       path.join(instancesPath, newName)
     );
   };
+
+  const openFileDialog = async () => {
+    const dialog = await ipcRenderer.invoke('openFileDialog');
+    if (dialog.canceled) return;
+    const instancePath = path.join(instancesPath, instanceName);
+    // const ext = path.basename(
+    //   dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
+    // );
+    // const filePath = path.join(instancePath, `bg.${ext}`);
+    const filePath = path.join(instancePath, `bg.png`);
+    await fss.copy(dialog.filePaths[0], filePath, { overwrite: true });
+    setBackground(filePath);
+    updateBackGround(filePath);
+  };
+
   return (
     <Container>
       <Column>
-      <instanceBackground>
-        ciao
-      </instanceBackground>
+        <InstanceBackground onClick={openFileDialog} src={background} />
         <MainTitle>Overview</MainTitle>
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
