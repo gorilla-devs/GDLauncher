@@ -11,7 +11,11 @@ import base64 from 'base64-stream';
 import getStream from 'get-stream';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faUndo, faCross } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSave,
+  faUndo,
+  faTimesCircle
+} from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Card, Switch, Slider } from 'antd';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import { DEFAULT_JAVA_ARGS } from '../../../app/desktop/utils/constants';
@@ -28,16 +32,57 @@ const Column = styled.div`
   max-width: 600px;
 `;
 
-const InstanceBackground = styled.img`
+const Overlay = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: ${props => props.theme.palette.grey[700]};
+  opacity: 0;
+`;
+
+const InstanceBackground = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: ${props => props.theme.palette.primary.dark};
+  background: ${props =>
+    props.imagePath
+      ? `url(${props.imagePath}) center no-repeat`
+      : props.theme.palette.primary.dark};
+
+  transition: opacity 0.2s ease;
+  &&:hover svg {
+    opacity: 1;
+    z-index: 2;
+  }
+
+  &&:hover p {
+    opacity: 1;
+    z-index: 2;
+  }
+
+  &&:hover ${Overlay} {
+    opacity: 0.3;
+  }
+
+  svg {
+    margin-top: 10px;
+    color: ${props => props.theme.palette.colors.red};
+    opacity: 0;
+  }
+
+  p {
+    width: 50px;
+    text-align: center;
+    opacity: 0;
+  }
 `;
-// background: ${props =>
-//   props.imagePath
-//     ? `url(${props.imagePath}) center no-repeat`
-//     : props.theme.palette.primary.dark};
+// background: ${props => props.theme.palette.primary.dark};
 
 const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
@@ -105,14 +150,28 @@ const Overview = ({ instanceName }) => {
 
   const dispatch = useDispatch();
 
-  const setBg = async () => {
-    if (config?.background) {
-      setBackground(path.join(instancesPath, instanceName, config?.background));
-    }
-  };
+  // const setBg = async () => {
+  //   if (config?.background) {
+  //     setBackground(path.join(instancesPath, instanceName, config?.background));
+  //   }
+  // };
 
   useEffect(() => {
-    setBg();
+    // const instancePath = path.join(instancesPath, instanceName);
+    // const fileName = path.basename(dialog.filePaths[0]);
+    // const ext = path.basename(
+    //   dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
+    // );
+    // const filePath = path.join(instancePath, `icon.${ext}`);
+    if (config?.background) {
+      fs.readFile(path.join(instancesPath, instanceName, config?.background))
+        .then(res => {
+          console.log('res', res);
+          setBackground(`data:image/png;base64,${res.toString('base64')}`);
+        })
+        .catch(console.warning);
+    }
+    // setBg();
     console.log('background', background);
   }, []);
 
@@ -180,14 +239,24 @@ const Overview = ({ instanceName }) => {
     // const encodedData = new base64.Base64Encode();
     // const b64s = imageReadStream.pipe(encodedData);
     // const base64String = await getStream(b64s);
-    updateBackGround(`icon.${ext}`);
+    // updateBackGround(`icon.${ext}`);
 
-    // fs.readFile(filePath)
-    //   .then(res =>
-    //     setBackground(`data:image/png;base64,${res.toString('base64')}`)
-    //   )
-    //   .catch(console.warning);
+    // if (instance.background) {
+    //   fs.readFile(path.join(instancesPath, instanceName, instance.background))
+    //     .then(res =>
+    //       setBackground(`data:image/png;base64,${res.toString('base64')}`)
+    //     )
+    //     .catch(console.warning);
+    // } else {
+
+    fs.readFile(filePath)
+      .then(res => {
+        console.log('res', res);
+        setBackground(`data:image/png;base64,${res.toString('base64')}`);
+      })
+      .catch(console.warning);
     setBackground(filePath);
+    updateBackGround(`icon.${ext}`);
   };
 
   return (
@@ -196,11 +265,20 @@ const Overview = ({ instanceName }) => {
         <InstanceBackground
           onClick={openFileDialog}
           imagePath={background}
-          src={background}
-          key={background}
-          alt={background}
+          // src={background}
+          // key={background}
+          // alt={background}
         >
-          {/* <FontAwesomeIcon icon={faCross} /> */}
+          <Overlay />
+          <p>Change icon</p>
+          <FontAwesomeIcon
+            icon={faTimesCircle}
+            onClick={e => {
+              e.stopPropagation();
+              updateBackGround('');
+              setBackground('');
+            }}
+          />
         </InstanceBackground>
         <MainTitle>Overview</MainTitle>
         <RenameRow>
