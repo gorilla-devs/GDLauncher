@@ -186,7 +186,6 @@ const Instance = ({ instanceName }) => {
   };
 
   useEffect(() => {
-    console.log('background', instance, instance.background);
     if (instance.background) {
       fs.readFile(path.join(instancesPath, instanceName, instance.background))
         .then(res =>

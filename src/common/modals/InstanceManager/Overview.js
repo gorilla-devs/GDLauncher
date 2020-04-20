@@ -1,14 +1,11 @@
-/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
-import { createReadStream, promises as fs } from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import { ipcRenderer } from 'electron';
 import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
-import base64 from 'base64-stream';
-import getStream from 'get-stream';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -19,8 +16,8 @@ import {
 import { Input, Button, Card, Switch, Slider } from 'antd';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import { DEFAULT_JAVA_ARGS } from '../../../app/desktop/utils/constants';
-
 import { updateInstanceConfig } from '../../reducers/actions';
+
 const Container = styled.div`
   margin-left: 50px;
   height: 100%;
@@ -150,29 +147,14 @@ const Overview = ({ instanceName }) => {
 
   const dispatch = useDispatch();
 
-  // const setBg = async () => {
-  //   if (config?.background) {
-  //     setBackground(path.join(instancesPath, instanceName, config?.background));
-  //   }
-  // };
-
   useEffect(() => {
-    // const instancePath = path.join(instancesPath, instanceName);
-    // const fileName = path.basename(dialog.filePaths[0]);
-    // const ext = path.basename(
-    //   dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
-    // );
-    // const filePath = path.join(instancePath, `icon.${ext}`);
     if (config?.background) {
       fs.readFile(path.join(instancesPath, instanceName, config?.background))
-        .then(res => {
-          console.log('res', res);
-          setBackground(`data:image/png;base64,${res.toString('base64')}`);
-        })
+        .then(res =>
+          setBackground(`data:image/png;base64,${res.toString('base64')}`)
+        )
         .catch(console.warning);
     }
-    // setBg();
-    console.log('background', background);
   }, []);
 
   const updateJavaMemory = v => {
@@ -228,32 +210,16 @@ const Overview = ({ instanceName }) => {
     ]);
     if (dialog.canceled) return;
     const instancePath = path.join(instancesPath, instanceName);
-    const fileName = path.basename(dialog.filePaths[0]);
     const ext = path.basename(
       dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
     );
     const filePath = path.join(instancePath, `icon.${ext}`);
     await fss.copy(dialog.filePaths[0], filePath);
 
-    // const imageReadStream = createReadStream(dialog.filePaths[0]);
-    // const encodedData = new base64.Base64Encode();
-    // const b64s = imageReadStream.pipe(encodedData);
-    // const base64String = await getStream(b64s);
-    // updateBackGround(`icon.${ext}`);
-
-    // if (instance.background) {
-    //   fs.readFile(path.join(instancesPath, instanceName, instance.background))
-    //     .then(res =>
-    //       setBackground(`data:image/png;base64,${res.toString('base64')}`)
-    //     )
-    //     .catch(console.warning);
-    // } else {
-
     fs.readFile(filePath)
-      .then(res => {
-        console.log('res', res);
-        setBackground(`data:image/png;base64,${res.toString('base64')}`);
-      })
+      .then(res =>
+        setBackground(`data:image/png;base64,${res.toString('base64')}`)
+      )
       .catch(console.warning);
     setBackground(filePath);
     updateBackGround(`icon.${ext}`);
@@ -262,13 +228,7 @@ const Overview = ({ instanceName }) => {
   return (
     <Container>
       <Column>
-        <InstanceBackground
-          onClick={openFileDialog}
-          imagePath={background}
-          // src={background}
-          // key={background}
-          // alt={background}
-        >
+        <InstanceBackground onClick={openFileDialog} imagePath={background}>
           <Overlay />
           <p>Change icon</p>
           <FontAwesomeIcon
