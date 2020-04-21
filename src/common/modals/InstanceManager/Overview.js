@@ -210,10 +210,11 @@ const Overview = ({ instanceName }) => {
     ]);
     if (dialog.canceled) return;
     const instancePath = path.join(instancesPath, instanceName);
+    const fileName = path.basename(dialog.filePaths[0]);
     const ext = path.basename(
       dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
     );
-    const filePath = path.join(instancePath, `icon.${ext}`);
+    const filePath = path.join(instancePath, `${fileName}.${ext}`);
     await fss.copy(dialog.filePaths[0], filePath);
 
     fs.readFile(filePath)
@@ -222,7 +223,7 @@ const Overview = ({ instanceName }) => {
       )
       .catch(console.warning);
     setBackground(filePath);
-    updateBackGround(`icon.${ext}`);
+    updateBackGround(`${fileName}.${ext}`);
   };
 
   return (
