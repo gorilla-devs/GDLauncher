@@ -1,18 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
-import { promises as fs } from 'fs';
+
 import path from 'path';
-import { ipcRenderer } from 'electron';
+
 import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSave,
-  faUndo,
-  faTimesCircle
-} from '@fortawesome/free-solid-svg-icons';
+import { faSave, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Card, Switch, Slider } from 'antd';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import { DEFAULT_JAVA_ARGS } from '../../../app/desktop/utils/constants';
@@ -28,58 +24,6 @@ const Container = styled.div`
 const Column = styled.div`
   max-width: 600px;
 `;
-
-const Overlay = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: ${props => props.theme.palette.grey[700]};
-  opacity: 0;
-`;
-
-const InstanceBackground = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: ${props =>
-    props.imagePath
-      ? `url(${props.imagePath}) center no-repeat`
-      : props.theme.palette.primary.dark};
-
-  transition: opacity 0.2s ease;
-  &&:hover svg {
-    opacity: 1;
-    z-index: 2;
-  }
-
-  &&:hover p {
-    opacity: 1;
-    z-index: 2;
-  }
-
-  &&:hover ${Overlay} {
-    opacity: 0.3;
-  }
-
-  svg {
-    margin-top: 10px;
-    color: ${props => props.theme.palette.colors.red};
-    opacity: 0;
-  }
-
-  p {
-    width: 50px;
-    text-align: center;
-    opacity: 0;
-  }
-`;
-// background: ${props => props.theme.palette.primary.dark};
 
 const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
@@ -143,19 +87,8 @@ const Overview = ({ instanceName }) => {
     config?.javaArgs
   );
   const [newName, setNewName] = useState(instanceName);
-  const [background, setBackground] = useState(config?.background);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (config?.background) {
-      fs.readFile(path.join(instancesPath, instanceName, config?.background))
-        .then(res =>
-          setBackground(`data:image/png;base64,${res.toString('base64')}`)
-        )
-        .catch(console.warning);
-    }
-  }, []);
 
   const updateJavaMemory = v => {
     dispatch(
@@ -171,15 +104,6 @@ const Overview = ({ instanceName }) => {
       updateInstanceConfig(instanceName, prev => ({
         ...prev,
         javaArgs: v
-      }))
-    );
-  };
-
-  const updateBackGround = v => {
-    dispatch(
-      updateInstanceConfig(instanceName, prev => ({
-        ...prev,
-        background: v
       }))
     );
   };
@@ -204,43 +128,9 @@ const Overview = ({ instanceName }) => {
     );
   };
 
-  const openFileDialog = async () => {
-    const dialog = await ipcRenderer.invoke('openFileDialog', [
-      { name: 'Image', extensions: ['png', 'jpg', 'jpeg'] }
-    ]);
-    if (dialog.canceled) return;
-    const instancePath = path.join(instancesPath, instanceName);
-    const fileName = path.basename(dialog.filePaths[0]);
-    const ext = path.basename(
-      dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
-    );
-    const filePath = path.join(instancePath, `${fileName}.${ext}`);
-    await fss.copy(dialog.filePaths[0], filePath);
-
-    fs.readFile(filePath)
-      .then(res =>
-        setBackground(`data:image/png;base64,${res.toString('base64')}`)
-      )
-      .catch(console.warning);
-    setBackground(filePath);
-    updateBackGround(`${fileName}.${ext}`);
-  };
-
   return (
     <Container>
       <Column>
-        <InstanceBackground onClick={openFileDialog} imagePath={background}>
-          <Overlay />
-          <p>Change icon</p>
-          <FontAwesomeIcon
-            icon={faTimesCircle}
-            onClick={e => {
-              e.stopPropagation();
-              updateBackGround('');
-              setBackground('');
-            }}
-          />
-        </InstanceBackground>
         <MainTitle>Overview</MainTitle>
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
