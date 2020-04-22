@@ -22,6 +22,7 @@ import {
   clearLatestModManifests,
   updateInstanceConfig
 } from '../../reducers/actions';
+import instanceDefaultBackground from '../../../common/assets/instance_default.png';
 
 const SideMenu = styled.div`
   display: flex;
@@ -102,8 +103,8 @@ const InstanceBackground = styled.div`
   background: ${props =>
     props.imagePath
       ? `url(${props.imagePath}) center no-repeat`
-      : props.theme.palette.primary.dark};
-  background-size: 120px;
+      : `url(${instanceDefaultBackground}) center no-repeat`};
+  background-size: 180px;
   transition: opacity 0.2s ease;
   &&:hover svg {
     opacity: 1;
