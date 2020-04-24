@@ -39,14 +39,10 @@ Menu.setApplicationMenu();
 if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
   app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
 } else {
+  app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
   const store = new Store({ name: 'overrides' });
   if (store.has('userDataOverride')) {
     app.setPath('userData', store.get('userDataOverride'));
-  } else {
-    app.setPath(
-      'userData',
-      path.join(app.getPath('appData'), 'gdlauncher_next')
-    );
   }
 }
 
