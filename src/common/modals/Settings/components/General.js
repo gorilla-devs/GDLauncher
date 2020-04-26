@@ -280,12 +280,6 @@ const General = () => {
   const changeDataPath = async () => {
     const appData = await ipcRenderer.invoke('getAppdataPath');
     const appDataPath = path.join(appData, 'gdlauncher_next');
-    console.log('>G>T', dataPath);
-    console.log(
-      'userData',
-      userData,
-      JSON.stringify({ userDataOverride: dataPath })
-    );
     if (!dataPath) return;
     dispatch(updateUserData(dataPath));
 
@@ -295,14 +289,22 @@ const General = () => {
     );
 
     if (moveDatas) {
-      const files = await fs.readdir(userData);
-      await Promise.all(
-        files.forEach(async name => {
-          await fsa.move(path.join(userData, name), dataPath, {
-            overwrite: true
-          });
-        })
-      );
+      try {
+        const files = await fs.readdir(userData);
+        await Promise.all(
+          files.map(async name => {
+            await fsa.copy(
+              path.join(userData, name),
+              path.join(dataPath, name),
+              {
+                overwrite: true
+              }
+            );
+          })
+        );
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -629,7 +631,7 @@ const General = () => {
               margin-left: 20px;
             `}
           >
-            Move all the files to the new directory
+            Copy all the files to the new directory
           </p>
         </div>
       </CustomDataPathContainer>
