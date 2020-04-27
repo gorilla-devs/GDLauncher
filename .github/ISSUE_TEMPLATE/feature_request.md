@@ -12,7 +12,7 @@ assignees: ''
 **Describe the new feature you are requesting**
 
 
-**Describe alternatives to this feature if Applicable**
+**Describe alternatives to this feature if applicable**
 
 
-**Additional Inforomation**
+**Additional Information**
