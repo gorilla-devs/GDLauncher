@@ -47,8 +47,7 @@ import {
   getAddonsByFingerprint,
   getAddonFiles,
   getAddon,
-  getAddonCategories,
-  getJavaManifestFromMirror
+  getAddonCategories
 } from '../api';
 import {
   _getCurrentAccount,
@@ -118,21 +117,12 @@ export function initManifests() {
       return fabric;
     };
     const getJavaManifestVersions = async () => {
-      try {
-        const java = (await getJavaManifest()).data;
-        dispatch({
-          type: ActionTypes.UPDATE_JAVA_MANIFEST,
-          data: java
-        });
-        return java;
-      } catch {
-        const java = (await getJavaManifestFromMirror()).data;
-        dispatch({
-          type: ActionTypes.UPDATE_JAVA_MANIFEST,
-          data: java
-        });
-        return java;
-      }
+      const java = (await getJavaManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_JAVA_MANIFEST,
+        data: java
+      });
+      return java;
     };
     const getAddonCategoriesVersions = async () => {
       const curseforgeCategories = (await getAddonCategories()).data;
