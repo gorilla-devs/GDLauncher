@@ -169,11 +169,8 @@ const InstanceManager = ({ instanceName }) => {
     ]);
     if (dialog.canceled) return;
     const instancePath = path.join(instancesPath, instanceName);
-    const fileName = path.basename(dialog.filePaths[0]);
-    const ext = path.basename(
-      dialog.filePaths[0].substr(dialog.filePaths[0].lastIndexOf('.') + 1)
-    );
-    const filePath = path.join(instancePath, `${fileName}.${ext}`);
+    const ext = path.extname(dialog.filePaths[0]);
+    const filePath = path.join(instancePath, `icon${ext}`);
     await fss.copy(dialog.filePaths[0], filePath);
 
     fs.readFile(filePath)
@@ -182,7 +179,7 @@ const InstanceManager = ({ instanceName }) => {
       )
       .catch(console.warning);
     setBackground(filePath);
-    updateBackGround(`${fileName}.${ext}`);
+    updateBackGround(`icon${ext}`);
   };
 
   useEffect(() => {
@@ -225,8 +222,8 @@ const InstanceManager = ({ instanceName }) => {
                 icon={faTimesCircle}
                 onClick={e => {
                   e.stopPropagation();
-                  updateBackGround('');
-                  setBackground('');
+                  updateBackGround(null);
+                  setBackground(null);
                 }}
               />
             </InstanceBackground>
