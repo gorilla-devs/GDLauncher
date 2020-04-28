@@ -38,10 +38,12 @@ const main = async () => {
 
     if (lastRelease) {
       uploadUrl = lastRelease.upload_url;
+      console.log('Found a release with this tag. Uploading there.');
     } else {
-      throw new Error();
+      throw new Error('Could not find release. Creating one.');
     }
   } catch (err) {
+    console.log(err);
     const { data: newRelease } = await axios.default.post(
       'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases',
       { tag_name: `v${version}`, name: `v${version}`, draft: true },
@@ -52,9 +54,12 @@ const main = async () => {
       }
     );
     uploadUrl = newRelease.upload_url;
+    console.log('New release tag created.');
   }
 
   const deployFiles = await readdir(deployFolder);
+
+  console.log(`Found ${deployFiles.length} files to upload.`);
   let uploaded = 0;
   await pMap(
     deployFiles,
@@ -91,6 +96,7 @@ const main = async () => {
         });
       } catch (err) {
         console.error(err.message);
+        throw err;
       }
       uploaded += 1;
       console.log(`Uploaded ${uploaded} / ${deployFiles.length} -- ${file}`);
