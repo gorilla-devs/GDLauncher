@@ -195,7 +195,7 @@ const Instance = ({ instanceName }) => {
     } else {
       setBackground(`${instanceDefaultBackground}`);
     }
-  }, [instance, instancesPath, instanceName]);
+  }, [instance.background, instancesPath, instanceName]);
 
   const startInstance = () => {
     if (isInQueue || isPlaying) return;

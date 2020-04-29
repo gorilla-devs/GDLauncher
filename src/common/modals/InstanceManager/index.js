@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
-import fss from 'fs-extra';
+import fse from 'fs-extra';
 import { promises as fs } from 'fs';
 import path from 'path';
 import Modal from '../../components/Modal';
@@ -106,17 +106,17 @@ const InstanceBackground = styled.div`
       : `url(${instanceDefaultBackground}) center no-repeat`};
   background-size: 180px;
   transition: opacity 0.2s ease;
-  &&:hover svg {
+  &:hover svg {
     opacity: 1;
     z-index: 2;
   }
 
-  &&:hover p {
+  &:hover p {
     opacity: 1;
     z-index: 2;
   }
 
-  &&:hover ${Overlay} {
+  &:hover ${Overlay} {
     opacity: 0.9;
   }
 
@@ -154,7 +154,7 @@ const InstanceManager = ({ instanceName }) => {
   const [background, setBackground] = useState(instance?.background);
   const ContentComponent = menuEntries[page].component;
 
-  const updateBackGround = v => {
+  const updateBackground = v => {
     dispatch(
       updateInstanceConfig(instanceName, prev => ({
         ...prev,
@@ -170,8 +170,8 @@ const InstanceManager = ({ instanceName }) => {
     if (dialog.canceled) return;
     const instancePath = path.join(instancesPath, instanceName);
     const ext = path.extname(dialog.filePaths[0]);
-    const filePath = path.join(instancePath, `icon${ext}`);
-    await fss.copy(dialog.filePaths[0], filePath);
+    const filePath = path.join(instancePath, `background${ext}`);
+    await fse.copy(dialog.filePaths[0], filePath);
 
     fs.readFile(filePath)
       .then(res =>
@@ -179,12 +179,12 @@ const InstanceManager = ({ instanceName }) => {
       )
       .catch(console.warning);
     setBackground(filePath);
-    updateBackGround(`icon${ext}`);
+    updateBackground(`background${ext}`);
   };
 
   useEffect(() => {
     if (instance?.background) {
-      fs.readFile(path.join(instancesPath, instanceName, instance?.background))
+      fs.readFile(path.join(instancesPath, instanceName, instance.background))
         .then(res =>
           setBackground(`data:image/png;base64,${res.toString('base64')}`)
         )
@@ -222,7 +222,7 @@ const InstanceManager = ({ instanceName }) => {
                 icon={faTimesCircle}
                 onClick={e => {
                   e.stopPropagation();
-                  updateBackGround(null);
+                  updateBackground(null);
                   setBackground(null);
                 }}
               />
