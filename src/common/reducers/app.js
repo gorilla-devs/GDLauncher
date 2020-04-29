@@ -74,20 +74,6 @@ function javaManifest(state = {}, action) {
   }
 }
 
-function modsManifests(state = [], action) {
-  const index = state.findIndex(mod => mod.id === action.id);
-  switch (action.type) {
-    case ActionTypes.UPDATE_MODS_MANIFESTS:
-      return index !== -1
-        ? [...state.slice(0, index), action.mod, ...state.slice(index + 1)]
-        : [...state, action.mod];
-    case ActionTypes.REMOVE_MOD_MANIFEST:
-      return accounts.filter(mod => mod.id !== action.id);
-    default:
-      return state;
-  }
-}
-
 function clientToken(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CLIENT_TOKEN:
@@ -122,7 +108,6 @@ export default combineReducers({
   forgeManifest,
   fabricManifest,
   javaManifest,
-  modsManifests,
   curseforgeCategories,
   clientToken,
   isNewUser,

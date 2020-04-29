@@ -62,9 +62,7 @@ const AddAccount = ({ username }) => {
 export default AddAccount;
 
 const StyledInput = styled(Input)`
-  && {
-    margin-bottom: 20px;
-  }
+  margin-bottom: 20px;
 `;
 
 const StyledButton = styled(Button)`

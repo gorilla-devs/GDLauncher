@@ -82,16 +82,18 @@ const UuidContainer = styled.div`
   text-align: left;
 `;
 
-const Username = styled.div`
-  font-size: smaller;
-  font-weight: 200;
-  color: ${props => props.theme.palette.grey[100]};
-`;
-
 const Uuid = styled.div`
   font-size: smaller;
   font-weight: 200;
   color: ${props => props.theme.palette.grey[100]};
+  display: flex;
+`;
+
+const Username = styled.div`
+  font-size: smaller;
+  font-weight: 200;
+  color: ${props => props.theme.palette.grey[100]};
+  display: flex;
 `;
 
 const PersonalDataContainer = styled.div`
@@ -206,7 +208,6 @@ const General = () => {
   const queuedInstances = useSelector(state => state.downloadQueue);
   const tempPath = useSelector(_getTempPath);
   const [copiedUuid, setCopiedUuid] = useState(false);
-  const [copiedUsername, setCopiedUsername] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [deletingInstances, setDeletingInstances] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
@@ -251,49 +252,21 @@ const General = () => {
             `}
           >
             <UsernameContainer>
-              Username
-              <br />
-              <Username>
-                {currentAccount.selectedProfile.name}{' '}
-                <Tooltip
-                  title={copiedUsername ? 'copied' : 'copy'}
-                  placement="top"
-                >
-                  <div
-                    css={`
-                      width: 13px;
-                      height: 14px;
-                      margin: 0;
-                      margin-left: 4px;
-                      float: right;
-                    `}
-                  >
-                    <FontAwesomeIcon
-                      icon={faCopy}
-                      onClick={() =>
-                        copy(
-                          setCopiedUsername,
-                          currentAccount.selectedProfile.name
-                        )
-                      }
-                    />
-                  </div>
-                </Tooltip>
-              </Username>
+              Username <br />
+              <Username>{currentAccount.selectedProfile.name}</Username>
             </UsernameContainer>
             <UuidContainer>
               UUID
               <br />
               <Uuid>
                 {dashUuid(currentAccount.selectedProfile.id)}
-                <Tooltip title={copiedUuid ? 'copied' : 'copy'} placement="top">
+                <Tooltip title={copiedUuid ? 'Copied' : 'Copy'} placement="top">
                   <div
                     css={`
                       width: 13px;
                       height: 14px;
                       margin: 0;
-                      margin-left: 4px;
-                      float: right;
+                      margin-left: 10px;
                     `}
                   >
                     <FontAwesomeIcon

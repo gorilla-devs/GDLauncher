@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import path from 'path';
-import memoize from 'lodash.memoize';
+import memoize from 'lodash/memoize';
 import { convertOSToJavaFormat } from '../../app/desktop/utils';
 
 const _instances = state => state.instances;
@@ -62,7 +62,7 @@ export const _getJavaPath = createSelector(
 );
 
 export const _getInstancesPath = createSelector(_userData, userData =>
-  path.join(userData, 'instances_next')
+  path.join(userData, 'instances')
 );
 
 export const _getTempPath = createSelector(_userData, userData =>

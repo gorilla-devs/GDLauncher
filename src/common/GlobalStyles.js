@@ -143,20 +143,22 @@ export default createGlobalStyle`
     cursor: pointer;
     font-weight: 400;
     line-height: 1.5;
-    padding: 4px 10px;
+    padding: 8px 10px;
     text-align: left;
     white-space: nowrap;
     span {
       color: ${props => props.theme.palette.text.primary};
       width: 25px;
-  
     }
   }
-  
-  .react-contextmenu-item.react-contextmenu-item--active,
-  .react-contextmenu-item.react-contextmenu-item--selected,
-  .react-contextmenu-item:hover{
-    background-color: ${props => props.theme.palette.grey[800]};
+
+  .react-contextmenu-item:not(.react-contextmenu-item--divider):hover{
+    background: ${({ theme }) => theme.palette.grey[500]};
+    text-decoration: none;
+  }
+
+  .react-contextmenu-item:not(.react-contextmenu-item--divider):active{
+    background: ${({ theme }) => theme.palette.grey[400]};
     text-decoration: none;
   }
 
@@ -171,7 +173,7 @@ export default createGlobalStyle`
   }
   
   .react-contextmenu-item--divider {
-    border-bottom: 1px solid ${props => props.theme.palette.grey[300]};
+    border-bottom: 1px solid ${props => props.theme.palette.grey[400]};
     cursor: inherit;
     margin-bottom: 3px;
     padding: 2px 0;

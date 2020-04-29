@@ -10,7 +10,11 @@ import { ipcRenderer } from 'electron';
 import path from 'path';
 import crypto from 'crypto';
 import { exec, spawn } from 'child_process';
-import { MC_LIBRARIES_URL } from '../../../common/utils/constants';
+import {
+  MC_LIBRARIES_URL,
+  FABRIC,
+  FORGE
+} from '../../../common/utils/constants';
 import { removeDuplicates } from '../../../common/utils';
 import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
@@ -296,6 +300,7 @@ export const getJVMArguments112 = (
   args.push(`-Xms${memory}m`);
   args.push(...jvmOptions);
   args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
+  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
 
   args.push(mcJson.mainClass);
 
@@ -649,13 +654,23 @@ export const reflect = p =>
     e => ({ e, status: false })
   );
 
+export const convertCompletePathToInstance = (f, instancesPath) => {
+  const escapeRegExp = stringToGoIntoTheRegex => {
+    return stringToGoIntoTheRegex.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  };
+
+  return f.replace(new RegExp(escapeRegExp(instancesPath), 'gi'), '');
+};
+
 export const isMod = (fileName, instancesPath) =>
   /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
-    fileName.replace(instancesPath, '')
+    convertCompletePathToInstance(fileName, instancesPath)
   );
 
 export const isInstanceFolderPath = (f, instancesPath) =>
-  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(f.replace(instancesPath, ''));
+  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(
+    convertCompletePathToInstance(f, instancesPath)
+  );
 
 export const isFileModFabric = file => {
   return (
@@ -697,9 +712,8 @@ export const getFirstReleaseCandidate = files => {
   return latestFile;
 };
 
-export const getFileSha1 = async filePath => {
+export const getFileHash = async (filePath, algorithm = 'sha1') => {
   // Calculate sha1 on original file
-  const algorithm = 'sha1';
   const shasum = crypto.createHash(algorithm);
 
   const s = originalFs.ReadStream(filePath);
@@ -726,4 +740,25 @@ export const getFilesRecursive = async dir => {
     })
   );
   return files.reduce((a, f) => a.concat(f), []);
+};
+
+export const convertcurseForgeToCanonical = (
+  curseForge,
+  mcVersion,
+  forgeManifest
+) => {
+  const patchedCurseForge = curseForge.replace('forge-', '');
+  const forgeEquivalent = forgeManifest[mcVersion].find(v => {
+    return v.split('-')[1] === patchedCurseForge;
+  });
+  return forgeEquivalent;
+};
+
+export const getPatchedInstanceType = instance => {
+  const isForge = instance.modloader[0] === FORGE;
+  const hasJumpLoader = (instance.mods || []).find(v => v.projectID === 361988);
+  if (isForge && !hasJumpLoader) {
+    return FORGE;
+  }
+  return FABRIC;
 };

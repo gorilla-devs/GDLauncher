@@ -6,7 +6,14 @@ import { LoadingOutlined } from '@ant-design/icons';
 import path from 'path';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faClock } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlay,
+  faClock,
+  faWrench,
+  faFolder,
+  faTrash,
+  faStop
+} from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
 import { useSelector, useDispatch } from 'react-redux';
@@ -44,6 +51,17 @@ const Spinner = keyframes`
   }
 `;
 
+const PlayButtonAnimation = keyframes`
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
 const InstanceContainer = styled.div`
   display: flex;
   position: absolute;
@@ -73,6 +91,8 @@ const HoverContainer = styled.div`
   cursor: pointer;
   font-size: 18px;
   margin: 10px;
+  padding: 10px;
+  text-align: center;
   font-weight: 800;
   border-radius: 4px;
   transition: opacity 150ms ease-in-out;
@@ -90,14 +110,13 @@ const HoverContainer = styled.div`
     animation: 1.5s linear infinite ${Spinner};
     animation-play-state: inherit;
     border: solid 3px transparent;
-    border-bottom-color: ${props => props.theme.palette.colors.green};
+    border-bottom-color: ${props => props.theme.palette.colors.yellow};
     border-radius: 50%;
     content: '';
-    height: 60px;
-    width: 60px;
+    height: 30px;
+    width: 30px;
     position: absolute;
-    top: 13px;
-    left: 9px;
+    top: 10px;
     transform: translate3d(-50%, -50%, 0);
     will-change: transform;
   }
@@ -192,10 +211,15 @@ const Instance = ({ instanceName }) => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
   const killProcess = () => {
+    console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
-      children.forEach(el => {
-        process.kill(el.PID);
-      });
+      if (children.length) {
+        children.forEach(el => {
+          process.kill(el.PID);
+        });
+      } else {
+        process.kill(isPlaying.pid);
+      }
     });
   };
 
@@ -251,17 +275,22 @@ const Instance = ({ instanceName }) => {
                       position: relative;
                       width: 20px;
                       height: 20px;
-                      margin-top: -8px;
                     `}
                   >
-                    <FontAwesomeIcon
-                      css={`
-                        color: ${({ theme }) => theme.palette.colors.green};
-                        font-size: 27px;
-                        position: absolute;
-                      `}
-                      icon={faPlay}
-                    />
+                    {isPlaying.initialized && (
+                      <FontAwesomeIcon
+                        css={`
+                          color: ${({ theme }) => theme.palette.colors.green};
+                          font-size: 27px;
+                          position: absolute;
+                          margin-left: -6px;
+                          margin-top: -2px;
+                          animation: ${PlayButtonAnimation} 0.5s
+                            cubic-bezier(0.75, -1.5, 0, 2.75);
+                        `}
+                        icon={faPlay}
+                      />
+                    )}
                     {!isPlaying.initialized && <div className="spinner" />}
                   </div>
                 )}
@@ -278,16 +307,46 @@ const Instance = ({ instanceName }) => {
         onHide={() => setIsHovered(false)}
       >
         <MenuInstanceName>{instanceName}</MenuInstanceName>
-        {isPlaying && <MenuItem onClick={killProcess}>Kill</MenuItem>}
+        {isPlaying && (
+          <MenuItem onClick={killProcess}>
+            <FontAwesomeIcon
+              icon={faStop}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Kill
+          </MenuItem>
+        )}
         <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
+          <FontAwesomeIcon
+            icon={faWrench}
+            css={`
+              margin-right: 10px;
+            `}
+          />
           Manage
         </MenuItem>
-        <MenuItem onClick={openFolder}>Open Folder</MenuItem>
+        <MenuItem onClick={openFolder}>
+          <FontAwesomeIcon
+            icon={faFolder}
+            css={`
+              margin-right: 10px;
+            `}
+          />
+          Open Folder
+        </MenuItem>
         <MenuItem divider />
         <MenuItem
           disabled={Boolean(isInQueue) || Boolean(isPlaying)}
           onClick={openConfirmationDeleteModal}
         >
+          <FontAwesomeIcon
+            icon={faTrash}
+            css={`
+              margin-right: 10px;
+            `}
+          />
           Delete
         </MenuItem>
       </ContextMenu>

@@ -15,6 +15,7 @@ const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
 const Store = require('electron-store');
+const log = require('electron-log');
 const fs = require('fs').promises;
 
 const discordRPC = require('./discordRPC');
@@ -24,7 +25,6 @@ const gotTheLock = app.requestSingleInstanceLock();
 // Prevent multiple instances
 if (!gotTheLock) {
   app.quit();
-  app.exit();
 }
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -39,14 +39,18 @@ Menu.setApplicationMenu();
 if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
   app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
 } else {
-  // this defaults to app.getPath('userData'), which is fine since we only use it for setup
   const store = new Store({ name: 'overrides' });
   if (store.has('userDataOverride')) {
     app.setPath('userData', store.get('userDataOverride'));
+  } else {
+    app.setPath(
+      'userData',
+      path.join(app.getPath('appData'), 'gdlauncher_next')
+    );
   }
 }
 
-console.log(process.env.REACT_APP_RELEASE_TYPE);
+log.log(process.env.REACT_APP_RELEASE_TYPE);
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -62,7 +66,7 @@ function createWindow() {
     minHeight: 700,
     show: true,
     frame: false,
-    backgroundColor: '#353E48',
+    backgroundColor: '#212B36',
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
@@ -139,10 +143,6 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
   mainWindow.on('maximize', () => {
     mainWindow.webContents.send('window-maximized');
   });
@@ -165,9 +165,18 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
+  log.log('Quitting app (window-all-closed)');
+  app.quit();
+  log.log('Quitting app (quit) (window-all-closed)');
+});
+
+app.on('before-quit', async () => {
+  if (watcher) {
+    await watcher.stop();
+    watcher = null;
   }
+  mainWindow.removeAllListeners('close');
+  mainWindow = null;
 });
 
 app.on('second-instance', () => {
@@ -214,8 +223,7 @@ ipcMain.handle('show-window', () => {
 });
 
 ipcMain.handle('quit-app', () => {
-  app.quit();
-  app.exit();
+  mainWindow.close();
 });
 
 ipcMain.handle('getAppdataPath', () => {
@@ -266,8 +274,9 @@ ipcMain.handle('openFileDialog', (e, filters) => {
 });
 
 ipcMain.handle('appRestart', () => {
+  log.log('Restarting app');
   app.relaunch();
-  app.exit();
+  mainWindow.close();
 });
 
 ipcMain.handle('getPrimaryDisplaySizes', () => {
@@ -288,22 +297,26 @@ ipcMain.handle('shutdown-discord-rpc', () => {
 
 ipcMain.handle('start-listener', async (e, dirPath) => {
   try {
+    log.log('Trying to start listener');
     if (watcher) {
       await watcher.stop();
       watcher = null;
     }
     watcher = await nsfw(dirPath, events => {
+      log.log('Received listener events', events.length);
       mainWindow.webContents.send('listener-events', events);
     });
+    log.log('Started listener');
     return watcher.start();
   } catch (err) {
-    console.error(err);
+    log.error(err);
     return Promise.reject(err);
   }
 });
 
 ipcMain.handle('stop-listener', async () => {
   if (watcher) {
+    log.log('Stopping listener');
     await watcher.stop();
     watcher = null;
   }
@@ -356,8 +369,11 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
       const updaterBat = 'updateLauncher.bat';
       await fs.writeFile(
         path.join(tempFolder, updaterBat),
-        `robocopy "${path.join(tempFolder, 'update')}" "." /MOV /E${
-          quitAfterInstall ? '' : ` & "${app.getPath('exe')}"`
+        `ping 127.0.0.1 -n 1 > nul & robocopy "${path.join(
+          tempFolder,
+          'update'
+        )}" "." /MOV /E${
+          quitAfterInstall ? '' : ` & start "" "${app.getPath('exe')}"`
         }
         DEL "${path.join(tempFolder, updaterVbs)}"
         DEL "%~f0"
@@ -378,7 +394,12 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
       updateSpawn = spawn(path.join(tempFolder, updaterVbs), {
         cwd: path.dirname(app.getPath('exe')),
         detached: true,
-        shell: true
+        shell: true,
+        stdio: [
+          'ignore' /* stdin */,
+          'ignore' /* stdout */,
+          'ignore' /* stderr */
+        ]
       });
     } else {
       // Linux
@@ -396,12 +417,15 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
           cwd: path.dirname(app.getPath('exe')),
           detached: true,
           shell: true,
-          stdio: 'ignore'
+          stdio: [
+            'ignore' /* stdin */,
+            'ignore' /* stdout */,
+            'ignore' /* stderr */
+          ]
         }
       );
     }
     updateSpawn.unref();
-    app.quit();
-    app.exit();
+    mainWindow.close();
   }
 });

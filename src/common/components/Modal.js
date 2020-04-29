@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import CloseButton from './CloseButton';
@@ -79,4 +79,4 @@ const Modal = ({
   );
 };
 
-export default Modal;
+export default memo(Modal);

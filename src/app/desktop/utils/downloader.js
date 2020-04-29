@@ -26,11 +26,9 @@ export const downloadInstanceFiles = async (
       do {
         counter += 1;
         if (counter !== 1) {
-          // eslint-disable-next-line no-await-in-loop
           await new Promise(resolve => setTimeout(resolve, 5000));
         }
         try {
-          // eslint-disable-next-line no-await-in-loop
           res = await downloadFileInstance(
             item.path,
             item.url,

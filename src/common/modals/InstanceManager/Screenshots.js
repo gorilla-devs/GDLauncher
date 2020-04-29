@@ -10,9 +10,9 @@ import styled from 'styled-components';
 import makeDir from 'make-dir';
 import { Checkbox } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import groupBy from 'lodash.groupby';
-import isEqual from 'lodash.isequal';
-import sortBy from 'lodash.sortby';
+import groupBy from 'lodash/groupBy';
+import isEqual from 'lodash/isEqual';
+import sortBy from 'lodash/sortBy';
 import {
   ContextMenuTrigger,
   ContextMenu,

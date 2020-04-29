@@ -1,23 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-// import Settings from "components/modals/Settings";
-// import Changelog from "components/modals/Changelog";
-// import LoginHelper from "components/modals/LoginHelper";
-import AddInstance from '../modals/AddInstance';
-import Settings from '../modals/Settings/Settings';
-import Screenshot from '../modals/Screenshot';
-import InstanceDeleteConfirmation from '../modals/InstanceDeleteConfirmation';
-import ActionConfirmation from '../modals/ActionConfirmation';
-import AccountsManager from '../modals/AccountsManager';
-import AddAccount from '../modals/AddAccount';
-import InstanceManager from '../modals/InstanceManager';
-import ModsBrowser from '../modals/ModsBrowser';
-import ModpackDescription from '../modals/ModpackDescription';
-import Onboarding from '../modals/Onboarding';
-import JavaSetup from '../modals/JavaSetup';
-import ModOverview from '../modals/ModOverview';
 import { closeModal } from '../reducers/modals/actions';
+import AsyncComponent from './AsyncComponent';
+import AddInstance from '../modals/AddInstance';
+import Settings from '../modals/Settings';
 
 const Overlay = styled.div`
   position: absolute;
@@ -27,7 +14,7 @@ const Overlay = styled.div`
   right: 0;
   backdrop-filter: blur(4px);
   will-change: opacity;
-  transition: opacity 220ms cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: opacity 300ms cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 1000;
 `;
 
@@ -40,33 +27,42 @@ const Modal = styled.div`
   justify-content: center;
   align-items: center;
   background: transparent;
-  transition: transform 220ms;
+  transition: transform 300ms;
   will-change: transform;
   transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 1001;
 `;
 
 const modalsComponentLookupTable = {
-  // Changelog,
-  // LoginHelper
   AddInstance,
-  AccountsManager,
+  AccountsManager: AsyncComponent(
+    lazy(() => import('../modals/AccountsManager'))
+  ),
   Settings,
-  Screenshot,
-  InstanceDeleteConfirmation,
-  ActionConfirmation,
-  AddAccount,
-  ModpackDescription,
-  InstanceManager,
-  Onboarding,
-  ModOverview,
-  ModsBrowser,
-  JavaSetup
+  Screenshot: AsyncComponent(lazy(() => import('../modals/Screenshot'))),
+  InstanceDeleteConfirmation: AsyncComponent(
+    lazy(() => import('../modals/InstanceDeleteConfirmation'))
+  ),
+  ActionConfirmation: AsyncComponent(
+    lazy(() => import('../modals/ActionConfirmation'))
+  ),
+  AddAccount: AsyncComponent(lazy(() => import('../modals/AddAccount'))),
+  ModpackDescription: AsyncComponent(
+    lazy(() => import('../modals/ModpackDescription'))
+  ),
+  InstanceManager: AsyncComponent(
+    lazy(() => import('../modals/InstanceManager'))
+  ),
+  Onboarding: AsyncComponent(lazy(() => import('../modals/Onboarding'))),
+  ModOverview: AsyncComponent(lazy(() => import('../modals/ModOverview'))),
+  ModsBrowser: AsyncComponent(lazy(() => import('../modals/ModsBrowser'))),
+  JavaSetup: AsyncComponent(lazy(() => import('../modals/JavaSetup'))),
+  ModsUpdater: AsyncComponent(lazy(() => import('../modals/ModsUpdater')))
 };
 
-const ModalContainer = ({ unmounting, children, preventClose }) => {
+const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
   const [modalStyle, setModalStyle] = useState({
-    transform: 'scale(0.8)',
+    transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
     opacity: 0
   });
   const [bgStyle, setBgStyle] = useState({
@@ -105,8 +101,8 @@ const ModalContainer = ({ unmounting, children, preventClose }) => {
   const unMountStyle = () => {
     // css for unmount animation
     setModalStyle({
-      transform: 'scale(0.8)',
-      opacity: 0
+      transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
+      opacity: 1
     });
     setBgStyle({
       background: 'rgba(0, 0, 0, 0.70)',
@@ -148,6 +144,7 @@ const ModalsManager = () => {
         unmounting={unmounting}
         key={modalType}
         preventClose={modalProps.preventClose}
+        modalType={modalType}
       >
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <ModalComponent {...modalProps} />

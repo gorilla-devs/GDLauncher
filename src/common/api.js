@@ -6,7 +6,7 @@ import {
   MC_MANIFEST_URL,
   FABRIC_APIS,
   JAVA_MANIFEST_URL,
-  CLIENT_ID,
+  IMGUR_CLIENT_ID,
   FORGESVC_CATEGORIES
 } from './utils/constants';
 import { sortByDate } from './utils';
@@ -63,7 +63,7 @@ export const imgurPost = (image, onProgress) => {
 
   return axios.post('https://api.imgur.com/3/image', bodyFormData, {
     headers: {
-      Authorization: `Client-ID ${CLIENT_ID}`
+      Authorization: `Client-ID ${IMGUR_CLIENT_ID}`
     },
     ...(onProgress && { onUploadProgress: onProgress })
   });
@@ -113,6 +113,11 @@ export const getFabricJson = ([, , yarn, loader]) => {
 export const getAddon = addonID => {
   const url = `${FORGESVC_URL}/addon/${addonID}`;
   return axios.get(url);
+};
+
+export const getMultipleAddons = async addons => {
+  const url = `${FORGESVC_URL}/addon`;
+  return axios.post(url, addons);
 };
 
 export const getAddonFiles = addonID => {
