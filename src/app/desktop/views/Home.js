@@ -34,19 +34,12 @@ const Home = () => {
     dispatch(openModal('AddInstance', { defaultPage }));
   };
 
-  const openWelcomeModal = () => {
-    dispatch(openModal('Onboarding'));
-  };
-
-  const openAccountModal = () => {
-    dispatch(openModal('AccountsManager'));
-  };
   const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
     if (isNewUser) {
-      openWelcomeModal();
+      dispatch(openModal('Onboarding'));
     }
   }, [account]);
 
@@ -74,7 +67,12 @@ const Home = () => {
           <FontAwesomeIcon icon={faPlus} />
         </AddInstanceIcon>
       </Dropdown>
-      <AccountContainer type="primary" onClick={openAccountModal}>
+      <AccountContainer
+        type="primary"
+        onClick={() => {
+          dispatch(openModal('AccountsManager'));
+        }}
+      >
         {profileImage ? (
           <img
             src={`data:image/jpeg;base64,${profileImage}`}

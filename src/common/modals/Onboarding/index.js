@@ -67,9 +67,7 @@ const Onboarding = () => {
                 // active={page === 1}
                 onClick={() => {
                   setPage(i);
-                  if (i > page) {
-                    executeScroll(i - page);
-                  } else executeScroll(i - page);
+                  executeScroll(i - page);
                 }}
               >
                 {title}
