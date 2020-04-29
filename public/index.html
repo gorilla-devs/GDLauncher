@@ -2,18 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="%PUBLIC_URL%/icon.ico" />
     <meta
       name="description"
       content="GDLauncher -- A custom Minecraft launcher"
     />
-    <link rel="apple-touch-icon" href="icon.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <style>
       .loader,
       .loader:after {
@@ -59,20 +52,23 @@
     </style>
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <script>
-      (function() {
-        if (process.env.NODE_ENV !== "development") {
+      (function () {
+        if (process.env.NODE_ENV !== 'development') {
           window.ga =
             window.ga ||
-            function() {
+            function () {
               (ga.q = ga.q || []).push(arguments);
             };
           ga.l = +new Date();
-          ga("create", "UA-147631204-1", "auto");
-          ga("set", "transport", "xhr");
-          ga("set", "appName", "GDLauncher");
-          ga("set", "checkProtocolTask", null);
-          ga("set", "checkStorageTask", null);
-          ga("send", "pageview");
+          ga('create', 'UA-147631204-1', 'none');
+          ga('set', 'transport', 'xhr');
+          ga('set', 'appName', 'GDLauncher');
+          ga('set', 'checkProtocolTask', null);
+          ga('set', 'checkStorageTask', null);
+          ga('set', 'storage', 'none');
+          ga('set', 'storeGac', null);
+          ga('set', 'anonymizeIp', true);
+          ga('set', 'ds', 'app');
         }
       })();
     </script>
@@ -92,7 +88,13 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
       <div
-        style="width:100%; height: 95vh; display: flex; justify-content: center; align-items: center;"
+        style="
+          width: 100%;
+          height: 95vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        "
       >
         <div class="loader">Loading...</div>
       </div>

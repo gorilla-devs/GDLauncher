@@ -2129,6 +2129,17 @@ export const initLatestMods = instanceName => {
   };
 };
 
+export const isAppLatestVersion = () => {
+  return async () => {
+    const { data: latestRelease } = await axios.get(
+      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/latest'
+    );
+
+    const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
+    return !lt(installedVersion, coerce(latestRelease.tag_name));
+  };
+};
+
 export const checkForPortableUpdates = () => {
   return async (dispatch, getState) => {
     const state = getState();
