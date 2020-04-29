@@ -1754,9 +1754,16 @@ export function launchInstance(instanceName) {
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
     const { memory, args } = state.settings.java;
-    const { modloader, javaArgs, javaMemory } = _getInstance(state)(
-      instanceName
-    );
+    const {
+      resolution: globalMinecraftResolution
+    } = state.settings.minecraftSettings;
+    const {
+      modloader,
+      javaArgs,
+      javaMemory,
+      resolution: instanceResolution
+    } = _getInstance(state)(instanceName);
+
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
     const instanceJLFPath = path.join(
@@ -1862,6 +1869,7 @@ export function launchInstance(instanceName) {
 
     const javaArguments = (javaArgs !== undefined ? javaArgs : args).split(' ');
     const javaMem = javaMemory !== undefined ? javaMemory : memory;
+    const gameResolution = instanceResolution || globalMinecraftResolution;
 
     const jvmArguments = getJvmArguments(
       libraries,
@@ -1871,6 +1879,7 @@ export function launchInstance(instanceName) {
       mcJson,
       account,
       javaMem,
+      gameResolution,
       false,
       javaArguments
     );
@@ -1895,6 +1904,7 @@ export function launchInstance(instanceName) {
         mcJson,
         account,
         javaMem,
+        gameResolution,
         true,
         javaArguments
       ).join(' ')}`.replace(...replaceRegex)

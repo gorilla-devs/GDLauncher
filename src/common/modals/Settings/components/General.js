@@ -298,9 +298,7 @@ const General = () => {
           </div>
           <Select
             css={`
-              && {
-                width: 100px;
-              }
+              width: 100px;
             `}
             onChange={e => {
               dispatch(updateReleaseChannel(e));

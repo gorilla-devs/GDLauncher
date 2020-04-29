@@ -281,8 +281,8 @@ ipcMain.handle('appRestart', () => {
   mainWindow.close();
 });
 
-ipcMain.handle('getPrimaryDisplaySizes', () => {
-  return screen.getPrimaryDisplay().bounds;
+ipcMain.handle('getAllDisplaysBounds', () => {
+  return screen.getAllDisplays().map(v => v.bounds);
 });
 
 ipcMain.handle('init-discord-rpc', () => {
