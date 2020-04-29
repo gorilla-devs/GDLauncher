@@ -1,12 +1,12 @@
 /* eslint-disable */
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { Select, Input } from "antd";
-import { useDebouncedCallback } from "use-debounce";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { getSearch } from "../../../api";
-import ModpacksListWrapper from "./ModpacksListWrapper";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { Select, Input } from 'antd';
+import { useDebouncedCallback } from 'use-debounce';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { getSearch } from '../../../api';
+import ModpacksListWrapper from './ModpacksListWrapper';
+import { useSelector } from 'react-redux';
 
 let lastRequest;
 const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
@@ -16,8 +16,8 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   const [loading, setLoading] = useState(false);
   const [minecraftVersion, setMinecraftVersion] = useState(null);
   const [categoryId, setCategoryId] = useState(null);
-  const [sortBy, setSortBy] = useState("Featured");
-  const [searchText, setSearchText] = useState("");
+  const [sortBy, setSortBy] = useState('Featured');
+  const [searchText, setSearchText] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
     lastRequest = reqObj;
     setLoading(true);
     const { data } = await getSearch(
-      "modpacks",
+      'modpacks',
       searchText,
       40,
       reset ? 0 : modpacks.length,
@@ -65,9 +65,11 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
         >
           <Select.Option value={null}>All Versions</Select.Option>
           {(mcVersions || [])
-            .filter(v => v?.type === "release")
+            .filter(v => v?.type === 'release')
             .map(v => (
-              <Select.Option value={v?.id}>{v?.id}</Select.Option>
+              <Select.Option key={v?.id} value={v?.id}>
+                {v?.id}
+              </Select.Option>
             ))}
         </StyledSelect>
         <StyledSelect
@@ -75,12 +77,14 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
           onChange={setCategoryId}
           defaultValue={null}
         >
-          <Select.Option value={null}>All Categories</Select.Option>
+          <Select.Option key={'allcategories'} value={null}>
+            All Categories
+          </Select.Option>
           {(categories || [])
             .filter(v => v?.rootGameCategoryId === 4471)
             .sort((a, b) => a?.name.localeCompare(b?.name))
             .map(v => (
-              <Select.Option value={v?.id}>
+              <Select.Option value={v?.id} key={v?.id}>
                 <div
                   css={`
                     display: flex;
@@ -92,10 +96,10 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
                   <img
                     src={v?.avatarUrl}
                     css={`
-                    height: 16px;
-                    width: 16px;
-                    margin-right: 10px;
-                  `}
+                      height: 16px;
+                      width: 16px;
+                      margin-right: 10px;
+                    `}
                   />
                   {v?.name}
                 </div>
@@ -107,12 +111,24 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
           defaultValue="Featured"
           onChange={setSortBy}
         >
-          <Select.Option value="Featured">Featured</Select.Option>
-          <Select.Option value="Popularity">Popularity</Select.Option>
-          <Select.Option value="LastUpdated">Last Updated</Select.Option>
-          <Select.Option value="Name">Name</Select.Option>
-          <Select.Option value="Author">Author</Select.Option>
-          <Select.Option value="TotalDownloads">Total Downloads</Select.Option>
+          <Select.Option key="Featured" value="Featured">
+            Featured
+          </Select.Option>
+          <Select.Option key="Popularity" value="Popularity">
+            Popularity
+          </Select.Option>
+          <Select.Option key="LastUpdated" value="LastUpdated">
+            Last Updated
+          </Select.Option>
+          <Select.Option key="Name" value="Name">
+            Name
+          </Select.Option>
+          <Select.Option key="Author" value="Author">
+            Author
+          </Select.Option>
+          <Select.Option key="TotalDownloads" value="TotalDownloads">
+            Total Downloads
+          </Select.Option>
         </StyledSelect>
         <StyledInput
           placeholder="Search..."
