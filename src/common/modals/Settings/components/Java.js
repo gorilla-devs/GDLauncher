@@ -116,12 +116,9 @@ export default function MyAccountPreferences() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (customResolution.width && customResolution.height) {
-      setWidth(customResolution.width);
-      setHeight(customResolution.height);
-    } else {
-      setWidth(800);
-      setHeight(600);
+    setWidth(customResolution?.width && 800);
+    setHeight(customResolution?.height && 600);
+    if (!customResolution.width && !customResolution.height) {
       dispatch(updateResolution({ height: 600, width: 800 }));
     }
   }, []);
@@ -251,7 +248,7 @@ export default function MyAccountPreferences() {
               onChange={e => {
                 const w = parseInt(e.target.value, 10);
                 setWidth(w);
-                dispatch(updateResolution({ height, pane: w }));
+                dispatch(updateResolution({ height, width: w }));
               }}
             />
           </div>

@@ -180,7 +180,7 @@ const Overview = ({ instanceName }) => {
                       omit(prev, ['resolution'])
                     )
                   );
-                } else if (v) {
+                } else {
                   updateGameResolution(600, 800);
                   setHeight(600);
                   setWidth(800);

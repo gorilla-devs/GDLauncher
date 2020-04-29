@@ -1869,7 +1869,7 @@ export function launchInstance(instanceName) {
 
     const javaArguments = (javaArgs !== undefined ? javaArgs : args).split(' ');
     const javaMem = javaMemory !== undefined ? javaMemory : memory;
-    const resol = instanceResolution || globalMinecraftResolution;
+    const gameResolution = instanceResolution || globalMinecraftResolution;
 
     const jvmArguments = getJvmArguments(
       libraries,
@@ -1879,7 +1879,7 @@ export function launchInstance(instanceName) {
       mcJson,
       account,
       javaMem,
-      resol,
+      gameResolution,
       false,
       javaArguments
     );
@@ -1904,7 +1904,7 @@ export function launchInstance(instanceName) {
         mcJson,
         account,
         javaMem,
-        resol,
+        gameResolution,
         true,
         javaArguments
       ).join(' ')}`.replace(...replaceRegex)
