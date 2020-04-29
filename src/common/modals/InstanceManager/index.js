@@ -84,7 +84,7 @@ const Overlay = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 10%;
   background: ${props => props.theme.palette.grey[700]};
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -98,7 +98,7 @@ const InstanceBackground = styled.div`
   align-items: center;
   width: 100px;
   height: 100px;
-  border-radius: 50%;
+  border-radius: 10%;
   margin-bottom: 20px;
   background: ${props =>
     props.imagePath
