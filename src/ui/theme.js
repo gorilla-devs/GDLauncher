@@ -65,8 +65,7 @@ module.exports = {
       sidebar: 172
     },
     height: {
-      systemNavbar: 23,
-      navbar: 36
+      systemNavbar: 45
     }
   }
 };

@@ -13,7 +13,11 @@ import {
 import { addToQueue } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
 import { Input } from 'antd';
-import { downloadAddonZip, importAddonZip } from '../../../app/desktop/utils';
+import {
+  downloadAddonZip,
+  importAddonZip,
+  convertcurseForgeToCanonical
+} from '../../../app/desktop/utils';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import { transparentize } from 'polished';
 import bgImage from '../../../common/assets/mcCube.jpg';
@@ -41,6 +45,7 @@ const InstanceName = ({
   const instancesPath = useSelector(_getInstancesPath);
   const tempPath = useSelector(_getTempPath);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
+  const forgeManifest = useSelector(state => state.app.forgeManifest);
   const [instanceName, setInstanceName] = useState(mcName);
   const [alreadyExists, setAlreadyExists] = useState(false);
   const [invalidName, setInvalidName] = useState(true);
@@ -112,9 +117,11 @@ const InstanceName = ({
       const modloader = [
         version[0],
         manifest.minecraft.version,
-        manifest.minecraft.modLoaders
-          .find(v => v.primary)
-          .id.replace('forge-', ''),
+        convertcurseForgeToCanonical(
+          manifest.minecraft.modLoaders.find(v => v.primary).id,
+          manifest.minecraft.version,
+          forgeManifest
+        ),
         version[1],
         version[2]
       ];
@@ -136,9 +143,11 @@ const InstanceName = ({
       const modloader = [
         version[0],
         manifest.minecraft.version,
-        manifest.minecraft.modLoaders
-          .find(v => v.primary)
-          .id.replace('forge-', '')
+        convertcurseForgeToCanonical(
+          manifest.minecraft.modLoaders.find(v => v.primary).id,
+          manifest.minecraft.version,
+          forgeManifest
+        )
       ];
       dispatch(addToQueue(localInstanceName, modloader, manifest));
     } else if (isVanilla) {

@@ -62,11 +62,11 @@ const Home = () => {
       <News news={news} />
       <Instances />
       <Dropdown overlay={menu} trigger={['click']}>
-        <AddInstanceIcon color="primary">
+        <AddInstanceIcon type="primary">
           <FontAwesomeIcon icon={faPlus} />
         </AddInstanceIcon>
       </Dropdown>
-      <AccountContainer color="primary" onClick={openAccountModal}>
+      <AccountContainer type="primary" onClick={openAccountModal}>
         {profileImage ? (
           <img
             src={`data:image/jpeg;base64,${profileImage}`}

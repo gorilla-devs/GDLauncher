@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState, useCallback } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -17,7 +17,8 @@ import { FABRIC, FORGE } from '../utils/constants';
 import {
   getFirstReleaseCandidate,
   filterFabricFilesByVersion,
-  filterForgeFilesByVersion
+  filterForgeFilesByVersion,
+  getPatchedInstanceType
 } from '../../app/desktop/utils';
 
 const CellContainer = styled.div.attrs(props => ({
@@ -75,9 +76,9 @@ const Cell = ({
   items,
   version,
   installedMods,
-  instanceName,
-  getLoader
+  instanceName
 }) => {
+  const instance = useSelector(state => _getInstance(state)(instanceName));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
@@ -136,8 +137,8 @@ const Cell = ({
                   e.stopPropagation();
                   const files = (await getAddonFiles(mod?.id)).data;
 
-                  const isFabric = getLoader() === FABRIC;
-                  const isForge = getLoader() === FORGE;
+                  const isFabric = getPatchedInstanceType(instance) === FABRIC;
+                  const isForge = getPatchedInstanceType(instance) === FORGE;
 
                   let filteredFiles = [];
 
@@ -196,8 +197,7 @@ const ModsListWrapper = ({
   instance,
   version,
   installedMods,
-  instanceName,
-  getLoader
+  instanceName
 }) => {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
@@ -271,7 +271,6 @@ const ModsListWrapper = ({
               isNextPageLoading={isNextPageLoading}
               installedMods={installedMods}
               instanceName={instanceName}
-              getLoader={getLoader}
               // eslint-disable-next-line
               {...p}
             />
@@ -294,17 +293,6 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
 
   const installedMods = instance?.mods;
-
-  const getLoader = useCallback(() => {
-    const isForge = instance.modloader[0] === FORGE;
-    const hasJumpLoader = (instance.mods || []).find(
-      v => v.projectID === 361988
-    );
-    if (isForge && !hasJumpLoader) {
-      return FORGE;
-    }
-    return FABRIC;
-  }, [instance.mods, instance.modloader]);
 
   const [loadMoreModsDebounced] = useDebouncedCallback(
     (s, reset) => {
@@ -335,7 +323,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
       filterType,
       filterType !== 'Author' && filterType !== 'Name',
       gameVersion,
-      getLoader() === FABRIC ? 4780 : null
+      getPatchedInstanceType(instance) === FABRIC ? 4780 : null
     );
     const newMods = reset ? data : mods.concat(data);
     if (lastRequest === reqObj) {
@@ -398,7 +386,6 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
               version={gameVersion}
               installedMods={installedMods}
               instanceName={instanceName}
-              getLoader={getLoader}
             />
           )}
         </AutoSizer>

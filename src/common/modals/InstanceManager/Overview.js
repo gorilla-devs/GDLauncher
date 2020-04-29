@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
 import path from 'path';
-import omit from 'lodash.omit';
+import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

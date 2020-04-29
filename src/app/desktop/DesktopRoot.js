@@ -1,4 +1,4 @@
-import React, { useEffect, memo } from 'react';
+import React, { useEffect, memo, useState } from 'react';
 import { useDidMount } from 'rooks';
 import styled from 'styled-components';
 import { Switch } from 'react-router';
@@ -24,7 +24,6 @@ import {
 import features from '../../common/reducers/loading/features';
 import GlobalStyles from '../../common/GlobalStyles';
 import RouteBackground from '../../common/components/RouteBackground';
-import Navbar from './components/Navbar';
 import ga from '../../common/utils/analytics';
 import routes from './utils/routes';
 import { _getCurrentAccount } from '../../common/utils/selectors';
@@ -45,6 +44,9 @@ const Container = styled.div`
   width: 100vw;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s;
+  transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  will-change: transform;
 `;
 
 function DesktopRoot() {
@@ -53,16 +55,18 @@ function DesktopRoot() {
   const clientToken = useSelector(state => state.app.clientToken);
   const javaPath = useSelector(state => state.settings.java.path);
   const location = useSelector(state => state.router.location);
+  const modals = useSelector(state => state.modals);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
+  const [contentStyle, setContentStyle] = useState({ transform: 'scale(1)' });
 
   message.config({
-    top: 26
+    top: 45
   });
 
   const init = async () => {
     const userDataStatic = await ipcRenderer.invoke('getUserData');
     const userData = dispatch(updateUserData(userDataStatic));
-    dispatch(checkClientToken());
+    await dispatch(checkClientToken());
     dispatch(initNews());
 
     dispatch(requesting(features.mcAuthentication));
@@ -108,13 +112,24 @@ function DesktopRoot() {
 
   useTrackIdle(location.pathname);
 
+  useEffect(() => {
+    if (
+      modals[0] &&
+      modals[0].modalType === 'Settings' &&
+      !modals[0].unmounting
+    ) {
+      setContentStyle({ transform: 'scale(0.4)' });
+    } else {
+      setContentStyle({ transform: 'scale(1)' });
+    }
+  }, [modals]);
+
   return (
     <Wrapper>
       <SystemNavbar />
-      <Container>
+      <Container style={contentStyle}>
         <GlobalStyles />
         <RouteBackground />
-        <Navbar />
         <Switch>
           {routes.map((route, i) => (
             <RouteWithSubRoutes key={i} {...route} /> // eslint-disable-line
