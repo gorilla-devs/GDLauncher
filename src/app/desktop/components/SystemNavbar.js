@@ -162,21 +162,8 @@ const SystemNavbar = () => {
           `}
         >
           <a href="https://gdevs.io/" rel="noopener noreferrer">
-            <Logo size={35} cursor />
+            <Logo size={35} pointerCursor />
           </a>
-          {/* <a href="https://gdevs.io/" rel="noopener noreferrer">
-            <img
-              src={logo}
-              height="30px"
-              alt="logo"
-              draggable="false"
-              css={`
-                z-index: 1;
-                cursor: pointer;
-                margin-left: 8px;
-              `}
-            />
-          </a> */}
           <DevtoolButton />
         </div>
       )}
@@ -249,19 +236,9 @@ const SystemNavbar = () => {
       {isOsx && (
         <div>
           <DevtoolButton />
-          {/* <a href="https://gdevs.io/" rel="noopener noreferrer">
-            <img
-              src={logo}
-              height="30px"
-              alt="logo"
-              draggable="false"
-              css={`
-                z-index: 1;
-                cursor: pointer;
-                margin-right: 8px;
-              `}
-            />
-          </a> */}
+          <a href="https://gdevs.io/" rel="noopener noreferrer">
+            <Logo size={35} pointerCursor />
+          </a>
         </div>
       )}
     </MainContainer>
