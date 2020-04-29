@@ -13,11 +13,11 @@
 @primary-color: #365076;
 @info-color: @primary-color;
 @success-color: @green-6;
-@processing-color: @blue-6;
+@processing-color: @primary-color;
 @error-color: @red-5;
 @highlight-color: @red-5;
 @warning-color: @gold-6;
-@normal-color: #1B2533;
+@normal-color: #1b2533;
 @white: #fff;
 @black: #000;
 
@@ -138,8 +138,8 @@
 @ease-in-out-quint: cubic-bezier(0.86, 0, 0.07, 1);
 
 // Border color
-@border-color-base: hsv(0, 0, 85%); // base border outline a component
-@border-color-split: hsv(0, 0, 94%); // split border inside a component
+@border-color-base: @component-background; // base border outline a component
+@border-color-split: @component-background; // split border inside a component
 @border-color-inverse: @white;
 @border-width-base: 1px; // width of the border for a component
 @border-style-base: solid; // style of a components border
@@ -155,7 +155,7 @@
   0,
   98%
 ); // background of header and selected item
-@background-color-base: hsv(0, 0, 96%); // Default grey background color
+@background-color-base: @component-background; // Default grey background color
 
 // Disabled states
 @disabled-color: fade(#fff, 25%);
@@ -782,21 +782,21 @@
 // ---
 @slider-margin: 10px 6px 10px;
 @slider-rail-background-color: @background-color-base;
-@slider-rail-background-color-hover: #e1e1e1;
-@slider-track-background-color: @primary-3;
-@slider-track-background-color-hover: @primary-4;
+@slider-rail-background-color-hover: @background-color-base;
+@slider-track-background-color: @primary-color;
+@slider-track-background-color-hover: @primary-color;
 @slider-handle-border-width: 2px;
 @slider-handle-background-color: @component-background;
-@slider-handle-color: @primary-3;
-@slider-handle-color-hover: @primary-4;
-@slider-handle-color-focus: tint(@primary-color, 20%);
-@slider-handle-color-focus-shadow: fade(@primary-color, 12%);
+@slider-handle-color: @primary-color;
+@slider-handle-color-hover: @primary-color;
+@slider-handle-color-focus: @primary-color;
+@slider-handle-color-focus-shadow: transparent;
 @slider-handle-color-tooltip-open: @primary-color;
 @slider-handle-size: 14px;
 @slider-handle-margin-top: -5px;
 @slider-handle-shadow: 0;
 @slider-dot-border-color: @border-color-split;
-@slider-dot-border-color-active: tint(@primary-color, 50%);
+@slider-dot-border-color-active: @border-color-split;
 @slider-disabled-color: @disabled-color;
 @slider-disabled-background-color: @component-background;
 

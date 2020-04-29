@@ -197,7 +197,7 @@ export default function MyAccountPreferences() {
           css={`
             margin: 20px 20px 20px 0;
           `}
-          onChange={e => {
+          onAfterChange={e => {
             dispatch(updateJavaMemory(e));
           }}
           defaultValue={javaMemory}

@@ -7,7 +7,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUndo } from '@fortawesome/free-solid-svg-icons';
-import { Input, Button, Card, Switch, Slider } from 'antd';
+import { Input, Button, Switch, Slider } from 'antd';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import { DEFAULT_JAVA_ARGS } from '../../../app/desktop/utils/constants';
 
@@ -43,7 +43,7 @@ const RenameButton = styled(Button)`
   margin-left: 20px;
 `;
 
-const JavaManagerCard = styled(Card)`
+const JavaManagerCard = styled.div`
   margin-bottom: 20px;
   padding: 0;
 `;
