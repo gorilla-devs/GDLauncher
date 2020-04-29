@@ -162,11 +162,8 @@ app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   log.log('Quitting app (window-all-closed)');
-  if (process.platform !== 'darwin') {
-    log.log('Quitting app (trying) (window-all-closed)');
-    app.quit();
-    log.log('Quitting app (quit) (window-all-closed)');
-  }
+  app.quit();
+  log.log('Quitting app (quit) (window-all-closed)');
 });
 
 app.on('before-quit', async () => {
