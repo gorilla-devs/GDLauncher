@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
@@ -9,13 +9,15 @@ import {
   faFolder,
   faUndo,
   faLevelDownAlt,
-  faList
+  faList,
+  faDesktop
 } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Input, Switch } from 'antd';
 import {
   updateJavaArguments,
   updateJavaMemory,
-  updateJavaPath
+  updateJavaPath,
+  updateResolution
 } from '../../../reducers/settings/actions';
 import { DEFAULT_JAVA_ARGS } from '../../../../app/desktop/utils/constants';
 import { _getJavaPath } from '../../../utils/selectors';
@@ -37,6 +39,27 @@ const AutodetectPath = styled.div`
 const SelectMemory = styled.div`
   width: 100%;
   height: 100px;
+`;
+
+const Resolution = styled.div`
+  width: 100%;
+  height: 100px;
+`;
+
+const ResolutionInputContainer = styled.div`
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  div {
+    width: 200px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 `;
 
 const JavaCustomArguments = styled.div`
@@ -80,11 +103,29 @@ const marks = {
 };
 
 export default function MyAccountPreferences() {
+  const [height, setHeight] = useState(null);
+  const [width, setWidth] = useState(null);
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
   const javaPath = useSelector(_getJavaPath);
   const customJavaPath = useSelector(state => state.settings.java.path);
+  const customResolution = useSelector(
+    state => state.settings.minecraftSettings.resolution
+  );
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log(
+      'PPP',
+      customResolution?.width || 800,
+      customResolution?.height || 600
+    );
+    setWidth(customResolution?.width || 800);
+    setHeight(customResolution?.height || 600);
+    if (!customResolution.width && !customResolution.height) {
+      dispatch(updateResolution({ height: 600, width: 800 }));
+    }
+  }, []);
 
   return (
     <JavaSettings>
@@ -171,6 +212,52 @@ export default function MyAccountPreferences() {
           </div>
         </>
       )}
+      <Hr />
+      <Resolution>
+        <Title
+          css={`
+            width: 100%;
+            margin-top: 0px;
+            height: 8px;
+            text-align: left;
+            margin-bottom: 20px;
+          `}
+        >
+          Game Resolution&nbsp; <FontAwesomeIcon icon={faDesktop} />
+        </Title>
+        <Paragraph
+          css={`
+            width: 100%;
+            text-align: left;
+            margin: 0;
+          `}
+        >
+          Select the resolution you want to use while playing
+        </Paragraph>
+        <ResolutionInputContainer>
+          <div>
+            <Input
+              placeholder="height"
+              value={height}
+              onChange={e => {
+                const h = parseInt(e.target.value, 10);
+                setHeight(h);
+                dispatch(updateResolution({ height: h, width }));
+              }}
+            />
+            &nbsp;X&nbsp;
+            <Input
+              placeholder="width"
+              value={width}
+              onChange={e => {
+                const w = parseInt(e.target.value, 10);
+                setWidth(w);
+                dispatch(updateResolution({ height, width: w }));
+              }}
+            />
+          </div>
+        </ResolutionInputContainer>
+      </Resolution>
       <Hr />
       <SelectMemory>
         <Title
