@@ -161,7 +161,13 @@ const SystemNavbar = () => {
             margin-left: 10px;
           `}
         >
-          <a href="https://gdevs.io/" rel="noopener noreferrer">
+          <a
+            href="https://gdevs.io/"
+            rel="noopener noreferrer"
+            css={`
+              margin-top: 5px;
+            `}
+          >
             <Logo size={35} pointerCursor />
           </a>
           <DevtoolButton />
@@ -236,7 +242,13 @@ const SystemNavbar = () => {
       {isOsx && (
         <div>
           <DevtoolButton />
-          <a href="https://gdevs.io/" rel="noopener noreferrer">
+          <a
+            href="https://gdevs.io/"
+            rel="noopener noreferrer"
+            css={`
+              margin-top: 5px;
+            `}
+          >
             <Logo size={35} pointerCursor />
           </a>
         </div>

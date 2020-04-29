@@ -19,7 +19,10 @@ import {
   updateJavaPath,
   updateResolution
 } from '../../../reducers/settings/actions';
-import { DEFAULT_JAVA_ARGS, resolutionPresets } from '../../../../app/desktop/utils/constants';
+import {
+  DEFAULT_JAVA_ARGS,
+  resolutionPresets
+} from '../../../../app/desktop/utils/constants';
 import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
 

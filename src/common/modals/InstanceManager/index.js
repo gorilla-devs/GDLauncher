@@ -23,6 +23,7 @@ import {
   updateInstanceConfig
 } from '../../reducers/actions';
 import instanceDefaultBackground from '../../../common/assets/instance_default.png';
+import omit from 'lodash/omit';
 
 const SideMenu = styled.div`
   display: flex;
@@ -51,13 +52,13 @@ const SettingsButton = styled(Button)`
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
   background: ${props =>
-    props.active ? props.theme.palette.grey[600] : 'transparent'};
+    props.active ? props.theme.palette.grey[600] : props.theme.palette.grey[800]};
   border: 0px;
   text-align: left;
   color: ${props => props.theme.palette.text.primary};
   &:hover {
     color: ${props => props.theme.palette.text.primary};
-    background: ${props => props.theme.palette.grey[props.active ? 600 : 800]};
+    background: ${props => props.theme.palette.grey[700]};
   }
   &:focus {
     color: ${props => props.theme.palette.text.primary};
@@ -85,7 +86,7 @@ const Overlay = styled.div`
   width: 100%;
   height: 100%;
   border-radius: 10%;
-  background: ${props => props.theme.palette.grey[700]};
+  background: ${props => props.theme.palette.grey[800]};
   opacity: 0;
   transition: opacity 0.2s ease;
 `;
@@ -96,10 +97,11 @@ const InstanceBackground = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100px;
+  width: 130px;
   height: 100px;
   border-radius: 10%;
   margin-bottom: 20px;
+  margin-top: 10px;
   background: ${props =>
     props.imagePath
       ? `url(${props.imagePath}) center no-repeat`
@@ -155,12 +157,20 @@ const InstanceManager = ({ instanceName }) => {
   const ContentComponent = menuEntries[page].component;
 
   const updateBackground = v => {
-    dispatch(
-      updateInstanceConfig(instanceName, prev => ({
-        ...prev,
-        background: v
-      }))
-    );
+    if (v) {
+      dispatch(
+        updateInstanceConfig(instanceName, prev => ({
+          ...prev,
+          background: v
+        }))
+      );
+    } else {
+      dispatch(
+        updateInstanceConfig(instanceName, prev => ({
+          ...omit(prev, ['background'])
+        }))
+      );
+    }
   };
 
   const openFileDialog = async () => {
@@ -172,13 +182,8 @@ const InstanceManager = ({ instanceName }) => {
     const ext = path.extname(dialog.filePaths[0]);
     const filePath = path.join(instancePath, `background${ext}`);
     await fse.copy(dialog.filePaths[0], filePath);
-
-    fs.readFile(filePath)
-      .then(res =>
-        setBackground(`data:image/png;base64,${res.toString('base64')}`)
-      )
-      .catch(console.warning);
-    setBackground(filePath);
+    const res = await fs.readFile(filePath);
+    setBackground(`data:image/png;base64,${res.toString('base64')}`);
     updateBackground(`background${ext}`);
   };
 
@@ -217,15 +222,21 @@ const InstanceManager = ({ instanceName }) => {
           <SideMenu>
             <InstanceBackground onClick={openFileDialog} imagePath={background}>
               <Overlay />
-              <p>Change icon</p>
-              <FontAwesomeIcon
-                icon={faTimesCircle}
-                onClick={e => {
-                  e.stopPropagation();
-                  updateBackground(null);
-                  setBackground(null);
-                }}
-              />
+              <p>Change Icon</p>
+              {background && (
+                <FontAwesomeIcon
+                  icon={faTimesCircle}
+                  css={`
+                    cursor: pointer;
+                    font-size: 20px;
+                  `}
+                  onClick={e => {
+                    e.stopPropagation();
+                    updateBackground(null);
+                    setBackground(null);
+                  }}
+                />
+              )}
             </InstanceBackground>
             {Object.entries(menuEntries).map(([k, tab]) => {
               if (

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import path from 'path';
 import { ipcRenderer } from 'electron';
-import uuid from 'uuid/v5';
+import { v5 as uuid } from 'uuid';
 import { machineId } from 'node-machine-id';
 import fse from 'fs-extra';
 import coerce from 'semver/functions/coerce';
