@@ -18,6 +18,7 @@ import {
   updateUpdateAvailable,
   isAppLatestVersion
 } from '../../../common/reducers/actions';
+import Logo from '../../../ui/Logo';
 
 const SystemNavbar = () => {
   const dispatch = useDispatch();
@@ -157,8 +158,10 @@ const SystemNavbar = () => {
           css={`
             cursor: auto !important;
             -webkit-app-region: drag;
+            margin-left: 10px;
           `}
         >
+          <Logo size={35} />
           {/* <a href="https://gdevs.io/" rel="noopener noreferrer">
             <img
               src={logo}
