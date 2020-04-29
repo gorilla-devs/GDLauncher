@@ -54,9 +54,8 @@ const Paragraph = styled.p`
   color: ${props => props.theme.palette.text.third};
 `;
 
-const Hr = styled.hr`
-  opacity: 0.29;
-  background: ${props => props.theme.palette.secondary.light};
+const Hr = styled.div`
+  height: 35px;
 `;
 
 const MainTitle = styled.h1`
@@ -209,17 +208,12 @@ export default function MyAccountPreferences() {
           valueLabelDisplay="auto"
         />
       </SelectMemory>
-      <Hr
-        css={`
-          margin-top: 40px;
-        `}
-      />
+      <Hr />
       <JavaCustomArguments>
         <Title
           css={`
             width: 100%;
             text-align: left;
-            margin-bottom: 20px;
           `}
         >
           Java Custom Arguments &nbsp; <FontAwesomeIcon icon={faList} />
