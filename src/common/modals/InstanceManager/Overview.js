@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
+
 import path from 'path';
+
 import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
@@ -13,7 +15,6 @@ import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
 } from '../../../app/desktop/utils/constants';
-
 import { updateInstanceConfig } from '../../reducers/actions';
 import { ipcRenderer } from 'electron';
 
@@ -165,6 +166,7 @@ const Overview = ({ instanceName }) => {
       path.join(instancesPath, newName)
     );
   };
+
   return (
     <Container>
       <Column>
