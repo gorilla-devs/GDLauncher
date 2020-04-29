@@ -161,7 +161,9 @@ const SystemNavbar = () => {
             margin-left: 10px;
           `}
         >
-          <Logo size={35} />
+          <a href="https://gdevs.io/" rel="noopener noreferrer">
+            <Logo size={35} cursor />
+          </a>
           {/* <a href="https://gdevs.io/" rel="noopener noreferrer">
             <img
               src={logo}

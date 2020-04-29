@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 
-const Logo = ({ size }) => {
+const Logo = ({ size, cursor }) => {
   return (
     <svg
       version="1.1"
@@ -12,10 +12,10 @@ const Logo = ({ size }) => {
     >
       <g>
         <polygon
-          css={{ fill: '#365076' }}
+          css={{ fill: '#365076', cursor: cursor ? 'pointer' : '' }}
           points="874.343,259.5 437,7 -0.343,259.5 -0.343,764.5 437,1017 874.343,764.5 	"
         />
-        <g>
+        <g css={{ cursor: cursor ? 'pointer' : '' }}>
           <path
             css={{ fill: '#FFFFFF' }}
             d="M437,759.001L437,759.001c74.506,0,134.905-60.399,134.905-134.905v-22.951
