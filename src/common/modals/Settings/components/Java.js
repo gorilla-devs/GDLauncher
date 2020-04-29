@@ -12,14 +12,14 @@ import {
   faList,
   faDesktop
 } from '@fortawesome/free-solid-svg-icons';
-import { Slider, Button, Input, Switch } from 'antd';
+import { Slider, Button, Input, Switch, Select } from 'antd';
 import {
   updateJavaArguments,
   updateJavaMemory,
   updateJavaPath,
   updateResolution
 } from '../../../reducers/settings/actions';
-import { DEFAULT_JAVA_ARGS } from '../../../../app/desktop/utils/constants';
+import { DEFAULT_JAVA_ARGS, resolutionPresets } from '../../../../app/desktop/utils/constants';
 import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
 
@@ -103,28 +103,21 @@ const marks = {
 };
 
 export default function MyAccountPreferences() {
-  const [height, setHeight] = useState(null);
-  const [width, setWidth] = useState(null);
+  const [screenResolution, setScreenResolution] = useState(null);
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
   const javaPath = useSelector(_getJavaPath);
   const customJavaPath = useSelector(state => state.settings.java.path);
-  const customResolution = useSelector(
+  const mcResolution = useSelector(
     state => state.settings.minecraftSettings.resolution
   );
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(
-      'PPP',
-      customResolution?.width || 800,
-      customResolution?.height || 600
-    );
-    setWidth(customResolution?.width || 800);
-    setHeight(customResolution?.height || 600);
-    if (!customResolution.width && !customResolution.height) {
-      dispatch(updateResolution({ height: 600, width: 800 }));
-    }
+    ipcRenderer
+      .invoke('getAllDisplaysBounds')
+      .then(setScreenResolution)
+      .catch(console.error);
   }, []);
 
   return (
@@ -232,30 +225,49 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          Select the resolution you want to use while playing
+          Select the initial game resolution in pixels (width x height)
         </Paragraph>
         <ResolutionInputContainer>
           <div>
             <Input
-              placeholder="height"
-              value={height}
+              placeholder="width"
+              value={mcResolution.width}
               onChange={e => {
-                const h = parseInt(e.target.value, 10);
-                setHeight(h);
-                dispatch(updateResolution({ height: h, width }));
+                const w = parseInt(e.target.value, 10);
+                dispatch(updateResolution({ width: w || 800 }));
               }}
             />
             &nbsp;X&nbsp;
             <Input
-              placeholder="width"
-              value={width}
+              placeholder="Height"
+              value={mcResolution.height}
               onChange={e => {
-                const w = parseInt(e.target.value, 10);
-                setWidth(w);
-                dispatch(updateResolution({ height, width: w }));
+                const h = parseInt(e.target.value, 10);
+                dispatch(updateResolution({ height: h || 600 }));
               }}
             />
           </div>
+          <Select
+            placeholder="Presets"
+            onChange={v => {
+              const w = parseInt(v.split('x')[0], 10);
+              const h = parseInt(v.split('x')[1], 10);
+              dispatch(updateResolution({ height: h, width: w }));
+            }}
+          >
+            {resolutionPresets.map(v => {
+              const w = parseInt(v.split('x')[0], 10);
+              const h = parseInt(v.split('x')[1], 10);
+
+              const isBiggerThanScreen = (screenResolution || []).every(
+                bounds => {
+                  return bounds.width < w || bounds.height < h;
+                }
+              );
+              if (isBiggerThanScreen) return null;
+              return <Select.Option value={v}>{v}</Select.Option>;
+            })}
+          </Select>
         </ResolutionInputContainer>
       </Resolution>
       <Hr />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
 import path from 'path';
@@ -7,11 +7,15 @@ import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUndo } from '@fortawesome/free-solid-svg-icons';
-import { Input, Button, Switch, Slider } from 'antd';
+import { Input, Button, Switch, Slider, Select } from 'antd';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
-import { DEFAULT_JAVA_ARGS } from '../../../app/desktop/utils/constants';
+import {
+  DEFAULT_JAVA_ARGS,
+  resolutionPresets
+} from '../../../app/desktop/utils/constants';
 
 import { updateInstanceConfig } from '../../reducers/actions';
+import { ipcRenderer } from 'electron';
 
 const Container = styled.div`
   margin-left: 50px;
@@ -102,13 +106,18 @@ const Overview = ({ instanceName }) => {
     config?.javaArgs
   );
   const [newName, setNewName] = useState(instanceName);
+  const [screenResolution, setScreenResolution] = useState(null);
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
-  const [gameResolutionSwitch, setGameResolutionSwitch] = useState(
-    config?.resolution?.height && config?.resolution?.width
-  );
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    ipcRenderer
+      .invoke('getAllDisplaysBounds')
+      .then(setScreenResolution)
+      .catch(console.error);
+  }, []);
 
   const updateJavaMemory = v => {
     dispatch(
@@ -128,7 +137,7 @@ const Overview = ({ instanceName }) => {
     );
   };
 
-  const updateGameResolution = (h, w) => {
+  const updateGameResolution = (w, h) => {
     dispatch(
       updateInstanceConfig(instanceName, prev => ({
         ...prev,
@@ -167,56 +176,36 @@ const Overview = ({ instanceName }) => {
             <FontAwesomeIcon icon={faSave} />
           </RenameButton>
         </RenameRow>
-        <JavaManagerCard title="Override Java Settings">
+        <JavaManagerCard>
           <JavaManagerRow>
-            <div>Game Resolution</div>
+            <div>Override Game Resolution</div>
             <Switch
-              checked={gameResolutionSwitch}
+              checked={height && width}
               onChange={v => {
-                setGameResolutionSwitch(v);
                 if (!v) {
+                  setHeight(null);
+                  setWidth(null);
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
                       omit(prev, ['resolution'])
                     )
                   );
                 } else {
-                  updateGameResolution(600, 800);
+                  updateGameResolution(800, 600);
                   setHeight(600);
                   setWidth(800);
                 }
               }}
             />
           </JavaManagerRow>
-          {gameResolutionSwitch && (
+          {height && width && (
             <ResolutionInputContainer>
               <div>
                 <Input
-                  placeholder="height"
-                  value={height}
-                  onChange={e => {
-                    const h = parseInt(e.target.value, 10);
-                    setHeight(h);
-                    // setWidth(width);
-
-                    dispatch(
-                      updateInstanceConfig(instanceName, prev => ({
-                        ...prev,
-                        resolution: {
-                          height: h,
-                          width
-                        }
-                      }))
-                    );
-                  }}
-                />
-                &nbsp;X&nbsp;
-                <Input
-                  placeholder="width"
+                  placeholder="Width"
                   value={width}
                   onChange={e => {
-                    const w = parseInt(e.target.value, 10);
-                    // setHeight(height);
+                    const w = parseInt(e.target.value, 10) || 800;
                     setWidth(w);
                     dispatch(
                       updateInstanceConfig(instanceName, prev => ({
@@ -229,11 +218,60 @@ const Overview = ({ instanceName }) => {
                     );
                   }}
                 />
+                &nbsp;X&nbsp;
+                <Input
+                  placeholder="Height"
+                  value={height}
+                  onChange={e => {
+                    const h = parseInt(e.target.value, 10) || 600;
+                    setHeight(h);
+                    dispatch(
+                      updateInstanceConfig(instanceName, prev => ({
+                        ...prev,
+                        resolution: {
+                          height: h,
+                          width
+                        }
+                      }))
+                    );
+                  }}
+                />
               </div>
+              <Select
+                placeholder="Presets"
+                onChange={v => {
+                  const w = parseInt(v.split('x')[0], 10);
+                  const h = parseInt(v.split('x')[1], 10);
+                  setHeight(h);
+                  setWidth(w);
+                  dispatch(
+                    updateInstanceConfig(instanceName, prev => ({
+                      ...prev,
+                      resolution: {
+                        height: h,
+                        width: w
+                      }
+                    }))
+                  );
+                }}
+              >
+                {resolutionPresets.map(v => {
+                  const w = parseInt(v.split('x')[0], 10);
+                  const h = parseInt(v.split('x')[1], 10);
+
+                  const isBiggerThanScreen = (screenResolution || []).every(
+                    bounds => {
+                      return bounds.width < w || bounds.height < h;
+                    }
+                  );
+                  if (isBiggerThanScreen) return null;
+                  return <Select.Option value={v}>{v}</Select.Option>;
+                })}
+              </Select>
             </ResolutionInputContainer>
           )}
           <JavaManagerRow>
-            <div>Java Memory</div>
+            <div>Override Java Memory</div>
             <Switch
               checked={JavaMemorySwitch}
               onChange={v => {
@@ -267,7 +305,7 @@ const Overview = ({ instanceName }) => {
             </div>
           )}
           <JavaManagerRow>
-            <div>Java Arguments</div>
+            <div>Override Java Arguments</div>
             <Switch
               checked={JavaArgumentsSwitch}
               onChange={v => {
