@@ -197,7 +197,7 @@ const Overview = ({ instanceName }) => {
                   onChange={e => {
                     const h = parseInt(e.target.value, 10);
                     setHeight(h);
-                    setWidth(width);
+                    // setWidth(width);
 
                     dispatch(
                       updateInstanceConfig(instanceName, prev => ({
@@ -216,7 +216,7 @@ const Overview = ({ instanceName }) => {
                   value={width}
                   onChange={e => {
                     const w = parseInt(e.target.value, 10);
-                    setHeight(height);
+                    // setHeight(height);
                     setWidth(w);
                     dispatch(
                       updateInstanceConfig(instanceName, prev => ({

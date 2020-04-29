@@ -111,13 +111,18 @@ export default function MyAccountPreferences() {
   const javaPath = useSelector(_getJavaPath);
   const customJavaPath = useSelector(state => state.settings.java.path);
   const customResolution = useSelector(
-    state => state.settings.minecraftSettings
+    state => state.settings.minecraftSettings.resolution
   );
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setWidth(customResolution?.width && 800);
-    setHeight(customResolution?.height && 600);
+    console.log(
+      'PPP',
+      customResolution?.width || 800,
+      customResolution?.height || 600
+    );
+    setWidth(customResolution?.width || 800);
+    setHeight(customResolution?.height || 600);
     if (!customResolution.width && !customResolution.height) {
       dispatch(updateResolution({ height: 600, width: 800 }));
     }
