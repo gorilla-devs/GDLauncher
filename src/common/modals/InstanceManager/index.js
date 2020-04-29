@@ -37,7 +37,7 @@ const SideMenuContainer = styled.div`
   height: 100%;
   flex: 1;
   flex-grow: 3;
-  background: ${props => props.theme.palette.secondary.main};
+  background: ${props => props.theme.palette.grey[800]};
 `;
 
 const SettingsButton = styled(Button)`

@@ -53,6 +53,9 @@ const modalsComponentLookupTable = {
   InstanceManager: AsyncComponent(
     lazy(() => import('../modals/InstanceManager'))
   ),
+  AutoUpdatesNotAvailable: AsyncComponent(
+    lazy(() => import('../modals/AutoUpdatesNotAvailable'))
+  ),
   Onboarding: AsyncComponent(lazy(() => import('../modals/Onboarding'))),
   ModOverview: AsyncComponent(lazy(() => import('../modals/ModOverview'))),
   ModsBrowser: AsyncComponent(lazy(() => import('../modals/ModsBrowser'))),

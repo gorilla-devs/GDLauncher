@@ -104,9 +104,8 @@ function DesktopRoot() {
 
   useEffect(() => {
     if (clientToken && process.env.NODE_ENV !== 'development') {
-      ga.setUserId(clientToken)
-        .then(() => ga.trackPage(location.pathname))
-        .catch(console.error);
+      ga.setUserId(clientToken);
+      ga.trackPage(location.pathname);
     }
   }, [location.pathname, clientToken]);
 
