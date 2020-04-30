@@ -28,7 +28,6 @@ const SideMenu = styled.div`
 const SettingsContainer = styled.div`
   flex: 1;
   flex-grow: 3;
-  background: ${props => props.theme.palette.secondary.main};
 `;
 
 const SettingsColumn = styled.div`

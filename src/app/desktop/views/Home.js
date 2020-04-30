@@ -9,6 +9,7 @@ import News from '../components/News';
 import { openModal } from '../../../common/reducers/modals/actions';
 import { _getCurrentAccount } from '../../../common/utils/selectors';
 import { extractFace } from '../utils';
+import { updateIsNewUser } from '../../../common/reducers/actions';
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
@@ -38,8 +39,10 @@ const Home = () => {
 
   useEffect(() => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
+    console.log('isNewUser', isNewUser);
     if (isNewUser) {
       dispatch(openModal('Onboarding'));
+      dispatch(updateIsNewUser(false));
     }
   }, [account]);
 

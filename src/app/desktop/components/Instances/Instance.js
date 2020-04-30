@@ -139,7 +139,7 @@ const TimePlayed = styled.div`
 `;
 
 const MenuInstanceName = styled.div`
-  background: ${props => props.theme.palette.grey[900]};
+  background: ${props => props.theme.palette.grey[800]};
   height: 40px;
   display: flex;
   justify-content: center;

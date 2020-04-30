@@ -1,7 +1,7 @@
 import axios from 'axios';
 import path from 'path';
 import { ipcRenderer } from 'electron';
-import uuid from 'uuid/v5';
+import { v5 as uuid } from 'uuid';
 import { machineId } from 'node-machine-id';
 import fse from 'fs-extra';
 import coerce from 'semver/functions/coerce';
@@ -330,7 +330,7 @@ export function downloadJavaLegacyFixer() {
 export function login(username, password, redirect = true) {
   return async (dispatch, getState) => {
     const {
-      app: { isNewUser, clientToken }
+      app: { clientToken }
     } = getState();
     if (!username || !password) {
       throw new Error('No username or password provided');
@@ -343,16 +343,8 @@ export function login(username, password, redirect = true) {
       }
       dispatch(updateAccount(data.selectedProfile.id, data));
       dispatch(updateCurrentAccountId(data.selectedProfile.id));
-
-      if (!isNewUser) {
-        if (redirect) {
-          dispatch(push('/home'));
-        }
-      } else {
-        dispatch(updateIsNewUser(false));
-        if (redirect) {
-          dispatch(push('/onboarding'));
-        }
+      if (redirect) {
+        dispatch(push('/home'));
       }
     } catch (err) {
       console.error(err);
@@ -415,11 +407,7 @@ export function loginWithAccessToken(redirect = true) {
 }
 
 export function loginThroughNativeLauncher() {
-  return async (dispatch, getState) => {
-    const {
-      app: { isNewUser }
-    } = getState();
-
+  return async dispatch => {
     const homedir = await ipcRenderer.invoke('getAppdataPath');
     const mcFolder = process.platform === 'darwin' ? 'minecraft' : '.minecraft';
     const vanillaMCPath = path.join(homedir, mcFolder);
@@ -448,12 +436,7 @@ export function loginThroughNativeLauncher() {
       dispatch(updateAccount(data.selectedProfile.id, data));
       dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
-      if (isNewUser) {
-        dispatch(updateIsNewUser(false));
-        dispatch(push('/onboarding'));
-      } else {
-        dispatch(push('/home'));
-      }
+      dispatch(push('/home'));
     } catch (err) {
       throw new Error(err);
     }
@@ -1754,9 +1737,16 @@ export function launchInstance(instanceName) {
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
     const { memory, args } = state.settings.java;
-    const { modloader, javaArgs, javaMemory } = _getInstance(state)(
-      instanceName
-    );
+    const {
+      resolution: globalMinecraftResolution
+    } = state.settings.minecraftSettings;
+    const {
+      modloader,
+      javaArgs,
+      javaMemory,
+      resolution: instanceResolution
+    } = _getInstance(state)(instanceName);
+
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
     const instanceJLFPath = path.join(
@@ -1862,6 +1852,7 @@ export function launchInstance(instanceName) {
 
     const javaArguments = (javaArgs !== undefined ? javaArgs : args).split(' ');
     const javaMem = javaMemory !== undefined ? javaMemory : memory;
+    const gameResolution = instanceResolution || globalMinecraftResolution;
 
     const jvmArguments = getJvmArguments(
       libraries,
@@ -1871,6 +1862,7 @@ export function launchInstance(instanceName) {
       mcJson,
       account,
       javaMem,
+      gameResolution,
       false,
       javaArguments
     );
@@ -1895,6 +1887,7 @@ export function launchInstance(instanceName) {
         mcJson,
         account,
         javaMem,
+        gameResolution,
         true,
         javaArguments
       ).join(' ')}`.replace(...replaceRegex)
@@ -2126,6 +2119,17 @@ export const initLatestMods = instanceName => {
     });
 
     dispatch(updateLatestModManifests(manifestsObj));
+  };
+};
+
+export const isAppLatestVersion = () => {
+  return async () => {
+    const { data: latestRelease } = await axios.get(
+      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/latest'
+    );
+
+    const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
+    return !lt(installedVersion, coerce(latestRelease.tag_name));
   };
 };
 

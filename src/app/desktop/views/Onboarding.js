@@ -81,6 +81,7 @@ const Home = () => {
             font-size: 40px;
             font-weight: 700;
             text-align: center;
+            width: 300px;
             display: flex;
             flex-direction: column;
             justify-content: center;

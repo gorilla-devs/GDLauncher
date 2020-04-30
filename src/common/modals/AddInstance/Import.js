@@ -45,10 +45,11 @@ const Import = ({
   const onClick = async () => {
     if (loading || !localValue) return;
     setLoading(true);
-    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*).zip$/;
     const isUrlRegex = urlRegex.test(localValue);
 
     const tempFilePath = path.join(tempPath, path.basename(localValue));
+
 
     if (isUrlRegex) {
       try {
@@ -62,7 +63,7 @@ const Import = ({
         console.error(err);
         setError(true);
         setLoading(false);
-        return;
+        throw err;
       }
     }
 
@@ -145,7 +146,7 @@ const Import = ({
         >
           <Input
             disabled={loading}
-            placeholder="http://"
+            placeholder="http://.../file.zip"
             value={localValue}
             onChange={e => setLocalValue(e.target.value)}
             css={`

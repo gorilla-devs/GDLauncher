@@ -4,7 +4,7 @@ import { Button } from 'antd';
 import { useSelector } from 'react-redux';
 import Modal from '../../components/Modal';
 import { _getCurrentAccount } from '../../utils/selectors';
-import logo from '../../assets/logo.png';
+import Logo from '../../../ui/Logo';
 
 const scrollToRef = ref =>
   ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -13,7 +13,7 @@ const Onboarding = () => {
   const [page, setPage] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const account = useSelector(_getCurrentAccount);
-  const slides = ['Welcome', 'info', 'info2', 'info3'];
+  const slides = ['Welcome', 'into', 'project', 'support'];
 
   const firstSlideRef = useRef(null);
   const secondSlideRef = useRef(null);
@@ -57,6 +57,7 @@ const Onboarding = () => {
         width: 900px;
         max-height: 700px;
       `}
+      title="Welcome"
       removePadding
     >
       <Container>
@@ -64,7 +65,7 @@ const Onboarding = () => {
           {slides.map((title, i) => {
             return (
               <SectionButton
-                // active={page === 1}
+                active={page === i}
                 onClick={() => {
                   setPage(i);
                   executeScroll(i - page);
@@ -79,7 +80,7 @@ const Onboarding = () => {
         <Content>
           <SlideContainer ref={firstSlideRef}>
             <LogoContainer>
-              <Logo src={logo} />
+              <Logo size={300} />
               Welcome to GDLauncher&nbsp;
               {account.selectedProfile.name}!
             </LogoContainer>
@@ -107,7 +108,6 @@ const Onboarding = () => {
                 font-size: 30px;
                 font-weight: 600;
                 text-align: center;
-                margin: 20%;
               `}
             >
               If you like GDLauncher please, take into consideration donating.
@@ -210,13 +210,9 @@ const LogoContainer = styled.div`
   font-weight: 700;
 `;
 
-const Logo = styled.img`
-  width: 300px;
-`;
-
 const Text = styled.div`
   font-weight: 600;
   text-align: center;
   font-size: 30px;
-  max-width: 60%;
+  max-width: 70%;
 `;
