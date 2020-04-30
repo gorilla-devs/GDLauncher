@@ -116,8 +116,8 @@ function createWindow() {
 
   tray = new Tray(
     isDev
-      ? path.join(__dirname, './icon.ico')
-      : path.join(__dirname, '../build/icon.ico')
+      ? path.join(__dirname, './icon.png')
+      : path.join(__dirname, '../build/icon.png')
   );
   const trayMenuTemplate = [
     {

@@ -109,7 +109,12 @@ const commonConfig = {
     },
     productName: 'GDLauncher',
     appId: 'org.gorilladevs.GDLauncher',
-    files: ['!node_modules/**/*', 'build/**/*', 'package.json'],
+    files: [
+      '!node_modules/**/*',
+      'build/**/*',
+      'package.json',
+      'public/icon.png'
+    ],
     dmg: {
       contents: [
         {
