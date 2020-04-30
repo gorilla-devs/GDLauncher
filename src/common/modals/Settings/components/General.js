@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import fsa from 'fs-extra';
 import { promises as fs } from 'fs';
 import path from 'path';
+import Store from 'electron-store';
 import {
   faCopy,
   faDownload,
@@ -254,8 +255,7 @@ const General = () => {
       .invoke('getAppdataPath')
       .then(appData => {
         const appDataPath = path.join(appData, 'gdlauncher_next');
-        const aaa = path.join(appData, 'gdlauncher_next');
-        console.log('CALIPP', userData, path.join(aaa, 'overrides.json'));
+
         if (userData === appDataPath) {
           setDefaultDataPath('Default Path');
         }
@@ -279,32 +279,51 @@ const General = () => {
   const changeDataPath = async () => {
     const appData = await ipcRenderer.invoke('getAppdataPath');
     const appDataPath = path.join(appData, 'gdlauncher_next');
+
+    const notCopiedFiles = [
+      'Cache',
+      'Code Cache',
+      'Dictionaries',
+      'GPUCache',
+      'Cookies',
+      'Cookies-journal'
+    ];
+
+    const store = new Store({
+      name: 'overrides',
+      cwd: appDataPath,
+      fileExtension: '',
+      encryptionKey: 'GDLauncher'
+    });
+
     if (!dataPath) return;
     dispatch(updateUserData(dataPath));
 
-    await fs.writeFile(
-      path.join(appDataPath, 'overrides.json'),
-      JSON.stringify({ userDataOverride: dataPath })
-    );
+    store.set('userDataOverride', dataPath);
+    console.log('userDataOverride', appDataPath);
 
     if (moveDatas) {
       try {
         const files = await fs.readdir(userData);
         await Promise.all(
           files.map(async name => {
-            await fsa.copy(
-              path.join(userData, name),
-              path.join(dataPath, name),
-              {
-                overwrite: true
-              }
-            );
+            if (!notCopiedFiles.includes(name)) {
+              await fsa.copy(
+                path.join(userData, name),
+                path.join(dataPath, name),
+                {
+                  overwrite: true
+                }
+              );
+            }
           })
         );
       } catch (e) {
         console.error(e);
       }
     }
+
+    ipcRenderer.invoke('appRestart');
   };
 
   const openFolder = async () => {
@@ -607,7 +626,7 @@ const General = () => {
             // disabled={disableInstancesActions}
             // loading={deletingInstances}
           >
-            Apply
+            Apply & Restart
           </Button>
         </div>
         <div
