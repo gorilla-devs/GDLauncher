@@ -12,3 +12,15 @@ export const DEFAULT_JAVA_ARGS = `-Dfml.ignorePatchDiscrepancies=true -Dfml.igno
     : ''
 } -Xms256m`;
 export const DEFAULT_MEMORY = 4096;
+
+export const resolutionPresets = [
+  '800x600',
+  '1024x768',
+  '1280x1024',
+  '1366x768',
+  '1600x900',
+  '1920x1080',
+  '2560x1440',
+  '3440x1440',
+  '3440x1500'
+];
