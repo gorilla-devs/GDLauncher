@@ -281,8 +281,8 @@ ipcMain.handle('appRestart', () => {
   mainWindow.close();
 });
 
-ipcMain.handle('getPrimaryDisplaySizes', () => {
-  return screen.getPrimaryDisplay().bounds;
+ipcMain.handle('getAllDisplaysBounds', () => {
+  return screen.getAllDisplays().map(v => v.bounds);
 });
 
 ipcMain.handle('init-discord-rpc', () => {
@@ -305,6 +305,7 @@ ipcMain.handle('start-listener', async (e, dirPath) => {
       watcher = null;
     }
     watcher = await nsfw(dirPath, events => {
+      log.log(`Detected ${events.length} events from listener`);
       mainWindow.webContents.send('listener-events', events);
     });
     log.log('Started listener');

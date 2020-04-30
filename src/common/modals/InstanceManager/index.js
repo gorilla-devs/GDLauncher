@@ -2,25 +2,34 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
+import fse from 'fs-extra';
+import { promises as fs } from 'fs';
+import path from 'path';
 import Modal from '../../components/Modal';
 import Overview from './Overview';
+import { ipcRenderer } from 'electron';
 import Screenshots from './Screenshots';
 import Notes from './Notes';
 import Mods from './Mods';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
-import { _getInstance } from '../../utils/selectors';
+import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import { FORGE, FABRIC } from '../../utils/constants';
 import Modpack from './Modpack';
 import {
   initLatestMods,
-  clearLatestModManifests
+  clearLatestModManifests,
+  updateInstanceConfig
 } from '../../reducers/actions';
+import instanceDefaultBackground from '../../../common/assets/instance_default.png';
+import omit from 'lodash/omit';
 
 const SideMenu = styled.div`
   display: flex;
   flex: 0;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   height: 100%;
   flex-grow: 1;
 `;
@@ -29,7 +38,7 @@ const SideMenuContainer = styled.div`
   height: 100%;
   flex: 1;
   flex-grow: 3;
-  background: ${props => props.theme.palette.secondary.main};
+  background: ${props => props.theme.palette.grey[800]};
 `;
 
 const SettingsButton = styled(Button)`
@@ -43,13 +52,13 @@ const SettingsButton = styled(Button)`
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
   background: ${props =>
-    props.active ? props.theme.palette.grey[600] : 'transparent'};
+    props.active ? props.theme.palette.grey[600] : props.theme.palette.grey[800]};
   border: 0px;
   text-align: left;
   color: ${props => props.theme.palette.text.primary};
   &:hover {
     color: ${props => props.theme.palette.text.primary};
-    background: ${props => props.theme.palette.grey[props.active ? 600 : 800]};
+    background: ${props => props.theme.palette.grey[700]};
   }
   &:focus {
     color: ${props => props.theme.palette.text.primary};
@@ -72,6 +81,61 @@ const Content = styled.div`
   position: relative;
 `;
 
+const Overlay = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 10%;
+  background: ${props => props.theme.palette.grey[800]};
+  opacity: 0;
+  transition: opacity 0.2s ease;
+`;
+
+const InstanceBackground = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 130px;
+  height: 100px;
+  border-radius: 10%;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  background: ${props =>
+    props.imagePath
+      ? `url(${props.imagePath}) center no-repeat`
+      : `url(${instanceDefaultBackground}) center no-repeat`};
+  background-size: 180px;
+  transition: opacity 0.2s ease;
+  &:hover svg {
+    opacity: 1;
+    z-index: 2;
+  }
+
+  &:hover p {
+    opacity: 1;
+    z-index: 2;
+  }
+
+  &:hover ${Overlay} {
+    opacity: 0.9;
+  }
+
+  svg {
+    margin-top: 10px;
+    width: 30px;
+    color: ${props => props.theme.palette.colors.red};
+    opacity: 0;
+  }
+
+  p {
+    width: 50px;
+    text-align: center;
+    opacity: 0;
+  }
+`;
+
 const menuEntries = {
   overview: { name: 'Overview', component: Overview },
   mods: { name: 'Mods', component: Mods },
@@ -83,11 +147,55 @@ const menuEntries = {
   // settings: { name: "Settings", component: Overview },
   // servers: { name: "Servers", component: Overview }
 };
+
 const InstanceManager = ({ instanceName }) => {
   const dispatch = useDispatch();
+  const instancesPath = useSelector(_getInstancesPath);
   const [page, setPage] = useState(Object.keys(menuEntries)[0]);
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const [background, setBackground] = useState(instance?.background);
   const ContentComponent = menuEntries[page].component;
+
+  const updateBackground = v => {
+    if (v) {
+      dispatch(
+        updateInstanceConfig(instanceName, prev => ({
+          ...prev,
+          background: v
+        }))
+      );
+    } else {
+      dispatch(
+        updateInstanceConfig(instanceName, prev => ({
+          ...omit(prev, ['background'])
+        }))
+      );
+    }
+  };
+
+  const openFileDialog = async () => {
+    const dialog = await ipcRenderer.invoke('openFileDialog', [
+      { name: 'Image', extensions: ['png', 'jpg', 'jpeg'] }
+    ]);
+    if (dialog.canceled) return;
+    const instancePath = path.join(instancesPath, instanceName);
+    const ext = path.extname(dialog.filePaths[0]);
+    const filePath = path.join(instancePath, `background${ext}`);
+    await fse.copy(dialog.filePaths[0], filePath);
+    const res = await fs.readFile(filePath);
+    setBackground(`data:image/png;base64,${res.toString('base64')}`);
+    updateBackground(`background${ext}`);
+  };
+
+  useEffect(() => {
+    if (instance?.background) {
+      fs.readFile(path.join(instancesPath, instanceName, instance.background))
+        .then(res =>
+          setBackground(`data:image/png;base64,${res.toString('base64')}`)
+        )
+        .catch(console.warning);
+    }
+  }, []);
 
   useEffect(() => {
     dispatch(clearLatestModManifests());
@@ -112,6 +220,24 @@ const InstanceManager = ({ instanceName }) => {
       <Container>
         <SideMenuContainer>
           <SideMenu>
+            <InstanceBackground onClick={openFileDialog} imagePath={background}>
+              <Overlay />
+              <p>Change Icon</p>
+              {background && (
+                <FontAwesomeIcon
+                  icon={faTimesCircle}
+                  css={`
+                    cursor: pointer;
+                    font-size: 20px;
+                  `}
+                  onClick={e => {
+                    e.stopPropagation();
+                    updateBackground(null);
+                    setBackground(null);
+                  }}
+                />
+              )}
+            </InstanceBackground>
             {Object.entries(menuEntries).map(([k, tab]) => {
               if (
                 (tab.name === menuEntries.mods.name &&

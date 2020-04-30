@@ -127,11 +127,11 @@ export default createGlobalStyle`
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     text-align: center;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition: transform 100ms;
+    transition: transform 80ms;
   }
   
   .react-contextmenu.react-contextmenu--visible {
-    transition: transform 100ms;
+    transition: transform 80ms;
     transform: scale(1);
     pointer-events: auto;
     z-index: 9999;
@@ -153,12 +153,12 @@ export default createGlobalStyle`
   }
 
   .react-contextmenu-item:not(.react-contextmenu-item--divider):hover{
-    background: ${({ theme }) => theme.palette.grey[500]};
+    background: ${({ theme }) => theme.palette.grey[600]};
     text-decoration: none;
   }
 
   .react-contextmenu-item:not(.react-contextmenu-item--divider):active{
-    background: ${({ theme }) => theme.palette.grey[400]};
+    background: ${({ theme }) => theme.palette.grey[500]};
     text-decoration: none;
   }
 
@@ -173,7 +173,7 @@ export default createGlobalStyle`
   }
   
   .react-contextmenu-item--divider {
-    border-bottom: 1px solid ${props => props.theme.palette.grey[400]};
+    border-bottom: 1px solid ${props => props.theme.palette.grey[600]};
     cursor: inherit;
     margin-bottom: 3px;
     padding: 2px 0;

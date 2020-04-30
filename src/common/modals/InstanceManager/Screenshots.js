@@ -202,8 +202,7 @@ const Screenshots = ({ instanceName }) => {
             getScreenshotsCount(dateGroups) === selectedItems.length
           }
         />
-        <div>{`${selectedItems.length} selected`}</div>
-
+        <div>&nbsp;{`${selectedItems.length} selected`}</div>
         <DeleteButton
           onClick={() => {
             dispatch(
