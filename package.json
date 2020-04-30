@@ -160,6 +160,7 @@
     "base64-stream": "^1.0.0",
     "connected-react-router": "^6.8.0",
     "craco-antd": "^1.14.1",
+    "directory-tree": "^2.2.4",
     "discord-rpc": "^3.1.0",
     "electron-log": "^4.1.1",
     "electron-store": "^5.1.1",

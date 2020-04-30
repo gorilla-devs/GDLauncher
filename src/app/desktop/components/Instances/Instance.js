@@ -12,7 +12,8 @@ import {
   faWrench,
   faFolder,
   faTrash,
-  faStop
+  faStop,
+  faBoxOpen
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -210,6 +211,9 @@ const Instance = ({ instanceName }) => {
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
+  const exportInstance = () => {
+    dispatch(openModal('InstanceExport', { instanceName }));
+  };
   const killProcess = () => {
     console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
@@ -335,6 +339,15 @@ const Instance = ({ instanceName }) => {
             `}
           />
           Open Folder
+        </MenuItem>
+        <MenuItem onClick={exportInstance}>
+          <FontAwesomeIcon
+            icon={faBoxOpen}
+            css={`
+              margin-right: 10px;
+            `}
+          />
+          Export Pack
         </MenuItem>
         <MenuItem divider />
         <MenuItem
