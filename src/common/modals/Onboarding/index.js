@@ -4,7 +4,7 @@ import { Button } from 'antd';
 import { useSelector } from 'react-redux';
 import Modal from '../../components/Modal';
 import { _getCurrentAccount } from '../../utils/selectors';
-import logo from '../../assets/logo.png';
+import Logo from '../../../ui/Logo';
 
 const scrollToRef = ref =>
   ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -81,7 +81,7 @@ const Onboarding = () => {
         <Content>
           <SlideContainer ref={firstSlideRef}>
             <LogoContainer>
-              <Logo src={logo} />
+              <Logo size={300} />
               Welcome to GDLauncher&nbsp;
               {account.selectedProfile.name}!
             </LogoContainer>
@@ -210,10 +210,6 @@ const LogoContainer = styled.div`
   align-items: center;
   font-size: 30px;
   font-weight: 700;
-`;
-
-const Logo = styled.img`
-  width: 300px;
 `;
 
 const Text = styled.div`

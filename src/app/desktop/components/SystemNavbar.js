@@ -194,9 +194,7 @@ const SystemNavbar = () => {
         {!isOsx ? (
           <>
             {isUpdateAvailable && <UpdateButton />}
-            {!isLocation('/') && !isLocation('/onboarding') && (
-              <SettingsButton />
-            )}
+            {!isLocation('/') && <SettingsButton />}
             <div onClick={() => ipcRenderer.invoke('minimize-window')}>
               <FontAwesomeIcon icon={faWindowMinimize} />
             </div>
@@ -232,9 +230,7 @@ const SystemNavbar = () => {
             <div onClick={() => ipcRenderer.invoke('minimize-window')}>
               <FontAwesomeIcon icon={faWindowMinimize} />
             </div>
-            {!isLocation('/') && !isLocation('/onboarding') && (
-              <SettingsButton />
-            )}
+            {!isLocation('/') && <SettingsButton />}
             {isUpdateAvailable && <UpdateButton />}
           </>
         )}

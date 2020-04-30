@@ -330,7 +330,7 @@ export function downloadJavaLegacyFixer() {
 export function login(username, password, redirect = true) {
   return async (dispatch, getState) => {
     const {
-      app: { isNewUser, clientToken }
+      app: { clientToken }
     } = getState();
     if (!username || !password) {
       throw new Error('No username or password provided');
@@ -343,16 +343,8 @@ export function login(username, password, redirect = true) {
       }
       dispatch(updateAccount(data.selectedProfile.id, data));
       dispatch(updateCurrentAccountId(data.selectedProfile.id));
-
-      if (!isNewUser) {
-        if (redirect) {
-          dispatch(push('/home'));
-        }
-      } else {
-        dispatch(updateIsNewUser(false));
-        if (redirect) {
-          dispatch(push('/onboarding'));
-        }
+      if (redirect) {
+        dispatch(push('/home'));
       }
     } catch (err) {
       console.error(err);
@@ -415,11 +407,7 @@ export function loginWithAccessToken(redirect = true) {
 }
 
 export function loginThroughNativeLauncher() {
-  return async (dispatch, getState) => {
-    const {
-      app: { isNewUser }
-    } = getState();
-
+  return async dispatch => {
     const homedir = await ipcRenderer.invoke('getAppdataPath');
     const mcFolder = process.platform === 'darwin' ? 'minecraft' : '.minecraft';
     const vanillaMCPath = path.join(homedir, mcFolder);
@@ -448,12 +436,7 @@ export function loginThroughNativeLauncher() {
       dispatch(updateAccount(data.selectedProfile.id, data));
       dispatch(updateCurrentAccountId(data.selectedProfile.id));
 
-      if (isNewUser) {
-        dispatch(updateIsNewUser(false));
-        dispatch(push('/onboarding'));
-      } else {
-        dispatch(push('/home'));
-      }
+      dispatch(push('/home'));
     } catch (err) {
       throw new Error(err);
     }
