@@ -300,7 +300,6 @@ const General = () => {
     dispatch(updateUserData(dataPath));
 
     store.set('userDataOverride', dataPath);
-    console.log('userDataOverride', appDataPath);
 
     if (moveDatas) {
       try {
