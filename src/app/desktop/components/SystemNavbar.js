@@ -13,11 +13,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { openModal } from '../../../common/reducers/modals/actions';
-import logo from '../../../common/assets/logo.png';
 import {
   checkForPortableUpdates,
-  updateUpdateAvailable
+  updateUpdateAvailable,
+  isAppLatestVersion
 } from '../../../common/reducers/actions';
+import Logo from '../../../ui/Logo';
 
 const SystemNavbar = () => {
   const dispatch = useDispatch();
@@ -48,8 +49,12 @@ const SystemNavbar = () => {
         ipcRenderer.on('updateAvailable', () => {
           dispatch(updateUpdateAvailable(true));
         });
-      } else {
+      } else if (process.platform !== 'linux') {
         dispatch(checkForPortableUpdates())
+          .then(v => dispatch(updateUpdateAvailable(v)))
+          .catch(console.error);
+      } else {
+        dispatch(isAppLatestVersion())
           .then(v => dispatch(updateUpdateAvailable(v)))
           .catch(console.error);
       }
@@ -57,9 +62,13 @@ const SystemNavbar = () => {
       setInterval(() => {
         if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
           ipcRenderer.invoke('checkForUpdates');
+        } else if (process.platform !== 'linux') {
+          dispatch(checkForPortableUpdates())
+            .then(v => dispatch(updateUpdateAvailable(v)))
+            .catch(console.error);
         } else {
-          checkForPortableUpdates()
-            .then(val => dispatch(updateUpdateAvailable(val)))
+          dispatch(isAppLatestVersion())
+            .then(v => dispatch(updateUpdateAvailable(v)))
             .catch(console.error);
         }
       }, 600000);
@@ -71,6 +80,8 @@ const SystemNavbar = () => {
   };
 
   const isOsx = process.platform === 'darwin';
+
+  const isLinux = process.platform === 'linux';
 
   const DevtoolButton = () => (
     <TerminalButton
@@ -111,7 +122,11 @@ const SystemNavbar = () => {
   const UpdateButton = () => (
     <TerminalButton
       onClick={() => {
-        ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+        if (!isLinux) {
+          ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+        } else {
+          dispatch(openModal('AutoUpdatesNotAvailable'));
+        }
       }}
       css={`
         color: ${props => props.theme.palette.colors.green};
@@ -143,20 +158,17 @@ const SystemNavbar = () => {
           css={`
             cursor: auto !important;
             -webkit-app-region: drag;
+            margin-left: 10px;
           `}
         >
-          <a href="https://gdevs.io/" rel="noopener noreferrer">
-            <img
-              src={logo}
-              height="30px"
-              alt="logo"
-              draggable="false"
-              css={`
-                z-index: 1;
-                cursor: pointer;
-                margin-left: 8px;
-              `}
-            />
+          <a
+            href="https://gdevs.io/"
+            rel="noopener noreferrer"
+            css={`
+              margin-top: 5px;
+            `}
+          >
+            <Logo size={35} pointerCursor />
           </a>
           <DevtoolButton />
         </div>
@@ -230,18 +242,14 @@ const SystemNavbar = () => {
       {isOsx && (
         <div>
           <DevtoolButton />
-          <a href="https://gdevs.io/" rel="noopener noreferrer">
-            <img
-              src={logo}
-              height="30px"
-              alt="logo"
-              draggable="false"
-              css={`
-                z-index: 1;
-                cursor: pointer;
-                margin-right: 8px;
-              `}
-            />
+          <a
+            href="https://gdevs.io/"
+            rel="noopener noreferrer"
+            css={`
+              margin-top: 5px;
+            `}
+          >
+            <Logo size={35} pointerCursor />
           </a>
         </div>
       )}

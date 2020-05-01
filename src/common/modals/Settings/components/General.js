@@ -107,9 +107,8 @@ const PersonalDataContainer = styled.div`
   border-radius: ${props => props.theme.shape.borderRadius};
 `;
 
-const Hr = styled.hr`
-  opacity: 0.29;
-  background: ${props => props.theme.palette.secondary.light};
+const Hr = styled.div`
+  height: 25px;
 `;
 
 const ReleaseChannel = styled.div`
@@ -314,9 +313,7 @@ const General = () => {
           </div>
           <Select
             css={`
-              && {
-                width: 100px;
-              }
+              width: 100px;
             `}
             onChange={e => {
               dispatch(updateReleaseChannel(e));

@@ -162,7 +162,7 @@ const AccountItem = styled.div`
   transition: background 0.1s ease-in-out;
   &:hover {
     ${props =>
-      props.active ? '' : `background: ${props.theme.palette.grey[500]};`}
+      props.active ? '' : `background: ${props.theme.palette.grey[600]};`}
   }
 `;
 

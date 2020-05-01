@@ -1,7 +1,7 @@
 import axios from 'axios';
 import path from 'path';
 import { ipcRenderer } from 'electron';
-import uuid from 'uuid/v5';
+import { v5 as uuid } from 'uuid';
 import { machineId } from 'node-machine-id';
 import fse from 'fs-extra';
 import coerce from 'semver/functions/coerce';
@@ -47,8 +47,7 @@ import {
   getAddonsByFingerprint,
   getAddonFiles,
   getAddon,
-  getAddonCategories,
-  getJavaManifestFromMirror
+  getAddonCategories
 } from '../api';
 import {
   _getCurrentAccount,
@@ -119,21 +118,12 @@ export function initManifests() {
       return fabric;
     };
     const getJavaManifestVersions = async () => {
-      try {
-        const java = (await getJavaManifest()).data;
-        dispatch({
-          type: ActionTypes.UPDATE_JAVA_MANIFEST,
-          data: java
-        });
-        return java;
-      } catch {
-        const java = (await getJavaManifestFromMirror()).data;
-        dispatch({
-          type: ActionTypes.UPDATE_JAVA_MANIFEST,
-          data: java
-        });
-        return java;
-      }
+      const java = (await getJavaManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_JAVA_MANIFEST,
+        data: java
+      });
+      return java;
     };
     const getAddonCategoriesVersions = async () => {
       const curseforgeCategories = (await getAddonCategories()).data;
@@ -1892,9 +1882,16 @@ export function launchInstance(instanceName) {
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
     const { memory, args } = state.settings.java;
-    const { modloader, javaArgs, javaMemory } = _getInstance(state)(
-      instanceName
-    );
+    const {
+      resolution: globalMinecraftResolution
+    } = state.settings.minecraftSettings;
+    const {
+      modloader,
+      javaArgs,
+      javaMemory,
+      resolution: instanceResolution
+    } = _getInstance(state)(instanceName);
+
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
     const instanceJLFPath = path.join(
@@ -2000,6 +1997,7 @@ export function launchInstance(instanceName) {
 
     const javaArguments = (javaArgs !== undefined ? javaArgs : args).split(' ');
     const javaMem = javaMemory !== undefined ? javaMemory : memory;
+    const gameResolution = instanceResolution || globalMinecraftResolution;
 
     const jvmArguments = getJvmArguments(
       libraries,
@@ -2009,6 +2007,7 @@ export function launchInstance(instanceName) {
       mcJson,
       account,
       javaMem,
+      gameResolution,
       false,
       javaArguments
     );
@@ -2033,6 +2032,7 @@ export function launchInstance(instanceName) {
         mcJson,
         account,
         javaMem,
+        gameResolution,
         true,
         javaArguments
       ).join(' ')}`.replace(...replaceRegex)
@@ -2360,6 +2360,17 @@ export const initLatestMods = instanceName => {
     });
 
     dispatch(updateLatestModManifests(manifestsObj));
+  };
+};
+
+export const isAppLatestVersion = () => {
+  return async () => {
+    const { data: latestRelease } = await axios.get(
+      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/latest'
+    );
+
+    const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
+    return !lt(installedVersion, coerce(latestRelease.tag_name));
   };
 };
 

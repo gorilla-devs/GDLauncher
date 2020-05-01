@@ -70,6 +70,21 @@ function showNews(state = true, action) {
   }
 }
 
+function minecraftSettings(
+  state = { resolution: { height: 600, width: 800 } },
+  action
+) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_MINECRAFT_RESOLUTION:
+      return {
+        ...state,
+        resolution: { ...state.resolution, ...action.resolution }
+      };
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path: null,
@@ -108,5 +123,6 @@ export default combineReducers({
   potatoPcMode,
   showNews,
   java,
-  cacheMods
+  cacheMods,
+  minecraftSettings
 });
