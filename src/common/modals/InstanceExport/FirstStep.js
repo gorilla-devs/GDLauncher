@@ -1,10 +1,8 @@
 import React from 'react';
 import path from 'path';
 import { Button, Input } from 'antd';
-// import { ipcRenderer } from 'electron';
+import styles from './ExportPackModal.module.css';
 import ContinueButton from './ContinueButton';
-
-// import styles from './ExportPackModal.module.css';
 
 export default function FirstStep({
   filePath,
@@ -18,24 +16,9 @@ export default function FirstStep({
   setPackZipName
 }) {
   return (
-    <div
-      css={`
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        text-align: center;
-      `}
-    >
-      <div>
-        <div
-          css={`
-            text-align: center;
-            margin-top: 15%;
-            height: calc(100% - 40px);
-            vertial-align: middle;
-          `}
-        >
+    <div className={styles.container}>
+      <div className={styles.centeredDiv}>
+        <div>
           <div>
             <h2>Pack Author Name</h2>
             <div>

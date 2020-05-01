@@ -15,7 +15,7 @@ import { get7zPath } from '../../../app/desktop/utils';
  * @param {String} zipDestPath Destination path (cwd of 7z).
  * @param {Array} filesArray Array of files to include. Relative to current working directory unless full path is passed for each file.
  */
-const createArchive = async (archiveName, zipDestPath, filesArray) => {
+const createZip = async (archiveName, zipDestPath, filesArray) => {
   const sevenZipPath = await get7zPath();
   const zipCreation = add7z(`${archiveName}.zip`, filesArray, {
     $bin: sevenZipPath,
@@ -97,7 +97,6 @@ export default function ThirdStep({
             const slicedFile = file.slice(
               path.join(instancesPath, instanceName).length + 1
             );
-            // console.log(path.join(tempExport, 'overrides', slicedFile));
             await fse.copy(
               file,
               path.join(tempExport, 'overrides', slicedFile)
@@ -108,9 +107,9 @@ export default function ThirdStep({
       );
 
       // Create manifest file
-      const configPath = path.join(path.join(tempExport, 'manifest.json'));
+      const manifestPath = path.join(path.join(tempExport, 'manifest.json'));
       const manifestString = await createManifest();
-      await fse.outputJson(configPath, manifestString);
+      await fse.outputJson(manifestPath, manifestString);
 
       // Create zipped export file
       const filesToZip = [
@@ -121,11 +120,7 @@ export default function ThirdStep({
       await fse.remove(
         path.join(filePath, `${packZipName}-${packVersion}.zip`)
       );
-      await createArchive(
-        `${packZipName}-${packVersion}`,
-        filePath,
-        filesToZip
-      );
+      await createZip(`${packZipName}-${packVersion}`, filePath, filesToZip);
 
       // Clean up temp folder
       await fse.remove(tempExport);

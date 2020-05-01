@@ -2,16 +2,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import {
-//   faLongArrowAltLeft,
-//   faLongArrowAltRight
-// } from '@fortawesome/free-solid-svg-icons';
-// import { LoadingOutlined } from '@ant-design/icons';
-// import { transparentize } from 'polished';
-// import { Input, Spin } from 'antd';
 import { ipcRenderer } from 'electron';
-// import path from 'path';
 import FirstStep from './FirstStep';
 import SecondStep from './SecondStep';
 import ThirdStep from './ThirdStep';
@@ -22,17 +13,9 @@ import {
 } from '../../utils/selectors';
 
 const Content = ({
-  // inProp,
   instanceName,
-  // step,
-  // setStep,
   page,
   setPage,
-  // setVersion,
-  // version,
-  // setModpack,
-  // importZipPath,
-  // setImportZipPath,
   instanceConfig,
   closeModal
 }) => {

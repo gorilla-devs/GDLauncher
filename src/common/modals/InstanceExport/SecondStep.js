@@ -15,7 +15,7 @@ export default function SecondStep({
   const [treeData, setTreeData] = useState([]);
   const instancePath = path.join(instancesPath, instanceName);
 
-  const filesToDisable = [
+  const fileBlackList = [
     path.join(instancePath, 'config.json'),
     path.join(instancePath, 'natives'),
     path.join(instancePath, 'thumbnail.png'),
@@ -29,17 +29,16 @@ export default function SecondStep({
 
   useEffect(() => {
     const getTreeData = async () => {
-      const arr = dirTree(path.join(instancePath));
+      const arr = dirTree(instancePath);
 
       const mapArr = (children, disableChildren = false) => {
         if (children === undefined || children.length === 0) return [];
         return children.map(child => {
           const disableBool =
-            disableChildren || filesToDisable.some(file => file === child.path);
+            disableChildren || fileBlackList.some(file => file === child.path);
           return {
             title: child.name,
             key: child.path,
-            type: child.type,
             selectable: false,
             disableCheckbox: disableBool,
             children: mapArr(child.children, disableBool)
@@ -52,7 +51,7 @@ export default function SecondStep({
           {
             title: localName,
             key: localPath,
-            type: 'directory',
+            selectable: false,
             expanded: true,
             children
           }
@@ -72,8 +71,12 @@ export default function SecondStep({
   };
 
   return (
-    <div>
-      <h2>What files/folders would you like to export?</h2>
+    <div
+      css={`
+        text-align: center;
+      `}
+    >
+      <h2>Files to include in export</h2>
       <div
         css={`
           overflow-y: auto;
