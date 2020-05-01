@@ -422,7 +422,10 @@ export function loginThroughNativeLauncher() {
 
     const homedir = await ipcRenderer.invoke('getAppdataPath');
     const mcFolder = process.platform === 'darwin' ? 'minecraft' : '.minecraft';
-    const vanillaMCPath = path.join(homedir, mcFolder);
+    const vanillaMCPath =
+      process.platform === 'linux'
+        ? path.join(homedir, '../', mcFolder)
+        : path.join(homedir, mcFolder);
     const vnlJson = await fse.readJson(
       path.join(vanillaMCPath, 'launcher_profiles.json')
     );
