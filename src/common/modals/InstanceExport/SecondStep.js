@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import dirTree from 'directory-tree';
 import { Tree } from 'antd';
 import path from 'path';
-// import { PACKS_PATH } from '../../constants';
 import BackButton from './BackButton';
 import ContinueButton from './ContinueButton';
 // import styles from './ExportPackModal.module.css';
@@ -10,94 +9,71 @@ import ContinueButton from './ContinueButton';
 export default function SecondStep({
   instanceName,
   instancesPath,
-  selectedFiles,
   setSelectedFiles,
   setPage
 }) {
   const [treeData, setTreeData] = useState([]);
-  const [expandedKeys, setExpandedKeys] = useState([]);
-  const [checkedKeys, setCheckedKeys] = useState([]);
-  const [selectedKeys, setSelectedKeys] = useState([]);
-  const [autoExpandParent, setAutoExpandParent] = useState(true);
+  const instancePath = path.join(instancesPath, instanceName);
 
   const filesToDisable = [
-    path.join(instancesPath, instanceName, 'config.json'),
-    path.join(instancesPath, instanceName, 'natives'),
-    path.join(instancesPath, instanceName, 'thumbnail.png'),
-    path.join(instancesPath, instanceName, 'usercache.json'),
-    path.join(instancesPath, instanceName, 'usernamecache.json'),
-    path.join(instancesPath, instanceName, 'logs'),
-    path.join(instancesPath, instanceName, '.mixin.out'),
-    path.join(instancesPath, instanceName, 'screenshots'),
-    path.join(instancesPath, instanceName, 'crash-reports')
+    path.join(instancePath, 'config.json'),
+    path.join(instancePath, 'natives'),
+    path.join(instancePath, 'thumbnail.png'),
+    path.join(instancePath, 'usercache.json'),
+    path.join(instancePath, 'usernamecache.json'),
+    path.join(instancePath, 'logs'),
+    path.join(instancePath, '.mixin.out'),
+    path.join(instancePath, 'screenshots'),
+    path.join(instancePath, 'crash-reports')
   ];
 
-  useEffect(() => getTreeData(), []);
+  useEffect(() => {
+    const getTreeData = async () => {
+      const arr = dirTree(path.join(instancePath));
 
-  const getTreeData = () => {
-    const arr = dirTree(path.join(instancesPath, instanceName));
+      const mapArr = (children, disableChildren = false) => {
+        if (children === undefined || children.length === 0) return [];
+        return children.map(child => {
+          const disableBool =
+            disableChildren || filesToDisable.some(file => file === child.path);
+          return {
+            title: child.name,
+            key: child.path,
+            type: child.type,
+            selectable: false,
+            disableCheckbox: disableBool,
+            children: mapArr(child.children, disableBool)
+          };
+        });
+      };
 
-    const mapArr = children => {
-      if (children === undefined || children.length === 0) return [];
-      return children.map(child => ({
-        title: child.name,
-        key: child.path,
-        type: child.type,
-        children: mapArr(child.children)
-      }));
+      function rootNode(localName, localPath, children = []) {
+        return [
+          {
+            title: localName,
+            key: localPath,
+            type: 'directory',
+            expanded: true,
+            children
+          }
+        ];
+      }
+
+      await setTreeData(
+        rootNode('Root Node', instancePath, mapArr(arr.children))
+      );
     };
 
-    setTreeData(mapArr(arr.children));
-    // console.log(arr);
-    // console.log(arr.children);
-    // console.log(mapArr(arr.children));
-    setCheckedKeys(selectedFiles);
-  };
-
-  const onExpand = LexpandedKeys => {
-    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-    // or, you can remove all expanded children keys.
-    setExpandedKeys(LexpandedKeys);
-    setAutoExpandParent(false);
-  };
+    getTreeData();
+  }, []);
 
   const onCheck = LcheckedKeys => {
-    setCheckedKeys(LcheckedKeys);
     setSelectedFiles(LcheckedKeys);
   };
-
-  const onSelect = LselectedKeys => {
-    setSelectedKeys(LselectedKeys);
-  };
-
-  const renderTreeNodes = (data, disableChildren = false) =>
-    data.map(item => {
-      if (item.children) {
-        return (
-          <Tree.TreeNode
-            disabled={
-              disableChildren ? true : filesToDisable.find(f => item.key === f)
-            }
-            // checkable={!disableChildren}
-            title={item.title}
-            key={item.key}
-            dataRef={item}
-          >
-            {renderTreeNodes(
-              item.children,
-              disableChildren || filesToDisable.find(f => item.key === f)
-            )}
-          </Tree.TreeNode>
-        );
-      }
-      // eslint-disable-next-line react/jsx-props-no-spreading
-      return <Tree.TreeNode {...item} />;
-    });
 
   return (
     <div>
       <h2>What files/folders would you like to export?</h2>
-      <div>Only select mods that are not on curseforge.</div>
       <div
         css={`
           overflow-y: auto;
@@ -109,16 +85,10 @@ export default function SecondStep({
       >
         <Tree
           checkable
-          onExpand={onExpand}
-          expandedKeys={expandedKeys}
-          autoExpandParent={autoExpandParent}
+          selectable={true}
           onCheck={onCheck}
-          checkedKeys={checkedKeys}
-          onSelect={onSelect}
-          selectedKeys={selectedKeys}
-        >
-          {renderTreeNodes(treeData)}
-        </Tree>
+          treeData={treeData}
+        />
       </div>
       <BackButton onClick={setPage} />
       <ContinueButton onClick={setPage} />

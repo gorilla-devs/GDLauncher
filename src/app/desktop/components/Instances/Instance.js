@@ -340,7 +340,12 @@ const Instance = ({ instanceName }) => {
           />
           Open Folder
         </MenuItem>
-        <MenuItem onClick={exportInstance}>
+
+        {/* // TODO - Support other export options besides twitch forge. */}
+        <MenuItem
+          onClick={exportInstance}
+          disabled={Boolean(isInQueue) || instance.modloader[0] !== 'forge'}
+        >
           <FontAwesomeIcon
             icon={faBoxOpen}
             css={`

@@ -5,28 +5,28 @@ import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import fse from 'fs-extra';
-import { add } from 'node-7z';
+import { add as add7z } from 'node-7z';
 import styles from './ExportPackModal.module.css';
 import { get7zPath } from '../../../app/desktop/utils';
 
 /**
  *
- * @param {String} archiveName Name of archive without the extension.
+ * @param {String} archiveName Name of archive without file extension.
  * @param {String} zipDestPath Destination path (cwd of 7z).
  * @param {Array} filesArray Array of files to include. Relative to current working directory unless full path is passed for each file.
  */
 const createArchive = async (archiveName, zipDestPath, filesArray) => {
   const sevenZipPath = await get7zPath();
-  const extraction = add(archiveName, filesArray, {
+  const zipCreation = add7z(`${archiveName}.zip`, filesArray, {
     $bin: sevenZipPath,
     $raw: ['-tzip'],
     $spawnOptions: { cwd: zipDestPath }
   });
   await new Promise((resolve, reject) => {
-    extraction.on('end', () => {
+    zipCreation.on('end', () => {
       resolve();
     });
-    extraction.on('error', err => {
+    zipCreation.on('error', err => {
       reject(err.stderr);
     });
   });
@@ -79,55 +79,62 @@ export default function ThirdStep({
   };
 
   useEffect(() => {
+    const workOnFiles = async () => {
+      const filteredFiles = selectedFiles.filter(
+        file =>
+          !mods.find(
+            installedMod => installedMod.fileName === path.basename(file)
+          )
+      );
+
+      // Process files from selection
+      await fse.mkdirp(path.join(tempExport, 'overrides'));
+
+      await Promise.all(
+        filteredFiles.map(async file => {
+          const stats = await fse.stat(file);
+          if (stats.isFile()) {
+            const slicedFile = file.slice(
+              path.join(instancesPath, instanceName).length + 1
+            );
+            // console.log(path.join(tempExport, 'overrides', slicedFile));
+            await fse.copy(
+              file,
+              path.join(tempExport, 'overrides', slicedFile)
+            );
+          }
+        }),
+        { concurrency: 30 }
+      );
+
+      // Create manifest file
+      const configPath = path.join(path.join(tempExport, 'manifest.json'));
+      const manifestString = await createManifest();
+      await fse.outputJson(configPath, manifestString);
+
+      // Create zipped export file
+      const filesToZip = [
+        path.join(tempExport, 'overrides'),
+        path.join(tempExport, 'manifest.json')
+      ];
+
+      await fse.remove(
+        path.join(filePath, `${packZipName}-${packVersion}.zip`)
+      );
+      await createArchive(
+        `${packZipName}-${packVersion}`,
+        filePath,
+        filesToZip
+      );
+
+      // Clean up temp folder
+      await fse.remove(tempExport);
+
+      setIsCompleted(true);
+    };
+
     workOnFiles();
   }, []);
-
-  const workOnFiles = async () => {
-    const filteredFiles = selectedFiles.filter(
-      file =>
-        !mods.find(
-          installedMod => installedMod.fileName === path.basename(file)
-        )
-    );
-
-    // Process files from selection
-    await fse.mkdirp(path.join(tempExport, 'overrides'));
-
-    await Promise.all(
-      filteredFiles.map(async file => {
-        const stats = await fse.stat(file);
-        if (stats.isFile()) {
-          const slicedFile = file.slice(
-            path.join(instancesPath, instanceName).length + 1
-          );
-          // console.log(path.join(tempExport, 'overrides', slicedFile));
-          await fse.copy(file, path.join(tempExport, 'overrides', slicedFile));
-        }
-      }),
-      { concurrency: 30 }
-    );
-
-    // Create manifest file
-    const configPath = path.join(path.join(tempExport, 'manifest.json'));
-    const manifestString = await createManifest();
-    await fse.outputJson(configPath, manifestString);
-
-    // Create zipped export file
-    const filesToZip = [
-      path.join(tempExport, 'overrides'),
-      path.join(tempExport, 'manifest.json')
-    ];
-    await createArchive(
-      `${packZipName}-${packVersion}.zip`,
-      filePath,
-      filesToZip
-    );
-
-    // Clean up temp folder
-    await fse.remove(tempExport);
-
-    setIsCompleted(true);
-  };
 
   return (
     <div className={styles.container}>

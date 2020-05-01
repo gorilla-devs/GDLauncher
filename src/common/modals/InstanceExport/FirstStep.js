@@ -84,6 +84,16 @@ export default function FirstStep({
               />
             </div>
           </div>
+          <div>
+            <h2>Resulting File name</h2>
+            <div>
+              <h3>
+                {packZipName && packVersion
+                  ? `${packZipName}-${packVersion}.zip`
+                  : 'Invalid'}
+              </h3>
+            </div>
+          </div>
 
           <h2>Destination folder for export</h2>
           <Button type="primary" onClick={showFileDialog}>
@@ -98,7 +108,12 @@ export default function FirstStep({
           </Button>
         </div>
       </div>
-      {filePath === null ? null : <ContinueButton onClick={setPage} />}
+      <ContinueButton
+        onClick={setPage}
+        disabled={
+          !(packZipName && packVersion && packAuthor && filePath !== null)
+        }
+      />
     </div>
   );
 }

@@ -58,20 +58,16 @@ const Content = ({
       packZipName={packZipName}
       filePath={filePath}
       showFileDialog={openFolderDialog}
-      // actualStep={step}
-      // setActualStep={setStep}
       setPackVersion={setPackVersion}
       packVersion={packVersion}
       packAuthor={packAuthor}
       setPackAuthor={setPackAuthor}
       setPage={setPage}
-      page={page}
     />,
     <SecondStep
       filePath={filePath}
       instanceName={instanceName}
       setSelectedFiles={setSelectedFiles}
-      selectedFiles={selectedFiles}
       instancesPath={instancesPath}
       setPage={setPage}
     />,
@@ -90,7 +86,7 @@ const Content = ({
   ];
 
   return (
-    <Transition in="true" timeout={200}>
+    <Transition in timeout={200}>
       {state => (
         <Animation state={state}>
           <div
