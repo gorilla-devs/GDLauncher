@@ -83,12 +83,7 @@ export default function SecondStep({
           border-color: ${props => props.theme.palette.primary.dark};
         `}
       >
-        <Tree
-          checkable
-          selectable={true}
-          onCheck={onCheck}
-          treeData={treeData}
-        />
+        <Tree checkable selectable onCheck={onCheck} treeData={treeData} />
       </div>
       <BackButton onClick={setPage} />
       <ContinueButton onClick={setPage} />
