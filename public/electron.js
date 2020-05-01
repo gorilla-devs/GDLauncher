@@ -36,17 +36,21 @@ app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
 
-if (process.env.REACT_APP_RELEASE_TYPE === 'portable') {
+app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
+
+if (
+  process.env.REACT_APP_RELEASE_TYPE === 'portable' &&
+  process.platform !== 'linux'
+) {
   app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
 } else {
-  const store = new Store({ name: 'overrides' });
+  const store = new Store({
+    name: 'overrides',
+    fileExtension: '',
+    encryptionKey: 'GDLauncher'
+  });
   if (store.has('userDataOverride')) {
     app.setPath('userData', store.get('userDataOverride'));
-  } else {
-    app.setPath(
-      'userData',
-      path.join(app.getPath('appData'), 'gdlauncher_next')
-    );
   }
 }
 
@@ -66,7 +70,7 @@ function createWindow() {
     minHeight: 700,
     show: true,
     frame: false,
-    backgroundColor: '#212B36',
+    backgroundColor: '#1B2533',
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
@@ -165,9 +169,7 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  log.log('Quitting app (window-all-closed)');
   app.quit();
-  log.log('Quitting app (quit) (window-all-closed)');
 });
 
 app.on('before-quit', async () => {
@@ -279,8 +281,8 @@ ipcMain.handle('appRestart', () => {
   mainWindow.close();
 });
 
-ipcMain.handle('getPrimaryDisplaySizes', () => {
-  return screen.getPrimaryDisplay().bounds;
+ipcMain.handle('getAllDisplaysBounds', () => {
+  return screen.getAllDisplays().map(v => v.bounds);
 });
 
 ipcMain.handle('init-discord-rpc', () => {
@@ -303,7 +305,7 @@ ipcMain.handle('start-listener', async (e, dirPath) => {
       watcher = null;
     }
     watcher = await nsfw(dirPath, events => {
-      log.log('Received listener events', events.length);
+      log.log(`Detected ${events.length} events from listener`);
       mainWindow.webContents.send('listener-events', events);
     });
     log.log('Started listener');
@@ -363,68 +365,42 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
     autoUpdater.quitAndInstall(true, true);
   } else {
-    let updateSpawn;
-    if (process.platform === 'win32') {
-      const updaterVbs = 'updater.vbs';
-      const updaterBat = 'updateLauncher.bat';
-      await fs.writeFile(
-        path.join(tempFolder, updaterBat),
-        `ping 127.0.0.1 -n 1 > nul & robocopy "${path.join(
-          tempFolder,
-          'update'
-        )}" "." /MOV /E${
-          quitAfterInstall ? '' : ` & start "" "${app.getPath('exe')}"`
-        }
+    const updaterVbs = 'updater.vbs';
+    const updaterBat = 'updateLauncher.bat';
+    await fs.writeFile(
+      path.join(tempFolder, updaterBat),
+      `ping 127.0.0.1 -n 1 > nul & robocopy "${path.join(
+        tempFolder,
+        'update'
+      )}" "." /MOV /E${
+        quitAfterInstall ? '' : ` & start "" "${app.getPath('exe')}"`
+      }
         DEL "${path.join(tempFolder, updaterVbs)}"
         DEL "%~f0"
         `
-      );
+    );
 
-      await fs.writeFile(
-        path.join(tempFolder, updaterVbs),
-        `Set WshShell = CreateObject("WScript.Shell") 
+    await fs.writeFile(
+      path.join(tempFolder, updaterVbs),
+      `Set WshShell = CreateObject("WScript.Shell") 
           WshShell.Run chr(34) & "${path.join(
             tempFolder,
             updaterBat
           )}" & Chr(34), 0
           Set WshShell = Nothing
           `
-      );
+    );
 
-      updateSpawn = spawn(path.join(tempFolder, updaterVbs), {
-        cwd: path.dirname(app.getPath('exe')),
-        detached: true,
-        shell: true,
-        stdio: [
-          'ignore' /* stdin */,
-          'ignore' /* stdout */,
-          'ignore' /* stderr */
-        ]
-      });
-    } else {
-      // Linux
-      updateSpawn = spawn(
-        `sleep 1 && cp -lrf "${path.join(
-          tempFolder,
-          'update'
-        )}"/* "." && rm -rf "${path.join(
-          tempFolder,
-          'update'
-        )}" && chmod +x "${app.getPath('exe')}" && chmod 755 "${app.getPath(
-          'exe'
-        )}"${quitAfterInstall ? '' : ` && "${app.getPath('exe')}"`}`,
-        {
-          cwd: path.dirname(app.getPath('exe')),
-          detached: true,
-          shell: true,
-          stdio: [
-            'ignore' /* stdin */,
-            'ignore' /* stdout */,
-            'ignore' /* stderr */
-          ]
-        }
-      );
-    }
+    const updateSpawn = spawn(path.join(tempFolder, updaterVbs), {
+      cwd: path.dirname(app.getPath('exe')),
+      detached: true,
+      shell: true,
+      stdio: [
+        'ignore' /* stdin */,
+        'ignore' /* stdout */,
+        'ignore' /* stderr */
+      ]
+    });
     updateSpawn.unref();
     mainWindow.close();
   }

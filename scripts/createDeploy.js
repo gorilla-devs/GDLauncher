@@ -155,9 +155,15 @@ const commonConfig = {
       output: 'release'
     }
   },
-  linux: type === 'portable' ? ['appimage:x64', 'zip:x64'] : [],
-  win: [type === 'setup' ? 'nsis-web:x64' : 'zip:x64'],
-  mac: type === 'setup' ? ['dmg:x64'] : []
+  ...((!process.env.RELEASE_TESTING || process.platform === 'linux') && {
+    linux: type === 'setup' ? ['appimage:x64', 'zip:x64'] : []
+  }),
+  ...((!process.env.RELEASE_TESTING || process.platform === 'win32') && {
+    win: [type === 'setup' ? 'nsis-web:x64' : 'zip:x64']
+  }),
+  ...((!process.env.RELEASE_TESTING || process.platform === 'darwin') && {
+    mac: type === 'setup' ? ['dmg:x64'] : []
+  })
 };
 
 const main = async () => {
@@ -194,16 +200,16 @@ const main = async () => {
         path.join('nsis-web', nsisWeb7z),
         path.join('nsis-web', 'latest.yml')
       ],
-      linux: []
-    },
-    portable: {
-      darwin: [],
-      win32: [`${productName}-win-${type}.zip`],
       linux: [
         `${productName}-linux-${type}.zip`,
         `${productName}-linux-${type}.AppImage`,
         'latest-linux.yml'
       ]
+    },
+    portable: {
+      darwin: [],
+      win32: [`${productName}-win-${type}.zip`],
+      linux: []
     }
   };
 

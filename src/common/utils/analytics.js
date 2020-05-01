@@ -1,5 +1,3 @@
-import { ipcRenderer } from 'electron';
-import { release, arch, type } from 'os';
 import { version } from '../../../package.json';
 
 function queue(...args) {
@@ -13,6 +11,9 @@ class GAnalytics {
   constructor() {
     this.curPage = 'N/A';
     this.userId = null;
+    this.setProperties({
+      appVersion: version
+    });
   }
 
   trackPage(page) {
@@ -25,45 +26,22 @@ class GAnalytics {
   }
 
   idle(page) {
-    if (this.userId) {
-      this.curPage = page;
-      queue('set', 'page', page);
-      queue('send', 'event', 'idleForFiveMinutes', page);
-    }
+    this.curPage = page;
+    this.setProperties({ page });
+    queue('send', 'event', 'idleForFiveMinutes', page);
   }
 
   /* eslint-disable */
   setProperties(hash) {
     for (const key in hash) {
-      queue("set", key, hash[key]);
+      queue('set', key, hash[key]);
     }
   }
 
-  async setUserId(userId) {
-    queue("set", "userId", userId);
-    // Try to set screen size
-    try {
-      const { width, height } = await ipcRenderer.invoke(
-        "getPrimaryDisplaySizes"
-      );
-      this.setProperties({
-        sr: `${width}x${height}`,
-        ds: "app"
-      });
-      queue("send", "event", "screenSize", `${width}x${height}`);
-      queue(
-        "send",
-        "event",
-        "operatingSystem",
-        `${type()} - ${release()} - ${arch()}`
-      );
-    } catch (err) {
-      console.error(err);
-    }
+  setUserId(userId) {
     this.setProperties({
-      appVersion: version
+      userId
     });
-    this.userId = userId;
   }
   /* eslint-enable */
 }
