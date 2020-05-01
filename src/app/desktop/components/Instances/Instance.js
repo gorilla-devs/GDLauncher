@@ -341,7 +341,7 @@ const Instance = ({ instanceName }) => {
           Open Folder
         </MenuItem>
 
-        {/* // TODO - Support other export options besides twitch forge. */}
+        {/* // TODO - Support other export options besides curseforge forge. */}
         <MenuItem
           onClick={exportInstance}
           disabled={Boolean(isInQueue) || instance.modloader[0] !== 'forge'}
