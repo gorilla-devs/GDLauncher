@@ -1,7 +1,6 @@
 import React from 'react';
 import path from 'path';
 import { Button, Input } from 'antd';
-import styles from './ExportPackModal.module.css';
 import ContinueButton from './ContinueButton';
 
 export default function FirstStep({
@@ -16,8 +15,24 @@ export default function FirstStep({
   setPackZipName
 }) {
   return (
-    <div className={styles.container}>
-      <div className={styles.centeredDiv}>
+    <div
+      css={`
+        height: 85%;
+        width: 100%;
+        padding: 20px;
+        overflow-y: auto;
+      `}
+    >
+      <div
+        css={`
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          align-items: center;
+          text-align: center;
+        `}
+      >
         <div>
           <div>
             <h2>Pack Author Name</h2>
@@ -82,7 +97,7 @@ export default function FirstStep({
           <Button type="primary" onClick={showFileDialog}>
             {
               // eslint-disable-next-line no-nested-ternary
-              filePath === null
+              !filePath
                 ? 'Select Folder'
                 : path.basename(filePath).length >= 24
                 ? `${path.basename(filePath).substr(0, 24)}...`
@@ -93,9 +108,7 @@ export default function FirstStep({
       </div>
       <ContinueButton
         onClick={setPage}
-        disabled={
-          !(packZipName && packVersion && packAuthor && filePath !== null)
-        }
+        disabled={!(packZipName && packVersion && packAuthor && filePath)}
       />
     </div>
   );

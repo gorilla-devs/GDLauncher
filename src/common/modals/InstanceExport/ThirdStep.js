@@ -6,7 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import fse from 'fs-extra';
 import { add as add7z } from 'node-7z';
-import styles from './ExportPackModal.module.css';
+import makeDir from 'make-dir';
+import pMap from 'p-map';
 import { get7zPath } from '../../../app/desktop/utils';
 
 /**
@@ -47,6 +48,7 @@ export default function ThirdStep({
   const [isCompleted, setIsCompleted] = useState(false);
   const { modloader, mods } = instanceConfig;
   const mcVersion = modloader[1];
+  const modloaderName = modloader[0];
   const forgeVersion = modloader[2].slice(mcVersion.length + 1);
   const dispatch = useDispatch();
   const tempExport = path.join(tempPath, instanceName);
@@ -58,7 +60,7 @@ export default function ThirdStep({
         version: modloader[1],
         modLoaders: [
           {
-            id: `forge-${forgeVersion}`,
+            id: `${modloaderName}-${forgeVersion}`,
             primary: true
           }
         ]
@@ -70,28 +72,31 @@ export default function ThirdStep({
       author: packAuthor,
       projectID: modloader.length > 3 ? parseInt(modloader[3], 10) : undefined,
       name: packZipName,
-      files: mods.map(mod => ({
-        projectID: mod.projectID,
-        fileID: mod.fileID,
-        required: true
-      }))
+      files: mods
+        .filter(mod => mod?.projectID)
+        .map(mod => ({
+          projectID: mod.projectID,
+          fileID: mod.fileID,
+          required: true
+        }))
     };
   };
 
   useEffect(() => {
     const workOnFiles = async () => {
-      const filteredFiles = selectedFiles.filter(
-        file =>
-          !mods.find(
-            installedMod => installedMod.fileName === path.basename(file)
-          )
-      );
+      // Make sure mod with curseforge ids gets removed and ones without pass through to copy.
+      const filteredFiles = selectedFiles.filter(file => {
+        const match = mods.find(mod => mod.fileName === path.basename(file));
+        if (match && match.projectID) return false;
+        return true;
+      });
 
       // Process files from selection
-      await fse.mkdirp(path.join(tempExport, 'overrides'));
+      await makeDir(path.join(tempExport, 'overrides'));
 
-      await Promise.all(
-        filteredFiles.map(async file => {
+      await pMap(
+        filteredFiles,
+        async file => {
           const stats = await fse.stat(file);
           if (stats.isFile()) {
             const slicedFile = file.slice(
@@ -102,8 +107,8 @@ export default function ThirdStep({
               path.join(tempExport, 'overrides', slicedFile)
             );
           }
-        }),
-        { concurrency: 30 }
+        },
+        { concurrency: 3 }
       );
 
       // Create manifest file
@@ -132,13 +137,34 @@ export default function ThirdStep({
   }, []);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.centeredDiv}>
+    <div
+      css={`
+        height: 85%;
+        width: 100%;
+        padding: 20px;
+        overflow-y: auto;
+      `}
+    >
+      <div
+        css={`
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          align-items: center;
+          text-align: center;
+        `}
+      >
         {isCompleted ? (
           <div>
             <h2>
               All Done!{' '}
-              <FontAwesomeIcon icon={faCheck} style={{ color: '#27ae60' }} />
+              <FontAwesomeIcon
+                icon={faCheck}
+                css={`
+                  color: ${props => props.theme.palette.colors.green};
+                `}
+              />
             </h2>
             <Button type="primary" onClick={() => dispatch(closeModal())}>
               Go Back To Instances

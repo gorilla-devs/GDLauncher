@@ -424,7 +424,7 @@ export function loginThroughNativeLauncher() {
     const mcFolder = process.platform === 'darwin' ? 'minecraft' : '.minecraft';
     const vanillaMCPath =
       process.platform === 'linux'
-        ? path.join(homedir, '../', mcFolder)
+        ? path.resolve(homedir, '../', mcFolder)
         : path.join(homedir, mcFolder);
     const vnlJson = await fse.readJson(
       path.join(vanillaMCPath, 'launcher_profiles.json')

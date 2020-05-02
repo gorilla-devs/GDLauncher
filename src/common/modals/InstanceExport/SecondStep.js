@@ -4,7 +4,6 @@ import { Tree } from 'antd';
 import path from 'path';
 import BackButton from './BackButton';
 import ContinueButton from './ContinueButton';
-// import styles from './ExportPackModal.module.css';
 
 export default function SecondStep({
   instanceName,
@@ -32,7 +31,7 @@ export default function SecondStep({
       const arr = dirTree(instancePath);
 
       const mapArr = (children, disableChildren = false) => {
-        if (children === undefined || children.length === 0) return [];
+        if (!children || children.length === 0) return [];
         return children.map(child => {
           const disableBool =
             disableChildren || fileBlackList.some(file => file === child.path);
