@@ -213,6 +213,10 @@ const main = async () => {
       linux: [
         `${productName}-linux-${type}.zip`,
         `${productName}-linux-${type}.AppImage`,
+        `${productName}-linux-${type}.snap`,
+        `${productName}-linux-${type}.deb`,
+        `${productName}-linux-${type}.rpm`,
+        `${productName}-linux-${type}.pacman`,
         'latest-linux.yml'
       ]
     },
