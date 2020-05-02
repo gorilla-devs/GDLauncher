@@ -645,9 +645,10 @@ export const extractFace = async buffer => {
   return imageBuffer.toString('base64');
 };
 
-export const normalizeModData = (data, projectID, modName) => {
+export const normalizeModData = (data, projectID, modName, categorySection) => {
   const temp = data;
   temp.name = modName;
+  temp.categorySection = { path: categorySection.path };
   if (data.projectID && data.fileID) return temp;
   if (data.id) {
     temp.projectID = projectID;

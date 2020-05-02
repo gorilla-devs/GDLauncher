@@ -423,7 +423,9 @@ const General = () => {
               width: 350px;
             `}
           >
-            Enable / disable caching mods from curseforge.
+            Enable / disable caching mods from curseforge to a cache folder for
+            later reuse. Other instance are already used as a cache if this
+            option is disabled.
           </p>
           <Switch
             onChange={e => {

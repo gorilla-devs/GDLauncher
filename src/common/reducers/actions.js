@@ -60,6 +60,7 @@ import {
   _getAccounts,
   _getTempPath,
   _getInstance,
+  _getInstances,
   _getDataStorePath,
   _getModCachePath
 } from '../utils/selectors';
@@ -1091,15 +1092,16 @@ export function processManifest(instanceName) {
     const concurrency = state.settings.concurrentDownloads;
     const { cacheMods } = state.settings;
     const manifestFile = 'manifest.json';
+    // TODO - Check instances for mods
+    const instanceList = _getInstances(state);
+    const instancesWithMods = instanceList.filter(instance => {
+      if (!(instance?.mods && instance.mods.length !== 0)) return false;
+      return instance.name !== instanceName;
+    });
+    // console.log('LOGGING INSTANCE LIST HERE');
+    // console.log(instancesWithMods);
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading mods...'));
-
-    // If caching is enabled make sure mods folder exists.
-    if (cacheMods) {
-      await fse.ensureDir(
-        path.join(_getInstancesPath(state), instanceName, 'mods')
-      );
-    }
 
     let modManifests = [];
     await pMap(
@@ -1107,11 +1109,6 @@ export function processManifest(instanceName) {
       async item => {
         let ok = false;
         let tries = 0;
-        const cachedModFolder = path.join(
-          _getModCachePath(state),
-          item.projectID.toString(),
-          item.fileID.toString()
-        );
         /* eslint-disable no-await-in-loop */
         do {
           tries += 1;
@@ -1119,83 +1116,152 @@ export function processManifest(instanceName) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
           try {
-            const cachedFileExists = await fse.pathExists(
-              path.join(cachedModFolder, manifestFile)
+            // Copy from cache folder instead of downloading from curseforge.
+            if (cacheMods) {
+              const cachedModFolder = path.join(
+                _getModCachePath(state),
+                item.projectID.toString(),
+                item.fileID.toString()
+              );
+              if (
+                await fse.pathExists(path.join(cachedModFolder, manifestFile))
+              ) {
+                const cachedManifest = await fse.readJSON(
+                  path.join(cachedModFolder, manifestFile)
+                );
+                const destFile = path.join(
+                  _getInstancesPath(state),
+                  instanceName,
+                  cachedManifest.categorySection.path,
+                  cachedManifest.fileName
+                );
+                const destFileExists = await fse.pathExists(destFile);
+                if (!destFileExists) {
+                  console.log(
+                    `[Mod Cache] Retrieved: ${cachedManifest.fileName}`
+                  );
+                  await fse.ensureDir(path.dirname(destFile));
+                  // await fse.copyFile(
+                  await fse.ensureLink(
+                    path.join(cachedModFolder, cachedManifest.fileName),
+                    destFile
+                  );
+                }
+
+                // manifest was already normalized so just append it to the array.
+                modManifests = modManifests.concat(cachedManifest);
+
+                const percentage =
+                  (modManifests.length * 100) / manifest.files.length - 1;
+                dispatch(
+                  updateDownloadProgress(percentage > 0 ? percentage : 0)
+                );
+                ok = true;
+
+                // eslint-disable-next-line no-continue
+                continue;
+              }
+            }
+
+            // Copy from other instances if exists.
+            const firstInstanceWithModMatch = instancesWithMods.find(
+              // eslint-disable-next-line no-loop-func
+              instance =>
+                instance.mods.some(
+                  mod =>
+                    mod.projectID === item.projectID &&
+                    mod.fileID === item.fileID
+                )
+            );
+            const modData = firstInstanceWithModMatch?.mods.find(
+              mod => mod.projectID === item.projectID
+            );
+            // console.log(modData);
+
+            if (modData) {
+              const destFile = path.join(
+                _getInstancesPath(state),
+                instanceName,
+                modData.categorySection.path,
+                modData.fileName
+              );
+              const destFileExistsInstance = await fse.pathExists(destFile);
+              if (!destFileExistsInstance) {
+                console.log(
+                  `[Mod Cache] Retrieved from instance: ${modData.fileName}`
+                );
+                const otherInstance = path.join(
+                  _getInstancesPath(state),
+                  firstInstanceWithModMatch.name,
+                  modData.categorySection.path,
+                  modData.fileName
+                );
+
+                await fse.ensureDir(path.dirname(destFile));
+                // await fse.copyFile(
+                await fse.ensureLink(path.join(otherInstance), destFile);
+                modManifests = modManifests.concat(modData);
+
+                const percentage =
+                  (modManifests.length * 100) / manifest.files.length - 1;
+                dispatch(
+                  updateDownloadProgress(percentage > 0 ? percentage : 0)
+                );
+                ok = true;
+
+                // eslint-disable-next-line no-continue
+                continue;
+              }
+            }
+
+            // Download mod from curseforge.
+            const { data: addon } = await getAddon(item.projectID);
+            const modManifest = (
+              await getAddonFile(item.projectID, item.fileID)
+            ).data;
+            const destFile = path.join(
+              _getInstancesPath(state),
+              instanceName,
+              addon.categorySection.path,
+              modManifest.fileName
+            );
+            const fileExists = await fse.pathExists(destFile);
+            if (!fileExists) {
+              await downloadFile(destFile, modManifest.downloadUrl);
+            }
+
+            const newManifest = normalizeModData(
+              modManifest,
+              item.projectID,
+              addon.name,
+              addon.categorySection // name: "Mods", "Texture Packs", "Worlds", path: "mods", "resourcepacks", "saves"
             );
 
-            // Copy from cache instead of downloading from curseforge.
-            if (cacheMods && cachedFileExists) {
-              const cachedManifest = await fse.readJSON(
-                path.join(cachedModFolder, manifestFile)
+            modManifests = modManifests.concat(newManifest);
+
+            if (cacheMods) {
+              const cachedModFolder = path.join(
+                _getModCachePath(state),
+                item.projectID.toString(),
+                item.fileID.toString()
               );
-              const destFile = path.join(
-                _getInstancesPath(state),
-                instanceName,
-                'mods',
-                cachedManifest.fileName
+              console.log(`[Mod Cache] Caching: ${modManifest.fileName}`);
+              await fse.ensureDir(cachedModFolder);
+              // await fse.copyFile(
+              await fse.ensureLink(
+                destFile,
+                path.join(cachedModFolder, modManifest.fileName)
               );
-              const destFileExists = await fse.pathExists(destFile);
-              if (!destFileExists) {
-                console.log(
-                  `[Mod Cache] Retrieved: ${cachedManifest.fileName}`
-                );
-                await fse.copyFile(
-                  path.join(cachedModFolder, cachedManifest.fileName),
-                  destFile
-                );
-              }
-
-              // manifest was already normalized so just append it to the array.
-              modManifests = modManifests.concat(cachedManifest);
-
-              const percentage =
-                (modManifests.length * 100) / manifest.files.length - 1;
-              dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
-              ok = true;
-
-              // Download mod from curseforge.
-            } else {
-              const { data: addon } = await getAddon(item.projectID);
-              const modManifest = (
-                await getAddonFile(item.projectID, item.fileID)
-              ).data;
-              const destFile = path.join(
-                _getInstancesPath(state),
-                instanceName,
-                'mods',
-                modManifest.fileName
+              await fse.outputJson(
+                path.join(cachedModFolder, manifestFile),
+                newManifest
               );
-              const fileExists = await fse.pathExists(destFile);
-              if (!fileExists) {
-                await downloadFile(destFile, modManifest.downloadUrl);
-              }
-
-              const newManifest = normalizeModData(
-                modManifest,
-                item.projectID,
-                addon.name
-              );
-
-              modManifests = modManifests.concat(newManifest);
-
-              if (cacheMods) {
-                console.log(`[Mod Cache] Caching: ${modManifest.fileName}`);
-                await fse.ensureDir(cachedModFolder);
-                await fse.copyFile(
-                  destFile,
-                  path.join(cachedModFolder, modManifest.fileName)
-                );
-                await fse.outputJson(
-                  path.join(cachedModFolder, manifestFile),
-                  newManifest
-                );
-              }
-
-              const percentage =
-                (modManifests.length * 100) / manifest.files.length - 1;
-              dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
-              ok = true;
             }
+
+            const percentage =
+              (modManifests.length * 100) / manifest.files.length - 1;
+            dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+            ok = true;
           } catch (err) {
             console.error(err);
           }
@@ -1497,7 +1563,8 @@ export const startListener = () => {
               mod = normalizeModData(
                 exactMatch.file,
                 exactMatch.file.projectId,
-                addon.name
+                addon.name,
+                addon.categorySection
               );
               mod.fileName = path.basename(fileName);
             } else if (notMatch) {
@@ -2111,12 +2178,7 @@ export function installMod(
     const cachedFileExists = await fse.pathExists(
       path.join(cachedModFolder, manifestFile)
     );
-    // If caching is enabled make sure mods folder exists.
-    if (cacheMods) {
-      await fse.ensureDir(
-        path.join(_getInstancesPath(state), instanceName, 'mods')
-      );
-    }
+
     if (cacheMods && cachedFileExists) {
       const cachedManifest = await fse.readJSON(
         path.join(cachedModFolder, manifestFile)
@@ -2124,13 +2186,15 @@ export function installMod(
       const destFile = path.join(
         _getInstancesPath(state),
         instanceName,
-        'mods',
+        cachedManifest.categorySection.path,
         cachedManifest.fileName
       );
       const destFileExists = await fse.pathExists(destFile);
       if (!destFileExists) {
         console.log(`[Mod Cache] Retrieved: ${cachedManifest.fileName}`);
-        await fse.copyFile(
+        await fse.ensureDir(path.dirname(destFile));
+        // await fse.copyFile(
+        await fse.ensureLink(
           path.join(cachedModFolder, cachedManifest.fileName),
           destFile
         );
@@ -2185,12 +2249,17 @@ export function installMod(
     const mainModData = await getAddonFile(projectID, fileID);
     const { data: addon } = await getAddon(projectID);
     mainModData.data.projectID = projectID;
-    const destFile = path.join(instancePath, 'mods', mainModData.data.fileName);
+    const destFile = path.join(
+      instancePath,
+      addon.categorySection.path,
+      mainModData.data.fileName
+    );
     const tempFile = path.join(_getTempPath(state), mainModData.data.fileName);
     const newModManifest = normalizeModData(
       mainModData.data,
       projectID,
-      addon.name
+      addon.name,
+      addon.categorySection
     );
 
     if (useTempMiddleware) {
@@ -2237,7 +2306,8 @@ export function installMod(
     if (cacheMods) {
       console.log(`[Mod Cache] Caching: ${mainModData.data.fileName}`);
       await fse.ensureDir(cachedModFolder);
-      await fse.copyFile(
+      // await fse.copyFile(
+      await fse.ensureLink(
         destFile,
         path.join(cachedModFolder, mainModData.data.fileName)
       );

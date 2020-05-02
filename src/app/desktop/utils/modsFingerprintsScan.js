@@ -85,7 +85,8 @@ const modsFingerprintsScan = async instancesPath => {
                 ...normalizeModData(
                   exactMatch.file,
                   exactMatch.file.projectId,
-                  addonData.name
+                  addonData.name,
+                  addonData.categorySection
                 ),
                 fileName
               };
