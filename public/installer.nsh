@@ -1,6 +1,8 @@
 # For my application GUID (fix GUID to match what your application uses)
 !define NEW_GUID_INSTALLER "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
 !define OLD_GUID_UNINSTALLER "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
+!define SUPER_OLD_GUID_INSTALLER "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
+!define SUPER_OLD_GUID_UNINSTALLER "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
 
 !ifndef BUILD_UNINSTALLER
     Function CheckForNewInstallation
@@ -39,6 +41,15 @@
         # Restore stack
         Pop $R0
     FunctionEnd
+
+    Function CleanSuperOldInstallation
+        # Preserve stack
+        Push $R2
+        DeleteRegKey HKCU "${SUPER_OLD_GUID_INSTALLER}"
+        DeleteRegKey HKCU "${SUPER_OLD_GUID_UNINSTALLER}"
+        # Restore stack
+        Pop $R2
+    FunctionEnd
 !endif
 
 !macro customInit
@@ -49,4 +60,5 @@
 !macro customInstall
     # Remove old entry for installation for sure now if it exists, because we just installed the client
     Call CleanOldInstallation
+    Call CleanSuperOldInstallation
 !macroend
