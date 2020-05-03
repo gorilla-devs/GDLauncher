@@ -483,7 +483,8 @@ const General = () => {
             `}
           >
             Enable / disable - Caching mods from curseforge to a dedicated cache
-            folder. Keeps a copy of every mod installed to a special cache folder.
+            folder. Keeps a copy of every mod installed to a special cache
+            folder.
           </p>
           <Switch
             onChange={e => {
