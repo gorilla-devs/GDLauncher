@@ -29,6 +29,7 @@ import {
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
   updateShowNews,
+  updateCacheModsInstances,
   updateCacheMods
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
@@ -214,6 +215,9 @@ const General = () => {
   const [deletingInstances, setDeletingInstances] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
   const cacheMods = useSelector(state => state.settings.cacheMods);
+  const cacheModsInstances = useSelector(
+    state => state.settings.cacheModsInstances
+  );
   const modCachePath = useSelector(_getModCachePath);
 
   const dispatch = useDispatch();
@@ -415,7 +419,7 @@ const General = () => {
             margin-top: 0px;
           `}
         >
-          Cache Mods &nbsp; <FontAwesomeIcon icon={faHdd} />
+          Cache Mods Using Instances &nbsp; <FontAwesomeIcon icon={faHdd} />
         </Title>
         <DiscordRpc>
           <p
@@ -423,9 +427,34 @@ const General = () => {
               width: 350px;
             `}
           >
-            Enable / disable caching mods from curseforge to a cache folder for
-            later reuse. Other instance are already used as a cache if this
-            option is disabled.
+            Enable / disable - Search instances for mods to copy instead of
+            redownloading local content.
+          </p>
+          <Switch
+            onChange={e => {
+              dispatch(updateCacheModsInstances(e));
+            }}
+            checked={cacheModsInstances}
+          />
+        </DiscordRpc>
+      </div>
+      <Hr />
+      <div>
+        <Title
+          css={`
+            margin-top: 0px;
+          `}
+        >
+          Cache Mods Using Dedicated&nbsp; <FontAwesomeIcon icon={faHdd} />
+        </Title>
+        <DiscordRpc>
+          <p
+            css={`
+              width: 350px;
+            `}
+          >
+            Enable / disable - Caching mods from curseforge to a dedicated cache
+            folder.
           </p>
           <Switch
             onChange={e => {
@@ -435,6 +464,7 @@ const General = () => {
           />
         </DiscordRpc>
       </div>
+      <Hr />
       <div>
         <Title
           css={`

@@ -105,7 +105,16 @@ function java(
   }
 }
 
-function cacheMods(state = true, action) {
+function cacheModsInstances(state = true, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_CACHE_MODS_INSTANCES:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
+function cacheMods(state = false, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CACHE_MODS:
       return action.value;
@@ -124,5 +133,6 @@ export default combineReducers({
   showNews,
   java,
   cacheMods,
+  cacheModsInstances,
   minecraftSettings
 });

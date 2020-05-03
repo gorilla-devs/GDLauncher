@@ -107,3 +107,12 @@ export function updateCacheMods(value) {
     });
   };
 }
+
+export function updateCacheModsInstances(value) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_CACHE_MODS_INSTANCES,
+      value
+    });
+  };
+}
