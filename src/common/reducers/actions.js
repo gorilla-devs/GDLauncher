@@ -1167,7 +1167,6 @@ export function processManifest(instanceName) {
                 }
               }
             }
-
             // Copy from cache folder instead of downloading from curseforge.
             if (cacheMods) {
               const cachedModFolder = path.join(
