@@ -1,8 +1,5 @@
 # For my application GUID (fix GUID to match what your application uses)
 !macro customInit
-    push $4
-    push $0
-
     SetShellVarContext current 
     # Workaround for installer handing when the app directory is removed manually
     ${ifNot} ${FileExists} "$INSTDIR"
@@ -15,6 +12,15 @@
     DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
     DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
 
+    # Read appdata/gdlauncher_next/overrides
+    # if it's present, delete the folder reported inside
+    # then delete appdata/gdlauncher_next/overrides
+!macroends
+!macro customUnInit
+    push $4
+    push $0
+
+    SetShellVarContext current 
     ClearErrors
     FileOpen $4 "$APPDATA\gdlauncher_next\overrides" r
     FileRead $4 $0
