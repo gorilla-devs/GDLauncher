@@ -14,9 +14,10 @@ const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
-const Store = require('electron-store');
 const log = require('electron-log');
-const fs = require('fs').promises;
+const fss = require('fs');
+
+const fs = fss.promises;
 
 const discordRPC = require('./discordRPC');
 
@@ -44,13 +45,14 @@ if (
 ) {
   app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
 } else {
-  const store = new Store({
-    name: 'overrides',
-    fileExtension: '',
-    encryptionKey: 'GDLauncher'
-  });
-  if (store.has('userDataOverride')) {
-    app.setPath('userData', store.get('userDataOverride'));
+  const overrideExists = fss.existsSync(
+    path.join(app.getPath('userData'), 'override')
+  );
+  if (overrideExists) {
+    const override = fss.readFileSync(
+      path.join(app.getPath('userData'), 'override')
+    );
+    app.setPath('userData', override.toString());
   }
 }
 
