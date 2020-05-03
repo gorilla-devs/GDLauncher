@@ -30,7 +30,8 @@ import {
   updatePotatoPcMode,
   updateShowNews,
   updateCacheModsInstances,
-  updateCacheMods
+  updateCacheMods,
+  updateAssetsCheckSkip
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
@@ -214,6 +215,7 @@ const General = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [deletingInstances, setDeletingInstances] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
+  const assetsCheckSkip = useSelector(state => state.settings.assetsCheckSkip);
   const cacheMods = useSelector(state => state.settings.cacheMods);
   const cacheModsInstances = useSelector(
     state => state.settings.cacheModsInstances
@@ -419,16 +421,43 @@ const General = () => {
             margin-top: 0px;
           `}
         >
+          Fast Assets Check &nbsp; <FontAwesomeIcon icon={faHdd} />
+        </Title>
+        <DiscordRpc>
+          <p
+            css={`
+              width: 500px;
+            `}
+          >
+            Enable / disable - Makes installs that use the same MC / Forge
+            version faster. Leave enabled unless havivng issues with missing
+            assets.
+          </p>
+          <Switch
+            onChange={e => {
+              dispatch(updateAssetsCheckSkip(e));
+            }}
+            checked={assetsCheckSkip}
+          />
+        </DiscordRpc>
+      </div>
+      <Hr />
+      <div>
+        <Title
+          css={`
+            margin-top: 0px;
+          `}
+        >
           Cache Mods Using Instances &nbsp; <FontAwesomeIcon icon={faHdd} />
         </Title>
         <DiscordRpc>
           <p
             css={`
-              width: 350px;
+              width: 500px;
             `}
           >
-            Enable / disable - Search instances for mods to copy instead of
-            redownloading local content.
+            Enable / disable - Uses existing instances as a cache source. Leave
+            enabled unless issues with new mods.
           </p>
           <Switch
             onChange={e => {
@@ -450,11 +479,11 @@ const General = () => {
         <DiscordRpc>
           <p
             css={`
-              width: 350px;
+              width: 500px;
             `}
           >
             Enable / disable - Caching mods from curseforge to a dedicated cache
-            folder.
+            folder. Keeps a copy of every mod installed to a special cache folder.
           </p>
           <Switch
             onChange={e => {

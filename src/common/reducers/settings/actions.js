@@ -99,6 +99,15 @@ export function updateDiscordRPC(val) {
   };
 }
 
+export function updateAssetsCheckSkip(value) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_ASSETS_CHECK_SKIP,
+      value
+    });
+  };
+}
+
 export function updateCacheMods(value) {
   return dispatch => {
     dispatch({

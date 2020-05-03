@@ -105,6 +105,15 @@ function java(
   }
 }
 
+function assetsCheckSkip(state = true, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_ASSETS_CHECK_SKIP:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
 function cacheModsInstances(state = true, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CACHE_MODS_INSTANCES:
@@ -133,6 +142,7 @@ export default combineReducers({
   showNews,
   java,
   cacheMods,
+  assetsCheckSkip,
   cacheModsInstances,
   minecraftSettings
 });

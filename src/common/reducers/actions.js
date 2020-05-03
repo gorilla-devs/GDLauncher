@@ -742,6 +742,7 @@ export function downloadFabric(instanceName) {
 export function downloadForge(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
+    const { assetsCheckSkip } = state.settings;
     const { modloader } = _getCurrentDownloadItem(state);
 
     const completedForgeSkipFile = path.join(
@@ -752,7 +753,7 @@ export function downloadForge(instanceName) {
       `${modloader[2]}.complete`
     );
     const checkForgeSkip = await fse.pathExists(completedForgeSkipFile);
-    if (!checkForgeSkip) {
+    if (!checkForgeSkip && assetsCheckSkip) {
       const forgeJson = {};
       const forgeJsonPath = path.join(
         _getLibrariesPath(state),
@@ -1080,7 +1081,10 @@ export function downloadForge(instanceName) {
 
       await fse.remove(tempInstaller);
 
-      await fse.outputFile(completedForgeSkipFile, '');
+      await fse.outputFile(
+        completedForgeSkipFile,
+        'If I exist GDLauncher skips all asset checks for my version'
+      );
     }
   };
 }
@@ -1093,7 +1097,6 @@ export function processManifest(instanceName) {
     const { cacheMods } = state.settings;
     const { cacheModsInstances } = state.settings;
     const manifestFile = 'manifest.json';
-    // TODO - Check instances for mods
     const instanceList = _getInstances(state);
     const instancesWithMods = instanceList.filter(instance => {
       if (!(instance?.mods && instance.mods.length !== 0)) return false;
@@ -1347,6 +1350,7 @@ export function processManifest(instanceName) {
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
+    const { assetsCheckSkip } = state.settings;
     const {
       app: {
         vanillaManifest: { versions: mcVersions }
@@ -1365,8 +1369,7 @@ export function downloadInstance(instanceName) {
       `${mcVersion}.complete`
     );
     const skipInstallVanilla = await fse.pathExists(skipFileVanilla);
-    console.log(`skipping downlaod phase: ${skipInstallVanilla}`);
-    if (skipInstallVanilla) {
+    if (skipInstallVanilla && assetsCheckSkip) {
       // Read Manifest and extra natives.
       const mcJsonPath = path.join(
         _getMinecraftVersionsPath(state),
@@ -1490,7 +1493,10 @@ export function downloadInstance(instanceName) {
         await copyAssetsToLegacy(assets);
       }
 
-      await fse.outputFile(skipFileVanilla, '');
+      await fse.outputFile(
+        skipFileVanilla,
+        'If I exist GDLauncher skips all asset checks for my version'
+      );
 
       if (modloader && modloader[0] === FABRIC) {
         await dispatch(downloadFabric(instanceName));
