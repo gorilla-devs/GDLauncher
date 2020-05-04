@@ -6,6 +6,7 @@
     SetShellVarContext current 
     # Workaround for installer handing when the app directory is removed manually
     ${ifNot} ${FileExists} "$INSTDIR"
+      ${ifNot} ${FileExists} "$INSTDIR"
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
     ${EndIf}
@@ -27,6 +28,29 @@
         !appendfile "$APPDATA\gdlauncher_next\overrides" ""
 
     FileClose $4
+
+    pop $4
+    pop $0
+
+!macroend
+!macro customUnInit
+    push $4
+    push $0
+
+    SetShellVarContext current 
+    ClearErrors
+    FileOpen $4 "$APPDATA\gdlauncher_next\overrides.data" r
+    FileRead $4 $0
+    ${If} ${Errors}
+        Abort "Unable to find overrides file!"
+    ${EndIf}
+        RMDir /r "$0"
+        Delete "$APPDATA\gdlauncher_next\overrides.data"
+    FileClose $4
+
+    FileOpen $9 "$APPDATA\gdlauncher_next\overrides.data" w
+    FileWrite $9 ""
+    FileClose $9 ;Closes the filled file
 
     pop $4
     pop $0
