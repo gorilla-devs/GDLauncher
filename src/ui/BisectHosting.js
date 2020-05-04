@@ -2,23 +2,28 @@ import React, { memo } from 'react';
 import styled from 'styled-components';
 
 const Logo = styled.svg`
-  height: 40px;
+  height: ${props => props.size || 40}px;
   -webkit-app-region: no-drag;
   * {
     transition: opacity 0.1s ease-in-out;
   }
   &:hover {
     * {
-      cursor: pointer;
+      cursor: ${props => (props.showPointerCursor ? 'pointer' : 'auto')};
       opacity: 0.9;
     }
   }
 `;
 
-function BisectHosting({ size, pointer }) {
+function BisectHosting({ size, showPointerCursor, onClick }) {
   return (
     // eslint-disable-next-line
-    <Logo viewBox="0 0 241.66 78.82" size={size} pointer={pointer}>
+    <Logo
+      onClick={onClick}
+      viewBox="0 0 241.66 78.82"
+      size={size}
+      showPointerCursor={showPointerCursor}
+    >
       <defs>
         <style>
           {

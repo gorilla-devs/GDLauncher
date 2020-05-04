@@ -677,7 +677,7 @@ const General = () => {
         <p>
           {updateAvailable
             ? 'There is an update available to be installed. Click on update to install it and restart the launcher'
-            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever there is one'}
+            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available'}
         </p>
         <div
           css={`
