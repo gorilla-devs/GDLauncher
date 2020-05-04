@@ -4,9 +4,6 @@ import { ipcRenderer, clipboard } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import fsa from 'fs-extra';
-import { promises as fs } from 'fs';
-import path from 'path';
-import Store from 'electron-store';
 import {
   faCopy,
   faDownload,
@@ -14,10 +11,9 @@ import {
   faTrash,
   faPlay,
   faToilet,
-  faNewspaper,
-  faFolder
+  faNewspaper
 } from '@fortawesome/free-solid-svg-icons';
-import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
+import { Select, Tooltip, Button, Switch } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import {
   _getCurrentAccount,
@@ -33,10 +29,7 @@ import {
   updateShowNews
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
-import {
-  updateConcurrentDownloads,
-  updateUserData
-} from '../../../reducers/actions';
+import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { extractFace } from '../../../../app/desktop/utils';
 
 const MyAccountPrf = styled.div`
@@ -175,25 +168,6 @@ const LauncherVersion = styled.div`
     color: ${props => props.theme.palette.text.primary};
   }
 `;
-const CustomDataPathContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  width: 100%;
-  height: 140px;
-  padding: 5px 20px 5px 20px;
-  border-radius: ${props => props.theme.shape.borderRadius};
-
-  h1 {
-    width: 100%;
-    font-size: 15px;
-    font-weight: 700;
-    color: ${props => props.theme.palette.text.primary};
-    z-index: 1;
-    text-align: left;
-  }
-`;
 
 function copy(setCopied, copyText) {
   setCopied(true);
@@ -235,11 +209,7 @@ const General = () => {
   const [copiedUuid, setCopiedUuid] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [deletingInstances, setDeletingInstances] = useState(false);
-  const [dataPath, setDataPath] = useState(null);
-  const [moveDatas, setMoveDatas] = useState(false);
-  const [defaultDataPath, setDefaultDataPath] = useState(null);
   const showNews = useSelector(state => state.settings.showNews);
-  const userData = useSelector(state => state.userData);
 
   const dispatch = useDispatch();
 
@@ -250,18 +220,6 @@ const General = () => {
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
     extractFace(currentAccount.skin).then(setProfileImage).catch(console.error);
-
-    ipcRenderer
-      .invoke('getAppdataPath')
-      .then(appData => {
-        const appDataPath = path.join(appData, 'gdlauncher_next');
-
-        if (userData === appDataPath) {
-          setDefaultDataPath('Default Path');
-        }
-        return setDefaultDataPath(userData);
-      })
-      .catch(console.error);
   }, []);
 
   const clearSharedData = async () => {
@@ -274,65 +232,6 @@ const General = () => {
       console.error(e);
     }
     setDeletingInstances(false);
-  };
-
-  const changeDataPath = async () => {
-    const appData = await ipcRenderer.invoke('getAppdataPath');
-    const appDataPath = path.join(appData, 'gdlauncher_next');
-
-    const notCopiedFiles = [
-      'Cache',
-      'Code Cache',
-      'Dictionaries',
-      'GPUCache',
-      'Cookies',
-      'Cookies-journal'
-    ];
-
-    const store = new Store({
-      name: 'overrides',
-      cwd: appDataPath,
-      fileExtension: '',
-      encryptionKey: 'GDLauncher'
-    });
-
-    if (!dataPath) return;
-    dispatch(updateUserData(dataPath));
-
-    store.set('userDataOverride', dataPath);
-
-    if (moveDatas) {
-      try {
-        const files = await fs.readdir(userData);
-        await Promise.all(
-          files.map(async name => {
-            if (!notCopiedFiles.includes(name)) {
-              await fsa.copy(
-                path.join(userData, name),
-                path.join(dataPath, name),
-                {
-                  overwrite: true
-                }
-              );
-            }
-          })
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    ipcRenderer.invoke('appRestart');
-  };
-
-  const openFolder = async () => {
-    const { filePaths, canceled } = await ipcRenderer.invoke(
-      'openFolderDialog',
-      userData
-    );
-    if (!filePaths[0] || canceled) return;
-    setDataPath(filePaths[0]);
-    setDefaultDataPath(filePaths[0]);
   };
 
   return (
@@ -588,69 +487,6 @@ const General = () => {
           Clear
         </Button>
       </div>
-      <Hr />
-      {/* {process.env.REACT_APP_RELEASE_TYPE === 'setup' && ( */}
-      <CustomDataPathContainer>
-        <h1>Data Path</h1>
-        <div
-          css={`
-            display: flex;
-            justify-content: space-between;
-            text-align: left;
-            width: 100%;
-            height: 30px;
-            margin: 0 10px;
-            p {
-              text-align: left;
-              color: ${props => props.theme.palette.text.third};
-            }
-          `}
-        >
-          <Input value={defaultDataPath} />
-          <Button
-            css={`
-              margin-left: 20px;
-            `}
-            onClick={openFolder}
-            // disabled={disableInstancesActions}
-            // loading={deletingInstances}
-          >
-            <FontAwesomeIcon icon={faFolder} />
-          </Button>
-          <Button
-            css={`
-              margin-left: 20px;
-            `}
-            onClick={() => changeDataPath()}
-            // disabled={disableInstancesActions}
-            // loading={deletingInstances}
-          >
-            Apply & Restart
-          </Button>
-        </div>
-        <div
-          css={`
-            margin-top: 10px;
-            display: flex;
-            justify-content: flex-start;
-            width: 100%;
-          `}
-        >
-          <Checkbox
-            onChange={e => {
-              setMoveDatas(e.target.checked);
-            }}
-          />
-          <p
-            css={`
-              margin-left: 20px;
-            `}
-          >
-            Copy all the files to the new directory
-          </p>
-        </div>
-      </CustomDataPathContainer>
-      {/* )} */}
       <Hr />
       <LauncherVersion>
         <div
