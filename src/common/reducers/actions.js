@@ -82,7 +82,9 @@ import {
   filterForgeFilesByVersion,
   filterFabricFilesByVersion,
   getPatchedInstanceType,
-  convertCompletePathToInstance
+  convertCompletePathToInstance,
+  downloadAddonZip,
+  convertcurseForgeToCanonical
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -674,7 +676,7 @@ export function addToQueue(instanceName, modloader, manifest, background) {
           modloader,
           timePlayed: prev.timePlayed || 0,
           background,
-          ...(addMods && { mods: [] })
+          ...(addMods && { mods: prev.mods || [] })
         }),
         true
       )
@@ -1117,15 +1119,6 @@ export function processManifest(instanceName) {
       { concurrency }
     );
 
-    await dispatch(
-      updateInstanceConfig(instanceName, config => {
-        return {
-          ...config,
-          mods: [...(config.mods || []), ...modManifests]
-        };
-      })
-    );
-
     dispatch(updateDownloadStatus(instanceName, 'Copying overrides...'));
     const addonPathZip = path.join(
       _getTempPath(state),
@@ -1162,19 +1155,54 @@ export function processManifest(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, 'Finalizing overrides...'));
 
-    // Force premature unlock to let our listener catch mods from override
-    lockfile.unlock(
-      path.join(_getInstancesPath(getState()), instanceName, 'installing.lock'),
-      err => {
-        if (err) console.log(err);
-      }
+    const overrideFiles = await getFilesRecursive(
+      path.join(_getTempPath(state), instanceName, 'overrides')
+    );
+    await dispatch(
+      updateInstanceConfig(instanceName, config => {
+        return {
+          ...config,
+          mods: [...(config.mods || []), ...modManifests],
+          overrides: overrideFiles.map(v =>
+            path.relative(
+              path.join(_getTempPath(state), instanceName, 'overrides'),
+              v
+            )
+          )
+        };
+      })
     );
 
-    await fse.copy(
-      path.join(_getTempPath(state), instanceName, 'overrides'),
-      path.join(_getInstancesPath(state), instanceName),
-      { overwrite: true }
+    await new Promise(resolve => {
+      // Force premature unlock to let our listener catch mods from override
+      lockfile.unlock(
+        path.join(
+          _getInstancesPath(getState()),
+          instanceName,
+          'installing.lock'
+        ),
+        err => {
+          if (err) console.error(err);
+          resolve();
+        }
+      );
+    });
+
+    await Promise.all(
+      overrideFiles.map(v => {
+        const relativePath = path.relative(
+          path.join(_getTempPath(state), instanceName, 'overrides'),
+          v
+        );
+        const newPath = path.join(
+          _getInstancesPath(state),
+          instanceName,
+          relativePath
+        );
+        return fse.copy(v, newPath, { overwrite: true });
+      })
     );
+
     await fse.remove(addonPathZip);
     await fse.remove(path.join(_getTempPath(state), instanceName));
   };
@@ -1305,6 +1333,103 @@ export function downloadInstance(instanceName) {
     dispatch(addNextInstanceToCurrentDownload());
   };
 }
+
+export const changeModpackVersion = (instanceName, newModpackData) => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const instance = _getInstance(state)(instanceName);
+    const tempPath = _getTempPath(state);
+    const instancePath = path.join(_getInstancesPath(state), instanceName);
+
+    const { data: addon } = await getAddon(instance.modloader[3]);
+
+    const manifest = await fse.readJson(
+      path.join(instancePath, 'manifest.json')
+    );
+
+    await fse.remove(path.join(instancePath, 'manifest.json'));
+
+    // Delete prev overrides
+    await Promise.all(
+      (instance?.overrides || []).map(async v => {
+        try {
+          await fs.stat(path.join(instancePath, v));
+          await fse.remove(path.join(instancePath, v));
+        } catch {
+          // Swallow error
+        }
+      })
+    );
+
+    const modsProjectIDs = (manifest?.files || []).map(v => v?.projectID);
+
+    dispatch(
+      updateInstanceConfig(instanceName, prev =>
+        omit(
+          {
+            ...prev,
+            mods: prev.mods.filter(v => !modsProjectIDs.includes(v?.projectID))
+          },
+          ['overrides']
+        )
+      )
+    );
+
+    await Promise.all(
+      modsProjectIDs.map(async projectID => {
+        const modFound = instance.mods?.find(v => v?.projectID === projectID);
+        if (modFound?.fileName) {
+          try {
+            await fs.stat(path.join(instancePath, 'mods', modFound?.fileName));
+            await fse.remove(
+              path.join(instancePath, 'mods', modFound?.fileName)
+            );
+          } catch {
+            // Swallow error
+          }
+        }
+      })
+    );
+
+    const imageURL = addon?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
+
+    const newManifest = await downloadAddonZip(
+      instance.modloader[3],
+      newModpackData.id,
+      path.join(_getInstancesPath(state), instanceName),
+      path.join(tempPath, instanceName)
+    );
+
+    await downloadFile(
+      path.join(
+        _getInstancesPath(state),
+        instanceName,
+        `background${path.extname(imageURL)}`
+      ),
+      imageURL
+    );
+
+    const modloader = [
+      instance.modloader[0],
+      newManifest.minecraft.version,
+      convertcurseForgeToCanonical(
+        newManifest.minecraft.modLoaders.find(v => v.primary).id,
+        newManifest.minecraft.version,
+        state.app.forgeManifest
+      ),
+      instance.modloader[3],
+      newModpackData.id
+    ];
+    dispatch(
+      addToQueue(
+        instanceName,
+        modloader,
+        manifest,
+        `background${path.extname(imageURL)}`
+      )
+    );
+  };
+};
 
 export const startListener = () => {
   return async (dispatch, getState) => {
@@ -1931,6 +2056,13 @@ export function launchInstance(instanceName) {
         }))
       );
     }, 60 * 1000);
+
+    dispatch(
+      updateInstanceConfig(instanceName, prev => ({
+        ...prev,
+        lastPlayed: Date.now()
+      }))
+    );
     dispatch(addStartedInstance({ instanceName, pid: ps.pid }));
 
     ps.stdout.on('data', data => {

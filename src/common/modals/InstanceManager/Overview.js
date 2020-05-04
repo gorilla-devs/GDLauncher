@@ -17,30 +17,23 @@ import {
   resolutionPresets
 } from '../../../app/desktop/utils/constants';
 import { updateInstanceConfig } from '../../reducers/actions';
+import { convertMinutesToHumanTime } from '../../utils';
 
 const Container = styled.div`
-  margin-left: 50px;
+  padding: 0 50px;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
 `;
 
-const Column = styled.div`
-  max-width: 600px;
-`;
-
-const MainTitle = styled.h1`
-  color: ${props => props.theme.palette.text.primary};
-  margin: 0 500px 20px 0;
-  margin-bottom: 20px;
-`;
+const Column = styled.div``;
 
 const RenameRow = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   color: ${props => props.theme.palette.text.primary};
-  margin: 0 500px 20px 0;
+  margin: 30px 0 30px 0;
   width: 100%;
 `;
 
@@ -48,9 +41,35 @@ const RenameButton = styled(Button)`
   margin-left: 20px;
 `;
 
-const JavaManagerCard = styled.div`
-  margin-bottom: 20px;
+const CardBox = styled.div`
+  flex: 1;
+  height: 60px;
+  font-weight: 500;
+  border-radius: ${props => props.theme.shape.borderRadius};
+  color: ${props => props.theme.palette.text.primary};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 20px;
+  position: relative;
+  padding: 0 10px;
+`;
+
+const OverviewCard = styled.div`
+  margin-bottom: 30px;
   padding: 0;
+  ${CardBox} {
+    margin: 0 20px;
+  }
+  ${CardBox}:first-child {
+    margin-right: 20px;
+    margin-left: 0;
+  }
+  ${CardBox}:last-child {
+    margin-left: 20px;
+    margin-right: 0;
+  }
 `;
 
 const JavaManagerRow = styled.div`
@@ -58,7 +77,7 @@ const JavaManagerRow = styled.div`
   flex-direction: row;
   justify-content: space-between;
   color: ${props => props.theme.palette.text.primary};
-  margin: 0 500px 20px 0;
+  margin: 0 500px 30px 0;
   width: 100%;
 `;
 
@@ -71,7 +90,7 @@ const JavaArgumentsResetButton = styled(Button)`
 `;
 
 const ResolutionInputContainer = styled.div`
-  margin: 10px 0 20px 0;
+  margin: 10px 0 30px 0;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -167,10 +186,155 @@ const Overview = ({ instanceName }) => {
     );
   };
 
+  const computeLastPlayed = timestamp => {
+    const lastPlayed = new Date(timestamp);
+    const timeDiff = lastPlayed.getTime() - new Date(Date.now()).getTime();
+    const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    switch (diffDays) {
+      case 0:
+        return 'Today';
+      case -1:
+        return 'Yesterday';
+      default:
+        return lastPlayed.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric'
+        });
+    }
+  };
+
   return (
     <Container>
       <Column>
-        <MainTitle>Overview</MainTitle>
+        <OverviewCard
+          css={`
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+          `}
+        >
+          <CardBox
+            css={`
+              background: ${props => props.theme.palette.colors.crimson};
+            `}
+          >
+            <div
+              css={`
+                position: absolute;
+                top: 5px;
+                left: 10px;
+                font-size: 10px;
+                color: ${props => props.theme.palette.text.third};
+              `}
+            >
+              Minecraft Version
+            </div>
+            <div>{config?.modloader[1]}</div>
+          </CardBox>
+          <CardBox
+            css={`
+              background: ${props => props.theme.palette.colors.liberty};
+            `}
+          >
+            <div
+              css={`
+                position: absolute;
+                top: 5px;
+                left: 10px;
+                font-size: 10px;
+                color: ${props => props.theme.palette.text.third};
+              `}
+            >
+              Modloader
+            </div>
+            <div>{config?.modloader[0]}</div>
+          </CardBox>
+          <CardBox
+            css={`
+              background: ${props => props.theme.palette.colors.darkBlue};
+            `}
+          >
+            <div
+              css={`
+                position: absolute;
+                top: 5px;
+                left: 10px;
+                font-size: 10px;
+                color: ${props => props.theme.palette.text.third};
+              `}
+            >
+              Modloader Version
+            </div>
+            <div>{config?.modloader[2] || '-'}</div>
+          </CardBox>
+        </OverviewCard>
+        <OverviewCard
+          css={`
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 60px;
+          `}
+        >
+          <CardBox
+            css={`
+              background: ${props => props.theme.palette.colors.ruby};
+            `}
+          >
+            <div
+              css={`
+                position: absolute;
+                top: 5px;
+                left: 10px;
+                font-size: 10px;
+                color: ${props => props.theme.palette.text.third};
+              `}
+            >
+              Mods
+            </div>
+            <div>{config?.mods?.length || '-'}</div>
+          </CardBox>
+          <CardBox
+            css={`
+              background: ${props => props.theme.palette.colors.darkYellow};
+            `}
+          >
+            <div
+              css={`
+                position: absolute;
+                top: 5px;
+                left: 10px;
+                font-size: 10px;
+                color: ${props => props.theme.palette.text.third};
+              `}
+            >
+              Played Time
+            </div>
+            <div>{convertMinutesToHumanTime(config?.timePlayed)}</div>
+          </CardBox>
+          <CardBox
+            css={`
+              background: ${props => props.theme.palette.colors.orange};
+            `}
+          >
+            <div
+              css={`
+                position: absolute;
+                top: 5px;
+                left: 10px;
+                font-size: 10px;
+                color: ${props => props.theme.palette.text.third};
+              `}
+            >
+              Last Played
+            </div>
+            <div>
+              {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
+            </div>
+          </CardBox>
+        </OverviewCard>
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
           <RenameButton onClick={() => renameInstance()} type="primary">
@@ -178,7 +342,7 @@ const Overview = ({ instanceName }) => {
             <FontAwesomeIcon icon={faSave} />
           </RenameButton>
         </RenameRow>
-        <JavaManagerCard>
+        <OverviewCard>
           <JavaManagerRow>
             <div>Override Game Resolution</div>
             <Switch
@@ -339,7 +503,7 @@ const Overview = ({ instanceName }) => {
               </JavaArgumentsResetButton>
             </JavaManagerRow>
           )}
-        </JavaManagerCard>
+        </OverviewCard>
       </Column>
     </Container>
   );

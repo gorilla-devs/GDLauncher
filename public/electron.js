@@ -39,6 +39,17 @@ Menu.setApplicationMenu();
 
 app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
 
+let allowBetaReleases = false;
+const releaseChannelExists = fss.existsSync(
+  path.join(app.getPath('userData'), 'rChannel')
+);
+if (releaseChannelExists) {
+  const releaseChannelConfig = fss.readFileSync(
+    path.join(app.getPath('userData'), 'rChannel')
+  );
+  allowBetaReleases = releaseChannelConfig === 'beta';
+}
+
 if (
   process.env.REACT_APP_RELEASE_TYPE === 'portable' &&
   process.platform !== 'linux'
@@ -339,6 +350,8 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
+  autoUpdater.allowDowngrade = allowBetaReleases;
+  autoUpdater.allowPrerelease = allowBetaReleases;
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',
     repo: 'GDLauncher-Releases',
