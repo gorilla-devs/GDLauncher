@@ -57,11 +57,11 @@ if (
   app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
 } else {
   const overrideExists = fss.existsSync(
-    path.join(app.getPath('userData'), 'override')
+    path.join(app.getPath('userData'), 'override.data')
   );
   if (overrideExists) {
     const override = fss.readFileSync(
-      path.join(app.getPath('userData'), 'override')
+      path.join(app.getPath('userData'), 'override.data')
     );
     app.setPath('userData', override.toString());
   }

@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import fsa from 'fs-extra';
+import { promises as fs } from 'fs';
 import {
   faCopy,
   faDownload,
@@ -12,9 +13,10 @@ import {
   faTrash,
   faPlay,
   faToilet,
-  faNewspaper
+  faNewspaper,
+  faFolder
 } from '@fortawesome/free-solid-svg-icons';
-import { Select, Tooltip, Button, Switch } from 'antd';
+import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import {
   _getCurrentAccount,
@@ -168,6 +170,22 @@ const LauncherVersion = styled.div`
     color: ${props => props.theme.palette.text.primary};
   }
 `;
+const CustomDataPathContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 140px;
+  border-radius: ${props => props.theme.shape.borderRadius};
+
+  h1 {
+    width: 100%;
+    font-size: 15px;
+    font-weight: 700;
+    color: ${props => props.theme.palette.text.primary};
+    z-index: 1;
+    text-align: left;
+  }
+`;
 
 function copy(setCopied, copyText) {
   setCopied(true);
@@ -209,7 +227,11 @@ const General = () => {
   const [copiedUuid, setCopiedUuid] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [deletingInstances, setDeletingInstances] = useState(false);
+  const userData = useSelector(state => state.userData);
+  const [dataPath, setDataPath] = useState(userData);
+  const [moveUserData, setMoveUserData] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
+  const [loadingMoveUserData, setLoadingMoveUserData] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -241,6 +263,54 @@ const General = () => {
       console.error(e);
     }
     setDeletingInstances(false);
+  };
+
+  const changeDataPath = async () => {
+    setLoadingMoveUserData(true);
+    const appData = await ipcRenderer.invoke('getAppdataPath');
+    const appDataPath = path.join(appData, 'gdlauncher_next');
+
+    const notCopiedFiles = [
+      'Cache',
+      'Code Cache',
+      'Dictionaries',
+      'GPUCache',
+      'Cookies',
+      'Cookies-journal'
+    ];
+    await fsa.writeFile(path.join(appDataPath, 'override.data'), dataPath);
+
+    if (moveUserData) {
+      try {
+        const files = await fs.readdir(userData);
+        await Promise.all(
+          files.map(async name => {
+            if (!notCopiedFiles.includes(name)) {
+              await fsa.copy(
+                path.join(userData, name),
+                path.join(dataPath, name),
+                {
+                  overwrite: true
+                }
+              );
+            }
+          })
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    setLoadingMoveUserData(false);
+    ipcRenderer.invoke('appRestart');
+  };
+
+  const openFolder = async () => {
+    const { filePaths, canceled } = await ipcRenderer.invoke(
+      'openFolderDialog',
+      userData
+    );
+    if (!filePaths[0] || canceled) return;
+    setDataPath(filePaths[0]);
   };
 
   return (
@@ -500,6 +570,91 @@ const General = () => {
           Clear
         </Button>
       </div>
+      <Hr />
+      {/* {process.env.REACT_APP_RELEASE_TYPE === 'setup' && ( */}
+      <CustomDataPathContainer>
+        <Title
+          css={`
+            width: 400px;
+            float: left;
+          `}
+        >
+          User Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+          <a
+            css={`
+              margin-left: 30px;
+            `}
+            onClick={async () => {
+              const appData = await ipcRenderer.invoke('getAppdataPath');
+              const appDataPath = path.join(appData, 'gdlauncher_next');
+              setDataPath(appDataPath);
+            }}
+          >
+            Reset Path
+          </a>
+        </Title>
+        <div
+          css={`
+            display: flex;
+            justify-content: space-between;
+            text-align: left;
+            width: 100%;
+            height: 30px;
+            margin: 20px 0 10px 0;
+            p {
+              text-align: left;
+              color: ${props => props.theme.palette.text.third};
+            }
+          `}
+        >
+          <Input
+            value={dataPath}
+            onChange={e => setDataPath(e.target.value)}
+            disabled={loadingMoveUserData || deletingInstances}
+          />
+          <Button
+            css={`
+              margin-left: 20px;
+            `}
+            onClick={openFolder}
+            disabled={loadingMoveUserData || deletingInstances}
+          >
+            <FontAwesomeIcon icon={faFolder} />
+          </Button>
+          <Button
+            css={`
+              margin-left: 20px;
+            `}
+            onClick={changeDataPath}
+            disabled={
+              disableInstancesActions ||
+              userData === dataPath ||
+              !dataPath ||
+              dataPath.length === 0 ||
+              deletingInstances
+            }
+            loading={loadingMoveUserData}
+          >
+            Apply & Restart
+          </Button>
+        </div>
+        <div
+          css={`
+            display: flex;
+            justify-content: flex-start;
+            width: 100%;
+          `}
+        >
+          <Checkbox
+            onChange={e => {
+              setMoveUserData(e.target.checked);
+            }}
+          >
+            Copy current data to the new directory
+          </Checkbox>
+        </div>
+      </CustomDataPathContainer>
+      {/* )} */}
       <Hr />
       <LauncherVersion>
         <div
