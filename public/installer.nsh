@@ -45,7 +45,6 @@
     Delete "$0\Config"
     Delete "$0\rChannel"
     
-    MessageBox MB_OK "messagebox_text $INSTDIR $0 $0\instances $0\java $0\datastore $0\rChannel"
     FileClose $4
 
     RMDir /r "$APPDATA\gdlauncher_next"
