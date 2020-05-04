@@ -176,6 +176,14 @@ const CustomDataPathContainer = styled.div`
   width: 100%;
   height: 140px;
   border-radius: ${props => props.theme.shape.borderRadius};
+  h1 {
+    width: 100%;
+    font-size: 15px;
+    font-weight: 700;
+    color: ${props => props.theme.palette.text.primary};
+    z-index: 1;
+    text-align: left;
+  }
 `;
 
 function copy(setCopied, copyText) {
