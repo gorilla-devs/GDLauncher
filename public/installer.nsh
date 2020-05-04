@@ -12,29 +12,46 @@
     DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
 
 !macroend
+
+
 !macro customUnInit
     push $4
     push $0
-
+    
     SetShellVarContext current 
     ClearErrors
-    FileOpen $4 "$APPDATA\gdlauncher_next\overrides.data" r
+    FileOpen $4 "$APPDATA\gdlauncher_next\override.data" r
     FileRead $4 $0
-    ${If} ${Errors}
-        Abort "Unable to find overrides file!"
-    ${EndIf}
-        RMDir /r "$0"
-        Delete "$APPDATA\gdlauncher_next\overrides.data"
+
+    RMDir /r "$0\instances"
+    RMDir /r "$0\java"
+    RMDir /r "$0\datastore"
+    RMDir /r "$0\blob_storage"
+    RMDir /r "$0\Local Storage"
+    RMDir /r "$0\Cache"
+    RMDir /r "$0\Code Cache"
+    RMDir /r "$0\Dictionaries"
+    RMDir /r "$0\GPUCache"
+    RMDir /r "$0\Session Storage"
+    RMDir /r "$0\shared_proto_db"
+    RMDir /r "$0\temp"
+    Delete "$0\Cookies"
+    Delete "$0\.updaterId"
+    Delete "$0\7za.exe"
+    Delete "$0\Cookies-journal"
+    Delete "$0\Network Persistent State"
+    Delete "$0\Preferences"
+    Delete "$0\TransportSecurity"
+    Delete "$0\Config"
+    Delete "$0\rChannel"
+    
+    MessageBox MB_OK "messagebox_text $INSTDIR $0 $0\instances $0\java $0\datastore $0\rChannel"
     FileClose $4
 
-    FileOpen $9 "$APPDATA\gdlauncher_next\overrides.data" w
-    FileWrite $9 ""
-    FileClose $9 
+    RMDir /r "$APPDATA\gdlauncher_next"
+    RMDir /r $INSTDIR
+    
 
     pop $4
     pop $0
-
-    # Read appdata/gdlauncher_next/overrides
-    # if it's present, delete the folder reported inside
-    # then delete appdata/gdlauncher_next/overrides
 !macroend
