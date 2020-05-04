@@ -1152,7 +1152,11 @@ export function processManifest(instanceName) {
                   );
 
                   await fse.ensureDir(path.dirname(destFile));
-                  await fse.ensureLink(path.join(otherInstance), destFile);
+                  try {
+                    await fse.ensureLink(path.join(otherInstance), destFile);
+                  } catch {
+                    await fse.copyFile(path.join(otherInstance), destFile);
+                  }
                   modManifests = modManifests.concat(modData);
 
                   const percentage =
@@ -2209,11 +2213,17 @@ export function installMod(
       if (!destFileExists) {
         console.log(`[Mod Cache] Retrieved: ${cachedManifest.fileName}`);
         await fse.ensureDir(path.dirname(destFile));
-        // await fse.copyFile(
-        await fse.ensureLink(
-          path.join(cachedModFolder, cachedManifest.fileName),
-          destFile
-        );
+        try {
+          await fse.ensureLink(
+            path.join(cachedModFolder, cachedManifest.fileName),
+            destFile
+          );
+        } catch {
+          await fse.copyFile(
+            path.join(cachedModFolder, cachedManifest.fileName),
+            destFile
+          );
+        }
       }
       // manifest was already normalized so just append it to the array.
       await dispatch(
@@ -2322,11 +2332,17 @@ export function installMod(
     if (cacheMods) {
       console.log(`[Mod Cache] Caching: ${mainModData.data.fileName}`);
       await fse.ensureDir(cachedModFolder);
-      // await fse.copyFile(
-      await fse.ensureLink(
-        destFile,
-        path.join(cachedModFolder, mainModData.data.fileName)
-      );
+      try {
+        await fse.ensureLink(
+          destFile,
+          path.join(cachedModFolder, mainModData.data.fileName)
+        );
+      } catch {
+        await fse.copyFile(
+          destFile,
+          path.join(cachedModFolder, mainModData.data.fileName)
+        );
+      }
       await fse.outputJson(
         path.join(cachedModFolder, manifestFile),
         newModManifest
