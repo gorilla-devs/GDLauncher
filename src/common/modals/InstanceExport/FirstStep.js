@@ -172,7 +172,7 @@ export default function FirstStep({
                     name="inputPackAuthor"
                     allowClear="true"
                     defaultValue={packZipName}
-                    // placeholder="Pack Name"
+                    maxLength={50}
                     css={`
                       width: 250px;
                     `}
@@ -189,7 +189,7 @@ export default function FirstStep({
                     type="text"
                     name="inputPackVersion"
                     defaultValue={packVersion}
-                    // placeholder="Major.Minor.Patch"
+                    maxLength={50}
                     allowClear="true"
                     css={`
                       width: 250px;
@@ -211,7 +211,7 @@ export default function FirstStep({
                     type="text"
                     name="inputPackAuthor"
                     defaultValue={packAuthor}
-                    // placeholder="Pack Author"
+                    maxLength={50}
                     allowClear="true"
                     css={`
                       width: 250px;
