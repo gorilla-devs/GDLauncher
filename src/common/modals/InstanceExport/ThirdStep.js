@@ -54,7 +54,7 @@ export default function ThirdStep({
   const tempExport = path.join(tempPath, instanceName);
 
   // Construct manifest contents
-  const createManifest = async () => {
+  const createManifest = async (_mods = mods) => {
     return {
       minecraft: {
         version: modloader[1],
@@ -72,7 +72,7 @@ export default function ThirdStep({
       author: packAuthor,
       projectID: modloader.length > 3 ? parseInt(modloader[3], 10) : undefined,
       name: packZipName,
-      files: mods
+      files: _mods
         .filter(mod => mod?.projectID)
         .map(mod => ({
           projectID: mod.projectID,
@@ -84,11 +84,20 @@ export default function ThirdStep({
 
   useEffect(() => {
     const workOnFiles = async () => {
-      // Make sure mod with curseforge ids gets removed and ones without pass through to copy.
+      // Make sure mod with curseforge ids gets removed from mods folder if included.
       const filteredFiles = selectedFiles.filter(file => {
         const match = mods.find(mod => mod.fileName === path.basename(file));
         if (match && match.projectID) return false;
         return true;
+      });
+
+      // Filter only selected curseforge mods for use in manifest.
+      const filteredCurseforgeMods = mods.filter(mod => {
+        const match = selectedFiles.find(
+          file => mod.fileName === path.basename(file)
+        );
+        if (match && mod.projectID) return true;
+        return false;
       });
 
       // Process files from selection
@@ -113,7 +122,7 @@ export default function ThirdStep({
 
       // Create manifest file
       const manifestPath = path.join(path.join(tempExport, 'manifest.json'));
-      const manifestString = await createManifest();
+      const manifestString = await createManifest(filteredCurseforgeMods);
       await fse.outputJson(manifestPath, manifestString);
 
       // Create zipped export file

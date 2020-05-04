@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import path from 'path';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
@@ -28,6 +29,8 @@ const Content = ({
   const [selectedFiles, setSelectedFiles] = useState([]);
   const instancesPath = useSelector(_getInstancesPath);
   const tempPath = useSelector(_getTempPath);
+  const [treeData, setTreeData] = useState([]);
+  const instancePath = path.join(instancesPath, instanceName);
 
   const openFolderDialog = async () => {
     const dialog = await ipcRenderer.invoke('openFolderDialog', instancesPath);
@@ -46,13 +49,18 @@ const Content = ({
       packAuthor={packAuthor}
       setPackAuthor={setPackAuthor}
       setPage={setPage}
+      instancePath={instancePath}
+      setTreeData={setTreeData}
+      treeData={treeData}
+      setSelectedFiles={setSelectedFiles}
+      selectedFiles={selectedFiles}
     />,
     <SecondStep
-      filePath={filePath}
-      instanceName={instanceName}
+      treeData={treeData}
       setSelectedFiles={setSelectedFiles}
-      instancesPath={instancesPath}
+      selectedFiles={selectedFiles}
       setPage={setPage}
+      instancePath={instancePath}
     />,
     <ThirdStep
       packZipName={packZipName}
