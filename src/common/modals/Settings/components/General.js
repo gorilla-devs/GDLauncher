@@ -2,6 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { ipcRenderer, clipboard } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
+import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import fsa from 'fs-extra';
 import {
@@ -22,7 +23,6 @@ import {
   _getTempPath
 } from '../../../utils/selectors';
 import {
-  updateReleaseChannel,
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
@@ -190,8 +190,8 @@ function dashUuid(UUID) {
 
 const General = () => {
   const [version, setVersion] = useState(null);
+  const [releaseChannel, setReleaseChannel] = useState(null);
   const currentAccount = useSelector(_getCurrentAccount);
-  const releaseC = useSelector(state => state.settings.releaseChannel);
   const hideWindowOnGameLaunch = useSelector(
     state => state.settings.hideWindowOnGameLaunch
   );
@@ -220,6 +220,15 @@ const General = () => {
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
     extractFace(currentAccount.skin).then(setProfileImage).catch(console.error);
+    ipcRenderer
+      .invoke('getAppdataPath')
+      .then(appData =>
+        fsa
+          .readFile(path.join(appData, 'gdlauncher_next', 'rChannel'))
+          .then(v => setReleaseChannel(parseInt(v.toString(), 10)))
+          .catch(() => setReleaseChannel(0))
+      )
+      .catch(console.error);
   }, []);
 
   const clearSharedData = async () => {
@@ -300,14 +309,18 @@ const General = () => {
             css={`
               width: 100px;
             `}
-            onChange={e => {
-              dispatch(updateReleaseChannel(e));
+            onChange={async e => {
+              const appData = await ipcRenderer.invoke('getAppdataPath');
+              setReleaseChannel(e);
+              await fsa.writeFile(
+                path.join(appData, 'gdlauncher_next', 'rChannel'),
+                e
+              );
             }}
-            value={releaseC}
-            defaultValue={!releaseC ? 'Stable' : 'Beta'}
+            value={releaseChannel}
           >
-            <Select.Option value="1">Beta</Select.Option>
-            <Select.Option value="0">Stable</Select.Option>
+            <Select.Option value={0}>Stable</Select.Option>
+            <Select.Option value={1}>Beta</Select.Option>
           </Select>
         </div>
       </ReleaseChannel>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,6 +18,7 @@ import {
   updateUpdateAvailable,
   isAppLatestVersion
 } from '../../../common/reducers/actions';
+import BisectHosting from '../../../ui/BisectHosting';
 import Logo from '../../../ui/Logo';
 
 const SystemNavbar = () => {
@@ -25,6 +26,29 @@ const SystemNavbar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
   const isUpdateAvailable = useSelector(state => state.updateAvailable);
   const location = useSelector(state => state.router.location.pathname);
+
+  const checkForUpdates = () => {
+    if (
+      process.env.REACT_APP_RELEASE_TYPE === 'setup' &&
+      (process.platform !== 'linux' || process.env.APPIMAGE)
+    ) {
+      ipcRenderer.invoke('checkForUpdates');
+      ipcRenderer.on('updateAvailable', () => {
+        dispatch(updateUpdateAvailable(true));
+      });
+    } else if (
+      process.platform === 'win32' &&
+      process.env.REACT_APP_RELEASE_TYPE === 'portable'
+    ) {
+      dispatch(checkForPortableUpdates())
+        .then(v => dispatch(updateUpdateAvailable(v)))
+        .catch(console.error);
+    } else {
+      dispatch(isAppLatestVersion())
+        .then(v => dispatch(updateUpdateAvailable(v)))
+        .catch(console.error);
+    }
+  };
 
   useEffect(() => {
     ipcRenderer
@@ -43,34 +67,9 @@ const SystemNavbar = () => {
     if (process.env.NODE_ENV === 'development') return;
     setTimeout(() => {
       console.log(process.env.REACT_APP_RELEASE_TYPE);
-      if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
-        // Check every 10 minutes
-        ipcRenderer.invoke('checkForUpdates');
-        ipcRenderer.on('updateAvailable', () => {
-          dispatch(updateUpdateAvailable(true));
-        });
-      } else if (process.platform !== 'linux') {
-        dispatch(checkForPortableUpdates())
-          .then(v => dispatch(updateUpdateAvailable(v)))
-          .catch(console.error);
-      } else {
-        dispatch(isAppLatestVersion())
-          .then(v => dispatch(updateUpdateAvailable(v)))
-          .catch(console.error);
-      }
-
+      checkForUpdates();
       setInterval(() => {
-        if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
-          ipcRenderer.invoke('checkForUpdates');
-        } else if (process.platform !== 'linux') {
-          dispatch(checkForPortableUpdates())
-            .then(v => dispatch(updateUpdateAvailable(v)))
-            .catch(console.error);
-        } else {
-          dispatch(isAppLatestVersion())
-            .then(v => dispatch(updateUpdateAvailable(v)))
-            .catch(console.error);
-        }
+        checkForUpdates();
       }, 600000);
     }, 500);
   }, []);
@@ -122,7 +121,7 @@ const SystemNavbar = () => {
   const UpdateButton = () => (
     <TerminalButton
       onClick={() => {
-        if (!isLinux) {
+        if (!isLinux || process.env.APPIMAGE) {
           ipcRenderer.invoke('installUpdateAndQuitOrRestart');
         } else {
           dispatch(openModal('AutoUpdatesNotAvailable'));
@@ -135,9 +134,8 @@ const SystemNavbar = () => {
       <FontAwesomeIcon icon={faDownload} />
     </TerminalButton>
   );
-
   const quitApp = () => {
-    if (isUpdateAvailable && process.env.NODE_ENV !== 'development') {
+    if (isUpdateAvailable && (!isLinux || process.env.APPIMAGE)) {
       ipcRenderer.invoke('installUpdateAndQuitOrRestart', true);
     } else {
       ipcRenderer.invoke('quit-app');
@@ -154,42 +152,36 @@ const SystemNavbar = () => {
   return (
     <MainContainer>
       {!isOsx && (
-        <div
-          css={`
-            cursor: auto !important;
-            -webkit-app-region: drag;
-            margin-left: 10px;
-          `}
-        >
-          <a
-            href="https://gdevs.io/"
-            rel="noopener noreferrer"
+        <>
+          <div
             css={`
-              margin-top: 5px;
+              cursor: auto !important;
+              -webkit-app-region: drag;
+              margin-left: 10px;
             `}
           >
-            <Logo size={35} pointerCursor />
-          </a>
-          <DevtoolButton />
-        </div>
+            <a
+              href="https://gdevs.io/"
+              rel="noopener noreferrer"
+              css={`
+                margin-top: 5px;
+              `}
+            >
+              <Logo size={35} pointerCursor />
+            </a>
+            <DevtoolButton />
+          </div>
+          <div
+            css={`
+              display: flex;
+              height: 100%;
+            `}
+          >
+            Partnered with &nbsp;&nbsp;
+            <BisectHosting />
+          </div>
+        </>
       )}
-      {/* <div
-        css={`
-          height: 100%;
-          cursor: auto !important;
-        `}
-      >
-        Sponsored by
-        <img
-          src="EHEHEHHEH"
-          alt="Eheheh"
-          css={`
-            height: 100%;
-            transition: all 0.1s ease-in-out;
-            padding: 0 10px;
-          `}
-        />
-      </div> */}
       <Container os={isOsx}>
         {!isOsx ? (
           <>
@@ -197,10 +189,20 @@ const SystemNavbar = () => {
             {!isLocation('/') && !isLocation('/onboarding') && (
               <SettingsButton />
             )}
-            <div onClick={() => ipcRenderer.invoke('minimize-window')}>
+            <div
+              onClick={() => ipcRenderer.invoke('minimize-window')}
+              css={`
+                -webkit-app-region: no-drag;
+              `}
+            >
               <FontAwesomeIcon icon={faWindowMinimize} />
             </div>
-            <div onClick={() => ipcRenderer.invoke('min-max-window')}>
+            <div
+              onClick={() => ipcRenderer.invoke('min-max-window')}
+              css={`
+                -webkit-app-region: no-drag;
+              `}
+            >
               <FontAwesomeIcon
                 icon={isMaximized ? faWindowRestore : faWindowMaximize}
               />
@@ -208,6 +210,7 @@ const SystemNavbar = () => {
             <div
               css={`
                 font-size: 18px;
+                -webkit-app-region: no-drag;
               `}
               onClick={quitApp}
             >
@@ -219,17 +222,28 @@ const SystemNavbar = () => {
             <div
               css={`
                 font-size: 18px;
+                -webkit-app-region: no-drag;
               `}
               onClick={quitApp}
             >
               <FontAwesomeIcon icon={faTimes} />
             </div>
-            <div onClick={() => ipcRenderer.invoke('min-max-window')}>
+            <div
+              onClick={() => ipcRenderer.invoke('min-max-window')}
+              css={`
+                -webkit-app-region: no-drag;
+              `}
+            >
               <FontAwesomeIcon
                 icon={isMaximized ? faWindowRestore : faWindowMaximize}
               />
             </div>
-            <div onClick={() => ipcRenderer.invoke('minimize-window')}>
+            <div
+              onClick={() => ipcRenderer.invoke('minimize-window')}
+              css={`
+                -webkit-app-region: no-drag;
+              `}
+            >
               <FontAwesomeIcon icon={faWindowMinimize} />
             </div>
             {!isLocation('/') && !isLocation('/onboarding') && (
@@ -240,24 +254,35 @@ const SystemNavbar = () => {
         )}
       </Container>
       {isOsx && (
-        <div>
-          <DevtoolButton />
-          <a
-            href="https://gdevs.io/"
-            rel="noopener noreferrer"
+        <>
+          <div
             css={`
-              margin-top: 5px;
+              display: flex;
+              height: 100%;
             `}
           >
-            <Logo size={35} pointerCursor />
-          </a>
-        </div>
+            Partnered with &nbsp;&nbsp;
+            <BisectHosting />
+          </div>
+          <div>
+            <DevtoolButton />
+            <a
+              href="https://gdevs.io/"
+              rel="noopener noreferrer"
+              css={`
+                margin-top: 5px;
+              `}
+            >
+              <Logo size={35} pointerCursor />
+            </a>
+          </div>
+        </>
       )}
     </MainContainer>
   );
 };
 
-export default SystemNavbar;
+export default memo(SystemNavbar);
 
 const MainContainer = styled.div`
   width: 100%;
@@ -270,7 +295,6 @@ const MainContainer = styled.div`
   position: relative;
   z-index: 100000;
   & > * {
-    -webkit-app-region: no-drag;
     height: 100%;
     display: flex;
     justify-content: center;
@@ -286,7 +310,6 @@ const Container = styled.div`
   align-items: center;
   -webkit-app-region: drag;
   & > * {
-    -webkit-app-region: no-drag;
     width: ${({ theme }) => theme.sizes.height.systemNavbar}px;
     height: 100%;
     display: flex;
@@ -310,6 +333,7 @@ const Container = styled.div`
 const TerminalButton = styled.div`
   transition: background 0.1s ease-in-out;
   display: flex;
+  -webkit-app-region: no-drag;
   justify-content: center;
   cursor: pointer;
   align-items: center;
