@@ -6,7 +6,6 @@
     SetShellVarContext current 
     # Workaround for installer handing when the app directory is removed manually
     ${ifNot} ${FileExists} "$INSTDIR"
-      ${ifNot} ${FileExists} "$INSTDIR"
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
     ${EndIf}
