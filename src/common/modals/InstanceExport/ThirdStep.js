@@ -111,10 +111,17 @@ export default function ThirdStep({
             const slicedFile = file.slice(
               path.join(instancesPath, instanceName).length + 1
             );
-            await fse.copy(
-              file,
-              path.join(tempExport, 'overrides', slicedFile)
-            );
+            try {
+              await fse.ensureLink(
+                file,
+                path.join(tempExport, 'overrides', slicedFile)
+              );
+            } catch {
+              await fse.copy(
+                file,
+                path.join(tempExport, 'overrides', slicedFile)
+              );
+            }
           }
         },
         { concurrency: 3 }
