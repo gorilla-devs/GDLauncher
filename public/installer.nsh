@@ -10,10 +10,6 @@
     DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
     DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
 
-
-    # Read appdata/gdlauncher_next/overrides
-    # if it's present, delete the folder reported inside
-    # then delete appdata/gdlauncher_next/overrides
 !macroend
 !macro customUnInit
     push $4
@@ -21,17 +17,18 @@
 
     SetShellVarContext current 
     ClearErrors
-    FileOpen $4 "$APPDATA\gdlauncher_next\overrides" r
+    FileOpen $4 "$APPDATA\gdlauncher_next\overrides.data" r
     FileRead $4 $0
-    MessageBox MB_OK "Unable to find overrides file!  $AppData\gdlauncher_next\overrides"
     ${If} ${Errors}
         Abort "Unable to find overrides file!"
     ${EndIf}
         RMDir /r "$0"
-        Delete "$APPDATA\gdlauncher_next\overrides"
-        ; !appendfile "$APPDATA\gdlauncher_next\overrides" ""
-
+        Delete "$APPDATA\gdlauncher_next\overrides.data"
     FileClose $4
+
+    FileOpen $9 "$APPDATA\gdlauncher_next\overrides.data" w
+    FileWrite $9 ""
+    FileClose $9 ;Closes the filled file
 
     pop $4
     pop $0
