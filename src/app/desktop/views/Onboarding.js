@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { push } from 'connected-react-router';
 import styled from 'styled-components';
@@ -32,7 +32,6 @@ const Home = () => {
   const thirdSlideRef = useRef(null);
   const forthSlideRef = useRef(null);
   const fifthSlideRef = useRef(null);
-  const sixthSliderRef = useRef(null);
   const executeScroll = type => {
     if (currentSlide + type < 0 || currentSlide + type > 5) return;
     setCurrentSlide(currentSlide + type);
@@ -51,9 +50,6 @@ const Home = () => {
         break;
       case 4:
         scrollToRef(fifthSlideRef);
-        break;
-      case 5:
-        scrollToRef(sixthSliderRef);
         break;
       default:
         scrollToRef(firstSlideRef);
@@ -119,13 +115,14 @@ const Home = () => {
       >
         <div
           css={`
-            font-size: 40px;
+            font-size: 35px;
             font-weight: 700;
             text-align: center;
+            padding: 0 120px;
           `}
         >
-          Before you start playing and having fun, here&apos;s something really
-          important we want you to know.
+          GDLauncher is free and open source. Only a few developers work on it,
+          and they all have a full time job and a life outside of here.
         </div>
       </div>
       <div
@@ -148,10 +145,8 @@ const Home = () => {
             margin: 20%;
           `}
         >
-          GDLauncher is free and open source. Only a few developers work on it,
-          and they all have a full time job and a life outside of here. They do
-          this because they love helping the community by building an incredible
-          product that can make Minecraft more enjoyable.
+          They do this because they love helping the community by building an
+          incredible product that can make Minecraft more enjoyable.
         </div>
       </div>
       <div
@@ -174,9 +169,7 @@ const Home = () => {
             margin: 20%;
           `}
         >
-          If you like GDLauncher please, take into consideration donating. Even
-          the equivalent of a single coffee would let us know that you like our
-          product and that we should keep working on it!
+          If you like GDLauncher, consider helping us through Patreon.
           <div
             css={`
               margin: 40px;
@@ -233,32 +226,6 @@ const Home = () => {
           />
         </div>
       </div>
-      <div
-        ref={sixthSliderRef}
-        css={`
-          height: 100%;
-          width: 100%;
-          background: ${props => props.theme.palette.colors.darkBlue};
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        `}
-      >
-        <div
-          css={`
-            font-size: 30px;
-            font-weight: 600;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin: 20%;
-          `}
-        >
-          This is all. Go and have fun now!
-        </div>
-      </div>
       {currentSlide !== 0 && (
         <div
           css={`
@@ -304,7 +271,7 @@ const Home = () => {
           }
         `}
         onClick={() => {
-          if (currentSlide === 5) {
+          if (currentSlide === 4) {
             dispatch(push('/home'));
           } else {
             executeScroll(1);
@@ -312,11 +279,11 @@ const Home = () => {
         }}
       >
         <FontAwesomeIcon
-          icon={currentSlide === 5 ? faLongArrowAltRight : faLongArrowAltDown}
+          icon={currentSlide === 4 ? faLongArrowAltRight : faLongArrowAltDown}
         />
       </div>
     </Background>
   );
 };
 
-export default Home;
+export default memo(Home);

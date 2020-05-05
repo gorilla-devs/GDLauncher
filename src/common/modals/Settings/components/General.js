@@ -2,8 +2,10 @@ import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { ipcRenderer, clipboard } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
+import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import fsa from 'fs-extra';
+import { promises as fs } from 'fs';
 import {
   faCopy,
   faDownload,
@@ -11,9 +13,10 @@ import {
   faTrash,
   faPlay,
   faToilet,
-  faNewspaper
+  faNewspaper,
+  faFolder
 } from '@fortawesome/free-solid-svg-icons';
-import { Select, Tooltip, Button, Switch } from 'antd';
+import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import {
   _getCurrentAccount,
@@ -22,7 +25,6 @@ import {
   _getTempPath
 } from '../../../utils/selectors';
 import {
-  updateReleaseChannel,
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
@@ -168,6 +170,22 @@ const LauncherVersion = styled.div`
     color: ${props => props.theme.palette.text.primary};
   }
 `;
+const CustomDataPathContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 140px;
+  border-radius: ${props => props.theme.shape.borderRadius};
+
+  h1 {
+    width: 100%;
+    font-size: 15px;
+    font-weight: 700;
+    color: ${props => props.theme.palette.text.primary};
+    z-index: 1;
+    text-align: left;
+  }
+`;
 
 function copy(setCopied, copyText) {
   setCopied(true);
@@ -190,8 +208,8 @@ function dashUuid(UUID) {
 
 const General = () => {
   const [version, setVersion] = useState(null);
+  const [releaseChannel, setReleaseChannel] = useState(null);
   const currentAccount = useSelector(_getCurrentAccount);
-  const releaseC = useSelector(state => state.settings.releaseChannel);
   const hideWindowOnGameLaunch = useSelector(
     state => state.settings.hideWindowOnGameLaunch
   );
@@ -209,7 +227,11 @@ const General = () => {
   const [copiedUuid, setCopiedUuid] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [deletingInstances, setDeletingInstances] = useState(false);
+  const userData = useSelector(state => state.userData);
+  const [dataPath, setDataPath] = useState(userData);
+  const [moveUserData, setMoveUserData] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
+  const [loadingMoveUserData, setLoadingMoveUserData] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -220,6 +242,15 @@ const General = () => {
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
     extractFace(currentAccount.skin).then(setProfileImage).catch(console.error);
+    ipcRenderer
+      .invoke('getAppdataPath')
+      .then(appData =>
+        fsa
+          .readFile(path.join(appData, 'gdlauncher_next', 'rChannel'))
+          .then(v => setReleaseChannel(parseInt(v.toString(), 10)))
+          .catch(() => setReleaseChannel(0))
+      )
+      .catch(console.error);
   }, []);
 
   const clearSharedData = async () => {
@@ -232,6 +263,54 @@ const General = () => {
       console.error(e);
     }
     setDeletingInstances(false);
+  };
+
+  const changeDataPath = async () => {
+    setLoadingMoveUserData(true);
+    const appData = await ipcRenderer.invoke('getAppdataPath');
+    const appDataPath = path.join(appData, 'gdlauncher_next');
+
+    const notCopiedFiles = [
+      'Cache',
+      'Code Cache',
+      'Dictionaries',
+      'GPUCache',
+      'Cookies',
+      'Cookies-journal'
+    ];
+    await fsa.writeFile(path.join(appDataPath, 'override.data'), dataPath);
+
+    if (moveUserData) {
+      try {
+        const files = await fs.readdir(userData);
+        await Promise.all(
+          files.map(async name => {
+            if (!notCopiedFiles.includes(name)) {
+              await fsa.copy(
+                path.join(userData, name),
+                path.join(dataPath, name),
+                {
+                  overwrite: true
+                }
+              );
+            }
+          })
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    setLoadingMoveUserData(false);
+    ipcRenderer.invoke('appRestart');
+  };
+
+  const openFolder = async () => {
+    const { filePaths, canceled } = await ipcRenderer.invoke(
+      'openFolderDialog',
+      userData
+    );
+    if (!filePaths[0] || canceled) return;
+    setDataPath(filePaths[0]);
   };
 
   return (
@@ -300,14 +379,18 @@ const General = () => {
             css={`
               width: 100px;
             `}
-            onChange={e => {
-              dispatch(updateReleaseChannel(e));
+            onChange={async e => {
+              const appData = await ipcRenderer.invoke('getAppdataPath');
+              setReleaseChannel(e);
+              await fsa.writeFile(
+                path.join(appData, 'gdlauncher_next', 'rChannel'),
+                e
+              );
             }}
-            value={releaseC}
-            defaultValue={!releaseC ? 'Stable' : 'Beta'}
+            value={releaseChannel}
           >
-            <Select.Option value="1">Beta</Select.Option>
-            <Select.Option value="0">Stable</Select.Option>
+            <Select.Option value={0}>Stable</Select.Option>
+            <Select.Option value={1}>Beta</Select.Option>
           </Select>
         </div>
       </ReleaseChannel>
@@ -337,7 +420,9 @@ const General = () => {
           {[...Array(20).keys()]
             .map(x => x + 1)
             .map(x => (
-              <Select.Option value={x}>{x}</Select.Option>
+              <Select.Option key={x} value={x}>
+                {x}
+              </Select.Option>
             ))}
         </Select>
       </ParallelDownload>
@@ -488,6 +573,91 @@ const General = () => {
         </Button>
       </div>
       <Hr />
+      {/* {process.env.REACT_APP_RELEASE_TYPE === 'setup' && ( */}
+      <CustomDataPathContainer>
+        <Title
+          css={`
+            width: 400px;
+            float: left;
+          `}
+        >
+          User Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+          <a
+            css={`
+              margin-left: 30px;
+            `}
+            onClick={async () => {
+              const appData = await ipcRenderer.invoke('getAppdataPath');
+              const appDataPath = path.join(appData, 'gdlauncher_next');
+              setDataPath(appDataPath);
+            }}
+          >
+            Reset Path
+          </a>
+        </Title>
+        <div
+          css={`
+            display: flex;
+            justify-content: space-between;
+            text-align: left;
+            width: 100%;
+            height: 30px;
+            margin: 20px 0 10px 0;
+            p {
+              text-align: left;
+              color: ${props => props.theme.palette.text.third};
+            }
+          `}
+        >
+          <Input
+            value={dataPath}
+            onChange={e => setDataPath(e.target.value)}
+            disabled={loadingMoveUserData || deletingInstances}
+          />
+          <Button
+            css={`
+              margin-left: 20px;
+            `}
+            onClick={openFolder}
+            disabled={loadingMoveUserData || deletingInstances}
+          >
+            <FontAwesomeIcon icon={faFolder} />
+          </Button>
+          <Button
+            css={`
+              margin-left: 20px;
+            `}
+            onClick={changeDataPath}
+            disabled={
+              disableInstancesActions ||
+              userData === dataPath ||
+              !dataPath ||
+              dataPath.length === 0 ||
+              deletingInstances
+            }
+            loading={loadingMoveUserData}
+          >
+            Apply & Restart
+          </Button>
+        </div>
+        <div
+          css={`
+            display: flex;
+            justify-content: flex-start;
+            width: 100%;
+          `}
+        >
+          <Checkbox
+            onChange={e => {
+              setMoveUserData(e.target.checked);
+            }}
+          >
+            Copy current data to the new directory
+          </Checkbox>
+        </div>
+      </CustomDataPathContainer>
+      {/* )} */}
+      <Hr />
       <LauncherVersion>
         <div
           css={`
@@ -509,7 +679,7 @@ const General = () => {
         <p>
           {updateAvailable
             ? 'There is an update available to be installed. Click on update to install it and restart the launcher'
-            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever there is one'}
+            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available'}
         </p>
         <div
           css={`

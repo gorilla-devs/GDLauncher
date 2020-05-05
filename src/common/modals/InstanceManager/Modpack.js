@@ -1,13 +1,17 @@
 import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { Select, Button } from 'antd';
+import { useDispatch } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import { getAddonFiles, getAddonFileChangelog } from '../../api';
+import { changeModpackVersion } from '../../reducers/actions';
+import { closeModal } from '../../reducers/modals/actions';
 
-const Modpack = ({ modpackId }) => {
+const Modpack = ({ modpackId, instanceName }) => {
   const [files, setFiles] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const initData = async () => {
     setLoading(true);
@@ -25,7 +29,6 @@ const Modpack = ({ modpackId }) => {
       })
     );
     setFiles(mappedFiles);
-    console.log(mappedFiles);
     setLoading(false);
   };
 
@@ -140,7 +143,14 @@ const Modpack = ({ modpackId }) => {
         {files[selectedIndex]?.changelog &&
           ReactHtmlParser(files[selectedIndex]?.changelog)}
       </Changelog>
-      <Button type="primary" disabled={selectedIndex === null}>
+      <Button
+        type="primary"
+        disabled={selectedIndex === null}
+        onClick={() => {
+          dispatch(closeModal());
+          dispatch(changeModpackVersion(instanceName, files[selectedIndex]));
+        }}
+      >
         Switch Version
       </Button>
     </Container>
