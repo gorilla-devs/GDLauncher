@@ -30,7 +30,7 @@ const SystemNavbar = () => {
   const checkForUpdates = () => {
     if (
       process.env.REACT_APP_RELEASE_TYPE === 'setup' &&
-      (process.platform !== 'linux' || process.env.APPIMAGE)
+      (process.env.APPIMAGE || process.platform !== 'linux')
     ) {
       ipcRenderer.invoke('checkForUpdates');
       ipcRenderer.on('updateAvailable', () => {
@@ -121,7 +121,7 @@ const SystemNavbar = () => {
   const UpdateButton = () => (
     <TerminalButton
       onClick={() => {
-        if (!isLinux || process.env.APPIMAGE) {
+        if (process.env.APPIMAGE || !isLinux) {
           ipcRenderer.invoke('installUpdateAndQuitOrRestart');
         } else {
           dispatch(openModal('AutoUpdatesNotAvailable'));
@@ -135,7 +135,7 @@ const SystemNavbar = () => {
     </TerminalButton>
   );
   const quitApp = () => {
-    if (isUpdateAvailable && (!isLinux || process.env.APPIMAGE)) {
+    if (isUpdateAvailable && (process.env.APPIMAGE || !isLinux)) {
       ipcRenderer.invoke('installUpdateAndQuitOrRestart', true);
     } else {
       ipcRenderer.invoke('quit-app');
@@ -165,6 +165,7 @@ const SystemNavbar = () => {
               rel="noopener noreferrer"
               css={`
                 margin-top: 5px;
+                -webkit-app-region: no-drag;
               `}
             >
               <Logo size={35} pointerCursor />
@@ -279,6 +280,7 @@ const SystemNavbar = () => {
               rel="noopener noreferrer"
               css={`
                 margin-top: 5px;
+                -webkit-app-region: no-drag;
               `}
             >
               <Logo size={35} pointerCursor />

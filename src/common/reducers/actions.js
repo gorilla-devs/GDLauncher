@@ -23,6 +23,7 @@ import originalFs from 'original-fs';
 import pMap from 'p-map';
 import { message } from 'antd';
 import makeDir from 'make-dir';
+import { eq } from 'semver';
 import * as ActionTypes from './actionTypes';
 import {
   NEWS_URL,
@@ -95,7 +96,6 @@ import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
-import { eq } from 'semver';
 
 export function initManifests() {
   return async (dispatch, getState) => {
