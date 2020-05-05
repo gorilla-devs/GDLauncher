@@ -13,23 +13,34 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, windows-2016, ubuntu-latest]
 
     steps:
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 1
       - name: Use Node.js 13.9.0
         uses: actions/setup-node@v1
         with:
           node-version: '13.9.0'
+
+      - name: install node tools
+        if: matrix.os == 'windows-2016'
+        run: npm install --global --production windows-build-tools@5.2.2
+      - name: install node-gyp
+        run: npm install --global node-gyp@latest
+      - name: Set node config to use python2.7
+        run: npm config set python python2.7
+      - name: Work around for Windows Server 2019
+        run: set path=%path%;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin
+
       - name: yarn install
         run: |
-          yarn install
+          yarn
       - name: yarn lint
         run: |
           yarn lint
@@ -51,7 +62,7 @@ jobs:
           path: deploy
 
       - uses: actions/upload-artifact@v1
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-2016'
         with:
           name: Windows Release
           path: deploy
