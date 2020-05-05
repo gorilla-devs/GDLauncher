@@ -23,6 +23,7 @@ import originalFs from 'original-fs';
 import pMap from 'p-map';
 import { message } from 'antd';
 import makeDir from 'make-dir';
+import { eq } from 'semver';
 import * as ActionTypes from './actionTypes';
 import {
   NEWS_URL,
@@ -1464,9 +1465,15 @@ export const startListener = () => {
     });
 
     Queue.on('end', () => {
-      setTimeout(() => {
-        if (closeMessage) closeMessage();
-      }, 500);
+      closeMessage = message.loading({
+        ...notificationObj,
+        content: `Syncronizing files. 0 left.`,
+        duration: 1
+      });
+      if (closeMessage) {
+        message.destroy();
+        closeMessage();
+      }
     });
 
     const changesTracker = {};
@@ -2278,7 +2285,7 @@ export const isAppLatestVersion = () => {
     );
 
     const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
-    return !lt(installedVersion, coerce(latestRelease.tag_name));
+    return eq(installedVersion, coerce(latestRelease.tag_name));
   };
 };
 

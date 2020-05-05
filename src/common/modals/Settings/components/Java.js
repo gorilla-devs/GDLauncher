@@ -268,7 +268,11 @@ export default function MyAccountPreferences() {
                 }
               );
               if (isBiggerThanScreen) return null;
-              return <Select.Option value={v}>{v}</Select.Option>;
+              return (
+                <Select.Option key={v} value={v}>
+                  {v}
+                </Select.Option>
+              );
             })}
           </Select>
         </ResolutionInputContainer>

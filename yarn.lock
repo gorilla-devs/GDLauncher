@@ -3009,7 +3009,7 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.9.1.tgz#7e33d8f7d449b3f673cd72deb9abdc552dbe528e"
   integrity sha512-wMHVg2EOHaMRxbzgFJ9gtjOOCrI80OHLG14rxi28XwOW8ux6IiEbRCGGGqCtdAIg4FQCbW20k9RsT4y3gJlFug==
 
-"axios@https://github.com/gorilla-devs/axios.git#62786f2b6c4c813d4dc0159744bcdce7342e365d":
+axios@^0.19.2, "axios@https://github.com/gorilla-devs/axios.git#62786f2b6c4c813d4dc0159744bcdce7342e365d":
   version "0.19.2"
   resolved "https://github.com/gorilla-devs/axios.git#62786f2b6c4c813d4dc0159744bcdce7342e365d"
   dependencies:
@@ -5387,10 +5387,10 @@ direction@^1.0.3:
   resolved "https://registry.yarnpkg.com/direction/-/direction-1.0.4.tgz#2b86fb686967e987088caf8b89059370d4837442"
   integrity sha512-GYqKi1aH7PJXxdhTeZBFrg8vUBeKXi+cNprXsC1kpJcbcVnV9wBsrOu1cQEdG0WeQwlfHiy3XvnKfIrJ2R0NzQ==
 
-discord-rpc@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/discord-rpc/-/discord-rpc-3.1.0.tgz#dcdc68224f92878897b0be8e334435c220d55d10"
-  integrity sha512-/j0yLDBsuGX/QmxDIbbmKl5hqOQMy57O+KUJJdti6fcpVygn7gCJNPuNNHO6ZebPqGU8qFcCs09crIRljShTWQ==
+discord-rpc@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/discord-rpc/-/discord-rpc-3.1.1.tgz#23942a6e3ec1e523d1fcd69b5823e64b719cdffe"
+  integrity sha512-2nTB+82q4OnCtataJkWMQ2YBWs2UEjs490uC7/xSTvXAOb7I+ZDsweHWFL692sSpDzg7pRlmy1+XVyjWqleulg==
   dependencies:
     node-fetch "2.6.0"
     ws "7.1.2"
@@ -10854,10 +10854,10 @@ pnp-webpack-plugin@1.6.4:
   dependencies:
     ts-pnp "^1.1.6"
 
-polished@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/polished/-/polished-3.6.0.tgz#03eb2871c9bc4785d5199dd751cde7af6de42ff8"
-  integrity sha512-H7tsy9h5JVGXh7BdNzm/v/Q+zIasiwXnYflSmrLd+YpK+8dXKJTKl/kzCtB2kns2N5dyelRvjUtpOKK/nLCanA==
+polished@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/polished/-/polished-3.6.1.tgz#89561e6adfdb7e449015fb77c6768c64a7b6e5aa"
+  integrity sha512-nG/7fcBqdu2766AePajDFvJ6mj3Ma735/zm6ulMYLZI+Nbj74Po95+QN5p2nEGo6l3IMgaKvp6MN/9PIZkFwHA==
   dependencies:
     "@babel/runtime" "^7.9.2"
 
@@ -12704,7 +12704,7 @@ request-promise-core@1.1.3:
   dependencies:
     lodash "^4.17.15"
 
-request-promise-native@^1.0.5, request-promise-native@^1.0.8:
+request-promise-native@^1.0.5:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/request-promise-native/-/request-promise-native-1.0.8.tgz#a455b960b826e44e2bf8999af64dff2bfe58cb36"
   integrity sha512-dapwLGqkHtwL5AEbfenuzjTYg35Jd6KPytsC2/TLkVMz8rm+tNt72MGUWT1RP/aYawMpN6HqbNGBQaRcBtjQMQ==
@@ -12713,7 +12713,7 @@ request-promise-native@^1.0.5, request-promise-native@^1.0.8:
     stealthy-require "^1.1.1"
     tough-cookie "^2.3.3"
 
-request@^2.83.0, request@^2.87.0, request@^2.88.0, request@^2.88.2:
+request@^2.83.0, request@^2.87.0, request@^2.88.0:
   version "2.88.2"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==
@@ -13353,18 +13353,18 @@ slash@^3.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
-slate-history@^0.57.2:
-  version "0.57.2"
-  resolved "https://registry.yarnpkg.com/slate-history/-/slate-history-0.57.2.tgz#801480317f66fa1a7f7ff090ec10c4ca0c14b04c"
-  integrity sha512-AncVHKP/l+A9kVY01+MFbuYy5vLJWYmZhyvYq4YdD4BtDzvIMLFAxRFR8MZoUOxBy0l3PeAxYFEd6mG2ay2Dyg==
+slate-history@^0.57.3:
+  version "0.57.3"
+  resolved "https://registry.yarnpkg.com/slate-history/-/slate-history-0.57.3.tgz#22e8263610d53d5753c8ede2cc90394c93fb6727"
+  integrity sha512-8vqjLWAsX79117uhfMPqDPXgi7QnFXSZjjSJotzhMRnuqYUw9RneWf/VGVKmsJXZ8JliaQ+QFYEd3EctvmDOlQ==
   dependencies:
     immer "^5.0.0"
     is-plain-object "^3.0.0"
 
-slate-react@^0.57.2:
-  version "0.57.2"
-  resolved "https://registry.yarnpkg.com/slate-react/-/slate-react-0.57.2.tgz#0045258aaf0007a05f96aa09988b9a6152fdb76d"
-  integrity sha512-fg91E7XISMnFfoHB8vPbbaKoTDpaTfE+iwnG9i6EzbIfwNysz8XvLDpRW3XExm1ZtAfhEKB3Um8nPMtGaugVRg==
+slate-react@^0.57.3:
+  version "0.57.3"
+  resolved "https://registry.yarnpkg.com/slate-react/-/slate-react-0.57.3.tgz#c20662359c55e6cc1e117036e18e818c68a6bb51"
+  integrity sha512-UOodnOD5P3XnTB3iztTyum3PVLwhpiwqc3So6PlHVr2pIm5Pjf4IfHCNAuP+/xMB2tOunSQR3bBXNPz34k6pWg==
   dependencies:
     "@types/is-hotkey" "^0.1.1"
     "@types/lodash" "^4.14.149"
@@ -13374,10 +13374,10 @@ slate-react@^0.57.2:
     lodash "^4.17.4"
     scroll-into-view-if-needed "^2.2.20"
 
-slate@^0.57.2:
-  version "0.57.2"
-  resolved "https://registry.yarnpkg.com/slate/-/slate-0.57.2.tgz#f45fb7a4b767c7a7a3b93365c3a446049d947f3e"
-  integrity sha512-qxx9iwNmN3fn13hPbwh1p65aNLCgpHMMK/XXLX7rBVv+GT2UFys9tU8OK6FyUF/lU2uEJ++sScDu8cHjzwLefw==
+slate@^0.57.3:
+  version "0.57.3"
+  resolved "https://registry.yarnpkg.com/slate/-/slate-0.57.3.tgz#2b2bd5c85c2d56c9b663787b7e45a64a439ea8c1"
+  integrity sha512-GQrqxtojEhsA4q/ae6T25wv89VI1eqkFx3r1LyoQ1DkfFPgu5oE7wGCb9TAGTNPgTenTDGLHW5HqUQ1WMF8LIw==
   dependencies:
     "@types/esrever" "^0.2.0"
     esrever "^0.2.0"
@@ -14797,16 +14797,15 @@ w3c-xmlserializer@^1.1.2:
     webidl-conversions "^4.0.2"
     xml-name-validator "^3.0.0"
 
-wait-on@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/wait-on/-/wait-on-4.0.2.tgz#6ee9b5751b4e0329630abbb5fdba787802b32914"
-  integrity sha512-Qpmgm3Hw/sXm7xK68FBsYy5r+Uid94/QymwnEjn9GTpfiWTUVYm0bccivVwY/BXGYO2r+5Cd8S/DzrRZqHK/9w==
+wait-on@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/wait-on/-/wait-on-5.0.0.tgz#72e554b338490bbc7131362755ca1af04f46d029"
+  integrity sha512-6v9lttmGGRT7Lr16E/0rISTBIV1DN72n9+77Bpt1iBfzmhBI+75RDlacFe0Q+JizkmwWXmgHUcFG5cgx3Bwqzw==
   dependencies:
     "@hapi/joi" "^17.1.1"
+    axios "^0.19.2"
     lodash "^4.17.15"
     minimist "^1.2.5"
-    request "^2.88.2"
-    request-promise-native "^1.0.8"
     rxjs "^6.5.5"
 
 walker@^1.0.7, walker@~1.0.5:
