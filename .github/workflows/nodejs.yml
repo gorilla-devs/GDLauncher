@@ -30,7 +30,7 @@ jobs:
 
       - name: install node tools
         if: matrix.os == 'windows-2016'
-        run: npm install --global --production windows-build-tools@5.2.2
+        run: npm install --global --production --verbose windows-build-tools@5.2.2
       - name: install node-gyp
         run: npm install --global node-gyp@latest
       - name: Set node config to use python2.7
