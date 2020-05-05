@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-2016, ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
       - name: Context
@@ -29,7 +29,7 @@ jobs:
           node-version: '13.9.0'
 
       - name: install node tools
-        if: matrix.os == 'windows-2016'
+        if: matrix.os == 'windows-latest'
         run: npm install --global --production --vs2017 --verbose windows-build-tools@4.0.0
       - name: install node-gyp
         run: npm install --global node-gyp@latest
@@ -60,7 +60,7 @@ jobs:
           path: deploy
 
       - uses: actions/upload-artifact@v1
-        if: matrix.os == 'windows-2016'
+        if: matrix.os == 'windows-latest'
         with:
           name: Windows Release
           path: deploy
