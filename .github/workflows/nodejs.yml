@@ -28,10 +28,10 @@ jobs:
         with:
           node-version: '13.9.0'
 
-      - name: install node tools
-        if: matrix.os == 'windows-latest'
       - name: Set node config to use python2.7
         run: npm config set python python2.7
+      - name: install node tools
+        if: matrix.os == 'windows-latest'
         run: npm install --global --production --vs2015 windows-build-tools@4.0.0
       - name: install node-gyp
         run: npm install --global node-gyp@latest
