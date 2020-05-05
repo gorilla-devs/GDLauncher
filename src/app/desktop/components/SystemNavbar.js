@@ -45,7 +45,7 @@ const SystemNavbar = () => {
         .catch(console.error);
     } else {
       dispatch(isAppLatestVersion())
-        .then(v => dispatch(updateUpdateAvailable(v)))
+        .then(v => dispatch(updateUpdateAvailable(!v)))
         .catch(console.error);
     }
   };
