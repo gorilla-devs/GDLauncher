@@ -80,10 +80,26 @@ export const convertMinutesToHumanTime = minutes => {
     if (hours > 0) {
       return `${hours} h, ${min} m`;
     }
+    if (min < 1) {
+      return `${min} minutes`;
+    }
+    if (min < 2) {
+      return `${min} minute`;
+    }
     return `${min} minutes`;
   }
-  if (months > 0) {
+  if (weeks < 4) {
+    if (weeks < 2) {
+      return `${weeks} week`;
+    }
+  }
+  if (weeks > 1) {
+    return `${weeks} weeks`;
+  }
+  if (months < 2) {
+    return `${months} month`;
+  }
+  if (months > 1) {
     return `${months} months`;
   }
-  return `${weeks} weeks`;
 };
