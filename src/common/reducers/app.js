@@ -74,6 +74,15 @@ function javaManifest(state = {}, action) {
   }
 }
 
+function dontShowJavaOption(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_JAVA_OPTION:
+      return action.show;
+    default:
+      return state;
+  }
+}
+
 function clientToken(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CLIENT_TOKEN:
@@ -111,5 +120,6 @@ export default combineReducers({
   curseforgeCategories,
   clientToken,
   isNewUser,
-  showChangelogs
+  showChangelogs,
+  dontShowJavaOption
 });

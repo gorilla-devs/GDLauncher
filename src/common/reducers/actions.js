@@ -272,6 +272,15 @@ export function updateIsNewUser(isNewUser) {
   };
 }
 
+export function updateJavaOption(show) {
+  return async dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_JAVA_OPTION,
+      show
+    });
+  };
+}
+
 export function updateCurrentAccountId(id) {
   return async dispatch => {
     dispatch({

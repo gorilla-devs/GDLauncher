@@ -4,10 +4,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Button, Dropdown, Menu } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
+import { promisify } from 'util';
+import { exec } from 'child_process';
 import Instances from '../components/Instances';
 import News from '../components/News';
 import { openModal } from '../../../common/reducers/modals/actions';
-import { _getCurrentAccount } from '../../../common/utils/selectors';
+import { updateJavaOption } from '../../../common/reducers/actions';
+import {
+  _getCurrentAccount,
+  _getJavaPath
+} from '../../../common/utils/selectors';
 import { extractFace } from '../utils';
 
 const AddInstanceIcon = styled(Button)`
@@ -28,9 +34,35 @@ const Home = () => {
   const dispatch = useDispatch();
   const account = useSelector(_getCurrentAccount);
   const news = useSelector(state => state.news);
+  const showJavaOptions = useSelector(state => state.app.dontShowJavaOption);
+  const javaPath = useSelector(_getJavaPath);
 
   const openAddInstanceModal = defaultPage => {
     dispatch(openModal('AddInstance', { defaultPage }));
+  };
+
+  const isGlobalJavaOptions = async () => {
+    try {
+      const { stdout, stderr } = await promisify(exec)(
+        `"${javaPath}" -version`
+      );
+      const validOutput = stdout === '' ? stderr : stdout;
+      return (
+        validOutput.includes('_JAVA_OPTIONS') && validOutput.includes('-Xmx')
+      );
+    } catch (e) {
+      console.error(`Could not check for global java options: ${e.message}`);
+      return false;
+    }
+  };
+
+  const checkJavaOptions = async () => {
+    const javaOptions = await isGlobalJavaOptions();
+    console.log('oim', javaOptions);
+    dispatch(updateJavaOption(true));
+    if (javaOptions && showJavaOptions) {
+      dispatch(openModal('JavaOptionsFixModal'));
+    }
   };
 
   const openAccountModal = () => {
@@ -41,6 +73,11 @@ const Home = () => {
   useEffect(() => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
   }, [account]);
+
+  useEffect(() => {
+    dispatch(updateJavaOption(false));
+    checkJavaOptions();
+  }, []);
 
   const menu = (
     <Menu>
