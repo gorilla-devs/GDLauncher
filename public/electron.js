@@ -14,9 +14,10 @@ const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
-const Store = require('electron-store');
 const log = require('electron-log');
-const fs = require('fs').promises;
+const fss = require('fs');
+
+const fs = fss.promises;
 
 const discordRPC = require('./discordRPC');
 
@@ -38,19 +39,31 @@ Menu.setApplicationMenu();
 
 app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
 
+let allowBetaReleases = false;
+const releaseChannelExists = fss.existsSync(
+  path.join(app.getPath('userData'), 'rChannel')
+);
+if (releaseChannelExists) {
+  const releaseChannelConfig = fss.readFileSync(
+    path.join(app.getPath('userData'), 'rChannel')
+  );
+  allowBetaReleases = releaseChannelConfig === 'beta';
+}
+
 if (
   process.env.REACT_APP_RELEASE_TYPE === 'portable' &&
   process.platform !== 'linux'
 ) {
   app.setPath('userData', path.join(path.dirname(app.getPath('exe')), 'data'));
 } else {
-  const store = new Store({
-    name: 'overrides',
-    fileExtension: '',
-    encryptionKey: 'GDLauncher'
-  });
-  if (store.has('userDataOverride')) {
-    app.setPath('userData', store.get('userDataOverride'));
+  const overrideExists = fss.existsSync(
+    path.join(app.getPath('userData'), 'override.data')
+  );
+  if (overrideExists) {
+    const override = fss.readFileSync(
+      path.join(app.getPath('userData'), 'override.data')
+    );
+    app.setPath('userData', override.toString());
   }
 }
 
@@ -337,6 +350,8 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
+  autoUpdater.allowDowngrade = allowBetaReleases;
+  autoUpdater.allowPrerelease = allowBetaReleases;
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',
     repo: 'GDLauncher-Releases',

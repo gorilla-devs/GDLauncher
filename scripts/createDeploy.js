@@ -156,7 +156,10 @@ const commonConfig = {
     }
   },
   ...((!process.env.RELEASE_TESTING || process.platform === 'linux') && {
-    linux: type === 'setup' ? ['appimage:x64', 'zip:x64'] : []
+    linux:
+      type === 'setup'
+        ? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
+        : ['snap:x64']
   }),
   ...((!process.env.RELEASE_TESTING || process.platform === 'win32') && {
     win: [type === 'setup' ? 'nsis-web:x64' : 'zip:x64']
@@ -203,13 +206,15 @@ const main = async () => {
       linux: [
         `${productName}-linux-${type}.zip`,
         `${productName}-linux-${type}.AppImage`,
+        `${productName}-linux-${type}.deb`,
+        `${productName}-linux-${type}.rpm`,
         'latest-linux.yml'
       ]
     },
     portable: {
       darwin: [],
       win32: [`${productName}-win-${type}.zip`],
-      linux: []
+      linux: [`${productName}-linux-${type}.snap`]
     }
   };
 

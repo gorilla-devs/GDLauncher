@@ -37,7 +37,12 @@ module.exports = {
       purple: '#BB6BD9',
       green: '#27AE60',
       blue: '#3FA7D6',
-      darkBlue: '#203753'
+      darkBlue: '#203753',
+      liberty: '#4146A5',
+      crimson: '#15616D',
+      ruby: '#7D1128',
+      darkYellow: '#EE964B',
+      orange: '#B95355'
     },
     text: {
       disabled: 'rgba(255, 255, 255, 0.38)',
