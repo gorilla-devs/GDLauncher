@@ -258,7 +258,4 @@ const TextEditor = styled(Editable)`
 const WrappedMarkButton = styled(({ active, ...props }) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
   <Button {...props} />
-))`
-margin: 0 2px;
-border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
-`;
+))``;
