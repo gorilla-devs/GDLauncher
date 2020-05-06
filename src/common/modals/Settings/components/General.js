@@ -420,7 +420,9 @@ const General = () => {
           {[...Array(20).keys()]
             .map(x => x + 1)
             .map(x => (
-              <Select.Option value={x}>{x}</Select.Option>
+              <Select.Option key={x} value={x}>
+                {x}
+              </Select.Option>
             ))}
         </Select>
       </ParallelDownload>
