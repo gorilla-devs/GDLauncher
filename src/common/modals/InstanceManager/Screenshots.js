@@ -263,7 +263,7 @@ const Screenshots = ({ instanceName }) => {
                               )
                             }
                             selected={selectedItems.indexOf(file.name) > -1}
-                            src={`file:////${path.join(
+                            src={`file:///${path.join(
                               screenshotsPath,
                               file.name
                             )}`}
