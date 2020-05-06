@@ -148,6 +148,23 @@ const CopyTitle = styled.h1`
   animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
 `;
 
+const DeleteSelectedMods = styled(({ selectedMods, ...props }) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <FontAwesomeIcon {...props} />
+))`
+  margin: 0 10px;
+  ${props =>
+    props.selectedMods === 'true' &&
+    `&:hover {
+  cursor: pointer;
+  path {
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+    color: ${props.theme.palette.error.main};
+  }
+}`}
+`;
+
 const deleteMods = async (
   instanceName,
   instancePath,
@@ -528,7 +545,7 @@ const Mods = ({ instanceName }) => {
           >
             Select All
           </Checkbox>
-          <FontAwesomeIcon
+          <DeleteSelectedMods
             onClick={async () => {
               if (selectedMods.length === 0) return;
               await deleteMods(
@@ -539,20 +556,7 @@ const Mods = ({ instanceName }) => {
               );
               setSelectedMods([]);
             }}
-            selectedMods={selectedMods}
-            css={`
-              margin: 0 10px;
-              ${props =>
-                props.selectedMods.length > 0 &&
-                `&:hover {
-                cursor: pointer;
-                path {
-                  cursor: pointer;
-                  transition: all 0.1s ease-in-out;
-                  color: ${props.theme.palette.error.main};
-                }
-              }`}
-            `}
+            selectedMods={(selectedMods.length > 0).toString()}
             icon={faTrash}
           />
           <StyledDropdown
