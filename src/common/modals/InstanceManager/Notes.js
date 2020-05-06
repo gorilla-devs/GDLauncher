@@ -185,19 +185,19 @@ const BlockButton = ({ format, icon }) => {
 const MarkButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
-    <Button
+    <WrappedMarkButton
       css={`
         margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
       `}
-      active={isMarkActive(editor, format).toString()}
+      active={isMarkActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
         toggleMark(editor, format);
       }}
     >
       <FontAwesomeIcon icon={icon} />
-    </Button>
+    </WrappedMarkButton>
   );
 };
 
@@ -253,4 +253,12 @@ const TextEditor = styled(Editable)`
   overflow-x: auto;
   word-break: break-word;
   border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
+`;
+
+const WrappedMarkButton = styled(({ active, ...props }) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <Button {...props} />
+))`
+margin: 0 2px;
+border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
 `;

@@ -154,7 +154,7 @@ const DeleteSelectedMods = styled(({ selectedMods, ...props }) => (
 ))`
   margin: 0 10px;
   ${props =>
-    props.selectedMods === 'true' &&
+    props.selectedMods > 0 &&
     `&:hover {
   cursor: pointer;
   path {
@@ -556,7 +556,7 @@ const Mods = ({ instanceName }) => {
               );
               setSelectedMods([]);
             }}
-            selectedMods={(selectedMods.length > 0).toString()}
+            selectedMods={selectedMods.length}
             icon={faTrash}
           />
           <StyledDropdown
