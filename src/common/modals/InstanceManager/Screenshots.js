@@ -263,7 +263,7 @@ const Screenshots = ({ instanceName }) => {
                               )
                             }
                             selected={selectedItems.indexOf(file.name) > -1}
-                            src={path.join(screenshotsPath, file.name)}
+                            src={path.join('file:///', screenshotsPath, file.name)}
                           />
                         </PhotoContainer>
                       </ContextMenuTrigger>
