@@ -167,7 +167,7 @@ const BlockButton = ({ format, icon }) => {
         margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
       `}
-      active={isBlockActive(editor, format)}
+      active={isBlockActive(editor, format).toString()}
       onMouseDown={event => {
         event.preventDefault();
         toggleBlock(editor, format);
@@ -190,7 +190,7 @@ const MarkButton = ({ format, icon }) => {
         margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
       `}
-      active={isMarkActive(editor, format)}
+      active={isMarkActive(editor, format).toString()}
       onMouseDown={event => {
         event.preventDefault();
         toggleMark(editor, format);

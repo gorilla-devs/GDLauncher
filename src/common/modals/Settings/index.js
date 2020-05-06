@@ -37,7 +37,8 @@ const SettingsColumn = styled.div`
   overflow-x: hidden;
 `;
 
-const SettingsButton = styled(Button)`
+// eslint-disable-next-line react/jsx-props-no-spreading
+const SettingsButton = styled(({ active, ...props }) => <Button {...props} />)`
   align-items: left;
   justify-content: left;
   text-align: left;

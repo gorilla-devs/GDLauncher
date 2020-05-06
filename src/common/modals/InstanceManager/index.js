@@ -41,7 +41,8 @@ const SideMenuContainer = styled.div`
   background: ${props => props.theme.palette.grey[800]};
 `;
 
-const SettingsButton = styled(Button)`
+// eslint-disable-next-line react/jsx-props-no-spreading
+const SettingsButton = styled(({ active, ...props }) => <Button {...props} />)`
   align-items: left;
   justify-content: left;
   text-align: left;
