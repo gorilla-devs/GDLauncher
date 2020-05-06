@@ -139,9 +139,22 @@ const Screenshots = ({ instanceName }) => {
 
   const deleteFile = useCallback(
     async fileName => {
+      console.log(
+        'PPP',
+        selectedItems,
+        instancesPath,
+        instanceName,
+        fileName
+        // path.join(instancesPath, instanceName, 'screenshots', fileName)
+      );
       if (selectedItems.length === 1) {
         await fse.remove(
-          path.join(instancesPath, instanceName, 'screenshots', fileName)
+          path.join(
+            instancesPath,
+            instanceName,
+            'screenshots',
+            selectedItems[0]
+          )
         );
       } else if (selectedItems.length > 1) {
         Promise.all(
