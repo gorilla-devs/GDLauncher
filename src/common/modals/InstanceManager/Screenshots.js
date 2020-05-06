@@ -474,7 +474,10 @@ const StyledContexMenu = styled(ContextMenu)`
   }
 `;
 
-const DeleteButton = styled(FontAwesomeIcon)`
+const DeleteButton = styled(({ selectedItems, ...props }) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <FontAwesomeIcon {...props} />
+))`
   margin-left: 20px;
   transition: color 0.3s ease-in-out;
   &:hover {
