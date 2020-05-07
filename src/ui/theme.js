@@ -34,15 +34,15 @@ module.exports = {
     colors: {
       red: '#D64441',
       yellow: '#FAB849',
-      purple: '#BB6BD9',
+      lavander: '#BB6BD9',
       green: '#27AE60',
       blue: '#3FA7D6',
-      darkBlue: '#203753',
-      liberty: '#4146A5',
-      crimson: '#15616D',
-      ruby: '#7D1128',
-      darkYellow: '#EE964B',
-      orange: '#B95355'
+      lightBlue: '#345995',
+      liberty: '#6761a8',
+      jungleGreen: '#43aa8b',
+      maximumRed: '#d62828',
+      darkYellow: '#f18805',
+      orange: '#f26430'
     },
     text: {
       disabled: 'rgba(255, 255, 255, 0.38)',
