@@ -1,10 +1,10 @@
 import React, { memo, useState } from 'react';
 import styled from 'styled-components';
 import { clipboard } from 'electron';
-import { Tooltip } from 'antd';
+import { Tooltip, Collapse } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
-import { Collapse } from 'antd';
+
 import Modal from '../components/Modal';
 import Logo from '../../ui/LogoSad';
 
