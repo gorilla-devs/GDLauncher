@@ -61,7 +61,10 @@ const modalsComponentLookupTable = {
   ModOverview: AsyncComponent(lazy(() => import('../modals/ModOverview'))),
   ModsBrowser: AsyncComponent(lazy(() => import('../modals/ModsBrowser'))),
   JavaSetup: AsyncComponent(lazy(() => import('../modals/JavaSetup'))),
-  ModsUpdater: AsyncComponent(lazy(() => import('../modals/ModsUpdater')))
+  ModsUpdater: AsyncComponent(lazy(() => import('../modals/ModsUpdater'))),
+  InstanceCrashed: AsyncComponent(
+    lazy(() => import('../modals/InstanceCrashed'))
+  )
 };
 
 const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
