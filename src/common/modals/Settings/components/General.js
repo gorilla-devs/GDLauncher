@@ -14,7 +14,6 @@ import {
   faPlay,
   faToilet,
   faNewspaper,
-  faHdd,
   faFolder
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
@@ -23,17 +22,13 @@ import {
   _getCurrentAccount,
   _getDataStorePath,
   _getInstancesPath,
-  _getTempPath,
-  _getModCachePath
+  _getTempPath
 } from '../../../utils/selectors';
 import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
-  updateShowNews,
-  updateCacheModsInstances,
-  updateCacheMods,
-  updateAssetsCheckSkip
+  updateShowNews
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
@@ -236,12 +231,6 @@ const General = () => {
   const [dataPath, setDataPath] = useState(userData);
   const [moveUserData, setMoveUserData] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
-  const assetsCheckSkip = useSelector(state => state.settings.assetsCheckSkip);
-  const cacheMods = useSelector(state => state.settings.cacheMods);
-  const cacheModsInstances = useSelector(
-    state => state.settings.cacheModsInstances
-  );
-  const modCachePath = useSelector(_getModCachePath);
   const [loadingMoveUserData, setLoadingMoveUserData] = useState(false);
 
   const dispatch = useDispatch();
@@ -270,16 +259,6 @@ const General = () => {
       await fsa.emptyDir(dataStorePath);
       await fsa.emptyDir(instancesPath);
       await fsa.emptyDir(tempPath);
-    } catch (e) {
-      console.error(e);
-    }
-    setDeletingInstances(false);
-  };
-
-  const clearCachedMods = async () => {
-    setDeletingInstances(true);
-    try {
-      await fsa.emptyDir(modCachePath);
     } catch (e) {
       console.error(e);
     }
@@ -498,128 +477,6 @@ const General = () => {
           checked={showNews}
         />
       </DiscordRpc>
-
-      <Hr />
-      <div>
-        <Title
-          css={`
-            margin-top: 0px;
-          `}
-        >
-          Fast Assets Check &nbsp; <FontAwesomeIcon icon={faHdd} />
-        </Title>
-        <DiscordRpc>
-          <p
-            css={`
-              width: 500px;
-            `}
-          >
-            Enable / disable - Makes installs that use the same MC / Forge
-            version faster. Leave enabled unless havivng issues with missing
-            assets.
-          </p>
-          <Switch
-            onChange={e => {
-              dispatch(updateAssetsCheckSkip(e));
-            }}
-            checked={assetsCheckSkip}
-          />
-        </DiscordRpc>
-      </div>
-      <Hr />
-      <div>
-        <Title
-          css={`
-            margin-top: 0px;
-          `}
-        >
-          Cache Mods Using Instances &nbsp; <FontAwesomeIcon icon={faHdd} />
-        </Title>
-        <DiscordRpc>
-          <p
-            css={`
-              width: 500px;
-            `}
-          >
-            Enable / disable - Uses existing instances as a cache source. Leave
-            enabled unless issues with new mods.
-          </p>
-          <Switch
-            onChange={e => {
-              dispatch(updateCacheModsInstances(e));
-            }}
-            checked={cacheModsInstances}
-          />
-        </DiscordRpc>
-      </div>
-      <Hr />
-      <div>
-        <Title
-          css={`
-            margin-top: 0px;
-          `}
-        >
-          Cache Mods Using Dedicated&nbsp; <FontAwesomeIcon icon={faHdd} />
-        </Title>
-        <DiscordRpc>
-          <p
-            css={`
-              width: 500px;
-            `}
-          >
-            Enable / disable - Caching mods from curseforge to a dedicated cache
-            folder. Keeps a copy of every mod installed to a special cache
-            folder.
-          </p>
-          <Switch
-            onChange={e => {
-              dispatch(updateCacheMods(e));
-            }}
-            checked={cacheMods}
-          />
-        </DiscordRpc>
-      </div>
-      <Hr />
-      <div>
-        <Title
-          css={`
-            width: 300px;
-            float: left;
-          `}
-        >
-          Clear Mod Cache&nbsp; <FontAwesomeIcon icon={faTrash} />
-        </Title>
-        <div
-          css={`
-            display: flex;
-            justify-content: space-between;
-            text-align: left;
-            width: 100%;
-            margin-bottom: 30px;
-            p {
-              text-align: left;
-              color: ${props => props.theme.palette.text.third};
-            }
-          `}
-        >
-          <p
-            css={`
-              margin: 0;
-              width: 500px;
-            `}
-          >
-            Deletes all the mods in the cache. This connot be undone.
-          </p>
-          <Button
-            onClick={clearCachedMods}
-            disabled={disableInstancesActions}
-            loading={deletingInstances}
-          >
-            Clear
-          </Button>
-        </div>
-      </div>
-
       <Hr />
       <Title
         css={`
