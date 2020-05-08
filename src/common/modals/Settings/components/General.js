@@ -32,6 +32,7 @@ import {
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
+import { openModal } from '../../../reducers/modals/actions';
 import { extractFace } from '../../../../app/desktop/utils';
 
 const MyAccountPrf = styled.div`
@@ -668,13 +669,14 @@ const General = () => {
           `}
         >
           <HorizontalLogo size={200} />{' '}
-          <div
+          <Button
             css={`
               margin-left: 10px;
             `}
+            onClick={() => dispatch(openModal('ChangeLogs', { version }))}
           >
             v {version}
-          </div>
+          </Button>
         </div>
         <p>
           {updateAvailable
