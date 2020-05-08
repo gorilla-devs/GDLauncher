@@ -53,6 +53,8 @@ jobs:
           BITRISE_GIT_TAG: ''
           CI_BUILD_TAG: ''
           RELEASE_TESTING: true
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
         run: |
           yarn release
       - uses: actions/upload-artifact@v1
