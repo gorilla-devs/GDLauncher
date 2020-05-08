@@ -35,13 +35,13 @@ const calcError = code => {
 
 const { Panel } = Collapse;
 
-const ErrorHandler = ({ code, errorsLog }) => {
+const InstanceCrashed = ({ code, errorLogs }) => {
   const [copiedLog, setCopiedLog] = useState(null);
 
   function copy(e) {
     e.stopPropagation();
     setCopiedLog(true);
-    clipboard.writeText(errorsLog);
+    clipboard.writeText(errorLogs);
     setTimeout(() => {
       setCopiedLog(false);
     }, 500);
@@ -53,7 +53,7 @@ const ErrorHandler = ({ code, errorsLog }) => {
         height: 450px;
         width: 500px;
       `}
-      title="ErrorHandler"
+      title="Uwu We make a fucky wucky!!"
     >
       <Container>
         <InnerContainer>
@@ -110,7 +110,7 @@ const ErrorHandler = ({ code, errorsLog }) => {
                 overflow-y: auto;
               `}
             >
-              {errorsLog}
+              {errorLogs}
             </p>
           </Panel>
         </Collapse>
@@ -119,7 +119,7 @@ const ErrorHandler = ({ code, errorsLog }) => {
   );
 };
 
-export default memo(ErrorHandler);
+export default memo(InstanceCrashed);
 
 const Container = styled.div`
   width: 100%;

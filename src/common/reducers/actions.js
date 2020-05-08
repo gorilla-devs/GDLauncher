@@ -1906,7 +1906,7 @@ export function launchInstance(instanceName) {
       '__JLF__.jar'
     );
 
-    let errorsLog = null;
+    let errorLogs = '';
 
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
@@ -2084,7 +2084,7 @@ export function launchInstance(instanceName) {
 
     ps.stderr.on('data', data => {
       console.error(`ps stderr: ${data}`);
-      errorsLog += data;
+      errorLogs += data || '';
     });
 
     ps.on('close', code => {
@@ -2093,11 +2093,11 @@ export function launchInstance(instanceName) {
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
       dispatch(removeStartedInstance(instanceName));
       clearInterval(playTimer);
-      if (code !== 0) {
+      if (code !== 0 && errorLogs) {
         dispatch(
-          openModal('ErrorHandler', {
+          openModal('InstanceCrashed', {
             code,
-            errorsLog: errorsLog.toString('utf8')
+            errorLogs: errorLogs?.toString('utf8')
           })
         );
         console.warn(`Process exited with code ${code}. Not too good..`);
