@@ -17,7 +17,7 @@ const Img = styled.img`
 `;
 
 export default function Screenshot({ screenshotsPath, file }) {
-  const image = path.join(screenshotsPath, file.name);
+  const image = path.join('file:///', screenshotsPath, file.name);
 
   return (
     <Modal
