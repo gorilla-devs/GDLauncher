@@ -53,8 +53,8 @@ const modalsComponentLookupTable = {
   InstanceManager: AsyncComponent(
     lazy(() => import('../modals/InstanceManager'))
   ),
-  InstanceExport: AsyncComponent(
-    lazy(() => import('../modals/InstanceExport'))
+  InstanceExportCurseForge: AsyncComponent(
+    lazy(() => import('../modals/InstanceExport/CurseForge'))
   ),
   AutoUpdatesNotAvailable: AsyncComponent(
     lazy(() => import('../modals/AutoUpdatesNotAvailable'))

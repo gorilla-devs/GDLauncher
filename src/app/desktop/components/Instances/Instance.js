@@ -190,8 +190,8 @@ const Instance = ({ instanceName }) => {
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
-  const exportInstance = () => {
-    dispatch(openModal('InstanceExport', { instanceName }));
+  const instanceExportCurseForge = () => {
+    dispatch(openModal('InstanceExportCurseForge', { instanceName }));
   };
   const killProcess = () => {
     console.log(isPlaying.pid);
@@ -322,7 +322,7 @@ const Instance = ({ instanceName }) => {
 
         {/* // TODO - Support other export options besides curseforge forge. */}
         <MenuItem
-          onClick={exportInstance}
+          onClick={instanceExportCurseForge}
           disabled={Boolean(isInQueue) || instance.modloader[0] !== 'forge'}
         >
           <FontAwesomeIcon

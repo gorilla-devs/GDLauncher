@@ -8,7 +8,7 @@ import fse from 'fs-extra';
 import { add as add7z } from 'node-7z';
 import makeDir from 'make-dir';
 import pMap from 'p-map';
-import { get7zPath } from '../../../app/desktop/utils';
+import { get7zPath } from '../../../../app/desktop/utils';
 
 /**
  *

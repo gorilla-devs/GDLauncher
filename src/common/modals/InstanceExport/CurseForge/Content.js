@@ -11,7 +11,7 @@ import {
   _getInstancesPath,
   _getTempPath,
   _getCurrentAccount
-} from '../../utils/selectors';
+} from '../../../utils/selectors';
 
 const Content = ({
   instanceName,

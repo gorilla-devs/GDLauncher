@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { _getInstance } from '../../utils/selectors';
-import Modal from '../../components/Modal';
-import { closeModal } from '../../reducers/modals/actions';
+import { _getInstance } from '../../../utils/selectors';
+import Modal from '../../../components/Modal';
+import { closeModal } from '../../../reducers/modals/actions';
 import Content from './Content';
 
-const InstanceExport = ({ instanceName }) => {
+const InstanceExportCurseForge = ({ instanceName }) => {
   const [version, setVersion] = useState(null);
   const [modpack, setModpack] = useState(null);
   const [page, setPage] = useState(0);
@@ -39,4 +39,4 @@ const InstanceExport = ({ instanceName }) => {
   );
 };
 
-export default React.memo(InstanceExport);
+export default React.memo(InstanceExportCurseForge);
