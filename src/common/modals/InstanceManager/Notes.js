@@ -162,12 +162,12 @@ const Leaf = ({ attributes, children, leaf }) => {
 const BlockButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
-    <Button
+    <BlockInnerButton
       css={`
         margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
       `}
-      active={isBlockActive(editor, format).toString()}
+      active={isBlockActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault();
         toggleBlock(editor, format);
@@ -178,14 +178,14 @@ const BlockButton = ({ format, icon }) => {
       ) : (
         <FontAwesomeIcon icon={icon} />
       )}
-    </Button>
+    </BlockInnerButton>
   );
 };
 
 const MarkButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
-    <WrappedMarkButton
+    <MarkInnerButton
       css={`
         margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
@@ -197,7 +197,7 @@ const MarkButton = ({ format, icon }) => {
       }}
     >
       <FontAwesomeIcon icon={icon} />
-    </WrappedMarkButton>
+    </MarkInnerButton>
   );
 };
 
@@ -255,7 +255,12 @@ const TextEditor = styled(Editable)`
   border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
 `;
 
-const WrappedMarkButton = styled(({ active, ...props }) => (
+const MarkInnerButton = styled(({ active, ...props }) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
   <Button {...props} />
-))``;
+));
+
+const BlockInnerButton = styled(({ active, ...props }) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <Button {...props} />
+));
