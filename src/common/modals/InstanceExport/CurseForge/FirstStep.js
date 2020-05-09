@@ -248,8 +248,11 @@ export default function FirstStep({
               !filePath
                 ? ''
                 : filePath.length >= 80
-                ? `...${filePath.slice(-80)}`
+                ? `...${filePath.slice(-83)}`
                 : filePath
+              // If filePath is null return empty string.
+              // elseif filePath is longer then 80 charaters trim it down.
+              // else return filePath unchanged.
             }
             css={`
               position: absolute;

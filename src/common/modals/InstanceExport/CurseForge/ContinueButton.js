@@ -5,7 +5,11 @@ import { faLongArrowAltRight } from '@fortawesome/free-solid-svg-icons';
 export default function ContinueButton({ onClick, disabled = false }) {
   return (
     <div
-      onClick={!disabled ? () => onClick(s => s + 1) : null}
+      onClick={() => {
+        if (!disabled) {
+          onClick(s => s + 1);
+        }
+      }}
       disabled={disabled}
       css={`
         position: absolute;
