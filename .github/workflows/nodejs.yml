@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - next
+      - releases
   pull_request:
     branches:
       - next
+      - releases
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -45,7 +47,7 @@ jobs:
         run: |
           yarn lint
       - name: yarn release for windows
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-latest' && github.event_name == 'push'
         env:
           CI: ''
           TRAVIS_TAG: ''
@@ -59,7 +61,7 @@ jobs:
         run: |
           yarn release
       - name: yarn release for mac and linux
-        if: matrix.os != 'windows-latest'
+        if: matrix.os != 'windows-latest' || github.event_name != 'push'
         env:
           CI: ''
           TRAVIS_TAG: ''
@@ -70,6 +72,10 @@ jobs:
           RELEASE_TESTING: true
         run: |
           yarn release
+      - name: upload release to gh releases
+        if: github.event_name == 'push' && github.base_ref == 'releases'
+        run: |
+          yarn upload
       - uses: actions/upload-artifact@v1
         if: matrix.os == 'macos-latest'
         with:
