@@ -7,7 +7,7 @@ export default function BackButton({ onClick, disabled = false }) {
     <div
       onClick={() => {
         if (!disabled) {
-          onClick(s => s + 1);
+          onClick(s => s - 1);
         }
       }}
       disabled={disabled}
