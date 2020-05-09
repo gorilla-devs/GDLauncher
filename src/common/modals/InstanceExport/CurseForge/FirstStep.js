@@ -133,6 +133,12 @@ export default function FirstStep({
     getTreeData();
   }, []);
 
+  function filePathDisplay() {
+    if (!filePath) return '';
+    if (filePath.length >= 80) return `...${filePath.slice(-77)}`;
+    return filePath;
+  }
+
   return (
     <div
       css={`
@@ -243,17 +249,7 @@ export default function FirstStep({
             type="text"
             name="filePathDisplay"
             disabled
-            value={
-              // eslint-disable-next-line no-nested-ternary
-              !filePath
-                ? ''
-                : filePath.length >= 80
-                ? `...${filePath.slice(-83)}`
-                : filePath
-              // If filePath is null return empty string.
-              // elseif filePath is longer then 80 charaters trim it down.
-              // else return filePath unchanged.
-            }
+            value={filePathDisplay()}
             css={`
               position: absolute;
               bottom: 70px;
