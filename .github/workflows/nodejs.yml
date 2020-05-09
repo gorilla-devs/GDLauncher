@@ -44,7 +44,22 @@ jobs:
       - name: yarn lint
         run: |
           yarn lint
-      - name: yarn release
+      - name: yarn release for windows
+        if: matrix.os == 'windows-latest'
+        env:
+          CI: ''
+          TRAVIS_TAG: ''
+          APPVEYOR_REPO_TAG_NAME: ''
+          CIRCLE_TAG: ''
+          BITRISE_GIT_TAG: ''
+          CI_BUILD_TAG: ''
+          RELEASE_TESTING: true
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+        run: |
+          yarn release
+      - name: yarn release for mac and linux
+        if: matrix.os != 'windows-latest'
         env:
           CI: ''
           TRAVIS_TAG: ''

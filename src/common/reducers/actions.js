@@ -97,6 +97,7 @@ import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
+import { openModal } from './modals/actions';
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -2011,6 +2012,8 @@ export function launchInstance(instanceName) {
       '__JLF__.jar'
     );
 
+    let errorLogs = '';
+
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
     );
@@ -2187,6 +2190,7 @@ export function launchInstance(instanceName) {
 
     ps.stderr.on('data', data => {
       console.error(`ps stderr: ${data}`);
+      errorLogs += data || '';
     });
 
     ps.on('close', code => {
@@ -2195,7 +2199,13 @@ export function launchInstance(instanceName) {
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
       dispatch(removeStartedInstance(instanceName));
       clearInterval(playTimer);
-      if (code !== 0) {
+      if (code !== 0 && errorLogs) {
+        dispatch(
+          openModal('InstanceCrashed', {
+            code,
+            errorLogs: errorLogs?.toString('utf8')
+          })
+        );
         console.warn(`Process exited with code ${code}. Not too good..`);
       }
     });

@@ -141,7 +141,12 @@ const Screenshots = ({ instanceName }) => {
     async fileName => {
       if (selectedItems.length === 1) {
         await fse.remove(
-          path.join(instancesPath, instanceName, 'screenshots', fileName)
+          path.join(
+            instancesPath,
+            instanceName,
+            'screenshots',
+            selectedItems[0]
+          )
         );
       } else if (selectedItems.length > 1) {
         Promise.all(
@@ -258,7 +263,10 @@ const Screenshots = ({ instanceName }) => {
                               )
                             }
                             selected={selectedItems.indexOf(file.name) > -1}
-                            src={path.join(screenshotsPath, file.name)}
+                            src={`file:///${path.join(
+                              screenshotsPath,
+                              file.name
+                            )}`}
                           />
                         </PhotoContainer>
                       </ContextMenuTrigger>
