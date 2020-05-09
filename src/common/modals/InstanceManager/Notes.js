@@ -162,7 +162,7 @@ const Leaf = ({ attributes, children, leaf }) => {
 const BlockButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
-    <Button
+    <BlockInnerButton
       css={`
         margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
@@ -178,14 +178,14 @@ const BlockButton = ({ format, icon }) => {
       ) : (
         <FontAwesomeIcon icon={icon} />
       )}
-    </Button>
+    </BlockInnerButton>
   );
 };
 
 const MarkButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
-    <Button
+    <MarkInnerButton
       css={`
         margin: 0 2px;
         border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
@@ -197,7 +197,7 @@ const MarkButton = ({ format, icon }) => {
       }}
     >
       <FontAwesomeIcon icon={icon} />
-    </Button>
+    </MarkInnerButton>
   );
 };
 
@@ -254,3 +254,13 @@ const TextEditor = styled(Editable)`
   word-break: break-word;
   border: ${props => `solid 2px ${props.theme.palette.primary.main}`};
 `;
+
+const MarkInnerButton = styled(({ active, ...props }) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <Button {...props} />
+))``;
+
+const BlockInnerButton = styled(({ active, ...props }) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <Button {...props} />
+))``;
