@@ -217,7 +217,7 @@ const Overview = ({ instanceName }) => {
         >
           <CardBox
             css={`
-              background: ${props => props.theme.palette.colors.crimson};
+              background: ${props => props.theme.palette.colors.jungleGreen};
             `}
           >
             <div
@@ -226,7 +226,7 @@ const Overview = ({ instanceName }) => {
                 top: 5px;
                 left: 10px;
                 font-size: 10px;
-                color: ${props => props.theme.palette.text.third};
+                color: ${props => props.theme.palette.text.secondary};
               `}
             >
               Minecraft Version
@@ -235,7 +235,7 @@ const Overview = ({ instanceName }) => {
           </CardBox>
           <CardBox
             css={`
-              background: ${props => props.theme.palette.colors.liberty};
+              background: ${props => props.theme.palette.colors.darkYellow};
             `}
           >
             <div
@@ -244,7 +244,7 @@ const Overview = ({ instanceName }) => {
                 top: 5px;
                 left: 10px;
                 font-size: 10px;
-                color: ${props => props.theme.palette.text.third};
+                color: ${props => props.theme.palette.text.secondary};
               `}
             >
               Modloader
@@ -253,7 +253,7 @@ const Overview = ({ instanceName }) => {
           </CardBox>
           <CardBox
             css={`
-              background: ${props => props.theme.palette.colors.darkBlue};
+              background: ${props => props.theme.palette.colors.lightBlue};
             `}
           >
             <div
@@ -262,7 +262,7 @@ const Overview = ({ instanceName }) => {
                 top: 5px;
                 left: 10px;
                 font-size: 10px;
-                color: ${props => props.theme.palette.text.third};
+                color: ${props => props.theme.palette.text.secondary};
               `}
             >
               Modloader Version
@@ -280,7 +280,7 @@ const Overview = ({ instanceName }) => {
         >
           <CardBox
             css={`
-              background: ${props => props.theme.palette.colors.ruby};
+              background: ${props => props.theme.palette.colors.maximumRed};
             `}
           >
             <div
@@ -289,7 +289,7 @@ const Overview = ({ instanceName }) => {
                 top: 5px;
                 left: 10px;
                 font-size: 10px;
-                color: ${props => props.theme.palette.text.third};
+                color: ${props => props.theme.palette.text.secondary};
               `}
             >
               Mods
@@ -298,7 +298,7 @@ const Overview = ({ instanceName }) => {
           </CardBox>
           <CardBox
             css={`
-              background: ${props => props.theme.palette.colors.darkYellow};
+              background: ${props => props.theme.palette.colors.liberty};
             `}
           >
             <div
@@ -307,7 +307,7 @@ const Overview = ({ instanceName }) => {
                 top: 5px;
                 left: 10px;
                 font-size: 10px;
-                color: ${props => props.theme.palette.text.third};
+                color: ${props => props.theme.palette.text.secondary};
               `}
             >
               Played Time
@@ -325,7 +325,7 @@ const Overview = ({ instanceName }) => {
                 top: 5px;
                 left: 10px;
                 font-size: 10px;
-                color: ${props => props.theme.palette.text.third};
+                color: ${props => props.theme.palette.text.secondary};
               `}
             >
               Last Played
