@@ -44,10 +44,10 @@ export default function FirstStep({
 
       const flatDirArray = objectIn => {
         const arrayResult = [];
-        function innerObjectLoop(_objectIn) {
-          if (!_objectIn || _objectIn.length === 0) return;
+        function innerObjectLoop(innerObject) {
+          if (!innerObject || innerObject.length === 0) return;
           // eslint-disable-next-line array-callback-return
-          _objectIn.map(child => {
+          innerObject.map(child => {
             if (fileBlackList.some(file => file === child.path)) return;
             arrayResult.push(child.path);
             innerObjectLoop(child.children);
@@ -77,8 +77,8 @@ export default function FirstStep({
           if (child.type === 'directory') dirs.push(childResult);
         });
 
-        function arrSort(_arrayToSort) {
-          return _arrayToSort
+        function arrSort(innerArrayToSort) {
+          return innerArrayToSort
             .map((el, i) => {
               return { index: i, value: el.title.toLowerCase() };
             })
@@ -92,7 +92,7 @@ export default function FirstStep({
               return 0;
             })
             .map(el => {
-              return _arrayToSort[el.index];
+              return innerArrayToSort[el.index];
             });
         }
         return arrSort(dirs).concat(arrSort(files));

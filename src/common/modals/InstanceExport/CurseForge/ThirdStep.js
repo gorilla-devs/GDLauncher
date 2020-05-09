@@ -54,7 +54,7 @@ export default function ThirdStep({
   const tempExport = path.join(tempPath, instanceName);
 
   // Construct manifest contents
-  const createManifest = async (_mods = mods) => {
+  const createManifest = async (modsArray = mods) => {
     return {
       minecraft: {
         version: modloader[1],
@@ -72,7 +72,7 @@ export default function ThirdStep({
       author: packAuthor,
       projectID: modloader.length > 3 ? parseInt(modloader[3], 10) : undefined,
       name: packZipName,
-      files: _mods
+      files: modsArray
         .filter(mod => mod?.projectID)
         .map(mod => ({
           projectID: mod.projectID,
