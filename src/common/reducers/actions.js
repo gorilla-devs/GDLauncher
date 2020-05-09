@@ -51,6 +51,7 @@ import {
   getAddonCategories
 } from '../api';
 import {
+  _getNativeLibs,
   _getCurrentAccount,
   _getCurrentDownloadItem,
   _getJavaPath,
@@ -1308,14 +1309,6 @@ export function downloadInstance(instanceName) {
     if (skipInstallVanilla) {
       // Read Manifest and extra natives.
       mcJson = await fse.readJson(mcJsonPath);
-      const libraries = librariesMapper(
-        mcJson.libraries,
-        _getLibrariesPath(state)
-      );
-      await extractNatives(
-        libraries,
-        path.join(_getInstancesPath(state), instanceName)
-      );
 
       if (modloader && modloader[0] === FABRIC) {
         await dispatch(downloadFabric(instanceName));
@@ -1410,7 +1403,7 @@ export function downloadInstance(instanceName) {
 
       await extractNatives(
         libraries,
-        path.join(_getInstancesPath(state), instanceName)
+        path.join(_getNativeLibs(state), mcVersion)
       );
 
       if (assetsJson.map_to_resources) {
@@ -2114,6 +2107,7 @@ export function launchInstance(instanceName) {
 
     const jvmArguments = getJvmArguments(
       libraries,
+      path.join(_getNativeLibs(state), modloader[1]),
       mcMainFile,
       instancePath,
       assetsPath,
@@ -2137,25 +2131,14 @@ export function launchInstance(instanceName) {
     if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
 
     console.log(
-      `"${javaPath}" ${getJvmArguments(
-        libraries,
-        mcMainFile,
-        instancePath,
-        assetsPath,
-        mcJson,
-        account,
-        javaMem,
-        gameResolution,
-        true,
-        javaArguments
-      ).join(' ')}`.replace(...replaceRegex)
+      `"${javaPath}" ${jvmArguments.join(' ')}`.replace(...replaceRegex)
     );
 
     if (state.settings.hideWindowOnGameLaunch) {
       await ipcRenderer.invoke('hide-window');
     }
 
-    const ps = spawn(
+    const minecraftProcess = spawn(
       `"${javaPath.replace(...replaceRegex)}"`,
       jvmArguments.map(v => v.replace(...replaceRegex)),
       {
@@ -2179,21 +2162,21 @@ export function launchInstance(instanceName) {
         lastPlayed: Date.now()
       }))
     );
-    dispatch(addStartedInstance({ instanceName, pid: ps.pid }));
+    dispatch(addStartedInstance({ instanceName, pid: minecraftProcess.pid }));
 
-    ps.stdout.on('data', data => {
+    minecraftProcess.stdout.on('data', data => {
       console.log(data.toString());
       if (data.toString().includes('Setting user:')) {
         dispatch(updateStartedInstance({ instanceName, initialized: true }));
       }
     });
 
-    ps.stderr.on('data', data => {
+    minecraftProcess.stderr.on('data', data => {
       console.error(`ps stderr: ${data}`);
       errorLogs += data || '';
     });
 
-    ps.on('close', code => {
+    minecraftProcess.on('close', code => {
       ipcRenderer.invoke('show-window');
       fse.remove(instanceJLFPath);
       if (process.platform === 'win32') fse.remove(symLinkDirPath);

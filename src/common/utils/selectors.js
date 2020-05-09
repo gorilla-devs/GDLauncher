@@ -86,3 +86,14 @@ export const _getMinecraftVersionsPath = createSelector(
 export const _getAssetsPath = createSelector(_getDataStorePath, datastorePath =>
   path.join(datastorePath, 'assets')
 );
+
+export const _getNativeLibs = createSelector(
+  _getDataStorePath,
+  datastorePath => {
+    if (process.platform === 'win32')
+      return path.join(datastorePath, 'natives', 'Windows');
+    if (process.platform === 'darwin')
+      return path.join(datastorePath, 'natives', 'MacOS');
+    return path.join(datastorePath, 'natives', 'Linux');
+  }
+);
