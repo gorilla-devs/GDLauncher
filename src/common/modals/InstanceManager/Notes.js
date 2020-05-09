@@ -258,9 +258,9 @@ const TextEditor = styled(Editable)`
 const MarkInnerButton = styled(({ active, ...props }) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
   <Button {...props} />
-));
+))``;
 
 const BlockInnerButton = styled(({ active, ...props }) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
   <Button {...props} />
-));
+))``;
