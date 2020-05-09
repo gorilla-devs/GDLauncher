@@ -597,7 +597,6 @@ export function updateDownloadStatus(instanceName, status) {
   };
 }
 
-
 export function updateLastUpdateVersion(version) {
   return dispatch => {
     dispatch({
