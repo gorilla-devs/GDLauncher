@@ -746,23 +746,17 @@ export function downloadForge(instanceName) {
     const state = getState();
     const { modloader } = _getCurrentDownloadItem(state);
 
-    const completedForgeSkipFile = path.join(
+    const forgeJsonPath = path.join(
       _getLibrariesPath(state),
       'net',
       'minecraftforge',
       modloader[2],
-      `${modloader[2]}.complete`
+      `${modloader[2]}.json`
     );
-    const checkForgeSkip = await fse.pathExists(completedForgeSkipFile);
+
+    const checkForgeSkip = await fse.pathExists(forgeJsonPath);
     if (!checkForgeSkip) {
       const forgeJson = {};
-      const forgeJsonPath = path.join(
-        _getLibrariesPath(state),
-        'net',
-        'minecraftforge',
-        modloader[2],
-        `${modloader[2]}.json`
-      );
 
       const sevenZipPath = await get7zPath();
       const pre152 = lte(coerce(modloader[1]), coerce('1.5.2'));
@@ -864,8 +858,6 @@ export function downloadForge(instanceName) {
         await fse.remove(
           path.join(_getTempPath(state), 'install_profile.json')
         );
-
-        await fse.outputJson(forgeJsonPath, forgeJson);
 
         // Extract forge bin
         if (forgeJson.install.filePath) {
@@ -1082,10 +1074,8 @@ export function downloadForge(instanceName) {
 
       await fse.remove(tempInstaller);
 
-      await fse.outputFile(
-        completedForgeSkipFile,
-        'If I exist GDLauncher skips all asset checks for my version'
-      );
+      // Finally write manifest and use to check if valid next time.
+      await fse.outputJson(forgeJsonPath, forgeJson);
     }
   };
 }
@@ -1309,17 +1299,13 @@ export function downloadInstance(instanceName) {
 
     let mcJson;
 
-    const skipFileVanilla = path.join(
+    const mcJsonPath = path.join(
       _getMinecraftVersionsPath(state),
-      `${mcVersion}.complete`
+      `${mcVersion}.json`
     );
-    const skipInstallVanilla = await fse.pathExists(skipFileVanilla);
+    const skipInstallVanilla = await fse.pathExists(mcJsonPath);
     if (skipInstallVanilla) {
       // Read Manifest and extra natives.
-      const mcJsonPath = path.join(
-        _getMinecraftVersionsPath(state),
-        `${mcVersion}.json`
-      );
       mcJson = await fse.readJson(mcJsonPath);
       const libraries = librariesMapper(
         mcJson.libraries,
@@ -1346,16 +1332,11 @@ export function downloadInstance(instanceName) {
       dispatch(addNextInstanceToCurrentDownload());
     } else {
       // DOWNLOAD MINECRAFT JSON
-      const mcJsonPath = path.join(
-        _getMinecraftVersionsPath(state),
-        `${mcVersion}.json`
-      );
       try {
         mcJson = await fse.readJson(mcJsonPath);
       } catch (err) {
         const versionURL = mcVersions.find(v => v.id === mcVersion).url;
         mcJson = (await axios.get(versionURL)).data;
-        await fse.outputJson(mcJsonPath, mcJson);
       }
 
       // COMPUTING MC ASSETS
@@ -1438,10 +1419,8 @@ export function downloadInstance(instanceName) {
         await copyAssetsToLegacy(assets);
       }
 
-      await fse.outputFile(
-        skipFileVanilla,
-        'If I exist GDLauncher skips all asset checks for my version'
-      );
+      // Finally write manifest and use to check if valid next time.
+      await fse.outputJson(mcJsonPath, mcJson);
 
       if (modloader && modloader[0] === FABRIC) {
         await dispatch(downloadFabric(instanceName));
