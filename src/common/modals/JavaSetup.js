@@ -9,13 +9,11 @@ import path from 'path';
 import { extractFull } from 'node-7z';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons';
+import { promisify } from 'util';
+import { exec } from 'child_process';
 import Modal from '../components/Modal';
 import { downloadFile } from '../../app/desktop/utils/downloader';
-import {
-  convertOSToJavaFormat,
-  get7zPath,
-  fixFilePermissions
-} from '../../app/desktop/utils';
+import { convertOSToJavaFormat, get7zPath } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { updateJavaPath } from '../reducers/settings/actions';
@@ -291,9 +289,18 @@ const AutomaticSetup = () => {
     await fse.remove(path.join(tempFolder, `${releaseName}-jre`));
 
     const ext = process.platform === 'win32' ? '.exe' : '';
-    await fixFilePermissions(
-      path.join(javaBaseFolder, version, 'bin', `java${ext}`)
-    );
+
+    if (process.platform !== 'win32') {
+      const execPath = path.join(javaBaseFolder, version, 'bin', `java${ext}`);
+
+      await promisify(exec)(
+        `chmod +x "${path.join(userData, path.basename(execPath))}"`
+      );
+      await promisify(exec)(
+        `chmod 755 "${path.join(userData, path.basename(execPath))}"`
+      );
+    }
+
     dispatch(updateJavaPath(null));
     setCurrentStep(`Java is ready!`);
     ipcRenderer.invoke('update-progress-bar', -1);

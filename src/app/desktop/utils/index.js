@@ -185,39 +185,10 @@ export const isLatestJavaDownloaded = async (meta, userData) => {
 export const get7zPath = async () => {
   // Get userData from ipc because we can't always get this from redux
   const baseDir = await ipcRenderer.invoke('getUserData');
-  if (process.platform === 'darwin') {
-    return path.join(baseDir, '7za-osx');
+  if (process.platform === 'darwin' || process.platform === 'linux') {
+    return path.join(baseDir, '7za');
   }
-  if (process.platform === 'win32') {
-    return path.join(baseDir, '7za.exe');
-  }
-  return path.join(baseDir, '7za-linux');
-};
-
-export const fixFilePermissions = async filePath => {
-  if (process.platform === 'linux' || process.platform === 'darwin') {
-    await promisify(exec)(`chmod +x "${filePath}"`);
-    await promisify(exec)(`chmod 755 "${filePath}"`);
-  }
-};
-
-export const extract7z = async () => {
-  const appPath = await ipcRenderer.invoke('getAppPath');
-  const baseDir = path.join(
-    appPath,
-    process.env.NODE_ENV === 'development' ? 'public' : 'build',
-    '7z'
-  );
-  let zipLocationAsar = path.join(baseDir, '7za-linux');
-  if (process.platform === 'darwin') {
-    zipLocationAsar = path.join(baseDir, '7za-osx');
-  }
-  if (process.platform === 'win32') {
-    zipLocationAsar = path.join(baseDir, '7za.exe');
-  }
-  const sevenZipPath = await get7zPath();
-  await fse.copy(zipLocationAsar, sevenZipPath);
-  await fixFilePermissions(sevenZipPath);
+  return path.join(baseDir, '7za.exe');
 };
 
 export const extractNatives = async (libraries, instancePath) => {

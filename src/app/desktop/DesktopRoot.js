@@ -27,7 +27,7 @@ import RouteBackground from '../../common/components/RouteBackground';
 import ga from '../../common/utils/analytics';
 import routes from './utils/routes';
 import { _getCurrentAccount } from '../../common/utils/selectors';
-import { isLatestJavaDownloaded, extract7z } from './utils';
+import { isLatestJavaDownloaded } from './utils';
 import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
 import { openModal } from '../../common/reducers/modals/actions';
@@ -72,7 +72,6 @@ function DesktopRoot() {
     dispatch(requesting(features.mcAuthentication));
 
     const manifests = await dispatch(initManifests());
-    await extract7z();
     const isLatestJava = await isLatestJavaDownloaded(manifests.java, userData);
     const isJavaOK = javaPath || isLatestJava;
     if (!isJavaOK) {

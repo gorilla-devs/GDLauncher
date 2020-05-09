@@ -95,8 +95,8 @@ export const convertMinutesToHumanTime = minutes => {
     case minutes === 1:
       return `1 minute`;
     case minutes === 0:
-      return `not played yet`;
+      return '0 minutes';
     default:
-      return `loading playtime`;
+      return '';
   }
 };

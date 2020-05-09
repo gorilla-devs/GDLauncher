@@ -10,12 +10,13 @@ const {
   globalShortcut
 } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const nsfw = require('nsfw');
 const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
+const { promisify } = require('util');
 
 const fs = fss.promises;
 
@@ -70,6 +71,43 @@ if (
 log.log(process.env.REACT_APP_RELEASE_TYPE);
 
 const isDev = process.env.NODE_ENV === 'development';
+
+async function extract7z() {
+  const baseDir = path.join(app.getAppPath(), 'node_modules', '7zip-bin');
+
+  let zipLocationAsar = path.join(baseDir, 'linux', 'x64', '7za');
+  if (process.platform === 'darwin') {
+    zipLocationAsar = path.join(baseDir, 'mac', '7za');
+  }
+  if (process.platform === 'win32') {
+    zipLocationAsar = path.join(baseDir, 'win', 'x64', '7za.exe');
+  }
+  try {
+    await fs.copyFile(
+      zipLocationAsar,
+      path.join(app.getPath('userData'), path.basename(zipLocationAsar))
+    );
+
+    if (process.platform === 'linux' || process.platform === 'darwin') {
+      await promisify(exec)(
+        `chmod +x "${path.join(
+          app.getPath('userData'),
+          path.basename(zipLocationAsar)
+        )}"`
+      );
+      await promisify(exec)(
+        `chmod 755 "${path.join(
+          app.getPath('userData'),
+          path.basename(zipLocationAsar)
+        )}"`
+      );
+    }
+  } catch (e) {
+    log.error(e);
+  }
+}
+
+extract7z();
 
 let mainWindow;
 let tray;
