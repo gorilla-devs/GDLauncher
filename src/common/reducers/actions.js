@@ -597,6 +597,16 @@ export function updateDownloadStatus(instanceName, status) {
   };
 }
 
+
+export function updateLastUpdateVersion(version) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_LAST_UPDATE_VERSION,
+      version
+    });
+  };
+}
+
 export function updateDownloadCurrentPhase(instanceName, status) {
   return dispatch => {
     dispatch({

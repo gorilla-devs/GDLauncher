@@ -36,7 +36,7 @@ const BisectHosting = () => {
               color: ${props => props.theme.palette.colors.green};
             `}
           >
-            gdl
+            GDL
           </span>{' '}
           with{' '}
           <span

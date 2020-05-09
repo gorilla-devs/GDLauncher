@@ -669,14 +669,15 @@ const General = () => {
           `}
         >
           <HorizontalLogo size={200} />{' '}
-          <Button
+          <div
             css={`
               margin-left: 10px;
+              cursor: pointer;
             `}
-            onClick={() => dispatch(openModal('ChangeLogs', { version }))}
+            onClick={() => dispatch(openModal('ChangeLogs'))}
           >
             v {version}
-          </Button>
+          </div>
         </div>
         <p>
           {updateAvailable

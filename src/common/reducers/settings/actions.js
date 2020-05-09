@@ -45,15 +45,6 @@ export function updatePotatoPcMode(value) {
   };
 }
 
-export function updateShowChangelog(show) {
-  return dispatch => {
-    dispatch({
-      type: ActionTypes.UPDATE_SHOW_CHANGELOG,
-      show
-    });
-  };
-}
-
 export function updateResolution(resolution) {
   return dispatch => {
     dispatch({

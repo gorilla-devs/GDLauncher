@@ -4,11 +4,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Button, Dropdown, Menu } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
+import { ipcRenderer } from 'electron';
 import Instances from '../components/Instances';
 import News from '../components/News';
 import { openModal } from '../../../common/reducers/modals/actions';
 import { _getCurrentAccount } from '../../../common/utils/selectors';
 import { extractFace } from '../utils';
+import { updateLastUpdateVersion } from '../../../common/reducers/actions';
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
@@ -28,6 +30,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const account = useSelector(_getCurrentAccount);
   const news = useSelector(state => state.news);
+  const lastUpdateVersion = useSelector(state => state.app.lastUpdateVersion);
 
   const openAddInstanceModal = defaultPage => {
     dispatch(openModal('AddInstance', { defaultPage }));
@@ -37,6 +40,21 @@ const Home = () => {
     dispatch(openModal('AccountsManager'));
   };
   const [profileImage, setProfileImage] = useState(null);
+
+  useEffect(() => {
+    ipcRenderer
+      .invoke('getAppVersion')
+      .then(v => {
+        if (lastUpdateVersion !== v) {
+          dispatch(updateLastUpdateVersion(v));
+          if (lastUpdateVersion) {
+            dispatch(openModal('ChangeLogs'));
+          }
+        }
+        return null;
+      })
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);

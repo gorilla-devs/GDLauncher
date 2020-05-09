@@ -12,6 +12,7 @@ import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.webm';
 import HorizontalLogo from '../../../ui/HorizontalLogo';
+import { openModal } from '../../../common/reducers/modals/actions';
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
@@ -200,7 +201,14 @@ const Login = () => {
                   </a>
                 </div>
               </FooterLinks>
-              <div>v{version}</div>
+              <div
+                css={`
+                  cursor: pointer;
+                `}
+                onClick={() => dispatch(openModal('ChangeLogs'))}
+              >
+                v{version}
+              </div>
             </Footer>
           </LeftSide>
           <Background transitionState={transitionState}>
