@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { transparentize } from 'polished';
 import styled, { keyframes } from 'styled-components';
 import { promises as fs } from 'fs';
@@ -351,4 +351,4 @@ const Instance = ({ instanceName }) => {
   );
 };
 
-export default Instance;
+export default memo(Instance);
