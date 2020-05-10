@@ -127,7 +127,7 @@
     "electron-builder": "^22.6.0",
     "electron-builder-squirrel-windows": "^22.6.0",
     "electron-rebuild": "^1.10.1",
-    "eslint": "^7.0.0",
+    "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-formatter-pretty": "^3.0.1",
