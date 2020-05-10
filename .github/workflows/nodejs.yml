@@ -73,7 +73,7 @@ jobs:
         run: |
           yarn release
       - name: upload release to gh releases
-        if: github.event_name == 'push' && github.base_ref == 'releases'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/releases'
         run: |
           yarn upload
       - uses: actions/upload-artifact@v1
