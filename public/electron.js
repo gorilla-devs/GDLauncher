@@ -40,7 +40,8 @@ Menu.setApplicationMenu();
 
 app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
 
-let allowBetaReleases = false;
+let allowUnstableReleases = false;
+let releaseChannel = null;
 const releaseChannelExists = fss.existsSync(
   path.join(app.getPath('userData'), 'rChannel')
 );
@@ -48,7 +49,14 @@ if (releaseChannelExists) {
   const releaseChannelConfig = fss.readFileSync(
     path.join(app.getPath('userData'), 'rChannel')
   );
-  allowBetaReleases = releaseChannelConfig === 'beta';
+  const releaseId = parseInt(releaseChannelConfig.toString(), 10);
+  if (releaseId === 1) {
+    releaseChannel = 'beta';
+    allowUnstableReleases = true;
+  } else if (releaseId === 2) {
+    releaseChannel = 'alpha';
+    allowUnstableReleases = true;
+  }
 }
 
 if (
@@ -388,8 +396,11 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
-  autoUpdater.allowDowngrade = allowBetaReleases;
-  autoUpdater.allowPrerelease = allowBetaReleases;
+  autoUpdater.allowDowngrade = allowUnstableReleases;
+  autoUpdater.allowPrerelease = allowUnstableReleases;
+  if (allowUnstableReleases) {
+    autoUpdater.channel = releaseChannel;
+  }
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',
     repo: 'GDLauncher-Releases',
