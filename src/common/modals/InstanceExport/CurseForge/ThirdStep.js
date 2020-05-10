@@ -7,6 +7,8 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import fse from 'fs-extra';
 import { add as add7z } from 'node-7z';
 import makeDir from 'make-dir';
+import { Transition } from 'react-transition-group';
+import styled from 'styled-components';
 import pMap from 'p-map';
 import { get7zPath } from '../../../../app/desktop/utils';
 
@@ -43,7 +45,9 @@ export default function ThirdStep({
   packAuthor,
   selectedFiles,
   closeModal,
-  packZipName
+  packZipName,
+  inProp,
+  page
 }) {
   const [isCompleted, setIsCompleted] = useState(false);
   const { modloader, mods } = instanceConfig;
@@ -83,6 +87,7 @@ export default function ThirdStep({
   };
 
   useEffect(() => {
+    if (page !== 2) return;
     const workOnFiles = async () => {
       // Make sure mod with curseforge ids gets removed from mods folder if included.
       const filteredFiles = selectedFiles.filter(file => {
@@ -150,46 +155,95 @@ export default function ThirdStep({
     };
 
     workOnFiles();
-  }, []);
+  }, [page]);
 
   return (
-    <div
-      css={`
-        height: 85%;
-        width: 100%;
-        padding: 20px;
-        overflow-y: auto;
-      `}
-    >
-      <div
-        css={`
-          display: flex;
-          justify-content: center;
-          width: 100%;
-          height: 100%;
-          align-items: center;
-          text-align: center;
-        `}
-      >
-        {isCompleted ? (
-          <div>
-            <h2>
-              All Done!{' '}
-              <FontAwesomeIcon
-                icon={faCheck}
+    <Transition in={inProp} timeout={200}>
+      {state => (
+        <Animation state={state}>
+          <div
+            css={`
+              width: 100%;
+              height: calc(100% - 40px);
+              display: flex;
+              margin: 20px;
+            `}
+          >
+            <div
+              css={`
+                flex: 5;
+                height: 100%;
+              `}
+            >
+              <div
                 css={`
-                  color: ${props => props.theme.palette.colors.green};
+                  height: 85%;
+                  width: 100%;
+                  padding: 20px;
+                  overflow-y: auto;
                 `}
-              />
-            </h2>
-            <Button type="primary" onClick={() => dispatch(closeModal())}>
-              Go Back To Instances
-            </Button>
+              >
+                <div
+                  css={`
+                    display: flex;
+                    justify-content: center;
+                    width: 100%;
+                    height: 100%;
+                    align-items: center;
+                    text-align: center;
+                  `}
+                >
+                  {isCompleted ? (
+                    <div>
+                      <h1>
+                        All Done!{' '}
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          css={`
+                            color: ${props => props.theme.palette.colors.green};
+                          `}
+                        />
+                      </h1>
+                      <div>
+                        <Button
+                          type="primary"
+                          onClick={() => dispatch(closeModal())}
+                          css={`
+                            margin-top: 20px;
+                          `}
+                        >
+                          Go Back To Instances
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <h2>We&apos;re doing some magical stuff</h2>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        ) : (
-          <h2>We&apos;re doing some magical stuff</h2>
-        )}
-      </div>
-    </div>
+        </Animation>
+      )}
+    </Transition>
   );
 }
+
+const Animation = styled.div`
+  transition: 0.2s ease-in-out;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 100000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  transform: translateX(
+    ${({ state }) => (state === 'exiting' || state === 'exited' ? 100 : 0)}%
+  );
+`;

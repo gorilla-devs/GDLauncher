@@ -35,6 +35,7 @@ const ChangeLogs = () => {
               <li>Added changelogs modal</li>
               <li>Windows executables are now digitally signed</li>
               <li>Crash handler modal for instances</li>
+              <li>Instances exporter</li>
             </ul>
           </div>
         </Section>

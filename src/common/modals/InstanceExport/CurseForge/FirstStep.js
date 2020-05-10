@@ -2,12 +2,14 @@ import React, { useEffect } from 'react';
 import dirTree from 'directory-tree';
 import path from 'path';
 import { Button, Input } from 'antd';
+import { Transition } from 'react-transition-group';
 import styled from 'styled-components';
+import { faFolder } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ContinueButton from './ContinueButton';
 
 const InlineBlock = styled.span`
   display: inline-block;
-  margin-left: 10px;
   margin-right: 10px;
 `;
 
@@ -19,11 +21,13 @@ export default function FirstStep({
   setPackVersion,
   packVersion,
   setPage,
+  page,
   packAuthor,
   setPackAuthor,
   packZipName,
   setPackZipName,
-  setSelectedFiles
+  setSelectedFiles,
+  inProp
 }) {
   const fileBlackList = [
     path.join(instancePath, 'config.json'),
@@ -39,6 +43,7 @@ export default function FirstStep({
   ];
 
   useEffect(() => {
+    if (page !== 1) return;
     const getTreeData = async () => {
       const arr = dirTree(instancePath);
 
@@ -98,21 +103,6 @@ export default function FirstStep({
         return arrSort(dirs).concat(arrSort(files));
       };
 
-      // const mapArr = (children, disableChildren = false) => {
-      //   if (!children || children.length === 0) return [];
-      //   return children.map(child => {
-      //     const disableBool =
-      //       disableChildren || fileBlackList.some(file => file === child.path);
-      //     return {
-      //       title: child.name,
-      //       key: child.path,
-      //       selectable: false,
-      //       disableCheckbox: disableBool,
-      //       children: mapArr(child.children, disableBool)
-      //     };
-      //   });
-      // };
-
       function rootNode(localName, localPath, children = []) {
         return [
           {
@@ -131,150 +121,186 @@ export default function FirstStep({
     };
 
     getTreeData();
-  }, []);
+  }, [page]);
 
   function filePathDisplay() {
     if (!filePath) return '';
-    if (filePath.length >= 80) return `...${filePath.slice(-77)}`;
-    return filePath;
+    let fileName = `${packZipName}-${packVersion}.zip`;
+    if (fileName.length >= 25)
+      fileName = `...${fileName.slice(fileName.length - 25)}`;
+    const joinedPath = path.join(filePath, fileName);
+
+    if (joinedPath.length >= 45)
+      return `...${joinedPath.slice(joinedPath.length - 45)}`;
+    return joinedPath;
   }
 
   return (
-    <div
-      css={`
-        height: 85%;
-        width: 100%;
-        padding: 20px;
-        overflow-y: auto;
-      `}
-    >
-      <div
-        css={`
-          display: flex;
-          justify-content: center;
-          width: 100%;
-          height: 100%;
-          align-items: center;
-          text-align: center;
-        `}
-      >
-        <div
-          css={`
-            text-align: center;
-          `}
-        >
-          <div>
+    <Transition in={inProp} timeout={200}>
+      {state => (
+        <Animation state={state}>
+          <div
+            css={`
+              width: 100%;
+              height: 100%;
+              display: flex;
+              margin-top: 40px;
+            `}
+          >
             <div
               css={`
-                text-align: right;
+                flex: 5;
+                height: 100%;
               `}
             >
-              <div>
-                <InlineBlock>
-                  <h3>Name</h3>
-                </InlineBlock>
-                <InlineBlock>
-                  <Input
-                    type="text"
-                    name="inputPackAuthor"
-                    allowClear="true"
-                    defaultValue={packZipName}
-                    maxLength={50}
-                    css={`
-                      width: 250px;
-                    `}
-                    onChange={e => setPackZipName(e.target.value)}
-                  />
-                </InlineBlock>
-              </div>
-              <div>
-                <InlineBlock>
-                  <h3>Version</h3>
-                </InlineBlock>
-                <InlineBlock>
-                  <Input
-                    type="text"
-                    name="inputPackVersion"
-                    defaultValue={packVersion}
-                    maxLength={50}
-                    allowClear="true"
-                    css={`
-                      width: 250px;
-                    `}
-                    onChange={e => setPackVersion(e.target.value)}
-                  />
-                </InlineBlock>
-              </div>
-              <div>
-                <InlineBlock>
-                  <h3>Author</h3>
-                </InlineBlock>
-                <InlineBlock
+              <div
+                css={`
+                  height: 85%;
+                  width: 100%;
+                  overflow-y: auto;
+                `}
+              >
+                <div
                   css={`
-                    display: inline-block;
+                    display: flex;
+                    justify-content: center;
+                    width: 100%;
+                    height: 100%;
+                    text-align: center;
                   `}
                 >
-                  <Input
-                    type="text"
-                    name="inputPackAuthor"
-                    defaultValue={packAuthor}
-                    maxLength={50}
-                    allowClear="true"
+                  <div
                     css={`
-                      width: 250px;
+                      width: calc(100% - 40px);
                     `}
-                    onChange={e => setPackAuthor(e.target.value)}
-                  />
-                </InlineBlock>
+                  >
+                    <div
+                      css={`
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 10px;
+                      `}
+                    >
+                      <InlineBlock>
+                        <h3>Name</h3>
+                      </InlineBlock>
+                      <span>
+                        <Input
+                          type="text"
+                          name="inputPackAuthor"
+                          allowClear="true"
+                          defaultValue={packZipName}
+                          maxLength={50}
+                          css={`
+                            width: 300px;
+                          `}
+                          onChange={e => setPackZipName(e.target.value)}
+                        />
+                      </span>
+                    </div>
+                    <div
+                      css={`
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 10px;
+                      `}
+                    >
+                      <InlineBlock>
+                        <h3>Version</h3>
+                      </InlineBlock>
+                      <span>
+                        <Input
+                          type="text"
+                          name="inputPackVersion"
+                          defaultValue={packVersion}
+                          maxLength={10}
+                          allowClear="true"
+                          css={`
+                            width: 300px;
+                          `}
+                          onChange={e => setPackVersion(e.target.value)}
+                        />
+                      </span>
+                    </div>
+                    <div
+                      css={`
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 40px;
+                      `}
+                    >
+                      <InlineBlock>
+                        <h3>Author</h3>
+                      </InlineBlock>
+                      <span
+                        css={`
+                          display: inline-block;
+                        `}
+                      >
+                        <Input
+                          type="text"
+                          name="inputPackAuthor"
+                          defaultValue={packAuthor}
+                          maxLength={50}
+                          allowClear="true"
+                          css={`
+                            width: 300px;
+                          `}
+                          onChange={e => setPackAuthor(e.target.value)}
+                        />
+                      </span>
+                    </div>
+                    <div
+                      css={`
+                        display: flex;
+                        justify-content: space-between;
+                      `}
+                    >
+                      <Input
+                        type="text"
+                        name="filePathDisplay"
+                        disabled
+                        value={filePathDisplay()}
+                        css={`
+                          margin-right: 10px;
+                        `}
+                      />
+                      <Button type="primary" onClick={showFileDialog}>
+                        <FontAwesomeIcon icon={faFolder} />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                <ContinueButton
+                  onClick={setPage}
+                  disabled={
+                    !(packZipName && packVersion && packAuthor && filePath)
+                  }
+                />
               </div>
             </div>
           </div>
-          <div>
-            <Input
-              type="text"
-              name="fileNameDisplay"
-              disabled
-              value={
-                packZipName && packVersion
-                  ? `${packZipName}-${packVersion}.zip`
-                  : 'Invalid'
-              }
-              css={`
-                width: 400px;
-                margin-top: 15px;
-              `}
-            />
-          </div>
-          <Input
-            type="text"
-            name="filePathDisplay"
-            disabled
-            value={filePathDisplay()}
-            css={`
-              position: absolute;
-              bottom: 70px;
-              left: calc(50% - 300px);
-              width: 600px;
-            `}
-          />
-          <Button
-            type="primary"
-            onClick={showFileDialog}
-            css={`
-              position: absolute;
-              bottom: 30px;
-              left: calc(50% - 60px);
-              width: 120px;
-            `}
-          >
-            Select Folder
-          </Button>
-        </div>
-      </div>
-      <ContinueButton
-        onClick={setPage}
-        disabled={!(packZipName && packVersion && packAuthor && filePath)}
-      />
-    </div>
+        </Animation>
+      )}
+    </Transition>
   );
 }
+
+const Animation = styled.div`
+  transition: 0.2s ease-in-out;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 100000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  transform: translateX(
+    ${({ state }) => (state === 'exiting' || state === 'exited' ? -100 : 0)}%
+  );
+`;
