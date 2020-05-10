@@ -74,6 +74,8 @@ jobs:
           yarn release
       - name: upload release to gh releases
         if: github.event_name == 'push' && github.ref == 'refs/heads/releases'
+        env:
+          GH_ACCESS_TOKEN_RELEASES: ${{ secrets.GH_ACCESS_TOKEN_RELEASES }}
         run: |
           yarn upload
       - uses: actions/upload-artifact@v1
