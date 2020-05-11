@@ -392,7 +392,6 @@ const General = () => {
           >
             <Select.Option value={0}>Stable</Select.Option>
             <Select.Option value={1}>Beta</Select.Option>
-            <Select.Option value={2}>Alpha</Select.Option>
           </Select>
         </div>
       </ReleaseChannel>
