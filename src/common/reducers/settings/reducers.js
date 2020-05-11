@@ -71,7 +71,7 @@ function showNews(state = true, action) {
 }
 
 function minecraftSettings(
-  state = { resolution: { height: 600, width: 800 } },
+  state = { resolution: { height: 480, width: 854 } },
   action
 ) {
   switch (action.type) {

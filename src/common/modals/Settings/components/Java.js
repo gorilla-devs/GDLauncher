@@ -237,7 +237,7 @@ export default function MyAccountPreferences() {
               value={mcResolution.width}
               onChange={e => {
                 const w = parseInt(e.target.value, 10);
-                dispatch(updateResolution({ width: w || 800 }));
+                dispatch(updateResolution({ width: w || 854 }));
               }}
             />
             &nbsp;X&nbsp;
@@ -246,7 +246,7 @@ export default function MyAccountPreferences() {
               value={mcResolution.height}
               onChange={e => {
                 const h = parseInt(e.target.value, 10);
-                dispatch(updateResolution({ height: h || 600 }));
+                dispatch(updateResolution({ height: h || 480 }));
               }}
             />
           </div>
