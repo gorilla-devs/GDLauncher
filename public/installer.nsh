@@ -5,12 +5,6 @@
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
     ${EndIf}
-
-    DeleteRegKey HKCU "Software\${APP_GUID}"
-    DeleteRegKey HKCU "Software\{${APP_GUID}}"
-    DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
-    DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
-
 !macroend
 
 !macro customUnInstall

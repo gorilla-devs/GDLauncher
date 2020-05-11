@@ -26,7 +26,7 @@ const LoginButton = styled(Button)`
   color: ${props => props.theme.palette.text.primary};
   &:hover {
     color: ${props => props.theme.palette.text.primary};
-    background: ${props => props.theme.palette.grey[props.active ? 600 : 500]};
+    background: ${props => props.theme.palette.grey[600]};
   }
   &:focus {
     color: ${props => props.theme.palette.text.primary};
@@ -197,7 +197,7 @@ const Login = () => {
                 </div>
                 <div>
                   <a href="https://my.minecraft.net/en-us/password/forgot/">
-                    CAN&apos;T SIGN IN
+                    FORGOT PASSWORD
                   </a>
                 </div>
               </FooterLinks>

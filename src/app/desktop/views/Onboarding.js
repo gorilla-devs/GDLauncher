@@ -124,7 +124,7 @@ const Home = () => {
             padding: 0 120px;
           `}
         >
-          Welcome {account.selectedProfile.name} to GDLauncher!
+          {account.selectedProfile.name}, welcome to GDLauncher!
         </div>
       </div>
       <div
@@ -227,7 +227,7 @@ const Home = () => {
             margin: 20%;
           `}
         >
-          Also, don&apos;t forget to join us on discord! This is where our
+          Also, don&apos;t forget to join us on Discord! This is where our
           community is!
           <iframe
             css={`
