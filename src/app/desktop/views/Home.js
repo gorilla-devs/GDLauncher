@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -63,10 +63,10 @@ const Home = () => {
   const menu = (
     <Menu>
       <Menu.Item key="0" onClick={() => openAddInstanceModal(0)}>
-        Empty Instance
+        Create Instance
       </Menu.Item>
       <Menu.Item key="1" onClick={() => openAddInstanceModal(1)}>
-        Modpack Instance
+        Browse Modpacks
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="2" onClick={() => openAddInstanceModal(2)}>
@@ -112,4 +112,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default memo(Home);

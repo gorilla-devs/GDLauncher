@@ -53,9 +53,6 @@ if (releaseChannelExists) {
   if (releaseId === 1) {
     releaseChannel = 'beta';
     allowUnstableReleases = true;
-  } else if (releaseId === 2) {
-    releaseChannel = 'alpha';
-    allowUnstableReleases = true;
   }
 }
 
