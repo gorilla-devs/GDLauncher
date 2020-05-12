@@ -66,9 +66,10 @@ const Form = styled.div`
 `;
 
 const Background = styled.div`
-  width: auto;
-  height: 100%;
-  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   video {
     transition: 0.3s ease-in-out;
     transform: translateX(
