@@ -61,18 +61,19 @@ const Instances = () => {
         instances.map(i => <Instance key={i.name} instanceName={i.name} />)
       ) : (
         <NoInstance>
-          No Instance has been installed
+          {showOldGDHelp
+            ? 'Where did my old instances go?'
+            : 'No Instance has been installed'}
           <SubNoInstance>
-            {showOldGDHelp === true && (
+            {showOldGDHelp ? (
               <div>
-                Where did my old instances go? <br /> Click{' '}
+                Click{' '}
                 <a href="https://github.com/gorilla-devs/GDLauncher/wiki/Instances-Upgrade-Guide">
                   here
                 </a>{' '}
                 for more info
               </div>
-            )}
-            {showOldGDHelp === false && (
+            ) : (
               <div>
                 Click on the icon in the bottom left corner to add new instances
               </div>

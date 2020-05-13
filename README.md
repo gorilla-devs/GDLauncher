@@ -90,7 +90,7 @@ These are the steps to compile it yourself.
 
 You need the following software installed:
 
-- [NodeJS](https://nodejs.org/en/download/) (> v1.13.9 x64)
+- [NodeJS](https://nodejs.org/en/download/) (> v13.9.0 x64)
 - yarn (`npm i -g yarn`)
 - [Rust](https://www.rust-lang.org/)
 - C++ compiler (g++ or windows build tools)
@@ -171,4 +171,10 @@ It was here that a community started gathering around the project. In the meanwh
 
 ## 🎓 License
 
-This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) file for details.
+
+If you need GDLauncher licensed under different conditions, please contact davide@gdevs.io
+
+A simple way to keep in terms of the license is by forking this repository and leaving it open source under the same license. We love free software, seeing people use our code and then not share the code, breaking the license, is saddening. So please take a look at the license and respect what we're doing.
+
+Also, while we cannot enforce this under the license, you cannot use our CDN/files/assets on your own launcher. Again we cannot enforce this under the license, but needless to say, we'd be very unhappy if you did that and really would like to leave cease and desist letters as a last resort.

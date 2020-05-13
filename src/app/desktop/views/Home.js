@@ -47,9 +47,7 @@ const Home = () => {
       .then(v => {
         if (lastUpdateVersion !== v) {
           dispatch(updateLastUpdateVersion(v));
-          if (lastUpdateVersion) {
-            dispatch(openModal('ChangeLogs'));
-          }
+          dispatch(openModal('ChangeLogs'));
         }
         return null;
       })
