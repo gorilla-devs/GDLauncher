@@ -171,4 +171,6 @@ It was here that a community started gathering around the project. In the meanwh
 
 ## 🎓 License
 
-This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) file for details.
+
+If you need GDLauncher licensed under different conditions, please contact davide@gdevs.io
