@@ -323,7 +323,14 @@ const Instance = ({ instanceName }) => {
         {/* // TODO - Support other export options besides curseforge forge. */}
         <MenuItem
           onClick={instanceExportCurseForge}
-          disabled={Boolean(isInQueue) || instance.modloader[0] !== 'forge'}
+          disabled={
+            Boolean(isInQueue) ||
+            !(
+              instance.modloader[0] === 'forge' ||
+              instance.modloader[0] === 'fabric' ||
+              instance.modloader[0] === 'vanilla'
+            )
+          }
         >
           <FontAwesomeIcon
             icon={faBoxOpen}
