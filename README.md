@@ -90,7 +90,7 @@ These are the steps to compile it yourself.
 
 You need the following software installed:
 
-- [NodeJS](https://nodejs.org/en/download/) (> v1.13.9 x64)
+- [NodeJS](https://nodejs.org/en/download/) (> v13.9.0 x64)
 - yarn (`npm i -g yarn`)
 - [Rust](https://www.rust-lang.org/)
 - C++ compiler (g++ or windows build tools)
