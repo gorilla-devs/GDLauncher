@@ -72,12 +72,14 @@ export default function ThirdStep({
         loader = {
           id: modloaderName,
           yarn: modloader[2],
-          loader: modloader[3]
+          loader: modloader[3],
+          primary: true
         };
         break;
       case 'vanilla':
         loader = {
-          id: modloaderName
+          id: modloaderName,
+          primary: true
         };
         break;
       default:
