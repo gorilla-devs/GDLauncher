@@ -174,3 +174,7 @@ It was here that a community started gathering around the project. In the meanwh
 This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) file for details.
 
 If you need GDLauncher licensed under different conditions, please contact davide@gdevs.io
+
+A simple way to keep in terms of the license is by forking this repository and leaving it open source under the same license. We love free software, seeing people use our code and then not share the code, breaking the license, is saddening. So please take a look at the license and respect what we're doing.
+
+Also, while we cannot enforce this under the license, you cannot use our CDN/files/assets on your own launcher. Again we cannot enforce this under the license, but needless to say, we'd be very unhappy if you did that and really would like to leave cease and desist letters as a last resort.
