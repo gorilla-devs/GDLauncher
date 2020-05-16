@@ -22,6 +22,13 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
+        <Section
+          css={`
+            margin-bottom: 20px;
+          `}
+        >
+          Welcome to our biggest update ever! Here's what changed.
+        </Section>
         <Section>
           <SectionTitle
             css={`
@@ -32,10 +39,9 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Added changelogs modal</li>
+              <li>We just improved everything that was here before</li>
               <li>Windows executables are now digitally signed</li>
               <li>Crash handler modal for instances</li>
-              <li>Instances exporter</li>
             </ul>
           </div>
         </Section>
@@ -49,9 +55,7 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed linux auto updates</li>
-              <li>Fixed sync message not going away</li>
-              <li>Fixed screenshots on linux</li>
+              <li>We fixed way too many things...</li>
             </ul>
           </div>
         </Section>
