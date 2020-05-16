@@ -6,9 +6,6 @@ const middleware = store => next => action => {
   const nextState = store.getState();
   const { dispatch } = store;
 
-  //   const isAccountManagerModalOpen = nextState.modals.find(
-  //     modal => modal.modalType === "AccountsManager"
-  //   );
   const currentAccountIdChanged =
     currState.app.currentAccountId !== nextState.app.currentAccountId;
 

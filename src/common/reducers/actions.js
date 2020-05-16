@@ -21,7 +21,6 @@ import symlink from 'symlink-dir';
 import { promises as fs } from 'fs';
 import originalFs from 'original-fs';
 import pMap from 'p-map';
-import { message } from 'antd';
 import makeDir from 'make-dir';
 import { parse } from 'semver';
 import * as ActionTypes from './actionTypes';
@@ -318,6 +317,15 @@ export function updateUserData(userData) {
       path: userData
     });
     return userData;
+  };
+}
+
+export function updateMessage(message) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_MESSAGE,
+      message
+    });
   };
 }
 
@@ -662,7 +670,13 @@ export function updateInstanceConfig(
   };
 }
 
-export function addToQueue(instanceName, modloader, manifest, background) {
+export function addToQueue(
+  instanceName,
+  modloader,
+  manifest,
+  background,
+  timePlayed
+) {
   return async (dispatch, getState) => {
     const state = getState();
     const { currentDownload } = state;
@@ -688,7 +702,7 @@ export function addToQueue(instanceName, modloader, manifest, background) {
         instanceName,
         prev => ({
           modloader,
-          timePlayed: prev.timePlayed || 0,
+          timePlayed: prev.timePlayed || timePlayed || 0,
           background,
           ...(addMods && { mods: prev.mods || [] })
         }),
@@ -1452,41 +1466,30 @@ export const startListener = () => {
     const instancesPath = _getInstancesPath(state);
     const Queue = new PromiseQueue();
 
-    const notificationObj = {
-      key: 'RTSAction',
-      duration: 0
-    };
-
-    let closeMessage;
-
     Queue.on('start', queueLength => {
       if (queueLength > 1) {
-        closeMessage = message.loading({
-          ...notificationObj,
-          content: `Syncronizing files. ${queueLength} left.`
-        });
+        dispatch(
+          updateMessage({
+            content: `Syncronizing mods. ${queueLength} left.`,
+            duration: 0
+          })
+        );
       }
     });
 
     Queue.on('executed', queueLength => {
       if (queueLength > 1) {
-        closeMessage = message.loading({
-          ...notificationObj,
-          content: `Syncronizing files. ${queueLength} left.`
-        });
+        dispatch(
+          updateMessage({
+            content: `Syncronizing mods. ${queueLength} left.`,
+            duration: 0
+          })
+        );
       }
     });
 
     Queue.on('end', () => {
-      closeMessage = message.loading({
-        ...notificationObj,
-        content: `Syncronizing files. 0 left.`,
-        duration: 1
-      });
-      if (closeMessage) {
-        message.destroy();
-        closeMessage();
-      }
+      dispatch(updateMessage(null));
     });
 
     const changesTracker = {};

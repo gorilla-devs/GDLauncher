@@ -38,6 +38,21 @@ app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
 
+let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
+
+// Read config and eventually use new path
+try {
+  const configFile = fss.readFileSync(
+    path.join(app.getPath('userData'), 'config.json')
+  );
+  const config = JSON.parse(configFile);
+  if (config.settings.instancesPath) {
+    oldLauncherUserData = config.settings.instancesPath;
+  }
+} catch {
+  // Do nothing
+}
+
 app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
 
 let allowUnstableReleases = false;
@@ -297,6 +312,10 @@ ipcMain.handle('getUserData', () => {
   return app.getPath('userData');
 });
 
+ipcMain.handle('getOldLauncherUserData', () => {
+  return oldLauncherUserData;
+});
+
 ipcMain.handle('getExecutablePath', () => {
   return path.dirname(app.getPath('exe'));
 });
@@ -424,7 +443,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
     'temp'
   );
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
-    autoUpdater.quitAndInstall(true, true);
+    autoUpdater.quitAndInstall(true, !quitAfterInstall);
   } else {
     const updaterVbs = 'updater.vbs';
     const updaterBat = 'updateLauncher.bat';
