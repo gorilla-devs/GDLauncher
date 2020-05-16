@@ -27,6 +27,7 @@ import { launchInstance } from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
+import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
 
 const Container = styled.div`
   position: relative;
@@ -326,9 +327,9 @@ const Instance = ({ instanceName }) => {
           disabled={
             Boolean(isInQueue) ||
             !(
-              instance.modloader[0] === 'forge' ||
-              instance.modloader[0] === 'fabric' ||
-              instance.modloader[0] === 'vanilla'
+              instance.modloader[0] === FORGE ||
+              instance.modloader[0] === FABRIC ||
+              instance.modloader[0] === VANILLA
             )
           }
         >

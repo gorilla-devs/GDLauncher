@@ -114,7 +114,7 @@ const InstanceName = ({
         ),
         imageURL
       );
-      if (version[0] === 'forge') {
+      if (version[0] === FORGE) {
         const modloader = [
           version[0],
           manifest.minecraft.version,
@@ -134,7 +134,7 @@ const InstanceName = ({
             `background${path.extname(imageURL)}`
           )
         );
-      } else if (version[0] === 'fabric') {
+      } else if (version[0] === FABRIC) {
         const modloader = [
           version[0],
           manifest.minecraft.version,
@@ -151,7 +151,7 @@ const InstanceName = ({
             `background${path.extname(imageURL)}`
           )
         );
-      } else if (version[0] === 'vanilla') {
+      } else if (version[0] === VANILLA) {
         const modloader = [
           version[0],
           manifest.minecraft.version,
@@ -175,7 +175,7 @@ const InstanceName = ({
         tempPath
       );
 
-      if (version[0] === 'forge') {
+      if (version[0] === FORGE) {
         const modloader = [
           version[0],
           manifest.minecraft.version,
@@ -186,7 +186,7 @@ const InstanceName = ({
           )
         ];
         dispatch(addToQueue(localInstanceName, modloader, manifest));
-      } else if (version[0] === 'fabric') {
+      } else if (version[0] === FABRIC) {
         const modloader = [
           version[0],
           manifest.minecraft.version,
@@ -194,7 +194,7 @@ const InstanceName = ({
           manifest.minecraft.modLoaders[0].loader
         ];
         dispatch(addToQueue(localInstanceName, modloader, manifest));
-      } else if (version[0] === 'vanilla') {
+      } else if (version[0] === VANILLA) {
         const modloader = [version[0], manifest.minecraft.version];
         dispatch(addToQueue(localInstanceName, modloader, manifest));
       }

@@ -11,6 +11,7 @@ import { Transition } from 'react-transition-group';
 import styled from 'styled-components';
 import pMap from 'p-map';
 import { get7zPath } from '../../../../app/desktop/utils';
+import { FABRIC, VANILLA, FORGE } from '../../../utils/constants';
 
 /**
  *
@@ -60,13 +61,13 @@ export default function ThirdStep({
   const createManifest = async (modsArray = mods) => {
     let loader = {};
     switch (modloaderName) {
-      case 'forge':
+      case FORGE:
         loader = {
           id: `${modloaderName}-${modloader[2].slice(mcVersion.length + 1)}`,
           primary: true
         };
         break;
-      case 'fabric':
+      case FABRIC:
         loader = {
           id: modloaderName,
           yarn: modloader[2],
@@ -74,7 +75,7 @@ export default function ThirdStep({
           primary: true
         };
         break;
-      case 'vanilla':
+      case VANILLA:
         loader = {
           id: modloaderName,
           primary: true

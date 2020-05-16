@@ -104,15 +104,15 @@ const Import = ({
       setModpack({ name: manifest.name });
     }
     const isForge = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes('forge') && v.primary
+      v => v.id.includes(FORGE) && v.primary
     );
 
     const isFabric = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes('fabric') && v.primary
+      v => v.id.includes(FABRIC) && v.primary
     );
 
     const isVanilla = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes('vanilla') && v.primary
+      v => v.id.includes(VANILLA) && v.primary
     );
 
     if (!isForge && !isFabric && !isVanilla) {
