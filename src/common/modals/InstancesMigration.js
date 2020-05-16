@@ -17,6 +17,7 @@ import {
 } from '../utils/selectors';
 import { addToQueue } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
+import Logo from '../../ui/Logo';
 
 const InstancesMigration = () => {
   const dispatch = useDispatch();
@@ -172,25 +173,41 @@ const InstancesMigration = () => {
     <Modal
       css={`
         height: 500px;
-        width: 650px;
+        width: 550px;
       `}
       title="Instances Migration"
+      header={false}
     >
       <Container>
-        <div>
-          Importing {totalInstances} Instances -{' '}
-          {Object.keys(downloadQueue).length} Left
+        <div
+          css={`
+            margin-top: 20px;
+          `}
+        >
+          <Logo size={100} />
         </div>
         <div
           css={`
             margin-top: 20px;
           `}
         >
-          Please, do NOT close GDLauncher.
+          Importing {totalInstances} Instances -{' '}
+          {Object.keys(downloadQueue).length} Left
         </div>
         <div
           css={`
             margin-top: 20px;
+            font-size: 20px;
+            color: ${props => props.theme.palette.text.secondary};
+          `}
+        >
+          Please, do NOT close GDLauncher.
+        </div>
+        <div
+          css={`
+            margin-top: 80px;
+            font-size: 20px;
+            color: ${props => props.theme.palette.text.secondary};
           `}
         >
           {!copying
@@ -206,7 +223,7 @@ const InstancesMigration = () => {
             justify-content: center;
             width: 100%;
             font-size: 50px;
-            margin-top: 40px;
+            margin-top: 50px;
           `}
         >
           <LoadingOutlined />

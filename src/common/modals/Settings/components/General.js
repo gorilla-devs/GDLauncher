@@ -613,7 +613,11 @@ const General = () => {
           <Input
             value={dataPath}
             onChange={e => setDataPath(e.target.value)}
-            disabled={loadingMoveUserData || deletingInstances}
+            disabled={
+              loadingMoveUserData ||
+              deletingInstances ||
+              disableInstancesActions
+            }
           />
           <Button
             css={`
