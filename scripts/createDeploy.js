@@ -137,15 +137,15 @@ const commonConfig = {
       ]
     },
     nsisWeb: {
-      oneClick: false,
+      oneClick: true,
       installerIcon: './public/icon.ico',
       uninstallerIcon: './public/icon.ico',
       installerHeader: './public/installerHeader.bmp',
       installerSidebar: './public/installerSidebar.bmp',
       installerHeaderIcon: './public/icon.ico',
       deleteAppDataOnUninstall: true,
-      allowToChangeInstallationDirectory: true,
-      perMachine: true,
+      allowToChangeInstallationDirectory: false,
+      perMachine: false,
       differentialPackage: true,
       include: './public/installer.nsh'
     },

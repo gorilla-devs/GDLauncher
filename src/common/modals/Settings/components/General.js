@@ -20,7 +20,7 @@ import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import {
   _getCurrentAccount,
-  _getDataStorePath,
+  // _getDataStorePath,
   _getInstancesPath,
   _getTempPath
 } from '../../../utils/selectors';
@@ -220,7 +220,7 @@ const General = () => {
     state => state.settings.concurrentDownloads
   );
   const updateAvailable = useSelector(state => state.updateAvailable);
-  const dataStorePath = useSelector(_getDataStorePath);
+  // const dataStorePath = useSelector(_getDataStorePath);
   const instancesPath = useSelector(_getInstancesPath);
   const isPlaying = useSelector(state => state.startedInstances);
   const queuedInstances = useSelector(state => state.downloadQueue);
@@ -257,7 +257,7 @@ const General = () => {
   const clearSharedData = async () => {
     setDeletingInstances(true);
     try {
-      await fsa.emptyDir(dataStorePath);
+      // await fsa.emptyDir(dataStorePath);
       await fsa.emptyDir(instancesPath);
       await fsa.emptyDir(tempPath);
     } catch (e) {
@@ -613,7 +613,11 @@ const General = () => {
           <Input
             value={dataPath}
             onChange={e => setDataPath(e.target.value)}
-            disabled={loadingMoveUserData || deletingInstances}
+            disabled={
+              loadingMoveUserData ||
+              deletingInstances ||
+              disableInstancesActions
+            }
           />
           <Button
             css={`
