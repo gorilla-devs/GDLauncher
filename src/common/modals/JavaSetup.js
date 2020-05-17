@@ -9,13 +9,13 @@ import path from 'path';
 import { extractFull } from 'node-7z';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons';
+import { spawn } from 'child_process';
 import Modal from '../components/Modal';
 import { downloadFile } from '../../app/desktop/utils/downloader';
 import { convertOSToJavaFormat, get7zPath } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { updateJavaPath } from '../reducers/settings/actions';
-import { spawn } from 'child_process';
 
 const JavaSetup = () => {
   const [step, setStep] = useState(0);
