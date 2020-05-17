@@ -166,8 +166,8 @@ This is why I decided to rewrite it completely one more time, applying all the k
 
 Here you can find the previous versions of the code:
 
-- [Original C# Code](https://www.github.com/gorilla-devs/GDLauncher)
-- [First React Version](https://www.github.com/gorilla-devs/GDLauncher)
+- [Original C# Code](https://www.github.com/gorilla-devs/GDLauncher/tree/csharp_legacy_launcher)
+- [First React Version](https://www.github.com/gorilla-devs/GDLauncher/tree/GDLauncher_old)
 
 ## 🎓 License
 

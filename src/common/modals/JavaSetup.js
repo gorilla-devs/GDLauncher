@@ -9,14 +9,13 @@ import path from 'path';
 import { extractFull } from 'node-7z';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons';
-import { promisify } from 'util';
-import { exec } from 'child_process';
 import Modal from '../components/Modal';
 import { downloadFile } from '../../app/desktop/utils/downloader';
 import { convertOSToJavaFormat, get7zPath } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { updateJavaPath } from '../reducers/settings/actions';
+import { spawn } from 'child_process';
 
 const JavaSetup = () => {
   const [step, setStep] = useState(0);
@@ -293,12 +292,37 @@ const AutomaticSetup = () => {
     if (process.platform !== 'win32') {
       const execPath = path.join(javaBaseFolder, version, 'bin', `java${ext}`);
 
-      await promisify(exec)(
-        `chmod +x "${path.join(userData, path.basename(execPath))}"`
+      const chmod = spawn(
+        `chmod`,
+        ['+x', `"${path.join(userData, path.basename(execPath))}"`],
+        {
+          shell: true
+        }
       );
-      await promisify(exec)(
-        `chmod 755 "${path.join(userData, path.basename(execPath))}"`
+
+      chmod.stdout.on('data', data => {
+        console.log(data.toString());
+      });
+
+      chmod.stderr.on('data', data => {
+        console.error(data);
+      });
+
+      const chmodExec = spawn(
+        `chmod`,
+        ['755', `"${path.join(userData, path.basename(execPath))}"`],
+        {
+          shell: true
+        }
       );
+
+      chmodExec.stdout.on('data', data => {
+        console.log(data.toString());
+      });
+
+      chmodExec.stderr.on('data', data => {
+        console.error(data);
+      });
     }
 
     dispatch(updateJavaPath(null));
