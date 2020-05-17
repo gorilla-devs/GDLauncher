@@ -441,7 +441,8 @@ const General = () => {
             width: 350px;
           `}
         >
-          Enable / disable Discord Integration. This displays what you are playing in Discord.
+          Enable / disable Discord Integration. This displays what you
+          are playing in Discord.
         </p>
         <Switch
           onChange={e => {
