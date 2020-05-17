@@ -77,6 +77,7 @@ const ChangeLogs = () => {
               height: 40px;
               padding: 0;
               font-size: 20px;
+              padding: 4px !important;
             `}
             type="primary"
             href="https://discord.gg/4cGYzen"
