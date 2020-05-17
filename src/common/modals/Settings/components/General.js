@@ -433,7 +433,7 @@ const General = () => {
           margin-top: 0px;
         `}
       >
-        Discord RPC &nbsp; <FontAwesomeIcon icon={faDiscord} />
+        Discord Integration &nbsp; <FontAwesomeIcon icon={faDiscord} />
       </Title>
       <DiscordRpc>
         <p
@@ -441,7 +441,7 @@ const General = () => {
             width: 350px;
           `}
         >
-          Enable / disable Discord RPC
+          Enable / disable Discord Integration. This displays what you are playing in Discord.
         </p>
         <Switch
           onChange={e => {
