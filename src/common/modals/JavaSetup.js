@@ -292,13 +292,9 @@ const AutomaticSetup = () => {
     if (process.platform !== 'win32') {
       const execPath = path.join(javaBaseFolder, version, 'bin', `java${ext}`);
 
-      const chmod = spawn(
-        `chmod`,
-        ['+x', `"${path.join(userData, path.basename(execPath))}"`],
-        {
-          shell: true
-        }
-      );
+      const chmod = spawn(`chmod`, ['+x', `"${execPath}"`], {
+        shell: true
+      });
 
       chmod.stdout.on('data', data => {
         console.log(data.toString());
@@ -308,13 +304,9 @@ const AutomaticSetup = () => {
         console.error(data);
       });
 
-      const chmodExec = spawn(
-        `chmod`,
-        ['755', `"${path.join(userData, path.basename(execPath))}"`],
-        {
-          shell: true
-        }
-      );
+      const chmodExec = spawn(`chmod`, ['755', `"${execPath}"`], {
+        shell: true
+      });
 
       chmodExec.stdout.on('data', data => {
         console.log(data.toString());
