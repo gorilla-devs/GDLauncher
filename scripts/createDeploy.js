@@ -103,7 +103,7 @@ const commonConfig = {
   config: {
     publish: {
       owner: 'gorilla-devs',
-      repo: 'GDLauncher-Releases',
+      repo: 'GDLauncher',
       provider: 'github',
       private: false
     },

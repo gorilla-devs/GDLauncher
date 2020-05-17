@@ -2306,7 +2306,7 @@ export const initLatestMods = instanceName => {
 export const isAppLatestVersion = () => {
   return async () => {
     const { data: latestReleases } = await axios.get(
-      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases'
+      'https://api.github.com/repos/gorilla-devs/GDLauncher/releases'
     );
 
     const latestPrerelease = latestReleases.find(v => v.prerelease);
@@ -2326,11 +2326,10 @@ export const isAppLatestVersion = () => {
 
     const installedVersion = parse(await ipcRenderer.invoke('getAppVersion'));
     const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
-    if (releaseChannel === 0 && !isAppUpdated(latestStablerelease)) {
+    if (!isAppUpdated(latestStablerelease)) {
       return latestStablerelease;
     }
-
-    if (!isAppUpdated(latestPrerelease)) {
+    if (!isAppUpdated(latestPrerelease) && releaseChannel !== 0) {
       return latestPrerelease;
     }
 
@@ -2347,7 +2346,7 @@ export const checkForPortableUpdates = () => {
 
     const isLatestVersion = await isAppLatestVersion();
     // eslint-disable-next-line
-    const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher-Releases/releases/download/${isLatestVersion?.tag_name}`;
+    const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${isLatestVersion?.tag_name}`;
 
     const { data: latestManifest } = await axios.get(
       `${baseAssetUrl}/${process.platform}_latest.json`
