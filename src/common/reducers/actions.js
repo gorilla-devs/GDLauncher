@@ -2303,7 +2303,7 @@ export const initLatestMods = instanceName => {
   };
 };
 
-export const isAppLatestVersion = () => {
+export const getAppLatestVersion = () => {
   return async () => {
     const { data: latestReleases } = await axios.get(
       'https://api.github.com/repos/gorilla-devs/GDLauncher/releases'
@@ -2344,15 +2344,15 @@ export const checkForPortableUpdates = () => {
 
     const tempFolder = path.join(_getTempPath(state), `update`);
 
-    const isLatestVersion = await isAppLatestVersion();
-    // eslint-disable-next-line
-    const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${isLatestVersion?.tag_name}`;
+    const latestVersion = await getAppLatestVersion();
 
-    const { data: latestManifest } = await axios.get(
-      `${baseAssetUrl}/${process.platform}_latest.json`
-    );
-
-    if (!isLatestVersion) {
+    // Latest version has a value only if the user is not using the latest
+    if (latestVersion) {
+      // eslint-disable-next-line
+      const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${latestVersion?.tag_name}`;
+      const { data: latestManifest } = await axios.get(
+        `${baseAssetUrl}/${process.platform}_latest.json`
+      );
       // Cleanup all files that are not required for the update
       await makeDir(tempFolder);
 
@@ -2462,6 +2462,6 @@ export const checkForPortableUpdates = () => {
         { concurrency: 3 }
       );
     }
-    return !isLatestVersion;
+    return latestVersion;
   };
 };
