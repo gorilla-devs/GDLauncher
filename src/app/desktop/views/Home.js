@@ -50,7 +50,12 @@ const Home = () => {
     const oldLauncherUserData = await ipcRenderer.invoke(
       'getOldLauncherUserData'
     );
-    const files = await fs.readdir(path.join(oldLauncherUserData, 'packs'));
+    let files = [];
+    try {
+      files = await fs.readdir(path.join(oldLauncherUserData, 'packs'));
+    } catch {
+      // Swallow error
+    }
     return (
       await Promise.all(
         files.map(async f => {
@@ -74,7 +79,11 @@ const Home = () => {
       }
 
       const oldInstances = await getOldInstances();
-      if (oldInstances.length > 0 && instances.length === 0) {
+      if (
+        oldInstances.length > 0 &&
+        instances.length === 0 &&
+        process.env.NODE_ENV !== 'development'
+      ) {
         dispatch(openModal('InstancesMigration', { preventClose: true }));
       }
     };

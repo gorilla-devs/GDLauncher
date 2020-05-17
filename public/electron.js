@@ -412,14 +412,16 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
-  autoUpdater.allowDowngrade = allowUnstableReleases;
+  // False for now
+  // autoUpdater.allowDowngrade = allowUnstableReleases;
+  autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = allowUnstableReleases;
   if (allowUnstableReleases) {
     autoUpdater.channel = releaseChannel;
   }
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',
-    repo: 'GDLauncher-Releases',
+    repo: 'GDLauncher',
     provider: 'github'
   });
 
