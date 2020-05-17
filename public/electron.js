@@ -56,7 +56,6 @@ try {
 app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
 
 let allowUnstableReleases = false;
-let releaseChannel = null;
 const releaseChannelExists = fss.existsSync(
   path.join(app.getPath('userData'), 'rChannel')
 );
@@ -66,7 +65,6 @@ if (releaseChannelExists) {
   );
   const releaseId = parseInt(releaseChannelConfig.toString(), 10);
   if (releaseId === 1) {
-    releaseChannel = 'beta';
     allowUnstableReleases = true;
   }
 }
@@ -416,9 +414,6 @@ if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   // autoUpdater.allowDowngrade = allowUnstableReleases;
   autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = allowUnstableReleases;
-  if (allowUnstableReleases) {
-    autoUpdater.channel = releaseChannel;
-  }
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',
     repo: 'GDLauncher',
