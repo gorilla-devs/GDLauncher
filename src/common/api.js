@@ -100,11 +100,11 @@ export const getJavaManifest = () => {
   return axios.get(url);
 };
 
-export const getFabricJson = ([, , yarn, loader]) => {
+export const getFabricJson = ([, version, loader]) => {
   return axios.get(
-    `https://fabricmc.net/download/technic/?yarn=${encodeURIComponent(
-      yarn
-    )}&loader=${encodeURIComponent(loader)}`
+    `${FABRIC_APIS}/v2/versions/loader/${encodeURIComponent(
+      version
+    )}/${encodeURIComponent(loader)}/profile/json`
   );
 };
 
