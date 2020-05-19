@@ -9,7 +9,8 @@ import path from 'path';
 import { extractFull } from 'node-7z';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons';
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import Modal from '../components/Modal';
 import { downloadFile } from '../../app/desktop/utils/downloader';
 import { convertOSToJavaFormat, get7zPath } from '../../app/desktop/utils';
@@ -292,29 +293,8 @@ const AutomaticSetup = () => {
     if (process.platform !== 'win32') {
       const execPath = path.join(javaBaseFolder, version, 'bin', `java${ext}`);
 
-      const chmod = spawn(`chmod`, ['+x', `"${execPath}"`], {
-        shell: true
-      });
-
-      chmod.stdout.on('data', data => {
-        console.log(data.toString());
-      });
-
-      chmod.stderr.on('data', data => {
-        console.error(data);
-      });
-
-      const chmodExec = spawn(`chmod`, ['755', `"${execPath}"`], {
-        shell: true
-      });
-
-      chmodExec.stdout.on('data', data => {
-        console.log(data.toString());
-      });
-
-      chmodExec.stderr.on('data', data => {
-        console.error(data);
-      });
+      await promisify(exec)(`chmod +x "${execPath}"`);
+      await promisify(exec)(`chmod 755 "${execPath}"`);
     }
 
     dispatch(updateJavaPath(null));
