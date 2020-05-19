@@ -12,25 +12,28 @@ const BisectHosting = () => {
       css={`
         height: 360px;
         width: 500px;
+        font-size: 10px;
+        line-height: 1.8;
       `}
       title="We teamed up with BisectHosting"
     >
       <Container>
-        <BisectHostingLogo size={70} />
+        <BisectHostingLogo size={70} hover />
         <h2
           css={`
             margin-top: 20px;
           `}
         >
-          Get yourself a server from{' '}
+          Grab a server from our official partner{' '}
           <span
             css={`
-              color: ${props => props.theme.palette.colors.green};
+              font-weight: 800;
             `}
           >
-            $2.99
+            BisectHosting
           </span>{' '}
-          using our coupon{' '}
+          <span>for effortless modded server installs and updates.</span> New
+          customers can save 25% off their first month using the promo code:{' '}
           <span
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -52,7 +55,7 @@ const BisectHosting = () => {
           <Button
             type="primary"
             css={`
-              margin-top: 50px;
+              margin-top: 25px;
             `}
           >
             Go to BisectHosting.com &nbsp;
