@@ -26,12 +26,20 @@ const SystemNavbar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
   const isUpdateAvailable = useSelector(state => state.updateAvailable);
   const location = useSelector(state => state.router.location.pathname);
+  const [isAppImage, setIsAppImage] = useState(false);
+
+  const modals = useSelector(state => state.modals);
+
+  const areSettingsOpen = modals.find(
+    v => v.modalType === 'Settings' && !v.unmounting
+  );
 
   const checkForUpdates = async () => {
-    const isAppImage = await ipcRenderer.invoke('isAppImage');
+    const isAppImageVar = await ipcRenderer.invoke('isAppImage');
+    setIsAppImage(isAppImageVar);
     if (
       process.env.REACT_APP_RELEASE_TYPE === 'setup' &&
-      (isAppImage || process.platform !== 'linux')
+      (isAppImageVar || process.platform === 'win32')
     ) {
       ipcRenderer.invoke('checkForUpdates');
       ipcRenderer.on('updateAvailable', () => {
@@ -42,11 +50,11 @@ const SystemNavbar = () => {
       process.env.REACT_APP_RELEASE_TYPE === 'portable'
     ) {
       dispatch(checkForPortableUpdates())
-        .then(v => dispatch(updateUpdateAvailable(v)))
+        .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     } else {
       dispatch(getAppLatestVersion())
-        .then(v => dispatch(updateUpdateAvailable(!v)))
+        .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     }
   };
@@ -72,7 +80,7 @@ const SystemNavbar = () => {
       setInterval(() => {
         checkForUpdates();
       }, 600000);
-    }, 500);
+    }, 1500);
   }, []);
 
   const openDevTools = () => {
@@ -80,8 +88,8 @@ const SystemNavbar = () => {
   };
 
   const isOsx = process.platform === 'darwin';
-
   const isLinux = process.platform === 'linux';
+  const isWindows = process.platform === 'win32';
 
   const DevtoolButton = () => (
     <TerminalButton
@@ -94,52 +102,42 @@ const SystemNavbar = () => {
     </TerminalButton>
   );
 
-  const SettingsButton = () => {
-    const modals = useSelector(state => state.modals);
+  const SettingsButton = () => (
+    <TerminalButton
+      areSettingsOpen={areSettingsOpen}
+      css={`
+        margin: 0 20px 0 10px;
+        ${props =>
+          props.areSettingsOpen
+            ? `background: ${props.theme.palette.grey[700]};`
+            : null}
+      `}
+      onClick={() => {
+        dispatch(openModal('Settings'));
+      }}
+    >
+      <FontAwesomeIcon icon={faCog} />
+    </TerminalButton>
+  );
 
-    const areSettingsOpen = modals.find(
-      v => v.modalType === 'Settings' && !v.unmounting
-    );
-    return (
-      <TerminalButton
-        areSettingsOpen={areSettingsOpen}
-        css={`
-          margin: 0 20px 0 10px;
-          ${props =>
-            props.areSettingsOpen
-              ? `background: ${props.theme.palette.grey[700]};`
-              : null}
-        `}
-        onClick={() => {
-          dispatch(openModal('Settings'));
-        }}
-      >
-        <FontAwesomeIcon icon={faCog} />
-      </TerminalButton>
-    );
-  };
+  const UpdateButton = () => (
+    <TerminalButton
+      onClick={() => {
+        if (isAppImage || isWindows) {
+          ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+        } else {
+          dispatch(openModal('AutoUpdatesNotAvailable'));
+        }
+      }}
+      css={`
+        color: ${props => props.theme.palette.colors.green};
+      `}
+    >
+      <FontAwesomeIcon icon={faDownload} />
+    </TerminalButton>
+  );
 
-  const UpdateButton = async () => {
-    const isAppImage = await ipcRenderer.invoke('isAppImage');
-    return (
-      <TerminalButton
-        onClick={() => {
-          if (isAppImage || !isLinux) {
-            ipcRenderer.invoke('installUpdateAndQuitOrRestart');
-          } else {
-            dispatch(openModal('AutoUpdatesNotAvailable'));
-          }
-        }}
-        css={`
-          color: ${props => props.theme.palette.colors.green};
-        `}
-      >
-        <FontAwesomeIcon icon={faDownload} />
-      </TerminalButton>
-    );
-  };
-  const quitApp = async () => {
-    const isAppImage = await ipcRenderer.invoke('isAppImage');
+  const quitApp = () => {
     if (isUpdateAvailable && (isAppImage || !isLinux)) {
       ipcRenderer.invoke('installUpdateAndQuitOrRestart', true);
     } else {
