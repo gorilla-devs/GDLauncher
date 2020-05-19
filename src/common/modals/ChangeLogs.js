@@ -22,14 +22,7 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        <Section
-          css={`
-            margin-bottom: 20px;
-          `}
-        >
-          Welcome to our biggest update ever! Here's what changed.
-        </Section>
-        <Section>
+        {/* <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -44,7 +37,7 @@ const ChangeLogs = () => {
               <li>Crash handler modal for instances</li>
             </ul>
           </div>
-        </Section>
+        </Section> */}
         <Section>
           <SectionTitle
             css={`
@@ -55,7 +48,10 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>We fixed way too many things...</li>
+              <li>Fixed java permissions on mac and linux</li>
+              <li>Fixed some typos</li>
+              <li>Improved instances migration</li>
+              <li>Improved appimage auto updater</li>
             </ul>
           </div>
         </Section>

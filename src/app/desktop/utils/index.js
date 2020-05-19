@@ -180,8 +180,12 @@ export const isLatestJavaDownloaded = async (meta, userData, retry) => {
 
     if (retry) {
       if (process.platform !== 'win32') {
-        await promisify(exec)(`chmod +x "${javaExecutable}"`);
-        await promisify(exec)(`chmod 755 "${javaExecutable}"`);
+        try {
+          await promisify(exec)(`chmod +x "${javaExecutable}"`);
+          await promisify(exec)(`chmod 755 "${javaExecutable}"`);
+        } catch {
+          // swallow error
+        }
       }
 
       return isLatestJavaDownloaded(meta, userData);
