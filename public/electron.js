@@ -17,7 +17,6 @@ const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
-const packageJSON = require('../package.json');
 
 const fs = fss.promises;
 
@@ -324,7 +323,7 @@ ipcMain.handle('getExecutablePath', () => {
 });
 
 ipcMain.handle('getAppVersion', () => {
-  return packageJSON?.version;
+  return app.getVersion();
 });
 
 ipcMain.handle('getIsWindowMaximized', () => {
