@@ -61,59 +61,66 @@ const InstancesMigration = () => {
         instances,
         async instance => {
           await new Promise(resolve => setTimeout(resolve, 300));
-          const config = await fse.readJSON(
-            path.join(oldLauncherUserData, 'packs', instance, 'config.json')
-          );
-          const { version, forgeVersion, timePlayed } = config;
+          try {
+            const config = await fse.readJSON(
+              path.join(oldLauncherUserData, 'packs', instance, 'config.json')
+            );
 
-          const instanceFiles = await fs.readdir(
-            path.join(oldLauncherUserData, 'packs', instance)
-          );
+            const { version, forgeVersion, timePlayed } = config;
 
-          setTotalFiles(v => v + instanceFiles.length);
+            if (version) {
+              const instanceFiles = await fs.readdir(
+                path.join(oldLauncherUserData, 'packs', instance)
+              );
 
-          let icon = null;
+              setTotalFiles(v => v + instanceFiles.length);
 
-          await Promise.all(
-            instanceFiles.map(async f => {
-              try {
-                const iconExts = ['png', 'jpg', 'jpeg'];
-                if (f === 'config.json') return;
-                const isIcon = iconExts.find(v => f === `thumbnail.${v}`);
-                if (isIcon) {
-                  await makeDir(path.join(instancesPath, instance));
-                  await fse.copy(
-                    path.join(oldLauncherUserData, 'packs', instance, f),
-                    path.join(instancesPath, instance, `icon.${isIcon}`)
-                  );
-                  icon = `icon.${isIcon}`;
-                }
-              } catch (error) {
-                console.error(error);
-              }
-              return null;
-            })
-          );
+              let icon = null;
 
-          dispatch(
-            addToQueue(
-              instance,
-              [
-                forgeVersion ? 'forge' : 'vanilla',
-                version,
-                ...(forgeVersion
-                  ? [
-                      `${forgeVersions[version].find(v =>
-                        v.includes(forgeVersion.replace('forge-', ''))
-                      )}`
-                    ]
-                  : [])
-              ],
-              null,
-              icon,
-              timePlayed
-            )
-          );
+              await Promise.all(
+                instanceFiles.map(async f => {
+                  try {
+                    const iconExts = ['png', 'jpg', 'jpeg'];
+                    if (f === 'config.json') return;
+                    const isIcon = iconExts.find(v => f === `thumbnail.${v}`);
+                    if (isIcon) {
+                      await makeDir(path.join(instancesPath, instance));
+                      await fse.copy(
+                        path.join(oldLauncherUserData, 'packs', instance, f),
+                        path.join(instancesPath, instance, `icon.${isIcon}`)
+                      );
+                      icon = `icon.${isIcon}`;
+                    }
+                  } catch (error) {
+                    console.error(error);
+                  }
+                  return null;
+                })
+              );
+
+              dispatch(
+                addToQueue(
+                  instance,
+                  [
+                    forgeVersion ? 'forge' : 'vanilla',
+                    version,
+                    ...(forgeVersion
+                      ? [
+                          `${forgeVersions[version].find(v =>
+                            v.includes(forgeVersion.replace('forge-', ''))
+                          )}`
+                        ]
+                      : [])
+                  ],
+                  null,
+                  icon,
+                  timePlayed
+                )
+              );
+            }
+          } catch (e) {
+            console.error(e);
+          }
         },
         { concurrency: 1 }
       );
