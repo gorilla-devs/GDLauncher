@@ -39,7 +39,7 @@ const SystemNavbar = () => {
     setIsAppImage(isAppImageVar);
     if (
       process.env.REACT_APP_RELEASE_TYPE === 'setup' &&
-      (isAppImageVar || process.platform !== 'linux')
+      (isAppImageVar || process.platform === 'win32')
     ) {
       ipcRenderer.invoke('checkForUpdates');
       ipcRenderer.on('updateAvailable', () => {
@@ -88,8 +88,8 @@ const SystemNavbar = () => {
   };
 
   const isOsx = process.platform === 'darwin';
-
   const isLinux = process.platform === 'linux';
+  const isWindows = process.platform === 'win32';
 
   const DevtoolButton = () => (
     <TerminalButton
@@ -123,7 +123,7 @@ const SystemNavbar = () => {
   const UpdateButton = () => (
     <TerminalButton
       onClick={() => {
-        if (isAppImage || !isLinux) {
+        if (isAppImage || isWindows) {
           ipcRenderer.invoke('installUpdateAndQuitOrRestart');
         } else {
           dispatch(openModal('AutoUpdatesNotAvailable'));
