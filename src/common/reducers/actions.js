@@ -2326,6 +2326,7 @@ export const getAppLatestVersion = () => {
 
     const installedVersion = parse(await ipcRenderer.invoke('getAppVersion'));
     const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
+
     if (!isAppUpdated(latestStablerelease)) {
       return latestStablerelease;
     }

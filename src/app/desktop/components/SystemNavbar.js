@@ -50,11 +50,11 @@ const SystemNavbar = () => {
       process.env.REACT_APP_RELEASE_TYPE === 'portable'
     ) {
       dispatch(checkForPortableUpdates())
-        .then(v => dispatch(updateUpdateAvailable(v)))
+        .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     } else {
       dispatch(getAppLatestVersion())
-        .then(v => dispatch(updateUpdateAvailable(!v)))
+        .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     }
   };
