@@ -267,7 +267,11 @@ const Overview = ({ instanceName }) => {
             >
               Modloader Version
             </div>
-            <div>{config?.modloader[2] || '-'}</div>
+            <div>
+              {config?.modloader[0] === 'forge'
+                ? config?.modloader[2]?.split('-')[1]
+                : config?.modloader[2] || '-'}
+            </div>
           </CardBox>
         </OverviewCard>
         <OverviewCard
