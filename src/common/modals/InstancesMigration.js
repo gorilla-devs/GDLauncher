@@ -39,10 +39,28 @@ const InstancesMigration = () => {
     const instances = (
       await Promise.all(
         files.map(async f => {
-          const stat = await fs.stat(
-            path.join(oldLauncherUserData, 'packs', f)
-          );
-          return stat.isDirectory() ? f : null;
+          try {
+            const stat = await fs.stat(
+              path.join(oldLauncherUserData, 'packs', f)
+            );
+
+            if (stat.isDirectory()) {
+              const config = await fse.readJSON(
+                path.join(oldLauncherUserData, 'packs', f, 'config.json')
+              );
+
+              const isForgeOk = config?.forgeVersion
+                ? forgeVersions[config?.version].find(v =>
+                    v.includes(config?.forgeVersion.replace('forge-', ''))
+                  )
+                : true;
+
+              return config.version && isForgeOk ? f : null;
+            }
+            return null;
+          } catch {
+            return null;
+          }
         })
       )
     ).filter(v => v);
@@ -61,65 +79,61 @@ const InstancesMigration = () => {
         instances,
         async instance => {
           await new Promise(resolve => setTimeout(resolve, 300));
-          try {
-            const config = await fse.readJSON(
-              path.join(oldLauncherUserData, 'packs', instance, 'config.json')
+          const config = await fse.readJSON(
+            path.join(oldLauncherUserData, 'packs', instance, 'config.json')
+          );
+
+          const { version, forgeVersion, timePlayed } = config;
+
+          if (version) {
+            const instanceFiles = await fs.readdir(
+              path.join(oldLauncherUserData, 'packs', instance)
             );
 
-            const { version, forgeVersion, timePlayed } = config;
+            setTotalFiles(v => v + instanceFiles.length);
 
-            if (version) {
-              const instanceFiles = await fs.readdir(
-                path.join(oldLauncherUserData, 'packs', instance)
-              );
+            let icon = null;
 
-              setTotalFiles(v => v + instanceFiles.length);
-
-              let icon = null;
-
-              await Promise.all(
-                instanceFiles.map(async f => {
-                  try {
-                    const iconExts = ['png', 'jpg', 'jpeg'];
-                    if (f === 'config.json') return;
-                    const isIcon = iconExts.find(v => f === `thumbnail.${v}`);
-                    if (isIcon) {
-                      await makeDir(path.join(instancesPath, instance));
-                      await fse.copy(
-                        path.join(oldLauncherUserData, 'packs', instance, f),
-                        path.join(instancesPath, instance, `icon.${isIcon}`)
-                      );
-                      icon = `icon.${isIcon}`;
-                    }
-                  } catch (error) {
-                    console.error(error);
+            await Promise.all(
+              instanceFiles.map(async f => {
+                try {
+                  const iconExts = ['png', 'jpg', 'jpeg'];
+                  if (f === 'config.json') return;
+                  const isIcon = iconExts.find(v => f === `thumbnail.${v}`);
+                  if (isIcon) {
+                    await makeDir(path.join(instancesPath, instance));
+                    await fse.copy(
+                      path.join(oldLauncherUserData, 'packs', instance, f),
+                      path.join(instancesPath, instance, `icon.${isIcon}`)
+                    );
+                    icon = `icon.${isIcon}`;
                   }
-                  return null;
-                })
-              );
+                } catch (error) {
+                  console.error(error);
+                }
+                return null;
+              })
+            );
 
-              dispatch(
-                addToQueue(
-                  instance,
-                  [
-                    forgeVersion ? 'forge' : 'vanilla',
-                    version,
-                    ...(forgeVersion
-                      ? [
-                          `${forgeVersions[version].find(v =>
-                            v.includes(forgeVersion.replace('forge-', ''))
-                          )}`
-                        ]
-                      : [])
-                  ],
-                  null,
-                  icon,
-                  timePlayed
-                )
-              );
-            }
-          } catch (e) {
-            console.error(e);
+            dispatch(
+              addToQueue(
+                instance,
+                [
+                  forgeVersion ? 'forge' : 'vanilla',
+                  version,
+                  ...(forgeVersion
+                    ? [
+                        `${forgeVersions[version].find(v =>
+                          v.includes(forgeVersion.replace('forge-', ''))
+                        )}`
+                      ]
+                    : [])
+                ],
+                null,
+                icon,
+                timePlayed
+              )
+            );
           }
         },
         { concurrency: 1 }
@@ -170,7 +184,6 @@ const InstancesMigration = () => {
         { concurrency: 1 }
       );
       setCopying(false);
-      fse.remove(path.join(oldLauncherUserData, 'packs'));
       dispatch(closeModal());
     };
     copyInstanceFiles();
