@@ -297,6 +297,10 @@ ipcMain.handle('quit-app', () => {
   mainWindow.close();
 });
 
+ipcMain.handle('isAppImage', () => {
+  return process.env.APPIMAGE;
+});
+
 ipcMain.handle('getAppdataPath', () => {
   return app.getPath('appData');
 });
