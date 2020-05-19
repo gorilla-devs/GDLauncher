@@ -27,10 +27,11 @@ const SystemNavbar = () => {
   const isUpdateAvailable = useSelector(state => state.updateAvailable);
   const location = useSelector(state => state.router.location.pathname);
 
-  const checkForUpdates = () => {
+  const checkForUpdates = async () => {
+    const isAppImage = await ipcRenderer.invoke('isAppImage');
     if (
       process.env.REACT_APP_RELEASE_TYPE === 'setup' &&
-      (process.env.APPIMAGE || process.platform !== 'linux')
+      (isAppImage || process.platform !== 'linux')
     ) {
       ipcRenderer.invoke('checkForUpdates');
       ipcRenderer.on('updateAvailable', () => {
@@ -118,24 +119,28 @@ const SystemNavbar = () => {
     );
   };
 
-  const UpdateButton = () => (
-    <TerminalButton
-      onClick={() => {
-        if (process.env.APPIMAGE || !isLinux) {
-          ipcRenderer.invoke('installUpdateAndQuitOrRestart');
-        } else {
-          dispatch(openModal('AutoUpdatesNotAvailable'));
-        }
-      }}
-      css={`
-        color: ${props => props.theme.palette.colors.green};
-      `}
-    >
-      <FontAwesomeIcon icon={faDownload} />
-    </TerminalButton>
-  );
-  const quitApp = () => {
-    if (isUpdateAvailable && (process.env.APPIMAGE || !isLinux)) {
+  const UpdateButton = async () => {
+    const isAppImage = await ipcRenderer.invoke('isAppImage');
+    return (
+      <TerminalButton
+        onClick={() => {
+          if (isAppImage || !isLinux) {
+            ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+          } else {
+            dispatch(openModal('AutoUpdatesNotAvailable'));
+          }
+        }}
+        css={`
+          color: ${props => props.theme.palette.colors.green};
+        `}
+      >
+        <FontAwesomeIcon icon={faDownload} />
+      </TerminalButton>
+    );
+  };
+  const quitApp = async () => {
+    const isAppImage = await ipcRenderer.invoke('isAppImage');
+    if (isUpdateAvailable && (isAppImage || !isLinux)) {
       ipcRenderer.invoke('installUpdateAndQuitOrRestart', true);
     } else {
       ipcRenderer.invoke('quit-app');

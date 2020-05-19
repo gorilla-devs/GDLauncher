@@ -9,8 +9,8 @@ import path from 'path';
 import { extractFull } from 'node-7z';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons';
-import { promisify } from 'util';
 import { exec } from 'child_process';
+import { promisify } from 'util';
 import Modal from '../components/Modal';
 import { downloadFile } from '../../app/desktop/utils/downloader';
 import { convertOSToJavaFormat, get7zPath } from '../../app/desktop/utils';
@@ -293,12 +293,8 @@ const AutomaticSetup = () => {
     if (process.platform !== 'win32') {
       const execPath = path.join(javaBaseFolder, version, 'bin', `java${ext}`);
 
-      await promisify(exec)(
-        `chmod +x "${path.join(userData, path.basename(execPath))}"`
-      );
-      await promisify(exec)(
-        `chmod 755 "${path.join(userData, path.basename(execPath))}"`
-      );
+      await promisify(exec)(`chmod +x "${execPath}"`);
+      await promisify(exec)(`chmod 755 "${execPath}"`);
     }
 
     dispatch(updateJavaPath(null));
