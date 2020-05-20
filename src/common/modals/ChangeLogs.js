@@ -48,10 +48,8 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed java permissions on mac and linux</li>
-              <li>Fixed some typos</li>
-              <li>Improved instances migration</li>
-              <li>Improved appimage auto updater</li>
+              <li>Fixed various issues on MacOS</li>
+              <li>Fixed modpack updater</li>
             </ul>
           </div>
         </Section>
