@@ -33,15 +33,7 @@ const BisectHosting = () => {
             BisectHosting
           </span>{' '}
           <span>for effortless modded server installs and updates.</span> New
-          customers can save 25% off their first month using the promo code:{' '}
-          <span
-            css={`
-              color: ${props => props.theme.palette.colors.green};
-            `}
-          >
-            GDL
-          </span>{' '}
-          with{' '}
+          customers can save{' '}
           <span
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -49,7 +41,15 @@ const BisectHosting = () => {
           >
             25%
           </span>{' '}
-          off!
+          off their first month using the promo code{' '}
+          <span
+            css={`
+              color: ${props => props.theme.palette.colors.green};
+            `}
+          >
+            GDL
+          </span>{' '}
+          at checkout.
         </h2>
         <a href="https://bisecthosting.com/gdl">
           <Button

@@ -71,9 +71,9 @@ const ChangeLogs = () => {
             css={`
               width: 200px;
               height: 40px;
-              padding: 0;
               font-size: 20px;
               padding: 4px !important;
+              margin-top: 20px;
             `}
             type="primary"
             href="https://discord.gg/4cGYzen"
@@ -113,7 +113,7 @@ const SectionTitle = styled.h2`
 const Section = styled.div`
   width: 100%;
   text-align: center;
-  font-size: 20px;
+  font-size: 16px;
   div {
     display: flex;
     flex-direction: column;
