@@ -7,7 +7,8 @@ const {
   dialog,
   shell,
   screen,
-  globalShortcut
+  globalShortcut,
+  nativeImage
 } = require('electron');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -183,11 +184,13 @@ function createWindow() {
     }
   );
 
-  tray = new Tray(
-    isDev
-      ? path.join(__dirname, './icon.png')
-      : path.join(__dirname, '../build/icon.png')
-  );
+  const RESOURCE_DIR = isDev ? __dirname : path.join(__dirname, '../build');
+
+  const iconPath = path.join(RESOURCE_DIR, 'logo_32x32.png');
+
+  const nimage = nativeImage.createFromPath(iconPath);
+
+  tray = new Tray(nimage);
   const trayMenuTemplate = [
     {
       label: 'GDLauncher',
