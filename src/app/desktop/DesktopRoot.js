@@ -31,6 +31,7 @@ import { isLatestJavaDownloaded } from './utils';
 import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
 import { openModal } from '../../common/reducers/modals/actions';
+import Message from './components/Message';
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -49,7 +50,7 @@ const Container = styled.div`
   will-change: transform;
 `;
 
-function DesktopRoot() {
+function DesktopRoot({ store }) {
   const dispatch = useDispatch();
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
@@ -60,22 +61,49 @@ function DesktopRoot() {
   const [contentStyle, setContentStyle] = useState({ transform: 'scale(1)' });
 
   message.config({
-    top: 45
+    top: 45,
+    maxCount: 1
   });
 
   const init = async () => {
+    dispatch(requesting(features.mcAuthentication));
     const userDataStatic = await ipcRenderer.invoke('getUserData');
     const userData = dispatch(updateUserData(userDataStatic));
     await dispatch(checkClientToken());
     dispatch(initNews());
 
-    dispatch(requesting(features.mcAuthentication));
-
     const manifests = await dispatch(initManifests());
-    const isLatestJava = await isLatestJavaDownloaded(manifests.java, userData);
-    const isJavaOK = javaPath || isLatestJava;
+
+    let isJavaOK = javaPath;
+
+    if (!isJavaOK) {
+      isJavaOK = await isLatestJavaDownloaded(manifests.java, userData, true);
+    }
+
     if (!isJavaOK) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
+
+      // Super duper hacky solution to await the modal to be closed...
+      // Please forgive me
+      await new Promise(resolve => {
+        function checkModalStillOpen(state) {
+          return state.modals.find(v => v.modalType === 'JavaSetup');
+        }
+
+        let currentValue;
+        const unsubscribe = store.subscribe(() => {
+          const previousValue = currentValue;
+          currentValue = store.getState().modals.length;
+          if (previousValue !== currentValue) {
+            const stillOpen = checkModalStillOpen(store.getState());
+
+            if (!stillOpen) {
+              unsubscribe();
+              return resolve();
+            }
+          }
+        });
+      });
     }
 
     if (process.env.NODE_ENV === 'development' && currentAccount) {
@@ -125,6 +153,7 @@ function DesktopRoot() {
   return (
     <Wrapper>
       <SystemNavbar />
+      <Message />
       <Container style={contentStyle}>
         <GlobalStyles />
         <RouteBackground />

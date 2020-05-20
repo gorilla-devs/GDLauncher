@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
@@ -224,4 +224,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default memo(Login);

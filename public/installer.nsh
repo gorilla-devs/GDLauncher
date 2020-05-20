@@ -2,9 +2,15 @@
 !macro customInit
     # Workaround for installer handing when the app directory is removed manually
     ${ifNot} ${FileExists} "$INSTDIR"
-        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
-        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
+        DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
     ${EndIf}
+
+    DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\{${APP_GUID}}"
+
+    ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}" "QuietUninstallString"
+    StrCmp $0 "" proceed 0
+    DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_GUID}"
+    proceed:
 !macroend
 
 !macro customUnInstall

@@ -11,6 +11,15 @@ function news(state = [], action) {
   }
 }
 
+function message(state = null, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_MESSAGE:
+      return action.message;
+    default:
+      return state;
+  }
+}
+
 function userData(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_USERDATA:
@@ -151,6 +160,7 @@ function latestModManifests(state = {}, action) {
 export default {
   userData,
   news,
+  message,
   downloadQueue,
   currentDownload,
   instances,

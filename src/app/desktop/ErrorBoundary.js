@@ -54,15 +54,6 @@ export default class ErrorBoundary extends React.Component {
           >
             WE’RE SSSSSSORRY. GDLauncher ran into a creeper and blew up..
           </h1>
-          <h2
-            css={`
-              color: ${props => props.theme.palette.text.third};
-            `}
-          >
-            OOPSIE WOOPSIE!! Uwu We make a fucky wucky!! A wittle fucko boingo!
-            The code monkeys at our headquarters are working VEWY HAWD to fix
-            this!
-          </h2>
           <div
             css={`
               margin-top: 20px;

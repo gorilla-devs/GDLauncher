@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "0.0.10",
+  "version": "1.0.4",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -122,7 +122,7 @@
     "concurrently": "^5.2.0",
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
-    "electron": "^8.2.5",
+    "electron": "^8.3.0",
     "electron-build-env": "^0.2.0",
     "electron-builder": "^22.6.0",
     "electron-builder-squirrel-windows": "^22.6.0",
@@ -153,8 +153,8 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@loadable/babel-plugin": "^5.12.0",
     "7zip-bin": "^5.0.3",
+    "@loadable/babel-plugin": "^5.12.0",
     "antd": "4.2.2",
     "axios": "https://github.com/gorilla-devs/axios.git#62786f2b6c4c813d4dc0159744bcdce7342e365d",
     "base64-stream": "^1.0.0",

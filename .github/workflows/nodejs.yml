@@ -3,11 +3,11 @@ name: GDLauncher Next CI
 on:
   push:
     branches:
-      - next
+      - master
       - releases
   pull_request:
     branches:
-      - next
+      - master
       - releases
 jobs:
   build:

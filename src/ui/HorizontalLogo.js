@@ -15,7 +15,7 @@ const Logo = styled.svg`
   }
 `;
 
-const HorizontalLogo = ({ size, pointer }) => {
+const HorizontalLogo = ({ size, pointer, onClick }) => {
   return (
     <Logo
       version="1.1"
@@ -26,6 +26,7 @@ const HorizontalLogo = ({ size, pointer }) => {
       size={size}
       fill="none"
       xmlSpace="preserve"
+      onClick={onClick}
     >
       <g>
         <polygon

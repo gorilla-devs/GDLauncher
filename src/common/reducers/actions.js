@@ -21,7 +21,6 @@ import symlink from 'symlink-dir';
 import { promises as fs } from 'fs';
 import originalFs from 'original-fs';
 import pMap from 'p-map';
-import { message } from 'antd';
 import makeDir from 'make-dir';
 import { parse } from 'semver';
 import * as ActionTypes from './actionTypes';
@@ -318,6 +317,15 @@ export function updateUserData(userData) {
       path: userData
     });
     return userData;
+  };
+}
+
+export function updateMessage(message) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_MESSAGE,
+      message
+    });
   };
 }
 
@@ -662,7 +670,13 @@ export function updateInstanceConfig(
   };
 }
 
-export function addToQueue(instanceName, modloader, manifest, background) {
+export function addToQueue(
+  instanceName,
+  modloader,
+  manifest,
+  background,
+  timePlayed
+) {
   return async (dispatch, getState) => {
     const state = getState();
     const { currentDownload } = state;
@@ -688,7 +702,7 @@ export function addToQueue(instanceName, modloader, manifest, background) {
         instanceName,
         prev => ({
           modloader,
-          timePlayed: prev.timePlayed || 0,
+          timePlayed: prev.timePlayed || timePlayed || 0,
           background,
           ...(addMods && { mods: prev.mods || [] })
         }),
@@ -1438,7 +1452,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
       addToQueue(
         instanceName,
         modloader,
-        manifest,
+        newManifest,
         `background${path.extname(imageURL)}`
       )
     );
@@ -1452,41 +1466,30 @@ export const startListener = () => {
     const instancesPath = _getInstancesPath(state);
     const Queue = new PromiseQueue();
 
-    const notificationObj = {
-      key: 'RTSAction',
-      duration: 0
-    };
-
-    let closeMessage;
-
     Queue.on('start', queueLength => {
       if (queueLength > 1) {
-        closeMessage = message.loading({
-          ...notificationObj,
-          content: `Syncronizing files. ${queueLength} left.`
-        });
+        dispatch(
+          updateMessage({
+            content: `Syncronizing mods. ${queueLength} left.`,
+            duration: 0
+          })
+        );
       }
     });
 
     Queue.on('executed', queueLength => {
       if (queueLength > 1) {
-        closeMessage = message.loading({
-          ...notificationObj,
-          content: `Syncronizing files. ${queueLength} left.`
-        });
+        dispatch(
+          updateMessage({
+            content: `Syncronizing mods. ${queueLength} left.`,
+            duration: 0
+          })
+        );
       }
     });
 
     Queue.on('end', () => {
-      closeMessage = message.loading({
-        ...notificationObj,
-        content: `Syncronizing files. 0 left.`,
-        duration: 1
-      });
-      if (closeMessage) {
-        message.destroy();
-        closeMessage();
-      }
+      dispatch(updateMessage(null));
     });
 
     const changesTracker = {};
@@ -2300,10 +2303,10 @@ export const initLatestMods = instanceName => {
   };
 };
 
-export const isAppLatestVersion = () => {
+export const getAppLatestVersion = () => {
   return async () => {
     const { data: latestReleases } = await axios.get(
-      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases'
+      'https://api.github.com/repos/gorilla-devs/GDLauncher/releases'
     );
 
     const latestPrerelease = latestReleases.find(v => v.prerelease);
@@ -2323,11 +2326,11 @@ export const isAppLatestVersion = () => {
 
     const installedVersion = parse(await ipcRenderer.invoke('getAppVersion'));
     const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
-    if (releaseChannel === 0 && !isAppUpdated(latestStablerelease)) {
+
+    if (!isAppUpdated(latestStablerelease)) {
       return latestStablerelease;
     }
-
-    if (!isAppUpdated(latestPrerelease)) {
+    if (!isAppUpdated(latestPrerelease) && releaseChannel !== 0) {
       return latestPrerelease;
     }
 
@@ -2342,15 +2345,15 @@ export const checkForPortableUpdates = () => {
 
     const tempFolder = path.join(_getTempPath(state), `update`);
 
-    const isLatestVersion = await isAppLatestVersion();
-    // eslint-disable-next-line
-    const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher-Releases/releases/download/${isLatestVersion?.tag_name}`;
+    const latestVersion = await getAppLatestVersion();
 
-    const { data: latestManifest } = await axios.get(
-      `${baseAssetUrl}/${process.platform}_latest.json`
-    );
-
-    if (!isLatestVersion) {
+    // Latest version has a value only if the user is not using the latest
+    if (latestVersion) {
+      // eslint-disable-next-line
+      const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${latestVersion?.tag_name}`;
+      const { data: latestManifest } = await axios.get(
+        `${baseAssetUrl}/${process.platform}_latest.json`
+      );
       // Cleanup all files that are not required for the update
       await makeDir(tempFolder);
 
@@ -2460,6 +2463,6 @@ export const checkForPortableUpdates = () => {
         { concurrency: 3 }
       );
     }
-    return !isLatestVersion;
+    return latestVersion;
   };
 };

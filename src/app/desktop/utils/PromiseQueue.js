@@ -37,10 +37,10 @@ class PromiseQueue {
 
   async execute() {
     const startHandler = this.listeners.start;
+    if (this.isPending) return false;
     if (startHandler) {
       setTimeout(startHandler, 0);
     }
-    if (this.isPending) return false;
     while (this.queue[0]) {
       const item = this.queue.shift();
       this.isPending = true;

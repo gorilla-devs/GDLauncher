@@ -7,7 +7,8 @@ const {
   dialog,
   shell,
   screen,
-  globalShortcut
+  globalShortcut,
+  nativeImage
 } = require('electron');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -38,10 +39,24 @@ app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
 
+let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
+
+// Read config and eventually use new path
+try {
+  const configFile = fss.readFileSync(
+    path.join(app.getPath('userData'), 'config.json')
+  );
+  const config = JSON.parse(configFile);
+  if (config.settings.instancesPath) {
+    oldLauncherUserData = config.settings.instancesPath;
+  }
+} catch {
+  // Do nothing
+}
+
 app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
 
 let allowUnstableReleases = false;
-let releaseChannel = null;
 const releaseChannelExists = fss.existsSync(
   path.join(app.getPath('userData'), 'rChannel')
 );
@@ -51,7 +66,6 @@ if (releaseChannelExists) {
   );
   const releaseId = parseInt(releaseChannelConfig.toString(), 10);
   if (releaseId === 1) {
-    releaseChannel = 'beta';
     allowUnstableReleases = true;
   }
 }
@@ -170,11 +184,13 @@ function createWindow() {
     }
   );
 
-  tray = new Tray(
-    isDev
-      ? path.join(__dirname, './icon.png')
-      : path.join(__dirname, '../build/icon.png')
-  );
+  const RESOURCE_DIR = isDev ? __dirname : path.join(__dirname, '../build');
+
+  const iconPath = path.join(RESOURCE_DIR, 'logo_32x32.png');
+
+  const nimage = nativeImage.createFromPath(iconPath);
+
+  tray = new Tray(nimage);
   const trayMenuTemplate = [
     {
       label: 'GDLauncher',
@@ -225,7 +241,13 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  app.quit();
+  if (watcher) {
+    watcher.stop();
+    watcher = null;
+  }
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 app.on('before-quit', async () => {
@@ -264,7 +286,7 @@ ipcMain.handle('hide-window', () => {
 ipcMain.handle('min-max-window', () => {
   if (mainWindow.isMaximized()) {
     mainWindow.unmaximize();
-  } else if (mainWindow.maximizable) {
+  } else {
     mainWindow.maximize();
   }
 });
@@ -282,6 +304,11 @@ ipcMain.handle('show-window', () => {
 
 ipcMain.handle('quit-app', () => {
   mainWindow.close();
+  mainWindow = null;
+});
+
+ipcMain.handle('isAppImage', () => {
+  return process.env.APPIMAGE;
 });
 
 ipcMain.handle('getAppdataPath', () => {
@@ -295,6 +322,10 @@ ipcMain.handle('getAppPath', () => {
 
 ipcMain.handle('getUserData', () => {
   return app.getPath('userData');
+});
+
+ipcMain.handle('getOldLauncherUserData', () => {
+  return oldLauncherUserData;
 });
 
 ipcMain.handle('getExecutablePath', () => {
@@ -393,14 +424,13 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
-  autoUpdater.allowDowngrade = allowUnstableReleases;
+  // False for now
+  // autoUpdater.allowDowngrade = allowUnstableReleases;
+  autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = allowUnstableReleases;
-  if (allowUnstableReleases) {
-    autoUpdater.channel = releaseChannel;
-  }
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',
-    repo: 'GDLauncher-Releases',
+    repo: 'GDLauncher',
     provider: 'github'
   });
 
@@ -424,7 +454,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
     'temp'
   );
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
-    autoUpdater.quitAndInstall(true, true);
+    autoUpdater.quitAndInstall(true, !quitAfterInstall);
   } else {
     const updaterVbs = 'updater.vbs';
     const updaterBat = 'updateLauncher.bat';

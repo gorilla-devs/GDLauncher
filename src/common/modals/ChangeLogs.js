@@ -22,7 +22,7 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        <Section>
+        {/* <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -32,13 +32,12 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Added changelogs modal</li>
+              <li>We just improved everything that was here before</li>
               <li>Windows executables are now digitally signed</li>
               <li>Crash handler modal for instances</li>
-              <li>Instances exporter</li>
             </ul>
           </div>
-        </Section>
+        </Section> */}
         <Section>
           <SectionTitle
             css={`
@@ -49,9 +48,10 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed linux auto updates</li>
-              <li>Fixed sync message not going away</li>
-              <li>Fixed screenshots on linux</li>
+              <li>Fixed java permissions on mac and linux</li>
+              <li>Fixed some typos</li>
+              <li>Improved instances migration</li>
+              <li>Improved appimage auto updater</li>
             </ul>
           </div>
         </Section>
@@ -71,8 +71,9 @@ const ChangeLogs = () => {
             css={`
               width: 200px;
               height: 40px;
-              padding: 0;
               font-size: 20px;
+              padding: 4px !important;
+              margin-top: 20px;
             `}
             type="primary"
             href="https://discord.gg/4cGYzen"
@@ -112,7 +113,7 @@ const SectionTitle = styled.h2`
 const Section = styled.div`
   width: 100%;
   text-align: center;
-  font-size: 20px;
+  font-size: 16px;
   div {
     display: flex;
     flex-direction: column;
