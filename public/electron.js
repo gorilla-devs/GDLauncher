@@ -238,7 +238,9 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  app.quit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 app.on('before-quit', async () => {
@@ -277,7 +279,7 @@ ipcMain.handle('hide-window', () => {
 ipcMain.handle('min-max-window', () => {
   if (mainWindow.isMaximized()) {
     mainWindow.unmaximize();
-  } else if (mainWindow.maximizable) {
+  } else {
     mainWindow.maximize();
   }
 });
