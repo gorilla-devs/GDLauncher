@@ -103,7 +103,6 @@ const Home = () => {
       <Menu.Item key="1" onClick={() => openAddInstanceModal(1)}>
         Browse Modpacks
       </Menu.Item>
-      <Menu.Divider />
       <Menu.Item key="2" onClick={() => openAddInstanceModal(2)}>
         Import Instance
       </Menu.Item>
