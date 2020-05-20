@@ -53,6 +53,9 @@ const modalsComponentLookupTable = {
   InstanceManager: AsyncComponent(
     lazy(() => import('../modals/InstanceManager'))
   ),
+  InstanceExportCurseForge: AsyncComponent(
+    lazy(() => import('../modals/InstanceExport/CurseForge'))
+  ),
   AutoUpdatesNotAvailable: AsyncComponent(
     lazy(() => import('../modals/AutoUpdatesNotAvailable'))
   ),
@@ -65,7 +68,10 @@ const modalsComponentLookupTable = {
   InstanceCrashed: AsyncComponent(
     lazy(() => import('../modals/InstanceCrashed'))
   ),
-  ChangeLogs: AsyncComponent(lazy(() => import('../modals/ChangeLogs')))
+  ChangeLogs: AsyncComponent(lazy(() => import('../modals/ChangeLogs'))),
+  InstancesMigration: AsyncComponent(
+    lazy(() => import('../modals/InstancesMigration'))
+  )
 };
 
 const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {

@@ -8,8 +8,8 @@ export const sortByDate = (a, b) => {
 
 export function sortByForgeVersionDesc(a, b) {
   if (typeof a === 'string' && typeof b === 'string') {
-    const versionA = a.split('.');
-    const versionB = b.split('.');
+    const versionA = a.split('-')[1].split('.');
+    const versionB = b.split('-')[1].split('.');
 
     for (let i = 0; i < versionA.length; i += 1) {
       const verNumA = Number(versionA[i]) || 0;
@@ -73,17 +73,30 @@ export const convertMinutesToHumanTime = minutes => {
   const weeks = Math.floor(days / 7);
   const months = Math.floor(weeks / 4);
 
-  if (days < 7) {
-    if (days > 0) {
+  // values to display: d, h, m, minutes, days, weeks, months
+
+  switch (true) {
+    case months >= 2:
+      return `${months} months`;
+    case months === 1:
+      return `1 month`;
+    case weeks >= 2:
+      return `${weeks} weeks`;
+    case weeks === 1:
+      return `1 week`;
+    case days >= 1:
       return `${days} d, ${hours} h, ${min} m`;
-    }
-    if (hours > 0) {
+    case hours >= 2:
       return `${hours} h, ${min} m`;
-    }
-    return `${min} minutes`;
+    case hours === 1:
+      return `1 hour`;
+    case minutes >= 2:
+      return `${min} minutes`;
+    case minutes === 1:
+      return `1 minute`;
+    case minutes === 0:
+      return '0 minutes';
+    default:
+      return '';
   }
-  if (months > 0) {
-    return `${months} months`;
-  }
-  return `${weeks} weeks`;
 };

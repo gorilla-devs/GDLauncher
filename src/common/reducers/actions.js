@@ -21,9 +21,8 @@ import symlink from 'symlink-dir';
 import { promises as fs } from 'fs';
 import originalFs from 'original-fs';
 import pMap from 'p-map';
-import { message } from 'antd';
 import makeDir from 'make-dir';
-import { eq } from 'semver';
+import { parse } from 'semver';
 import * as ActionTypes from './actionTypes';
 import {
   NEWS_URL,
@@ -323,6 +322,15 @@ export function updateUserData(userData) {
   };
 }
 
+export function updateMessage(message) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_MESSAGE,
+      message
+    });
+  };
+}
+
 export function downloadJavaLegacyFixer() {
   return async (dispatch, getState) => {
     const state = getState();
@@ -428,7 +436,10 @@ export function loginThroughNativeLauncher() {
 
     const homedir = await ipcRenderer.invoke('getAppdataPath');
     const mcFolder = process.platform === 'darwin' ? 'minecraft' : '.minecraft';
-    const vanillaMCPath = path.join(homedir, mcFolder);
+    const vanillaMCPath =
+      process.platform === 'linux'
+        ? path.resolve(homedir, '../', mcFolder)
+        : path.join(homedir, mcFolder);
     const vnlJson = await fse.readJson(
       path.join(vanillaMCPath, 'launcher_profiles.json')
     );
@@ -599,6 +610,15 @@ export function updateDownloadStatus(instanceName, status) {
   };
 }
 
+export function updateLastUpdateVersion(version) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_LAST_UPDATE_VERSION,
+      version
+    });
+  };
+}
+
 export function updateDownloadCurrentPhase(instanceName, status) {
   return dispatch => {
     dispatch({
@@ -652,7 +672,13 @@ export function updateInstanceConfig(
   };
 }
 
-export function addToQueue(instanceName, modloader, manifest, background) {
+export function addToQueue(
+  instanceName,
+  modloader,
+  manifest,
+  background,
+  timePlayed
+) {
   return async (dispatch, getState) => {
     const state = getState();
     const { currentDownload } = state;
@@ -678,7 +704,7 @@ export function addToQueue(instanceName, modloader, manifest, background) {
         instanceName,
         prev => ({
           modloader,
-          timePlayed: prev.timePlayed || 0,
+          timePlayed: prev.timePlayed || timePlayed || 0,
           background,
           ...(addMods && { mods: prev.mods || [] })
         }),
@@ -1524,7 +1550,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
       addToQueue(
         instanceName,
         modloader,
-        manifest,
+        newManifest,
         `background${path.extname(imageURL)}`
       )
     );
@@ -1538,41 +1564,30 @@ export const startListener = () => {
     const instancesPath = _getInstancesPath(state);
     const Queue = new PromiseQueue();
 
-    const notificationObj = {
-      key: 'RTSAction',
-      duration: 0
-    };
-
-    let closeMessage;
-
     Queue.on('start', queueLength => {
       if (queueLength > 1) {
-        closeMessage = message.loading({
-          ...notificationObj,
-          content: `Syncronizing files. ${queueLength} left.`
-        });
+        dispatch(
+          updateMessage({
+            content: `Syncronizing mods. ${queueLength} left.`,
+            duration: 0
+          })
+        );
       }
     });
 
     Queue.on('executed', queueLength => {
       if (queueLength > 1) {
-        closeMessage = message.loading({
-          ...notificationObj,
-          content: `Syncronizing files. ${queueLength} left.`
-        });
+        dispatch(
+          updateMessage({
+            content: `Syncronizing mods. ${queueLength} left.`,
+            duration: 0
+          })
+        );
       }
     });
 
     Queue.on('end', () => {
-      closeMessage = message.loading({
-        ...notificationObj,
-        content: `Syncronizing files. 0 left.`,
-        duration: 1
-      });
-      if (closeMessage) {
-        message.destroy();
-        closeMessage();
-      }
+      dispatch(updateMessage(null));
     });
 
     const changesTracker = {};
@@ -2472,14 +2487,38 @@ export const initLatestMods = instanceName => {
   };
 };
 
-export const isAppLatestVersion = () => {
+export const getAppLatestVersion = () => {
   return async () => {
-    const { data: latestRelease } = await axios.get(
-      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/latest'
+    const { data: latestReleases } = await axios.get(
+      'https://api.github.com/repos/gorilla-devs/GDLauncher/releases'
     );
 
-    const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
-    return eq(installedVersion, coerce(latestRelease.tag_name));
+    const latestPrerelease = latestReleases.find(v => v.prerelease);
+    const latestStablerelease = latestReleases.find(v => !v.prerelease);
+
+    const appData = parse(await ipcRenderer.invoke('getAppdataPath'));
+    let releaseChannel = 0;
+
+    try {
+      const rChannel = await fs.readFile(
+        path.join(appData, 'gdlauncher_next', 'rChannel')
+      );
+      releaseChannel = rChannel.toString();
+    } catch {
+      // swallow error
+    }
+
+    const installedVersion = parse(await ipcRenderer.invoke('getAppVersion'));
+    const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
+
+    if (!isAppUpdated(latestStablerelease)) {
+      return latestStablerelease;
+    }
+    if (!isAppUpdated(latestPrerelease) && releaseChannel !== 0) {
+      return latestPrerelease;
+    }
+
+    return false;
   };
 };
 
@@ -2488,25 +2527,17 @@ export const checkForPortableUpdates = () => {
     const state = getState();
     const baseFolder = await ipcRenderer.invoke('getExecutablePath');
 
-    const { data: latestRelease } = await axios.get(
-      'https://api.github.com/repos/gorilla-devs/GDLauncher-Releases/releases/latest'
-    );
-
     const tempFolder = path.join(_getTempPath(state), `update`);
 
-    const installedVersion = coerce(await ipcRenderer.invoke('getAppVersion'));
-    const isUpdateAvailable = lt(
-      installedVersion,
-      coerce(latestRelease.tag_name)
-    );
+    const latestVersion = await getAppLatestVersion();
 
-    const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher-Releases/releases/download/${latestRelease.tag_name}`;
-
-    const { data: latestManifest } = await axios.get(
-      `${baseAssetUrl}/${process.platform}_latest.json`
-    );
-
-    if (isUpdateAvailable) {
+    // Latest version has a value only if the user is not using the latest
+    if (latestVersion) {
+      // eslint-disable-next-line
+      const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${latestVersion?.tag_name}`;
+      const { data: latestManifest } = await axios.get(
+        `${baseAssetUrl}/${process.platform}_latest.json`
+      );
       // Cleanup all files that are not required for the update
       await makeDir(tempFolder);
 
@@ -2616,6 +2647,6 @@ export const checkForPortableUpdates = () => {
         { concurrency: 3 }
       );
     }
-    return isUpdateAvailable;
+    return latestVersion;
   };
 };

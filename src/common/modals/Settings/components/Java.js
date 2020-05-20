@@ -237,7 +237,7 @@ export default function MyAccountPreferences() {
               value={mcResolution.width}
               onChange={e => {
                 const w = parseInt(e.target.value, 10);
-                dispatch(updateResolution({ width: w || 800 }));
+                dispatch(updateResolution({ width: w || 854 }));
               }}
             />
             &nbsp;X&nbsp;
@@ -246,7 +246,7 @@ export default function MyAccountPreferences() {
               value={mcResolution.height}
               onChange={e => {
                 const h = parseInt(e.target.value, 10);
-                dispatch(updateResolution({ height: h || 600 }));
+                dispatch(updateResolution({ height: h || 480 }));
               }}
             />
           </div>
@@ -297,7 +297,7 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          Select the preferred amount of memory to use when lauching the game
+          Select the preferred amount of memory to use when launching the game
         </Paragraph>
         <Slider
           css={`
@@ -329,7 +329,7 @@ export default function MyAccountPreferences() {
             text-align: left;
           `}
         >
-          Select the preferred custom arguments to use when lauching the game
+          Select the preferred custom arguments to use when launching the game
         </Paragraph>
         <div
           css={`

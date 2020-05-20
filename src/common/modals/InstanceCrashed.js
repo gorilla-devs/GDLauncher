@@ -53,7 +53,7 @@ const InstanceCrashed = ({ code, errorLogs }) => {
         height: 450px;
         width: 500px;
       `}
-      title="Uwu We make a fucky wucky!!"
+      title="The instance could not be launched"
     >
       <Container>
         <InnerContainer>

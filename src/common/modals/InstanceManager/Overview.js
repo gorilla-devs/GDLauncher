@@ -267,7 +267,11 @@ const Overview = ({ instanceName }) => {
             >
               Modloader Version
             </div>
-            <div>{config?.modloader[2] || '-'}</div>
+            <div>
+              {config?.modloader[0] === 'forge'
+                ? config?.modloader[2]?.split('-')[1]
+                : config?.modloader[2] || '-'}
+            </div>
           </CardBox>
         </OverviewCard>
         <OverviewCard
@@ -357,9 +361,9 @@ const Overview = ({ instanceName }) => {
                     )
                   );
                 } else {
-                  updateGameResolution(800, 600);
-                  setHeight(600);
-                  setWidth(800);
+                  updateGameResolution(854, 480);
+                  setHeight(480);
+                  setWidth(854);
                 }
               }}
             />
@@ -371,7 +375,7 @@ const Overview = ({ instanceName }) => {
                   placeholder="Width"
                   value={width}
                   onChange={e => {
-                    const w = parseInt(e.target.value, 10) || 800;
+                    const w = parseInt(e.target.value, 10) || 854;
                     setWidth(w);
                     dispatch(
                       updateInstanceConfig(instanceName, prev => ({
@@ -389,7 +393,7 @@ const Overview = ({ instanceName }) => {
                   placeholder="Height"
                   value={height}
                   onChange={e => {
-                    const h = parseInt(e.target.value, 10) || 600;
+                    const h = parseInt(e.target.value, 10) || 480;
                     setHeight(h);
                     dispatch(
                       updateInstanceConfig(instanceName, prev => ({

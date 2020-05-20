@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
@@ -12,6 +12,7 @@ import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.webm';
 import HorizontalLogo from '../../../ui/HorizontalLogo';
+import { openModal } from '../../../common/reducers/modals/actions';
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
@@ -25,7 +26,7 @@ const LoginButton = styled(Button)`
   color: ${props => props.theme.palette.text.primary};
   &:hover {
     color: ${props => props.theme.palette.text.primary};
-    background: ${props => props.theme.palette.grey[props.active ? 600 : 500]};
+    background: ${props => props.theme.palette.grey[600]};
   }
   &:focus {
     color: ${props => props.theme.palette.text.primary};
@@ -65,9 +66,10 @@ const Form = styled.div`
 `;
 
 const Background = styled.div`
-  width: auto;
-  height: 100%;
-  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   video {
     transition: 0.3s ease-in-out;
     transform: translateX(
@@ -196,11 +198,18 @@ const Login = () => {
                 </div>
                 <div>
                   <a href="https://my.minecraft.net/en-us/password/forgot/">
-                    CAN&apos;T SIGN IN
+                    FORGOT PASSWORD
                   </a>
                 </div>
               </FooterLinks>
-              <div>v{version}</div>
+              <div
+                css={`
+                  cursor: pointer;
+                `}
+                onClick={() => dispatch(openModal('ChangeLogs'))}
+              >
+                v{version}
+              </div>
             </Footer>
           </LeftSide>
           <Background transitionState={transitionState}>
@@ -215,4 +224,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default memo(Login);

@@ -1,12 +1,18 @@
 /* eslint-disable react/no-unescaped-entities */
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
+import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import Modal from '../components/Modal';
 
-const ChangeLogs = ({ version }) => {
+const ChangeLogs = () => {
+  const [version, setVersion] = useState(null);
+
+  useEffect(() => {
+    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
+  }, []);
   return (
     <Modal
       css={`
@@ -16,45 +22,36 @@ const ChangeLogs = ({ version }) => {
       title={`What's new in ${version}`}
     >
       <Container>
-        <Section>
+        {/* <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
             `}
           >
-            <span>New Features!</span>
+            <span>New Features</span>
           </SectionTitle>
           <div>
             <ul>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
+              <li>We just improved everything that was here before</li>
+              <li>Windows executables are now digitally signed</li>
+              <li>Crash handler modal for instances</li>
             </ul>
           </div>
-        </Section>
+        </Section> */}
         <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.red};
             `}
           >
-            <span>Bug Fix</span>
+            <span>Bug Fixes</span>
           </SectionTitle>
           <div>
             <ul>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
-              <li>ppsd</li>
+              <li>Fixed java permissions on mac and linux</li>
+              <li>Fixed some typos</li>
+              <li>Improved instances migration</li>
+              <li>Improved appimage auto updater</li>
             </ul>
           </div>
         </Section>
@@ -64,20 +61,22 @@ const ChangeLogs = ({ version }) => {
               color: ${props => props.theme.palette.colors.lavander};
             `}
           >
-            <span>Thanks for using GDLauncher</span>
+            <span>Join Our Community</span>
           </SectionTitle>
           <p>
-            We love our users, that's why we have a dedicated discorc server
-            just to talk to all of them!
+            We love our users, that's why we have a dedicated Discord server
+            just to talk with all of them!
           </p>
           <Button
             css={`
               width: 200px;
               height: 40px;
-              background: #7289da;
-              padding: 0;
+              font-size: 20px;
+              padding: 4px !important;
+              margin-top: 20px;
             `}
-            href="https://discord.gg/WumUmE6"
+            type="primary"
+            href="https://discord.gg/4cGYzen"
           >
             <FontAwesomeIcon icon={faDiscord} />
             &nbsp; Discord
@@ -92,9 +91,8 @@ export default memo(ChangeLogs);
 
 const Container = styled.div`
   width: 100%;
-  height: 410px;
+  height: 100%;
   text-align: center;
-  padding: 0 30px;
   overflow-y: auto;
   color: ${props => props.theme.palette.text.primary};
 `;
@@ -115,15 +113,14 @@ const SectionTitle = styled.h2`
 const Section = styled.div`
   width: 100%;
   text-align: center;
+  font-size: 16px;
   div {
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: 100%;
-    height: 200px;
     margin: 40px 0;
     border-radius: 5px;
-    background: ${props => props.theme.palette.grey[900]};
 
     p {
       margin: 20px 0;

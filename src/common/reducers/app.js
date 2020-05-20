@@ -92,10 +92,10 @@ function isNewUser(state = true, action) {
   }
 }
 
-function showChangelogs(state = false, action) {
+function lastUpdateVersion(state = null, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_SHOW_CHANGELOG:
-      return action.show;
+    case ActionTypes.UPDATE_LAST_UPDATE_VERSION:
+      return action.version;
     default:
       return state;
   }
@@ -111,5 +111,5 @@ export default combineReducers({
   curseforgeCategories,
   clientToken,
   isNewUser,
-  showChangelogs
+  lastUpdateVersion
 });

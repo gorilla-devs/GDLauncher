@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { transparentize } from 'polished';
 import styled, { keyframes } from 'styled-components';
 import { promises as fs } from 'fs';
@@ -12,7 +12,8 @@ import {
   faWrench,
   faFolder,
   faTrash,
-  faStop
+  faStop,
+  faBoxOpen
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -189,6 +190,9 @@ const Instance = ({ instanceName }) => {
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
+  const instanceExportCurseForge = () => {
+    dispatch(openModal('InstanceExportCurseForge', { instanceName }));
+  };
   const killProcess = () => {
     console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
@@ -315,6 +319,20 @@ const Instance = ({ instanceName }) => {
           />
           Open Folder
         </MenuItem>
+
+        {/* // TODO - Support other export options besides curseforge forge. */}
+        <MenuItem
+          onClick={instanceExportCurseForge}
+          disabled={Boolean(isInQueue) || instance.modloader[0] !== 'forge'}
+        >
+          <FontAwesomeIcon
+            icon={faBoxOpen}
+            css={`
+              margin-right: 10px;
+            `}
+          />
+          Export Pack
+        </MenuItem>
         <MenuItem divider />
         <MenuItem
           disabled={Boolean(isInQueue) || Boolean(isPlaying)}
@@ -333,4 +351,4 @@ const Instance = ({ instanceName }) => {
   );
 };
 
-export default Instance;
+export default memo(Instance);
