@@ -1452,7 +1452,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
       addToQueue(
         instanceName,
         modloader,
-        manifest,
+        newManifest,
         `background${path.extname(imageURL)}`
       )
     );
