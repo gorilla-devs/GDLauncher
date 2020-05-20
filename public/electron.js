@@ -238,7 +238,13 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  app.quit();
+  if (watcher) {
+    watcher.stop();
+    watcher = null;
+  }
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 app.on('before-quit', async () => {
@@ -295,6 +301,7 @@ ipcMain.handle('show-window', () => {
 
 ipcMain.handle('quit-app', () => {
   mainWindow.close();
+  mainWindow = null;
 });
 
 ipcMain.handle('isAppImage', () => {
