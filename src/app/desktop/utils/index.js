@@ -695,16 +695,12 @@ export const filterForgeFilesByVersion = (files, version) => {
 };
 
 export const getFirstPreferredCandidate = (files, release) => {
-  if (release) {
-    const preferredCandidate = files.find(v => v.releaseType === release);
-    if (preferredCandidate) return preferredCandidate;
-  }
+  let counter = release || 1;
 
   let latestFile = null;
-  let counter = 1;
   while (counter <= 3 && !latestFile) {
     const c = counter;
-    const latest = files.find(v => v.releaseType === c);
+    const latest = files.find(v => v.releaseType <= c);
     if (latest) {
       latestFile = latest;
     }
