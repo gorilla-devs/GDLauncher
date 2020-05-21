@@ -694,7 +694,12 @@ export const filterForgeFilesByVersion = (files, version) => {
   });
 };
 
-export const getFirstReleaseCandidate = files => {
+export const getFirstPreferredCandidate = (files, release) => {
+  if (release) {
+    const preferredCandidate = files.find(v => v.releaseType === release);
+    if (preferredCandidate) return preferredCandidate;
+  }
+
   let latestFile = null;
   let counter = 1;
   while (counter <= 3 && !latestFile) {
