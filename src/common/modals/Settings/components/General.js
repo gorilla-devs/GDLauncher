@@ -445,7 +445,7 @@ const General = () => {
         >
           Select the preferred release channel for downloading Curse projects.
           Stable will fallback to Beta then Alpha if the previous isn&apos;t
-          available
+          available.
         </p>
         <Select
           css={`
