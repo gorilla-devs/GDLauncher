@@ -91,7 +91,7 @@ export const getForgeManifest = () => {
 };
 
 export const getFabricManifest = () => {
-  const url = `${FABRIC_APIS}/versions?timestamp=${new Date().getTime()}`;
+  const url = `${FABRIC_APIS}/versions`;
   return axios.get(url);
 };
 
