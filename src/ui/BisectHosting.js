@@ -7,15 +7,18 @@ const Logo = styled.svg`
   * {
     transition: opacity 0.1s ease-in-out;
   }
-  &:hover {
+ ${props =>
+   !props.hover
+     ? `&:hover {
     * {
-      cursor: ${props => (props.showPointerCursor ? 'pointer' : 'auto')};
+      cursor: ${props.showPointerCursor ? 'pointer' : 'auto'};
       opacity: 0.9;
-    }
+    } `
+     : ``}
   }
 `;
 
-function BisectHosting({ size, showPointerCursor, onClick }) {
+function BisectHosting({ size, showPointerCursor, onClick, hover }) {
   return (
     // eslint-disable-next-line
     <Logo
@@ -23,6 +26,7 @@ function BisectHosting({ size, showPointerCursor, onClick }) {
       viewBox="0 0 241.66 78.82"
       size={size}
       showPointerCursor={showPointerCursor}
+      hover={hover}
     >
       <defs>
         <style>

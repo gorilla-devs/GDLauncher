@@ -22,14 +22,7 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        <Section
-          css={`
-            margin-bottom: 20px;
-          `}
-        >
-          Welcome to our biggest update ever! Here's what changed.
-        </Section>
-        <Section>
+        {/* <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -44,7 +37,7 @@ const ChangeLogs = () => {
               <li>Crash handler modal for instances</li>
             </ul>
           </div>
-        </Section>
+        </Section> */}
         <Section>
           <SectionTitle
             css={`
@@ -55,7 +48,8 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>We fixed way too many things...</li>
+              <li>Fixed various issues on MacOS</li>
+              <li>Fixed modpack updater</li>
             </ul>
           </div>
         </Section>
@@ -75,9 +69,9 @@ const ChangeLogs = () => {
             css={`
               width: 200px;
               height: 40px;
-              padding: 0;
               font-size: 20px;
               padding: 4px !important;
+              margin-top: 20px;
             `}
             type="primary"
             href="https://discord.gg/4cGYzen"
@@ -117,7 +111,7 @@ const SectionTitle = styled.h2`
 const Section = styled.div`
   width: 100%;
   text-align: center;
-  font-size: 20px;
+  font-size: 16px;
   div {
     display: flex;
     flex-direction: column;

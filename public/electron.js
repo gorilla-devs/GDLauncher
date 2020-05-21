@@ -7,7 +7,8 @@ const {
   dialog,
   shell,
   screen,
-  globalShortcut
+  globalShortcut,
+  nativeImage
 } = require('electron');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -183,11 +184,13 @@ function createWindow() {
     }
   );
 
-  tray = new Tray(
-    isDev
-      ? path.join(__dirname, './icon.png')
-      : path.join(__dirname, '../build/icon.png')
-  );
+  const RESOURCE_DIR = isDev ? __dirname : path.join(__dirname, '../build');
+
+  const iconPath = path.join(RESOURCE_DIR, 'logo_32x32.png');
+
+  const nimage = nativeImage.createFromPath(iconPath);
+
+  tray = new Tray(nimage);
   const trayMenuTemplate = [
     {
       label: 'GDLauncher',
@@ -238,7 +241,13 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  app.quit();
+  if (watcher) {
+    watcher.stop();
+    watcher = null;
+  }
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 app.on('before-quit', async () => {
@@ -277,7 +286,7 @@ ipcMain.handle('hide-window', () => {
 ipcMain.handle('min-max-window', () => {
   if (mainWindow.isMaximized()) {
     mainWindow.unmaximize();
-  } else if (mainWindow.maximizable) {
+  } else {
     mainWindow.maximize();
   }
 });
@@ -295,6 +304,11 @@ ipcMain.handle('show-window', () => {
 
 ipcMain.handle('quit-app', () => {
   mainWindow.close();
+  mainWindow = null;
+});
+
+ipcMain.handle('isAppImage', () => {
+  return process.env.APPIMAGE;
 });
 
 ipcMain.handle('getAppdataPath', () => {

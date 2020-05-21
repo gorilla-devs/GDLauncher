@@ -156,7 +156,7 @@ export const librariesMapper = (libraries, librariesPath) => {
   );
 };
 
-export const isLatestJavaDownloaded = async (meta, userData) => {
+export const isLatestJavaDownloaded = async (meta, userData, retry) => {
   const javaOs = convertOSToJavaFormat(process.platform);
   const javaMeta = meta.find(v => v.os === javaOs);
   const javaFolder = path.join(
@@ -166,17 +166,31 @@ export const isLatestJavaDownloaded = async (meta, userData) => {
   );
   // Check if it's downloaded, if it's latest version and if it's a valid download
   let isValid = true;
+
+  const javaExecutable = path.join(
+    javaFolder,
+    'bin',
+    `java${javaOs === 'windows' ? '.exe' : ''}`
+  );
   try {
     await fs.access(javaFolder);
-    await promisify(exec)(
-      `"${path.join(
-        javaFolder,
-        'bin',
-        `java${javaOs === 'windows' ? '.exe' : ''}`
-      )}" -version`
-    );
+    await promisify(exec)(`"${javaExecutable}" -version`);
   } catch (err) {
     console.log(err);
+
+    if (retry) {
+      if (process.platform !== 'win32') {
+        try {
+          await promisify(exec)(`chmod +x "${javaExecutable}"`);
+          await promisify(exec)(`chmod 755 "${javaExecutable}"`);
+        } catch {
+          // swallow error
+        }
+      }
+
+      return isLatestJavaDownloaded(meta, userData);
+    }
+
     isValid = false;
   }
   return isValid;

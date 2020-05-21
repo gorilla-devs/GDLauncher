@@ -73,8 +73,13 @@ function DesktopRoot({ store }) {
     dispatch(initNews());
 
     const manifests = await dispatch(initManifests());
-    const isLatestJava = await isLatestJavaDownloaded(manifests.java, userData);
-    const isJavaOK = javaPath || isLatestJava;
+
+    let isJavaOK = javaPath;
+
+    if (!isJavaOK) {
+      isJavaOK = await isLatestJavaDownloaded(manifests.java, userData, true);
+    }
+
     if (!isJavaOK) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
 
