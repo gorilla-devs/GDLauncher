@@ -23,7 +23,7 @@ const LoginButton = styled(Button)`
   height: auto;
   margin-top: 40px;
   text-align: center;
-  // color: ${props => props.theme.palette.text.primary};
+  color: ${props => props.theme.palette.text.primary};
   &:hover {
     color: ${props => props.theme.palette.text.primary};
     background: ${props => props.theme.palette.grey[600]};
@@ -59,7 +59,7 @@ const LeftSide = styled.div`
   }
   p {
     margin-top: 1em;
-    color: ${props => props.theme.palette.grey[400]};
+    color: ${props => props.theme.palette.text.third};
   }
 `;
 
@@ -109,10 +109,10 @@ const FooterLinks = styled.div`
   font-size: 0.75rem;
   margin: 0 !important;
   a {
-    color: ${props => props.theme.palette.grey[400]};
+    color: ${props => props.theme.palette.text.third};
   }
   a:hover {
-    color: ${props => props.theme.palette.grey[100]};
+    color: ${props => props.theme.palette.text.secondary};
   }
 `;
 
