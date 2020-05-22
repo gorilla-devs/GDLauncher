@@ -1,0 +1,99 @@
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Inter", sans-serif;
+}
+html {
+  scroll-behavior: smooth;
+}
+svg {
+  width: 1.5em;
+}
+.PartneredContainer svg {
+  width: 122px !important;
+}
+.downloadButton {
+  font-family: Inter;
+  display: flex !important;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+  height: 50px !important;
+  padding: 0 !important;
+  margin: 0;
+  z-index: 2;
+}
+.downloadButton:hover {
+  filter: brightness(120%);
+  transition: all 0.2s ease-in-out;
+}
+.githubButton {
+  font-family: Inter;
+  display: flex !important;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+  height: 50px !important;
+  padding: 0 !important;
+  z-index: 2;
+  margin-left: 20px;
+}
+.githubButton:hover {
+  filter: brightness(120%);
+  transition: all 0.2s ease-in-out;
+}
+.discordButton {
+  font-family: Inter;
+  display: flex !important;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 200px;
+  height: 50px !important;
+  padding: 0 !important;
+  z-index: 2;
+  background: #7289da;
+  border-color: #7289da;
+  margin-left: 20px;
+}
+.discordButton:hover {
+  filter: brightness(120%);
+  transition: all 0.2s ease-in-out;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #909ea4;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background-color: #050818;
+  border-radius: 1px;
+}
+@media only screen and (max-width: 600px) {
+  .githubButton {
+    margin: 20px 0 00px 0;
+  }
+  .discordButton {
+    margin: 20px 0 00px 0;
+  }
+}
+a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+h1,
+h2,
+p {
+  color: #e1e2e4 !important;
+}
+.button {
+  cursor: pointer;
+}
+
