@@ -2246,7 +2246,7 @@ export function installMod(
       const instanceDestFile = path.join(
         _getInstancesPath(state),
         instanceName,
-        modData.categorySection.path,
+        modData.categorySection ? modData.categorySection.path : 'mods',
         modData.fileName
       );
       const destFileExistsInstance = await fse.pathExists(instanceDestFile);
@@ -2254,7 +2254,7 @@ export function installMod(
         const otherInstance = path.join(
           _getInstancesPath(state),
           firstInstanceWithModMatch.name,
-          modData.categorySection.path,
+          modData.categorySection ? modData.categorySection.path : 'mods',
           modData.fileName
         );
 
