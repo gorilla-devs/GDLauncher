@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button } from 'antd';
 import { useKey } from 'rooks';
 import { login } from '../../../common/reducers/actions';
@@ -23,7 +23,7 @@ const LoginButton = styled(Button)`
   height: auto;
   margin-top: 40px;
   text-align: center;
-  color: ${props => props.theme.palette.text.primary};
+  // color: ${props => props.theme.palette.text.primary};
   &:hover {
     color: ${props => props.theme.palette.text.primary};
     background: ${props => props.theme.palette.grey[600]};
@@ -57,12 +57,18 @@ const LeftSide = styled.div`
   & div {
     margin: 10px 0;
   }
+  p {
+    margin-top: 1em;
+    color: ${props => props.theme.palette.grey[400]};
+  }
 `;
 
 const Form = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  align-items: center;
+  margin: 40px 0 !important;
 `;
 
 const Background = styled.div`
@@ -95,12 +101,19 @@ const Footer = styled.div`
   bottom: 0;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   width: calc(100% - 80px);
 `;
 
 const FooterLinks = styled.div`
   font-size: 0.75rem;
+  margin: 0 !important;
+  a {
+    color: ${props => props.theme.palette.grey[400]};
+  }
+  a:hover {
+    color: ${props => props.theme.palette.grey[100]};
+  }
 `;
 
 const Loading = styled.div`
@@ -159,7 +172,7 @@ const Login = () => {
             <Header>
               <HorizontalLogo size={200} />
             </Header>
-            Sign in with your Mojang Account
+            <p>Sign in with your Mojang Account</p>
             <Form>
               <div>
                 <Input
@@ -180,12 +193,12 @@ const Login = () => {
                 <LoginFailMessage>Invalid email or password. </LoginFailMessage>
               )}
               <LoginButton color="primary" onClick={authenticate}>
-                SIGN IN
+                Sign In
                 <FontAwesomeIcon
                   css={`
                     margin-left: 6px;
                   `}
-                  icon={faArrowAltCircleRight}
+                  icon={faArrowRight}
                 />
               </LoginButton>
             </Form>
