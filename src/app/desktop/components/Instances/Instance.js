@@ -4,7 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import { promises as fs } from 'fs';
 import { LoadingOutlined } from '@ant-design/icons';
 import path from 'path';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, clipboard } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPlay,
@@ -13,10 +13,16 @@ import {
   faFolder,
   faTrash,
   faStop,
-  faBoxOpen
+  faBoxOpen,
+  faCopy
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
-import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
+import {
+  ContextMenuTrigger,
+  ContextMenu,
+  MenuItem,
+  hideMenu
+} from 'react-contextmenu';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   _getInstance,
@@ -156,6 +162,7 @@ const Instance = ({ instanceName }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
   const [background, setBackground] = useState(`${instanceDefaultBackground}`);
+  const [nameCopied, setNameCopied] = useState(false);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const downloadQueue = useSelector(_getDownloadQueue);
   const currentDownload = useSelector(state => state.currentDownload);
@@ -301,6 +308,26 @@ const Instance = ({ instanceName }) => {
             Kill
           </MenuItem>
         )}
+        <MenuItem
+          preventClose
+          disabled={Boolean(isInQueue)}
+          onClick={() => {
+            setNameCopied(true);
+            clipboard.writeText(instanceName);
+            setTimeout(() => {
+              setNameCopied(false);
+              hideMenu();
+            }, 500);
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faCopy}
+            css={`
+              margin-right: 10px;
+            `}
+          />
+          {nameCopied ? 'Name Copied! ' : 'Copy Name'}
+        </MenuItem>
         <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
           <FontAwesomeIcon
             icon={faWrench}
