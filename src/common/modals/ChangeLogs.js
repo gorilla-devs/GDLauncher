@@ -22,7 +22,7 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        {/* <Section>
+        <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -32,12 +32,10 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>We just improved everything that was here before</li>
-              <li>Windows executables are now digitally signed</li>
-              <li>Crash handler modal for instances</li>
+              <li>Improved fabric according to dev guidelines</li>
             </ul>
           </div>
-        </Section> */}
+        </Section>
         <Section>
           <SectionTitle
             css={`
@@ -48,8 +46,7 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed various issues on MacOS</li>
-              <li>Fixed modpack updater</li>
+              <li>Minor UI fixes</li>
             </ul>
           </div>
         </Section>
