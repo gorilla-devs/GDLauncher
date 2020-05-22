@@ -23,6 +23,7 @@ const MessageContainer = styled.div`
   border-radius: 5px;
   transition: opacity 200ms ease-in-out;
   opacity: ${props => props.visible};
+  visibility: ${props => (props.visible ? 'visible' : 'hidden')};
 `;
 
 const Message = () => {
