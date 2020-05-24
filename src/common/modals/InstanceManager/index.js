@@ -9,6 +9,7 @@ import Modal from '../../components/Modal';
 import Overview from './Overview';
 import { ipcRenderer } from 'electron';
 import Screenshots from './Screenshots';
+import ResourcePacks from './ResourcePacks';
 import Notes from './Notes';
 import Mods from './Mods';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -53,7 +54,9 @@ const SettingsButton = styled(({ active, ...props }) => <Button {...props} />)`
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
   background: ${props =>
-    props.active ? props.theme.palette.grey[600] : props.theme.palette.grey[800]};
+    props.active
+      ? props.theme.palette.grey[600]
+      : props.theme.palette.grey[800]};
   border: 0px;
   text-align: left;
   color: ${props => props.theme.palette.text.primary};
@@ -142,6 +145,7 @@ const menuEntries = {
   mods: { name: 'Mods', component: Mods },
   modpack: { name: 'Modpack', component: Modpack },
   notes: { name: 'Notes', component: Notes },
+  ResourcePacks: { name: 'ResourcePacks', component: ResourcePacks },
   // resourcePacks: { name: "Resource Packs", component: Overview },
   // worlds: { name: "Worlds", component: Overview },
   screenshots: { name: 'Screenshots', component: Screenshots }
