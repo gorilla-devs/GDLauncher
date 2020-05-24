@@ -199,12 +199,6 @@ const ResourcePacks = ({ instanceName }) => {
           )
         );
       } else if (selectedItems.length > 1 && !item) {
-        console.log(
-          'PEPPE',
-          selectedItems.length,
-          selectedItems,
-          resourcePacksPath
-        );
         Promise.all(
           selectedItems.map(async file => {
             await fse.remove(path.join(resourcePacksPath, file));
@@ -227,7 +221,6 @@ const ResourcePacks = ({ instanceName }) => {
     } = data;
     const item = items[index];
     const dispatch = useDispatch();
-    console.log('SELE', selectedItems);
     return (
       <RowContainer index={index} override={style}>
         <div className="leftPartContent">
@@ -293,8 +286,6 @@ const ResourcePacks = ({ instanceName }) => {
       { extensions: ['7zip', 'zip'] }
     ]);
     if (dialog.canceled) return;
-
-    console.log('d', dialog);
     const fileName = path.basename(dialog.filePaths[0]);
     await fse.copy(
       dialog.filePaths[0],
@@ -361,7 +352,6 @@ const ResourcePacks = ({ instanceName }) => {
       const fileType = fileName.split('.')[1];
       return fileType;
     });
-    console.log('file', files);
 
     await pMap(
       Object.values(files),
@@ -374,7 +364,6 @@ const ResourcePacks = ({ instanceName }) => {
         setNumOfDraggedFiles(files.length);
 
         const { path: filePath } = file;
-        console.log('ff', fileName, dragComp[fileName]);
 
         if (Object.values(files).length === 1) {
           if (
@@ -387,7 +376,6 @@ const ResourcePacks = ({ instanceName }) => {
               path.join(instancesPath, instanceName, 'resourcepacks', fileName)
             );
             dragComp[fileName] = true;
-            console.log('ffaa', fileName, dragComp[fileName]);
             setFileDrop(false);
           } else {
             console.error('This file is not a zip');
@@ -423,7 +411,6 @@ const ResourcePacks = ({ instanceName }) => {
     );
     setDragCompletedPopulated(files.length === Object.values(dragComp).length);
     setDragCompleted(dragComp);
-    console.log('test1', dragCompleted);
   };
 
   const onDragEnter = e => {
