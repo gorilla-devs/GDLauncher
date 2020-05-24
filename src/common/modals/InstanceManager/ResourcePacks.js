@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { memo, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
 import path from 'path';
@@ -8,27 +8,16 @@ import { promises as fs, watch } from 'fs';
 import makeDir from 'make-dir';
 import { ipcRenderer } from 'electron';
 import { FixedSizeList as List, areEqual } from 'react-window';
-import { Input, Button, Spin } from 'antd';
-// import { Checkbox, Input, Button, Switch, Spin, Dropdown, Menu } from 'antd';
+import { Checkbox, Button, Switch, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faTrash,
-  faArrowDown
-  // faEllipsisV
-} from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
-import fse, { copySync } from 'fs-extra';
+import fse from 'fs-extra';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
-// import {
-//   updateInstanceConfig,
-//   deleteMod,
-//   updateMod
-// } from '../../reducers/actions';
-// import { openModal } from '../../reducers/modals/actions';
 
 const antIcon = (
   <LoadingOutlined
@@ -146,204 +135,40 @@ const CopyTitle = styled.h1`
   animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
 `;
 
-// const DeleteSelectedMods = styled(({ selectedMods, ...props }) => (
-//   // eslint-disable-next-line react/jsx-props-no-spreading
-//   <FontAwesomeIcon {...props} />
-// ))`
-//   margin: 0 10px;
-//   ${props =>
-//     props.selectedMods > 0 &&
-//     `&:hover {
-//   cursor: pointer;
-//   path {
-//     cursor: pointer;
-//     transition: all 0.1s ease-in-out;
-//     color: ${props.theme.palette.error.main};
-//   }
-// }`}
-// `;
-
 let watcher;
 
-// const toggleModDisabled = async (
-//   c,
-//   instanceName,
-//   instancePath,
-//   mod,
-//   dispatch
-// ) => {
-//   const destFileName = c
-//     ? mod.fileName.replace('.disabled', '')
-//     : `${mod.fileName}.disabled`;
-//   await dispatch(
-//     updateInstanceConfig(instanceName, prev => ({
-//       ...prev,
-//       mods: prev.mods.map(m => {
-//         if (m.fileName === mod.fileName) {
-//           return {
-//             ...m,
-//             fileName: destFileName
-//           };
-//         }
-//         return m;
-//       })
-//     }))
-//   );
-//   await fse.move(
-//     path.join(instancePath, 'mods', mod.fileName),
-//     path.join(instancePath, 'mods', destFileName)
-//   );
-// };
+const toggleModDisabled = async (
+  c,
+  instanceName,
+  instancePath,
+  item,
+  dispatch
+) => {
+  const destFileName = c ? item.replace('.disabled', '') : `${item}.disabled`;
 
-// const deleteFile = useCallback(
-//   async (
-//     fileName,
-//     instancesPath,
-//     selectedItems,
-//     resourcePacksPath,
-//     instanceName
-//   ) => {
-//     if (selectedItems.length === 1) {
-//       await fse.remove(
-//         path.join(
-//           instancesPath,
-//           instanceName,
-//           'resourcepacks',
-//           selectedItems[0]
-//         )
-//       );
-//     } else if (selectedItems.length > 1) {
-//       Promise.all(
-//         selectedItems.map(async screenShot => {
-//           await fse.remove(
-//             path.join(
-//               resourcePacksPath,
-//               instanceName,
-//               'resourcepacks',
-//               screenShot
-//             )
-//           );
-//         })
-//       );
-//     }
-//   },
-//   [selectedItems, instancesPath, instanceName]
-// );
-
-const Row = memo(({ index, style, data }) => {
-  const [loading, setLoading] = useState(false);
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const {
-    items,
-    instanceName,
-    instancesPath,
-    selectedItems,
-    setSelectedItems,
-    resourcePacksPath
-  } = data;
-  const item = items[index];
-  const dispatch = useDispatch();
-
-  return (
-    <RowContainer index={index} override={style}>
-      <div className="leftPartContent">
-        {/* <Checkbox
-          checked={selectedMods.includes(item.fileName)}
-          onChange={e => {
-            if (e.target.checked) {
-              setSelectedMods([...selectedMods, item.fileName]);
-            } else {
-              setSelectedMods(selectedMods.filter(v => v !== item.fileName));
-            }
-          }}
-        /> */}
-        {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
-      </div>
-      <div className="rowCenterContent">{item}</div>
-      <div className="rightPartContent">
-        {/* <Switch
-          size="small"
-          checked={path.extname(item) !== '.disabled'}
-          disabled={loading || updateLoading}
-          onChange={async c => {
-            setLoading(true);
-            await toggleModDisabled(c, item, instancePath, item, dispatch);
-            setTimeout(() => setLoading(false), 500);
-          }}
-        /> */}
-        <FontAwesomeIcon
-          css={`
-            &:hover {
-              cursor: pointer;
-              path {
-                cursor: pointer;
-                transition: all 0.1s ease-in-out;
-                color: ${props => props.theme.palette.error.main};
-              }
-            }
-          `}
-          // onClick={() => {
-          //   dispatch(
-          //   //   openModal('ActionConfirmation', {
-          //   //     resourcePacksPath,
-          //   //     selectedItems,
-          //   //     setSelectedItems,
-          //   //     instanceName,
-          //   //     instancesPath,
-          //   //     message: 'Are you sure you want to delete this image?',
-          //   //     fileName: item,
-          //   //     confirmCallback: deleteFile,
-          //   //     title: 'Confirm'
-          //   //   })
-          //   // );
-          // }}
-          icon={faTrash}
-        />
-      </div>
-    </RowContainer>
+  await fse.move(
+    path.join(instancePath, 'resourcepacks', item),
+    path.join(instancePath, 'resourcepacks', destFileName)
   );
-}, areEqual);
+};
 
 const createItemData = memoize(
-  (
+  (items, instanceName, instancePath, selectedItems, setSelectedItems) => ({
     items,
     instanceName,
-    instancesPath,
-    gameVersion,
-    selectedMods,
-    setSelectedMods,
-    latestMods
-  ) => ({
-    items,
-    instanceName,
-    instancesPath,
-    gameVersion,
-    selectedMods,
-    setSelectedMods,
-    latestMods
+    instancePath,
+    selectedItems,
+    setSelectedItems
   })
 );
 
-// const sort = arr =>
-//   arr.slice().sort((a, b) => a.fileName.localeCompare(b.fileName));
-
-// const filter = (arr, search) =>
-//   arr.filter(
-//     mod =>
-//       mod.fileName.toLowerCase().includes(search.toLowerCase()) ||
-//       mod.displayName.toLowerCase().includes(search.toLowerCase())
-//   );
-
 const ResourcePacks = ({ instanceName }) => {
-  // const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
   const [resourcePacks, setResourcePacks] = useState([]);
-  const [search, setSearch] = useState('');
   const [fileDrag, setFileDrag] = useState(false);
   const [fileDrop, setFileDrop] = useState(false);
   const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
   const [dragCompleted, setDragCompleted] = useState({});
-  // const [filePath, setFilePath] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
   const resourcePacksPath = path.join(
@@ -352,7 +177,116 @@ const ResourcePacks = ({ instanceName }) => {
     'resourcepacks'
   );
 
-  const dispatch = useDispatch();
+  const deleteFile = useCallback(
+    async (
+      item,
+      instancesPath,
+      selectedItems,
+      resourcePacksPath,
+      instanceName
+    ) => {
+      if (selectedItems.length === 0 && item) {
+        await fse.remove(
+          path.join(instancesPath, instanceName, 'resourcepacks', item)
+        );
+      } else if (selectedItems.length === 1) {
+        await fse.remove(
+          path.join(
+            instancesPath,
+            instanceName,
+            'resourcepacks',
+            selectedItems[0]
+          )
+        );
+      } else if (selectedItems.length > 1 && !item) {
+        console.log(
+          'PEPPE',
+          selectedItems.length,
+          selectedItems,
+          resourcePacksPath
+        );
+        Promise.all(
+          selectedItems.map(async file => {
+            await fse.remove(path.join(resourcePacksPath, file));
+          })
+        );
+      }
+    },
+    [selectedItems, instancesPath, instanceName]
+  );
+
+  const Row = memo(({ index, style, data }) => {
+    const [loading, setLoading] = useState(false);
+    const {
+      items,
+      instanceName,
+      instancePath,
+      selectedItems,
+      setSelectedItems,
+      resourcePacksPath
+    } = data;
+    const item = items[index];
+    const dispatch = useDispatch();
+    console.log('SELE', selectedItems);
+    return (
+      <RowContainer index={index} override={style}>
+        <div className="leftPartContent">
+          <Checkbox
+            checked={selectedItems.includes(item)}
+            onChange={e => {
+              if (e.target.checked) {
+                setSelectedItems([...selectedItems, item]);
+              } else {
+                setSelectedItems(selectedItems.filter(v => v !== item));
+              }
+            }}
+          />
+          {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
+        </div>
+        <div className="rowCenterContent">{item}</div>
+        <div className="rightPartContent">
+          <Switch
+            size="small"
+            checked={path.extname(item) !== '.disabled'}
+            disabled={loading}
+            onChange={async c => {
+              setLoading(true);
+              await toggleModDisabled(
+                c,
+                instanceName,
+                instancePath,
+                item,
+                dispatch
+              );
+              setTimeout(() => setLoading(false), 500);
+            }}
+          />
+          <FontAwesomeIcon
+            css={`
+              &:hover {
+                cursor: pointer;
+                path {
+                  cursor: pointer;
+                  transition: all 0.1s ease-in-out;
+                  color: ${props => props.theme.palette.error.main};
+                }
+              }
+            `}
+            onClick={() =>
+              deleteFile(
+                item,
+                instancesPath,
+                selectedItems,
+                resourcePacksPath,
+                instanceName
+              )
+            }
+            icon={faTrash}
+          />
+        </div>
+      </RowContainer>
+    );
+  }, areEqual);
 
   const openFolderDialog = async () => {
     const dialog = await ipcRenderer.invoke('openFileDialog', [
@@ -371,10 +305,8 @@ const ResourcePacks = ({ instanceName }) => {
   const startListener = async () => {
     await makeDir(resourcePacksPath);
     const files = await fs.readdir(resourcePacksPath);
-    console.log('fff', files);
     setResourcePacks(files);
     watcher = watch(resourcePacksPath, async (event, filename) => {
-      console.log('filename', filename);
       if (filename) {
         const resourcePackFiles = await fs.readdir(resourcePacksPath);
         setResourcePacks(resourcePackFiles);
@@ -384,7 +316,6 @@ const ResourcePacks = ({ instanceName }) => {
 
   useEffect(() => {
     startListener();
-    console.log('re', resourcePacksPath);
     return () => watcher?.close();
   }, []);
 
@@ -409,7 +340,6 @@ const ResourcePacks = ({ instanceName }) => {
 
   const itemData = createItemData(
     resourcePacks,
-    instancesPath,
     instanceName,
     path.join(instancesPath, instanceName),
     selectedItems,
@@ -519,8 +449,52 @@ const ResourcePacks = ({ instanceName }) => {
             justify-content: center;
             align-items: center;
           `}
-        ></div>
+        >
+          <Checkbox
+            checked={
+              selectedItems.length === resourcePacks.length &&
+              selectedItems.length !== 0
+            }
+            indeterminate={
+              selectedItems.length !== 0 &&
+              selectedItems.length !== resourcePacks.length
+            }
+            onChange={() =>
+              selectedItems.length !== resourcePacks.length
+                ? setSelectedItems(resourcePacks.map(v => v))
+                : setSelectedItems([])
+            }
+          >
+            Select All
+          </Checkbox>
+          <FontAwesomeIcon
+            css={`
+              margin: 0 10px;
+              &:hover {
+                cursor: pointer;
+                path {
+                  cursor: pointer;
+                  transition: all 0.1s ease-in-out;
+                  color: ${props => props.theme.palette.error.main};
+                }
+              }
+            `}
+            onClick={() =>
+              deleteFile(
+                null,
+                instancesPath,
+                selectedItems,
+                resourcePacksPath,
+                instanceName
+              )
+            }
+            icon={faTrash}
+          />
+        </div>
         <Button
+          css={`
+            margin: 0 10px;
+          `}
           type="primary"
           onClick={() => {
             openFolderDialog();
@@ -528,16 +502,6 @@ const ResourcePacks = ({ instanceName }) => {
         >
           Add ResourcePack
         </Button>
-        <Input
-          allowClear
-          value={search}
-          defaultValue={search}
-          onChange={e => setSearch(e.target.value)}
-          css={`
-            width: 200px;
-          `}
-          // placeholder={`Search ${mods.length} mods`}
-        />
       </Header>
       <div
         onDragEnter={onDragEnter}
