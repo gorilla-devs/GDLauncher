@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { clipboard } from 'electron';
 import { Tooltip, Collapse } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
+import { pasteBinPost } from '../api';
 
 import Modal from '../components/Modal';
 import Logo from '../../ui/LogoSad';
@@ -37,6 +38,20 @@ const { Panel } = Collapse;
 
 const InstanceCrashed = ({ code, errorLogs }) => {
   const [copiedLog, setCopiedLog] = useState(null);
+
+  async function share(e) {
+    e.stopPropagation();
+
+    const res = await pasteBinPost(errorLogs);
+
+    if (res.status === 200) {
+      setCopiedLog(true);
+      clipboard.writeText(res.data);
+      setTimeout(() => {
+        setCopiedLog(false);
+      }, 500);
+    }
+  }
 
   function copy(e) {
     e.stopPropagation();
@@ -90,15 +105,42 @@ const InstanceCrashed = ({ code, errorLogs }) => {
                 `}
               >
                 <>Error Log</> &nbsp;
-                <Tooltip title={copiedLog ? 'Copied' : 'Copy'} placement="top">
-                  <div
-                    css={`
-                      margin: 0;
-                    `}
+                <div
+                  css={`
+                    display: flex;
+                  `}
+                >
+                  <Tooltip
+                    title={copiedLog ? 'Copied Link' : 'Share'}
+                    placement="top"
                   >
-                    <FontAwesomeIcon icon={faCopy} onClick={e => copy(e)} />
-                  </div>
-                </Tooltip>
+                    <div
+                      css={`
+                        margin: 0;
+                      `}
+                    >
+                      <FontAwesomeIcon
+                        css={`
+                          margin: 0 20px;
+                        `}
+                        icon={faShare}
+                        onClick={e => share(e)}
+                      />
+                    </div>
+                  </Tooltip>
+                  <Tooltip
+                    title={copiedLog ? 'Copied' : 'Copy'}
+                    placement="top"
+                  >
+                    <div
+                      css={`
+                        margin: 0;
+                      `}
+                    >
+                      <FontAwesomeIcon icon={faCopy} onClick={e => copy(e)} />
+                    </div>
+                  </Tooltip>
+                </div>
               </div>
             }
             key="1"

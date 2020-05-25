@@ -7,7 +7,8 @@ import {
   FABRIC_APIS,
   JAVA_MANIFEST_URL,
   IMGUR_CLIENT_ID,
-  FORGESVC_CATEGORIES
+  FORGESVC_CATEGORIES,
+  PASTEBIN_DEV_KEY
 } from './utils/constants';
 import { sortByDate } from './utils';
 
@@ -54,6 +55,25 @@ export const mcRefresh = (accessToken, clientToken) => {
 export const mcGetPlayerSkin = uuid => {
   return axios.get(
     `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`
+  );
+};
+
+export const pasteBinPost = code => {
+  const bodyFormData = new FormData();
+  bodyFormData.append('api_dev_key', PASTEBIN_DEV_KEY);
+  bodyFormData.append('api_option', 'paste');
+  bodyFormData.append('api_paste_code', code);
+
+  const config = {
+    headers: {
+      'content-type': 'multipart/form-data'
+    }
+  };
+
+  return axios.post(
+    'https://pastebin.com/api/api_post.php',
+    bodyFormData,
+    config.headers
   );
 };
 

@@ -19,6 +19,7 @@ export const FMLLIBS_OUR_BASE_URL = 'https://fmllibs.gdevs.io';
 export const FMLLIBS_FORGE_BASE_URL =
   'https://files.minecraftforge.net/fmllibs';
 export const IMGUR_CLIENT_ID = '509a564cf4466c9';
+export const PASTEBIN_DEV_KEY = '478d52a29c7e952ba116d09bd9625fde';
 export const FABRIC = 'fabric';
 export const FORGE = 'forge';
 export const VANILLA = 'vanilla';
