@@ -1,23 +1,27 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable */
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
-
 import path from 'path';
-
 import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faUndo } from '@fortawesome/free-solid-svg-icons';
-import { Input, Button, Switch, Slider, Select } from 'antd';
+import {
+  faSave,
+  faUndo,
+  faTimes,
+  faCog
+} from '@fortawesome/free-solid-svg-icons';
+import { Input, Button, Switch, Slider, Select, Cascader } from 'antd';
 import { ipcRenderer } from 'electron';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
 } from '../../../app/desktop/utils/constants';
-import { updateInstanceConfig } from '../../reducers/actions';
-import { convertMinutesToHumanTime } from '../../utils';
+import { updateInstanceConfig, addToQueue } from '../../reducers/actions';
+import { convertMinutesToHumanTime, sortByForgeVersionDesc } from '../../utils';
 
 const Container = styled.div`
   padding: 0 50px;
@@ -85,6 +89,11 @@ const JavaMemorySlider = styled(Slider)`
   margin: 30px 0 55px 0;
 `;
 
+const CustomInput = styled(Input)`
+  height: 20px;
+  margin-top: 5px;
+`;
+
 const JavaArgumentsResetButton = styled(Button)`
   margin-left: 20px;
 `;
@@ -129,8 +138,121 @@ const Overview = ({ instanceName }) => {
   const [screenResolution, setScreenResolution] = useState(null);
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
+  const [minecraftVersion, setMinecraftVersion] = useState(false);
+  const [modloader, setModLoader] = useState(false);
+  const vanillaManifest = useSelector(state => state.app.vanillaManifest);
+  const fabricManifest = useSelector(state => state.app.fabricManifest);
+  const forgeManifest = useSelector(state => state.app.forgeManifest);
+
+  const instancePath = useSelector(state =>
+    path.join(_getInstancesPath(state), instanceName)
+  );
 
   const dispatch = useDispatch();
+
+  const VanillafilteredVersions = useMemo(() => {
+    const snapshots = vanillaManifest.versions
+      .filter(v => v.type === 'snapshot')
+      .map(v => v.id);
+    const versions = [
+      {
+        value: 'release',
+        label: 'Releases',
+        children: vanillaManifest.versions
+          .filter(v => v.type === 'release')
+          .map(v => ({
+            value: v.id,
+            label: v.id
+          }))
+      },
+      {
+        value: 'snapshot',
+        label: 'Snapshots',
+        children: vanillaManifest.versions
+          .filter(v => v.type === 'snapshot')
+          .map(v => ({
+            value: v.id,
+            label: v.id
+          }))
+      },
+      {
+        value: 'old_beta',
+        label: 'Old Beta',
+        children: vanillaManifest.versions
+          .filter(v => v.type === 'old_beta')
+          .map(v => ({
+            value: v.id,
+            label: v.id
+          }))
+      },
+      {
+        value: 'old_alpha',
+        label: 'Old Alpha',
+        children: vanillaManifest.versions
+          .filter(v => v.type === 'old_alpha')
+          .map(v => ({
+            value: v.id,
+            label: v.id
+          }))
+      }
+    ];
+    return versions;
+  }, [vanillaManifest, fabricManifest, forgeManifest]);
+
+  const ForgefilteredVersions = useMemo(() => {
+    const versions = [
+      {
+        value: 'release',
+        label: 'Releases',
+        children: Object.entries(forgeManifest).map(([k, v]) => ({
+          value: k,
+          label: k,
+          children: v.sort(sortByForgeVersionDesc).map(child => ({
+            value: child,
+            label: child.split('-')[1]
+          }))
+        }))
+      }
+    ];
+    return versions;
+  }, [vanillaManifest, fabricManifest, forgeManifest]);
+
+  const FabricfilteredVersions = useMemo(() => {
+    const snapshots = vanillaManifest.versions
+      .filter(v => v.type === 'snapshot')
+      .map(v => v.id);
+    const versions = [
+      {
+        value: 'release',
+        label: 'Releases',
+        children: fabricManifest.mappings
+          .filter(v => !snapshots.includes(v.gameVersion))
+          .map(v => ({
+            value: v.version,
+            label: v.version,
+            children: fabricManifest.loader.map(c => ({
+              value: c.version,
+              label: c.version
+            }))
+          }))
+      },
+      {
+        value: 'snapshot',
+        label: 'Snapshots',
+        children: fabricManifest.mappings
+          .filter(v => snapshots.includes(v.gameVersion))
+          .map(v => ({
+            value: v.version,
+            label: v.version,
+            children: fabricManifest.loader.map(c => ({
+              value: c.version,
+              label: c.version
+            }))
+          }))
+      }
+    ];
+    return versions;
+  }, [vanillaManifest, fabricManifest, forgeManifest]);
 
   useEffect(() => {
     ipcRenderer
@@ -186,6 +308,17 @@ const Overview = ({ instanceName }) => {
     );
   };
 
+  const calcCoscaderContent = v => {
+    switch (v) {
+      case 'vanilla':
+        return VanillafilteredVersions;
+      case 'forge':
+        return ForgefilteredVersions;
+      case 'fabric':
+        return FabricfilteredVersions;
+    }
+  };
+
   const computeLastPlayed = timestamp => {
     const lastPlayed = new Date(timestamp);
     const timeDiff = lastPlayed.getTime() - new Date(Date.now()).getTime();
@@ -229,9 +362,83 @@ const Overview = ({ instanceName }) => {
                 color: ${props => props.theme.palette.text.secondary};
               `}
             >
-              Minecraft Version
+              {minecraftVersion ? null : 'Minecraft Version'}
             </div>
-            <div>{config?.modloader[1]}</div>
+
+            <div
+              css={`
+                position: absolute;
+                top: 5px;
+                right: 10px;
+                font-size: 10px;
+                color: ${props => props.theme.palette.text.secondary};
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faCog}
+                onClick={() => {
+                  setMinecraftVersion(!minecraftVersion);
+                }}
+              />
+            </div>
+
+            {minecraftVersion ? (
+              <Cascader
+                // value={config?.modloader[1]}
+                options={calcCoscaderContent(config?.modloader[0])}
+                onChange={async v => {
+                  if (config?.modloader[0] && config?.modloader[3]) {
+                    try {
+                      const manifest = await fss.readJson(
+                        path.join(instancePath, 'manifest.json')
+                      );
+
+                      dispatch(
+                        addToQueue(
+                          instanceName,
+                          [
+                            config?.modloader[0],
+                            v[1],
+                            v[2],
+                            config?.modloader[3],
+                            config?.modloader[4]
+                          ],
+                          // config?.modloader,
+                          manifest,
+                          `background${path.extname(config?.background)}`
+                        )
+                      );
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }
+                  // const manifest = await fss.readJson(
+                  //   path.join(instancePath, 'manifest.json')
+                  // );
+                  console.log(v, instancePath);
+                  // dispatch(
+                  //   addToQueue(
+                  //     instanceName,
+                  //     [config?.modloader[0],"1.12.2","1.12.2-14.23.5.2838",285109,2935316]
+                  //     // config?.modloader,
+                  //     manifest,
+                  //     `background${path.extname(config?.background)}`
+                  //   )
+                  // );
+                  setMinecraftVersion(false);
+                }}
+                placeholder="Select a version"
+                size="large"
+                css={`
+                  input {
+                    height: 32px;
+                  }
+                  width: 100px;
+                `}
+              />
+            ) : (
+              <div>{config?.modloader[1]}</div>
+            )}
           </CardBox>
           <CardBox
             css={`
@@ -247,9 +454,43 @@ const Overview = ({ instanceName }) => {
                 color: ${props => props.theme.palette.text.secondary};
               `}
             >
-              Modloader
+              {modloader ? null : 'Modloader'}
             </div>
-            <div>{config?.modloader[0]}</div>
+            <div
+              css={`
+                position: absolute;
+                top: 5px;
+                right: 10px;
+                font-size: 10px;
+                color: ${props => props.theme.palette.text.secondary};
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faCog}
+                onClick={() => setModLoader(!modloader)}
+              />
+            </div>
+            {modloader ? (
+              <Select
+                css={`
+                  .ant-select-selector {
+                    background: ${props =>
+                      props.theme.palette.colors.darkYellow};
+                  }
+                  width: 100px;
+
+                  border: 2px solid
+                    ${props => props.theme.palette.colors.orange};
+                `}
+                value={config?.modloader[0]}
+              >
+                <Select.Option value={0}>Vanilla</Select.Option>
+                <Select.Option value={1}>Forge</Select.Option>
+                <Select.Option value={1}>Fabric</Select.Option>
+              </Select>
+            ) : (
+              <div>{config?.modloader[0]}</div>
+            )}
           </CardBox>
           <CardBox
             css={`
@@ -267,6 +508,21 @@ const Overview = ({ instanceName }) => {
             >
               Modloader Version
             </div>
+            {(config?.modloader[2] || '-') !== '-' ? (
+              <div
+                css={`
+                  position: absolute;
+                  top: 5px;
+                  right: 10px;
+                  font-size: 10px;
+                  color: ${props => props.theme.palette.text.secondary};
+                `}
+              >
+                <FontAwesomeIcon icon={faCog} />
+              </div>
+            ) : (
+              ''
+            )}
             <div>
               {config?.modloader[0] === 'forge'
                 ? config?.modloader[2]?.split('-')[1]
