@@ -22,6 +22,7 @@ import {
 } from '../../../app/desktop/utils/constants';
 import { updateInstanceConfig, addToQueue } from '../../reducers/actions';
 import { convertMinutesToHumanTime, sortByForgeVersionDesc } from '../../utils';
+import { closeModal } from '../../reducers/modals/actions';
 
 const Container = styled.div`
   padding: 0 50px;
@@ -387,7 +388,9 @@ const Overview = ({ instanceName }) => {
                 // value={config?.modloader[1]}
                 options={calcCoscaderContent(config?.modloader[0])}
                 onChange={async v => {
-                  if (config?.modloader[0] && config?.modloader[3]) {
+                  console.log(v, instancePath, config?.modloader[3]);
+                  if (config?.modloader[0] === 'forge') {
+                    console.log('pippo', instancePath);
                     try {
                       const manifest = await fss.readJson(
                         path.join(instancePath, 'manifest.json')
@@ -410,12 +413,30 @@ const Overview = ({ instanceName }) => {
                       );
                     } catch (e) {
                       console.error(e);
+                      dispatch(
+                        addToQueue(instanceName, [
+                          config?.modloader[0],
+                          v[1],
+                          v[2],
+                          config?.modloader[3],
+                          config?.modloader[4]
+                        ])
+                      );
                     }
+                  } else if (config?.modloader[0] === 'vanilla') {
+                    dispatch(
+                      addToQueue(
+                        instanceName,
+
+                        null,
+                        `background${path.extname(config?.background)}`
+                      )
+                    );
                   }
                   // const manifest = await fss.readJson(
                   //   path.join(instancePath, 'manifest.json')
                   // );
-                  console.log(v, instancePath);
+
                   // dispatch(
                   //   addToQueue(
                   //     instanceName,
@@ -426,6 +447,7 @@ const Overview = ({ instanceName }) => {
                   //   )
                   // );
                   setMinecraftVersion(false);
+                  dispatch(closeModal());
                 }}
                 placeholder="Select a version"
                 size="large"
@@ -472,6 +494,77 @@ const Overview = ({ instanceName }) => {
             </div>
             {modloader ? (
               <Select
+                onChange={async v => {
+                  console.log('v', config?.modloader);
+                  if (v === 'vanilla') {
+                    try {
+                      dispatch(
+                        addToQueue(instanceName, [v, config?.modloader[1]])
+                      );
+                    } catch (e) {
+                      console.error(e);
+                    }
+                    console.log([
+                      v,
+                      config?.modloader[1],
+                      config?.modloader[2],
+                      config?.modloader[3],
+                      config?.modloader[4]
+                    ]);
+                  } else if (v === 'forge') {
+                    try {
+                      const manifest = await fss.readJson(
+                        path.join(instancePath, 'manifest.json')
+                      );
+
+                      dispatch(
+                        addToQueue(
+                          instanceName,
+                          [v, config?.modloader[1]],
+                          manifest,
+                          `background${path.extname(config?.background)}`
+                        )
+                      );
+                    } catch (e) {
+                      console.error(e);
+                      dispatch(
+                        addToQueue(instanceName, [v, config?.modloader[1]])
+                      );
+                    }
+                    console.log([
+                      v,
+                      config?.modloader[1],
+                      config?.modloader[2],
+                      config?.modloader[3],
+                      config?.modloader[4]
+                    ]);
+                  } else {
+                    dispatch(
+                      addToQueue(
+                        instanceName,
+                        [
+                          v,
+                          config?.modloader[1],
+                          config?.modloader[2],
+                          config?.modloader[3],
+                          config?.modloader[4]
+                        ],
+                        manifest,
+                        `background${path.extname(config?.background)}`
+                      )
+                    );
+                    console.log([
+                      v,
+                      config?.modloader[1],
+                      config?.modloader[2],
+                      config?.modloader[3],
+                      config?.modloader[4]
+                    ]);
+                  }
+
+                  setModLoader(false);
+                  dispatch(closeModal());
+                }}
                 css={`
                   .ant-select-selector {
                     background: ${props =>
@@ -484,9 +577,9 @@ const Overview = ({ instanceName }) => {
                 `}
                 value={config?.modloader[0]}
               >
-                <Select.Option value={0}>Vanilla</Select.Option>
-                <Select.Option value={1}>Forge</Select.Option>
-                <Select.Option value={1}>Fabric</Select.Option>
+                <Select.Option value={'vanilla'}>Vanilla</Select.Option>
+                <Select.Option value={'forge'}>Forge</Select.Option>
+                <Select.Option value={'fabric'}>Fabric</Select.Option>
               </Select>
             ) : (
               <div>{config?.modloader[0]}</div>
