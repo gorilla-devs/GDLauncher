@@ -320,6 +320,10 @@ const Overview = ({ instanceName }) => {
     }
   };
 
+  const snapshots = vanillaManifest.versions
+    .filter(v => v.type === 'snapshot')
+    .map(v => v.id);
+
   const computeLastPlayed = timestamp => {
     const lastPlayed = new Date(timestamp);
     const timeDiff = lastPlayed.getTime() - new Date(Date.now()).getTime();
@@ -424,14 +428,17 @@ const Overview = ({ instanceName }) => {
                       );
                     }
                   } else if (config?.modloader[0] === 'vanilla') {
-                    dispatch(
-                      addToQueue(
-                        instanceName,
-
-                        null,
-                        `background${path.extname(config?.background)}`
-                      )
-                    );
+                    dispatch(addToQueue(instanceName, v[1]));
+                  } else if (config?.modloader[0] === 'fabric') {
+                    console.log('pp', config?.modloader[0], v[1], v[2]);
+                    // dispatch(
+                    //   addToQueue(instanceName, [
+                    //     config?.modloader[0],
+                    //     v[1],
+                    //     v[2],
+                    //     null
+                    //   ])
+                    // );
                   }
                   // const manifest = await fss.readJson(
                   //   path.join(instancePath, 'manifest.json')
