@@ -495,7 +495,14 @@ const Overview = ({ instanceName }) => {
             {modloader ? (
               <Select
                 onChange={async v => {
-                  console.log('v', config?.modloader);
+                  const snapshots = vanillaManifest.versions
+                    .filter(v => v.type === 'snapshot')
+                    .map(v => v.id);
+                  console.log('v', [
+                    v,
+                    config?.modloader[1],
+                    config?.modloader[2]
+                  ]);
                   if (v === 'vanilla') {
                     try {
                       dispatch(
@@ -512,32 +519,33 @@ const Overview = ({ instanceName }) => {
                       config?.modloader[4]
                     ]);
                   } else if (v === 'forge') {
+                    console.log('forge', instancePath, [
+                      v,
+                      config?.modloader[1]
+                    ]);
+
                     try {
-                      const manifest = await fss.readJson(
-                        path.join(instancePath, 'manifest.json')
-                      );
+                      // const manifest = await fss.readJson(
+                      //   path.join(instancePath, 'manifest.json')
+                      // );
 
                       dispatch(
                         addToQueue(
                           instanceName,
-                          [v, config?.modloader[1]],
-                          manifest,
-                          `background${path.extname(config?.background)}`
+                          [
+                            v,
+                            config?.modloader[1],
+                            Object.entries(forgeManifest).filter(
+                              x => x[0] === config?.modloader[1]
+                            )[0][1][0]
+                          ],
+                          null
+                          // `background${path.extname(config?.background)}`
                         )
                       );
                     } catch (e) {
                       console.error(e);
-                      dispatch(
-                        addToQueue(instanceName, [v, config?.modloader[1]])
-                      );
                     }
-                    console.log([
-                      v,
-                      config?.modloader[1],
-                      config?.modloader[2],
-                      config?.modloader[3],
-                      config?.modloader[4]
-                    ]);
                   } else {
                     dispatch(
                       addToQueue(
@@ -545,12 +553,14 @@ const Overview = ({ instanceName }) => {
                         [
                           v,
                           config?.modloader[1],
-                          config?.modloader[2],
-                          config?.modloader[3],
-                          config?.modloader[4]
-                        ],
-                        manifest,
-                        `background${path.extname(config?.background)}`
+                          fabricManifest.mappings
+                            .filter(v => !snapshots.includes(v.gameVersion))
+                            .filter(
+                              x => x.gameVersion === config?.modloader[1]
+                            )[0].version
+                        ]
+                        // manifest,
+                        // `background${path.extname(config?.background)}`
                       )
                     );
                     console.log([
