@@ -392,7 +392,7 @@ const Overview = ({ instanceName }) => {
                 // value={config?.modloader[1]}
                 options={calcCoscaderContent(config?.modloader[0])}
                 onChange={async v => {
-                  console.log(v, instancePath, config?.modloader[3]);
+                  console.log(v, instancePath, config?.modloader);
                   if (config?.modloader[0] === 'forge') {
                     console.log('pippo', instancePath);
                     try {
@@ -428,17 +428,22 @@ const Overview = ({ instanceName }) => {
                       );
                     }
                   } else if (config?.modloader[0] === 'vanilla') {
-                    dispatch(addToQueue(instanceName, v[1]));
+                    dispatch(addToQueue(instanceName, [v[0], v[1]]));
                   } else if (config?.modloader[0] === 'fabric') {
-                    console.log('pp', config?.modloader[0], v[1], v[2]);
-                    // dispatch(
-                    //   addToQueue(instanceName, [
-                    //     config?.modloader[0],
-                    //     v[1],
-                    //     v[2],
-                    //     null
-                    //   ])
-                    // );
+                    console.log('pp', [
+                      config?.modloader[0],
+                      v[1].split('+')[0],
+                      v[1],
+                      v[2]
+                    ]);
+                    dispatch(
+                      addToQueue(instanceName, [
+                        config?.modloader[0],
+                        v[1].split('+')[0],
+                        v[1],
+                        v[2]
+                      ])
+                    );
                   }
                   // const manifest = await fss.readJson(
                   //   path.join(instancePath, 'manifest.json')
@@ -466,7 +471,7 @@ const Overview = ({ instanceName }) => {
                 `}
               />
             ) : (
-              <div>{config?.modloader[1]}</div>
+              <div>{config?.modloader[2]}</div>
             )}
           </CardBox>
           <CardBox
@@ -505,11 +510,6 @@ const Overview = ({ instanceName }) => {
                   const snapshots = vanillaManifest.versions
                     .filter(v => v.type === 'snapshot')
                     .map(v => v.id);
-                  console.log('v', [
-                    v,
-                    config?.modloader[1],
-                    config?.modloader[2]
-                  ]);
                   if (v === 'vanilla') {
                     try {
                       dispatch(
@@ -518,13 +518,13 @@ const Overview = ({ instanceName }) => {
                     } catch (e) {
                       console.error(e);
                     }
-                    console.log([
-                      v,
-                      config?.modloader[1],
-                      config?.modloader[2],
-                      config?.modloader[3],
-                      config?.modloader[4]
-                    ]);
+                    // console.log([
+                    //   v,
+                    //   config?.modloader[1],
+                    //   config?.modloader[2],
+                    //   config?.modloader[3],
+                    //   config?.modloader[4]
+                    // ]);
                   } else if (v === 'forge') {
                     console.log('forge', instancePath, [
                       v,
@@ -554,29 +554,27 @@ const Overview = ({ instanceName }) => {
                       console.error(e);
                     }
                   } else {
-                    dispatch(
-                      addToQueue(
-                        instanceName,
-                        [
-                          v,
-                          config?.modloader[1],
-                          fabricManifest.mappings
-                            .filter(v => !snapshots.includes(v.gameVersion))
-                            .filter(
-                              x => x.gameVersion === config?.modloader[1]
-                            )[0].version
-                        ]
-                        // manifest,
-                        // `background${path.extname(config?.background)}`
-                      )
-                    );
-                    console.log([
+                    console.log('tee', [
                       v,
                       config?.modloader[1],
-                      config?.modloader[2],
-                      config?.modloader[3],
-                      config?.modloader[4]
+                      fabricManifest.mappings
+                        .filter(v => !snapshots.includes(v.gameVersion))
+                        .filter(x => x.gameVersion === config?.modloader[1])[0]
+                        .version,
+                      fabricManifest.loader[0].version
                     ]);
+                    dispatch(
+                      addToQueue(instanceName, [
+                        v,
+                        config?.modloader[1],
+                        fabricManifest.mappings
+                          .filter(v => !snapshots.includes(v.gameVersion))
+                          .filter(
+                            x => x.gameVersion === config?.modloader[1]
+                          )[0].version,
+                        fabricManifest.loader[0].version
+                      ])
+                    );
                   }
 
                   setModLoader(false);
