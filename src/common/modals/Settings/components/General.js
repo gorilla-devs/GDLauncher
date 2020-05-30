@@ -314,6 +314,10 @@ const General = () => {
     setDataPath(filePaths[0]);
   };
 
+  const restartPc = async () => {
+    ipcRenderer.invoke('appRestart');
+  };
+
   return (
     <MyAccountPrf>
       <PersonalData>
@@ -530,7 +534,18 @@ const General = () => {
         </p>
         <Switch
           onChange={e => {
+            if (!potatoPcMode) {
+              dispatch(
+                openModal('ActionConfirmation', {
+                  message:
+                    'The computer needs to be restarted for this operation',
+                  confirmCallback: restartPc,
+                  title: 'Confirm'
+                })
+              );
+            }
             dispatch(updatePotatoPcMode(e));
+            // ipcRenderer.invoke('appRestart');
           }}
           checked={potatoPcMode}
         />
