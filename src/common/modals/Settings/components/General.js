@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, memo, useCallback } from 'react';
 import styled from 'styled-components';
 import { ipcRenderer, clipboard } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
@@ -314,9 +314,10 @@ const General = () => {
     setDataPath(filePaths[0]);
   };
 
-  const restartPc = async () => {
+  const restartPc = useCallback(() => {
+    dispatch(updatePotatoPcMode(true));
     ipcRenderer.invoke('appRestart');
-  };
+  }, [potatoPcMode]);
 
   return (
     <MyAccountPrf>
@@ -533,7 +534,7 @@ const General = () => {
           and all animations and special effects will be disabled
         </p>
         <Switch
-          onChange={e => {
+          onChange={() => {
             if (!potatoPcMode) {
               dispatch(
                 openModal('ActionConfirmation', {
@@ -543,9 +544,9 @@ const General = () => {
                   title: 'Confirm'
                 })
               );
+            } else {
+              dispatch(updatePotatoPcMode(false));
             }
-            dispatch(updatePotatoPcMode(e));
-            // ipcRenderer.invoke('appRestart');
           }}
           checked={potatoPcMode}
         />
