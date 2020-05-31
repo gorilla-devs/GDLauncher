@@ -27,11 +27,13 @@ import {
 import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
-  updatePotatoPcMode,
   updateShowNews
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
-import { updateConcurrentDownloads } from '../../../reducers/actions';
+import {
+  updateConcurrentDownloads,
+  updatePotatoPcMode
+} from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
 import { extractFace } from '../../../../app/desktop/utils';
 
@@ -215,7 +217,7 @@ const General = () => {
     state => state.settings.hideWindowOnGameLaunch
   );
   const DiscordRPC = useSelector(state => state.settings.discordRPC);
-  const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
+  const potatoPcMode = useSelector(state => state.potatoPcMode);
   const concurrentDownloads = useSelector(
     state => state.settings.concurrentDownloads
   );
@@ -233,6 +235,7 @@ const General = () => {
   const [moveUserData, setMoveUserData] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
   const [loadingMoveUserData, setLoadingMoveUserData] = useState(false);
+  const [loadingPotatoPcMode, setLoadingPotatoPcMode] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -526,12 +529,23 @@ const General = () => {
           `}
         >
           You got a potato PC? Don&apos;t worry! We got you covered. Enable this
-          and all animations and special effects will be disabled
+          and all animations and special effects will be disabled.
         </p>
         <Switch
-          onChange={e => {
+          onChange={async e => {
+            setLoadingPotatoPcMode(true);
+
+            if (e) {
+              await fs.writeFile(path.join(userData, 'lowSpecs'), null);
+            } else {
+              await fs.unlink(path.join(userData, 'lowSpecs'));
+            }
+
+            setLoadingPotatoPcMode(false);
+
             dispatch(updatePotatoPcMode(e));
           }}
+          loading={loadingPotatoPcMode}
           checked={potatoPcMode}
         />
       </DiscordRpc>

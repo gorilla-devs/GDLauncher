@@ -49,7 +49,7 @@ const winReleaseFolder = path.resolve(
   __dirname,
   '../',
   './release',
-  `win-unpacked`
+  `win-ia32-unpacked`
 );
 const deployFolder = path.resolve(__dirname, '../', 'deploy');
 
@@ -112,9 +112,9 @@ const commonConfig = {
     appId: 'org.gorilladevs.GDLauncher',
     files: [
       '!node_modules/**/*',
-      'node_modules/7zip-bin/linux/x64/7za',
+      'node_modules/7zip-bin/linux/ia32/7za',
       'node_modules/7zip-bin/mac/7za',
-      'node_modules/7zip-bin/win/x64/7za.exe',
+      'node_modules/7zip-bin/win/ia32/7za.exe',
       'build/**/*',
       'package.json',
       'public/icon.png'
@@ -137,14 +137,14 @@ const commonConfig = {
       ]
     },
     nsisWeb: {
-      oneClick: true,
+      oneClick: false,
       installerIcon: './public/icon.ico',
       uninstallerIcon: './public/icon.ico',
       installerHeader: './public/installerHeader.bmp',
       installerSidebar: './public/installerSidebar.bmp',
       installerHeaderIcon: './public/icon.ico',
       deleteAppDataOnUninstall: true,
-      allowToChangeInstallationDirectory: false,
+      allowToChangeInstallationDirectory: true,
       perMachine: false,
       differentialPackage: true,
       include: './public/installer.nsh'
@@ -165,14 +165,14 @@ const commonConfig = {
   ...((!process.env.RELEASE_TESTING || process.platform === 'linux') && {
     linux:
       type === 'setup'
-        ? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
-        : ['snap:x64']
+        ? ['appimage:ia32', 'zip:ia32', 'deb:ia32', 'rpm:ia32']
+        : ['snap:ia32']
   }),
   ...((!process.env.RELEASE_TESTING || process.platform === 'win32') && {
-    win: [type === 'setup' ? 'nsis-web:x64' : 'zip:x64']
+    win: [type === 'setup' ? 'nsis-web:ia32' : 'zip:ia32']
   }),
   ...((!process.env.RELEASE_TESTING || process.platform === 'darwin') && {
-    mac: type === 'setup' ? ['dmg:x64'] : []
+    mac: type === 'setup' ? ['dmg:ia32'] : []
   })
 };
 
@@ -196,7 +196,7 @@ const main = async () => {
     path.resolve(__dirname, '../', 'package.json')
   );
 
-  const nsisWeb7z = `${productName}-${version}-${process.arch}.nsis.7z`;
+  const nsisWeb7z = `${productName}-${version}-ia32.nsis.7z`;
 
   const allFiles = {
     setup: {

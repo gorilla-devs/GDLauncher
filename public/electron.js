@@ -18,6 +18,8 @@ const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
+const querystring = require('querystring');
+const InstancesManager = require('./instancesManager').default;
 
 const fs = fss.promises;
 
@@ -35,6 +37,10 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 // app.commandLine.appendSwitch("disable-web-security");
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+app.commandLine.appendSwitch(
+  'js-flags',
+  '--expose_gc --max-old-space-size=128'
+);
 
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu();
@@ -68,6 +74,13 @@ if (releaseChannelExists) {
   if (releaseId === 1) {
     allowUnstableReleases = true;
   }
+}
+
+const lowSpecs = fss.existsSync(path.join(app.getPath('userData'), 'lowSpecs'));
+if (lowSpecs) {
+  app.commandLine.appendSwitch('disable-software-rasterizer');
+  app.commandLine.appendSwitch('in-process-gpu');
+  app.disableHardwareAcceleration();
 }
 
 if (
@@ -129,8 +142,48 @@ async function extract7z() {
 extract7z();
 
 let mainWindow;
-let tray;
 let watcher;
+let tray;
+const consoles = {};
+
+function createTrayIcon() {
+  const RESOURCE_DIR = isDev ? __dirname : path.join(__dirname, '../build');
+
+  const iconPath = path.join(RESOURCE_DIR, 'logo_32x32.png');
+
+  const nimage = nativeImage.createFromPath(iconPath);
+
+  if (tray) {
+    tray.destroy();
+    tray = null;
+  }
+
+  tray = new Tray(nimage);
+  const trayMenuTemplate = [
+    {
+      label: 'GDLauncher',
+      enabled: false
+    },
+    {
+      label: 'Show Dev Tools',
+      click: () => mainWindow.webContents.openDevTools()
+    }
+  ];
+
+  const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+  tray.setContextMenu(trayMenu);
+  tray.setToolTip('GDLauncher');
+  tray.on('double-click', () => {
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.focus();
+    } else {
+      createAndUpdateWindow();
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -184,29 +237,6 @@ function createWindow() {
     }
   );
 
-  const RESOURCE_DIR = isDev ? __dirname : path.join(__dirname, '../build');
-
-  const iconPath = path.join(RESOURCE_DIR, 'logo_32x32.png');
-
-  const nimage = nativeImage.createFromPath(iconPath);
-
-  tray = new Tray(nimage);
-  const trayMenuTemplate = [
-    {
-      label: 'GDLauncher',
-      enabled: false
-    },
-    {
-      label: 'Show Dev Tools',
-      click: () => mainWindow.webContents.openDevTools()
-    }
-  ];
-
-  const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
-  tray.setContextMenu(trayMenu);
-  tray.setToolTip('GDLauncher');
-  tray.on('double-click', () => mainWindow.show());
-
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:3000'
@@ -227,6 +257,8 @@ function createWindow() {
     mainWindow.webContents.send('window-minimized');
   });
 
+  createTrayIcon();
+
   const handleRedirect = (e, url) => {
     if (url !== mainWindow.webContents.getURL()) {
       e.preventDefault();
@@ -236,16 +268,73 @@ function createWindow() {
 
   mainWindow.webContents.on('will-navigate', handleRedirect);
   mainWindow.webContents.on('new-window', handleRedirect);
+  return mainWindow;
 }
 
-app.on('ready', createWindow);
+function createConsoleWindow(instanceName, pid) {
+  consoles[pid] = new BrowserWindow({
+    width: 500,
+    height: 700,
+    show: true,
+    frame: false,
+    backgroundColor: '#1B2533',
+    webPreferences: {
+      experimentalFeatures: true,
+      nodeIntegration: true,
+      // Disable in dev since I think hot reload is messing with it
+      webSecurity: !isDev
+    }
+  });
+
+  const queryData = querystring.encode({ instanceName, pid });
+
+  consoles[pid].loadURL(
+    isDev
+      ? `file://${path.join(__dirname, `../public/console.html?${queryData}`)}`
+      : `file://${path.join(__dirname, `../build/console.html?${queryData}`)}`
+  );
+
+  consoles[pid].webContents.openDevTools({ mode: 'undocked' });
+
+  setInterval(() => {
+    consoles[pid].webContents.send('log-data', 'This is my log hello');
+  }, 20);
+}
+
+const instancesManager = new InstancesManager(
+  path.join(app.getPath('userData'), 'instances'),
+  mainWindow,
+  createWindow
+);
+
+function createAndUpdateWindow() {
+  createWindow(instancesManager.startedInstances);
+  instancesManager._updateMainWindow(mainWindow);
+}
+
+ipcMain.handle('launchInstance', (e, ...data) => {
+  return instancesManager.initializeInstance(...data);
+});
+
+ipcMain.handle('fetchStartedInstances', () => {
+  return instancesManager.startedInstances;
+});
+
+app.on('ready', () => {
+  createAndUpdateWindow();
+  createConsoleWindow('My Instance Name', 123);
+  createTrayIcon();
+});
 
 app.on('window-all-closed', () => {
   if (watcher) {
     watcher.stop();
     watcher = null;
   }
-  if (process.platform !== 'darwin') {
+  if (
+    process.platform !== 'darwin' &&
+    Object.keys(instancesManager.startedInstances).length === 0
+  ) {
     app.quit();
   }
 });
@@ -269,7 +358,7 @@ app.on('second-instance', () => {
 
 app.on('activate', () => {
   if (mainWindow === null) {
-    createWindow();
+    createAndUpdateWindow();
   }
 });
 
@@ -280,6 +369,11 @@ ipcMain.handle('update-progress-bar', (event, p) => {
 ipcMain.handle('hide-window', () => {
   if (mainWindow) {
     mainWindow.hide();
+    setTimeout(() => {
+      mainWindow.close();
+      mainWindow = null;
+      instancesManager._updateMainWindow(mainWindow);
+    }, 1000);
   }
 });
 
@@ -299,12 +393,17 @@ ipcMain.handle('show-window', () => {
   if (mainWindow) {
     mainWindow.show();
     mainWindow.focus();
+  } else {
+    createAndUpdateWindow();
+    mainWindow.show();
+    mainWindow.focus();
   }
 });
 
 ipcMain.handle('quit-app', () => {
   mainWindow.close();
   mainWindow = null;
+  instancesManager._updateMainWindow(mainWindow);
 });
 
 ipcMain.handle('isAppImage', () => {
@@ -326,6 +425,10 @@ ipcMain.handle('getUserData', () => {
 
 ipcMain.handle('getOldLauncherUserData', () => {
   return oldLauncherUserData;
+});
+
+ipcMain.handle('getPotatoPcMode', () => {
+  return lowSpecs;
 });
 
 ipcMain.handle('getExecutablePath', () => {

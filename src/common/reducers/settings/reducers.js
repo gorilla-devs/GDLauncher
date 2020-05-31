@@ -43,19 +43,10 @@ function discordRPC(state = true, action) {
   }
 }
 
-function hideWindowOnGameLaunch(state = false, action) {
+function hideWindowOnGameLaunch(state = true, action) {
   switch (action.type) {
     case ActionTypes.HIDE_WINDOW_ON_GAME_LAUNCH:
       return action.hideWindow;
-    default:
-      return state;
-  }
-}
-
-function potatoPcMode(state = false, action) {
-  switch (action.type) {
-    case ActionTypes.UPDATE_POTATO_PC_MODE:
-      return action.value;
     default:
       return state;
   }
@@ -111,7 +102,6 @@ export default combineReducers({
   concurrentDownloads,
   discordRPC,
   hideWindowOnGameLaunch,
-  potatoPcMode,
   showNews,
   java,
   minecraftSettings

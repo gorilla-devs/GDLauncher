@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/icon.ico" />
+    <meta name="description" content="GDLauncher Console" />
+    <style>
+      body {
+        margin: 0;
+      }
+      #root {
+        width: 100vw;
+        height: 100vh;
+      }
+      #navbar {
+        height: 45px;
+        width: 100%;
+        background: #050818;
+        color: white;
+        -webkit-app-region: drag;
+      }
+      #container {
+        color: white;
+      }
+    </style>
+    <title>GDLauncher Console</title>
+  </head>
+  <body>
+    <div id="root">
+      <div id="navbar"></div>
+      <div id="container">
+        <ul id="logList"></ul>
+      </div>
+    </div>
+    <script>
+      void (function () {
+        const querystring = window.require('querystring');
+        const { ipcRenderer } = window.require('electron');
+
+        const { instanceName } = querystring.parse(
+          window.global.location.search.slice(1)
+        );
+        document.getElementById('navbar').textContent = instanceName;
+
+        ipcRenderer.on('log-data', (e, data) => {
+          const node = document.createElement('li');
+          const textnode = document.createTextNode(data);
+          node.appendChild(textnode);
+          document.getElementById('logList').appendChild(node);
+        });
+      })();
+    </script>
+  </body>
+</html>

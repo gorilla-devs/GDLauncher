@@ -1,4 +1,10 @@
 # For my application GUID (fix GUID to match what your application uses)
+
+!macro customInstallMode
+    StrCpy $isForceCurrentInstall "1"
+    StrCpy $isForceMachineInstall "0"
+!macroend
+
 !macro customInit
     # Workaround for installer handing when the app directory is removed manually
     ${ifNot} ${FileExists} "$INSTDIR"

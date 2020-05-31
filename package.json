@@ -183,6 +183,7 @@
     "p-map": "^4.0.0",
     "polished": "^3.6.3",
     "ps-tree": "^1.2.0",
+    "querystring": "^0.2.0",
     "react": "^16.13.1",
     "react-beautiful-dnd": "^13.0.0",
     "react-content-loader": "^5.0.4",

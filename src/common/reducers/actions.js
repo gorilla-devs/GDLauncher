@@ -16,7 +16,6 @@ import lockfile from 'lockfile';
 import omit from 'lodash/omit';
 import Seven, { extractFull } from 'node-7z';
 import { push } from 'connected-react-router';
-import { spawn } from 'child_process';
 import symlink from 'symlink-dir';
 import { promises as fs } from 'fs';
 import originalFs from 'original-fs';
@@ -95,7 +94,6 @@ import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
-import { openModal } from './modals/actions';
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -317,6 +315,15 @@ export function updateUserData(userData) {
       path: userData
     });
     return userData;
+  };
+}
+
+export function updatePotatoPcMode(value) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_POTATO_PC_MODE,
+      value
+    });
   };
 }
 
@@ -1921,7 +1928,7 @@ export function launchInstance(instanceName) {
       '__JLF__.jar'
     );
 
-    let errorLogs = '';
+    // const errorLogs = '';
 
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
@@ -2060,64 +2067,54 @@ export function launchInstance(instanceName) {
       ).join(' ')}`.replace(...replaceRegex)
     );
 
-    if (state.settings.hideWindowOnGameLaunch) {
-      await ipcRenderer.invoke('hide-window');
-    }
-
-    const ps = spawn(
-      `"${javaPath.replace(...replaceRegex)}"`,
-      jvmArguments.map(v => v.replace(...replaceRegex)),
-      {
-        cwd: instancePath,
-        shell: true
-      }
-    );
-
-    const playTimer = setInterval(() => {
-      dispatch(
-        updateInstanceConfig(instanceName, prev => ({
-          ...prev,
-          timePlayed: (Number(prev.timePlayed) || 0) + 1
-        }))
-      );
-    }, 60 * 1000);
-
     dispatch(
       updateInstanceConfig(instanceName, prev => ({
         ...prev,
         lastPlayed: Date.now()
       }))
     );
+
+    const ps = await ipcRenderer.invoke(
+      'launchInstance',
+      instanceName,
+      `"${javaPath.replace(...replaceRegex)}"`,
+      jvmArguments.map(v => v.replace(...replaceRegex)),
+      instanceJLFPath,
+      symLinkDirPath
+    );
+
     dispatch(addStartedInstance({ instanceName, pid: ps.pid }));
 
-    ps.stdout.on('data', data => {
-      console.log(data.toString());
-      if (data.toString().includes('Setting user:')) {
-        dispatch(updateStartedInstance({ instanceName, initialized: true }));
-      }
-    });
+    if (state.settings.hideWindowOnGameLaunch) {
+      await ipcRenderer.invoke('hide-window');
+    }
 
-    ps.stderr.on('data', data => {
-      console.error(`ps stderr: ${data}`);
-      errorLogs += data || '';
-    });
+    // ps.stdout.on('data', data => {
+    //   console.log(data.toString());
+    //   if (data.toString().includes('Setting user:')) {
+    //     dispatch(updateStartedInstance({ instanceName, initialized: true }));
+    //   }
+    // });
 
-    ps.on('close', code => {
-      ipcRenderer.invoke('show-window');
-      fse.remove(instanceJLFPath);
-      if (process.platform === 'win32') fse.remove(symLinkDirPath);
-      dispatch(removeStartedInstance(instanceName));
-      clearInterval(playTimer);
-      if (code !== 0 && errorLogs) {
-        dispatch(
-          openModal('InstanceCrashed', {
-            code,
-            errorLogs: errorLogs?.toString('utf8')
-          })
-        );
-        console.warn(`Process exited with code ${code}. Not too good..`);
-      }
-    });
+    // ps.stderr.on('data', data => {
+    //   console.error(`ps stderr: ${data}`);
+    //   errorLogs += data || '';
+    // });
+
+    // ps.on('close', code => {
+    //   ipcRenderer.invoke('show-window');
+    //   dispatch(removeStartedInstance(instanceName));
+    //   clearInterval(playTimer);
+    //   if (code !== 0 && errorLogs) {
+    //     dispatch(
+    //       openModal('InstanceCrashed', {
+    //         code,
+    //         errorLogs: errorLogs?.toString('utf8')
+    //       })
+    //     );
+    //     console.warn(`Process exited with code ${code}. Not too good..`);
+    //   }
+    // });
   };
 }
 

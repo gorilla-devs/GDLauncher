@@ -20,6 +20,15 @@ function message(state = null, action) {
   }
 }
 
+function potatoPcMode(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_POTATO_PC_MODE:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
 function userData(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_USERDATA:
@@ -109,8 +118,7 @@ function startedInstances(state = {}, action) {
       return {
         ...state,
         [action.instance.instanceName]: {
-          pid: action.instance.pid,
-          initialized: false
+          ...omit(action.instance, ['instanceName'])
         }
       };
     case ActionTypes.UPDATE_STARTED_INSTANCE:
@@ -118,7 +126,7 @@ function startedInstances(state = {}, action) {
         ...state,
         [action.instance.instanceName]: {
           ...state[action.instance.instanceName],
-          initialized: true
+          ...omit(action.instance, ['instanceName'])
         }
       };
     case ActionTypes.REMOVE_STARTED_INSTANCE:
@@ -167,5 +175,6 @@ export default {
   startedInstances,
   selectedInstance,
   updateAvailable,
-  latestModManifests
+  latestModManifests,
+  potatoPcMode
 };

@@ -24,7 +24,7 @@ const main = async () => {
     }
   );
 
-  await rebuild(path.resolve(__dirname, '../'), electronVersion, 'x64');
+  await rebuild(path.resolve(__dirname, '../'), electronVersion, 'ia32');
 };
 
 main();
