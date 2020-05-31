@@ -539,7 +539,7 @@ const General = () => {
               dispatch(
                 openModal('ActionConfirmation', {
                   message:
-                    'The computer needs to be restarted for this operation',
+                    'GDLauncher requires to be restarted for this operation',
                   confirmCallback: restartPc,
                   title: 'Confirm'
                 })
