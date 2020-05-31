@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useCallback } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { ipcRenderer, clipboard } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
@@ -314,10 +314,10 @@ const General = () => {
     setDataPath(filePaths[0]);
   };
 
-  const restartPc = useCallback(() => {
+  const restartPc = () => {
     dispatch(updatePotatoPcMode(true));
     ipcRenderer.invoke('appRestart');
-  }, [potatoPcMode]);
+  };
 
   return (
     <MyAccountPrf>
@@ -539,9 +539,9 @@ const General = () => {
               dispatch(
                 openModal('ActionConfirmation', {
                   message:
-                    'GDLauncher requires to be restarted for this operation',
+                    'GDLauncher needs to be restarted for the change to be applied',
                   confirmCallback: restartPc,
-                  title: 'Confirm'
+                  title: 'Potato pc mode'
                 })
               );
             } else {
