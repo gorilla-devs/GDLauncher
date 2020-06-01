@@ -157,6 +157,7 @@
     "antd": "4.2.4",
     "axios": "https://github.com/gorilla-devs/axios.git#62786f2b6c4c813d4dc0159744bcdce7342e365d",
     "base64-stream": "^1.0.0",
+    "clusterize.js": "^0.18.1",
     "connected-react-router": "^6.8.0",
     "craco-antd": "^1.14.1",
     "directory-tree": "^2.2.4",

@@ -296,9 +296,11 @@ function createConsoleWindow(instanceName, pid) {
 
   consoles[pid].webContents.openDevTools({ mode: 'undocked' });
 
+  let count = 0;
   setInterval(() => {
-    consoles[pid].webContents.send('log-data', 'This is my log hello');
-  }, 20);
+    consoles[pid].webContents.send('log-data', `Element ${count}`);
+    count += 1;
+  }, 50);
 }
 
 const instancesManager = new InstancesManager(
