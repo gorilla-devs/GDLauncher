@@ -31,6 +31,12 @@
       #container {
         color: white;
       }
+
+      #scrollArea {
+        margin-top: 20px;
+        height: 100%;
+        overflow-x: hidden;
+      }
     </style>
     <title>GDLauncher Console</title>
   </head>
@@ -39,24 +45,16 @@
       <div id="navbar"></div>
       <div id="container">
         <div class="clusterize">
-          <table>
+          <!-- <table>
             <thead>
               <tr>
                 <th>Headers</th>
               </tr>
             </thead>
-          </table>
-          <div
-            id="scrollArea"
-            class="clusterize-scroll"
-            style="background-color: green;"
-          >
+          </table> -->
+          <div id="scrollArea" class="clusterize-scroll">
             <table style="width: 100%;">
-              <tbody
-                id="contentArea"
-                class="clusterize-content"
-                style="background-color: rebeccapurple;"
-              >
+              <tbody id="contentArea" class="clusterize-content">
                 <tr class="clusterize-no-data">
                   <td>Loading data…</td>
                 </tr>
@@ -84,7 +82,7 @@
           contentId: 'contentArea'
         });
         ipcRenderer.on('log-data', (e, data) => {
-          logs.push(`<tr>${data}</tr>`);
+          logs.push('<tr><td>' + data + '</td></tr>');
 
           // const node = document.createElement('li');
           // const textnode = document.createTextNode(data);
