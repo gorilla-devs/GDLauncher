@@ -35,7 +35,7 @@ const calcError = code => {
 
 const { Panel } = Collapse;
 
-const InstanceCrashed = ({ code, errorLogs }) => {
+const InstanceCrashed = ({ code, errorLogs, stackTrace }) => {
   const [copiedLog, setCopiedLog] = useState(null);
 
   function copy(e) {
@@ -46,12 +46,13 @@ const InstanceCrashed = ({ code, errorLogs }) => {
       setCopiedLog(false);
     }, 500);
   }
+  console.log('errorLogs', errorLogs);
 
   return (
     <Modal
       css={`
-        height: 450px;
-        width: 500px;
+        height: 550px;
+        width: 600px;
       `}
       title="The instance could not be launched"
     >
@@ -105,12 +106,15 @@ const InstanceCrashed = ({ code, errorLogs }) => {
           >
             <p
               css={`
-                height: 110px;
+                height: 210px;
                 word-break: break-all;
                 overflow-y: auto;
               `}
             >
               {errorLogs}
+              <br />
+              <br />
+              {stackTrace.replace('at', ' at')}
             </p>
           </Panel>
         </Collapse>
