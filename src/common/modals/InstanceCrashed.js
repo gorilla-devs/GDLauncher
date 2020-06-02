@@ -36,13 +36,13 @@ const calcError = code => {
 
 const { Panel } = Collapse;
 
-const InstanceCrashed = ({ code, errorLogs }) => {
+const InstanceCrashed = ({ code, errorLogs, stackTrace }) => {
   const [copiedLog, setCopiedLog] = useState(null);
 
   async function share(e) {
     e.stopPropagation();
 
-    const res = await pasteBinPost(errorLogs);
+    const res = await pasteBinPost(`${errorLogs} ${stackTrace}`);
 
     if (res.status === 200) {
       setCopiedLog(true);
@@ -56,17 +56,18 @@ const InstanceCrashed = ({ code, errorLogs }) => {
   function copy(e) {
     e.stopPropagation();
     setCopiedLog(true);
-    clipboard.writeText(errorLogs);
+    clipboard.writeText(`${errorLogs} ${stackTrace}`);
     setTimeout(() => {
       setCopiedLog(false);
     }, 500);
   }
+  console.log('errorLogs', errorLogs);
 
   return (
     <Modal
       css={`
-        height: 450px;
-        width: 500px;
+        height: 550px;
+        width: 600px;
       `}
       title="The instance could not be launched"
     >
@@ -145,15 +146,29 @@ const InstanceCrashed = ({ code, errorLogs }) => {
             }
             key="1"
           >
-            <p
+            <div
               css={`
-                height: 110px;
-                word-break: break-all;
+                max-height: 225px;
                 overflow-y: auto;
               `}
             >
-              {errorLogs}
-            </p>
+              <p
+                css={`
+                  word-break: break-all;
+                  overflow-y: auto;
+                `}
+              >
+                {errorLogs}
+              </p>
+              <p
+                css={`
+                  word-break: break-all;
+                  overflow-y: auto;
+                `}
+              >
+                {stackTrace.replace(' ', '\r\n')}
+              </p>
+            </div>
           </Panel>
         </Collapse>
       </Container>

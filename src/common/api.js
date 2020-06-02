@@ -63,6 +63,8 @@ export const pasteBinPost = code => {
   bodyFormData.append('api_dev_key', PASTEBIN_DEV_KEY);
   bodyFormData.append('api_option', 'paste');
   bodyFormData.append('api_paste_code', code);
+  bodyFormData.append('api_paste_expire_date', 'N');
+  bodyFormData.append('api_results_limit', 1000);
 
   const config = {
     headers: {

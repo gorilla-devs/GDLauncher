@@ -1452,7 +1452,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
       addToQueue(
         instanceName,
         modloader,
-        manifest,
+        newManifest,
         `background${path.extname(imageURL)}`
       )
     );
@@ -1922,6 +1922,7 @@ export function launchInstance(instanceName) {
     );
 
     let errorLogs = '';
+    let stackTrace = '';
 
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
@@ -2098,8 +2099,11 @@ export function launchInstance(instanceName) {
     });
 
     ps.stderr.on('data', data => {
+      const errorObj = {};
+      Error.captureStackTrace(errorObj);
       console.error(`ps stderr: ${data}`);
       errorLogs += data || '';
+      stackTrace = errorObj.stack || '';
     });
 
     ps.on('close', code => {
@@ -2112,7 +2116,8 @@ export function launchInstance(instanceName) {
         dispatch(
           openModal('InstanceCrashed', {
             code,
-            errorLogs: errorLogs?.toString('utf8')
+            errorLogs: errorLogs?.toString('utf8'),
+            stackTrace
           })
         );
         console.warn(`Process exited with code ${code}. Not too good..`);
