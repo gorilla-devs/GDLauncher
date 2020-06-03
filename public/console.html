@@ -20,6 +20,7 @@
       #root {
         width: 100vw;
         height: 100vh;
+        overflow: hidden;
       }
       #navbar {
         height: 45px;
@@ -34,8 +35,29 @@
 
       #scrollArea {
         margin-top: 20px;
+        margin-bottom: 20px;
         height: 100%;
+      }
+
+      .clusterize-scroll {
         overflow-x: hidden;
+        max-height: 94vh;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        border-radius: 1px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #909ea4;
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background-color: #050818;
+        border-radius: 1px;
       }
     </style>
     <title>GDLauncher Console</title>
@@ -75,14 +97,15 @@
           window.global.location.search.slice(1)
         );
         document.getElementById('navbar').textContent = instanceName;
-        // var data = ['<tr>…</tr>', '<tr>…</tr>'];
+
         let list = new Clusterize({
           rows: logs,
           scrollId: 'scrollArea',
           contentId: 'contentArea'
         });
         ipcRenderer.on('log-data', (e, data) => {
-          logs.push('<tr><td>' + data + '</td></tr>');
+          // logs.push('<tr><td>' + data + '</td></tr>');
+          logs.push(`<tr><td>${data}</td></tr>`);
 
           // const node = document.createElement('li');
           // const textnode = document.createTextNode(data);
