@@ -114,7 +114,7 @@ const Home = () => {
       {/* <News news={news} /> */}
       <Banner color="black" title="Black Lives Matter">
         Our community is hurting. The systemic inequalities our community
-        experiences are once again center stage. GDLauncher stand for equality
+        experiences are once again center stage. GDLauncher stands for equality
         and inclusion. We stand against the racism and injustice our Black
         community endures. Until change happens and Black Lives Matter, we will
         never truly be the community we strive to be.
