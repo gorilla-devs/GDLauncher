@@ -12,6 +12,7 @@ import RootElectron from './Root-Electron';
 import ModalsManager from './common/components/ModalsManager';
 
 import 'typeface-roboto';
+import 'inter-ui';
 import ErrorBoundary from './app/desktop/ErrorBoundary';
 
 const Root =
