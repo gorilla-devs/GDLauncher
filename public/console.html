@@ -38,6 +38,10 @@
         height: 100%;
       }
 
+      #contentArea > div {
+        margin: 10px;
+      }
+
       .clusterize-scroll {
         overflow-x: hidden;
         max-height: calc(100vh - 45px - 40px);
@@ -94,10 +98,10 @@
         let lastScrollTop = 0;
 
         ipcRenderer.on('log-data', (e, data) => {
-          logs.push(`<div>${data}</div>`);
+          logs.push(`<div >${data}</div>`);
 
           const scrollElem = document.getElementById('contentArea');
-          list.update([...logs, data]);
+          list.update([...logs, `<div >${data}</div>`]);
           const elem = document.getElementById('scrollArea');
           if (shouldScroll) elem.scrollTop = elem.scrollHeight;
         });
