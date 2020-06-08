@@ -20,7 +20,6 @@
       #root {
         width: 100vw;
         height: 100vh;
-        overflow: hidden;
       }
       #navbar {
         height: 45px;
@@ -31,17 +30,17 @@
       }
       #container {
         color: white;
+        position: relative;
       }
 
       #scrollArea {
-        margin-top: 20px;
-        margin-bottom: 20px;
+        margin-top: 40px;
         height: 100%;
       }
 
       .clusterize-scroll {
         overflow-x: hidden;
-        max-height: 90vh;
+        max-height: calc(100vh - 45px - 40px);
       }
 
       ::-webkit-scrollbar {
@@ -66,22 +65,9 @@
     <div id="root">
       <div id="navbar"></div>
       <div id="container">
-        <div class="clusterize">
-          <!-- <table>
-            <thead>
-              <tr>
-                <th>Headers</th>
-              </tr>
-            </thead>
-          </table> -->
-          <div id="scrollArea" class="clusterize-scroll">
-            <table style="width: 100%;">
-              <tbody id="contentArea" class="clusterize-content">
-                <tr class="clusterize-no-data">
-                  <td>Loading data…</td>
-                </tr>
-              </tbody>
-            </table>
+        <div id="scrollArea" class="clusterize-scroll">
+          <div id="contentArea" class="clusterize-content">
+            <div class="clusterize-no-data">Loading data…</div>
           </div>
         </div>
       </div>
@@ -98,21 +84,36 @@
         );
         document.getElementById('navbar').textContent = instanceName;
 
-        let list = new Clusterize({
+        const list = new Clusterize({
           rows: logs,
           scrollId: 'scrollArea',
           contentId: 'contentArea'
         });
-        ipcRenderer.on('log-data', (e, data) => {
-          // logs.push('<tr><td>' + data + '</td></tr>');
-          logs.push(`<tr><td>${data}</td></tr>`);
 
-          // const node = document.createElement('li');
-          // const textnode = document.createTextNode(data);
-          // node.appendChild(textnode);
-          // document.getElementById('logList').appendChild(node);
+        let shouldScroll = true;
+        let lastScrollTop = 0;
+
+        ipcRenderer.on('log-data', (e, data) => {
+          logs.push(`<div>${data}</div>`);
+
+          const scrollElem = document.getElementById('contentArea');
           list.update([...logs, data]);
+          const elem = document.getElementById('scrollArea');
+          if (shouldScroll) elem.scrollTop = elem.scrollHeight;
         });
+
+        document
+          .querySelector('#scrollArea')
+          .addEventListener('scroll', function (e) {
+            let isBottom =
+              document.getElementById('scrollArea').scrollTop ===
+              document.getElementById('scrollArea').scrollHeight -
+                document.getElementById('scrollArea').offsetHeight;
+
+            if (!isBottom) {
+              shouldScroll = false;
+            }
+          });
       })();
     </script>
   </body>
