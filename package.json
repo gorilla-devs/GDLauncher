@@ -168,6 +168,7 @@
     "fs-extra": "^9.0.0",
     "get-stream": "^5.1.0",
     "history": "^4.10.1",
+    "inter-ui": "^3.13.1",
     "is-electron": "^2.2.0",
     "jarfile": "^2.0.0",
     "jimp": "^0.12.1",
