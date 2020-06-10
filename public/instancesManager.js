@@ -63,6 +63,9 @@ class InstancesManager {
 
     ps.on('close', () => {
       clearInterval(playTimer);
+      if (!ps.killed) {
+        ps.kill();
+      }
       fse.remove(instanceJLFPath);
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
       this._updateInstance(ps.pid, null);

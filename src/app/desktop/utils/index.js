@@ -537,10 +537,10 @@ export const patchForge113 = async (
         });
 
         ps.on('close', code => {
-          if (code !== 0) {
-            console.log(`process exited with code ${code}`);
-            resolve();
+          if (!ps.killed) {
+            ps.kill('SIGKILL');
           }
+          console.log(`process exited with code ${code}`);
           resolve();
         });
       });

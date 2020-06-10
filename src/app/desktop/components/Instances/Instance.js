@@ -198,10 +198,10 @@ const Instance = ({ instanceName }) => {
     psTree(isPlaying.pid, (err, children) => {
       if (children.length) {
         children.forEach(el => {
-          process.kill(el.PID);
+          process.kill(el.PID, 'SIGKILL');
         });
       } else {
-        process.kill(isPlaying.pid);
+        process.kill(isPlaying.pid, 'SIGKILL');
       }
     });
   };

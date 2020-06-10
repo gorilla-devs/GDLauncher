@@ -1338,7 +1338,7 @@ export function downloadInstance(instanceName) {
     );
 
     // Wait 400ms to avoid "The process cannot access the file because it is being used by another process."
-    await new Promise(resolve => setTimeout(() => resolve(), 400));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     await extractNatives(
       libraries,
