@@ -36,15 +36,6 @@ export function updateShowNews(value) {
   };
 }
 
-export function updatePotatoPcMode(value) {
-  return dispatch => {
-    dispatch({
-      type: ActionTypes.UPDATE_POTATO_PC_MODE,
-      value
-    });
-  };
-}
-
 export function updateResolution(resolution) {
   return dispatch => {
     dispatch({

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/icon.ico" />
+    <meta name="description" content="GDLauncher Console" />
+
+    <link
+      href="https://cdn.jsdelivr.net/clusterize.js/0.16.1/clusterize.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+      }
+      #root {
+        width: 100vw;
+        height: 100vh;
+      }
+      #navbar {
+        height: 45px;
+        width: 100%;
+        background: #050818;
+        color: white;
+        -webkit-app-region: drag;
+      }
+      #container {
+        color: white;
+        position: relative;
+      }
+
+      #scrollArea {
+        margin-top: 40px;
+        height: 100%;
+      }
+
+      #contentArea > div {
+        margin: 10px;
+      }
+
+      .clusterize-scroll {
+        overflow-x: hidden;
+        max-height: calc(100vh - 45px - 40px);
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        border-radius: 1px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #909ea4;
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background-color: #050818;
+        border-radius: 1px;
+      }
+    </style>
+    <title>GDLauncher Console</title>
+  </head>
+  <body>
+    <div id="root">
+      <div id="navbar"></div>
+      <div id="container">
+        <div id="scrollArea" class="clusterize-scroll">
+          <div id="contentArea" class="clusterize-content">
+            <div class="clusterize-no-data">Loading data…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      void (function () {
+        const logs = [];
+        const querystring = window.require('querystring');
+        const Clusterize = window.require('clusterize.js');
+        const { ipcRenderer } = window.require('electron');
+
+        const { instanceName } = querystring.parse(
+          window.global.location.search.slice(1)
+        );
+        document.getElementById('navbar').textContent = instanceName;
+
+        const list = new Clusterize({
+          rows: logs,
+          scrollId: 'scrollArea',
+          contentId: 'contentArea'
+        });
+
+        let shouldScroll = true;
+        let lastScrollTop = 0;
+
+        ipcRenderer.on('log-data', (e, data) => {
+          logs.push(`<div >${data}</div>`);
+
+          const scrollElem = document.getElementById('contentArea');
+          list.update([...logs, `<div >${data}</div>`]);
+          const elem = document.getElementById('scrollArea');
+          if (shouldScroll) elem.scrollTop = elem.scrollHeight;
+        });
+
+        document
+          .querySelector('#scrollArea')
+          .addEventListener('scroll', function (e) {
+            let isBottom =
+              document.getElementById('scrollArea').scrollTop ===
+              document.getElementById('scrollArea').scrollHeight -
+                document.getElementById('scrollArea').offsetHeight;
+
+            if (!isBottom) {
+              shouldScroll = false;
+            }
+          });
+      })();
+    </script>
+  </body>
+</html>
