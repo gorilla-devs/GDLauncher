@@ -44,7 +44,10 @@
 
         ipcRenderer.on('log-data', (e, data) => {
           const node = document.createElement('li');
-          const textnode = document.createTextNode(data);
+          if (data.foreground) {
+            node.style.color = data.foreground;
+          }
+          const textnode = document.createTextNode(data.text);
           node.appendChild(textnode);
           document.getElementById('logList').appendChild(node);
         });

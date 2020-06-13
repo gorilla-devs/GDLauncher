@@ -19,7 +19,9 @@ const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
 const querystring = require('querystring');
-const InstancesManager = require('./instancesManager').default;
+const fse = require('fs-extra');
+const { omit } = require('lodash');
+const { parseAnsi } = require('ansi-color-parse');
 
 const fs = fss.promises;
 
@@ -144,7 +146,7 @@ extract7z();
 let mainWindow;
 let watcher;
 let tray;
-const consoles = {};
+let startedInstances = {};
 
 function createTrayIcon() {
   const RESOURCE_DIR = isDev ? __dirname : path.join(__dirname, '../build');
@@ -178,7 +180,7 @@ function createTrayIcon() {
       mainWindow.show();
       mainWindow.focus();
     } else {
-      createAndUpdateWindow();
+      createWindow();
       mainWindow.show();
       mainWindow.focus();
     }
@@ -271,11 +273,11 @@ function createWindow() {
   return mainWindow;
 }
 
-function createConsoleWindow(instanceName, pid) {
-  consoles[pid] = new BrowserWindow({
+function createConsoleWindow(instanceName, pid, show) {
+  startedInstances[pid].console = new BrowserWindow({
     width: 500,
     height: 700,
-    show: true,
+    show,
     frame: false,
     backgroundColor: '#1B2533',
     webPreferences: {
@@ -288,41 +290,123 @@ function createConsoleWindow(instanceName, pid) {
 
   const queryData = querystring.encode({ instanceName, pid });
 
-  consoles[pid].loadURL(
+  startedInstances[pid].console.loadURL(
     isDev
       ? `file://${path.join(__dirname, `../public/console.html?${queryData}`)}`
       : `file://${path.join(__dirname, `../build/console.html?${queryData}`)}`
   );
 
-  consoles[pid].webContents.openDevTools({ mode: 'undocked' });
+  startedInstances[pid].console.on('close', () => {
+    if (startedInstances[pid]) {
+      startedInstances[pid].console = null;
+    }
+  });
 
-  setInterval(() => {
-    consoles[pid].webContents.send('log-data', 'This is my log hello');
-  }, 20);
+  startedInstances[pid].console.webContents.once('dom-ready', () => {
+    if (startedInstances[pid].logs) {
+      startedInstances[pid].logs.map(v =>
+        startedInstances[pid].console.webContents.send('log-data', v)
+      );
+    }
+  });
+
+  return startedInstances[pid].console;
 }
 
-const instancesManager = new InstancesManager(
-  path.join(app.getPath('userData'), 'instances'),
-  mainWindow,
-  createWindow
-);
+function initializeInstance(
+  instanceName,
+  javaPath,
+  jvmArguments,
+  instanceJLFPath,
+  symLinkDirPath
+) {
+  const instancesPath = path.join(app.getPath('userData'), 'instances');
+  const ps = spawn(javaPath, jvmArguments, {
+    cwd: path.join(instancesPath, instanceName),
+    shell: true
+  });
+  startedInstances[ps.pid] = { instanceName, playedTime: 0, logs: [] };
 
-function createAndUpdateWindow() {
-  createWindow(instancesManager.startedInstances);
-  instancesManager._updateMainWindow(mainWindow);
+  const playTimer = setInterval(async () => {
+    if (!mainWindow) {
+      const prev = await fse.readJSON(
+        path.join(instancesPath, instanceName, 'config.json')
+      );
+      await fse.writeJSON(
+        path.join(instancesPath, instanceName, 'config.json'),
+        {
+          ...prev,
+          timePlayed: (Number(prev.timePlayed) || 0) + 1
+        }
+      );
+    } else {
+      mainWindow.webContents.send(
+        'update-instance-config',
+        instanceName,
+        prev => ({
+          ...prev,
+          timePlayed: (Number(prev.timePlayed) || 0) + 1
+        })
+      );
+    }
+  }, 60 * 1000);
+
+  ps.stdout.on('data', data => {
+    const logString = parseAnsi(data.toString())[0];
+    startedInstances[ps.pid].logs.push(logString);
+    if (startedInstances[ps.pid].console) {
+      startedInstances[ps.pid].console.webContents.send('log-data', logString);
+    }
+  });
+
+  ps.stderr.on('data', data => {
+    const logString = parseAnsi(data.toString());
+    startedInstances[ps.pid].logs.push(logString);
+    if (startedInstances[ps.pid]?.console) {
+      startedInstances[ps.pid].console.webContents.send('log-data', logString);
+    }
+  });
+
+  ps.on('close', () => {
+    clearInterval(playTimer);
+    startedInstances = omit(startedInstances, [ps.pid]);
+    startedInstances[ps.pid] = null;
+    if (!ps.killed) {
+      ps.kill();
+    }
+    fse.remove(instanceJLFPath);
+    if (process.platform === 'win32') fse.remove(symLinkDirPath);
+    if (mainWindow) {
+      mainWindow.webContents.send('instanceStopped', instanceName);
+      mainWindow.show();
+      mainWindow.focus();
+    } else {
+      mainWindow = createWindow(startedInstances);
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+  return ps;
 }
 
 ipcMain.handle('launchInstance', (e, ...data) => {
-  return instancesManager.initializeInstance(...data);
+  return initializeInstance(...data);
 });
 
 ipcMain.handle('fetchStartedInstances', () => {
-  return instancesManager.startedInstances;
+  return startedInstances;
+});
+
+ipcMain.handle('showInstanceConsole', (e, pid, instanceName) => {
+  if (startedInstances[pid]?.console?.webContents) {
+    startedInstances[pid].console.show();
+  } else {
+    createConsoleWindow(instanceName, pid, true);
+  }
 });
 
 app.on('ready', () => {
-  createAndUpdateWindow();
-  createConsoleWindow('My Instance Name', 123);
+  createWindow();
   createTrayIcon();
 });
 
@@ -333,7 +417,7 @@ app.on('window-all-closed', () => {
   }
   if (
     process.platform !== 'darwin' &&
-    Object.keys(instancesManager.startedInstances).length === 0
+    Object.keys(startedInstances).length === 0
   ) {
     app.quit();
   }
@@ -358,7 +442,7 @@ app.on('second-instance', () => {
 
 app.on('activate', () => {
   if (mainWindow === null) {
-    createAndUpdateWindow();
+    createWindow();
   }
 });
 
@@ -372,7 +456,6 @@ ipcMain.handle('hide-window', () => {
     setTimeout(() => {
       mainWindow.close();
       mainWindow = null;
-      instancesManager._updateMainWindow(mainWindow);
     }, 1000);
   }
 });
@@ -394,7 +477,7 @@ ipcMain.handle('show-window', () => {
     mainWindow.show();
     mainWindow.focus();
   } else {
-    createAndUpdateWindow();
+    createWindow();
     mainWindow.show();
     mainWindow.focus();
   }
@@ -403,7 +486,6 @@ ipcMain.handle('show-window', () => {
 ipcMain.handle('quit-app', () => {
   mainWindow.close();
   mainWindow = null;
-  instancesManager._updateMainWindow(mainWindow);
 });
 
 ipcMain.handle('isAppImage', () => {

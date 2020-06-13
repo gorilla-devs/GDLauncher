@@ -190,11 +190,13 @@ const Instance = ({ instanceName }) => {
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
+  const showInstanceConsole = () => {
+    ipcRenderer.invoke('showInstanceConsole', isPlaying.pid);
+  };
   const instanceExportCurseForge = () => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));
   };
   const killProcess = () => {
-    console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
       if (children.length) {
         children.forEach(el => {
@@ -291,15 +293,26 @@ const Instance = ({ instanceName }) => {
       >
         <MenuInstanceName>{instanceName}</MenuInstanceName>
         {isPlaying && (
-          <MenuItem onClick={killProcess}>
-            <FontAwesomeIcon
-              icon={faStop}
-              css={`
-                margin-right: 10px;
-              `}
-            />
-            Kill
-          </MenuItem>
+          <>
+            <MenuItem onClick={killProcess}>
+              <FontAwesomeIcon
+                icon={faStop}
+                css={`
+                  margin-right: 10px;
+                `}
+              />
+              Kill
+            </MenuItem>
+            <MenuItem onClick={showInstanceConsole}>
+              <FontAwesomeIcon
+                icon={faWrench}
+                css={`
+                  margin-right: 10px;
+                `}
+              />
+              Show Console
+            </MenuItem>
+          </>
         )}
         <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
           <FontAwesomeIcon
