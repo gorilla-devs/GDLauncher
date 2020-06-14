@@ -3,54 +3,150 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/icon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/3cb9f76276.js"></script>
     <meta name="description" content="GDLauncher Console" />
     <style>
       body {
         margin: 0;
+        font-family: inter;
       }
       #root {
         width: 100vw;
         height: 100vh;
       }
       #navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         height: 45px;
         width: 100%;
         background: #050818;
         color: white;
         -webkit-app-region: drag;
       }
+      #navbar div {
+        padding: 10px;
+      }
+
       #container {
         color: white;
+        position: relative;
+      }
+
+      #scrollArea {
+        margin-top: 40px;
+        height: 100%;
+      }
+
+      #contentArea > div {
+        margin: 10px;
+      }
+
+      .clusterize-scroll {
+        overflow-x: hidden;
+        max-height: calc(100vh - 45px - 40px);
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        border-radius: 1px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #909ea4;
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background-color: #050818;
+        border-radius: 1px;
+      }
+
+      .clusterize-content {
+        outline: 0;
+      }
+
+      .clusterize-no-data td {
+        text-align: center;
       }
     </style>
     <title>GDLauncher Console</title>
   </head>
   <body>
     <div id="root">
-      <div id="navbar"></div>
+      <div id="navbar">
+        <div id="name"></div>
+        <div id="closeButton">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
       <div id="container">
-        <ul id="logList"></ul>
+        <div id="scrollArea" class="clusterize-scroll">
+          <div id="contentArea" class="clusterize-content">
+            <div class="clusterize-no-data">Loading data…</div>
+          </div>
+        </div>
       </div>
     </div>
     <script>
       void (function () {
+        const logs = [];
         const querystring = window.require('querystring');
+        const Clusterize = window.require('clusterize.js');
         const { ipcRenderer } = window.require('electron');
+        // const { FontAwesomeIcon } = window.require(
+        //   '@fortawesome/react-fontawesome'
+        // );
+        // const { faTimes } = window.require('@fortawesome/free-solid-svg-icons');
 
         const { instanceName } = querystring.parse(
           window.global.location.search.slice(1)
         );
-        document.getElementById('navbar').textContent = instanceName;
+        document.getElementById('name').textContent = instanceName;
+
+        document.getElementById(
+          'closeButton'
+        ).innerHTML = `<FontAwesomeIcon class="fas fa-times"></FontAwesomeIcon>`;
+
+        const list = new Clusterize({
+          rows: logs,
+          scrollId: 'scrollArea',
+          contentId: 'contentArea'
+        });
+
+        let shouldScroll = true;
+        let lastScrollTop = 0;
 
         ipcRenderer.on('log-data', (e, data) => {
-          const node = document.createElement('li');
-          if (data.foreground) {
-            node.style.color = data.foreground;
-          }
-          const textnode = document.createTextNode(data.text);
-          node.appendChild(textnode);
-          document.getElementById('logList').appendChild(node);
+          logs.push(
+            `<div style="color: ${data.foreground ? data.foreground : ''}">${
+              data.text
+            }</div>`
+          );
+
+          const scrollElem = document.getElementById('contentArea');
+          list.update([...logs, `<div >${data}</div>`]);
+          const elem = document.getElementById('scrollArea');
+          if (shouldScroll) elem.scrollTop = elem.scrollHeight;
         });
+
+        document
+          .querySelector('#scrollArea')
+          .addEventListener('scroll', function (e) {
+            let isBottom =
+              document.getElementById('scrollArea').scrollTop ===
+              document.getElementById('scrollArea').scrollHeight -
+                document.getElementById('scrollArea').offsetHeight;
+
+            if (isBottom) {
+              shouldScroll = true;
+            } else shouldScroll = false;
+          });
       })();
     </script>
   </body>
