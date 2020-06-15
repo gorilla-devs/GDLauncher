@@ -191,7 +191,7 @@ const Instance = ({ instanceName }) => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
   const showInstanceConsole = () => {
-    ipcRenderer.invoke('showInstanceConsole', isPlaying.pid);
+    ipcRenderer.invoke('showInstanceConsole', isPlaying.pid, instanceName);
   };
   const instanceExportCurseForge = () => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));

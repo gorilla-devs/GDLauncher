@@ -304,13 +304,17 @@ function createConsoleWindow(instanceName, pid, show) {
 
   startedInstances[pid].console.webContents.once('dom-ready', () => {
     if (startedInstances[pid].logs) {
-      startedInstances[pid].logs.map(v =>
-        startedInstances[pid].console.webContents.send('log-data', v)
-      );
+      // eslint-disable-next-line array-callback-return
+      startedInstances[pid].logs.map(v => {
+        startedInstances[pid].console.webContents.send('log-data', v);
+      });
     }
   });
 
-  return startedInstances[pid].console;
+  ipcMain.handleOnce(`closeConsole-${pid}`, () => {
+    startedInstances[pid].console.close();
+    startedInstances[pid].console = null;
+  });
 }
 
 function initializeInstance(

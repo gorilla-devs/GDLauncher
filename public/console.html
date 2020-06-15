@@ -7,9 +7,12 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap"
       rel="stylesheet"
     />
-    <script src="https://kit.fontawesome.com/3cb9f76276.js"></script>
+
     <meta name="description" content="GDLauncher Console" />
     <style>
+      html {
+        scroll-behavior: smooth;
+      }
       body {
         margin: 0;
         font-family: inter;
@@ -28,9 +31,6 @@
         color: white;
         -webkit-app-region: drag;
       }
-      #navbar div {
-        padding: 10px;
-      }
 
       #container {
         color: white;
@@ -40,6 +40,11 @@
       #scrollArea {
         margin-top: 40px;
         height: 100%;
+      }
+
+      #contentArea {
+        margin: 10px;
+        font-size: 14px;
       }
 
       #contentArea > div {
@@ -74,6 +79,47 @@
       .clusterize-no-data td {
         text-align: center;
       }
+
+      #scrollDownButton {
+        position: absolute;
+        bottom: 30px;
+        right: 30px;
+        background-color: #050818;
+        border-radius: 50%;
+        display: block;
+        width: 30px;
+        height: 30px;
+        z-index: 10000;
+      }
+
+      #closeButton {
+        height: 100%;
+        display: flex;
+        width: 45px;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.1s ease-in-out;
+        -webkit-app-region: no-drag;
+      }
+
+      #closeButton svg {
+        width: 10px;
+      }
+
+      .closeButton:hover {
+        color: #acb9be;
+        background-color: #1b2533;
+      }
+
+      .closeButton:active {
+        color: #acb9be;
+        background-color: #2d3c49;
+      }
+
+      #name {
+        margin-left: 10px;
+      }
     </style>
     <title>GDLauncher Console</title>
   </head>
@@ -81,11 +127,42 @@
     <div id="root">
       <div id="navbar">
         <div id="name"></div>
-        <div id="closeButton">
-          <i class="fas fa-times"></i>
+        <div id="closeButton" class="closeButton">
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fas"
+            data-icon="times"
+            class="svg-inline--fa fa-times fa-w-11"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 352 512"
+          >
+            <path
+              fill="currentColor"
+              d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+            ></path>
+          </svg>
         </div>
       </div>
       <div id="container">
+        <div id="scrollDownButton">
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fas"
+            data-icon="arrow-circle-down"
+            class="svg-inline--fa fa-arrow-circle-down fa-w-16"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="currentColor"
+              d="M504 256c0 137-111 248-248 248S8 393 8 256 119 8 256 8s248 111 248 248zm-143.6-28.9L288 302.6V120c0-13.3-10.7-24-24-24h-16c-13.3 0-24 10.7-24 24v182.6l-72.4-75.5c-9.3-9.7-24.8-9.9-34.3-.4l-10.9 11c-9.4 9.4-9.4 24.6 0 33.9L239 404.3c9.4 9.4 24.6 9.4 33.9 0l132.7-132.7c9.4-9.4 9.4-24.6 0-33.9l-10.9-11c-9.5-9.5-25-9.3-34.3.4z"
+            ></path>
+          </svg>
+        </div>
         <div id="scrollArea" class="clusterize-scroll">
           <div id="contentArea" class="clusterize-content">
             <div class="clusterize-no-data">Loading data…</div>
@@ -99,19 +176,18 @@
         const querystring = window.require('querystring');
         const Clusterize = window.require('clusterize.js');
         const { ipcRenderer } = window.require('electron');
-        // const { FontAwesomeIcon } = window.require(
-        //   '@fortawesome/react-fontawesome'
-        // );
-        // const { faTimes } = window.require('@fortawesome/free-solid-svg-icons');
 
-        const { instanceName } = querystring.parse(
+        const { instanceName, pid } = querystring.parse(
           window.global.location.search.slice(1)
         );
-        document.getElementById('name').textContent = instanceName;
 
-        document.getElementById(
-          'closeButton'
-        ).innerHTML = `<FontAwesomeIcon class="fas fa-times"></FontAwesomeIcon>`;
+        document.getElementById('name').innerText = instanceName;
+
+        document
+          .getElementById('closeButton')
+          .addEventListener('click', function () {
+            ipcRenderer.invoke(`closeConsole-${pid}`);
+          });
 
         const list = new Clusterize({
           rows: logs,
@@ -123,17 +199,113 @@
         let lastScrollTop = 0;
 
         ipcRenderer.on('log-data', (e, data) => {
+          let date = new Date();
+          let regex = /\[\D+|\d+\]/;
+
+          const existTimeStamp = regex.test(data.text);
+          const includesMainInfo = data.text.includes('[main/INFO] ');
+          const includesMainWarn = data.text.includes('[main/WARN] ');
+          const includesMainError = data.text.includes('[main/ERROR] ');
+
+          const calcHeader = (inf, warn, err) => {
+            if (inf) {
+              return `<span style="color: #27AE60">[main/INFO]</span>`;
+            } else if (warn) {
+              return `<span style="color: #FAB849">[main/WARN]</span>`;
+            } else if (err) {
+              return `<span style="color: #d62828">[main/ERROR]</span>`;
+            } else return '';
+          };
+
+          // let NewDate = existTimeStamp
+          //   ? data.text.replace(
+          //       /\[(.+?)\]/,
+          //       '[' +
+          //         date.getHours() +
+          //         ':' +
+          //         date.getMinutes() +
+          //         ':' +
+          //         date.getSeconds() +
+          //         ']'
+          //     )
+          //   : `[
+          //     ${date.getHours()}
+          //     :
+          //     ${date.getMinutes()}
+          //     :
+          //     ${date.getSeconds()}
+          //     ] ` + data.text;
+
           logs.push(
-            `<div style="color: ${data.foreground ? data.foreground : ''}">${
-              data.text
-            }</div>`
+            existTimeStamp
+              ? `<div>
+                <span style="color: white" >${`[
+              ${date.getHours()}
+              :
+              ${date.getMinutes()}
+              :
+              ${date.getSeconds()}
+              ] `}
+                </span>
+                ${calcHeader(
+                  includesMainInfo,
+                  includesMainWarn,
+                  includesMainError
+                )}
+                  <span style="color: #979CA1">${data.text.replace(
+                    /\[(.+?)\]/g,
+                    ''
+                  )}</span></div>`
+              : `<div>
+                <span style="color: white">${`[
+              ${date.getHours()}
+              :
+              ${date.getMinutes()}
+              :
+              ${date.getSeconds()}
+              ] `}</span>
+                <span style="color: #979CA1">${data.text}</span>
+                </div>`
           );
 
           const scrollElem = document.getElementById('contentArea');
-          list.update([...logs, `<div >${data}</div>`]);
+          list.update([
+            ...logs,
+            existTimeStamp
+              ? `<div>
+                <span style="color: white" >${`[
+              ${date.getHours()}
+              :
+              ${date.getMinutes()}
+              :
+              ${date.getSeconds()}
+              ] `}
+                </span>
+                ${calcHeader(
+                  includesMainInfo,
+                  includesMainWarn,
+                  includesMainError
+                )}
+                  <span style="color: #979CA1">${data.text.replace(
+                    /\[(.+?)\]/g,
+                    ''
+                  )}</span></div>`
+              : `<div>
+                <span style="color: white">${`[
+              ${date.getHours()}
+              :
+              ${date.getMinutes()}
+              :
+              ${date.getSeconds()}
+              ] `}</span>
+                <span style="color: #979CA1">${data.text}</span>
+                </div>`
+          ]);
           const elem = document.getElementById('scrollArea');
           if (shouldScroll) elem.scrollTop = elem.scrollHeight;
         });
+
+        const scrollDwButton = document.getElementById('scrollDownButton');
 
         document
           .querySelector('#scrollArea')
@@ -144,8 +316,20 @@
                 document.getElementById('scrollArea').offsetHeight;
 
             if (isBottom) {
+              scrollDwButton.style.display = 'none';
               shouldScroll = true;
-            } else shouldScroll = false;
+            } else {
+              scrollDwButton.style.display = 'block';
+              shouldScroll = false;
+            }
+            document
+              .getElementById('scrollDownButton')
+              .addEventListener('click', function () {
+                document.getElementById('scrollArea').scrollTop =
+                  document.getElementById('scrollArea').scrollHeight -
+                  document.getElementById('scrollArea').offsetHeight;
+                shouldScroll = true;
+              });
           });
       })();
     </script>
