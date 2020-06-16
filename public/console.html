@@ -3,14 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/icon.ico" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap"
-      rel="stylesheet"
-    />
 
     <meta name="description" content="GDLauncher Console" />
     <style>
       html {
+        font-family: Inter;
         scroll-behavior: smooth;
       }
       body {
@@ -217,25 +214,6 @@
             } else return '';
           };
 
-          // let NewDate = existTimeStamp
-          //   ? data.text.replace(
-          //       /\[(.+?)\]/,
-          //       '[' +
-          //         date.getHours() +
-          //         ':' +
-          //         date.getMinutes() +
-          //         ':' +
-          //         date.getSeconds() +
-          //         ']'
-          //     )
-          //   : `[
-          //     ${date.getHours()}
-          //     :
-          //     ${date.getMinutes()}
-          //     :
-          //     ${date.getSeconds()}
-          //     ] ` + data.text;
-
           logs.push(
             existTimeStamp
               ? `<div>
@@ -317,7 +295,7 @@
 
             if (isBottom) {
               scrollDwButton.style.display = 'none';
-              shouldScroll = true;
+              // shouldScroll = true;
             } else {
               scrollDwButton.style.display = 'block';
               shouldScroll = false;
