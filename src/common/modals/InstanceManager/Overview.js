@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
 import path from 'path';
@@ -11,7 +11,8 @@ import {
   faSave,
   faUndo,
   faTimes,
-  faCog
+  faCog,
+  faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Switch, Slider, Select, Cascader } from 'antd';
 import { ipcRenderer } from 'electron';
@@ -21,6 +22,7 @@ import {
   resolutionPresets
 } from '../../../app/desktop/utils/constants';
 import { updateInstanceConfig, addToQueue } from '../../reducers/actions';
+import { openModal } from '../../reducers/modals/actions';
 import { convertMinutesToHumanTime, sortByForgeVersionDesc } from '../../utils';
 import { closeModal } from '../../reducers/modals/actions';
 
@@ -140,120 +142,10 @@ const Overview = ({ instanceName }) => {
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
   const [minecraftVersion, setMinecraftVersion] = useState(false);
-  const [modloader, setModLoader] = useState(false);
-  const vanillaManifest = useSelector(state => state.app.vanillaManifest);
-  const fabricManifest = useSelector(state => state.app.fabricManifest);
-  const forgeManifest = useSelector(state => state.app.forgeManifest);
 
-  const instancePath = useSelector(state =>
-    path.join(_getInstancesPath(state), instanceName)
-  );
+  const [modloader, setModLoader] = useState(false);
 
   const dispatch = useDispatch();
-
-  const VanillafilteredVersions = useMemo(() => {
-    const snapshots = vanillaManifest.versions
-      .filter(v => v.type === 'snapshot')
-      .map(v => v.id);
-    const versions = [
-      {
-        value: 'release',
-        label: 'Releases',
-        children: vanillaManifest.versions
-          .filter(v => v.type === 'release')
-          .map(v => ({
-            value: v.id,
-            label: v.id
-          }))
-      },
-      {
-        value: 'snapshot',
-        label: 'Snapshots',
-        children: vanillaManifest.versions
-          .filter(v => v.type === 'snapshot')
-          .map(v => ({
-            value: v.id,
-            label: v.id
-          }))
-      },
-      {
-        value: 'old_beta',
-        label: 'Old Beta',
-        children: vanillaManifest.versions
-          .filter(v => v.type === 'old_beta')
-          .map(v => ({
-            value: v.id,
-            label: v.id
-          }))
-      },
-      {
-        value: 'old_alpha',
-        label: 'Old Alpha',
-        children: vanillaManifest.versions
-          .filter(v => v.type === 'old_alpha')
-          .map(v => ({
-            value: v.id,
-            label: v.id
-          }))
-      }
-    ];
-    return versions;
-  }, [vanillaManifest, fabricManifest, forgeManifest]);
-
-  const ForgefilteredVersions = useMemo(() => {
-    const versions = [
-      {
-        value: 'release',
-        label: 'Releases',
-        children: Object.entries(forgeManifest).map(([k, v]) => ({
-          value: k,
-          label: k,
-          children: v.sort(sortByForgeVersionDesc).map(child => ({
-            value: child,
-            label: child.split('-')[1]
-          }))
-        }))
-      }
-    ];
-    return versions;
-  }, [vanillaManifest, fabricManifest, forgeManifest]);
-
-  const FabricfilteredVersions = useMemo(() => {
-    const snapshots = vanillaManifest.versions
-      .filter(v => v.type === 'snapshot')
-      .map(v => v.id);
-    const versions = [
-      {
-        value: 'release',
-        label: 'Releases',
-        children: fabricManifest.mappings
-          .filter(v => !snapshots.includes(v.gameVersion))
-          .map(v => ({
-            value: v.version,
-            label: v.version,
-            children: fabricManifest.loader.map(c => ({
-              value: c.version,
-              label: c.version
-            }))
-          }))
-      },
-      {
-        value: 'snapshot',
-        label: 'Snapshots',
-        children: fabricManifest.mappings
-          .filter(v => snapshots.includes(v.gameVersion))
-          .map(v => ({
-            value: v.version,
-            label: v.version,
-            children: fabricManifest.loader.map(c => ({
-              value: c.version,
-              label: c.version
-            }))
-          }))
-      }
-    ];
-    return versions;
-  }, [vanillaManifest, fabricManifest, forgeManifest]);
 
   useEffect(() => {
     ipcRenderer
@@ -308,21 +200,6 @@ const Overview = ({ instanceName }) => {
       path.join(instancesPath, newName)
     );
   };
-
-  const calcCoscaderContent = v => {
-    switch (v) {
-      case 'vanilla':
-        return VanillafilteredVersions;
-      case 'forge':
-        return ForgefilteredVersions;
-      case 'fabric':
-        return FabricfilteredVersions;
-    }
-  };
-
-  const snapshots = vanillaManifest.versions
-    .filter(v => v.type === 'snapshot')
-    .map(v => v.id);
 
   const computeLastPlayed = timestamp => {
     const lastPlayed = new Date(timestamp);
@@ -382,97 +259,12 @@ const Overview = ({ instanceName }) => {
               <FontAwesomeIcon
                 icon={faCog}
                 onClick={() => {
-                  setMinecraftVersion(!minecraftVersion);
+                  dispatch(openModal('McVersionChanger', { instanceName }));
                 }}
               />
             </div>
 
-            {minecraftVersion ? (
-              <Cascader
-                // value={config?.modloader[1]}
-                options={calcCoscaderContent(config?.modloader[0])}
-                onChange={async v => {
-                  console.log(v, instancePath, config?.modloader);
-                  if (config?.modloader[0] === 'forge') {
-                    console.log('pippo', instancePath);
-                    try {
-                      const manifest = await fss.readJson(
-                        path.join(instancePath, 'manifest.json')
-                      );
-
-                      dispatch(
-                        addToQueue(
-                          instanceName,
-                          [
-                            config?.modloader[0],
-                            v[1],
-                            v[2],
-                            config?.modloader[3],
-                            config?.modloader[4]
-                          ],
-                          // config?.modloader,
-                          manifest,
-                          `background${path.extname(config?.background)}`
-                        )
-                      );
-                    } catch (e) {
-                      console.error(e);
-                      dispatch(
-                        addToQueue(instanceName, [
-                          config?.modloader[0],
-                          v[1],
-                          v[2],
-                          config?.modloader[3],
-                          config?.modloader[4]
-                        ])
-                      );
-                    }
-                  } else if (config?.modloader[0] === 'vanilla') {
-                    dispatch(addToQueue(instanceName, [v[0], v[1]]));
-                  } else if (config?.modloader[0] === 'fabric') {
-                    console.log('pp', [
-                      config?.modloader[0],
-                      v[1].split('+')[0],
-                      v[1],
-                      v[2]
-                    ]);
-                    dispatch(
-                      addToQueue(instanceName, [
-                        config?.modloader[0],
-                        v[1].split('+')[0],
-                        v[1],
-                        v[2]
-                      ])
-                    );
-                  }
-                  // const manifest = await fss.readJson(
-                  //   path.join(instancePath, 'manifest.json')
-                  // );
-
-                  // dispatch(
-                  //   addToQueue(
-                  //     instanceName,
-                  //     [config?.modloader[0],"1.12.2","1.12.2-14.23.5.2838",285109,2935316]
-                  //     // config?.modloader,
-                  //     manifest,
-                  //     `background${path.extname(config?.background)}`
-                  //   )
-                  // );
-                  setMinecraftVersion(false);
-                  dispatch(closeModal());
-                }}
-                placeholder="Select a version"
-                size="large"
-                css={`
-                  input {
-                    height: 32px;
-                  }
-                  width: 100px;
-                `}
-              />
-            ) : (
-              <div>{config?.modloader[2]}</div>
-            )}
+            <div>{config?.modloader[1]}</div>
           </CardBox>
           <CardBox
             css={`
@@ -501,104 +293,13 @@ const Overview = ({ instanceName }) => {
             >
               <FontAwesomeIcon
                 icon={faCog}
-                onClick={() => setModLoader(!modloader)}
+                onClick={() => {
+                  dispatch(openModal('McVersionChanger', { instanceName }));
+                }}
               />
             </div>
-            {modloader ? (
-              <Select
-                onChange={async v => {
-                  const snapshots = vanillaManifest.versions
-                    .filter(v => v.type === 'snapshot')
-                    .map(v => v.id);
-                  if (v === 'vanilla') {
-                    try {
-                      dispatch(
-                        addToQueue(instanceName, [v, config?.modloader[1]])
-                      );
-                    } catch (e) {
-                      console.error(e);
-                    }
-                    // console.log([
-                    //   v,
-                    //   config?.modloader[1],
-                    //   config?.modloader[2],
-                    //   config?.modloader[3],
-                    //   config?.modloader[4]
-                    // ]);
-                  } else if (v === 'forge') {
-                    console.log('forge', instancePath, [
-                      v,
-                      config?.modloader[1]
-                    ]);
 
-                    try {
-                      // const manifest = await fss.readJson(
-                      //   path.join(instancePath, 'manifest.json')
-                      // );
-
-                      dispatch(
-                        addToQueue(
-                          instanceName,
-                          [
-                            v,
-                            config?.modloader[1],
-                            Object.entries(forgeManifest).filter(
-                              x => x[0] === config?.modloader[1]
-                            )[0][1][0]
-                          ],
-                          null
-                          // `background${path.extname(config?.background)}`
-                        )
-                      );
-                    } catch (e) {
-                      console.error(e);
-                    }
-                  } else {
-                    console.log('tee', [
-                      v,
-                      config?.modloader[1],
-                      fabricManifest.mappings
-                        .filter(v => !snapshots.includes(v.gameVersion))
-                        .filter(x => x.gameVersion === config?.modloader[1])[0]
-                        .version,
-                      fabricManifest.loader[0].version
-                    ]);
-                    dispatch(
-                      addToQueue(instanceName, [
-                        v,
-                        config?.modloader[1],
-                        fabricManifest.mappings
-                          .filter(v => !snapshots.includes(v.gameVersion))
-                          .filter(
-                            x => x.gameVersion === config?.modloader[1]
-                          )[0].version,
-                        fabricManifest.loader[0].version
-                      ])
-                    );
-                  }
-
-                  setModLoader(false);
-                  dispatch(closeModal());
-                }}
-                css={`
-                  .ant-select-selector {
-                    background: ${props =>
-                      props.theme.palette.colors.darkYellow};
-                  }
-                  width: 100px;
-
-                  border: 2px solid
-                    ${props => props.theme.palette.colors.orange};
-                `}
-                value={config?.modloader[0]}
-              >
-                <Select.Option value={'vanilla'}>Vanilla</Select.Option>
-                <Select.Option value={'forge'}>Forge</Select.Option>
-                <Select.Option value={'fabric'}>Fabric</Select.Option>
-              </Select>
-            ) : (
-              <div>{config?.modloader[0]}</div>
-            )}
+            <div>{config?.modloader[0]}</div>
           </CardBox>
           <CardBox
             css={`
@@ -626,7 +327,12 @@ const Overview = ({ instanceName }) => {
                   color: ${props => props.theme.palette.text.secondary};
                 `}
               >
-                <FontAwesomeIcon icon={faCog} />
+                <FontAwesomeIcon
+                  icon={faCog}
+                  onClick={() => {
+                    dispatch(openModal('McVersionChanger', { instanceName }));
+                  }}
+                />
               </div>
             ) : (
               ''
