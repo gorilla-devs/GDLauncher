@@ -1,10 +1,14 @@
-import React, { memo, useState } from 'react';
+import React, { useEffect, memo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { clipboard } from 'electron';
 import { Tooltip, Collapse } from 'antd';
+import { promises as fs } from 'fs';
+import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
 import { pasteBinPost } from '../api';
+import { _getInstancesPath } from '../utils/selectors';
 
 import Modal from '../components/Modal';
 import Logo from '../../ui/LogoSad';
@@ -36,8 +40,56 @@ const calcError = code => {
 
 const { Panel } = Collapse;
 
-const InstanceCrashed = ({ code, errorLogs, stackTrace }) => {
+const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
   const [copiedLog, setCopiedLog] = useState(null);
+  const [crashLog, setCrashLog] = useState(null);
+  const instancesPath = useSelector(_getInstancesPath);
+
+  const readCrashReport = async () => {
+    const instancePath = path.join(instancesPath, instanceName);
+
+    // const date = new Date();
+    // crash-2020-06-18_09.43.53-client.txt
+    try {
+      const files = await fs.readdir(instancePath, 'crash-reports');
+      await Promise.all(
+        files.map(async element => {
+          const stats = await fs.stat(
+            path.join(instancePath, 'crash-reports', element)
+          );
+          const fileBirthdate = new Date(stats.birthtimeMs);
+          const timeDiff = Date.now() - fileBirthdate;
+          const seconds = parseInt(Math.floor(timeDiff / 1000), 10);
+          if (seconds < 2) {
+            const crashReport = await fs.readFile(element);
+            setCrashLog(crashReport);
+            console.log('crashReport', crashReport);
+          }
+          console.log('timedif', element, seconds);
+        })
+      );
+      console.log('test', files);
+
+      // const crashReport = await fs.readFile(
+      //   path.join(
+      //     instancePath,
+      //     `crash-${date.getFullYear()}-${
+      //       date.getMonth() + 1
+      //     }-${date.getDate()}_${date.getHours()}.${date.getMinutes()}.${date.getSeconds()}-client.txt`
+      //   )
+      // );
+
+      // setCrashLog(crashReport);
+      // console.log('crashReport', crashReport);
+    } catch {
+      const files = await fs.readdir(instancePath);
+      console.log('DAPAT', instancePath, files);
+    }
+  };
+
+  useEffect(() => {
+    readCrashReport();
+  }, []);
 
   async function share(e) {
     e.stopPropagation();
@@ -153,10 +205,10 @@ const InstanceCrashed = ({ code, errorLogs, stackTrace }) => {
                 overflow-y: auto;
               `}
             >
-              {errorLogs}
+              {errorLogs && 'Uknown Error'}
               <br />
               <br />
-              {stackTrace.replace('at', ' at')}
+              {crashLog}
             </p>
           </Panel>
         </Collapse>

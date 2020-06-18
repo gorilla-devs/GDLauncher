@@ -1922,7 +1922,6 @@ export function launchInstance(instanceName) {
     );
 
     let errorLogs = '';
-    let stackTrace = '';
 
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${modloader[1]}.json`)
@@ -2099,12 +2098,8 @@ export function launchInstance(instanceName) {
     });
 
     ps.stderr.on('data', data => {
-      const { stack } = new Error();
-      Error.captureStackTrace(data);
       console.error(`ps stderr: ${data}`);
-      console.log(`p: ${stack}`);
       errorLogs += data || '';
-      stackTrace = `${stack}&nbsp;` || '';
     });
 
     ps.on('close', code => {
@@ -2113,12 +2108,14 @@ export function launchInstance(instanceName) {
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
       dispatch(removeStartedInstance(instanceName));
       clearInterval(playTimer);
-      if (code !== 0 && errorLogs) {
+      console.log('CODE', code, errorLogs);
+      if (code !== 0) {
+        console.log('T');
         dispatch(
           openModal('InstanceCrashed', {
+            instanceName,
             code,
-            errorLogs: errorLogs?.toString('utf8'),
-            stackTrace
+            errorLogs: errorLogs?.toString('utf8')
           })
         );
         console.warn(`Process exited with code ${code}. Not too good..`);
