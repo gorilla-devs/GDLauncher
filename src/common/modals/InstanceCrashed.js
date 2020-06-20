@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { clipboard } from 'electron';
 import { Tooltip, Collapse } from 'antd';
-import { promises as fs } from 'fs';
+import makeDir from 'make-dir';
+import { promises as fs, watch } from 'fs';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
@@ -44,51 +45,55 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
   const [copiedLog, setCopiedLog] = useState(null);
   const [crashLog, setCrashLog] = useState(null);
   const instancesPath = useSelector(_getInstancesPath);
+  const instancePath = path.join(instancesPath, instanceName);
+  const crashReportsPath = path.join(instancePath, 'crash-reports');
 
-  const readCrashReport = async () => {
-    const instancePath = path.join(instancesPath, instanceName);
+  let watcher;
 
-    // const date = new Date();
-    // crash-2020-06-18_09.43.53-client.txt
+  const scanCrashReports = async () => {
+    await makeDir(crashReportsPath);
     try {
-      const files = await fs.readdir(instancePath, 'crash-reports');
+      const files = await fs.readdir(crashReportsPath);
       await Promise.all(
         files.map(async element => {
-          const stats = await fs.stat(
-            path.join(instancePath, 'crash-reports', element)
-          );
+          const stats = await fs.stat(path.join(crashReportsPath, element));
           const fileBirthdate = new Date(stats.birthtimeMs);
           const timeDiff = Date.now() - fileBirthdate;
           const seconds = parseInt(Math.floor(timeDiff / 1000), 10);
-          if (seconds < 2) {
-            const crashReport = await fs.readFile(element);
-            setCrashLog(crashReport);
-            console.log('crashReport', crashReport);
+          if (seconds <= 3) {
+            const crashReport = await fs.readFile(
+              path.join(crashReportsPath, element)
+            );
+            setCrashLog(crashReport.toString());
+            console.log('crashReport', crashReport.toString());
           }
-          console.log('timedif', element, seconds);
+          console.log('timedif', element, stats.birthtimeMs / 1000, seconds);
         })
       );
-      console.log('test', files);
-
-      // const crashReport = await fs.readFile(
-      //   path.join(
-      //     instancePath,
-      //     `crash-${date.getFullYear()}-${
-      //       date.getMonth() + 1
-      //     }-${date.getDate()}_${date.getHours()}.${date.getMinutes()}.${date.getSeconds()}-client.txt`
-      //   )
-      // );
-
-      // setCrashLog(crashReport);
-      // console.log('crashReport', crashReport);
-    } catch {
-      const files = await fs.readdir(instancePath);
-      console.log('DAPAT', instancePath, files);
+    } catch (e) {
+      console.error(e);
+      // const files = await fs.readdir(instancePath);
     }
+  };
+
+  const readCrashReport = async () => {
+    // const date = new Date();
+    // crash-2020-06-18_09.43.53-client.txt
+    scanCrashReports();
+    if (watcher) {
+      await watcher.stop();
+      watcher = null;
+    }
+    watcher = await watch(crashReportsPath, async () => {
+      console.log('pepe');
+      scanCrashReports();
+    });
   };
 
   useEffect(() => {
     readCrashReport();
+    console.log('errorLogs', errorLogs);
+    return () => watcher?.close();
   }, []);
 
   async function share(e) {
@@ -113,7 +118,6 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
       setCopiedLog(false);
     }, 500);
   }
-  console.log('errorLogs', errorLogs);
 
   return (
     <Modal
@@ -198,18 +202,18 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
             }
             key="1"
           >
-            <p
+            <div
               css={`
                 height: 210px;
                 word-break: break-all;
                 overflow-y: auto;
               `}
             >
-              {errorLogs && 'Uknown Error'}
+              <p>{errorLogs && 'Uknown Error'}</p>
               <br />
               <br />
-              {crashLog}
-            </p>
+              <pre>{crashLog}</pre>
+            </div>
           </Panel>
         </Collapse>
       </Container>
