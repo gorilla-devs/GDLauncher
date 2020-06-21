@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
 import { pasteBinPost } from '../api';
 import { _getInstancesPath } from '../utils/selectors';
+import parseCrashlog from '../../app/desktop/utils/CrashLogParser';
 
 import Modal from '../components/Modal';
 import Logo from '../../ui/LogoSad';
@@ -44,6 +45,7 @@ const { Panel } = Collapse;
 const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
   const [copiedLog, setCopiedLog] = useState(null);
   const [crashLog, setCrashLog] = useState(null);
+  const [crashLogParsed, setCrashLogParsed] = useState(null);
   const instancesPath = useSelector(_getInstancesPath);
   const instancePath = path.join(instancesPath, instanceName);
   const crashReportsPath = path.join(instancePath, 'crash-reports');
@@ -65,9 +67,16 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
               path.join(crashReportsPath, element)
             );
             setCrashLog(crashReport.toString());
-            console.log('crashReport', crashReport.toString());
+            console.log('DATTT', parseCrashlog(crashReport.toString()));
+            setCrashLogParsed(parseCrashlog(crashReport.toString()));
+
+            console.log(
+              'crashReport',
+              parseCrashlog(crashReport.toString()),
+              crashLogParsed
+            );
           }
-          console.log('timedif', element, stats.birthtimeMs / 1000, seconds);
+          // console.log('timedif', element, stats.birthtimeMs / 1000, seconds);
         })
       );
     } catch (e) {
@@ -119,6 +128,8 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
     }, 500);
   }
 
+  // console.log('EEE', Object.entries(crashLogParsed));
+
   return (
     <Modal
       css={`
@@ -160,6 +171,7 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
                   justify-content: space-between;
                   align-items: center;
                 `}
+                key="1"
               >
                 <>Error Log</> &nbsp;
                 <div
@@ -214,6 +226,27 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
               <br />
               <pre>{crashLog}</pre>
             </div>
+          </Panel>
+          <Panel
+            header={
+              <div
+                css={`
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: start;
+                  align-items: center;
+                `}
+              >
+                Crash Report Analyzer
+              </div>
+            }
+            key="2"
+          >
+            {/* {crashLogParsed
+              ? Object.entries(crashLogParsed).map(([a, b]) => (
+                  <div>{(a, b)}</div>
+                ))
+              : null} */}
           </Panel>
         </Collapse>
       </Container>
