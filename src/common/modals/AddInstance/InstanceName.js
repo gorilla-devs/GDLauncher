@@ -44,7 +44,6 @@ const InstanceName = ({
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const tempPath = useSelector(_getTempPath);
-  const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
   const [instanceName, setInstanceName] = useState(mcName);
   const [alreadyExists, setAlreadyExists] = useState(false);
@@ -154,14 +153,9 @@ const InstanceName = ({
       dispatch(addToQueue(localInstanceName, [version[0], version[2]]));
       await wait(2);
     } else if (isFabric) {
-      const mappedItem = fabricManifest.mappings.find(
-        v => v.version === version[2]
-      );
-      const splitItem = version[2].split(mappedItem.separator);
       dispatch(
         addToQueue(localInstanceName, [
           FABRIC,
-          splitItem[0],
           version[2],
           version[3]
         ])

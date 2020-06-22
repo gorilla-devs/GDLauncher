@@ -80,8 +80,8 @@ const NewInstance = ({ setVersion, setModpack }) => {
           {
             value: 'release',
             label: 'Releases',
-            children: fabricManifest.mappings
-              .filter(v => !snapshots.includes(v.gameVersion))
+            children: fabricManifest.game
+              .filter(v => v.stable)
               .map(v => ({
                 value: v.version,
                 label: v.version,
@@ -94,8 +94,8 @@ const NewInstance = ({ setVersion, setModpack }) => {
           {
             value: 'snapshot',
             label: 'Snapshots',
-            children: fabricManifest.mappings
-              .filter(v => snapshots.includes(v.gameVersion))
+            children: fabricManifest.game
+              .filter(v => !v.stable)
               .map(v => ({
                 value: v.version,
                 label: v.version,
