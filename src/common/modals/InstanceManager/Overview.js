@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
 import path from 'path';
@@ -7,24 +6,17 @@ import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSave,
-  faUndo,
-  faTimes,
-  faCog,
-  faCheck
-} from '@fortawesome/free-solid-svg-icons';
-import { Input, Button, Switch, Slider, Select, Cascader } from 'antd';
+import { faSave, faUndo, faCog } from '@fortawesome/free-solid-svg-icons';
+import { Input, Button, Switch, Slider, Select } from 'antd';
 import { ipcRenderer } from 'electron';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
 } from '../../../app/desktop/utils/constants';
-import { updateInstanceConfig, addToQueue } from '../../reducers/actions';
+import { updateInstanceConfig } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
-import { convertMinutesToHumanTime, sortByForgeVersionDesc } from '../../utils';
-import { closeModal } from '../../reducers/modals/actions';
+import { convertMinutesToHumanTime } from '../../utils';
 
 const Container = styled.div`
   padding: 0 50px;
@@ -92,11 +84,6 @@ const JavaMemorySlider = styled(Slider)`
   margin: 30px 0 55px 0;
 `;
 
-const CustomInput = styled(Input)`
-  height: 20px;
-  margin-top: 5px;
-`;
-
 const JavaArgumentsResetButton = styled(Button)`
   margin-left: 20px;
 `;
@@ -141,9 +128,6 @@ const Overview = ({ instanceName }) => {
   const [screenResolution, setScreenResolution] = useState(null);
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
-  const [minecraftVersion, setMinecraftVersion] = useState(false);
-
-  const [modloader, setModLoader] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -244,7 +228,7 @@ const Overview = ({ instanceName }) => {
                 color: ${props => props.theme.palette.text.secondary};
               `}
             >
-              {minecraftVersion ? null : 'Minecraft Version'}
+              Minecraft Version
             </div>
 
             <div
@@ -280,7 +264,7 @@ const Overview = ({ instanceName }) => {
                 color: ${props => props.theme.palette.text.secondary};
               `}
             >
-              {modloader ? null : 'Modloader'}
+              Modloader
             </div>
             <div
               css={`
