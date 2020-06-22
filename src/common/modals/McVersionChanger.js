@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Cascader } from 'antd';
 import styled from 'styled-components';
 import fss from 'fs-extra';
@@ -8,8 +8,8 @@ import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstancesPath, _getInstance } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
-import { sortByForgeVersionDesc } from '../utils';
 import { FABRIC, VANILLA, FORGE } from '../utils/constants';
+import { filteredVersions } from '../../app/desktop/utils';
 
 const McVersionChanger = ({ instanceName }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -22,106 +22,11 @@ const McVersionChanger = ({ instanceName }) => {
 
   const dispatch = useDispatch();
 
-  const filteredVersions = useMemo(() => {
-    const snapshots = vanillaManifest.versions
-      .filter(v => v.type === 'snapshot')
-      .map(v => v.id);
-    const versions = [
-      {
-        value: 'vanilla',
-        label: 'Vanilla',
-        children: [
-          {
-            value: 'release',
-            label: 'Releases',
-            children: vanillaManifest.versions
-              .filter(v => v.type === 'release')
-              .map(v => ({
-                value: v.id,
-                label: v.id
-              }))
-          },
-          {
-            value: 'snapshot',
-            label: 'Snapshots',
-            children: vanillaManifest.versions
-              .filter(v => v.type === 'snapshot')
-              .map(v => ({
-                value: v.id,
-                label: v.id
-              }))
-          },
-          {
-            value: 'old_beta',
-            label: 'Old Beta',
-            children: vanillaManifest.versions
-              .filter(v => v.type === 'old_beta')
-              .map(v => ({
-                value: v.id,
-                label: v.id
-              }))
-          },
-          {
-            value: 'old_alpha',
-            label: 'Old Alpha',
-            children: vanillaManifest.versions
-              .filter(v => v.type === 'old_alpha')
-              .map(v => ({
-                value: v.id,
-                label: v.id
-              }))
-          }
-        ]
-      },
-      {
-        value: 'forge',
-        label: 'Forge',
-        children: Object.entries(forgeManifest).map(([k, v]) => ({
-          value: k,
-          label: k,
-          children: v.sort(sortByForgeVersionDesc).map(child => ({
-            value: child,
-            label: child.split('-')[1]
-          }))
-        }))
-      },
-      {
-        value: 'fabric',
-        label: 'Fabric',
-        children: [
-          {
-            value: 'release',
-            label: 'Releases',
-            children: fabricManifest.mappings
-              .filter(v => !snapshots.includes(v.gameVersion))
-              .map(v => ({
-                value: v.version,
-                label: v.version,
-                children: fabricManifest.loader.map(c => ({
-                  value: c.version,
-                  label: c.version
-                }))
-              }))
-          },
-          {
-            value: 'snapshot',
-            label: 'Snapshots',
-            children: fabricManifest.mappings
-              .filter(v => snapshots.includes(v.gameVersion))
-              .map(v => ({
-                value: v.version,
-                label: v.version,
-                children: fabricManifest.loader.map(c => ({
-                  value: c.version,
-                  label: c.version
-                }))
-              }))
-          }
-        ]
-      }
-    ];
-    return versions;
-  }, [vanillaManifest, fabricManifest, forgeManifest]);
+  const filteredVers = filteredVersions(
+    vanillaManifest,
+    forgeManifest,
+    fabricManifest
+  );
 
   return (
     <Modal
@@ -133,7 +38,7 @@ const McVersionChanger = ({ instanceName }) => {
     >
       <Container>
         <Cascader
-          options={filteredVersions}
+          options={filteredVers}
           onChange={async v => {
             const isVanilla = v[0] === VANILLA;
             const isFabric = v[0] === FABRIC;
@@ -169,7 +74,7 @@ const McVersionChanger = ({ instanceName }) => {
             }
 
             dispatch(closeModal());
-            setTimeout(() => dispatch(closeModal()), 500);
+            setTimeout(() => dispatch(closeModal()), 200);
           }}
           placeholder="Select a version"
           size="large"
