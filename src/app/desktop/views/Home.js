@@ -8,7 +8,7 @@ import { ipcRenderer } from 'electron';
 import { promises as fs } from 'fs';
 import path from 'path';
 import Instances from '../components/Instances';
-import News from '../components/News';
+import Banner from '../components/Banner';
 import { openModal } from '../../../common/reducers/modals/actions';
 import {
   _getCurrentAccount,
@@ -34,7 +34,7 @@ const AccountContainer = styled(Button)`
 const Home = () => {
   const dispatch = useDispatch();
   const account = useSelector(_getCurrentAccount);
-  const news = useSelector(state => state.news);
+  // const news = useSelector(state => state.news);
   const lastUpdateVersion = useSelector(state => state.app.lastUpdateVersion);
   const instances = useSelector(_getInstances);
 
@@ -103,7 +103,6 @@ const Home = () => {
       <Menu.Item key="1" onClick={() => openAddInstanceModal(1)}>
         Browse Modpacks
       </Menu.Item>
-      <Menu.Divider />
       <Menu.Item key="2" onClick={() => openAddInstanceModal(2)}>
         Import Instance
       </Menu.Item>
@@ -112,7 +111,14 @@ const Home = () => {
 
   return (
     <div>
-      <News news={news} />
+      {/* <News news={news} /> */}
+      <Banner color="black" title="Black Lives Matter">
+        Our community is hurting. The systemic inequalities our community
+        experiences are once again center stage. GDLauncher stands for equality
+        and inclusion. We stand against the racism and injustice our Black
+        community endures. Until change happens and Black Lives Matter, we will
+        never truly be the community we strive to be.
+      </Banner>
       <Instances />
       <Dropdown overlay={menu} trigger={['click']}>
         <AddInstanceIcon type="primary">

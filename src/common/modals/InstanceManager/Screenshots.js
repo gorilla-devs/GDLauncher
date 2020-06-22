@@ -24,7 +24,8 @@ import {
   faTrash,
   faCopy,
   faLink,
-  faFolder
+  faFolder,
+  faImage
 } from '@fortawesome/free-solid-svg-icons';
 import { _getInstancesPath } from '../../utils/selectors';
 import { openModal } from '../../reducers/modals/actions';
@@ -338,20 +339,17 @@ const Screenshots = ({ instanceName }) => {
                         {selectedItems.length < 2 && (
                           <>
                             <MenuItem
-                              onClick={() => {
+                              onClick={() =>
                                 dispatch(
-                                  openModal('ActionConfirmation', {
-                                    message:
-                                      'Are you sure you want to delete this image?',
-                                    fileName: file.name,
-                                    confirmCallback: deleteFile,
-                                    title: 'Confirm'
+                                  openModal('Screenshot', {
+                                    screenshotsPath,
+                                    file
                                   })
-                                );
-                              }}
+                                )
+                              }
                             >
-                              <FontAwesomeIcon icon={faTrash} />
-                              Delete
+                              <FontAwesomeIcon icon={faImage} />
+                              Preview
                             </MenuItem>
                             <MenuItem
                               onClick={() => {
@@ -410,6 +408,22 @@ const Screenshots = ({ instanceName }) => {
                                 }
                               />
                             </ImgurShareMenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                dispatch(
+                                  openModal('ActionConfirmation', {
+                                    message:
+                                      'Are you sure you want to delete this image?',
+                                    fileName: file.name,
+                                    confirmCallback: deleteFile,
+                                    title: 'Confirm'
+                                  })
+                                );
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faTrash} />
+                              Delete
+                            </MenuItem>
                           </>
                         )}
                       </StyledContexMenu>

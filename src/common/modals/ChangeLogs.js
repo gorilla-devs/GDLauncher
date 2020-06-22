@@ -22,7 +22,27 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        {/* <Section>
+        <Section>
+          <SectionTitle
+            css={`
+              ${props => props.theme.palette.text.primary};
+            `}
+          >
+            <span>BLACK LIVES MATTER</span>
+          </SectionTitle>
+          <div
+            css={`
+              padding: 0 10px;
+            `}
+          >
+            Our community is hurting. The systemic inequalities our community
+            experiences are once again center stage. GDLauncher stands for
+            equality and inclusion. We stand against the racism and injustice
+            our Black community endures. Until change happens and Black Lives
+            Matter, we will never truly be the community we strive to be.
+          </div>
+        </Section>
+        <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -32,13 +52,11 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>We just improved everything that was here before</li>
-              <li>Windows executables are now digitally signed</li>
-              <li>Crash handler modal for instances</li>
+              <li>Fonts are loaded from disk to be always available offline</li>
             </ul>
           </div>
-        </Section> */}
-        <Section>
+        </Section>
+        {/* <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.red};
@@ -48,11 +66,10 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed various issues on MacOS</li>
-              <li>Fixed modpack updater</li>
+              <li>Minor UI fixes</li>
             </ul>
           </div>
-        </Section>
+        </Section> */}
         <Section>
           <SectionTitle
             css={`
