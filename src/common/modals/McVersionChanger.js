@@ -9,6 +9,7 @@ import { addToQueue } from '../reducers/actions';
 import { _getInstancesPath, _getInstance } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { sortByForgeVersionDesc } from '../utils';
+import { FABRIC, VANILLA, FORGE } from '../utils/constants';
 
 const McVersionChanger = ({ instanceName }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -134,9 +135,12 @@ const McVersionChanger = ({ instanceName }) => {
         <Cascader
           options={filteredVersions}
           onChange={async v => {
-            if (v[0] === 'vanilla') {
+            const isVanilla = v[0] === VANILLA;
+            const isFabric = v[0] === FABRIC;
+            const isForge = v[0] === FORGE;
+            if (isVanilla) {
               dispatch(addToQueue(instanceName, [v[0], v[2]]));
-            } else if (v[0] === 'forge') {
+            } else if (isForge) {
               try {
                 const manifest = await fss.readJson(
                   path.join(instancePath, 'manifest.json')
@@ -154,14 +158,13 @@ const McVersionChanger = ({ instanceName }) => {
                 console.error(e);
                 dispatch(addToQueue(instanceName, v));
               }
-            } else if (v[0] === 'fabric') {
+            } else if (isFabric) {
+              const mappedItem = fabricManifest.mappings.find(
+                ver => ver.version === v[2]
+              );
+              const splitItem = v[2].split(mappedItem.separator);
               dispatch(
-                addToQueue(instanceName, [
-                  'fabric',
-                  v[2].split('+')[0],
-                  v[2],
-                  v[3]
-                ])
+                addToQueue(instanceName, ['fabric', splitItem[0], v[2], v[3]])
               );
             }
 
