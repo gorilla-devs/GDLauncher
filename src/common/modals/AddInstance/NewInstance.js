@@ -3,14 +3,14 @@ import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Cascader } from 'antd';
 import styled from 'styled-components';
-import { filteredVersions } from '../../../app/desktop/utils';
+import { getFilteredVersions } from '../../../app/desktop/utils';
 
 const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
 
-  const filteredVers = filteredVersions(
+  const filteredVers = getFilteredVersions(
     vanillaManifest,
     forgeManifest,
     fabricManifest

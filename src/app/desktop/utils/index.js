@@ -160,7 +160,7 @@ export const librariesMapper = (libraries, librariesPath) => {
   );
 };
 
-export const filteredVersions = (
+export const getFilteredVersions = (
   vanillaManifest,
   forgeManifest,
   fabricManifest

@@ -9,7 +9,7 @@ import { addToQueue } from '../reducers/actions';
 import { _getInstancesPath, _getInstance } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { FABRIC, VANILLA, FORGE } from '../utils/constants';
-import { filteredVersions } from '../../app/desktop/utils';
+import { getFilteredVersions } from '../../app/desktop/utils';
 
 const McVersionChanger = ({ instanceName }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -22,7 +22,7 @@ const McVersionChanger = ({ instanceName }) => {
 
   const dispatch = useDispatch();
 
-  const filteredVers = filteredVersions(
+  const filteredVers = getFilteredVersions(
     vanillaManifest,
     forgeManifest,
     fabricManifest
