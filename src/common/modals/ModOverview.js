@@ -13,7 +13,7 @@ import { closeModal } from '../reducers/modals/actions';
 import { installMod, updateInstanceConfig } from '../reducers/actions';
 import { remove } from 'fs-extra';
 import { _getInstancesPath, _getInstance } from '../utils/selectors';
-import { FABRIC, FORGE } from '../utils/constants';
+import { FABRIC, FORGE, CURSEFORGE_URL } from '../utils/constants';
 import {
   filterFabricFilesByVersion,
   filterForgeFilesByVersion,
@@ -41,7 +41,12 @@ const ModOverview = ({
   useEffect(() => {
     setLoadingFiles(true);
     getAddon(projectID).then(data => setAddon(data.data));
-    getAddonDescription(projectID).then(data => setDescription(data.data));
+    getAddonDescription(projectID).then(data => {
+      // Replace the beginning of all relative URLs with the Curseforge URL
+      const modifiedData = data.data.replace(/href="(?!http)/g, `href="${CURSEFORGE_URL}`)
+
+      setDescription(modifiedData)
+    });
     getAddonFiles(projectID).then(data => {
       const isFabric =
         getPatchedInstanceType(instance) === FABRIC && projectID !== 361988;
