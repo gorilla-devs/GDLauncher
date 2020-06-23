@@ -203,6 +203,42 @@ const Overview = ({ instanceName }) => {
     }
   };
 
+  const Card = ({ title, children, color, icon }) => {
+    return (
+      <CardBox
+        css={`
+          background: ${color};
+        `}
+      >
+        <div
+          css={`
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 10px;
+            color: ${props => props.theme.palette.text.secondary};
+          `}
+        >
+          {title}
+        </div>
+
+        <div
+          css={`
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 10px;
+            color: ${props => props.theme.palette.text.secondary};
+          `}
+        >
+          {icon || null}
+        </div>
+
+        <div>{children}</div>
+      </CardBox>
+    );
+  };
+
   return (
     <Container>
       <Column>
@@ -214,119 +250,52 @@ const Overview = ({ instanceName }) => {
             margin-top: 20px;
           `}
         >
-          <CardBox
-            css={`
-              background: ${props => props.theme.palette.colors.jungleGreen};
-            `}
-          >
-            <div
-              css={`
-                position: absolute;
-                top: 5px;
-                left: 10px;
-                font-size: 10px;
-                color: ${props => props.theme.palette.text.secondary};
-              `}
-            >
-              Minecraft Version
-            </div>
-
-            <div
-              css={`
-                position: absolute;
-                top: 5px;
-                right: 10px;
-                font-size: 10px;
-                color: ${props => props.theme.palette.text.secondary};
-              `}
-            >
+          <Card
+            title="Minecraft Version"
+            color={props => props.theme.palette.colors.jungleGreen}
+            icon={
               <FontAwesomeIcon
                 icon={faCog}
                 onClick={() => {
                   dispatch(openModal('McVersionChanger', { instanceName }));
                 }}
               />
-            </div>
-
-            <div>{config?.modloader[1]}</div>
-          </CardBox>
-          <CardBox
-            css={`
-              background: ${props => props.theme.palette.colors.darkYellow};
-            `}
+            }
           >
-            <div
-              css={`
-                position: absolute;
-                top: 5px;
-                left: 10px;
-                font-size: 10px;
-                color: ${props => props.theme.palette.text.secondary};
-              `}
-            >
-              Modloader
-            </div>
-            <div
-              css={`
-                position: absolute;
-                top: 5px;
-                right: 10px;
-                font-size: 10px;
-                color: ${props => props.theme.palette.text.secondary};
-              `}
-            >
+            {config?.modloader[1]}
+          </Card>
+          <Card
+            title="Modloader"
+            color={props => props.theme.palette.colors.darkYellow}
+            icon={
               <FontAwesomeIcon
                 icon={faCog}
                 onClick={() => {
                   dispatch(openModal('McVersionChanger', { instanceName }));
                 }}
               />
-            </div>
-
-            <div>{config?.modloader[0]}</div>
-          </CardBox>
-          <CardBox
-            css={`
-              background: ${props => props.theme.palette.colors.lightBlue};
-            `}
+            }
           >
-            <div
-              css={`
-                position: absolute;
-                top: 5px;
-                left: 10px;
-                font-size: 10px;
-                color: ${props => props.theme.palette.text.secondary};
-              `}
-            >
-              Modloader Version
-            </div>
-            {(config?.modloader[2] || '-') !== '-' ? (
-              <div
-                css={`
-                  position: absolute;
-                  top: 5px;
-                  right: 10px;
-                  font-size: 10px;
-                  color: ${props => props.theme.palette.text.secondary};
-                `}
-              >
+            {config?.modloader[0]}
+          </Card>
+          <Card
+            title="Modloader Version"
+            color={props => props.theme.palette.colors.lightBlue}
+            icon={
+              (config?.modloader[2] || '-') !== '-' ? (
                 <FontAwesomeIcon
                   icon={faCog}
                   onClick={() => {
                     dispatch(openModal('McVersionChanger', { instanceName }));
                   }}
                 />
-              </div>
-            ) : (
-              ''
-            )}
-            <div>
-              {config?.modloader[0] === 'forge'
-                ? config?.modloader[2]?.split('-')[1]
-                : config?.modloader[2] || '-'}
-            </div>
-          </CardBox>
+              ) : null
+            }
+          >
+            {config?.modloader[0] === 'forge'
+              ? config?.modloader[2]?.split('-')[1]
+              : config?.modloader[2] || '-'}
+          </Card>
         </OverviewCard>
         <OverviewCard
           css={`
@@ -336,62 +305,24 @@ const Overview = ({ instanceName }) => {
             margin-bottom: 60px;
           `}
         >
-          <CardBox
-            css={`
-              background: ${props => props.theme.palette.colors.maximumRed};
-            `}
+          <Card
+            title="Mods"
+            color={props => props.theme.palette.colors.maximumRed}
           >
-            <div
-              css={`
-                position: absolute;
-                top: 5px;
-                left: 10px;
-                font-size: 10px;
-                color: ${props => props.theme.palette.text.secondary};
-              `}
-            >
-              Mods
-            </div>
-            <div>{config?.mods?.length || '-'}</div>
-          </CardBox>
-          <CardBox
-            css={`
-              background: ${props => props.theme.palette.colors.liberty};
-            `}
+            {config?.mods?.length || '-'}
+          </Card>
+          <Card
+            title="Played Time"
+            color={props => props.theme.palette.colors.liberty}
           >
-            <div
-              css={`
-                position: absolute;
-                top: 5px;
-                left: 10px;
-                font-size: 10px;
-                color: ${props => props.theme.palette.text.secondary};
-              `}
-            >
-              Played Time
-            </div>
-            <div>{convertMinutesToHumanTime(config?.timePlayed)}</div>
-          </CardBox>
-          <CardBox
-            css={`
-              background: ${props => props.theme.palette.colors.orange};
-            `}
+            {convertMinutesToHumanTime(config?.timePlayed)}
+          </Card>
+          <Card
+            title="Last Played"
+            color={props => props.theme.palette.colors.orange}
           >
-            <div
-              css={`
-                position: absolute;
-                top: 5px;
-                left: 10px;
-                font-size: 10px;
-                color: ${props => props.theme.palette.text.secondary};
-              `}
-            >
-              Last Played
-            </div>
-            <div>
-              {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
-            </div>
-          </CardBox>
+            {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
+          </Card>
         </OverviewCard>
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
