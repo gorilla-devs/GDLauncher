@@ -214,8 +214,7 @@
             } else return '';
           };
 
-          let ParsedLogs = existTimeStamp
-            ? `<div>
+          let logsWithInfos = `<div>
                 <span style="color: white" >${`[
               ${date.getHours()}
               :
@@ -232,8 +231,9 @@
                   <span style="color: #979CA1">${data.text.replace(
                     /\[(.+?)\]/g,
                     ''
-                  )}</span></div>`
-            : `<div>
+                  )}</span></div>`;
+
+          let logsWithTime = `<div>
                 <span style="color: white">${`[
               ${date.getHours()}
               :
@@ -243,6 +243,8 @@
               ] `}</span>
                 <span style="color: #979CA1">${data.text}</span>
                 </div>`;
+
+          let ParsedLogs = existTimeStamp ? logsWithInfos : logsWithTime;
 
           logs.push(ParsedLogs);
 
