@@ -214,9 +214,8 @@
             } else return '';
           };
 
-          logs.push(
-            existTimeStamp
-              ? `<div>
+          let ParsedLogs = existTimeStamp
+            ? `<div>
                 <span style="color: white" >${`[
               ${date.getHours()}
               :
@@ -234,7 +233,7 @@
                     /\[(.+?)\]/g,
                     ''
                   )}</span></div>`
-              : `<div>
+            : `<div>
                 <span style="color: white">${`[
               ${date.getHours()}
               :
@@ -243,42 +242,12 @@
               ${date.getSeconds()}
               ] `}</span>
                 <span style="color: #979CA1">${data.text}</span>
-                </div>`
-          );
+                </div>`;
+
+          logs.push(ParsedLogs);
 
           const scrollElem = document.getElementById('contentArea');
-          list.update([
-            ...logs,
-            existTimeStamp
-              ? `<div>
-                <span style="color: white" >${`[
-              ${date.getHours()}
-              :
-              ${date.getMinutes()}
-              :
-              ${date.getSeconds()}
-              ] `}
-                </span>
-                ${calcHeader(
-                  includesMainInfo,
-                  includesMainWarn,
-                  includesMainError
-                )}
-                  <span style="color: #979CA1">${data.text.replace(
-                    /\[(.+?)\]/g,
-                    ''
-                  )}</span></div>`
-              : `<div>
-                <span style="color: white">${`[
-              ${date.getHours()}
-              :
-              ${date.getMinutes()}
-              :
-              ${date.getSeconds()}
-              ] `}</span>
-                <span style="color: #979CA1">${data.text}</span>
-                </div>`
-          ]);
+          list.update([...logs, ParsedLogs]);
           const elem = document.getElementById('scrollArea');
           if (shouldScroll) elem.scrollTop = elem.scrollHeight;
         });
