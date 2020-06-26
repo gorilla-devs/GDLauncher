@@ -2134,6 +2134,7 @@ export function installMod(
     const state = getState();
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
+    const instance = _getInstance(state)(instanceName);
     const mainModData = await getAddonFile(projectID, fileID);
     const { data: addon } = await getAddon(projectID);
     mainModData.data.projectID = projectID;
@@ -2199,6 +2200,7 @@ export function installMod(
           // type 6: include
 
           if (dep.type === 3) {
+            if (instance.mods.some(x => x.projectID === dep.addonId)) return;
             const depList = await getAddonFiles(dep.addonId);
             const depData = depList.data.find(v =>
               v.gameVersion.includes(gameVersion)

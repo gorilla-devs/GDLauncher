@@ -27,6 +27,7 @@ import { launchInstance } from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
+import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
 
 const Container = styled.div`
   position: relative;
@@ -323,7 +324,14 @@ const Instance = ({ instanceName }) => {
         {/* // TODO - Support other export options besides curseforge forge. */}
         <MenuItem
           onClick={instanceExportCurseForge}
-          disabled={Boolean(isInQueue) || instance.modloader[0] !== 'forge'}
+          disabled={
+            Boolean(isInQueue) ||
+            !(
+              instance.modloader[0] === FORGE ||
+              instance.modloader[0] === FABRIC ||
+              instance.modloader[0] === VANILLA
+            )
+          }
         >
           <FontAwesomeIcon
             icon={faBoxOpen}
