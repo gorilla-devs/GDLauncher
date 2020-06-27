@@ -698,12 +698,15 @@ export function addToQueue(
     dispatch(
       updateInstanceConfig(
         instanceName,
-        prev => ({
-          modloader,
-          timePlayed: prev.timePlayed || timePlayed || 0,
-          background,
-          mods: prev.mods || []
-        }),
+        prev => {
+          return {
+            ...(prev || {}),
+            modloader,
+            timePlayed: prev.timePlayed || timePlayed || 0,
+            background,
+            mods: prev.mods || []
+          };
+        },
         true
       )
     );
