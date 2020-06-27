@@ -49,9 +49,8 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
         <Cascader
           options={filteredVers}
           defaultValue={patchedDefaultValue}
-          onChange={async version => {
-            setSelectedVersion(version);
-          }}
+          onChange={setSelectedVersion}
+          allowClear={false}
           placeholder="Select a version"
           size="large"
           css={`
