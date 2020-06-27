@@ -58,6 +58,7 @@ const ChangeLogs = () => {
             <ul>
               <li>Fixed curse links sometimes not working</li>
               <li>Fixed the news loader</li>
+              <li>Fixed context menu sometimes going outside the window</li>
             </ul>
           </div>
         </Section>
