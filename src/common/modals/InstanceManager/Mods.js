@@ -235,7 +235,6 @@ const Row = memo(({ index, style, data }) => {
     latestMods[item.projectID] && latestMods[item.projectID].id !== item.fileID;
   const dispatch = useDispatch();
 
-  console.log('items', item);
   return (
     <>
       <ContextMenuTrigger id={item.displayName}>

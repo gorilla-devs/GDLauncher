@@ -32,7 +32,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
     for (const releaseType of type.children) {
       const match = releaseType.children.find(v => v.value === defaultValue[1]);
       if (match)
-        return [defaultValue[0], releaseType.value, ...defaultValue.slice(1)];
+        return [defaultValue[0], releaseType.value, ...defaultValue[1]];
     }
   }, [defaultValue, instanceName, filteredVers]);
 
@@ -100,6 +100,8 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 ? `background${path.extname(config?.background)}`
                 : null;
 
+              const isModpack = defaultValue.slice(3, 5).length === 2;
+
               const isVanilla = selectedVersion[0] === VANILLA;
               const isFabric = selectedVersion[0] === FABRIC;
               const isForge = selectedVersion[0] === FORGE;
@@ -114,13 +116,25 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 );
               } else if (isForge) {
                 dispatch(
-                  addToQueue(instanceName, selectedVersion, null, background)
+                  addToQueue(
+                    instanceName,
+                    isModpack
+                      ? [...selectedVersion, ...defaultValue.slice(3, 5)]
+                      : selectedVersion,
+                    null,
+                    background
+                  )
                 );
               } else if (isFabric) {
                 dispatch(
                   addToQueue(
                     instanceName,
-                    [FABRIC, selectedVersion[2], selectedVersion[3]],
+                    [
+                      FABRIC,
+                      selectedVersion[2],
+                      selectedVersion[3],
+                      ...(isModpack ? defaultValue.slice(3, 5) : [])
+                    ],
                     null,
                     background
                   )
