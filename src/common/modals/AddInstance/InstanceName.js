@@ -199,18 +199,14 @@ const InstanceName = ({
       }
     } else if (isVanilla) {
       dispatch(addToQueue(localInstanceName, [version[0], version[2]]));
+      await wait(2);
     } else if (isFabric) {
-      dispatch(
-        addToQueue(localInstanceName, [
-          FABRIC,
-          version[2],
-          version[3]
-        ])
-      );
+      dispatch(addToQueue(localInstanceName, [FABRIC, version[2], version[3]]));
+      await wait(2);
     } else if (isForge) {
       dispatch(addToQueue(localInstanceName, version));
+      await wait(2);
     }
-    await wait(2);
     dispatch(closeModal());
   };
   return (
