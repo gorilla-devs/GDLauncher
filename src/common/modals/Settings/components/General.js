@@ -14,7 +14,8 @@ import {
   faPlay,
   faToilet,
   faNewspaper,
-  faFolder
+  faFolder,
+  faFire
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
@@ -28,7 +29,8 @@ import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
-  updateShowNews
+  updateShowNews,
+  updateCurseReleaseChannel
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
@@ -233,6 +235,9 @@ const General = () => {
   const [moveUserData, setMoveUserData] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
   const [loadingMoveUserData, setLoadingMoveUserData] = useState(false);
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
 
   const dispatch = useDispatch();
 
@@ -425,6 +430,33 @@ const General = () => {
                 {x}
               </Select.Option>
             ))}
+        </Select>
+      </ParallelDownload>
+      <Hr />
+      <Title>
+        Preferred Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
+      </Title>
+      <ParallelDownload>
+        <p
+          css={`
+            margin: 0;
+            width: 400px;
+          `}
+        >
+          Select the preferred release channel for downloading Curse projects.
+          This also applies for mods update.
+        </p>
+        <Select
+          css={`
+            width: 100px;
+            text-align: start;
+          `}
+          onChange={e => dispatch(updateCurseReleaseChannel(e))}
+          value={curseReleaseChannel}
+        >
+          <Select.Option value={1}>Stable</Select.Option>
+          <Select.Option value={2}>Beta</Select.Option>
+          <Select.Option value={3}>Alpha</Select.Option>
         </Select>
       </ParallelDownload>
       <Hr />

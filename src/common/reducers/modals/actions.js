@@ -24,3 +24,18 @@ export function closeModal() {
     );
   };
 }
+
+export function closeAllModals() {
+  return (dispatch, getState) => {
+    dispatch({
+      type: UNMOUNTING_MODAL
+    });
+    setTimeout(() => {
+      while (getState().modals.length > 0) {
+        dispatch({
+          type: CLOSE_MODAL
+        });
+      }
+    }, 220);
+  };
+}

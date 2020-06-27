@@ -1,6 +1,6 @@
 import React, { useEffect, useState, memo } from 'react';
 import { ipcRenderer } from 'electron';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faWindowMinimize,
@@ -192,7 +192,7 @@ const SystemNavbar = () => {
               showPointerCursor
               onClick={() => dispatch(openModal('BisectHosting'))}
             />
-            <PulsatingCircle />
+            {/* <PulsatingCircle /> */}
           </div>
         </>
       )}
@@ -280,7 +280,7 @@ const SystemNavbar = () => {
               showPointerCursor
               onClick={() => dispatch(openModal('BisectHosting'))}
             />
-            <PulsatingCircle />
+            {/* <PulsatingCircle /> */}
           </div>
           <div>
             <DevtoolButton />
@@ -366,51 +366,51 @@ const TerminalButton = styled.div`
   }
 `;
 
-const opacityPulse = keyframes`
- 0% {
-    -webkit-box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.4);
- }
- 70% {
-    -webkit-box-shadow: 0 0 0 10px rgba(39, 174, 96, 0);
- }
- 100% {
-    -webkit-box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
- }
-`;
-const PulsingCircleInner = styled.div`
-  animation: ${opacityPulse} 1s ease-out;
-  animation-delay: ${props => props.delay};
-  animation-iteration-count: infinite;
-  background: ${props => props.theme.palette.colors.green};
-  opacity: ${props => props.opacity || 1};
-  border-radius: 50%;
-  height: ${props => props.height};
-  width: ${props => props.width};
-  position: absolute;
-  display: inline-block;
-  text-align: center;
-`;
-const PulsingCircleContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin-left: 1rem;
-  margin-right: 1.5rem;
-  top: -1px;
-`;
+// const opacityPulse = keyframes`
+//  0% {
+//     -webkit-box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.4);
+//  }
+//  70% {
+//     -webkit-box-shadow: 0 0 0 10px rgba(39, 174, 96, 0);
+//  }
+//  100% {
+//     -webkit-box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
+//  }
+// `;
+// const PulsingCircleInner = styled.div`
+//   animation: ${opacityPulse} 1s ease-out;
+//   animation-delay: ${props => props.delay};
+//   animation-iteration-count: infinite;
+//   background: ${props => props.theme.palette.colors.green};
+//   opacity: ${props => props.opacity || 1};
+//   border-radius: 50%;
+//   height: ${props => props.height};
+//   width: ${props => props.width};
+//   position: absolute;
+//   display: inline-block;
+//   text-align: center;
+// `;
+// const PulsingCircleContainer = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   position: relative;
+//   margin-left: 1rem;
+//   margin-right: 1.5rem;
+//   top: -1px;
+// `;
 
-function PulsatingCircle() {
-  return (
-    <PulsingCircleContainer>
-      <PulsingCircleInner delay="0s" height="17px" width="17px" opacity={0.1} />
-      <PulsingCircleInner
-        delay="0.5s"
-        height="12.75"
-        width="12.75"
-        opacity={0.15}
-      />
-      <PulsingCircleInner delay="1s" height="8.5px" width="8.5px" />
-    </PulsingCircleContainer>
-  );
-}
+// function PulsatingCircle() {
+//   return (
+//     <PulsingCircleContainer>
+//       <PulsingCircleInner delay="0s" height="17px" width="17px" opacity={0.1} />
+//       <PulsingCircleInner
+//         delay="0.5s"
+//         height="12.75"
+//         width="12.75"
+//         opacity={0.15}
+//       />
+//       <PulsingCircleInner delay="1s" height="8.5px" width="8.5px" />
+//     </PulsingCircleContainer>
+//   );
+// }
