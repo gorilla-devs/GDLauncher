@@ -119,6 +119,8 @@ const commonConfig = {
       'package.json',
       'public/icon.png'
     ],
+    extraFiles:
+      process.platform === 'win32' && type === 'setup' ? ['vcredist/**/*'] : [],
     asar: {
       smartUnpack: false
     },

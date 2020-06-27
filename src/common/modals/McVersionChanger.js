@@ -1,7 +1,6 @@
 import React, { memo, useMemo, useState } from 'react';
 import { Cascader } from 'antd';
 import styled from 'styled-components';
-import fss from 'fs-extra';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLongArrowAltRight } from '@fortawesome/free-solid-svg-icons';
@@ -9,7 +8,7 @@ import path from 'path';
 import { isEqual } from 'lodash';
 import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
-import { _getInstancesPath, _getInstance } from '../utils/selectors';
+import { _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
 import { FABRIC, VANILLA, FORGE } from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
@@ -19,9 +18,6 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
   const config = useSelector(state => _getInstance(state)(instanceName));
-  const instancePath = useSelector(state =>
-    path.join(_getInstancesPath(state), instanceName)
-  );
   const [selectedVersion, setSelectedVersion] = useState(null);
 
   const dispatch = useDispatch();
@@ -118,21 +114,8 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                   )
                 );
               } else if (isForge) {
-                let manifest = null;
-                try {
-                  manifest = await fss.readJson(
-                    path.join(instancePath, 'manifest.json')
-                  );
-                } catch (e) {
-                  console.warn(e);
-                }
                 dispatch(
-                  addToQueue(
-                    instanceName,
-                    selectedVersion,
-                    manifest,
-                    background
-                  )
+                  addToQueue(instanceName, selectedVersion, null, background)
                 );
               } else if (isFabric) {
                 dispatch(
