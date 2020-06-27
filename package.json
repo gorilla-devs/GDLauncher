@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -189,6 +189,7 @@
     "react-contextmenu": "^2.13.0",
     "react-dom": "^16.13.1",
     "react-html-parser": "^2.0.2",
+    "react-portal": "^4.2.1",
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
