@@ -695,8 +695,6 @@ export function addToQueue(
       }
     );
 
-    const addMods = modloader[0] === FORGE || modloader[0] === FABRIC;
-
     dispatch(
       updateInstanceConfig(
         instanceName,
@@ -704,7 +702,7 @@ export function addToQueue(
           modloader,
           timePlayed: prev.timePlayed || timePlayed || 0,
           background,
-          ...(addMods && { mods: prev.mods || [] })
+          mods: prev.mods || []
         }),
         true
       )
