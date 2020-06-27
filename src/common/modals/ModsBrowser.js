@@ -357,7 +357,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         <Header>
           <Select
             css={`
-              width: 130px;
+              width: 160px;
               margin: 0 10px;
             `}
             defaultValue={filterType}

@@ -434,7 +434,7 @@ const General = () => {
       </ParallelDownload>
       <Hr />
       <Title>
-        Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
+        Preferred Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
       </Title>
       <ParallelDownload>
         <p
@@ -444,8 +444,7 @@ const General = () => {
           `}
         >
           Select the preferred release channel for downloading Curse projects.
-          Stable will fallback to Beta then Alpha if the previous isn&apos;t
-          available.
+          This also applies for mods update.
         </p>
         <Select
           css={`
