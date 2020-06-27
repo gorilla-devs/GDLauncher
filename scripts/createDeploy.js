@@ -120,7 +120,15 @@ const commonConfig = {
       'public/icon.png'
     ],
     extraFiles:
-      process.platform === 'win32' && type === 'setup' ? ['vcredist/**/*'] : [],
+      process.platform === 'win32' && type === 'setup'
+        ? [
+            {
+              from: 'vcredist/',
+              to: './',
+              filter: '**/*'
+            }
+          ]
+        : [],
     asar: {
       smartUnpack: false
     },
