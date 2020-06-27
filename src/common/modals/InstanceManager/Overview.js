@@ -10,7 +10,7 @@ import { faSave, faUndo, faCog } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Switch, Slider, Select } from 'antd';
 import { ipcRenderer } from 'electron';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
-import instanceDefaultBackground from '../../../common/assets/instance_default.png';
+import instanceDefaultBackground from '../../assets/instance_default.png';
 import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
