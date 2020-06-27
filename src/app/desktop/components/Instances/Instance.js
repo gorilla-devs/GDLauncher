@@ -337,6 +337,7 @@ const Instance = ({ instanceName }) => {
             icon={faBoxOpen}
             css={`
               margin-right: 10px;
+              width: 16px !important;
             `}
           />
           Export Pack
