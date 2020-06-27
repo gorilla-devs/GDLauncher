@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { Cascader } from 'antd';
 import styled from 'styled-components';
 import fss from 'fs-extra';
 import { useSelector, useDispatch } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLongArrowAltRight } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
 import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstancesPath, _getInstance } from '../utils/selectors';
-import { closeModal } from '../reducers/modals/actions';
+import { closeAllModals } from '../reducers/modals/actions';
 import { FABRIC, VANILLA, FORGE } from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
+import { isEqual } from 'lodash';
 
-const McVersionChanger = ({ instanceName }) => {
+const McVersionChanger = ({ instanceName, defaultValue }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
@@ -19,14 +22,23 @@ const McVersionChanger = ({ instanceName }) => {
   const instancePath = useSelector(state =>
     path.join(_getInstancesPath(state), instanceName)
   );
+  const [selectedVersion, setSelectedVersion] = useState(null);
 
   const dispatch = useDispatch();
 
-  const filteredVers = getFilteredVersions(
-    vanillaManifest,
-    forgeManifest,
-    fabricManifest
-  );
+  const filteredVers = useMemo(() => {
+    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest);
+  }, [vanillaManifest, forgeManifest, fabricManifest]);
+
+  const patchedDefaultValue = useMemo(() => {
+    if (defaultValue[0] === FORGE) return defaultValue;
+    const type = filteredVers.find(v => v.value === defaultValue[0]);
+    for (const releaseType of type.children) {
+      const match = releaseType.children.find(v => v.value === defaultValue[1]);
+      if (match)
+        return [defaultValue[0], releaseType.value, ...defaultValue.slice(1)];
+    }
+  }, [defaultValue, instanceName, filteredVers]);
 
   return (
     <Modal
@@ -35,46 +47,14 @@ const McVersionChanger = ({ instanceName }) => {
         height: 380px;
         width: 600px;
       `}
+      removePadding
     >
       <Container>
         <Cascader
           options={filteredVers}
-          onChange={async v => {
-            const isVanilla = v[0] === VANILLA;
-            const isFabric = v[0] === FABRIC;
-            const isForge = v[0] === FORGE;
-            if (isVanilla) {
-              dispatch(addToQueue(instanceName, [v[0], v[2]]));
-            } else if (isForge) {
-              try {
-                const manifest = await fss.readJson(
-                  path.join(instancePath, 'manifest.json')
-                );
-
-                dispatch(
-                  addToQueue(
-                    instanceName,
-                    v,
-                    manifest,
-                    `background${path.extname(config?.background)}`
-                  )
-                );
-              } catch (e) {
-                console.error(e);
-                dispatch(addToQueue(instanceName, v));
-              }
-            } else if (isFabric) {
-              const mappedItem = fabricManifest.mappings.find(
-                ver => ver.version === v[2]
-              );
-              const splitItem = v[2].split(mappedItem.separator);
-              dispatch(
-                addToQueue(instanceName, ['fabric', splitItem[0], v[2], v[3]])
-              );
-            }
-
-            dispatch(closeModal());
-            setTimeout(() => dispatch(closeModal()), 200);
+          defaultValue={patchedDefaultValue}
+          onChange={async version => {
+            setSelectedVersion(version);
           }}
           placeholder="Select a version"
           size="large"
@@ -82,12 +62,101 @@ const McVersionChanger = ({ instanceName }) => {
             width: 400px;
           `}
         />
+        <div
+          css={`
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+          `}
+        >
+          <div
+            isVersionDifferent={
+              selectedVersion && !isEqual(patchedDefaultValue, selectedVersion)
+            }
+            css={`
+              width: 70px;
+              height: 40px;
+              transition: 0.1s ease-in-out;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              border-radius: 4px;
+              font-size: 40px;
+              color: ${props =>
+                props.isVersionDifferent
+                  ? props.theme.palette.text.icon
+                  : props.theme.palette.text.disabled};
+              ${props => (props.isVersionDifferent ? 'cursor: pointer;' : '')}
+              &:hover {
+                background-color: ${props =>
+                  props.isVersionDifferent
+                    ? props.theme.action.hover
+                    : 'transparent'};
+              }
+            `}
+            onClick={async () => {
+              if (
+                !selectedVersion ||
+                isEqual(patchedDefaultValue, selectedVersion)
+              ) {
+                return;
+              }
+              const background = config?.background
+                ? `background${path.extname(config?.background)}`
+                : null;
+
+              const isVanilla = selectedVersion[0] === VANILLA;
+              const isFabric = selectedVersion[0] === FABRIC;
+              const isForge = selectedVersion[0] === FORGE;
+              if (isVanilla) {
+                dispatch(
+                  addToQueue(
+                    instanceName,
+                    [selectedVersion[0], selectedVersion[2]],
+                    null,
+                    background
+                  )
+                );
+              } else if (isForge) {
+                let manifest = null;
+                try {
+                  manifest = await fss.readJson(
+                    path.join(instancePath, 'manifest.json')
+                  );
+                } catch (e) {
+                  console.warn(e);
+                }
+                dispatch(
+                  addToQueue(
+                    instanceName,
+                    selectedVersion,
+                    manifest,
+                    background
+                  )
+                );
+              } else if (isFabric) {
+                dispatch(
+                  addToQueue(
+                    instanceName,
+                    [FABRIC, selectedVersion[2], selectedVersion[3]],
+                    null,
+                    background
+                  )
+                );
+              }
+
+              dispatch(closeAllModals());
+            }}
+          >
+            <FontAwesomeIcon icon={faLongArrowAltRight} />
+          </div>
+        </div>
       </Container>
     </Modal>
   );
 };
 
-export default McVersionChanger;
+export default memo(McVersionChanger);
 
 const Container = styled.div`
   width: 100%;
@@ -95,4 +164,5 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 `;

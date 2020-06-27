@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import fss from 'fs-extra';
 import path from 'path';
@@ -111,6 +111,53 @@ const marks = {
   16384: '16384 MB'
 };
 
+const Card = memo(
+  ({ title, children, color, icon, instanceName, defaultValue }) => {
+    const dispatch = useDispatch();
+    return (
+      <CardBox
+        css={`
+          background: ${color};
+        `}
+      >
+        <div
+          css={`
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 10px;
+            color: ${props => props.theme.palette.text.secondary};
+          `}
+        >
+          {title}
+        </div>
+
+        {icon && (
+          <div
+            css={`
+              position: absolute;
+              top: 5px;
+              right: 10px;
+              font-size: 10px;
+              color: ${props => props.theme.palette.text.secondary};
+              cursor: pointer;
+            `}
+            onClick={() => {
+              dispatch(
+                openModal('McVersionChanger', { instanceName, defaultValue })
+              );
+            }}
+          >
+            {icon}
+          </div>
+        )}
+
+        <div>{children}</div>
+      </CardBox>
+    );
+  }
+);
+
 const Overview = ({ instanceName }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
@@ -203,42 +250,6 @@ const Overview = ({ instanceName }) => {
     }
   };
 
-  const Card = ({ title, children, color, icon }) => {
-    return (
-      <CardBox
-        css={`
-          background: ${color};
-        `}
-      >
-        <div
-          css={`
-            position: absolute;
-            top: 5px;
-            left: 10px;
-            font-size: 10px;
-            color: ${props => props.theme.palette.text.secondary};
-          `}
-        >
-          {title}
-        </div>
-
-        <div
-          css={`
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            font-size: 10px;
-            color: ${props => props.theme.palette.text.secondary};
-          `}
-        >
-          {icon || null}
-        </div>
-
-        <div>{children}</div>
-      </CardBox>
-    );
-  };
-
   return (
     <Container>
       <Column>
@@ -253,42 +264,29 @@ const Overview = ({ instanceName }) => {
           <Card
             title="Minecraft Version"
             color={props => props.theme.palette.colors.jungleGreen}
-            icon={
-              <FontAwesomeIcon
-                icon={faCog}
-                onClick={() => {
-                  dispatch(openModal('McVersionChanger', { instanceName }));
-                }}
-              />
-            }
+            instanceName={instanceName}
+            defaultValue={config?.modloader}
+            icon={<FontAwesomeIcon icon={faCog} />}
           >
             {config?.modloader[1]}
           </Card>
           <Card
             title="Modloader"
             color={props => props.theme.palette.colors.darkYellow}
-            icon={
-              <FontAwesomeIcon
-                icon={faCog}
-                onClick={() => {
-                  dispatch(openModal('McVersionChanger', { instanceName }));
-                }}
-              />
-            }
+            instanceName={instanceName}
+            defaultValue={config?.modloader}
+            icon={<FontAwesomeIcon icon={faCog} />}
           >
             {config?.modloader[0]}
           </Card>
           <Card
             title="Modloader Version"
             color={props => props.theme.palette.colors.lightBlue}
+            instanceName={instanceName}
+            defaultValue={config?.modloader}
             icon={
               (config?.modloader[2] || '-') !== '-' ? (
-                <FontAwesomeIcon
-                  icon={faCog}
-                  onClick={() => {
-                    dispatch(openModal('McVersionChanger', { instanceName }));
-                  }}
-                />
+                <FontAwesomeIcon icon={faCog} />
               ) : null
             }
           >

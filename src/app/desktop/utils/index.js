@@ -165,9 +165,6 @@ export const getFilteredVersions = (
   forgeManifest,
   fabricManifest
 ) => {
-  const snapshots = vanillaManifest.versions
-    .filter(v => v.type === 'snapshot')
-    .map(v => v.id);
   const versions = [
     {
       value: 'vanilla',
@@ -234,8 +231,8 @@ export const getFilteredVersions = (
         {
           value: 'release',
           label: 'Releases',
-          children: fabricManifest.mappings
-            .filter(v => !snapshots.includes(v.gameVersion))
+          children: fabricManifest.game
+            .filter(v => v.stable)
             .map(v => ({
               value: v.version,
               label: v.version,
@@ -248,8 +245,8 @@ export const getFilteredVersions = (
         {
           value: 'snapshot',
           label: 'Snapshots',
-          children: fabricManifest.mappings
-            .filter(v => snapshots.includes(v.gameVersion))
+          children: fabricManifest.game
+            .filter(v => !v.stable)
             .map(v => ({
               value: v.version,
               label: v.version,
