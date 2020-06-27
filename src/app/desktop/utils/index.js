@@ -800,12 +800,13 @@ export const filterForgeFilesByVersion = (files, version) => {
   });
 };
 
-export const getFirstReleaseCandidate = files => {
+export const getFirstPreferredCandidate = (files, release) => {
+  let counter = release || 1;
+
   let latestFile = null;
-  let counter = 1;
   while (counter <= 3 && !latestFile) {
     const c = counter;
-    const latest = files.find(v => v.releaseType === c);
+    const latest = files.find(v => v.releaseType <= c);
     if (latest) {
       latestFile = latest;
     }

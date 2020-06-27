@@ -70,6 +70,16 @@ function showNews(state = true, action) {
   }
 }
 
+// 1 is stable, 2 is beta, 3 is alpha
+function curseReleaseChannel(state = 1, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_CURSE_RELEASE_CHANNEL:
+      return action.curseReleaseChannel;
+    default:
+      return state;
+  }
+}
+
 function minecraftSettings(
   state = { resolution: { height: 480, width: 854 } },
   action
@@ -113,6 +123,7 @@ export default combineReducers({
   hideWindowOnGameLaunch,
   potatoPcMode,
   showNews,
+  curseReleaseChannel,
   java,
   minecraftSettings
 });
