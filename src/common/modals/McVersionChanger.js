@@ -6,13 +6,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLongArrowAltRight } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
+import { isEqual } from 'lodash';
 import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstancesPath, _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
 import { FABRIC, VANILLA, FORGE } from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
-import { isEqual } from 'lodash';
 
 const McVersionChanger = ({ instanceName, defaultValue }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
