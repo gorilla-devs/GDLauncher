@@ -10,7 +10,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faShare } from '@fortawesome/free-solid-svg-icons';
 import { pasteBinPost } from '../api';
 import { _getInstancesPath } from '../utils/selectors';
-import parseCrashlog from '../../app/desktop/utils/CrashLogParser';
 
 import Modal from '../components/Modal';
 import Logo from '../../ui/LogoSad';
@@ -45,7 +44,6 @@ const { Panel } = Collapse;
 const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
   const [copiedLog, setCopiedLog] = useState(null);
   const [crashLog, setCrashLog] = useState(null);
-  const [crashLogParsed, setCrashLogParsed] = useState(null);
   const instancesPath = useSelector(_getInstancesPath);
   const instancePath = path.join(instancesPath, instanceName);
   const crashReportsPath = path.join(instancePath, 'crash-reports');
@@ -67,27 +65,15 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
               path.join(crashReportsPath, element)
             );
             setCrashLog(crashReport.toString());
-            console.log('DATTT', parseCrashlog(crashReport.toString()));
-            setCrashLogParsed(parseCrashlog(crashReport.toString()));
-
-            console.log(
-              'crashReport',
-              parseCrashlog(crashReport.toString()),
-              crashLogParsed
-            );
           }
-          // console.log('timedif', element, stats.birthtimeMs / 1000, seconds);
         })
       );
     } catch (e) {
       console.error(e);
-      // const files = await fs.readdir(instancePath);
     }
   };
 
   const readCrashReport = async () => {
-    // const date = new Date();
-    // crash-2020-06-18_09.43.53-client.txt
     scanCrashReports();
     if (watcher) {
       await watcher.stop();
@@ -105,10 +91,10 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
     return () => watcher?.close();
   }, []);
 
-  async function share(e) {
+  async function share(e, content) {
     e.stopPropagation();
 
-    const res = await pasteBinPost(errorLogs);
+    const res = await pasteBinPost(content);
 
     if (res.status === 200) {
       setCopiedLog(true);
@@ -119,22 +105,20 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
     }
   }
 
-  function copy(e) {
+  function copy(e, content) {
     e.stopPropagation();
     setCopiedLog(true);
-    clipboard.writeText(errorLogs);
+    clipboard.writeText(content);
     setTimeout(() => {
       setCopiedLog(false);
     }, 500);
   }
 
-  // console.log('EEE', Object.entries(crashLogParsed));
-
   return (
     <Modal
       css={`
-        height: 550px;
-        width: 600px;
+        height: 580px;
+        width: 630px;
       `}
       title="The instance could not be launched"
     >
@@ -161,6 +145,7 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
             width: 100%;
           `}
           defaultActiveKey={['1']}
+          accordion
         >
           <Panel
             header={
@@ -193,7 +178,7 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
                           margin: 0 20px;
                         `}
                         icon={faShare}
-                        onClick={e => share(e)}
+                        onClick={e => share(e, errorLogs)}
                       />
                     </div>
                   </Tooltip>
@@ -206,7 +191,10 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
                         margin: 0;
                       `}
                     >
-                      <FontAwesomeIcon icon={faCopy} onClick={e => copy(e)} />
+                      <FontAwesomeIcon
+                        icon={faCopy}
+                        onClick={e => copy(e, errorLogs)}
+                      />
                     </div>
                   </Tooltip>
                 </div>
@@ -216,15 +204,12 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
           >
             <div
               css={`
-                height: 210px;
+                height: 100px;
                 word-break: break-all;
                 overflow-y: auto;
               `}
             >
-              <p>{errorLogs && 'Uknown Error'}</p>
-              <br />
-              <br />
-              <pre>{crashLog}</pre>
+              <p>{errorLogs || 'Uknown Error'}</p>
             </div>
           </Panel>
           <Panel
@@ -233,20 +218,70 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
                 css={`
                   display: flex;
                   flex-direction: row;
-                  justify-content: start;
+                  justify-content: space-between;
                   align-items: center;
                 `}
+                key="1"
               >
-                Crash Report Analyzer
+                <>Crash Log</> &nbsp;
+                <div
+                  css={`
+                    display: flex;
+                  `}
+                >
+                  <Tooltip
+                    title={copiedLog ? 'Copied Link' : 'Share'}
+                    placement="top"
+                  >
+                    <div
+                      css={`
+                        margin: 0;
+                      `}
+                    >
+                      <FontAwesomeIcon
+                        css={`
+                          margin: 0 20px;
+                        `}
+                        icon={faShare}
+                        onClick={e => share(e, crashLog)}
+                      />
+                    </div>
+                  </Tooltip>
+                  <Tooltip
+                    title={copiedLog ? 'Copied' : 'Copy'}
+                    placement="top"
+                  >
+                    <div
+                      css={`
+                        margin: 0;
+                      `}
+                    >
+                      <FontAwesomeIcon
+                        icon={faCopy}
+                        onClick={e => copy(e, crashLog)}
+                      />
+                    </div>
+                  </Tooltip>
+                </div>
               </div>
             }
             key="2"
           >
-            {/* {crashLogParsed
-              ? Object.entries(crashLogParsed).map(([a, b]) => (
-                  <div>{(a, b)}</div>
-                ))
-              : null} */}
+            <div
+              css={`
+                max-height: 200px;
+                overflow: auto;
+              `}
+            >
+              <pre
+                css={`
+                  word-break: break-all;
+                  text-align: start;
+                `}
+              >
+                {crashLog || 'No crash log found'}
+              </pre>
+            </div>
           </Panel>
         </Collapse>
       </Container>
