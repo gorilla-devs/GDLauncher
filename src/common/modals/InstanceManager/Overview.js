@@ -10,6 +10,7 @@ import { faSave, faUndo, faCog } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Switch, Slider, Select } from 'antd';
 import { ipcRenderer } from 'electron';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
+import instanceDefaultBackground from '../../../common/assets/instance_default.png';
 import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
@@ -32,7 +33,7 @@ const RenameRow = styled.div`
   flex-direction: row;
   justify-content: space-between;
   color: ${props => props.theme.palette.text.primary};
-  margin: 30px 0 30px 0;
+  margin: 60px 0 30px 0;
   width: 100%;
 `;
 
@@ -76,7 +77,7 @@ const JavaManagerRow = styled.div`
   flex-direction: row;
   justify-content: space-between;
   color: ${props => props.theme.palette.text.primary};
-  margin: 0 500px 30px 0;
+  margin: 0 500px 20px 0;
   width: 100%;
 `;
 
@@ -118,6 +119,9 @@ const Card = memo(
       <CardBox
         css={`
           background: ${color};
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
         `}
       >
         <div
@@ -158,7 +162,7 @@ const Card = memo(
   }
 );
 
-const Overview = ({ instanceName }) => {
+const Overview = ({ instanceName, background, manifest }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
   const [JavaMemorySwitch, setJavaMemorySwitch] = useState(
@@ -300,7 +304,7 @@ const Overview = ({ instanceName }) => {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            margin-bottom: 60px;
+            margin-bottom: 30px;
           `}
         >
           <Card
@@ -322,6 +326,18 @@ const Overview = ({ instanceName }) => {
             {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
           </Card>
         </OverviewCard>
+        {config?.modloader.slice(3, 5).length === 2 && manifest && (
+          <Card
+            title="Curse Modpack"
+            color={`linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), ${
+              background
+                ? `url(${background})`
+                : `url(${instanceDefaultBackground})`
+            }`}
+          >
+            {manifest?.name} - {manifest?.version}
+          </Card>
+        )}
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
           <RenameButton onClick={() => renameInstance()} type="primary">

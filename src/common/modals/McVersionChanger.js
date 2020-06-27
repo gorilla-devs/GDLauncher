@@ -46,6 +46,35 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
       removePadding
     >
       <Container>
+        {selectedVersion &&
+          selectedVersion[0] !== patchedDefaultValue[0] &&
+          defaultValue.slice(3, 5).length === 2 && (
+            <div
+              css={`
+                color: ${props => props.theme.palette.colors.yellow};
+                font-weight: 900;
+                width: 400px;
+                text-align: center;
+                margin-bottom: 30px;
+                margin-top: -50px;
+              `}
+            >
+              <div
+                css={`
+                  font-size: 20px;
+                  margin-bottom: 10px;
+                `}
+              >
+                DISCLAIMER
+              </div>
+              <div>
+                Changing modloader (forge -&gt; fabric...) will result in the
+                loss of the modpack metadata. You won&apos;t be able to change
+                the modpack version or recognize this instance as a modpack
+                anymore.
+              </div>
+            </div>
+          )}
         <Cascader
           options={filteredVers}
           defaultValue={patchedDefaultValue}
@@ -105,6 +134,10 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
               const isVanilla = selectedVersion[0] === VANILLA;
               const isFabric = selectedVersion[0] === FABRIC;
               const isForge = selectedVersion[0] === FORGE;
+
+              const isSameLoader =
+                selectedVersion[0] === patchedDefaultValue[0];
+
               if (isVanilla) {
                 dispatch(
                   addToQueue(
@@ -118,7 +151,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 dispatch(
                   addToQueue(
                     instanceName,
-                    isModpack
+                    isModpack && isSameLoader
                       ? [...selectedVersion, ...defaultValue.slice(3, 5)]
                       : selectedVersion,
                     null,
@@ -133,7 +166,9 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                       FABRIC,
                       selectedVersion[2],
                       selectedVersion[3],
-                      ...(isModpack ? defaultValue.slice(3, 5) : [])
+                      ...(isModpack && isSameLoader
+                        ? defaultValue.slice(3, 5)
+                        : [])
                     ],
                     null,
                     background
@@ -161,4 +196,5 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
+  flex-direction: column;
 `;
