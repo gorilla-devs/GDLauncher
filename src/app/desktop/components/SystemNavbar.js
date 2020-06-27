@@ -153,7 +153,13 @@ const SystemNavbar = () => {
   };
 
   return (
-    <MainContainer>
+    <MainContainer
+      onDoubleClick={() => {
+        if (process.platform === 'darwin') {
+          ipcRenderer.invoke('min-max-window');
+        }
+      }}
+    >
       {!isOsx && (
         <>
           <div

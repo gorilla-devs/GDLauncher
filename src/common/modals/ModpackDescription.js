@@ -9,7 +9,7 @@ import { transparentize } from 'polished';
 import { getAddonDescription, getAddonFiles } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal } from '../reducers/modals/actions';
-import { FORGE } from '../utils/constants';
+import { FORGE, CURSEFORGE_URL } from '../utils/constants';
 
 const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
@@ -20,7 +20,12 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
 
   useEffect(() => {
     setLoading(true);
-    getAddonDescription(modpack.id).then(data => setDescription(data.data));
+    getAddonDescription(modpack.id).then(data => {
+      // Replace the beginning of all relative URLs with the Curseforge URL
+      const modifiedData = data.data.replace(/href="(?!http)/g, `href="${CURSEFORGE_URL}`)
+
+      setDescription(modifiedData)
+    });
     getAddonFiles(modpack.id).then(data => {
       setFiles(data.data);
       setLoading(false);
