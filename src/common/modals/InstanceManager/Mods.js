@@ -221,6 +221,9 @@ const toggleModDisabled = async (
 const Row = memo(({ index, style, data }) => {
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const {
     items,
     instanceName,
@@ -232,10 +235,11 @@ const Row = memo(({ index, style, data }) => {
   } = data;
   const item = items[index];
   const isUpdateAvailable =
-    latestMods[item.projectID] && latestMods[item.projectID].id !== item.fileID;
+    latestMods[item.projectID] &&
+    latestMods[item.projectID].id !== item.fileID &&
+    latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
 
-  console.log('items', item);
   return (
     <>
       <ContextMenuTrigger id={item.displayName}>
@@ -394,6 +398,9 @@ const filter = (arr, search) =>
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const latestMods = useSelector(state => state.latestModManifests);
   const [mods, setMods] = useState(sort(instance.mods));
   const [selectedMods, setSelectedMods] = useState([]);
@@ -439,7 +446,9 @@ const Mods = ({ instanceName }) => {
   const hasModUpdates = useMemo(() => {
     return instance?.mods?.find(v => {
       const isUpdateAvailable =
-        latestMods[v.projectID] && latestMods[v.projectID].id !== v.fileID;
+        latestMods[v.projectID] &&
+        latestMods[v.projectID].id !== v.fileID &&
+        latestMods[v.projectID].releaseType <= curseReleaseChannel;
       return isUpdateAvailable;
     });
   }, [instance.mods, latestMods]);

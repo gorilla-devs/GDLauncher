@@ -135,13 +135,6 @@ const SubTitle = styled.p`
   z-index: 2;
 `;
 
-const StyledContentLoader = styled(ContentLoader)`
-  speed: 0.6;
-  arialabel: false;
-  height: 158px;
-  width: 830px;
-`;
-
 function openNews(e, inf) {
   e.preventDefault();
   shell.openExternal(inf.url);
@@ -223,20 +216,16 @@ function News({ style, news }) {
       <ImageList news={news} currentImageIndex={currentImageIndex} />
     </Carousel>
   ) : (
-    <StyledContentLoader
-      primaryColor={ContextTheme.shade11}
-      secondaryColor={ContextTheme.shade10}
+    <ContentLoader
+      speed={2}
+      width={1000}
+      height={180}
+      viewBox="0 0 1000 180"
+      foregroundColor={ContextTheme.palette.grey[700]}
+      backgroundColor={ContextTheme.palette.grey[800]}
     >
-      <rect
-        rx="0"
-        ry="0"
-        width="830"
-        height="158"
-        css={`
-          border-radius: 2px;
-        `}
-      />
-    </StyledContentLoader>
+      <rect x="0" y="0" rx="0" ry="0" width="1000" height="1080" />
+    </ContentLoader>
   );
 }
 

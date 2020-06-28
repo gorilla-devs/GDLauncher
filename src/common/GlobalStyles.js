@@ -93,18 +93,18 @@ export default createGlobalStyle`
     font-size: 16px;
     min-width: 180px;
     outline: none;
-    transform: scale(0);
     transform-origin: top left;
     pointer-events: none;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     text-align: center;
+    opacity: 0;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition: transform 80ms;
+    transition: opacity 150ms;
   }
   
   .react-contextmenu.react-contextmenu--visible {
-    transition: transform 80ms;
-    transform: scale(1);
+    transition: opacity 150ms;
+    opacity: 1;
     pointer-events: auto;
     z-index: 9999;
   }

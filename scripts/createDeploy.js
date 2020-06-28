@@ -119,6 +119,16 @@ const commonConfig = {
       'package.json',
       'public/icon.png'
     ],
+    extraFiles:
+      process.platform === 'win32'
+        ? [
+            {
+              from: 'vcredist/',
+              to: './',
+              filter: '**/*'
+            }
+          ]
+        : [],
     asar: {
       smartUnpack: false
     },

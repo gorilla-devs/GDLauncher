@@ -25,26 +25,6 @@ const ChangeLogs = () => {
         <Section>
           <SectionTitle
             css={`
-              ${props => props.theme.palette.text.primary};
-            `}
-          >
-            <span>BLACK LIVES MATTER</span>
-          </SectionTitle>
-          <div
-            css={`
-              padding: 0 10px;
-            `}
-          >
-            Our community is hurting. The systemic inequalities our community
-            experiences are once again center stage. GDLauncher stands for
-            equality and inclusion. We stand against the racism and injustice
-            our Black community endures. Until change happens and Black Lives
-            Matter, we will never truly be the community we strive to be.
-          </div>
-        </Section>
-        <Section>
-          <SectionTitle
-            css={`
               color: ${props => props.theme.palette.colors.green};
             `}
           >
@@ -52,11 +32,21 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fonts are loaded from disk to be always available offline</li>
+              <li>Mods name can now be copied by right clicking on it</li>
+              <li>Minor improvements to instance export</li>
+              <li>Prevented installing multiple mod dependencies</li>
+              <li>Minecraft version/modloader can now be changed</li>
+              <li>Added preferred curse release channel to the settings</li>
+              <li>You can now see the installed version of the modpack</li>
+              <li>Updated some dependencies</li>
+              <li>
+                Added bundled vcredist, so you won't need to have them installed
+                on your computer for gdlauncher to work
+              </li>
             </ul>
           </div>
         </Section>
-        {/* <Section>
+        <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.red};
@@ -66,10 +56,12 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Minor UI fixes</li>
+              <li>Fixed curse links sometimes not working</li>
+              <li>Fixed the news loader</li>
+              <li>Fixed context menu sometimes going outside the window</li>
             </ul>
           </div>
-        </Section> */}
+        </Section>
         <Section>
           <SectionTitle
             css={`
