@@ -484,7 +484,6 @@ const Mods = ({ instanceName }) => {
     setFileDrop(true);
     const dragComp = {};
     const { files } = e.dataTransfer;
-    const arrTypes = Object.values(files).map(file => getFileType(file));
 
     await pMap(
       Object.values(files),
@@ -498,31 +497,14 @@ const Mods = ({ instanceName }) => {
 
         const { path: filePath } = file;
 
-        if (Object.values(files).length === 1) {
-          if (fileType === 'jar' || fileType === 'disabled') {
-            await fse.copy(
-              filePath,
-              path.join(instancesPath, instanceName, 'mods', fileName)
-            );
-            dragComp[fileName] = true;
-          } else {
-            console.error('This file is not a mod!');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
-        } else if (arrTypes.includes('jar')) {
-          if (fileType === 'jar') {
-            await fse.copy(
-              filePath,
-              path.join(instancesPath, instanceName, 'mods', fileName)
-            );
-            dragComp[fileName] = true;
-          } else {
-            setFileDrop(false);
-            setFileDrag(false);
-          }
+        if (fileType === 'jar' || fileType === 'disabled') {
+          await fse.copy(
+            filePath,
+            path.join(instancesPath, instanceName, 'mods', fileName)
+          );
+          dragComp[fileName] = true;
         } else {
-          console.error('The files are  not a mod!');
+          console.error('This file is not a mod!', file);
           setFileDrop(false);
           setFileDrag(false);
         }
