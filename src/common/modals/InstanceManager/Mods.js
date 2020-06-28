@@ -490,6 +490,7 @@ const Mods = ({ instanceName }) => {
       async file => {
         const fileName = file.name;
         const fileType = getFileType(file);
+        const existingMods = itemData.items.map(item => item.fileName);
 
         dragComp[fileName] = false;
 
@@ -497,7 +498,14 @@ const Mods = ({ instanceName }) => {
 
         const { path: filePath } = file;
 
-        if (fileType === 'jar' || fileType === 'disabled') {
+        if (existingMods.includes(fileName)) {
+          console.error(
+            'A mod with this name already exists in the instance.',
+            file.name
+          );
+          setFileDrop(false);
+          setFileDrag(false);
+        } else if (fileType === 'jar' || fileType === 'disabled') {
           await fse.copy(
             filePath,
             path.join(instancesPath, instanceName, 'mods', fileName)
