@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { _getInstances } from '../../../../common/utils/selectors';
@@ -26,6 +26,7 @@ const SubNoInstance = styled.div`
 
 const Instances = () => {
   const instances = useSelector(_getInstances);
+
   return (
     <Container>
       {instances.length > 0 ? (
@@ -42,4 +43,4 @@ const Instances = () => {
   );
 };
 
-export default Instances;
+export default memo(Instances);

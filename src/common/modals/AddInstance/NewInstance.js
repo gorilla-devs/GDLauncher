@@ -10,11 +10,9 @@ const NewInstance = ({ setVersion, setModpack }) => {
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
 
-  const filteredVers = getFilteredVersions(
-    vanillaManifest,
-    forgeManifest,
-    fabricManifest
-  );
+  const filteredVers = useMemo(() => {
+    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest);
+  }, [vanillaManifest, forgeManifest, fabricManifest]);
 
   return (
     <Container>

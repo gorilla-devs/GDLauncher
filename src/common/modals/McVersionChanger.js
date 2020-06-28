@@ -27,13 +27,22 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
   }, [vanillaManifest, forgeManifest, fabricManifest]);
 
   const patchedDefaultValue = useMemo(() => {
-    if (defaultValue[0] === FORGE) return defaultValue;
+    const isFabric = defaultValue[0] === FABRIC;
+    const isForge = defaultValue[0] === FORGE;
+
+    if (isForge) return defaultValue.slice(0, 3);
     const type = filteredVers.find(v => v.value === defaultValue[0]);
     for (const releaseType of type.children) {
       const match = releaseType.children.find(v => v.value === defaultValue[1]);
-      if (match)
-        return [defaultValue[0], releaseType.value, ...defaultValue[1]];
+      if (match) {
+        return [
+          defaultValue[0],
+          releaseType.value,
+          ...defaultValue.slice(1, isFabric ? 3 : 2)
+        ];
+      }
     }
+    return defaultValue;
   }, [defaultValue, instanceName, filteredVers]);
 
   return (
