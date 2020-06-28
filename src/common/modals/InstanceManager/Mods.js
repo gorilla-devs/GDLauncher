@@ -482,7 +482,7 @@ const Mods = ({ instanceName }) => {
       Object.values(files),
       async file => {
         const fileName = file.name;
-        const fileType = fileName.split('.')[1];
+        const fileType = fileName.split('.')[fileName.split('.').length - 1];
 
         dragComp[fileName] = false;
 
