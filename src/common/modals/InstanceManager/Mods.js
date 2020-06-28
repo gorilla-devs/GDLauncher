@@ -395,6 +395,18 @@ const filter = (arr, search) =>
       mod.displayName.toLowerCase().includes(search.toLowerCase())
   );
 
+const getFileType = (file) => {
+  const fileName = file.name;
+  let fileType = '';
+
+  const splitFileName = fileName.split('.');
+  if (splitFileName.length) {
+    fileType = splitFileName[splitFileName.length - 1]
+  }
+
+  return fileType;
+}
+
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
@@ -472,17 +484,13 @@ const Mods = ({ instanceName }) => {
     setFileDrop(true);
     const dragComp = {};
     const { files } = e.dataTransfer;
-    const arrTypes = Object.values(files).map(file => {
-      const fileName = file.name;
-      const fileType = fileName.split('.')[1];
-      return fileType;
-    });
+    const arrTypes = Object.values(files).map(file => getFileType(file));
 
     await pMap(
       Object.values(files),
       async file => {
         const fileName = file.name;
-        const fileType = fileName.split('.')[1];
+        const fileType = getFileType(file);
 
         dragComp[fileName] = false;
 
@@ -503,7 +511,6 @@ const Mods = ({ instanceName }) => {
             setFileDrag(false);
           }
         } else {
-          /* eslint-disable */
           if (arrTypes.includes('jar')) {
             if (fileType === 'jar') {
               await fse.copy(
