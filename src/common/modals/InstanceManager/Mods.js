@@ -395,17 +395,17 @@ const filter = (arr, search) =>
       mod.displayName.toLowerCase().includes(search.toLowerCase())
   );
 
-const getFileType = (file) => {
+const getFileType = file => {
   const fileName = file.name;
   let fileType = '';
 
   const splitFileName = fileName.split('.');
   if (splitFileName.length) {
-    fileType = splitFileName[splitFileName.length - 1]
+    fileType = splitFileName[splitFileName.length - 1];
   }
 
   return fileType;
-}
+};
 
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
@@ -510,23 +510,21 @@ const Mods = ({ instanceName }) => {
             setFileDrop(false);
             setFileDrag(false);
           }
-        } else {
-          if (arrTypes.includes('jar')) {
-            if (fileType === 'jar') {
-              await fse.copy(
-                filePath,
-                path.join(instancesPath, instanceName, 'mods', fileName)
-              );
-              dragComp[fileName] = true;
-            } else {
-              setFileDrop(false);
-              setFileDrag(false);
-            }
+        } else if (arrTypes.includes('jar')) {
+          if (fileType === 'jar') {
+            await fse.copy(
+              filePath,
+              path.join(instancesPath, instanceName, 'mods', fileName)
+            );
+            dragComp[fileName] = true;
           } else {
-            console.error('The files are  not a mod!');
             setFileDrop(false);
             setFileDrag(false);
           }
+        } else {
+          console.error('The files are  not a mod!');
+          setFileDrop(false);
+          setFileDrag(false);
         }
       },
       { concurrency: 10 }
