@@ -54,21 +54,23 @@ const ProfileSettings = () => {
                     dispatch(
                       updateCurrentAccountId(account.selectedProfile.id)
                     );
-                    dispatch(
-                      load(
-                        features.mcAuthentication,
-                        dispatch(loginWithAccessToken(false))
-                      )
-                    ).catch(() => {
-                      dispatch(updateCurrentAccountId(currentId));
+                    if (account.type === 'mojang') {
                       dispatch(
-                        updateAccount(account.selectedProfile.id, {
-                          ...account,
-                          accessToken: null
-                        })
-                      );
-                      message.error('Account not valid');
-                    });
+                        load(
+                          features.mcAuthentication,
+                          dispatch(loginWithAccessToken(false))
+                        )
+                      ).catch(() => {
+                        dispatch(updateCurrentAccountId(currentId));
+                        dispatch(
+                          updateAccount(account.selectedProfile.id, {
+                            ...account,
+                            accessToken: null
+                          })
+                        );
+                        message.error('Account not valid');
+                      });
+                    }
                   }}
                 >
                   <div>

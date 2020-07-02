@@ -1,7 +1,7 @@
 import axios from 'axios';
 import path from 'path';
 import { ipcRenderer } from 'electron';
-import { v5 as uuid } from 'uuid';
+import { v5 as uuidv5 } from 'uuid';
 import { machineId } from 'node-machine-id';
 import fse from 'fs-extra';
 import coerce from 'semver/functions/coerce';
@@ -96,6 +96,7 @@ import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
 import { openModal } from './modals/actions';
+import { uuidFromUsername, hashCode } from '../../app/desktop/utils/crypto';
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -227,8 +228,11 @@ export function switchToFirstValidAccount(id) {
         continue; //eslint-disable-line
       try {
         dispatch(updateCurrentAccountId(accounts[i].selectedProfile.id));
-        // eslint-disable-next-line no-await-in-loop
-        await dispatch(loginWithAccessToken());
+
+        if (accounts[i].type === 'mojang') {
+          // eslint-disable-next-line no-await-in-loop
+          await dispatch(loginWithAccessToken());
+        }
         found = accounts[i].selectedProfile.id;
       } catch {
         dispatch(
@@ -339,7 +343,71 @@ export function downloadJavaLegacyFixer() {
   };
 }
 
-export function login(username, password, redirect = true) {
+export function loginOffline(username, redirect = true) {
+  return async (dispatch, getState) => {
+    const {
+      app: { isNewUser, clientToken }
+    } = getState();
+
+    if (!username) {
+      throw new Error('No username provided');
+    }
+
+    try {
+      const uuid = uuidFromUsername(username);
+
+      let skinType;
+
+      if (hashCode(uuid) % 2 === 1) {
+        skinType = 'alex';
+      } else {
+        skinType = 'steve';
+      }
+
+      dispatch(
+        updateAccount(uuid, {
+          type: 'offline',
+          skin: skinType,
+          accessToken: 'OFFLINE',
+          clientToken,
+          availableProfiles: [
+            {
+              name: username,
+              id: uuid
+            }
+          ],
+          user: {
+            username,
+            id: uuid
+          },
+
+          selectedProfile: {
+            name: username,
+            id: uuid
+          }
+        })
+      );
+
+      dispatch(updateCurrentAccountId(uuid));
+
+      if (!isNewUser) {
+        if (redirect) {
+          dispatch(push('/home'));
+        }
+      } else {
+        dispatch(updateIsNewUser(false));
+        if (redirect) {
+          dispatch(push('/onboarding'));
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      throw new Error(err);
+    }
+  };
+}
+
+export function loginMojang(username, password, redirect = true) {
   return async (dispatch, getState) => {
     const {
       app: { isNewUser, clientToken }
@@ -349,6 +417,7 @@ export function login(username, password, redirect = true) {
     }
     try {
       const { data } = await mcAuthenticate(username, password, clientToken);
+      data.type = 'mojang';
       const skinUrl = await getPlayerSkin(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
@@ -497,7 +566,7 @@ export function checkClientToken() {
     if (clientToken) return clientToken;
     const MY_NAMESPACE = '1dfd2800-790c-11ea-a17c-e930c253ce6b';
     const machineUuid = await machineId();
-    const newToken = uuid(machineUuid, MY_NAMESPACE);
+    const newToken = uuidv5(machineUuid, MY_NAMESPACE);
     dispatch({
       type: ActionTypes.UPDATE_CLIENT_TOKEN,
       clientToken: newToken

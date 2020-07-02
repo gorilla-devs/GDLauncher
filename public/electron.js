@@ -238,7 +238,21 @@ function createWindow() {
   mainWindow.webContents.on('new-window', handleRedirect);
 }
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+  if (isDev) {
+    const {
+      default: installExtension,
+      REDUX_DEVTOOLS
+      // eslint-disable-next-line global-require
+    } = require('electron-devtools-installer');
+
+    installExtension(REDUX_DEVTOOLS)
+      .then(name => console.log(`Added Extension:  ${name}`))
+      .catch(err => console.log('An error occurred: ', err));
+  }
+
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (watcher) {

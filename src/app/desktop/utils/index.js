@@ -23,6 +23,9 @@ import {
 import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
 
+import steve from '../../../common/assets/steve.png';
+import alex from '../../../common/assets/alex.png';
+
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
 
@@ -728,7 +731,21 @@ export const getPlayerSkin = async uuid => {
   return decoded?.textures?.SKIN?.url;
 };
 
-export const extractFace = async buffer => {
+export const extractFace = async data => {
+  const base64Mime = encoded => encoded.replace(/^data:image\/png;base64,/, '');
+
+  console.log(data);
+
+  let buffer;
+
+  if (data === 'steve') {
+    buffer = Buffer.from(base64Mime(steve), 'base64');
+  } else if (data === 'alex') {
+    buffer = Buffer.from(base64Mime(alex), 'base64');
+  } else {
+    buffer = data;
+  }
+
   const image = await jimp.read(buffer);
   image.crop(8, 8, 8, 8);
   image.scale(10, jimp.RESIZE_NEAREST_NEIGHBOR);

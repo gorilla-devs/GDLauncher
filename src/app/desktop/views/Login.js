@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { Input, Button } from 'antd';
+import { Input, Button, Radio } from 'antd';
 import { useKey } from 'rooks';
-import { login } from '../../../common/reducers/actions';
+import { loginMojang, loginOffline } from '../../../common/reducers/actions';
 import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.webm';
@@ -68,7 +68,7 @@ const Form = styled.div`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  margin: 40px 0 !important;
+  // margin: 40px 0 !important;
 `;
 
 const Background = styled.div`
@@ -136,6 +136,9 @@ const LoginFailMessage = styled.div`
 
 const Login = () => {
   const dispatch = useDispatch();
+  // Supported: mojang / offline
+  const [accountType, setAccountType] = useState('offline');
+  const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [version, setVersion] = useState(null);
@@ -145,17 +148,36 @@ const Login = () => {
   );
 
   const authenticate = () => {
-    if (!email || !password) return;
-    dispatch(requesting('accountAuthentication'));
-    setTimeout(() => {
-      dispatch(
-        load(features.mcAuthentication, dispatch(login(email, password)))
-      ).catch(e => {
-        console.error(e);
-        setLoginFailed(true);
-        setPassword(null);
-      });
-    }, 1000);
+    if (accountType === 'offline') {
+      if (!username) return;
+      dispatch(requesting('accountAuthentication'));
+      setTimeout(() => {
+        dispatch(
+          load(features.mcAuthentication, dispatch(loginOffline(username)))
+        ).catch(e => {
+          console.error(e);
+          setLoginFailed(true);
+          setPassword(null);
+        });
+      }, 1000);
+    }
+
+    if (accountType === 'mojang') {
+      if (!email || !password) return;
+      dispatch(requesting('accountAuthentication'));
+      setTimeout(() => {
+        dispatch(
+          load(
+            features.mcAuthentication,
+            dispatch(loginMojang(email, password))
+          )
+        ).catch(e => {
+          console.error(e);
+          setLoginFailed(true);
+          setPassword(null);
+        });
+      }, 1000);
+    }
   };
 
   useKey(['Enter'], authenticate);
@@ -172,36 +194,80 @@ const Login = () => {
             <Header>
               <HorizontalLogo size={200} />
             </Header>
-            <p>Sign in with your Mojang Account</p>
-            <Form>
-              <div>
-                <Input
-                  placeholder="Email"
-                  value={email}
-                  onChange={({ target: { value } }) => setEmail(value)}
-                />
-              </div>
-              <div>
-                <Input
-                  placeholder="Password"
-                  type="password"
-                  value={password}
-                  onChange={({ target: { value } }) => setPassword(value)}
-                />
-              </div>
-              {loginFailed && (
-                <LoginFailMessage>Invalid email or password. </LoginFailMessage>
-              )}
-              <LoginButton color="primary" onClick={authenticate}>
-                Sign In
-                <FontAwesomeIcon
-                  css={`
-                    margin-left: 6px;
-                  `}
-                  icon={faArrowRight}
-                />
-              </LoginButton>
-            </Form>
+            <Radio.Group
+              onChange={({ target: { value } }) => setAccountType(value)}
+              defaultValue="offline"
+            >
+              <Radio.Button value="offline">Offline</Radio.Button>
+              <Radio.Button value="mojang">Mojang</Radio.Button>
+            </Radio.Group>
+
+            {accountType === 'offline' && (
+              <>
+                <p>Sign in with offline mode.</p>
+                <Form>
+                  <div>
+                    <Input
+                      placeholder="Username"
+                      value={username}
+                      onChange={({ target: { value } }) => setUsername(value)}
+                    />
+                  </div>
+                  {loginFailed && (
+                    <LoginFailMessage>
+                      Unknown error during login.{' '}
+                    </LoginFailMessage>
+                  )}
+                  <LoginButton color="primary" onClick={authenticate}>
+                    Sign In
+                    <FontAwesomeIcon
+                      css={`
+                        margin-left: 6px;
+                      `}
+                      icon={faArrowRight}
+                    />
+                  </LoginButton>
+                </Form>
+              </>
+            )}
+
+            {accountType === 'mojang' && (
+              <>
+                <p>Sign in with your Mojang Account</p>
+                <Form>
+                  <div>
+                    <Input
+                      placeholder="Email"
+                      value={email}
+                      onChange={({ target: { value } }) => setEmail(value)}
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Password"
+                      type="password"
+                      value={password}
+                      onChange={({ target: { value } }) => setPassword(value)}
+                    />
+                  </div>
+                  {loginFailed && (
+                    <LoginFailMessage>
+                      Invalid email or password.{' '}
+                    </LoginFailMessage>
+                  )}
+                  <LoginButton color="primary" onClick={authenticate}>
+                    Sign In
+                    <FontAwesomeIcon
+                      css={`
+                        margin-left: 6px;
+                      `}
+                      icon={faArrowRight}
+                    />
+                  </LoginButton>
+                </Form>
+              </>
+            )}
+
             <Footer>
               <FooterLinks>
                 <div>
