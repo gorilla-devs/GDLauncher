@@ -103,6 +103,6 @@ jobs:
           JOB_STATUS: ${{ job.status }}
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
-          git clone https://github.com/gorilla-devs/github-actions-discord-webhook.git webhook
+          git clone https://github.com/VolanDeVovan/github-actions-discord-webhook.git webhook
           bash webhook/send.sh $JOB_STATUS $WEBHOOK_URL
         shell: bash

@@ -2378,7 +2378,7 @@ export const initLatestMods = instanceName => {
 export const getAppLatestVersion = () => {
   return async () => {
     const { data: latestReleases } = await axios.get(
-      'https://api.github.com/repos/gorilla-devs/GDLauncher/releases'
+      'https://api.github.com/repos/VolanDeVovan/GDLauncher/releases'
     );
 
     const latestPrerelease = latestReleases.find(v => v.prerelease);
@@ -2422,7 +2422,7 @@ export const checkForPortableUpdates = () => {
     // Latest version has a value only if the user is not using the latest
     if (latestVersion) {
       // eslint-disable-next-line
-      const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${latestVersion?.tag_name}`;
+      const baseAssetUrl = `https://github.com/VolanDeVovan/GDLauncher/releases/download/${latestVersion?.tag_name}`;
       const { data: latestManifest } = await axios.get(
         `${baseAssetUrl}/${process.platform}_latest.json`
       );

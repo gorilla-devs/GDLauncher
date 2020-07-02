@@ -102,7 +102,7 @@ const createDeployFiles = async () => {
 const commonConfig = {
   config: {
     publish: {
-      owner: 'gorilla-devs',
+      owner: 'VolanDeVovan',
       repo: 'GDLauncher',
       provider: 'github',
       private: false
