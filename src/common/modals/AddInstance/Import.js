@@ -1,19 +1,18 @@
-/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import fse from 'fs-extra';
 import { promises as fs } from 'fs';
 import { extractFull } from 'node-7z';
-import { get7zPath, isMod } from '../../../app/desktop/utils';
+import { transparentize } from 'polished';
 import { ipcRenderer } from 'electron';
 import { Button, Input } from 'antd';
-import { _getTempPath } from '../../utils/selectors';
 import { useSelector } from 'react-redux';
-import { getAddon, getAddonFiles } from '../../api';
+import { _getTempPath } from '../../utils/selectors';
+import { get7zPath } from '../../../app/desktop/utils';
+import { getAddon } from '../../api';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
 import { FABRIC, FORGE, VANILLA } from '../../utils/constants';
-import { transparentize } from 'polished';
 
 const Import = ({
   setModpack,
@@ -45,11 +44,10 @@ const Import = ({
   const onClick = async () => {
     if (loading || !localValue) return;
     setLoading(true);
-    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*).zip$/;
+    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*).zip$/;
     const isUrlRegex = urlRegex.test(localValue);
 
     const tempFilePath = path.join(tempPath, path.basename(localValue));
-
 
     if (isUrlRegex) {
       try {
@@ -93,7 +91,16 @@ const Import = ({
         reject(err.stderr);
       });
     });
-    const manifest = await fse.readJson(path.join(tempPath, 'manifest.json'));
+
+    let manifest;
+    try {
+      manifest = await fse.readJson(path.join(tempPath, 'manifest.json'));
+    } catch (err) {
+      setError(true);
+      setLoading(false);
+      console.error(err);
+    }
+
     await fse.remove(path.join(tempPath, 'manifest.json'));
     let addon = null;
     if (manifest.projectID) {
