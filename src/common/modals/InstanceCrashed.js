@@ -80,14 +80,12 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
       watcher = null;
     }
     watcher = await watch(crashReportsPath, async () => {
-      console.log('pepe');
       scanCrashReports();
     });
   };
 
   useEffect(() => {
     readCrashReport();
-    console.log('errorLogs', errorLogs);
     return () => watcher?.close();
   }, []);
 
