@@ -482,7 +482,7 @@ const Mods = ({ instanceName }) => {
       Object.values(files),
       async file => {
         const fileName = file.name;
-        const fileType = fileName.split('.')[fileName.split('.').length - 1];
+        const fileType = path.extname(fileName);
 
         dragComp[fileName] = false;
 
@@ -491,7 +491,7 @@ const Mods = ({ instanceName }) => {
         const { path: filePath } = file;
 
         if (Object.values(files).length === 1) {
-          if (fileType === 'jar' || fileType === 'disabled') {
+          if (fileType === '.jar' || fileType === '.disabled') {
             await fse.copy(
               filePath,
               path.join(instancesPath, instanceName, 'mods', fileName)
