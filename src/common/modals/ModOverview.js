@@ -99,6 +99,17 @@ const ModOverview = ({
     return number.toLocaleString();
   };
 
+  const formatDate = date => {
+    const parsedDate = Date.parse(date);
+    const newDate = new Date(parsedDate);
+    console.log('test', date, parsedDate, newDate);
+    return new Date(newDate).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   const getReleaseType = id => {
     switch (id) {
       case 1:
@@ -160,7 +171,7 @@ const ModOverview = ({
                 {addon?.name}
                 <ParallaxContentInfos>
                   <div>
-                    <label>Authors: </label>
+                    <label>Author: </label>
                     {addon?.authors[0].name}
                   </div>
                   {addon?.downloadCount && (
@@ -171,7 +182,7 @@ const ModOverview = ({
                   )}
                   <div>
                     <label>Last Update: </label>{' '}
-                    {addon?.dateModified.slice(0, 10)}
+                    {formatDate(addon?.dateModified)}
                   </div>
                   <div>
                     <label>Mc version: </label>

@@ -33,6 +33,17 @@ const formatNumber = number => {
   return number.toLocaleString();
 };
 
+const formatDate = date => {
+  const parsedDate = Date.parse(date);
+  const newDate = new Date(parsedDate);
+  console.log('test', date, parsedDate, newDate);
+  return new Date(newDate).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
 const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
@@ -116,7 +127,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                 {modpack.name}
                 <ParallaxContentInfos>
                   <div>
-                    <label>Authors: </label>
+                    <label>Author: </label>
                     {modpack.authors[0].name}
                   </div>
                   <div>
@@ -124,8 +135,8 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                     {formatNumber(modpack.downloadCount)}
                   </div>
                   <div>
-                    <label>Last Update: </label>{' '}
-                    {modpack.dateModified.slice(0, 10)}
+                    <label>Last Update: </label>
+                    {formatDate(modpack.dateModified)}
                   </div>
                   <div>
                     <label>Mc version: </label>

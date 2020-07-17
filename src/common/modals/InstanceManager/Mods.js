@@ -65,6 +65,7 @@ const RowContainer = styled.div.attrs(props => ({
     justify-content: center;
     align-items: center;
     transition: color 0.1s ease-in-out;
+    color: ${props => props.isHovered && props.theme.palette.primary.main};
     cursor: pointer;
     svg {
       margin-right: 10px;
@@ -221,6 +222,7 @@ const toggleModDisabled = async (
 const Row = memo(({ index, style, data }) => {
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const curseReleaseChannel = useSelector(
     state => state.settings.curseReleaseChannel
   );
@@ -243,7 +245,7 @@ const Row = memo(({ index, style, data }) => {
   return (
     <>
       <ContextMenuTrigger id={item.displayName}>
-        <RowContainer index={index} override={style}>
+        <RowContainer index={index} override={style} isHovered={isHovered}>
           <div className="leftPartContent">
             <Checkbox
               checked={selectedMods.includes(item.fileName)}
@@ -345,7 +347,11 @@ const Row = memo(({ index, style, data }) => {
         </RowContainer>
       </ContextMenuTrigger>
       <Portal>
-        <ContextMenu id={item.displayName}>
+        <ContextMenu
+          id={item.displayName}
+          onShow={() => setIsHovered(true)}
+          onHide={() => setIsHovered(false)}
+        >
           <MenuItem
             onClick={() => {
               clipboard.writeText(item.displayName);
