@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import { shell } from 'electron';
+import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
@@ -116,7 +118,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                     {modpack.authors[0].name}
                   </div>
                   <div>
-                    <label>Downloads: </label> {/* {modpack.downloadCount} */}
+                    <label>Downloads: </label>
                     {formatNumber(modpack.downloadCount)}
                   </div>
                   <div>
@@ -129,12 +131,19 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                   </div>
                 </ParallaxContentInfos>
                 <Button
-                  onClick={() => {
-                    shell.openExternal(modpack.websiteUrl);
-                  }}
+                  href={modpack.websiteUrl}
+                  css={`
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                  `}
                   type="primary"
                 >
-                  Visit website
+                  <FontAwesomeIcon icon={faExternalLinkAlt} />
                 </Button>
               </ParallaxInnerContent>
             </ParallaxContent>
@@ -289,6 +298,14 @@ const ParallaxInnerContent = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+  }
 `;
 
 const ParallaxContent = styled.div`

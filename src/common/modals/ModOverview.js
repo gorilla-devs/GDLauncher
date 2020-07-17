@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import path from 'path';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
@@ -43,9 +45,12 @@ const ModOverview = ({
     getAddon(projectID).then(data => setAddon(data.data));
     getAddonDescription(projectID).then(data => {
       // Replace the beginning of all relative URLs with the Curseforge URL
-      const modifiedData = data.data.replace(/href="(?!http)/g, `href="${CURSEFORGE_URL}`)
+      const modifiedData = data.data.replace(
+        /href="(?!http)/g,
+        `href="${CURSEFORGE_URL}`
+      );
 
-      setDescription(modifiedData)
+      setDescription(modifiedData);
     });
     getAddonFiles(projectID).then(data => {
       const isFabric =
@@ -72,6 +77,23 @@ const ModOverview = ({
       return 'Select A Version';
     }
   };
+
+  function formatNumber(num) {
+    const nfObject = new Intl.NumberFormat('en-US');
+    const output = nfObject.format(num);
+    const numOfNumber = output
+      .split(',')
+      .slice(1, output.split(',').length)
+      .join('');
+    switch (numOfNumber.length / 3) {
+      case 1:
+        return `${output.split(',')[0]}k`;
+      case 2:
+        return `${output.split(',')[0]}.${output.split(',')[1]}m`;
+      default:
+        return num;
+    }
+  }
 
   const getReleaseType = id => {
     switch (id) {
@@ -111,6 +133,8 @@ const ModOverview = ({
 
   const handleChange = value => setSelectedItem(JSON.parse(value));
 
+  console.log('addon?', addon);
+
   const primaryImage = (addon?.attachments || []).find(v => v.isDefault);
   return (
     <Modal
@@ -127,7 +151,44 @@ const ModOverview = ({
         </StyledCloseButton>
         <Container>
           <Parallax bg={primaryImage?.url}>
-            <ParallaxContent>{addon?.name}</ParallaxContent>
+            <ParallaxContent>
+              <ParallaxInnerContent>
+                {addon?.name}
+                <ParallaxContentInfos>
+                  <div>
+                    <label>Authors: </label>
+                    {addon?.authors[0].name}
+                  </div>
+                  <div>
+                    <label>Downloads: </label>
+                    {formatNumber(addon?.downloadCount)}
+                  </div>
+                  <div>
+                    <label>Last Update: </label>{' '}
+                    {addon?.dateModified.slice(0, 10)}
+                  </div>
+                  <div>
+                    <label>Mc version: </label>
+                    {addon?.gameVersionLatestFiles[0].gameVersion}
+                  </div>
+                </ParallaxContentInfos>
+                <Button
+                  href={addon?.websiteUrl}
+                  css={`
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                  `}
+                  type="primary"
+                >
+                  <FontAwesomeIcon icon={faExternalLinkAlt} />
+                </Button>
+              </ParallaxInnerContent>
+            </ParallaxContent>
           </Parallax>
           <Content>{ReactHtmlParser(description)}</Content>
         </Container>
@@ -317,6 +378,21 @@ const Parallax = styled.div`
   background-size: cover;
 `;
 
+const ParallaxInnerContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+  }
+`;
+
 const ParallaxContent = styled.div`
   height: 100%;
   width: 100%;
@@ -330,6 +406,23 @@ const ParallaxContent = styled.div`
   padding: 0 30px;
   text-align: center;
   background: rgba(0, 0, 0, 0.8);
+`;
+
+const ParallaxContentInfos = styled.div`
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: normal;
+  font-size: 12px;
+  position: absolute;
+  bottom: 40px;
+  div {
+    margin: 0 5px;
+    label {
+      font-weight: bold;
+    }
+  }
 `;
 
 const Content = styled.div`
