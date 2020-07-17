@@ -78,22 +78,26 @@ const ModOverview = ({
     }
   };
 
-  function formatNumber(num) {
-    const nfObject = new Intl.NumberFormat('en-US');
-    const output = nfObject.format(num);
-    const numOfNumber = output
-      .split(',')
-      .slice(1, output.split(',').length)
-      .join('');
-    switch (numOfNumber.length / 3) {
-      case 1:
-        return `${output.split(',')[0]}k`;
-      case 2:
-        return `${output.split(',')[0]}.${output.split(',')[1]}m`;
-      default:
-        return num;
+  const formatNumber = number => {
+    // Alter numbers larger than 1k
+    console.log('pino', number);
+    if (number >= 1e3) {
+      console.log('pino');
+      const units = ['k', 'M', 'B', 'T'];
+
+      // Divide to get SI Unit engineering style numbers (1e3,1e6,1e9, etc)
+      const unit = Math.floor((number.toFixed(0).length - 1) / 3) * 3;
+      // Calculate the remainder
+      const num = (number / `1e${unit}`).toFixed(0);
+      const unitname = units[Math.floor(unit / 3) - 1];
+
+      // output number remainder + unitname
+      return num + unitname;
     }
-  }
+
+    // return formatted original number
+    return number.toLocaleString();
+  };
 
   const getReleaseType = id => {
     switch (id) {
@@ -159,10 +163,12 @@ const ModOverview = ({
                     <label>Authors: </label>
                     {addon?.authors[0].name}
                   </div>
-                  <div>
-                    <label>Downloads: </label>
-                    {formatNumber(addon?.downloadCount)}
-                  </div>
+                  {addon?.downloadCount && (
+                    <div>
+                      <label>Downloads: </label>
+                      {formatNumber(addon?.downloadCount)}
+                    </div>
+                  )}
                   <div>
                     <label>Last Update: </label>{' '}
                     {addon?.dateModified.slice(0, 10)}
