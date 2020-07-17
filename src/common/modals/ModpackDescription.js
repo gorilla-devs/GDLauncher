@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
+import { shell } from 'electron';
 import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
@@ -10,6 +11,23 @@ import { getAddonDescription, getAddonFiles } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal } from '../reducers/modals/actions';
 import { FORGE, CURSEFORGE_URL } from '../utils/constants';
+
+function formatNumber(num) {
+  const nfObject = new Intl.NumberFormat('en-US');
+  const output = nfObject.format(num);
+  const numOfNumber = output
+    .split(',')
+    .slice(1, output.split(',').length)
+    .join('');
+  switch (numOfNumber.length / 3) {
+    case 1:
+      return `${output.split(',')[0]}k`;
+    case 2:
+      return `${output.split(',')[0]}.${output.split(',')[1]}m`;
+    default:
+      return num;
+  }
+}
 
 const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
@@ -22,9 +40,12 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
     setLoading(true);
     getAddonDescription(modpack.id).then(data => {
       // Replace the beginning of all relative URLs with the Curseforge URL
-      const modifiedData = data.data.replace(/href="(?!http)/g, `href="${CURSEFORGE_URL}`)
+      const modifiedData = data.data.replace(
+        /href="(?!http)/g,
+        `href="${CURSEFORGE_URL}`
+      );
 
-      setDescription(modifiedData)
+      setDescription(modifiedData);
     });
     getAddonFiles(modpack.id).then(data => {
       setFiles(data.data);
@@ -86,7 +107,37 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
         </StyledCloseButton>
         <Container>
           <Parallax bg={primaryImage.thumbnailUrl}>
-            <ParallaxContent>{modpack.name}</ParallaxContent>
+            <ParallaxContent>
+              <ParallaxInnerContent>
+                {modpack.name}
+                <ParallaxContentInfos>
+                  <div>
+                    <label>Authors: </label>
+                    {modpack.authors[0].name}
+                  </div>
+                  <div>
+                    <label>Downloads: </label> {/* {modpack.downloadCount} */}
+                    {formatNumber(modpack.downloadCount)}
+                  </div>
+                  <div>
+                    <label>Last Update: </label>{' '}
+                    {modpack.dateModified.slice(0, 10)}
+                  </div>
+                  <div>
+                    <label>Mc version: </label>
+                    {modpack.gameVersionLatestFiles[0].gameVersion}
+                  </div>
+                </ParallaxContentInfos>
+                <Button
+                  onClick={() => {
+                    shell.openExternal(modpack.websiteUrl);
+                  }}
+                  type="primary"
+                >
+                  Visit website
+                </Button>
+              </ParallaxInnerContent>
+            </ParallaxContent>
           </Parallax>
           <Content>{ReactHtmlParser(description)}</Content>
         </Container>
@@ -151,7 +202,6 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                           month: 'long',
                           day: 'numeric'
                         })}
-                        
                       </div>
                     </div>
                   </div>
@@ -234,6 +284,13 @@ const Parallax = styled.div`
   background-size: cover;
 `;
 
+const ParallaxInnerContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
 const ParallaxContent = styled.div`
   height: 100%;
   width: 100%;
@@ -243,8 +300,24 @@ const ParallaxContent = styled.div`
   font-weight: bold;
   font-size: 60px;
   text-align: center;
-  padding-top: 20%;
   background: rgba(0, 0, 0, 0.8);
+`;
+
+const ParallaxContentInfos = styled.div`
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: normal;
+  font-size: 12px;
+  position: absolute;
+  bottom: 40px;
+  div {
+    margin: 0 5px;
+    label {
+      font-weight: bold;
+    }
+  }
 `;
 
 const Content = styled.div`
