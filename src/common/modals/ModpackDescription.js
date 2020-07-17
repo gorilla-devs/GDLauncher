@@ -36,7 +36,6 @@ const formatNumber = number => {
 const formatDate = date => {
   const parsedDate = Date.parse(date);
   const newDate = new Date(parsedDate);
-  console.log('test', date, parsedDate, newDate);
   return new Date(newDate).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',

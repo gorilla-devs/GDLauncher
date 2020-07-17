@@ -80,9 +80,7 @@ const ModOverview = ({
 
   const formatNumber = number => {
     // Alter numbers larger than 1k
-    console.log('pino', number);
     if (number >= 1e3) {
-      console.log('pino');
       const units = ['k', 'M', 'B', 'T'];
 
       // Divide to get SI Unit engineering style numbers (1e3,1e6,1e9, etc)
@@ -102,7 +100,6 @@ const ModOverview = ({
   const formatDate = date => {
     const parsedDate = Date.parse(date);
     const newDate = new Date(parsedDate);
-    console.log('test', date, parsedDate, newDate);
     return new Date(newDate).toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',
@@ -147,8 +144,6 @@ const ModOverview = ({
   };
 
   const handleChange = value => setSelectedItem(JSON.parse(value));
-
-  console.log('addon?', addon);
 
   const primaryImage = (addon?.attachments || []).find(v => v.isDefault);
   return (
