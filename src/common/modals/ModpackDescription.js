@@ -4,51 +4,46 @@ import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import { shell } from 'electron';
-import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faExternalLinkAlt, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
-import { getAddonDescription, getAddonFiles } from '../api';
+import {
+  getAddonDescription,
+  getAddonFiles,
+  getAddonFileChangelog
+} from '../api';
 import CloseButton from '../components/CloseButton';
-import { closeModal } from '../reducers/modals/actions';
+import { closeModal, openModal } from '../reducers/modals/actions';
 import { FORGE, CURSEFORGE_URL } from '../utils/constants';
-
-const formatNumber = number => {
-  // Alter numbers larger than 1k
-  if (number >= 1e3) {
-    const units = ['k', 'M', 'B', 'T'];
-
-    // Divide to get SI Unit engineering style numbers (1e3,1e6,1e9, etc)
-    const unit = Math.floor((number.toFixed(0).length - 1) / 3) * 3;
-    // Calculate the remainder
-    const num = (number / `1e${unit}`).toFixed(0);
-    const unitname = units[Math.floor(unit / 3) - 1];
-
-    // output number remainder + unitname
-    return num + unitname;
-  }
-
-  // return formatted original number
-  return number.toLocaleString();
-};
-
-const formatDate = date => {
-  const parsedDate = Date.parse(date);
-  const newDate = new Date(parsedDate);
-  return new Date(newDate).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-};
+import { formatNumber, formatDate } from '../utils';
 
 const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
   const [files, setFiles] = useState(null);
+  const [changeLog, setChangeLog] = useState(null);
   const [selectedId, setSelectedId] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const initScreenShots = async data => {
+    if (data) {
+      const mappedFiles = await Promise.all(
+        data.map(async v => {
+          const { data: changelog } = await getAddonFileChangelog(
+            modpack.id,
+            v.id
+          );
+          return {
+            ...v,
+            changelog
+          };
+        })
+      );
+      setChangeLog(mappedFiles);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -63,6 +58,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
     });
     getAddonFiles(modpack.id).then(data => {
       setFiles(data.data);
+      initScreenShots(data.data);
       setLoading(false);
     });
   }, []);
@@ -156,6 +152,27 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                   type="primary"
                 >
                   <FontAwesomeIcon icon={faExternalLinkAlt} />
+                </Button>
+                <Button
+                  onClick={() => {
+                    dispatch(
+                      openModal('ModsChangeLogs', {
+                        changeLog: changeLog[0]?.changelog
+                      })
+                    );
+                  }}
+                  css={`
+                    position: absolute;
+                    top: 20px;
+                    left: 60px;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                  `}
+                  type="primary"
+                >
+                  <FontAwesomeIcon icon={faInfo} />
                 </Button>
               </ParallaxInnerContent>
             </ParallaxContent>
