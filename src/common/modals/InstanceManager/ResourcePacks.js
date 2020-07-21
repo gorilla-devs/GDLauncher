@@ -44,6 +44,7 @@ const RowContainer = styled.div.attrs(props => ({
   width: 100%;
   background: ${props => props.theme.palette.grey[800]};
   border: solid 5px ${props => props.theme.palette.grey[700]};
+  border-style: solid none solid none;
   display: flex;
   justify-content: space-between;
   align-items: center;
