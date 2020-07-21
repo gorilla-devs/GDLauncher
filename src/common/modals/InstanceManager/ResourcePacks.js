@@ -42,7 +42,8 @@ const RowContainer = styled.div.attrs(props => ({
   style: props.override
 }))`
   width: 100%;
-  background: ${props => props.theme.palette.grey[props.index % 2 ? 700 : 800]};
+  background: ${props => props.theme.palette.grey[800]};
+  border: solid 5px ${props => props.theme.palette.grey[700]};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -68,7 +69,7 @@ const RowContainer = styled.div.attrs(props => ({
       margin-right: 10px;
     }
     &:hover {
-      color: ${props => props.theme.palette.primary.main};
+      color: ${props => props.theme.palette.text.primary};
     }
   }
   .rightPartContent {
@@ -82,40 +83,40 @@ const RowContainer = styled.div.attrs(props => ({
 `;
 
 const DragEnterEffect = styled.div`
-  position: absolute;
-  display: flex;
-  flex-direction; column;
-  justify-content: center;
-  align-items: center;
-  border: solid 5px ${props => props.theme.palette.primary.main};
-  transition: opacity 0.2s ease-in-out;
-  border-radius: 3px;
-  width: 100%;
-  height: 100%;
-  margin-top: 3px;
-  z-index: ${props =>
-    props.transitionState !== 'entering' && props.transitionState !== 'entered'
-      ? -1
-      : 2};
+position: absolute;
+display: flex;
+flex-direction; column;
+justify-content: center;
+align-items: center;
+border: solid 5px ${props => props.theme.palette.primary.main};
+transition: opacity 0.2s ease-in-out;
+border-radius: 3px;
+width: 100%;
+height: 100%;
+margin-top: 3px;
+z-index: ${props =>
+  props.transitionState !== 'entering' && props.transitionState !== 'entered'
+    ? -1
+    : 2};
   backdrop-filter: blur(4px);
   background: linear-gradient(
     0deg,
     rgba(0, 0, 0, .3) 40%,
     rgba(0, 0, 0, .3) 40%
-  );
-  opacity: ${({ transitionState }) =>
-    transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
-`;
+    );
+    opacity: ${({ transitionState }) =>
+      transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
+    `;
 
 export const keyFrameMoveUpDown = keyframes`
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
-
-`;
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+    
+    `;
 
 const DragArrow = styled(FontAwesomeIcon)`
   ${props =>
@@ -161,6 +162,13 @@ const createItemData = memoize(
     setSelectedItems
   })
 );
+const NotItemsAvailable = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const ResourcePacks = ({ instanceName }) => {
   const instancesPath = useSelector(_getInstancesPath);
@@ -349,7 +357,7 @@ const ResourcePacks = ({ instanceName }) => {
     const { files } = e.dataTransfer;
     const arrTypes = Object.values(files).map(file => {
       const fileName = file.name;
-      const fileType = fileName.split('.')[1];
+      const fileType = path.extname(fileName);
       return fileType;
     });
 
@@ -357,7 +365,7 @@ const ResourcePacks = ({ instanceName }) => {
       Object.values(files),
       async file => {
         const fileName = file.name;
-        const fileType = fileName.split('.')[1];
+        const fileType = path.extname(fileName);
 
         dragComp[fileName] = false;
 
@@ -366,10 +374,11 @@ const ResourcePacks = ({ instanceName }) => {
         const { path: filePath } = file;
 
         if (Object.values(files).length === 1) {
+          console.log('FILE', fileType);
           if (
-            fileType === 'zip' ||
-            fileType === '7z' ||
-            fileType === 'disabled'
+            fileType === '.zip' ||
+            fileType === '.7z' ||
+            fileType === '.disabled'
           ) {
             await fse.copy(
               filePath,
@@ -531,6 +540,9 @@ const ResourcePacks = ({ instanceName }) => {
             </DragEnterEffect>
           )}
         </Transition>
+        {resourcePacks.length === 0 && (
+          <NotItemsAvailable>No ResourcePacks Available</NotItemsAvailable>
+        )}
         <AutoSizer>
           {({ height, width }) => (
             <List
