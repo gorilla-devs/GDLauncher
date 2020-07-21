@@ -159,6 +159,7 @@ const InstanceManager = ({ instanceName }) => {
   const [page, setPage] = useState(Object.keys(menuEntries)[0]);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const [background, setBackground] = useState(instance?.background);
+  const [manifest, setManifest] = useState(null);
   const ContentComponent = menuEntries[page].component;
 
   const updateBackground = v => {
@@ -204,6 +205,15 @@ const InstanceManager = ({ instanceName }) => {
 
   useEffect(() => {
     dispatch(clearLatestModManifests());
+  }, []);
+
+  useEffect(() => {
+    if ((instance?.modloader || []).slice(3, 5).length === 2) {
+      fse
+        .readJson(path.join(instancesPath, instanceName, 'manifest.json'))
+        .then(setManifest)
+        .catch(console.error);
+    }
   }, []);
 
   useEffect(() => {
@@ -269,6 +279,8 @@ const InstanceManager = ({ instanceName }) => {
           <ContentComponent
             instanceName={instanceName}
             modpackId={instance?.modloader[3]}
+            background={background}
+            manifest={manifest}
           />
         </Content>
       </Container>

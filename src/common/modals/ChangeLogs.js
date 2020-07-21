@@ -32,7 +32,17 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Improved fabric according to dev guidelines</li>
+              <li>Mods name can now be copied by right clicking on it</li>
+              <li>Minor improvements to instance export</li>
+              <li>Prevented installing multiple mod dependencies</li>
+              <li>Minecraft version/modloader can now be changed</li>
+              <li>Added preferred curse release channel to the settings</li>
+              <li>You can now see the installed version of the modpack</li>
+              <li>Updated some dependencies</li>
+              <li>
+                Added bundled vcredist, so you won't need to have them installed
+                on your computer for gdlauncher to work
+              </li>
             </ul>
           </div>
         </Section>
@@ -46,7 +56,9 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Minor UI fixes</li>
+              <li>Fixed curse links sometimes not working</li>
+              <li>Fixed the news loader</li>
+              <li>Fixed context menu sometimes going outside the window</li>
             </ul>
           </div>
         </Section>

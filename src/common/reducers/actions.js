@@ -695,17 +695,18 @@ export function addToQueue(
       }
     );
 
-    const addMods = modloader[0] === FORGE || modloader[0] === FABRIC;
-
     dispatch(
       updateInstanceConfig(
         instanceName,
-        prev => ({
-          modloader,
-          timePlayed: prev.timePlayed || timePlayed || 0,
-          background,
-          ...(addMods && { mods: prev.mods || [] })
-        }),
+        prev => {
+          return {
+            ...(prev || {}),
+            modloader,
+            timePlayed: prev.timePlayed || timePlayed || 0,
+            background,
+            mods: prev.mods || []
+          };
+        },
         true
       )
     );
@@ -2134,6 +2135,7 @@ export function installMod(
     const state = getState();
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
+    const instance = _getInstance(state)(instanceName);
     const mainModData = await getAddonFile(projectID, fileID);
     const { data: addon } = await getAddon(projectID);
     mainModData.data.projectID = projectID;
@@ -2199,6 +2201,7 @@ export function installMod(
           // type 6: include
 
           if (dep.type === 3) {
+            if (instance.mods.some(x => x.projectID === dep.addonId)) return;
             const depList = await getAddonFiles(dep.addonId);
             const depData = depList.data.find(v =>
               v.gameVersion.includes(gameVersion)

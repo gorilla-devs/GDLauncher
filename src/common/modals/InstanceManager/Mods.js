@@ -1,6 +1,9 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
+import { clipboard } from 'electron';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
+import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
+import { Portal } from 'react-portal';
 import path from 'path';
 import pMap from 'p-map';
 import { FixedSizeList as List, areEqual } from 'react-window';
@@ -11,7 +14,8 @@ import {
   faTrash,
   faArrowDown,
   faDownload,
-  faEllipsisV
+  faEllipsisV,
+  faCopy
 } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
@@ -217,6 +221,9 @@ const toggleModDisabled = async (
 const Row = memo(({ index, style, data }) => {
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const {
     items,
     instanceName,
@@ -228,46 +235,94 @@ const Row = memo(({ index, style, data }) => {
   } = data;
   const item = items[index];
   const isUpdateAvailable =
-    latestMods[item.projectID] && latestMods[item.projectID].id !== item.fileID;
+    latestMods[item.projectID] &&
+    latestMods[item.projectID].id !== item.fileID &&
+    latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
 
   return (
-    <RowContainer index={index} override={style}>
-      <div className="leftPartContent">
-        <Checkbox
-          checked={selectedMods.includes(item.fileName)}
-          onChange={e => {
-            if (e.target.checked) {
-              setSelectedMods([...selectedMods, item.fileName]);
-            } else {
-              setSelectedMods(selectedMods.filter(v => v !== item.fileName));
-            }
-          }}
-        />
-        {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
-      </div>
-      <div
-        onClick={() => {
-          if (!item.fileID) return;
-          dispatch(
-            openModal('ModOverview', {
-              projectID: item.projectID,
-              fileID: item.fileID,
-              fileName: item.fileName,
-              gameVersion,
-              instanceName
-            })
-          );
-        }}
-        className="rowCenterContent"
-      >
-        {item.fileName}
-      </div>
-      <div className="rightPartContent">
-        {isUpdateAvailable &&
-          (updateLoading ? (
-            <LoadingOutlined />
-          ) : (
+    <>
+      <ContextMenuTrigger id={item.displayName}>
+        <RowContainer index={index} override={style}>
+          <div className="leftPartContent">
+            <Checkbox
+              checked={selectedMods.includes(item.fileName)}
+              onChange={e => {
+                if (e.target.checked) {
+                  setSelectedMods([...selectedMods, item.fileName]);
+                } else {
+                  setSelectedMods(
+                    selectedMods.filter(v => v !== item.fileName)
+                  );
+                }
+              }}
+            />
+            {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
+          </div>
+          <div
+            onClick={() => {
+              if (!item.fileID) return;
+              dispatch(
+                openModal('ModOverview', {
+                  projectID: item.projectID,
+                  fileID: item.fileID,
+                  fileName: item.fileName,
+                  gameVersion,
+                  instanceName
+                })
+              );
+            }}
+            className="rowCenterContent"
+          >
+            {item.fileName}
+          </div>
+          <div className="rightPartContent">
+            {isUpdateAvailable &&
+              (updateLoading ? (
+                <LoadingOutlined />
+              ) : (
+                <FontAwesomeIcon
+                  css={`
+                    &:hover {
+                      cursor: pointer;
+                      path {
+                        cursor: pointer;
+                        transition: all 0.1s ease-in-out;
+                        color: ${props => props.theme.palette.colors.green};
+                      }
+                    }
+                  `}
+                  icon={faDownload}
+                  onClick={async () => {
+                    setUpdateLoading(true);
+                    await dispatch(
+                      updateMod(
+                        instanceName,
+                        item,
+                        latestMods[item.projectID].id,
+                        gameVersion
+                      )
+                    );
+                    setUpdateLoading(false);
+                  }}
+                />
+              ))}
+            <Switch
+              size="small"
+              checked={path.extname(item.fileName) !== '.disabled'}
+              disabled={loading || updateLoading}
+              onChange={async c => {
+                setLoading(true);
+                await toggleModDisabled(
+                  c,
+                  instanceName,
+                  instancePath,
+                  item,
+                  dispatch
+                );
+                setTimeout(() => setLoading(false), 500);
+              }}
+            />
             <FontAwesomeIcon
               css={`
                 &:hover {
@@ -275,61 +330,38 @@ const Row = memo(({ index, style, data }) => {
                   path {
                     cursor: pointer;
                     transition: all 0.1s ease-in-out;
-                    color: ${props => props.theme.palette.colors.green};
+                    color: ${props => props.theme.palette.error.main};
                   }
                 }
               `}
-              icon={faDownload}
-              onClick={async () => {
-                setUpdateLoading(true);
-                await dispatch(
-                  updateMod(
-                    instanceName,
-                    item,
-                    latestMods[item.projectID].id,
-                    gameVersion
-                  )
-                );
-                setUpdateLoading(false);
+              onClick={() => {
+                if (!loading && !updateLoading) {
+                  dispatch(deleteMod(instanceName, item));
+                }
               }}
+              icon={faTrash}
             />
-          ))}
-        <Switch
-          size="small"
-          checked={path.extname(item.fileName) !== '.disabled'}
-          disabled={loading || updateLoading}
-          onChange={async c => {
-            setLoading(true);
-            await toggleModDisabled(
-              c,
-              instanceName,
-              instancePath,
-              item,
-              dispatch
-            );
-            setTimeout(() => setLoading(false), 500);
-          }}
-        />
-        <FontAwesomeIcon
-          css={`
-            &:hover {
-              cursor: pointer;
-              path {
-                cursor: pointer;
-                transition: all 0.1s ease-in-out;
-                color: ${props => props.theme.palette.error.main};
-              }
-            }
-          `}
-          onClick={() => {
-            if (!loading && !updateLoading) {
-              dispatch(deleteMod(instanceName, item));
-            }
-          }}
-          icon={faTrash}
-        />
-      </div>
-    </RowContainer>
+          </div>
+        </RowContainer>
+      </ContextMenuTrigger>
+      <Portal>
+        <ContextMenu id={item.displayName}>
+          <MenuItem
+            onClick={() => {
+              clipboard.writeText(item.displayName);
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faCopy}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Copy Name
+          </MenuItem>
+        </ContextMenu>
+      </Portal>
+    </>
   );
 }, areEqual);
 
@@ -366,6 +398,9 @@ const filter = (arr, search) =>
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const latestMods = useSelector(state => state.latestModManifests);
   const [mods, setMods] = useState(sort(instance.mods));
   const [selectedMods, setSelectedMods] = useState([]);
@@ -411,7 +446,9 @@ const Mods = ({ instanceName }) => {
   const hasModUpdates = useMemo(() => {
     return instance?.mods?.find(v => {
       const isUpdateAvailable =
-        latestMods[v.projectID] && latestMods[v.projectID].id !== v.fileID;
+        latestMods[v.projectID] &&
+        latestMods[v.projectID].id !== v.fileID &&
+        latestMods[v.projectID].releaseType <= curseReleaseChannel;
       return isUpdateAvailable;
     });
   }, [instance.mods, latestMods]);

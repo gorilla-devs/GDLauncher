@@ -15,7 +15,7 @@ import { _getInstance } from '../utils/selectors';
 import { installMod } from '../reducers/actions';
 import { FABRIC, FORGE } from '../utils/constants';
 import {
-  getFirstReleaseCandidate,
+  getFirstPreferredCandidate,
   filterFabricFilesByVersion,
   filterForgeFilesByVersion,
   getPatchedInstanceType
@@ -79,6 +79,9 @@ const Cell = ({
   instanceName
 }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
@@ -148,9 +151,12 @@ const Cell = ({
                     filteredFiles = filterForgeFilesByVersion(files, version);
                   }
 
-                  const latestFile = getFirstReleaseCandidate(filteredFiles);
+                  const preferredFile = getFirstPreferredCandidate(
+                    filteredFiles,
+                    curseReleaseChannel
+                  );
 
-                  if (latestFile === null) {
+                  if (preferredFile === null) {
                     setLoading(false);
                     setError('Mod Not Available');
                     console.error(
@@ -160,7 +166,12 @@ const Cell = ({
                   }
 
                   await dispatch(
-                    installMod(mod?.id, latestFile?.id, instanceName, version)
+                    installMod(
+                      mod?.id,
+                      preferredFile?.id,
+                      instanceName,
+                      version
+                    )
                   );
                   setLoading(false);
                 }}
@@ -346,7 +357,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         <Header>
           <Select
             css={`
-              width: 130px;
+              width: 160px;
               margin: 0 10px;
             `}
             defaultValue={filterType}
