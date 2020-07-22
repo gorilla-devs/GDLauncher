@@ -375,7 +375,6 @@ const ResourcePacks = ({ instanceName }) => {
         const { path: filePath } = file;
 
         if (Object.values(files).length === 1) {
-          console.log('FILE', fileType);
           if (
             fileType === '.zip' ||
             fileType === '.7z' ||
