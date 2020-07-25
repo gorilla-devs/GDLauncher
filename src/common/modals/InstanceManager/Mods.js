@@ -395,6 +395,18 @@ const filter = (arr, search) =>
       mod.displayName.toLowerCase().includes(search.toLowerCase())
   );
 
+const getFileType = file => {
+  const fileName = file.name;
+  let fileType = '';
+
+  const splitFileName = fileName.split('.');
+  if (splitFileName.length) {
+    fileType = splitFileName[splitFileName.length - 1];
+  }
+
+  return fileType;
+};
+
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
@@ -472,17 +484,13 @@ const Mods = ({ instanceName }) => {
     setFileDrop(true);
     const dragComp = {};
     const { files } = e.dataTransfer;
-    const arrTypes = Object.values(files).map(file => {
-      const fileName = file.name;
-      const fileType = fileName.split('.')[1];
-      return fileType;
-    });
 
     await pMap(
       Object.values(files),
       async file => {
         const fileName = file.name;
-        const fileType = fileName.split('.')[1];
+        const fileType = getFileType(file);
+        const existingMods = itemData.items.map(item => item.fileName);
 
         dragComp[fileName] = false;
 
@@ -490,36 +498,23 @@ const Mods = ({ instanceName }) => {
 
         const { path: filePath } = file;
 
-        if (Object.values(files).length === 1) {
-          if (fileType === 'jar' || fileType === 'disabled') {
-            await fse.copy(
-              filePath,
-              path.join(instancesPath, instanceName, 'mods', fileName)
-            );
-            dragComp[fileName] = true;
-          } else {
-            console.error('This file is not a mod!');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
+        if (existingMods.includes(fileName)) {
+          console.error(
+            'A mod with this name already exists in the instance.',
+            file.name
+          );
+          setFileDrop(false);
+          setFileDrag(false);
+        } else if (fileType === 'jar' || fileType === 'disabled') {
+          await fse.copy(
+            filePath,
+            path.join(instancesPath, instanceName, 'mods', fileName)
+          );
+          dragComp[fileName] = true;
         } else {
-          /* eslint-disable */
-          if (arrTypes.includes('jar')) {
-            if (fileType === 'jar') {
-              await fse.copy(
-                filePath,
-                path.join(instancesPath, instanceName, 'mods', fileName)
-              );
-              dragComp[fileName] = true;
-            } else {
-              setFileDrop(false);
-              setFileDrag(false);
-            }
-          } else {
-            console.error('The files are  not a mod!');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
+          console.error('This file is not a mod!', file);
+          setFileDrop(false);
+          setFileDrag(false);
         }
       },
       { concurrency: 10 }
