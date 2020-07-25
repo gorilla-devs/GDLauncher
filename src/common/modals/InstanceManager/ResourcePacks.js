@@ -8,7 +8,6 @@ import makeDir from 'make-dir';
 import { ipcRenderer } from 'electron';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import { Checkbox, Button, Switch } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
@@ -82,24 +81,6 @@ export const keyFrameMoveUpDown = keyframes`
     }
     
     `;
-
-const DragArrow = styled(FontAwesomeIcon)`
-  ${props =>
-    props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
-
-  color: ${props => props.theme.palette.primary.main};
-
-  animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
-`;
-
-const CopyTitle = styled.h1`
-  ${props =>
-    props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
-
-  color: ${props => props.theme.palette.primary.main};
-
-  animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
-`;
 
 let watcher;
 
