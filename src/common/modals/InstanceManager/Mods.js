@@ -1,24 +1,22 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
 import { clipboard } from 'electron';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import memoize from 'memoize-one';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
 import { Portal } from 'react-portal';
 import path from 'path';
 import pMap from 'p-map';
 import { FixedSizeList as List, areEqual } from 'react-window';
-import { Checkbox, Input, Button, Switch, Spin, Dropdown, Menu } from 'antd';
+import { Checkbox, Input, Button, Switch, Dropdown, Menu } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTrash,
-  faArrowDown,
   faDownload,
   faEllipsisV,
   faCopy
 } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
-import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
@@ -29,6 +27,7 @@ import {
   updateMod
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
+import DragnDropEffect from '../../../ui/DragnDropEffect';
 
 const Header = styled.div`
   height: 40px;
@@ -83,32 +82,6 @@ const RowContainer = styled.div.attrs(props => ({
   }
 `;
 
-const DragEnterEffect = styled.div`
-  position: absolute;
-  display: flex;
-  flex-direction; column;
-  justify-content: center;
-  align-items: center;
-  border: solid 5px ${props => props.theme.palette.primary.main};
-  transition: opacity 0.2s ease-in-out;
-  border-radius: 3px;
-  width: 100%;
-  height: 100%;
-  margin-top: 3px;
-  z-index: ${props =>
-    props.transitionState !== 'entering' && props.transitionState !== 'entered'
-      ? -1
-      : 2};
-  backdrop-filter: blur(4px);
-  background: linear-gradient(
-    0deg,
-    rgba(0, 0, 0, .3) 40%,
-    rgba(0, 0, 0, .3) 40%
-  );
-  opacity: ${({ transitionState }) =>
-    transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
-`;
-
 const StyledDropdown = styled.div`
   width: 32px;
   height: 32px;
@@ -122,34 +95,6 @@ const StyledDropdown = styled.div`
   &:hover {
     background: ${props => props.theme.palette.grey[400]};
   }
-`;
-
-export const keyFrameMoveUpDown = keyframes`
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
-
-`;
-
-const DragArrow = styled(FontAwesomeIcon)`
-  ${props =>
-    props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
-
-  color: ${props => props.theme.palette.primary.main};
-
-  animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
-`;
-
-const CopyTitle = styled.h1`
-  ${props =>
-    props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
-
-  color: ${props => props.theme.palette.primary.main};
-
-  animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
 `;
 
 const DeleteSelectedMods = styled(({ selectedMods, ...props }) => (
@@ -414,15 +359,6 @@ const Mods = ({ instanceName }) => {
 
   const dispatch = useDispatch();
 
-  const antIcon = (
-    <LoadingOutlined
-      css={`
-        font-size: 24px;
-      `}
-      spin
-    />
-  );
-
   useEffect(() => {
     const modList = instance.mods;
 
@@ -644,40 +580,15 @@ const Mods = ({ instanceName }) => {
           height: calc(100% - 40px);
         `}
       >
-        <Transition timeout={300} in={fileDrag}>
-          {transitionState => (
-            <DragEnterEffect
-              onDrop={onDrop}
-              transitionState={transitionState}
-              onDragLeave={onDragLeave}
-              fileDrag={fileDrag}
-              onDragOver={onDragOver}
-            >
-              {fileDrop ? (
-                <Spin
-                  indicator={antIcon}
-                  css={`
-                    width: 30px;
-                  `}
-                >
-                  {numOfDraggedFiles > 0 ? numOfDraggedFiles : 1}
-                </Spin>
-              ) : (
-                <div
-                  css={`
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                  `}
-                  onDragLeave={e => e.stopPropagation()}
-                >
-                  <CopyTitle>copy</CopyTitle>
-                  <DragArrow icon={faArrowDown} size="3x" />
-                </div>
-              )}
-            </DragEnterEffect>
-          )}
-        </Transition>
+        <DragnDropEffect
+          onDrop={onDrop}
+          onDragLeave={onDragLeave}
+          onDragOver={onDragOver}
+          onDragEnter={onDragEnter}
+          fileDrag={fileDrag}
+          fileDrop={fileDrop}
+          numOfDraggedFiles={numOfDraggedFiles}
+        />
         <AutoSizer>
           {({ height, width }) => (
             <List

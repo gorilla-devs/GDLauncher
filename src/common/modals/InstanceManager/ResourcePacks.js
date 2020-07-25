@@ -8,25 +8,16 @@ import { promises as fs, watch } from 'fs';
 import makeDir from 'make-dir';
 import { ipcRenderer } from 'electron';
 import { FixedSizeList as List, areEqual } from 'react-window';
-import { Checkbox, Button, Switch, Spin } from 'antd';
+import { Checkbox, Button, Switch } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
-import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
-
-const antIcon = (
-  <LoadingOutlined
-    css={`
-      font-size: 24px;
-    `}
-    spin
-  />
-);
+import DragnDropEffect from '../../../ui/DragnDropEffect';
 
 const Header = styled.div`
   height: 40px;
@@ -82,32 +73,6 @@ const RowContainer = styled.div.attrs(props => ({
     }
   }
 `;
-
-const DragEnterEffect = styled.div`
-position: absolute;
-display: flex;
-flex-direction; column;
-justify-content: center;
-align-items: center;
-border: solid 5px ${props => props.theme.palette.primary.main};
-transition: opacity 0.2s ease-in-out;
-border-radius: 3px;
-width: 100%;
-height: 100%;
-margin-top: 3px;
-z-index: ${props =>
-  props.transitionState !== 'entering' && props.transitionState !== 'entered'
-    ? -1
-    : 2};
-  backdrop-filter: blur(4px);
-  background: linear-gradient(
-    0deg,
-    rgba(0, 0, 0, .3) 40%,
-    rgba(0, 0, 0, .3) 40%
-    );
-    opacity: ${({ transitionState }) =>
-      transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
-    `;
 
 export const keyFrameMoveUpDown = keyframes`
     0% {
@@ -506,40 +471,15 @@ const ResourcePacks = ({ instanceName }) => {
           height: calc(100% - 40px);
         `}
       >
-        <Transition timeout={300} in={fileDrag}>
-          {transitionState => (
-            <DragEnterEffect
-              onDrop={onDrop}
-              transitionState={transitionState}
-              onDragLeave={onDragLeave}
-              fileDrag={fileDrag}
-              onDragOver={onDragOver}
-            >
-              {fileDrop ? (
-                <Spin
-                  indicator={antIcon}
-                  css={`
-                    width: 30px;
-                  `}
-                >
-                  {numOfDraggedFiles > 0 ? numOfDraggedFiles : 1}
-                </Spin>
-              ) : (
-                <div
-                  css={`
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                  `}
-                  onDragLeave={e => e.stopPropagation()}
-                >
-                  <CopyTitle>copy</CopyTitle>
-                  <DragArrow icon={faArrowDown} size="3x" />
-                </div>
-              )}
-            </DragEnterEffect>
-          )}
-        </Transition>
+        <DragnDropEffect
+          onDrop={onDrop}
+          onDragLeave={onDragLeave}
+          onDragOver={onDragOver}
+          onDragEnter={onDragEnter}
+          fileDrag={fileDrag}
+          fileDrop={fileDrop}
+          numOfDraggedFiles={numOfDraggedFiles}
+        />
         {resourcePacks.length === 0 && (
           <NotItemsAvailable>No ResourcePacks Available</NotItemsAvailable>
         )}
