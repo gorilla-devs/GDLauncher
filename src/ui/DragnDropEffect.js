@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Spin } from 'antd';
+import path from 'path';
+import pMap from 'p-map';
+import fse from 'fs-extra';
 import { Transition } from 'react-transition-group';
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -70,49 +73,162 @@ const antIcon = (
 );
 
 const DragnDrogEffect = ({
-  onDrop,
-  onDragLeave,
-  onDragOver,
-  fileDrag,
-  fileDrop,
-  numOfDraggedFiles
+  instancesPath,
+  instanceName,
+  fileList,
+  children
 }) => {
+  const [fileDrag, setFileDrag] = useState(false);
+  const [fileDrop, setFileDrop] = useState(false);
+  const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
+  const [dragCompleted, setDragCompleted] = useState({});
+  const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
+
+  const onDragOver = e => {
+    setFileDrag(true);
+    e.preventDefault();
+  };
+
+  const onDrop = async e => {
+    setFileDrop(true);
+    const dragComp = {};
+    const { files } = e.dataTransfer;
+    const arrTypes = Object.values(files).map(file => {
+      const fileName = file.name;
+      const fileType = path.extname(fileName);
+      return fileType;
+    });
+
+    await pMap(
+      Object.values(files),
+      async file => {
+        const fileName = file.name;
+        const fileType = path.extname(fileName);
+
+        dragComp[fileName] = false;
+
+        setNumOfDraggedFiles(files.length);
+
+        const { path: filePath } = file;
+
+        if (Object.values(files).length === 1) {
+          if (
+            fileType === '.zip' ||
+            fileType === '.7z' ||
+            fileType === '.disabled'
+          ) {
+            await fse.copy(
+              filePath,
+              path.join(instancesPath, instanceName, 'resourcepacks', fileName)
+            );
+            dragComp[fileName] = true;
+            setFileDrop(false);
+          } else {
+            console.error('This file is not a zip');
+            setFileDrop(false);
+            setFileDrag(false);
+          }
+        } else {
+          /* eslint-disable */
+          if (arrTypes.includes('7z') || arrTypes.includes('zip')) {
+            if (fileType === 'zip' || fileType === '7z') {
+              await fse.copy(
+                filePath,
+                path.join(
+                  instancesPath,
+                  instanceName,
+                  'resourcepacks',
+                  fileName
+                )
+              );
+              dragComp[fileName] = true;
+            } else {
+              setFileDrop(false);
+              setFileDrag(false);
+            }
+          } else {
+            console.error('The files are  not a zips!');
+            setFileDrop(false);
+            setFileDrag(false);
+          }
+        }
+      },
+      { concurrency: 10 }
+    );
+    setDragCompletedPopulated(files.length === Object.values(dragComp).length);
+    setDragCompleted(dragComp);
+  };
+
+  const onDragEnter = e => {
+    setFileDrag(true);
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const onDragLeave = () => {
+    setFileDrag(false);
+  };
+
+  useEffect(() => {
+    if (dragCompletedPopulated) {
+      const AllFilesAreCompleted = Object.keys(dragCompleted).every(x =>
+        fileList.find(y => y === x)
+      );
+
+      setNumOfDraggedFiles(numOfDraggedFiles - 1);
+
+      if (AllFilesAreCompleted) {
+        setFileDrop(false);
+        setFileDrag(false);
+      }
+    }
+  }, [dragCompleted, fileList]);
+
   return (
     <>
-      <Transition timeout={300} in={fileDrag}>
-        {transitionState => (
-          <DragEnterEffect
-            onDrop={onDrop}
-            transitionState={transitionState}
-            onDragLeave={onDragLeave}
-            fileDrag={fileDrag}
-            onDragOver={onDragOver}
-          >
-            {fileDrop ? (
-              <Spin
-                indicator={antIcon}
-                css={`
-                  width: 30px;
-                `}
-              >
-                {numOfDraggedFiles > 0 ? numOfDraggedFiles : 1}
-              </Spin>
-            ) : (
-              <div
-                css={`
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                `}
-                onDragLeave={e => e.stopPropagation()}
-              >
-                <CopyTitle>Copy</CopyTitle>
-                <DragArrow icon={faArrowDown} size="3x" />
-              </div>
-            )}
-          </DragEnterEffect>
-        )}
-      </Transition>
+      <div
+        onDragEnter={onDragEnter}
+        css={`
+          width: 100%;
+          height: calc(100% - 40px);
+        `}
+      >
+        <Transition timeout={300} in={fileDrag}>
+          {transitionState => (
+            <DragEnterEffect
+              onDrop={onDrop}
+              transitionState={transitionState}
+              onDragLeave={onDragLeave}
+              fileDrag={fileDrag}
+              onDragOver={onDragOver}
+            >
+              {fileDrop ? (
+                <Spin
+                  indicator={antIcon}
+                  css={`
+                    width: 30px;
+                  `}
+                >
+                  {numOfDraggedFiles > 0 ? numOfDraggedFiles : 1}
+                </Spin>
+              ) : (
+                <div
+                  css={`
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                  `}
+                  onDragLeave={e => e.stopPropagation()}
+                >
+                  <CopyTitle>Copy</CopyTitle>
+                  <DragArrow icon={faArrowDown} size="3x" />
+                </div>
+              )}
+            </DragEnterEffect>
+          )}
+        </Transition>
+        {children}
+      </div>
     </>
   );
 };

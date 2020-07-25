@@ -3,7 +3,6 @@ import React, { memo, useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
 import path from 'path';
-import pMap from 'p-map';
 import { promises as fs, watch } from 'fs';
 import makeDir from 'make-dir';
 import { ipcRenderer } from 'electron';
@@ -139,9 +138,6 @@ const NotItemsAvailable = styled.div`
 const ResourcePacks = ({ instanceName }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const [resourcePacks, setResourcePacks] = useState([]);
-  const [fileDrag, setFileDrag] = useState(false);
-  const [fileDrop, setFileDrop] = useState(false);
-  const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
   const [dragCompleted, setDragCompleted] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
   const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
@@ -299,10 +295,6 @@ const ResourcePacks = ({ instanceName }) => {
     }
   }, [dragCompleted, resourcePacks]);
 
-  // useEffect(() => {
-  //   setMods(filter(sort(instance.mods), search));
-  // }, [search, instance.mods]);
-
   const itemData = createItemData(
     resourcePacks,
     instanceName,
@@ -311,91 +303,6 @@ const ResourcePacks = ({ instanceName }) => {
     setSelectedItems,
     resourcePacksPath
   );
-
-  const onDragOver = e => {
-    setFileDrag(true);
-    e.preventDefault();
-  };
-
-  const onDrop = async e => {
-    setFileDrop(true);
-    const dragComp = {};
-    const { files } = e.dataTransfer;
-    const arrTypes = Object.values(files).map(file => {
-      const fileName = file.name;
-      const fileType = path.extname(fileName);
-      return fileType;
-    });
-
-    await pMap(
-      Object.values(files),
-      async file => {
-        const fileName = file.name;
-        const fileType = path.extname(fileName);
-
-        dragComp[fileName] = false;
-
-        setNumOfDraggedFiles(files.length);
-
-        const { path: filePath } = file;
-
-        if (Object.values(files).length === 1) {
-          if (
-            fileType === '.zip' ||
-            fileType === '.7z' ||
-            fileType === '.disabled'
-          ) {
-            await fse.copy(
-              filePath,
-              path.join(instancesPath, instanceName, 'resourcepacks', fileName)
-            );
-            dragComp[fileName] = true;
-            setFileDrop(false);
-          } else {
-            console.error('This file is not a zip');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
-        } else {
-          /* eslint-disable */
-          if (arrTypes.includes('7z') || arrTypes.includes('zip')) {
-            if (fileType === 'zip' || fileType === '7z') {
-              await fse.copy(
-                filePath,
-                path.join(
-                  instancesPath,
-                  instanceName,
-                  'resourcepacks',
-                  fileName
-                )
-              );
-              dragComp[fileName] = true;
-            } else {
-              setFileDrop(false);
-              setFileDrag(false);
-            }
-          } else {
-            console.error('The files are  not a zips!');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
-        }
-      },
-      { concurrency: 10 }
-    );
-    setDragCompletedPopulated(files.length === Object.values(dragComp).length);
-    setDragCompleted(dragComp);
-  };
-
-  const onDragEnter = e => {
-    setFileDrag(true);
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const onDragLeave = () => {
-    setFileDrag(false);
-  };
 
   return (
     <div
@@ -464,22 +371,12 @@ const ResourcePacks = ({ instanceName }) => {
           Add ResourcePack
         </Button>
       </Header>
-      <div
-        onDragEnter={onDragEnter}
-        css={`
-          width: 100%;
-          height: calc(100% - 40px);
-        `}
+
+      <DragnDropEffect
+        instancesPath={instancesPath}
+        instanceName={instanceName}
+        fileList={resourcePacks}
       >
-        <DragnDropEffect
-          onDrop={onDrop}
-          onDragLeave={onDragLeave}
-          onDragOver={onDragOver}
-          onDragEnter={onDragEnter}
-          fileDrag={fileDrag}
-          fileDrop={fileDrop}
-          numOfDraggedFiles={numOfDraggedFiles}
-        />
         {resourcePacks.length === 0 && (
           <NotItemsAvailable>No ResourcePacks Available</NotItemsAvailable>
         )}
@@ -496,7 +393,7 @@ const ResourcePacks = ({ instanceName }) => {
             </List>
           )}
         </AutoSizer>
-      </div>
+      </DragnDropEffect>
     </div>
   );
 };

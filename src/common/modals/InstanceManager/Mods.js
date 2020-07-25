@@ -5,7 +5,6 @@ import memoize from 'memoize-one';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
 import { Portal } from 'react-portal';
 import path from 'path';
-import pMap from 'p-map';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import { Checkbox, Input, Button, Switch, Dropdown, Menu } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
@@ -351,29 +350,8 @@ const Mods = ({ instanceName }) => {
   const [selectedMods, setSelectedMods] = useState([]);
   const [search, setSearch] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [fileDrag, setFileDrag] = useState(false);
-  const [fileDrop, setFileDrop] = useState(false);
-  const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
-  const [dragCompleted, setDragCompleted] = useState({});
-  const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const modList = instance.mods;
-
-    if (dragCompletedPopulated) {
-      const AllFilesAreCompleted = Object.keys(dragCompleted).every(x =>
-        modList.find(y => y.fileName === x)
-      );
-      setNumOfDraggedFiles(numOfDraggedFiles - 1);
-
-      if (AllFilesAreCompleted) {
-        setFileDrop(false);
-        setFileDrag(false);
-      }
-    }
-  }, [dragCompleted, instance.mods]);
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
@@ -398,81 +376,6 @@ const Mods = ({ instanceName }) => {
     setSelectedMods,
     latestMods
   );
-
-  const onDragOver = e => {
-    setFileDrag(true);
-    e.preventDefault();
-  };
-
-  const onDrop = async e => {
-    setFileDrop(true);
-    const dragComp = {};
-    const { files } = e.dataTransfer;
-    const arrTypes = Object.values(files).map(file => {
-      const fileName = file.name;
-      const fileType = fileName.split('.')[1];
-      return fileType;
-    });
-
-    await pMap(
-      Object.values(files),
-      async file => {
-        const fileName = file.name;
-        const fileType = fileName.split('.')[1];
-
-        dragComp[fileName] = false;
-
-        setNumOfDraggedFiles(files.length);
-
-        const { path: filePath } = file;
-
-        if (Object.values(files).length === 1) {
-          if (fileType === 'jar' || fileType === 'disabled') {
-            await fse.copy(
-              filePath,
-              path.join(instancesPath, instanceName, 'mods', fileName)
-            );
-            dragComp[fileName] = true;
-          } else {
-            console.error('This file is not a mod!');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
-        } else {
-          /* eslint-disable */
-          if (arrTypes.includes('jar')) {
-            if (fileType === 'jar') {
-              await fse.copy(
-                filePath,
-                path.join(instancesPath, instanceName, 'mods', fileName)
-              );
-              dragComp[fileName] = true;
-            } else {
-              setFileDrop(false);
-              setFileDrag(false);
-            }
-          } else {
-            console.error('The files are  not a mod!');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
-        }
-      },
-      { concurrency: 10 }
-    );
-    setDragCompletedPopulated(files.length === Object.values(dragComp).length);
-    setDragCompleted(dragComp);
-  };
-
-  const onDragEnter = e => {
-    setFileDrag(true);
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const onDragLeave = () => {
-    setFileDrag(false);
-  };
 
   const menu = (
     <Menu>
@@ -573,22 +476,12 @@ const Mods = ({ instanceName }) => {
           placeholder={`Search ${mods.length} mods`}
         />
       </Header>
-      <div
-        onDragEnter={onDragEnter}
-        css={`
-          width: 100%;
-          height: calc(100% - 40px);
-        `}
+
+      <DragnDropEffect
+        instancesPath={instancesPath}
+        instanceName={instanceName}
+        fileList={instance.mods}
       >
-        <DragnDropEffect
-          onDrop={onDrop}
-          onDragLeave={onDragLeave}
-          onDragOver={onDragOver}
-          onDragEnter={onDragEnter}
-          fileDrag={fileDrag}
-          fileDrop={fileDrop}
-          numOfDraggedFiles={numOfDraggedFiles}
-        />
         <AutoSizer>
           {({ height, width }) => (
             <List
@@ -602,7 +495,7 @@ const Mods = ({ instanceName }) => {
             </List>
           )}
         </AutoSizer>
-      </div>
+      </DragnDropEffect>
     </div>
   );
 };
