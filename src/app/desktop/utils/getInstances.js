@@ -11,12 +11,18 @@ const getInstances = async instancesPath => {
       );
       const config = await fse.readJSON(configPath);
       if (!config.modloader) {
-        throw new Error(`Config for ${instance} could not be parsed`);
+        console.error(`Config for ${instance} could not be parsed`);
+        return {
+          ...config,
+          name: instance,
+          corrupted: true
+        };
       }
 
       return {
         ...config,
-        name: instance
+        name: instance,
+        corrupted: false
       };
     } catch (err) {
       console.error(err);

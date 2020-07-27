@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { transparentize } from 'polished';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { promises as fs } from 'fs';
 import { LoadingOutlined } from '@ant-design/icons';
 import path from 'path';
@@ -14,7 +14,8 @@ import {
   faFolder,
   faTrash,
   faStop,
-  faBoxOpen
+  faBoxOpen,
+  faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -86,6 +87,92 @@ const InstanceContainer = styled.div`
   margin: 10px;
 `;
 
+// const modalShake = keyframes`
+//   0% { transform: scale(1.01) }
+//   30% { transform: scale(0.99) }
+//   60% { transform: scale(1.01) }
+//   90% { transform: scale(0.99)}
+//   100% {transform: scale(1) }
+// `;
+
+// const modalShake = keyframes`
+// 10%, 90% {
+//   transform: translate3d(-1px, 0, 0);
+// }
+
+// 20%, 80% {
+//   transform: translate3d(2px, 0, 0);
+// }
+
+// 30%, 50%, 70% {
+//   transform: translate3d(-3px, 0, 0);
+// }
+
+// 40%, 60% {
+//   transform: translate3d(3px, 0, 0);
+// }
+// `;
+
+const modalShake = keyframes`
+10%, 90% {
+  transform: rotate(0deg);
+}
+
+20%, 80% {
+  transform: rotate(-1deg);
+}
+
+30%, 50%, 70% {
+  transform: rotate(0deg);
+}
+
+40%, 60% {
+  transform: rotate(1deg);
+}
+`;
+
+const CorruptedInstanceContainer = styled.div`
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  font-size: 20px;
+  overflow: hidden;
+  height: 100%;
+  animation: ${props =>
+    props.corruptedlunchTry
+      ? css`
+          ${modalShake} 0.25s linear infinite
+        `
+      : ''};
+  background: linear-gradient(0deg,rgba(0,0,0,0.9),rgba(0,0,0,0.9)),url("${props =>
+    props.background}") center no-repeat;
+  background-position: center;
+  border: 4px solid ${props => props.theme.palette.colors.maximumRed};
+  color: ${props => props.theme.palette.text.secondary};
+  font-weight: 600;
+  background-size: cover;
+  border-radius: 4px;
+  margin: 10px;
+  &&:hover{}
+`;
+
+const CorruptedIcon = styled.div`
+  position: absolute;
+  left: 7px;
+  top: 4px;
+  font-size: 11px;
+  color: ${props => props.theme.palette.colors.maximumRed};
+  animation: ${props =>
+    props.corruptedlunchTry
+      ? css`
+          ${modalShake} 0.25s linear infinite
+        `
+      : ''};
+`;
+
 const HoverContainer = styled.div`
   position: absolute;
   display: flex;
@@ -154,9 +241,12 @@ const MenuInstanceName = styled.div`
   font-weight: 700;
 `;
 
-const Instance = ({ instanceName }) => {
+const Instance = ({ instanceName, corrupted }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+  const [corruptedInstanceLunchTry, setCorruptedInstanceLunchTry] = useState(
+    false
+  );
   const [background, setBackground] = useState(`${instanceDefaultBackground}`);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const downloadQueue = useSelector(_getDownloadQueue);
@@ -196,7 +286,6 @@ const Instance = ({ instanceName }) => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));
   };
   const killProcess = () => {
-    console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
       if (children.length) {
         children.forEach(el => {
@@ -210,155 +299,202 @@ const Instance = ({ instanceName }) => {
 
   return (
     <>
-      <ContextMenuTrigger id={instanceName}>
-        <Container
-          installing={isInQueue}
-          onClick={startInstance}
-          isHovered={isHovered || isPlaying}
-        >
-          <InstanceContainer installing={isInQueue} background={background}>
-            <TimePlayed>
-              <FontAwesomeIcon
-                icon={faClock}
-                css={`
-                  margin-right: 5px;
-                `}
-              />
+      {!corrupted ? (
+        <>
+          <ContextMenuTrigger id={instanceName}>
+            <Container
+              installing={isInQueue}
+              onClick={startInstance}
+              isHovered={isHovered || isPlaying}
+            >
+              <InstanceContainer installing={isInQueue} background={background}>
+                <TimePlayed>
+                  <FontAwesomeIcon
+                    icon={faClock}
+                    css={`
+                      margin-right: 5px;
+                    `}
+                  />
 
-              {convertMinutesToHumanTime(instance.timePlayed)}
-            </TimePlayed>
-            <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
-            {instanceName}
-          </InstanceContainer>
-          <HoverContainer
-            installing={isInQueue}
-            isHovered={isHovered || isPlaying}
-          >
-            {currentDownload === instanceName ? (
-              <>
-                <div
+                  {convertMinutesToHumanTime(instance.timePlayed)}
+                </TimePlayed>
+                <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
+                {instanceName}
+              </InstanceContainer>
+              <HoverContainer
+                installing={isInQueue}
+                isHovered={isHovered || isPlaying}
+              >
+                {currentDownload === instanceName ? (
+                  <>
+                    <div
+                      css={`
+                        font-size: 14px;
+                      `}
+                    >
+                      {isInQueue ? isInQueue.status : null}
+                    </div>
+                    {`${isInQueue.percentage}%`}
+                    <LoadingOutlined
+                      css={`
+                        position: absolute;
+                        bottom: 8px;
+                        right: 8px;
+                      `}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {isPlaying && (
+                      <div
+                        css={`
+                          position: relative;
+                          width: 20px;
+                          height: 20px;
+                        `}
+                      >
+                        {isPlaying.initialized && (
+                          <FontAwesomeIcon
+                            css={`
+                              color: ${({ theme }) =>
+                                theme.palette.colors.green};
+                              font-size: 27px;
+                              position: absolute;
+                              margin-left: -6px;
+                              margin-top: -2px;
+                              animation: ${PlayButtonAnimation} 0.5s
+                                cubic-bezier(0.75, -1.5, 0, 2.75);
+                            `}
+                            icon={faPlay}
+                          />
+                        )}
+                        {!isPlaying.initialized && <div className="spinner" />}
+                      </div>
+                    )}
+                    {isInQueue && 'In Queue'}
+                    {!isInQueue && !isPlaying && 'PLAY'}
+                  </>
+                )}
+              </HoverContainer>
+            </Container>
+          </ContextMenuTrigger>
+          <Portal>
+            <ContextMenu
+              id={instance.name}
+              onShow={() => setIsHovered(true)}
+              onHide={() => setIsHovered(false)}
+            >
+              <MenuInstanceName>{instanceName}</MenuInstanceName>
+              {isPlaying && (
+                <MenuItem onClick={killProcess}>
+                  <FontAwesomeIcon
+                    icon={faStop}
+                    css={`
+                      margin-right: 10px;
+                    `}
+                  />
+                  Kill
+                </MenuItem>
+              )}
+              <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
+                <FontAwesomeIcon
+                  icon={faWrench}
                   css={`
-                    font-size: 14px;
-                  `}
-                >
-                  {isInQueue ? isInQueue.status : null}
-                </div>
-                {`${isInQueue.percentage}%`}
-                <LoadingOutlined
-                  css={`
-                    position: absolute;
-                    bottom: 8px;
-                    right: 8px;
+                    margin-right: 10px;
                   `}
                 />
-              </>
-            ) : (
-              <>
-                {isPlaying && (
-                  <div
-                    css={`
-                      position: relative;
-                      width: 20px;
-                      height: 20px;
-                    `}
-                  >
-                    {isPlaying.initialized && (
-                      <FontAwesomeIcon
-                        css={`
-                          color: ${({ theme }) => theme.palette.colors.green};
-                          font-size: 27px;
-                          position: absolute;
-                          margin-left: -6px;
-                          margin-top: -2px;
-                          animation: ${PlayButtonAnimation} 0.5s
-                            cubic-bezier(0.75, -1.5, 0, 2.75);
-                        `}
-                        icon={faPlay}
-                      />
-                    )}
-                    {!isPlaying.initialized && <div className="spinner" />}
-                  </div>
-                )}
-                {isInQueue && 'In Queue'}
-                {!isInQueue && !isPlaying && 'PLAY'}
-              </>
-            )}
-          </HoverContainer>
-        </Container>
-      </ContextMenuTrigger>
-      <Portal>
-        <ContextMenu
-          id={instance.name}
-          onShow={() => setIsHovered(true)}
-          onHide={() => setIsHovered(false)}
-        >
-          <MenuInstanceName>{instanceName}</MenuInstanceName>
-          {isPlaying && (
-            <MenuItem onClick={killProcess}>
-              <FontAwesomeIcon
-                icon={faStop}
-                css={`
-                  margin-right: 10px;
-                `}
-              />
-              Kill
-            </MenuItem>
-          )}
-          <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
-            <FontAwesomeIcon
-              icon={faWrench}
-              css={`
-                margin-right: 10px;
-              `}
-            />
-            Manage
-          </MenuItem>
-          <MenuItem onClick={openFolder}>
-            <FontAwesomeIcon
-              icon={faFolder}
-              css={`
-                margin-right: 10px;
-              `}
-            />
-            Open Folder
-          </MenuItem>
+                Manage
+              </MenuItem>
+              <MenuItem onClick={openFolder}>
+                <FontAwesomeIcon
+                  icon={faFolder}
+                  css={`
+                    margin-right: 10px;
+                  `}
+                />
+                Open Folder
+              </MenuItem>
 
-          {/* // TODO - Support other export options besides curseforge forge. */}
-          <MenuItem
-            onClick={instanceExportCurseForge}
-            disabled={
-              Boolean(isInQueue) ||
-              !(
-                instance.modloader[0] === FORGE ||
-                instance.modloader[0] === FABRIC ||
-                instance.modloader[0] === VANILLA
-              )
-            }
-          >
-            <FontAwesomeIcon
-              icon={faBoxOpen}
-              css={`
-                margin-right: 10px;
-                width: 16px !important;
-              `}
-            />
-            Export Pack
-          </MenuItem>
-          <MenuItem divider />
-          <MenuItem
-            disabled={Boolean(isInQueue) || Boolean(isPlaying)}
-            onClick={openConfirmationDeleteModal}
-          >
-            <FontAwesomeIcon
-              icon={faTrash}
-              css={`
-                margin-right: 10px;
-              `}
-            />
-            Delete
-          </MenuItem>
-        </ContextMenu>
-      </Portal>
+              {/* // TODO - Support other export options besides curseforge forge. */}
+              <MenuItem
+                onClick={instanceExportCurseForge}
+                disabled={
+                  Boolean(isInQueue) ||
+                  !(
+                    instance.modloader[0] === FORGE ||
+                    instance.modloader[0] === FABRIC ||
+                    instance.modloader[0] === VANILLA
+                  )
+                }
+              >
+                <FontAwesomeIcon
+                  icon={faBoxOpen}
+                  css={`
+                    margin-right: 10px;
+                    width: 16px !important;
+                  `}
+                />
+                Export Pack
+              </MenuItem>
+              <MenuItem divider />
+              <MenuItem
+                disabled={Boolean(isInQueue) || Boolean(isPlaying)}
+                onClick={openConfirmationDeleteModal}
+              >
+                <FontAwesomeIcon
+                  icon={faTrash}
+                  css={`
+                    margin-right: 10px;
+                  `}
+                />
+                Delete
+              </MenuItem>
+            </ContextMenu>
+          </Portal>
+        </>
+      ) : (
+        <div>
+          <Container isHovered={isHovered || isPlaying}>
+            <CorruptedInstanceContainer
+              background={background}
+              corruptedlunchTry={corruptedInstanceLunchTry}
+              onClick={() => {
+                setCorruptedInstanceLunchTry(true);
+                setTimeout(() => {
+                  setCorruptedInstanceLunchTry(false);
+                }, 200);
+              }}
+            >
+              <CorruptedIcon corruptedlunchTry={corruptedInstanceLunchTry}>
+                <FontAwesomeIcon icon={faExclamationTriangle} />
+              </CorruptedIcon>
+              <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
+              <div>
+                <div
+                  css={`
+                    color: ${props => props.theme.palette.colors.maximumRed};
+                    line-height: 1;
+                    font-weight: 400;
+                    font-size: 14px;
+                    margin-bottom: 5px;
+                  `}
+                >
+                  {instanceName}
+                </div>
+                <div
+                  css={`
+                    color: ${props => props.theme.palette.colors.maximumRed};
+                    line-height: 1;
+                    font-size: 19px;
+                  `}
+                >
+                  Corrupted Instance
+                </div>
+              </div>
+            </CorruptedInstanceContainer>
+          </Container>
+        </div>
+      )}
     </>
   );
 };

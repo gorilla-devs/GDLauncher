@@ -26,11 +26,16 @@ const SubNoInstance = styled.div`
 
 const Instances = () => {
   const instances = useSelector(_getInstances);
-
   return (
     <Container>
       {instances.length > 0 ? (
-        instances.map(i => <Instance key={i.name} instanceName={i.name} />)
+        instances.map(i => (
+          <Instance
+            key={i.name}
+            instanceName={i.name}
+            corrupted={i.corrupted}
+          />
+        ))
       ) : (
         <NoInstance>
           No Instance has been installed

@@ -24,11 +24,13 @@ const middleware = store => next => action => {
       await ipcRenderer.invoke('stop-listener');
       await makeDir(instancesPath);
       const instances = await getInstances(instancesPath);
+
       dispatch({
         type: ActionTypes.UPDATE_INSTANCES,
         instances
       });
       const instances1 = await modsFingerprintsScan(instancesPath);
+
       dispatch({
         type: ActionTypes.UPDATE_INSTANCES,
         instances: instances1
