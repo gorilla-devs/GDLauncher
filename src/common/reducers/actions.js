@@ -2108,9 +2108,7 @@ export function launchInstance(instanceName) {
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
       dispatch(removeStartedInstance(instanceName));
       clearInterval(playTimer);
-      console.log('CODE', code, errorLogs);
       if (code !== 0) {
-        console.log('T');
         dispatch(
           openModal('InstanceCrashed', {
             instanceName,
