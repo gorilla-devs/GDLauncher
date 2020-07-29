@@ -72,7 +72,7 @@ const antIcon = (
   />
 );
 
-const DragnDrogEffect = ({
+const DragnDropEffect = ({
   instancesPath,
   instanceName,
   fileList,
@@ -233,4 +233,4 @@ const DragnDrogEffect = ({
   );
 };
 
-export default DragnDrogEffect;
+export default DragnDropEffect;
