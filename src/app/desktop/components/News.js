@@ -223,8 +223,28 @@ function News({ style, news }) {
       viewBox="0 0 1000 180"
       foregroundColor={ContextTheme.palette.grey[700]}
       backgroundColor={ContextTheme.palette.grey[800]}
+      title={false}
     >
-      <rect x="0" y="0" rx="0" ry="0" width="1000" height="1080" />
+      {/* <rect x="0" y="0" rx="0" ry="0" width="1000" height="1080" /> */}
+      <rect width="20" height="180" />
+      <rect x="980" width="20" height="180" />
+      <rect
+        x="490"
+        y="-490"
+        transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 510 -490)"
+        width="20"
+        height="1000"
+      />
+      <rect
+        x="490"
+        y="-330"
+        transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 670 -330)"
+        width="20"
+        height="1000"
+      />
+
+      <rect x="40.5" y="100" width="304" height="14.4" />
+      <rect x="40.5" y="125.6" width="304" height="14.4" />
     </ContentLoader>
   );
 }
