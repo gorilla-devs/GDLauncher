@@ -1513,14 +1513,22 @@ export const startListener = () => {
             const notMatch = (data.unmatchedFingerprints || [])[0];
             let mod = {};
             if (exactMatch) {
-              const { data: addon } = await getAddon(exactMatch.file.projectId);
-
-              mod = normalizeModData(
-                exactMatch.file,
-                exactMatch.file.projectId,
-                addon.name
-              );
-              mod.fileName = path.basename(fileName);
+              let addon = null;
+              try {
+                addon = (await getAddon(exactMatch.file.projectId)).data;
+                mod = normalizeModData(
+                  exactMatch.file,
+                  exactMatch.file.projectId,
+                  addon.name
+                );
+                mod.fileName = path.basename(fileName);
+              } catch {
+                mod = {
+                  fileName: path.basename(fileName),
+                  displayName: path.basename(fileName),
+                  packageFingerprint: murmurHash
+                };
+              }
             } else if (notMatch) {
               mod = {
                 fileName: path.basename(fileName),
