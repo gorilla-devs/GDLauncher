@@ -22,7 +22,15 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        <Section>
+        <div
+          css={`
+            margin-bottom: 30px;
+          `}
+        >
+          We are really sorry for the current issues. Sadly, there is not much
+          we can do since they are cause by CurseForge.
+        </div>
+        {/* <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -45,7 +53,7 @@ const ChangeLogs = () => {
               </li>
             </ul>
           </div>
-        </Section>
+        </Section> */}
         <Section>
           <SectionTitle
             css={`
@@ -56,9 +64,11 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed curse links sometimes not working</li>
-              <li>Fixed the news loader</li>
-              <li>Fixed context menu sometimes going outside the window</li>
+              <li>Fixed instances corruption</li>
+              <li>Fixed instances disappearing when adding mods</li>
+              <li>
+                Fixed modals closing when dragging the mouse outside of them
+              </li>
             </ul>
           </div>
         </Section>
