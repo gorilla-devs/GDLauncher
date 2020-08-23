@@ -5,7 +5,7 @@
 const path = require('path');
 // eslint-disable-next-line
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
@@ -58,7 +58,7 @@ const baseConfig = {
   ]
 };
 
-module.exports = merge.smart(baseConfig, {
+module.exports = merge(baseConfig, {
   devtool: 'eval-cheap-module-source-map',
 
   mode: 'production',
