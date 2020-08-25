@@ -347,14 +347,17 @@ export function login(username, password, redirect = true) {
     if (!username || !password) {
       throw new Error('No username or password provided');
     }
+
     try {
       const { data } = await mcAuthenticate(username, password, clientToken);
-      const skinUrl = await getPlayerSkin(data.selectedProfile.id);
-      if (skinUrl) {
-        data.skin = skinUrl;
-      }
-      dispatch(updateAccount(data.selectedProfile.id, data));
-      dispatch(updateCurrentAccountId(data.selectedProfile.id));
+      if (data.selectedProfile) {
+        const skinUrl = await getPlayerSkin(data.selectedProfile.id);
+        if (skinUrl) {
+          data.skin = skinUrl;
+        }
+        dispatch(updateAccount(data.selectedProfile.id, data));
+        dispatch(updateCurrentAccountId(data.selectedProfile.id));
+      } else throw new Error('Account not Activated');
 
       if (!isNewUser) {
         if (redirect) {

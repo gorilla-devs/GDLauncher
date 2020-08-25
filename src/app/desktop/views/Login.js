@@ -131,6 +131,7 @@ const Loading = styled.div`
     transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
 `;
 const LoginFailMessage = styled.div`
+  text-align: center;
   color: ${props => props.theme.palette.colors.red};
 `;
 
@@ -140,6 +141,7 @@ const Login = () => {
   const [password, setPassword] = useState(null);
   const [version, setVersion] = useState(null);
   const [loginFailed, setLoginFailed] = useState(false);
+  const [loginFailedError, setLoginFailedError] = useState(null);
   const loading = useSelector(
     state => state.loading.accountAuthentication.isRequesting
   );
@@ -152,8 +154,17 @@ const Login = () => {
         load(features.mcAuthentication, dispatch(login(email, password)))
       ).catch(e => {
         console.error(e);
+        console.log('error', e.message);
+        const isError403 = e.message.includes('403');
         setLoginFailed(true);
         setPassword(null);
+        if (isError403) {
+          console.log('PPPP', isError403);
+          setLoginFailedError(null);
+        } else {
+          setLoginFailedError('Account not active');
+          console.log('isError403', isError403);
+        }
       });
     }, 1000);
   };
@@ -189,9 +200,14 @@ const Login = () => {
                   onChange={({ target: { value } }) => setPassword(value)}
                 />
               </div>
-              {loginFailed && (
-                <LoginFailMessage>Invalid email or password. </LoginFailMessage>
-              )}
+              {loginFailed &&
+                (!loginFailedError ? (
+                  <LoginFailMessage>
+                    Invalid email or password.
+                  </LoginFailMessage>
+                ) : (
+                  <LoginFailMessage>{loginFailedError}</LoginFailMessage>
+                ))}
               <LoginButton color="primary" onClick={authenticate}>
                 Sign In
                 <FontAwesomeIcon
