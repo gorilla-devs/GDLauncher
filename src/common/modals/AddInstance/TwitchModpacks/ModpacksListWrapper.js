@@ -60,14 +60,23 @@ const ModpacksListWrapper = ({
 
     const primaryImage = modpack.attachments.find(v => v.isDefault);
     return (
-      <ModpackContainer
+      <div
+        // eslint-disable-next-line
         style={{
           ...style,
           top: style.top + 8,
-          height: style.height - 8
+          height: style.height - 8,
+          background: `url('${primaryImage.thumbnailUrl}')`,
+          position: 'absolute',
+          width: '100%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          margin: '10px 0',
+          transition: 'height 0.2s ease-in-out',
+          borderRadius: 4
         }}
         key={modpack.id}
-        bg={primaryImage.thumbnailUrl}
       >
         <Modpack>
           <div>{modpack.name}</div>
@@ -101,7 +110,7 @@ const ModpacksListWrapper = ({
             Explore / Versions
           </div>
         </ModpackHover>
-      </ModpackContainer>
+      </div>
     );
   });
 
@@ -146,18 +155,6 @@ const ModpacksListWrapper = ({
 };
 
 export default memo(ModpacksListWrapper);
-
-const ModpackContainer = styled.div`
-  position: absolute;
-  width: 100%;
-  background: url('${props => props.bg}');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  margin: 10px 0;
-  transition: height 0.2s ease-in-out;
-  border-radius: 4px;
-  `;
 
 const Modpack = styled.div`
   width: 100%;
