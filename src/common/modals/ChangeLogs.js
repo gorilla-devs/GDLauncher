@@ -32,7 +32,8 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Improved the UI for the modpacks browser modal.</li>
+              <li>Restyled the UI to add new instances.</li>
+              <li>Some performance improvements.</li>
             </ul>
           </div>
         </Section>
@@ -46,8 +47,9 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Security fixes</li>
-              <li>Improved login errors</li>
+              <li>Security fixes.</li>
+              <li>Improved login errors.</li>
+              <li>The news should now be up to date.</li>
             </ul>
           </div>
         </Section>

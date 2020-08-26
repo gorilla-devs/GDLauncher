@@ -115,6 +115,7 @@ const Status = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: ${props => props.theme.palette.text.third};
 `;
 
 const FooterLinks = styled.div`
@@ -181,7 +182,7 @@ const Login = () => {
         load(features.mcAuthentication, dispatch(login(email, password)))
       ).catch(e => {
         console.error(e);
-        setLoginFailed(true);
+        setLoginFailed(e);
         setPassword(null);
       });
     }, 1000);
@@ -191,7 +192,6 @@ const Login = () => {
     const { data } = await axios.get('https://status.mojang.com/check');
     const result = {};
     Object.assign(result, ...data);
-    console.log(result);
     setStatus(result);
   };
 
@@ -228,7 +228,7 @@ const Login = () => {
                 />
               </div>
               {loginFailed && (
-                <LoginFailMessage>Invalid email or password. </LoginFailMessage>
+                <LoginFailMessage>{loginFailed?.message}</LoginFailMessage>
               )}
               <LoginButton color="primary" onClick={authenticate}>
                 Sign In
