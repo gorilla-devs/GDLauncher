@@ -7,53 +7,66 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { getSearch } from '../../../api';
 import ModpacksListWrapper from './ModpacksListWrapper';
 import { useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBomb } from '@fortawesome/free-solid-svg-icons';
 
 let lastRequest;
 const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   const mcVersions = useSelector(state => state.app.vanillaManifest?.versions);
   const categories = useSelector(state => state.app.curseforgeCategories);
   const [modpacks, setModpacks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [minecraftVersion, setMinecraftVersion] = useState(null);
   const [categoryId, setCategoryId] = useState(null);
   const [sortBy, setSortBy] = useState('Featured');
   const [searchText, setSearchText] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
-
-  useEffect(() => {
-    updateModpacks();
-  }, [searchText, sortBy, minecraftVersion, categoryId]);
+  const [error, setError] = useState(false);
 
   const [updateModpacks] = useDebouncedCallback(() => {
     loadMoreModpacks(true);
   }, 500);
 
   const loadMoreModpacks = async (reset = false) => {
-    if (loading) return;
     const reqObj = {};
     lastRequest = reqObj;
-    setLoading(true);
-    const { data } = await getSearch(
-      'modpacks',
-      searchText,
-      40,
-      reset ? 0 : modpacks.length,
-      sortBy,
-      true,
-      minecraftVersion,
-      categoryId
-    );
+    if (!loading) {
+      setLoading(true);
+    }
+    if (reset && (modpacks.length !== 0 || hasNextPage)) {
+      setModpacks([]);
+      setHasNextPage(false);
+    }
+    let data = null;
+    try {
+      if (error) {
+        setError(false);
+      }
+      ({ data } = await getSearch(
+        'modpacks',
+        searchText,
+        40,
+        reset ? 0 : modpacks.length,
+        sortBy,
+        true,
+        minecraftVersion,
+        categoryId
+      ));
+    } catch (err) {
+      setError(err);
+      return;
+    }
     const newModpacks = reset ? data : [...modpacks, ...data];
-    setLoading(false);
     if (lastRequest === reqObj) {
+      setLoading(false);
       setHasNextPage(newModpacks.length % 40 === 0);
       setModpacks(newModpacks);
     }
   };
 
   useEffect(() => {
-    loadMoreModpacks();
-  }, []);
+    updateModpacks();
+  }, [searchText, sortBy, minecraftVersion, categoryId]);
 
   return (
     <Container>
@@ -138,21 +151,43 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
         />
       </HeaderContainer>
       <ModpacksContainer>
-        <AutoSizer>
-          {({ height, width }) => (
-            <ModpacksListWrapper
-              hasNextPage={hasNextPage}
-              isNextPageLoading={loading}
-              items={modpacks}
-              loadNextPage={loadMoreModpacks}
-              width={width}
-              height={height}
-              setStep={setStep}
-              setVersion={setVersion}
-              setModpack={setModpack}
-            />
-          )}
-        </AutoSizer>
+        {!error ? (
+          <AutoSizer>
+            {({ height, width }) => (
+              <ModpacksListWrapper
+                hasNextPage={hasNextPage}
+                isNextPageLoading={loading}
+                items={modpacks}
+                loadNextPage={loadMoreModpacks}
+                width={width}
+                height={height}
+                setStep={setStep}
+                setVersion={setVersion}
+                setModpack={setModpack}
+              />
+            )}
+          </AutoSizer>
+        ) : (
+          <div
+            css={`
+              margin-top: 120px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              font-size: 150px;
+            `}
+          >
+            <FontAwesomeIcon icon={faBomb} />
+            <div
+              css={`
+                font-size: 20px;
+                margin-top: 70px;
+              `}
+            >
+              An error occurred while loading the modpacks list...
+            </div>
+          </div>
+        )}
       </ModpacksContainer>
     </Container>
   );

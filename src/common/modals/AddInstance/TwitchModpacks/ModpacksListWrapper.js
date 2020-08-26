@@ -1,8 +1,9 @@
-import React, { forwardRef, memo } from 'react';
-import styled from 'styled-components';
+import React, { forwardRef, memo, useContext, useEffect } from 'react';
+import styled, { ThemeContext } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { FixedSizeList as List } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
+import ContentLoader from 'react-content-loader';
 import { transparentize } from 'polished';
 import { openModal } from '../../../reducers/modals/actions';
 import { FORGE } from '../../../utils/constants';
@@ -34,7 +35,6 @@ const ModpacksListWrapper = ({
   const dispatch = useDispatch();
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 1 : items.length;
-
   // Only load 1 page of items at a time.
   // Pass an empty callback to InfiniteLoader in case it asks us to load more than once.
   const loadMoreItems = isNextPageLoading ? () => {} : loadNextPage;
@@ -43,15 +43,21 @@ const ModpacksListWrapper = ({
 
   // Render an item or a loading indicator.
   const Item = memo(({ index, style }) => {
-    let content;
     const modpack = items[index];
-    if (!isItemLoaded(index)) {
-      content = <div css={style}>Loading...</div>;
+    if (!modpack) {
+      return (
+        <ModpackLoader
+          hasNextPage={hasNextPage}
+          isNextPageLoading={isNextPageLoading}
+          width={width}
+          loadNextPage={loadNextPage}
+          top={style.top + 8}
+        />
+      );
     }
-    if (!modpack) return null;
 
     const primaryImage = modpack.attachments.find(v => v.isDefault);
-    content = (
+    return (
       <ModpackContainer
         style={{
           ...style,
@@ -95,8 +101,6 @@ const ModpacksListWrapper = ({
         </ModpackHover>
       </ModpackContainer>
     );
-
-    return content;
   });
 
   const innerElementType = forwardRef(({ style, ...rest }, ref) => (
@@ -115,14 +119,14 @@ const ModpacksListWrapper = ({
   return (
     <InfiniteLoader
       isItemLoaded={isItemLoaded}
-      itemCount={itemCount}
+      itemCount={itemCount !== 0 ? itemCount : 40}
       loadMoreItems={() => loadMoreItems()}
     >
       {({ onItemsRendered, ref }) => (
         <List
           height={height}
           width={width}
-          itemCount={itemCount}
+          itemCount={itemCount !== 0 ? itemCount : 40}
           itemSize={100}
           onItemsRendered={onItemsRendered}
           innerElementType={innerElementType}
@@ -190,3 +194,32 @@ const ModpackHover = styled.div`
     opacity: 1;
   }
 `;
+
+const ModpackLoader = memo(
+  ({ width, top, isNextPageLoading, hasNextPage, loadNextPage }) => {
+    const ContextTheme = useContext(ThemeContext);
+
+    useEffect(() => {
+      if (hasNextPage && isNextPageLoading) {
+        loadNextPage();
+      }
+    }, []);
+    return (
+      <ContentLoader
+        speed={2}
+        foregroundColor={ContextTheme.palette.grey[900]}
+        backgroundColor={ContextTheme.palette.grey[800]}
+        title={false}
+        style={{
+          width: width - 8,
+          height: '100px',
+          paddingTop: 8,
+          position: 'absolute',
+          top
+        }}
+      >
+        <rect x="0" y="0" width="100%" height="92px" />
+      </ContentLoader>
+    );
+  }
+);
