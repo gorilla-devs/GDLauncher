@@ -90,8 +90,7 @@ These are the steps to compile it yourself.
 
 You need the following software installed:
 
-- [NodeJS](https://nodejs.org/en/download/) (> v13.9.0 x64)
-- yarn (`npm i -g yarn`)
+- [NodeJS](https://nodejs.org/en/download/) (> v14.8.0 x64)
 - [Rust](https://www.rust-lang.org/)
 - C++ compiler (g++ or windows build tools)
 
@@ -101,19 +100,19 @@ Install the dependencies and devDependencies.
 
 ```sh
 $ cd GDLauncher
-$ yarn
+$ npm i
 ```
 
 Start the development environment
 
 ```sh
-$ yarn dev
+$ npm run dev
 ```
 
 For production environment...
 
 ```sh
-$ yarn build && yarn start-prod
+$ npm run build && npm run start-prod
 ```
 
 ### 🚚 Packaging
@@ -121,7 +120,7 @@ $ yarn build && yarn start-prod
 To package the app for the local platform:
 
 ```sh
-$ yarn release
+$ npm run release
 ```
 
 ## 🚀 Technologies

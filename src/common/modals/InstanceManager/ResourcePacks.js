@@ -27,6 +27,19 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
+const TrashIcon = styled(FontAwesomeIcon)`
+  margin: 0 10px;
+
+  &:hover {
+    cursor: pointer;
+    path {
+      cursor: pointer;
+      transition: all 0.1s ease-in-out;
+      color: ${props => props.theme.palette.error.main};
+    }
+  }
+`;
+
 const RowContainer = styled.div.attrs(props => ({
   style: props.override
 }))`
@@ -205,17 +218,7 @@ const ResourcePacks = ({ instanceName }) => {
               setTimeout(() => setLoading(false), 500);
             }}
           />
-          <FontAwesomeIcon
-            css={`
-              &:hover {
-                cursor: pointer;
-                path {
-                  cursor: pointer;
-                  transition: all 0.1s ease-in-out;
-                  color: ${props => props.theme.palette.error.main};
-                }
-              }
-            `}
+          <TrashIcon
             onClick={() =>
               deleteFile(
                 item,
@@ -316,18 +319,7 @@ const ResourcePacks = ({ instanceName }) => {
           >
             Select All
           </Checkbox>
-          <FontAwesomeIcon
-            css={`
-              margin: 0 10px;
-              &:hover {
-                cursor: pointer;
-                path {
-                  cursor: pointer;
-                  transition: all 0.1s ease-in-out;
-                  color: ${props => props.theme.palette.error.main};
-                }
-              }
-            `}
+          <TrashIcon
             onClick={() =>
               deleteFile(
                 null,

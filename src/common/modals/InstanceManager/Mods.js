@@ -1,21 +1,24 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
 import { clipboard } from 'electron';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
 import { Portal } from 'react-portal';
 import path from 'path';
+import pMap from 'p-map';
 import { FixedSizeList as List, areEqual } from 'react-window';
-import { Checkbox, Input, Button, Switch, Dropdown, Menu } from 'antd';
+import { Checkbox, Input, Button, Switch, Spin, Dropdown, Menu } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTrash,
+  faArrowDown,
   faDownload,
   faEllipsisV,
   faCopy
 } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
+import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
@@ -26,7 +29,6 @@ import {
   updateMod
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
-import DragnDropEffect from '../../../ui/DragnDropEffect';
 
 const Header = styled.div`
   height: 40px;
@@ -81,6 +83,32 @@ const RowContainer = styled.div.attrs(props => ({
   }
 `;
 
+const DragEnterEffect = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction; column;
+  justify-content: center;
+  align-items: center;
+  border: solid 5px ${props => props.theme.palette.primary.main};
+  transition: opacity 0.2s ease-in-out;
+  border-radius: 3px;
+  width: 100%;
+  height: 100%;
+  margin-top: 3px;
+  z-index: ${props =>
+    props.transitionState !== 'entering' && props.transitionState !== 'entered'
+      ? -1
+      : 2};
+  backdrop-filter: blur(4px);
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, .3) 40%,
+    rgba(0, 0, 0, .3) 40%
+  );
+  opacity: ${({ transitionState }) =>
+    transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
+`;
+
 const StyledDropdown = styled.div`
   width: 32px;
   height: 32px;
@@ -94,6 +122,34 @@ const StyledDropdown = styled.div`
   &:hover {
     background: ${props => props.theme.palette.grey[400]};
   }
+`;
+
+export const keyFrameMoveUpDown = keyframes`
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+
+`;
+
+const DragArrow = styled(FontAwesomeIcon)`
+  ${props =>
+    props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
+
+  color: ${props => props.theme.palette.primary.main};
+
+  animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
+`;
+
+const CopyTitle = styled.h1`
+  ${props =>
+    props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
+
+  color: ${props => props.theme.palette.primary.main};
+
+  animation: ${keyFrameMoveUpDown} 1.5s linear infinite;
 `;
 
 const DeleteSelectedMods = styled(({ selectedMods, ...props }) => (
@@ -339,6 +395,18 @@ const filter = (arr, search) =>
       mod.displayName.toLowerCase().includes(search.toLowerCase())
   );
 
+const getFileType = file => {
+  const fileName = file.name;
+  let fileType = '';
+
+  const splitFileName = fileName.split('.');
+  if (splitFileName.length) {
+    fileType = splitFileName[splitFileName.length - 1];
+  }
+
+  return fileType;
+};
+
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
@@ -350,8 +418,38 @@ const Mods = ({ instanceName }) => {
   const [selectedMods, setSelectedMods] = useState([]);
   const [search, setSearch] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [fileDrag, setFileDrag] = useState(false);
+  const [fileDrop, setFileDrop] = useState(false);
+  const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
+  const [dragCompleted, setDragCompleted] = useState({});
+  const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
 
   const dispatch = useDispatch();
+
+  const antIcon = (
+    <LoadingOutlined
+      css={`
+        font-size: 24px;
+      `}
+      spin
+    />
+  );
+
+  useEffect(() => {
+    const modList = instance.mods;
+
+    if (dragCompletedPopulated) {
+      const AllFilesAreCompleted = Object.keys(dragCompleted).every(x =>
+        modList.find(y => y.fileName === x)
+      );
+      setNumOfDraggedFiles(numOfDraggedFiles - 1);
+
+      if (AllFilesAreCompleted) {
+        setFileDrop(false);
+        setFileDrag(false);
+      }
+    }
+  }, [dragCompleted, instance.mods]);
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
@@ -376,6 +474,64 @@ const Mods = ({ instanceName }) => {
     setSelectedMods,
     latestMods
   );
+
+  const onDragOver = e => {
+    setFileDrag(true);
+    e.preventDefault();
+  };
+
+  const onDrop = async e => {
+    setFileDrop(true);
+    const dragComp = {};
+    const { files } = e.dataTransfer;
+
+    await pMap(
+      Object.values(files),
+      async file => {
+        const fileName = file.name;
+        const fileType = getFileType(file);
+        const existingMods = itemData.items.map(item => item.fileName);
+
+        dragComp[fileName] = false;
+
+        setNumOfDraggedFiles(files.length);
+
+        const { path: filePath } = file;
+
+        if (existingMods.includes(fileName)) {
+          console.error(
+            'A mod with this name already exists in the instance.',
+            file.name
+          );
+          setFileDrop(false);
+          setFileDrag(false);
+        } else if (fileType === 'jar' || fileType === 'disabled') {
+          await fse.copy(
+            filePath,
+            path.join(instancesPath, instanceName, 'mods', fileName)
+          );
+          dragComp[fileName] = true;
+        } else {
+          console.error('This file is not a mod!', file);
+          setFileDrop(false);
+          setFileDrag(false);
+        }
+      },
+      { concurrency: 10 }
+    );
+    setDragCompletedPopulated(files.length === Object.values(dragComp).length);
+    setDragCompleted(dragComp);
+  };
+
+  const onDragEnter = e => {
+    setFileDrag(true);
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const onDragLeave = () => {
+    setFileDrag(false);
+  };
 
   const menu = (
     <Menu>
@@ -476,12 +632,47 @@ const Mods = ({ instanceName }) => {
           placeholder={`Search ${mods.length} mods`}
         />
       </Header>
-
-      <DragnDropEffect
-        instancesPath={instancesPath}
-        instanceName={instanceName}
-        fileList={instance.mods}
+      <div
+        onDragEnter={onDragEnter}
+        css={`
+          width: 100%;
+          height: calc(100% - 40px);
+        `}
       >
+        <Transition timeout={300} in={fileDrag}>
+          {transitionState => (
+            <DragEnterEffect
+              onDrop={onDrop}
+              transitionState={transitionState}
+              onDragLeave={onDragLeave}
+              fileDrag={fileDrag}
+              onDragOver={onDragOver}
+            >
+              {fileDrop ? (
+                <Spin
+                  indicator={antIcon}
+                  css={`
+                    width: 30px;
+                  `}
+                >
+                  {numOfDraggedFiles > 0 ? numOfDraggedFiles : 1}
+                </Spin>
+              ) : (
+                <div
+                  css={`
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                  `}
+                  onDragLeave={e => e.stopPropagation()}
+                >
+                  <CopyTitle>copy</CopyTitle>
+                  <DragArrow icon={faArrowDown} size="3x" />
+                </div>
+              )}
+            </DragEnterEffect>
+          )}
+        </Transition>
         <AutoSizer>
           {({ height, width }) => (
             <List
@@ -495,7 +686,7 @@ const Mods = ({ instanceName }) => {
             </List>
           )}
         </AutoSizer>
-      </DragnDropEffect>
+      </div>
     </div>
   );
 };
