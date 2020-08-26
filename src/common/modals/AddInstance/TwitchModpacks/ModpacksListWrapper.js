@@ -30,7 +30,9 @@ const ModpacksListWrapper = ({
   // Callback function responsible for loading the next page of items.
   loadNextPage,
 
-  setModpack
+  setModpack,
+
+  infiniteLoaderRef
 }) => {
   const dispatch = useDispatch();
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
@@ -122,7 +124,7 @@ const ModpacksListWrapper = ({
       itemCount={itemCount !== 0 ? itemCount : 40}
       loadMoreItems={() => loadMoreItems()}
     >
-      {({ onItemsRendered, ref }) => (
+      {({ onItemsRendered }) => (
         <List
           height={height}
           width={width}
@@ -130,7 +132,11 @@ const ModpacksListWrapper = ({
           itemSize={100}
           onItemsRendered={onItemsRendered}
           innerElementType={innerElementType}
-          ref={ref}
+          ref={list => {
+            // Manually bind ref to reset scroll
+            // eslint-disable-next-line
+            infiniteLoaderRef.current = list;
+          }}
         >
           {Item}
         </List>
