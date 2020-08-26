@@ -1,18 +1,19 @@
 /* eslint-disable */
-import React, { useState, useMemo } from "react";
-import styled from "styled-components";
-import { Checkbox, TextField, Cascader, Button, Input } from "antd";
-import Modal from "../../components/Modal";
+import React, { useState, useMemo } from 'react';
+import styled from 'styled-components';
+import { Checkbox, TextField, Cascader, Button, Input } from 'antd';
+import Modal from '../../components/Modal';
 
-import InstanceName from "./InstanceName";
+import InstanceName from './InstanceName';
 
-import Content from "./Content";
+import Content from './Content';
 
 const AddInstance = ({ defaultPage }) => {
   const [version, setVersion] = useState(null);
   const [step, setStep] = useState(0);
   const [modpack, setModpack] = useState(null);
-  const [importZipPath, setImportZipPath] = useState("");
+  const [importZipPath, setImportZipPath] = useState('');
+  const [page, setPage] = useState(defaultPage);
 
   return (
     <Modal
@@ -26,7 +27,8 @@ const AddInstance = ({ defaultPage }) => {
     >
       <Content
         in={step === 0}
-        page={defaultPage}
+        page={page}
+        setPage={setPage}
         setStep={setStep}
         setVersion={setVersion}
         version={version}

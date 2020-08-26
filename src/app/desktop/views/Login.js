@@ -4,9 +4,14 @@ import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowRight,
+  faExclamationCircle,
+  faCheckCircle
+} from '@fortawesome/free-solid-svg-icons';
 import { Input, Button } from 'antd';
 import { useKey } from 'rooks';
+import axios from 'axios';
 import { login } from '../../../common/reducers/actions';
 import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
@@ -100,9 +105,16 @@ const Footer = styled.div`
   position: absolute;
   bottom: 0;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   width: calc(100% - 80px);
+`;
+
+const Status = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const FooterLinks = styled.div`
@@ -134,12 +146,29 @@ const LoginFailMessage = styled.div`
   color: ${props => props.theme.palette.colors.red};
 `;
 
+const StatusIcon = ({ color }) => {
+  return (
+    <FontAwesomeIcon
+      icon={color === 'red' ? faExclamationCircle : faCheckCircle}
+      color={color}
+      css={`
+        margin: 0 5px;
+        color: ${props =>
+          props.color === 'green'
+            ? props.theme.palette.colors.green
+            : props.theme.palette.error.main};
+      `}
+    />
+  );
+};
+
 const Login = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [version, setVersion] = useState(null);
   const [loginFailed, setLoginFailed] = useState(false);
+  const [status, setStatus] = useState({});
   const loading = useSelector(
     state => state.loading.accountAuthentication.isRequesting
   );
@@ -158,10 +187,19 @@ const Login = () => {
     }, 1000);
   };
 
+  const fetchStatus = async () => {
+    const { data } = await axios.get('https://status.mojang.com/check');
+    const result = {};
+    Object.assign(result, ...data);
+    console.log(result);
+    setStatus(result);
+  };
+
   useKey(['Enter'], authenticate);
 
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
+    fetchStatus().catch(console.error);
   }, []);
 
   return (
@@ -203,26 +241,41 @@ const Login = () => {
               </LoginButton>
             </Form>
             <Footer>
-              <FooterLinks>
-                <div>
-                  <a href="https://my.minecraft.net/en-us/store/minecraft/#register">
-                    CREATE AN ACCOUNT
-                  </a>
-                </div>
-                <div>
-                  <a href="https://my.minecraft.net/en-us/password/forgot/">
-                    FORGOT PASSWORD
-                  </a>
-                </div>
-              </FooterLinks>
               <div
                 css={`
-                  cursor: pointer;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-end;
+                  width: 100%;
                 `}
-                onClick={() => dispatch(openModal('ChangeLogs'))}
               >
-                v{version}
+                <FooterLinks>
+                  <div>
+                    <a href="https://my.minecraft.net/en-us/store/minecraft/#register">
+                      CREATE AN ACCOUNT
+                    </a>
+                  </div>
+                  <div>
+                    <a href="https://my.minecraft.net/en-us/password/forgot/">
+                      FORGOT PASSWORD
+                    </a>
+                  </div>
+                </FooterLinks>
+                <div
+                  css={`
+                    cursor: pointer;
+                  `}
+                  onClick={() => dispatch(openModal('ChangeLogs'))}
+                >
+                  v{version}
+                </div>
               </div>
+              <Status>
+                Auth: <StatusIcon color={status['authserver.mojang.com']} />
+                Session: <StatusIcon color={status['session.minecraft.net']} />
+                Skins: <StatusIcon color={status['textures.minecraft.net']} />
+                API: <StatusIcon color={status['api.mojang.com']} />
+              </Status>
             </Footer>
           </LeftSide>
           <Background transitionState={transitionState}>
