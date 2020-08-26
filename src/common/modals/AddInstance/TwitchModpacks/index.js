@@ -29,7 +29,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
       infiniteLoaderRef.current.scrollToItem(0);
     }
     loadMoreModpacks(true);
-  }, 500);
+  }, 250);
 
   const loadMoreModpacks = async (reset = false) => {
     const reqObj = {};
