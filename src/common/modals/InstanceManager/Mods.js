@@ -415,6 +415,7 @@ const Mods = ({ instanceName }) => {
   );
   const latestMods = useSelector(state => state.latestModManifests);
   const [mods, setMods] = useState(sort(instance.mods));
+
   const [selectedMods, setSelectedMods] = useState([]);
   const [search, setSearch] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -545,6 +546,40 @@ const Mods = ({ instanceName }) => {
       >
         Update all mods
       </Menu.Item>
+      {selectedMods.length >= 1 && selectedMods.length < mods.length && (
+        <Menu.Item
+          key="1"
+          onClick={async () => {
+            await pMap(
+              selectedMods,
+              async file => {
+                const item = mods.find(x => x.fileName === file);
+
+                const isUpdateAvailable =
+                  latestMods[item.projectID] &&
+                  latestMods[item.projectID].id !== item.fileID &&
+                  latestMods[item.projectID].releaseType <= curseReleaseChannel;
+
+                if (isUpdateAvailable) {
+                  await dispatch(
+                    updateMod(
+                      instanceName,
+                      item,
+                      latestMods[item.projectID].id,
+                      instance.modloader[1]
+                    )
+                  );
+                } else setSelectedMods(mods.filter(x => x.fileName !== file));
+              },
+              { concurrency: 5 }
+            );
+            setIsMenuOpen(false);
+          }}
+          disabled={!hasModUpdates}
+        >
+          Update all selected mod
+        </Menu.Item>
+      )}
     </Menu>
   );
 
