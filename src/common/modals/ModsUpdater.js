@@ -7,7 +7,7 @@ import { updateMod } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
 import { _getInstance } from '../utils/selectors';
 
-const ModsUpdater = ({ instanceName }) => {
+const ModsUpdater = ({ instanceName, mods }) => {
   const dispatch = useDispatch();
   const latestMods = useSelector(state => state.latestModManifests);
   const instance = useSelector(state => _getInstance(state)(instanceName));
@@ -31,7 +31,7 @@ const ModsUpdater = ({ instanceName }) => {
 
   useEffect(() => {
     let cancel = false;
-    const updateMods = async () => {
+    const updateAllMods = async () => {
       let i = 0;
       while (!cancel && i < totalMods.length) {
         const mod = totalMods[i];
@@ -57,7 +57,42 @@ const ModsUpdater = ({ instanceName }) => {
       }
     };
 
-    updateMods();
+    const updateSelectedMods = async () => {
+      let i = 0;
+      while (!cancel && i < mods.length) {
+        const fileName = mods[i];
+        const item = totalMods.find(x => x.fileName === fileName);
+
+        if (item) {
+          const isUpdateAvailable =
+            latestMods[item.projectID] &&
+            latestMods[item.projectID].id !== item.fileID &&
+            latestMods[item.projectID].releaseType <= curseReleaseChannel;
+
+          if (isUpdateAvailable) {
+            await dispatch(
+              updateMod(
+                instanceName,
+                item,
+                latestMods[item.projectID].id,
+                instance.modloader[1],
+                // eslint-disable-next-line
+                p => {
+                  if (!cancel) setInstallProgress(p);
+                }
+              )
+            );
+          }
+        }
+        if (!cancel) {
+          setComputedMods(p => p + 1);
+        }
+        i += 1;
+      }
+    };
+
+    if (mods.length >= 1) updateSelectedMods();
+    else updateAllMods();
     return () => {
       cancel = true;
     };
@@ -72,7 +107,8 @@ const ModsUpdater = ({ instanceName }) => {
       title="Mods Updater"
     >
       <Container>
-        Updating mod {computedMods} / {totalMods.length}
+        Updating mod {computedMods} /
+        {mods.length >= 1 ? mods.length : totalMods.length}
         {installProgress !== null && (
           <Progress percent={parseInt(installProgress, 10)} />
         )}

@@ -539,7 +539,7 @@ const Mods = ({ instanceName }) => {
       <Menu.Item
         key="0"
         onClick={async () => {
-          dispatch(openModal('ModsUpdater', { instanceName }));
+          dispatch(openModal('ModsUpdater', { instanceName, mods: [] }));
           setIsMenuOpen(false);
         }}
         disabled={!hasModUpdates}
@@ -550,28 +550,8 @@ const Mods = ({ instanceName }) => {
         <Menu.Item
           key="1"
           onClick={async () => {
-            await pMap(
-              selectedMods,
-              async file => {
-                const item = mods.find(x => x.fileName === file);
-
-                const isUpdateAvailable =
-                  latestMods[item.projectID] &&
-                  latestMods[item.projectID].id !== item.fileID &&
-                  latestMods[item.projectID].releaseType <= curseReleaseChannel;
-
-                if (isUpdateAvailable) {
-                  await dispatch(
-                    updateMod(
-                      instanceName,
-                      item,
-                      latestMods[item.projectID].id,
-                      instance.modloader[1]
-                    )
-                  );
-                } else setSelectedMods(mods.filter(x => x.fileName !== file));
-              },
-              { concurrency: 5 }
+            dispatch(
+              openModal('ModsUpdater', { instanceName, mods: selectedMods })
             );
             setIsMenuOpen(false);
           }}
