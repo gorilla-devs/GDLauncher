@@ -93,7 +93,6 @@ const ModsListWrapper = ({
 
   // Every row is loaded except for our loading indicator row.
   const isItemLoaded = index => !hasNextPage || index < items.length;
-  // console.log('tt', height);
 
   const innerElementType = forwardRef(({ style, ...rest }, ref) => (
     <div
@@ -156,7 +155,6 @@ const Row = ({ index, style, data }) => {
 
   const item = items[index];
 
-  console.log('TT', item);
   const isInstalled = installedMods.find(v => v.projectID === item?.id);
   const primaryImage = item.attachments.find(v => v.isDefault);
   return (
