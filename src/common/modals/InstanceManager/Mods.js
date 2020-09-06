@@ -40,11 +40,24 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
-const RowContainer = styled.div.attrs(props => ({
-  style: props.override
-}))`
+const RowContainer = styled.div`
   width: 100%;
-  background: ${props => props.theme.palette.grey[props.index % 2 ? 700 : 800]};
+  background: ${props => props.theme.palette.grey[800]};
+  ${props =>
+    path.extname(props.name) === '.disabled' &&
+    `border: 2px solid
+    ${props.theme.palette.colors.red};`}
+  ${props =>
+    props.disabled &&
+    ` background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.colors.red},
+  ${props.theme.palette.colors.red} 10px,
+  ${props.theme.palette.colors.maximumRed} 10px,
+  ${props.theme.palette.colors.maximumRed} 20px
+);`}
+  transition: border 0.1s ease-in-out;
+  border-radius: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -70,7 +83,7 @@ const RowContainer = styled.div.attrs(props => ({
       margin-right: 10px;
     }
     &:hover {
-      color: ${props => props.theme.palette.primary.main};
+      color: ${props => props.theme.palette.text.primary};
     }
   }
   .rightPartContent {
@@ -240,10 +253,28 @@ const Row = memo(({ index, style, data }) => {
     latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
 
+  const name = item.fileName.replace('.jar', '').replace('.disabled', '');
+
   return (
     <>
       <ContextMenuTrigger id={item.displayName}>
-        <RowContainer index={index} override={style}>
+        <RowContainer
+          index={index}
+          name={item.fileName}
+          disabled={path.extname(item.fileName) === '.disabled'}
+          style={{
+            ...style,
+            top: style.top + 15,
+            height: style.height - 15,
+            position: 'absolute',
+            width: '100%',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            margin: '15px 0',
+            transition: 'height 0.2s ease-in-out'
+          }}
+        >
           <div className="leftPartContent">
             <Checkbox
               checked={selectedMods.includes(item.fileName)}
@@ -274,7 +305,7 @@ const Row = memo(({ index, style, data }) => {
             }}
             className="rowCenterContent"
           >
-            {item.fileName}
+            {name}
           </div>
           <div className="rightPartContent">
             {isUpdateAvailable &&
