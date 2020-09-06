@@ -171,7 +171,28 @@ const Row = ({ index, style, data }) => {
       {isInstalled && <ModInstalledIcon icon={faCheckCircle} />}
       <RowInnerContainer>
         <RowContainerImg img={primaryImage.thumbnailUrl} />
-        {item.name}
+        <div
+          css={`
+            color: ${props => props.theme.palette.text.third};
+            &:hover {
+              color: ${props => props.theme.palette.text.primary};
+            }
+            transition: color 0.1s ease-in-out;
+          `}
+          onClick={() => {
+            dispatch(
+              openModal('ModOverview', {
+                gameVersion,
+                projectID: item.id,
+                ...(isInstalled && { fileID: isInstalled.fileID }),
+                ...(isInstalled && { fileName: isInstalled.fileName }),
+                instanceName
+              })
+            );
+          }}
+        >
+          {item.name}
+        </div>
       </RowInnerContainer>
       {!isInstalled ? (
         error || (
