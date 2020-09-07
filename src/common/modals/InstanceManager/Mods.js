@@ -42,20 +42,13 @@ const Header = styled.div`
 
 const RowContainer = styled.div`
   width: 100%;
-  background: ${props => props.theme.palette.grey[800]};
-  ${props =>
-    path.extname(props.name) === '.disabled' &&
-    `border: 2px solid
-    ${props.theme.palette.colors.red};`}
+  height: 100%;
+  background: ${props =>
+    props.disabled ? 'transparent' : props.theme.palette.grey[800]};
   ${props =>
     props.disabled &&
-    ` background: repeating-linear-gradient(
-  45deg,
-  ${props.theme.palette.colors.red},
-  ${props.theme.palette.colors.red} 10px,
-  ${props.theme.palette.colors.maximumRed} 10px,
-  ${props.theme.palette.colors.maximumRed} 20px
-);`}
+    `border: 2px solid
+    ${props.theme.palette.colors.red};`}
   transition: border 0.1s ease-in-out;
   border-radius: 4px;
   display: flex;
@@ -73,7 +66,6 @@ const RowContainer = styled.div`
   }
   .rowCenterContent {
     flex: 1;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -94,6 +86,26 @@ const RowContainer = styled.div`
       margin-left: 10px;
     }
   }
+`;
+
+const RowContainerBackground = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  z-index: -1;
+  ${props =>
+    props.disabled &&
+    ` background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.colors.red},
+  ${props.theme.palette.colors.red} 10px,
+  ${props.theme.palette.colors.maximumRed} 10px,
+  ${props.theme.palette.colors.maximumRed} 20px
+  );`};
+  filter: brightness(60%);
+  transition: all 0.1s ease-in-out;
+  opacity: ${props => (props.disabled ? 1 : 0)};
 `;
 
 const DragEnterEffect = styled.div`
@@ -268,9 +280,6 @@ const Row = memo(({ index, style, data }) => {
             height: style.height - 15,
             position: 'absolute',
             width: '100%',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
             margin: '15px 0',
             transition: 'height 0.2s ease-in-out'
           }}
@@ -373,6 +382,9 @@ const Row = memo(({ index, style, data }) => {
               icon={faTrash}
             />
           </div>
+          <RowContainerBackground
+            disabled={path.extname(item.fileName) === '.disabled'}
+          />
         </RowContainer>
       </ContextMenuTrigger>
       <Portal>
