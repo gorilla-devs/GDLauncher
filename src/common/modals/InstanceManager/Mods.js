@@ -546,21 +546,22 @@ const Mods = ({ instanceName }) => {
       >
         Update all mods
       </Menu.Item>
-      {selectedMods.length >= 1 && selectedMods.length < mods.length && (
-        <Menu.Item
-          key="1"
-          onClick={async () => {
-            dispatch(
-              openModal('ModsUpdater', { instanceName, mods: selectedMods })
-            );
-            setSelectedMods([]);
-            setIsMenuOpen(false);
-          }}
-          disabled={!hasModUpdates}
-        >
-          Update all selected mod
-        </Menu.Item>
-      )}
+
+      <Menu.Item
+        key="1"
+        onClick={async () => {
+          dispatch(
+            openModal('ModsUpdater', { instanceName, mods: selectedMods })
+          );
+          setSelectedMods([]);
+          setIsMenuOpen(false);
+        }}
+        disabled={
+          !selectedMods.length >= 1 && !selectedMods.length < mods.length
+        }
+      >
+        Update all selected mod
+      </Menu.Item>
     </Menu>
   );
 
