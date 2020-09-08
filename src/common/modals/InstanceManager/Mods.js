@@ -553,6 +553,7 @@ const Mods = ({ instanceName }) => {
             dispatch(
               openModal('ModsUpdater', { instanceName, mods: selectedMods })
             );
+            setSelectedMods([]);
             setIsMenuOpen(false);
           }}
           disabled={!hasModUpdates}
