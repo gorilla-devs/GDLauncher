@@ -279,7 +279,7 @@ const Row = memo(({ index, style, data }) => {
             top: style.top + 15,
             height: style.height - 15,
             position: 'absolute',
-            width: '100%',
+            width: '97%',
             margin: '15px 0',
             transition: 'height 0.2s ease-in-out'
           }}
