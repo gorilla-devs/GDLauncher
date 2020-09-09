@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { Button, Dropdown, Menu } from 'antd';
+import { Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
 // import { promises as fs } from 'fs';
@@ -95,29 +95,13 @@ const Home = () => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
   }, [account]);
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="0" onClick={() => openAddInstanceModal(0)}>
-        Create Instance
-      </Menu.Item>
-      <Menu.Item key="1" onClick={() => openAddInstanceModal(1)}>
-        Browse Modpacks
-      </Menu.Item>
-      <Menu.Item key="2" onClick={() => openAddInstanceModal(2)}>
-        Import Instance
-      </Menu.Item>
-    </Menu>
-  );
-
   return (
     <div>
       <News news={news} />
       <Instances />
-      <Dropdown overlay={menu} trigger={['click']}>
-        <AddInstanceIcon type="primary">
-          <FontAwesomeIcon icon={faPlus} />
-        </AddInstanceIcon>
-      </Dropdown>
+      <AddInstanceIcon type="primary" onClick={() => openAddInstanceModal(0)}>
+        <FontAwesomeIcon icon={faPlus} />
+      </AddInstanceIcon>
       <AccountContainer type="primary" onClick={openAccountModal}>
         {profileImage ? (
           <img

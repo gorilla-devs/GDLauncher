@@ -1,23 +1,25 @@
 /* eslint-disable */
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faLongArrowAltLeft,
-  faLongArrowAltRight
+  faLongArrowAltRight,
+  faArchive
 } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOutlined } from '@ant-design/icons';
-import { transparentize } from 'polished';
-import { Input, Spin } from 'antd';
+import { Input, Spin, Radio } from 'antd';
 import TwitchModpacks from './TwitchModpacks';
 import Import from './Import';
 import NewInstance from './NewInstance';
+import minecraftIcon from '../../assets/minecraftIcon.png';
+import twitchIcon from '../../assets/twitchIcon.webp';
 
 const Content = ({
   in: inProp,
   setStep,
   page,
+  setPage,
   setVersion,
   version,
   setModpack,
@@ -60,7 +62,58 @@ const Content = ({
                 height: 100%;
               `}
             >
-              {pages[page]}
+              <div
+                css={`
+                  display: flex;
+                  justify-content: center;
+                  margin-bottom: 20px;
+                `}
+              >
+                <Radio.Group
+                  defaultValue={page}
+                  onChange={e => setPage(e.target.value)}
+                >
+                  <Radio.Button value={0}>
+                    <img
+                      src={minecraftIcon}
+                      width="22px"
+                      css={`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Vanilla
+                  </Radio.Button>
+                  <Radio.Button value={1}>
+                    <img
+                      src={twitchIcon}
+                      width="18px"
+                      css={`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Twitch
+                  </Radio.Button>
+                  {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button>
+                  <Radio.Button value={4} disabled>Technic</Radio.Button>
+                  <Radio.Button value={4} disabled>FTB</Radio.Button> */}
+                  <Radio.Button value={2}>
+                    <FontAwesomeIcon
+                      icon={faArchive}
+                      css={`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Import Zip
+                  </Radio.Button>
+                </Radio.Group>
+              </div>
+              <div
+                css={`
+                  height: calc(100% - 50px);
+                `}
+              >
+                {pages[page]}
+              </div>
             </div>
             <div
               page={page}
