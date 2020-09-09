@@ -111,7 +111,14 @@ const DragnDropEffect = ({
 
         const { path: filePath } = file;
 
-        if (Object.values(files).length === 1) {
+        if (fileList && fileList?.includes(fileName)) {
+          console.error(
+            'A resourcepack with this name already exists in the instance.',
+            file.name
+          );
+          setFileDrop(false);
+          setFileDrag(false);
+        } else if (Object.values(files).length === 1) {
           if (
             fileType === '.zip' ||
             fileType === '.7z' ||
