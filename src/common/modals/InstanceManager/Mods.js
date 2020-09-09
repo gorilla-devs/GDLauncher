@@ -265,7 +265,10 @@ const Row = memo(({ index, style, data }) => {
     latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
 
-  const name = item.fileName.replace('.jar', '').replace('.disabled', '');
+  const name = item.fileName
+    .replace('.jar', '')
+    .replace('.zip', '')
+    .replace('.disabled', '');
 
   return (
     <>
