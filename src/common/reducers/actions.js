@@ -348,7 +348,17 @@ export function login(username, password, redirect = true) {
       throw new Error('No username or password provided');
     }
     try {
-      const { data } = await mcAuthenticate(username, password, clientToken);
+      let data = null;
+      try {
+        ({ data } = await mcAuthenticate(username, password, clientToken));
+      } catch (err) {
+        console.error(err);
+        throw new Error('Invalid username or password.');
+      }
+
+      if (!data?.selectedProfile?.id) {
+        throw new Error("It looks like you didn't buy the game.");
+      }
       const skinUrl = await getPlayerSkin(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
@@ -641,15 +651,23 @@ export function updateInstanceConfig(
         instanceName,
         'config.json'
       );
+      const tempConfigPath = path.join(
+        _getInstancesPath(state),
+        instanceName,
+        'config_new_temp.json'
+      );
       // Remove queue and name, they are augmented in the reducer and we don't want them in the config file
       const newConfig = updateFunction(omit(instance, ['queue', 'name']));
       try {
         await fs.lstat(configPath);
 
-        await fse.outputJson(configPath, newConfig);
+        await fse.outputJson(tempConfigPath, newConfig);
+
+        await fse.rename(tempConfigPath, configPath);
       } catch {
         if (forceWrite) {
-          await fse.outputJson(configPath, newConfig);
+          await fse.outputJson(tempConfigPath, newConfig);
+          await fse.rename(tempConfigPath, configPath);
         }
       }
       dispatch({
@@ -1513,14 +1531,22 @@ export const startListener = () => {
             const notMatch = (data.unmatchedFingerprints || [])[0];
             let mod = {};
             if (exactMatch) {
-              const { data: addon } = await getAddon(exactMatch.file.projectId);
-
-              mod = normalizeModData(
-                exactMatch.file,
-                exactMatch.file.projectId,
-                addon.name
-              );
-              mod.fileName = path.basename(fileName);
+              let addon = null;
+              try {
+                addon = (await getAddon(exactMatch.file.projectId)).data;
+                mod = normalizeModData(
+                  exactMatch.file,
+                  exactMatch.file.projectId,
+                  addon.name
+                );
+                mod.fileName = path.basename(fileName);
+              } catch {
+                mod = {
+                  fileName: path.basename(fileName),
+                  displayName: path.basename(fileName),
+                  packageFingerprint: murmurHash
+                };
+              }
             } else if (notMatch) {
               mod = {
                 fileName: path.basename(fileName),
@@ -2104,6 +2130,9 @@ export function launchInstance(instanceName) {
     });
 
     ps.on('close', code => {
+      if (!ps.killed) {
+        ps.kill('SIGKILL');
+      }
       ipcRenderer.invoke('show-window');
       fse.remove(instanceJLFPath);
       if (process.platform === 'win32') fse.remove(symLinkDirPath);

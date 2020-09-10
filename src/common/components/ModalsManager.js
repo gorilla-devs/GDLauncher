@@ -100,9 +100,7 @@ const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
     if (unmounting) unMountStyle();
   }, [unmounting]);
 
-  const back = e => {
-    e.stopPropagation();
-
+  const back = () => {
     if (preventClose) {
       setModalStyle({
         animation: `modalShake 0.25s linear infinite`
@@ -144,10 +142,8 @@ const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
   };
 
   return (
-    <Overlay onClick={back} style={bgStyle}>
-      <Modal style={modalStyle} onClick={back}>
-        {children}
-      </Modal>
+    <Overlay onMouseDown={back} style={bgStyle}>
+      <Modal style={modalStyle}>{children}</Modal>
     </Overlay>
   );
 };

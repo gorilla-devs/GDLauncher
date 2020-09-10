@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { useKey } from 'rooks';
 import CloseButton from './CloseButton';
 import { closeModal } from '../reducers/modals/actions';
 
@@ -32,9 +33,12 @@ const Modal = ({
   removePadding
 }) => {
   const dispatch = useDispatch();
+
+  useKey(['Escape'], () => dispatch(closeModal()));
+
   return (
     <div
-      onClick={e => e.stopPropagation()}
+      onMouseDown={e => e.stopPropagation()}
       transparentBackground={transparentBackground}
       className={className}
       css={`
