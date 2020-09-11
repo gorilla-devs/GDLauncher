@@ -415,7 +415,6 @@ const Mods = ({ instanceName }) => {
   );
   const latestMods = useSelector(state => state.latestModManifests);
   const [mods, setMods] = useState(sort(instance.mods));
-
   const [selectedMods, setSelectedMods] = useState([]);
   const [search, setSearch] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -538,7 +537,7 @@ const Mods = ({ instanceName }) => {
     <Menu>
       <Menu.Item
         key="0"
-        onClick={async () => {
+        onClick={() => {
           dispatch(openModal('ModsUpdater', { instanceName, mods: [] }));
           setIsMenuOpen(false);
         }}
@@ -549,7 +548,7 @@ const Mods = ({ instanceName }) => {
 
       <Menu.Item
         key="1"
-        onClick={async () => {
+        onClick={() => {
           dispatch(
             openModal('ModsUpdater', { instanceName, mods: selectedMods })
           );
