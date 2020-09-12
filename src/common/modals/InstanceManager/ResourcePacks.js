@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { memo, useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
@@ -14,7 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
-import { _getInstance, _getInstancesPath } from '../../utils/selectors';
+import { _getInstancesPath } from '../../utils/selectors';
 import DragnDropEffect from '../../../ui/DragnDropEffect';
 
 const Header = styled.div`
@@ -97,13 +96,7 @@ export const keyFrameMoveUpDown = keyframes`
 
 let watcher;
 
-const toggleModDisabled = async (
-  c,
-  instanceName,
-  instancePath,
-  item,
-  dispatch
-) => {
+const toggleModDisabled = async (c, instancePath, item) => {
   const destFileName = c ? item.replace('.disabled', '') : `${item}.disabled`;
 
   await fse.move(
@@ -132,16 +125,17 @@ const NotItemsAvailable = styled.div`
 const ResourcePacks = ({ instanceName }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const [resourcePacks, setResourcePacks] = useState([]);
-  const [dragCompleted, setDragCompleted] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
-  const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
   const resourcePacksPath = path.join(
     instancesPath,
     instanceName,
     'resourcepacks'
   );
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const deleteFile = useCallback(
+    /* eslint-disable no-shadow */
     async (
       item,
       instancesPath,
@@ -163,7 +157,7 @@ const ResourcePacks = ({ instanceName }) => {
           )
         );
       } else if (selectedItems.length > 1 && !item) {
-        Promise.all(
+        await Promise.all(
           selectedItems.map(async file => {
             await fse.remove(path.join(resourcePacksPath, file));
           })
@@ -174,7 +168,6 @@ const ResourcePacks = ({ instanceName }) => {
   );
 
   const Row = memo(({ index, style, data }) => {
-    const [loading, setLoading] = useState(false);
     const {
       items,
       instanceName,
@@ -184,7 +177,6 @@ const ResourcePacks = ({ instanceName }) => {
       resourcePacksPath
     } = data;
     const item = items[index];
-    const dispatch = useDispatch();
     return (
       <RowContainer index={index} override={style}>
         <div className="leftPartContent">
@@ -263,21 +255,6 @@ const ResourcePacks = ({ instanceName }) => {
     startListener();
     return () => watcher?.close();
   }, []);
-
-  useEffect(() => {
-    if (dragCompletedPopulated) {
-      const AllFilesAreCompleted = Object.keys(dragCompleted).every(x =>
-        resourcePacks.find(y => y === x)
-      );
-
-      setNumOfDraggedFiles(numOfDraggedFiles - 1);
-
-      if (AllFilesAreCompleted) {
-        setFileDrop(false);
-        setFileDrag(false);
-      }
-    }
-  }, [dragCompleted, resourcePacks]);
 
   const itemData = createItemData(
     resourcePacks,
