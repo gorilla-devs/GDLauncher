@@ -135,31 +135,30 @@ const ResourcePacks = ({ instanceName }) => {
   const dispatch = useDispatch();
 
   const deleteFile = useCallback(
-    /* eslint-disable no-shadow */
     async (
       item,
-      instancesPath,
-      selectedItems,
-      resourcePacksPath,
-      instanceName
+      instancesPathh,
+      selectedItemss,
+      rscPacksPath,
+      instanceNamee
     ) => {
-      if (selectedItems.length === 0 && item) {
+      if (selectedItemss.length === 0 && item) {
         await fse.remove(
-          path.join(instancesPath, instanceName, 'resourcepacks', item)
+          path.join(instancesPathh, instanceNamee, 'resourcepacks', item)
         );
-      } else if (selectedItems.length === 1) {
+      } else if (selectedItemss.length === 1) {
         await fse.remove(
           path.join(
-            instancesPath,
-            instanceName,
+            instancesPathh,
+            instanceNamee,
             'resourcepacks',
-            selectedItems[0]
+            selectedItemss[0]
           )
         );
-      } else if (selectedItems.length > 1 && !item) {
+      } else if (selectedItemss.length > 1 && !item) {
         await Promise.all(
-          selectedItems.map(async file => {
-            await fse.remove(path.join(resourcePacksPath, file));
+          selectedItemss.map(async file => {
+            await fse.remove(path.join(rscPacksPath, file));
           })
         );
       }
@@ -170,23 +169,23 @@ const ResourcePacks = ({ instanceName }) => {
   const Row = memo(({ index, style, data }) => {
     const {
       items,
-      instanceName,
+      instanceName: name,
       instancePath,
-      selectedItems,
-      setSelectedItems,
-      resourcePacksPath
+      selectedItems: slcItems,
+      setSelectedItems: setSlcItems,
+      resourcePacksPath: rscPacksPath
     } = data;
     const item = items[index];
     return (
       <RowContainer index={index} override={style}>
         <div className="leftPartContent">
           <Checkbox
-            checked={selectedItems.includes(item)}
+            checked={slcItems.includes(item)}
             onChange={e => {
               if (e.target.checked) {
-                setSelectedItems([...selectedItems, item]);
+                setSlcItems([...slcItems, item]);
               } else {
-                setSelectedItems(selectedItems.filter(v => v !== item));
+                setSlcItems(slcItems.filter(v => v !== item));
               }
             }}
           />
@@ -200,25 +199,13 @@ const ResourcePacks = ({ instanceName }) => {
             disabled={loading}
             onChange={async c => {
               setLoading(true);
-              await toggleModDisabled(
-                c,
-                instanceName,
-                instancePath,
-                item,
-                dispatch
-              );
+              await toggleModDisabled(c, name, instancePath, item, dispatch);
               setTimeout(() => setLoading(false), 500);
             }}
           />
           <TrashIcon
             onClick={() =>
-              deleteFile(
-                item,
-                instancesPath,
-                selectedItems,
-                resourcePacksPath,
-                instanceName
-              )
+              deleteFile(item, instancesPath, slcItems, rscPacksPath, name)
             }
             icon={faTrash}
           />
