@@ -40,15 +40,24 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
-const RowContainer = styled.div`
+const RowContainer = styled.div.attrs(props => ({
+  style: props.override
+}))`
   width: 100%;
   height: 100%;
   background: ${props =>
-    props.disabled ? 'transparent' : props.theme.palette.grey[800]};
+    props.disabled || props.selected
+      ? 'transparent'
+      : props.theme.palette.grey[800]};
   ${props =>
     props.disabled &&
+    !props.selected &&
     `border: 2px solid
     ${props.theme.palette.colors.red};`}
+  ${props =>
+    props.selected &&
+    `border: 2px solid
+    ${props.theme.palette.primary.main};`}
   transition: border 0.1s ease-in-out;
   border-radius: 4px;
   display: flex;
@@ -94,9 +103,21 @@ const RowContainerBackground = styled.div`
   position: absolute;
   left: 0;
   z-index: -1;
+
+  ${props =>
+    props.selected &&
+    ` background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.primary.main},
+  ${props.theme.palette.primary.main} 10px,
+  ${props.theme.palette.primary.dark} 10px,
+  ${props.theme.palette.primary.dark} 20px
+  );`};
+
   ${props =>
     props.disabled &&
-    ` background: repeating-linear-gradient(
+    !props.selected &&
+    `background: repeating-linear-gradient(
   45deg,
   ${props.theme.palette.colors.red},
   ${props.theme.palette.colors.red} 10px,
@@ -105,7 +126,7 @@ const RowContainerBackground = styled.div`
   );`};
   filter: brightness(60%);
   transition: all 0.1s ease-in-out;
-  opacity: ${props => (props.disabled ? 1 : 0)};
+  opacity: ${props => (props.disabled || props.selected ? 1 : 0)};
 `;
 
 const DragEnterEffect = styled.div`
@@ -276,8 +297,9 @@ const Row = memo(({ index, style, data }) => {
         <RowContainer
           index={index}
           name={item.fileName}
+          selected={selectedMods.includes(item.fileName)}
           disabled={path.extname(item.fileName) === '.disabled'}
-          style={{
+          override={{
             ...style,
             top: style.top + 15,
             height: style.height - 15,
@@ -386,6 +408,7 @@ const Row = memo(({ index, style, data }) => {
             />
           </div>
           <RowContainerBackground
+            selected={selectedMods.includes(item.fileName)}
             disabled={path.extname(item.fileName) === '.disabled'}
           />
         </RowContainer>
