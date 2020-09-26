@@ -44,7 +44,22 @@ const RowContainer = styled.div.attrs(props => ({
   style: props.override
 }))`
   width: 100%;
-  background: ${props => props.theme.palette.grey[props.index % 2 ? 700 : 800]};
+  height: 100%;
+  background: ${props =>
+    props.disabled || props.selected
+      ? 'transparent'
+      : props.theme.palette.grey[800]};
+  ${props =>
+    props.disabled &&
+    !props.selected &&
+    `border: 2px solid
+    ${props.theme.palette.colors.red};`}
+  ${props =>
+    props.selected &&
+    `border: 2px solid
+    ${props.theme.palette.primary.main};`}
+  transition: border 0.1s ease-in-out;
+  border-radius: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -60,7 +75,6 @@ const RowContainer = styled.div.attrs(props => ({
   }
   .rowCenterContent {
     flex: 1;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -71,7 +85,7 @@ const RowContainer = styled.div.attrs(props => ({
       margin-right: 10px;
     }
     &:hover {
-      color: ${props => props.theme.palette.primary.main};
+      color: ${props => props.theme.palette.text.primary};
     }
   }
   .rightPartContent {
@@ -82,6 +96,38 @@ const RowContainer = styled.div.attrs(props => ({
       margin-left: 10px;
     }
   }
+`;
+
+const RowContainerBackground = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  z-index: -1;
+
+  ${props =>
+    props.selected &&
+    ` background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.primary.main},
+  ${props.theme.palette.primary.main} 10px,
+  ${props.theme.palette.primary.dark} 10px,
+  ${props.theme.palette.primary.dark} 20px
+  );`};
+
+  ${props =>
+    props.disabled &&
+    !props.selected &&
+    `background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.colors.red},
+  ${props.theme.palette.colors.red} 10px,
+  ${props.theme.palette.colors.maximumRed} 10px,
+  ${props.theme.palette.colors.maximumRed} 20px
+  );`};
+  filter: brightness(60%);
+  transition: all 0.1s ease-in-out;
+  opacity: ${props => (props.disabled || props.selected ? 1 : 0)};
 `;
 
 const DragEnterEffect = styled.div`
@@ -242,10 +288,30 @@ const Row = memo(({ index, style, data }) => {
     latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
 
+  const name = item.fileName
+    .replace('.jar', '')
+    .replace('.zip', '')
+    .replace('.disabled', '');
+
   return (
     <>
       <ContextMenuTrigger id={item.displayName}>
-        <RowContainer index={index} override={style} isHovered={isHovered}>
+        <RowContainer
+          index={index}
+          name={item.fileName}
+          isHovered={isHovered}
+          selected={selectedMods.includes(item.fileName)}
+          disabled={path.extname(item.fileName) === '.disabled'}
+          override={{
+            ...style,
+            top: style.top + 15,
+            height: style.height - 15,
+            position: 'absolute',
+            width: '97%',
+            margin: '15px 0',
+            transition: 'height 0.2s ease-in-out'
+          }}
+        >
           <div className="leftPartContent">
             <Checkbox
               checked={selectedMods.includes(item.fileName)}
@@ -276,7 +342,7 @@ const Row = memo(({ index, style, data }) => {
             }}
             className="rowCenterContent"
           >
-            {item.fileName}
+            {name}
           </div>
           <div className="rightPartContent">
             {isUpdateAvailable &&
@@ -344,6 +410,10 @@ const Row = memo(({ index, style, data }) => {
               icon={faTrash}
             />
           </div>
+          <RowContainerBackground
+            selected={selectedMods.includes(item.fileName)}
+            disabled={path.extname(item.fileName) === '.disabled'}
+          />
         </RowContainer>
       </ContextMenuTrigger>
       <Portal>
