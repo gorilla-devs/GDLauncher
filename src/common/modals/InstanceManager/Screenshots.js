@@ -486,8 +486,10 @@ const DateSection = styled.div`
 
 const NoScreenAvailable = styled.div`
   height: 100%;
-  text-align: center;
-  padding-top: 25%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledContexMenu = styled(ContextMenu)`
