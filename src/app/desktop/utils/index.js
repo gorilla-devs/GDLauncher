@@ -4,7 +4,7 @@ import fse from 'fs-extra';
 import { extractFull } from 'node-7z';
 import jimp from 'jimp/es';
 import makeDir from 'make-dir';
-import jarAnalyzer from 'jarfile';
+import { fetchJarAtPath } from 'jarfile';
 import { promisify } from 'util';
 import { ipcRenderer } from 'electron';
 import path from 'path';
@@ -620,7 +620,7 @@ export const patchForge113 = async (
         cp => `"${path.join(librariesPath, ...mavenToArray(cp))}"`
       );
 
-      const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
+      const jarFile = await promisify(fetchJarAtPath)(filePath);
       const mainClass = jarFile.valueForManifestEntry('Main-Class');
       await new Promise(resolve => {
         const ps = spawn(

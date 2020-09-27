@@ -47,9 +47,21 @@ const RowContainer = styled.div.attrs(props => ({
   style: props.override
 }))`
   width: 100%;
-  background: ${props => props.theme.palette.grey[800]};
-  border: solid 5px ${props => props.theme.palette.grey[700]};
-  border-style: solid none solid none;
+  background: ${props =>
+    props.disabled || props.selected
+      ? 'transparent'
+      : props.theme.palette.grey[800]};
+
+  ${props =>
+    props.disabled &&
+    !props.selected &&
+    `box-shadow: inset 0 0 0 3px ${props.theme.palette.colors.red};`}
+  ${props =>
+    props.selected &&
+    `box-shadow: inset 0 0 0 3px ${props.theme.palette.primary.main};`}
+      
+  transition: border 0.1s ease-in-out;
+  border-radius: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -86,6 +98,38 @@ const RowContainer = styled.div.attrs(props => ({
       margin-left: 10px;
     }
   }
+`;
+
+const RowContainerBackground = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  z-index: -1;
+
+  ${props =>
+    props.selected &&
+    ` background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.primary.main},
+  ${props.theme.palette.primary.main} 10px,
+  ${props.theme.palette.primary.dark} 10px,
+  ${props.theme.palette.primary.dark} 20px
+  );`};
+
+  ${props =>
+    props.disabled &&
+    !props.selected &&
+    `background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.colors.red},
+  ${props.theme.palette.colors.red} 10px,
+  ${props.theme.palette.colors.maximumRed} 10px,
+  ${props.theme.palette.colors.maximumRed} 20px
+  );`};
+  filter: brightness(60%);
+  transition: opacity 0.1s ease-in-out;
+  opacity: ${props => (props.disabled || props.selected ? 1 : 0)};
 `;
 
 export const keyFrameMoveUpDown = keyframes`
@@ -185,7 +229,20 @@ const ResourcePacks = ({ instanceName }) => {
     } = data;
     const item = items[index];
     return (
-      <RowContainer index={index} override={style}>
+      <RowContainer
+        index={index}
+        override={{
+          ...style,
+          top: style.top + 15,
+          height: style.height - 15,
+          position: 'absolute',
+          width: '97%',
+          margin: '15px 0',
+          transition: 'height 0.2s ease-in-out'
+        }}
+        selected={slcItems.includes(item)}
+        disabled={path.extname(item) !== '.disabled'}
+      >
         <div className="leftPartContent">
           <Checkbox
             checked={slcItems.includes(item)}
@@ -219,6 +276,10 @@ const ResourcePacks = ({ instanceName }) => {
             icon={faTrash}
           />
         </div>
+        <RowContainerBackground
+          selected={slcItems.includes(item)}
+          disabled={path.extname(item) !== '.disabled'}
+        />
       </RowContainer>
     );
   }, areEqual);
