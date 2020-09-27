@@ -221,7 +221,7 @@ function News({ style, news }) {
       width={1000}
       height={180}
       viewBox="0 0 1000 180"
-      foregroundColor={ContextTheme.palette.grey[700]}
+      foregroundColor={ContextTheme.palette.grey[900]}
       backgroundColor={ContextTheme.palette.grey[800]}
       title={false}
     >

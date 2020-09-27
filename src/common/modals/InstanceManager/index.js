@@ -9,6 +9,7 @@ import Modal from '../../components/Modal';
 import Overview from './Overview';
 import { ipcRenderer } from 'electron';
 import Screenshots from './Screenshots';
+import ResourcePacks from './ResourcePacks';
 import Notes from './Notes';
 import Mods from './Mods';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -144,6 +145,7 @@ const menuEntries = {
   mods: { name: 'Mods', component: Mods },
   modpack: { name: 'Modpack', component: Modpack },
   notes: { name: 'Notes', component: Notes },
+  resourcePacks: { name: 'Resource Packs', component: ResourcePacks },
   // resourcePacks: { name: "Resource Packs", component: Overview },
   // worlds: { name: "Worlds", component: Overview },
   screenshots: { name: 'Screenshots', component: Screenshots }

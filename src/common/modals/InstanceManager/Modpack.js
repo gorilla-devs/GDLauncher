@@ -211,6 +211,9 @@ const Changelog = styled.div`
   margin: 20px 40px;
   padding: 20px;
   font-size: 20px;
+  * {
+    color: ${props => props.theme.palette.text.primary} !important;
+  }
   & > div:first-child {
     font-size: 24px;
     width: 100%;

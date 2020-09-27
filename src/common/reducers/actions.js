@@ -348,7 +348,17 @@ export function login(username, password, redirect = true) {
       throw new Error('No username or password provided');
     }
     try {
-      const { data } = await mcAuthenticate(username, password, clientToken);
+      let data = null;
+      try {
+        ({ data } = await mcAuthenticate(username, password, clientToken));
+      } catch (err) {
+        console.error(err);
+        throw new Error('Invalid username or password.');
+      }
+
+      if (!data?.selectedProfile?.id) {
+        throw new Error("It looks like you didn't buy the game.");
+      }
       const skinUrl = await getPlayerSkin(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
@@ -2241,6 +2251,7 @@ export function installMod(
         { concurrency: 2 }
       );
     }
+    return destFile;
   };
 }
 
@@ -2346,8 +2357,15 @@ export const getAppLatestVersion = () => {
       // swallow error
     }
 
-    const installedVersion = parse(await ipcRenderer.invoke('getAppVersion'));
+    const v = await ipcRenderer.invoke('getAppVersion');
+
+    const installedVersion = parse(v);
     const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
+
+    // If we're on beta but the release channel is stable, return latest stable to force an update
+    if (v.includes('beta') && releaseChannel === 0) {
+      return latestStablerelease;
+    }
 
     if (!isAppUpdated(latestStablerelease)) {
       return latestStablerelease;
@@ -2371,7 +2389,6 @@ export const checkForPortableUpdates = () => {
 
     // Latest version has a value only if the user is not using the latest
     if (latestVersion) {
-      // eslint-disable-next-line
       const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${latestVersion?.tag_name}`;
       const { data: latestManifest } = await axios.get(
         `${baseAssetUrl}/${process.platform}_latest.json`

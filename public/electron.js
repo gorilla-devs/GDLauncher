@@ -424,9 +424,7 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
-  // False for now
-  // autoUpdater.allowDowngrade = allowUnstableReleases;
-  autoUpdater.allowDowngrade = false;
+  autoUpdater.allowDowngrade = allowUnstableReleases;
   autoUpdater.allowPrerelease = allowUnstableReleases;
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',
