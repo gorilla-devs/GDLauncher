@@ -23,44 +23,29 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
   const [files, setFiles] = useState(null);
-  const [changeLog, setChangeLog] = useState(null);
   const [selectedId, setSelectedId] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const initScreenShots = async data => {
-    if (data) {
-      const mappedFiles = await Promise.all(
-        data.map(async v => {
-          const { data: changelog } = await getAddonFileChangelog(
-            modpack.id,
-            v.id
-          );
-          return {
-            ...v,
-            changelog
-          };
-        })
-      );
-      setChangeLog(mappedFiles);
-    }
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    getAddonDescription(modpack.id).then(data => {
-      // Replace the beginning of all relative URLs with the Curseforge URL
-      const modifiedData = data.data.replace(
-        /href="(?!http)/g,
-        `href="${CURSEFORGE_URL}`
-      );
+    const init = async () => {
+      setLoading(true);
+      await Promise.all([
+        getAddonDescription(modpack.id).then(data => {
+          // Replace the beginning of all relative URLs with the Curseforge URL
+          const modifiedData = data.data.replace(
+            /href="(?!http)/g,
+            `href="${CURSEFORGE_URL}`
+          );
 
-      setDescription(modifiedData);
-    });
-    getAddonFiles(modpack.id).then(data => {
-      setFiles(data.data);
-      initScreenShots(data.data);
-      setLoading(false);
-    });
+          setDescription(modifiedData);
+        }),
+        getAddonFiles(modpack.id).then(async data => {
+          setFiles(data.data);
+          setLoading(false);
+        })
+      ]);
+    };
+    init();
   }, []);
 
   const handleChange = value => setSelectedId(value);
@@ -134,7 +119,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                     {formatDate(modpack.dateModified)}
                   </div>
                   <div>
-                    <label>Mc version: </label>
+                    <label>MC version: </label>
                     {modpack.gameVersionLatestFiles[0].gameVersion}
                   </div>
                 </ParallaxContentInfos>
@@ -154,10 +139,12 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                   <FontAwesomeIcon icon={faExternalLinkAlt} />
                 </Button>
                 <Button
+                  disabled={loading}
                   onClick={() => {
                     dispatch(
-                      openModal('ModsChangeLogs', {
-                        changeLog: changeLog[0]?.changelog
+                      openModal('ModChangelog', {
+                        modpackId: modpack.id,
+                        files
                       })
                     );
                   }}

@@ -8,8 +8,8 @@ import { ipcRenderer } from 'electron';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import { Checkbox, Button, Switch } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { useSelector, useDispatch } from 'react-redux';
+import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useSelector } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
@@ -26,17 +26,21 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
-const TrashIcon = styled(FontAwesomeIcon)`
+const TrashIcon = styled(({ selectedMods, ...props }) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  <FontAwesomeIcon {...props} />
+))`
   margin: 0 10px;
-
-  &:hover {
+  ${props =>
+    props.selectedMods > 0 &&
+    `&:hover {
+  cursor: pointer;
+  path {
     cursor: pointer;
-    path {
-      cursor: pointer;
-      transition: all 0.1s ease-in-out;
-      color: ${props => props.theme.palette.error.main};
-    }
+    transition: color 0.1s ease-in-out;
+    color: ${props.theme.palette.error.main};
   }
+}`}
 `;
 
 const RowContainer = styled.div.attrs(props => ({
@@ -92,11 +96,25 @@ export const keyFrameMoveUpDown = keyframes`
       transform: translateY(-15px);
     }
     
-    `;
+`;
+
+const OpenFolderButton = styled(FontAwesomeIcon)`
+  transition: color 0.1s ease-in-out;
+  cursor: pointer;
+  margin: 0 10px;
+  &:hover {
+    cursor: pointer;
+    path {
+      cursor: pointer;
+      transition: color 0.1s ease-in-out;
+      color: ${props => props.theme.palette.primary.main};
+    }
+  }
+`;
 
 let watcher;
 
-const toggleModDisabled = async (c, instancePath, item) => {
+const toggleResourcePackDisabled = async (c, instancePath, item) => {
   const destFileName = c ? item.replace('.disabled', '') : `${item}.disabled`;
 
   await fse.move(
@@ -132,7 +150,6 @@ const ResourcePacks = ({ instanceName }) => {
     'resourcepacks'
   );
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
 
   const deleteFile = useCallback(
     async (
@@ -142,20 +159,11 @@ const ResourcePacks = ({ instanceName }) => {
       rscPacksPath,
       instanceNamee
     ) => {
-      if (selectedItemss.length === 0 && item) {
+      if (item) {
         await fse.remove(
           path.join(instancesPathh, instanceNamee, 'resourcepacks', item)
         );
-      } else if (selectedItemss.length === 1) {
-        await fse.remove(
-          path.join(
-            instancesPathh,
-            instanceNamee,
-            'resourcepacks',
-            selectedItemss[0]
-          )
-        );
-      } else if (selectedItemss.length > 1 && !item) {
+      } else if (selectedItemss.length > 0) {
         await Promise.all(
           selectedItemss.map(async file => {
             await fse.remove(path.join(rscPacksPath, file));
@@ -191,7 +199,7 @@ const ResourcePacks = ({ instanceName }) => {
           />
           {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
         </div>
-        <div className="rowCenterContent">{item}</div>
+        <div className="rowCenterContent">{item.replace('.disabled', '')}</div>
         <div className="rightPartContent">
           <Switch
             size="small"
@@ -199,14 +207,15 @@ const ResourcePacks = ({ instanceName }) => {
             disabled={loading}
             onChange={async c => {
               setLoading(true);
-              await toggleModDisabled(c, name, instancePath, item, dispatch);
+              await toggleResourcePackDisabled(c, instancePath, item);
               setTimeout(() => setLoading(false), 500);
             }}
           />
           <TrashIcon
-            onClick={() =>
-              deleteFile(item, instancesPath, slcItems, rscPacksPath, name)
-            }
+            selectedMods
+            onClick={() => {
+              deleteFile(item, instancesPath, slcItems, rscPacksPath, name);
+            }}
             icon={faTrash}
           />
         </div>
@@ -216,7 +225,8 @@ const ResourcePacks = ({ instanceName }) => {
 
   const openFolderDialog = async () => {
     const dialog = await ipcRenderer.invoke('openFileDialog', [
-      { extensions: ['7zip', 'zip'] }
+      { name: 'Resource Pack', extensions: ['zip'] },
+      { name: 'All', extensions: ['*'] }
     ]);
     if (dialog.canceled) return;
     const fileName = path.basename(dialog.filePaths[0]);
@@ -224,6 +234,11 @@ const ResourcePacks = ({ instanceName }) => {
       dialog.filePaths[0],
       path.join(instancesPath, instanceName, 'resourcepacks', fileName)
     );
+  };
+
+  const openFolder = async p => {
+    await makeDir(p);
+    ipcRenderer.invoke('openFolder', p);
   };
 
   const startListener = async () => {
@@ -234,6 +249,9 @@ const ResourcePacks = ({ instanceName }) => {
       if (filename) {
         const resourcePackFiles = await fs.readdir(resourcePacksPath);
         setResourcePacks(resourcePackFiles);
+        setSelectedItems(prev => {
+          return prev.filter(v => resourcePackFiles.includes(v));
+        });
       }
     });
   };
@@ -277,23 +295,35 @@ const ResourcePacks = ({ instanceName }) => {
             }
             onChange={() =>
               selectedItems.length !== resourcePacks.length
-                ? setSelectedItems(resourcePacks.map(v => v))
+                ? setSelectedItems(resourcePacks)
                 : setSelectedItems([])
             }
           >
             Select All
           </Checkbox>
           <TrashIcon
-            onClick={() =>
+            selectedMods={selectedItems.length}
+            onClick={async () => {
               deleteFile(
                 null,
                 instancesPath,
                 selectedItems,
                 resourcePacksPath,
                 instanceName
-              )
-            }
+              );
+            }}
             icon={faTrash}
+          />
+          <OpenFolderButton
+            onClick={async () => {
+              await makeDir(
+                path.join(instancesPath, instanceName, 'resourcepacks')
+              );
+              openFolder(
+                path.join(instancesPath, instanceName, 'resourcepacks')
+              );
+            }}
+            icon={faFolder}
           />
         </div>
         <Button

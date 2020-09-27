@@ -2251,6 +2251,7 @@ export function installMod(
         { concurrency: 2 }
       );
     }
+    return destFile;
   };
 }
 

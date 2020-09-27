@@ -6,7 +6,7 @@ import ReactHtmlParser from 'react-html-parser';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLinkAlt, faInfo } from '@fortawesome/free-solid-svg-icons';
-import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
+import { Button, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
 import {
@@ -38,70 +38,55 @@ const ModOverview = ({
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
   const [addon, setAddon] = useState(null);
-  const [changeLog, setChangeLog] = useState(null);
   const [files, setFiles] = useState([]);
-  const [selectedItem, setSelectedItem] = useState({ fileID, fileName });
+  const [selectedItem, setSelectedItem] = useState(fileID);
   const [installedData, setInstalledData] = useState({ fileID, fileName });
   const [loading, setLoading] = useState(false);
   const [loadingFiles, setLoadingFiles] = useState(true);
   const instancesPath = useSelector(_getInstancesPath);
   const instance = useSelector(state => _getInstance(state)(instanceName));
 
-  const initScreenShots = async data => {
-    if (data) {
-      const mappedFiles = await Promise.all(
-        data.map(async v => {
-          const { data: changelog } = await getAddonFileChangelog(
-            projectID,
-            v.id
-          );
-          return {
-            ...v,
-            changelog
-          };
-        })
-      );
-      setChangeLog(mappedFiles);
-    }
-  };
-
   useEffect(() => {
-    setLoadingFiles(true);
-    getAddon(projectID).then(data => setAddon(data.data));
-    getAddonDescription(projectID).then(data => {
-      // Replace the beginning of all relative URLs with the Curseforge URL
-      const modifiedData = data.data.replace(
-        /href="(?!http)/g,
-        `href="${CURSEFORGE_URL}`
-      );
+    const init = async () => {
+      setLoadingFiles(true);
+      await Promise.all([
+        getAddon(projectID).then(data => setAddon(data.data)),
+        getAddonDescription(projectID).then(data => {
+          // Replace the beginning of all relative URLs with the Curseforge URL
+          const modifiedData = data.data.replace(
+            /href="(?!http)/g,
+            `href="${CURSEFORGE_URL}`
+          );
+          setDescription(modifiedData);
+        }),
+        getAddonFiles(projectID).then(async data => {
+          const isFabric =
+            getPatchedInstanceType(instance) === FABRIC && projectID !== 361988;
+          const isForge =
+            getPatchedInstanceType(instance) === FORGE || projectID === 361988;
+          let filteredFiles = [];
+          if (isFabric) {
+            filteredFiles = filterFabricFilesByVersion(data.data, gameVersion);
+          } else if (isForge) {
+            filteredFiles = filterForgeFilesByVersion(data.data, gameVersion);
+          }
 
-      setDescription(modifiedData);
-    });
-    getAddonFiles(projectID).then(data => {
-      const isFabric =
-        getPatchedInstanceType(instance) === FABRIC && projectID !== 361988;
-      const isForge =
-        getPatchedInstanceType(instance) === FORGE || projectID === 361988;
-      let filteredFiles = [];
-      if (isFabric) {
-        filteredFiles = filterFabricFilesByVersion(data.data, gameVersion);
-      } else if (isForge) {
-        filteredFiles = filterForgeFilesByVersion(data.data, gameVersion);
-      }
+          setFiles(filteredFiles);
+          setLoadingFiles(false);
+        })
+      ]);
+    };
 
-      initScreenShots(data.data);
-      setFiles(filteredFiles);
-      setLoadingFiles(false);
-    });
+    init();
   }, []);
 
   const getPlaceholderText = () => {
     if (loadingFiles) {
-      return 'Loading Files';
+      return 'Loading files';
     } else if (files.length === 0 && !loadingFiles) {
-      return 'Mod Not Available';
+      return 'Mod not available';
     } else {
-      return 'Select A Version';
+      return 'Select a version';
     }
   };
 
@@ -143,7 +128,6 @@ const ModOverview = ({
 
   const handleChange = value => setSelectedItem(JSON.parse(value));
 
-  // ReactHtmlParser(files[selectedIndex]?.changelog)
   const primaryImage = (addon?.attachments || []).find(v => v.isDefault);
   return (
     <Modal
@@ -179,7 +163,7 @@ const ModOverview = ({
                     {formatDate(addon?.dateModified)}
                   </div>
                   <div>
-                    <label>Mc version: </label>
+                    <label>MC version: </label>
                     {addon?.gameVersionLatestFiles[0].gameVersion}
                   </div>
                 </ParallaxContentInfos>
@@ -199,10 +183,12 @@ const ModOverview = ({
                   <FontAwesomeIcon icon={faExternalLinkAlt} />
                 </Button>
                 <Button
+                  disabled={loadingFiles}
                   onClick={() => {
                     dispatch(
-                      openModal('ModsChangeLogs', {
-                        changeLog: changeLog[0]?.changelog
+                      openModal('ModChangelog', {
+                        modpackId: projectID,
+                        files
                       })
                     );
                   }}
@@ -243,10 +229,9 @@ const ModOverview = ({
             loading={loadingFiles}
             disabled={loadingFiles}
             value={
-              (files.length !== 0 &&
-                files.find(v => v.id === installedData.fileID) &&
-                JSON.stringify(selectedItem)) ||
-              undefined
+              files.length !== 0 &&
+              files.find(v => v.id === installedData.fileID) &&
+              selectedItem
             }
             onChange={handleChange}
             listItemHeight={50}
@@ -256,10 +241,7 @@ const ModOverview = ({
               <Select.Option
                 title={file.displayName}
                 key={file.id}
-                value={JSON.stringify({
-                  fileID: file.id,
-                  fileName: file.fileName
-                })}
+                value={file.id}
               >
                 <div
                   css={`
@@ -308,10 +290,7 @@ const ModOverview = ({
           </StyledSelect>
           <Button
             type="primary"
-            disabled={
-              !selectedItem.fileID ||
-              installedData.fileID === selectedItem.fileID
-            }
+            disabled={!selectedItem || installedData.fileID === selectedItem}
             loading={loading}
             onClick={async () => {
               setLoading(true);
@@ -320,7 +299,7 @@ const ModOverview = ({
                   updateInstanceConfig(instanceName, prev => ({
                     ...prev,
                     mods: prev.mods.filter(
-                      v => v.fileID !== installedData.fileID
+                      v => v.fileName !== installedData.fileName
                     )
                   }))
                 );
@@ -333,16 +312,16 @@ const ModOverview = ({
                   )
                 );
               }
-              await dispatch(
+              const newFile = await dispatch(
                 installMod(
                   projectID,
-                  selectedItem.fileID,
+                  selectedItem,
                   instanceName,
                   gameVersion,
                   !installedData.fileID
                 )
               );
-              setInstalledData(selectedItem);
+              setInstalledData({ fileID: selectedItem, fileName: newFile });
               setLoading(false);
             }}
           >
