@@ -87,7 +87,7 @@ if (
   }
 }
 
-log.log(process.env.REACT_APP_RELEASE_TYPE);
+log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -424,7 +424,7 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
-  autoUpdater.allowDowngrade = allowUnstableReleases;
+  autoUpdater.allowDowngrade = !allowUnstableReleases;
   autoUpdater.allowPrerelease = allowUnstableReleases;
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',
