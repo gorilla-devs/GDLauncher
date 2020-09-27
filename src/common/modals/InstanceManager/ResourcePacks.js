@@ -241,7 +241,7 @@ const ResourcePacks = ({ instanceName }) => {
           transition: 'height 0.2s ease-in-out'
         }}
         selected={slcItems.includes(item)}
-        disabled={path.extname(item) !== '.disabled'}
+        disabled={path.extname(item) === '.disabled'}
       >
         <div className="leftPartContent">
           <Checkbox
@@ -278,7 +278,7 @@ const ResourcePacks = ({ instanceName }) => {
         </div>
         <RowContainerBackground
           selected={slcItems.includes(item)}
-          disabled={path.extname(item) !== '.disabled'}
+          disabled={path.extname(item) === '.disabled'}
         />
       </RowContainer>
     );
