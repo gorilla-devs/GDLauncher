@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { memo, useEffect, useState, forwardRef } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components';
@@ -9,6 +10,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { FixedSizeList as List } from 'react-window';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
+import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
 import { getSearch, getAddonFiles } from '../api';
 import { openModal } from '../reducers/modals/actions';
@@ -274,6 +276,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
   const [filterType, setFilterType] = useState('Featured');
   const [searchQuery, setSearchQuery] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const instance = useSelector(state => _getInstance(state)(instanceName));
 
   const installedMods = instance?.mods;
@@ -297,20 +301,33 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
   const loadMoreMods = async (searchP = '', reset) => {
     const reqObj = {};
     lastRequest = reqObj;
+    if (!loading) {
+      setLoading(true);
+    }
     const isReset = reset !== undefined ? reset : false;
     setAreModsLoading(true);
-    const { data } = await getSearch(
-      'mods',
-      searchP,
-      itemsNumber,
-      isReset ? 0 : mods.length,
-      filterType,
-      filterType !== 'Author' && filterType !== 'Name',
-      gameVersion,
-      getPatchedInstanceType(instance) === FABRIC ? 4780 : null
-    );
+    let data = null;
+    try {
+      if (error) {
+        setError(false);
+      }
+      ({ data } = await getSearch(
+        'mods',
+        searchP,
+        itemsNumber,
+        isReset ? 0 : mods.length,
+        filterType,
+        filterType !== 'Author' && filterType !== 'Name',
+        gameVersion,
+        getPatchedInstanceType(instance) === FABRIC ? 4780 : null
+      ));
+    } catch (err) {
+      setError(err);
+    }
+
     const newMods = reset ? data : mods.concat(data);
     if (lastRequest === reqObj) {
+      setLoading(false);
       setMods(newMods || []);
       setHasNextPage((newMods || []).length % itemsNumber === 0);
     }
@@ -365,23 +382,68 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
             allowClear
           />
         </Header>
-        <AutoSizer>
-          {({ height, width }) => (
-            <ModsListWrapper
-              hasNextPage={hasNextPage}
-              isNextPageLoading={areModsLoading}
-              items={mods}
-              width={width}
-              height={height - 50}
-              loadNextPage={loadMoreMods}
-              searchQuery={searchQuery}
-              version={gameVersion}
-              installedMods={installedMods}
-              instanceName={instanceName}
-              itemData={itemData}
-            />
-          )}
-        </AutoSizer>
+
+        {!error ? (
+          !loading && mods.length === 0 ? (
+            <div
+              css={`
+                margin-top: 120px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 150px;
+              `}
+            >
+              <FontAwesomeIcon icon={faExclamationCircle} />
+              <div
+                css={`
+                  font-size: 20px;
+                  margin-top: 70px;
+                `}
+              >
+                No mods has been found with the current filters.
+              </div>
+            </div>
+          ) : (
+            <AutoSizer>
+              {({ height, width }) => (
+                <ModsListWrapper
+                  hasNextPage={hasNextPage}
+                  isNextPageLoading={areModsLoading}
+                  items={mods}
+                  width={width}
+                  height={height - 50}
+                  loadNextPage={loadMoreMods}
+                  searchQuery={searchQuery}
+                  version={gameVersion}
+                  installedMods={installedMods}
+                  instanceName={instanceName}
+                  itemData={itemData}
+                />
+              )}
+            </AutoSizer>
+          )
+        ) : (
+          <div
+            css={`
+              margin-top: 120px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              font-size: 150px;
+            `}
+          >
+            <FontAwesomeIcon icon={faBomb} />
+            <div
+              css={`
+                font-size: 20px;
+                margin-top: 70px;
+              `}
+            >
+              An error occurred while loading the mods list...
+            </div>
+          </div>
+        )}
       </Container>
     </Modal>
   );
