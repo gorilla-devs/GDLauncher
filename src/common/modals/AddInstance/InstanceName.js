@@ -57,7 +57,7 @@ const InstanceName = ({
       if (
         !regex.test(instanceName || mcName) ||
         !finalWhiteSpace.test(instanceName || mcName) ||
-        (instanceName || mcName).length >= 35
+        (instanceName || mcName).length >= 45
       ) {
         setInvalidName(true);
         setAlreadyExists(false);
