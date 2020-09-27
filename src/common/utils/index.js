@@ -24,6 +24,33 @@ export function sortByForgeVersionDesc(a, b) {
   return 0;
 }
 
+export const formatNumber = number => {
+  // Alter numbers larger than 1k
+  if (number >= 1e3) {
+    const units = ['k', 'M', 'B', 'T'];
+
+    const unit = Math.floor((number.toFixed(0).length - 1) / 3) * 3;
+    // Calculate the remainder
+    const num = (number / `1e${unit}`).toFixed(0);
+    const unitname = units[Math.floor(unit / 3) - 1];
+
+    // output number remainder + unitname
+    return num + unitname;
+  }
+
+  // return formatted original number
+  return number.toLocaleString();
+};
+
+export const formatDate = date => {
+  const parsedDate = Date.parse(date);
+  return new Date(parsedDate).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
 export const getForgeFileIDFromAddonVersion = async (files, addonVersion) => {
   const foundID = files.find(a => a.fileName.includes(addonVersion));
   return foundID ? foundID.id : null;

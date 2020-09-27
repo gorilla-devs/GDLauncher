@@ -3,31 +3,62 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
+import { shell } from 'electron';
+import { faExternalLinkAlt, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
-import { getAddonDescription, getAddonFiles } from '../api';
+import {
+  getAddonDescription,
+  getAddonFiles,
+  getAddonFileChangelog
+} from '../api';
 import CloseButton from '../components/CloseButton';
-import { closeModal } from '../reducers/modals/actions';
+import { closeModal, openModal } from '../reducers/modals/actions';
 import { FORGE, CURSEFORGE_URL } from '../utils/constants';
+import { formatNumber, formatDate } from '../utils';
 
 const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState(null);
   const [files, setFiles] = useState(null);
+  const [changeLog, setChangeLog] = useState(null);
   const [selectedId, setSelectedId] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const initScreenShots = async data => {
+    if (data) {
+      const mappedFiles = await Promise.all(
+        data.map(async v => {
+          const { data: changelog } = await getAddonFileChangelog(
+            modpack.id,
+            v.id
+          );
+          return {
+            ...v,
+            changelog
+          };
+        })
+      );
+      setChangeLog(mappedFiles);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
     getAddonDescription(modpack.id).then(data => {
       // Replace the beginning of all relative URLs with the Curseforge URL
-      const modifiedData = data.data.replace(/href="(?!http)/g, `href="${CURSEFORGE_URL}`)
+      const modifiedData = data.data.replace(
+        /href="(?!http)/g,
+        `href="${CURSEFORGE_URL}`
+      );
 
-      setDescription(modifiedData)
+      setDescription(modifiedData);
     });
     getAddonFiles(modpack.id).then(data => {
       setFiles(data.data);
+      initScreenShots(data.data);
       setLoading(false);
     });
   }, []);
@@ -86,7 +117,65 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
         </StyledCloseButton>
         <Container>
           <Parallax bg={primaryImage.thumbnailUrl}>
-            <ParallaxContent>{modpack.name}</ParallaxContent>
+            <ParallaxContent>
+              <ParallaxInnerContent>
+                {modpack.name}
+                <ParallaxContentInfos>
+                  <div>
+                    <label>Author: </label>
+                    {modpack.authors[0].name}
+                  </div>
+                  <div>
+                    <label>Downloads: </label>
+                    {formatNumber(modpack.downloadCount)}
+                  </div>
+                  <div>
+                    <label>Last Update: </label>
+                    {formatDate(modpack.dateModified)}
+                  </div>
+                  <div>
+                    <label>Mc version: </label>
+                    {modpack.gameVersionLatestFiles[0].gameVersion}
+                  </div>
+                </ParallaxContentInfos>
+                <Button
+                  href={modpack.websiteUrl}
+                  css={`
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                  `}
+                  type="primary"
+                >
+                  <FontAwesomeIcon icon={faExternalLinkAlt} />
+                </Button>
+                <Button
+                  onClick={() => {
+                    dispatch(
+                      openModal('ModsChangeLogs', {
+                        changeLog: changeLog[0]?.changelog
+                      })
+                    );
+                  }}
+                  css={`
+                    position: absolute;
+                    top: 20px;
+                    left: 60px;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                  `}
+                  type="primary"
+                >
+                  <FontAwesomeIcon icon={faInfo} />
+                </Button>
+              </ParallaxInnerContent>
+            </ParallaxContent>
           </Parallax>
           <Content>{ReactHtmlParser(description)}</Content>
         </Container>
@@ -151,7 +240,6 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                           month: 'long',
                           day: 'numeric'
                         })}
-                        
                       </div>
                     </div>
                   </div>
@@ -234,6 +322,21 @@ const Parallax = styled.div`
   background-size: cover;
 `;
 
+const ParallaxInnerContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+  }
+`;
+
 const ParallaxContent = styled.div`
   height: 100%;
   width: 100%;
@@ -243,8 +346,24 @@ const ParallaxContent = styled.div`
   font-weight: bold;
   font-size: 60px;
   text-align: center;
-  padding-top: 20%;
   background: rgba(0, 0, 0, 0.8);
+`;
+
+const ParallaxContentInfos = styled.div`
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: normal;
+  font-size: 12px;
+  position: absolute;
+  bottom: 40px;
+  div {
+    margin: 0 5px;
+    label {
+      font-weight: bold;
+    }
+  }
 `;
 
 const Content = styled.div`
