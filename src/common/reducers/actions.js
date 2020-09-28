@@ -1141,7 +1141,7 @@ export function processManifest(instanceName) {
             const destFile = path.join(
               _getInstancesPath(state),
               instanceName,
-              'mods',
+              addon?.categorySection?.path || 'mods',
               modManifest.fileName
             );
             const fileExists = await fse.pathExists(destFile);
