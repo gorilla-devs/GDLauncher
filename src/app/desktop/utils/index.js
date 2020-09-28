@@ -597,8 +597,7 @@ export const patchForge113 = async (
   mainJar,
   librariesPath,
   javaPath,
-  updatePercentage,
-  tempPath
+  updatePercentage
 ) => {
   const { processors } = forgeJson;
   const replaceIfPossible = arg => {
@@ -640,15 +639,12 @@ export const patchForge113 = async (
         cp => `"${path.join(librariesPath, ...mavenToArray(cp))}"`
       );
 
-      console.log('tempPath', tempPath);
       const sevenZipPath = await get7zPath();
       const mainClass = await readJarManifest(
         filePath,
         sevenZipPath,
         'Main-Class'
       );
-
-      console.log('mainClass', mainClass);
 
       await new Promise(resolve => {
         const ps = spawn(
