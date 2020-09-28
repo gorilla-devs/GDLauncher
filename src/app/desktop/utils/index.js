@@ -4,7 +4,6 @@ import fse from 'fs-extra';
 import { extractFull } from 'node-7z';
 import jimp from 'jimp/es';
 import makeDir from 'make-dir';
-import jarAnalyzer from 'jarfile';
 import { promisify } from 'util';
 import { ipcRenderer } from 'electron';
 import path from 'path';
@@ -573,12 +572,33 @@ export const getJVMArguments113 = (
   return args;
 };
 
+export const readJarManifest = async (jarPath, sevenZipPath, property) => {
+  const list = extractFull(jarPath, '.', {
+    $bin: sevenZipPath,
+    toStdout: true,
+    $cherryPick: 'META-INF/MANIFEST.MF'
+  });
+
+  await new Promise((resolve, reject) => {
+    list.on('end', () => {
+      resolve();
+    });
+    list.on('error', error => {
+      reject(error.stderr);
+    });
+  });
+
+  if (list.info.has(property)) return list.info.get(property);
+  return null;
+};
+
 export const patchForge113 = async (
   forgeJson,
   mainJar,
   librariesPath,
   javaPath,
-  updatePercentage
+  updatePercentage,
+  tempPath
 ) => {
   const { processors } = forgeJson;
   const replaceIfPossible = arg => {
@@ -620,8 +640,16 @@ export const patchForge113 = async (
         cp => `"${path.join(librariesPath, ...mavenToArray(cp))}"`
       );
 
-      const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
-      const mainClass = jarFile.valueForManifestEntry('Main-Class');
+      console.log('tempPath', tempPath);
+      const sevenZipPath = await get7zPath();
+      const mainClass = await readJarManifest(
+        filePath,
+        sevenZipPath,
+        'Main-Class'
+      );
+
+      console.log('mainClass', mainClass);
+
       await new Promise(resolve => {
         const ps = spawn(
           `"${javaPath}"`,
