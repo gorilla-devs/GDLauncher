@@ -36,8 +36,46 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
+const application = {
+  label: 'Application',
+  submenu: [
+    {
+      label: 'About Application',
+      selector: 'orderFrontStandardAboutPanel:'
+    }
+  ]
+};
+
+const edit = {
+  label: 'Edit',
+  submenu: [
+    {
+      label: 'Cut',
+      accelerator: 'CmdOrCtrl+X',
+      selector: 'cut:'
+    },
+    {
+      label: 'Copy',
+      accelerator: 'CmdOrCtrl+C',
+      selector: 'copy:'
+    },
+    {
+      label: 'Paste',
+      accelerator: 'CmdOrCtrl+V',
+      selector: 'paste:'
+    },
+    {
+      label: 'Select All',
+      accelerator: 'CmdOrCtrl+A',
+      selector: 'selectAll:'
+    }
+  ]
+};
+
+const template = [application, edit];
+
 // app.allowRendererProcessReuse = true;
-Menu.setApplicationMenu();
+Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 
 let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
 
@@ -131,58 +169,6 @@ extract7z();
 let mainWindow;
 let tray;
 let watcher;
-
-function createMenu() {
-  const application = {
-    label: 'Application',
-    submenu: [
-      {
-        label: 'About Application',
-        selector: 'orderFrontStandardAboutPanel:'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'Quit',
-        accelerator: 'Command+Q',
-        click: () => {
-          app.quit();
-        }
-      }
-    ]
-  };
-
-  const edit = {
-    label: 'Edit',
-    submenu: [
-      {
-        label: 'Cut',
-        accelerator: 'CmdOrCtrl+X',
-        selector: 'cut:'
-      },
-      {
-        label: 'Copy',
-        accelerator: 'CmdOrCtrl+C',
-        selector: 'copy:'
-      },
-      {
-        label: 'Paste',
-        accelerator: 'CmdOrCtrl+V',
-        selector: 'paste:'
-      },
-      {
-        label: 'Select All',
-        accelerator: 'CmdOrCtrl+A',
-        selector: 'selectAll:'
-      }
-    ]
-  };
-
-  const template = [application, edit];
-
-  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
-}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -290,10 +276,7 @@ function createWindow() {
   mainWindow.webContents.on('new-window', handleRedirect);
 }
 
-app.on('ready', () => {
-  createWindow();
-  createMenu();
-});
+app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (watcher) {
