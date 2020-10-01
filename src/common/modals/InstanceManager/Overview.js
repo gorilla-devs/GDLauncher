@@ -261,42 +261,30 @@ const Overview = ({ instanceName, background, manifest }) => {
           css={`
             display: flex;
             justify-content: space-between;
-            width: 100%;
+            width: 100% + 20px;
             margin-top: 20px;
+            margin-left: -20px;
           `}
         >
           <Card
             title="Minecraft Version"
-            color={props => props.theme.palette.colors.jungleGreen}
+            color={(props) => props.theme.palette.colors.darkYellow}
             instanceName={instanceName}
             defaultValue={config?.modloader}
             icon={<FontAwesomeIcon icon={faCog} />}
           >
+            {config?.modloader[0] === "vanilla" ? "Vanilla " : ""}
+            {config?.modloader[0] === "fabric" ? "Fabric " : ""}
+            {config?.modloader[0] === "forge" ? "Forge " : ""}
             {config?.modloader[1]}
-          </Card>
-          <Card
-            title="Modloader"
-            color={props => props.theme.palette.colors.darkYellow}
-            instanceName={instanceName}
-            defaultValue={config?.modloader}
-            icon={<FontAwesomeIcon icon={faCog} />}
-          >
-            {config?.modloader[0]}
-          </Card>
-          <Card
-            title="Modloader Version"
-            color={props => props.theme.palette.colors.lightBlue}
-            instanceName={instanceName}
-            defaultValue={config?.modloader}
-            icon={
-              (config?.modloader[2] || '-') !== '-' ? (
-                <FontAwesomeIcon icon={faCog} />
-              ) : null
-            }
-          >
-            {config?.modloader[0] === 'forge'
-              ? config?.modloader[2]?.split('-')[1]
-              : config?.modloader[2] || '-'}
+            {config?.modloader[0] === "fabric" ? " - " : ""}
+            {config?.modloader[0] === "fabric"
+              ? config?.modloader[2] || "-"
+              : ""}
+            {config?.modloader[0] === "forge" ? " - " : ""}
+            {config?.modloader[0] === "forge"
+              ? config?.modloader[2]?.split("-")[1]
+              : ""}
           </Card>
         </OverviewCard>
         <OverviewCard
@@ -308,27 +296,27 @@ const Overview = ({ instanceName, background, manifest }) => {
           `}
         >
           <Card
-            title="Mods"
-            color={props => props.theme.palette.colors.maximumRed}
+            title="Mod Count"
+            color={(props) => props.theme.palette.colors.maximumRed}
           >
-            {config?.mods?.length || '-'}
+            {config?.mods?.length || "-"}
           </Card>
           <Card
             title="Played Time"
-            color={props => props.theme.palette.colors.liberty}
+            color={(props) => props.theme.palette.colors.liberty}
           >
             {convertMinutesToHumanTime(config?.timePlayed)}
           </Card>
           <Card
             title="Last Played"
-            color={props => props.theme.palette.colors.orange}
+            color={(props) => props.theme.palette.colors.orange}
           >
-            {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
+            {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : "-"}
           </Card>
         </OverviewCard>
         {config?.modloader.slice(3, 5).length === 2 && manifest && (
           <Card
-            title="Curse Modpack"
+            title="CurseForge Modpack"
             color={`linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), ${
               background
                 ? `url(${background})`
