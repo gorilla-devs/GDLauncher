@@ -36,6 +36,7 @@ import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
 import { extractFace } from '../../../../app/desktop/utils';
+import i18n from '../../../config/i18next';
 
 const MyAccountPrf = styled.div`
   width: 100%;
@@ -322,7 +323,7 @@ const General = () => {
   return (
     <MyAccountPrf>
       <PersonalData>
-        <MainTitle>General</MainTitle>
+        <MainTitle>{i18n.t('settings:general')}</MainTitle>
         <PersonalDataContainer>
           {profileImage ? (
             <ProfileImage src={`data:image/jpeg;base64,${profileImage}`} />
