@@ -93,7 +93,7 @@ const Content = ({
                         cursor: pointer;
                       `}
                     />
-                    Twitch
+                    Curseforge
                   </Radio.Button>
                   {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button>
                   <Radio.Button value={4} disabled>Technic</Radio.Button>
