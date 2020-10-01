@@ -36,16 +36,6 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
-const application = {
-  label: 'Application',
-  submenu: [
-    {
-      label: 'About Application',
-      selector: 'orderFrontStandardAboutPanel:'
-    }
-  ]
-};
-
 const edit = {
   label: 'Edit',
   submenu: [
@@ -72,10 +62,8 @@ const edit = {
   ]
 };
 
-const template = [application, edit];
-
 // app.allowRendererProcessReuse = true;
-Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
 
 let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
 
