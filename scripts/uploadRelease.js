@@ -46,7 +46,12 @@ const main = async () => {
     console.log(err);
     const { data: newRelease } = await axios.default.post(
       'https://api.github.com/repos/gorilla-devs/GDLauncher/releases',
-      { tag_name: `v${version}`, name: `v${version}`, draft: true },
+      {
+        tag_name: `v${version}`,
+        name: `v${version}`,
+        draft: true,
+        prerelease: version.includes('beta')
+      },
       {
         headers: {
           Authorization: `token ${process.env.GH_ACCESS_TOKEN_RELEASES}`

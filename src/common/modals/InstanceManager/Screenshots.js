@@ -150,7 +150,7 @@ const Screenshots = ({ instanceName }) => {
           )
         );
       } else if (selectedItems.length > 1) {
-        Promise.all(
+        await Promise.all(
           selectedItems.map(async screenShot => {
             await fse.remove(
               path.join(instancesPath, instanceName, 'screenshots', screenShot)
@@ -207,17 +207,21 @@ const Screenshots = ({ instanceName }) => {
             getScreenshotsCount(dateGroups) > 0 &&
             getScreenshotsCount(dateGroups) === selectedItems.length
           }
-        />
-        <div>&nbsp;{`${selectedItems.length} selected`}</div>
+        >
+          {`${selectedItems.length} selected`}
+        </GlobalCheckbox>
+
         <DeleteButton
           onClick={() => {
-            dispatch(
-              openModal('ActionConfirmation', {
-                message: 'Are you sure you want to delete this images?',
-                confirmCallback: deleteFile,
-                title: 'Confirm'
-              })
-            );
+            if (selectedItems.length) {
+              dispatch(
+                openModal('ActionConfirmation', {
+                  message: 'Are you sure you want to delete this images?',
+                  confirmCallback: deleteFile,
+                  title: 'Confirm'
+                })
+              );
+            }
           }}
           selectedItems={selectedItems}
           icon={faTrash}
@@ -297,7 +301,7 @@ const Screenshots = ({ instanceName }) => {
                         {selectedItems.length > 1 &&
                         selectedItems.length <
                           getScreenshotsCount(dateGroups) ? (
-                          <DeleteAllButton
+                          <MenuItem
                             onClick={() => {
                               dispatch(
                                 openModal('ActionConfirmation', {
@@ -312,12 +316,12 @@ const Screenshots = ({ instanceName }) => {
                           >
                             <FontAwesomeIcon icon={faTrash} />
                             {`Delete ${selectedItems.length} items`}
-                          </DeleteAllButton>
+                          </MenuItem>
                         ) : (
                           selectedItems.length ===
                             getScreenshotsCount(dateGroups) &&
                           getScreenshotsCount(dateGroups) > 1 && (
-                            <DeleteAllButton
+                            <MenuItem
                               onClick={() => {
                                 dispatch(
                                   openModal('ActionConfirmation', {
@@ -332,7 +336,7 @@ const Screenshots = ({ instanceName }) => {
                             >
                               <FontAwesomeIcon icon={faTrash} />
                               Delete all
-                            </DeleteAllButton>
+                            </MenuItem>
                           )
                         )}
 
@@ -434,7 +438,7 @@ const Screenshots = ({ instanceName }) => {
             );
           })
         ) : (
-          <NoScreenAvailable>No Screenshots Available</NoScreenAvailable>
+          <NoScreenAvailable>No Screenshot Available</NoScreenAvailable>
         )}
       </Container>
     </ExternalContainer>
@@ -486,8 +490,10 @@ const DateSection = styled.div`
 
 const NoScreenAvailable = styled.div`
   height: 100%;
-  text-align: center;
-  padding-top: 25%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledContexMenu = styled(ContextMenu)`
@@ -500,7 +506,7 @@ const DeleteButton = styled(({ selectedItems, ...props }) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
   <FontAwesomeIcon {...props} />
 ))`
-  margin-left: 20px;
+  margin: 0 10px;
   transition: color 0.3s ease-in-out;
   &:hover {
     path {
@@ -512,18 +518,16 @@ const DeleteButton = styled(({ selectedItems, ...props }) => (
 `;
 
 const OpenFolderButton = styled(FontAwesomeIcon)`
-  float: right;
-  margin-left: 20px;
-  transition: color 0.3s ease-in-out;
+  transition: color 0.1s ease-in-out;
   cursor: pointer;
-`;
-
-const DeleteAllButton = styled(MenuItem)`
-  background: ${props => props.theme.palette.colors.red};
-
+  margin: 0 10px;
   &:hover {
-    background: ${props => props.theme.palette.colors.red};
-    filter: brightness(80%);
+    cursor: pointer;
+    path {
+      cursor: pointer;
+      transition: color 0.1s ease-in-out;
+      color: ${props => props.theme.palette.primary.main};
+    }
   }
 `;
 
