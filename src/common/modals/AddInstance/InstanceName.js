@@ -46,6 +46,7 @@ const InstanceName = ({
   const tempPath = useSelector(_getTempPath);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
   const [instanceName, setInstanceName] = useState(mcName);
+  const [instanceNameSufx, setInstanceNameSufx] = useState(null);
   const [alreadyExists, setAlreadyExists] = useState(false);
   const [invalidName, setInvalidName] = useState(true);
   const [clicked, setClicked] = useState(false);
@@ -63,14 +64,21 @@ const InstanceName = ({
         setAlreadyExists(false);
         return;
       }
-      fse
-        .pathExists(path.join(instancesPath, instanceName || mcName))
-        .then(exists => {
-          setAlreadyExists(exists);
-          setInvalidName(false);
-        });
     }
   }, [instanceName, step]);
+
+  useEffect(() => {
+    fse
+      .pathExists(path.join(instancesPath, instanceName || mcName))
+      .then(exists => {
+        instanceNameSuffix(instanceName || mcName).then(x =>
+          setInstanceNameSufx(x)
+        );
+
+        setAlreadyExists(exists);
+        setInvalidName(false);
+      });
+  }, [step]);
 
   const thumbnailURL = modpack?.attachments?.find(v => v.isDefault)
     ?.thumbnailUrl;
@@ -80,6 +88,82 @@ const InstanceName = ({
     return new Promise(resolve => {
       setTimeout(() => resolve(), s * 1000);
     });
+  };
+
+  function findMissingNums(numbers) {
+    let arrayLength = Math.max.apply(Math, numbers);
+    let missing = [];
+
+    for (let i = 0; i < arrayLength; i++) {
+      if (numbers.indexOf(i) < 0) {
+        missing = missing.concat(i);
+      }
+    }
+    return missing;
+  }
+
+  function countOccurences(string, word) {
+    return string.split(word).length - 1;
+  }
+
+  const instanceNameSuffix = async name => {
+    let regex = /\((.*?)\)/;
+    let numOfElements = 1;
+    const files = await fse.readdir(instancesPath);
+    const exists = await fse.pathExists(path.join(instancesPath, name));
+    console.log('A', exists);
+    if (exists) {
+      const existNewName = await fse.pathExists(`${name}) - Copy`);
+      const countWord = countOccurences(`${name}) - Copy`, 'Copy');
+
+      console.log('B', existNewName, countWord, files);
+      if (!existNewName) {
+        const nums = files.map(y => {
+          if (regex.test(y)) {
+            return y.match(regex)[1];
+          }
+        });
+        files.forEach(x => {
+          let count = (x.match(/Copy/g) || []).length;
+
+          console.log('C', x, count === countWord, count, countWord);
+
+          if (count === countWord) {
+            if (regex.test(x)) {
+              const missingNumbers = findMissingNums(nums);
+
+              numOfElements =
+                missingNumbers.sort()[0] == 2 ? 1 : missingNumbers.sort()[0];
+              console.log(
+                'E',
+                missingNumbers.sort(),
+                numOfElements,
+                nums,
+                x.includes(x.match(regex)[1]),
+                x.match(regex)[1],
+                count,
+                countWord
+              );
+              // if (x.match(regex)[1] == 2 && !files.includes(`${name} - Copy`));
+              // instanceNameSuffix(`${name}) - Copy`);
+              // if (
+              //   x.includes(x.match(regex)[1])
+              //   //  &&
+              //   // !files.includes(`${name} - Copy`)
+              // );
+              // numOfElements++;
+            }
+            numOfElements++;
+          }
+        });
+
+        console.log('D', numOfElements);
+        if (numOfElements > 1) {
+          return `${name} - Copy (${numOfElements})`;
+        }
+        return `${name} - Copy`;
+      } else return `${name}) - Copy`;
+    } else return name;
   };
 
   const createInstance = async localInstanceName => {
@@ -268,8 +352,10 @@ const InstanceName = ({
                     <Input
                       state={state1}
                       size="large"
-                      placeholder={mcName}
-                      onChange={e => setInstanceName(e.target.value)}
+                      placeholder={instanceNameSufx || instanceName || mcName}
+                      onChange={e =>
+                        setInstanceName(instanceNameSuffix(e.target.value))
+                      }
                       css={`
                         opacity: ${({ state }) =>
                           state === 'entering' || state === 'entered' ? 0 : 1};
@@ -298,6 +384,7 @@ const InstanceName = ({
                       {invalidName &&
                         'Instance name is not valid or too long. Please try another one'}
                       {alreadyExists &&
+                        !instanceNameSufx &&
                         'An instance with this name already exists!'}
                     </div>
                   </div>
@@ -321,11 +408,17 @@ const InstanceName = ({
                     }
                   `}
                   onClick={() => {
-                    createInstance(instanceName || mcName);
+                    console.log(
+                      'ss',
+                      instanceNameSufx || instanceName || mcName
+                    );
+                    createInstance(instanceNameSufx || instanceName || mcName);
                     setClicked(true);
                   }}
                 >
-                  {clicked || alreadyExists || invalidName ? (
+                  {clicked ||
+                  (alreadyExists && !instanceNameSufx) ||
+                  invalidName ? (
                     ''
                   ) : (
                     <FontAwesomeIcon icon={faLongArrowAltRight} />
