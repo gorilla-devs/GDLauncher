@@ -94,7 +94,7 @@ import {
 import { removeDuplicates, getFileMurmurHash2 } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
-import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
+import PromiseQueue from '../utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
 import { openModal } from './modals/actions';
 

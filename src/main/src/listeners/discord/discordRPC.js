@@ -4,7 +4,7 @@ const log = require('electron-log');
 let client;
 let activity;
 
-exports.initRPC = () => {
+export const initRPC = () => {
   client = new Client({ transport: 'ipc' });
 
   activity = {
@@ -30,12 +30,12 @@ exports.initRPC = () => {
   });
 };
 
-exports.updateDetails = details => {
+export const updateDetails = details => {
   activity.details = details;
   client.setActivity(activity);
 };
 
-exports.shutdownRPC = () => {
+export const shutdownRPC = () => {
   if (!client) return;
   client.clearActivity();
   client.destroy();

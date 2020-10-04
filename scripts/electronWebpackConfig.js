@@ -50,7 +50,7 @@ const baseConfig = {
 
   plugins: [
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production',
+      NODE_ENV: process.env.NODE_ENV,
       REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE
     }),
 
@@ -59,13 +59,13 @@ const baseConfig = {
 };
 
 module.exports = merge(baseConfig, {
-  devtool: 'eval-cheap-module-source-map',
+  devtool: 'inline-source-map',
 
-  mode: 'production',
+  mode: process.env.NODE_ENV,
 
   target: 'electron-main',
 
-  entry: './public/electron.js',
+  entry: './src/main/electron.js',
 
   output: {
     path: path.join(__dirname, '..'),
@@ -99,7 +99,7 @@ module.exports = merge(baseConfig, {
      * development checks
      */
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production',
+      NODE_ENV: process.env.NODE_ENV,
       DEBUG_PROD: false,
       START_MINIMIZED: false
     })

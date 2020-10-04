@@ -36,6 +36,8 @@ import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
 import { extractFace } from '../../../../app/desktop/utils';
+import sendMessage from '../../../utils/sendMessage';
+import EV from '../../../messageEvents';
 
 const MyAccountPrf = styled.div`
   width: 100%;
@@ -480,9 +482,9 @@ const General = () => {
           onChange={e => {
             dispatch(updateDiscordRPC(e));
             if (e) {
-              ipcRenderer.invoke('init-discord-rpc');
+              sendMessage(EV.INIT_DISCORD_RPC);
             } else {
-              ipcRenderer.invoke('shutdown-discord-rpc');
+              sendMessage(EV.SHUTDOWN_DISCORD_RPC);
             }
           }}
           checked={DiscordRPC}
