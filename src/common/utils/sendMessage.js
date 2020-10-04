@@ -22,7 +22,7 @@ window.addEventListener('__MAIN_MESSAGE__', event => {
     if (success) entry.resolve(value);
     else entry.reject(value);
     delete requestMap[id];
-    return;
+    return true;
   }
 
   if (type in typeHandlerMap) {
