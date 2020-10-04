@@ -4,7 +4,6 @@ import memoize from 'memoize-one';
 import path from 'path';
 import { promises as fs, watch } from 'fs';
 import makeDir from 'make-dir';
-import { ipcRenderer } from 'electron';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import { Checkbox, Button, Switch } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,6 +14,8 @@ import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
 import { _getInstancesPath } from '../../utils/selectors';
 import DragnDropEffect from '../../../ui/DragnDropEffect';
+import sendMessage from '../../utils/sendMessage';
+import EV from '../../messageEvents';
 
 const Header = styled.div`
   height: 40px;
@@ -285,7 +286,7 @@ const ResourcePacks = ({ instanceName }) => {
   }, areEqual);
 
   const openFolderDialog = async () => {
-    const dialog = await ipcRenderer.invoke('openFileDialog', [
+    const dialog = await sendMessage(EV.OPEN_FILE_DIALOG, [
       { name: 'Resource Pack', extensions: ['zip'] },
       { name: 'All', extensions: ['*'] }
     ]);
@@ -299,7 +300,7 @@ const ResourcePacks = ({ instanceName }) => {
 
   const openFolder = async p => {
     await makeDir(p);
-    ipcRenderer.invoke('openFolder', p);
+    sendMessage(EV.OPEN_FOLDER);
   };
 
   const startListener = async () => {

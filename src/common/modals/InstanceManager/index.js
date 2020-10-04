@@ -7,7 +7,6 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import Modal from '../../components/Modal';
 import Overview from './Overview';
-import { ipcRenderer } from 'electron';
 import Screenshots from './Screenshots';
 import ResourcePacks from './ResourcePacks';
 import Notes from './Notes';
@@ -25,6 +24,8 @@ import {
 } from '../../reducers/actions';
 import instanceDefaultBackground from '../../../common/assets/instance_default.png';
 import omit from 'lodash/omit';
+import sendMessage from '../../utils/sendMessage';
+import EV from '../../messageEvents';
 
 const SideMenu = styled.div`
   display: flex;
@@ -180,7 +181,7 @@ const InstanceManager = ({ instanceName }) => {
   };
 
   const openFileDialog = async () => {
-    const dialog = await ipcRenderer.invoke('openFileDialog', [
+    const dialog = await sendMessage(EV.OPEN_FILE_DIALOG, [
       { name: 'Image', extensions: ['png', 'jpg', 'jpeg'] }
     ]);
     if (dialog.canceled) return;

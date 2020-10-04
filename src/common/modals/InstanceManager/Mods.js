@@ -1,5 +1,4 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
-import { clipboard, ipcRenderer } from 'electron';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -31,6 +30,8 @@ import {
   updateMod
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
+import sendMessage from '../../utils/sendMessage';
+import EV from '../../messageEvents';
 
 const Header = styled.div`
   height: 40px;
@@ -465,7 +466,7 @@ const Row = memo(({ index, style, data }) => {
         >
           <MenuItem
             onClick={() => {
-              clipboard.writeText(item.displayName);
+              sendMessage(EV.COPY_TO_CLIPBOARD, item.displayName);
             }}
           >
             <FontAwesomeIcon
@@ -545,7 +546,7 @@ const Mods = ({ instanceName }) => {
 
   const openFolder = async p => {
     await makeDir(p);
-    ipcRenderer.invoke('openFolder', p);
+    sendMessage(EV.OPEN_FOLDER, p);
   };
 
   const antIcon = (

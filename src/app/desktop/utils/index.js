@@ -5,7 +5,6 @@ import { extractFull } from 'node-7z';
 import jimp from 'jimp/es';
 import makeDir from 'make-dir';
 import { promisify } from 'util';
-import { ipcRenderer } from 'electron';
 import path from 'path';
 import crypto from 'crypto';
 import { exec, spawn } from 'child_process';
@@ -21,6 +20,8 @@ import {
 } from '../../../common/utils';
 import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
+import sendMessage from '../../../common/utils/sendMessage';
+import EV from '../../../common/messageEvents';
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -303,7 +304,7 @@ export const isLatestJavaDownloaded = async (meta, userData, retry) => {
 
 export const get7zPath = async () => {
   // Get userData from ipc because we can't always get this from redux
-  const baseDir = await ipcRenderer.invoke('getUserData');
+  const baseDir = await sendMessage(EV.GET_USER_DATA_PATH);
   if (process.platform === 'darwin' || process.platform === 'linux') {
     return path.join(baseDir, '7za');
   }

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Button, Progress, Input } from 'antd';
 import { Transition } from 'react-transition-group';
 import styled from 'styled-components';
-import { ipcRenderer } from 'electron';
 import fse from 'fs-extra';
 import { useSelector, useDispatch } from 'react-redux';
 import path from 'path';
@@ -17,6 +16,8 @@ import { convertOSToJavaFormat, get7zPath } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { updateJavaPath } from '../reducers/settings/actions';
+import sendMessage from '../utils/sendMessage';
+import EV from '../messageEvents';
 
 const JavaSetup = () => {
   const [step, setStep] = useState(0);
@@ -128,7 +129,7 @@ const ManualSetup = ({ setChoice }) => {
   const dispatch = useDispatch();
 
   const selectFolder = async () => {
-    const { filePaths, canceled } = await ipcRenderer.invoke('openFileDialog');
+    const { filePaths, canceled } = await sendMessage(EV.OPEN_FILE_DIALOG);
     if (!canceled) {
       setJavaPath(filePaths[0]);
     }
@@ -220,11 +221,11 @@ const AutomaticSetup = () => {
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
     await downloadFile(downloadLocation, url, p => {
-      ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
+      sendMessage(EV.UPDATE_PROGRESS_BAR, parseInt(p, 10) / 100);
       setDownloadPercentage(parseInt(p, 10));
     });
 
-    ipcRenderer.invoke('update-progress-bar', -1);
+    sendMessage(EV.UPDATE_PROGRESS_BAR, -1);
     setDownloadPercentage(null);
     await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -238,7 +239,7 @@ const AutomaticSetup = () => {
     });
     await new Promise((resolve, reject) => {
       firstExtraction.on('progress', ({ percent }) => {
-        ipcRenderer.invoke('update-progress-bar', percent);
+        sendMessage(EV.UPDATE_PROGRESS_BAR, percent);
         setDownloadPercentage(percent);
       });
       firstExtraction.on('end', () => {
@@ -253,7 +254,7 @@ const AutomaticSetup = () => {
 
     // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
     if (process.platform !== 'win32') {
-      ipcRenderer.invoke('update-progress-bar', -1);
+      sendMessage(EV.UPDATE_PROGRESS_BAR, -1);
       setDownloadPercentage(null);
       await new Promise(resolve => setTimeout(resolve, 500));
       setCurrentStep(`Extracting 2 / ${totalSteps}`);
@@ -267,7 +268,7 @@ const AutomaticSetup = () => {
       });
       await new Promise((resolve, reject) => {
         secondExtraction.on('progress', ({ percent }) => {
-          ipcRenderer.invoke('update-progress-bar', percent);
+          sendMessage(EV.UPDATE_PROGRESS_BAR, percent);
           setDownloadPercentage(percent);
         });
         secondExtraction.on('end', () => {
@@ -299,7 +300,7 @@ const AutomaticSetup = () => {
 
     dispatch(updateJavaPath(null));
     setCurrentStep(`Java is ready!`);
-    ipcRenderer.invoke('update-progress-bar', -1);
+    sendMessage(EV.UPDATE_PROGRESS_BAR, -1);
     setDownloadPercentage(null);
     await new Promise(resolve => setTimeout(resolve, 2000));
     dispatch(closeModal());

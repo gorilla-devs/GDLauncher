@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faJava } from '@fortawesome/free-brands-svg-icons';
 import {
@@ -25,6 +24,8 @@ import {
 } from '../../../../app/desktop/utils/constants';
 import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
+import sendMessage from '../../../utils/sendMessage';
+import EV from '../../../messageEvents';
 
 const JavaSettings = styled.div`
   width: 100%;
@@ -117,8 +118,7 @@ export default function MyAccountPreferences() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    ipcRenderer
-      .invoke('getAllDisplaysBounds')
+    sendMessage(EV.GET_ALL_DISPLAYS_BOUNDS)
       .then(setScreenResolution)
       .catch(console.error);
   }, []);
@@ -194,8 +194,8 @@ export default function MyAccountPreferences() {
               <StyledButtons
                 color="primary"
                 onClick={async () => {
-                  const { filePaths, canceled } = await ipcRenderer.invoke(
-                    'openFileDialog',
+                  const { filePaths, canceled } = await sendMessage(
+                    EV.OPEN_FILE_DIALOG,
                     javaPath
                   );
                   if (!filePaths[0] || canceled) return;

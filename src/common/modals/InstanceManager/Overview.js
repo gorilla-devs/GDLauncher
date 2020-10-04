@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUndo, faCog } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Switch, Slider, Select } from 'antd';
-import { ipcRenderer } from 'electron';
 import { _getInstancesPath, _getInstance } from '../../utils/selectors';
 import instanceDefaultBackground from '../../assets/instance_default.png';
 import {
@@ -18,6 +17,8 @@ import {
 import { updateInstanceConfig } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 import { convertMinutesToHumanTime } from '../../utils';
+import sendMessage from '../../utils/sendMessage';
+import EV from '../../messageEvents';
 
 const Container = styled.div`
   padding: 0 50px;
@@ -183,8 +184,7 @@ const Overview = ({ instanceName, background, manifest }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    ipcRenderer
-      .invoke('getAllDisplaysBounds')
+    sendMessage(EV.GET_ALL_DISPLAYS_BOUNDS)
       .then(setScreenResolution)
       .catch(console.error);
   }, []);

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Button } from 'antd';
-import { ipcRenderer } from 'electron';
 import creeper from '../../common/assets/creeper.png';
+import sendMessage from '../../common/utils/sendMessage';
+import EV from '../../common/messageEvents';
 
 export default class ErrorBoundary extends React.Component {
   static getDerivedStateFromError(error) {
@@ -65,7 +66,7 @@ export default class ErrorBoundary extends React.Component {
           <Button
             type="primary"
             onClick={() => {
-              ipcRenderer.invoke('appRestart');
+              sendMessage(EV.RESTART_APP);
             }}
             css={`
               margin-top: 30px;

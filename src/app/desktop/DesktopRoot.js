@@ -2,7 +2,6 @@ import React, { useEffect, memo, useState } from 'react';
 import { useDidMount } from 'rooks';
 import styled from 'styled-components';
 import { Switch } from 'react-router';
-import { ipcRenderer } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
 import { push } from 'connected-react-router';
 import { message } from 'antd';
@@ -32,6 +31,8 @@ import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
 import { openModal } from '../../common/reducers/modals/actions';
 import Message from './components/Message';
+import sendMessage from '../../common/utils/sendMessage';
+import EV from '../../common/messageEvents';
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -67,7 +68,7 @@ function DesktopRoot({ store }) {
 
   const init = async () => {
     dispatch(requesting(features.mcAuthentication));
-    const userDataStatic = await ipcRenderer.invoke('getUserData');
+    const userDataStatic = await sendMessage(EV.GET_USER_DATA_PATH);
     const userData = dispatch(updateUserData(userDataStatic));
     await dispatch(checkClientToken());
     dispatch(initNews());
@@ -122,7 +123,7 @@ function DesktopRoot({ store }) {
     }
 
     if (shouldShowDiscordRPC) {
-      ipcRenderer.invoke('init-discord-rpc');
+      sendMessage(EV.INIT_DISCORD_RPC);
     }
   };
 

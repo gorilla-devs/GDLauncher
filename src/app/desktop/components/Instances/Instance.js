@@ -4,7 +4,6 @@ import styled, { keyframes } from 'styled-components';
 import { promises as fs } from 'fs';
 import { LoadingOutlined } from '@ant-design/icons';
 import path from 'path';
-import { ipcRenderer } from 'electron';
 import { Portal } from 'react-portal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -29,6 +28,8 @@ import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
 import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
+import sendMessage from '../../../../common/utils/sendMessage';
+import EV from '../../../../common/messageEvents';
 
 const Container = styled.div`
   position: relative;
@@ -184,7 +185,7 @@ const Instance = ({ instanceName }) => {
     dispatch(launchInstance(instanceName));
   };
   const openFolder = () => {
-    ipcRenderer.invoke('openFolder', path.join(instancesPath, instance.name));
+    sendMessage(EV.OPEN_FOLDER, path.join(instancesPath, instance.name));
   };
   const openConfirmationDeleteModal = () => {
     dispatch(openModal('InstanceDeleteConfirmation', { instanceName }));

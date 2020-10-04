@@ -2,16 +2,17 @@
 import React, { memo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
-import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import Modal from '../components/Modal';
+import sendMessage from '../utils/sendMessage';
+import EV from '../messageEvents';
 
 const ChangeLogs = () => {
   const [version, setVersion] = useState(null);
 
   useEffect(() => {
-    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
+    sendMessage(EV.GET_APP_VERSION).then(setVersion).catch(console.error);
   }, []);
 
   return (

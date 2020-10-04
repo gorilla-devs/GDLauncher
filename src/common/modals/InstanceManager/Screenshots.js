@@ -1,7 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { promises as fs, watch, createReadStream } from 'fs';
-import { clipboard, ipcRenderer } from 'electron';
 import fse from 'fs-extra';
 import path from 'path';
 import base64 from 'base64-stream';
@@ -30,6 +29,8 @@ import {
 import { _getInstancesPath } from '../../utils/selectors';
 import { openModal } from '../../reducers/modals/actions';
 import { imgurPost } from '../../api';
+import sendMessage from '../../utils/sendMessage';
+import EV from '../../messageEvents';
 
 const getScreenshots = async screenshotsPath => {
   const files = await fs.readdir(screenshotsPath);
@@ -71,13 +72,13 @@ const getImgurLink = async (imagePath, fileSize, setProgressUpdate) => {
     const res = await imgurPost(base64String, updateProgress);
 
     if (res.status == 200) {
-      clipboard.writeText(res.data.data.link);
+      sendMessage(EV.COPY_TEXT_TO_CLIPBOARD, res.data.data.link);
     }
   }
 };
 
 const openFolder = screenshotsPath => {
-  ipcRenderer.invoke('openFolder', screenshotsPath);
+  sendMessage(EV.OPEN_FOLDER, screenshotsPath);
 };
 
 const getTitle = days => {
@@ -357,7 +358,8 @@ const Screenshots = ({ instanceName }) => {
                             </MenuItem>
                             <MenuItem
                               onClick={() => {
-                                clipboard.writeImage(
+                                sendMessage(
+                                  EV.COPY_IMAGE_TO_CLIPBOARD,
                                   path.join(screenshotsPath, file.name)
                                 );
                               }}

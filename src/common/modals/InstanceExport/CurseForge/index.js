@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ipcRenderer } from 'electron';
 import path from 'path';
 import {
   _getInstance,
@@ -13,6 +12,8 @@ import { closeModal } from '../../../reducers/modals/actions';
 import FirstStep from './FirstStep';
 import SecondStep from './SecondStep';
 import ThirdStep from './ThirdStep';
+import sendMessage from '../../../utils/sendMessage';
+import EV from '../../../messageEvents';
 
 const InstanceExportCurseForge = ({ instanceName }) => {
   const [page, setPage] = useState(0);
@@ -33,7 +34,7 @@ const InstanceExportCurseForge = ({ instanceName }) => {
   const instancePath = path.join(instancesPath, instanceName);
 
   const openFolderDialog = async () => {
-    const dialog = await ipcRenderer.invoke('openFolderDialog', instancesPath);
+    const dialog = await sendMessage(EV.OPEN_FOLDER_DIALOG, instancesPath);
     if (dialog.canceled) return;
     setFilePath(dialog.filePaths[0]);
   };

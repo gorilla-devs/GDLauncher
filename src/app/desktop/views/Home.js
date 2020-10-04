@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { ipcRenderer } from 'electron';
 // import { promises as fs } from 'fs';
 // import path from 'path';
 import Instances from '../components/Instances';
@@ -16,6 +15,8 @@ import {
 } from '../../../common/utils/selectors';
 import { extractFace } from '../utils';
 import { updateLastUpdateVersion } from '../../../common/reducers/actions';
+import sendMessage from '../../../common/utils/sendMessage';
+import EV from '../../../common/messageEvents';
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
@@ -72,7 +73,7 @@ const Home = () => {
 
   useEffect(() => {
     const init = async () => {
-      const appVersion = await ipcRenderer.invoke('getAppVersion');
+      const appVersion = await sendMessage(EV.GET_APP_VERSION);
       if (lastUpdateVersion !== appVersion) {
         dispatch(updateLastUpdateVersion(appVersion));
         dispatch(openModal('ChangeLogs'));

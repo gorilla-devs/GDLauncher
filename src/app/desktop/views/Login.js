@@ -1,6 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,6 +17,8 @@ import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.webm';
 import HorizontalLogo from '../../../ui/HorizontalLogo';
 import { openModal } from '../../../common/reducers/modals/actions';
+import sendMessage from '../../../common/utils/sendMessage';
+import EV from '../../../common/messageEvents';
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
@@ -198,7 +199,7 @@ const Login = () => {
   useKey(['Enter'], authenticate);
 
   useEffect(() => {
-    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
+    sendMessage(EV.GET_APP_VERSION).then(setVersion).catch(console.error);
     fetchStatus().catch(console.error);
   }, []);
 

@@ -1,6 +1,5 @@
-import { app, ipcMain, dialog, shell, screen } from 'electron';
+import { app, ipcMain } from 'electron';
 import log from 'electron-log';
-import path from 'path';
 import handleKeybinds from './src/handleKeybinds';
 import { createWindow, mainWindow } from './src/mainWindow';
 import extractSevenZip from './src/extractSevenZip';
@@ -74,101 +73,6 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
-});
-
-ipcMain.handle('update-progress-bar', (event, p) => {
-  mainWindow.setProgressBar(p);
-});
-
-ipcMain.handle('hide-window', () => {
-  if (mainWindow) {
-    mainWindow.hide();
-  }
-});
-
-ipcMain.handle('min-max-window', () => {
-  if (mainWindow.isMaximized()) {
-    mainWindow.unmaximize();
-  } else {
-    mainWindow.maximize();
-  }
-});
-
-ipcMain.handle('minimize-window', () => {
-  mainWindow.minimize();
-});
-
-ipcMain.handle('show-window', () => {
-  if (mainWindow) {
-    mainWindow.show();
-    mainWindow.focus();
-  }
-});
-
-ipcMain.handle('quit-app', () => {
-  mainWindow.close();
-  mainWindow = null;
-});
-
-ipcMain.handle('isAppImage', () => {
-  return process.env.APPIMAGE;
-});
-
-ipcMain.handle('getAppdataPath', () => {
-  return app.getPath('appData');
-});
-
-// Returns path to app.asar
-ipcMain.handle('getAppPath', () => {
-  return app.getAppPath();
-});
-
-ipcMain.handle('getUserData', () => {
-  return app.getPath('userData');
-});
-
-ipcMain.handle('getExecutablePath', () => {
-  return path.dirname(app.getPath('exe'));
-});
-
-ipcMain.handle('getAppVersion', () => {
-  return app.getVersion();
-});
-
-ipcMain.handle('getIsWindowMaximized', () => {
-  return !mainWindow.maximizable;
-});
-
-ipcMain.handle('openFolder', (e, folderPath) => {
-  shell.openItem(folderPath);
-});
-
-ipcMain.handle('open-devtools', () => {
-  mainWindow.webContents.openDevTools({ mode: 'undocked' });
-});
-
-ipcMain.handle('openFolderDialog', (e, defaultPath) => {
-  return dialog.showOpenDialog({
-    properties: ['openDirectory'],
-    defaultPath: path.dirname(defaultPath)
-  });
-});
-
-ipcMain.handle('openFileDialog', (e, filters) => {
-  return dialog.showOpenDialog({
-    properties: ['openFile'],
-    filters
-  });
-});
-
-ipcMain.handle('appRestart', () => {
-  log.log('Restarting app');
-  app.relaunch();
-  mainWindow.close();
-});
-
-ipcMain.handle('getAllDisplaysBounds', () => {
-  return screen.getAllDisplays().map(v => v.bounds);
 });
 
 ipcMain.handle('start-listener', async (e, dirPath) => {

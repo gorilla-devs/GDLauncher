@@ -97,6 +97,8 @@ import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
 import { openModal } from './modals/actions';
+import sendMessage from '../utils/sendMessage';
+import EV from '../messageEvents';
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -443,7 +445,7 @@ export function loginThroughNativeLauncher() {
       app: { isNewUser }
     } = getState();
 
-    const homedir = await ipcRenderer.invoke('getAppdataPath');
+    const homedir = await sendMessage(EV.GET_APP_DATA_PATH);
     const mcFolder = process.platform === 'darwin' ? 'minecraft' : '.minecraft';
     const vanillaMCPath =
       process.platform === 'linux'
@@ -2103,7 +2105,7 @@ export function launchInstance(instanceName) {
     );
 
     if (state.settings.hideWindowOnGameLaunch) {
-      await ipcRenderer.invoke('hide-window');
+      await sendMessage(EV.HIDE_MAIN_WINDOW);
     }
 
     const ps = spawn(
@@ -2150,7 +2152,7 @@ export function launchInstance(instanceName) {
         ps.kill('SIGKILL');
       }
       await new Promise(resolve => setTimeout(resolve, 200));
-      ipcRenderer.invoke('show-window');
+      await sendMessage(EV.SHOW_MAIN_WINDOW);
       dispatch(removeStartedInstance(instanceName));
       fse.remove(instanceJLFPath);
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
@@ -2361,7 +2363,7 @@ export const getAppLatestVersion = () => {
     const latestPrerelease = latestReleases.find(v => v.prerelease);
     const latestStablerelease = latestReleases.find(v => !v.prerelease);
 
-    const appData = parse(await ipcRenderer.invoke('getAppdataPath'));
+    const appData = parse(await sendMessage(EV.GET_APP_DATA_PATH));
     let releaseChannel = 0;
 
     try {
@@ -2373,7 +2375,7 @@ export const getAppLatestVersion = () => {
       // swallow error
     }
 
-    const v = await ipcRenderer.invoke('getAppVersion');
+    const v = await sendMessage(EV.GET_APP_VERSION);
 
     const installedVersion = parse(v);
     const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
@@ -2397,7 +2399,7 @@ export const getAppLatestVersion = () => {
 export const checkForPortableUpdates = () => {
   return async (dispatch, getState) => {
     const state = getState();
-    const baseFolder = await ipcRenderer.invoke('getExecutablePath');
+    const baseFolder = await sendMessage(EV.GET_EXECUTABLE_PATH);
 
     const tempFolder = path.join(_getTempPath(state), `update`);
 
