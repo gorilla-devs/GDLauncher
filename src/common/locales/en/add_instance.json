@@ -1,0 +1,23 @@
+{
+    "add_new_instance": "Add New Instance",
+    "there_was_an_issue_while_importing": "There was an issue while importing.",
+    "select_a_version": "Select a version",
+
+    "invalid_instance_name_error": "Instance name is not valid or too long. Please try another one",
+    "already_exitst_instance_name_error": "An instance with this name already exists",
+
+    "twitch_mod_pack": {
+        "all_versions": "All Versions",
+        "all_categories": "All Categories",
+        "featured": "Featured",
+        "popularity": "Popularity",
+        "last_updated": "Last Updated",
+        "name": "Name",
+        "auther": "Author",
+        "total_downloads": "Total Downloads",
+        "search": "Search..."
+    },
+
+    "local_file_or_link_to_a_direct_download": "Local file or link to a direct download",
+    "browse": "Browse"
+}
