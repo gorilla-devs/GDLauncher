@@ -1,5 +1,5 @@
-import { addListener } from '../messageListener';
-import EV from '../../../common/messageEvents';
+import { addListener } from '../../messageListener';
+import EV from '../../../../common/messageEvents';
 
 addListener(EV.UPDATE_MOD_SYNC, async () => {
   return true;
