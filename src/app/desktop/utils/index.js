@@ -19,7 +19,7 @@ import {
   sortByForgeVersionDesc
 } from '../../../common/utils';
 import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
-import { downloadFile } from './downloader';
+import { downloadFile } from '../../../common/utils/downloader';
 import sendMessage from '../../../common/utils/sendMessage';
 import EV from '../../../common/messageEvents';
 

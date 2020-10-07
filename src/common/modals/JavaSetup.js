@@ -11,7 +11,7 @@ import { faFolder } from '@fortawesome/free-solid-svg-icons';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import Modal from '../components/Modal';
-import { downloadFile } from '../../app/desktop/utils/downloader';
+import { downloadFile } from '../utils/downloader';
 import { convertOSToJavaFormat, get7zPath } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';

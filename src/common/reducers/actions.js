@@ -83,10 +83,7 @@ import {
   downloadAddonZip,
   convertcurseForgeToCanonical
 } from '../../app/desktop/utils';
-import {
-  downloadFile,
-  downloadInstanceFiles
-} from '../../app/desktop/utils/downloader';
+import { downloadFile, downloadInstanceFiles } from '../utils/downloader';
 import {
   removeDuplicates,
   getFileMurmurHash2,
@@ -2173,112 +2170,6 @@ export function launchInstance(instanceName) {
   };
 }
 
-export function installMod(
-  projectID,
-  fileID,
-  instanceName,
-  gameVersion,
-  installDeps = true,
-  onProgress,
-  useTempMiddleware
-) {
-  return async (dispatch, getState) => {
-    const state = getState();
-    const instancesPath = _getInstancesPath(state);
-    const instancePath = path.join(instancesPath, instanceName);
-    const instance = _getInstance(state)(instanceName);
-    const mainModData = await getAddonFile(projectID, fileID);
-    const { data: addon } = await getAddon(projectID);
-    mainModData.data.projectID = projectID;
-    const destFile = path.join(instancePath, 'mods', mainModData.data.fileName);
-    const tempFile = path.join(_getTempPath(state), mainModData.data.fileName);
-
-    if (useTempMiddleware) {
-      await downloadFile(tempFile, mainModData.data.downloadUrl, onProgress);
-    }
-
-    let needToAddMod = true;
-    await dispatch(
-      updateInstanceConfig(instanceName, prev => {
-        needToAddMod = !prev.mods.find(
-          v => v.fileID === fileID && v.projectID === projectID
-        );
-        return {
-          ...prev,
-          mods: [
-            ...prev.mods,
-            ...(needToAddMod
-              ? [normalizeModData(mainModData.data, projectID, addon.name)]
-              : [])
-          ]
-        };
-      })
-    );
-
-    if (!needToAddMod) {
-      if (useTempMiddleware) {
-        await fse.remove(tempFile);
-      }
-      return;
-    }
-
-    if (!useTempMiddleware) {
-      try {
-        await fse.access(destFile);
-        const murmur2 = await getFileMurmurHash2(destFile);
-        if (murmur2 !== mainModData.data.packageFingerprint) {
-          await downloadFile(
-            destFile,
-            mainModData.data.downloadUrl,
-            onProgress
-          );
-        }
-      } catch {
-        await downloadFile(destFile, mainModData.data.downloadUrl, onProgress);
-      }
-    } else {
-      await fse.move(tempFile, destFile, { overwrite: true });
-    }
-
-    if (installDeps) {
-      await pMap(
-        mainModData.data.dependencies,
-        async dep => {
-          // type 1: embedded
-          // type 2: optional
-          // type 3: required
-          // type 4: tool
-          // type 5: incompatible
-          // type 6: include
-
-          if (dep.type === 3) {
-            if (instance.mods.some(x => x.projectID === dep.addonId)) return;
-            const depList = (await getAddonFiles(dep.addonId)).data.sort(
-              sortByDate
-            );
-            const depData = depList.data.find(v =>
-              v.gameVersion.includes(gameVersion)
-            );
-            await dispatch(
-              installMod(
-                dep.addonId,
-                depData.id,
-                instanceName,
-                gameVersion,
-                installDeps,
-                onProgress,
-                useTempMiddleware
-              )
-            );
-          }
-        },
-        { concurrency: 2 }
-      );
-    }
-    return destFile;
-  };
-}
-
 export const deleteMod = (instanceName, mod) => {
   return async (dispatch, getState) => {
     const instancesPath = _getInstancesPath(getState());
@@ -2291,29 +2182,6 @@ export const deleteMod = (instanceName, mod) => {
     await fse.remove(
       path.join(instancesPath, instanceName, 'mods', mod.fileName)
     );
-  };
-};
-
-export const updateMod = (
-  instanceName,
-  mod,
-  fileID,
-  gameVersion,
-  onProgress
-) => {
-  return async dispatch => {
-    await dispatch(
-      installMod(
-        mod.projectID,
-        fileID,
-        instanceName,
-        gameVersion,
-        false,
-        onProgress,
-        true
-      )
-    );
-    await dispatch(deleteMod(instanceName, mod));
   };
 };
 

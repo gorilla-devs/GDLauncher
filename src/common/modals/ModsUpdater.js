@@ -3,9 +3,10 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { Progress } from 'antd';
 import Modal from '../components/Modal';
-import { updateMod } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
 import { _getInstance } from '../utils/selectors';
+import sendMessage from '../utils/sendMessage';
+import EV from '../messageEvents';
 
 const ModsUpdater = ({ instanceName }) => {
   const dispatch = useDispatch();
@@ -35,18 +36,16 @@ const ModsUpdater = ({ instanceName }) => {
       let i = 0;
       while (!cancel && i < totalMods.length) {
         const mod = totalMods[i];
-        await dispatch(
-          updateMod(
-            instanceName,
-            mod,
-            latestMods[mod.projectID].id,
-            instance.modloader[1],
-            // eslint-disable-next-line
-            p => {
-              if (!cancel) setInstallProgress(p);
-            }
-          )
-        );
+        await sendMessage(EV.UPDATE_MOD, [
+          instanceName,
+          mod,
+          latestMods[mod.projectID].id,
+          instance.modloader[1],
+          // eslint-disable-next-line
+          p => {
+            if (!cancel) setInstallProgress(p);
+          }
+        ]);
         if (!cancel) {
           setComputedMods(p => p + 1);
         }

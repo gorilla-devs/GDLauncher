@@ -12,7 +12,6 @@ import Modal from '../components/Modal';
 import { getSearch, getAddonFiles } from '../api';
 import { openModal } from '../reducers/modals/actions';
 import { _getInstance } from '../utils/selectors';
-import { installMod } from '../reducers/actions';
 import { FABRIC, FORGE } from '../utils/constants';
 import {
   getFirstPreferredCandidate,
@@ -21,6 +20,8 @@ import {
   getPatchedInstanceType
 } from '../../app/desktop/utils';
 import { sortByDate } from '../utils';
+import sendMessage from '../utils/sendMessage';
+import EV from '../messageEvents';
 
 const CellContainer = styled.div.attrs(props => ({
   style: props.override
@@ -167,14 +168,12 @@ const Cell = ({
                     return;
                   }
 
-                  await dispatch(
-                    installMod(
-                      mod?.id,
-                      preferredFile?.id,
-                      instanceName,
-                      version
-                    )
-                  );
+                  await sendMessage(EV.INSTALL_MOD, [
+                    mod?.id,
+                    preferredFile?.id,
+                    instanceName,
+                    version
+                  ]);
                   setLoading(false);
                 }}
               >

@@ -10,7 +10,7 @@ import { Button, Input } from 'antd';
 import { _getTempPath } from '../../utils/selectors';
 import { useSelector } from 'react-redux';
 import { getAddon } from '../../api';
-import { downloadFile } from '../../../app/desktop/utils/downloader';
+import { downloadFile } from '../../utils/downloader';
 import { FABRIC, FORGE, VANILLA } from '../../utils/constants';
 import { transparentize } from 'polished';
 import sendMessage from '../../utils/sendMessage';

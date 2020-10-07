@@ -21,7 +21,7 @@ import {
 } from '../../../app/desktop/utils';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
-import { downloadFile } from '../../../app/desktop/utils/downloader';
+import { downloadFile } from '../../utils/downloader';
 import { FABRIC, VANILLA, FORGE } from '../../utils/constants';
 
 const InstanceName = ({

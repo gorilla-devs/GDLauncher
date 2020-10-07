@@ -4,7 +4,7 @@ import axios from 'axios';
 import pMap from 'p-map';
 import path from 'path';
 import adapter from 'axios/lib/adapters/http';
-import computeFileHash from './computeFileHash';
+import computeFileHash from '../../app/desktop/utils/computeFileHash';
 
 const fs = fss.promises;
 

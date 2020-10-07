@@ -1,23 +1,29 @@
 import path from 'path';
 import { app } from 'electron';
-import fse from 'fs-extra';
 import log from 'electron-log';
 import { promises as fs } from 'fs';
 import pMap from 'p-map';
 import lockfile from 'lockfile';
 import nsfw from 'nsfw';
 import murmur from 'murmur2-calculator';
-import { getAddon, getAddonsByFingerprint } from '../../common/api';
+import {
+  getAddon,
+  getAddonFile,
+  getAddonFiles,
+  getAddonsByFingerprint
+} from '../../common/api';
 import {
   convertCompletePathToInstance,
   isInstanceFolderPath,
   isMod,
-  normalizeModData
+  normalizeModData,
+  sortByDate
 } from '../../common/utils';
 import { sendMessage } from './messageListener';
 import EV from '../../common/messageEvents';
 import generateMessageId from '../../common/utils/generateMessageId';
 import PromiseQueue from '../../common/utils/PromiseQueue';
+import { downloadFile } from '../../common/utils/downloader';
 
 // eslint-disable-next-line
 export let INSTANCES = {};
@@ -54,7 +60,7 @@ const getInstances = async instancesPath => {
       const configPath = path.join(
         path.join(instancesPath, instance, 'config.json')
       );
-      const config = await fse.readJSON(configPath);
+      const config = JSON.parse(await fs.readFile(configPath));
       if (!config.modloader) {
         throw new Error(`Config for ${instance} could not be parsed`);
       }
@@ -89,14 +95,21 @@ const modsFingerprintsScan = async instancesPath => {
       const configPath = path.join(
         path.join(instancesPath, instance, 'config.json')
       );
-      const config = await fse.readJSON(configPath);
+      const config = JSON.parse(await fs.readFile(configPath));
 
       if (!config.modloader) {
         throw new Error(`Config for ${instance} could not be parsed`);
       }
 
       const modsFolder = path.join(instancesPath, instance, 'mods');
-      const modsFolderExists = await fse.pathExists(modsFolder);
+
+      let modsFolderExists;
+      try {
+        await fs.access(modsFolder);
+        modsFolderExists = true;
+      } catch {
+        modsFolderExists = false;
+      }
 
       if (!modsFolderExists) return { ...config, name: instance };
 
@@ -198,10 +211,10 @@ const modsFingerprintsScan = async instancesPath => {
       };
 
       if (JSON.stringify(config) !== JSON.stringify(newConfig)) {
-        await fse.outputJson(configPath, newConfig);
+        await fs.writeFile(configPath, JSON.stringify(newConfig));
         return { ...newConfig, name: instance };
       }
-      return { ...config, name: instance };
+      return { ...newConfig, name: instance };
     } catch (err) {
       console.error(err);
     }
@@ -367,7 +380,7 @@ const startListener = async instancesPath => {
           'config.json'
         );
         try {
-          const config = await fse.readJSON(configPath);
+          const config = JSON.parse(await fs.readFile(configPath));
 
           if (!config.modloader) {
             throw new Error(`Config for ${instanceName} could not be parsed`);
@@ -407,7 +420,7 @@ const startListener = async instancesPath => {
             newInstanceName,
             'config.json'
           );
-          const config = await fse.readJSON(configPath);
+          const config = JSON.parse(await fs.readFile(configPath));
           if (!config.modloader) {
             throw new Error(
               `Config for ${newInstanceName} could not be parsed`
@@ -616,4 +629,168 @@ const startListener = async instancesPath => {
   });
   log.log('Started listener');
   return watcher.start();
+};
+
+export const deleteMods = async ([instanceName, selectedMods]) => {
+  const instancePath = path.join(
+    app.getPath('userData'),
+    'instances',
+    instanceName
+  );
+
+  INSTANCES[instanceName].mods = INSTANCES[instanceName].mods.filter(
+    m => !selectedMods.includes(m.fileName)
+  );
+
+  await Promise.all(
+    selectedMods.map(fileName =>
+      fs.unlink(path.join(instancePath, 'mods', fileName))
+    )
+  );
+
+  sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+};
+
+export const toggleModDisabled = async ([
+  oldFileName,
+  destFileName,
+  instanceName
+]) => {
+  const instancePath = path.join(
+    app.getPath('userData'),
+    'instances',
+    instanceName
+  );
+
+  INSTANCES[instanceName].mods = INSTANCES[instanceName].mods.map(m => {
+    if (m.fileName === oldFileName) {
+      return {
+        ...m,
+        fileName: destFileName
+      };
+    }
+    return m;
+  });
+
+  await fs.rename(
+    path.join(instancePath, 'mods', oldFileName),
+    path.join(instancePath, 'mods', destFileName)
+  );
+  sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+};
+
+export const installMod = async ([
+  projectID,
+  fileID,
+  instanceName,
+  gameVersion,
+  installDeps = true,
+  onProgress,
+  useTempMiddleware
+]) => {
+  const instancePath = path.join(
+    app.getPath('userData'),
+    'instances',
+    instanceName
+  );
+
+  const tempPath = path.join(app.getPath('userData'), 'temp');
+
+  const instance = INSTANCES[instanceName];
+  const mainModData = await getAddonFile(projectID, fileID);
+  const { data: addon } = await getAddon(projectID);
+  mainModData.data.projectID = projectID;
+  const destFile = path.join(instancePath, 'mods', mainModData.data.fileName);
+  const tempFile = path.join(tempPath, mainModData.data.fileName);
+
+  if (useTempMiddleware) {
+    await downloadFile(tempFile, mainModData.data.downloadUrl, onProgress);
+  }
+
+  const needToAddMod = !instance.mods.find(
+    v => v.fileID === fileID && v.projectID === projectID
+  );
+
+  if (needToAddMod) {
+    instance.mods.push(
+      normalizeModData(mainModData.data, projectID, addon.name)
+    );
+  }
+
+  sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+
+  if (!needToAddMod) {
+    if (useTempMiddleware) {
+      await fs.unlink(tempFile);
+    }
+    return;
+  }
+
+  if (!useTempMiddleware) {
+    try {
+      await fs.lstat(destFile);
+      const murmur2 = await getFileMurmurHash2(destFile);
+      if (murmur2 !== mainModData.data.packageFingerprint) {
+        await downloadFile(destFile, mainModData.data.downloadUrl, onProgress);
+      }
+    } catch {
+      await downloadFile(destFile, mainModData.data.downloadUrl, onProgress);
+    }
+  } else {
+    await fs.rename(tempFile, destFile);
+  }
+
+  if (installDeps) {
+    await pMap(
+      mainModData.data.dependencies,
+      async dep => {
+        // type 1: embedded
+        // type 2: optional
+        // type 3: required
+        // type 4: tool
+        // type 5: incompatible
+        // type 6: include
+
+        if (dep.type === 3) {
+          if (instance.mods.some(x => x.projectID === dep.addonId)) return;
+          const depList = (await getAddonFiles(dep.addonId)).data.sort(
+            sortByDate
+          );
+          const depData = depList.find(v =>
+            v.gameVersion.includes(gameVersion)
+          );
+          await installMod([
+            dep.addonId,
+            depData.id,
+            instanceName,
+            gameVersion,
+            installDeps,
+            onProgress,
+            useTempMiddleware
+          ]);
+        }
+      },
+      { concurrency: 2 }
+    );
+  }
+  return mainModData.data.fileName;
+};
+
+export const updateMod = async ([
+  instanceName,
+  mod,
+  fileID,
+  gameVersion,
+  onProgress
+]) => {
+  await installMod([
+    mod.projectID,
+    fileID,
+    instanceName,
+    gameVersion,
+    false,
+    onProgress,
+    true
+  ]);
+  await deleteMods([instanceName, [mod.fileName]]);
 };
