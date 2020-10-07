@@ -28,18 +28,21 @@ import { downloadFile } from '../../common/utils/downloader';
 // eslint-disable-next-line
 export let INSTANCES = {};
 
-// eslint-disable-next-line
 export const initializeInstances = async () => {
-  const instancesPath = path.join(app.getPath('userData'), 'instances');
+  try {
+    const instancesPath = path.join(app.getPath('userData'), 'instances');
 
-  // Initially read from disk
-  INSTANCES = await getInstances(instancesPath);
-  sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
-  INSTANCES = await modsFingerprintsScan(instancesPath);
-  sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+    // Initially read from disk
+    INSTANCES = await getInstances(instancesPath);
+    sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+    INSTANCES = await modsFingerprintsScan(instancesPath);
+    sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
 
-  // Initialize listener
-  startListener(instancesPath).catch(log.error);
+    // Initialize listener
+    await startListener(instancesPath);
+  } catch (err) {
+    log.error(err);
+  }
 };
 
 const isDirectory = source => fs.lstat(source).then(r => r.isDirectory());
