@@ -428,6 +428,7 @@ const startListener = async instancesPath => {
   };
 
   const watcher = await nsfw(instancesPath, async events => {
+    console.log(`Detected ${events.length} events from instances listener`);
     await Promise.all(
       events.map(async event => {
         // Using oldFile instead of newFile is intentional.
@@ -470,12 +471,17 @@ const startListener = async instancesPath => {
           !changesTracker[completePath].completed &&
           (event.action === 2 || event.action === 0 || event.action === 1)
         ) {
+          let fileHandle;
           try {
             await new Promise(resolve => setTimeout(resolve, 300));
-            await fs.open(completePath, 'r+');
+            fileHandle = await fs.open(completePath, 'r+');
             changesTracker[completePath].completed = true;
-          } catch {
+          } finally {
             // Do nothing, simply not completed..
+            // Remember to close the file handler
+            if (fileHandle !== undefined) {
+              await fileHandle.close();
+            }
           }
         }
       })
