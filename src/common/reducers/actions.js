@@ -74,16 +74,12 @@ import {
   mavenToArray,
   copyAssetsToLegacy,
   getPlayerSkin,
-  normalizeModData,
   reflect,
-  isMod,
-  isInstanceFolderPath,
   getFileHash,
   getFilesRecursive,
   filterForgeFilesByVersion,
   filterFabricFilesByVersion,
   getPatchedInstanceType,
-  convertCompletePathToInstance,
   downloadAddonZip,
   convertcurseForgeToCanonical
 } from '../../app/desktop/utils';
@@ -91,13 +87,21 @@ import {
   downloadFile,
   downloadInstanceFiles
 } from '../../app/desktop/utils/downloader';
-import { removeDuplicates, getFileMurmurHash2 } from '../utils';
+import {
+  removeDuplicates,
+  getFileMurmurHash2,
+  sortByDate,
+  isMod,
+  normalizeModData,
+  convertCompletePathToInstance,
+  isInstanceFolderPath
+} from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
 import { openModal } from './modals/actions';
-import sendMessage from '../utils/sendMessage';
+import sendMessage, { handleMessage } from '../utils/sendMessage';
 import EV from '../messageEvents';
 
 export function initManifests() {
@@ -2249,7 +2253,9 @@ export function installMod(
 
           if (dep.type === 3) {
             if (instance.mods.some(x => x.projectID === dep.addonId)) return;
-            const depList = await getAddonFiles(dep.addonId);
+            const depList = (await getAddonFiles(dep.addonId)).data.sort(
+              sortByDate
+            );
             const depData = depList.data.find(v =>
               v.gameVersion.includes(gameVersion)
             );
@@ -2332,7 +2338,7 @@ export const initLatestMods = instanceName => {
     const manifests = await pMap(
       modsToInit,
       async mod => {
-        const { data } = await getAddonFiles(mod);
+        const data = (await getAddonFiles(mod)).data.sort(sortByDate);
         return { projectID: mod, data };
       },
       { concurrency: 40 }
@@ -2521,5 +2527,22 @@ export const checkForPortableUpdates = () => {
       );
     }
     return latestVersion;
+  };
+};
+
+export const initInstances = () => {
+  return async dispatch => {
+    const initialInstances = await sendMessage(EV.GET_INSTANCES);
+    dispatch({
+      type: ActionTypes.UPDATE_INSTANCES,
+      instances: initialInstances
+    });
+
+    handleMessage(EV.UPDATE_INSTANCES, instances => {
+      dispatch({
+        type: ActionTypes.UPDATE_INSTANCES,
+        instances
+      });
+    });
   };
 };

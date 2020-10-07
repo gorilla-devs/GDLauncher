@@ -23,19 +23,6 @@ import { downloadFile } from './downloader';
 import sendMessage from '../../../common/utils/sendMessage';
 import EV from '../../../common/messageEvents';
 
-export const isDirectory = source =>
-  fs.lstat(source).then(r => r.isDirectory());
-
-export const getDirectories = async source => {
-  const dirs = await fs.readdir(source);
-  return Promise.all(
-    dirs
-      .map(name => path.join(source, name))
-      .filter(isDirectory)
-      .map(dir => path.basename(dir))
-  );
-};
-
 export const mavenToArray = (s, nativeString, forceExt) => {
   const pathSplit = s.split(':');
   const fileName = pathSplit[3]
@@ -761,42 +748,10 @@ export const extractFace = async buffer => {
   return imageBuffer.toString('base64');
 };
 
-export const normalizeModData = (data, projectID, modName) => {
-  const temp = data;
-  temp.name = modName;
-  if (data.projectID && data.fileID) return temp;
-  if (data.id) {
-    temp.projectID = projectID;
-    temp.fileID = data.id;
-    delete temp.id;
-    delete temp.projectId;
-    delete temp.fileId;
-  }
-  return temp;
-};
-
 export const reflect = p =>
   p.then(
     v => ({ v, status: true }),
     e => ({ e, status: false })
-  );
-
-export const convertCompletePathToInstance = (f, instancesPath) => {
-  const escapeRegExp = stringToGoIntoTheRegex => {
-    return stringToGoIntoTheRegex.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-  };
-
-  return f.replace(new RegExp(escapeRegExp(instancesPath), 'gi'), '');
-};
-
-export const isMod = (fileName, instancesPath) =>
-  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
-    convertCompletePathToInstance(fileName, instancesPath)
-  );
-
-export const isInstanceFolderPath = (f, instancesPath) =>
-  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(
-    convertCompletePathToInstance(f, instancesPath)
   );
 
 export const isFileModFabric = file => {

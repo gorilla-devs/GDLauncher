@@ -3,7 +3,7 @@ import log from 'electron-log';
 import path from 'path';
 import { addListener } from '../messageListener';
 import EV from '../../../common/messageEvents';
-import { mainWindow } from '../mainWindow';
+import { mainWindow } from '../windows';
 
 addListener(EV.UPDATE_PROGRESS_BAR, async v => {
   mainWindow.setProgressBar(v);

@@ -1,20 +1,19 @@
 import path from 'path';
 import {
   shell,
-  BrowserWindow,
   globalShortcut,
   nativeImage,
   Tray,
-  Menu
+  Menu,
+  BrowserWindow
 } from 'electron';
 
 const isDev = process.env.NODE_ENV === 'development';
+let tray;
 
 // eslint-disable-next-line
 export let mainWindow;
-let tray;
-
-export const createWindow = () => {
+export function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 700,
@@ -101,14 +100,6 @@ export const createWindow = () => {
     mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('window-maximized');
-  });
-
-  mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('window-minimized');
-  });
-
   const handleRedirect = (e, url) => {
     if (url !== mainWindow.webContents.getURL()) {
       e.preventDefault();
@@ -119,4 +110,4 @@ export const createWindow = () => {
   mainWindow.webContents.on('will-navigate', handleRedirect);
   mainWindow.webContents.on('new-window', handleRedirect);
   return mainWindow;
-};
+}

@@ -20,6 +20,7 @@ import {
   filterForgeFilesByVersion,
   getPatchedInstanceType
 } from '../../app/desktop/utils';
+import { sortByDate } from '../utils';
 
 const CellContainer = styled.div.attrs(props => ({
   style: props.override
@@ -138,8 +139,9 @@ const Cell = ({
                 onClick={async e => {
                   setLoading(true);
                   e.stopPropagation();
-                  const files = (await getAddonFiles(mod?.id)).data;
-
+                  const files = (await getAddonFiles(mod?.id)).data.sort(
+                    sortByDate
+                  );
                   const isFabric = getPatchedInstanceType(instance) === FABRIC;
                   const isForge = getPatchedInstanceType(instance) === FORGE;
 

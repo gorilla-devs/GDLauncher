@@ -17,7 +17,7 @@ import {
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
 import { FORGE, CURSEFORGE_URL } from '../utils/constants';
-import { formatNumber, formatDate } from '../utils';
+import { formatNumber, formatDate, sortByDate } from '../utils';
 
 const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const dispatch = useDispatch();
@@ -40,7 +40,8 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
           setDescription(modifiedData);
         }),
         getAddonFiles(modpack.id).then(async data => {
-          setFiles(data.data);
+          const sortedFiles = data.data.sort(sortByDate);
+          setFiles(sortedFiles);
           setLoading(false);
         })
       ]);

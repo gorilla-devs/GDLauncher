@@ -1,6 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
-import { ipcRenderer } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -733,9 +732,7 @@ const General = () => {
         >
           {updateAvailable ? (
             <Button
-              onClick={() =>
-                ipcRenderer.invoke('installUpdateAndQuitOrRestart')
-              }
+              onClick={() => sendMessage(EV.APPLY_UPDATE)}
               css={`
                 margin-right: 10px;
               `}

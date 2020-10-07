@@ -1,11 +1,18 @@
-import { app, ipcMain } from 'electron';
+import { app } from 'electron';
 import log from 'electron-log';
 import handleKeybinds from './src/handleKeybinds';
-import { createWindow, mainWindow } from './src/mainWindow';
+import { mainWindow, createMainWindow } from './src/windows';
 import extractSevenZip from './src/extractSevenZip';
-import { listenMessage, registerListeners } from './src/messageListener';
+import {
+  listenMessage,
+  registerListeners,
+  sendMessage
+} from './src/messageListener';
 import handleUserDataPath from './src/handleUserDataPath';
 import initializeAutoUpdater from './src/autoUpdater';
+import { initializeInstances } from './src/instancesHandler';
+import EV from '../common/messageEvents';
+import generateMessageId from '../common/utils/generateMessageId';
 
 log.transports.file.level = 'silly';
 log.transports.console.level = true;
@@ -13,9 +20,6 @@ log.transports.file.maxSize = 900 * 1024; // 900KB
 
 // eslint-disable-next-line
 import './src/handleGlobalCrash';
-
-const murmur = require('murmur2-calculator');
-const nsfw = require('nsfw');
 
 // Prevent multiple instances
 const gotTheLock = app.requestSingleInstanceLock();
@@ -37,7 +41,16 @@ extractSevenZip();
 let watcher;
 
 app.on('ready', () => {
-  createWindow();
+  const window = createMainWindow();
+
+  window.on('maximize', () => {
+    sendMessage(EV.MAIN_WINDOW_MAXIMIZED, generateMessageId());
+  });
+
+  window.on('unmaximize', () => {
+    sendMessage(EV.MAIN_WINDOW_MINIMIZED, generateMessageId());
+  });
+
   registerListeners();
   listenMessage();
 });
@@ -70,45 +83,37 @@ app.on('second-instance', () => {
 });
 
 app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow();
+  if (!mainWindow) {
+    createMainWindow();
   }
 });
 
-ipcMain.handle('start-listener', async (e, dirPath) => {
-  try {
-    log.log('Trying to start listener');
-    if (watcher) {
-      await watcher.stop();
-      watcher = null;
-    }
-    watcher = await nsfw(dirPath, events => {
-      log.log(`Detected ${events.length} events from listener`);
-      mainWindow.webContents.send('listener-events', events);
-    });
-    log.log('Started listener');
-    return watcher.start();
-  } catch (err) {
-    log.error(err);
-    return Promise.reject(err);
-  }
-});
+// ipcMain.handle('start-listener', async (e, dirPath) => {
+//   try {
+//     log.log('Trying to start listener');
+//     if (watcher) {
+//       await watcher.stop();
+//       watcher = null;
+//     }
+//     watcher = await nsfw(dirPath, events => {
+//       log.log(`Detected ${events.length} events from listener`);
+//       mainWindow.webContents.send('listener-events', events);
+//     });
+//     log.log('Started listener');
+//     return watcher.start();
+//   } catch (err) {
+//     log.error(err);
+//     return Promise.reject(err);
+//   }
+// });
 
-ipcMain.handle('stop-listener', async () => {
-  if (watcher) {
-    log.log('Stopping listener');
-    await watcher.stop();
-    watcher = null;
-  }
-});
-
-ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
-  return new Promise((resolve, reject) => {
-    return murmur(filePath).then(v => {
-      if (v.toString().length === 0) reject();
-      return resolve(v);
-    });
-  });
-});
+// ipcMain.handle('stop-listener', async () => {
+//   if (watcher) {
+//     log.log('Stopping listener');
+//     await watcher.stop();
+//     watcher = null;
+//   }
+// });
 
 initializeAutoUpdater();
+initializeInstances();

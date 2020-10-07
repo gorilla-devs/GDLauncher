@@ -9,7 +9,6 @@ import {
   IMGUR_CLIENT_ID,
   FORGESVC_CATEGORIES
 } from './utils/constants';
-import { sortByDate } from './utils';
 
 export const mcAuthenticate = (username, password, clientToken) => {
   return axios.post(
@@ -122,10 +121,7 @@ export const getMultipleAddons = async addons => {
 
 export const getAddonFiles = addonID => {
   const url = `${FORGESVC_URL}/addon/${addonID}/files`;
-  return axios.get(url).then(res => ({
-    ...res,
-    data: res.data.sort(sortByDate)
-  }));
+  return axios.get(url);
 };
 
 export const getAddonDescription = addonID => {

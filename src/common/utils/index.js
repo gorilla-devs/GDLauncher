@@ -1,5 +1,3 @@
-import { ipcRenderer } from 'electron';
-
 export const sortByDate = (a, b) => {
   const dateA = new Date(a.fileDate);
   const dateB = new Date(b.fileDate);
@@ -64,8 +62,8 @@ export const generateRandomString = () => {
 };
 
 // Create the murmur hash of a mod
-export const getFileMurmurHash2 = async filePath => {
-  return ipcRenderer.invoke('calculateMurmur2FromPath', filePath);
+export const getFileMurmurHash2 = async () => {
+  // return ipcRenderer.invoke('calculateMurmur2FromPath', filePath);
 };
 
 export const numberToRoundedWord = number => {
@@ -127,3 +125,35 @@ export const convertMinutesToHumanTime = minutes => {
       return '';
   }
 };
+
+export const normalizeModData = (data, projectID, modName) => {
+  const temp = data;
+  temp.name = modName;
+  if (data.projectID && data.fileID) return temp;
+  if (data.id) {
+    temp.projectID = projectID;
+    temp.fileID = data.id;
+    delete temp.id;
+    delete temp.projectId;
+    delete temp.fileId;
+  }
+  return temp;
+};
+
+export const isMod = (fileName, instancesPath) =>
+  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
+    convertCompletePathToInstance(fileName, instancesPath)
+  );
+
+export const convertCompletePathToInstance = (f, instancesPath) => {
+  const escapeRegExp = stringToGoIntoTheRegex => {
+    return stringToGoIntoTheRegex.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  };
+
+  return f.replace(new RegExp(escapeRegExp(instancesPath), 'gi'), '');
+};
+
+export const isInstanceFolderPath = (f, instancesPath) =>
+  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(
+    convertCompletePathToInstance(f, instancesPath)
+  );

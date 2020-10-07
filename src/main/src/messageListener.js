@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
-import { mainWindow } from './mainWindow';
+import { mainWindow } from './windows';
 
 let blockedListener = false;
 

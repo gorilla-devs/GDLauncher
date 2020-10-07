@@ -6,6 +6,7 @@ import ReactHtmlParser from 'react-html-parser';
 import { getAddonFiles, getAddonFileChangelog } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
+import { sortByDate } from '../../utils';
 
 const Modpack = ({ modpackId, instanceName, manifest }) => {
   const [files, setFiles] = useState([]);
@@ -16,9 +17,10 @@ const Modpack = ({ modpackId, instanceName, manifest }) => {
 
   const initData = async () => {
     setLoading(true);
-    const { data } = await getAddonFiles(modpackId);
+    const data = await getAddonFiles(modpackId);
+    const sortedFiles = data.data.sort(sortByDate);
     const mappedFiles = await Promise.all(
-      data.map(async v => {
+      sortedFiles.map(async v => {
         const { data: changelog } = await getAddonFileChangelog(
           modpackId,
           v.id

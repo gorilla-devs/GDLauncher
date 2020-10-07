@@ -27,7 +27,12 @@ const baseConfig = {
         use: {
           loader: 'babel-loader',
           options: {
-            cacheDirectory: true
+            cacheDirectory: true,
+            presets: ['@babel/preset-env'],
+            plugins: [
+              '@babel/plugin-proposal-nullish-coalescing-operator',
+              '@babel/plugin-proposal-optional-chaining'
+            ]
           }
         }
       }

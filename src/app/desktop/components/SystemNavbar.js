@@ -1,5 +1,4 @@
 import React, { useEffect, useState, memo } from 'react';
-import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -20,7 +19,10 @@ import {
 } from '../../../common/reducers/actions';
 import BisectHosting from '../../../ui/BisectHosting';
 import Logo from '../../../ui/Logo';
+import sendMessage, { handleMessage } from '../../../common/utils/sendMessage';
+import EV from '../../../common/messageEvents';
 
+const isDev = process.env.NODE_ENV === 'development';
 const SystemNavbar = () => {
   const dispatch = useDispatch();
   const [isMaximized, setIsMaximized] = useState(false);
@@ -35,14 +37,15 @@ const SystemNavbar = () => {
   );
 
   const checkForUpdates = async () => {
-    const isAppImageVar = await ipcRenderer.invoke('isAppImage');
+    if (isDev) return;
+    const isAppImageVar = await sendMessage(EV.IS_APP_IMAGE);
     setIsAppImage(isAppImageVar);
     if (
       process.env.REACT_APP_RELEASE_TYPE === 'setup' &&
       (isAppImageVar || process.platform === 'win32')
     ) {
-      ipcRenderer.invoke('checkForUpdates');
-      ipcRenderer.on('updateAvailable', () => {
+      sendMessage(EV.CHECK_FOR_UPDATES);
+      handleMessage(EV.UPDATE_AVAILABLE, () => {
         dispatch(updateUpdateAvailable(true));
       });
     } else if (
@@ -60,14 +63,13 @@ const SystemNavbar = () => {
   };
 
   useEffect(() => {
-    ipcRenderer
-      .invoke('getIsWindowMaximized')
+    sendMessage(EV.IS_MAIN_WINDOW_MAXIMIZED)
       .then(setIsMaximized)
       .catch(console.error);
-    ipcRenderer.on('window-maximized', () => {
+    handleMessage(EV.MAIN_WINDOW_MAXIMIZED, () => {
       setIsMaximized(true);
     });
-    ipcRenderer.on('window-minimized', () => {
+    handleMessage(EV.MAIN_WINDOW_MINIMIZED, () => {
       setIsMaximized(false);
     });
   }, []);
@@ -84,7 +86,7 @@ const SystemNavbar = () => {
   }, []);
 
   const openDevTools = () => {
-    ipcRenderer.invoke('open-devtools');
+    sendMessage(EV.OPEN_MAIN_WINDOW_DEVTOOLS);
   };
 
   const isOsx = process.platform === 'darwin';
@@ -124,7 +126,7 @@ const SystemNavbar = () => {
     <TerminalButton
       onClick={() => {
         if (isAppImage || isWindows) {
-          ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+          sendMessage(EV.APPLY_UPDATE);
         } else {
           dispatch(openModal('AutoUpdatesNotAvailable'));
         }
@@ -139,9 +141,9 @@ const SystemNavbar = () => {
 
   const quitApp = () => {
     if (isUpdateAvailable && (isAppImage || !isLinux)) {
-      ipcRenderer.invoke('installUpdateAndQuitOrRestart', true);
+      sendMessage(EV.APPLY_UPDATE, true);
     } else {
-      ipcRenderer.invoke('quit-app');
+      sendMessage(EV.QUIT_APP);
     }
   };
 
@@ -156,7 +158,7 @@ const SystemNavbar = () => {
     <MainContainer
       onDoubleClick={() => {
         if (process.platform === 'darwin') {
-          ipcRenderer.invoke('min-max-window');
+          sendMessage(EV.MINMAX_MAIN_WINDOW);
         }
       }}
     >
@@ -204,7 +206,7 @@ const SystemNavbar = () => {
               <SettingsButton />
             )}
             <div
-              onClick={() => ipcRenderer.invoke('minimize-window')}
+              onClick={() => sendMessage(EV.MINIMIZE_MAIN_WINDOW)}
               css={`
                 -webkit-app-region: no-drag;
               `}
@@ -212,7 +214,7 @@ const SystemNavbar = () => {
               <FontAwesomeIcon icon={faWindowMinimize} />
             </div>
             <div
-              onClick={() => ipcRenderer.invoke('min-max-window')}
+              onClick={() => sendMessage(EV.MINMAX_MAIN_WINDOW)}
               css={`
                 -webkit-app-region: no-drag;
               `}
@@ -243,7 +245,7 @@ const SystemNavbar = () => {
               <FontAwesomeIcon icon={faTimes} />
             </div>
             <div
-              onClick={() => ipcRenderer.invoke('min-max-window')}
+              onClick={() => sendMessage(EV.MINMAX_MAIN_WINDOW)}
               css={`
                 -webkit-app-region: no-drag;
               `}
@@ -253,7 +255,7 @@ const SystemNavbar = () => {
               />
             </div>
             <div
-              onClick={() => ipcRenderer.invoke('minimize-window')}
+              onClick={() => sendMessage(EV.MINIMIZE_MAIN_WINDOW)}
               css={`
                 -webkit-app-region: no-drag;
               `}

@@ -4,15 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-// import { promises as fs } from 'fs';
-// import path from 'path';
 import Instances from '../components/Instances';
 import News from '../components/News';
 import { openModal } from '../../../common/reducers/modals/actions';
-import {
-  _getCurrentAccount
-  // _getInstances
-} from '../../../common/utils/selectors';
+import { _getCurrentAccount } from '../../../common/utils/selectors';
 import { extractFace } from '../utils';
 import { updateLastUpdateVersion } from '../../../common/reducers/actions';
 import sendMessage from '../../../common/utils/sendMessage';
@@ -37,7 +32,6 @@ const Home = () => {
   const account = useSelector(_getCurrentAccount);
   const news = useSelector(state => state.news);
   const lastUpdateVersion = useSelector(state => state.app.lastUpdateVersion);
-  // const instances = useSelector(_getInstances);
 
   const openAddInstanceModal = defaultPage => {
     dispatch(openModal('AddInstance', { defaultPage }));
@@ -46,28 +40,6 @@ const Home = () => {
   const openAccountModal = () => {
     dispatch(openModal('AccountsManager'));
   };
-
-  // const getOldInstances = async () => {
-  //   const oldLauncherUserData = await ipcRenderer.invoke(
-  //     'getOldLauncherUserData'
-  //   );
-  //   let files = [];
-  //   try {
-  //     files = await fs.readdir(path.join(oldLauncherUserData, 'packs'));
-  //   } catch {
-  //     // Swallow error
-  //   }
-  //   return (
-  //     await Promise.all(
-  //       files.map(async f => {
-  //         const stat = await fs.stat(
-  //           path.join(oldLauncherUserData, 'packs', f)
-  //         );
-  //         return stat.isDirectory() ? f : null;
-  //       })
-  //     )
-  //   ).filter(v => v);
-  // };
 
   const [profileImage, setProfileImage] = useState(null);
 
@@ -78,15 +50,6 @@ const Home = () => {
         dispatch(updateLastUpdateVersion(appVersion));
         dispatch(openModal('ChangeLogs'));
       }
-
-      // const oldInstances = await getOldInstances();
-      // if (
-      //   oldInstances.length > 0 &&
-      //   instances.length === 0 &&
-      //   process.env.NODE_ENV !== 'development'
-      // ) {
-      //   dispatch(openModal('InstancesMigration', { preventClose: true }));
-      // }
     };
 
     init();

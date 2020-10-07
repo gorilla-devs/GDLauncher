@@ -13,7 +13,8 @@ import {
   loginThroughNativeLauncher,
   switchToFirstValidAccount,
   checkClientToken,
-  updateUserData
+  updateUserData,
+  initInstances
 } from '../../common/reducers/actions';
 import {
   load,
@@ -70,6 +71,7 @@ function DesktopRoot({ store }) {
     dispatch(requesting(features.mcAuthentication));
     const userDataStatic = await sendMessage(EV.GET_USER_DATA_PATH);
     const userData = dispatch(updateUserData(userDataStatic));
+    await dispatch(initInstances());
     await dispatch(checkClientToken());
     dispatch(initNews());
 

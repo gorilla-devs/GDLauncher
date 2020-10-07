@@ -70,9 +70,6 @@ const modalsComponentLookupTable = {
     lazy(() => import('../modals/InstanceCrashed'))
   ),
   ChangeLogs: AsyncComponent(lazy(() => import('../modals/ChangeLogs'))),
-  InstancesMigration: AsyncComponent(
-    lazy(() => import('../modals/InstancesMigration'))
-  ),
   McVersionChanger: AsyncComponent(
     lazy(() => import('../modals/McVersionChanger'))
   )
