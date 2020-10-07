@@ -236,7 +236,18 @@ const DeleteSelectedMods = styled(({ selectedMods, ...props }) => (
 }`}
 `;
 
-const deleteMods = async (instanceName, instancePath, selectedMods) => {
+const deleteMods = async (
+  instanceName,
+  instancePath,
+  selectedMods,
+  dispatch
+) => {
+  await dispatch(
+    updateInstanceConfig(instanceName, prev => ({
+      ...prev,
+      mods: prev.mods.filter(m => !selectedMods.includes(m.fileName))
+    }))
+  );
   await Promise.all(
     selectedMods.map(fileName =>
       fse.remove(path.join(instancePath, 'mods', fileName))

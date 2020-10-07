@@ -26,7 +26,8 @@ export function createMainWindow() {
       experimentalFeatures: true,
       nodeIntegration: true,
       // Disable in dev since I think hot reload is messing with it
-      webSecurity: !isDev
+      webSecurity: !isDev,
+      enableRemoteModule: true
     }
   });
 

@@ -340,7 +340,7 @@ const startListener = async instancesPath => {
       );
       if (modData) {
         try {
-          console.log('[RTS] RENAMING MOD', fileName, newFilePath, modData);
+          console.log('[RTS] RENAMING MOD', fileName, newFilePath);
           INSTANCES[oldInstanceName].mods = [
             ...(INSTANCES[oldInstanceName].mods || []).filter(
               m => m.fileName !== path.basename(fileName)
