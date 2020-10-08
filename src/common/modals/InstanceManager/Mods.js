@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
-import { clipboard } from 'electron';
+import { clipboard, ipcRenderer } from 'electron';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -15,13 +15,15 @@ import {
   faArrowDown,
   faDownload,
   faEllipsisV,
-  faCopy
+  faCopy,
+  faFolder
 } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
+import makeDir from 'make-dir';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import {
   updateInstanceConfig,
@@ -53,19 +55,23 @@ const RowContainer = styled.div.attrs(props => ({
   ${props =>
     props.disabled &&
     !props.selected &&
-    `border: 2px solid
-    ${props.theme.palette.colors.red};`}
+    `box-shadow: inset 0 0 0 3px ${props.theme.palette.colors.red};`}
   ${props =>
     props.selected &&
-    `border: 2px solid
-    ${props.theme.palette.primary.main};`}
+    `box-shadow: inset 0 0 0 3px ${props.theme.palette.primary.main};`}
   transition: border 0.1s ease-in-out;
   border-radius: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 16px;
+  box-sizing: content-box;
   padding: 0 10px;
+  &:hover {
+    .rowCenterContent {
+      color: ${props => props.theme.palette.text.primary};
+    }
+  }
   .leftPartContent {
     display: flex;
     justify-content: center;
@@ -80,13 +86,12 @@ const RowContainer = styled.div.attrs(props => ({
     justify-content: center;
     align-items: center;
     transition: color 0.1s ease-in-out;
-    color: ${props => props.isHovered && props.theme.palette.primary.main};
+    height: 100%;
+    ${props =>
+      props.isHovered ? `color: ${props.theme.palette.text.primary};` : ''}
     cursor: pointer;
     svg {
       margin-right: 10px;
-    }
-    &:hover {
-      color: ${props => props.theme.palette.text.primary};
     }
   }
   .rightPartContent {
@@ -127,7 +132,7 @@ const RowContainerBackground = styled.div`
   ${props.theme.palette.colors.maximumRed} 20px
   );`};
   filter: brightness(60%);
-  transition: all 0.1s ease-in-out;
+  transition: opacity 0.1s ease-in-out;
   opacity: ${props => (props.disabled || props.selected ? 1 : 0)};
 `;
 
@@ -182,6 +187,20 @@ export const keyFrameMoveUpDown = keyframes`
 
 `;
 
+const OpenFolderButton = styled(FontAwesomeIcon)`
+  transition: color 0.1s ease-in-out;
+  cursor: pointer;
+  margin: 0 10px;
+  &:hover {
+    cursor: pointer;
+    path {
+      cursor: pointer;
+      transition: color 0.1s ease-in-out;
+      color: ${props => props.theme.palette.primary.main};
+    }
+  }
+`;
+
 const DragArrow = styled(FontAwesomeIcon)`
   ${props =>
     props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
@@ -211,7 +230,7 @@ const DeleteSelectedMods = styled(({ selectedMods, ...props }) => (
   cursor: pointer;
   path {
     cursor: pointer;
-    transition: all 0.1s ease-in-out;
+    transition: color 0.1s ease-in-out;
     color: ${props.theme.palette.error.main};
   }
 }`}
@@ -382,6 +401,17 @@ const Row = memo(({ index, style, data }) => {
               disabled={loading || updateLoading}
               onChange={async c => {
                 setLoading(true);
+                const destFileName = c
+                  ? item.fileName.replace('.disabled', '')
+                  : `${item.fileName}.disabled`;
+                const isCurrentlySelected = selectedMods.find(
+                  v => v === item.fileName
+                );
+
+                if (isCurrentlySelected) {
+                  setSelectedMods(prev => [...prev, destFileName]);
+                }
+
                 await toggleModDisabled(
                   c,
                   instanceName,
@@ -389,7 +419,15 @@ const Row = memo(({ index, style, data }) => {
                   item,
                   dispatch
                 );
-                setTimeout(() => setLoading(false), 500);
+                if (isCurrentlySelected) {
+                  setSelectedMods(prev =>
+                    prev.filter(v => v !== item.fileName)
+                  );
+                }
+
+                setTimeout(() => {
+                  setLoading(false);
+                }, 500);
               }}
             />
             <FontAwesomeIcon
@@ -420,7 +458,10 @@ const Row = memo(({ index, style, data }) => {
       <Portal>
         <ContextMenu
           id={item.displayName}
-          onShow={() => setIsHovered(true)}
+          onShow={() => {
+            setSelectedMods([item.fileName]);
+            setIsHovered(true);
+          }}
           onHide={() => setIsHovered(false)}
         >
           <MenuItem
@@ -503,6 +544,11 @@ const Mods = ({ instanceName }) => {
 
   const dispatch = useDispatch();
 
+  const openFolder = async p => {
+    await makeDir(p);
+    ipcRenderer.invoke('openFolder', p);
+  };
+
   const antIcon = (
     <LoadingOutlined
       css={`
@@ -530,6 +576,9 @@ const Mods = ({ instanceName }) => {
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
+    setSelectedMods(prev => {
+      return prev.filter(v => instance.mods.find(m => m.fileName === v));
+    });
   }, [search, instance.mods]);
 
   const hasModUpdates = useMemo(() => {
@@ -668,6 +717,12 @@ const Mods = ({ instanceName }) => {
             selectedMods={selectedMods.length}
             icon={faTrash}
           />
+          <OpenFolderButton
+            onClick={() =>
+              openFolder(path.join(instancesPath, instanceName, 'mods'))
+            }
+            icon={faFolder}
+          />
           <StyledDropdown
             onClick={() => {
               if (!isMenuOpen) {
@@ -745,7 +800,7 @@ const Mods = ({ instanceName }) => {
                   `}
                   onDragLeave={e => e.stopPropagation()}
                 >
-                  <CopyTitle>copy</CopyTitle>
+                  <CopyTitle>Copy</CopyTitle>
                   <DragArrow icon={faArrowDown} size="3x" />
                 </div>
               )}

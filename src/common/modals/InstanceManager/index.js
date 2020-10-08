@@ -146,7 +146,7 @@ const menuEntries = {
   mods: { name: i18n.t('instance_manager:index.menu.mods'), component: Mods },
   modpack: { name: i18n.t('instance_manager:index.menu.modpack'), component: Modpack },
   notes: { name: i18n.t('instance_manager:index.menu.notes'), component: Notes },
-  ResourcePacks: { name: i18n.t('instance_manager:index.menu.resource_packs'), component: ResourcePacks },
+  resourcePacks: { name: i18n.t('instance_manager:index.menu.resource_packs'), component: ResourcePacks },
   // resourcePacks: { name: "Resource Packs", component: Overview },
   // worlds: { name: "Worlds", component: Overview },
   screenshots: { name: i18n.t('instance_manager:index.menu.screenshots'), component: Screenshots }
