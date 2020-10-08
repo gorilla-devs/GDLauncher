@@ -14,8 +14,8 @@
       "description": "同時にダウンロードを行う数を選択してください。もし遅いネットワークを利用している場合は最大で3を選択してください。"
   },
   "preferred_curse_release_channel": {
-      "title": "Curseリリースチャネル",
-      "description": "Curseプロジェクトをダウンロードする際に優先するリリースを選択してください。この設定は mod の更新にも適用されます。",
+      "title": "CurseForgeリリースチャネル",
+      "description": "CurseForgeプロジェクトをダウンロードする際に優先するリリースを選択してください。この設定は mod の更新にも適用されます。",
       "select": {
           "stable": "安定版",
           "beta": "ベータ",
