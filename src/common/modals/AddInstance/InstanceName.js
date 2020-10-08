@@ -297,9 +297,9 @@ const InstanceName = ({
                       `}
                     >
                       {invalidName &&
-                        i18n.t('add_instances:invalid_instance_name_error')}
+                        i18n.t('add_instance:invalid_instance_name_error')}
                       {alreadyExists &&
-                        i18n.t('add_instances:already_exitst_instance_name_error')}
+                        i18n.t('add_instance:already_exitst_instance_name_error')}
                     </div>
                   </div>
                 </div>
