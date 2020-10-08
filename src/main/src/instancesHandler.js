@@ -432,8 +432,16 @@ const startListener = async instancesPath => {
           console.log(
             `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
           );
-          INSTANCES[newInstanceName] = { ...config, name: newInstanceName };
+          INSTANCES[newInstanceName] = {
+            ...config,
+            name: newInstanceName
+          };
           delete INSTANCES[oldInstanceName];
+          sendMessage(
+            EV.UPDATE_MANAGE_MODAL_INSTANCE_NAME,
+            generateMessageId(),
+            [oldInstanceName, newInstanceName]
+          );
           sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
         } catch (err) {
           console.error(err);

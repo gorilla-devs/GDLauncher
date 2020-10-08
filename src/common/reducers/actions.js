@@ -2399,18 +2399,54 @@ export const checkForPortableUpdates = () => {
 };
 
 export const initInstances = () => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     const initialInstances = await sendMessage(EV.GET_INSTANCES);
     dispatch({
       type: ActionTypes.UPDATE_INSTANCES,
       instances: initialInstances
     });
 
+    handleMessage(
+      EV.UPDATE_MANAGE_MODAL_INSTANCE_NAME,
+      ([oldName, newName]) => {
+        const state = getState();
+        const instanceManagerModalIndex = state.modals.findIndex(
+          x =>
+            x.modalType === 'InstanceManager' &&
+            x.modalProps.instanceName === oldName
+        );
+        dispatch({
+          type: UPDATE_MODAL,
+          modals: [
+            ...state.modals.slice(0, instanceManagerModalIndex),
+            {
+              modalType: 'InstanceManager',
+              modalProps: { instanceName: newName }
+            },
+            ...state.modals.slice(instanceManagerModalIndex + 1)
+          ]
+        });
+      }
+    );
+
     handleMessage(EV.UPDATE_INSTANCES, instances => {
       dispatch({
         type: ActionTypes.UPDATE_INSTANCES,
         instances
       });
+    });
+
+    handleMessage(EV.UPDATE_MOD_SYNC_STATE, value => {
+      if (value > 1) {
+        dispatch(
+          updateMessage({
+            content: `Syncronizing mods. ${value} left.`,
+            duration: 0
+          })
+        );
+      } else {
+        dispatch(updateMessage(null));
+      }
     });
   };
 };

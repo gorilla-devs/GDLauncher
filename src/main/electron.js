@@ -38,7 +38,6 @@ app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
 
 extractSevenZip();
-let watcher;
 
 app.on('ready', () => {
   const window = createMainWindow();
@@ -56,20 +55,12 @@ app.on('ready', () => {
 });
 
 app.on('window-all-closed', () => {
-  if (watcher) {
-    watcher.stop();
-    watcher = null;
-  }
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 app.on('before-quit', async () => {
-  if (watcher) {
-    await watcher.stop();
-    watcher = null;
-  }
   mainWindow.removeAllListeners('close');
   mainWindow = null;
 });
@@ -87,33 +78,6 @@ app.on('activate', () => {
     createMainWindow();
   }
 });
-
-// ipcMain.handle('start-listener', async (e, dirPath) => {
-//   try {
-//     log.log('Trying to start listener');
-//     if (watcher) {
-//       await watcher.stop();
-//       watcher = null;
-//     }
-//     watcher = await nsfw(dirPath, events => {
-//       log.log(`Detected ${events.length} events from listener`);
-//       mainWindow.webContents.send('listener-events', events);
-//     });
-//     log.log('Started listener');
-//     return watcher.start();
-//   } catch (err) {
-//     log.error(err);
-//     return Promise.reject(err);
-//   }
-// });
-
-// ipcMain.handle('stop-listener', async () => {
-//   if (watcher) {
-//     log.log('Stopping listener');
-//     await watcher.stop();
-//     watcher = null;
-//   }
-// });
 
 initializeAutoUpdater();
 initializeInstances();
