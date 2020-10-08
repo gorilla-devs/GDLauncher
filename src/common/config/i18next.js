@@ -8,7 +8,7 @@ i18n
   .use(initReactI18next)
   .use(LanguageDetector)
   .init({
-    ns: ['add_instance', 'settings'],
+    ns: ['instance', 'add_instance', 'instance_manager', 'settings'],
     supportedLngs: ['en', 'ja'],
     nonExplicitSupportedLngs: true,
     fallbackLng: 'en',

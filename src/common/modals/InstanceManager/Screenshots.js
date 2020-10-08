@@ -30,6 +30,7 @@ import {
 import { _getInstancesPath } from '../../utils/selectors';
 import { openModal } from '../../reducers/modals/actions';
 import { imgurPost } from '../../api';
+import i18n from '../../config/i18next';
 
 const getScreenshots = async screenshotsPath => {
   const files = await fs.readdir(screenshotsPath);
@@ -208,7 +209,11 @@ const Screenshots = ({ instanceName }) => {
             getScreenshotsCount(dateGroups) === selectedItems.length
           }
         />
-        <div>&nbsp;{`${selectedItems.length} selected`}</div>
+        <div>
+          &nbsp;{i18n.t('instance_manager:screenshots.x_selected', {
+            count: selectedItems.length
+         })}
+        </div>
         <DeleteButton
           onClick={() => {
             dispatch(
@@ -434,7 +439,9 @@ const Screenshots = ({ instanceName }) => {
             );
           })
         ) : (
-          <NoScreenAvailable>No Screenshots Available</NoScreenAvailable>
+          <NoScreenAvailable>
+            {i18n.t('instance_manager:screenshots.no_screenshots_available')}
+          </NoScreenAvailable>
         )}
       </Container>
     </ExternalContainer>
