@@ -42,18 +42,18 @@ class PromiseQueue {
       setTimeout(startHandler, 0);
     }
     while (this.queue[0]) {
-      const item = this.queue.shift();
       this.isPending = true;
       try {
-        // eslint-disable-next-line
-        const value = await item.promise();
+        const value = await this.queue[0].promise();
+        this.queue[0].resolve(value);
+      } catch (e) {
+        this.queue[0].reject(e);
+      } finally {
+        this.queue.shift();
         const executedHandler = this.listeners.executed;
         if (executedHandler) {
           setTimeout(executedHandler, 0);
         }
-        item.resolve(value);
-      } catch (e) {
-        item.reject(e);
       }
       this.isPending = false;
     }
