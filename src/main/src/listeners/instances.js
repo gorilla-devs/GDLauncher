@@ -3,11 +3,10 @@ import EV from '../../../common/messageEvents';
 import {
   deleteMods,
   installMod,
-  INSTANCES,
-  renameInstance,
   toggleModDisabled,
   updateMod
-} from '../instancesHandler';
+} from '../instancesHandler/mods';
+import { INSTANCES, renameInstance } from '../instancesHandler/instances';
 
 addListener(EV.GET_INSTANCES, async () => INSTANCES);
 

@@ -10,7 +10,7 @@ import {
 } from './src/messageListener';
 import handleUserDataPath from './src/handleUserDataPath';
 import initializeAutoUpdater from './src/autoUpdater';
-import { initializeInstances } from './src/instancesHandler';
+import initializeInstances from './src/instancesHandler';
 import EV from '../common/messageEvents';
 import generateMessageId from '../common/utils/generateMessageId';
 
