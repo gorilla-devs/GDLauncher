@@ -75,26 +75,39 @@ function currentDownload(state = null, action) {
   }
 }
 
+const patchInstances = (state, action) => {
+  // eslint-disable-next-line
+  for (const instance1 in action.instances) {
+    const instance = action.instances[instance1];
+    // eslint-disable-next-line
+    if (!instance) continue;
+    if (!instance.name) {
+      // eslint-disable-next-line
+      instance.name = instance1;
+    }
+    if (state.list[instance.name]?.queue) {
+      // eslint-disable-next-line
+      instance.queue = state.list[instance.name].queue;
+    } else {
+      // eslint-disable-next-line
+      instance.queue = new PromiseQueue();
+    }
+  }
+};
+
 function instances(state = { started: false, list: {} }, action) {
   switch (action.type) {
+    case ActionTypes.UPDATE_SPECIFIC_INSTANCE:
+      patchInstances(state, action);
+      return {
+        ...state,
+        list: { ...state.list, [action.instance.name]: action.instance }
+      };
+    case ActionTypes.REMOVE_SPECIFIC_INSTANCE:
+      patchInstances(state, action);
+      return { ...state, list: omit(state.list, [action.instanceName]) };
     case ActionTypes.UPDATE_INSTANCES:
-      // eslint-disable-next-line
-      for (const instance1 in action.instances) {
-        const instance = action.instances[instance1];
-        // eslint-disable-next-line
-        if (!instance) continue;
-        if (!instance.name) {
-          // eslint-disable-next-line
-          instance.name = instance1;
-        }
-        if (state.list[instance.name]?.queue) {
-          // eslint-disable-next-line
-          instance.queue = state.list[instance.name].queue;
-        } else {
-          // eslint-disable-next-line
-          instance.queue = new PromiseQueue();
-        }
-      }
+      patchInstances(state, action);
       return { ...state, list: action.instances };
     case ActionTypes.UPDATE_INSTANCES_STARTED:
       return { ...state, started: action.started };

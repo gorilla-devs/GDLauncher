@@ -4,6 +4,7 @@ import {
   deleteMods,
   installMod,
   INSTANCES,
+  renameInstance,
   toggleModDisabled,
   updateMod
 } from '../instancesHandler';
@@ -14,3 +15,4 @@ addListener(EV.TOGGLE_MOD_DISABLED, toggleModDisabled);
 addListener(EV.DELETE_MODS, deleteMods);
 addListener(EV.INSTALL_MOD, installMod);
 addListener(EV.UPDATE_MOD, updateMod);
+addListener(EV.RENAME_INSTANCE, renameInstance);

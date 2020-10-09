@@ -69,7 +69,7 @@ addListener(EV.IS_MAIN_WINDOW_MAXIMIZED, async () => {
 });
 
 addListener(EV.OPEN_FOLDER, async folderPath => {
-  shell.openItem(folderPath);
+  shell.openExternal(folderPath);
 });
 
 addListener(EV.OPEN_FOLDER_DIALOG, async defaultPath => {

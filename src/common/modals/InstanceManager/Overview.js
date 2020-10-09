@@ -1,14 +1,12 @@
 import React, { useState, useEffect, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import fss from 'fs-extra';
-import path from 'path';
 import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUndo, faCog } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Switch, Slider, Select } from 'antd';
-import { _getInstancesPath, _getInstance } from '../../utils/selectors';
+import { _getInstance } from '../../utils/selectors';
 import instanceDefaultBackground from '../../assets/instance_default.png';
 import {
   DEFAULT_JAVA_ARGS,
@@ -164,7 +162,6 @@ const Card = memo(
 );
 
 const Overview = ({ instanceName, background, manifest }) => {
-  const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
   const [JavaMemorySwitch, setJavaMemorySwitch] = useState(
     config?.javaMemory !== undefined
@@ -230,10 +227,11 @@ const Overview = ({ instanceName, background, manifest }) => {
   };
 
   const renameInstance = () => {
-    fss.rename(
-      path.join(instancesPath, instanceName),
-      path.join(instancesPath, newName)
-    );
+    // TODO: Validation
+    if (!newName) {
+      return;
+    }
+    return sendMessage(EV.RENAME_INSTANCE, [instanceName, newName]);
   };
 
   const computeLastPlayed = timestamp => {

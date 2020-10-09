@@ -2407,7 +2407,7 @@ export const initInstances = () => {
     });
 
     handleMessage(
-      EV.UPDATE_MANAGE_MODAL_INSTANCE_NAME,
+      EV.UPDATE_MANAGE_MODAL_INSTANCE_RENAME,
       ([oldName, newName]) => {
         const state = getState();
         const instanceManagerModalIndex = state.modals.findIndex(
@@ -2433,6 +2433,34 @@ export const initInstances = () => {
       dispatch({
         type: ActionTypes.UPDATE_INSTANCES,
         instances
+      });
+    });
+
+    handleMessage(EV.UPDATE_SPECIFIC_INSTANCE, instance => {
+      dispatch({
+        type: ActionTypes.UPDATE_SPECIFIC_INSTANCE,
+        instance
+      });
+    });
+
+    handleMessage(EV.REMOVE_SPECIFIC_INSTANCE, instanceName => {
+      const state = getState();
+      const instanceManagerModalIndex = state.modals.findIndex(
+        x =>
+          x.modalType === 'InstanceManager' &&
+          x.modalProps.instanceName === instanceName
+      );
+      dispatch({
+        type: UPDATE_MODAL,
+        modals: [
+          ...state.modals.slice(0, instanceManagerModalIndex),
+          ...state.modals.slice(instanceManagerModalIndex + 1)
+        ]
+      });
+
+      dispatch({
+        type: ActionTypes.REMOVE_SPECIFIC_INSTANCE,
+        instanceName
       });
     });
 

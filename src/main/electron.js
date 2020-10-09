@@ -22,6 +22,7 @@ log.transports.file.maxSize = 900 * 1024; // 900KB
 import './src/handleGlobalCrash';
 
 // Prevent multiple instances
+app.allowRendererProcessReuse = false;
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();

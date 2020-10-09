@@ -3,6 +3,7 @@ import { app } from 'electron';
 import log from 'electron-log';
 import { promises as fs } from 'fs';
 import pMap from 'p-map';
+import { debounce } from 'lodash';
 import lockfile from 'lockfile';
 import nsfw from 'nsfw';
 import murmur from 'murmur2-calculator';
@@ -27,6 +28,8 @@ import { downloadFile } from '../../common/utils/downloader';
 
 // eslint-disable-next-line
 export let INSTANCES = {};
+// eslint-disable-next-line
+export let INSTANCES_QUEUES = {};
 
 export const initializeInstances = async () => {
   try {
@@ -43,6 +46,53 @@ export const initializeInstances = async () => {
   } catch (err) {
     log.error(err);
   }
+};
+
+const unsafeUpdateInstance = instanceName => {
+  const instancesPath = path.join(app.getPath('userData'), 'instances');
+  const updateConfigFile = async () => {
+    const configPath = path.join(instancesPath, instanceName, 'config.json');
+    const tempConfigPath = path.join(
+      instancesPath,
+      instanceName,
+      'config_new_temp.json'
+    );
+    // Ensure that the new config is actually valid to write
+    try {
+      const JsonString = JSON.stringify(INSTANCES[instanceName]);
+      const isJson = JSON.parse(JsonString);
+      if (!isJson || typeof isJson !== 'object') {
+        const err = `Cannot write this JSON to ${instanceName}. Not an object`;
+        log.error(err);
+        throw new Error(err);
+      }
+    } catch {
+      const err = `Cannot write this JSON to ${instanceName}. Not parsable`;
+      log.error(err, INSTANCES[instanceName]);
+      throw new Error(err);
+    }
+
+    try {
+      sendMessage(
+        EV.UPDATE_SPECIFIC_INSTANCE,
+        generateMessageId(),
+        INSTANCES[instanceName]
+      );
+      await fs.writeFile(
+        tempConfigPath,
+        JSON.stringify(INSTANCES[instanceName])
+      );
+      await fs.rename(tempConfigPath, configPath);
+    } catch (err) {
+      log.error('Could not perform write action to config', err, instanceName);
+    }
+  };
+
+  if (!INSTANCES_QUEUES[instanceName]) {
+    INSTANCES_QUEUES[instanceName] = new PromiseQueue();
+  }
+
+  INSTANCES_QUEUES[instanceName].add(updateConfigFile);
 };
 
 const isDirectory = source => fs.lstat(source).then(r => r.isDirectory());
@@ -252,20 +302,28 @@ const startListener = async instancesPath => {
   // Real Time Scanner
   const Queue = new PromiseQueue();
 
+  const unsafeUpdateModSyncState = v => {
+    sendMessage(EV.UPDATE_MOD_SYNC_STATE, generateMessageId(), v);
+  };
+  const updateModSyncState = debounce(unsafeUpdateModSyncState, 200, {
+    trailing: true,
+    maxWait: 600
+  });
+
   Queue.on('start', queueLength => {
     if (queueLength > 1) {
-      sendMessage(EV.UPDATE_MOD_SYNC_STATE, generateMessageId(), queueLength);
+      updateModSyncState(queueLength);
     }
   });
 
   Queue.on('executed', queueLength => {
     if (queueLength > 1) {
-      sendMessage(EV.UPDATE_MOD_SYNC_STATE, generateMessageId(), queueLength);
+      updateModSyncState(queueLength);
     }
   });
 
   Queue.on('end', () => {
-    sendMessage(EV.UPDATE_MOD_SYNC_STATE, generateMessageId(), null);
+    updateModSyncState(null);
   });
 
   const changesTracker = {};
@@ -318,7 +376,7 @@ const startListener = async instancesPath => {
             console.log('[RTS] ADDING MOD', fileName, instanceName);
 
             INSTANCES[instanceName].mods.push(mod);
-            sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+            unsafeUpdateInstance(instanceName);
           }
         }
       } catch (err) {
@@ -340,7 +398,8 @@ const startListener = async instancesPath => {
           INSTANCES[instanceName].mods = INSTANCES[instanceName].mods.filter(
             m => m.fileName !== path.basename(fileName)
           );
-          sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+          // TODO: not updating ui
+          unsafeUpdateInstance(instanceName);
         } catch (err) {
           console.error(err);
         }
@@ -349,22 +408,22 @@ const startListener = async instancesPath => {
     Queue.add(processChange);
   };
 
-  const processRenamedFile = async (fileName, oldInstanceName, newFilePath) => {
+  const processRenamedFile = async (fileName, instanceName, newFilePath) => {
     const processChange = async () => {
-      const modData = INSTANCES[oldInstanceName].mods.find(
+      const modData = INSTANCES[instanceName].mods.find(
         m => m.fileName === path.basename(fileName)
       );
       if (modData) {
         try {
           console.log('[RTS] RENAMING MOD', fileName, newFilePath);
-          INSTANCES[oldInstanceName].mods = [
-            ...(INSTANCES[oldInstanceName].mods || []).filter(
+          INSTANCES[instanceName].mods = [
+            ...(INSTANCES[instanceName].mods || []).filter(
               m => m.fileName !== path.basename(fileName)
             ),
             { ...modData, fileName: path.basename(newFilePath) }
           ];
 
-          sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+          unsafeUpdateInstance(instanceName);
         } catch (err) {
           console.error(err);
         }
@@ -392,7 +451,7 @@ const startListener = async instancesPath => {
 
           // ADD INSTANCE AND UPDATE
           INSTANCES[instanceName] = { ...config, name: instanceName };
-          sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+          unsafeUpdateInstance(instanceName);
         } catch (err) {
           console.warn(err);
         }
@@ -406,7 +465,11 @@ const startListener = async instancesPath => {
       if (INSTANCES[instanceName]) {
         console.log('[RTS] REMOVING INSTANCE', instanceName);
         delete INSTANCES[instanceName];
-        sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+        sendMessage(
+          EV.REMOVE_SPECIFIC_INSTANCE,
+          generateMessageId(),
+          instanceName
+        );
       }
     };
     Queue.add(processChange);
@@ -437,12 +500,16 @@ const startListener = async instancesPath => {
             name: newInstanceName
           };
           delete INSTANCES[oldInstanceName];
-          sendMessage(
-            EV.UPDATE_MANAGE_MODAL_INSTANCE_NAME,
+          await sendMessage(
+            EV.UPDATE_INSTANCES,
+            generateMessageId(),
+            INSTANCES
+          );
+          await sendMessage(
+            EV.UPDATE_MANAGE_MODAL_INSTANCE_RENAME,
             generateMessageId(),
             [oldInstanceName, newInstanceName]
           );
-          sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
         } catch (err) {
           console.error(err);
         }
@@ -493,11 +560,10 @@ const startListener = async instancesPath => {
         if (
           changesTracker[completePath] &&
           !changesTracker[completePath].completed &&
-          (event.action === 2 || event.action === 0 || event.action === 1)
+          (event.action === 2 || event.action === 0)
         ) {
           let fileHandle;
           try {
-            await new Promise(resolve => setTimeout(resolve, 300));
             fileHandle = await fs.open(completePath, 'r+');
             changesTracker[completePath].completed = true;
           } finally {
@@ -571,6 +637,7 @@ const startListener = async instancesPath => {
               }
             );
           });
+
           if (isLocked) return;
 
           if (
@@ -659,7 +726,7 @@ export const deleteMods = async ([instanceName, selectedMods]) => {
     )
   );
 
-  sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+  unsafeUpdateInstance(instanceName);
 };
 
 export const toggleModDisabled = async ([
@@ -687,7 +754,7 @@ export const toggleModDisabled = async ([
     path.join(instancePath, 'mods', oldFileName),
     path.join(instancePath, 'mods', destFileName)
   );
-  sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+  unsafeUpdateInstance(instanceName);
 };
 
 export const installMod = async ([
@@ -728,7 +795,7 @@ export const installMod = async ([
     );
   }
 
-  sendMessage(EV.UPDATE_INSTANCES, generateMessageId(), INSTANCES);
+  unsafeUpdateInstance(instanceName);
 
   if (!needToAddMod) {
     if (useTempMiddleware) {
@@ -804,4 +871,12 @@ export const updateMod = async ([
     true
   ]);
   await deleteMods([instanceName, [mod.fileName]]);
+};
+
+export const renameInstance = async ([oldName, newName]) => {
+  const instancesPath = path.join(app.getPath('userData'), 'instances');
+  return fs.rename(
+    path.join(instancesPath, oldName),
+    path.join(instancesPath, newName)
+  );
 };
