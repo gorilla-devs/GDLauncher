@@ -111,53 +111,35 @@ const InstanceName = ({
     let numOfElements = 1;
     const files = await fse.readdir(instancesPath);
     const exists = await fse.pathExists(path.join(instancesPath, name));
-    console.log('A', exists);
+
     if (exists) {
       const existNewName = await fse.pathExists(`${name}) - Copy`);
       const countWord = countOccurences(`${name}) - Copy`, 'Copy');
 
-      console.log('B', existNewName, countWord, files);
       if (!existNewName) {
-        const nums = files.map(y => {
-          if (regex.test(y)) {
-            return y.match(regex)[1];
-          }
-        });
+        const nums = files
+          .map(y => {
+            if (regex.test(y)) {
+              return parseInt(y.match(regex)[1]);
+            }
+          })
+          .filter(x => x !== undefined);
         files.forEach(x => {
           let count = (x.match(/Copy/g) || []).length;
 
-          console.log('C', x, count === countWord, count, countWord);
-
           if (count === countWord) {
             if (regex.test(x)) {
-              const missingNumbers = findMissingNums(nums);
+              const missingNumbers = findMissingNums(nums).filter(x => x > 1);
 
-              numOfElements =
-                missingNumbers.sort()[0] == 2 ? 1 : missingNumbers.sort()[0];
-              console.log(
-                'E',
-                missingNumbers.sort(),
-                numOfElements,
-                nums,
-                x.includes(x.match(regex)[1]),
-                x.match(regex)[1],
-                count,
-                countWord
-              );
-              // if (x.match(regex)[1] == 2 && !files.includes(`${name} - Copy`));
-              // instanceNameSuffix(`${name}) - Copy`);
-              // if (
-              //   x.includes(x.match(regex)[1])
-              //   //  &&
-              //   // !files.includes(`${name} - Copy`)
-              // );
-              // numOfElements++;
+              if (missingNumbers.length > 0)
+                numOfElements = missingNumbers.sort()[0];
+              else numOfElements = parseInt(x.match(regex)[1]) + 1;
             }
-            numOfElements++;
+
+            if (numOfElements === 1 && count === countWord) numOfElements++;
           }
         });
 
-        console.log('D', numOfElements);
         if (numOfElements > 1) {
           return `${name} - Copy (${numOfElements})`;
         }
@@ -365,7 +347,7 @@ const InstanceName = ({
                       `}
                     />
                     <div
-                      show={invalidName || alreadyExists}
+                      show={!instanceNameSufx && (invalidName || alreadyExists)}
                       css={`
                         opacity: ${props => (props.show ? 1 : 0)};
                         color: ${props => props.theme.palette.error.main};
@@ -408,10 +390,6 @@ const InstanceName = ({
                     }
                   `}
                   onClick={() => {
-                    console.log(
-                      'ss',
-                      instanceNameSufx || instanceName || mcName
-                    );
                     createInstance(instanceNameSufx || instanceName || mcName);
                     setClicked(true);
                   }}
