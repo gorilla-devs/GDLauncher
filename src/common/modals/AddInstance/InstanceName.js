@@ -22,6 +22,7 @@ import {
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
+import { instanceNameSuffix } from '../../../app/desktop/utils';
 import { FABRIC, VANILLA, FORGE } from '../../utils/constants';
 
 const InstanceName = ({
@@ -71,7 +72,7 @@ const InstanceName = ({
     fse
       .pathExists(path.join(instancesPath, instanceName || mcName))
       .then(exists => {
-        instanceNameSuffix(instanceName || mcName).then(x =>
+        instanceNameSuffix(instanceName || mcName, instancesPath).then(x =>
           setInstanceNameSufx(x)
         );
 
@@ -88,64 +89,6 @@ const InstanceName = ({
     return new Promise(resolve => {
       setTimeout(() => resolve(), s * 1000);
     });
-  };
-
-  function findMissingNums(numbers) {
-    let arrayLength = Math.max.apply(Math, numbers);
-    let missing = [];
-
-    for (let i = 0; i < arrayLength; i++) {
-      if (numbers.indexOf(i) < 0) {
-        missing = missing.concat(i);
-      }
-    }
-    return missing;
-  }
-
-  function countOccurences(string, word) {
-    return string.split(word).length - 1;
-  }
-
-  const instanceNameSuffix = async name => {
-    let regex = /\((.*?)\)/;
-    let numOfElements = 1;
-    const files = await fse.readdir(instancesPath);
-    const exists = await fse.pathExists(path.join(instancesPath, name));
-
-    if (exists) {
-      const existNewName = await fse.pathExists(`${name}) - Copy`);
-      const countWord = countOccurences(`${name}) - Copy`, 'Copy');
-
-      if (!existNewName) {
-        const nums = files
-          .map(y => {
-            if (regex.test(y)) {
-              return parseInt(y.match(regex)[1]);
-            }
-          })
-          .filter(x => x !== undefined);
-        files.forEach(x => {
-          let count = (x.match(/Copy/g) || []).length;
-
-          if (count === countWord) {
-            if (regex.test(x)) {
-              const missingNumbers = findMissingNums(nums).filter(x => x > 1);
-
-              if (missingNumbers.length > 0)
-                numOfElements = missingNumbers.sort()[0];
-              else numOfElements = parseInt(x.match(regex)[1]) + 1;
-            }
-
-            if (numOfElements === 1 && count === countWord) numOfElements++;
-          }
-        });
-
-        if (numOfElements > 1) {
-          return `${name} - Copy (${numOfElements})`;
-        }
-        return `${name} - Copy`;
-      } else return `${name}) - Copy`;
-    } else return name;
   };
 
   const createInstance = async localInstanceName => {
@@ -336,7 +279,9 @@ const InstanceName = ({
                       size="large"
                       placeholder={instanceNameSufx || instanceName || mcName}
                       onChange={e =>
-                        setInstanceName(instanceNameSuffix(e.target.value))
+                        setInstanceName(
+                          instanceNameSuffix(e.target.value, instancesPath)
+                        )
                       }
                       css={`
                         opacity: ${({ state }) =>

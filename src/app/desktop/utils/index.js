@@ -334,6 +334,72 @@ export const extractNatives = async (libraries, instancePath) => {
   );
 };
 
+function findMissingNums(numbers) {
+  const arrayLength = Math.max(...numbers);
+  let missing = [];
+
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < arrayLength; i++) {
+    if (numbers.indexOf(i) < 0) {
+      missing = missing.concat(i);
+    }
+  }
+  return missing;
+}
+
+function countOccurences(string, word) {
+  return string.split(word).length - 1;
+}
+
+export const instanceNameSuffix = async (name, instancesPath) => {
+  const regex = /\((.*?)\)/;
+  let numOfElements = 1;
+  const files = await fse.readdir(instancesPath);
+  const exists = await fse.pathExists(path.join(instancesPath, name));
+
+  if (exists) {
+    const existNewName = await fse.pathExists(`${name}) - Copy`);
+    const countWord = countOccurences(`${name}) - Copy`, 'Copy');
+
+    if (!existNewName) {
+      const nums = files
+        // eslint-disable-next-line array-callback-return
+        .map(y => {
+          if (regex.test(y)) {
+            // eslint-disable-next-line radix
+            return parseInt(y.match(regex)[1]);
+          }
+        })
+        .filter(x => x !== undefined);
+      files.forEach(x => {
+        const count = (x.match(/Copy/g) || []).length;
+
+        if (count === countWord) {
+          if (regex.test(x)) {
+            const missingNumbers = findMissingNums(nums).filter(z => z > 1);
+
+            if (missingNumbers.length > 0)
+              // eslint-disable-next-line prefer-destructuring
+              numOfElements = missingNumbers.sort()[0];
+            // eslint-disable-next-line radix
+            else numOfElements = parseInt(x.match(regex)[1]) + 1;
+          }
+
+          // eslint-disable-next-line no-plusplus
+          if (numOfElements === 1 && count === countWord) numOfElements++;
+        }
+      });
+
+      if (numOfElements > 1) {
+        return `${name} - Copy (${numOfElements})`;
+      }
+      return `${name} - Copy`;
+    }
+    return `${name}) - Copy`;
+  }
+  return name;
+};
+
 export const copyAssetsToResources = async assets => {
   await Promise.all(
     assets.map(async asset => {
