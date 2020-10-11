@@ -11,6 +11,7 @@ import {
   faPlay,
   faClock,
   faWrench,
+  faCopy,
   faFolder,
   faTrash,
   faStop,
@@ -29,6 +30,7 @@ import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
 import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
+import { duplicateInstance } from '../../utils/index';
 
 const Container = styled.div`
   position: relative;
@@ -189,6 +191,10 @@ const Instance = ({ instanceName }) => {
   const openConfirmationDeleteModal = () => {
     dispatch(openModal('InstanceDeleteConfirmation', { instanceName }));
   };
+  const dupliacateInstance = () => {
+    // dispatch(openModal('InstanceManager', { instanceName }));
+    duplicateInstance(path.join(instancesPath, instance.name), instancesPath);
+  };
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
@@ -304,6 +310,15 @@ const Instance = ({ instanceName }) => {
               Kill
             </MenuItem>
           )}
+          <MenuItem disabled={Boolean(isInQueue)} onClick={dupliacateInstance}>
+            <FontAwesomeIcon
+              icon={faCopy}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Duplicate
+          </MenuItem>
           <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
             <FontAwesomeIcon
               icon={faWrench}
