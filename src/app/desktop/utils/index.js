@@ -338,8 +338,7 @@ function findMissingNums(numbers) {
   const arrayLength = Math.max(...numbers);
   let missing = [];
 
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < arrayLength; i++) {
+  for (let i = 0; i < arrayLength; i += 1) {
     if (numbers.indexOf(i) < 0) {
       missing = missing.concat(i);
     }
@@ -363,14 +362,13 @@ export const instanceNameSuffix = async (name, instancesPath) => {
 
     if (!existNewName) {
       const nums = files
-        // eslint-disable-next-line array-callback-return
         .map(y => {
           if (regex.test(y)) {
-            // eslint-disable-next-line radix
-            return parseInt(y.match(regex)[1]);
+            return parseInt(y.match(regex)[1], 10);
           }
+          return null;
         })
-        .filter(x => x !== undefined);
+        .filter(x => x);
       files.forEach(x => {
         const count = (x.match(/Copy/g) || []).length;
 
@@ -379,14 +377,11 @@ export const instanceNameSuffix = async (name, instancesPath) => {
             const missingNumbers = findMissingNums(nums).filter(z => z > 1);
 
             if (missingNumbers.length > 0)
-              // eslint-disable-next-line prefer-destructuring
-              numOfElements = missingNumbers.sort()[0];
-            // eslint-disable-next-line radix
-            else numOfElements = parseInt(x.match(regex)[1]) + 1;
+              [numOfElements] = missingNumbers.sort();
+            else numOfElements = parseInt(x.match(regex)[1], 10) + 1;
           }
 
-          // eslint-disable-next-line no-plusplus
-          if (numOfElements === 1 && count === countWord) numOfElements++;
+          if (numOfElements === 1 && count === countWord) numOfElements += 1;
         }
       });
 
