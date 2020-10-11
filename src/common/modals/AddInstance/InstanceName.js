@@ -278,11 +278,13 @@ const InstanceName = ({
                       state={state1}
                       size="large"
                       placeholder={instanceNameSufx || instanceName || mcName}
-                      onChange={e =>
-                        setInstanceName(
-                          instanceNameSuffix(e.target.value, instancesPath)
-                        )
-                      }
+                      onChange={async e => {
+                        const newName = await instanceNameSuffix(
+                          e.target.value,
+                          instancesPath
+                        );
+                        setInstanceName(newName);
+                      }}
                       css={`
                         opacity: ${({ state }) =>
                           state === 'entering' || state === 'entered' ? 0 : 1};
