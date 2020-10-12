@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Input } from 'antd';
 import styled from 'styled-components';
 import path from 'path';
@@ -29,10 +29,11 @@ export default function DuplicateInstance({ instanceName }) {
   const [newInstanceName, setNewInstanceName] = useState(null);
   const instancesPath = useSelector(_getInstancesPath);
 
-  const handleNewInstanceName = async name => {
-    const newName = await instanceNameSuffix(name, instancesPath);
-    setNewInstanceName(newName);
-  };
+  useEffect(() => {
+    instanceNameSuffix(instanceName, instancesPath)
+      .then(x => setNewInstanceName(x))
+      .catch(console.error);
+  }, []);
 
   return (
     <Modal
@@ -49,7 +50,7 @@ export default function DuplicateInstance({ instanceName }) {
         <h3>Enter a new name or we will fill it for you :)</h3>
         <Input
           placeholder={instanceName}
-          onChange={e => handleNewInstanceName(e.target.value)}
+          onChange={e => setNewInstanceName(e.target.value)}
           value={newInstanceName}
         />
         <Buttons>
