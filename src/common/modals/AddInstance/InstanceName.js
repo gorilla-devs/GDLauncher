@@ -45,6 +45,7 @@ const InstanceName = ({
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const tempPath = useSelector(_getTempPath);
+  const instances = useSelector(state => state.instances.list);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
   const [instanceName, setInstanceName] = useState(mcName);
   const [instanceNameSufx, setInstanceNameSufx] = useState(null);
@@ -72,9 +73,13 @@ const InstanceName = ({
     fse
       .pathExists(path.join(instancesPath, instanceName || mcName))
       .then(exists => {
-        instanceNameSuffix(instanceName || mcName, instancesPath).then(x =>
-          setInstanceNameSufx(x)
-        );
+        // instanceNameSuffix(instanceName || mcName, instances).then(x => {
+        //   console.log('cAAAAA', x);
+        //   setInstanceNameSufx(x);
+        // });
+        const newName = instanceNameSuffix(instanceName || mcName, instances);
+        console.log('cAAAAA', newName);
+          setInstanceNameSufx(newName);
 
         setAlreadyExists(exists);
         setInvalidName(false);
@@ -279,9 +284,9 @@ const InstanceName = ({
                       size="large"
                       placeholder={instanceNameSufx || instanceName || mcName}
                       onChange={async e => {
-                        const newName = await instanceNameSuffix(
+                        const newName = instanceNameSuffix(
                           e.target.value,
-                          instancesPath
+                          instances
                         );
                         setInstanceName(newName);
                       }}
