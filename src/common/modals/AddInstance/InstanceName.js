@@ -73,13 +73,8 @@ const InstanceName = ({
     fse
       .pathExists(path.join(instancesPath, instanceName || mcName))
       .then(exists => {
-        // instanceNameSuffix(instanceName || mcName, instances).then(x => {
-        //   console.log('cAAAAA', x);
-        //   setInstanceNameSufx(x);
-        // });
         const newName = instanceNameSuffix(instanceName || mcName, instances);
-        console.log('cAAAAA', newName);
-          setInstanceNameSufx(newName);
+        setInstanceNameSufx(newName);
 
         setAlreadyExists(exists);
         setInvalidName(false);
