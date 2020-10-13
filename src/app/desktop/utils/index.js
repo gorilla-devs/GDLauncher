@@ -334,65 +334,21 @@ export const extractNatives = async (libraries, instancePath) => {
   );
 };
 
-function findMissingNums(numbers) {
-  const arrayLength = Math.max(...numbers);
-  let missing = [];
-
-  for (let i = 0; i < arrayLength; i += 1) {
-    if (numbers.indexOf(i) < 0) {
-      missing = missing.concat(i);
-    }
+export const instanceNameSuffix = (name, instanceList) => {
+  const match = name.match(/^(.+ - copy )(\((\d+)\))$/);
+  const instancesArrayList = Object.keys(instanceList);
+  if (name && !instancesArrayList.includes(name)) {
+    return name;
   }
-  return missing;
-}
+  const newName =
+    match && match[3] !== '5'
+      ? `${match[1]}(${parseInt(match[3], 10) + 1})`
+      : `${name} - copy (1)`;
 
-function countOccurences(string, word) {
-  return string.split(word).length - 1;
-}
-
-export const instanceNameSuffix = async (name, instancesPath) => {
-  const regex = /\((.*?)\)/;
-  let numOfElements = 1;
-  const files = await fse.readdir(instancesPath);
-  const exists = await fse.pathExists(path.join(instancesPath, name));
-
-  if (exists) {
-    const existNewName = await fse.pathExists(`${name}) - Copy`);
-    const countWord = countOccurences(`${name}) - Copy`, 'Copy');
-
-    if (!existNewName) {
-      const nums = files
-        .map(y => {
-          if (regex.test(y)) {
-            return parseInt(y.match(regex)[1], 10);
-          }
-          return null;
-        })
-        .filter(x => x);
-      files.forEach(x => {
-        const count = (x.match(/Copy/g) || []).length;
-
-        if (count === countWord) {
-          if (regex.test(x)) {
-            const missingNumbers = findMissingNums(nums).filter(z => z > 1);
-
-            if (missingNumbers.length > 0)
-              [numOfElements] = missingNumbers.sort();
-            else numOfElements = parseInt(x.match(regex)[1], 10) + 1;
-          }
-
-          if (numOfElements === 1 && count === countWord) numOfElements += 1;
-        }
-      });
-
-      if (numOfElements > 1) {
-        return `${name} - Copy (${numOfElements})`;
-      }
-      return `${name} - Copy`;
-    }
-    return `${name}) - Copy`;
+  if (newName && !instancesArrayList.includes(newName)) {
+    return newName;
   }
-  return name;
+  return instanceNameSuffix(newName, instanceList);
 };
 
 export const copyAssetsToResources = async assets => {
