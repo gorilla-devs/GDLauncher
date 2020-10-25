@@ -7,11 +7,12 @@ import { faLongArrowAltRight } from '@fortawesome/free-solid-svg-icons';
 import path from 'path';
 import { isEqual } from 'lodash';
 import Modal from '../components/Modal';
-import { addToQueue } from '../reducers/actions';
 import { _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
 import { FABRIC, VANILLA, FORGE } from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
+import sendMessage from '../utils/sendMessage';
+import EV from '../messageEvents';
 
 const McVersionChanger = ({ instanceName, defaultValue }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -148,41 +149,35 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 selectedVersion[0] === patchedDefaultValue[0];
 
               if (isVanilla) {
-                dispatch(
-                  addToQueue(
-                    instanceName,
-                    [selectedVersion[0], selectedVersion[2]],
-                    null,
-                    background
-                  )
-                );
+                sendMessage(EV.APPLY_INSTALL_INSTANCE, [
+                  instanceName,
+                  [selectedVersion[0], selectedVersion[2]],
+                  null,
+                  background
+                ]);
               } else if (isForge) {
-                dispatch(
-                  addToQueue(
-                    instanceName,
-                    isModpack && isSameLoader
-                      ? [...selectedVersion, ...defaultValue.slice(3, 5)]
-                      : selectedVersion,
-                    null,
-                    background
-                  )
-                );
+                sendMessage(EV.APPLY_INSTALL_INSTANCE, [
+                  instanceName,
+                  isModpack && isSameLoader
+                    ? [...selectedVersion, ...defaultValue.slice(3, 5)]
+                    : selectedVersion,
+                  null,
+                  background
+                ]);
               } else if (isFabric) {
-                dispatch(
-                  addToQueue(
-                    instanceName,
-                    [
-                      FABRIC,
-                      selectedVersion[2],
-                      selectedVersion[3],
-                      ...(isModpack && isSameLoader
-                        ? defaultValue.slice(3, 5)
-                        : [])
-                    ],
-                    null,
-                    background
-                  )
-                );
+                sendMessage(EV.APPLY_INSTALL_INSTANCE, [
+                  instanceName,
+                  [
+                    FABRIC,
+                    selectedVersion[2],
+                    selectedVersion[3],
+                    ...(isModpack && isSameLoader
+                      ? defaultValue.slice(3, 5)
+                      : [])
+                  ],
+                  null,
+                  background
+                ]);
               }
 
               dispatch(closeAllModals());

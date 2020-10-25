@@ -5,36 +5,13 @@ import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import fse from 'fs-extra';
-import { add as add7z } from 'node-7z';
 import makeDir from 'make-dir';
 import { Transition } from 'react-transition-group';
 import styled from 'styled-components';
 import pMap from 'p-map';
-import { get7zPath } from '../../../../app/desktop/utils';
 import { FABRIC, VANILLA, FORGE } from '../../../utils/constants';
-
-/**
- *
- * @param {String} archiveName Name of archive without file extension.
- * @param {String} zipDestPath Destination path (cwd of 7z).
- * @param {Array} filesArray Array of files to include. Relative to current working directory unless full path is passed for each file.
- */
-const createZip = async (archiveName, zipDestPath, filesArray) => {
-  const sevenZipPath = await get7zPath();
-  const zipCreation = add7z(`${archiveName}.zip`, filesArray, {
-    $bin: sevenZipPath,
-    $raw: ['-tzip'],
-    $spawnOptions: { cwd: zipDestPath }
-  });
-  await new Promise((resolve, reject) => {
-    zipCreation.on('end', () => {
-      resolve();
-    });
-    zipCreation.on('error', err => {
-      reject(err.stderr);
-    });
-  });
-};
+import EV from '../../../messageEvents';
+import sendMessage from '../../../utils/sendMessage';
 
 export default function ThirdStep({
   instanceName,
@@ -178,7 +155,11 @@ export default function ThirdStep({
       await fse.remove(
         path.join(filePath, `${packZipName}-${packVersion}.zip`)
       );
-      await createZip(`${packZipName}-${packVersion}`, filePath, filesToZip);
+      await sendMessage(EV.CREATE_EXTRACT_ZIP, [
+        `${packZipName}-${packVersion}`,
+        filePath,
+        filesToZip
+      ]);
 
       // Clean up temp folder
       await fse.remove(tempExport);

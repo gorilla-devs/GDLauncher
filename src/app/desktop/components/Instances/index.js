@@ -26,11 +26,32 @@ const SubNoInstance = styled.div`
 
 const Instances = () => {
   const instances = useSelector(_getInstances);
+  const instancesQueue = useSelector(state => state.instances.installing);
+  const installationStatus = useSelector(
+    state => state.instances.installationStatus
+  );
+  const installationProgress = useSelector(
+    state => state.instances.installationProgress
+  );
 
   return (
     <Container>
-      {instances.length > 0 ? (
-        instances.map(i => <Instance key={i.name} instanceName={i.name} />)
+      {instances.length + instancesQueue.length > 0 ? (
+        <>
+          {instances.map(v => (
+            <Instance key={v.name} instance={v} />
+          ))}
+          {instancesQueue.map((v, i) => (
+            <Instance
+              key={v.name}
+              instance={v}
+              installationStatus={installationStatus}
+              installationProgress={installationProgress}
+              isInstalling={i === 0}
+              isInQueue
+            />
+          ))}
+        </>
       ) : (
         <NoInstance>
           No Instance has been installed

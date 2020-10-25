@@ -53,7 +53,14 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <script>
       (function () {
-        if (process.env.NODE_ENV !== 'development') {
+        const isElectron =
+          typeof navigator !== 'undefined' &&
+          (navigator.userAgent || '').includes('Electron');
+
+        if (
+          window.location.hostname !== 'localhost' ||
+          (isElectron && process.env.NODE_ENV !== 'development')
+        ) {
           window.ga =
             window.ga ||
             function () {
@@ -105,7 +112,7 @@
             x="0px"
             y="0px"
             viewBox="0 0 1080 1080"
-            style="enable-background: new 0 0 1080 1080;"
+            style="enable-background: new 0 0 1080 1080"
             xml:space="preserve"
           >
             <style type="text/css">

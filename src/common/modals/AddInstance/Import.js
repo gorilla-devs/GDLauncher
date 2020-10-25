@@ -5,7 +5,6 @@ import path from 'path';
 import fse from 'fs-extra';
 import { promises as fs } from 'fs';
 import { extractFull } from 'node-7z';
-import { get7zPath } from '../../../app/desktop/utils';
 import { Button, Input } from 'antd';
 import { _getTempPath } from '../../utils/selectors';
 import { useSelector } from 'react-redux';
@@ -67,7 +66,8 @@ const Import = ({
       }
     }
 
-    const sevenZipPath = await get7zPath();
+    const sevenZipPath = await sendMessage(EV.GET_7Z_PATH);
+
     try {
       await fs.access(path.join(tempPath, 'manifest.json'));
     } catch {

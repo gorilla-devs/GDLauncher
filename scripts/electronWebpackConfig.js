@@ -64,7 +64,7 @@ const baseConfig = {
 };
 
 module.exports = merge(baseConfig, {
-  devtool: 'inline-source-map',
+  devtool: 'eval-cheap-module-source-map',
 
   mode: process.env.NODE_ENV,
 
@@ -107,7 +107,8 @@ module.exports = merge(baseConfig, {
       NODE_ENV: process.env.NODE_ENV,
       DEBUG_PROD: false,
       START_MINIMIZED: false
-    })
+    }),
+    new webpack.ExternalsPlugin('commonjs', ['leveldown'])
   ],
 
   /**

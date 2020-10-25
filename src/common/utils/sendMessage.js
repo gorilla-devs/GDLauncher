@@ -37,6 +37,10 @@ export function handleMessage(type, fn) {
   typeHandlerMap[type] = fn;
 }
 
+export function removeMessageHandler(type) {
+  delete typeHandlerMap[type];
+}
+
 export default function sendMessage(type, value) {
   const id = generateMessageId();
   const event = new CustomEvent('__RENDERER_MESSAGE__', {
@@ -52,7 +56,7 @@ export default function sendMessage(type, value) {
   return new Promise((resolve, reject) => {
     const t = setTimeout(
       () => reject(new Error('Timeout exceeded')),
-      15 * 1000
+      20 * 1000
     );
     requestMap[id] = { resolve, reject, t };
   });

@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import path from 'path';
 import memoize from 'lodash/memoize';
-import { convertOSToJavaFormat } from '../../app/desktop/utils';
+import { convertOSToJavaFormat } from '.';
 
 const _instances = state => state.instances;
 const _accounts = state => state.app.accounts;

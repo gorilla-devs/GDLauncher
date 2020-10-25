@@ -21,7 +21,7 @@ class PromiseQueue {
   on(eventName, handler) {
     switch (eventName) {
       case 'executed':
-        this.listeners.executed = () => handler(this.queue.length + 1);
+        this.listeners.executed = () => handler(this.queue.length);
         break;
       case 'start':
         this.listeners.start = () => handler(this.queue.length + 1);
@@ -49,11 +49,11 @@ class PromiseQueue {
       } catch (e) {
         this.queue[0].reject(e);
       } finally {
-        this.queue.shift();
         const executedHandler = this.listeners.executed;
         if (executedHandler) {
           setTimeout(executedHandler, 0);
         }
+        this.queue.shift();
       }
       this.isPending = false;
     }

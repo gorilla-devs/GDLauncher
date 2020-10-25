@@ -1,7 +1,7 @@
 import isElectron from 'is-electron';
-import DesktopRoot from './app/desktop/DesktopRoot';
-import BrowserRoot from './app/browser/BrowserRoot';
 
-const Root = isElectron() ? DesktopRoot : BrowserRoot;
+const Root = isElectron()
+  ? require('./app/desktop/DesktopRoot').default
+  : require('./app/browser/BrowserRoot').default;
 
 export default Root;

@@ -3,14 +3,14 @@ import { app } from 'electron';
 import log from 'electron-log';
 import { promises as fs } from 'fs';
 import pMap from 'p-map';
-import murmur from 'murmur2-calculator';
 import { getAddon, getAddonsByFingerprint } from '../../../common/api';
 import { isMod, normalizeModData } from '../../../common/utils';
 import { sendMessage } from '../messageListener';
 import EV from '../../../common/messageEvents';
 import generateMessageId from '../../../common/utils/generateMessageId';
 import startListener from './watcher';
-import { INSTANCES } from './instances';
+import { getInstanceDB, INSTANCES } from './instances';
+import { getFileMurmurHash2 } from '../helpers';
 
 const assignInstances = data => {
   for (const key in data) {
@@ -51,20 +51,14 @@ const getDirectories = async source => {
 };
 
 const getInstances = async instancesPath => {
-  const mapFolderToInstance = async instance => {
+  const mapFolderToInstance = async uid => {
     try {
-      const configPath = path.join(
-        path.join(instancesPath, instance, 'config.json')
-      );
-      const config = JSON.parse(await fs.readFile(configPath));
+      const config = await getInstanceDB(uid).get(`config`);
       if (!config.modloader) {
-        throw new Error(`Config for ${instance} could not be parsed`);
+        throw new Error(`Config for ${uid} could not be parsed`);
       }
 
-      return {
-        ...config,
-        name: instance
-      };
+      return config;
     } catch (err) {
       console.error(err);
     }
@@ -79,25 +73,22 @@ const getInstances = async instancesPath => {
   for (const instance of instances) {
     // eslint-disable-next-line
     if (!instance) continue;
-    hashMap[instance.name] = instance;
+    hashMap[instance.uid] = instance;
   }
 
   return hashMap;
 };
 
 const modsFingerprintsScan = async instancesPath => {
-  const mapFolderToInstance = async instance => {
+  const mapFolderToInstance = async uid => {
     try {
-      const configPath = path.join(
-        path.join(instancesPath, instance, 'config.json')
-      );
-      const config = JSON.parse(await fs.readFile(configPath));
+      const config = await getInstanceDB(uid).get(`config`);
 
       if (!config.modloader) {
-        throw new Error(`Config for ${instance} could not be parsed`);
+        throw new Error(`Config for ${uid} could not be parsed`);
       }
 
-      const modsFolder = path.join(instancesPath, instance, 'mods');
+      const modsFolder = path.join(instancesPath, uid, 'mods');
 
       let modsFolderExists;
       try {
@@ -107,7 +98,7 @@ const modsFingerprintsScan = async instancesPath => {
         modsFolderExists = false;
       }
 
-      if (!modsFolderExists) return { ...config, name: instance };
+      if (!modsFolderExists) return config;
 
       // Check if config.mods has a different number of mods than the actual number of mods
 
@@ -207,18 +198,16 @@ const modsFingerprintsScan = async instancesPath => {
       };
 
       if (JSON.stringify(config) !== JSON.stringify(newConfig)) {
-        await fs.writeFile(configPath, JSON.stringify(newConfig));
-        return { ...newConfig, name: instance };
+        await getInstanceDB(uid).put(`config`, newConfig);
       }
-      return { ...newConfig, name: instance };
+      return newConfig;
     } catch (err) {
       console.error(err);
     }
     return null;
   };
 
-  const folders = await getDirectories(instancesPath);
-  const instances = await pMap(folders, mapFolderToInstance, {
+  const instances = await pMap(Object.keys(INSTANCES), mapFolderToInstance, {
     concurrency: 5
   });
   const hashMap = {};
@@ -226,19 +215,10 @@ const modsFingerprintsScan = async instancesPath => {
   for (const instance of instances) {
     // eslint-disable-next-line
     if (!instance) continue;
-    hashMap[instance.name] = instance;
+    hashMap[instance.uid] = instance;
   }
 
   return hashMap;
-};
-
-const getFileMurmurHash2 = filePath => {
-  return new Promise((resolve, reject) => {
-    return murmur(filePath).then(v => {
-      if (v.toString().length === 0) reject();
-      return resolve(v);
-    });
-  });
 };
 
 export default initializeInstances;

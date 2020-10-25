@@ -1,34 +1,17 @@
-import { app } from 'electron';
 import pMap from 'p-map';
 import { promises as fs } from 'fs';
-import murmur from 'murmur2-calculator';
 import path from 'path';
 import { getAddon, getAddonFile, getAddonFiles } from '../../../common/api';
 import { normalizeModData, sortByDate } from '../../../common/utils';
 import { downloadFile } from '../../../common/utils/downloader';
 import { INSTANCES, updateInstance } from './instances';
+import { getFileMurmurHash2 } from '../helpers';
+import { INSTANCES_PATH, TEMP_PATH } from '../config';
 
-const getFileMurmurHash2 = filePath => {
-  return new Promise((resolve, reject) => {
-    return murmur(filePath).then(v => {
-      if (v.toString().length === 0) reject();
-      return resolve(v);
-    });
-  });
-};
+export const toggleModDisabled = async ([oldFileName, destFileName, uid]) => {
+  const instancePath = path.join(INSTANCES_PATH, uid);
 
-export const toggleModDisabled = async ([
-  oldFileName,
-  destFileName,
-  instanceName
-]) => {
-  const instancePath = path.join(
-    app.getPath('userData'),
-    'instances',
-    instanceName
-  );
-
-  INSTANCES[instanceName].mods = INSTANCES[instanceName].mods.map(m => {
+  INSTANCES[uid].mods = INSTANCES[uid].mods.map(m => {
     if (m.fileName === oldFileName) {
       return {
         ...m,
@@ -42,17 +25,13 @@ export const toggleModDisabled = async ([
     path.join(instancePath, 'mods', oldFileName),
     path.join(instancePath, 'mods', destFileName)
   );
-  updateInstance(instanceName);
+  updateInstance(uid);
 };
 
-export const deleteMods = async ([instanceName, selectedMods]) => {
-  const instancePath = path.join(
-    app.getPath('userData'),
-    'instances',
-    instanceName
-  );
+export const deleteMods = async ([uid, selectedMods]) => {
+  const instancePath = path.join(INSTANCES_PATH, uid);
 
-  INSTANCES[instanceName].mods = INSTANCES[instanceName].mods.filter(
+  INSTANCES[uid].mods = INSTANCES[uid].mods.filter(
     m => !selectedMods.includes(m.fileName)
   );
 
@@ -62,32 +41,26 @@ export const deleteMods = async ([instanceName, selectedMods]) => {
     )
   );
 
-  updateInstance(instanceName);
+  updateInstance(uid);
 };
 
 export const installMod = async ([
   projectID,
   fileID,
-  instanceName,
+  uid,
   gameVersion,
   installDeps = true,
   onProgress,
   useTempMiddleware
 ]) => {
-  const instancePath = path.join(
-    app.getPath('userData'),
-    'instances',
-    instanceName
-  );
+  const instancePath = path.join(INSTANCES_PATH, uid);
 
-  const tempPath = path.join(app.getPath('userData'), 'temp');
-
-  const instance = INSTANCES[instanceName];
+  const instance = INSTANCES[uid];
   const mainModData = await getAddonFile(projectID, fileID);
   const { data: addon } = await getAddon(projectID);
   mainModData.data.projectID = projectID;
   const destFile = path.join(instancePath, 'mods', mainModData.data.fileName);
-  const tempFile = path.join(tempPath, mainModData.data.fileName);
+  const tempFile = path.join(TEMP_PATH, mainModData.data.fileName);
 
   if (useTempMiddleware) {
     await downloadFile(tempFile, mainModData.data.downloadUrl, onProgress);
@@ -103,7 +76,7 @@ export const installMod = async ([
     );
   }
 
-  updateInstance(instanceName);
+  updateInstance(uid);
 
   if (!needToAddMod) {
     if (useTempMiddleware) {
@@ -148,7 +121,7 @@ export const installMod = async ([
           await installMod([
             dep.addonId,
             depData.id,
-            instanceName,
+            uid,
             gameVersion,
             installDeps,
             onProgress,
@@ -163,7 +136,7 @@ export const installMod = async ([
 };
 
 export const updateMod = async ([
-  instanceName,
+  uid,
   mod,
   fileID,
   gameVersion,
@@ -172,11 +145,11 @@ export const updateMod = async ([
   await installMod([
     mod.projectID,
     fileID,
-    instanceName,
+    uid,
     gameVersion,
     false,
     onProgress,
     true
   ]);
-  await deleteMods([instanceName, [mod.fileName]]);
+  await deleteMods([uid, [mod.fileName]]);
 };

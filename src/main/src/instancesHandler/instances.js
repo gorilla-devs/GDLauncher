@@ -1,11 +1,15 @@
-import { app } from 'electron';
-import { promises as fs } from 'fs';
 import path from 'path';
 import log from 'electron-log';
+import { add as add7z } from 'node-7z';
+import LevelUp from 'levelup';
+import LevelDOWN from 'leveldown';
+import encode from 'encoding-down';
 import EV from '../../../common/messageEvents';
 import generateMessageId from '../../../common/utils/generateMessageId';
 import PromiseQueue from '../../../common/utils/PromiseQueue';
 import { sendMessage } from '../messageListener';
+import { get7zPath } from '../helpers';
+import { INSTANCES_PATH } from '../config';
 
 // eslint-disable-next-line
 export const INSTANCES = {};
@@ -13,57 +17,78 @@ export const INSTANCES_QUEUES = {};
 
 export const INSTANCES_INSTALL_QUEUE = new PromiseQueue();
 
-export const updateInstance = instanceName => {
-  const instancesPath = path.join(app.getPath('userData'), 'instances');
-  const updateConfigFile = async () => {
-    const configPath = path.join(instancesPath, instanceName, 'config.json');
-    const tempConfigPath = path.join(
-      instancesPath,
-      instanceName,
-      'config_new_temp.json'
-    );
-    // Ensure that the new config is actually valid to write
-    try {
-      const JsonString = JSON.stringify(INSTANCES[instanceName]);
-      const isJson = JSON.parse(JsonString);
-      if (!isJson || typeof isJson !== 'object') {
-        const err = `Cannot write this JSON to ${instanceName}. Not an object`;
-        log.error(err);
-        throw new Error(err);
-      }
-    } catch {
-      const err = `Cannot write this JSON to ${instanceName}. Not parsable`;
-      log.error(err, INSTANCES[instanceName]);
-      throw new Error(err);
-    }
+const INSTANCES_DBS = {};
+export const getInstanceDB = uid => {
+  if (INSTANCES_DBS[uid] && INSTANCES_DBS[uid].isOpen()) {
+    return INSTANCES_DBS[uid];
+  }
+  const dbPath = path.join(INSTANCES_PATH, uid, '__db_config');
+  const instanceDB = LevelUp(
+    encode(LevelDOWN(dbPath), { valueEncoding: 'json' })
+  );
 
-    try {
-      sendMessage(
-        EV.UPDATE_SPECIFIC_INSTANCE,
-        generateMessageId(),
-        INSTANCES[instanceName]
-      );
-      await fs.writeFile(
-        tempConfigPath,
-        JSON.stringify(INSTANCES[instanceName])
-      );
-      await fs.rename(tempConfigPath, configPath);
-    } catch (err) {
-      log.error('Could not perform write action to config', err, instanceName);
+  const closeDB = () => {
+    if (instanceDB.isOpen()) {
+      instanceDB.removeAllListeners();
+      instanceDB.close();
     }
   };
 
-  if (!INSTANCES_QUEUES[instanceName]) {
-    INSTANCES_QUEUES[instanceName] = new PromiseQueue();
-  }
-
-  INSTANCES_QUEUES[instanceName].add(updateConfigFile);
+  let autoCloseDB = setTimeout(closeDB, 1000 * 40);
+  instanceDB.on('put', () => {
+    clearTimeout(autoCloseDB);
+    autoCloseDB = setTimeout(closeDB, 1000 * 40);
+  });
+  instanceDB.on('del', () => {
+    clearTimeout(autoCloseDB);
+    autoCloseDB = setTimeout(closeDB, 1000 * 40);
+  });
+  INSTANCES_DBS[uid] = instanceDB;
+  return instanceDB;
 };
 
-export const renameInstance = async ([oldName, newName]) => {
-  const instancesPath = path.join(app.getPath('userData'), 'instances');
-  return fs.rename(
-    path.join(instancesPath, oldName),
-    path.join(instancesPath, newName)
-  );
+export const updateInstance = uid => {
+  const updateConfigFile = async () => {
+    try {
+      await getInstanceDB(uid).put(`instances.${uid}.config`, INSTANCES[uid]);
+      sendMessage(
+        EV.UPDATE_SPECIFIC_INSTANCE,
+        generateMessageId(),
+        INSTANCES[uid]
+      );
+    } catch (e) {
+      log.error(`Could not update ${uid} config`, e);
+    }
+  };
+
+  if (!INSTANCES_QUEUES[uid]) {
+    INSTANCES_QUEUES[uid] = new PromiseQueue();
+  }
+
+  return INSTANCES_QUEUES[uid].add(updateConfigFile);
+};
+
+export const renameInstance = async ([uid, newName]) => {
+  INSTANCES[uid].name = newName;
+  updateInstance(uid);
+};
+
+export const createExtractZip = async ([
+  archiveName,
+  zipDestPath,
+  filesArray
+]) => {
+  const zipCreation = add7z(`${archiveName}.zip`, filesArray, {
+    $bin: get7zPath(),
+    $raw: ['-tzip'],
+    $spawnOptions: { cwd: zipDestPath }
+  });
+  await new Promise((resolve, reject) => {
+    zipCreation.on('end', () => {
+      resolve();
+    });
+    zipCreation.on('error', err => {
+      reject(err.stderr);
+    });
+  });
 };

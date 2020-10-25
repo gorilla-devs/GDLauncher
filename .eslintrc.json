@@ -17,11 +17,7 @@
   "settings": {
     "import/resolver": {
       "alias": {
-        "map": [
-          ["^ui$", "./src/ui"],
-          ["app", "./src/app/"],
-          ["common", "./src/common"]
-        ],
+        "map": [["@ui", "./src/ui"]],
         "extensions": [".js", ".jsx", ".json", ".svg", ".png", ".jpg"]
       }
     }
@@ -83,8 +79,8 @@
     ],
     "react/jsx-pascal-case": [2, { "allowAllCaps": false }],
     "react/prefer-stateless-function": "off",
-    "import/no-unresolved": "off",
     "no-prototype-builtins": "off",
+    "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "jsx-a11y/anchor-is-valid": "off",
     "import/extensions": [

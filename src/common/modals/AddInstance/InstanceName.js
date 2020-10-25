@@ -23,6 +23,8 @@ import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../utils/downloader';
 import { FABRIC, VANILLA, FORGE } from '../../utils/constants';
+import sendMessage from '../../utils/sendMessage';
+import EV from '../../messageEvents';
 
 const InstanceName = ({
   in: inProp,
@@ -41,14 +43,12 @@ const InstanceName = ({
   ).trim();
   const originalMcName =
     modpack?.name || (version && `Minecraft ${version[0]}`);
-  const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
-  const tempPath = useSelector(_getTempPath);
-  const forgeManifest = useSelector(state => state.app.forgeManifest);
   const [instanceName, setInstanceName] = useState(mcName);
   const [alreadyExists, setAlreadyExists] = useState(false);
   const [invalidName, setInvalidName] = useState(true);
   const [clicked, setClicked] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (instanceName || mcName) {
@@ -74,141 +74,17 @@ const InstanceName = ({
 
   const thumbnailURL = modpack?.attachments?.find(v => v.isDefault)
     ?.thumbnailUrl;
-  const imageURL = modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
 
-  const wait = s => {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(), s * 1000);
-    });
-  };
-
-  const createInstance = async localInstanceName => {
-    if (!version || !localInstanceName) return;
-    const isVanilla = version[0] === VANILLA;
-    const isFabric = version[0] === FABRIC;
-    const isForge = version[0] === FORGE;
-    const isTwitchModpack = Boolean(modpack?.attachments);
-    let manifest;
-    if (isTwitchModpack) {
-      if (importZipPath) {
-        manifest = await importAddonZip(
-          importZipPath,
-          path.join(instancesPath, localInstanceName),
-          path.join(tempPath, localInstanceName),
-          tempPath
-        );
-      } else {
-        manifest = await downloadAddonZip(
-          version[1],
-          version[2],
-          path.join(instancesPath, localInstanceName),
-          path.join(tempPath, localInstanceName)
-        );
-      }
-      await downloadFile(
-        path.join(
-          instancesPath,
-          localInstanceName,
-          `background${path.extname(imageURL)}`
-        ),
-        imageURL
-      );
-      if (version[0] === FORGE) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          convertcurseForgeToCanonical(
-            manifest.minecraft.modLoaders.find(v => v.primary).id,
-            manifest.minecraft.version,
-            forgeManifest
-          ),
-          version[1],
-          version[2]
-        ];
-        dispatch(
-          addToQueue(
-            localInstanceName,
-            modloader,
-            manifest,
-            `background${path.extname(imageURL)}`
-          )
-        );
-      } else if (version[0] === FABRIC) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          manifest.minecraft.modLoaders[0].yarn,
-          manifest.minecraft.modLoaders[0].loader,
-          version[1],
-          version[2]
-        ];
-        dispatch(
-          addToQueue(
-            localInstanceName,
-            modloader,
-            manifest,
-            `background${path.extname(imageURL)}`
-          )
-        );
-      } else if (version[0] === VANILLA) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          version[1],
-          version[2]
-        ];
-        dispatch(
-          addToQueue(
-            localInstanceName,
-            modloader,
-            manifest,
-            `background${path.extname(imageURL)}`
-          )
-        );
-      }
-    } else if (importZipPath) {
-      manifest = await importAddonZip(
-        importZipPath,
-        path.join(instancesPath, localInstanceName),
-        path.join(tempPath, localInstanceName),
-        tempPath
-      );
-
-      if (version[0] === FORGE) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          convertcurseForgeToCanonical(
-            manifest.minecraft.modLoaders.find(v => v.primary).id,
-            manifest.minecraft.version,
-            forgeManifest
-          )
-        ];
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
-      } else if (version[0] === FABRIC) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          manifest.minecraft.modLoaders[0].yarn,
-          manifest.minecraft.modLoaders[0].loader
-        ];
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
-      } else if (version[0] === VANILLA) {
-        const modloader = [version[0], manifest.minecraft.version];
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
-      }
-    } else if (isVanilla) {
-      dispatch(addToQueue(localInstanceName, [version[0], version[2]]));
-      await wait(2);
-    } else if (isFabric) {
-      dispatch(addToQueue(localInstanceName, [FABRIC, version[2], version[3]]));
-      await wait(2);
-    } else if (isForge) {
-      dispatch(addToQueue(localInstanceName, version));
-      await wait(2);
-    }
+  const createInstance = async localName => {
+    await sendMessage(EV.INSTALL_INSTANCE, [
+      localName,
+      version,
+      modpack,
+      importZipPath
+    ]);
     dispatch(closeModal());
   };
+
   return (
     <Transition in={inProp} timeout={200}>
       {state => (

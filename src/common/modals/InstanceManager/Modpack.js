@@ -4,9 +4,10 @@ import { Select, Button } from 'antd';
 import { useDispatch } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import { getAddonFiles, getAddonFileChangelog } from '../../api';
-import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
 import { sortByDate } from '../../utils';
+import sendMessage from '../../utils/sendMessage';
+import EV from '../../messageEvents';
 
 const Modpack = ({ modpackId, instanceName, manifest }) => {
   const [files, setFiles] = useState([]);
@@ -153,9 +154,10 @@ const Modpack = ({ modpackId, instanceName, manifest }) => {
         disabled={selectedIndex === null}
         onClick={async () => {
           setInstalling(true);
-          await dispatch(
-            changeModpackVersion(instanceName, files[selectedIndex])
-          );
+          await sendMessage(EV.UPDATE_MODPACK_VERSION, [
+            instanceName,
+            files[selectedIndex]
+          ]);
           setInstalling(false);
           dispatch(closeModal());
         }}

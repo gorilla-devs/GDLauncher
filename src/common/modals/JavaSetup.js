@@ -2,21 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Button, Progress, Input } from 'antd';
 import { Transition } from 'react-transition-group';
 import styled from 'styled-components';
-import fse from 'fs-extra';
-import { useSelector, useDispatch } from 'react-redux';
-import path from 'path';
-import { extractFull } from 'node-7z';
+import { useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import Modal from '../components/Modal';
-import { downloadFile } from '../utils/downloader';
-import { convertOSToJavaFormat, get7zPath } from '../../app/desktop/utils';
-import { _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { updateJavaPath } from '../reducers/settings/actions';
-import sendMessage from '../utils/sendMessage';
+import sendMessage, {
+  handleMessage,
+  removeMessageHandler
+} from '../utils/sendMessage';
 import EV from '../messageEvents';
 
 const JavaSetup = () => {
@@ -203,111 +198,27 @@ const ManualSetup = ({ setChoice }) => {
 const AutomaticSetup = () => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
   const [currentStep, setCurrentStep] = useState('Downloading Java');
-  const javaManifest = useSelector(state => state.app.javaManifest);
-  const userData = useSelector(state => state.userData);
-  const tempFolder = useSelector(_getTempPath);
   const dispatch = useDispatch();
 
-  const installJava = async () => {
-    const javaOs = convertOSToJavaFormat(process.platform);
-    const javaMeta = javaManifest.find(v => v.os === javaOs);
-    const {
-      version_data: { openjdk_version: version },
-      binary_link: url,
-      release_name: releaseName
-    } = javaMeta;
-    const javaBaseFolder = path.join(userData, 'java');
-    await fse.remove(javaBaseFolder);
-    const downloadLocation = path.join(tempFolder, path.basename(url));
-
-    await downloadFile(downloadLocation, url, p => {
-      sendMessage(EV.UPDATE_PROGRESS_BAR, parseInt(p, 10) / 100);
-      setDownloadPercentage(parseInt(p, 10));
-    });
-
-    sendMessage(EV.UPDATE_PROGRESS_BAR, -1);
-    setDownloadPercentage(null);
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const totalSteps = process.platform !== 'win32' ? 2 : 1;
-
-    setCurrentStep(`Extracting 1 / ${totalSteps}`);
-    const sevenZipPath = await get7zPath();
-    const firstExtraction = extractFull(downloadLocation, tempFolder, {
-      $bin: sevenZipPath,
-      $progress: true
-    });
-    await new Promise((resolve, reject) => {
-      firstExtraction.on('progress', ({ percent }) => {
-        sendMessage(EV.UPDATE_PROGRESS_BAR, percent);
-        setDownloadPercentage(percent);
-      });
-      firstExtraction.on('end', () => {
-        resolve();
-      });
-      firstExtraction.on('error', err => {
-        reject(err);
-      });
-    });
-
-    await fse.remove(downloadLocation);
-
-    // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
-    if (process.platform !== 'win32') {
-      sendMessage(EV.UPDATE_PROGRESS_BAR, -1);
-      setDownloadPercentage(null);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCurrentStep(`Extracting 2 / ${totalSteps}`);
-      const tempTarName = path.join(
-        tempFolder,
-        path.basename(url).replace('.tar.gz', '.tar')
-      );
-      const secondExtraction = extractFull(tempTarName, tempFolder, {
-        $bin: sevenZipPath,
-        $progress: true
-      });
-      await new Promise((resolve, reject) => {
-        secondExtraction.on('progress', ({ percent }) => {
-          sendMessage(EV.UPDATE_PROGRESS_BAR, percent);
-          setDownloadPercentage(percent);
-        });
-        secondExtraction.on('end', () => {
-          resolve();
-        });
-        secondExtraction.on('error', err => {
-          reject(err);
-        });
-      });
-      await fse.remove(tempTarName);
-    }
-
-    const directoryToMove =
-      process.platform === 'darwin'
-        ? path.join(tempFolder, `${releaseName}-jre`, 'Contents', 'Home')
-        : path.join(tempFolder, `${releaseName}-jre`);
-    await fse.move(directoryToMove, path.join(javaBaseFolder, version));
-
-    await fse.remove(path.join(tempFolder, `${releaseName}-jre`));
-
-    const ext = process.platform === 'win32' ? '.exe' : '';
-
-    if (process.platform !== 'win32') {
-      const execPath = path.join(javaBaseFolder, version, 'bin', `java${ext}`);
-
-      await promisify(exec)(`chmod +x "${execPath}"`);
-      await promisify(exec)(`chmod 755 "${execPath}"`);
-    }
-
-    dispatch(updateJavaPath(null));
-    setCurrentStep(`Java is ready!`);
-    sendMessage(EV.UPDATE_PROGRESS_BAR, -1);
-    setDownloadPercentage(null);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    dispatch(closeModal());
-  };
-
   useEffect(() => {
-    installJava();
+    sendMessage(EV.INSTALL_JAVA)
+      .then(() => {
+        return dispatch(closeModal());
+      })
+      .catch(console.log);
+
+    handleMessage(EV.UPDATE_JAVA_DOWNLOAD_PROGRESS, value => {
+      setDownloadPercentage(value);
+    });
+    handleMessage(EV.UPDATE_JAVA_DOWNLOAD_STEP, value => {
+      setCurrentStep(value);
+    });
+
+    // Cleanup listeners
+    return () => {
+      removeMessageHandler(EV.UPDATE_JAVA_DOWNLOAD_PROGRESS);
+      removeMessageHandler(EV.UPDATE_JAVA_DOWNLOAD_STEP);
+    };
   }, []);
 
   return (

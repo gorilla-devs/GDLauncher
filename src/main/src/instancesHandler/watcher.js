@@ -2,9 +2,7 @@ import { promises as fs } from 'fs';
 import { debounce } from 'lodash';
 import path from 'path';
 import log from 'electron-log';
-import lockfile from 'lockfile';
 import nsfw from 'nsfw';
-import murmur from 'murmur2-calculator';
 import { getAddon, getAddonsByFingerprint } from '../../../common/api';
 import EV from '../../../common/messageEvents';
 import {
@@ -16,16 +14,12 @@ import {
 import generateMessageId from '../../../common/utils/generateMessageId';
 import PromiseQueue from '../../../common/utils/PromiseQueue';
 import { sendMessage } from '../messageListener';
-import { INSTANCES, updateInstance } from './instances';
-
-const getFileMurmurHash2 = filePath => {
-  return new Promise((resolve, reject) => {
-    return murmur(filePath).then(v => {
-      if (v.toString().length === 0) reject();
-      return resolve(v);
-    });
-  });
-};
+import {
+  INSTANCES,
+  INSTANCES_INSTALL_QUEUE,
+  updateInstance
+} from './instances';
+import { getFileMurmurHash2 } from '../helpers';
 
 const startListener = async instancesPath => {
   // Real Time Scanner
@@ -57,9 +51,9 @@ const startListener = async instancesPath => {
 
   const changesTracker = {};
 
-  const processAddedFile = async (fileName, instanceName) => {
+  const processAddedFile = async (fileName, uid) => {
     const processChange = async () => {
-      const instance = INSTANCES[instanceName];
+      const instance = INSTANCES[uid];
       const isInConfig = (instance?.mods || []).find(
         mod => mod.fileName === path.basename(fileName)
       );
@@ -97,15 +91,15 @@ const startListener = async instancesPath => {
               packageFingerprint: murmurHash
             };
           }
-          const updatedInstance = INSTANCES[instanceName];
+          const updatedInstance = INSTANCES[uid];
           const isStillNotInConfig = !(updatedInstance?.mods || []).find(
             m => m.fileName === path.basename(fileName)
           );
           if (isStillNotInConfig && updatedInstance) {
-            console.log('[RTS] ADDING MOD', fileName, instanceName);
+            console.log('[RTS] ADDING MOD', fileName, uid);
 
-            INSTANCES[instanceName].mods.push(mod);
-            updateInstance(instanceName);
+            INSTANCES[uid].mods.push(mod);
+            updateInstance(uid);
           }
         }
       } catch (err) {
@@ -115,20 +109,19 @@ const startListener = async instancesPath => {
     Queue.add(processChange);
   };
 
-  const processRemovedFile = async (fileName, instanceName) => {
+  const processRemovedFile = async (fileName, uid) => {
     const processChange = async () => {
-      const instance = INSTANCES[instanceName];
+      const instance = INSTANCES[uid];
       const isInConfig = (instance?.mods || []).find(
         mod => mod.fileName === path.basename(fileName)
       );
       if (isInConfig) {
         try {
-          console.log('[RTS] REMOVING MOD', fileName, instanceName);
-          INSTANCES[instanceName].mods = INSTANCES[instanceName].mods.filter(
+          console.log('[RTS] REMOVING MOD', fileName, uid);
+          INSTANCES[uid].mods = INSTANCES[uid].mods.filter(
             m => m.fileName !== path.basename(fileName)
           );
-          // TODO: not updating ui
-          updateInstance(instanceName);
+          updateInstance(uid);
         } catch (err) {
           console.error(err);
         }
@@ -137,22 +130,22 @@ const startListener = async instancesPath => {
     Queue.add(processChange);
   };
 
-  const processRenamedFile = async (fileName, instanceName, newFilePath) => {
+  const processRenamedFile = async (fileName, uid, newFilePath) => {
     const processChange = async () => {
-      const modData = INSTANCES[instanceName].mods.find(
+      const modData = INSTANCES[uid].mods.find(
         m => m.fileName === path.basename(fileName)
       );
       if (modData) {
         try {
           console.log('[RTS] RENAMING MOD', fileName, newFilePath);
-          INSTANCES[instanceName].mods = [
-            ...(INSTANCES[instanceName].mods || []).filter(
+          INSTANCES[uid].mods = [
+            ...(INSTANCES[uid].mods || []).filter(
               m => m.fileName !== path.basename(fileName)
             ),
             { ...modData, fileName: path.basename(newFilePath) }
           ];
 
-          updateInstance(instanceName);
+          updateInstance(uid);
         } catch (err) {
           console.error(err);
         }
@@ -161,44 +154,12 @@ const startListener = async instancesPath => {
     Queue.add(processChange);
   };
 
-  const processAddedInstance = async instanceName => {
+  const processRemovedInstance = uid => {
     const processChange = async () => {
-      const instance = INSTANCES[instanceName];
-      if (!instance) {
-        const configPath = path.join(
-          instancesPath,
-          instanceName,
-          'config.json'
-        );
-        try {
-          const config = JSON.parse(await fs.readFile(configPath));
-
-          if (!config.modloader) {
-            throw new Error(`Config for ${instanceName} could not be parsed`);
-          }
-          console.log('[RTS] ADDING INSTANCE', instanceName);
-
-          // ADD INSTANCE AND UPDATE
-          INSTANCES[instanceName] = { ...config, name: instanceName };
-          updateInstance(instanceName);
-        } catch (err) {
-          console.warn(err);
-        }
-      }
-    };
-    Queue.add(processChange);
-  };
-
-  const processRemovedInstance = instanceName => {
-    const processChange = async () => {
-      if (INSTANCES[instanceName]) {
-        console.log('[RTS] REMOVING INSTANCE', instanceName);
-        delete INSTANCES[instanceName];
-        sendMessage(
-          EV.REMOVE_SPECIFIC_INSTANCE,
-          generateMessageId(),
-          instanceName
-        );
+      if (INSTANCES[uid]) {
+        console.log('[RTS] REMOVING INSTANCE', uid);
+        delete INSTANCES[uid];
+        sendMessage(EV.REMOVE_SPECIFIC_INSTANCE, generateMessageId(), uid);
       }
     };
     Queue.add(processChange);
@@ -210,29 +171,15 @@ const startListener = async instancesPath => {
 
       if (!instance) {
         try {
-          const configPath = path.join(
-            instancesPath,
-            newInstanceName,
-            'config.json'
-          );
-          const config = JSON.parse(await fs.readFile(configPath));
-          if (!config.modloader) {
-            throw new Error(
-              `Config for ${newInstanceName} could not be parsed`
-            );
-          }
           console.log(
             `[RTS] RENAMING INSTANCE ${oldInstanceName} -> ${newInstanceName}`
           );
-          INSTANCES[newInstanceName] = {
-            ...config,
-            name: newInstanceName
-          };
+          INSTANCES[newInstanceName] = INSTANCES[oldInstanceName];
           delete INSTANCES[oldInstanceName];
           await sendMessage(
-            EV.UPDATE_INSTANCES,
+            EV.REMOVE_SPECIFIC_INSTANCE,
             generateMessageId(),
-            INSTANCES
+            oldInstanceName
           );
           await sendMessage(
             EV.UPDATE_MANAGE_MODAL_INSTANCE_RENAME,
@@ -314,10 +261,7 @@ const startListener = async instancesPath => {
           action === 1 &&
           completed
         ) {
-          const instanceName = convertCompletePathToInstance(
-            fileName,
-            instancesPath
-          )
+          const uid = convertCompletePathToInstance(fileName, instancesPath)
             .substr(1)
             .split(path.sep)[0];
           // Check if we can find any other action with this instance name
@@ -329,7 +273,7 @@ const startListener = async instancesPath => {
               )
                 .substr(1)
                 .split(path.sep)[0];
-              if (instanceName === instName) {
+              if (uid === instName) {
                 delete changesTracker[file];
               }
             }
@@ -349,35 +293,37 @@ const startListener = async instancesPath => {
           delete changesTracker[fileName];
 
           // Infer the instance name from the full path
-          const instanceName = convertCompletePathToInstance(
-            filePath,
-            instancesPath
-          )
+          const uid = convertCompletePathToInstance(filePath, instancesPath)
             .substr(1)
             .split(path.sep)[0];
 
-          // If we're installing a modpack we don't want to process anything
-          const isLocked = await new Promise((resolve, reject) => {
-            lockfile.check(
-              path.join(instancesPath, instanceName, 'installing.lock'),
-              (err, locked) => {
-                if (err) reject(err);
-                resolve(locked);
-              }
-            );
-          });
+          const isInstalling = INSTANCES_INSTALL_QUEUE.queue.find(
+            v => v?.promise?.config?.name === uid
+          );
 
-          if (isLocked) return;
+          // let fileHandle;
+          // try {
+          //   fileHandle = await fs.open(
+          //     path.join(instancesPath, uid, 'config.json'),
+          //     'r+'
+          //   );
+          // } catch {
+          //   if (fileHandle !== undefined) {
+          //     await fileHandle.close();
+          //   }
+          // }
+
+          if (isInstalling) return;
 
           if (
             isMod(fileName, instancesPath) &&
-            INSTANCES[instanceName] &&
+            INSTANCES[uid] &&
             action !== 3
           ) {
             if (action === 0) {
-              processAddedFile(filePath, instanceName);
+              processAddedFile(filePath, uid);
             } else if (action === 1) {
-              processRemovedFile(filePath, instanceName);
+              processRemovedFile(filePath, uid);
             }
           } else if (
             action === 3 &&
@@ -392,18 +338,18 @@ const startListener = async instancesPath => {
               .substr(1)
               .split(path.sep)[0];
             if (
-              oldInstanceName === instanceName &&
+              oldInstanceName === uid &&
               isMod(newFilePath, instancesPath) &&
               isMod(fileName, instancesPath)
             ) {
-              processRenamedFile(fileName, instanceName, newFilePath);
+              processRenamedFile(fileName, uid, newFilePath);
             } else if (
-              oldInstanceName !== instanceName &&
+              oldInstanceName !== uid &&
               isMod(newFilePath, instancesPath) &&
               isMod(fileName, instancesPath)
             ) {
               processRemovedFile(fileName, oldInstanceName);
-              processAddedFile(newFilePath, instanceName);
+              processAddedFile(newFilePath, uid);
             } else if (
               !isMod(newFilePath, instancesPath) &&
               isMod(fileName, instancesPath)
@@ -413,13 +359,11 @@ const startListener = async instancesPath => {
               isMod(newFilePath, instancesPath) &&
               !isMod(fileName, instancesPath)
             ) {
-              processAddedFile(newFilePath, instanceName);
+              processAddedFile(newFilePath, uid);
             }
           } else if (isInstanceFolderPath(filePath, instancesPath)) {
-            if (action === 0) {
-              processAddedInstance(instanceName);
-            } else if (action === 1) {
-              processRemovedInstance(instanceName);
+            if (action === 1) {
+              processRemovedInstance(uid);
             } else if (action === 3) {
               const oldInstanceName = convertCompletePathToInstance(
                 fileName,
@@ -427,7 +371,7 @@ const startListener = async instancesPath => {
               )
                 .substr(1)
                 .split(path.sep)[0];
-              processRenamedInstance(oldInstanceName, instanceName);
+              processRenamedInstance(oldInstanceName, uid);
             }
           }
         }

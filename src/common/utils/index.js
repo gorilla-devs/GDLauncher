@@ -61,11 +61,6 @@ export const generateRandomString = () => {
   );
 };
 
-// Create the murmur hash of a mod
-export const getFileMurmurHash2 = async () => {
-  // return ipcRenderer.invoke('calculateMurmur2FromPath', filePath);
-};
-
 export const numberToRoundedWord = number => {
   // Alter numbers larger than 1k
   if (number >= 1e3) {
@@ -89,6 +84,78 @@ export const removeDuplicates = (myArr, prop) => {
   return myArr.filter((obj, pos, arr) => {
     return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
   });
+};
+
+export const reflect = p => {
+  return p.then(
+    v => ({ v, status: true }),
+    e => ({ e, status: false })
+  );
+};
+
+export const mavenToArray = (s, nativeString, forceExt) => {
+  const pathSplit = s.split(':');
+  const fileName = pathSplit[3]
+    ? `${pathSplit[2]}-${pathSplit[3]}`
+    : pathSplit[2];
+  const finalFileName = fileName.includes('@')
+    ? fileName.replace('@', '.')
+    : `${fileName}${nativeString || ''}${forceExt || '.jar'}`;
+  const initPath = pathSplit[0]
+    .split('.')
+    .concat(pathSplit[1])
+    .concat(pathSplit[2].split('@')[0])
+    .concat(`${pathSplit[1]}-${finalFileName}`);
+  return initPath;
+};
+
+export const convertOSToMCFormat = ElectronFormat => {
+  switch (ElectronFormat) {
+    case 'win32':
+      return 'windows';
+    case 'darwin':
+      return 'osx';
+    case 'linux':
+      return 'linux';
+    default:
+      return false;
+  }
+};
+
+export const convertOSToJavaFormat = ElectronFormat => {
+  switch (ElectronFormat) {
+    case 'win32':
+      return 'windows';
+    case 'darwin':
+      return 'mac';
+    case 'linux':
+      return 'linux';
+    default:
+      return false;
+  }
+};
+
+export const skipLibrary = lib => {
+  let skip = false;
+  if (lib.rules) {
+    skip = true;
+    lib.rules.forEach(({ action, os, features }) => {
+      if (features) return true;
+      if (
+        action === 'allow' &&
+        ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
+      ) {
+        skip = false;
+      }
+      if (
+        action === 'disallow' &&
+        ((os && os.name === convertOSToMCFormat(process.platform)) || !os)
+      ) {
+        skip = true;
+      }
+    });
+  }
+  return skip;
 };
 
 export const convertMinutesToHumanTime = minutes => {
@@ -138,6 +205,12 @@ export const normalizeModData = (data, projectID, modName) => {
     delete temp.fileId;
   }
   return temp;
+};
+
+export const waitTime = s => {
+  return new Promise(resolve => {
+    setTimeout(() => resolve(), s * 1000);
+  });
 };
 
 export const isMod = (fileName, instancesPath) =>

@@ -24,4 +24,5 @@ export default function handleUserDataPath() {
       app.setPath('userData', override.toString());
     }
   }
+  console.log('INITIALIZED APPDATA');
 }

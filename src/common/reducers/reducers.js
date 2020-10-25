@@ -1,6 +1,5 @@
 import omit from 'lodash/omit';
 import * as ActionTypes from './actionTypes';
-import PromiseQueue from '../utils/PromiseQueue';
 
 function news(state = [], action) {
   switch (action.type) {
@@ -29,43 +28,6 @@ function userData(state = null, action) {
   }
 }
 
-function downloadQueue(state = {}, action) {
-  switch (action.type) {
-    case ActionTypes.ADD_DOWNLOAD_TO_QUEUE:
-      return {
-        ...state,
-        [action.instanceName]: {
-          percentage: 0,
-          modloader: action.modloader,
-          status: null,
-          currentPhase: 1,
-          totalPhases: action.phases,
-          manifest: action.manifest
-        }
-      };
-    case ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE:
-      return omit(state, action.instanceName);
-    case ActionTypes.UPDATE_DOWNLOAD_PROGRESS:
-      return {
-        ...state,
-        [action.instanceName]: {
-          ...state[action.instanceName],
-          percentage: action.percentage
-        }
-      };
-    case ActionTypes.UPDATE_DOWNLOAD_STATUS:
-      return {
-        ...state,
-        [action.instanceName]: {
-          ...state[action.instanceName],
-          status: action.status
-        }
-      };
-    default:
-      return state;
-  }
-}
-
 function currentDownload(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CURRENT_DOWNLOAD:
@@ -75,40 +37,48 @@ function currentDownload(state = null, action) {
   }
 }
 
-const patchInstances = (state, action) => {
-  // eslint-disable-next-line
-  for (const instance1 in action.instances) {
-    const instance = action.instances[instance1];
-    // eslint-disable-next-line
-    if (!instance) continue;
-    if (!instance.name) {
-      // eslint-disable-next-line
-      instance.name = instance1;
-    }
-    if (state.list[instance.name]?.queue) {
-      // eslint-disable-next-line
-      instance.queue = state.list[instance.name].queue;
-    } else {
-      // eslint-disable-next-line
-      instance.queue = new PromiseQueue();
-    }
-  }
-};
-
-function instances(state = { started: false, list: {} }, action) {
+function instances(
+  state = {
+    started: false,
+    list: {},
+    installing: [],
+    installationStatus: null,
+    installationProgress: null
+  },
+  action
+) {
   switch (action.type) {
     case ActionTypes.UPDATE_SPECIFIC_INSTANCE:
-      patchInstances(state, action);
       return {
         ...state,
-        list: { ...state.list, [action.instance.name]: action.instance }
+        list: { ...state.list, [action.instance.uid]: action.instance }
       };
     case ActionTypes.REMOVE_SPECIFIC_INSTANCE:
-      patchInstances(state, action);
-      return { ...state, list: omit(state.list, [action.instanceName]) };
+      return { ...state, list: omit(state.list, [action.uid]) };
     case ActionTypes.UPDATE_INSTANCES:
-      patchInstances(state, action);
       return { ...state, list: action.instances };
+
+    case ActionTypes.ADD_SPECIFIC_INSTANCE_QUEUE:
+      return {
+        ...state,
+        installing: [...state.installing, { name: action.instance.name }]
+      };
+    case ActionTypes.REMOVE_SPECIFIC_INSTANCE_QUEUE:
+      return {
+        ...state,
+        installing: state.installing.slice(1)
+      };
+    case ActionTypes.UPDATE_INSTALLATION_STATUS:
+      return {
+        ...state,
+        installationStatus: action.data
+      };
+    case ActionTypes.UPDATE_INSTALLATION_PROGRESS:
+      return {
+        ...state,
+        installationProgress: action.data
+      };
+
     case ActionTypes.UPDATE_INSTANCES_STARTED:
       return { ...state, started: action.started };
     default:
@@ -174,7 +144,6 @@ export default {
   userData,
   news,
   message,
-  downloadQueue,
   currentDownload,
   instances,
   startedInstances,
