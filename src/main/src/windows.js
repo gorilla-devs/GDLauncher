@@ -24,10 +24,10 @@ export function createMainWindow() {
     backgroundColor: '#1B2533',
     webPreferences: {
       experimentalFeatures: true,
-      nodeIntegration: true,
+      nodeIntegration: false,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev,
-      enableRemoteModule: true
+      enableRemoteModule: false
     }
   });
 
