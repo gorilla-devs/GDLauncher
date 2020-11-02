@@ -16,10 +16,7 @@ const baseConfig = {
     rules: [
       {
         test: /\.node$/,
-        loader: 'native-ext-loader',
-        options: {
-          basePath: []
-        }
+        loader: 'native-ext-loader'
       },
       {
         test: /\.jsx?$/,
@@ -57,9 +54,7 @@ const baseConfig = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: process.env.NODE_ENV,
       REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE
-    }),
-
-    new webpack.NamedModulesPlugin()
+    })
   ]
 };
 
@@ -78,16 +73,16 @@ module.exports = merge(baseConfig, {
   },
 
   optimization: {
-    minimizer: [
-      new TerserPlugin({
-        parallel: true,
-        sourceMap: true,
-        cache: true
-      })
-    ]
+    minimize: true,
+    minimizer: [new TerserPlugin()]
   },
 
   plugins: [
+    new webpack.ExternalsPlugin('commonjs', [
+      'leveldown',
+      'murmur2-calculator',
+      'nsfw'
+    ]),
     new BundleAnalyzerPlugin({
       analyzerMode:
         process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
@@ -107,8 +102,7 @@ module.exports = merge(baseConfig, {
       NODE_ENV: process.env.NODE_ENV,
       DEBUG_PROD: false,
       START_MINIMIZED: false
-    }),
-    new webpack.ExternalsPlugin('commonjs', ['leveldown'])
+    })
   ],
 
   /**

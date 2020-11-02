@@ -2,6 +2,7 @@ import path from 'path';
 import { app } from 'electron';
 import log from 'electron-log';
 import { promises as fs } from 'fs';
+import makeDir from 'make-dir';
 import pMap from 'p-map';
 import { getAddon, getAddonsByFingerprint } from '../../../common/api';
 import { isMod, normalizeModData } from '../../../common/utils';
@@ -23,6 +24,7 @@ const assignInstances = data => {
 const initializeInstances = async () => {
   try {
     const instancesPath = path.join(app.getPath('userData'), 'instances');
+    await makeDir(instancesPath);
     // Initially read from disk
     let instances = await getInstances(instancesPath);
     assignInstances(instances);

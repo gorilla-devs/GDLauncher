@@ -24,10 +24,10 @@ export function createMainWindow() {
     backgroundColor: '#1B2533',
     webPreferences: {
       experimentalFeatures: true,
-      nodeIntegration: false,
+      nodeIntegration: true,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev,
-      enableRemoteModule: false
+      enableRemoteModule: true
     }
   });
 
@@ -88,11 +88,10 @@ export function createMainWindow() {
   tray.setContextMenu(trayMenu);
   tray.setToolTip('GDLauncher');
   tray.on('double-click', () => mainWindow.show());
-
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`,
+      : `file://${path.resolve(__dirname, '../build/index.html')}`,
     {
       userAgent: 'GDLauncher'
     }

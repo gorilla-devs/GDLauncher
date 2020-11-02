@@ -1,4 +1,5 @@
 import path from 'path';
+import { app } from 'electron';
 import { extractFull } from 'node-7z';
 import { promises as fs } from 'fs';
 import crypto from 'crypto';
@@ -7,7 +8,6 @@ import { spawn } from 'child_process';
 import makeDir from 'make-dir';
 import originalFs from 'original-fs';
 import murmur from 'murmur2-calculator';
-import { USERDATA_PATH } from './config';
 import { MC_LIBRARIES_URL } from '../../common/utils/constants';
 import {
   convertOSToMCFormat,
@@ -19,11 +19,17 @@ import { downloadFile } from '../../common/utils/downloader';
 import { getAddonFile } from '../../common/api';
 
 export const get7zPath = () => {
-  // Get userData from ipc because we can't always get this from redux
-  if (process.platform === 'darwin' || process.platform === 'linux') {
-    return path.join(USERDATA_PATH, '7za');
+  const baseDir = path.join(app.getAppPath(), '7z');
+
+  let zipLocationAsar = path.join(baseDir, 'linux', 'x64', '7za');
+  if (process.platform === 'darwin') {
+    zipLocationAsar = path.join(baseDir, 'mac', '7za');
   }
-  return path.join(USERDATA_PATH, '7za.exe');
+  if (process.platform === 'win32') {
+    zipLocationAsar = path.join(baseDir, 'win', 'x64', '7za.exe');
+  }
+
+  return zipLocationAsar;
 };
 
 export const extractNatives = async (libraries, instancePath) => {

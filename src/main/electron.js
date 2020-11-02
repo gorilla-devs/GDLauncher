@@ -9,7 +9,7 @@ handleUserDataPath();
 
 const handleKeybinds = require('./src/handleKeybinds').default;
 const { mainWindow, createMainWindow } = require('./src/windows');
-const extractSevenZip = require('./src/extractSevenZip').default;
+const extractSevenZip = require('./src/fix7zPermissions').default;
 const {
   listenMessage,
   registerListeners,
@@ -88,6 +88,6 @@ app.on('activate', () => {
 
 handleKeybinds();
 extractSevenZip();
-initializeAutoUpdater();
-initializeInstances();
-initializeManifests();
+initializeAutoUpdater().catch(log.error);
+initializeInstances().catch(log.error);
+initializeManifests().catch(log.error);

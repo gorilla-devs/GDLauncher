@@ -67,8 +67,6 @@ module.exports = ({ env }) => {
       devtool: 'eval-cheap-module-source-map',
       configure: {
         devtool: 'eval-cheap-module-source-map',
-        target:
-          process.env.APP_TYPE === 'electron' ? 'electron-renderer' : 'web',
         optimization: {
           splitChunks: {
             name: false,
@@ -103,9 +101,7 @@ module.exports = ({ env }) => {
       optimization: {
         minimizer: [
           new TerserPlugin({
-            parallel: true,
-            sourceMap: true,
-            cache: true
+            parallel: true
           })
         ]
       },

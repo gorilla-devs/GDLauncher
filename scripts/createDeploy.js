@@ -67,7 +67,9 @@ const createDeployFiles = async () => {
 
       const destinationPath = path.join(
         deployFolder,
-        `win_${path.relative(winReleaseFolder, v).replace(path.sep, '-')}.gz`
+        `win_${path
+          .relative(winReleaseFolder, v)
+          .replace(RegExp(`${path.sep}${path.sep}`, 'g'), '___')}.gz`
       );
       await makeDir(path.dirname(destinationPath));
       const destination = fs.createWriteStream(destinationPath);
@@ -112,15 +114,32 @@ const commonConfig = {
     appId: 'org.gorilladevs.GDLauncher',
     files: [
       '!node_modules/**/*',
-      'node_modules/7zip-bin/linux/x64/7za',
-      'node_modules/7zip-bin/mac/7za',
-      'node_modules/7zip-bin/win/x64/7za.exe',
+      'node_modules/murmur2-calculator/**/*',
+      '!node_modules/murmur2-calculator/native/target/**/*',
+      'node_modules/nsfw/**/*',
+      '!node_modules/nsfw/build/**/*',
+      'node_modules/nsfw/build/Release/nsfw.node',
+      'node_modules/leveldown/**/*',
+      '!node_modules/leveldown/build/**/*',
+      'node_modules/abstract-leveldown/**/*',
+      'node_modules/xtend/**/*',
+      'node_modules/level-supports/**/*',
+      'node_modules/node-addon-api/**/*',
+      'node_modules/level-concat-iterator/**/*',
+      'node_modules/immediate/**/*',
+      'node_modules/buffer/**/*',
+      'node_modules/node-gyp-build/**/*',
       'build/**/*',
       'package.json',
       'public/icon.png'
     ],
-    extraFiles:
-      process.platform === 'win32'
+    extraFiles: [
+      {
+        from: 'node_modules/7zip-bin',
+        to: './7z',
+        filter: '**/*'
+      },
+      ...(process.platform === 'win32'
         ? [
             {
               from: 'vcredist/',
@@ -128,7 +147,8 @@ const commonConfig = {
               filter: '**/*'
             }
           ]
-        : [],
+        : [])
+    ],
     asar: {
       smartUnpack: false
     },
