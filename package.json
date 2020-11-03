@@ -180,7 +180,7 @@
     "lodash": "^4.17.20",
     "make-dir": "^3.1.0",
     "memoize-one": "^5.1.1",
-    "murmur2-calculator": "git@github.com:gorilla-devs/murmur2-calculator.git#142a23ef6f5869e6f7e181c2f733f0a99b4dd017",
+    "murmur2-calculator": "https://github.com/gorilla-devs/murmur2-calculator.git#142a23ef6f5869e6f7e181c2f733f0a99b4dd017",
     "node-7z": "^2.1.2",
     "node-machine-id": "^1.1.12",
     "nsfw": "^2.1.0",
