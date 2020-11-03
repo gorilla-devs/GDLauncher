@@ -139,6 +139,11 @@ const commonConfig = {
         to: './7z',
         filter: '**/*'
       },
+      {
+        from: 'java',
+        to: './java',
+        filter: '**/*'
+      },
       ...(process.platform === 'win32'
         ? [
             {
