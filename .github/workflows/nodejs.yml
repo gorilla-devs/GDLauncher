@@ -40,6 +40,9 @@ jobs:
       - name: Set node config to set msvs_version to 2015
         if: matrix.os == 'windows-latest'
         run: npm config set msvs_version 2015
+      - name: Clear cache
+        if: matrix.os == 'ubuntu-latest'
+        run: npm cache clean --force && rm -rf ~/.npm
       - name: npm run install
         run: |
           npm i
