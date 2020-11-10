@@ -36,7 +36,6 @@ import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
 import { extractFace } from '../../../../app/desktop/utils';
-import i18n from '../../../config/i18next';
 
 const MyAccountPrf = styled.div`
   width: 100%;
@@ -323,7 +322,7 @@ const General = () => {
   return (
     <MyAccountPrf>
       <PersonalData>
-        <MainTitle>{i18n.t('settings:general')}</MainTitle>
+        <MainTitle>General</MainTitle>
         <PersonalDataContainer>
           {profileImage ? (
             <ProfileImage src={`data:image/jpeg;base64,${profileImage}`} />
@@ -337,7 +336,7 @@ const General = () => {
             `}
           >
             <UsernameContainer>
-              {i18n.t('settings:username')} <br />
+              Username <br />
               <Username>{currentAccount.selectedProfile.name}</Username>
             </UsernameContainer>
             <UuidContainer>
@@ -372,14 +371,15 @@ const General = () => {
       </PersonalData>
       <Hr />
       <ReleaseChannel>
-        <Title>{i18n.t('settings:release_channel.title')}</Title>
+        <Title>Release Channel</Title>
         <div>
           <div
             css={`
               width: 400px;
             `}
           >
-            {i18n.t('settings:release_channel.description')}
+            Stable updates once a month, beta does update more often but it may
+            have more bugs.
           </div>
           <Select
             css={`
@@ -395,19 +395,14 @@ const General = () => {
             }}
             value={releaseChannel}
           >
-            <Select.Option value={0}>
-              {i18n.t('settings:release_channel.select.stable')}
-            </Select.Option>
-            <Select.Option value={1}>
-              {i18n.t('settings:release_channel.select.beta')}
-            </Select.Option>
+            <Select.Option value={0}>Stable</Select.Option>
+            <Select.Option value={1}>Beta</Select.Option>
           </Select>
         </div>
       </ReleaseChannel>
       <Hr />
       <Title>
-        {i18n.t('settings:concurrent_downloads.title')}
-        &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
+        Concurrent Downloads &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
       </Title>
       <ParallelDownload>
         <p
@@ -416,7 +411,8 @@ const General = () => {
             width: 400px;
           `}
         >
-          {i18n.t('settings:concurrent_downloads.description')}
+          Select the number of concurrent downloads. If you have a slow
+          connection, select max 3
         </p>
 
         <Select
@@ -438,8 +434,7 @@ const General = () => {
       </ParallelDownload>
       <Hr />
       <Title>
-        {i18n.t('settings:preferred_curse_release_channel.title')}
-        &nbsp; <FontAwesomeIcon icon={faFire} />
+        Preferred Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
       </Title>
       <ParallelDownload>
         <p
@@ -448,7 +443,8 @@ const General = () => {
             width: 400px;
           `}
         >
-          {i18n.t('settings:preferred_curse_release_channel.description')}
+          Select the preferred release channel for downloading Curse projects.
+          This also applies for mods update.
         </p>
         <Select
           css={`
@@ -458,15 +454,9 @@ const General = () => {
           onChange={e => dispatch(updateCurseReleaseChannel(e))}
           value={curseReleaseChannel}
         >
-          <Select.Option value={1}>
-            {i18n.t('settings:preferred_curse_release_channel.select.stable')}
-          </Select.Option>
-          <Select.Option value={2}>
-            {i18n.t('settings:preferred_curse_release_channel.select.beta')}
-          </Select.Option>
-          <Select.Option value={3}>
-            {i18n.t('settings:preferred_curse_release_channel.select.alpha')}
-          </Select.Option>
+          <Select.Option value={1}>Stable</Select.Option>
+          <Select.Option value={2}>Beta</Select.Option>
+          <Select.Option value={3}>Alpha</Select.Option>
         </Select>
       </ParallelDownload>
       <Hr />
@@ -475,8 +465,7 @@ const General = () => {
           margin-top: 0px;
         `}
       >
-        {i18n.t('settings:discord_integration.title')}
-        &nbsp; <FontAwesomeIcon icon={faDiscord} />
+        Discord Integration &nbsp; <FontAwesomeIcon icon={faDiscord} />
       </Title>
       <DiscordRpc>
         <p
@@ -484,7 +473,8 @@ const General = () => {
             width: 350px;
           `}
         >
-          {i18n.t('settings:discord_integration.description')}
+          Enable / disable Discord Integration. This displays what you are
+          playing in Discord.
         </p>
         <Switch
           onChange={e => {
@@ -504,8 +494,7 @@ const General = () => {
           margin-top: 0px;
         `}
       >
-        {i18n.t('settings:minecraft_news.title')}
-        &nbsp; <FontAwesomeIcon icon={faNewspaper} />
+        Minecraft News &nbsp; <FontAwesomeIcon icon={faNewspaper} />
       </Title>
       <DiscordRpc>
         <p
@@ -513,7 +502,7 @@ const General = () => {
             width: 350px;
           `}
         >
-          {i18n.t('settings:minecraft_news.description')}
+          Enable / disable Minecraft news.
         </p>
         <Switch
           onChange={e => {
@@ -528,8 +517,7 @@ const General = () => {
           margin-top: 0px;
         `}
       >
-        {i18n.t('settings:hide_launcher_while_playing.title')}
-        &nbsp; <FontAwesomeIcon icon={faPlay} />
+        Hide Launcher While Playing &nbsp; <FontAwesomeIcon icon={faPlay} />
       </Title>
       <DiscordRpc
         css={`
@@ -541,7 +529,8 @@ const General = () => {
             width: 500px;
           `}
         >
-          {i18n.t('settings:hide_launcher_while_playing.description')}
+          Automatically hide the launcher when launching an instance. You will
+          still be able to open it from the icon tray
         </p>
         <Switch
           onChange={e => {
@@ -556,8 +545,7 @@ const General = () => {
           margin-top: 0px;
         `}
       >
-        {i18n.t('settings:potato_pc_mode.title')}
-        &nbsp; <FontAwesomeIcon icon={faToilet} />
+        Potato PC Mode &nbsp; <FontAwesomeIcon icon={faToilet} />
       </Title>
       <DiscordRpc
         css={`
@@ -569,7 +557,8 @@ const General = () => {
             width: 500px;
           `}
         >
-          {i18n.t('settings:potato_pc_mode.description')}
+          You got a potato PC? Don&apos;t worry! We got you covered. Enable this
+          and all animations and special effects will be disabled
         </p>
         <Switch
           onChange={e => {
@@ -585,8 +574,7 @@ const General = () => {
           float: left;
         `}
       >
-        {i18n.t('settings:clear_shared_data.title')}
-        &nbsp; <FontAwesomeIcon icon={faTrash} />
+        Clear Shared Data&nbsp; <FontAwesomeIcon icon={faTrash} />
       </Title>
       <div
         css={`
@@ -607,7 +595,8 @@ const General = () => {
             width: 500px;
           `}
         >
-          {i18n.t('settings:clear_shared_data.description')}
+          Deletes all the shared files between instances. Doing this will result
+          in the complete loss of the instances data
         </p>
         <Button
           onClick={() => {
@@ -634,8 +623,7 @@ const General = () => {
             float: left;
           `}
         >
-          {i18n.t('settings:user_data_path.title')}
-          &nbsp; <FontAwesomeIcon icon={faFolder} />
+          User Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
           <a
             css={`
               margin-left: 30px;
@@ -646,7 +634,7 @@ const General = () => {
               setDataPath(appDataPath);
             }}
           >
-            {i18n.t('settings:user_data_path.reset')}
+            Reset Path
           </a>
         </Title>
         <div
@@ -695,7 +683,7 @@ const General = () => {
             }
             loading={loadingMoveUserData}
           >
-            {i18n.t('settings:user_data_path.appry_and_restart')}
+            Apply & Restart
           </Button>
         </div>
         <div
@@ -710,7 +698,7 @@ const General = () => {
               setMoveUserData(e.target.checked);
             }}
           >
-            {i18n.t('settings:user_data_path.copy_current_data')}
+            Copy current data to the new directory
           </Checkbox>
         </div>
       </CustomDataPathContainer>
@@ -739,8 +727,8 @@ const General = () => {
         </div>
         <p>
           {updateAvailable
-            ? i18n.t('settings:update.update_avaliable_message')
-            : i18n.t('settings:update.up_to_date_message')}
+            ? 'There is an update available to be installed. Click on update to install it and restart the launcher'
+            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available'}
         </p>
         <div
           css={`
@@ -760,8 +748,7 @@ const General = () => {
               `}
               type="primary"
             >
-              {i18n.t('settings:update.update_button_label')}
-              &nbsp;
+              Update &nbsp;
               <FontAwesomeIcon icon={faDownload} />
             </Button>
           ) : (
@@ -772,7 +759,7 @@ const General = () => {
                 padding: 6px 8px;
               `}
             >
-              {i18n.t('settings:update.up_to_date_label')}
+              Up to date
             </div>
           )}
         </div>

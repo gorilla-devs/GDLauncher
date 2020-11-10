@@ -14,7 +14,6 @@ import { getAddon, getAddonFiles } from '../../api';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
 import { FABRIC, FORGE, VANILLA } from '../../utils/constants';
 import { transparentize } from 'polished';
-import i18n from '../../config/i18next';
 
 const Import = ({
   setModpack,
@@ -145,7 +144,7 @@ const Import = ({
   return (
     <Container>
       <div>
-        {i18n.t('add_instance:local_file_or_link_to_a_direct_download')}
+        Local file or link to a direct download
         <div
           css={`
             display: flex;
@@ -163,7 +162,7 @@ const Import = ({
             `}
           />
           <Button disabled={loading} type="primary" onClick={openFileDialog}>
-            {i18n.t('add_instance:browse')}
+            Browse
           </Button>
         </div>
         <div
@@ -182,7 +181,7 @@ const Import = ({
               transparentize(0.7, props.theme.palette.grey[700])};
           `}
         >
-          {error && i18n.t('add_instance:there_was_an_issue_while_importing')}
+          {error && 'There was an issue while importing.'}
         </div>
       </div>
     </Container>
