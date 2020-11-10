@@ -1,0 +1,23 @@
+{
+    "add_new_instance": "新しいインスタンスを追加",
+    "there_was_an_issue_while_importing": "インポート中にエラーが発生しました",
+    "select_a_version": "バージョンを選択",
+
+    "invalid_instance_name_error": "インスタンス名が不正または長すぎます。別の名前をお試しください。",
+    "already_exitst_instance_name_error": "この名前のインスタンスはすでに存在します。",
+
+    "twitch_mod_pack": {
+        "all_versions": "全てのバージョン",
+        "all_categories": "全てのカテゴリ",
+        "featured": "特集",
+        "popularity": "人気",
+        "last_updated": "最新",
+        "name": "Mod名",
+        "auther": "製作者名",
+        "total_downloads": "総ダウンロード数",
+        "search": "検索..."
+    },
+
+    "local_file_or_link_to_a_direct_download": "ローカルファイルまたはダウンロードリンク",
+    "browse": "ファイルを選択"
+}

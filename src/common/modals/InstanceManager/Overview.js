@@ -18,6 +18,7 @@ import {
 import { updateInstanceConfig } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 import { convertMinutesToHumanTime } from '../../utils';
+import i18n from '../../config/i18next';
 
 const Container = styled.div`
   padding: 0 50px;
@@ -266,7 +267,7 @@ const Overview = ({ instanceName, background, manifest }) => {
           `}
         >
           <Card
-            title="Minecraft Version"
+            title={i18n.t('instance_manager:overview.minecraft_version')}
             color={props => props.theme.palette.colors.jungleGreen}
             instanceName={instanceName}
             defaultValue={config?.modloader}
@@ -275,7 +276,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.modloader[1]}
           </Card>
           <Card
-            title="Modloader"
+            title={i18n.t('instance_manager:overview.modloader')}
             color={props => props.theme.palette.colors.darkYellow}
             instanceName={instanceName}
             defaultValue={config?.modloader}
@@ -284,7 +285,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.modloader[0]}
           </Card>
           <Card
-            title="Modloader Version"
+            title={i18n.t('instance_manager:overview.modloader_version')}
             color={props => props.theme.palette.colors.lightBlue}
             instanceName={instanceName}
             defaultValue={config?.modloader}
@@ -314,13 +315,13 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.mods?.length || '-'}
           </Card>
           <Card
-            title="Played Time"
+            title={i18n.t('instance_manager:overview.played_time')}
             color={props => props.theme.palette.colors.liberty}
           >
             {convertMinutesToHumanTime(config?.timePlayed)}
           </Card>
           <Card
-            title="Last Played"
+            title={i18n.t('instance_manager:overview.last_played')}
             color={props => props.theme.palette.colors.orange}
           >
             {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
@@ -341,13 +342,16 @@ const Overview = ({ instanceName, background, manifest }) => {
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
           <RenameButton onClick={() => renameInstance()} type="primary">
-            Rename&nbsp;
+            {i18n.t('instance_manager:overview.rename')}
+            &nbsp;
             <FontAwesomeIcon icon={faSave} />
           </RenameButton>
         </RenameRow>
         <OverviewCard>
           <JavaManagerRow>
-            <div>Override Game Resolution</div>
+            <div>
+              {i18n.t('instance_manager:overview.override_game_resolution')}
+            </div>
             <Switch
               checked={height && width}
               onChange={v => {
@@ -440,7 +444,9 @@ const Overview = ({ instanceName, background, manifest }) => {
             </ResolutionInputContainer>
           )}
           <JavaManagerRow>
-            <div>Override Java Memory</div>
+            <div>
+              {i18n.t('instance_manager:overview.override_java_memory')}
+            </div>
             <Switch
               checked={JavaMemorySwitch}
               onChange={v => {
@@ -474,7 +480,9 @@ const Overview = ({ instanceName, background, manifest }) => {
             </div>
           )}
           <JavaManagerRow>
-            <div>Override Java Arguments</div>
+            <div>
+              {i18n.t('instance_manager:overview.override_java_arguments')}
+            </div>
             <Switch
               checked={JavaArgumentsSwitch}
               onChange={v => {
