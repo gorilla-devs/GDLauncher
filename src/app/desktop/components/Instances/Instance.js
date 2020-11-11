@@ -29,6 +29,7 @@ import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
 import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
+import i18n from '../../../../common/config/i18next';
 
 const Container = styled.div`
   position: relative;
@@ -311,7 +312,7 @@ const Instance = ({ instanceName }) => {
                 margin-right: 10px;
               `}
             />
-            Manage
+            {i18n.t('instance:menu.manage')}
           </MenuItem>
           <MenuItem onClick={openFolder}>
             <FontAwesomeIcon
@@ -320,7 +321,7 @@ const Instance = ({ instanceName }) => {
                 margin-right: 10px;
               `}
             />
-            Open Folder
+            {i18n.t('instance:menu.open_folder')}
           </MenuItem>
 
           {/* // TODO - Support other export options besides curseforge forge. */}
@@ -342,7 +343,7 @@ const Instance = ({ instanceName }) => {
                 width: 16px !important;
               `}
             />
-            Export Pack
+            {i18n.t('instance:menu.export_pack')}
           </MenuItem>
           <MenuItem divider />
           <MenuItem
@@ -355,7 +356,7 @@ const Instance = ({ instanceName }) => {
                 margin-right: 10px;
               `}
             />
-            Delete
+            {i18n.t('instance:menu.delete')}
           </MenuItem>
         </ContextMenu>
       </Portal>
