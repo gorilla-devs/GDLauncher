@@ -14,13 +14,14 @@ import {
   faPlay,
   faToilet,
   faNewspaper,
-  faFolder
+  faFolder,
+  faFire
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import {
   _getCurrentAccount,
-  // _getDataStorePath,
+  _getDataStorePath,
   _getInstancesPath,
   _getTempPath
 } from '../../../utils/selectors';
@@ -28,12 +29,14 @@ import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
-  updateShowNews
+  updateShowNews,
+  updateCurseReleaseChannel
 } from '../../../reducers/settings/actions';
 import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
 import { extractFace } from '../../../../app/desktop/utils';
+import i18n from '../../../config/i18next';
 
 const MyAccountPrf = styled.div`
   width: 100%;
@@ -220,7 +223,7 @@ const General = () => {
     state => state.settings.concurrentDownloads
   );
   const updateAvailable = useSelector(state => state.updateAvailable);
-  // const dataStorePath = useSelector(_getDataStorePath);
+  const dataStorePath = useSelector(_getDataStorePath);
   const instancesPath = useSelector(_getInstancesPath);
   const isPlaying = useSelector(state => state.startedInstances);
   const queuedInstances = useSelector(state => state.downloadQueue);
@@ -233,6 +236,9 @@ const General = () => {
   const [moveUserData, setMoveUserData] = useState(false);
   const showNews = useSelector(state => state.settings.showNews);
   const [loadingMoveUserData, setLoadingMoveUserData] = useState(false);
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
 
   const dispatch = useDispatch();
 
@@ -257,7 +263,7 @@ const General = () => {
   const clearSharedData = async () => {
     setDeletingInstances(true);
     try {
-      // await fsa.emptyDir(dataStorePath);
+      await fsa.emptyDir(dataStorePath);
       await fsa.emptyDir(instancesPath);
       await fsa.emptyDir(tempPath);
     } catch (e) {
@@ -317,7 +323,7 @@ const General = () => {
   return (
     <MyAccountPrf>
       <PersonalData>
-        <MainTitle>General</MainTitle>
+        <MainTitle>{i18n.t('settings:general')}</MainTitle>
         <PersonalDataContainer>
           {profileImage ? (
             <ProfileImage src={`data:image/jpeg;base64,${profileImage}`} />
@@ -331,7 +337,7 @@ const General = () => {
             `}
           >
             <UsernameContainer>
-              Username <br />
+              {i18n.t('settings:username')} <br />
               <Username>{currentAccount.selectedProfile.name}</Username>
             </UsernameContainer>
             <UuidContainer>
@@ -366,15 +372,14 @@ const General = () => {
       </PersonalData>
       <Hr />
       <ReleaseChannel>
-        <Title>Release Channel</Title>
+        <Title>{i18n.t('settings:release_channel.title')}</Title>
         <div>
           <div
             css={`
               width: 400px;
             `}
           >
-            Stable updates once a month, beta does update more often but it may
-            have more bugs.
+            {i18n.t('settings:release_channel.description')}
           </div>
           <Select
             css={`
@@ -390,14 +395,19 @@ const General = () => {
             }}
             value={releaseChannel}
           >
-            <Select.Option value={0}>Stable</Select.Option>
-            <Select.Option value={1}>Beta</Select.Option>
+            <Select.Option value={0}>
+              {i18n.t('settings:release_channel.select.stable')}
+            </Select.Option>
+            <Select.Option value={1}>
+              {i18n.t('settings:release_channel.select.beta')}
+            </Select.Option>
           </Select>
         </div>
       </ReleaseChannel>
       <Hr />
       <Title>
-        Concurrent Downloads &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
+        {i18n.t('settings:concurrent_downloads.title')}
+        &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
       </Title>
       <ParallelDownload>
         <p
@@ -406,8 +416,7 @@ const General = () => {
             width: 400px;
           `}
         >
-          Select the number of concurrent downloads. If you have a slow
-          connection, select max 3
+          {i18n.t('settings:concurrent_downloads.description')}
         </p>
 
         <Select
@@ -428,12 +437,46 @@ const General = () => {
         </Select>
       </ParallelDownload>
       <Hr />
+      <Title>
+        {i18n.t('settings:preferred_curse_release_channel.title')}
+        &nbsp; <FontAwesomeIcon icon={faFire} />
+      </Title>
+      <ParallelDownload>
+        <p
+          css={`
+            margin: 0;
+            width: 400px;
+          `}
+        >
+          {i18n.t('settings:preferred_curse_release_channel.description')}
+        </p>
+        <Select
+          css={`
+            width: 100px;
+            text-align: start;
+          `}
+          onChange={e => dispatch(updateCurseReleaseChannel(e))}
+          value={curseReleaseChannel}
+        >
+          <Select.Option value={1}>
+            {i18n.t('settings:preferred_curse_release_channel.select.stable')}
+          </Select.Option>
+          <Select.Option value={2}>
+            {i18n.t('settings:preferred_curse_release_channel.select.beta')}
+          </Select.Option>
+          <Select.Option value={3}>
+            {i18n.t('settings:preferred_curse_release_channel.select.alpha')}
+          </Select.Option>
+        </Select>
+      </ParallelDownload>
+      <Hr />
       <Title
         css={`
           margin-top: 0px;
         `}
       >
-        Discord Integration &nbsp; <FontAwesomeIcon icon={faDiscord} />
+        {i18n.t('settings:discord_integration.title')}
+        &nbsp; <FontAwesomeIcon icon={faDiscord} />
       </Title>
       <DiscordRpc>
         <p
@@ -441,8 +484,7 @@ const General = () => {
             width: 350px;
           `}
         >
-          Enable / disable Discord Integration. This displays what you are
-          playing in Discord.
+          {i18n.t('settings:discord_integration.description')}
         </p>
         <Switch
           onChange={e => {
@@ -462,7 +504,8 @@ const General = () => {
           margin-top: 0px;
         `}
       >
-        Minecraft News &nbsp; <FontAwesomeIcon icon={faNewspaper} />
+        {i18n.t('settings:minecraft_news.title')}
+        &nbsp; <FontAwesomeIcon icon={faNewspaper} />
       </Title>
       <DiscordRpc>
         <p
@@ -470,7 +513,7 @@ const General = () => {
             width: 350px;
           `}
         >
-          Enable / disable Minecraft news.
+          {i18n.t('settings:minecraft_news.description')}
         </p>
         <Switch
           onChange={e => {
@@ -485,7 +528,8 @@ const General = () => {
           margin-top: 0px;
         `}
       >
-        Hide Launcher While Playing &nbsp; <FontAwesomeIcon icon={faPlay} />
+        {i18n.t('settings:hide_launcher_while_playing.title')}
+        &nbsp; <FontAwesomeIcon icon={faPlay} />
       </Title>
       <DiscordRpc
         css={`
@@ -497,8 +541,7 @@ const General = () => {
             width: 500px;
           `}
         >
-          Automatically hide the launcher when launching an instance. You will
-          still be able to open it from the icon tray
+          {i18n.t('settings:hide_launcher_while_playing.description')}
         </p>
         <Switch
           onChange={e => {
@@ -513,7 +556,8 @@ const General = () => {
           margin-top: 0px;
         `}
       >
-        Potato PC Mode &nbsp; <FontAwesomeIcon icon={faToilet} />
+        {i18n.t('settings:potato_pc_mode.title')}
+        &nbsp; <FontAwesomeIcon icon={faToilet} />
       </Title>
       <DiscordRpc
         css={`
@@ -525,8 +569,7 @@ const General = () => {
             width: 500px;
           `}
         >
-          You got a potato PC? Don&apos;t worry! We got you covered. Enable this
-          and all animations and special effects will be disabled
+          {i18n.t('settings:potato_pc_mode.description')}
         </p>
         <Switch
           onChange={e => {
@@ -542,7 +585,8 @@ const General = () => {
           float: left;
         `}
       >
-        Clear Shared Data&nbsp; <FontAwesomeIcon icon={faTrash} />
+        {i18n.t('settings:clear_shared_data.title')}
+        &nbsp; <FontAwesomeIcon icon={faTrash} />
       </Title>
       <div
         css={`
@@ -563,11 +607,18 @@ const General = () => {
             width: 500px;
           `}
         >
-          Deletes all the shared files between instances. Doing this will result
-          in the complete loss of the instances data
+          {i18n.t('settings:clear_shared_data.description')}
         </p>
         <Button
-          onClick={clearSharedData}
+          onClick={() => {
+            dispatch(
+              openModal('ActionConfirmation', {
+                message: 'Are you sure you want to delete shared data?',
+                confirmCallback: clearSharedData,
+                title: 'Confirm'
+              })
+            );
+          }}
           disabled={disableInstancesActions}
           loading={deletingInstances}
         >
@@ -583,7 +634,8 @@ const General = () => {
             float: left;
           `}
         >
-          User Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+          {i18n.t('settings:user_data_path.title')}
+          &nbsp; <FontAwesomeIcon icon={faFolder} />
           <a
             css={`
               margin-left: 30px;
@@ -594,7 +646,7 @@ const General = () => {
               setDataPath(appDataPath);
             }}
           >
-            Reset Path
+            {i18n.t('settings:user_data_path.reset')}
           </a>
         </Title>
         <div
@@ -643,7 +695,7 @@ const General = () => {
             }
             loading={loadingMoveUserData}
           >
-            Apply & Restart
+            {i18n.t('settings:user_data_path.appry_and_restart')}
           </Button>
         </div>
         <div
@@ -658,7 +710,7 @@ const General = () => {
               setMoveUserData(e.target.checked);
             }}
           >
-            Copy current data to the new directory
+            {i18n.t('settings:user_data_path.copy_current_data')}
           </Checkbox>
         </div>
       </CustomDataPathContainer>
@@ -687,8 +739,8 @@ const General = () => {
         </div>
         <p>
           {updateAvailable
-            ? 'There is an update available to be installed. Click on update to install it and restart the launcher'
-            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available'}
+            ? i18n.t('settings:update.update_avaliable_message')
+            : i18n.t('settings:update.up_to_date_message')}
         </p>
         <div
           css={`
@@ -708,7 +760,8 @@ const General = () => {
               `}
               type="primary"
             >
-              Update &nbsp;
+              {i18n.t('settings:update.update_button_label')}
+              &nbsp;
               <FontAwesomeIcon icon={faDownload} />
             </Button>
           ) : (
@@ -719,7 +772,7 @@ const General = () => {
                 padding: 6px 8px;
               `}
             >
-              Up to date
+              {i18n.t('settings:update.up_to_date_label')}
             </div>
           )}
         </div>

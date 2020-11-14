@@ -2,17 +2,17 @@ import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { Button, Dropdown, Menu } from 'antd';
+import { Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
-import { promises as fs } from 'fs';
-import path from 'path';
+// import { promises as fs } from 'fs';
+// import path from 'path';
 import Instances from '../components/Instances';
 import News from '../components/News';
 import { openModal } from '../../../common/reducers/modals/actions';
 import {
-  _getCurrentAccount,
-  _getInstances
+  _getCurrentAccount
+  // _getInstances
 } from '../../../common/utils/selectors';
 import { extractFace } from '../utils';
 import { updateLastUpdateVersion } from '../../../common/reducers/actions';
@@ -36,7 +36,7 @@ const Home = () => {
   const account = useSelector(_getCurrentAccount);
   const news = useSelector(state => state.news);
   const lastUpdateVersion = useSelector(state => state.app.lastUpdateVersion);
-  const instances = useSelector(_getInstances);
+  // const instances = useSelector(_getInstances);
 
   const openAddInstanceModal = defaultPage => {
     dispatch(openModal('AddInstance', { defaultPage }));
@@ -46,27 +46,27 @@ const Home = () => {
     dispatch(openModal('AccountsManager'));
   };
 
-  const getOldInstances = async () => {
-    const oldLauncherUserData = await ipcRenderer.invoke(
-      'getOldLauncherUserData'
-    );
-    let files = [];
-    try {
-      files = await fs.readdir(path.join(oldLauncherUserData, 'packs'));
-    } catch {
-      // Swallow error
-    }
-    return (
-      await Promise.all(
-        files.map(async f => {
-          const stat = await fs.stat(
-            path.join(oldLauncherUserData, 'packs', f)
-          );
-          return stat.isDirectory() ? f : null;
-        })
-      )
-    ).filter(v => v);
-  };
+  // const getOldInstances = async () => {
+  //   const oldLauncherUserData = await ipcRenderer.invoke(
+  //     'getOldLauncherUserData'
+  //   );
+  //   let files = [];
+  //   try {
+  //     files = await fs.readdir(path.join(oldLauncherUserData, 'packs'));
+  //   } catch {
+  //     // Swallow error
+  //   }
+  //   return (
+  //     await Promise.all(
+  //       files.map(async f => {
+  //         const stat = await fs.stat(
+  //           path.join(oldLauncherUserData, 'packs', f)
+  //         );
+  //         return stat.isDirectory() ? f : null;
+  //       })
+  //     )
+  //   ).filter(v => v);
+  // };
 
   const [profileImage, setProfileImage] = useState(null);
 
@@ -78,14 +78,14 @@ const Home = () => {
         dispatch(openModal('ChangeLogs'));
       }
 
-      const oldInstances = await getOldInstances();
-      if (
-        oldInstances.length > 0 &&
-        instances.length === 0 &&
-        process.env.NODE_ENV !== 'development'
-      ) {
-        dispatch(openModal('InstancesMigration', { preventClose: true }));
-      }
+      // const oldInstances = await getOldInstances();
+      // if (
+      //   oldInstances.length > 0 &&
+      //   instances.length === 0 &&
+      //   process.env.NODE_ENV !== 'development'
+      // ) {
+      //   dispatch(openModal('InstancesMigration', { preventClose: true }));
+      // }
     };
 
     init();
@@ -95,29 +95,13 @@ const Home = () => {
     extractFace(account.skin).then(setProfileImage).catch(console.error);
   }, [account]);
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="0" onClick={() => openAddInstanceModal(0)}>
-        Create Instance
-      </Menu.Item>
-      <Menu.Item key="1" onClick={() => openAddInstanceModal(1)}>
-        Browse Modpacks
-      </Menu.Item>
-      <Menu.Item key="2" onClick={() => openAddInstanceModal(2)}>
-        Import Instance
-      </Menu.Item>
-    </Menu>
-  );
-
   return (
     <div>
       <News news={news} />
       <Instances />
-      <Dropdown overlay={menu} trigger={['click']}>
-        <AddInstanceIcon type="primary">
-          <FontAwesomeIcon icon={faPlus} />
-        </AddInstanceIcon>
-      </Dropdown>
+      <AddInstanceIcon type="primary" onClick={() => openAddInstanceModal(0)}>
+        <FontAwesomeIcon icon={faPlus} />
+      </AddInstanceIcon>
       <AccountContainer type="primary" onClick={openAccountModal}>
         {profileImage ? (
           <img

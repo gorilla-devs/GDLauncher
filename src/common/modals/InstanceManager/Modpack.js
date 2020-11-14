@@ -7,10 +7,11 @@ import { getAddonFiles, getAddonFileChangelog } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
 
-const Modpack = ({ modpackId, instanceName }) => {
+const Modpack = ({ modpackId, instanceName, manifest }) => {
   const [files, setFiles] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [installing, setInstalling] = useState(false);
   const dispatch = useDispatch();
 
   const initData = async () => {
@@ -76,6 +77,7 @@ const Modpack = ({ modpackId, instanceName }) => {
 
   return (
     <Container>
+      Installed version: {manifest?.name} - {manifest?.version}
       <div
         css={`
           display: flex;
@@ -144,11 +146,16 @@ const Modpack = ({ modpackId, instanceName }) => {
           ReactHtmlParser(files[selectedIndex]?.changelog)}
       </Changelog>
       <Button
+        loading={installing}
         type="primary"
         disabled={selectedIndex === null}
-        onClick={() => {
+        onClick={async () => {
+          setInstalling(true);
+          await dispatch(
+            changeModpackVersion(instanceName, files[selectedIndex])
+          );
+          setInstalling(false);
           dispatch(closeModal());
-          dispatch(changeModpackVersion(instanceName, files[selectedIndex]));
         }}
       >
         Switch Version
@@ -204,6 +211,9 @@ const Changelog = styled.div`
   margin: 20px 40px;
   padding: 20px;
   font-size: 20px;
+  * {
+    color: ${props => props.theme.palette.text.primary} !important;
+  }
   & > div:first-child {
     font-size: 24px;
     width: 100%;

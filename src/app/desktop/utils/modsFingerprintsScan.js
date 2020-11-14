@@ -78,17 +78,24 @@ const modsFingerprintsScan = async instancesPath => {
               v => v === hash
             );
             if (exactMatch) {
-              const { data: addonData } = await getAddon(
-                exactMatch.file.projectId
-              );
-              return {
-                ...normalizeModData(
-                  exactMatch.file,
-                  exactMatch.file.projectId,
-                  addonData.name
-                ),
-                fileName
-              };
+              let addonData = null;
+              try {
+                addonData = (await getAddon(exactMatch.file.projectId)).data;
+                return {
+                  ...normalizeModData(
+                    exactMatch.file,
+                    exactMatch.file.projectId,
+                    addonData.name
+                  ),
+                  fileName
+                };
+              } catch {
+                return {
+                  fileName,
+                  displayName: fileName,
+                  packageFingerprint: hash
+                };
+              }
             }
             if (unmatched) {
               return {

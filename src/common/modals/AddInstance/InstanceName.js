@@ -10,19 +10,20 @@ import {
   faLongArrowAltLeft,
   faLongArrowAltRight
 } from '@fortawesome/free-solid-svg-icons';
+import { Input } from 'antd';
+import { transparentize } from 'polished';
 import { addToQueue } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
-import { Input } from 'antd';
 import {
   downloadAddonZip,
   importAddonZip,
   convertcurseForgeToCanonical
 } from '../../../app/desktop/utils';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
-import { transparentize } from 'polished';
-import bgImage from '../../../common/assets/mcCube.jpg';
+import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
 import { FABRIC, VANILLA, FORGE } from '../../utils/constants';
+import i18n from '../../config/i18next';
 
 const InstanceName = ({
   in: inProp,
@@ -57,7 +58,7 @@ const InstanceName = ({
       if (
         !regex.test(instanceName || mcName) ||
         !finalWhiteSpace.test(instanceName || mcName) ||
-        (instanceName || mcName).length >= 35
+        (instanceName || mcName).length >= 45
       ) {
         setInvalidName(true);
         setAlreadyExists(false);
@@ -113,25 +114,59 @@ const InstanceName = ({
         ),
         imageURL
       );
-      const modloader = [
-        version[0],
-        manifest.minecraft.version,
-        convertcurseForgeToCanonical(
-          manifest.minecraft.modLoaders.find(v => v.primary).id,
+      if (version[0] === FORGE) {
+        const modloader = [
+          version[0],
           manifest.minecraft.version,
-          forgeManifest
-        ),
-        version[1],
-        version[2]
-      ];
-      dispatch(
-        addToQueue(
-          localInstanceName,
-          modloader,
-          manifest,
-          `background${path.extname(imageURL)}`
-        )
-      );
+          convertcurseForgeToCanonical(
+            manifest.minecraft.modLoaders.find(v => v.primary).id,
+            manifest.minecraft.version,
+            forgeManifest
+          ),
+          version[1],
+          version[2]
+        ];
+        dispatch(
+          addToQueue(
+            localInstanceName,
+            modloader,
+            manifest,
+            `background${path.extname(imageURL)}`
+          )
+        );
+      } else if (version[0] === FABRIC) {
+        const modloader = [
+          version[0],
+          manifest.minecraft.version,
+          manifest.minecraft.modLoaders[0].yarn,
+          manifest.minecraft.modLoaders[0].loader,
+          version[1],
+          version[2]
+        ];
+        dispatch(
+          addToQueue(
+            localInstanceName,
+            modloader,
+            manifest,
+            `background${path.extname(imageURL)}`
+          )
+        );
+      } else if (version[0] === VANILLA) {
+        const modloader = [
+          version[0],
+          manifest.minecraft.version,
+          version[1],
+          version[2]
+        ];
+        dispatch(
+          addToQueue(
+            localInstanceName,
+            modloader,
+            manifest,
+            `background${path.extname(imageURL)}`
+          )
+        );
+      }
     } else if (importZipPath) {
       manifest = await importAddonZip(
         importZipPath,
@@ -139,27 +174,35 @@ const InstanceName = ({
         path.join(tempPath, localInstanceName),
         tempPath
       );
-      const modloader = [
-        version[0],
-        manifest.minecraft.version,
-        convertcurseForgeToCanonical(
-          manifest.minecraft.modLoaders.find(v => v.primary).id,
+
+      if (version[0] === FORGE) {
+        const modloader = [
+          version[0],
           manifest.minecraft.version,
-          forgeManifest
-        )
-      ];
-      dispatch(addToQueue(localInstanceName, modloader, manifest));
+          convertcurseForgeToCanonical(
+            manifest.minecraft.modLoaders.find(v => v.primary).id,
+            manifest.minecraft.version,
+            forgeManifest
+          )
+        ];
+        dispatch(addToQueue(localInstanceName, modloader, manifest));
+      } else if (version[0] === FABRIC) {
+        const modloader = [
+          version[0],
+          manifest.minecraft.version,
+          manifest.minecraft.modLoaders[0].yarn,
+          manifest.minecraft.modLoaders[0].loader
+        ];
+        dispatch(addToQueue(localInstanceName, modloader, manifest));
+      } else if (version[0] === VANILLA) {
+        const modloader = [version[0], manifest.minecraft.version];
+        dispatch(addToQueue(localInstanceName, modloader, manifest));
+      }
     } else if (isVanilla) {
       dispatch(addToQueue(localInstanceName, [version[0], version[2]]));
       await wait(2);
     } else if (isFabric) {
-      dispatch(
-        addToQueue(localInstanceName, [
-          FABRIC,
-          version[2],
-          version[3]
-        ])
-      );
+      dispatch(addToQueue(localInstanceName, [FABRIC, version[2], version[3]]));
       await wait(2);
     } else if (isForge) {
       dispatch(addToQueue(localInstanceName, version));
@@ -254,9 +297,9 @@ const InstanceName = ({
                       `}
                     >
                       {invalidName &&
-                        'Instance name is not valid or too long. Please try another one'}
+                        i18n.t('add_instance:invalid_instance_name_error')}
                       {alreadyExists &&
-                        'An instance with this name already exists!'}
+                        i18n.t('add_instance:already_exitst_instance_name_error')}
                     </div>
                   </div>
                 </div>

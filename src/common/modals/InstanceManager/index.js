@@ -9,6 +9,7 @@ import Modal from '../../components/Modal';
 import Overview from './Overview';
 import { ipcRenderer } from 'electron';
 import Screenshots from './Screenshots';
+import ResourcePacks from './ResourcePacks';
 import Notes from './Notes';
 import Mods from './Mods';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -24,6 +25,7 @@ import {
 } from '../../reducers/actions';
 import instanceDefaultBackground from '../../../common/assets/instance_default.png';
 import omit from 'lodash/omit';
+import i18n from '../../config/i18next';
 
 const SideMenu = styled.div`
   display: flex;
@@ -53,7 +55,9 @@ const SettingsButton = styled(({ active, ...props }) => <Button {...props} />)`
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
   background: ${props =>
-    props.active ? props.theme.palette.grey[600] : props.theme.palette.grey[800]};
+    props.active
+      ? props.theme.palette.grey[600]
+      : props.theme.palette.grey[800]};
   border: 0px;
   text-align: left;
   color: ${props => props.theme.palette.text.primary};
@@ -138,13 +142,14 @@ const InstanceBackground = styled.div`
 `;
 
 const menuEntries = {
-  overview: { name: 'Overview', component: Overview },
-  mods: { name: 'Mods', component: Mods },
-  modpack: { name: 'Modpack', component: Modpack },
-  notes: { name: 'Notes', component: Notes },
+  overview: { name: i18n.t('instance_manager:index.menu.overview'), component: Overview },
+  mods: { name: i18n.t('instance_manager:index.menu.mods'), component: Mods },
+  modpack: { name: i18n.t('instance_manager:index.menu.modpack'), component: Modpack },
+  notes: { name: i18n.t('instance_manager:index.menu.notes'), component: Notes },
+  resourcePacks: { name: i18n.t('instance_manager:index.menu.resource_packs'), component: ResourcePacks },
   // resourcePacks: { name: "Resource Packs", component: Overview },
   // worlds: { name: "Worlds", component: Overview },
-  screenshots: { name: 'Screenshots', component: Screenshots }
+  screenshots: { name: i18n.t('instance_manager:index.menu.screenshots'), component: Screenshots }
   // settings: { name: "Settings", component: Overview },
   // servers: { name: "Servers", component: Overview }
 };
@@ -155,6 +160,7 @@ const InstanceManager = ({ instanceName }) => {
   const [page, setPage] = useState(Object.keys(menuEntries)[0]);
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const [background, setBackground] = useState(instance?.background);
+  const [manifest, setManifest] = useState(null);
   const ContentComponent = menuEntries[page].component;
 
   const updateBackground = v => {
@@ -203,6 +209,15 @@ const InstanceManager = ({ instanceName }) => {
   }, []);
 
   useEffect(() => {
+    if ((instance?.modloader || []).slice(3, 5).length === 2) {
+      fse
+        .readJson(path.join(instancesPath, instanceName, 'manifest.json'))
+        .then(setManifest)
+        .catch(console.error);
+    }
+  }, []);
+
+  useEffect(() => {
     if (instance?.name) {
       dispatch(initLatestMods(instance.name));
     }
@@ -215,7 +230,7 @@ const InstanceManager = ({ instanceName }) => {
         width: 85%;
         max-width: 1500px;
       `}
-      title={`Instance Manager - ${instanceName}`}
+      title={`${i18n.t('instance_manager:index.instance_manager')} - ${instanceName}`}
       removePadding
     >
       <Container>
@@ -223,7 +238,7 @@ const InstanceManager = ({ instanceName }) => {
           <SideMenu>
             <InstanceBackground onClick={openFileDialog} imagePath={background}>
               <Overlay />
-              <p>Change Icon</p>
+              <p>{i18n.t('instance_manager:index.change_icon')}</p>
               {background && (
                 <FontAwesomeIcon
                   icon={faTimesCircle}
@@ -265,6 +280,8 @@ const InstanceManager = ({ instanceName }) => {
           <ContentComponent
             instanceName={instanceName}
             modpackId={instance?.modloader[3]}
+            background={background}
+            manifest={manifest}
           />
         </Content>
       </Container>

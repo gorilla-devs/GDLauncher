@@ -1,6 +1,9 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
+import { clipboard, ipcRenderer } from 'electron';
 import styled, { keyframes } from 'styled-components';
 import memoize from 'memoize-one';
+import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
+import { Portal } from 'react-portal';
 import path from 'path';
 import pMap from 'p-map';
 import { FixedSizeList as List, areEqual } from 'react-window';
@@ -11,13 +14,16 @@ import {
   faTrash,
   faArrowDown,
   faDownload,
-  faEllipsisV
+  faEllipsisV,
+  faCopy,
+  faFolder
 } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
+import makeDir from 'make-dir';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import {
   updateInstanceConfig,
@@ -25,6 +31,7 @@ import {
   updateMod
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
+import i18n from '../../config/i18next';
 
 const Header = styled.div`
   height: 40px;
@@ -40,12 +47,31 @@ const RowContainer = styled.div.attrs(props => ({
   style: props.override
 }))`
   width: 100%;
-  background: ${props => props.theme.palette.grey[props.index % 2 ? 700 : 800]};
+  height: 100%;
+  background: ${props =>
+    props.disabled || props.selected
+      ? 'transparent'
+      : props.theme.palette.grey[800]};
+  ${props =>
+    props.disabled &&
+    !props.selected &&
+    `box-shadow: inset 0 0 0 3px ${props.theme.palette.colors.red};`}
+  ${props =>
+    props.selected &&
+    `box-shadow: inset 0 0 0 3px ${props.theme.palette.primary.main};`}
+  transition: border 0.1s ease-in-out;
+  border-radius: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 16px;
+  box-sizing: content-box;
   padding: 0 10px;
+  &:hover {
+    .rowCenterContent {
+      color: ${props => props.theme.palette.text.primary};
+    }
+  }
   .leftPartContent {
     display: flex;
     justify-content: center;
@@ -56,17 +82,16 @@ const RowContainer = styled.div.attrs(props => ({
   }
   .rowCenterContent {
     flex: 1;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: color 0.1s ease-in-out;
+    height: 100%;
+    ${props =>
+      props.isHovered ? `color: ${props.theme.palette.text.primary};` : ''}
     cursor: pointer;
     svg {
       margin-right: 10px;
-    }
-    &:hover {
-      color: ${props => props.theme.palette.primary.main};
     }
   }
   .rightPartContent {
@@ -77,6 +102,38 @@ const RowContainer = styled.div.attrs(props => ({
       margin-left: 10px;
     }
   }
+`;
+
+const RowContainerBackground = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  z-index: -1;
+
+  ${props =>
+    props.selected &&
+    ` background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.primary.main},
+  ${props.theme.palette.primary.main} 10px,
+  ${props.theme.palette.primary.dark} 10px,
+  ${props.theme.palette.primary.dark} 20px
+  );`};
+
+  ${props =>
+    props.disabled &&
+    !props.selected &&
+    `background: repeating-linear-gradient(
+  45deg,
+  ${props.theme.palette.colors.red},
+  ${props.theme.palette.colors.red} 10px,
+  ${props.theme.palette.colors.maximumRed} 10px,
+  ${props.theme.palette.colors.maximumRed} 20px
+  );`};
+  filter: brightness(60%);
+  transition: opacity 0.1s ease-in-out;
+  opacity: ${props => (props.disabled || props.selected ? 1 : 0)};
 `;
 
 const DragEnterEffect = styled.div`
@@ -130,6 +187,20 @@ export const keyFrameMoveUpDown = keyframes`
 
 `;
 
+const OpenFolderButton = styled(FontAwesomeIcon)`
+  transition: color 0.1s ease-in-out;
+  cursor: pointer;
+  margin: 0 10px;
+  &:hover {
+    cursor: pointer;
+    path {
+      cursor: pointer;
+      transition: color 0.1s ease-in-out;
+      color: ${props => props.theme.palette.primary.main};
+    }
+  }
+`;
+
 const DragArrow = styled(FontAwesomeIcon)`
   ${props =>
     props.fileDrag ? props.theme.palette.primary.main : 'transparent'};
@@ -159,7 +230,7 @@ const DeleteSelectedMods = styled(({ selectedMods, ...props }) => (
   cursor: pointer;
   path {
     cursor: pointer;
-    transition: all 0.1s ease-in-out;
+    transition: color 0.1s ease-in-out;
     color: ${props.theme.palette.error.main};
   }
 }`}
@@ -217,6 +288,10 @@ const toggleModDisabled = async (
 const Row = memo(({ index, style, data }) => {
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const {
     items,
     instanceName,
@@ -228,46 +303,133 @@ const Row = memo(({ index, style, data }) => {
   } = data;
   const item = items[index];
   const isUpdateAvailable =
-    latestMods[item.projectID] && latestMods[item.projectID].id !== item.fileID;
+    latestMods[item.projectID] &&
+    latestMods[item.projectID].id !== item.fileID &&
+    latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
 
+  const name = item.fileName
+    .replace('.jar', '')
+    .replace('.zip', '')
+    .replace('.disabled', '');
+
   return (
-    <RowContainer index={index} override={style}>
-      <div className="leftPartContent">
-        <Checkbox
-          checked={selectedMods.includes(item.fileName)}
-          onChange={e => {
-            if (e.target.checked) {
-              setSelectedMods([...selectedMods, item.fileName]);
-            } else {
-              setSelectedMods(selectedMods.filter(v => v !== item.fileName));
-            }
+    <>
+      <ContextMenuTrigger id={item.displayName}>
+        <RowContainer
+          index={index}
+          name={item.fileName}
+          isHovered={isHovered}
+          selected={selectedMods.includes(item.fileName)}
+          disabled={path.extname(item.fileName) === '.disabled'}
+          override={{
+            ...style,
+            top: style.top + 15,
+            height: style.height - 15,
+            position: 'absolute',
+            width: '97%',
+            margin: '15px 0',
+            transition: 'height 0.2s ease-in-out'
           }}
-        />
-        {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
-      </div>
-      <div
-        onClick={() => {
-          if (!item.fileID) return;
-          dispatch(
-            openModal('ModOverview', {
-              projectID: item.projectID,
-              fileID: item.fileID,
-              fileName: item.fileName,
-              gameVersion,
-              instanceName
-            })
-          );
-        }}
-        className="rowCenterContent"
-      >
-        {item.fileName}
-      </div>
-      <div className="rightPartContent">
-        {isUpdateAvailable &&
-          (updateLoading ? (
-            <LoadingOutlined />
-          ) : (
+        >
+          <div className="leftPartContent">
+            <Checkbox
+              checked={selectedMods.includes(item.fileName)}
+              onChange={e => {
+                if (e.target.checked) {
+                  setSelectedMods([...selectedMods, item.fileName]);
+                } else {
+                  setSelectedMods(
+                    selectedMods.filter(v => v !== item.fileName)
+                  );
+                }
+              }}
+            />
+            {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
+          </div>
+          <div
+            onClick={() => {
+              if (!item.fileID) return;
+              dispatch(
+                openModal('ModOverview', {
+                  projectID: item.projectID,
+                  fileID: item.fileID,
+                  fileName: item.fileName,
+                  gameVersion,
+                  instanceName
+                })
+              );
+            }}
+            className="rowCenterContent"
+          >
+            {name}
+          </div>
+          <div className="rightPartContent">
+            {isUpdateAvailable &&
+              (updateLoading ? (
+                <LoadingOutlined />
+              ) : (
+                <FontAwesomeIcon
+                  css={`
+                    &:hover {
+                      cursor: pointer;
+                      path {
+                        cursor: pointer;
+                        transition: all 0.1s ease-in-out;
+                        color: ${props => props.theme.palette.colors.green};
+                      }
+                    }
+                  `}
+                  icon={faDownload}
+                  onClick={async () => {
+                    setUpdateLoading(true);
+                    await dispatch(
+                      updateMod(
+                        instanceName,
+                        item,
+                        latestMods[item.projectID].id,
+                        gameVersion
+                      )
+                    );
+                    setUpdateLoading(false);
+                  }}
+                />
+              ))}
+            <Switch
+              size="small"
+              checked={path.extname(item.fileName) !== '.disabled'}
+              disabled={loading || updateLoading}
+              onChange={async c => {
+                setLoading(true);
+                const destFileName = c
+                  ? item.fileName.replace('.disabled', '')
+                  : `${item.fileName}.disabled`;
+                const isCurrentlySelected = selectedMods.find(
+                  v => v === item.fileName
+                );
+
+                if (isCurrentlySelected) {
+                  setSelectedMods(prev => [...prev, destFileName]);
+                }
+
+                await toggleModDisabled(
+                  c,
+                  instanceName,
+                  instancePath,
+                  item,
+                  dispatch
+                );
+                if (isCurrentlySelected) {
+                  setSelectedMods(prev =>
+                    prev.filter(v => v !== item.fileName)
+                  );
+                }
+
+                setTimeout(() => {
+                  setLoading(false);
+                }, 500);
+              }}
+            />
             <FontAwesomeIcon
               css={`
                 &:hover {
@@ -275,61 +437,49 @@ const Row = memo(({ index, style, data }) => {
                   path {
                     cursor: pointer;
                     transition: all 0.1s ease-in-out;
-                    color: ${props => props.theme.palette.colors.green};
+                    color: ${props => props.theme.palette.error.main};
                   }
                 }
               `}
-              icon={faDownload}
-              onClick={async () => {
-                setUpdateLoading(true);
-                await dispatch(
-                  updateMod(
-                    instanceName,
-                    item,
-                    latestMods[item.projectID].id,
-                    gameVersion
-                  )
-                );
-                setUpdateLoading(false);
+              onClick={() => {
+                if (!loading && !updateLoading) {
+                  dispatch(deleteMod(instanceName, item));
+                }
               }}
+              icon={faTrash}
             />
-          ))}
-        <Switch
-          size="small"
-          checked={path.extname(item.fileName) !== '.disabled'}
-          disabled={loading || updateLoading}
-          onChange={async c => {
-            setLoading(true);
-            await toggleModDisabled(
-              c,
-              instanceName,
-              instancePath,
-              item,
-              dispatch
-            );
-            setTimeout(() => setLoading(false), 500);
+          </div>
+          <RowContainerBackground
+            selected={selectedMods.includes(item.fileName)}
+            disabled={path.extname(item.fileName) === '.disabled'}
+          />
+        </RowContainer>
+      </ContextMenuTrigger>
+      <Portal>
+        <ContextMenu
+          id={item.displayName}
+          onShow={() => {
+            setSelectedMods([item.fileName]);
+            setIsHovered(true);
           }}
-        />
-        <FontAwesomeIcon
-          css={`
-            &:hover {
-              cursor: pointer;
-              path {
-                cursor: pointer;
-                transition: all 0.1s ease-in-out;
-                color: ${props => props.theme.palette.error.main};
-              }
-            }
-          `}
-          onClick={() => {
-            if (!loading && !updateLoading) {
-              dispatch(deleteMod(instanceName, item));
-            }
-          }}
-          icon={faTrash}
-        />
-      </div>
-    </RowContainer>
+          onHide={() => setIsHovered(false)}
+        >
+          <MenuItem
+            onClick={() => {
+              clipboard.writeText(item.displayName);
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faCopy}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Copy Name
+          </MenuItem>
+        </ContextMenu>
+      </Portal>
+    </>
   );
 }, areEqual);
 
@@ -363,9 +513,24 @@ const filter = (arr, search) =>
       mod.displayName.toLowerCase().includes(search.toLowerCase())
   );
 
+const getFileType = file => {
+  const fileName = file.name;
+  let fileType = '';
+
+  const splitFileName = fileName.split('.');
+  if (splitFileName.length) {
+    fileType = splitFileName[splitFileName.length - 1];
+  }
+
+  return fileType;
+};
+
 const Mods = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const instancesPath = useSelector(_getInstancesPath);
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const latestMods = useSelector(state => state.latestModManifests);
   const [mods, setMods] = useState(sort(instance.mods));
   const [selectedMods, setSelectedMods] = useState([]);
@@ -378,6 +543,11 @@ const Mods = ({ instanceName }) => {
   const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
 
   const dispatch = useDispatch();
+
+  const openFolder = async p => {
+    await makeDir(p);
+    ipcRenderer.invoke('openFolder', p);
+  };
 
   const antIcon = (
     <LoadingOutlined
@@ -406,12 +576,17 @@ const Mods = ({ instanceName }) => {
 
   useEffect(() => {
     setMods(filter(sort(instance.mods), search));
+    setSelectedMods(prev => {
+      return prev.filter(v => instance.mods.find(m => m.fileName === v));
+    });
   }, [search, instance.mods]);
 
   const hasModUpdates = useMemo(() => {
     return instance?.mods?.find(v => {
       const isUpdateAvailable =
-        latestMods[v.projectID] && latestMods[v.projectID].id !== v.fileID;
+        latestMods[v.projectID] &&
+        latestMods[v.projectID].id !== v.fileID &&
+        latestMods[v.projectID].releaseType <= curseReleaseChannel;
       return isUpdateAvailable;
     });
   }, [instance.mods, latestMods]);
@@ -435,17 +610,13 @@ const Mods = ({ instanceName }) => {
     setFileDrop(true);
     const dragComp = {};
     const { files } = e.dataTransfer;
-    const arrTypes = Object.values(files).map(file => {
-      const fileName = file.name;
-      const fileType = fileName.split('.')[1];
-      return fileType;
-    });
 
     await pMap(
       Object.values(files),
       async file => {
         const fileName = file.name;
-        const fileType = fileName.split('.')[1];
+        const fileType = getFileType(file);
+        const existingMods = itemData.items.map(item => item.fileName);
 
         dragComp[fileName] = false;
 
@@ -453,36 +624,23 @@ const Mods = ({ instanceName }) => {
 
         const { path: filePath } = file;
 
-        if (Object.values(files).length === 1) {
-          if (fileType === 'jar' || fileType === 'disabled') {
-            await fse.copy(
-              filePath,
-              path.join(instancesPath, instanceName, 'mods', fileName)
-            );
-            dragComp[fileName] = true;
-          } else {
-            console.error('This file is not a mod!');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
+        if (existingMods.includes(fileName)) {
+          console.error(
+            'A mod with this name already exists in the instance.',
+            file.name
+          );
+          setFileDrop(false);
+          setFileDrag(false);
+        } else if (fileType === 'jar' || fileType === 'disabled') {
+          await fse.copy(
+            filePath,
+            path.join(instancesPath, instanceName, 'mods', fileName)
+          );
+          dragComp[fileName] = true;
         } else {
-          /* eslint-disable */
-          if (arrTypes.includes('jar')) {
-            if (fileType === 'jar') {
-              await fse.copy(
-                filePath,
-                path.join(instancesPath, instanceName, 'mods', fileName)
-              );
-              dragComp[fileName] = true;
-            } else {
-              setFileDrop(false);
-              setFileDrag(false);
-            }
-          } else {
-            console.error('The files are  not a mod!');
-            setFileDrop(false);
-            setFileDrag(false);
-          }
+          console.error('This file is not a mod!', file);
+          setFileDrop(false);
+          setFileDrag(false);
         }
       },
       { concurrency: 10 }
@@ -511,7 +669,7 @@ const Mods = ({ instanceName }) => {
         }}
         disabled={!hasModUpdates}
       >
-        Update all mods
+        {i18n.t('instance_manager:mods.update_all_mods')}
       </Menu.Item>
     </Menu>
   );
@@ -543,7 +701,7 @@ const Mods = ({ instanceName }) => {
                 : setSelectedMods([])
             }
           >
-            Select All
+            {i18n.t('instance_manager:mods.select_all')}
           </Checkbox>
           <DeleteSelectedMods
             onClick={async () => {
@@ -558,6 +716,12 @@ const Mods = ({ instanceName }) => {
             }}
             selectedMods={selectedMods.length}
             icon={faTrash}
+          />
+          <OpenFolderButton
+            onClick={() =>
+              openFolder(path.join(instancesPath, instanceName, 'mods'))
+            }
+            icon={faFolder}
           />
           <StyledDropdown
             onClick={() => {
@@ -587,7 +751,7 @@ const Mods = ({ instanceName }) => {
             );
           }}
         >
-          Add Mod
+          {i18n.t('instance_manager:mods.add_mod')}
         </Button>
         <Input
           allowClear
@@ -597,7 +761,9 @@ const Mods = ({ instanceName }) => {
           css={`
             width: 200px;
           `}
-          placeholder={`Search ${mods.length} mods`}
+          placeholder={i18n.t('instance_manager:mods.search_x_mods', {
+            count: mods.length
+          })}
         />
       </Header>
       <div
@@ -634,7 +800,7 @@ const Mods = ({ instanceName }) => {
                   `}
                   onDragLeave={e => e.stopPropagation()}
                 >
-                  <CopyTitle>copy</CopyTitle>
+                  <CopyTitle>Copy</CopyTitle>
                   <DragArrow icon={faArrowDown} size="3x" />
                 </div>
               )}

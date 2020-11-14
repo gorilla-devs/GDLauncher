@@ -13,6 +13,7 @@ const ChangeLogs = () => {
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
   }, []);
+
   return (
     <Modal
       css={`
@@ -32,7 +33,11 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Improved fabric according to dev guidelines</li>
+              <li>Restyled the UI to add new instances.</li>
+              <li>Some performance improvements.</li>
+              <li>Better UX for twitch modpacks.</li>
+              <li>Longer instances names are now allowed.</li>
+              <li>Added a resource packs tab for instances.</li>
             </ul>
           </div>
         </Section>
@@ -46,7 +51,10 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Minor UI fixes</li>
+              <li>Security fixes.</li>
+              <li>Improved login errors.</li>
+              <li>The news should now be up to date.</li>
+              <li>Minor visual/functional fixes.</li>
             </ul>
           </div>
         </Section>

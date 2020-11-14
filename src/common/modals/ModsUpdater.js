@@ -11,13 +11,18 @@ const ModsUpdater = ({ instanceName }) => {
   const dispatch = useDispatch();
   const latestMods = useSelector(state => state.latestModManifests);
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const [computedMods, setComputedMods] = useState(0);
   const [installProgress, setInstallProgress] = useState(null);
 
   const filterAvailableUpdates = () => {
     return instance.mods.filter(mod => {
       return (
-        latestMods[mod.projectID] && latestMods[mod.projectID].id !== mod.fileID
+        latestMods[mod.projectID] &&
+        latestMods[mod.projectID].id !== mod.fileID &&
+        latestMods[mod.projectID].releaseType <= curseReleaseChannel
       );
     });
   };

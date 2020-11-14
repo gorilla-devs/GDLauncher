@@ -35,13 +35,13 @@
 
 ## 🎮 What is GDLauncher
 
-GDLauncher is a custom open source Minecraft launcher written from the ground up in electron/react. Its main goal is to make it easy and enjoyable to manage different Minecraft versions and install `forge/fabric`, bringing the playing and modding experience to the next level!
+GDLauncher is a custom open-source Minecraft launcher written from the ground up in electron/react. Its main goal is to make it easy and enjoyable to manage different Minecraft versions and install `forge/fabric`, bringing the playing and modding experience to the next level!
 
 ## ⚡️ Comparison with Twitch Launcher
 
 This is an example of the time that GDLauncher takes to install a modpack in comparison to Twitch. Both tests are running at the same time over a 1Gbps network to ensure that the network doesn't impact the comparison.
 
-- GDLauncher: `0:52m`
+- GDLauncher: `0.52m`
 - Twitch Launcher: `2.25m`
 
 <p align="center">
@@ -54,16 +54,16 @@ Below you will find everything you need to know about the launcher. If you want 
 
 ## 🎮 Download
 
-To download the latest version, you can either click [here](https://github.com/gorilla-devs/GDLauncher/releases) and select the appropriate version for your operating system, or visit our [website](https://gdevs.io).
+To download the latest version, you can either click [here](https://github.com/gorilla-devs/GDLauncher/releases) and select the appropriate version for your operating system or visit our [website](https://gdevs.io).
 
 ## 🎨 Features
 
 #### Our features:
 
 - Java downloader. You don't need to have java installed, a suitable version will be downloaded automatically.
-- It's as easy as pie to install the `vanilla` game, `forge`, `fabric` and all `twitch modpacks`. No further action from the user is required.
+- It's as easy as pie to install the `vanilla` game, `forge`, `fabric`, and all `twitch modpacks`. No further action from the user is required.
 - Install `mods` for both fabric and forge directly from our UI
-- Built-in autoupdater. The launcher will always keep itself updated to the latest release.
+- Built-in auto-updater. The launcher will always keep itself updated to the latest release.
 - Easily manage multiple `accounts` and switch between them.
 - Still playing on your grandma pc from the 80s? Don't worry, we got you covered with our `Potato PC Mode`!
 
@@ -80,7 +80,7 @@ To download the latest version, you can either click [here](https://github.com/g
 - Export instances to other launchers
 - Liteloader support
 - Optifine easy-installation support
-- A lot more..
+- A lot more...
 
 ## 💾 Compilation
 
@@ -90,8 +90,7 @@ These are the steps to compile it yourself.
 
 You need the following software installed:
 
-- [NodeJS](https://nodejs.org/en/download/) (> v13.9.0 x64)
-- yarn (`npm i -g yarn`)
+- [NodeJS](https://nodejs.org/en/download/) (> v14.8.0 x64)
 - [Rust](https://www.rust-lang.org/)
 - C++ compiler (g++ or windows build tools)
 
@@ -101,19 +100,19 @@ Install the dependencies and devDependencies.
 
 ```sh
 $ cd GDLauncher
-$ yarn
+$ npm i
 ```
 
 Start the development environment
 
 ```sh
-$ yarn dev
+$ npm run dev
 ```
 
 For production environment...
 
 ```sh
-$ yarn build && yarn start-prod
+$ npm run build && npm run start-prod
 ```
 
 ### 🚚 Packaging
@@ -121,7 +120,7 @@ $ yarn build && yarn start-prod
 To package the app for the local platform:
 
 ```sh
-$ yarn release
+$ npm run release
 ```
 
 ## 🚀 Technologies
@@ -153,16 +152,16 @@ You can find a list of unassigned tasks [here](https://github.com/gorilla-devs/G
 
 - **Davide Ceschia** - _Main Developer_ - [GorillaDevs](https://github.com/gorilla-devs)
 
-See also the list of [contributors](https://github.com/gorilla-devs/GDLauncher/contributors) who participated to this project.
+See also the list of [contributors](https://github.com/gorilla-devs/GDLauncher/contributors) who participated in this project.
 
 ## 📜 History
 
 This project started as a way for me to learn programming and get better at it. I initially developed it in C#.
 
 After a while, I didn't really like the language, so I just started it again from scratch in React and Electron.
-It was here that a community started gathering around the project. In the meanwhile I also found a job where I could learn even more about best practices, data structures and more.
+It was here that a community started gathering around the project. In the meanwhile, I also found a job where I could learn even more about best practices, data structures, and more.
 
-This is why I decided to rewrite it completely one more time, applying all the knowledge I gained in that time, and that made it possible to implement a lot of really cool features, that were really complicated to code from a technical point of view.
+This is why I decided to rewrite it completely one more time, applying all the knowledge I gained at that time, and that made it possible to implement a lot of really cool features, that were really complicated to code from a technical point of view.
 
 Here you can find the previous versions of the code:
 

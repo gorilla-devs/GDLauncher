@@ -15,11 +15,12 @@ import { _getInstance } from '../utils/selectors';
 import { installMod } from '../reducers/actions';
 import { FABRIC, FORGE } from '../utils/constants';
 import {
-  getFirstReleaseCandidate,
+  getFirstPreferredCandidate,
   filterFabricFilesByVersion,
   filterForgeFilesByVersion,
   getPatchedInstanceType
 } from '../../app/desktop/utils';
+import i18n from '../config/i18next';
 
 const CellContainer = styled.div.attrs(props => ({
   style: props.override
@@ -79,6 +80,9 @@ const Cell = ({
   instanceName
 }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
@@ -148,9 +152,12 @@ const Cell = ({
                     filteredFiles = filterForgeFilesByVersion(files, version);
                   }
 
-                  const latestFile = getFirstReleaseCandidate(filteredFiles);
+                  const preferredFile = getFirstPreferredCandidate(
+                    filteredFiles,
+                    curseReleaseChannel
+                  );
 
-                  if (latestFile === null) {
+                  if (preferredFile === null) {
                     setLoading(false);
                     setError('Mod Not Available');
                     console.error(
@@ -160,7 +167,12 @@ const Cell = ({
                   }
 
                   await dispatch(
-                    installMod(mod?.id, latestFile?.id, instanceName, version)
+                    installMod(
+                      mod?.id,
+                      preferredFile?.id,
+                      instanceName,
+                      version
+                    )
                   );
                   setLoading(false);
                 }}
@@ -346,25 +358,39 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         <Header>
           <Select
             css={`
-              width: 130px;
+              width: 160px;
               margin: 0 10px;
             `}
             defaultValue={filterType}
             onChange={setFilterType}
             disabled={areModsLoading}
           >
-            <Select.Option value="Featured">Featured</Select.Option>
-            <Select.Option value="Popularity">Popularity</Select.Option>
-            <Select.Option value="LastUpdated">Last Updated</Select.Option>
-            <Select.Option value="Name">Name</Select.Option>
-            <Select.Option value="Author">Author</Select.Option>
-            <Select.Option value="TotalDownloads">Downloads</Select.Option>
+            <Select.Option key="Featured" value="Featured">
+              {i18n.t('instance_manager:mods.mods_browser.featured')}
+            </Select.Option>
+            <Select.Option key="Popularity" value="Popularity">
+              {i18n.t('instance_manager:mods.mods_browser.popularity')}
+            </Select.Option>
+            <Select.Option key="LastUpdated" value="LastUpdated">
+              {i18n.t('instance_manager:mods.mods_browser.last_updated')}
+            </Select.Option>
+            <Select.Option key="Name" value="Name">
+              {i18n.t('instance_manager:mods.mods_browser.name')}
+            </Select.Option>
+            <Select.Option key="Author" value="Author">
+              {i18n.t('instance_manager:mods.mods_browser.auther')}
+            </Select.Option>
+            <Select.Option key="Downloads" value="TotalDownloads">
+              {i18n.t('instance_manager:mods.mods_browser.downloads')}
+            </Select.Option>
           </Select>
           <Input
             css={`
               height: 32px;
             `}
-            placeholder="Search for a mod"
+            placeholder={i18n.t(
+              'instance_manager:mods.mods_browser.search_for_a_mod'
+            )}
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);

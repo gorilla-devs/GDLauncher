@@ -12,8 +12,9 @@ import { _getTempPath } from '../../utils/selectors';
 import { useSelector } from 'react-redux';
 import { getAddon, getAddonFiles } from '../../api';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, FORGE } from '../../utils/constants';
+import { FABRIC, FORGE, VANILLA } from '../../utils/constants';
 import { transparentize } from 'polished';
+import i18n from '../../config/i18next';
 
 const Import = ({
   setModpack,
@@ -104,20 +105,27 @@ const Import = ({
       setModpack({ name: manifest.name });
     }
     const isForge = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes('forge') && v.primary
+      v => v.id.includes(FORGE) && v.primary
     );
 
     const isFabric = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes('fabric') && v.primary
+      v => v.id.includes(FABRIC) && v.primary
     );
 
-    if (!isForge && !isFabric) {
+    const isVanilla = (manifest?.minecraft?.modLoaders || []).find(
+      v => v.id.includes(VANILLA) && v.primary
+    );
+
+    if (!isForge && !isFabric && !isVanilla) {
       setError(true);
       setLoading(false);
       return;
     }
 
-    const modloader = [isForge ? FORGE : FABRIC];
+    const modloader = [];
+    if (isForge) modloader.push(FORGE);
+    else if (isFabric) modloader.push(FABRIC);
+    else if (isVanilla) modloader.push(VANILLA);
 
     if (manifest.projectID) {
       modloader.push(manifest.projectID);
@@ -137,7 +145,7 @@ const Import = ({
   return (
     <Container>
       <div>
-        Local file or link to a direct download
+        {i18n.t('add_instance:local_file_or_link_to_a_direct_download')}
         <div
           css={`
             display: flex;
@@ -155,7 +163,7 @@ const Import = ({
             `}
           />
           <Button disabled={loading} type="primary" onClick={openFileDialog}>
-            Browse
+            {i18n.t('add_instance:browse')}
           </Button>
         </div>
         <div
@@ -174,7 +182,7 @@ const Import = ({
               transparentize(0.7, props.theme.palette.grey[700])};
           `}
         >
-          {error && 'There was an issue while importing.'}
+          {error && i18n.t('add_instance:there_was_an_issue_while_importing')}
         </div>
       </div>
     </Container>

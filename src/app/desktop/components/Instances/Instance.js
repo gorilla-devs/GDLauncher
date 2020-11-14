@@ -5,6 +5,7 @@ import { promises as fs } from 'fs';
 import { LoadingOutlined } from '@ant-design/icons';
 import path from 'path';
 import { ipcRenderer } from 'electron';
+import { Portal } from 'react-portal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPlay,
@@ -27,6 +28,8 @@ import { launchInstance } from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
+import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
+import i18n from '../../../../common/config/i18next';
 
 const Container = styled.div`
   position: relative;
@@ -284,69 +287,79 @@ const Instance = ({ instanceName }) => {
           </HoverContainer>
         </Container>
       </ContextMenuTrigger>
-      <ContextMenu
-        id={instance.name}
-        onShow={() => setIsHovered(true)}
-        onHide={() => setIsHovered(false)}
-      >
-        <MenuInstanceName>{instanceName}</MenuInstanceName>
-        {isPlaying && (
-          <MenuItem onClick={killProcess}>
+      <Portal>
+        <ContextMenu
+          id={instance.name}
+          onShow={() => setIsHovered(true)}
+          onHide={() => setIsHovered(false)}
+        >
+          <MenuInstanceName>{instanceName}</MenuInstanceName>
+          {isPlaying && (
+            <MenuItem onClick={killProcess}>
+              <FontAwesomeIcon
+                icon={faStop}
+                css={`
+                  margin-right: 10px;
+                `}
+              />
+              Kill
+            </MenuItem>
+          )}
+          <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
             <FontAwesomeIcon
-              icon={faStop}
+              icon={faWrench}
               css={`
                 margin-right: 10px;
               `}
             />
-            Kill
+            {i18n.t('instance:menu.manage')}
           </MenuItem>
-        )}
-        <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
-          <FontAwesomeIcon
-            icon={faWrench}
-            css={`
-              margin-right: 10px;
-            `}
-          />
-          Manage
-        </MenuItem>
-        <MenuItem onClick={openFolder}>
-          <FontAwesomeIcon
-            icon={faFolder}
-            css={`
-              margin-right: 10px;
-            `}
-          />
-          Open Folder
-        </MenuItem>
+          <MenuItem onClick={openFolder}>
+            <FontAwesomeIcon
+              icon={faFolder}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            {i18n.t('instance:menu.open_folder')}
+          </MenuItem>
 
-        {/* // TODO - Support other export options besides curseforge forge. */}
-        <MenuItem
-          onClick={instanceExportCurseForge}
-          disabled={Boolean(isInQueue) || instance.modloader[0] !== 'forge'}
-        >
-          <FontAwesomeIcon
-            icon={faBoxOpen}
-            css={`
-              margin-right: 10px;
-            `}
-          />
-          Export Pack
-        </MenuItem>
-        <MenuItem divider />
-        <MenuItem
-          disabled={Boolean(isInQueue) || Boolean(isPlaying)}
-          onClick={openConfirmationDeleteModal}
-        >
-          <FontAwesomeIcon
-            icon={faTrash}
-            css={`
-              margin-right: 10px;
-            `}
-          />
-          Delete
-        </MenuItem>
-      </ContextMenu>
+          {/* // TODO - Support other export options besides curseforge forge. */}
+          <MenuItem
+            onClick={instanceExportCurseForge}
+            disabled={
+              Boolean(isInQueue) ||
+              !(
+                instance.modloader[0] === FORGE ||
+                instance.modloader[0] === FABRIC ||
+                instance.modloader[0] === VANILLA
+              )
+            }
+          >
+            <FontAwesomeIcon
+              icon={faBoxOpen}
+              css={`
+                margin-right: 10px;
+                width: 16px !important;
+              `}
+            />
+            {i18n.t('instance:menu.export_pack')}
+          </MenuItem>
+          <MenuItem divider />
+          <MenuItem
+            disabled={Boolean(isInQueue) || Boolean(isPlaying)}
+            onClick={openConfirmationDeleteModal}
+          >
+            <FontAwesomeIcon
+              icon={faTrash}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            {i18n.t('instance:menu.delete')}
+          </MenuItem>
+        </ContextMenu>
+      </Portal>
     </>
   );
 };

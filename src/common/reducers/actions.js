@@ -9,6 +9,7 @@ import gte from 'semver/functions/gte';
 import lt from 'semver/functions/lt';
 import lte from 'semver/functions/lte';
 import gt from 'semver/functions/gt';
+import log from 'electron-log';
 import omitBy from 'lodash/omitBy';
 import { pipeline } from 'stream';
 import zlib from 'zlib';
@@ -348,7 +349,17 @@ export function login(username, password, redirect = true) {
       throw new Error('No username or password provided');
     }
     try {
-      const { data } = await mcAuthenticate(username, password, clientToken);
+      let data = null;
+      try {
+        ({ data } = await mcAuthenticate(username, password, clientToken));
+      } catch (err) {
+        console.error(err);
+        throw new Error('Invalid username or password.');
+      }
+
+      if (!data?.selectedProfile?.id) {
+        throw new Error("It looks like you didn't buy the game.");
+      }
       const skinUrl = await getPlayerSkin(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
@@ -641,15 +652,37 @@ export function updateInstanceConfig(
         instanceName,
         'config.json'
       );
+      const tempConfigPath = path.join(
+        _getInstancesPath(state),
+        instanceName,
+        'config_new_temp.json'
+      );
       // Remove queue and name, they are augmented in the reducer and we don't want them in the config file
       const newConfig = updateFunction(omit(instance, ['queue', 'name']));
+      // Ensure that the new config is actually valid to write
+      try {
+        const JsonString = JSON.stringify(newConfig);
+        const isJson = JSON.parse(JsonString);
+        if (!isJson || typeof isJson !== 'object') {
+          const err = `Cannot write this JSON to ${instanceName}. Not an object`;
+          log.error(err);
+          throw new Error(err);
+        }
+      } catch {
+        const err = `Cannot write this JSON to ${instanceName}. Not parsable`;
+        log.error(err, newConfig);
+        throw new Error(err);
+      }
+
       try {
         await fs.lstat(configPath);
 
-        await fse.outputJson(configPath, newConfig);
+        await fse.outputJson(tempConfigPath, newConfig);
+        await fse.rename(tempConfigPath, configPath);
       } catch {
         if (forceWrite) {
-          await fse.outputJson(configPath, newConfig);
+          await fse.outputJson(tempConfigPath, newConfig);
+          await fse.rename(tempConfigPath, configPath);
         }
       }
       dispatch({
@@ -695,17 +728,18 @@ export function addToQueue(
       }
     );
 
-    const addMods = modloader[0] === FORGE || modloader[0] === FABRIC;
-
     dispatch(
       updateInstanceConfig(
         instanceName,
-        prev => ({
-          modloader,
-          timePlayed: prev.timePlayed || timePlayed || 0,
-          background,
-          ...(addMods && { mods: prev.mods || [] })
-        }),
+        prev => {
+          return {
+            ...(prev || {}),
+            modloader,
+            timePlayed: prev.timePlayed || timePlayed || 0,
+            background,
+            mods: prev.mods || []
+          };
+        },
         true
       )
     );
@@ -1122,7 +1156,7 @@ export function processManifest(instanceName) {
             const destFile = path.join(
               _getInstancesPath(state),
               instanceName,
-              'mods',
+              addon?.categorySection?.path || 'mods',
               modManifest.fileName
             );
             const fileExists = await fse.pathExists(destFile);
@@ -1512,14 +1546,22 @@ export const startListener = () => {
             const notMatch = (data.unmatchedFingerprints || [])[0];
             let mod = {};
             if (exactMatch) {
-              const { data: addon } = await getAddon(exactMatch.file.projectId);
-
-              mod = normalizeModData(
-                exactMatch.file,
-                exactMatch.file.projectId,
-                addon.name
-              );
-              mod.fileName = path.basename(fileName);
+              let addon = null;
+              try {
+                addon = (await getAddon(exactMatch.file.projectId)).data;
+                mod = normalizeModData(
+                  exactMatch.file,
+                  exactMatch.file.projectId,
+                  addon.name
+                );
+                mod.fileName = path.basename(fileName);
+              } catch {
+                mod = {
+                  fileName: path.basename(fileName),
+                  displayName: path.basename(fileName),
+                  packageFingerprint: murmurHash
+                };
+              }
             } else if (notMatch) {
               mod = {
                 fileName: path.basename(fileName),
@@ -2102,13 +2144,17 @@ export function launchInstance(instanceName) {
       errorLogs += data || '';
     });
 
-    ps.on('close', code => {
+    ps.on('close', async code => {
+      clearInterval(playTimer);
+      if (!ps.killed) {
+        ps.kill('SIGKILL');
+      }
+      await new Promise(resolve => setTimeout(resolve, 200));
       ipcRenderer.invoke('show-window');
+      dispatch(removeStartedInstance(instanceName));
       fse.remove(instanceJLFPath);
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
-      dispatch(removeStartedInstance(instanceName));
-      clearInterval(playTimer);
-      if (code !== 0) {
+      if (code !== 0 && errorLogs) {
         dispatch(
           openModal('InstanceCrashed', {
             instanceName,
@@ -2135,6 +2181,7 @@ export function installMod(
     const state = getState();
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
+    const instance = _getInstance(state)(instanceName);
     const mainModData = await getAddonFile(projectID, fileID);
     const { data: addon } = await getAddon(projectID);
     mainModData.data.projectID = projectID;
@@ -2200,6 +2247,7 @@ export function installMod(
           // type 6: include
 
           if (dep.type === 3) {
+            if (instance.mods.some(x => x.projectID === dep.addonId)) return;
             const depList = await getAddonFiles(dep.addonId);
             const depData = depList.data.find(v =>
               v.gameVersion.includes(gameVersion)
@@ -2220,6 +2268,7 @@ export function installMod(
         { concurrency: 2 }
       );
     }
+    return destFile;
   };
 }
 
@@ -2325,8 +2374,15 @@ export const getAppLatestVersion = () => {
       // swallow error
     }
 
-    const installedVersion = parse(await ipcRenderer.invoke('getAppVersion'));
+    const v = await ipcRenderer.invoke('getAppVersion');
+
+    const installedVersion = parse(v);
     const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
+
+    // If we're on beta but the release channel is stable, return latest stable to force an update
+    if (v.includes('beta') && releaseChannel === 0) {
+      return latestStablerelease;
+    }
 
     if (!isAppUpdated(latestStablerelease)) {
       return latestStablerelease;
@@ -2350,7 +2406,6 @@ export const checkForPortableUpdates = () => {
 
     // Latest version has a value only if the user is not using the latest
     if (latestVersion) {
-      // eslint-disable-next-line
       const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${latestVersion?.tag_name}`;
       const { data: latestManifest } = await axios.get(
         `${baseAssetUrl}/${process.platform}_latest.json`

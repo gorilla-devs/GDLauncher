@@ -4,7 +4,6 @@ import fse from 'fs-extra';
 import { extractFull } from 'node-7z';
 import jimp from 'jimp/es';
 import makeDir from 'make-dir';
-import jarAnalyzer from 'jarfile';
 import { promisify } from 'util';
 import { ipcRenderer } from 'electron';
 import path from 'path';
@@ -15,7 +14,11 @@ import {
   FABRIC,
   FORGE
 } from '../../../common/utils/constants';
-import { removeDuplicates } from '../../../common/utils';
+
+import {
+  removeDuplicates,
+  sortByForgeVersionDesc
+} from '../../../common/utils';
 import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
 
@@ -154,6 +157,108 @@ export const librariesMapper = (libraries, librariesPath) => {
       }, []),
     'url'
   );
+};
+
+export const getFilteredVersions = (
+  vanillaManifest,
+  forgeManifest,
+  fabricManifest
+) => {
+  const versions = [
+    {
+      value: 'vanilla',
+      label: 'Vanilla',
+      children: [
+        {
+          value: 'release',
+          label: 'Releases',
+          children: vanillaManifest.versions
+            .filter(v => v.type === 'release')
+            .map(v => ({
+              value: v.id,
+              label: v.id
+            }))
+        },
+        {
+          value: 'snapshot',
+          label: 'Snapshots',
+          children: vanillaManifest.versions
+            .filter(v => v.type === 'snapshot')
+            .map(v => ({
+              value: v.id,
+              label: v.id
+            }))
+        },
+        {
+          value: 'old_beta',
+          label: 'Old Beta',
+          children: vanillaManifest.versions
+            .filter(v => v.type === 'old_beta')
+            .map(v => ({
+              value: v.id,
+              label: v.id
+            }))
+        },
+        {
+          value: 'old_alpha',
+          label: 'Old Alpha',
+          children: vanillaManifest.versions
+            .filter(v => v.type === 'old_alpha')
+            .map(v => ({
+              value: v.id,
+              label: v.id
+            }))
+        }
+      ]
+    },
+    {
+      value: 'forge',
+      label: 'Forge',
+      children: Object.entries(forgeManifest).map(([k, v]) => ({
+        value: k,
+        label: k,
+        children: v.sort(sortByForgeVersionDesc).map(child => ({
+          value: child,
+          label: child.split('-')[1]
+        }))
+      }))
+    },
+    {
+      value: 'fabric',
+      label: 'Fabric',
+      children: [
+        {
+          value: 'release',
+          label: 'Releases',
+          children: fabricManifest.game
+            .filter(v => v.stable)
+            .map(v => ({
+              value: v.version,
+              label: v.version,
+              children: fabricManifest.loader.map(c => ({
+                value: c.version,
+                label: c.version
+              }))
+            }))
+        },
+        {
+          value: 'snapshot',
+          label: 'Snapshots',
+          children: fabricManifest.game
+            .filter(v => !v.stable)
+            .map(v => ({
+              value: v.version,
+              label: v.version,
+              children: fabricManifest.loader.map(c => ({
+                value: c.version,
+                label: c.version
+              }))
+            }))
+        }
+      ]
+    }
+  ];
+  return versions;
 };
 
 export const isLatestJavaDownloaded = async (meta, userData, retry) => {
@@ -467,6 +572,26 @@ export const getJVMArguments113 = (
   return args;
 };
 
+export const readJarManifest = async (jarPath, sevenZipPath, property) => {
+  const list = extractFull(jarPath, '.', {
+    $bin: sevenZipPath,
+    toStdout: true,
+    $cherryPick: 'META-INF/MANIFEST.MF'
+  });
+
+  await new Promise((resolve, reject) => {
+    list.on('end', () => {
+      resolve();
+    });
+    list.on('error', error => {
+      reject(error.stderr);
+    });
+  });
+
+  if (list.info.has(property)) return list.info.get(property);
+  return null;
+};
+
 export const patchForge113 = async (
   forgeJson,
   mainJar,
@@ -514,8 +639,13 @@ export const patchForge113 = async (
         cp => `"${path.join(librariesPath, ...mavenToArray(cp))}"`
       );
 
-      const jarFile = await promisify(jarAnalyzer.fetchJarAtPath)(filePath);
-      const mainClass = jarFile.valueForManifestEntry('Main-Class');
+      const sevenZipPath = await get7zPath();
+      const mainClass = await readJarManifest(
+        filePath,
+        sevenZipPath,
+        'Main-Class'
+      );
+
       await new Promise(resolve => {
         const ps = spawn(
           `"${javaPath}"`,
@@ -694,12 +824,13 @@ export const filterForgeFilesByVersion = (files, version) => {
   });
 };
 
-export const getFirstReleaseCandidate = files => {
+export const getFirstPreferredCandidate = (files, release) => {
+  let counter = release || 1;
+
   let latestFile = null;
-  let counter = 1;
   while (counter <= 3 && !latestFile) {
     const c = counter;
-    const latest = files.find(v => v.releaseType === c);
+    const latest = files.find(v => v.releaseType <= c);
     if (latest) {
       latestFile = latest;
     }

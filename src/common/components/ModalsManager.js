@@ -62,6 +62,7 @@ const modalsComponentLookupTable = {
   BisectHosting: AsyncComponent(lazy(() => import('../modals/BisectHosting'))),
   Onboarding: AsyncComponent(lazy(() => import('../modals/Onboarding'))),
   ModOverview: AsyncComponent(lazy(() => import('../modals/ModOverview'))),
+  ModChangelog: AsyncComponent(lazy(() => import('../modals/ModChangelog'))),
   ModsBrowser: AsyncComponent(lazy(() => import('../modals/ModsBrowser'))),
   JavaSetup: AsyncComponent(lazy(() => import('../modals/JavaSetup'))),
   ModsUpdater: AsyncComponent(lazy(() => import('../modals/ModsUpdater'))),
@@ -71,6 +72,9 @@ const modalsComponentLookupTable = {
   ChangeLogs: AsyncComponent(lazy(() => import('../modals/ChangeLogs'))),
   InstancesMigration: AsyncComponent(
     lazy(() => import('../modals/InstancesMigration'))
+  ),
+  McVersionChanger: AsyncComponent(
+    lazy(() => import('../modals/McVersionChanger'))
   )
 };
 
@@ -94,9 +98,7 @@ const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
     if (unmounting) unMountStyle();
   }, [unmounting]);
 
-  const back = e => {
-    e.stopPropagation();
-
+  const back = () => {
     if (preventClose) {
       setModalStyle({
         animation: `modalShake 0.25s linear infinite`
@@ -138,10 +140,8 @@ const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
   };
 
   return (
-    <Overlay onClick={back} style={bgStyle}>
-      <Modal style={modalStyle} onClick={back}>
-        {children}
-      </Modal>
+    <Overlay onMouseDown={back} style={bgStyle}>
+      <Modal style={modalStyle}>{children}</Modal>
     </Overlay>
   );
 };
