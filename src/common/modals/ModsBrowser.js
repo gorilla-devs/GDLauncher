@@ -30,6 +30,7 @@ import {
   filterForgeFilesByVersion,
   getPatchedInstanceType
 } from '../../app/desktop/utils';
+import i18n from '../config/i18next';
 
 const RowContainer = styled.div`
   display: flex;
@@ -411,18 +412,32 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
             onChange={setFilterType}
             disabled={areModsLoading}
           >
-            <Select.Option value="Featured">Featured</Select.Option>
-            <Select.Option value="Popularity">Popularity</Select.Option>
-            <Select.Option value="LastUpdated">Last Updated</Select.Option>
-            <Select.Option value="Name">Name</Select.Option>
-            <Select.Option value="Author">Author</Select.Option>
-            <Select.Option value="TotalDownloads">Downloads</Select.Option>
+            <Select.Option key="Featured" value="Featured">
+              {i18n.t('instance_manager:mods.mods_browser.featured')}
+            </Select.Option>
+            <Select.Option key="Popularity" value="Popularity">
+              {i18n.t('instance_manager:mods.mods_browser.popularity')}
+            </Select.Option>
+            <Select.Option key="LastUpdated" value="LastUpdated">
+              {i18n.t('instance_manager:mods.mods_browser.last_updated')}
+            </Select.Option>
+            <Select.Option key="Name" value="Name">
+              {i18n.t('instance_manager:mods.mods_browser.name')}
+            </Select.Option>
+            <Select.Option key="Author" value="Author">
+              {i18n.t('instance_manager:mods.mods_browser.auther')}
+            </Select.Option>
+            <Select.Option key="Downloads" value="TotalDownloads">
+              {i18n.t('instance_manager:mods.mods_browser.downloads')}
+            </Select.Option>
           </Select>
           <Input
             css={`
               height: 32px;
             `}
-            placeholder="Search for a mod"
+            placeholder={i18n.t(
+              'instance_manager:mods.mods_browser.search_for_a_mod'
+            )}
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);

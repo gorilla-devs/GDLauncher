@@ -18,6 +18,7 @@ const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
+const i18nextBackend = require('i18next-electron-fs-backend');
 
 const fs = fss.promises;
 
@@ -36,8 +37,34 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
+const edit = {
+  label: 'Edit',
+  submenu: [
+    {
+      label: 'Cut',
+      accelerator: 'CmdOrCtrl+X',
+      selector: 'cut:'
+    },
+    {
+      label: 'Copy',
+      accelerator: 'CmdOrCtrl+C',
+      selector: 'copy:'
+    },
+    {
+      label: 'Paste',
+      accelerator: 'CmdOrCtrl+V',
+      selector: 'paste:'
+    },
+    {
+      label: 'Select All',
+      accelerator: 'CmdOrCtrl+A',
+      selector: 'selectAll:'
+    }
+  ]
+};
+
 // app.allowRendererProcessReuse = true;
-Menu.setApplicationMenu();
+Menu.setApplicationMenu(Menu.buildFromTemplate([edit]));
 
 let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
 
@@ -87,7 +114,7 @@ if (
   }
 }
 
-log.log(process.env.REACT_APP_RELEASE_TYPE);
+log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -145,9 +172,12 @@ function createWindow() {
       experimentalFeatures: true,
       nodeIntegration: true,
       // Disable in dev since I think hot reload is messing with it
-      webSecurity: !isDev
+      webSecurity: !isDev,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
+
+  i18nextBackend.mainBindings(ipcMain, mainWindow, fs);
 
   if (isDev) {
     globalShortcut.register('CommandOrControl+R', () => {
@@ -247,6 +277,8 @@ app.on('window-all-closed', () => {
   }
   if (process.platform !== 'darwin') {
     app.quit();
+  } else {
+    i18nextBackend.clearMainBindings(ipcMain);
   }
 });
 

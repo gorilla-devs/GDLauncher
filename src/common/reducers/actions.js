@@ -9,6 +9,7 @@ import gte from 'semver/functions/gte';
 import lt from 'semver/functions/lt';
 import lte from 'semver/functions/lte';
 import gt from 'semver/functions/gt';
+import log from 'electron-log';
 import omitBy from 'lodash/omitBy';
 import { pipeline } from 'stream';
 import zlib from 'zlib';
@@ -658,11 +659,25 @@ export function updateInstanceConfig(
       );
       // Remove queue and name, they are augmented in the reducer and we don't want them in the config file
       const newConfig = updateFunction(omit(instance, ['queue', 'name']));
+      // Ensure that the new config is actually valid to write
+      try {
+        const JsonString = JSON.stringify(newConfig);
+        const isJson = JSON.parse(JsonString);
+        if (!isJson || typeof isJson !== 'object') {
+          const err = `Cannot write this JSON to ${instanceName}. Not an object`;
+          log.error(err);
+          throw new Error(err);
+        }
+      } catch {
+        const err = `Cannot write this JSON to ${instanceName}. Not parsable`;
+        log.error(err, newConfig);
+        throw new Error(err);
+      }
+
       try {
         await fs.lstat(configPath);
 
         await fse.outputJson(tempConfigPath, newConfig);
-
         await fse.rename(tempConfigPath, configPath);
       } catch {
         if (forceWrite) {
@@ -1141,7 +1156,7 @@ export function processManifest(instanceName) {
             const destFile = path.join(
               _getInstancesPath(state),
               instanceName,
-              'mods',
+              addon?.categorySection?.path || 'mods',
               modManifest.fileName
             );
             const fileExists = await fse.pathExists(destFile);
@@ -2129,15 +2144,16 @@ export function launchInstance(instanceName) {
       errorLogs += data || '';
     });
 
-    ps.on('close', code => {
+    ps.on('close', async code => {
+      clearInterval(playTimer);
       if (!ps.killed) {
         ps.kill('SIGKILL');
       }
+      await new Promise(resolve => setTimeout(resolve, 200));
       ipcRenderer.invoke('show-window');
+      dispatch(removeStartedInstance(instanceName));
       fse.remove(instanceJLFPath);
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
-      dispatch(removeStartedInstance(instanceName));
-      clearInterval(playTimer);
       if (code !== 0 && errorLogs) {
         dispatch(
           openModal('InstanceCrashed', {
@@ -2357,8 +2373,15 @@ export const getAppLatestVersion = () => {
       // swallow error
     }
 
-    const installedVersion = parse(await ipcRenderer.invoke('getAppVersion'));
+    const v = await ipcRenderer.invoke('getAppVersion');
+
+    const installedVersion = parse(v);
     const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
+
+    // If we're on beta but the release channel is stable, return latest stable to force an update
+    if (v.includes('beta') && releaseChannel === 0) {
+      return latestStablerelease;
+    }
 
     if (!isAppUpdated(latestStablerelease)) {
       return latestStablerelease;
@@ -2382,7 +2405,6 @@ export const checkForPortableUpdates = () => {
 
     // Latest version has a value only if the user is not using the latest
     if (latestVersion) {
-      // eslint-disable-next-line
       const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${latestVersion?.tag_name}`;
       const { data: latestManifest } = await axios.get(
         `${baseAssetUrl}/${process.platform}_latest.json`

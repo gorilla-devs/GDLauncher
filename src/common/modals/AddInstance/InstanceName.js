@@ -23,6 +23,7 @@ import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
 import { FABRIC, VANILLA, FORGE } from '../../utils/constants';
+import i18n from '../../config/i18next';
 
 const InstanceName = ({
   in: inProp,
@@ -57,7 +58,7 @@ const InstanceName = ({
       if (
         !regex.test(instanceName || mcName) ||
         !finalWhiteSpace.test(instanceName || mcName) ||
-        (instanceName || mcName).length >= 35
+        (instanceName || mcName).length >= 45
       ) {
         setInvalidName(true);
         setAlreadyExists(false);
@@ -296,9 +297,9 @@ const InstanceName = ({
                       `}
                     >
                       {invalidName &&
-                        'Instance name is not valid or too long. Please try another one'}
+                        i18n.t('add_instance:invalid_instance_name_error')}
                       {alreadyExists &&
-                        'An instance with this name already exists!'}
+                        i18n.t('add_instance:already_exitst_instance_name_error')}
                     </div>
                   </div>
                 </div>
