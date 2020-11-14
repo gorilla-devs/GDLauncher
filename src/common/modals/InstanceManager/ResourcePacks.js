@@ -15,6 +15,7 @@ import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
 import { _getInstancesPath } from '../../utils/selectors';
 import DragnDropEffect from '../../../ui/DragnDropEffect';
+import i18n from '../../config/i18next';
 
 const Header = styled.div`
   height: 40px;
@@ -360,7 +361,7 @@ const ResourcePacks = ({ instanceName }) => {
                 : setSelectedItems([])
             }
           >
-            Select All
+            {i18n.t('instance_manager:resource_packs.select_all')}
           </Checkbox>
           <TrashIcon
             selectedMods={selectedItems.length}
@@ -396,7 +397,7 @@ const ResourcePacks = ({ instanceName }) => {
             openFolderDialog();
           }}
         >
-          Add ResourcePack
+          {i18n.t('instance_manager:resource_packs.add_resouce_pack')}
         </Button>
       </Header>
 
@@ -406,7 +407,9 @@ const ResourcePacks = ({ instanceName }) => {
         fileList={resourcePacks}
       >
         {resourcePacks.length === 0 && (
-          <NotItemsAvailable>No ResourcePacks Available</NotItemsAvailable>
+          <NotItemsAvailable>
+            {i18n.t('instance_manager:resource_packs.no_items_available')}
+          </NotItemsAvailable>
         )}
         <AutoSizer>
           {({ height, width }) => (

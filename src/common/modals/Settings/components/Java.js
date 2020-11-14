@@ -25,6 +25,7 @@ import {
 } from '../../../../app/desktop/utils/constants';
 import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
+import i18n from '../../../config/i18next';
 
 const JavaSettings = styled.div`
   width: 100%;
@@ -125,14 +126,15 @@ export default function MyAccountPreferences() {
 
   return (
     <JavaSettings>
-      <MainTitle>Java</MainTitle>
+      <MainTitle>{i18n.t('settings:java')}</MainTitle>
       <Title
         css={`
           width: 500px;
           text-align: left;
         `}
       >
-        Autodetect Java Path&nbsp; <FontAwesomeIcon icon={faJava} />
+        {i18n.t('settings:autodetect_path.title')}
+        &nbsp; <FontAwesomeIcon icon={faJava} />
         <a
           css={`
             margin-left: 30px;
@@ -141,7 +143,7 @@ export default function MyAccountPreferences() {
             dispatch(openModal('JavaSetup'));
           }}
         >
-          Run Java Setup again
+          {i18n.t('settings:autodetect_path.run_java_setup_again')}
         </a>
       </Title>
       <AutodetectPath>
@@ -150,8 +152,7 @@ export default function MyAccountPreferences() {
             text-align: left;
           `}
         >
-          Disable this to specify a custom java path to use instead of using
-          openJDK shipped with GDLauncher. Please select the java.exe binary
+          {i18n.t('settings:autodetect_path.description')}
         </Paragraph>
         <Switch
           color="primary"
@@ -219,7 +220,8 @@ export default function MyAccountPreferences() {
             margin-bottom: 20px;
           `}
         >
-          Game Resolution&nbsp; <FontAwesomeIcon icon={faDesktop} />
+          {i18n.t('settings:resolution.title')}
+          &nbsp; <FontAwesomeIcon icon={faDesktop} />
         </Title>
         <Paragraph
           css={`
@@ -228,7 +230,7 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          Select the initial game resolution in pixels (width x height)
+          {i18n.t('settings:resolution.description')}
         </Paragraph>
         <ResolutionInputContainer>
           <div>
@@ -288,7 +290,8 @@ export default function MyAccountPreferences() {
             margin-bottom: 20px;
           `}
         >
-          Java Memory&nbsp; <FontAwesomeIcon icon={faMemory} />
+          {i18n.t('settings:select_memory.title')}
+          &nbsp; <FontAwesomeIcon icon={faMemory} />
         </Title>
         <Paragraph
           css={`
@@ -297,7 +300,7 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          Select the preferred amount of memory to use when launching the game
+          {i18n.t('settings:select_memory.description')}
         </Paragraph>
         <Slider
           css={`
@@ -322,14 +325,15 @@ export default function MyAccountPreferences() {
             text-align: left;
           `}
         >
-          Java Custom Arguments &nbsp; <FontAwesomeIcon icon={faList} />
+          {i18n.t('settings:java_custom_arguments.title')}
+          &nbsp; <FontAwesomeIcon icon={faList} />
         </Title>
         <Paragraph
           css={`
             text-align: left;
           `}
         >
-          Select the preferred custom arguments to use when launching the game
+          {i18n.t('settings:java_custom_arguments.description')}
         </Paragraph>
         <div
           css={`

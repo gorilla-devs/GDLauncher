@@ -66,7 +66,7 @@ const ModpacksListWrapper = ({
           ...style,
           top: style.top + 8,
           height: style.height - 8,
-          background: `url('${primaryImage.thumbnailUrl}')`,
+          background: `url('${primaryImage?.thumbnailUrl}')`,
           position: 'absolute',
           width: '100%',
           backgroundRepeat: 'no-repeat',

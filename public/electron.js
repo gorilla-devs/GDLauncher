@@ -18,6 +18,7 @@ const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
+const i18nextBackend = require('i18next-electron-fs-backend');
 
 const fs = fss.promises;
 
@@ -171,9 +172,12 @@ function createWindow() {
       experimentalFeatures: true,
       nodeIntegration: true,
       // Disable in dev since I think hot reload is messing with it
-      webSecurity: !isDev
+      webSecurity: !isDev,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
+
+  i18nextBackend.mainBindings(ipcMain, mainWindow, fs);
 
   if (isDev) {
     globalShortcut.register('CommandOrControl+R', () => {
@@ -273,6 +277,8 @@ app.on('window-all-closed', () => {
   }
   if (process.platform !== 'darwin') {
     app.quit();
+  } else {
+    i18nextBackend.clearMainBindings(ipcMain);
   }
 });
 
