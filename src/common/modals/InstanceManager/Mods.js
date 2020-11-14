@@ -31,6 +31,7 @@ import {
   updateMod
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
+import i18n from '../../config/i18next';
 
 const Header = styled.div`
   height: 40px;
@@ -668,7 +669,7 @@ const Mods = ({ instanceName }) => {
         }}
         disabled={!hasModUpdates}
       >
-        Update all mods
+        {i18n.t('instance_manager:mods.update_all_mods')}
       </Menu.Item>
 
       <Menu.Item
@@ -716,7 +717,7 @@ const Mods = ({ instanceName }) => {
                 : setSelectedMods([])
             }
           >
-            Select All
+            {i18n.t('instance_manager:mods.select_all')}
           </Checkbox>
           <DeleteSelectedMods
             onClick={async () => {
@@ -766,7 +767,7 @@ const Mods = ({ instanceName }) => {
             );
           }}
         >
-          Add Mod
+          {i18n.t('instance_manager:mods.add_mod')}
         </Button>
         <Input
           allowClear
@@ -776,7 +777,9 @@ const Mods = ({ instanceName }) => {
           css={`
             width: 200px;
           `}
-          placeholder={`Search ${mods.length} mods`}
+          placeholder={i18n.t('instance_manager:mods.search_x_mods', {
+            count: mods.length
+          })}
         />
       </Header>
       <div
