@@ -230,3 +230,15 @@ export const isInstanceFolderPath = (f, instancesPath) =>
   /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+$/.test(
     convertCompletePathToInstance(f, instancesPath)
   );
+
+export const convertcurseForgeToCanonical = (
+  curseForge,
+  mcVersion,
+  forgeManifest
+) => {
+  const patchedCurseForge = curseForge.replace('forge-', '');
+  const forgeEquivalent = forgeManifest[mcVersion].find(v => {
+    return v.split('-')[1] === patchedCurseForge;
+  });
+  return forgeEquivalent;
+};

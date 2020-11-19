@@ -10,8 +10,8 @@ import EV from '../../../common/messageEvents';
 import { mainWindow } from '../windows';
 import { convertOSToJavaFormat } from '../../../common/utils';
 import { MANIFESTS } from '../manifests';
-import { TEMP_PATH, USERDATA_PATH } from '../config';
-import { downloadFile } from '../../../common/utils/downloader';
+import { DB_INSTANCE, TEMP_PATH, USERDATA_PATH } from '../config';
+import { downloadFile } from '../helpers/downloader';
 import { get7zPath, getFileHash, getFilesRecursive } from '../helpers';
 
 addListener(EV.UPDATE_PROGRESS_BAR, async v => {
@@ -222,4 +222,12 @@ addListener(EV.GET_FILE_HASH, filePath => {
 
 addListener(EV.GET_FILES_RECURSIVE, dirPath => {
   return getFilesRecursive(dirPath);
+});
+
+addListener(EV.USER_PREF.SET_CONCURRENT_DOWNLOADS, concurrency => {
+  return DB_INSTANCE.put('concurrentDownloads', concurrency);
+});
+
+addListener(EV.USER_PREF.GET_CONCURRENT_DOWNLOADS, () => {
+  return DB_INSTANCE.get('concurrentDownloads');
 });

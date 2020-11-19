@@ -2,9 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "jsx": "react",
-    "paths": {
-      "@ui": ["src/ui"]
-    }
+    "paths": {}
   },
   "exclude": ["node_modules", "build"]
 }

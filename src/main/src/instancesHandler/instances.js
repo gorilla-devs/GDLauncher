@@ -9,7 +9,9 @@ import generateMessageId from '../../../common/utils/generateMessageId';
 import PromiseQueue from '../../../common/utils/PromiseQueue';
 import { sendMessage } from '../messageListener';
 import { get7zPath } from '../helpers';
-import { INSTANCES_PATH } from '../config';
+import { DATASTORE_PATH, INSTANCES_PATH } from '../config';
+import { downloadFile } from '../helpers/downloader';
+import { GDL_LEGACYJAVAFIXER_MOD_URL } from '../../../common/utils/constants';
 
 // eslint-disable-next-line
 export const INSTANCES = {};
@@ -50,7 +52,7 @@ export const getInstanceDB = uid => {
 export const updateInstance = uid => {
   const updateConfigFile = async () => {
     try {
-      await getInstanceDB(uid).put(`instances.${uid}.config`, INSTANCES[uid]);
+      await getInstanceDB(uid).put(`config`, INSTANCES[uid]);
       sendMessage(
         EV.UPDATE_SPECIFIC_INSTANCE,
         generateMessageId(),
@@ -91,4 +93,11 @@ export const createExtractZip = async ([
       reject(err.stderr);
     });
   });
+};
+
+export const downloadJavaLegacyFixer = async () => {
+  await downloadFile(
+    path.join(DATASTORE_PATH, '__JLF__.jar'),
+    GDL_LEGACYJAVAFIXER_MOD_URL
+  );
 };

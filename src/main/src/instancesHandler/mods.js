@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { getAddon, getAddonFile, getAddonFiles } from '../../../common/api';
 import { normalizeModData, sortByDate } from '../../../common/utils';
-import { downloadFile } from '../../../common/utils/downloader';
+import { downloadFile } from '../helpers/downloader';
 import { INSTANCES, updateInstance } from './instances';
 import { getFileMurmurHash2 } from '../helpers';
 import { INSTANCES_PATH, TEMP_PATH } from '../config';

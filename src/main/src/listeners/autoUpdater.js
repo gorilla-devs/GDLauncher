@@ -7,7 +7,7 @@ import { mainWindow } from '../windows';
 import { addListener } from '../messageListener';
 import EV from '../../../common/messageEvents';
 
-const applyUpdate = async (e, quitAfterInstall) => {
+const applyUpdate = async quitAfterInstall => {
   if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
     autoUpdater.quitAndInstall(true, !quitAfterInstall);
   } else {

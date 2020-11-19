@@ -42,6 +42,9 @@ export function listenMessage() {
     const callback = listeners[type];
     try {
       const result = await callback(value);
+      if (result instanceof Error) {
+        throw result;
+      }
       respondToMessage(type, id, result);
     } catch (error) {
       log.error('response', error);

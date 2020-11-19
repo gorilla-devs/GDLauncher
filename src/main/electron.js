@@ -19,6 +19,7 @@ const initializeAutoUpdater = require('./src/autoUpdater').default;
 const initializeInstances = require('./src/instancesHandler').default;
 const generateMessageId = require('../common/utils/generateMessageId').default;
 const initializeManifests = require('./src/manifests').default;
+const validateClientId = require('./src/helpers/getClientToken').default;
 const { USERDATA_PATH } = require('./src/config');
 
 log.transports.file.level = 'silly';
@@ -30,8 +31,6 @@ log.transports.file.resolvePath = variables => {
 
 // eslint-disable-next-line
 import './src/handleGlobalCrash';
-
-// handleUserDataPath();
 
 // Prevent multiple instances
 app.allowRendererProcessReuse = false;
@@ -86,8 +85,16 @@ app.on('activate', () => {
   }
 });
 
-handleKeybinds();
-extractSevenZip();
-initializeAutoUpdater().catch(log.error);
-initializeInstances().catch(log.error);
-initializeManifests().catch(log.error);
+const initializeEverything = async () => {
+  // These are executed synchronously!
+  handleKeybinds();
+
+  // These are normal promises
+  await validateClientId().catch(log.error);
+  extractSevenZip();
+  initializeAutoUpdater().catch(log.error);
+  initializeManifests().catch(log.error);
+  initializeInstances().catch(log.error);
+};
+
+initializeEverything();

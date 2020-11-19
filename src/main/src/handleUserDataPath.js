@@ -4,7 +4,6 @@ import fs from 'fs';
 
 export default function handleUserDataPath() {
   app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
-
   if (
     process.env.REACT_APP_RELEASE_TYPE === 'portable' &&
     process.platform !== 'linux'

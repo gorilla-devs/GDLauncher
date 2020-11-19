@@ -1,4 +1,4 @@
-// const path = require("path");
+// const path = require('path');
 
 // const alias = {
 //   app: path.resolve("./src/app/"),
@@ -9,26 +9,20 @@
 const CracoAntDesignPlugin = require('craco-antd');
 // eslint-disable-next-line
 const webpack = require('webpack');
-const path = require('path');
+// const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
-const alias = require('./aliases');
+// const alias = require('./aliases');
 
-const aliases = alias();
-const resolvedAliases = Object.fromEntries(
-  Object.entries(aliases).map(([key, value]) => [
-    key,
-    path.resolve(__dirname, value)
-  ])
-);
+// const aliases = alias();
+// const resolvedAliases = Object.fromEntries(
+//   Object.entries(aliases).map(([key, value]) => [
+//     key,
+//     path.resolve(__dirname, value)
+//   ])
+// );
 
 /* eslint-disable */
-const appTarget =
-  process.env.NODE_ENV === 'development'
-    ? 'Dev'
-    : process.env.NODE_ENV === 'web'
-    ? 'Web'
-    : 'Electron';
-/* eslint-enable */
+const appTarget = process.env.APP_TYPE === 'web' ? 'browser' : 'desktop';
 
 module.exports = ({ env }) => {
   const isEnvDevelopment = env === 'development';
@@ -40,9 +34,12 @@ module.exports = ({ env }) => {
         [
           '@babel/preset-env',
           {
-            targets: {
-              node: '14'
-            }
+            targets:
+              process.env.APP_TYPE === 'web'
+                ? 'defaults'
+                : {
+                    node: true
+                  }
           }
         ],
         '@babel/react'
@@ -64,10 +61,8 @@ module.exports = ({ env }) => {
       ]
     },
     webpack: {
-      devtool: 'eval-cheap-module-source-map',
-      configure: {
-        devtool: 'eval-cheap-module-source-map',
-        optimization: {
+      configure: webpackConfig => {
+        webpackConfig.optimization = {
           splitChunks: {
             name: false,
             chunks: 'all',
@@ -88,15 +83,14 @@ module.exports = ({ env }) => {
               }
             }
           }
-        },
-        output: {
+        };
+        Object.assign(webpackConfig.output, {
           filename: isEnvProduction
             ? 'static/js/[name].js'
             : isEnvDevelopment && 'static/js/bundle.js',
-          chunkFilename: isEnvProduction
-            ? 'static/js/[name].chunk.js'
-            : isEnvDevelopment && 'static/js/[name].chunk.js'
-        }
+          chunkFilename: 'static/js/[name].chunk.js'
+        });
+        return webpackConfig;
       },
       optimization: {
         minimizer: [
@@ -107,17 +101,15 @@ module.exports = ({ env }) => {
       },
       plugins: [
         new webpack.NormalModuleReplacementPlugin(
-          /(.*)-APP_TARGET(\.*)/,
+          /(.*)_APP_TARGET_(\.*)/,
           resource => {
-            // eslint-disable-next-line
             resource.request = resource.request.replace(
-              /-APP_TARGET/,
-              `-${appTarget}`
+              /_APP_TARGET_/,
+              `${appTarget}`
             );
           }
         )
-      ],
-      alias: resolvedAliases
+      ]
     },
     plugins: [
       {

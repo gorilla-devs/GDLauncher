@@ -24,10 +24,15 @@ export function createMainWindow() {
     backgroundColor: '#1B2533',
     webPreferences: {
       experimentalFeatures: true,
-      nodeIntegration: true,
-      // Disable in dev since I think hot reload is messing with it
-      webSecurity: !isDev,
-      enableRemoteModule: true
+      contextIsolation: true,
+      webSecurity: false,
+      nodeIntegration: false,
+      enableRemoteModule: false,
+      sandbox: true,
+      preload: path.resolve(
+        __dirname,
+        isDev ? '../src/main/src/preload.js' : '../build/preload.js'
+      )
     }
   });
 

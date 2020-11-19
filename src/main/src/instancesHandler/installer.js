@@ -36,10 +36,7 @@ import {
   MC_RESOURCES_URL,
   VANILLA
 } from '../../../common/utils/constants';
-import {
-  downloadFile,
-  downloadInstanceFiles
-} from '../../../common/utils/downloader';
+import { downloadFile, downloadInstanceFiles } from '../helpers/downloader';
 import {
   copyAssetsToLegacy,
   copyAssetsToResources,
@@ -56,10 +53,10 @@ import { getAddon, getAddonFile, getFabricJson } from '../../../common/api';
 import {
   mavenToArray,
   normalizeModData,
-  waitTime
+  waitTime,
+  convertcurseForgeToCanonical
 } from '../../../common/utils';
-import fmlLibsMapping from '../../../app/desktop/utils/fmllibs';
-import { convertcurseForgeToCanonical } from '../../../app/desktop/utils';
+import fmlLibsMapping from '../helpers/fmllibs';
 
 export const INSTALL_STATES = {
   DOWNLOADING_GAME_FILES: 'DOWNLOADING_GAME_FILES',
@@ -107,7 +104,7 @@ export const applyInstall = async ([
   INSTANCES[uid] = installFunc.config;
   updateInstance(uid);
   if (manifest) {
-    getInstanceDB(uid).put(`instances.${uid}.manifest`, manifest);
+    getInstanceDB(uid).put(`manifest`, manifest);
   }
 };
 

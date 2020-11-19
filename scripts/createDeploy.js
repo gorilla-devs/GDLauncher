@@ -139,11 +139,6 @@ const commonConfig = {
         to: './7z',
         filter: '**/*'
       },
-      {
-        from: 'java',
-        to: './java',
-        filter: '**/*'
-      },
       ...(process.platform === 'win32'
         ? [
             {
@@ -171,7 +166,7 @@ const commonConfig = {
         }
       ]
     },
-    nsisWeb: {
+    nsis: {
       oneClick: true,
       installerIcon: './public/icon.ico',
       uninstallerIcon: './public/icon.ico',
@@ -204,7 +199,7 @@ const commonConfig = {
         : ['snap:x64']
   }),
   ...((!process.env.RELEASE_TESTING || process.platform === 'win32') && {
-    win: [type === 'setup' ? 'nsis-web:x64' : 'zip:x64']
+    win: [type === 'setup' ? 'nsis:x64' : 'zip:x64']
   }),
   ...((!process.env.RELEASE_TESTING || process.platform === 'darwin') && {
     mac: type === 'setup' ? ['dmg:x64'] : []
@@ -227,12 +222,6 @@ const main = async () => {
 
   const { productName } = commonConfig.config;
 
-  const { version } = await fse.readJson(
-    path.resolve(__dirname, '../', 'package.json')
-  );
-
-  const nsisWeb7z = `${productName}-${version}-${process.arch}.nsis.7z`;
-
   const allFiles = {
     setup: {
       darwin: [
@@ -241,9 +230,9 @@ const main = async () => {
         'latest-mac.yml'
       ],
       win32: [
-        path.join('nsis-web', `${productName}-win-${type}.exe`),
-        path.join('nsis-web', nsisWeb7z),
-        path.join('nsis-web', 'latest.yml')
+        `${productName}-win-${type}.exe`,
+        `${productName}-win-${type}.exe.blockmap`,
+        'latest.yml'
       ],
       linux: [
         `${productName}-linux-${type}.zip`,
