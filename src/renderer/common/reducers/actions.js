@@ -18,7 +18,7 @@ export const updateCurrentAccountId = id => {
   return async dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
-      id
+      value: id
     });
     return sendMessage(EV.AUTH.SET_CURRENT_ACCOUNT_ID, id);
   };

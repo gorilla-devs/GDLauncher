@@ -60,12 +60,14 @@ const ProfileSettings = () => {
 
                     dispatch(requesting(features.checkingAccount));
                     const currentId = currentAccount.selectedProfile.id;
+                    console.log('SWITCHING TO:', account.selectedProfile.id);
                     await dispatch(
                       updateCurrentAccountId(account.selectedProfile.id)
                     );
                     try {
                       await dispatch(dispatch(loginWithAccessToken()));
                     } catch {
+                      console.log('SWITCHING BACK TO:', currentId);
                       await dispatch(updateCurrentAccountId(currentId));
                       message.error('Account not valid');
                     }
