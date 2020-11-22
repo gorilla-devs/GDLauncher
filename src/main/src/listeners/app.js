@@ -4,6 +4,7 @@ import { extractFull } from 'node-7z';
 import fse from 'fs-extra';
 import { promisify } from 'util';
 import { exec } from 'child_process';
+import to from 'await-to-js';
 import path from 'path';
 import { addListener, sendMessage } from '../messageListener';
 import EV from '../../../common/messageEvents';
@@ -12,7 +13,7 @@ import { convertOSToJavaFormat } from '../../../common/utils';
 import { MANIFESTS } from '../manifests';
 import { DB_INSTANCE, TEMP_PATH, USERDATA_PATH } from '../config';
 import { downloadFile } from '../helpers/downloader';
-import { get7zPath, getFileHash, getFilesRecursive } from '../helpers';
+import { extractFace, get7zPath } from '../helpers';
 
 addListener(EV.UPDATE_PROGRESS_BAR, async v => {
   mainWindow.setProgressBar(v);
@@ -52,23 +53,6 @@ addListener(EV.IS_APP_IMAGE, async () => {
   return process.env.APPIMAGE;
 });
 
-addListener(EV.GET_APP_DATA_PATH, async () => {
-  return app.getPath('appData');
-});
-
-// Returns path to app.asar
-addListener(EV.GET_APP_PATH, async () => {
-  return app.getAppPath();
-});
-
-addListener(EV.GET_USER_DATA_PATH, async () => {
-  return app.getPath('userData');
-});
-
-addListener(EV.GET_EXECUTABLE_PATH, async () => {
-  return path.dirname(app.getPath('exe'));
-});
-
 addListener(EV.GET_APP_VERSION, async () => {
   return app.getVersion();
 });
@@ -77,8 +61,8 @@ addListener(EV.IS_MAIN_WINDOW_MAXIMIZED, async () => {
   return !mainWindow.maximizable;
 });
 
-addListener(EV.OPEN_FOLDER, async folderPath => {
-  shell.openExternal(folderPath);
+addListener(EV.OPEN_EXTERNAL, async url => {
+  shell.openExternal(url);
 });
 
 addListener(EV.OPEN_FOLDER_DIALOG, async defaultPath => {
@@ -212,16 +196,8 @@ addListener(EV.INSTALL_JAVA, async () => {
   await new Promise(resolve => setTimeout(resolve, 2000));
 });
 
-addListener(EV.GET_7Z_PATH, () => {
-  return get7zPath();
-});
-
-addListener(EV.GET_FILE_HASH, filePath => {
-  return getFileHash(filePath);
-});
-
-addListener(EV.GET_FILES_RECURSIVE, dirPath => {
-  return getFilesRecursive(dirPath);
+addListener(EV.GET_PLAYER_FACE_SKIN, skin => {
+  return extractFace(skin);
 });
 
 addListener(EV.USER_PREF.SET_CONCURRENT_DOWNLOADS, concurrency => {
@@ -230,4 +206,21 @@ addListener(EV.USER_PREF.SET_CONCURRENT_DOWNLOADS, concurrency => {
 
 addListener(EV.USER_PREF.GET_CONCURRENT_DOWNLOADS, () => {
   return DB_INSTANCE.get('concurrentDownloads');
+});
+
+addListener(EV.USER_PREF.SET_SHOW_NEWS, showNews => {
+  return DB_INSTANCE.put('showNews', showNews);
+});
+
+addListener(EV.USER_PREF.GET_SHOW_NEWS, () => {
+  return DB_INSTANCE.get('showNews');
+});
+
+addListener(EV.SET_LAST_CHANGELOG_SHOWN, () => {
+  return DB_INSTANCE.put('lastVersionShown', app.getVersion());
+});
+
+addListener(EV.GET_LAST_CHANGELOG_SHOWN, async () => {
+  const [, lastVersion] = await to(DB_INSTANCE.get('lastVersionShown'));
+  return lastVersion || null;
 });

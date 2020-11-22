@@ -51,18 +51,24 @@ const MainContainer = styled.div`
   justify-content: space-between;
   position: relative;
   z-index: 100000;
-  & > * {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.1s ease-in-out;
-  }
 `;
 
 const WindowControls = styled.div`
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
   flex-direction: row-reverse;
   div {
-    margin: 0 10px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 20px;
+    &:hover {
+      background: ${({ theme }) => theme.palette.grey[800]};
+    }
+    &:active {
+      background: ${({ theme }) => theme.palette.grey[700]};
+    }
   }
 `;

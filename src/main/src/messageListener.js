@@ -18,10 +18,15 @@ export const sendMessage = (type, id, value, success) => {
 export function listenMessage() {
   const respondToMessage = (type, id, value, success = true) => {
     if (blockedListener) return;
+    let parsedValue = value;
+    if (!success) {
+      parsedValue = new Error(value);
+    }
+
     mainWindow.webContents.send('__MAIN_MESSAGE__', {
       type,
       id,
-      value,
+      value: parsedValue,
       success
     });
   };
@@ -42,9 +47,6 @@ export function listenMessage() {
     const callback = listeners[type];
     try {
       const result = await callback(value);
-      if (result instanceof Error) {
-        throw result;
-      }
       respondToMessage(type, id, result);
     } catch (error) {
       log.error('response', error);
@@ -63,7 +65,7 @@ export const blockListener = () => {
 };
 
 export const registerListeners = () => {
-  const modules = ['instances', 'discord', 'app'];
+  const modules = ['instances', 'discord', 'app', 'auth'];
   let isOk = true;
 
   const notifyError = (name, error) => {

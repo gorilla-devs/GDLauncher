@@ -10,6 +10,15 @@ function news(state = [], action) {
   }
 }
 
+function showNews(state = true, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_SHOW_NEWS:
+      return action.showNews;
+    default:
+      return state;
+  }
+}
+
 function message(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_MESSAGE:
@@ -18,6 +27,7 @@ function message(state = null, action) {
       return state;
   }
 }
+
 function accounts(state = {}, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_ACCOUNT:
@@ -27,6 +37,15 @@ function accounts(state = {}, action) {
       };
     case ActionTypes.REMOVE_ACCOUNT:
       return omit(state, [action.id]);
+    default:
+      return state;
+  }
+}
+
+function currentAccountId(state = null, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_CURRENT_ACCOUNT_ID:
+      return action.value;
     default:
       return state;
   }
@@ -73,9 +92,6 @@ function instances(
         ...state,
         installationProgress: action.data
       };
-
-    case ActionTypes.UPDATE_INSTANCE_STARTED:
-      return { ...state, started: action.started };
     case ActionTypes.ADD_STARTING_INSTANCE:
       return {
         ...state,
@@ -128,8 +144,10 @@ function updateAvailable(state = false, action) {
 }
 
 export default {
+  showNews,
   news,
   accounts,
+  currentAccountId,
   message,
   instances,
   updateAvailable

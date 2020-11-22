@@ -6,14 +6,15 @@ import { ConnectedRouter } from 'connected-react-router';
 import 'inter-ui';
 import Renderer from './renderer';
 import theme from './renderer/common/theme';
-import storeConfig from './renderer/common/store';
+import configureStore from './renderer/common/store';
 
-window.__store = storeConfig.store;
+const store = configureStore.configureStore();
+window.__store = store;
 
 const MainRoot = memo(() => {
   return (
-    <Provider store={storeConfig.store}>
-      <ConnectedRouter history={storeConfig.history}>
+    <Provider store={store}>
+      <ConnectedRouter history={configureStore.history}>
         <StyledThemeProvider theme={theme}>
           <Renderer />
         </StyledThemeProvider>

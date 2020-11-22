@@ -19,6 +19,7 @@ const initializeAutoUpdater = require('./src/autoUpdater').default;
 const initializeInstances = require('./src/instancesHandler').default;
 const generateMessageId = require('../common/utils/generateMessageId').default;
 const initializeManifests = require('./src/manifests').default;
+const setupInitialConfig = require('./src/setupInitialConfig').default;
 const validateClientId = require('./src/helpers/getClientToken').default;
 const { USERDATA_PATH } = require('./src/config');
 
@@ -92,6 +93,7 @@ const initializeEverything = async () => {
   // These are normal promises
   await validateClientId().catch(log.error);
   extractSevenZip();
+  setupInitialConfig().catch(log.error);
   initializeAutoUpdater().catch(log.error);
   initializeManifests().catch(log.error);
   initializeInstances().catch(log.error);

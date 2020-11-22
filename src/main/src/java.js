@@ -1,13 +1,12 @@
 import path from 'path';
-import { promises as fs } from 'fs';
 import { convertOSToJavaFormat } from '../../common/utils';
-import { USERDATA_PATH } from './config';
+import { DB_INSTANCE, DB_SCHEMA, USERDATA_PATH } from './config';
 import { MANIFESTS } from './manifests';
 
 let _javaOverride;
-const readOverrideFromFile = async () => {
+const readOverrideFromConfig = async () => {
   try {
-    _javaOverride = await fs.readFile(USERDATA_PATH, 'java.data');
+    _javaOverride = await DB_INSTANCE.get(DB_SCHEMA.customJavaPath);
   } catch {
     _javaOverride = null;
     // no override
@@ -16,7 +15,7 @@ const readOverrideFromFile = async () => {
 
 export default async function getJavaPath() {
   if (_javaOverride === undefined) {
-    await readOverrideFromFile();
+    await readOverrideFromConfig();
   }
 
   if (_javaOverride) return _javaOverride;

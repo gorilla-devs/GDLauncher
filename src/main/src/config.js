@@ -15,7 +15,23 @@ export const MC_ASSETS_PATH = (() => path.join(DATASTORE_PATH, 'assets'))();
 export const TEMP_PATH = (() => path.join(USERDATA_PATH, 'temp'))();
 
 export const DB_INSTANCE = levelup(
-  encode(
-    leveldown(path.join(USERDATA_PATH, 'configDB'), { valueEncoding: 'json' })
-  )
+  encode(leveldown(path.join(USERDATA_PATH, 'configDB')), {
+    valueEncoding: 'json'
+  })
 );
+
+export const DB_SCHEMA = {
+  showNews: 'showNews',
+  concurrentDownloads: 'concurrentDownloads',
+  lastVersionShown: 'lastVersionShown',
+  currentAccountId: 'currentAccountId',
+  accounts: 'accounts',
+  customJavaPath: 'customJavaPath',
+  manifests: {
+    mcVersions: 'manifests.mcVersions',
+    fabric: 'manifests.fabric',
+    forge: 'manifests.forge',
+    java: 'manifests.java',
+    addonCategories: 'manifests.addonCategories'
+  }
+};

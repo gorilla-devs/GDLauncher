@@ -18,7 +18,7 @@ import EV from 'src/common/messageEvents';
 import features from 'src/renderer/common/reducers/loading/features';
 import sendMessage from 'src/renderer/desktop/helpers/sendMessage';
 import { openModal } from 'src/renderer/common/reducers/modals/actions';
-import { loginMinecraftAccount } from '../actions';
+import { loginMinecraftAccount } from 'src/renderer/common/reducers/actions';
 
 const LoginButton = styled(Button)`
   border-radius: 4px;
@@ -172,17 +172,17 @@ const Login = () => {
   const [loginFailed, setLoginFailed] = useState(false);
   const [status, setStatus] = useState({});
   const loading = useSelector(
-    state => state.loading[features.addingAccount].isRequesting
+    state => state.loading[features.checkingAccount].isRequesting
   );
 
   const authenticate = () => {
     if (!email || !password) return;
-    dispatch(requesting(features.addingAccount));
+    dispatch(requesting(features.checkingAccount));
     setTimeout(() => {
       dispatch(
         load(
-          features.addingAccount,
-          dispatch(loginMinecraftAccount(email, password))
+          features.checkingAccount,
+          dispatch(loginMinecraftAccount(email, password, true))
         )
       ).catch(e => {
         console.error(e);

@@ -34,7 +34,6 @@ const enhancer = compose(
 
 const configureStore = () => {
   const store = createStore(rootReducer, enhancer);
-
   if (process.env.NODE_ENV !== 'production' && module.hot) {
     module.hot.accept(
       '../reducers',
@@ -45,4 +44,4 @@ const configureStore = () => {
   return store;
 };
 
-export default { store: configureStore(), history };
+export default { configureStore, history };

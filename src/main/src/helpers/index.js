@@ -7,6 +7,7 @@ import log from 'electron-log';
 import { spawn } from 'child_process';
 import makeDir from 'make-dir';
 import originalFs from 'original-fs';
+import jimp from 'jimp';
 import murmur from 'murmur2-calculator';
 import { MC_LIBRARIES_URL } from '../../../common/utils/constants';
 import {
@@ -355,4 +356,12 @@ export const getPlayerSkin = async uuid => {
   const base64 = data.properties[0].value;
   const decoded = JSON.parse(Buffer.from(base64, 'base64').toString());
   return decoded?.textures?.SKIN?.url;
+};
+
+export const extractFace = async buffer => {
+  const image = await jimp.read(buffer);
+  image.crop(8, 8, 8, 8);
+  image.scale(10, jimp.RESIZE_NEAREST_NEIGHBOR);
+  const imageBuffer = await image.getBufferAsync(jimp.MIME_PNG);
+  return imageBuffer.toString('base64');
 };

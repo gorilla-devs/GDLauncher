@@ -7,26 +7,22 @@ import {
   getJavaManifest,
   getMcManifest
 } from '../../common/api';
-import EV from '../../common/messageEvents';
 import { reflect } from '../../common/utils';
-import generateMessageId from '../../common/utils/generateMessageId';
-import { DB_INSTANCE } from './config';
-import { sendMessage } from './messageListener';
+import { DB_INSTANCE, DB_SCHEMA } from './config';
 
 export const MANIFESTS = {
-  mcVersions: {},
-  fabric: {},
-  forge: {},
-  java: [],
-  addonCategories: {}
+  [DB_SCHEMA.manifests.mcVersions]: {},
+  [DB_SCHEMA.manifests.fabric]: {},
+  [DB_SCHEMA.manifests.forge]: {},
+  [DB_SCHEMA.manifests.java]: [],
+  [DB_SCHEMA.manifests.addonCategories]: {}
 };
 
 const readManifestsFromDisk = async () => {
   for (const manifestKey in MANIFESTS) {
     if (MANIFESTS.hasOwnProperty(manifestKey)) {
-      const manifestPath = `manifests.${manifestKey}`;
       try {
-        const manifest = await DB_INSTANCE.get(manifestPath);
+        const manifest = await DB_INSTANCE.get(manifestKey);
         MANIFESTS[manifestKey] = manifest;
       } catch {
         // It's ok, we will download it after this
@@ -39,24 +35,24 @@ const getManifestsFromAPIs = async () => {
   let mc = null;
   try {
     mc = (await getMcManifest()).data;
-    MANIFESTS.mcVersions = mc;
+    MANIFESTS[DB_SCHEMA.manifests.mcVersions] = mc;
   } catch (err) {
     log.error(err);
   }
 
   const getFabricVersions = async () => {
     const fabric = (await getFabricManifest()).data;
-    MANIFESTS.fabric = fabric;
+    MANIFESTS[DB_SCHEMA.manifests.fabric] = fabric;
     return fabric;
   };
   const getJavaManifestVersions = async () => {
     const java = (await getJavaManifest()).data;
-    MANIFESTS.java = java;
+    MANIFESTS[DB_SCHEMA.manifests.java] = java;
     return java;
   };
   const getAddonCategoriesVersions = async () => {
     const curseforgeCategories = (await getAddonCategories()).data;
-    MANIFESTS.addonCategories = curseforgeCategories;
+    MANIFESTS[DB_SCHEMA.manifests.addonCategories] = curseforgeCategories;
     return curseforgeCategories;
   };
   const getForgeVersions = async () => {
@@ -70,7 +66,10 @@ const getManifestsFromAPIs = async () => {
       }
     });
 
-    MANIFESTS.forge = omitBy(forgeVersions, v => v.length === 0);
+    MANIFESTS[DB_SCHEMA.manifests.forge] = omitBy(
+      forgeVersions,
+      v => v.length === 0
+    );
     return omitBy(forgeVersions, v => v.length === 0);
   };
   // Using reflect to avoid rejection
@@ -82,16 +81,15 @@ const getManifestsFromAPIs = async () => {
   ]);
 
   if (fabric.e || java.e || categories.e || forge.e) {
-    log.error(fabric, java, categories, forge);
+    log.error(fabric.e, java.e, categories.e, forge.e);
   }
 };
 
 const updateManifestsInDB = async () => {
   for (const manifestKey in MANIFESTS) {
     if (MANIFESTS.hasOwnProperty(manifestKey)) {
-      const manifestPath = `manifests.${manifestKey}`;
       try {
-        await DB_INSTANCE.put(manifestPath, MANIFESTS[manifestKey]);
+        await DB_INSTANCE.put(manifestKey, MANIFESTS[manifestKey]);
         log.log(`Updated manifest ${manifestKey} in db`);
       } catch (e) {
         log.error(`Can't write manifest ${manifestKey} to db`, e);
@@ -103,9 +101,7 @@ const updateManifestsInDB = async () => {
 export default async function initializeManifests() {
   // Try to read them from disk
   await readManifestsFromDisk();
-  sendMessage(EV.UPDATE_MANIFESTS_FROM_DISK, generateMessageId(), MANIFESTS);
   await getManifestsFromAPIs();
-  sendMessage(EV.UPDATE_MANIFESTS_FROM_APIS, generateMessageId(), MANIFESTS);
   await updateManifestsInDB();
   log.log('Manifests initialized');
 }

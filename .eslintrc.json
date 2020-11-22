@@ -29,6 +29,7 @@
     "jsx-a11y/aria-role": "off",
     "no-restricted-syntax": "off",
     "no-unused-vars": "error",
+    "no-return-await": "off",
     "no-unused-expressions": "error",
     "consistent-return": "off",
     "jsx-a11y/no-static-element-interactions": "off",

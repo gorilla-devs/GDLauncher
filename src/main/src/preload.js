@@ -18,7 +18,6 @@ void (function () {
   window.addEventListener('__MAIN_MESSAGE__', event => {
     const data = event.detail;
     const { type, id, value, success } = data;
-
     if (typeof id === 'string' && id in requestMap) {
       const entry = requestMap[id];
       clearTimeout(entry.t);

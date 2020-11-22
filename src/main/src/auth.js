@@ -1,6 +1,7 @@
 import log from 'electron-log';
 import path from 'path';
 import { promises as fs } from 'fs';
+import to from 'await-to-js';
 import { APPDATA_PATH, DB_INSTANCE } from './config';
 import {
   mcAuthenticate,
@@ -13,12 +14,17 @@ import ERRORS from '../../common/errors';
 import { getPlayerSkin } from './helpers';
 
 export const validateCurrentAccount = async () => {
-  const accounts = await DB_INSTANCE.get('accounts').catch();
-  const currentAccountId = await DB_INSTANCE.get('currentAccountId');
-  const currentAccount = accounts[currentAccountId];
-  const { accessToken, clientToken, selectedProfile } = currentAccount;
-  if (!accessToken) throw new Error(ERRORS.LOGIN.ACCESS_TOKEN_MISSING);
+  let accessToken;
+  let clientToken;
+  let selectedProfile;
+  let accounts;
+  let currentAccount;
   try {
+    accounts = await DB_INSTANCE.get('accounts');
+    const currentAccountId = await DB_INSTANCE.get('currentAccountId');
+    currentAccount = accounts[currentAccountId];
+    ({ accessToken, clientToken, selectedProfile } = currentAccount);
+    if (!accessToken) throw new Error(ERRORS.LOGIN.ACCESS_TOKEN_MISSING);
     await mcValidate(accessToken, clientToken);
     try {
       const skinUrl = await getPlayerSkin(selectedProfile.id);
@@ -33,7 +39,7 @@ export const validateCurrentAccount = async () => {
   } catch (error) {
     log.error(error);
     // Trying refreshing the stored access token
-    if (error.response && error.response.status === 403) {
+    if (error?.response?.status === 403) {
       try {
         const { data } = await mcRefresh(accessToken, clientToken);
         const skinUrl = await getPlayerSkin(data.selectedProfile.id);
@@ -45,6 +51,12 @@ export const validateCurrentAccount = async () => {
         await DB_INSTANCE.put('accounts', accounts);
         return data;
       } catch (nestedError) {
+        // Invalidate token
+        if (currentAccount && accounts) {
+          currentAccount.accessToken = null;
+          await DB_INSTANCE.put('accounts', accounts);
+        }
+
         log.error(error, nestedError);
         throw new Error(error, nestedError);
       }
@@ -55,9 +67,9 @@ export const validateCurrentAccount = async () => {
 };
 
 export const switchToFirstValidAccount = async () => {
-  const accounts = await DB_INSTANCE.get('accounts').catch();
-  let found = null;
-  for (const accountId in accounts) {
+  const [, accounts] = await to(DB_INSTANCE.get('accounts'));
+  let found = false;
+  for (const accountId in accounts || {}) {
     try {
       await DB_INSTANCE.put(
         'currentAccountId',
@@ -71,7 +83,7 @@ export const switchToFirstValidAccount = async () => {
     }
   }
   if (!found) {
-    await DB_INSTANCE.put('currentAccountId', null);
+    await DB_INSTANCE.put('currentAccountId', false);
   }
   return found;
 };
@@ -113,7 +125,12 @@ export const loginWithUsernamePassword = async ([username, password]) => {
 
     await DB_INSTANCE.put('currentAccountId', data.selectedProfile.id);
     // Update or add the account in the accounts list
-    const accounts = (await DB_INSTANCE.get('accounts').catch()) || {};
+    let accounts = {};
+    try {
+      accounts = await DB_INSTANCE.get('accounts');
+    } catch {
+      // Nothing
+    }
     accounts[data.selectedProfile.id] = data;
     await DB_INSTANCE.put('accounts', accounts);
     return data;
@@ -124,7 +141,7 @@ export const loginWithUsernamePassword = async ([username, password]) => {
 };
 
 export const logout = async () => {
-  const accounts = await DB_INSTANCE.get('accounts').catch();
+  const accounts = await DB_INSTANCE.get('accounts');
   const currentAccountId = await DB_INSTANCE.get('currentAccountId');
   const { clientToken, accessToken } = accounts[currentAccountId];
   mcInvalidate(accessToken, clientToken).catch(log.error);
@@ -134,7 +151,7 @@ export const logout = async () => {
   return newCurrentId;
 };
 
-export const loginThroughNativePlatforms = async () => {
+export const loginThroughNativePlatform = async () => {
   const mcFolder = process.platform === 'darwin' ? 'minecraft' : '.minecraft';
   const vanillaMCPath =
     process.platform === 'linux'
@@ -164,16 +181,33 @@ export const loginThroughNativePlatforms = async () => {
 
     await DB_INSTANCE.put('currentAccountId', data.selectedProfile.id);
     // Update or add the account in the accounts list
-    const accounts = (await DB_INSTANCE.get('accounts').catch()) || {};
+    let accounts = {};
+    try {
+      accounts = await DB_INSTANCE.get('accounts');
+    } catch {
+      // Nothing
+    }
+
     accounts[data.selectedProfile.id] = data;
     await DB_INSTANCE.put('accounts', accounts);
+    return data;
   } catch (err) {
     throw new Error(err);
   }
 };
 
 export const getAllAccounts = async () => {
-  return DB_INSTANCE.get('accounts');
+  const [, accounts] = await to(DB_INSTANCE.get('accounts'));
+  return accounts || {};
+};
+
+export const getCurrentAccountId = async () => {
+  const [, currentAccountId] = await to(DB_INSTANCE.get('currentAccountId'));
+  return currentAccountId || false;
+};
+
+export const setCurrentAccountId = async id => {
+  return DB_INSTANCE.put('currentAccountId', id || false);
 };
 
 export const isNewUser = async () => {
@@ -183,4 +217,8 @@ export const isNewUser = async () => {
   } catch {
     return true;
   }
+};
+
+export const setIsNewUser = async value => {
+  return DB_INSTANCE.put('onboarded', value);
 };
