@@ -4,9 +4,9 @@ import { useDispatch } from 'react-redux';
 import { Input, Button } from 'antd';
 import { load } from 'src/renderer/common/reducers/loading/actions';
 import features from 'src/renderer/common/reducers/loading/features';
-import { loginMinecraftAccount } from 'src/renderer/common/reducers/actions';
 import { closeModal } from 'src/renderer/common/reducers/modals/actions';
 import ModalWindow from 'src/renderer/common/components/ModalWindow';
+import { login } from 'src/renderer/common/reducers/authActions';
 
 const AddAccount = ({ username }) => {
   const dispatch = useDispatch();
@@ -14,12 +14,7 @@ const AddAccount = ({ username }) => {
   const [password, setPassword] = useState('');
 
   const addAccount = () => {
-    dispatch(
-      load(
-        features.checkingAccount,
-        dispatch(loginMinecraftAccount(email, password))
-      )
-    )
+    dispatch(load(features.checkingAccount, dispatch(login(email, password))))
       .then(() => dispatch(closeModal()))
       .catch(console.error);
   };

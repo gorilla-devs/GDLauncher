@@ -65,7 +65,7 @@ export const blockListener = () => {
 };
 
 export const registerListeners = () => {
-  const modules = ['instances', 'discord', 'app', 'auth'];
+  const modules = ['instances', 'discord', 'app', 'auth', 'persistor'];
   let isOk = true;
 
   const notifyError = (name, error) => {

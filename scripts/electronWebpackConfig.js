@@ -47,7 +47,10 @@ const baseConfig = {
    */
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
-    modules: [path.join(__dirname, '..', 'build'), 'node_modules']
+    modules: [path.join(__dirname, '..', 'build'), 'node_modules'],
+    alias: {
+      src: path.resolve(__dirname, '../src/')
+    }
   },
 
   plugins: [

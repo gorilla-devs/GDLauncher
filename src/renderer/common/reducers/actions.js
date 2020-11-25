@@ -1,7 +1,4 @@
-import { push } from 'connected-react-router';
 import axios from 'axios';
-import EV from 'src/common/messageEvents';
-import sendMessage from 'src/renderer/desktop/helpers/sendMessage';
 import { NEWS_URL } from 'src/common/utils/constants';
 import * as ActionTypes from './actionTypes';
 
@@ -11,30 +8,6 @@ export const updateShowNews = showNews => {
       type: ActionTypes.UPDATE_SHOW_NEWS,
       showNews
     });
-  };
-};
-
-export const updateCurrentAccountId = id => {
-  return async dispatch => {
-    dispatch({
-      type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
-      value: id
-    });
-    return sendMessage(EV.AUTH.SET_CURRENT_ACCOUNT_ID, id);
-  };
-};
-
-export const removeAccount = id => {
-  return async (dispatch, getState) => {
-    dispatch({
-      type: ActionTypes.REMOVE_ACCOUNT,
-      id
-    });
-    const { accounts } = getState();
-    await sendMessage(EV.AUTH.LOGOUT, id);
-    if (Object.keys(accounts).length === 0) {
-      dispatch(push('/'));
-    }
   };
 };
 
@@ -70,106 +43,20 @@ export const initNews = () => {
   };
 };
 
-export const initAccounts = (accounts, currentAccountId) => {
+export const initStoreFromMain = storeValues => {
   return dispatch => {
-    for (const accountId in accounts || {}) {
-      dispatch({
-        type: ActionTypes.UPDATE_ACCOUNT,
-        id: accountId,
-        data: accounts[accountId]
-      });
-    }
     dispatch({
-      type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
-      value: currentAccountId || null
+      type: ActionTypes.INIT_STORE_VALUES,
+      data: storeValues
     });
   };
 };
 
-export const loginMinecraftAccount = (username, password, redirect) => {
-  return async dispatch => {
-    const result = await sendMessage(EV.AUTH.LOGIN_WITH_USERNAME_PASSWORD, [
-      username,
-      password
-    ]);
-    const isNewUser = await sendMessage(EV.AUTH.IS_NEW_USER);
+export const updateIsNewUser = value => {
+  return dispatch => {
     dispatch({
-      type: ActionTypes.UPDATE_ACCOUNT,
-      id: result?.selectedProfile?.id,
-      data: result
+      type: ActionTypes.UPDATE_IS_NEW_USER,
+      value
     });
-    dispatch({
-      type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
-      value: result?.selectedProfile?.id
-    });
-
-    if (redirect) {
-      if (isNewUser) {
-        dispatch(push('/onboarding'));
-      } else {
-        dispatch(push('/home'));
-      }
-    }
-  };
-};
-
-export const loginThroughNativePlatform = redirect => {
-  return async dispatch => {
-    try {
-      const result = await sendMessage(EV.AUTH.LOGIN_THROUGH_NATIVE_PLATFORM);
-      const isNewUser = await sendMessage(EV.AUTH.IS_NEW_USER);
-      dispatch({
-        type: ActionTypes.UPDATE_ACCOUNT,
-        id: result?.selectedProfile?.id,
-        data: result
-      });
-      dispatch({
-        type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
-        value: result?.selectedProfile?.id
-      });
-
-      if (redirect) {
-        if (isNewUser) {
-          dispatch(push('/onboarding'));
-        } else {
-          dispatch(push('/home'));
-        }
-      }
-    } catch {
-      if (redirect) {
-        dispatch(push('/'));
-      }
-    }
-  };
-};
-
-export const loginWithAccessToken = redirect => {
-  return async dispatch => {
-    try {
-      const result = await sendMessage(EV.AUTH.VALIDATE_CURRENT_ACCOUNT);
-      if (!result) throw new Error('Could not verify access token');
-      const isNewUser = await sendMessage(EV.AUTH.IS_NEW_USER);
-      dispatch({
-        type: ActionTypes.UPDATE_ACCOUNT,
-        id: result?.selectedProfile?.id,
-        data: result
-      });
-      dispatch({
-        type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
-        value: result?.selectedProfile?.id
-      });
-
-      if (redirect) {
-        if (isNewUser) {
-          dispatch(push('/onboarding'));
-        } else {
-          dispatch(push('/home'));
-        }
-      }
-    } catch {
-      if (redirect) {
-        dispatch(push('/'));
-      }
-    }
   };
 };

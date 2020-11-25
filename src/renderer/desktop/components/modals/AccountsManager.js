@@ -19,7 +19,7 @@ import {
   loginWithAccessToken,
   removeAccount,
   updateCurrentAccountId
-} from 'src/renderer/common/reducers/actions';
+} from 'src/renderer/common/reducers/authActions';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
@@ -60,14 +60,13 @@ const ProfileSettings = () => {
 
                     dispatch(requesting(features.checkingAccount));
                     const currentId = currentAccount.selectedProfile.id;
-                    console.log('SWITCHING TO:', account.selectedProfile.id);
                     await dispatch(
                       updateCurrentAccountId(account.selectedProfile.id)
                     );
                     try {
-                      await dispatch(dispatch(loginWithAccessToken()));
-                    } catch {
-                      console.log('SWITCHING BACK TO:', currentId);
+                      await dispatch(loginWithAccessToken());
+                    } catch (e) {
+                      console.error(e);
                       await dispatch(updateCurrentAccountId(currentId));
                       message.error('Account not valid');
                     }

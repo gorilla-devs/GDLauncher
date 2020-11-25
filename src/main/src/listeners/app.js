@@ -13,7 +13,7 @@ import { convertOSToJavaFormat } from '../../../common/utils';
 import { MANIFESTS } from '../manifests';
 import { DB_INSTANCE, TEMP_PATH, USERDATA_PATH } from '../config';
 import { downloadFile } from '../helpers/downloader';
-import { extractFace, get7zPath } from '../helpers';
+import { get7zPath } from '../helpers';
 
 addListener(EV.UPDATE_PROGRESS_BAR, async v => {
   mainWindow.setProgressBar(v);
@@ -194,26 +194,6 @@ addListener(EV.INSTALL_JAVA, async () => {
   sendMessage(EV.UPDATE_PROGRESS_BAR, -1);
   sendMessage(EV.UPDATE_JAVA_DOWNLOAD_PROGRESS, null);
   await new Promise(resolve => setTimeout(resolve, 2000));
-});
-
-addListener(EV.GET_PLAYER_FACE_SKIN, skin => {
-  return extractFace(skin);
-});
-
-addListener(EV.USER_PREF.SET_CONCURRENT_DOWNLOADS, concurrency => {
-  return DB_INSTANCE.put('concurrentDownloads', concurrency);
-});
-
-addListener(EV.USER_PREF.GET_CONCURRENT_DOWNLOADS, () => {
-  return DB_INSTANCE.get('concurrentDownloads');
-});
-
-addListener(EV.USER_PREF.SET_SHOW_NEWS, showNews => {
-  return DB_INSTANCE.put('showNews', showNews);
-});
-
-addListener(EV.USER_PREF.GET_SHOW_NEWS, () => {
-  return DB_INSTANCE.get('showNews');
 });
 
 addListener(EV.SET_LAST_CHANGELOG_SHOWN, () => {

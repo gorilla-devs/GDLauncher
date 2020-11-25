@@ -1,5 +1,6 @@
 import { omitBy } from 'lodash';
 import log from 'electron-log';
+import { DB_SCHEMA } from 'src/common/persistedKeys';
 import {
   getAddonCategories,
   getFabricManifest,
@@ -8,7 +9,7 @@ import {
   getMcManifest
 } from '../../common/api';
 import { reflect } from '../../common/utils';
-import { DB_INSTANCE, DB_SCHEMA } from './config';
+import { DB_INSTANCE } from './config';
 
 export const MANIFESTS = {
   [DB_SCHEMA.manifests.mcVersions]: {},

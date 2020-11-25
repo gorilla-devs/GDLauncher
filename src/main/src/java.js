@@ -1,12 +1,13 @@
 import path from 'path';
+import { DB_SCHEMA } from 'src/common/persistedKeys';
 import { convertOSToJavaFormat } from '../../common/utils';
-import { DB_INSTANCE, DB_SCHEMA, USERDATA_PATH } from './config';
+import { DB_INSTANCE, USERDATA_PATH } from './config';
 import { MANIFESTS } from './manifests';
 
 let _javaOverride;
 const readOverrideFromConfig = async () => {
   try {
-    _javaOverride = await DB_INSTANCE.get(DB_SCHEMA.customJavaPath);
+    _javaOverride = await DB_INSTANCE.get(DB_SCHEMA.persisted.customJavaPath);
   } catch {
     _javaOverride = null;
     // no override

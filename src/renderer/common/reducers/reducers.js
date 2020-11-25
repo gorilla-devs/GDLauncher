@@ -10,42 +10,10 @@ function news(state = [], action) {
   }
 }
 
-function showNews(state = true, action) {
-  switch (action.type) {
-    case ActionTypes.UPDATE_SHOW_NEWS:
-      return action.showNews;
-    default:
-      return state;
-  }
-}
-
 function message(state = null, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_MESSAGE:
       return action.message;
-    default:
-      return state;
-  }
-}
-
-function accounts(state = {}, action) {
-  switch (action.type) {
-    case ActionTypes.UPDATE_ACCOUNT:
-      return {
-        ...state,
-        [action.id]: action.data
-      };
-    case ActionTypes.REMOVE_ACCOUNT:
-      return omit(state, [action.id]);
-    default:
-      return state;
-  }
-}
-
-function currentAccountId(state = null, action) {
-  switch (action.type) {
-    case ActionTypes.UPDATE_CURRENT_ACCOUNT_ID:
-      return action.value;
     default:
       return state;
   }
@@ -144,10 +112,7 @@ function updateAvailable(state = false, action) {
 }
 
 export default {
-  showNews,
   news,
-  accounts,
-  currentAccountId,
   message,
   instances,
   updateAvailable

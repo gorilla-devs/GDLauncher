@@ -1,18 +1,14 @@
-import { DB_INSTANCE, DB_SCHEMA } from './config';
+import { persistedKeys } from 'src/common/persistedKeys';
+import { DB_INSTANCE } from './config';
 
 const setupInitialConfig = async () => {
-  const initialValues = {
-    [DB_SCHEMA.showNews]: true,
-    [DB_SCHEMA.concurrentDownloads]: 5
-  };
-
-  for (const key in initialValues) {
+  for (const value of persistedKeys) {
     try {
       // Check if the value is undefined
-      await DB_INSTANCE.get(key);
+      await DB_INSTANCE.get(value.key);
     } catch {
       // If it fails it means that it's not set, hence we set it
-      await DB_INSTANCE.put(key, initialValues[key]);
+      await DB_INSTANCE.put(value.key, value.default);
     }
   }
 };

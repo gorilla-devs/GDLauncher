@@ -19,19 +19,3 @@ export const DB_INSTANCE = levelup(
     valueEncoding: 'json'
   })
 );
-
-export const DB_SCHEMA = {
-  showNews: 'showNews',
-  concurrentDownloads: 'concurrentDownloads',
-  lastVersionShown: 'lastVersionShown',
-  currentAccountId: 'currentAccountId',
-  accounts: 'accounts',
-  customJavaPath: 'customJavaPath',
-  manifests: {
-    mcVersions: 'manifests.mcVersions',
-    fabric: 'manifests.fabric',
-    forge: 'manifests.forge',
-    java: 'manifests.java',
-    addonCategories: 'manifests.addonCategories'
-  }
-};

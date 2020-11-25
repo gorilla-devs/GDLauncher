@@ -3,21 +3,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { push } from 'connected-react-router';
 import styled from 'styled-components';
 import { Switch } from 'react-router';
-import EV from 'src/common/messageEvents';
+import { DB_SCHEMA } from 'src/common/persistedKeys';
 import SystemNavbar from './components/SystemNavbar';
 import routes from './routes';
 import RouteWithSubRoutes from '../common/components/RouteWithSubRoutes';
 import ModalsManager from '../common/components/ModalsManager';
 import DesktopStyles from './components/DesktopStyles';
-import sendMessage from './helpers/sendMessage';
-import {
-  initAccounts,
-  initNews,
-  loginThroughNativePlatform,
-  loginWithAccessToken
-} from '../common/reducers/actions';
+import { initNews, initStoreFromMain } from '../common/reducers/actions';
 import { load, received, requesting } from '../common/reducers/loading/actions';
 import features from '../common/reducers/loading/features';
+import fetchStoreValues from './helpers/fetchStoreValues';
+import {
+  loginThroughNativeLauncher,
+  loginWithAccessToken
+} from '../common/reducers/authActions';
 
 const DesktopRoot = () => {
   const dispatch = useDispatch();
@@ -29,21 +28,23 @@ const DesktopRoot = () => {
     const init = async () => {
       dispatch(requesting(features.checkingAccount));
 
-      // Init accounts
-      const accounts = await sendMessage(EV.AUTH.GET_ALL_ACCOUNTS);
-      const currentAccountId = await sendMessage(
-        EV.AUTH.GET_CURRENT_ACCOUNT_ID
-      );
-      dispatch(initAccounts(accounts, currentAccountId));
-      dispatch(initNews());
+      const storeValues = await fetchStoreValues();
 
-      if (
-        process.env.NODE_ENV === 'development' &&
-        accounts[currentAccountId]
-      ) {
+      dispatch(initStoreFromMain(storeValues));
+      dispatch(initNews());
+      const accounts = storeValues[DB_SCHEMA.persisted.accounts];
+      const currentAccountId =
+        storeValues[DB_SCHEMA.persisted.currentAccountId];
+
+      const account = accounts.find(
+        v => v.selectedProfile.id === currentAccountId
+      );
+
+      setInitialized(true);
+      if (process.env.NODE_ENV === 'development' && account) {
         dispatch(received(features.checkingAccount));
         dispatch(push('/home'));
-      } else if (accounts[currentAccountId]) {
+      } else if (account) {
         dispatch(
           load(features.checkingAccount, dispatch(loginWithAccessToken(true)))
         );
@@ -51,12 +52,10 @@ const DesktopRoot = () => {
         dispatch(
           load(
             features.checkingAccount,
-            dispatch(loginThroughNativePlatform(true))
+            dispatch(loginThroughNativeLauncher(true))
           )
         ).catch(console.error);
       }
-
-      setInitialized(true);
     };
     init();
   }, []);
