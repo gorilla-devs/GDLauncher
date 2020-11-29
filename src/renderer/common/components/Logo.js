@@ -1,13 +1,19 @@
 import React, { memo } from 'react';
 
-const Logo = ({ size, pointerCursor }) => {
+const Logo = ({ size, pointerCursor, opacity }) => {
   return (
     <svg
       version="1.1"
       x="0px"
       y="0px"
       viewBox="0 0 874 1024"
-      css={{ width: size, height: size }}
+      css={{
+        width: size,
+        height: size,
+        // eslint-disable-next-line object-shorthand
+        opacity: opacity,
+        transition: '.2s ease-in-out'
+      }}
       xmlSpace="preserve"
     >
       <g>
