@@ -1,20 +1,26 @@
 /* eslint-disable react/no-unescaped-entities */
 import React, { memo } from 'react';
 import styled from 'styled-components';
-// import { Button } from 'antd';
+import { useHistory, useLocation } from 'react-router-dom';
+import { useAuth } from 'src/renderer/common/components/ProvideAuth';
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 // import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 
 import { Button, Checkbox, Input } from 'antd';
-// import EV from 'src/common/messageEvents';
-// import sendMessage from '../../helpers/sendMessage';
 
 const Login = () => {
-  //   const [version, setVersion] = useState(null);
+  const history = useHistory();
+  const location = useLocation();
+  const auth = useAuth();
 
-  //   useEffect(() => {
-  //     sendMessage(EV.GET_APP_VERSION).then(setVersion).catch(console.error);
-  //   }, []);
+  const { from } = location.state || { from: { pathname: '/profile' } };
+
+  const login = () => {
+    console.log('GGg', from);
+    auth.signin(() => {
+      history.replace(from);
+    });
+  };
 
   return (
     <Container>
@@ -64,7 +70,9 @@ const Login = () => {
             padding: 5px;
           `}
         >
-          <Button type="primary">Login</Button>
+          <Button type="primary" onClick={login}>
+            Login
+          </Button>
           <Button>Sign Up</Button>
         </div>
       </div>

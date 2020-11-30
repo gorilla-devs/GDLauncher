@@ -1,17 +1,16 @@
 import React, { memo, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { Menu, Dropdown } from 'antd';
-import { NavLink as Link } from 'react-router-dom';
+import { NavLink as Link, useHistory } from 'react-router-dom';
 import {
   faChevronDown,
   faTimes,
   faBars
 } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from 'src/renderer/common/components/ProvideAuth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from 'src/renderer/common/components/Button';
 import routes from 'src/renderer/browser/routes';
 import logo from 'src/common/assets/logo.png';
-import { openModal } from 'src/renderer/common/reducers/modals/actions';
 import styled from 'styled-components';
 
 const Buttons = styled.div`
@@ -44,6 +43,13 @@ const NavLink = styled(Link)`
 `;
 
 const LoginButton = styled(Button)`
+  display: none;
+  font-size: 40px;
+  font-weight: bold;
+  margin: 0;
+`;
+
+const LoginButtonLink = styled(Link)`
   display: none;
   font-size: 40px;
   font-weight: bold;
@@ -175,6 +181,13 @@ const NavbarContainer = styled.div`
       font-size: 15px;
       display: inline-flexbox;
     }
+    ${LoginButtonLink} {
+      font-size: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 20px;
+    }
     ${InnerContainer} {
       display: flex;
       justify-content: normal;
@@ -197,9 +210,11 @@ const NavbarContainer = styled.div`
 `;
 
 const Navbar = () => {
-  const dispatch = useDispatch();
-  // const login = true;
   const [clicked, setClicked] = useState(false);
+  // const dispatch = useDispatch();
+  const auth = useAuth();
+  const history = useHistory();
+  // const login = true;
 
   const menu = (
     <Menu
@@ -258,12 +273,25 @@ const Navbar = () => {
             display: flex;
           `}
         >
-          <Buttons>
-            <LoginButton onClick={() => dispatch(openModal('Login'))}>
-              Login
-            </LoginButton>
-            <DownloadButton>Download</DownloadButton>
-          </Buttons>
+          {auth.user ? (
+            <Buttons>
+              <LoginButton
+                css={`
+                  width: 100px;
+                `}
+                onClick={() => {
+                  auth.signout(() => history.push('/'));
+                }}
+              >
+                Sign Out
+              </LoginButton>
+            </Buttons>
+          ) : (
+            <Buttons>
+              <LoginButtonLink to="/login">Login</LoginButtonLink>
+              <DownloadButton>Download</DownloadButton>
+            </Buttons>
+          )}
         </div>
       </NavbarContainer>
 
@@ -279,17 +307,38 @@ const Navbar = () => {
           {/* <SideBarButton>
             {login && <NavLink to="/profile">Profile</NavLink>}
           </SideBarButton> */}
-          <SideBarButton onClick={() => setClicked(x => !x)}>
-            <NavLink
-              css={`
-                font-weight: bold;
-              `}
-              to="/login"
+
+          {auth.user ? (
+            <SideBarButton
+              onClick={() => {
+                auth.signout(() => history.push('/'));
+                setClicked(x => !x);
+              }}
             >
-              Login
-            </NavLink>
-          </SideBarButton>
-          <SiderBarDownloadButton>Download</SiderBarDownloadButton>
+              <NavLink
+                css={`
+                  font-weight: bold;
+                `}
+                to="/login"
+              >
+                Sign Out
+              </NavLink>
+            </SideBarButton>
+          ) : (
+            <>
+              <SideBarButton onClick={() => setClicked(x => !x)}>
+                <NavLink
+                  css={`
+                    font-weight: bold;
+                  `}
+                  to="/login"
+                >
+                  Login
+                </NavLink>
+              </SideBarButton>
+              <SiderBarDownloadButton>Download</SiderBarDownloadButton>
+            </>
+          )}
         </InnerSideBarContainer>
       </SideBar>
     </>

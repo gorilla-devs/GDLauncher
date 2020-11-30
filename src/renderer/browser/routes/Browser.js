@@ -16,7 +16,6 @@ const Browser = styled.div`
   flex-direction: column;
   flex: 1;
   margin: 30px;
-  margin-top: 200px;
   /* width:  calc(100% - 20px); */
   width: 100%;
   max-width: 900px;
@@ -26,6 +25,30 @@ const Browser = styled.div`
   text-align: center;
   background: ${props => props.theme.palette.primary.dark};
   overflow-y: auto;
+`;
+
+const BrowserContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  /* flex: 1; */
+  margin-top: 200px;
+  width: 100%;
+  max-width: 900px;
+  height: 80vh;
+  /* justify-content: space-around; */
+  align-items: center;
+`;
+
+const ToolBar = styled.div`
+  display: flex;
+  border-radius: 5px;
+  margin: 30px 30px 0;
+  height: 100px;
+  width: calc(100% - 20px);
+  max-width: 900px;
+  border: 5px solid ${({ theme }) => theme.palette.primary.main};
+  justify-content: space-evenly;
+  align-items: center;
 `;
 
 const ItemsContainer = styled.div`
@@ -65,7 +88,7 @@ const Banner = styled.div`
   display: flex;
   width: 100%;
   max-width: 900px;
-  height: 300px;
+  height: 200px;
   padding: 10px;
   border-radius: 5px;
   background: ${props => props.theme.palette.grey[700]};
@@ -133,6 +156,9 @@ const InnerContainer = styled.div`
       height: 40px;
       border-radius: 5px;
     }
+    ${ToolBar} {
+      height: 50px;
+    }
   }
 `;
 
@@ -160,24 +186,27 @@ const BrowserComponent = () => {
             margin: 0 0 0 10px;
           `}
         />
-        <Browser>
-          <ItemsContainer>
-            {items.map(item => (
-              <Item key={item.name}>
-                <div
-                  css={`
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                  `}
-                >
-                  <Image />
-                  <h4>{item.name}</h4>
-                </div>
-              </Item>
-            ))}
-          </ItemsContainer>
-        </Browser>
+        <BrowserContainer>
+          <ToolBar />
+          <Browser>
+            <ItemsContainer>
+              {items.map(item => (
+                <Item key={item.name}>
+                  <div
+                    css={`
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                    `}
+                  >
+                    <Image />
+                    <h4>{item.name}</h4>
+                  </div>
+                </Item>
+              ))}
+            </ItemsContainer>
+          </Browser>
+        </BrowserContainer>
         <Banner
           css={`
             margin: 0 10px 0 0;

@@ -24,15 +24,23 @@ const logger = createLogger({
     error: () => '#F20404'
   }
 });
-
-const enhancer = compose(
-  applyMiddleware(
-    thunk,
-    router,
-    process.env.NODE_ENV !== 'production' ? logger : undefined,
-    window.__GD__ ? middlewareApp : undefined
-  )
+console.log(
+  'TRTRT',
+  window?.__GD__,
+  middlewareApp,
+  window?.__GD__ ? middlewareApp : undefined
 );
+
+const middlewares = [
+  thunk,
+  router,
+  process.env.NODE_ENV !== 'production' ? logger : undefined
+];
+
+// you don't need to add middlewareApp when it's on the browser
+if (window?.__GD__) middlewares.push(middlewareApp);
+
+const enhancer = compose(applyMiddleware(...middlewares));
 
 const configureStore = () => {
   const store = createStore(rootReducer, enhancer);
