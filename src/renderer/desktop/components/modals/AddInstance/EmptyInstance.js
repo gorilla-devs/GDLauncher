@@ -18,6 +18,7 @@ const NewInstance = ({ setVersion, setModpack }) => {
     <Container>
       <Cascader
         options={filteredVers}
+        
         placeholder="Select a version"
         size="large"
         css={`

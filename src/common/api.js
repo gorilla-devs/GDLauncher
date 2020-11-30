@@ -7,7 +7,8 @@ import {
   FABRIC_APIS,
   JAVA_MANIFEST_URL,
   IMGUR_CLIENT_ID,
-  FORGESVC_CATEGORIES
+  FORGESVC_CATEGORIES,
+  FTB_API_URL
 } from './utils/constants';
 
 export const mcAuthenticate = (username, password, clientToken) => {
@@ -171,4 +172,24 @@ export const getSearch = (
     gameVersion: gameVersion || ''
   };
   return axios.get(url, { params });
+};
+
+export const getFTBModpackData = async modpackId => {
+  try {
+    const url = `${FTB_API_URL}/modpack/${modpackId}`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getFTBMostPlayed = async () => {
+  const url = `${FTB_API_URL}/modpack/popular/plays/1000`;
+  return axios.get(url);
+};
+
+export const getFTBSearch = async searchText => {
+  const url = `${FTB_API_URL}/modpack/search/1000?term=${searchText}`;
+  return axios.get(url);
 };

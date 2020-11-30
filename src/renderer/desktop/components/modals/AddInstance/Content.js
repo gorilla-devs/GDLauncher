@@ -9,13 +9,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin, Radio } from 'antd';
-import TwitchModpacks from './TwitchModpacks';
+import CurseForgeModpacks from './CurseForgeModpacks';
 import EmptyInstance from './EmptyInstance';
 import minecraftIcon from 'src/common/assets/minecraftIcon.png';
-import twitchIcon from 'src/common/assets/twitchIcon.webp';
+import curseForgeIcon from 'src/common/assets/curseforgeIcon.webp';
+import ftbIcon from 'src/common/assets/ftbIcon.webp';
+import technicIcon from 'src/common/assets/technicIcon.webp';
+import atlauncherIcon from 'src/common/assets/atlauncherIcon.webp';
+import FTBModpacks from './FTBModpacks';
 
 const Content = ({ in: inProp, setStep, page, setPage }) => {
-  let pages = [<EmptyInstance />, <TwitchModpacks />];
+  let pages = [<EmptyInstance />, <CurseForgeModpacks />, <FTBModpacks />];
 
   return (
     <Transition in={inProp} timeout={200}>
@@ -59,14 +63,47 @@ const Content = ({ in: inProp, setStep, page, setPage }) => {
                   </Radio.Button>
                   <Radio.Button value={1}>
                     <img
-                      src={twitchIcon}
+                      src={curseForgeIcon}
                       width="18px"
                       css={`
-                        margin-right: 4px;
+                        margin-right: 6px;
                         cursor: pointer;
                       `}
                     />
-                    Twitch
+                    CurseForge
+                  </Radio.Button>
+                  <Radio.Button value={2}>
+                    <img
+                      src={ftbIcon}
+                      width="18px"
+                      css={`
+                        margin-right: 6px;
+                        cursor: pointer;
+                      `}
+                    />
+                    FTB
+                  </Radio.Button>
+                  <Radio.Button value={3}>
+                    <img
+                      src={atlauncherIcon}
+                      width="18px"
+                      css={`
+                        margin-right: 6px;
+                        cursor: pointer;
+                      `}
+                    />
+                    ATLauncher
+                  </Radio.Button>
+                  <Radio.Button value={4}>
+                    <img
+                      src={technicIcon}
+                      width="18px"
+                      css={`
+                        margin-right: 6px;
+                        cursor: pointer;
+                      `}
+                    />
+                    Technic
                   </Radio.Button>
                   {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button>
                   <Radio.Button value={4} disabled>Technic</Radio.Button>

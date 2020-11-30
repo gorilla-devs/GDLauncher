@@ -266,7 +266,7 @@ const Login = () => {
                   css={`
                     cursor: pointer;
                   `}
-                  onClick={() => dispatch(openModal('ChangeLogs'))}
+                  onClick={() => dispatch(openModal('Changelogs'))}
                 >
                   v{version}
                 </div>

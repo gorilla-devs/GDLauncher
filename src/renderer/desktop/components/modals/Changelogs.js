@@ -9,7 +9,7 @@ import CloseButton from 'src/renderer/common/components/CloseButton';
 // import EV from 'src/common/messageEvents';
 // import sendMessage from '../../helpers/sendMessage';
 
-const ChangeLogs = () => {
+const Changelogs = () => {
   //   const [version, setVersion] = useState(null);
 
   //   useEffect(() => {
@@ -106,7 +106,7 @@ const ChangeLogs = () => {
   );
 };
 
-export default memo(ChangeLogs);
+export default memo(Changelogs);
 
 const Container = styled.div`
   width: 100%;

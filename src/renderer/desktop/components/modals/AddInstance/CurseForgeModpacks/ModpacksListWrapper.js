@@ -93,7 +93,7 @@ const ModpacksListWrapper = ({
           <div
             onClick={() => {
               dispatch(
-                openModal('ModpackDescription', {
+                openModal('CurseForgeModpackOverview', {
                   modpack,
                   setStep
                 })

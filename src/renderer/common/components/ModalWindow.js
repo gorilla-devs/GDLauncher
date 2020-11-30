@@ -47,6 +47,7 @@ const ModalWindow = ({
 
   return (
     <Container
+      onMouseDown={e => e.stopPropagation()}
       transparentBackground={transparentBackground}
       className={className}
     >
