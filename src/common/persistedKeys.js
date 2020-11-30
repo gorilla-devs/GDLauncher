@@ -1,6 +1,7 @@
 import EV from './messageEvents';
 
 export const DB_SCHEMA = {
+  clientToken: 'clientToken',
   manifests: {
     mcVersions: 'mcVersions',
     fabric: 'fabric',
@@ -15,7 +16,8 @@ export const DB_SCHEMA = {
     isNewUser: 'isNewUser',
     showNews: 'showNews',
     concurrentDownloads: 'concurrentDownloads',
-    customJavaPath: 'customJavaPath'
+    customJavaPath: 'customJavaPath',
+    potatoPcMode: 'potatoPcMode'
   }
 };
 
@@ -49,5 +51,11 @@ export const persistedKeys = [
     set: EV.PERSISTOR.SET_ACCOUNTS,
     key: DB_SCHEMA.persisted.accounts,
     default: []
+  },
+  {
+    get: EV.PERSISTOR.GET_POTATO_PC_MODE,
+    set: EV.PERSISTOR.SET_POTATO_PC_MODE,
+    key: DB_SCHEMA.persisted.potatoPcMode,
+    default: false
   }
 ];

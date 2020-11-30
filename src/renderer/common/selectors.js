@@ -7,5 +7,6 @@ const _currentAccountId = state => state.currentAccountId;
 export const _getCurrentAccount = createSelector(
   _accounts,
   _currentAccountId,
-  (accounts, currentAccountId) => accounts[currentAccountId]
+  (accounts, currentAccountId) =>
+    accounts.find(v => v.selectedProfile.id === currentAccountId)
 );

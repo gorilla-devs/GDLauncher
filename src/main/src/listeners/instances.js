@@ -8,6 +8,7 @@ import {
 } from '../instancesHandler/mods';
 import {
   createExtractZip,
+  getInstanceBackground,
   INSTANCES,
   renameInstance
 } from '../instancesHandler/instances';
@@ -32,3 +33,4 @@ addListener(EV.APPLY_INSTALL_INSTANCE, applyInstall);
 addListener(EV.UPDATE_MODPACK_VERSION, changeModpackVersion);
 
 addListener(EV.MAP_LIBRARIES, librariesMapper);
+addListener(EV.GET_INSTANCE_BACKGROUND, getInstanceBackground);

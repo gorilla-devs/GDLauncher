@@ -8,7 +8,7 @@ const setupInitialConfig = async () => {
       await DB_INSTANCE.get(value.key);
     } catch {
       // If it fails it means that it's not set, hence we set it
-      await DB_INSTANCE.put(value.key, value.default);
+      await DB_INSTANCE.update(value.key, value.default);
     }
   }
 };

@@ -6,10 +6,8 @@ import modals from './modals';
 
 const Overlay = styled.div`
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  width: 100%;
+  height: 100%;
   backdrop-filter: blur(6px);
   will-change: opacity;
   transition: opacity 300ms cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -18,8 +16,10 @@ const Overlay = styled.div`
 
 const Modal = styled.div`
   position: absolute;
-  height: 100%;
-  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -29,6 +29,16 @@ const Modal = styled.div`
   will-change: transform;
   transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 1001;
+`;
+
+const Container = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
 `;
 
 const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
@@ -93,9 +103,10 @@ const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
   };
 
   return (
-    <Overlay onMouseDown={back} style={bgStyle}>
+    <Container>
+      <Overlay onMouseDown={back} style={bgStyle} />
       <Modal style={modalStyle}>{children}</Modal>
-    </Overlay>
+    </Container>
   );
 };
 

@@ -8,7 +8,7 @@ const setupListeners = () => {
       return DB_INSTANCE.get(value.key);
     });
     addListener(value.set, async v => {
-      return DB_INSTANCE.put(value.key, v);
+      return DB_INSTANCE.update(value.key, v);
     });
   }
 };

@@ -20,7 +20,7 @@ export function updateCurrentAccountId(id) {
   return async dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_CURRENT_ACCOUNT_ID,
-      id
+      value: id
     });
   };
 }
@@ -49,7 +49,7 @@ export function switchToFirstValidAccount(id) {
       }
     }
     if (!found) {
-      dispatch(updateCurrentAccountId(null));
+      dispatch(updateCurrentAccountId(false));
     }
     return found;
   };
@@ -58,7 +58,7 @@ export function switchToFirstValidAccount(id) {
 export function removeAccount(id) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { currentAccountId } = state.app;
+    const { currentAccountId } = state;
     let newId = id;
     if (currentAccountId === id) {
       newId = await dispatch(switchToFirstValidAccount(id));
@@ -72,12 +72,12 @@ export function removeAccount(id) {
 }
 
 export function login(username, password, redirect = true) {
-  return async dispatch => {
+  return async (dispatch, getState) => {
+    const { isNewUser } = getState();
     if (!username || !password) {
       throw new Error('No username or password provided');
     }
     try {
-      const isNewUser = await sendMessage(EV.AUTH.GET_IS_NEW_USER);
       const clientToken = await sendMessage(EV.AUTH.GET_CLIENT_TOKEN);
       let data = null;
       try {
@@ -91,7 +91,7 @@ export function login(username, password, redirect = true) {
         throw new Error("It looks like you didn't buy the game.");
       }
       const skinUrl = await sendMessage(
-        EV.AUTH.GET_PLAYER_SKIN,
+        EV.AUTH.GET_PLAYER_SKIN_URL,
         data.selectedProfile.id
       );
       if (skinUrl) {
@@ -127,7 +127,7 @@ export function loginWithAccessToken(redirect = true) {
       await mcValidate(accessToken, clientToken);
       try {
         const skinUrl = await sendMessage(
-          EV.AUTH.GET_PLAYER_SKIN,
+          EV.AUTH.GET_PLAYER_SKIN_URL,
           selectedProfile.id
         );
         if (skinUrl) {
@@ -149,7 +149,7 @@ export function loginWithAccessToken(redirect = true) {
         try {
           const { data } = await mcRefresh(accessToken, clientToken);
           const skinUrl = await sendMessage(
-            EV.AUTH.GET_PLAYER_SKIN,
+            EV.AUTH.GET_PLAYER_SKIN_URL,
             data.selectedProfile.id
           );
           if (skinUrl) {
@@ -178,9 +178,7 @@ export function loginWithAccessToken(redirect = true) {
 
 export function loginThroughNativeLauncher() {
   return async (dispatch, getState) => {
-    const {
-      app: { isNewUser }
-    } = getState();
+    const { isNewUser } = getState();
 
     const vnlJson = await sendMessage(
       EV.AUTH.GET_MC_VANILLA_LAUNCHER_PROFILES_FROM_FILE
@@ -192,7 +190,7 @@ export function loginThroughNativeLauncher() {
 
       const { data } = await mcRefresh(accessToken, clientToken);
       const skinUrl = await sendMessage(
-        EV.AUTH.GET_PLAYER_SKIN,
+        EV.AUTH.GET_PLAYER_SKIN_URL,
         data.selectedProfile.id
       );
       if (skinUrl) {

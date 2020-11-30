@@ -1,6 +1,8 @@
 import { omitBy } from 'lodash';
 import log from 'electron-log';
 import { DB_SCHEMA } from 'src/common/persistedKeys';
+import EV from 'src/common/messageEvents';
+import generateMessageId from 'src/common/utils/generateMessageId';
 import {
   getAddonCategories,
   getFabricManifest,
@@ -10,6 +12,7 @@ import {
 } from '../../common/api';
 import { reflect } from '../../common/utils';
 import { DB_INSTANCE } from './config';
+import { sendMessage } from './messageListener';
 
 export const MANIFESTS = {
   [DB_SCHEMA.manifests.mcVersions]: {},
@@ -90,7 +93,7 @@ const updateManifestsInDB = async () => {
   for (const manifestKey in MANIFESTS) {
     if (MANIFESTS.hasOwnProperty(manifestKey)) {
       try {
-        await DB_INSTANCE.put(manifestKey, MANIFESTS[manifestKey]);
+        await DB_INSTANCE.update(manifestKey, MANIFESTS[manifestKey]);
         log.log(`Updated manifest ${manifestKey} in db`);
       } catch (e) {
         log.error(`Can't write manifest ${manifestKey} to db`, e);
@@ -103,6 +106,7 @@ export default async function initializeManifests() {
   // Try to read them from disk
   await readManifestsFromDisk();
   await getManifestsFromAPIs();
+  sendMessage(EV.GET_MANIFESTS, generateMessageId(), MANIFESTS);
   await updateManifestsInDB();
   log.log('Manifests initialized');
 }

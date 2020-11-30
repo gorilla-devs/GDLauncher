@@ -101,3 +101,13 @@ export const downloadJavaLegacyFixer = async () => {
     GDL_LEGACYJAVAFIXER_MOD_URL
   );
 };
+
+export const getInstanceBackground = async () => {
+  // if (!INSTANCES[uid].background) return null;
+  // const backgroundPath = path.join(
+  //   INSTANCES_PATH,
+  //   uid,
+  //   INSTANCES[uid].background
+  // );
+  // return
+};

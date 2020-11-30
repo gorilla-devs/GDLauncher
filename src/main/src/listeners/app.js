@@ -197,7 +197,7 @@ addListener(EV.INSTALL_JAVA, async () => {
 });
 
 addListener(EV.SET_LAST_CHANGELOG_SHOWN, () => {
-  return DB_INSTANCE.put('lastVersionShown', app.getVersion());
+  return DB_INSTANCE.update('lastVersionShown', app.getVersion());
 });
 
 addListener(EV.GET_LAST_CHANGELOG_SHOWN, async () => {

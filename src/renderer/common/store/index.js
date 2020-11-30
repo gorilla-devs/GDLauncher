@@ -2,6 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { createHashHistory } from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import { createLogger } from 'redux-logger';
+import middlewareApp from 'src/renderer/desktop/helpers/middlewareApp';
 import thunk from './thunkEnhancer';
 import createRootReducer from '../reducers';
 
@@ -28,7 +29,8 @@ const enhancer = compose(
   applyMiddleware(
     thunk,
     router,
-    process.env.NODE_ENV !== 'production' ? logger : undefined
+    process.env.NODE_ENV !== 'production' ? logger : undefined,
+    window.__GD__ ? middlewareApp : undefined
   )
 );
 

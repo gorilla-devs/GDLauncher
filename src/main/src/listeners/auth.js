@@ -1,20 +1,21 @@
 import path from 'path';
 import { promises as fs } from 'fs';
+import { DB_SCHEMA } from 'src/common/persistedKeys';
 import { addListener } from '../messageListener';
 import EV from '../../../common/messageEvents';
 import { extractFace, getPlayerSkin } from '../helpers';
-import { APPDATA_PATH } from '../config';
+import { APPDATA_PATH, DB_INSTANCE } from '../config';
 
-addListener(EV.AUTH.AUTH.GET_PLAYER_SKIN, async id => {
-  return getPlayerSkin(id);
+addListener(EV.AUTH.GET_PLAYER_SKIN_URL, async accountId => {
+  return getPlayerSkin(accountId);
 });
 
-addListener(EV.AUTH.GET_PLAYER_FACE_SKIN, skin => {
-  return extractFace(skin);
+addListener(EV.AUTH.GET_PLAYER_FACE_SKIN, skinUrl => {
+  return extractFace(skinUrl);
 });
 
-addListener(EV.AUTH.GET_CLIENT_TOKEN, skin => {
-  return extractFace(skin);
+addListener(EV.AUTH.GET_CLIENT_TOKEN, () => {
+  return DB_INSTANCE.get(DB_SCHEMA.clientToken);
 });
 
 const mcFolder = process.platform === 'darwin' ? 'minecraft' : '.minecraft';

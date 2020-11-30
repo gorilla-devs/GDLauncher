@@ -23,6 +23,15 @@ const HeaderComponent = styled.div`
   }
 `;
 
+const Container = styled.div`
+  background: ${props =>
+    props.transparentBackground
+      ? 'transparent'
+      : props.theme.palette.grey[700]};
+  position: absolute;
+  border-radius: 4px;
+`;
+
 const ModalWindow = ({
   transparentBackground,
   header,
@@ -37,18 +46,9 @@ const ModalWindow = ({
   useKey(['Escape'], () => dispatch(closeModal()));
 
   return (
-    <div
-      onMouseDown={e => e.stopPropagation()}
+    <Container
       transparentBackground={transparentBackground}
       className={className}
-      css={`
-        background: ${props =>
-          props.transparentBackground
-            ? 'transparent'
-            : props.theme.palette.grey[700]};
-        position: absolute;
-        border-radius: 4px;
-      `}
     >
       {(header === undefined || header === true) && (
         <HeaderComponent>
@@ -77,7 +77,7 @@ const ModalWindow = ({
         {backBtnFn !== undefined && backBtnFn(() => dispatch(closeModal()))}
         {children}
       </div>
-    </div>
+    </Container>
   );
 };
 

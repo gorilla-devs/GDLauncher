@@ -7,16 +7,25 @@ import { useSelector, useDispatch } from 'react-redux';
 import { _getCurrentAccount } from 'src/renderer/common/selectors';
 import EV from 'src/common/messageEvents';
 import { openModal } from 'src/renderer/common/reducers/modals/actions';
-import sendMessage from '../helpers/sendMessage';
-import News from '../components/News';
+import { updateIsNewUser } from 'src/renderer/common/reducers/actions';
+import sendMessage from '../../helpers/sendMessage';
+import Instances from './Instances';
+import News from '../../components/News';
 
-const AddInstanceIcon = styled(Button)`
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
+const AddInstanceIcon = styled.div`
   position: fixed;
   bottom: 20px;
   left: 20px;
+  display: flex;
+  align-items: center;
 `;
 
-const AccountContainer = styled(Button)`
+const AccountContainer = styled.div`
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -42,11 +51,11 @@ const Home = () => {
   useEffect(() => {
     const init = async () => {
       const appVersion = await sendMessage(EV.GET_APP_VERSION);
-      sendMessage(EV.AUTH.SET_IS_NEW_USER, false);
       const lastVersionShown = await sendMessage(EV.GET_LAST_CHANGELOG_SHOWN);
+      dispatch(updateIsNewUser(false));
       if (lastVersionShown !== appVersion) {
         sendMessage(EV.SET_LAST_CHANGELOG_SHOWN);
-        dispatch(openModal('ChangeLogs'));
+        dispatch(openModal('Changelogs'));
       }
     };
 
@@ -55,44 +64,48 @@ const Home = () => {
 
   useEffect(() => {
     if (account) {
-      sendMessage(EV.GET_PLAYER_FACE_SKIN, account?.skin)
+      sendMessage(EV.AUTH.GET_PLAYER_FACE_SKIN, account?.skin)
         .then(setProfileImage)
         .catch(console.error);
     }
   }, [account]);
 
   return (
-    <div>
+    <Container>
       <News news={news} />
-      {/* <Instances /> */}
-      <AddInstanceIcon type="primary" onClick={() => openAddInstanceModal(0)}>
-        <FontAwesomeIcon icon={faPlus} />
+      <Instances />
+      <AddInstanceIcon>
+        <Button type="primary" onClick={() => openAddInstanceModal(0)}>
+          <FontAwesomeIcon icon={faPlus} />
+        </Button>
       </AddInstanceIcon>
-      <AccountContainer type="primary" onClick={openAccountModal}>
-        {profileImage ? (
-          <img
-            src={`data:image/jpeg;base64,${profileImage}`}
-            css={`
-              width: 15px;
-              cursor: pointer;
-              height: 15px;
-              margin-right: 10px;
-            `}
-            alt="profile"
-          />
-        ) : (
-          <div
-            css={`
-              width: 15px;
-              height: 15px;
-              background: ${props => props.theme.palette.grey[100]};
-              margin-right: 10px;
-            `}
-          />
-        )}
-        {account && account.selectedProfile.name}
+      <AccountContainer>
+        <Button type="primary" onClick={openAccountModal}>
+          {profileImage ? (
+            <img
+              src={`data:image/jpeg;base64,${profileImage}`}
+              css={`
+                width: 15px;
+                cursor: pointer;
+                height: 15px;
+                margin-right: 10px;
+              `}
+              alt="profile"
+            />
+          ) : (
+            <div
+              css={`
+                width: 15px;
+                height: 15px;
+                background: ${props => props.theme.palette.grey[100]};
+                margin-right: 10px;
+              `}
+            />
+          )}
+          {account?.selectedProfile?.name}
+        </Button>
       </AccountContainer>
-    </div>
+    </Container>
   );
 };
 

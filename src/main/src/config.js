@@ -19,3 +19,10 @@ export const DB_INSTANCE = levelup(
     valueEncoding: 'json'
   })
 );
+
+DB_INSTANCE.update = (key, value) => {
+  let newVal = value;
+  if (value === null || value === undefined) newVal = false;
+  // eslint-disable-next-line
+  return DB_INSTANCE.put(key, newVal);
+};

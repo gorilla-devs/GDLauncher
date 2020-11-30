@@ -52,10 +52,28 @@ export const initStoreFromMain = storeValues => {
   };
 };
 
+export const initManifestsFromMain = manifests => {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.INIT_MANIFESTS,
+      data: manifests
+    });
+  };
+};
+
 export const updateIsNewUser = value => {
   return dispatch => {
     dispatch({
       type: ActionTypes.UPDATE_IS_NEW_USER,
+      value
+    });
+  };
+};
+
+export const updatePotatoPcMode = value => {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_POTATO_PC,
       value
     });
   };

@@ -12,7 +12,6 @@ import generateMessageId from '../../../common/utils/generateMessageId';
 import startListener from './watcher';
 import { getInstanceDB, INSTANCES } from './instances';
 import { getFileMurmurHash2 } from '../helpers';
-import { INSTANCES_PATH } from '../config';
 
 const assignInstances = data => {
   for (const key in data) {
@@ -27,8 +26,6 @@ const initializeInstances = async () => {
     const instancesPath = path.join(app.getPath('userData'), 'instances');
     await makeDir(instancesPath);
     // Initially read from disk
-
-    await eventuallyMigrateInstances();
 
     let instances = await getInstances(instancesPath);
     assignInstances(instances);
@@ -225,49 +222,6 @@ const modsFingerprintsScan = async instancesPath => {
   }
 
   return hashMap;
-};
-
-const eventuallyMigrateInstances = async () => {
-  // INSTANCES_PATH
-  const timeStampRegexValidator = /\d{13}/;
-  const instances = fs.readdir(INSTANCES_PATH);
-  const uid = Date.now();
-  pMap(
-    instances,
-    async instanceName => {
-      const instancePath = path.join(INSTANCES_PATH, instanceName);
-      const configPath = path.join(instancePath, 'config.json');
-      const manifestPath = path.join(instancePath, 'manifest.json');
-      if (!timeStampRegexValidator.test(instanceName)) {
-        fs.rename(instancePath, path.join(INSTANCES_PATH, uid));
-
-        // try {
-        const existConfig = await fs.access(configPath).catch();
-        // await fs.access(configPath);
-
-        // Esiste database -> verifica se esiste .name -> eventualmente lo aggiungi -> riscrivi database -> se esiste config.json / manifest.json li cancelli
-        // Non esiste database -> verifica se esiste config.json -> se esiste lo leggi e scrivi in db aggiungendo .name -> cancelli config.json e manifest.json
-
-        const config = await fs.readFile(configPath);
-        config.name = instanceName;
-        // try {
-        const { name } = (await getInstanceDB(uid).get(`config`)) || {};
-
-        if (!name && existConfig) {
-          await getInstanceDB(uid).put(`config`, configPath);
-        }
-        await fs.rmdir(configPath);
-        await fs.rmdir(manifestPath);
-
-        // } catch (e) {}
-        await getInstanceDB(uid).put(`config`, config);
-        // } catch {}
-      }
-    },
-    { concurrency: 5 }
-  );
-
-  // await getInstanceDB(uid).put(`manifest`, manifest);
 };
 
 export default initializeInstances;

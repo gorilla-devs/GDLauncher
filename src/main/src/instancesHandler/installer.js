@@ -131,7 +131,7 @@ const startInstallation = async () => {
       v => v.id === mcVersion
     ).url;
     mcJson = (await axios.get(versionURL)).data;
-    await DB_INSTANCE.put(mcJsonPath, mcJson);
+    await DB_INSTANCE.update(mcJsonPath, mcJson);
   }
 
   // COMPUTING MC ASSETS
@@ -141,7 +141,7 @@ const startInstallation = async () => {
     assetsJson = await DB_INSTANCE.get(mcJsonPath);
   } catch (e) {
     assetsJson = (await axios.get(mcJson.assetIndex.url)).data;
-    await DB_INSTANCE.put(assetsPath, assetsJson);
+    await DB_INSTANCE.update(assetsPath, assetsJson);
   }
 
   const mcMainFile = {
@@ -440,7 +440,7 @@ const downloadForge = async () => {
 
     await fse.remove(path.join(TEMP_PATH, 'install_profile.json'));
 
-    await DB_INSTANCE.put(forgeJsonPath, forgeJson);
+    await DB_INSTANCE.update(forgeJsonPath, forgeJson);
 
     // Extract forge bin
     if (forgeJson.install.filePath) {

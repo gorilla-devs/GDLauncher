@@ -4,12 +4,17 @@ import { push } from 'connected-react-router';
 import styled from 'styled-components';
 import { Switch } from 'react-router';
 import { DB_SCHEMA } from 'src/common/persistedKeys';
+import EV from 'src/common/messageEvents';
 import SystemNavbar from './components/SystemNavbar';
 import routes from './routes';
 import RouteWithSubRoutes from '../common/components/RouteWithSubRoutes';
 import ModalsManager from '../common/components/ModalsManager';
 import DesktopStyles from './components/DesktopStyles';
-import { initNews, initStoreFromMain } from '../common/reducers/actions';
+import {
+  initManifestsFromMain,
+  initNews,
+  initStoreFromMain
+} from '../common/reducers/actions';
 import { load, received, requesting } from '../common/reducers/loading/actions';
 import features from '../common/reducers/loading/features';
 import fetchStoreValues from './helpers/fetchStoreValues';
@@ -17,6 +22,7 @@ import {
   loginThroughNativeLauncher,
   loginWithAccessToken
 } from '../common/reducers/authActions';
+import sendMessage, { handleMessage } from './helpers/sendMessage';
 
 const DesktopRoot = () => {
   const dispatch = useDispatch();
@@ -29,15 +35,21 @@ const DesktopRoot = () => {
       dispatch(requesting(features.checkingAccount));
 
       const storeValues = await fetchStoreValues();
+      const manifests = await sendMessage(EV.GET_MANIFESTS);
 
       dispatch(initStoreFromMain(storeValues));
+      dispatch(initManifestsFromMain(manifests));
       dispatch(initNews());
+
+      handleMessage(EV.GET_MANIFESTS, localManifests => {
+        dispatch(initManifestsFromMain(localManifests));
+      });
       const accounts = storeValues[DB_SCHEMA.persisted.accounts];
       const currentAccountId =
         storeValues[DB_SCHEMA.persisted.currentAccountId];
 
       const account = accounts.find(
-        v => v.selectedProfile.id === currentAccountId
+        v => v?.selectedProfile?.id === currentAccountId
       );
 
       setInitialized(true);
@@ -89,7 +101,9 @@ const DesktopRoot = () => {
 export default memo(DesktopRoot);
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
   position: relative;
   width: 100%;
-  height: calc(100% - ${({ theme }) => theme.sizes.height.systemNavbar}px);
+  height: 100%;
 `;

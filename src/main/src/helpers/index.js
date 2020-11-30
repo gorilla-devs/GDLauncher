@@ -358,8 +358,8 @@ export const getPlayerSkin = async uuid => {
   return decoded?.textures?.SKIN?.url;
 };
 
-export const extractFace = async buffer => {
-  const image = await jimp.read(buffer);
+export const extractFace = async url => {
+  const image = await jimp.read(url);
   image.crop(8, 8, 8, 8);
   image.scale(10, jimp.RESIZE_NEAREST_NEIGHBOR);
   const imageBuffer = await image.getBufferAsync(jimp.MIME_PNG);
