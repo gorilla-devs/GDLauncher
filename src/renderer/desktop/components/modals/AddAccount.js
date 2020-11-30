@@ -37,7 +37,7 @@ const AddAccount = ({ username }) => {
             Mojang login
           </h1>
           <StyledInput
-            disabled={!!username}
+            disabled={Boolean(username)}
             placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}

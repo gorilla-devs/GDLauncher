@@ -122,13 +122,13 @@ const AddInstance = ({ modpack, setStep }) => {
                 <Button
                   href={modpack.websiteUrl}
                   css={`
-                    position: absolute;
-                    top: 20px;
-                    left: 20px;
-                    width: 30px;
-                    height: 30px;
-                    display: flex;
-                    justify-content: center;
+                    position: absolute !important; 
+                    top: 20px !important;
+                    left: 20px !important;
+                    width: 30px !important;
+                    height: 30px !important;
+                    display: flex !important;
+                    justify-content: center !important;
                   `}
                   type="primary"
                 >
@@ -145,13 +145,14 @@ const AddInstance = ({ modpack, setStep }) => {
                     );
                   }}
                   css={`
-                    position: absolute;
-                    top: 20px;
-                    left: 60px;
-                    width: 30px;
-                    height: 30px;
-                    display: flex;
-                    justify-content: center;
+                    position: absolute !important;
+                    top: 20px !important;
+                    left: 60px !important;
+                    width: 30px !important;
+                    height: 30px !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
                   `}
                   type="primary"
                 >
