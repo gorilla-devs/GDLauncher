@@ -22,7 +22,8 @@ import {
   loginThroughNativeLauncher,
   loginWithAccessToken
 } from '../common/reducers/authActions';
-import sendMessage, { handleMessage } from './helpers/sendMessage';
+import sendMessage from './helpers/sendMessage';
+import setupRendererListeners from './setupRendererListeners';
 
 const DesktopRoot = () => {
   const dispatch = useDispatch();
@@ -41,9 +42,7 @@ const DesktopRoot = () => {
       dispatch(initManifestsFromMain(manifests));
       dispatch(initNews());
 
-      handleMessage(EV.GET_MANIFESTS, localManifests => {
-        dispatch(initManifestsFromMain(localManifests));
-      });
+      setupRendererListeners(dispatch);
       const accounts = storeValues[DB_SCHEMA.persisted.accounts];
       const currentAccountId =
         storeValues[DB_SCHEMA.persisted.currentAccountId];
