@@ -92,6 +92,7 @@ You need the following software installed:
 
 - [NodeJS](https://nodejs.org/en/download/) (> v14.8.0 x64)
 - [Rust](https://www.rust-lang.org/)
+- [Python2](https://www.python.org/)(Mac and linux)
 - C++ compiler (g++ or windows build tools)
 
 ### ▶️ Steps
