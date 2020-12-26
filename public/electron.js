@@ -18,17 +18,43 @@ const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
-const i18nextBackend = require('i18next-electron-fs-backend');
 
 const fs = fss.promises;
+
+let mainWindow;
+let tray;
+let watcher;
 
 const discordRPC = require('./discordRPC');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
 // Prevent multiple instances
-if (!gotTheLock) {
+if (gotTheLock) {
+  app.on('second-instance', (e, argv) => {
+    if (process.platform === 'win32') {
+      const args = process.argv.slice(1);
+      const args1 = argv.slice(1);
+      log.log([...args, ...args1]);
+      if (mainWindow) {
+        mainWindow.webContents.send('custom-protocol-event', [
+          ...args,
+          ...args1
+        ]);
+      }
+    }
+
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+} else {
   app.quit();
+}
+
+if (!app.isDefaultProtocolClient('gdlauncher')) {
+  app.setAsDefaultProtocolClient('gdlauncher');
 }
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -155,10 +181,6 @@ async function extract7z() {
 
 extract7z();
 
-let mainWindow;
-let tray;
-let watcher;
-
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
@@ -172,12 +194,9 @@ function createWindow() {
       experimentalFeatures: true,
       nodeIntegration: true,
       // Disable in dev since I think hot reload is messing with it
-      webSecurity: !isDev,
-      preload: path.join(__dirname, 'preload.js')
+      webSecurity: !isDev
     }
   });
-
-  i18nextBackend.mainBindings(ipcMain, mainWindow, fs);
 
   if (isDev) {
     globalShortcut.register('CommandOrControl+R', () => {
@@ -277,8 +296,6 @@ app.on('window-all-closed', () => {
   }
   if (process.platform !== 'darwin') {
     app.quit();
-  } else {
-    i18nextBackend.clearMainBindings(ipcMain);
   }
 });
 
@@ -289,14 +306,6 @@ app.on('before-quit', async () => {
   }
   mainWindow.removeAllListeners('close');
   mainWindow = null;
-});
-
-app.on('second-instance', () => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-  }
 });
 
 app.on('activate', () => {

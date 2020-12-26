@@ -9,7 +9,6 @@ import ModpacksListWrapper from './ModpacksListWrapper';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import i18n from '../../../config/i18next';
 
 let lastRequest;
 const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
@@ -81,7 +80,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
           onChange={setMinecraftVersion}
           defaultValue={null}
         >
-          <Select.Option value={null}>{i18n.t('add_instance:twitch_mod_pack.all_versions')}</Select.Option>
+          <Select.Option value={null}>All Versions</Select.Option>
           {(mcVersions || [])
             .filter(v => v?.type === 'release')
             .map(v => (
@@ -96,7 +95,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
           defaultValue={null}
         >
           <Select.Option key={'allcategories'} value={null}>
-            {i18n.t('add_instance:twitch_mod_pack.all_categories')}
+            All Categories
           </Select.Option>
           {(categories || [])
             .filter(v => v?.rootGameCategoryId === 4471)
@@ -130,26 +129,26 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
           onChange={setSortBy}
         >
           <Select.Option key="Featured" value="Featured">
-            {i18n.t('add_instance:twitch_mod_pack.featured')}
+            Featured
           </Select.Option>
           <Select.Option key="Popularity" value="Popularity">
-            {i18n.t('add_instance:twitch_mod_pack.popularity')}
+            Popularity
           </Select.Option>
           <Select.Option key="LastUpdated" value="LastUpdated">
-            {i18n.t('add_instance:twitch_mod_pack.last_updated')}
+            Last Updated
           </Select.Option>
           <Select.Option key="Name" value="Name">
-            {i18n.t('add_instance:twitch_mod_pack.name')}
+            Name
           </Select.Option>
           <Select.Option key="Author" value="Author">
-            {i18n.t('add_instance:twitch_mod_pack.auther')}
+            Author
           </Select.Option>
           <Select.Option key="TotalDownloads" value="TotalDownloads">
-            {i18n.t('add_instance:twitch_mod_pack.total_downloads')}
+            Total Downloads
           </Select.Option>
         </StyledSelect>
         <StyledInput
-          placeholder={i18n.t('add_instance:twitch_mod_pack.search')}
+          placeholder="Search..."
           onSearch={setSearchText}
           onChange={e => setSearchText(e.target.value)}
           style={{ width: 200 }}
