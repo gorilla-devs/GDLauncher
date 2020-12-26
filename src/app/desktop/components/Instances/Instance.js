@@ -11,6 +11,7 @@ import {
   faPlay,
   faClock,
   faWrench,
+  faCopy,
   faFolder,
   faTrash,
   faStop,
@@ -189,6 +190,13 @@ const Instance = ({ instanceName }) => {
   const openConfirmationDeleteModal = () => {
     dispatch(openModal('InstanceDeleteConfirmation', { instanceName }));
   };
+  const duplicateInstance = () => {
+    dispatch(
+      openModal('DuplicateInstance', {
+        instanceName: instance.name
+      })
+    );
+  };
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
@@ -304,6 +312,7 @@ const Instance = ({ instanceName }) => {
               Kill
             </MenuItem>
           )}
+
           <MenuItem disabled={Boolean(isInQueue)} onClick={manageInstance}>
             <FontAwesomeIcon
               icon={faWrench}
@@ -343,6 +352,15 @@ const Instance = ({ instanceName }) => {
               `}
             />
             Export Pack
+          </MenuItem>
+          <MenuItem disabled={Boolean(isInQueue)} onClick={duplicateInstance}>
+            <FontAwesomeIcon
+              icon={faCopy}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Duplicate
           </MenuItem>
           <MenuItem divider />
           <MenuItem

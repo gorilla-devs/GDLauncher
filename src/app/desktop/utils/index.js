@@ -363,6 +363,19 @@ export const copyAssetsToResources = async assets => {
   );
 };
 
+export const duplicateInstance = async (
+  folderPath,
+  instancesPath,
+  newInstanceName
+) => {
+  const name = path.basename(folderPath);
+  const newName = await instanceNameSuffix(name, instancesPath);
+  await fse.copy(
+    folderPath,
+    path.join(folderPath, '..', newInstanceName || newName)
+  );
+};
+
 export const copyAssetsToLegacy = async assets => {
   await Promise.all(
     assets.map(async asset => {

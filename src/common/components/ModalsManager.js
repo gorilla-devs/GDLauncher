@@ -46,6 +46,9 @@ const modalsComponentLookupTable = {
   ActionConfirmation: AsyncComponent(
     lazy(() => import('../modals/ActionConfirmation'))
   ),
+  DuplicateInstance: AsyncComponent(
+    lazy(() => import('../modals/DuplicateInstance'))
+  ),
   AddAccount: AsyncComponent(lazy(() => import('../modals/AddAccount'))),
   ModpackDescription: AsyncComponent(
     lazy(() => import('../modals/ModpackDescription'))

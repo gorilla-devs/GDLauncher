@@ -313,7 +313,6 @@ const InstanceName = ({
                       {invalidName &&
                         'Instance name is not valid or too long. Please try another one'}
                       {alreadyExists &&
-                        !instanceNameSufx &&
                         'An instance with this name already exists!'}
                     </div>
                   </div>
