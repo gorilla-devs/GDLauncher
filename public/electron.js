@@ -21,13 +21,40 @@ const { promisify } = require('util');
 
 const fs = fss.promises;
 
+let mainWindow;
+let tray;
+let watcher;
+
 const discordRPC = require('./discordRPC');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
 // Prevent multiple instances
-if (!gotTheLock) {
+if (gotTheLock) {
+  app.on('second-instance', (e, argv) => {
+    if (process.platform === 'win32') {
+      const args = process.argv.slice(1);
+      const args1 = argv.slice(1);
+      log.log([...args, ...args1]);
+      if (mainWindow) {
+        mainWindow.webContents.send('custom-protocol-event', [
+          ...args,
+          ...args1
+        ]);
+      }
+    }
+
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+} else {
   app.quit();
+}
+
+if (!app.isDefaultProtocolClient('gdlauncher')) {
+  app.setAsDefaultProtocolClient('gdlauncher');
 }
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -36,8 +63,34 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
+const edit = {
+  label: 'Edit',
+  submenu: [
+    {
+      label: 'Cut',
+      accelerator: 'CmdOrCtrl+X',
+      selector: 'cut:'
+    },
+    {
+      label: 'Copy',
+      accelerator: 'CmdOrCtrl+C',
+      selector: 'copy:'
+    },
+    {
+      label: 'Paste',
+      accelerator: 'CmdOrCtrl+V',
+      selector: 'paste:'
+    },
+    {
+      label: 'Select All',
+      accelerator: 'CmdOrCtrl+A',
+      selector: 'selectAll:'
+    }
+  ]
+};
+
 // app.allowRendererProcessReuse = true;
-Menu.setApplicationMenu();
+Menu.setApplicationMenu(Menu.buildFromTemplate([edit]));
 
 let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
 
@@ -127,10 +180,6 @@ async function extract7z() {
 }
 
 extract7z();
-
-let mainWindow;
-let tray;
-let watcher;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -257,14 +306,6 @@ app.on('before-quit', async () => {
   }
   mainWindow.removeAllListeners('close');
   mainWindow = null;
-});
-
-app.on('second-instance', () => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-  }
 });
 
 app.on('activate', () => {

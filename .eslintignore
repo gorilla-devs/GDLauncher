@@ -5,6 +5,7 @@
 
 # testing
 /coverage
+/src_old
 
 # production
 /build

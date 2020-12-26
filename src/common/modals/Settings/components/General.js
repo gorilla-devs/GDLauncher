@@ -21,7 +21,7 @@ import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import {
   _getCurrentAccount,
-  // _getDataStorePath,
+  _getDataStorePath,
   _getInstancesPath,
   _getTempPath
 } from '../../../utils/selectors';
@@ -222,7 +222,7 @@ const General = () => {
     state => state.settings.concurrentDownloads
   );
   const updateAvailable = useSelector(state => state.updateAvailable);
-  // const dataStorePath = useSelector(_getDataStorePath);
+  const dataStorePath = useSelector(_getDataStorePath);
   const instancesPath = useSelector(_getInstancesPath);
   const isPlaying = useSelector(state => state.startedInstances);
   const queuedInstances = useSelector(state => state.downloadQueue);
@@ -262,7 +262,7 @@ const General = () => {
   const clearSharedData = async () => {
     setDeletingInstances(true);
     try {
-      // await fsa.emptyDir(dataStorePath);
+      await fsa.emptyDir(dataStorePath);
       await fsa.emptyDir(instancesPath);
       await fsa.emptyDir(tempPath);
     } catch (e) {
@@ -599,7 +599,15 @@ const General = () => {
           in the complete loss of the instances data
         </p>
         <Button
-          onClick={clearSharedData}
+          onClick={() => {
+            dispatch(
+              openModal('ActionConfirmation', {
+                message: 'Are you sure you want to delete shared data?',
+                confirmCallback: clearSharedData,
+                title: 'Confirm'
+              })
+            );
+          }}
           disabled={disableInstancesActions}
           loading={deletingInstances}
         >
