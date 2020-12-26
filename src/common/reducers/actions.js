@@ -24,6 +24,7 @@ import originalFs from 'original-fs';
 import pMap from 'p-map';
 import makeDir from 'make-dir';
 import { parse } from 'semver';
+import { generate as generateRandomString } from 'randomstring';
 import * as ActionTypes from './actionTypes';
 import {
   NEWS_URL,
@@ -32,7 +33,9 @@ import {
   FORGE,
   FABRIC,
   FMLLIBS_OUR_BASE_URL,
-  FMLLIBS_FORGE_BASE_URL
+  FMLLIBS_FORGE_BASE_URL,
+  MICROSOFT_OAUTH_CLIENT_ID,
+  MICROSOFT_OAUTH_REDIRECT_URL
 } from '../utils/constants';
 import {
   mcAuthenticate,
@@ -48,7 +51,12 @@ import {
   getAddonsByFingerprint,
   getAddonFiles,
   getAddon,
-  getAddonCategories
+  getAddonCategories,
+  msAuthenticateXBL,
+  msExchangeCodeForAcessToken,
+  msAuthenticateXSTS,
+  msAuthenticateMinecraft,
+  msMinecraftProfile
 } from '../api';
 import {
   _getCurrentAccount,
@@ -482,6 +490,139 @@ export function loginThroughNativeLauncher() {
       }
     } catch (err) {
       throw new Error(err);
+    }
+  };
+}
+
+export function loginOAuth(redirect = true) {
+  return async (dispatch, getState) => {
+    const {
+      app: { isNewUser /* , clientToken */ }
+    } = getState();
+    try {
+      const clientId = MICROSOFT_OAUTH_CLIENT_ID;
+      const codeVerifier = generateRandomString(128);
+      const redirectUrl = MICROSOFT_OAUTH_REDIRECT_URL;
+
+      let authCode = null;
+      try {
+        authCode = await ipcRenderer.invoke(
+          'msLoginOAuth',
+          clientId,
+          codeVerifier,
+          redirectUrl
+        );
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error occurred while logging in Microsoft.');
+      }
+
+      let msAccessToken = null;
+      let msRefreshToken = null;
+      try {
+        ({
+          data: { access_token: msAccessToken, refresh_token: msRefreshToken }
+        } = await msExchangeCodeForAcessToken(
+          clientId,
+          redirectUrl,
+          authCode,
+          codeVerifier
+        ));
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error occurred while making logging in Microsoft .');
+      }
+
+      let xblToken = null;
+      let userHash = null;
+      try {
+        ({
+          data: {
+            Token: xblToken,
+            DisplayClaims: {
+              xui: [{ uhs: userHash }]
+            }
+          }
+        } = await msAuthenticateXBL(msAccessToken));
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error occurred while logging in Xbox Live .');
+      }
+
+      let xstsToken = null;
+      try {
+        ({
+          data: { Token: xstsToken }
+        } = await msAuthenticateXSTS(xblToken));
+      } catch (error) {
+        console.error(error);
+        throw new Error(
+          'Error occurred while fetching token from Xbox Secure Token Service.'
+        );
+      }
+
+      let mcAccessToken = null;
+      try {
+        ({
+          data: { access_token: mcAccessToken }
+        } = await msAuthenticateMinecraft(userHash, xstsToken));
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error occurred while logging in Minecraft.');
+      }
+
+      let mcUserId = null;
+      let mcUserName = null;
+      try {
+        ({
+          data: { id: mcUserId, name: mcUserName }
+        } = await msMinecraftProfile(mcAccessToken));
+      } catch (error) {
+        console.error(error);
+        if (error?.response?.status === 404) {
+          throw new Error("It looks like you didn't buy the game.");
+        }
+        throw new Error('Error occurred while fetching Minecraft profile.');
+      }
+
+      const skinUrl = await getPlayerSkin(mcUserId);
+
+      const account = {
+        accountType: 'MICROSOFT',
+        accessToken: mcAccessToken,
+        msOAuth: {
+          msAccessToken,
+          msRefreshToken,
+          xblToken,
+          xstsToken,
+          userHash
+        },
+        selectedProfile: {
+          id: mcUserId,
+          name: mcUserName
+        },
+        skin: skinUrl || undefined,
+        user: {
+          username: mcUserName
+        }
+      };
+
+      dispatch(updateAccount(mcUserId, account));
+      dispatch(updateCurrentAccountId(mcUserId));
+
+      if (!isNewUser) {
+        if (redirect) {
+          dispatch(push('/home'));
+        }
+      } else {
+        dispatch(updateIsNewUser(false));
+        if (redirect) {
+          dispatch(push('/onboarding'));
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      throw new Error(error);
     }
   };
 }
