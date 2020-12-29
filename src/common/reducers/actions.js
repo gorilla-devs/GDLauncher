@@ -35,7 +35,9 @@ import {
   FMLLIBS_OUR_BASE_URL,
   FMLLIBS_FORGE_BASE_URL,
   MICROSOFT_OAUTH_CLIENT_ID,
-  MICROSOFT_OAUTH_REDIRECT_URL
+  MICROSOFT_OAUTH_REDIRECT_URL,
+  ACCOUNT_MICROSOFT,
+  ACCOUNT_MOJANG
 } from '../utils/constants';
 import {
   mcAuthenticate,
@@ -56,7 +58,8 @@ import {
   msExchangeCodeForAcessToken,
   msAuthenticateXSTS,
   msAuthenticateMinecraft,
-  msMinecraftProfile
+  msMinecraftProfile,
+  msOAuthRefresh
 } from '../api';
 import {
   _getCurrentAccount,
@@ -237,7 +240,11 @@ export function switchToFirstValidAccount(id) {
       try {
         dispatch(updateCurrentAccountId(accounts[i].selectedProfile.id));
         // eslint-disable-next-line no-await-in-loop
-        await dispatch(loginWithAccessToken());
+        await dispatch(
+          accounts[i].accountType === ACCOUNT_MICROSOFT
+            ? loginWithOAuthAccessToken()
+            : loginWithAccessToken()
+        );
         found = accounts[i].selectedProfile.id;
       } catch {
         dispatch(
@@ -360,6 +367,7 @@ export function login(username, password, redirect = true) {
       let data = null;
       try {
         ({ data } = await mcAuthenticate(username, password, clientToken));
+        data.accountType = ACCOUNT_MOJANG;
       } catch (err) {
         console.error(err);
         throw new Error('Invalid username or password.');
@@ -388,6 +396,138 @@ export function login(username, password, redirect = true) {
     } catch (err) {
       console.error(err);
       throw new Error(err);
+    }
+  };
+}
+
+export function loginWithOAuthAccessToken(redirect = true) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const currentAccount = _getCurrentAccount(state);
+    const {
+      accessToken,
+      selectedProfile,
+      msOAuth: { msRefreshToken, mcExpiresAt },
+      user: { username: mcUserName }
+    } = currentAccount;
+
+    if (!accessToken) throw new Error();
+
+    // Check if token already expired
+    if (Date.now() >= mcExpiresAt) {
+      // Token expired
+      try {
+        const clientId = MICROSOFT_OAUTH_CLIENT_ID;
+
+        let msRefreshedAccessToken = null;
+        let msRefreshedRefreshToken = null;
+        try {
+          ({
+            data: {
+              access_token: msRefreshedAccessToken,
+              refresh_token: msRefreshedRefreshToken
+            }
+          } = await msOAuthRefresh(clientId, msRefreshToken));
+        } catch (error) {
+          console.error(error);
+          throw new Error('Error occurred while refreshing Microsoft token.');
+        }
+
+        let xblToken = null;
+        let userHash = null;
+        try {
+          ({
+            data: {
+              Token: xblToken,
+              DisplayClaims: {
+                xui: [{ uhs: userHash }]
+              }
+            }
+          } = await msAuthenticateXBL(msRefreshedAccessToken));
+        } catch (error) {
+          console.error(error);
+          throw new Error('Error occurred while logging in Xbox Live .');
+        }
+
+        let xstsToken = null;
+        try {
+          ({
+            data: { Token: xstsToken }
+          } = await msAuthenticateXSTS(xblToken));
+        } catch (error) {
+          console.error(error);
+          throw new Error(
+            'Error occurred while fetching token from Xbox Secure Token Service.'
+          );
+        }
+
+        let mcRefreshedAccessToken = null;
+        let mcRefreshedExpiresIn = null;
+        let mcRefreshedExpiresAt = null;
+        try {
+          ({
+            data: {
+              access_token: mcRefreshedAccessToken,
+              expires_in: mcRefreshedExpiresIn
+            }
+          } = await msAuthenticateMinecraft(userHash, xstsToken));
+          mcRefreshedExpiresAt = Date.now() + 1000 * mcRefreshedExpiresIn;
+        } catch (error) {
+          console.error(error);
+          throw new Error('Error occurred while logging in Minecraft.');
+        }
+
+        const skinUrl = await getPlayerSkin(selectedProfile.id);
+
+        const account = {
+          accountType: ACCOUNT_MICROSOFT,
+          accessToken: mcRefreshedAccessToken,
+          msOAuth: {
+            msAccessToken: msRefreshedAccessToken,
+            msRefreshToken: msRefreshedRefreshToken || msRefreshToken,
+            mcExpiresAt: mcRefreshedExpiresAt,
+            xblToken,
+            xstsToken,
+            userHash
+          },
+          selectedProfile: {
+            id: selectedProfile.id,
+            name: selectedProfile.name
+          },
+          skin: skinUrl || undefined,
+          user: {
+            username: mcUserName
+          }
+        };
+
+        dispatch(updateAccount(selectedProfile.id, account));
+        dispatch(updateCurrentAccountId(selectedProfile.id));
+
+        if (redirect) {
+          dispatch(push('/home'));
+        }
+      } catch (error) {
+        console.error(error);
+        throw new Error(error);
+      }
+    } else {
+      // Only reload skin
+      try {
+        const skinUrl = await getPlayerSkin(selectedProfile.id);
+        if (skinUrl) {
+          dispatch(
+            updateAccount(selectedProfile.id, {
+              ...currentAccount,
+              skin: skinUrl
+            })
+          );
+        }
+        if (redirect) {
+          dispatch(push('/home'));
+        }
+      } catch (err) {
+        console.warn('Could not fetch skin');
+      }
     }
   };
 }
@@ -467,6 +607,7 @@ export function loginThroughNativeLauncher() {
       const { accessToken } = vnlJson.authenticationDatabase[account];
 
       const { data } = await mcRefresh(accessToken, clientToken);
+      data.accountType = ACCOUNT_MOJANG;
       const skinUrl = await getPlayerSkin(data.selectedProfile.id);
       if (skinUrl) {
         data.skin = skinUrl;
@@ -562,10 +703,13 @@ export function loginOAuth(redirect = true) {
       }
 
       let mcAccessToken = null;
+      let mcExpiresIn = null;
+      let mcExpiresAt = null;
       try {
         ({
-          data: { access_token: mcAccessToken }
+          data: { access_token: mcAccessToken, expires_in: mcExpiresIn }
         } = await msAuthenticateMinecraft(userHash, xstsToken));
+        mcExpiresAt = Date.now() + 1000 * mcExpiresIn;
       } catch (error) {
         console.error(error);
         throw new Error('Error occurred while logging in Minecraft.');
@@ -588,11 +732,12 @@ export function loginOAuth(redirect = true) {
       const skinUrl = await getPlayerSkin(mcUserId);
 
       const account = {
-        accountType: 'MICROSOFT',
+        accountType: ACCOUNT_MICROSOFT,
         accessToken: mcAccessToken,
         msOAuth: {
           msAccessToken,
           msRefreshToken,
+          mcExpiresAt,
           xblToken,
           xstsToken,
           userHash

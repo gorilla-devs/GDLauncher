@@ -90,6 +90,23 @@ export const msMinecraftProfile = mcAccessToken => {
   });
 };
 
+export const msOAuthRefresh = (clientId, refreshToken) => {
+  return axios.post(
+    `${MICROSOFT_LIVE_LOGIN_URL}/oauth20_token.srf`,
+    qs.stringify({
+      grant_type: 'refresh_token',
+      scope: 'xboxlive.signin',
+      client_id: clientId,
+      refresh_token: refreshToken
+    }),
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }
+  );
+};
+
 // Minecraft API
 
 export const mcAuthenticate = (username, password, clientToken) => {
