@@ -335,7 +335,10 @@ ipcMain.handle(
       msAuthorizeUrl.searchParams.set('code_challenge', codeChallenge);
       msAuthorizeUrl.searchParams.set('code_challenge_method', 'S256');
       msAuthorizeUrl.searchParams.set('response_type', 'code');
-      msAuthorizeUrl.searchParams.set('scope', 'xboxlive.signin');
+      msAuthorizeUrl.searchParams.set(
+        'scope',
+        'xboxlive.signin xboxlive.offline_access'
+      );
       msAuthorizeUrl.searchParams.set(
         'cobrandid',
         '8058f65d-ce06-4c30-9559-473c9275a65d'
