@@ -11,10 +11,12 @@ import {
   updateCurrentAccountId,
   loginWithAccessToken,
   updateAccount,
-  removeAccount
+  removeAccount,
+  loginWithOAuthAccessToken
 } from '../reducers/actions';
 import { load } from '../reducers/loading/actions';
 import features from '../reducers/loading/features';
+import { ACCOUNT_MICROSOFT } from '../utils/constants';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
@@ -57,7 +59,11 @@ const ProfileSettings = () => {
                     dispatch(
                       load(
                         features.mcAuthentication,
-                        dispatch(loginWithAccessToken(false))
+                        dispatch(
+                          account.accountType === ACCOUNT_MICROSOFT
+                            ? loginWithOAuthAccessToken(false)
+                            : loginWithAccessToken(false)
+                        )
                       )
                     ).catch(() => {
                       dispatch(updateCurrentAccountId(currentId));

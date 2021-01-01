@@ -76,8 +76,8 @@ const InstanceContainer = styled.div`
   font-size: 20px;
   overflow: hidden;
   height: 100%;
-  background: linear-gradient(0deg,rgba(0,0,0,0.8),rgba(0,0,0,0.8)),url("${props =>
-    props.background}") center no-repeat;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+    url('${props => props.background}') center no-repeat;
   background-position: center;
   color: ${props => props.theme.palette.text.secondary};
   font-weight: 600;
