@@ -2438,7 +2438,7 @@ export function launchInstance(instanceName) {
       await new Promise(resolve => setTimeout(resolve, 200));
       ipcRenderer.invoke('show-window');
       dispatch(removeStartedInstance(instanceName));
-      fse.remove(instanceJLFPath);
+      await fse.remove(instanceJLFPath);
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
       if (code !== 0 && errorLogs) {
         dispatch(
