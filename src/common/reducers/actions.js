@@ -55,7 +55,7 @@ import {
   getAddon,
   getAddonCategories,
   msAuthenticateXBL,
-  msExchangeCodeForAcessToken,
+  msExchangeCodeForAccessToken,
   msAuthenticateXSTS,
   msAuthenticateMinecraft,
   msMinecraftProfile,
@@ -663,7 +663,7 @@ export function loginOAuth(redirect = true) {
       try {
         ({
           data: { access_token: msAccessToken, refresh_token: msRefreshToken }
-        } = await msExchangeCodeForAcessToken(
+        } = await msExchangeCodeForAccessToken(
           clientId,
           redirectUrl,
           authCode,

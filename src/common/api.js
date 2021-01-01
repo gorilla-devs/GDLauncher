@@ -18,7 +18,7 @@ import { sortByDate } from './utils';
 
 // Microsoft Auth
 
-export const msExchangeCodeForAcessToken = (
+export const msExchangeCodeForAccessToken = (
   clientId,
   redirectUrl,
   code,
