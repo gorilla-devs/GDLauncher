@@ -193,7 +193,7 @@ const commonConfig = {
     win: [type === 'setup' ? 'nsis-web:x64' : 'zip:x64']
   }),
   ...((!process.env.RELEASE_TESTING || process.platform === 'darwin') && {
-    mac: type === 'setup' ? ['dmg:x64', 'dmg:arm64'] : []
+    mac: type === 'setup' ? ['dmg:x64'] : []
   })
 };
 
