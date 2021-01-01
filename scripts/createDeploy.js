@@ -159,6 +159,10 @@ const commonConfig = {
       differentialPackage: true,
       include: './public/installer.nsh'
     },
+    mac: {
+      entitlements: './entitlements.mac.plist',
+      entitlementsInherit: './entitlements.mac.plist'
+    },
     /* eslint-disable */
     artifactName: `${'${productName}'}-${'${os}'}-${
       process.argv[2]
@@ -170,7 +174,14 @@ const commonConfig = {
     directories: {
       buildResources: 'public',
       output: 'release'
-    }
+    },
+    protocols: [
+      {
+        name: 'gdlauncher',
+        role: 'Viewer',
+        schemes: ['gdlauncher']
+      }
+    ]
   },
   ...((!process.env.RELEASE_TESTING || process.platform === 'linux') && {
     linux:
@@ -182,7 +193,7 @@ const commonConfig = {
     win: [type === 'setup' ? 'nsis-web:x64' : 'zip:x64']
   }),
   ...((!process.env.RELEASE_TESTING || process.platform === 'darwin') && {
-    mac: type === 'setup' ? ['dmg:x64'] : []
+    mac: type === 'setup' ? ['dmg:x64', 'dmg:arm64'] : []
   })
 };
 

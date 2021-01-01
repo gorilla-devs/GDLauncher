@@ -599,7 +599,15 @@ const General = () => {
           in the complete loss of the instances data
         </p>
         <Button
-          onClick={clearSharedData}
+          onClick={() => {
+            dispatch(
+              openModal('ActionConfirmation', {
+                message: 'Are you sure you want to delete shared data?',
+                confirmCallback: clearSharedData,
+                title: 'Confirm'
+              })
+            );
+          }}
           disabled={disableInstancesActions}
           loading={deletingInstances}
         >
