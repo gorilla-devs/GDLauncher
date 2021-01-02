@@ -14,7 +14,8 @@ import {
   loginThroughNativeLauncher,
   switchToFirstValidAccount,
   checkClientToken,
-  updateUserData
+  updateUserData,
+  loginWithOAuthAccessToken
 } from '../../common/reducers/actions';
 import {
   load,
@@ -32,6 +33,7 @@ import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
 import { openModal } from '../../common/reducers/modals/actions';
 import Message from './components/Message';
+import { ACCOUNT_MICROSOFT } from '../../common/utils/constants';
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -111,7 +113,14 @@ function DesktopRoot({ store }) {
       dispatch(push('/home'));
     } else if (currentAccount) {
       dispatch(
-        load(features.mcAuthentication, dispatch(loginWithAccessToken()))
+        load(
+          features.mcAuthentication,
+          dispatch(
+            currentAccount.accountType === ACCOUNT_MICROSOFT
+              ? loginWithOAuthAccessToken()
+              : loginWithAccessToken()
+          )
+        )
       ).catch(() => {
         dispatch(switchToFirstValidAccount());
       });

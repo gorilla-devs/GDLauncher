@@ -65,50 +65,67 @@ const modsFingerprintsScan = async instancesPath => {
       let newMods = config?.mods || [];
 
       if (Object.values(missingMods).length !== 0) {
-        const { data } = await getAddonsByFingerprint(
-          Object.values(missingMods)
-        );
+        let success = false;
+        let tries = 10;
 
-        const matches = await Promise.all(
-          Object.entries(missingMods).map(async ([fileName, hash]) => {
-            const exactMatch = (data.exactMatches || []).find(
-              v => v.file.packageFingerprint === hash
+        while (!success || tries > 10) {
+          try {
+            const { data } = await getAddonsByFingerprint(
+              Object.values(missingMods)
             );
-            const unmatched = (data.unmatchedFingerprints || []).find(
-              v => v === hash
-            );
-            if (exactMatch) {
-              let addonData = null;
-              try {
-                addonData = (await getAddon(exactMatch.file.projectId)).data;
-                return {
-                  ...normalizeModData(
-                    exactMatch.file,
-                    exactMatch.file.projectId,
-                    addonData.name
-                  ),
-                  fileName
-                };
-              } catch {
-                return {
-                  fileName,
-                  displayName: fileName,
-                  packageFingerprint: hash
-                };
-              }
-            }
-            if (unmatched) {
-              return {
-                fileName,
-                displayName: fileName,
-                packageFingerprint: hash
-              };
-            }
-            return null;
-          })
-        );
 
-        newMods = [...newMods, ...matches];
+            const matches = await Promise.all(
+              Object.entries(missingMods).map(async ([fileName, hash]) => {
+                const exactMatch = (data.exactMatches || []).find(
+                  v => v.file.packageFingerprint === hash
+                );
+                const unmatched = (data.unmatchedFingerprints || []).find(
+                  v => v === hash
+                );
+                if (exactMatch) {
+                  let addonData = null;
+                  try {
+                    addonData = (await getAddon(exactMatch.file.projectId))
+                      .data;
+                    return {
+                      ...normalizeModData(
+                        exactMatch.file,
+                        exactMatch.file.projectId,
+                        addonData.name
+                      ),
+                      fileName
+                    };
+                  } catch {
+                    return {
+                      fileName,
+                      displayName: fileName,
+                      packageFingerprint: hash
+                    };
+                  }
+                }
+                if (unmatched) {
+                  return {
+                    fileName,
+                    displayName: fileName,
+                    packageFingerprint: hash
+                  };
+                }
+                return null;
+              })
+            );
+
+            newMods = [...newMods, ...matches];
+            success = true;
+          } catch (err) {
+            console.error(err);
+            tries += 1;
+            await new Promise(resolve => {
+              setTimeout(() => {
+                resolve();
+              }, 5000);
+            });
+          }
+        }
       }
 
       const filterMods = newMods
