@@ -10,6 +10,7 @@ export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const FORGESVC_URL = 'https://addons-ecs.forgesvc.net/api/v2';
 export const FTB_API_URL = 'https://api.modpacks.ch/public';
+export const FTB_MODPACK_URL = 'https://feed-the-beast.com/modpack';
 export const FORGESVC_CATEGORIES =
   'https://addons-ecs.forgesvc.net/api/v2/category?gameId=432';
 export const NEWS_URL =

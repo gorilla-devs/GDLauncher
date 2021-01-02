@@ -17,7 +17,7 @@ import {
 } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
-import { FORGE, CURSEFORGE_URL } from '../utils/constants';
+import { FORGE, CURSEFORGE_URL, FTB_MODPACK_URL } from '../utils/constants';
 import { formatNumber, formatDate } from '../utils';
 
 const AddInstance = ({ modpack, setStep, setModpack, setVersion, type }) => {
@@ -102,7 +102,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion, type }) => {
       .replace(/-+/, 'minus')
       .replace(/[^0-9a-z]/gi, '_')
       .replace(/_+/, '_');
-    return `https://feed-the-beast.com/modpack/${newName}`;
+    return `${FTB_MODPACK_URL}/${newName}`;
   };
 
   const primaryImage = useMemo(() => {

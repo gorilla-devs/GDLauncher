@@ -3,6 +3,7 @@ import React, { memo, useState } from 'react';
 import styled from 'styled-components';
 import ReactHtmlParser from 'react-html-parser';
 import { Select } from 'antd';
+import ReactMarkdown from 'react-markdown';
 import Modal from '../components/Modal';
 import { getAddonFileChangelog, getFTBChangelog } from '../api';
 
@@ -95,10 +96,23 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
                 `}
               >
                 {type === 'ftb'
-                  ? (files || []).find(v => v.id === selectedId)?.content
+                  ? `${modpackName} - ${
+                      (files || []).find(v => v.id === selectedId)?.name
+                    }`
                   : (files || []).find(v => v.id === selectedId)?.displayName}
               </div>
-              {ReactHtmlParser(changelog)}
+              {type === 'ftb' ? (
+                <ReactMarkdown
+                  css={`
+                    font-size: 15px;
+                    padding: 20px;
+                  `}
+                >
+                  {changelog.content}
+                </ReactMarkdown>
+              ) : (
+                ReactHtmlParser(changelog)
+              )}
             </>
           ) : (
             <h2
