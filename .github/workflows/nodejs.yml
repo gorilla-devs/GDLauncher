@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - releases
+      - native-refactor
   pull_request:
     branches:
       - master
