@@ -11,8 +11,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useSelector } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
+import curseForgeIcon from '../../assets/curseforgeIcon.webp';
 import { _getInstancesPath } from '../../utils/selectors';
 import DragnDropEffect from '../../../ui/DragnDropEffect';
 
@@ -254,7 +254,7 @@ const ResourcePacks = ({ instanceName }) => {
               }
             }}
           />
-          {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
+          {item.fileID && <img src={curseForgeIcon} alt="curseforge" />}
         </div>
         <div className="rowCenterContent">{item.replace('.disabled', '')}</div>
         <div className="rightPartContent">

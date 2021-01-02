@@ -305,7 +305,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
 
   const installedMods = instance?.mods;
 
-  const [loadMoreModsDebounced] = useDebouncedCallback(
+  const loadMoreModsDebounced = useDebouncedCallback(
     (s, reset) => {
       loadMoreMods(s, reset);
     },
@@ -379,7 +379,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
-              loadMoreModsDebounced(e.target.value, true);
+              loadMoreModsDebounced.callback(e.target.value, true);
             }}
             allowClear
           />

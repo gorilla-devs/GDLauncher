@@ -21,9 +21,9 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
 import makeDir from 'make-dir';
+import curseForgeIcon from '../../assets/curseforgeIcon.webp';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import {
   updateInstanceConfig,
@@ -344,7 +344,9 @@ const Row = memo(({ index, style, data }) => {
                 }
               }}
             />
-            {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
+            {item.fileID && (
+              <img src={curseForgeIcon} height="15px" alt="curseforge" />
+            )}
           </div>
           <div
             onClick={() => {

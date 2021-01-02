@@ -31,7 +31,7 @@ const Notes = ({ instanceName }) => {
   const instance = useSelector(state => _getInstance(state)(instanceName));
   const [value, setValue] = useState(instance.notes || initialValue);
 
-  const [updateNotes] = useDebouncedCallback(
+  const updateNotes = useDebouncedCallback(
     v => {
       dispatch(
         updateInstanceConfig(instanceName, config => ({ ...config, notes: v }))
@@ -49,7 +49,7 @@ const Notes = ({ instanceName }) => {
           value={value}
           onChange={notes => {
             setValue(notes);
-            updateNotes(notes);
+            updateNotes.callback(notes);
           }}
         >
           <Toolbar>

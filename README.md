@@ -61,7 +61,7 @@ To download the latest version, you can either click [here](https://github.com/g
 #### Our features:
 
 - Java downloader. You don't need to have java installed, a suitable version will be downloaded automatically.
-- It's as easy as pie to install the `vanilla` game, `forge`, `fabric`, and all `twitch modpacks`. No further action from the user is required.
+- It's as easy as pie to install the `vanilla` game, `forge`, `fabric`, and all `curseforge modpacks`. No further action from the user is required.
 - Install `mods` for both fabric and forge directly from our UI
 - Built-in auto-updater. The launcher will always keep itself updated to the latest release.
 - Easily manage multiple `accounts` and switch between them.

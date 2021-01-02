@@ -87,9 +87,9 @@ const InstanceName = ({
     const isVanilla = version[0] === VANILLA;
     const isFabric = version[0] === FABRIC;
     const isForge = version[0] === FORGE;
-    const isTwitchModpack = Boolean(modpack?.attachments);
+    const isCurseForgeModpack = Boolean(modpack?.attachments);
     let manifest;
-    if (isTwitchModpack) {
+    if (isCurseForgeModpack) {
       if (importZipPath) {
         manifest = await importAddonZip(
           importZipPath,
