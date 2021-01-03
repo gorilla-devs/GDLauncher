@@ -6,8 +6,9 @@
 //   ui: path.resolve("./src/ui/")
 // };
 
+/* eslint-disable no-param-reassign */
+
 const CracoAntDesignPlugin = require('craco-antd');
-const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = ({ env }) => {
   const isEnvDevelopment = env === 'development';
@@ -44,49 +45,43 @@ module.exports = ({ env }) => {
     },
     webpack: {
       devtool: 'eval-cheap-module-source-map',
-      configure: {
-        devtool: 'eval-cheap-module-source-map',
-        target:
-          process.env.APP_TYPE === 'electron' ? 'electron-renderer' : 'web',
-        optimization: {
-          splitChunks: {
-            name: false,
-            chunks: 'all',
-            maxInitialRequests: Infinity,
-            cacheGroups: {
-              vendor: {
-                test: /[\\/]node_modules[\\/]!(antd)/,
-                name(module) {
-                  // get the name. E.g. node_modules/packageName/not/this/part.js
-                  // or node_modules/packageName
-                  const packageName = module.context.match(
-                    /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-                  )[1];
+      configure: webpackConfig => {
+        webpackConfig.target =
+          process.env.APP_TYPE === 'electron' ? 'electron-renderer' : 'web';
 
-                  // npm package names are URL-safe, but some servers don't like @ symbols
-                  return `npm.${packageName.replace('@', '')}`;
-                }
-              }
-            }
-          }
-        },
-        output: {
+        webpackConfig.output = {
           filename: isEnvProduction
             ? 'static/js/[name].js'
             : isEnvDevelopment && 'static/js/bundle.js',
           chunkFilename: isEnvProduction
             ? 'static/js/[name].chunk.js'
             : isEnvDevelopment && 'static/js/[name].chunk.js'
-        }
-      },
-      optimization: {
-        minimizer: [
-          new TerserPlugin({
-            parallel: true,
-            sourceMap: true,
-            cache: true
-          })
-        ]
+        };
+
+        webpackConfig.optimization.splitChunks = {
+          name: false,
+          chunks: 'all',
+          maxInitialRequests: Infinity,
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]!(antd)/,
+              name(module) {
+                // get the name. E.g. node_modules/packageName/not/this/part.js
+                // or node_modules/packageName
+                const packageName = module.context.match(
+                  /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+                )[1];
+
+                // npm package names are URL-safe, but some servers don't like @ symbols
+                return `npm.${packageName.replace('@', '')}`;
+              }
+            }
+          }
+        };
+        webpackConfig.resolve.aliasFields = [];
+        webpackConfig.resolve.mainFields = ['module', 'main'];
+
+        return webpackConfig;
       }
     },
     plugins: [
