@@ -43,7 +43,7 @@ jobs:
         run: npm config set msvs_version 2017
       - name: npm run install
         run: |
-          npm i
+          npm i --legacy-peer-deps
       - name: npm run lint
         run: |
           npm run lint
