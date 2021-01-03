@@ -20,7 +20,7 @@ module.exports = ({ env }) => {
           '@babel/preset-env',
           {
             targets: {
-              node: '13'
+              node: '15'
             }
           }
         ],

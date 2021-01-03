@@ -198,6 +198,7 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
+      enableRemoteModule: true,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
     }
@@ -461,7 +462,7 @@ ipcMain.handle('getIsWindowMaximized', () => {
 });
 
 ipcMain.handle('openFolder', (e, folderPath) => {
-  shell.openItem(folderPath);
+  shell.openPath(folderPath);
 });
 
 ipcMain.handle('open-devtools', () => {

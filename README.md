@@ -90,7 +90,7 @@ These are the steps to compile it yourself.
 
 You need the following software installed:
 
-- [NodeJS](https://nodejs.org/en/download/) (> v14.14.0 x64)
+- [NodeJS](https://nodejs.org/en/download/) (> v15.5.0 x64)
 - [Rust](https://www.rust-lang.org/)
 - [Python2](https://www.python.org/)(Mac and linux)
 - C++ compiler (g++ or windows build tools)
@@ -101,7 +101,7 @@ Install the dependencies and devDependencies.
 
 ```sh
 $ cd GDLauncher
-$ npm i
+$ npm i --legacy-peer-deps
 ```
 
 Start the development environment
