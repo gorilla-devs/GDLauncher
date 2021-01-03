@@ -10,9 +10,9 @@
 
 const CracoAntDesignPlugin = require('craco-antd');
 
-module.exports = ({ env }) => {
-  const isEnvDevelopment = env === 'development';
-  const isEnvProduction = env === 'production';
+module.exports = () => {
+  // const isEnvDevelopment = env === 'development';
+  // const isEnvProduction = env === 'production';
 
   return {
     babel: {
@@ -49,14 +49,14 @@ module.exports = ({ env }) => {
         webpackConfig.target =
           process.env.APP_TYPE === 'electron' ? 'electron-renderer' : 'web';
 
-        webpackConfig.output = {
-          filename: isEnvProduction
-            ? 'static/js/[name].js'
-            : isEnvDevelopment && 'static/js/bundle.js',
-          chunkFilename: isEnvProduction
-            ? 'static/js/[name].chunk.js'
-            : isEnvDevelopment && 'static/js/[name].chunk.js'
-        };
+        // webpackConfig.output = {
+        //   filename: isEnvProduction
+        //     ? 'static/js/[name].js'
+        //     : isEnvDevelopment && 'static/js/bundle.js',
+        //   chunkFilename: isEnvProduction
+        //     ? 'static/js/[name].chunk.js'
+        //     : isEnvDevelopment && 'static/js/[name].chunk.js'
+        // };
 
         webpackConfig.optimization.splitChunks = {
           name: false,
@@ -80,7 +80,7 @@ module.exports = ({ env }) => {
         };
         webpackConfig.resolve.aliasFields = [];
         webpackConfig.resolve.mainFields = ['module', 'main'];
-
+        console.log(webpackConfig);
         return webpackConfig;
       }
     },
