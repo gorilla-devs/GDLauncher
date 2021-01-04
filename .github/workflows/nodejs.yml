@@ -42,7 +42,7 @@ jobs:
         run: npm install --global --production node-gyp@latest
       - name: Set node config to set msvs_version to 2019
         if: matrix.os == 'windows-latest'
-        run: npm config set msvs_version 2015
+        run: npm config set msvs_version 2019
       - name: npm run install
         run: |
           npm i --legacy-peer-deps
