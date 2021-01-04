@@ -44,6 +44,7 @@
     "lint": "eslint .",
     "dev": "npm run build-electron:dev && cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none \"npm run start-electron\"",
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web npm run start",
+    "postinstall": "npm run rebuild",
     "preinstall": "node ./scripts/preinstall.js",
     "rebuild": "node ./scripts/buildNativeDeps.js",
     "deploy": "node ./scripts/createDeploy.js",
@@ -78,7 +79,7 @@
     ]
   },
   "engines": {
-    "node": ">=15.5.0"
+    "node": ">=14.14.0"
   },
   "eslintConfig": {
     "extends": "react-app"
