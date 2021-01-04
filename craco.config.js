@@ -80,7 +80,6 @@ module.exports = () => {
         };
         webpackConfig.resolve.aliasFields = [];
         webpackConfig.resolve.mainFields = ['module', 'main'];
-        console.log(webpackConfig);
         return webpackConfig;
       }
     },
