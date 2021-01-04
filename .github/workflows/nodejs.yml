@@ -31,17 +31,17 @@ jobs:
         with:
           node-version: '15.5.0'
 
+      - name: Use npm v6 
+        if: ${{ matrix.node-version == '15.x' }} 
+        run: npm install -g npm@6
       - name: Set node config to use python2.7
         run: npm config set python python2.7
       - name: install node tools
         if: matrix.os == 'windows-latest'
-        run: npm install --global --production --vs2015 windows-build-tools@4.0.0
-      - name: install node tools pt. 2
-        if: matrix.os == 'windows-latest'
-        run: npm install --global --production --vs2015 windows-build-tools
+        run: npm install --global windows-build-tools@4.0.0
       - name: install node-gyp
-        run: npm install --global node-gyp@latest
-      - name: Set node config to set msvs_version to 2015
+        run: npm install --global --production node-gyp@latest
+      - name: Set node config to set msvs_version to 2019
         if: matrix.os == 'windows-latest'
         run: npm config set msvs_version 2015
       - name: npm run install
