@@ -31,8 +31,7 @@ jobs:
         with:
           node-version: '15.5.0'
 
-      - name: Use npm v6 
-        if: ${{ matrix.node-version == '15.x' }} 
+      - name: Use npm v6
         run: npm install -g npm@6
       - name: Set node config to use python2.7
         run: npm config set python python2.7
