@@ -18,11 +18,11 @@
 # IDEs
 .idea
 *.iml
+.eslintcache
 
 # misc
 .DS_Store
 .env.local
-.env
 .electron-builder.env
 .env.development.local
 .env.test.local

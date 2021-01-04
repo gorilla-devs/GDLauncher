@@ -43,7 +43,10 @@ export const formatNumber = number => {
 };
 
 export const formatDate = date => {
-  const parsedDate = Date.parse(date);
+  let parsedDate = date;
+  if (typeof date !== 'number') {
+    parsedDate = Date.parse(date);
+  }
   return new Date(parsedDate).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',

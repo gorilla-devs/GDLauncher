@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 let lastRequest;
-const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
+const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
   const mcVersions = useSelector(state => state.app.vanillaManifest?.versions);
   const categories = useSelector(state => state.app.curseforgeCategories);
   const infiniteLoaderRef = useRef(null);
@@ -24,7 +24,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [error, setError] = useState(false);
 
-  const [updateModpacks] = useDebouncedCallback(() => {
+  const updateModpacks = useDebouncedCallback(() => {
     if (infiniteLoaderRef?.current?.scrollToItem) {
       infiniteLoaderRef.current.scrollToItem(0);
     }
@@ -69,7 +69,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   };
 
   useEffect(() => {
-    updateModpacks();
+    updateModpacks.callback();
   }, [searchText, sortBy, minecraftVersion, categoryId]);
 
   return (
@@ -220,7 +220,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   );
 };
 
-export default React.memo(TwitchModpacks);
+export default React.memo(CurseForgeModpacks);
 
 const Container = styled.div`
   width: 100%;

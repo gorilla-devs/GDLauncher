@@ -1,8 +1,9 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
+import ReactMarkdown from 'react-markdown';
 import { shell } from 'electron';
 import { faExternalLinkAlt, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,12 +17,12 @@ import {
 } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
-import { FORGE, CURSEFORGE_URL } from '../utils/constants';
+import { FORGE, CURSEFORGE_URL, FTB_MODPACK_URL } from '../utils/constants';
 import { formatNumber, formatDate } from '../utils';
 
-const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
+const AddInstance = ({ modpack, setStep, setModpack, setVersion, type }) => {
   const dispatch = useDispatch();
-  const [description, setDescription] = useState(null);
+  const [description, setDescription] = useState('');
   const [files, setFiles] = useState(null);
   const [selectedId, setSelectedId] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -29,21 +30,27 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      await Promise.all([
-        getAddonDescription(modpack.id).then(data => {
-          // Replace the beginning of all relative URLs with the Curseforge URL
-          const modifiedData = data.data.replace(
-            /href="(?!http)/g,
-            `href="${CURSEFORGE_URL}`
-          );
+      if (type === 'curseforge') {
+        await Promise.all([
+          getAddonDescription(modpack.id).then(data => {
+            // Replace the beginning of all relative URLs with the Curseforge URL
+            const modifiedData = data.data.replace(
+              /href="(?!http)/g,
+              `href="${CURSEFORGE_URL}`
+            );
 
-          setDescription(modifiedData);
-        }),
-        getAddonFiles(modpack.id).then(async data => {
-          setFiles(data.data);
-          setLoading(false);
-        })
-      ]);
+            setDescription(modifiedData);
+          }),
+          getAddonFiles(modpack.id).then(async data => {
+            setFiles(data.data);
+            setLoading(false);
+          })
+        ]);
+      } else if (type === 'ftb') {
+        setDescription(modpack.description);
+        setFiles(modpack.versions.slice().reverse());
+        setLoading(false);
+      }
     };
     init();
   }, []);
@@ -53,6 +60,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
   const getReleaseType = id => {
     switch (id) {
       case 1:
+      case 'Release':
         return (
           <span
             css={`
@@ -63,6 +71,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
           </span>
         );
       case 2:
+      case 'Beta':
         return (
           <span
             css={`
@@ -73,6 +82,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
           </span>
         );
       case 3:
+      case 'Alpha':
       default:
         return (
           <span
@@ -86,7 +96,27 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
     }
   };
 
-  const primaryImage = modpack.attachments.find(v => v.isDefault);
+  const parseLink = string => {
+    const newName = string
+      .replace(/\+/, 'plus')
+      .replace(/-+/, 'minus')
+      .replace(/[^0-9a-z]/gi, '_')
+      .replace(/_+/, '_');
+    return `${FTB_MODPACK_URL}/${newName}`;
+  };
+
+  const primaryImage = useMemo(() => {
+    if (type === 'curseforge') {
+      return modpack.attachments.find(v => v.isDefault).thumbnailUrl;
+    } else if (type === 'ftb') {
+      const image = modpack.art.reduce((prev, curr) => {
+        if (!prev || curr.size < prev.size) return curr;
+        return prev;
+      });
+      return image.url;
+    }
+  }, [modpack, type]);
+
   return (
     <Modal
       css={`
@@ -101,7 +131,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
           <CloseButton onClick={() => dispatch(closeModal())} />
         </StyledCloseButton>
         <Container>
-          <Parallax bg={primaryImage.thumbnailUrl}>
+          <Parallax bg={primaryImage}>
             <ParallaxContent>
               <ParallaxInnerContent>
                 {modpack.name}
@@ -112,19 +142,29 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                   </div>
                   <div>
                     <label>Downloads: </label>
-                    {formatNumber(modpack.downloadCount)}
+                    {type === 'ftb'
+                      ? formatNumber(modpack.installs)
+                      : formatNumber(modpack.downloadCount)}
                   </div>
                   <div>
                     <label>Last Update: </label>
-                    {formatDate(modpack.dateModified)}
+                    {type === 'ftb'
+                      ? formatDate(modpack.refreshed * 1000)
+                      : formatDate(modpack.dateModified)}
                   </div>
                   <div>
                     <label>MC version: </label>
-                    {modpack.gameVersionLatestFiles[0].gameVersion}
+                    {type === 'ftb'
+                      ? modpack.tags[0]?.name || '-'
+                      : modpack.gameVersionLatestFiles[0].gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
-                  href={modpack.websiteUrl}
+                  href={
+                    type === 'ftb'
+                      ? parseLink(modpack.name)
+                      : modpack.websiteUrl
+                  }
                   css={`
                     position: absolute;
                     top: 20px;
@@ -144,7 +184,9 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                     dispatch(
                       openModal('ModChangelog', {
                         modpackId: modpack.id,
-                        files
+                        modpackName: modpack.name,
+                        files,
+                        type
                       })
                     );
                   }}
@@ -164,7 +206,13 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
               </ParallaxInnerContent>
             </ParallaxContent>
           </Parallax>
-          <Content>{ReactHtmlParser(description)}</Content>
+          <Content>
+            {type === 'ftb' ? (
+              <ReactMarkdown>{description}</ReactMarkdown>
+            ) : (
+              ReactHtmlParser(description)
+            )}
+          </Content>
         </Container>
         <Footer>
           <div
@@ -184,7 +232,11 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
             >
               {(files || []).map(file => (
                 <Select.Option
-                  title={file.displayName}
+                  title={
+                    type === 'ftb'
+                      ? `${modpack.name} - ${file.name}`
+                      : file.displayName
+                  }
                   key={file.id}
                   value={file.id}
                 >
@@ -201,7 +253,9 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                         align-items: center;
                       `}
                     >
-                      {file.displayName}
+                      {type === 'ftb'
+                        ? `${modpack.name} - ${file.name}`
+                        : file.displayName}
                     </div>
                     <div
                       css={`
@@ -211,8 +265,16 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                         flex-direction: column;
                       `}
                     >
-                      <div>{file.gameVersion[0]}</div>
-                      <div>{getReleaseType(file.releaseType)}</div>
+                      <div>
+                        {type === 'ftb'
+                          ? modpack.tags[0]?.name || '-'
+                          : file.gameVersion[0]}
+                      </div>
+                      <div>
+                        {getReleaseType(
+                          type === 'ftb' ? file.type : file.releaseType
+                        )}
+                      </div>
                     </div>
                     <div
                       css={`
@@ -222,7 +284,9 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion }) => {
                       `}
                     >
                       <div>
-                        {new Date(file.fileDate).toLocaleDateString(undefined, {
+                        {new Date(
+                          type === 'ftb' ? file.updated * 1000 : file.fileDate
+                        ).toLocaleDateString(undefined, {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'

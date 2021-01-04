@@ -198,6 +198,7 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
+      enableRemoteModule: true,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
     }
@@ -235,6 +236,14 @@ function createWindow() {
         cancel: false,
         responseHeaders: details.responseHeaders
       });
+    }
+  );
+
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    (details, callback) => {
+      // eslint-disable-next-line
+      details.requestHeaders['Origin'] = 'https://gdevs.io';
+      callback({ cancel: false, requestHeaders: details.requestHeaders });
     }
   );
 
@@ -461,7 +470,7 @@ ipcMain.handle('getIsWindowMaximized', () => {
 });
 
 ipcMain.handle('openFolder', (e, folderPath) => {
-  shell.openItem(folderPath);
+  shell.openPath(folderPath);
 });
 
 ipcMain.handle('open-devtools', () => {
