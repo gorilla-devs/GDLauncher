@@ -36,6 +36,9 @@ jobs:
       - name: install node tools
         if: matrix.os == 'windows-latest'
         run: npm install --global --production --vs2015 windows-build-tools@4.0.0
+      - name: install node tools pt. 2
+        if: matrix.os == 'windows-latest'
+        run: npm install --global --production --vs2015 windows-build-tools
       - name: install node-gyp
         run: npm install --global node-gyp@latest
       - name: Set node config to set msvs_version to 2015
