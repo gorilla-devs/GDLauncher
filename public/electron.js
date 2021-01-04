@@ -239,6 +239,14 @@ function createWindow() {
     }
   );
 
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    (details, callback) => {
+      // eslint-disable-next-line
+      details.requestHeaders['Origin'] = 'https://gdevs.io';
+      callback({ cancel: false, requestHeaders: details.requestHeaders });
+    }
+  );
+
   const RESOURCE_DIR = isDev ? __dirname : path.join(__dirname, '../build');
 
   const iconPath = path.join(RESOURCE_DIR, 'logo_32x32.png');
