@@ -241,9 +241,16 @@ function createWindow() {
 
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
     (details, callback) => {
-      // eslint-disable-next-line
-      details.requestHeaders['Origin'] = 'https://gdevs.io';
-      callback({ cancel: false, requestHeaders: details.requestHeaders });
+      // Use a header to skip sending Origin on request.
+      const {
+        'X-Skip-Origin': xSkipOrigin,
+        Origin: _origin,
+        ...requestHeaders
+      } = details.requestHeaders;
+      if (xSkipOrigin !== 'skip') {
+        requestHeaders.Origin = 'https://gdevs.io';
+      }
+      callback({ cancel: false, requestHeaders });
     }
   );
 
@@ -346,7 +353,7 @@ ipcMain.handle(
       msAuthorizeUrl.searchParams.set('response_type', 'code');
       msAuthorizeUrl.searchParams.set(
         'scope',
-        'xboxlive.signin xboxlive.offline_access'
+        'offline_access xboxlive.signin xboxlive.offline_access'
       );
       msAuthorizeUrl.searchParams.set(
         'cobrandid',
@@ -382,6 +389,16 @@ ipcMain.handle(
       });
 
       oAuthWindow.webContents.session.clearStorageData();
+
+      // Remove Origin
+      oAuthWindow.webContents.session.webRequest.onBeforeSendHeaders(
+        (details, callback) => {
+          const {
+            requestHeaders: { Origin, ...requestHeaders }
+          } = details;
+          callback({ cancel: false, requestHeaders });
+        }
+      );
 
       oAuthWindow.on('close', () =>
         reject(new Error('User closed login window'))

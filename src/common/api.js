@@ -30,14 +30,15 @@ export const msExchangeCodeForAccessToken = (
     qs.stringify({
       grant_type: 'authorization_code',
       client_id: clientId,
-      scope: 'xboxlive.signin xboxlive.offline_access',
+      scope: 'offline_access xboxlive.signin xboxlive.offline_access',
       redirect_uri: redirectUrl,
       code,
       code_verifier: codeVerifier
     }),
     {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Skip-Origin': 'skip'
       }
     }
   );
@@ -96,13 +97,14 @@ export const msOAuthRefresh = (clientId, refreshToken) => {
     `${MICROSOFT_LIVE_LOGIN_URL}/oauth20_token.srf`,
     qs.stringify({
       grant_type: 'refresh_token',
-      scope: 'xboxlive.signin xboxlive.offline_access',
+      scope: 'offline_access xboxlive.signin xboxlive.offline_access',
       client_id: clientId,
       refresh_token: refreshToken
     }),
     {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Skip-Origin': 'skip'
       }
     }
   );
