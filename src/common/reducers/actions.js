@@ -407,27 +407,30 @@ export function loginWithOAuthAccessToken(redirect = true) {
     const {
       accessToken,
       selectedProfile,
-      msOAuth: { msRefreshToken, mcExpiresAt },
+      msOAuth: { msRefreshToken, msExpiresAt },
       user: { username: mcUserName }
     } = currentAccount;
 
     if (!accessToken) throw new Error();
-
     // Check if token already expired
-    if (Date.now() >= mcExpiresAt) {
+    if (Date.now() >= msExpiresAt) {
       // Token expired
       try {
         const clientId = MICROSOFT_OAUTH_CLIENT_ID;
 
         let msRefreshedAccessToken = null;
         let msRefreshedRefreshToken = null;
+        let msRefreshedExpiresIn = null;
+        let msRefreshedExpiresAt = null;
         try {
           ({
             data: {
               access_token: msRefreshedAccessToken,
-              refresh_token: msRefreshedRefreshToken
+              refresh_token: msRefreshedRefreshToken,
+              expires_in: msRefreshedExpiresIn
             }
           } = await msOAuthRefresh(clientId, msRefreshToken));
+          msRefreshedExpiresAt = Date.now() + 1000 * msRefreshedExpiresIn;
         } catch (error) {
           console.error(error);
           throw new Error('Error occurred while refreshing Microsoft token.');
@@ -485,6 +488,7 @@ export function loginWithOAuthAccessToken(redirect = true) {
           msOAuth: {
             msAccessToken: msRefreshedAccessToken,
             msRefreshToken: msRefreshedRefreshToken || msRefreshToken,
+            msExpiresAt: msRefreshedExpiresAt,
             mcExpiresAt: mcRefreshedExpiresAt,
             xblToken,
             xstsToken,
@@ -660,15 +664,22 @@ export function loginOAuth(redirect = true) {
 
       let msAccessToken = null;
       let msRefreshToken = null;
+      let msExpiresIn = null;
+      let msExpiresAt = null;
       try {
         ({
-          data: { access_token: msAccessToken, refresh_token: msRefreshToken }
+          data: {
+            access_token: msAccessToken,
+            refresh_token: msRefreshToken,
+            expires_in: msExpiresIn
+          }
         } = await msExchangeCodeForAccessToken(
           clientId,
           redirectUrl,
           authCode,
           codeVerifier
         ));
+        msExpiresAt = Date.now() + 1000 * msExpiresIn;
       } catch (error) {
         console.error(error);
         throw new Error('Error occurred while making logging in Microsoft .');
@@ -737,6 +748,7 @@ export function loginOAuth(redirect = true) {
         msOAuth: {
           msAccessToken,
           msRefreshToken,
+          msExpiresAt,
           mcExpiresAt,
           xblToken,
           xstsToken,
