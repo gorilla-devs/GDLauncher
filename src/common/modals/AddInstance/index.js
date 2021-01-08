@@ -8,11 +8,11 @@ import InstanceName from './InstanceName';
 
 import Content from './Content';
 
-const AddInstance = ({ defaultPage }) => {
+const AddInstance = ({ defaultPage, defaultImportZipPath = '' }) => {
   const [version, setVersion] = useState(null);
   const [step, setStep] = useState(0);
   const [modpack, setModpack] = useState(null);
-  const [importZipPath, setImportZipPath] = useState('');
+  const [importZipPath, setImportZipPath] = useState(defaultImportZipPath);
   const [page, setPage] = useState(defaultPage);
 
   return (

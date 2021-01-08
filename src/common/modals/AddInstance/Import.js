@@ -22,7 +22,7 @@ const Import = ({
   setImportZipPath,
   setOverrideNextStepOnClick
 }) => {
-  const [localValue, setLocalValue] = useState(null);
+  const [localValue, setLocalValue] = useState(importZipPath);
   const tempPath = useSelector(_getTempPath);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
