@@ -15,7 +15,7 @@ import {
 import pMap from 'p-map';
 
 let lastRequest;
-const FTBModpacks = ({ setStep, setModpack }) => {
+const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
   const infiniteLoaderRef = useRef(null);
   const [modpackIds, setModpackIds] = useState([]);
   const [modpacks, setModpacks] = useState([]);
@@ -126,6 +126,7 @@ const FTBModpacks = ({ setStep, setModpack }) => {
                   height={height}
                   setStep={setStep}
                   setModpack={setModpack}
+                  setVersion={setVersion}
                   infiniteLoaderRef={infiniteLoaderRef}
                 />
               )}
