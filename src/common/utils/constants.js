@@ -22,6 +22,10 @@ export const IMGUR_CLIENT_ID = '509a564cf4466c9';
 export const FABRIC = 'fabric';
 export const FORGE = 'forge';
 export const VANILLA = 'vanilla';
+
+export const CURSEFORGE = 'curseforge';
+export const FTB = 'ftb';
+
 export const ACCOUNT_MOJANG = 'ACCOUNT_MOJANG';
 export const ACCOUNT_MICROSOFT = 'ACCOUNT_MICROSOFT';
 export const CURSEFORGE_URL = 'https://www.curseforge.com';
