@@ -18,6 +18,7 @@ import {
 import { updateInstanceConfig } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 import { convertMinutesToHumanTime } from '../../utils';
+import { CURSEFORGE } from '../../utils/constants';
 
 const Container = styled.div`
   padding: 0 50px;
@@ -272,7 +273,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             defaultValue={config?.modloader}
             icon={<FontAwesomeIcon icon={faCog} />}
           >
-            {config?.modloader[1]}
+            {config?.modloader?.mcVersion}
           </Card>
           <Card
             title="Modloader"
@@ -281,7 +282,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             defaultValue={config?.modloader}
             icon={<FontAwesomeIcon icon={faCog} />}
           >
-            {config?.modloader[0]}
+            {config?.modloader?.loaderType}
           </Card>
           <Card
             title="Modloader Version"
@@ -289,14 +290,14 @@ const Overview = ({ instanceName, background, manifest }) => {
             instanceName={instanceName}
             defaultValue={config?.modloader}
             icon={
-              (config?.modloader[2] || '-') !== '-' ? (
+              (config?.modloader?.loaderVersion || '-') !== '-' ? (
                 <FontAwesomeIcon icon={faCog} />
               ) : null
             }
           >
-            {config?.modloader[0] === 'forge'
-              ? config?.modloader[2]?.split('-')[1]
-              : config?.modloader[2] || '-'}
+            {config?.modloader?.loaderType === 'forge'
+              ? config?.modloader?.loaderVersion?.split('-')[1]
+              : config?.modloader?.loaderVersion || '-'}
           </Card>
         </OverviewCard>
         <OverviewCard
@@ -326,7 +327,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
           </Card>
         </OverviewCard>
-        {config?.modloader.slice(3, 5).length === 2 && manifest && (
+        {config?.modloader.source === CURSEFORGE && manifest && (
           <Card
             title="Curse Modpack"
             color={`linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), ${

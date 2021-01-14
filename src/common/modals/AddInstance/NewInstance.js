@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Cascader } from 'antd';
 import styled from 'styled-components';
 import { getFilteredVersions } from '../../../app/desktop/utils';
+import { FABRIC, FORGE, VANILLA } from '../../utils/constants';
 
 const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -19,7 +20,20 @@ const NewInstance = ({ setVersion, setModpack }) => {
       <Cascader
         options={filteredVers}
         onChange={v => {
-          setVersion(v);
+          if (v[0] === VANILLA)
+            setVersion({ loaderType: v[0], mcVersion: v[2] });
+          if (v[0] === FORGE)
+            setVersion({
+              loaderType: v[0],
+              mcVersion: v[1],
+              loaderVersion: v[2]
+            });
+          if (v[0] === FABRIC)
+            setVersion({
+              loaderType: v[0],
+              mcVersion: v[2],
+              loaderVersion: v[3]
+            });
           setModpack(null);
         }}
         placeholder="Select a version"

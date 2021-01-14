@@ -10,7 +10,7 @@ import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
-import { FABRIC, VANILLA, FORGE } from '../utils/constants';
+import { FABRIC, VANILLA, FORGE, CURSEFORGE, FTB } from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
 
 const McVersionChanger = ({ instanceName, defaultValue }) => {
@@ -27,18 +27,28 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
   }, [vanillaManifest, forgeManifest, fabricManifest]);
 
   const patchedDefaultValue = useMemo(() => {
-    const isFabric = defaultValue[0] === FABRIC;
-    const isForge = defaultValue[0] === FORGE;
+    const isFabric = defaultValue?.loaderType === FABRIC;
+    const isForge = defaultValue?.loaderType === FORGE;
 
-    if (isForge) return defaultValue.slice(0, 3);
-    const type = filteredVers.find(v => v.value === defaultValue[0]);
+    if (isForge)
+      return [
+        defaultValue?.loaderType,
+        defaultValue?.mcVersion,
+        defaultValue?.loaderVersion
+      ];
+
+    const type = filteredVers.find(v => v.value === defaultValue?.loaderType);
     for (const releaseType of type.children) {
-      const match = releaseType.children.find(v => v.value === defaultValue[1]);
+      const match = releaseType.children.find(
+        v => v.value === defaultValue?.mcVersion
+      );
       if (match) {
         return [
-          defaultValue[0],
+          defaultValue?.loaderType,
           releaseType.value,
-          ...defaultValue.slice(1, isFabric ? 3 : 2)
+          ...(isFabric
+            ? [defaultValue?.mcVersion, defaultValue?.loaderVersion]
+            : [defaultValue?.mcVersion])
         ];
       }
     }
@@ -57,7 +67,8 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
       <Container>
         {selectedVersion &&
           selectedVersion[0] !== patchedDefaultValue[0] &&
-          defaultValue.slice(3, 5).length === 2 && (
+          (defaultValue?.source === CURSEFORGE ||
+            defaultValue?.source === FTB) && (
             <div
               css={`
                 color: ${props => props.theme.palette.colors.yellow};
@@ -138,7 +149,9 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 ? `background${path.extname(config?.background)}`
                 : null;
 
-              const isModpack = defaultValue.slice(3, 5).length === 2;
+              const isModpack =
+                defaultValue?.source === CURSEFORGE ||
+                defaultValue?.source === FTB;
 
               const isVanilla = selectedVersion[0] === VANILLA;
               const isFabric = selectedVersion[0] === FABRIC;
@@ -151,7 +164,11 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 dispatch(
                   addToQueue(
                     instanceName,
-                    [selectedVersion[0], selectedVersion[2]],
+                    {
+                      loaderType: selectedVersion[0],
+                      loaderVersion: selectedVersion[2],
+                      ...defaultValue
+                    },
                     null,
                     background
                   )
@@ -161,8 +178,13 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                   addToQueue(
                     instanceName,
                     isModpack && isSameLoader
-                      ? [...selectedVersion, ...defaultValue.slice(3, 5)]
-                      : selectedVersion,
+                      ? { ...defaultValue }
+                      : {
+                          loaderType: FABRIC,
+                          mcVersion: selectedVersion[2],
+                          loaderVersion: selectedVersion[3],
+                          ...defaultValue
+                        },
                     null,
                     background
                   )
@@ -171,14 +193,12 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 dispatch(
                   addToQueue(
                     instanceName,
-                    [
-                      FABRIC,
-                      selectedVersion[2],
-                      selectedVersion[3],
-                      ...(isModpack && isSameLoader
-                        ? defaultValue.slice(3, 5)
-                        : [])
-                    ],
+                    {
+                      loaderType: FABRIC,
+                      mcVersion: selectedVersion[2],
+                      loaderVersion: selectedVersion[3],
+                      ...defaultValue
+                    },
                     null,
                     background
                   )

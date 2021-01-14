@@ -50,7 +50,6 @@ const Import = ({
 
     const tempFilePath = path.join(tempPath, path.basename(localValue));
 
-
     if (isUrlRegex) {
       try {
         await fs.access(tempFilePath);
@@ -83,6 +82,7 @@ const Import = ({
         $cherryPick: 'manifest.json'
       }
     );
+
     await new Promise((resolve, reject) => {
       extraction.on('end', () => {
         resolve();
@@ -121,14 +121,14 @@ const Import = ({
       return;
     }
 
-    const modloader = [];
-    if (isForge) modloader.push(FORGE);
-    else if (isFabric) modloader.push(FABRIC);
-    else if (isVanilla) modloader.push(VANILLA);
+    const modloader = {};
+
+    if (isForge) modloader.loaderType = FORGE;
+    else if (isFabric) modloader.loaderType = FABRIC;
+    else if (isVanilla) modloader.loaderType = VANILLA;
 
     if (manifest.projectID) {
-      modloader.push(manifest.projectID);
-      modloader.push(null);
+      modloader.addonId = manifest.projectID;
     }
 
     setVersion(modloader);

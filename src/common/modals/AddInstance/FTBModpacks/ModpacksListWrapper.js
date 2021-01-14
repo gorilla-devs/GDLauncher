@@ -6,7 +6,28 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import ContentLoader from 'react-content-loader';
 import { transparentize } from 'polished';
 import { openModal } from '../../../reducers/modals/actions';
-import { FORGE } from '../../../utils/constants';
+import { FTB } from '../../../utils/constants';
+import { getFTBModpackVersionData } from '../../../api';
+
+const selectFTBModpack = async (modpack, setVersion, setModpack, setStep) => {
+  const addonId = modpack.id;
+  const fileId = modpack.versions[modpack.versions.length - 1].id;
+
+  const data = await getFTBModpackVersionData(modpack.id, fileId);
+
+  const forgeModloader = data.targets.find(v => v.type === 'modloader');
+  const mcVersion = data.targets.find(v => v.type === 'game').version;
+
+  setVersion({
+    loaderType: forgeModloader?.type,
+    mcVersion,
+    addonId,
+    fileId,
+    source: FTB
+  });
+  setModpack(modpack);
+  setStep(1);
+};
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -87,13 +108,7 @@ const ModpacksListWrapper = ({
         <ModpackHover>
           <div
             onClick={() => {
-              setVersion([
-                FORGE,
-                modpack.id,
-                modpack.versions[modpack.versions.length - 1].id
-              ]);
-              setModpack(modpack);
-              setStep(1);
+              selectFTBModpack(modpack, setVersion, setModpack, setStep);
             }}
           >
             Download Latest
