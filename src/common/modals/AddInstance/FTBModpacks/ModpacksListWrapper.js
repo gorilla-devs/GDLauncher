@@ -6,6 +6,7 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import ContentLoader from 'react-content-loader';
 import { transparentize } from 'polished';
 import { openModal } from '../../../reducers/modals/actions';
+import { FORGE } from '../../../utils/constants';
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -26,6 +27,8 @@ const ModpacksListWrapper = ({
   setStep,
 
   setModpack,
+
+  setVersion,
   // Callback function responsible for loading the next page of items.
   loadNextPage,
 
@@ -84,11 +87,11 @@ const ModpacksListWrapper = ({
         <ModpackHover>
           <div
             onClick={() => {
-              // setVersion([
-              //   FORGE,
-              //   modpack.id,
-              //   modpack.latestFiles[modpack.latestFiles.length - 1].id
-              // ]);
+              setVersion([
+                FORGE,
+                modpack.id,
+                modpack.versions[modpack.versions.length - 1].id
+              ]);
               setModpack(modpack);
               setStep(1);
             }}
@@ -101,6 +104,8 @@ const ModpacksListWrapper = ({
                 openModal('ModpackDescription', {
                   modpack,
                   setStep,
+                  setVersion,
+                  setModpack,
                   type: 'ftb'
                 })
               );

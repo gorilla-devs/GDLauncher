@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import path from 'path';
 import fse from 'fs-extra';
@@ -22,7 +22,8 @@ import {
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, VANILLA, FORGE } from '../../utils/constants';
+import { FABRIC, VANILLA, FORGE, FTB } from '../../utils/constants';
+import { getFTBModpackVersionData } from '../../api';
 
 const InstanceName = ({
   in: inProp,
@@ -72,9 +73,20 @@ const InstanceName = ({
     }
   }, [instanceName, step]);
 
-  const thumbnailURL = modpack?.attachments?.find(v => v.isDefault)
-    ?.thumbnailUrl;
-  const imageURL = modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
+  const imageURL = useMemo(() => {
+    if (!modpack) return null;
+    // Curseforge
+    if (!modpack.synopsis) {
+      return modpack.attachments.find(v => v.isDefault).thumbnailUrl;
+    } else {
+      // FTB
+      const image = modpack.art.reduce((prev, curr) => {
+        if (!prev || curr.size < prev.size) return curr;
+        return prev;
+      });
+      return image.url;
+    }
+  }, [modpack]);
 
   const wait = s => {
     return new Promise(resolve => {
@@ -88,6 +100,7 @@ const InstanceName = ({
     const isFabric = version[0] === FABRIC;
     const isForge = version[0] === FORGE;
     const isCurseForgeModpack = Boolean(modpack?.attachments);
+    const isFTBModpack = Boolean(modpack?.art);
     let manifest;
     if (isCurseForgeModpack) {
       if (importZipPath) {
@@ -166,6 +179,25 @@ const InstanceName = ({
           )
         );
       }
+    } else if (isFTBModpack) {
+      // Fetch mc version
+      const data = await getFTBModpackVersionData(version[1], version[2]);
+      const forgeModloader = data.targets.find(v => v.type === 'modloader');
+      const mcVersion = data.targets.find(v => v.type === 'game').version;
+      dispatch(
+        addToQueue(localInstanceName, {
+          modloader: {
+            name: forgeModloader.name,
+            version: forgeModloader.version
+          },
+          source: {
+            name: FTB,
+            addonId: version[1],
+            fileId: version[2]
+          },
+          mcVersion
+        })
+      );
     } else if (importZipPath) {
       manifest = await importAddonZip(
         importZipPath,
@@ -212,7 +244,7 @@ const InstanceName = ({
   return (
     <Transition in={inProp} timeout={200}>
       {state => (
-        <Animation state={state} bg={thumbnailURL || bgImage}>
+        <Animation state={state} bg={imageURL || bgImage}>
           <Transition in={clicked} timeout={200}>
             {state1 => (
               <>

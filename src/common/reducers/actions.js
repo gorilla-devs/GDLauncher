@@ -1008,6 +1008,7 @@ export function addToQueue(
   return async (dispatch, getState) => {
     const state = getState();
     const { currentDownload } = state;
+
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,

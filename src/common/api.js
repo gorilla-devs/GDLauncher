@@ -287,8 +287,19 @@ export const getFTBModpackData = async modpackId => {
     return { status: 'error' };
   }
 };
-export const getFTBChangelog = (addonID, fileID) => {
-  const url = `https://api.modpacks.ch/public/modpack/${addonID}/${fileID}/changelog`;
+
+export const getFTBModpackVersionData = async (modpackId, versionId) => {
+  try {
+    const url = `${FTB_API_URL}/modpack/${modpackId}/${versionId}`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getFTBChangelog = (modpackId, versionId) => {
+  const url = `https://api.modpacks.ch/public/modpack/${modpackId}/${versionId}/changelog`;
   return axios.get(url);
 };
 
