@@ -80,7 +80,9 @@
   "engines": {
     "node": ">=14.14.0"
   },
-  "cpu": ["x64"],
+  "cpu": [
+    "x64"
+  ],
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -154,8 +156,8 @@
     "webpack-merge": "^5.7.3"
   },
   "dependencies": {
-    "@loadable/babel-plugin": "^5.13.2",
     "7zip-bin": "^5.0.3",
+    "@loadable/babel-plugin": "^5.13.2",
     "antd": "4.9.4",
     "axios": "^0.21.1",
     "base64-stream": "^1.0.0",
@@ -167,6 +169,7 @@
     "electron-log": "^4.3.1",
     "electron-store": "^6.0.1",
     "electron-updater": "^4.3.5",
+    "fast-xml-parser": "^3.17.6",
     "fs-extra": "^9.0.1",
     "get-stream": "^6.0.0",
     "history": "^4.10.1",
