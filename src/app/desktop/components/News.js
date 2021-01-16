@@ -38,7 +38,7 @@ const ImageSlide = styled.div`
   height: 100%;
   width: 100%;
   border-radius: ${props => props.theme.shape.borderRadius};
-  background-image: url("${props => (props.image ? props.image : null)}");
+  background-image: url('${props => (props.image ? props.image : null)}');
   background-position: center;
   background-size: cover;
   transition: transform 0.2s ease-in-out;
@@ -142,7 +142,7 @@ function openNews(e, inf) {
 
 function ImageList({ currentImageIndex, news }) {
   const listImages = news.map(inf => (
-    <Slide key={inf.title} onClick={e => openNews(e, inf)}>
+    <Slide key={inf.guid} onClick={e => openNews(e, inf)}>
       <Title>{inf.title}</Title>
       <SubTitle>{inf.description}</SubTitle>
       <Gradient />

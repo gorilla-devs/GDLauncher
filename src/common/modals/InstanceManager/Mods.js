@@ -21,9 +21,9 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import fse from 'fs-extra';
 import makeDir from 'make-dir';
+import curseForgeIcon from '../../assets/curseforgeIcon.webp';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import {
   updateInstanceConfig,
@@ -31,7 +31,6 @@ import {
   updateMod
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
-import i18n from '../../config/i18next';
 
 const Header = styled.div`
   height: 40px;
@@ -345,7 +344,9 @@ const Row = memo(({ index, style, data }) => {
                 }
               }}
             />
-            {item.fileID && <FontAwesomeIcon icon={faTwitch} />}
+            {item.fileID && (
+              <img src={curseForgeIcon} height="15px" alt="curseforge" />
+            )}
           </div>
           <div
             onClick={() => {
@@ -669,7 +670,7 @@ const Mods = ({ instanceName }) => {
         }}
         disabled={!hasModUpdates}
       >
-        {i18n.t('instance_manager:mods.update_all_mods')}
+        Update all mods
       </Menu.Item>
     </Menu>
   );
@@ -701,7 +702,7 @@ const Mods = ({ instanceName }) => {
                 : setSelectedMods([])
             }
           >
-            {i18n.t('instance_manager:mods.select_all')}
+            Select All
           </Checkbox>
           <DeleteSelectedMods
             onClick={async () => {
@@ -751,7 +752,7 @@ const Mods = ({ instanceName }) => {
             );
           }}
         >
-          {i18n.t('instance_manager:mods.add_mod')}
+          Add Mod
         </Button>
         <Input
           allowClear
@@ -761,9 +762,7 @@ const Mods = ({ instanceName }) => {
           css={`
             width: 200px;
           `}
-          placeholder={i18n.t('instance_manager:mods.search_x_mods', {
-            count: mods.length
-          })}
+          placeholder={`Search ${mods.length} mods`}
         />
       </Header>
       <div

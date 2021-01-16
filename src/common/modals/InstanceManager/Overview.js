@@ -18,7 +18,6 @@ import {
 import { updateInstanceConfig } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 import { convertMinutesToHumanTime } from '../../utils';
-import i18n from '../../config/i18next';
 
 const Container = styled.div`
   padding: 0 50px;
@@ -217,7 +216,7 @@ const Overview = ({ instanceName, background, manifest }) => {
     );
   };
 
-  const [debouncedArgumentsUpdate] = useDebouncedCallback(
+  const debouncedArgumentsUpdate = useDebouncedCallback(
     v => {
       updateJavaArguments(v);
     },
@@ -267,7 +266,7 @@ const Overview = ({ instanceName, background, manifest }) => {
           `}
         >
           <Card
-            title={i18n.t('instance_manager:overview.minecraft_version')}
+            title="Minecraft Version"
             color={props => props.theme.palette.colors.jungleGreen}
             instanceName={instanceName}
             defaultValue={config?.modloader}
@@ -276,7 +275,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.modloader[1]}
           </Card>
           <Card
-            title={i18n.t('instance_manager:overview.modloader')}
+            title="Modloader"
             color={props => props.theme.palette.colors.darkYellow}
             instanceName={instanceName}
             defaultValue={config?.modloader}
@@ -285,7 +284,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.modloader[0]}
           </Card>
           <Card
-            title={i18n.t('instance_manager:overview.modloader_version')}
+            title="Modloader Version"
             color={props => props.theme.palette.colors.lightBlue}
             instanceName={instanceName}
             defaultValue={config?.modloader}
@@ -315,13 +314,13 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.mods?.length || '-'}
           </Card>
           <Card
-            title={i18n.t('instance_manager:overview.played_time')}
+            title="Played Time"
             color={props => props.theme.palette.colors.liberty}
           >
             {convertMinutesToHumanTime(config?.timePlayed)}
           </Card>
           <Card
-            title={i18n.t('instance_manager:overview.last_played')}
+            title="Last Played"
             color={props => props.theme.palette.colors.orange}
           >
             {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
@@ -342,16 +341,13 @@ const Overview = ({ instanceName, background, manifest }) => {
         <RenameRow>
           <Input value={newName} onChange={e => setNewName(e.target.value)} />
           <RenameButton onClick={() => renameInstance()} type="primary">
-            {i18n.t('instance_manager:overview.rename')}
-            &nbsp;
+            Rename&nbsp;
             <FontAwesomeIcon icon={faSave} />
           </RenameButton>
         </RenameRow>
         <OverviewCard>
           <JavaManagerRow>
-            <div>
-              {i18n.t('instance_manager:overview.override_game_resolution')}
-            </div>
+            <div>Override Game Resolution</div>
             <Switch
               checked={height && width}
               onChange={v => {
@@ -444,9 +440,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             </ResolutionInputContainer>
           )}
           <JavaManagerRow>
-            <div>
-              {i18n.t('instance_manager:overview.override_java_memory')}
-            </div>
+            <div>Override Java Memory</div>
             <Switch
               checked={JavaMemorySwitch}
               onChange={v => {
@@ -480,9 +474,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             </div>
           )}
           <JavaManagerRow>
-            <div>
-              {i18n.t('instance_manager:overview.override_java_arguments')}
-            </div>
+            <div>Override Java Arguments</div>
             <Switch
               checked={JavaArgumentsSwitch}
               onChange={v => {
@@ -506,7 +498,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 value={javaLocalArguments}
                 onChange={e => {
                   setJavaLocalArguments(e.target.value);
-                  debouncedArgumentsUpdate(e.target.value);
+                  debouncedArgumentsUpdate.callback(e.target.value);
                 }}
               />
               <JavaArgumentsResetButton onClick={resetJavaArguments}>

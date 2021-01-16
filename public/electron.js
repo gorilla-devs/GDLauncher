@@ -18,17 +18,48 @@ const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
-const i18nextBackend = require('i18next-electron-fs-backend');
+const { createHash } = require('crypto');
+const {
+  default: { fromBase64: toBase64URL }
+} = require('base64url');
+const { URL } = require('url');
 
 const fs = fss.promises;
+
+let mainWindow;
+let tray;
+let watcher;
 
 const discordRPC = require('./discordRPC');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
 // Prevent multiple instances
-if (!gotTheLock) {
+if (gotTheLock) {
+  app.on('second-instance', (e, argv) => {
+    if (process.platform === 'win32') {
+      const args = process.argv.slice(1);
+      const args1 = argv.slice(1);
+      log.log([...args, ...args1]);
+      if (mainWindow) {
+        mainWindow.webContents.send('custom-protocol-event', [
+          ...args,
+          ...args1
+        ]);
+      }
+    }
+
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+} else {
   app.quit();
+}
+
+if (!app.isDefaultProtocolClient('gdlauncher')) {
+  app.setAsDefaultProtocolClient('gdlauncher');
 }
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
@@ -155,10 +186,6 @@ async function extract7z() {
 
 extract7z();
 
-let mainWindow;
-let tray;
-let watcher;
-
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
@@ -171,13 +198,11 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
+      enableRemoteModule: true,
       // Disable in dev since I think hot reload is messing with it
-      webSecurity: !isDev,
-      preload: path.join(__dirname, 'preload.js')
+      webSecurity: !isDev
     }
   });
-
-  i18nextBackend.mainBindings(ipcMain, mainWindow, fs);
 
   if (isDev) {
     globalShortcut.register('CommandOrControl+R', () => {
@@ -211,6 +236,21 @@ function createWindow() {
         cancel: false,
         responseHeaders: details.responseHeaders
       });
+    }
+  );
+
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    (details, callback) => {
+      // Use a header to skip sending Origin on request.
+      const {
+        'X-Skip-Origin': xSkipOrigin,
+        Origin: _origin,
+        ...requestHeaders
+      } = details.requestHeaders;
+      if (xSkipOrigin !== 'skip') {
+        requestHeaders.Origin = 'https://gdevs.io';
+      }
+      callback({ cancel: false, requestHeaders });
     }
   );
 
@@ -277,8 +317,6 @@ app.on('window-all-closed', () => {
   }
   if (process.platform !== 'darwin') {
     app.quit();
-  } else {
-    i18nextBackend.clearMainBindings(ipcMain);
   }
 });
 
@@ -291,19 +329,95 @@ app.on('before-quit', async () => {
   mainWindow = null;
 });
 
-app.on('second-instance', () => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-  }
-});
-
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
 });
+
+ipcMain.handle(
+  'msLoginOAuth',
+  (_event, clientId, codeVerifier, redirectUrl) =>
+    new Promise((resolve, reject) => {
+      const codeChallenge = toBase64URL(
+        createHash('sha256').update(codeVerifier).digest('base64')
+      );
+
+      const msAuthorizeUrl = new URL(
+        'https://login.live.com/oauth20_authorize.srf'
+      );
+      msAuthorizeUrl.searchParams.set('client_id', clientId);
+      msAuthorizeUrl.searchParams.set('redirect_uri', redirectUrl);
+      msAuthorizeUrl.searchParams.set('code_challenge', codeChallenge);
+      msAuthorizeUrl.searchParams.set('code_challenge_method', 'S256');
+      msAuthorizeUrl.searchParams.set('response_type', 'code');
+      msAuthorizeUrl.searchParams.set(
+        'scope',
+        'offline_access xboxlive.signin xboxlive.offline_access'
+      );
+      msAuthorizeUrl.searchParams.set(
+        'cobrandid',
+        '8058f65d-ce06-4c30-9559-473c9275a65d'
+      );
+
+      const handleRedirect = (url, authWindow) => {
+        const rdUrl = new URL(url);
+        const orUrl = new URL(redirectUrl);
+
+        if (
+          rdUrl.origin === orUrl.origin &&
+          rdUrl.pathname === orUrl.pathname
+        ) {
+          const redirectCode = rdUrl.searchParams.get('code');
+          const redirectError = rdUrl.searchParams.get('error');
+
+          authWindow.destroy(); // Will not trigger 'close'
+
+          if (redirectCode) {
+            return resolve(redirectCode);
+          }
+          return reject(redirectError);
+        }
+      };
+
+      const oAuthWindow = new BrowserWindow({
+        title: 'Sign in to your Microsoft account',
+        show: false,
+        parent: mainWindow,
+        autoHideMenuBar: true,
+        'node-integration': false
+      });
+
+      oAuthWindow.webContents.session.clearStorageData();
+
+      // Remove Origin
+      oAuthWindow.webContents.session.webRequest.onBeforeSendHeaders(
+        (details, callback) => {
+          const {
+            requestHeaders: { Origin, ...requestHeaders }
+          } = details;
+          callback({ cancel: false, requestHeaders });
+        }
+      );
+
+      oAuthWindow.on('close', () =>
+        reject(new Error('User closed login window'))
+      );
+
+      oAuthWindow.webContents.on('will-navigate', (_e, url) =>
+        handleRedirect(url, oAuthWindow)
+      );
+
+      oAuthWindow.webContents.on('will-redirect', (_e, url) =>
+        handleRedirect(url, oAuthWindow)
+      );
+
+      oAuthWindow.show();
+      return oAuthWindow
+        .loadURL(msAuthorizeUrl.toString())
+        .catch(error => reject(error));
+    })
+);
 
 ipcMain.handle('update-progress-bar', (event, p) => {
   mainWindow.setProgressBar(p);
@@ -373,7 +487,7 @@ ipcMain.handle('getIsWindowMaximized', () => {
 });
 
 ipcMain.handle('openFolder', (e, folderPath) => {
-  shell.openItem(folderPath);
+  shell.openPath(folderPath);
 });
 
 ipcMain.handle('open-devtools', () => {

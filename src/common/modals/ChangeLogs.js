@@ -33,11 +33,8 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Restyled the UI to add new instances.</li>
-              <li>Some performance improvements.</li>
-              <li>Better UX for twitch modpacks.</li>
-              <li>Longer instances names are now allowed.</li>
-              <li>Added a resource packs tab for instances.</li>
+              <li>Added confirmation modal to delete shared data.</li>
+              <li>Implemented microsoft login.</li>
             </ul>
           </div>
         </Section>
@@ -52,9 +49,8 @@ const ChangeLogs = () => {
           <div>
             <ul>
               <li>Security fixes.</li>
-              <li>Improved login errors.</li>
-              <li>The news should now be up to date.</li>
-              <li>Minor visual/functional fixes.</li>
+              <li>Fixed copy/paste on MacOS.</li>
+              <li>Fixed a crash.</li>
             </ul>
           </div>
         </Section>

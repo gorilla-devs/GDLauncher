@@ -29,7 +29,6 @@ import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
 import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
-import i18n from '../../../../common/config/i18next';
 
 const Container = styled.div`
   position: relative;
@@ -77,8 +76,8 @@ const InstanceContainer = styled.div`
   font-size: 20px;
   overflow: hidden;
   height: 100%;
-  background: linear-gradient(0deg,rgba(0,0,0,0.8),rgba(0,0,0,0.8)),url("${props =>
-    props.background}") center no-repeat;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+    url('${props => props.background}') center no-repeat;
   background-position: center;
   color: ${props => props.theme.palette.text.secondary};
   font-weight: 600;
@@ -312,7 +311,7 @@ const Instance = ({ instanceName }) => {
                 margin-right: 10px;
               `}
             />
-            {i18n.t('instance:menu.manage')}
+            Manage
           </MenuItem>
           <MenuItem onClick={openFolder}>
             <FontAwesomeIcon
@@ -321,7 +320,7 @@ const Instance = ({ instanceName }) => {
                 margin-right: 10px;
               `}
             />
-            {i18n.t('instance:menu.open_folder')}
+            Open Folder
           </MenuItem>
 
           {/* // TODO - Support other export options besides curseforge forge. */}
@@ -343,7 +342,7 @@ const Instance = ({ instanceName }) => {
                 width: 16px !important;
               `}
             />
-            {i18n.t('instance:menu.export_pack')}
+            Export Pack
           </MenuItem>
           <MenuItem divider />
           <MenuItem
@@ -356,7 +355,7 @@ const Instance = ({ instanceName }) => {
                 margin-right: 10px;
               `}
             />
-            {i18n.t('instance:menu.delete')}
+            Delete
           </MenuItem>
         </ContextMenu>
       </Portal>

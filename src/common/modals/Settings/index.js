@@ -7,7 +7,6 @@ import General from './components/General';
 import Java from './components/Java';
 import CloseButton from '../../components/CloseButton';
 import { closeModal } from '../../reducers/modals/actions';
-import i18n from '../../config/i18next';
 
 const Container = styled.div`
   display: flex;
@@ -112,18 +111,18 @@ export default function Settings() {
           onClick={() => dispatch(closeModal())}
         />
         <SideMenu>
-          <SettingsTitle>{i18n.t('settings:general')}</SettingsTitle>
+          <SettingsTitle>General</SettingsTitle>
           <SettingsButton
             active={page === 'General'}
             onClick={() => setPage('General')}
           >
-            {i18n.t('settings:general')}
+            General
           </SettingsButton>
           <SettingsButton
             active={page === 'Java'}
             onClick={() => setPage('Java')}
           >
-            {i18n.t('settings:java')}
+            Java
           </SettingsButton>
           {/* <SettingsButton onClick={() => setPage("User Interface")}>
             User Interface

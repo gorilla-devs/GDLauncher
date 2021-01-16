@@ -27,7 +27,12 @@ const baseConfig = {
         use: {
           loader: 'babel-loader',
           options: {
-            cacheDirectory: true
+            cacheDirectory: true,
+            presets: [['@babel/preset-env', { targets: { node: '15' } }]],
+            plugins: [
+              '@babel/plugin-proposal-nullish-coalescing-operator',
+              '@babel/plugin-proposal-optional-chaining'
+            ]
           }
         }
       }
@@ -50,7 +55,7 @@ const baseConfig = {
 
   plugins: [
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production',
+      NODE_ENV: process.env.NODE_ENV,
       REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE
     }),
 
@@ -61,7 +66,7 @@ const baseConfig = {
 module.exports = merge(baseConfig, {
   devtool: 'eval-cheap-module-source-map',
 
-  mode: 'production',
+  mode: process.env.NODE_ENV,
 
   target: 'electron-main',
 

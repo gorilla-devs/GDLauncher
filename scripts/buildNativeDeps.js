@@ -10,19 +10,23 @@ const electronVersion = JSON.parse(
 ).devDependencies.electron.replace('^', '');
 
 const main = async () => {
-  build(
-    ['neon', 'build', 'murmur2-calculator', '--release'],
-    {
-      electron: electronVersion
-    },
-    err => {
-      if (err) {
-        console.log('Installation failed.');
-      } else {
-        console.log('Installation succeeded!');
+  await new Promise((resolve, reject) => {
+    build(
+      ['neon', 'build', 'murmur2-calculator', '--release'],
+      {
+        electron: electronVersion
+      },
+      err => {
+        if (err) {
+          console.log('Installation failed.');
+          reject(err);
+        } else {
+          console.log('Installation succeeded!');
+          resolve();
+        }
       }
-    }
-  );
+    );
+  });
 
   await rebuild(path.resolve(__dirname, '../'), electronVersion, 'x64');
 };

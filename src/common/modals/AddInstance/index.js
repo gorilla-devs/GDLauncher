@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { Checkbox, TextField, Cascader, Button, Input } from 'antd';
 import Modal from '../../components/Modal';
-import i18n from '../../config/i18next';
 
 import InstanceName from './InstanceName';
 
@@ -24,7 +23,7 @@ const AddInstance = ({ defaultPage }) => {
         max-width: 1000px;
         overflow: hidden;
       `}
-      title={i18n.t('add_instance:add_new_instance')}
+      title="Add New Instance"
     >
       <Content
         in={step === 0}

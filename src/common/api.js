@@ -1,5 +1,6 @@
 // @flow
 import axios from 'axios';
+import qs from 'querystring';
 import {
   MOJANG_APIS,
   FORGESVC_URL,
@@ -7,9 +8,109 @@ import {
   FABRIC_APIS,
   JAVA_MANIFEST_URL,
   IMGUR_CLIENT_ID,
-  FORGESVC_CATEGORIES
+  FORGESVC_CATEGORIES,
+  MICROSOFT_LIVE_LOGIN_URL,
+  MICROSOFT_XBOX_LOGIN_URL,
+  MICROSOFT_XSTS_AUTH_URL,
+  MINECRAFT_SERVICES_URL,
+  FTB_API_URL
 } from './utils/constants';
 import { sortByDate } from './utils';
+
+// Microsoft Auth
+
+export const msExchangeCodeForAccessToken = (
+  clientId,
+  redirectUrl,
+  code,
+  codeVerifier
+) => {
+  return axios.post(
+    `${MICROSOFT_LIVE_LOGIN_URL}/oauth20_token.srf`,
+    qs.stringify({
+      grant_type: 'authorization_code',
+      client_id: clientId,
+      scope: 'offline_access xboxlive.signin xboxlive.offline_access',
+      redirect_uri: redirectUrl,
+      code,
+      code_verifier: codeVerifier
+    }),
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Skip-Origin': 'skip'
+      }
+    }
+  );
+};
+
+export const msAuthenticateXBL = accessToken => {
+  return axios.post(
+    `${MICROSOFT_XBOX_LOGIN_URL}/user/authenticate`,
+    {
+      Properties: {
+        AuthMethod: 'RPS',
+        SiteName: 'user.auth.xboxlive.com',
+        RpsTicket: `d=${accessToken}` // your access token from step 2 here
+      },
+      RelyingParty: 'http://auth.xboxlive.com',
+      TokenType: 'JWT'
+    },
+    {
+      headers: {
+        'x-xbl-contract-version': 1
+      }
+    }
+  );
+};
+
+export const msAuthenticateXSTS = xblToken => {
+  return axios.post(`${MICROSOFT_XSTS_AUTH_URL}/xsts/authorize`, {
+    Properties: {
+      SandboxId: 'RETAIL',
+      UserTokens: [xblToken]
+    },
+    RelyingParty: 'rp://api.minecraftservices.com/',
+    TokenType: 'JWT'
+  });
+};
+
+export const msAuthenticateMinecraft = (uhsToken, xstsToken) => {
+  return axios.post(
+    `${MINECRAFT_SERVICES_URL}/authentication/login_with_xbox`,
+    {
+      identityToken: `XBL3.0 x=${uhsToken};${xstsToken}`
+    }
+  );
+};
+
+export const msMinecraftProfile = mcAccessToken => {
+  return axios.get(`${MINECRAFT_SERVICES_URL}/minecraft/profile`, {
+    headers: {
+      Authorization: `Bearer ${mcAccessToken}`
+    }
+  });
+};
+
+export const msOAuthRefresh = (clientId, refreshToken) => {
+  return axios.post(
+    `${MICROSOFT_LIVE_LOGIN_URL}/oauth20_token.srf`,
+    qs.stringify({
+      grant_type: 'refresh_token',
+      scope: 'offline_access xboxlive.signin xboxlive.offline_access',
+      client_id: clientId,
+      refresh_token: refreshToken
+    }),
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Skip-Origin': 'skip'
+      }
+    }
+  );
+};
+
+// Minecraft API
 
 export const mcAuthenticate = (username, password, clientToken) => {
   return axios.post(
@@ -175,4 +276,39 @@ export const getSearch = (
     gameVersion: gameVersion || ''
   };
   return axios.get(url, { params });
+};
+
+export const getFTBModpackData = async modpackId => {
+  try {
+    const url = `${FTB_API_URL}/modpack/${modpackId}`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getFTBModpackVersionData = async (modpackId, versionId) => {
+  try {
+    const url = `${FTB_API_URL}/modpack/${modpackId}/${versionId}`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getFTBChangelog = (modpackId, versionId) => {
+  const url = `https://api.modpacks.ch/public/modpack/${modpackId}/${versionId}/changelog`;
+  return axios.get(url);
+};
+
+export const getFTBMostPlayed = async () => {
+  const url = `${FTB_API_URL}/modpack/popular/plays/1000`;
+  return axios.get(url);
+};
+
+export const getFTBSearch = async searchText => {
+  const url = `${FTB_API_URL}/modpack/search/1000?term=${searchText}`;
+  return axios.get(url);
 };

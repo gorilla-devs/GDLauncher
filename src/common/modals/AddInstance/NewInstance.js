@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import { Cascader } from 'antd';
 import styled from 'styled-components';
 import { getFilteredVersions } from '../../../app/desktop/utils';
-import i18n from '../../config/i18next';
 
 const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
@@ -23,7 +22,7 @@ const NewInstance = ({ setVersion, setModpack }) => {
           setVersion(v);
           setModpack(null);
         }}
-        placeholder={i18n.t('add_instance:select_a_version')}
+        placeholder="Select a version"
         size="large"
         css={`
           width: 400px;

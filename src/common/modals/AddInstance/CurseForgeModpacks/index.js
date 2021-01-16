@@ -9,10 +9,9 @@ import ModpacksListWrapper from './ModpacksListWrapper';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import i18n from '../../../config/i18next';
 
 let lastRequest;
-const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
+const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
   const mcVersions = useSelector(state => state.app.vanillaManifest?.versions);
   const categories = useSelector(state => state.app.curseforgeCategories);
   const infiniteLoaderRef = useRef(null);
@@ -25,7 +24,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [error, setError] = useState(false);
 
-  const [updateModpacks] = useDebouncedCallback(() => {
+  const updateModpacks = useDebouncedCallback(() => {
     if (infiniteLoaderRef?.current?.scrollToItem) {
       infiniteLoaderRef.current.scrollToItem(0);
     }
@@ -70,7 +69,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   };
 
   useEffect(() => {
-    updateModpacks();
+    updateModpacks.callback();
   }, [searchText, sortBy, minecraftVersion, categoryId]);
 
   return (
@@ -81,7 +80,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
           onChange={setMinecraftVersion}
           defaultValue={null}
         >
-          <Select.Option value={null}>{i18n.t('add_instance:twitch_mod_pack.all_versions')}</Select.Option>
+          <Select.Option value={null}>All Versions</Select.Option>
           {(mcVersions || [])
             .filter(v => v?.type === 'release')
             .map(v => (
@@ -96,7 +95,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
           defaultValue={null}
         >
           <Select.Option key={'allcategories'} value={null}>
-            {i18n.t('add_instance:twitch_mod_pack.all_categories')}
+            All Categories
           </Select.Option>
           {(categories || [])
             .filter(v => v?.rootGameCategoryId === 4471)
@@ -130,26 +129,26 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
           onChange={setSortBy}
         >
           <Select.Option key="Featured" value="Featured">
-            {i18n.t('add_instance:twitch_mod_pack.featured')}
+            Featured
           </Select.Option>
           <Select.Option key="Popularity" value="Popularity">
-            {i18n.t('add_instance:twitch_mod_pack.popularity')}
+            Popularity
           </Select.Option>
           <Select.Option key="LastUpdated" value="LastUpdated">
-            {i18n.t('add_instance:twitch_mod_pack.last_updated')}
+            Last Updated
           </Select.Option>
           <Select.Option key="Name" value="Name">
-            {i18n.t('add_instance:twitch_mod_pack.name')}
+            Name
           </Select.Option>
           <Select.Option key="Author" value="Author">
-            {i18n.t('add_instance:twitch_mod_pack.auther')}
+            Author
           </Select.Option>
           <Select.Option key="TotalDownloads" value="TotalDownloads">
-            {i18n.t('add_instance:twitch_mod_pack.total_downloads')}
+            Total Downloads
           </Select.Option>
         </StyledSelect>
         <StyledInput
-          placeholder={i18n.t('add_instance:twitch_mod_pack.search')}
+          placeholder="Search..."
           onSearch={setSearchText}
           onChange={e => setSearchText(e.target.value)}
           style={{ width: 200 }}
@@ -221,7 +220,7 @@ const TwitchModpacks = ({ setStep, setVersion, setModpack }) => {
   );
 };
 
-export default React.memo(TwitchModpacks);
+export default React.memo(CurseForgeModpacks);
 
 const Container = styled.div`
   width: 100%;

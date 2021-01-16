@@ -25,7 +25,6 @@ import {
 } from '../../reducers/actions';
 import instanceDefaultBackground from '../../../common/assets/instance_default.png';
 import omit from 'lodash/omit';
-import i18n from '../../config/i18next';
 
 const SideMenu = styled.div`
   display: flex;
@@ -142,14 +141,14 @@ const InstanceBackground = styled.div`
 `;
 
 const menuEntries = {
-  overview: { name: i18n.t('instance_manager:index.menu.overview'), component: Overview },
-  mods: { name: i18n.t('instance_manager:index.menu.mods'), component: Mods },
-  modpack: { name: i18n.t('instance_manager:index.menu.modpack'), component: Modpack },
-  notes: { name: i18n.t('instance_manager:index.menu.notes'), component: Notes },
-  resourcePacks: { name: i18n.t('instance_manager:index.menu.resource_packs'), component: ResourcePacks },
+  overview: { name: 'Overview', component: Overview },
+  mods: { name: 'Mods', component: Mods },
+  modpack: { name: 'Modpack', component: Modpack },
+  notes: { name: 'Notes', component: Notes },
+  resourcePacks: { name: 'Resource Packs', component: ResourcePacks },
   // resourcePacks: { name: "Resource Packs", component: Overview },
   // worlds: { name: "Worlds", component: Overview },
-  screenshots: { name: i18n.t('instance_manager:index.menu.screenshots'), component: Screenshots }
+  screenshots: { name: 'Screenshots', component: Screenshots }
   // settings: { name: "Settings", component: Overview },
   // servers: { name: "Servers", component: Overview }
 };
@@ -230,7 +229,7 @@ const InstanceManager = ({ instanceName }) => {
         width: 85%;
         max-width: 1500px;
       `}
-      title={`${i18n.t('instance_manager:index.instance_manager')} - ${instanceName}`}
+      title={`Instance Manager - ${instanceName}`}
       removePadding
     >
       <Container>
@@ -238,7 +237,7 @@ const InstanceManager = ({ instanceName }) => {
           <SideMenu>
             <InstanceBackground onClick={openFileDialog} imagePath={background}>
               <Overlay />
-              <p>{i18n.t('instance_manager:index.change_icon')}</p>
+              <p>Change Icon</p>
               {background && (
                 <FontAwesomeIcon
                   icon={faTimesCircle}

@@ -3,11 +3,12 @@ import React, { memo, useState } from 'react';
 import styled from 'styled-components';
 import ReactHtmlParser from 'react-html-parser';
 import { Select } from 'antd';
+import ReactMarkdown from 'react-markdown';
 import Modal from '../components/Modal';
-import { getAddonFileChangelog } from '../api';
+import { getAddonFileChangelog, getFTBChangelog } from '../api';
 
 let latest = {};
-const ModChangelog = ({ modpackId, files }) => {
+const ModChangelog = ({ modpackId, files, type, modpackName }) => {
   const [changelog, setChangelog] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -18,7 +19,11 @@ const ModChangelog = ({ modpackId, files }) => {
     setLoading(true);
     let data;
     try {
-      ({ data } = await getAddonFileChangelog(modpackId, id));
+      if (type === 'ftb') {
+        ({ data } = await getFTBChangelog(modpackId, id));
+      } else {
+        ({ data } = await getAddonFileChangelog(modpackId, id));
+      }
     } catch (err) {
       console.error(err);
     }
@@ -69,9 +74,15 @@ const ModChangelog = ({ modpackId, files }) => {
           }}
           placeholder="Select a version"
         >
-          {files.map(v => (
-            <Select.Option key={v.id} value={v.id}>
-              {v.displayName}
+          {(files || []).map(v => (
+            <Select.Option
+              title={
+                type === 'ftb' ? `${modpackName} - ${v.name}` : v.displayName
+              }
+              key={v.id}
+              value={v.id}
+            >
+              {type === 'ftb' ? `${modpackName} - ${v.name}` : v.displayName}
             </Select.Option>
           ))}
         </Select>
@@ -84,9 +95,24 @@ const ModChangelog = ({ modpackId, files }) => {
                   margin-bottom: 40px;
                 `}
               >
-                {files.find(v => v.id === selectedId)?.displayName}
+                {type === 'ftb'
+                  ? `${modpackName} - ${
+                      (files || []).find(v => v.id === selectedId)?.name
+                    }`
+                  : (files || []).find(v => v.id === selectedId)?.displayName}
               </div>
-              {ReactHtmlParser(changelog)}
+              {type === 'ftb' ? (
+                <ReactMarkdown
+                  css={`
+                    font-size: 15px;
+                    padding: 20px;
+                  `}
+                >
+                  {changelog.content}
+                </ReactMarkdown>
+              ) : (
+                ReactHtmlParser(changelog)
+              )}
             </>
           ) : (
             <h2

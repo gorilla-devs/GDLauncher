@@ -7,12 +7,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowRight,
   faExclamationCircle,
-  faCheckCircle
+  faCheckCircle,
+  faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button } from 'antd';
 import { useKey } from 'rooks';
 import axios from 'axios';
-import { login } from '../../../common/reducers/actions';
+import { login, loginOAuth } from '../../../common/reducers/actions';
 import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
 import backgroundVideo from '../../../common/assets/background.webm';
@@ -37,6 +38,10 @@ const LoginButton = styled(Button)`
     color: ${props => props.theme.palette.text.primary};
     background: ${props => props.theme.palette.grey[600]};
   }
+`;
+
+const MicrosoftLoginButton = styled(LoginButton)`
+  margin-top: 10px;
 `;
 
 const Container = styled.div`
@@ -188,6 +193,19 @@ const Login = () => {
     }, 1000);
   };
 
+  const authenticateMicrosoft = () => {
+    dispatch(requesting('accountAuthentication'));
+
+    setTimeout(() => {
+      dispatch(load(features.mcAuthentication, dispatch(loginOAuth()))).catch(
+        e => {
+          console.error(e);
+          setLoginFailed(e);
+        }
+      );
+    }, 1000);
+  };
+
   const fetchStatus = async () => {
     const { data } = await axios.get('https://status.mojang.com/check');
     const result = {};
@@ -239,6 +257,18 @@ const Login = () => {
                   icon={faArrowRight}
                 />
               </LoginButton>
+              <MicrosoftLoginButton
+                color="primary"
+                onClick={authenticateMicrosoft}
+              >
+                Sign in with Microsoft
+                <FontAwesomeIcon
+                  css={`
+                    margin-left: 6px;
+                  `}
+                  icon={faExternalLinkAlt}
+                />
+              </MicrosoftLoginButton>
             </Form>
             <Footer>
               <div
