@@ -131,7 +131,7 @@ const ModsListWrapper = ({
     />
   ));
 
-  const Row = ({ index, style, data }) => {
+  const Row = memo(({ index, style, data }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const curseReleaseChannel = useSelector(
@@ -145,7 +145,7 @@ const ModsListWrapper = ({
     const isInstalled = installedMods.find(v => v.projectID === item?.id);
     const primaryImage = item.attachments.find(v => v.isDefault);
 
-    if (!item || isNextPageLoading) {
+    if (!item) {
       return (
         <ModsLoader
           hasNextPage={hasNextPage}
@@ -173,7 +173,7 @@ const ModsListWrapper = ({
         {isInstalled && <ModsIconBg />}
 
         <RowInnerContainer>
-          <RowContainerImg img={primaryImage.thumbnailUrl} />
+          <RowContainerImg img={primaryImage?.thumbnailUrl} />
           <div
             css={`
               color: ${props => props.theme.palette.text.third};
@@ -181,6 +181,7 @@ const ModsListWrapper = ({
                 color: ${props => props.theme.palette.text.primary};
               }
               transition: color 0.1s ease-in-out;
+              cursor: pointer;
             `}
             onClick={() => {
               dispatch(
@@ -199,55 +200,79 @@ const ModsListWrapper = ({
         </RowInnerContainer>
         {!isInstalled ? (
           error || (
-            <Button
-              type="primary"
-              onClick={async e => {
-                setLoading(true);
-                e.stopPropagation();
-                const files = (await getAddonFiles(item?.id)).data;
-
-                const isFabric = getPatchedInstanceType(instance) === FABRIC;
-                const isForge = getPatchedInstanceType(instance) === FORGE;
-
-                let filteredFiles = [];
-
-                if (isFabric) {
-                  filteredFiles = filterFabricFilesByVersion(
-                    files,
-                    gameVersion
+            <div>
+              <Button
+                type="primary"
+                css={`
+                  margin-right: 10px;
+                `}
+                onClick={() => {
+                  dispatch(
+                    openModal('ModOverview', {
+                      gameVersion,
+                      projectID: item.id,
+                      ...(isInstalled && { fileID: isInstalled.fileID }),
+                      ...(isInstalled && { fileName: isInstalled.fileName }),
+                      instanceName
+                    })
                   );
-                } else if (isForge) {
-                  filteredFiles = filterForgeFilesByVersion(files, gameVersion);
-                }
+                }}
+              >
+                Explore
+              </Button>
+              <Button
+                type="primary"
+                onClick={async e => {
+                  setLoading(true);
+                  e.stopPropagation();
+                  const files = (await getAddonFiles(item?.id)).data;
 
-                const preferredFile = getFirstPreferredCandidate(
-                  filteredFiles,
-                  curseReleaseChannel
-                );
+                  const isFabric = getPatchedInstanceType(instance) === FABRIC;
+                  const isForge = getPatchedInstanceType(instance) === FORGE;
 
-                if (preferredFile === null) {
+                  let filteredFiles = [];
+
+                  if (isFabric) {
+                    filteredFiles = filterFabricFilesByVersion(
+                      files,
+                      gameVersion
+                    );
+                  } else if (isForge) {
+                    filteredFiles = filterForgeFilesByVersion(
+                      files,
+                      gameVersion
+                    );
+                  }
+
+                  const preferredFile = getFirstPreferredCandidate(
+                    filteredFiles,
+                    curseReleaseChannel
+                  );
+
+                  if (preferredFile === null) {
+                    setLoading(false);
+                    setError('Mod Not Available');
+                    console.error(
+                      `Could not find any release candidate for addon: ${item?.id} / ${gameVersion}`
+                    );
+                    return;
+                  }
+
+                  await dispatch(
+                    installMod(
+                      item?.id,
+                      preferredFile?.id,
+                      instanceName,
+                      gameVersion
+                    )
+                  );
                   setLoading(false);
-                  setError('Mod Not Available');
-                  console.error(
-                    `Could not find any release candidate for addon: ${item?.id} / ${gameVersion}`
-                  );
-                  return;
-                }
-
-                await dispatch(
-                  installMod(
-                    item?.id,
-                    preferredFile?.id,
-                    instanceName,
-                    gameVersion
-                  )
-                );
-                setLoading(false);
-              }}
-              loading={loading}
-            >
-              Install
-            </Button>
+                }}
+                loading={loading}
+              >
+                Install
+              </Button>
+            </div>
           )
         ) : (
           <Button
@@ -269,12 +294,13 @@ const ModsListWrapper = ({
         )}
       </RowContainer>
     );
-  };
+  });
 
   return (
     <InfiniteLoader
       isItemLoaded={isItemLoaded}
-      itemCount={itemCount}
+      itemCount={itemCount !== 0 ? itemCount : 40}
+      // loadMoreItems={() => loadMoreItems()}
       loadMoreItems={() => loadMoreItems(searchQuery)}
       // threshold={20}
     >
