@@ -79,6 +79,7 @@ To download the latest version, you can either click [here](https://github.com/g
 - Export instances to other launchers
 - Liteloader support
 - Optifine easy-installation support
+- Manage your Minecraft skin directly from the launcher
 - A lot more...
 
 ## 💾 Compilation
