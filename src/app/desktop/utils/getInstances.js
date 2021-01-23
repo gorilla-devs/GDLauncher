@@ -10,8 +10,33 @@ const getInstances = async instancesPath => {
         path.join(instancesPath, instance, 'config.json')
       );
       const config = await fse.readJSON(configPath);
-      if (!config.modloader) {
+      if (!config.loader) {
         throw new Error(`Config for ${instance} could not be parsed`);
+      }
+
+      if (Array.isArray(config.modloader)) {
+        const loaderType = config.modloader[0];
+        const mcVersion = config.modloader[1];
+        const loaderVersion = config.modloader[2];
+        const fileId = config.modloader[3];
+        const addonId = config.modloader[4];
+        const source = config.modloader[5];
+
+        const patchedConfig = {
+          ...config,
+          loader: {
+            loaderType,
+            mcVersion,
+            ...(loaderVersion && { loaderVersion }),
+            ...(fileId && { fileId }),
+            ...(addonId && { addonId }),
+            ...(source && { source })
+          }
+        };
+
+        await fse.writeFile(configPath, JSON.stringify(patchedConfig));
+
+        return { ...patchedConfig, name: instance };
       }
 
       return {
