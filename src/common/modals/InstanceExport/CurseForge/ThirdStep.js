@@ -51,9 +51,9 @@ export default function ThirdStep({
   page
 }) {
   const [isCompleted, setIsCompleted] = useState(false);
-  const { modloader, mods } = instanceConfig;
-  const mcVersion = modloader?.mcVersion;
-  const modloaderName = modloader?.loaderType;
+  const { laoder, mods } = instanceConfig;
+  const mcVersion = laoder?.mcVersion;
+  const modloaderName = laoder?.loaderType;
   const dispatch = useDispatch();
   const tempExport = path.join(tempPath, instanceName);
 
@@ -63,7 +63,7 @@ export default function ThirdStep({
     switch (modloaderName) {
       case FORGE:
         loader = {
-          id: `${modloaderName}-${modloader?.loaderVersion.slice(
+          id: `${modloaderName}-${laoder?.loaderVersion.slice(
             mcVersion.length + 1
           )}`,
           primary: true
@@ -72,8 +72,8 @@ export default function ThirdStep({
       case FABRIC:
         loader = {
           id: modloaderName,
-          yarn: modloader?.loaderVersion,
-          loader: modloader?.fileId,
+          yarn: laoder?.loaderVersion,
+          loader: laoder?.fileId,
           primary: true
         };
         break;
@@ -100,8 +100,8 @@ export default function ThirdStep({
       version: packVersion,
       author: packAuthor,
       projectID:
-        modloaderName === 'forge' && modloader.length > 3
-          ? parseInt(modloader?.fileId, 10)
+        modloaderName === 'forge' && laoder.length > 3
+          ? parseInt(laoder?.fileId, 10)
           : undefined,
       name: packZipName,
       files: modsArray

@@ -1007,7 +1007,7 @@ export function updateInstanceConfig(
 
 export function addToQueue(
   instanceName,
-  modloader,
+  laoder,
   manifest,
   background,
   timePlayed
@@ -1019,7 +1019,7 @@ export function addToQueue(
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,
-      modloader,
+      laoder,
       manifest,
       background
     });
@@ -1038,7 +1038,7 @@ export function addToQueue(
         prev => {
           return {
             ...(prev || {}),
-            modloader,
+            laoder,
             timePlayed: prev.timePlayed || timePlayed || 0,
             background,
             mods: prev.mods || []
@@ -1068,7 +1068,7 @@ export function addNextInstanceToCurrentDownload() {
 export function downloadFabric(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { modloader } = _getCurrentDownloadItem(state);
+    const { laoder } = _getCurrentDownloadItem(state);
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading fabric files...'));
 
@@ -1077,14 +1077,14 @@ export function downloadFabric(instanceName) {
       _getLibrariesPath(state),
       'net',
       'fabricmc',
-      modloader?.mcVersion,
-      modloader?.loaderVersion,
+      laoder?.mcVersion,
+      laoder?.loaderVersion,
       'fabric.json'
     );
     try {
       fabricJson = await fse.readJson(fabricJsonPath);
     } catch (err) {
-      fabricJson = (await getFabricJson(modloader)).data;
+      fabricJson = (await getFabricJson(laoder)).data;
       await fse.outputJson(fabricJsonPath, fabricJson);
     }
 
@@ -1108,30 +1108,30 @@ export function downloadFabric(instanceName) {
 export function downloadForge(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { modloader } = _getCurrentDownloadItem(state);
+    const { laoder } = _getCurrentDownloadItem(state);
     const forgeJson = {};
 
     const forgeJsonPath = path.join(
       _getLibrariesPath(state),
       'net',
       'minecraftforge',
-      modloader?.loaderVersion,
-      `${modloader?.loaderVersion}.json`
+      laoder?.loaderVersion,
+      `${laoder?.loaderVersion}.json`
     );
 
     const sevenZipPath = await get7zPath();
-    const pre152 = lte(coerce(modloader?.mcVersion), coerce('1.5.2'));
-    const pre132 = lte(coerce(modloader?.mcVersion), coerce('1.3.2'));
+    const pre152 = lte(coerce(laoder?.mcVersion), coerce('1.5.2'));
+    const pre132 = lte(coerce(laoder?.mcVersion), coerce('1.3.2'));
     const baseUrl =
       'https://files.minecraftforge.net/maven/net/minecraftforge/forge';
     const tempInstaller = path.join(
       _getTempPath(state),
-      `${modloader?.loaderVersion}.jar`
+      `${laoder?.loaderVersion}.jar`
     );
     const expectedInstaller = path.join(
       _getDataStorePath(state),
       'forgeInstallers',
-      `${modloader?.loaderVersion}.jar`
+      `${laoder?.loaderVersion}.jar`
     );
 
     const extractSpecificFile = async from => {
@@ -1156,7 +1156,7 @@ export function downloadForge(instanceName) {
         await fs.access(forgeJsonPath);
       }
       const { data: hashes } = await axios.get(
-        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${modloader?.loaderVersion}/meta.json`
+        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${laoder?.loaderVersion}/meta.json`
       );
       console.log(hashes);
       const fileMd5 = await getFileHash(expectedInstaller, 'md5');
@@ -1189,7 +1189,7 @@ export function downloadForge(instanceName) {
       // Download installer jar and extract stuff
       await downloadFile(
         tempInstaller,
-        `${baseUrl}/${modloader?.loaderVersion}/forge-${modloader?.loaderVersion}-${urlTerminal}`,
+        `${baseUrl}/${laoder?.loaderVersion}/forge-${laoder?.loaderVersion}-${urlTerminal}`,
         p => dispatch(updateDownloadProgress(p))
       );
 
@@ -1322,11 +1322,11 @@ export function downloadForge(instanceName) {
       }
     };
 
-    if (gt(coerce(modloader?.mcVersion), coerce('1.5.2'))) {
+    if (gt(coerce(laoder?.mcVersion), coerce('1.5.2'))) {
       await installForgePost152();
     } else {
       // Download necessary libs
-      const fmllibs = fmlLibsMapping[modloader?.mcVersion];
+      const fmllibs = fmlLibsMapping[laoder?.mcVersion];
       await pMap(
         fmllibs || [],
         async lib => {
@@ -1368,11 +1368,11 @@ export function downloadForge(instanceName) {
       // Perform forge injection
       const mcJarPath = path.join(
         _getMinecraftVersionsPath(state),
-        `${modloader?.mcVersion}.jar`
+        `${laoder?.mcVersion}.jar`
       );
       const mcJarForgePath = path.join(
         _getMinecraftVersionsPath(state),
-        `${modloader?.loaderVersion}.jar`
+        `${laoder?.loaderVersion}.jar`
       );
       await fse.copy(mcJarPath, mcJarForgePath);
 
@@ -1389,14 +1389,12 @@ export function downloadForge(instanceName) {
         });
       });
 
-      await fse.remove(
-        path.join(_getTempPath(state), modloader?.loaderVersion)
-      );
+      await fse.remove(path.join(_getTempPath(state), laoder?.loaderVersion));
 
       // This is garbage, need to use a stream somehow to directly inject data from/to jar
       const extraction = extractFull(
         tempInstaller,
-        path.join(_getTempPath(state), modloader?.loaderVersion),
+        path.join(_getTempPath(state), laoder?.loaderVersion),
         {
           $bin: sevenZipPath,
           yes: true
@@ -1415,7 +1413,7 @@ export function downloadForge(instanceName) {
 
       const updatedFiles = Seven.add(
         mcJarForgePath,
-        `${path.join(_getTempPath(state), modloader?.loaderVersion)}/*`,
+        `${path.join(_getTempPath(state), laoder?.loaderVersion)}/*`,
         {
           $bin: sevenZipPath,
           yes: true
@@ -1430,9 +1428,7 @@ export function downloadForge(instanceName) {
         });
       });
 
-      await fse.remove(
-        path.join(_getTempPath(state), modloader?.loaderVersion)
-      );
+      await fse.remove(path.join(_getTempPath(state), laoder?.loaderVersion));
     }
 
     await fse.remove(tempInstaller);
@@ -1646,9 +1642,9 @@ export function downloadInstance(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading game files...'));
 
-    const { modloader, manifest } = _getCurrentDownloadItem(state);
+    const { laoder, manifest } = _getCurrentDownloadItem(state);
 
-    const mcVersion = modloader?.mcVersion;
+    const mcVersion = laoder?.mcVersion;
 
     let mcJson;
 
@@ -1745,17 +1741,17 @@ export function downloadInstance(instanceName) {
     if (mcJson.assets === 'legacy') {
       await copyAssetsToLegacy(assets);
     }
-    if (modloader?.loaderType === FABRIC) {
+    if (laoder?.loaderType === FABRIC) {
       await dispatch(downloadFabric(instanceName));
-    } else if (modloader?.loaderType === FORGE) {
+    } else if (laoder?.loaderType === FORGE) {
       await dispatch(downloadForge(instanceName));
     }
 
     // analyze source and do it for ftb and forge
 
-    if (manifest && modloader?.source === FTB)
+    if (manifest && laoder?.source === FTB)
       await dispatch(processFTBManifest(instanceName));
-    else if (manifest && modloader?.source === CURSEFORGE)
+    else if (manifest && laoder?.source === CURSEFORGE)
       await dispatch(processForgeManifest(instanceName));
 
     // if(manifest)
@@ -1774,7 +1770,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
     const tempPath = _getTempPath(state);
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
-    const { data: addon } = await getAddon(instance.modloader?.fileId);
+    const { data: addon } = await getAddon(instance.laoder?.fileId);
 
     const manifest = await fse.readJson(
       path.join(instancePath, 'manifest.json')
@@ -1827,7 +1823,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
     const imageURL = addon?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
 
     const newManifest = await downloadAddonZip(
-      instance.modloader?.fileId,
+      instance.laoder?.fileId,
       newModpackData.id,
       path.join(_getInstancesPath(state), instanceName),
       path.join(tempPath, instanceName)
@@ -1842,22 +1838,22 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
       imageURL
     );
 
-    const modloader = {
-      loaderType: instance.modloader?.loaderType,
+    const laoder = {
+      loaderType: instance.laoder?.loaderType,
       mcVersion: newManifest.minecraft.version,
       loaderVersion: convertcurseForgeToCanonical(
         newManifest.minecraft.modLoaders.find(v => v.primary).id,
         newManifest.minecraft.version,
         state.app.forgeManifest
       ),
-      fileId: instance.modloader?.fileId,
+      fileId: instance.laoder?.fileId,
       addonId: newModpackData.id
     };
 
     dispatch(
       addToQueue(
         instanceName,
-        modloader,
+        laoder,
         newManifest,
         `background${path.extname(imageURL)}`
       )
@@ -2033,7 +2029,7 @@ export const startListener = () => {
           try {
             const config = await fse.readJSON(configPath);
 
-            if (!config.modloader) {
+            if (!config.laoder) {
               throw new Error(`Config for ${instanceName} could not be parsed`);
             }
             console.log('[RTS] ADDING INSTANCE', instanceName);
@@ -2079,7 +2075,7 @@ export const startListener = () => {
               'config.json'
             );
             const config = await fse.readJSON(configPath);
-            if (!config.modloader) {
+            if (!config.laoder) {
               throw new Error(
                 `Config for ${newInstanceName} could not be parsed`
               );
@@ -2320,7 +2316,7 @@ export function launchInstance(instanceName) {
       resolution: globalMinecraftResolution
     } = state.settings.minecraftSettings;
     const {
-      modloader,
+      laoder,
       javaArgs,
       javaMemory,
       resolution: instanceResolution
@@ -2338,10 +2334,7 @@ export function launchInstance(instanceName) {
     let errorLogs = '';
 
     const mcJson = await fse.readJson(
-      path.join(
-        _getMinecraftVersionsPath(state),
-        `${modloader?.mcVersion}.json`
-      )
+      path.join(_getMinecraftVersionsPath(state), `${laoder?.mcVersion}.json`)
     );
     let libraries = [];
     let mcMainFile = {
@@ -2350,13 +2343,13 @@ export function launchInstance(instanceName) {
       path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
     };
 
-    if (modloader && modloader?.loaderType === 'fabric') {
+    if (laoder && laoder?.loaderType === 'fabric') {
       const fabricJsonPath = path.join(
         _getLibrariesPath(state),
         'net',
         'fabricmc',
-        modloader?.mcVersion,
-        modloader?.loaderVersion,
+        laoder?.mcVersion,
+        laoder?.loaderVersion,
         'fabric.json'
       );
       const fabricJson = await fse.readJson(fabricJsonPath);
@@ -2367,22 +2360,16 @@ export function launchInstance(instanceName) {
       libraries = libraries.concat(fabricLibraries);
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
-    } else if (modloader && modloader?.loaderType === 'forge') {
-      if (gt(coerce(modloader?.mcVersion), coerce('1.5.2'))) {
+    } else if (laoder && laoder?.loaderType === 'forge') {
+      if (gt(coerce(laoder?.mcVersion), coerce('1.5.2'))) {
         const getForgeLastVer = ver =>
           Number.parseInt(ver.split('.')[ver.split('.').length - 1], 10);
 
         if (
-          lt(
-            coerce(modloader?.loaderVersion.split('-')[1]),
-            coerce('10.13.1')
-          ) &&
-          gte(
-            coerce(modloader?.loaderVersion.split('-')[1]),
-            coerce('9.11.1')
-          ) &&
-          getForgeLastVer(modloader?.loaderVersion) < 1217 &&
-          getForgeLastVer(modloader?.loaderVersion) > 935
+          lt(coerce(laoder?.loaderVersion.split('-')[1]), coerce('10.13.1')) &&
+          gte(coerce(laoder?.loaderVersion.split('-')[1]), coerce('9.11.1')) &&
+          getForgeLastVer(laoder?.loaderVersion) < 1217 &&
+          getForgeLastVer(laoder?.loaderVersion) > 935
         ) {
           const moveJavaLegacyFixerToInstance = async () => {
             await fs.lstat(path.join(_getDataStorePath(state), '__JLF__.jar'));
@@ -2394,7 +2381,7 @@ export function launchInstance(instanceName) {
           try {
             await moveJavaLegacyFixerToInstance();
           } catch {
-            await dispatch(downloadJavaLegacyFixer(modloader));
+            await dispatch(downloadJavaLegacyFixer(laoder));
             await moveJavaLegacyFixerToInstance();
           }
         }
@@ -2403,8 +2390,8 @@ export function launchInstance(instanceName) {
           _getLibrariesPath(state),
           'net',
           'minecraftforge',
-          modloader?.loaderVersion,
-          `${modloader?.loaderVersion}.json`
+          laoder?.loaderVersion,
+          `${laoder?.loaderVersion}.json`
         );
         const forgeJson = await fse.readJson(forgeJsonPath);
         const forgeLibraries = librariesMapper(
@@ -2425,7 +2412,7 @@ export function launchInstance(instanceName) {
         mcMainFile = {
           path: path.join(
             _getMinecraftVersionsPath(state),
-            `${modloader?.loaderVersion}.jar`
+            `${laoder?.loaderVersion}.jar`
           )
         };
       }
@@ -2721,8 +2708,8 @@ export const initLatestMods = instanceName => {
       // Find latest version for each mod
       const [latestMod] =
         getPatchedInstanceType(instance) === FORGE || v.projectID === 361988
-          ? filterForgeFilesByVersion(v.data, instance.modloader?.mcVersion)
-          : filterFabricFilesByVersion(v.data, instance.modloader?.mcVersion);
+          ? filterForgeFilesByVersion(v.data, instance.laoder?.mcVersion)
+          : filterFabricFilesByVersion(v.data, instance.laoder?.mcVersion);
       if (latestMod) {
         manifestsObj[v.projectID] = latestMod;
       }

@@ -36,7 +36,7 @@ function downloadQueue(state = {}, action) {
         ...state,
         [action.instanceName]: {
           percentage: 0,
-          modloader: action.modloader,
+          laoder: action.laoder,
           status: null,
           currentPhase: 1,
           totalPhases: action.phases,

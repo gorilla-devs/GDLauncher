@@ -24,7 +24,7 @@ const getInstances = async instancesPath => {
 
         const patchedConfig = {
           ...config,
-          modloader: {
+          laoder: {
             loaderType,
             mcVersion,
             ...(loaderVersion && { loaderVersion }),

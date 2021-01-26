@@ -128,7 +128,7 @@ const InstanceName = ({
         imageURL
       );
       if (version?.loaderType === FORGE) {
-        const modloader = {
+        const laoder = {
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: convertcurseForgeToCanonical(
@@ -143,13 +143,13 @@ const InstanceName = ({
         dispatch(
           addToQueue(
             localInstanceName,
-            modloader,
+            laoder,
             manifest,
             `background${path.extname(imageURL)}`
           )
         );
       } else if (version?.loaderType === FABRIC) {
-        const modloader = {
+        const laoder = {
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: manifest.minecraft.modLoaders[0].yarn,
@@ -160,13 +160,13 @@ const InstanceName = ({
         dispatch(
           addToQueue(
             localInstanceName,
-            modloader,
+            laoder,
             manifest,
             `background${path.extname(imageURL)}`
           )
         );
       } else if (version?.loaderType === VANILLA) {
-        const modloader = {
+        const laoder = {
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: version?.loaderVersion,
@@ -176,7 +176,7 @@ const InstanceName = ({
         dispatch(
           addToQueue(
             localInstanceName,
-            modloader,
+            laoder,
             manifest,
             `background${path.extname(imageURL)}`
           )
@@ -193,7 +193,7 @@ const InstanceName = ({
       const forgeModloader = data.targets.find(v => v.type === 'modloader');
       const mcVersion = data.targets.find(v => v.type === 'game').version;
 
-      const modloader = {
+      const laoder = {
         loaderType: forgeModloader?.name,
         mcVersion,
         loaderVersion: convertcurseForgeToCanonical(
@@ -218,7 +218,7 @@ const InstanceName = ({
       dispatch(
         addToQueue(
           localInstanceName,
-          modloader,
+          laoder,
           data,
           `background${path.extname(imageURL)}`
         )
@@ -232,7 +232,7 @@ const InstanceName = ({
       );
 
       if (version?.loaderType === FORGE) {
-        const modloader = {
+        const laoder = {
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: convertcurseForgeToCanonical(
@@ -242,22 +242,22 @@ const InstanceName = ({
           )
         };
 
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
+        dispatch(addToQueue(localInstanceName, laoder, manifest));
       } else if (version?.loaderType === FABRIC) {
-        const modloader = {
+        const laoder = {
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: manifest.minecraft.modLoaders[0].yarn,
           fileId: manifest.minecraft.modLoaders[0].loader
         };
 
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
+        dispatch(addToQueue(localInstanceName, laoder, manifest));
       } else if (version?.loaderType === VANILLA) {
-        const modloader = {
+        const laoder = {
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version
         };
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
+        dispatch(addToQueue(localInstanceName, laoder, manifest));
       }
     } else if (isVanilla) {
       dispatch(

@@ -882,7 +882,7 @@ export const convertcurseForgeToCanonical = (
 };
 
 export const getPatchedInstanceType = instance => {
-  const isForge = instance.modloader?.loaderType === FORGE;
+  const isForge = instance.laoder?.loaderType === FORGE;
   const hasJumpLoader = (instance.mods || []).find(v => v.projectID === 361988);
   if (isForge && !hasJumpLoader) {
     return FORGE;
