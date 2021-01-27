@@ -46,6 +46,7 @@ const ModpacksListWrapper = ({
   // Render an item or a loading indicator.
   const Item = memo(({ index, style }) => {
     const modpack = items[index];
+
     if (!modpack) {
       return (
         <ModpackLoader

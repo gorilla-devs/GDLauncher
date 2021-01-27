@@ -142,7 +142,7 @@ function openNews(e, inf) {
 
 function ImageList({ currentImageIndex, news }) {
   const listImages = news.map(inf => (
-    <Slide key={inf.title} onClick={e => openNews(e, inf)}>
+    <Slide key={inf.guid} onClick={e => openNews(e, inf)}>
       <Title>{inf.title}</Title>
       <SubTitle>{inf.description}</SubTitle>
       <Gradient />
