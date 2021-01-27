@@ -753,11 +753,15 @@ export const getPlayerSkin = async uuid => {
 };
 
 export const extractFace = async buffer => {
-  const image = await jimp.read(buffer);
-  image.crop(8, 8, 8, 8);
-  image.scale(10, jimp.RESIZE_NEAREST_NEIGHBOR);
-  const imageBuffer = await image.getBufferAsync(jimp.MIME_PNG);
-  return imageBuffer.toString('base64');
+  const face = await jimp.read(buffer);
+  const hat = await jimp.read(buffer);
+  face.crop(8, 8, 8, 8);
+  hat.crop(40, 8, 8, 8);
+  face.scale(10, jimp.RESIZE_NEAREST_NEIGHBOR);
+  hat.scale(10, jimp.RESIZE_NEAREST_NEIGHBOR);
+  face.composite(hat, 0, 0);
+  const ImageBuffer = await face.getBufferAsync(jimp.MIME_PNG);
+  return ImageBuffer.toString('base64');
 };
 
 export const normalizeModData = (data, projectID, modName) => {
