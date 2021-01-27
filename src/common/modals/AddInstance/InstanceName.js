@@ -77,10 +77,10 @@ const InstanceName = ({
     if (!modpack) return null;
     // Curseforge
     if (!modpack.synopsis) {
-      return modpack.attachments.find(v => v.isDefault).thumbnailUrl;
+      return modpack?.attachments?.find(v => v.isDefault).thumbnailUrl;
     } else {
       // FTB
-      const image = modpack.art.reduce((prev, curr) => {
+      const image = modpack?.art?.reduce((prev, curr) => {
         if (!prev || curr.size < prev.size) return curr;
         return prev;
       });
