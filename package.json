@@ -184,6 +184,7 @@
     "node-7z": "^2.1.2",
     "node-machine-id": "^1.1.12",
     "nsfw": "^2.1.1",
+    "original-fs": "^1.1.0",
     "p-map": "^4.0.0",
     "polished": "^4.1.1",
     "ps-tree": "^1.2.0",
