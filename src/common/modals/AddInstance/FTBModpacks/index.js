@@ -33,7 +33,7 @@ const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
         ({ data } = await getFTBSearch(searchText));
       }
       setModpackIds(data.packs);
-      updateModpacks.callback();
+      updateModpacks();
     };
     init();
   }, [searchText]);

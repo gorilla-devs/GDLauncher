@@ -498,7 +498,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 value={javaLocalArguments}
                 onChange={e => {
                   setJavaLocalArguments(e.target.value);
-                  debouncedArgumentsUpdate.callback(e.target.value);
+                  debouncedArgumentsUpdate(e.target.value);
                 }}
               />
               <JavaArgumentsResetButton onClick={resetJavaArguments}>

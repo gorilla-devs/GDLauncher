@@ -198,9 +198,10 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
-      enableRemoteModule: true,
+      enableRemoteModule: false,
       // Disable in dev since I think hot reload is messing with it
-      webSecurity: !isDev
+      webSecurity: !isDev,
+      contextIsolation: false
     }
   });
 
@@ -385,7 +386,13 @@ ipcMain.handle(
         show: false,
         parent: mainWindow,
         autoHideMenuBar: true,
-        'node-integration': false
+        webPreferences: {
+          experimentalFeatures: true,
+          nodeIntegration: false,
+          enableRemoteModule: false,
+          webSecurity: true,
+          contextIsolation: true
+        }
       });
 
       oAuthWindow.webContents.session.clearStorageData();
