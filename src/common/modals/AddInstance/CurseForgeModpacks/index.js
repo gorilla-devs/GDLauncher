@@ -69,7 +69,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
   };
 
   useEffect(() => {
-    updateModpacks.callback();
+    updateModpacks();
   }, [searchText, sortBy, minecraftVersion, categoryId]);
 
   return (
