@@ -270,34 +270,34 @@ const Overview = ({ instanceName, background, manifest }) => {
             title="Minecraft Version"
             color={props => props.theme.palette.colors.jungleGreen}
             instanceName={instanceName}
-            defaultValue={config?.laoder}
+            defaultValue={config?.loader}
             icon={<FontAwesomeIcon icon={faCog} />}
           >
-            {config?.laoder?.mcVersion}
+            {config?.loader?.mcVersion}
           </Card>
           <Card
             title="Modloader"
             color={props => props.theme.palette.colors.darkYellow}
             instanceName={instanceName}
-            defaultValue={config?.laoder}
+            defaultValue={config?.loader}
             icon={<FontAwesomeIcon icon={faCog} />}
           >
-            {config?.laoder?.loaderType}
+            {config?.loader?.loaderType}
           </Card>
           <Card
             title="Modloader Version"
             color={props => props.theme.palette.colors.lightBlue}
             instanceName={instanceName}
-            defaultValue={config?.laoder}
+            defaultValue={config?.loader}
             icon={
-              (config?.laoder?.loaderVersion || '-') !== '-' ? (
+              (config?.loader?.loaderVersion || '-') !== '-' ? (
                 <FontAwesomeIcon icon={faCog} />
               ) : null
             }
           >
-            {config?.laoder?.loaderType === 'forge'
-              ? config?.laoder?.loaderVersion?.split('-')[1]
-              : config?.laoder?.loaderVersion || '-'}
+            {config?.loader?.loaderType === 'forge'
+              ? config?.loader?.loaderVersion?.split('-')[1]
+              : config?.loader?.loaderVersion || '-'}
           </Card>
         </OverviewCard>
         <OverviewCard
@@ -327,7 +327,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             {config?.lastPlayed ? computeLastPlayed(config?.lastPlayed) : '-'}
           </Card>
         </OverviewCard>
-        {config?.laoder.source === CURSEFORGE && manifest && (
+        {config?.loader.source === CURSEFORGE && manifest && (
           <Card
             title="Curse Modpack"
             color={`linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), ${

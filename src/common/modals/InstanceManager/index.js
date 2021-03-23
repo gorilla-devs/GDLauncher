@@ -208,7 +208,7 @@ const InstanceManager = ({ instanceName }) => {
   }, []);
 
   useEffect(() => {
-    if (instance?.laoder.source === CURSEFORGE) {
+    if (instance?.loader.source === CURSEFORGE) {
       fse
         .readJson(path.join(instancesPath, instanceName, 'manifest.json'))
         .then(setManifest)
@@ -256,10 +256,10 @@ const InstanceManager = ({ instanceName }) => {
             {Object.entries(menuEntries).map(([k, tab]) => {
               if (
                 (tab.name === menuEntries.mods.name &&
-                  instance?.laoder?.loaderType !== FORGE &&
-                  instance?.laoder?.loaderType !== FABRIC) ||
+                  instance?.loader?.loaderType !== FORGE &&
+                  instance?.loader?.loaderType !== FABRIC) ||
                 (tab.name === menuEntries.modpack.name &&
-                  !instance?.laoder?.fileId)
+                  !instance?.loader?.fileId)
               ) {
                 return null;
               }
@@ -278,7 +278,7 @@ const InstanceManager = ({ instanceName }) => {
         <Content>
           <ContentComponent
             instanceName={instanceName}
-            modpackId={instance?.laoder?.fileId}
+            modpackId={instance?.loader?.fileId}
             background={background}
             manifest={manifest}
           />

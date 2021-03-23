@@ -121,17 +121,17 @@ const Import = ({
       return;
     }
 
-    const laoder = {};
+    const loader = {};
 
-    if (isForge) laoder.loaderType = FORGE;
-    else if (isFabric) laoder.loaderType = FABRIC;
-    else if (isVanilla) laoder.loaderType = VANILLA;
+    if (isForge) loader.loaderType = FORGE;
+    else if (isFabric) loader.loaderType = FABRIC;
+    else if (isVanilla) loader.loaderType = VANILLA;
 
     if (manifest.projectID) {
-      laoder.addonId = manifest.projectID;
+      loader.addonId = manifest.projectID;
     }
 
-    setVersion(laoder);
+    setVersion(loader);
     if (isUrlRegex) {
       setImportZipPath(tempFilePath);
     }
