@@ -108,6 +108,7 @@ const commonConfig = {
       private: false
     },
     generateUpdatesFilesForAllChannels: true,
+    npmRebuild: false,
     productName: 'GDLauncher',
     appId: 'org.gorilladevs.GDLauncher',
     files: [
