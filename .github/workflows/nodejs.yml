@@ -38,6 +38,8 @@ jobs:
         run: npm install --global --production --vs2015 windows-build-tools@4.0.0
       - name: install node-gyp
         run: npm install --global node-gyp@latest
+      - name: install webpack
+        run: npm install --global webpack@4
       - name: Set node config to set msvs_version to 2015
         if: matrix.os == 'windows-latest'
         run: npm config set msvs_version 2015
