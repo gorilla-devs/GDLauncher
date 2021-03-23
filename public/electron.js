@@ -487,7 +487,7 @@ ipcMain.handle('getIsWindowMaximized', () => {
 });
 
 ipcMain.handle('openFolder', (e, folderPath) => {
-  shell.openPath(folderPath);
+  shell.openItem(folderPath);
 });
 
 ipcMain.handle('open-devtools', () => {
