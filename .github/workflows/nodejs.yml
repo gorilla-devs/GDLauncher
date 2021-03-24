@@ -22,6 +22,7 @@ jobs:
       - name: Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+          VS_PATH: '"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe"'
         run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v2
         with:
@@ -34,7 +35,7 @@ jobs:
       - name: Uninstall 2019 visual studio
         if: matrix.os == 'windows-latest'
         shell: cmd
-        run: \"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe\" /uninstall --passive
+        run: ${VS_PATH} /uninstall --passive
 
       - name: Set node config to use python2.7
         run: npm config set python python2.7
