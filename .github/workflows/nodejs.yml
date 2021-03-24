@@ -26,15 +26,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - name: Use Node.js 14.14.0
+      - name: Use Node.js 14.16.0
         uses: actions/setup-node@v1
         with:
-          node-version: '14.14.0'
-
-      - name: Uninstall 2019 visual studio
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: echo 1 && "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe" /Uninstall --passive --quiet
+          node-version: '14.16.0'
 
       - name: Set node config to use python2.7
         run: npm config set python python2.7
