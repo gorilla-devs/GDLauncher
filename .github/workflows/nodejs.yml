@@ -34,7 +34,7 @@ jobs:
       - name: Uninstall 2019 visual studio
         if: matrix.os == 'windows-latest'
         shell: cmd
-        run: start "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe" /uninstall --passive
+        run: start "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe" /Uninstall --passive
 
       - name: Set node config to use python2.7
         run: npm config set python python2.7
