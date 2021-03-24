@@ -34,7 +34,7 @@ jobs:
       - name: VS_PATH
         if: matrix.os == 'windows-latest'
         run: |
-          echo 'VS_PATH="C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe" >> $GITHUB_ENV
+          echo VS_PATH="C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe" >> $GITHUB_ENV
 
       - name: Uninstall 2019 visual studio
         if: matrix.os == 'windows-latest'
