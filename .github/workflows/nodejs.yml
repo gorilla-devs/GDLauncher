@@ -31,12 +31,14 @@ jobs:
         with:
           node-version: '14.14.0'
 
+      - name: Name Generator
+        run: |
+          echo 'VS_PATH="C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe" >> $GITHUB_ENV
+
       - name: Uninstall 2019 visual studio
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: ${VS_PATH} /uninstall --passive
-        env:
-          VS_PATH: '"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vs_installer.exe"'
 
       - name: Set node config to use python2.7
         run: npm config set python python2.7
