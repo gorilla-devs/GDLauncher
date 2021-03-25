@@ -164,7 +164,7 @@ const ModOverview = ({
                   </div>
                   <div>
                     <label>MC version: </label>
-                    {addon?.gameVersionLatestFiles[0].gameVersion}
+                    {addon?.gameVersionLatestFiles[0]?.gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button

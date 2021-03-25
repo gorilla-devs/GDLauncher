@@ -1033,7 +1033,6 @@ export function addToQueue(
       updateInstanceConfig(
         instanceName,
         prev => {
-          // console.log('mods', prev.mods);
           return {
             ...(prev || {}),
             loader,
@@ -1446,18 +1445,17 @@ export function processFTBManifest(instanceName) {
 
     let modManifests = [];
 
-    const mappedFiles = files.map(file => ({
-      path: path.join(instancePath, file.path, file.name),
-      url: file.url,
-      sha1: file.sha1
-    }));
-
     const updatePercentage = downloaded => {
-      dispatch(updateDownloadProgress((downloaded * 100) / mappedFiles.length));
+      dispatch(updateDownloadProgress((downloaded * 100) / files.length));
     };
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading FTB files...'));
-    await downloadInstanceFiles(mappedFiles, updatePercentage);
+    await downloadInstanceFiles(
+      files,
+      updatePercentage,
+      undefined,
+      instancePath
+    );
 
     await pMap(
       files,
@@ -1473,11 +1471,9 @@ export function processFTBManifest(instanceName) {
           try {
             const ext = item.name.split(/\.(?=[^.]+$)/)[1];
             const isJarFile = ext === 'jar';
-
             if (isJarFile) {
               const filePath = path.join(instancePath, item.path, item.name);
 
-              console.log(item);
               const hash = await getFileMurmurHash2(filePath);
               const { data } = await getAddonsByFingerprint([hash]);
 
@@ -1531,7 +1527,6 @@ export function processFTBManifest(instanceName) {
 
     await dispatch(
       updateInstanceConfig(instanceName, config => {
-        console.log('MOD-MANIFEST', modManifests);
         return {
           ...config,
           mods: [...(config.mods || []), ...modManifests]
@@ -1653,7 +1648,6 @@ export function processForgeManifest(instanceName) {
     );
     await dispatch(
       updateInstanceConfig(instanceName, config => {
-        console.log('OK1', modManifests);
         return {
           ...config,
           mods: [...(config.mods || []), ...modManifests],
