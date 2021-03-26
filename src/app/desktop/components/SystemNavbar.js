@@ -187,7 +187,13 @@ const SystemNavbar = () => {
               height: 100%;
             `}
           >
-            Partnered with &nbsp;&nbsp;
+            <div
+              css={`
+                white-space: nowrap;
+              `}
+            >
+              Partnered with &nbsp;&nbsp;
+            </div>
             <BisectHosting
               showPointerCursor
               onClick={() => dispatch(openModal('BisectHosting'))}
