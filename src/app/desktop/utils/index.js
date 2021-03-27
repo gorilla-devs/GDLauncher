@@ -394,10 +394,6 @@ export const getJVMArguments112 = (
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
 
   args.push(mcJson.mainClass);
-  if (resolution) {
-    args.push(`--width ${resolution.width}`);
-    args.push(`--height ${resolution.height}`);
-  }
 
   const mcArgs = mcJson.minecraftArguments.split(' ');
   const argDiscovery = /\${*(.*)}/;
@@ -454,6 +450,11 @@ export const getJVMArguments112 = (
 
   args.push(...mcArgs);
 
+  if (resolution) {
+    args.push(`--width ${resolution.width}`);
+    args.push(`--height ${resolution.height}`);
+  }
+
   return args;
 };
 
@@ -483,11 +484,6 @@ export const getJVMArguments113 = (
   args.push(...jvmOptions);
 
   args.push(mcJson.mainClass);
-
-  if (resolution) {
-    args.push(`--width ${resolution.width}`);
-    args.push(`--height ${resolution.height}`);
-  }
 
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
 
@@ -563,6 +559,11 @@ export const getJVMArguments113 = (
         }
       }
     }
+  }
+
+  if (resolution) {
+    args.push(`--width ${resolution.width}`);
+    args.push(`--height ${resolution.height}`);
   }
 
   args = args.filter(arg => {
