@@ -175,7 +175,7 @@ const Overview = ({ instanceName, background, manifest }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
   const defaultJavaPath = useSelector(state => _getJavaPath(state));
-  // const defaultJavaPath = useSelector(state => state.settings.java.path);
+
   const [JavaMemorySwitch, setJavaMemorySwitch] = useState(
     config?.javaMemory !== undefined
   );
