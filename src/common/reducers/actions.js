@@ -2234,7 +2234,8 @@ export const startListener = () => {
 export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const javaPath = _getJavaPath(state);
+    const defaultJavaPath = _getJavaPath(state);
+
     const { userData } = state;
     const account = _getCurrentAccount(state);
     const librariesPath = _getLibrariesPath(state);
@@ -2247,8 +2248,11 @@ export function launchInstance(instanceName) {
       modloader,
       javaArgs,
       javaMemory,
+      customJavaPath,
       resolution: instanceResolution
     } = _getInstance(state)(instanceName);
+
+    const javaPath = customJavaPath || defaultJavaPath;
 
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
