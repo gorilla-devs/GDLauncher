@@ -166,6 +166,7 @@ const Cell = ({
                     return;
                   }
 
+                  let prev = 0;
                   await dispatch(
                     installMod(
                       mod?.id,
@@ -174,13 +175,18 @@ const Cell = ({
                       version,
                       true,
                       p => {
-                        ipcRenderer.invoke(
-                          'update-progress-bar',
-                          parseInt(p, 10) / 100
-                        );
+                        if (parseInt(p, 10) !== prev) {
+                          console.log('p', parseInt(p, 10));
+                          prev = parseInt(p, 10);
+                          ipcRenderer.invoke(
+                            'update-progress-bar',
+                            parseInt(p, 10) / 100
+                          );
+                        }
                       }
                     )
                   );
+                  ipcRenderer.invoke('update-progress-bar', 0);
                   setLoading(false);
                 }}
               >

@@ -1085,10 +1085,15 @@ export function downloadFabric(instanceName) {
       _getLibrariesPath(state)
     );
 
+    let prev = 0;
     const updatePercentage = downloaded => {
-      const progress = (downloaded * 100) / libraries.length;
-      dispatch(updateDownloadProgress(progress));
-      ipcRenderer.invoke('update-progress-bar', progress);
+      const percentage = (downloaded * 100) / libraries.length;
+      const progress = parseInt(percentage, 10);
+      if (progress !== prev) {
+        prev = progress;
+        dispatch(updateDownloadProgress(progress));
+        ipcRenderer.invoke('update-progress-bar', progress);
+      }
     };
 
     await downloadInstanceFiles(
@@ -1178,12 +1183,17 @@ export function downloadForge(instanceName) {
       }
 
       // Download installer jar and extract stuff
+      let prev = 0;
       await downloadFile(
         tempInstaller,
         `${baseUrl}/${modloader[2]}/forge-${modloader[2]}-${urlTerminal}`,
         p => {
-          dispatch(updateDownloadProgress(p));
-          ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
+          const progress = parseInt(p, 10) / 100;
+          if (progress !== prev) {
+            prev = progress;
+            dispatch(updateDownloadProgress(p));
+            ipcRenderer.invoke('update-progress-bar', progress);
+          }
         }
       );
 
@@ -1275,10 +1285,15 @@ export function downloadForge(instanceName) {
         _getLibrariesPath(state)
       );
 
+      let prev = 0;
       const updatePercentage = downloaded => {
-        const progress = (downloaded * 100) / libraries.length;
-        dispatch(updateDownloadProgress(progress));
-        ipcRenderer.invoke('update-progress-bar', progress);
+        const percentage = (downloaded * 100) / libraries.length;
+        const progress = parseInt(percentage, 10);
+        if (progress !== prev) {
+          prev = progress;
+          dispatch(updateDownloadProgress(progress));
+          ipcRenderer.invoke('update-progress-bar', progress);
+        }
       };
 
       await downloadInstanceFiles(
@@ -1469,11 +1484,16 @@ export function processManifest(instanceName) {
             const percentage =
               (modManifests.length * 100) / manifest.files.length - 1;
             if (!fileExists) {
+              let prev = 0;
               await downloadFile(destFile, modManifest.downloadUrl, () => {
-                ipcRenderer.invoke(
-                  'update-progress-bar',
-                  percentage > 0 ? percentage : 0
-                );
+                const progress = percentage;
+                if (progress !== prev) {
+                  prev = progress;
+                  ipcRenderer.invoke(
+                    'update-progress-bar',
+                    percentage > 0 ? percentage : 0
+                  );
+                }
               });
             }
 
@@ -1511,9 +1531,8 @@ export function processManifest(instanceName) {
       extraction.on('progress', ({ percent }) => {
         if (percent !== progress) {
           progress = percent;
-
-          ipcRenderer.invoke('update-progress-bar', percent);
           dispatch(updateDownloadProgress(percent));
+          ipcRenderer.invoke('update-progress-bar', percent);
         }
       });
       extraction.on('end', () => {
@@ -1659,11 +1678,18 @@ export function downloadInstance(instanceName) {
       _getLibrariesPath(state)
     );
 
+    let prev = 0;
     const updatePercentage = downloaded => {
-      const progress =
+      const percentage =
         (downloaded * 100) / (assets.length + libraries.length + 1);
-      dispatch(updateDownloadProgress(progress));
-      ipcRenderer.invoke('update-progress-bar', progress);
+
+      const progress = parseInt(percentage, 10);
+
+      if (progress !== prev) {
+        prev = progress;
+        dispatch(updateDownloadProgress(progress));
+        ipcRenderer.invoke('update-progress-bar', progress);
+      }
     };
 
     await downloadInstanceFiles(
