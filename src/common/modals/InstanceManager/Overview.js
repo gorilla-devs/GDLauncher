@@ -94,7 +94,7 @@ const JavaMemorySlider = styled(Slider)`
   margin: 30px 0 55px 0;
 `;
 
-const JavaArgumentsResetButton = styled(Button)`
+const JavaResetButton = styled(Button)`
   margin-left: 20px;
 `;
 
@@ -538,9 +538,9 @@ const Overview = ({ instanceName, background, manifest }) => {
                   debouncedArgumentsUpdate.callback(e.target.value);
                 }}
               />
-              <JavaArgumentsResetButton onClick={resetJavaArguments}>
+              <JavaResetButton onClick={resetJavaArguments}>
                 <FontAwesomeIcon icon={faUndo} />
-              </JavaArgumentsResetButton>
+              </JavaResetButton>
             </JavaManagerRow>
           )}
           <JavaManagerRow>
@@ -586,9 +586,9 @@ const Overview = ({ instanceName, background, manifest }) => {
               >
                 <FontAwesomeIcon icon={faFolder} />
               </Button>
-              <JavaArgumentsResetButton onClick={resetCustomJavaPath}>
+              <JavaResetButton onClick={resetCustomJavaPath}>
                 <FontAwesomeIcon icon={faUndo} />
-              </JavaArgumentsResetButton>
+              </JavaResetButton>
             </JavaManagerRow>
           )}
         </OverviewCard>
