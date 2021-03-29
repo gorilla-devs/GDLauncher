@@ -248,14 +248,6 @@ const Overview = ({ instanceName, background, manifest }) => {
     { maxWait: 700, leading: false }
   );
 
-  const debouncedJavaPathUpdate = useDebouncedCallback(
-    v => {
-      updateCustomJavaPath(v);
-    },
-    400,
-    { maxWait: 700, leading: false }
-  );
-
   const resetJavaArguments = () => {
     setJavaLocalArguments(DEFAULT_JAVA_ARGS);
     updateJavaArguments(DEFAULT_JAVA_ARGS);
@@ -568,7 +560,6 @@ const Overview = ({ instanceName, background, manifest }) => {
                 value={customJavaPath}
                 onChange={e => {
                   setCustomJavaPath(e.target.value);
-                  debouncedJavaPathUpdate.callback(e.target.value);
                 }}
               />
 
