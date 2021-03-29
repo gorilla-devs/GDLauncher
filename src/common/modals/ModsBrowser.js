@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useState } from 'react';
+import { ipcRenderer } from 'electron';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -170,7 +171,14 @@ const Cell = ({
                       mod?.id,
                       preferredFile?.id,
                       instanceName,
-                      version
+                      version,
+                      true,
+                      p => {
+                        ipcRenderer.invoke(
+                          'update-progress-bar',
+                          parseInt(p, 10) / 100
+                        );
+                      }
                     )
                   );
                   setLoading(false);
