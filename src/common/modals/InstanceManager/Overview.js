@@ -175,19 +175,9 @@ const Overview = ({ instanceName, background, manifest }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
   const defaultJavaPath = useSelector(state => _getJavaPath(state));
-
-  const [JavaMemorySwitch, setJavaMemorySwitch] = useState(
-    Boolean(config?.javaMemory)
-  );
-  const [JavaArgumentsSwitch, setJavaArgumentsSwitch] = useState(
-    Boolean(config?.javaArgs)
-  );
   const [javaLocalMemory, setJavaLocalMemory] = useState(config?.javaMemory);
   const [javaLocalArguments, setJavaLocalArguments] = useState(
     config?.javaArgs
-  );
-  const [customJavaPathSwitch, setCustomJavaPathSwitch] = useState(
-    Boolean(config?.customJavaPath)
   );
   const [customJavaPath, setCustomJavaPath] = useState(config?.customJavaPath);
   const [newName, setNewName] = useState(instanceName);
@@ -471,10 +461,8 @@ const Overview = ({ instanceName, background, manifest }) => {
           <JavaManagerRow>
             <div>Override Java Memory</div>
             <Switch
-              checked={JavaMemorySwitch}
+              checked={Boolean(config?.javaMemory)}
               onChange={v => {
-                setJavaMemorySwitch(v);
-
                 if (!v) {
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
@@ -488,7 +476,7 @@ const Overview = ({ instanceName, background, manifest }) => {
               }}
             />
           </JavaManagerRow>
-          {JavaMemorySwitch && (
+          {Boolean(config?.javaMemory) && (
             <div>
               <JavaMemorySlider
                 onAfterChange={updateJavaMemory}
@@ -505,10 +493,8 @@ const Overview = ({ instanceName, background, manifest }) => {
           <JavaManagerRow>
             <div>Override Java Arguments</div>
             <Switch
-              checked={JavaArgumentsSwitch}
+              checked={Boolean(config?.javaArgs)}
               onChange={v => {
-                setJavaArgumentsSwitch(v);
-
                 if (!v) {
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
@@ -521,7 +507,7 @@ const Overview = ({ instanceName, background, manifest }) => {
               }}
             />
           </JavaManagerRow>
-          {JavaArgumentsSwitch && (
+          {Boolean(config?.javaArgs) && (
             <JavaManagerRow>
               <Input
                 value={javaLocalArguments}
@@ -538,10 +524,8 @@ const Overview = ({ instanceName, background, manifest }) => {
           <JavaManagerRow>
             <div>Custom Java Path</div>
             <Switch
-              checked={customJavaPathSwitch}
+              checked={Boolean(config?.customJavaPath)}
               onChange={v => {
-                setCustomJavaPathSwitch(v);
-
                 if (!v) {
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
@@ -554,7 +538,7 @@ const Overview = ({ instanceName, background, manifest }) => {
               }}
             />
           </JavaManagerRow>
-          {customJavaPathSwitch && (
+          {Boolean(config?.customJavaPath) && (
             <JavaManagerRow>
               <Input value={customJavaPath} />
 
