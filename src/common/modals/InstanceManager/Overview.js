@@ -177,17 +177,17 @@ const Overview = ({ instanceName, background, manifest }) => {
   const defaultJavaPath = useSelector(state => _getJavaPath(state));
 
   const [JavaMemorySwitch, setJavaMemorySwitch] = useState(
-    config?.javaMemory !== undefined
+    Boolean(config?.javaMemory)
   );
   const [JavaArgumentsSwitch, setJavaArgumentsSwitch] = useState(
-    config?.javaArgs !== undefined
+    Boolean(config?.javaArgs)
   );
   const [javaLocalMemory, setJavaLocalMemory] = useState(config?.javaMemory);
   const [javaLocalArguments, setJavaLocalArguments] = useState(
     config?.javaArgs
   );
   const [customJavaPathSwitch, setCustomJavaPathSwitch] = useState(
-    config?.customJavaPath !== undefined
+    Boolean(config?.customJavaPath)
   );
   const [customJavaPath, setCustomJavaPath] = useState(config?.customJavaPath);
   const [newName, setNewName] = useState(instanceName);
@@ -556,12 +556,7 @@ const Overview = ({ instanceName, background, manifest }) => {
           </JavaManagerRow>
           {customJavaPathSwitch && (
             <JavaManagerRow>
-              <Input
-                value={customJavaPath}
-                onChange={e => {
-                  setCustomJavaPath(e.target.value);
-                }}
-              />
+              <Input value={customJavaPath} />
 
               <Button
                 color="primary"
