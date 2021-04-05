@@ -11,8 +11,7 @@ const fs = fss.promises;
 export const downloadInstanceFiles = async (
   arr,
   updatePercentage,
-  threads = 4,
-  InstancePath
+  threads = 4
 ) => {
   let downloaded = 0;
   await pMap(
@@ -30,14 +29,9 @@ export const downloadInstanceFiles = async (
           await new Promise(resolve => setTimeout(resolve, 5000));
         }
 
-        // for FTB you need to "build" the filPath, InstancePath is passed only for FTB packs
-        const FilePath = InstancePath
-          ? path.join(InstancePath, item.path, item.name)
-          : item.path;
-
         try {
           res = await downloadFileInstance(
-            FilePath,
+            item.path,
             item.url,
             item.sha1,
             item.legacyPath

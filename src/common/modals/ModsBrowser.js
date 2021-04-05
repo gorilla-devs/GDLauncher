@@ -300,9 +300,8 @@ const ModsListWrapper = ({
     <InfiniteLoader
       isItemLoaded={isItemLoaded}
       itemCount={itemCount !== 0 ? itemCount : 40}
-      // loadMoreItems={() => loadMoreItems()}
       loadMoreItems={() => loadMoreItems(searchQuery)}
-      // threshold={20}
+      threshold={20}
     >
       {({ onItemsRendered, ref }) => (
         <List

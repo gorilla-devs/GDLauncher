@@ -14,13 +14,18 @@ const getInstances = async instancesPath => {
         throw new Error(`Config for ${instance} could not be parsed`);
       }
 
+      // if the launcher has the modloader as an array, convert it to object
       if (Array.isArray(config.modloader)) {
-        const loaderType = config.modloader[0];
-        const mcVersion = config.modloader[1];
-        const loaderVersion = config.modloader[2];
-        const fileId = config.modloader[3];
-        const addonId = config.modloader[4];
-        const source = config.modloader[5];
+        // source is the source where the modpack comes from example: ftb
+        // loaderType is the modloader example: forge
+        const [
+          loaderType,
+          mcVersion,
+          loaderVersion,
+          fileId,
+          addonId,
+          source
+        ] = config.modloader;
 
         const patchedConfig = {
           ...config,

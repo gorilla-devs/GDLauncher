@@ -1436,9 +1436,9 @@ export function processFTBManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const { manifest } = _getCurrentDownloadItem(state);
-    // const concurrency = state.settings.concurrentDownloads;
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
+    let fileHashes = [];
 
     const { files } = manifest;
     const concurrency = state.settings.concurrentDownloads;
@@ -1449,12 +1449,24 @@ export function processFTBManifest(instanceName) {
       dispatch(updateDownloadProgress((downloaded * 100) / files.length));
     };
 
+    const mappedFiles = files.map(file => {
+      return {
+        ...file,
+        path: path.join(instancePath, file.path, file.name)
+      };
+    });
+
     dispatch(updateDownloadStatus(instanceName, 'Downloading FTB files...'));
-    await downloadInstanceFiles(
+    await downloadInstanceFiles(mappedFiles, updatePercentage);
+
+    await pMap(
       files,
-      updatePercentage,
-      undefined,
-      instancePath
+      async item => {
+        const filePath = path.join(instancePath, item.path, item.name);
+        const hash = await getFileMurmurHash2(filePath);
+        fileHashes = fileHashes.concat(hash);
+      },
+      { concurrency }
     );
 
     await pMap(
@@ -1475,7 +1487,8 @@ export function processFTBManifest(instanceName) {
               const filePath = path.join(instancePath, item.path, item.name);
 
               const hash = await getFileMurmurHash2(filePath);
-              const { data } = await getAddonsByFingerprint([hash]);
+
+              const { data } = await getAddonsByFingerprint(fileHashes);
 
               const exactMatch = (data.exactMatches || [])[0];
               const notMatch = (data.unmatchedFingerprints || [])[0];
@@ -1534,22 +1547,6 @@ export function processFTBManifest(instanceName) {
       })
     );
 
-    await new Promise(resolve => {
-      // Force premature unlock to let our listener catch mods from override
-      lockfile.unlock(
-        path.join(
-          _getInstancesPath(getState()),
-          instanceName,
-          'installing.lock'
-        ),
-        err => {
-          if (err) console.error(err);
-          resolve();
-        }
-      );
-    });
-
-    // await fse.remove(addonPathZip);
     await fse.remove(path.join(_getTempPath(state), instanceName));
   };
 }

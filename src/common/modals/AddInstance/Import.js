@@ -123,9 +123,9 @@ const Import = ({
 
     const loader = {};
 
-    if (isForge) loader.loaderType = FORGE;
+    if (isVanilla) loader.loaderType = VANILLA;
+    else if (isForge) loader.loaderType = FORGE;
     else if (isFabric) loader.loaderType = FABRIC;
-    else if (isVanilla) loader.loaderType = VANILLA;
 
     if (manifest.projectID) {
       loader.addonId = manifest.projectID;
