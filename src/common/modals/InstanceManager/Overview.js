@@ -238,6 +238,14 @@ const Overview = ({ instanceName, background, manifest }) => {
     { maxWait: 700, leading: false }
   );
 
+  const debouncedJavaPathUpdate = useDebouncedCallback(
+    v => {
+      updateCustomJavaPath(v);
+    },
+    400,
+    { maxWait: 700, leading: false }
+  );
+
   const resetJavaArguments = () => {
     setJavaLocalArguments(DEFAULT_JAVA_ARGS);
     updateJavaArguments(DEFAULT_JAVA_ARGS);
@@ -461,9 +469,10 @@ const Overview = ({ instanceName, background, manifest }) => {
           <JavaManagerRow>
             <div>Override Java Memory</div>
             <Switch
-              checked={Boolean(config?.javaMemory)}
+              checked={javaLocalMemory}
               onChange={v => {
                 if (!v) {
+                  setJavaLocalMemory(null);
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
                       omit(prev, ['javaMemory'])
@@ -476,7 +485,7 @@ const Overview = ({ instanceName, background, manifest }) => {
               }}
             />
           </JavaManagerRow>
-          {Boolean(config?.javaMemory) && (
+          {javaLocalMemory && (
             <div>
               <JavaMemorySlider
                 onAfterChange={updateJavaMemory}
@@ -493,9 +502,10 @@ const Overview = ({ instanceName, background, manifest }) => {
           <JavaManagerRow>
             <div>Override Java Arguments</div>
             <Switch
-              checked={Boolean(config?.javaArgs)}
+              checked={javaLocalArguments}
               onChange={v => {
                 if (!v) {
+                  setJavaLocalArguments(null);
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
                       omit(prev, ['javaArgs'])
@@ -507,7 +517,7 @@ const Overview = ({ instanceName, background, manifest }) => {
               }}
             />
           </JavaManagerRow>
-          {Boolean(config?.javaArgs) && (
+          {javaLocalArguments && (
             <JavaManagerRow>
               <Input
                 value={javaLocalArguments}
@@ -524,9 +534,10 @@ const Overview = ({ instanceName, background, manifest }) => {
           <JavaManagerRow>
             <div>Custom Java Path</div>
             <Switch
-              checked={Boolean(config?.customJavaPath)}
+              checked={customJavaPath}
               onChange={v => {
                 if (!v) {
+                  setCustomJavaPath(null);
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
                       omit(prev, ['customJavaPath'])
@@ -538,9 +549,15 @@ const Overview = ({ instanceName, background, manifest }) => {
               }}
             />
           </JavaManagerRow>
-          {Boolean(config?.customJavaPath) && (
+          {customJavaPath && (
             <JavaManagerRow>
-              <Input value={customJavaPath} />
+              <Input
+                value={customJavaPath}
+                onChange={e => {
+                  setCustomJavaPath(e.target.value);
+                  debouncedJavaPathUpdate.callback(e.target.value);
+                }}
+              />
 
               <Button
                 color="primary"
