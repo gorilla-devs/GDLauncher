@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useState } from 'react';
+import { ipcRenderer } from 'electron';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -165,14 +166,27 @@ const Cell = ({
                     return;
                   }
 
+                  let prev = 0;
                   await dispatch(
                     installMod(
                       mod?.id,
                       preferredFile?.id,
                       instanceName,
-                      version
+                      version,
+                      true,
+                      p => {
+                        if (parseInt(p, 10) !== prev) {
+                          console.log('p', parseInt(p, 10));
+                          prev = parseInt(p, 10);
+                          ipcRenderer.invoke(
+                            'update-progress-bar',
+                            parseInt(p, 10) / 100
+                          );
+                        }
+                      }
                     )
                   );
+                  ipcRenderer.invoke('update-progress-bar', 0);
                   setLoading(false);
                 }}
               >

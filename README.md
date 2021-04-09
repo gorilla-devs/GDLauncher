@@ -72,7 +72,6 @@ To download the latest version, you can either click [here](https://github.com/g
 - Import modpacks from other launchers
 - Keep track of the time you played each instance
 - Add instances to the download queue, they will automatically download one after the other
-- Manage your Minecraft skin directly from the launcher
 
 #### Some of the features we are still working on are:
 
@@ -80,6 +79,7 @@ To download the latest version, you can either click [here](https://github.com/g
 - Export instances to other launchers
 - Liteloader support
 - Optifine easy-installation support
+- Manage your Minecraft skin directly from the launcher
 - A lot more...
 
 ## 💾 Compilation
