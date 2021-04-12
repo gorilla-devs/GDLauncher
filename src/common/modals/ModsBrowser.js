@@ -6,6 +6,7 @@ import React, {
   forwardRef,
   useContext
 } from 'react';
+import { ipcRenderer } from 'electron';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import styled, { ThemeContext } from 'styled-components';
 import memoize from 'memoize-one';
@@ -258,14 +259,27 @@ const ModsListWrapper = ({
                     return;
                   }
 
+                  let prev = 0;
                   await dispatch(
                     installMod(
                       item?.id,
                       preferredFile?.id,
                       instanceName,
-                      gameVersion
+                      gameVersion,
+                      true,
+                      p => {
+                        if (parseInt(p, 10) !== prev) {
+                          console.log('p', parseInt(p, 10));
+                          prev = parseInt(p, 10);
+                          ipcRenderer.invoke(
+                            'update-progress-bar',
+                            parseInt(p, 10) / 100
+                          );
+                        }
+                      }
                     )
                   );
+                  ipcRenderer.invoke('update-progress-bar', 0);
                   setLoading(false);
                 }}
                 loading={loading}

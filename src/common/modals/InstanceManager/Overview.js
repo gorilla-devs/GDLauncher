@@ -6,10 +6,19 @@ import omit from 'lodash/omit';
 import { useDebouncedCallback } from 'use-debounce';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faUndo, faCog } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSave,
+  faUndo,
+  faCog,
+  faFolder
+} from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Switch, Slider, Select } from 'antd';
 import { ipcRenderer } from 'electron';
-import { _getInstancesPath, _getInstance } from '../../utils/selectors';
+import {
+  _getInstancesPath,
+  _getInstance,
+  _getJavaPath
+} from '../../utils/selectors';
 import instanceDefaultBackground from '../../assets/instance_default.png';
 import {
   DEFAULT_JAVA_ARGS,
@@ -86,7 +95,7 @@ const JavaMemorySlider = styled(Slider)`
   margin: 30px 0 55px 0;
 `;
 
-const JavaArgumentsResetButton = styled(Button)`
+const JavaResetButton = styled(Button)`
   margin-left: 20px;
 `;
 
@@ -166,16 +175,12 @@ const Card = memo(
 const Overview = ({ instanceName, background, manifest }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
-  const [JavaMemorySwitch, setJavaMemorySwitch] = useState(
-    config?.javaMemory !== undefined
-  );
-  const [JavaArgumentsSwitch, setJavaArgumentsSwitch] = useState(
-    config?.javaArgs !== undefined
-  );
+  const defaultJavaPath = useSelector(state => _getJavaPath(state));
   const [javaLocalMemory, setJavaLocalMemory] = useState(config?.javaMemory);
   const [javaLocalArguments, setJavaLocalArguments] = useState(
     config?.javaArgs
   );
+  const [customJavaPath, setCustomJavaPath] = useState(config?.customJavaPath);
   const [newName, setNewName] = useState(instanceName);
   const [screenResolution, setScreenResolution] = useState(null);
   const [height, setHeight] = useState(config?.resolution?.height);
@@ -208,6 +213,15 @@ const Overview = ({ instanceName, background, manifest }) => {
     );
   };
 
+  const updateCustomJavaPath = v => {
+    dispatch(
+      updateInstanceConfig(instanceName, prev => ({
+        ...prev,
+        customJavaPath: v
+      }))
+    );
+  };
+
   const updateGameResolution = (w, h) => {
     dispatch(
       updateInstanceConfig(instanceName, prev => ({
@@ -225,9 +239,22 @@ const Overview = ({ instanceName, background, manifest }) => {
     { maxWait: 700, leading: false }
   );
 
+  const debouncedJavaPathUpdate = useDebouncedCallback(
+    v => {
+      updateCustomJavaPath(v);
+    },
+    400,
+    { maxWait: 700, leading: false }
+  );
+
   const resetJavaArguments = () => {
     setJavaLocalArguments(DEFAULT_JAVA_ARGS);
     updateJavaArguments(DEFAULT_JAVA_ARGS);
+  };
+
+  const resetCustomJavaPath = () => {
+    setCustomJavaPath(defaultJavaPath);
+    updateCustomJavaPath(defaultJavaPath);
   };
 
   const renameInstance = () => {
@@ -443,11 +470,10 @@ const Overview = ({ instanceName, background, manifest }) => {
           <JavaManagerRow>
             <div>Override Java Memory</div>
             <Switch
-              checked={JavaMemorySwitch}
+              checked={javaLocalMemory}
               onChange={v => {
-                setJavaMemorySwitch(v);
-
                 if (!v) {
+                  setJavaLocalMemory(null);
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
                       omit(prev, ['javaMemory'])
@@ -460,7 +486,7 @@ const Overview = ({ instanceName, background, manifest }) => {
               }}
             />
           </JavaManagerRow>
-          {JavaMemorySwitch && (
+          {javaLocalMemory && (
             <div>
               <JavaMemorySlider
                 onAfterChange={updateJavaMemory}
@@ -477,11 +503,10 @@ const Overview = ({ instanceName, background, manifest }) => {
           <JavaManagerRow>
             <div>Override Java Arguments</div>
             <Switch
-              checked={JavaArgumentsSwitch}
+              checked={javaLocalArguments}
               onChange={v => {
-                setJavaArgumentsSwitch(v);
-
                 if (!v) {
+                  setJavaLocalArguments(null);
                   dispatch(
                     updateInstanceConfig(instanceName, prev =>
                       omit(prev, ['javaArgs'])
@@ -493,7 +518,7 @@ const Overview = ({ instanceName, background, manifest }) => {
               }}
             />
           </JavaManagerRow>
-          {JavaArgumentsSwitch && (
+          {javaLocalArguments && (
             <JavaManagerRow>
               <Input
                 value={javaLocalArguments}
@@ -502,9 +527,56 @@ const Overview = ({ instanceName, background, manifest }) => {
                   debouncedArgumentsUpdate.callback(e.target.value);
                 }}
               />
-              <JavaArgumentsResetButton onClick={resetJavaArguments}>
+              <JavaResetButton onClick={resetJavaArguments}>
                 <FontAwesomeIcon icon={faUndo} />
-              </JavaArgumentsResetButton>
+              </JavaResetButton>
+            </JavaManagerRow>
+          )}
+          <JavaManagerRow>
+            <div>Custom Java Path</div>
+            <Switch
+              checked={customJavaPath}
+              onChange={v => {
+                if (!v) {
+                  setCustomJavaPath(null);
+                  dispatch(
+                    updateInstanceConfig(instanceName, prev =>
+                      omit(prev, ['customJavaPath'])
+                    )
+                  );
+                } else if (v) {
+                  resetCustomJavaPath();
+                }
+              }}
+            />
+          </JavaManagerRow>
+          {customJavaPath && (
+            <JavaManagerRow>
+              <Input
+                value={customJavaPath}
+                onChange={e => {
+                  setCustomJavaPath(e.target.value);
+                  debouncedJavaPathUpdate.callback(e.target.value);
+                }}
+              />
+
+              <Button
+                color="primary"
+                onClick={async () => {
+                  const { filePaths, canceled } = await ipcRenderer.invoke(
+                    'openFileDialog',
+                    defaultJavaPath
+                  );
+                  if (!filePaths[0] || canceled) return;
+                  setCustomJavaPath(filePaths[0]);
+                  updateCustomJavaPath(filePaths[0]);
+                }}
+              >
+                <FontAwesomeIcon icon={faFolder} />
+              </Button>
+              <JavaResetButton onClick={resetCustomJavaPath}>
+                <FontAwesomeIcon icon={faUndo} />
+              </JavaResetButton>
             </JavaManagerRow>
           )}
         </OverviewCard>
