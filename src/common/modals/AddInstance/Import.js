@@ -121,10 +121,9 @@ const Import = ({
       return;
     }
 
-    const loader = {};
+    const loader = { loaderType: VANILLA };
 
-    if (isVanilla) loader.loaderType = VANILLA;
-    else if (isForge) loader.loaderType = FORGE;
+    if (isForge) loader.loaderType = FORGE;
     else if (isFabric) loader.loaderType = FABRIC;
 
     if (manifest.projectID) {

@@ -10,9 +10,6 @@ const getInstances = async instancesPath => {
         path.join(instancesPath, instance, 'config.json')
       );
       const config = await fse.readJSON(configPath);
-      if (!config.loader) {
-        throw new Error(`Config for ${instance} could not be parsed`);
-      }
 
       // if the launcher has the modloader as an array, convert it to object
       if (Array.isArray(config.modloader)) {
