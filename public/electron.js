@@ -420,7 +420,7 @@ ipcMain.handle(
 );
 
 ipcMain.handle('update-progress-bar', (event, p) => {
-  mainWindow.setProgressBar(p);
+  mainWindow.setProgressBar(p / 100);
 });
 
 ipcMain.handle('hide-window', () => {
