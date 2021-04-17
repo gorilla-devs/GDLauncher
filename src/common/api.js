@@ -201,11 +201,11 @@ export const getJavaManifest = () => {
   return axios.get(url);
 };
 
-export const getFabricJson = ([, version, loader]) => {
+export const getFabricJson = ({ mcVersion, loaderVersion }) => {
   return axios.get(
     `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
-      version
-    )}/${encodeURIComponent(loader)}/profile/json`
+      mcVersion
+    )}/${encodeURIComponent(loaderVersion)}/profile/json`
   );
 };
 

@@ -30,6 +30,7 @@ const Content = ({
 }) => {
   const [overrideNextStepOnClick, setOverrideNextStepOnClick] = useState(null);
   const [loading, setLoading] = useState(false);
+
   let pages = [
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
     <CurseForgeModpacks
