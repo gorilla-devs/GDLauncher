@@ -269,7 +269,6 @@ const ModsListWrapper = ({
                       true,
                       p => {
                         if (parseInt(p, 10) !== prev) {
-                          console.log('p', parseInt(p, 10));
                           prev = parseInt(p, 10);
                           ipcRenderer.invoke(
                             'update-progress-bar',
