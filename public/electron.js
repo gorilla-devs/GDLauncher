@@ -13,8 +13,6 @@ const {
 const path = require('path');
 const { spawn, exec } = require('child_process');
 const { autoUpdater } = require('electron-updater');
-const nsfw = require('nsfw');
-const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
@@ -23,6 +21,8 @@ const {
   default: { fromBase64: toBase64URL }
 } = require('base64url');
 const { URL } = require('url');
+const murmur = require('./native/murmur2.js');
+const nsfw = require('./native/nsfw.js');
 
 const fs = fss.promises;
 
@@ -198,6 +198,7 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
+      contextIsolation: false,
       enableRemoteModule: true,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
@@ -385,7 +386,9 @@ ipcMain.handle(
         show: false,
         parent: mainWindow,
         autoHideMenuBar: true,
-        'node-integration': false
+        webPreferences: {
+          nodeIntegration: false
+        }
       });
 
       oAuthWindow.webContents.session.clearStorageData();

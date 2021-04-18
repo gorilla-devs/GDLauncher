@@ -37,15 +37,12 @@
     "build": "cross-env-shell NODE_ENV=production APP_TYPE=electron CI=false craco build",
     "test": "craco test",
     "eject": "craco eject",
-    "build-electron:portable": "cross-env-shell NODE_ENV=production REACT_APP_RELEASE_TYPE=portable webpack --config ./scripts/electronWebpackConfig.js --color && npm run moveBuildEntryPoint",
-    "build-electron:setup": "cross-env-shell NODE_ENV=production REACT_APP_RELEASE_TYPE=setup webpack --config ./scripts/electronWebpackConfig.js --color && npm run moveBuildEntryPoint",
-    "build-electron:dev": "cross-env-shell NODE_ENV=development REACT_APP_RELEASE_TYPE=setup webpack --config ./scripts/electronWebpackConfig.js --color && npm run moveBuildEntryPoint",
-    "moveBuildEntryPoint": "node ./scripts/moveNativesToBuild.js",
+    "build-electron:portable": "cross-env-shell NODE_ENV=production REACT_APP_RELEASE_TYPE=portable webpack --config ./scripts/electronWebpackConfig.js --color",
+    "build-electron:setup": "cross-env-shell NODE_ENV=production REACT_APP_RELEASE_TYPE=setup webpack --config ./scripts/electronWebpackConfig.js --color",
+    "build-electron:dev": "cross-env-shell NODE_ENV=development REACT_APP_RELEASE_TYPE=setup webpack --config ./scripts/electronWebpackConfig.js --color",
     "lint": "eslint .",
     "dev": "npm run build-electron:dev && cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none \"npm run start-electron\"",
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web npm run start",
-    "postinstall": "npm run rebuild",
-    "rebuild": "node ./scripts/buildNativeDeps.js",
     "deploy": "node ./scripts/createDeploy.js",
     "release:setup": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=setup \"npm run build\" && npm run build-electron:setup && npm run deploy setup",
     "release:portable": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=portable \"npm run build\" && npm run build-electron:portable && npm run deploy portable",
@@ -78,7 +75,7 @@
     ]
   },
   "engines": {
-    "node": ">=14.14.0"
+    "node": ">=14.16.0"
   },
   "cpu": [
     "x64"
@@ -126,10 +123,8 @@
     "concurrently": "^5.3.0",
     "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
-    "electron": "^9.4.4",
-    "electron-build-env": "^0.2.0",
+    "electron": "^12.0.1",
     "electron-builder": "^22.9.1",
-    "electron-rebuild": "^2.3.4",
     "eslint": "^7.17.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^7.1.0",
@@ -145,7 +140,6 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^4.3.6",
     "native-ext-loader": "^2.3.0",
-    "neon-cli": "^0.6.0",
     "prettier": "^2.2.1",
     "react-scripts": "4.0.1",
     "rimraf": "^3.0.2",
@@ -181,10 +175,8 @@
     "lodash": "^4.17.20",
     "make-dir": "^3.1.0",
     "memoize-one": "^5.1.1",
-    "murmur2-calculator": "https://github.com/gorilla-devs/murmur2-calculator",
     "node-7z": "^2.1.2",
     "node-machine-id": "^1.1.12",
-    "nsfw": "^2.1.0",
     "p-map": "^4.0.0",
     "polished": "^4.0.5",
     "ps-tree": "^1.2.0",
