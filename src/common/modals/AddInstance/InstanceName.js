@@ -88,14 +88,17 @@ const InstanceName = ({
     }
   }, [modpack]);
 
-  const wait = s => {
+  const wait = t => {
     return new Promise(resolve => {
-      setTimeout(() => resolve(), s * 1000);
+      setTimeout(() => resolve(), t);
     });
   };
 
   const createInstance = async localInstanceName => {
     if (!version || !localInstanceName) return;
+
+    const initTimestamp = Date.now();
+
     const isVanilla = version?.loaderType === VANILLA;
     const isFabric = version?.loaderType === FABRIC;
     const isForge = version?.loaderType === FORGE;
@@ -267,7 +270,6 @@ const InstanceName = ({
           mcVersion: version?.mcVersion
         })
       );
-      await wait(2);
     } else if (isFabric) {
       dispatch(
         addToQueue(localInstanceName, {
@@ -276,7 +278,6 @@ const InstanceName = ({
           loaderVersion: version?.loaderVersion
         })
       );
-      await wait(2);
     } else if (isForge) {
       dispatch(
         addToQueue(localInstanceName, {
@@ -285,8 +286,12 @@ const InstanceName = ({
           loaderVersion: version?.loaderVersion
         })
       );
-      await wait(2);
     }
+
+    if (Date.now() - initTimestamp < 2000) {
+      await wait(2000 - (Date.now() - initTimestamp));
+    }
+
     dispatch(closeModal());
   };
   return (
