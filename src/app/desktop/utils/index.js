@@ -219,7 +219,7 @@ export const getFilteredVersions = (
         label: k,
         children: v.sort(sortByForgeVersionDesc).map(child => ({
           value: child,
-          label: child.split('-')[1]
+          label: child
         }))
       }))
     },

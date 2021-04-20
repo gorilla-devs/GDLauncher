@@ -8,8 +8,8 @@ export const sortByDate = (a, b) => {
 
 export function sortByForgeVersionDesc(a, b) {
   if (typeof a === 'string' && typeof b === 'string') {
-    const versionA = a.split('-')[1].split('.');
-    const versionB = b.split('-')[1].split('.');
+    const versionA = a.split('.');
+    const versionB = b.split('.');
 
     for (let i = 0; i < versionA.length; i += 1) {
       const verNumA = Number(versionA[i]) || 0;

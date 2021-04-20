@@ -324,6 +324,7 @@ export function updateDownloadProgress(percentage) {
       instanceName: currentDownload,
       percentage: Number(percentage).toFixed(0)
     });
+    ipcRenderer.invoke('update-progress-bar', percentage);
   };
 }
 
@@ -1097,7 +1098,6 @@ export function downloadFabric(instanceName) {
       if (progress !== prev) {
         prev = progress;
         dispatch(updateDownloadProgress(progress));
-        ipcRenderer.invoke('update-progress-bar', progress);
       }
     };
 
@@ -1200,7 +1200,6 @@ export function downloadForge(instanceName) {
           if (progress !== prev) {
             prev = progress;
             dispatch(updateDownloadProgress(p));
-            ipcRenderer.invoke('update-progress-bar', progress);
           }
         }
       );
@@ -1300,7 +1299,6 @@ export function downloadForge(instanceName) {
         if (progress !== prev) {
           prev = progress;
           dispatch(updateDownloadProgress(progress));
-          ipcRenderer.invoke('update-progress-bar', progress);
         }
       };
 
@@ -1605,24 +1603,14 @@ export function processForgeManifest(instanceName) {
               modManifest.fileName
             );
             const fileExists = await fse.pathExists(destFile);
+            if (!fileExists) {
+              await downloadFile(destFile, modManifest.downloadUrl);
+            }
             modManifests = modManifests.concat(
               normalizeModData(modManifest, item.projectID, addon.name)
             );
             const percentage =
               (modManifests.length * 100) / manifest.files.length - 1;
-            if (!fileExists) {
-              let prev = 0;
-              await downloadFile(destFile, modManifest.downloadUrl, () => {
-                const progress = percentage;
-                if (progress !== prev) {
-                  prev = progress;
-                  ipcRenderer.invoke(
-                    'update-progress-bar',
-                    percentage > 0 ? percentage : 0
-                  );
-                }
-              });
-            }
 
             dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
             ok = true;
@@ -1659,7 +1647,6 @@ export function processForgeManifest(instanceName) {
         if (percent !== progress) {
           progress = percent;
           dispatch(updateDownloadProgress(percent));
-          ipcRenderer.invoke('update-progress-bar', percent);
         }
       });
       extraction.on('end', () => {
@@ -1817,7 +1804,6 @@ export function downloadInstance(instanceName) {
       if (progress !== prev) {
         prev = progress;
         dispatch(updateDownloadProgress(progress));
-        ipcRenderer.invoke('update-progress-bar', progress);
       }
     };
 
@@ -1854,7 +1840,7 @@ export function downloadInstance(instanceName) {
     else if (manifest && loader?.source === CURSEFORGE)
       await dispatch(processForgeManifest(instanceName));
 
-    // if(manifest)
+    dispatch(updateDownloadProgress(0));
 
     // Be aware that from this line the installer lock might be unlocked!
 
