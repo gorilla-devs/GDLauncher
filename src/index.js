@@ -31,6 +31,12 @@ const { store, persistor } = configureStore();
 
 window.__store = store;
 
+window.addEventListener('mouseup', e => {
+  if (e.button === 3 || e.button === 4 || e.button === 1) {
+    e.preventDefault();
+  }
+});
+
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>

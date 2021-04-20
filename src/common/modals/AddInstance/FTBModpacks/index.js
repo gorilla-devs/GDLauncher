@@ -80,8 +80,6 @@ const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
     }
   };
 
-  console.log(modpacks);
-
   return (
     <Container>
       <HeaderContainer>
@@ -163,11 +161,6 @@ export default React.memo(FTBModpacks);
 const Container = styled.div`
   width: 100%;
   height: 100%;
-`;
-
-const StyledSelect = styled(Select)`
-  width: 170px;
-  margin-right: 20px;
 `;
 
 const StyledInput = styled(Input.Search)``;
