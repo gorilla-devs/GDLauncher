@@ -199,6 +199,7 @@ const ModOverview = ({
                     width: 30px;
                     height: 30px;
                     display: flex;
+                    align-items: center;
                     justify-content: center;
                   `}
                   type="primary"

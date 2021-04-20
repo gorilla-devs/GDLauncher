@@ -32,6 +32,12 @@ import {
   getPatchedInstanceType
 } from '../../app/desktop/utils';
 
+const ItemName = styled.div`
+  color: ${props => props.theme.palette.text.third};
+  transition: color 0.1s ease-in-out;
+  cursor: pointer;
+`;
+
 const RowContainer = styled.div`
   display: flex;
   position: relative;
@@ -44,6 +50,12 @@ const RowContainer = styled.div`
   ${props =>
     props.isInstalled &&
     `border: 2px solid ${props.theme.palette.colors.green};`}
+
+  &:hover {
+    ${ItemName} {
+      color: ${props => props.theme.palette.text.primary};
+    }
+  }
 `;
 
 const RowInnerContainer = styled.div`
@@ -144,7 +156,7 @@ const ModsListWrapper = ({
     const item = items[index];
 
     const isInstalled = installedMods.find(v => v.projectID === item?.id);
-    const primaryImage = item.attachments.find(v => v.isDefault);
+    const primaryImage = item?.attachments.find(v => v.isDefault);
 
     if (!item) {
       return (
@@ -163,8 +175,8 @@ const ModsListWrapper = ({
         isInstalled={isInstalled}
         style={{
           ...style,
-          top: style.top + 15,
-          height: style.height - 15,
+          top: style.top + 10,
+          height: style.height - 10,
           position: 'absolute',
           margin: '15px 10px',
           transition: 'height 0.2s ease-in-out'
@@ -175,15 +187,7 @@ const ModsListWrapper = ({
 
         <RowInnerContainer>
           <RowContainerImg img={primaryImage?.thumbnailUrl} />
-          <div
-            css={`
-              color: ${props => props.theme.palette.text.third};
-              &:hover {
-                color: ${props => props.theme.palette.text.primary};
-              }
-              transition: color 0.1s ease-in-out;
-              cursor: pointer;
-            `}
+          <ItemName
             onClick={() => {
               dispatch(
                 openModal('ModOverview', {
@@ -197,7 +201,7 @@ const ModsListWrapper = ({
             }}
           >
             {item.name}
-          </div>
+          </ItemName>
         </RowInnerContainer>
         {!isInstalled ? (
           error || (
@@ -324,9 +328,8 @@ const ModsListWrapper = ({
           isNextPageLoading={isNextPageLoading}
           items={items}
           itemData={itemData}
-          itemCount={items.length}
+          itemCount={itemCount !== 0 ? itemCount : 40}
           itemSize={80}
-          useIsScrolling
           onItemsRendered={onItemsRendered}
           innerElementType={innerElementType}
         >
@@ -392,6 +395,11 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
       setAreModsLoading(true);
     }
 
+    if (reset && (mods.length !== 0 || hasNextPage)) {
+      setMods([]);
+      setHasNextPage(false);
+    }
+
     const isReset = reset !== undefined ? reset : false;
     let data = null;
     try {
@@ -415,8 +423,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
     const newMods = reset ? data : mods.concat(data);
     if (lastRequest === reqObj) {
       setAreModsLoading(false);
-      setMods(newMods || []);
       setHasNextPage((newMods || []).length % itemsNumber === 0);
+      setMods(newMods || []);
     }
   };
 
@@ -552,7 +560,7 @@ const ModsLoader = memo(
       <ContentLoader
         style={{
           width: width - 10,
-          height: '62px',
+          height: '80px',
           paddingTop: 8,
           position: 'absolute',
           top
@@ -562,7 +570,7 @@ const ModsLoader = memo(
         backgroundColor={ContextTheme.palette.grey[800]}
         title={false}
       >
-        <rect x="0" y="0" width="100%" height="65px" />
+        <rect x="0" y="0" width="100%" height="70px" />
       </ContentLoader>
     );
   }
