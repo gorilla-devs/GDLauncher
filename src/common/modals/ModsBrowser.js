@@ -72,7 +72,6 @@ const RowInnerContainer = styled.div`
 const RowContainerImg = styled.div`
   width: 38px;
   height: 38px;
-  background: ${props => `url('${props.img}')`};
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
