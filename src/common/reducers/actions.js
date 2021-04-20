@@ -159,7 +159,8 @@ export function initManifests() {
       // and add to it all correct versions
       mc.versions.forEach(v => {
         if (forge[v.id]) {
-          forgeVersions[v.id] = forge[v.id];
+          // Monkeypatch manifest since forge changed the format
+          forgeVersions[v.id] = forge[v.id].map(forgeV => `${v.id}-${forgeV}`);
         }
       });
 
