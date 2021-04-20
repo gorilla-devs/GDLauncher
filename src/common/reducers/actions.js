@@ -113,6 +113,7 @@ import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
 import { openModal } from './modals/actions';
+import forgePatcher from '../utils/forgePatcher';
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -160,7 +161,9 @@ export function initManifests() {
       mc.versions.forEach(v => {
         if (forge[v.id]) {
           // Monkeypatch manifest since forge changed the format
-          forgeVersions[v.id] = forge[v.id].map(forgeV => `${v.id}-${forgeV}`);
+          forgeVersions[v.id] = forge[v.id].map(forgeV =>
+            forgePatcher(forgeV, v.id)
+          );
         }
       });
 
@@ -1163,7 +1166,6 @@ export function downloadForge(instanceName) {
       const { data: hashes } = await axios.get(
         `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${loader?.loaderVersion}/meta.json`
       );
-      console.log(hashes);
       const fileMd5 = await getFileHash(expectedInstaller, 'md5');
       let expectedMd5 = hashes?.classifiers?.installer?.jar;
       if (pre132) {
@@ -1459,7 +1461,7 @@ export function processFTBManifest(instanceName) {
     const { manifest } = _getCurrentDownloadItem(state);
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
-    let fileHashes = [];
+    const fileHashes = {};
 
     const { files } = manifest;
     const concurrency = state.settings.concurrentDownloads;
@@ -1470,28 +1472,44 @@ export function processFTBManifest(instanceName) {
       dispatch(updateDownloadProgress((downloaded * 100) / files.length));
     };
 
-    const mappedFiles = files.map(file => {
+    let mappedFiles = files.map(async item => {
       return {
-        ...file,
-        path: path.join(instancePath, file.path, file.name)
+        ...item,
+        path: path.join(instancePath, item.path, item.name)
       };
     });
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading FTB files...'));
     await downloadInstanceFiles(mappedFiles, updatePercentage);
 
-    await pMap(
+    mappedFiles = await pMap(
       files,
       async item => {
         const filePath = path.join(instancePath, item.path, item.name);
         const hash = await getFileMurmurHash2(filePath);
-        fileHashes = fileHashes.concat(hash);
+
+        return {
+          ...item,
+          path: path.join(instancePath, item.path, item.name),
+          murmur2: hash
+        };
       },
-      { concurrency }
+      { concurrency: 10 }
     );
 
+    dispatch(updateDownloadStatus(instanceName, 'Finalizing FTB files...'));
+
+    const { data } = await getAddonsByFingerprint(
+      Object.values(mappedFiles).map(v => v.murmur2)
+    );
+    const { exactMatches } = data || {};
+
+    for (const item of exactMatches) {
+      fileHashes[item.file.packageFingerprint] = item;
+    }
+
     await pMap(
-      files,
+      mappedFiles,
       async item => {
         let ok = false;
         let tries = 0;
@@ -1505,37 +1523,27 @@ export function processFTBManifest(instanceName) {
             const ext = item.name.split(/\.(?=[^.]+$)/)[1];
             const isJarFile = ext === 'jar';
             if (isJarFile) {
-              const filePath = path.join(instancePath, item.path, item.name);
-
-              const hash = await getFileMurmurHash2(filePath);
-
-              const { data } = await getAddonsByFingerprint(fileHashes);
-
-              const exactMatch = (data.exactMatches || [])[0];
-              const notMatch = (data.unmatchedFingerprints || [])[0];
+              const exactMatch = fileHashes[item.murmur2];
 
               if (exactMatch) {
-                let addon = null;
+                const { projectId } = exactMatch.file;
                 try {
-                  let mod = {};
-
-                  addon = (await getAddon(exactMatch.file.projectId)).data;
-                  mod = normalizeModData(
+                  const { data: addon } = await getAddon(projectId);
+                  const mod = normalizeModData(
                     exactMatch.file,
-                    exactMatch.file.projectId,
+                    projectId,
                     addon.name
                   );
                   mod.fileName = path.basename(item.name);
-
                   modManifests = modManifests.concat(mod);
                 } catch {
                   modManifests = modManifests.concat({
                     fileName: path.basename(item.name),
                     displayName: path.basename(item.name),
-                    packageFingerprint: hash
+                    packageFingerprint: item.murmur2
                   });
                 }
-              } else if (notMatch) {
+              } else {
                 modManifests = modManifests.concat({
                   fileName: item.name,
                   displayName: item.name,
