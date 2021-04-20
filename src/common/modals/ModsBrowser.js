@@ -60,7 +60,6 @@ const RowInnerContainer = styled.div`
 const RowContainerImg = styled.div`
   width: 38px;
   height: 38px;
-  background: ${props => `url('${props.img}')`};
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -174,7 +173,9 @@ const ModsListWrapper = ({
         {isInstalled && <ModsIconBg />}
 
         <RowInnerContainer>
-          <RowContainerImg img={primaryImage?.thumbnailUrl} />
+          <RowContainerImg
+            style={{ background: `url('${primaryImage?.thumbnailUrl}')` }}
+          />
           <div
             css={`
               color: ${props => props.theme.palette.text.third};
