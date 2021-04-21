@@ -126,6 +126,9 @@ if (releaseChannelExists) {
   if (releaseId === 1) {
     allowUnstableReleases = true;
   }
+} else if (!releaseChannelExists && app.getVersion().includes('beta')) {
+  fss.writeFileSync(path.join(app.getPath('userData'), 'rChannel'), 1);
+  allowUnstableReleases = true;
 }
 
 if (
@@ -451,7 +454,12 @@ ipcMain.handle('show-window', () => {
   }
 });
 
-ipcMain.handle('quit-app', () => {
+ipcMain.handle('quit-app', async () => {
+  if (watcher) {
+    log.log('Stopping listener');
+    await watcher.stop();
+    watcher = null;
+  }
   mainWindow.close();
   mainWindow = null;
 });
@@ -511,8 +519,13 @@ ipcMain.handle('openFileDialog', (e, filters) => {
   });
 });
 
-ipcMain.handle('appRestart', () => {
+ipcMain.handle('appRestart', async () => {
   log.log('Restarting app');
+  if (watcher) {
+    log.log('Stopping listener');
+    await watcher.stop();
+    watcher = null;
+  }
   app.relaunch();
   mainWindow.close();
 });
@@ -573,7 +586,8 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
-  autoUpdater.allowDowngrade = !allowUnstableReleases;
+  autoUpdater.allowDowngrade =
+    !allowUnstableReleases && app.getVersion().includes('beta');
   autoUpdater.allowPrerelease = allowUnstableReleases;
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',

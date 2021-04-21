@@ -2821,46 +2821,44 @@ export const initLatestMods = instanceName => {
   };
 };
 
-export const getAppLatestVersion = () => {
-  return async () => {
-    const { data: latestReleases } = await axios.get(
-      'https://api.github.com/repos/gorilla-devs/GDLauncher/releases'
+export const getAppLatestVersion = async () => {
+  const { data: latestReleases } = await axios.get(
+    'https://api.github.com/repos/gorilla-devs/GDLauncher/releases?per_page=10'
+  );
+
+  const latestPrerelease = latestReleases.find(v => v.prerelease);
+  const latestStablerelease = latestReleases.find(v => !v.prerelease);
+
+  const appData = parse(await ipcRenderer.invoke('getAppdataPath'));
+  let releaseChannel = 0;
+
+  try {
+    const rChannel = await fs.readFile(
+      path.join(appData, 'gdlauncher_next', 'rChannel')
     );
+    releaseChannel = rChannel.toString();
+  } catch {
+    // swallow error
+  }
 
-    const latestPrerelease = latestReleases.find(v => v.prerelease);
-    const latestStablerelease = latestReleases.find(v => !v.prerelease);
+  const v = await ipcRenderer.invoke('getAppVersion');
 
-    const appData = parse(await ipcRenderer.invoke('getAppdataPath'));
-    let releaseChannel = 0;
+  const installedVersion = parse(v);
+  const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
 
-    try {
-      const rChannel = await fs.readFile(
-        path.join(appData, 'gdlauncher_next', 'rChannel')
-      );
-      releaseChannel = rChannel.toString();
-    } catch {
-      // swallow error
-    }
+  // If we're on beta but the release channel is stable, return latest stable to force an update
+  if (v.includes('beta') && releaseChannel === 0) {
+    return latestStablerelease;
+  }
 
-    const v = await ipcRenderer.invoke('getAppVersion');
+  if (!isAppUpdated(latestStablerelease)) {
+    return latestStablerelease;
+  }
+  if (!isAppUpdated(latestPrerelease) && releaseChannel !== 0) {
+    return latestPrerelease;
+  }
 
-    const installedVersion = parse(v);
-    const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
-
-    // If we're on beta but the release channel is stable, return latest stable to force an update
-    if (v.includes('beta') && releaseChannel === 0) {
-      return latestStablerelease;
-    }
-
-    if (!isAppUpdated(latestStablerelease)) {
-      return latestStablerelease;
-    }
-    if (!isAppUpdated(latestPrerelease) && releaseChannel !== 0) {
-      return latestPrerelease;
-    }
-
-    return false;
-  };
+  return false;
 };
 
 export const checkForPortableUpdates = () => {
@@ -2878,6 +2876,7 @@ export const checkForPortableUpdates = () => {
       const { data: latestManifest } = await axios.get(
         `${baseAssetUrl}/${process.platform}_latest.json`
       );
+      console.log('inside', latestVersion);
       // Cleanup all files that are not required for the update
       await makeDir(tempFolder);
 
