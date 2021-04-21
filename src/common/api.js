@@ -12,7 +12,8 @@ import {
   MICROSOFT_LIVE_LOGIN_URL,
   MICROSOFT_XBOX_LOGIN_URL,
   MICROSOFT_XSTS_AUTH_URL,
-  MINECRAFT_SERVICES_URL
+  MINECRAFT_SERVICES_URL,
+  FTB_API_URL
 } from './utils/constants';
 import { sortByDate } from './utils';
 
@@ -29,14 +30,15 @@ export const msExchangeCodeForAccessToken = (
     qs.stringify({
       grant_type: 'authorization_code',
       client_id: clientId,
-      scope: 'xboxlive.signin xboxlive.offline_access',
+      scope: 'offline_access xboxlive.signin xboxlive.offline_access',
       redirect_uri: redirectUrl,
       code,
       code_verifier: codeVerifier
     }),
     {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Skip-Origin': 'skip'
       }
     }
   );
@@ -95,13 +97,14 @@ export const msOAuthRefresh = (clientId, refreshToken) => {
     `${MICROSOFT_LIVE_LOGIN_URL}/oauth20_token.srf`,
     qs.stringify({
       grant_type: 'refresh_token',
-      scope: 'xboxlive.signin xboxlive.offline_access',
+      scope: 'offline_access xboxlive.signin xboxlive.offline_access',
       client_id: clientId,
       refresh_token: refreshToken
     }),
     {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Skip-Origin': 'skip'
       }
     }
   );
@@ -198,11 +201,11 @@ export const getJavaManifest = () => {
   return axios.get(url);
 };
 
-export const getFabricJson = ([, version, loader]) => {
+export const getFabricJson = ({ mcVersion, loaderVersion }) => {
   return axios.get(
     `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
-      version
-    )}/${encodeURIComponent(loader)}/profile/json`
+      mcVersion
+    )}/${encodeURIComponent(loaderVersion)}/profile/json`
   );
 };
 
@@ -273,4 +276,39 @@ export const getSearch = (
     gameVersion: gameVersion || ''
   };
   return axios.get(url, { params });
+};
+
+export const getFTBModpackData = async modpackId => {
+  try {
+    const url = `${FTB_API_URL}/modpack/${modpackId}`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getFTBModpackVersionData = async (modpackId, versionId) => {
+  try {
+    const url = `${FTB_API_URL}/modpack/${modpackId}/${versionId}`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getFTBChangelog = (modpackId, versionId) => {
+  const url = `https://api.modpacks.ch/public/modpack/${modpackId}/${versionId}/changelog`;
+  return axios.get(url);
+};
+
+export const getFTBMostPlayed = async () => {
+  const url = `${FTB_API_URL}/modpack/popular/plays/1000`;
+  return axios.get(url);
+};
+
+export const getFTBSearch = async searchText => {
+  const url = `${FTB_API_URL}/modpack/search/1000?term=${searchText}`;
+  return axios.get(url);
 };

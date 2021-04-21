@@ -13,8 +13,6 @@ const {
 const path = require('path');
 const { spawn, exec } = require('child_process');
 const { autoUpdater } = require('electron-updater');
-const nsfw = require('nsfw');
-const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
@@ -23,6 +21,8 @@ const {
   default: { fromBase64: toBase64URL }
 } = require('base64url');
 const { URL } = require('url');
+const murmur = require('./native/murmur2.js');
+const nsfw = require('./native/nsfw.js');
 
 const fs = fss.promises;
 
@@ -126,6 +126,9 @@ if (releaseChannelExists) {
   if (releaseId === 1) {
     allowUnstableReleases = true;
   }
+} else if (!releaseChannelExists && app.getVersion().includes('beta')) {
+  fss.writeFileSync(path.join(app.getPath('userData'), 'rChannel'), 1);
+  allowUnstableReleases = true;
 }
 
 if (
@@ -198,6 +201,8 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
     }
@@ -235,6 +240,21 @@ function createWindow() {
         cancel: false,
         responseHeaders: details.responseHeaders
       });
+    }
+  );
+
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    (details, callback) => {
+      // Use a header to skip sending Origin on request.
+      const {
+        'X-Skip-Origin': xSkipOrigin,
+        Origin: _origin,
+        ...requestHeaders
+      } = details.requestHeaders;
+      if (xSkipOrigin !== 'skip') {
+        requestHeaders.Origin = 'https://gdevs.io';
+      }
+      callback({ cancel: false, requestHeaders });
     }
   );
 
@@ -337,7 +357,7 @@ ipcMain.handle(
       msAuthorizeUrl.searchParams.set('response_type', 'code');
       msAuthorizeUrl.searchParams.set(
         'scope',
-        'xboxlive.signin xboxlive.offline_access'
+        'offline_access xboxlive.signin xboxlive.offline_access'
       );
       msAuthorizeUrl.searchParams.set(
         'cobrandid',
@@ -369,10 +389,22 @@ ipcMain.handle(
         show: false,
         parent: mainWindow,
         autoHideMenuBar: true,
-        'node-integration': false
+        webPreferences: {
+          nodeIntegration: false
+        }
       });
 
       oAuthWindow.webContents.session.clearStorageData();
+
+      // Remove Origin
+      oAuthWindow.webContents.session.webRequest.onBeforeSendHeaders(
+        (details, callback) => {
+          const {
+            requestHeaders: { Origin, ...requestHeaders }
+          } = details;
+          callback({ cancel: false, requestHeaders });
+        }
+      );
 
       oAuthWindow.on('close', () =>
         reject(new Error('User closed login window'))
@@ -394,7 +426,7 @@ ipcMain.handle(
 );
 
 ipcMain.handle('update-progress-bar', (event, p) => {
-  mainWindow.setProgressBar(p);
+  mainWindow.setProgressBar(p / 100);
 });
 
 ipcMain.handle('hide-window', () => {
@@ -422,7 +454,12 @@ ipcMain.handle('show-window', () => {
   }
 });
 
-ipcMain.handle('quit-app', () => {
+ipcMain.handle('quit-app', async () => {
+  if (watcher) {
+    log.log('Stopping listener');
+    await watcher.stop();
+    watcher = null;
+  }
   mainWindow.close();
   mainWindow = null;
 });
@@ -461,7 +498,7 @@ ipcMain.handle('getIsWindowMaximized', () => {
 });
 
 ipcMain.handle('openFolder', (e, folderPath) => {
-  shell.openItem(folderPath);
+  shell.openPath(folderPath);
 });
 
 ipcMain.handle('open-devtools', () => {
@@ -482,8 +519,13 @@ ipcMain.handle('openFileDialog', (e, filters) => {
   });
 });
 
-ipcMain.handle('appRestart', () => {
+ipcMain.handle('appRestart', async () => {
   log.log('Restarting app');
+  if (watcher) {
+    log.log('Stopping listener');
+    await watcher.stop();
+    watcher = null;
+  }
   app.relaunch();
   mainWindow.close();
 });
@@ -544,7 +586,8 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
-  autoUpdater.allowDowngrade = !allowUnstableReleases;
+  autoUpdater.allowDowngrade =
+    !allowUnstableReleases && app.getVersion().includes('beta');
   autoUpdater.allowPrerelease = allowUnstableReleases;
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',

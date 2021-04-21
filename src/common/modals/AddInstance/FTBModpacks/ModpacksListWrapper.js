@@ -6,7 +6,28 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import ContentLoader from 'react-content-loader';
 import { transparentize } from 'polished';
 import { openModal } from '../../../reducers/modals/actions';
-import { FORGE } from '../../../utils/constants';
+import { FTB } from '../../../utils/constants';
+import { getFTBModpackVersionData } from '../../../api';
+
+const selectFTBModpack = async (modpack, setVersion, setModpack, setStep) => {
+  const addonId = modpack.id;
+  const fileId = modpack.versions[modpack.versions.length - 1].id;
+
+  const data = await getFTBModpackVersionData(modpack.id, fileId);
+
+  const forgeModloader = data.targets.find(v => v.type === 'modloader');
+  const mcVersion = data.targets.find(v => v.type === 'game').version;
+
+  setVersion({
+    loaderType: forgeModloader?.type,
+    mcVersion,
+    addonId,
+    fileId,
+    source: FTB
+  });
+  setModpack(modpack);
+  setStep(1);
+};
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -26,11 +47,11 @@ const ModpacksListWrapper = ({
 
   setStep,
 
+  setModpack,
+
   setVersion,
   // Callback function responsible for loading the next page of items.
   loadNextPage,
-
-  setModpack,
 
   infiniteLoaderRef
 }) => {
@@ -58,7 +79,11 @@ const ModpacksListWrapper = ({
       );
     }
 
-    const primaryImage = modpack.attachments.find(v => v.isDefault);
+    const primaryImage = modpack.art.reduce((prev, curr) => {
+      if (!prev || curr.size < prev.size) return curr;
+      return prev;
+    });
+
     return (
       <div
         // eslint-disable-next-line
@@ -66,14 +91,13 @@ const ModpacksListWrapper = ({
           ...style,
           top: style.top + 8,
           height: style.height - 8,
-          background: `url('${primaryImage?.thumbnailUrl}')`,
+          background: `url('${primaryImage.url}')`,
           position: 'absolute',
           width: '100%',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           margin: '10px 0',
-          transition: 'height 0.2s ease-in-out',
           borderRadius: 4
         }}
         key={modpack.id}
@@ -84,13 +108,7 @@ const ModpacksListWrapper = ({
         <ModpackHover>
           <div
             onClick={() => {
-              setVersion([
-                FORGE,
-                modpack.id,
-                modpack.latestFiles[modpack.latestFiles.length - 1].id
-              ]);
-              setModpack(modpack);
-              setStep(1);
+              selectFTBModpack(modpack, setVersion, setModpack, setStep);
             }}
           >
             Download Latest
@@ -100,9 +118,10 @@ const ModpacksListWrapper = ({
               dispatch(
                 openModal('ModpackDescription', {
                   modpack,
+                  setStep,
                   setVersion,
                   setModpack,
-                  setStep
+                  type: 'ftb'
                 })
               );
             }}
@@ -130,14 +149,14 @@ const ModpacksListWrapper = ({
   return (
     <InfiniteLoader
       isItemLoaded={isItemLoaded}
-      itemCount={itemCount !== 0 ? itemCount : 40}
+      itemCount={itemCount !== 0 ? itemCount : 20}
       loadMoreItems={() => loadMoreItems()}
     >
       {({ onItemsRendered }) => (
         <List
           height={height}
           width={width}
-          itemCount={itemCount !== 0 ? itemCount : 40}
+          itemCount={itemCount !== 0 ? itemCount : 20}
           itemSize={100}
           onItemsRendered={onItemsRendered}
           innerElementType={innerElementType}

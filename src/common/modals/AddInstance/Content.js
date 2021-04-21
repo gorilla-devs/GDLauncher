@@ -8,12 +8,14 @@ import {
   faArchive
 } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Input, Spin, Radio } from 'antd';
-import TwitchModpacks from './TwitchModpacks';
+import { Spin, Radio } from 'antd';
+import CurseForgeModpacks from './CurseForgeModpacks';
+import FTBModpacks from './FTBModpacks';
 import Import from './Import';
 import NewInstance from './NewInstance';
 import minecraftIcon from '../../assets/minecraftIcon.png';
-import twitchIcon from '../../assets/twitchIcon.webp';
+import curseForgeIcon from '../../assets/curseforgeIcon.webp';
+import ftbIcon from '../../assets/ftbIcon.webp';
 
 const Content = ({
   in: inProp,
@@ -28,9 +30,10 @@ const Content = ({
 }) => {
   const [overrideNextStepOnClick, setOverrideNextStepOnClick] = useState(null);
   const [loading, setLoading] = useState(false);
+
   let pages = [
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
-    <TwitchModpacks
+    <CurseForgeModpacks
       setVersion={setVersion}
       setStep={setStep}
       setModpack={setModpack}
@@ -41,6 +44,11 @@ const Content = ({
       importZipPath={importZipPath}
       setImportZipPath={setImportZipPath}
       setOverrideNextStepOnClick={setOverrideNextStepOnClick}
+    />,
+    <FTBModpacks
+      setVersion={setVersion}
+      setStep={setStep}
+      setModpack={setModpack}
     />
   ];
 
@@ -86,18 +94,28 @@ const Content = ({
                   </Radio.Button>
                   <Radio.Button value={1}>
                     <img
-                      src={twitchIcon}
-                      width="18px"
+                      src={curseForgeIcon}
+                      width="20px"
                       css={`
                         margin-right: 4px;
                         cursor: pointer;
                       `}
                     />
-                    Twitch
+                    CurseForge
                   </Radio.Button>
                   {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button>
-                  <Radio.Button value={4} disabled>Technic</Radio.Button>
-                  <Radio.Button value={4} disabled>FTB</Radio.Button> */}
+                  <Radio.Button value={4} disabled>Technic</Radio.Button> */}
+                  <Radio.Button value={3}>
+                    <img
+                      src={ftbIcon}
+                      width="20px"
+                      css={`
+                        margin-right: 4px;
+                        cursor: pointer;
+                      `}
+                    />
+                    FTB
+                  </Radio.Button>
                   <Radio.Button value={2}>
                     <FontAwesomeIcon
                       icon={faArchive}

@@ -28,6 +28,7 @@ export const downloadInstanceFiles = async (
         if (counter !== 1) {
           await new Promise(resolve => setTimeout(resolve, 5000));
         }
+
         try {
           res = await downloadFileInstance(
             item.path,

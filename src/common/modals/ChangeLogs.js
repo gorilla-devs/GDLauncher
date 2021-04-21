@@ -33,8 +33,14 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Added confirmation modal to delete shared data.</li>
-              <li>Implemented microsoft login.</li>
+              <li>Added FTB support.</li>
+              <li>Added Microsoft accounts support.</li>
+              <li>Added confirmation modal when deleting all shared data.</li>
+              <li>Added a per-instance java path setting.</li>
+              <li>
+                Added a progress state in the taskbar icon when downloading an
+                instance.
+              </li>
             </ul>
           </div>
         </Section>
@@ -48,9 +54,12 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Security fixes.</li>
-              <li>Fixed copy/paste on MacOS.</li>
-              <li>Fixed a crash.</li>
+              <li>Fixed copy/paste on macOS.</li>
+              <li>Fixed crash when browsing curseforge modpacks.</li>
+              <li>Fixed duplicated news.</li>
+              <li>Fixed avatar images sometimes now showing correctly.</li>
+              <li>Fixed auto updates on portable-win.</li>
+              <li>Fixed crash when adding a new instance.</li>
             </ul>
           </div>
         </Section>

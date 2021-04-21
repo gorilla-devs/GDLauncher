@@ -10,8 +10,35 @@ const getInstances = async instancesPath => {
         path.join(instancesPath, instance, 'config.json')
       );
       const config = await fse.readJSON(configPath);
-      if (!config.modloader) {
-        throw new Error(`Config for ${instance} could not be parsed`);
+
+      // if the launcher has the modloader as an array, convert it to object
+      if (Array.isArray(config.modloader)) {
+        // source is the source where the modpack comes from example: ftb
+        // loaderType is the modloader example: forge
+        const [
+          loaderType,
+          mcVersion,
+          loaderVersion,
+          fileId,
+          addonId,
+          source
+        ] = config.modloader;
+
+        const patchedConfig = {
+          ...config,
+          loader: {
+            loaderType,
+            mcVersion,
+            ...(loaderVersion && { loaderVersion }),
+            ...(fileId && { fileId }),
+            ...(addonId && { addonId }),
+            ...(source && { source })
+          }
+        };
+
+        await fse.writeFile(configPath, JSON.stringify(patchedConfig));
+
+        return { ...patchedConfig, name: instance };
       }
 
       return {

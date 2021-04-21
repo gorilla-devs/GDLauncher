@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import path from 'path';
 import fse from 'fs-extra';
@@ -22,7 +22,8 @@ import {
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, VANILLA, FORGE } from '../../utils/constants';
+import { FABRIC, VANILLA, FORGE, FTB, CURSEFORGE } from '../../utils/constants';
+import { getFTBModpackVersionData } from '../../api';
 
 const InstanceName = ({
   in: inProp,
@@ -36,11 +37,11 @@ const InstanceName = ({
 }) => {
   const mcName = (
     modpack?.name.replace(/\W/g, ' ') ||
-    (version && `Minecraft ${version[0]}`) ||
+    (version && `Minecraft ${version?.loaderType}`) ||
     ''
   ).trim();
   const originalMcName =
-    modpack?.name || (version && `Minecraft ${version[0]}`);
+    modpack?.name || (version && `Minecraft ${version?.loaderType}`);
   const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const tempPath = useSelector(_getTempPath);
@@ -72,24 +73,40 @@ const InstanceName = ({
     }
   }, [instanceName, step]);
 
-  const thumbnailURL = modpack?.attachments?.find(v => v.isDefault)
-    ?.thumbnailUrl;
-  const imageURL = modpack?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
+  const imageURL = useMemo(() => {
+    if (!modpack) return null;
+    // Curseforge
+    if (!modpack.synopsis) {
+      return modpack?.attachments?.find(v => v.isDefault).thumbnailUrl;
+    } else {
+      // FTB
+      const image = modpack?.art?.reduce((prev, curr) => {
+        if (!prev || curr.size < prev.size) return curr;
+        return prev;
+      });
+      return image.url;
+    }
+  }, [modpack]);
 
-  const wait = s => {
+  const wait = t => {
     return new Promise(resolve => {
-      setTimeout(() => resolve(), s * 1000);
+      setTimeout(() => resolve(), t);
     });
   };
 
   const createInstance = async localInstanceName => {
     if (!version || !localInstanceName) return;
-    const isVanilla = version[0] === VANILLA;
-    const isFabric = version[0] === FABRIC;
-    const isForge = version[0] === FORGE;
-    const isTwitchModpack = Boolean(modpack?.attachments);
+
+    const initTimestamp = Date.now();
+
+    const isVanilla = version?.loaderType === VANILLA;
+    const isFabric = version?.loaderType === FABRIC;
+    const isForge = version?.loaderType === FORGE;
+    const isCurseForgeModpack = Boolean(modpack?.attachments);
+    const isFTBModpack = Boolean(modpack?.art);
     let manifest;
-    if (isTwitchModpack) {
+
+    if (isCurseForgeModpack) {
       if (importZipPath) {
         manifest = await importAddonZip(
           importZipPath,
@@ -99,8 +116,8 @@ const InstanceName = ({
         );
       } else {
         manifest = await downloadAddonZip(
-          version[1],
-          version[2],
+          version?.addonId,
+          version?.fileId,
           path.join(instancesPath, localInstanceName),
           path.join(tempPath, localInstanceName)
         );
@@ -113,59 +130,103 @@ const InstanceName = ({
         ),
         imageURL
       );
-      if (version[0] === FORGE) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          convertcurseForgeToCanonical(
+      if (version?.loaderType === FORGE) {
+        const loader = {
+          loaderType: version?.loaderType,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: convertcurseForgeToCanonical(
             manifest.minecraft.modLoaders.find(v => v.primary).id,
             manifest.minecraft.version,
             forgeManifest
           ),
-          version[1],
-          version[2]
-        ];
+          fileId: version?.fileId,
+          addonId: version?.addonId,
+          source: version?.source
+        };
+
         dispatch(
           addToQueue(
             localInstanceName,
-            modloader,
+            loader,
             manifest,
             `background${path.extname(imageURL)}`
           )
         );
-      } else if (version[0] === FABRIC) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          manifest.minecraft.modLoaders[0].yarn,
-          manifest.minecraft.modLoaders[0].loader,
-          version[1],
-          version[2]
-        ];
+      } else if (version?.loaderType === FABRIC) {
+        const loader = {
+          loaderType: version?.loaderType,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: manifest.minecraft.modLoaders[0].yarn,
+          fileId: manifest.minecraft.modLoaders[0].loader,
+          addonId: version?.addonId,
+          source: version?.source
+        };
         dispatch(
           addToQueue(
             localInstanceName,
-            modloader,
+            loader,
             manifest,
             `background${path.extname(imageURL)}`
           )
         );
-      } else if (version[0] === VANILLA) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          version[1],
-          version[2]
-        ];
+      } else if (version?.loaderType === VANILLA) {
+        const loader = {
+          loaderType: version?.loaderType,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: version?.loaderVersion,
+          fileId: version?.fileId
+        };
+
         dispatch(
           addToQueue(
             localInstanceName,
-            modloader,
+            loader,
             manifest,
             `background${path.extname(imageURL)}`
           )
         );
       }
+    } else if (isFTBModpack) {
+      // Fetch mc version
+
+      const data = await getFTBModpackVersionData(
+        version?.addonId,
+        version?.fileId
+      );
+
+      const forgeModloader = data.targets.find(v => v.type === 'modloader');
+      const mcVersion = data.targets.find(v => v.type === 'game').version;
+
+      const loader = {
+        loaderType: forgeModloader?.name,
+        mcVersion,
+        loaderVersion: convertcurseForgeToCanonical(
+          forgeModloader?.version,
+          mcVersion,
+          forgeManifest
+        ),
+        fileId: version?.fileId,
+        addonId: version?.addonId,
+        source: FTB
+      };
+
+      await downloadFile(
+        path.join(
+          instancesPath,
+          localInstanceName,
+          `background${path.extname(imageURL)}`
+        ),
+        imageURL
+      );
+
+      dispatch(
+        addToQueue(
+          localInstanceName,
+          loader,
+          data,
+          `background${path.extname(imageURL)}`
+        )
+      );
     } else if (importZipPath) {
       manifest = await importAddonZip(
         importZipPath,
@@ -174,45 +235,69 @@ const InstanceName = ({
         tempPath
       );
 
-      if (version[0] === FORGE) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          convertcurseForgeToCanonical(
+      if (version?.loaderType === FORGE) {
+        const loader = {
+          loaderType: version?.loaderType,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: convertcurseForgeToCanonical(
             manifest.minecraft.modLoaders.find(v => v.primary).id,
             manifest.minecraft.version,
             forgeManifest
           )
-        ];
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
-      } else if (version[0] === FABRIC) {
-        const modloader = [
-          version[0],
-          manifest.minecraft.version,
-          manifest.minecraft.modLoaders[0].yarn,
-          manifest.minecraft.modLoaders[0].loader
-        ];
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
-      } else if (version[0] === VANILLA) {
-        const modloader = [version[0], manifest.minecraft.version];
-        dispatch(addToQueue(localInstanceName, modloader, manifest));
+        };
+
+        dispatch(addToQueue(localInstanceName, loader, manifest));
+      } else if (version?.loaderType === FABRIC) {
+        const loader = {
+          loaderType: version?.loaderType,
+          mcVersion: manifest.minecraft.version,
+          loaderVersion: manifest.minecraft.modLoaders[0].yarn,
+          fileId: manifest.minecraft.modLoaders[0].loader
+        };
+
+        dispatch(addToQueue(localInstanceName, loader, manifest));
+      } else if (version?.loaderType === VANILLA) {
+        const loader = {
+          loaderType: version?.loaderType,
+          mcVersion: manifest.minecraft.version
+        };
+        dispatch(addToQueue(localInstanceName, loader, manifest));
       }
     } else if (isVanilla) {
-      dispatch(addToQueue(localInstanceName, [version[0], version[2]]));
-      await wait(2);
+      dispatch(
+        addToQueue(localInstanceName, {
+          loaderType: version?.loaderType,
+          mcVersion: version?.mcVersion
+        })
+      );
     } else if (isFabric) {
-      dispatch(addToQueue(localInstanceName, [FABRIC, version[2], version[3]]));
-      await wait(2);
+      dispatch(
+        addToQueue(localInstanceName, {
+          loaderType: FABRIC,
+          mcVersion: version?.mcVersion,
+          loaderVersion: version?.loaderVersion
+        })
+      );
     } else if (isForge) {
-      dispatch(addToQueue(localInstanceName, version));
-      await wait(2);
+      dispatch(
+        addToQueue(localInstanceName, {
+          loaderType: version?.loaderType,
+          mcVersion: version?.mcVersion,
+          loaderVersion: version?.loaderVersion
+        })
+      );
     }
+
+    if (Date.now() - initTimestamp < 2000) {
+      await wait(2000 - (Date.now() - initTimestamp));
+    }
+
     dispatch(closeModal());
   };
   return (
     <Transition in={inProp} timeout={200}>
       {state => (
-        <Animation state={state} bg={thumbnailURL || bgImage}>
+        <Animation state={state} bg={imageURL || bgImage}>
           <Transition in={clicked} timeout={200}>
             {state1 => (
               <>
@@ -374,11 +459,9 @@ const ModpackNameKeyframe = props => keyframes`
   from {
     transform: scale(1) translateY(0);
   }
-
   35% {
     transform: scale(1) translateY(65%);
   }
-
   to {
     transform: scale(${props.name.length < 17 ? 2 : 1}) translateY(65%);
   }

@@ -51,32 +51,34 @@ export default function ThirdStep({
   page
 }) {
   const [isCompleted, setIsCompleted] = useState(false);
-  const { modloader, mods } = instanceConfig;
-  const mcVersion = modloader[1];
-  const modloaderName = modloader[0];
+  const { loader, mods } = instanceConfig;
+  const mcVersion = loader?.mcVersion;
+  const modloaderName = loader?.loaderType;
   const dispatch = useDispatch();
   const tempExport = path.join(tempPath, instanceName);
 
   // Construct manifest contents
   const createManifest = async (modsArray = mods) => {
-    let loader = {};
+    let loaderObj = {};
     switch (modloaderName) {
       case FORGE:
-        loader = {
-          id: `${modloaderName}-${modloader[2].slice(mcVersion.length + 1)}`,
+        loaderObj = {
+          id: `${modloaderName}-${loader?.loaderVersion.slice(
+            mcVersion.length + 1
+          )}`,
           primary: true
         };
         break;
       case FABRIC:
-        loader = {
+        loaderObj = {
           id: modloaderName,
-          yarn: modloader[2],
-          loader: modloader[3],
+          yarn: loader?.loaderVersion,
+          loader: loader?.fileId,
           primary: true
         };
         break;
       case VANILLA:
-        loader = {
+        loaderObj = {
           id: modloaderName,
           primary: true
         };
@@ -90,7 +92,7 @@ export default function ThirdStep({
     return {
       minecraft: {
         version: mcVersion,
-        modLoaders: [loader]
+        modLoaders: [loaderObj]
       },
       manifestType: 'minecraftModpack',
       overrides: 'overrides',
@@ -98,8 +100,8 @@ export default function ThirdStep({
       version: packVersion,
       author: packAuthor,
       projectID:
-        modloaderName === 'forge' && modloader.length > 3
-          ? parseInt(modloader[3], 10)
+        modloaderName === 'forge' && loader.length > 3
+          ? parseInt(loader?.fileId, 10)
           : undefined,
       name: packZipName,
       files: modsArray

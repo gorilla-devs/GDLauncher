@@ -164,7 +164,7 @@ const ModOverview = ({
                   </div>
                   <div>
                     <label>MC version: </label>
-                    {addon?.gameVersionLatestFiles[0].gameVersion}
+                    {addon?.gameVersionLatestFiles[0]?.gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
@@ -220,8 +220,9 @@ const ModOverview = ({
                   font-weight: 700;
                 `}
               >
-                The installed version of this mod has been removed from twitch,
-                so you will only be able to get it as part of legacy modpacks.
+                The installed version of this mod has been removed from
+                CurseForge, so you will only be able to get it as part of legacy
+                modpacks.
               </div>
             )}
           <StyledSelect
