@@ -13,7 +13,7 @@ import {
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
 
-const Modpack = ({ modpackId, instanceName, manifest, fileId }) => {
+const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const [files, setFiles] = useState([]);
   const [versionName, setVersionName] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -55,7 +55,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileId }) => {
 
       setVersionName(
         `${ftbModpack.name} - ${
-          ftbModpack.versions.find(modpack => modpack.id === fileId).name
+          ftbModpack.versions.find(modpack => modpack.id === fileID).name
         }`
       );
 
@@ -86,6 +86,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileId }) => {
 
   useEffect(() => {
     initData();
+    console.log('IDDDDD', modpackId);
   }, []);
 
   const getReleaseType = id => {

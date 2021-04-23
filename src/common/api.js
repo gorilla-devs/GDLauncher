@@ -211,8 +211,8 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
 
 // FORGE ADDONS
 
-export const getAddon = addonID => {
-  const url = `${FORGESVC_URL}/addon/${addonID}`;
+export const getAddon = projectID => {
+  const url = `${FORGESVC_URL}/addon/${projectID}`;
   return axios.get(url);
 };
 
@@ -221,21 +221,21 @@ export const getMultipleAddons = async addons => {
   return axios.post(url, addons);
 };
 
-export const getAddonFiles = addonID => {
-  const url = `${FORGESVC_URL}/addon/${addonID}/files`;
+export const getAddonFiles = projectID => {
+  const url = `${FORGESVC_URL}/addon/${projectID}/files`;
   return axios.get(url).then(res => ({
     ...res,
     data: res.data.sort(sortByDate)
   }));
 };
 
-export const getAddonDescription = addonID => {
-  const url = `${FORGESVC_URL}/addon/${addonID}/description`;
+export const getAddonDescription = projectID => {
+  const url = `${FORGESVC_URL}/addon/${projectID}/description`;
   return axios.get(url);
 };
 
-export const getAddonFile = (addonID, fileID) => {
-  const url = `${FORGESVC_URL}/addon/${addonID}/file/${fileID}`;
+export const getAddonFile = (projectID, fileID) => {
+  const url = `${FORGESVC_URL}/addon/${projectID}/file/${fileID}`;
   return axios.get(url);
 };
 
@@ -244,8 +244,8 @@ export const getAddonsByFingerprint = fingerprints => {
   return axios.post(url, fingerprints);
 };
 
-export const getAddonFileChangelog = (addonID, fileID) => {
-  const url = `${FORGESVC_URL}/addon/${addonID}/file/${fileID}/changelog`;
+export const getAddonFileChangelog = (projectID, fileID) => {
+  const url = `${FORGESVC_URL}/addon/${projectID}/file/${fileID}/changelog`;
   return axios.get(url);
 };
 

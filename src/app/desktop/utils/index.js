@@ -718,8 +718,8 @@ export const importAddonZip = async (
   return manifest;
 };
 
-export const downloadAddonZip = async (id, fileId, instancePath, tempPath) => {
-  const { data } = await getAddonFile(id, fileId);
+export const downloadAddonZip = async (id, fileID, instancePath, tempPath) => {
+  const { data } = await getAddonFile(id, fileID);
   const instanceManifest = path.join(instancePath, 'manifest.json');
   const zipFile = path.join(tempPath, 'addon.zip');
   await downloadFile(zipFile, data.downloadUrl);
@@ -773,8 +773,6 @@ export const normalizeModData = (data, projectID, modName) => {
     temp.projectID = projectID;
     temp.fileID = data.id;
     delete temp.id;
-    delete temp.projectId;
-    delete temp.fileId;
   }
   return temp;
 };

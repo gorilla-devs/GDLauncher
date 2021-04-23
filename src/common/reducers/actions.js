@@ -1867,7 +1867,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
     if (instance.loader.source === CURSEFORGE) {
-      const { data: addon } = await getAddon(instance.loader?.addonID);
+      const { data: addon } = await getAddon(instance.loader?.projectID);
 
       const manifest = await fse.readJson(
         path.join(instancePath, 'manifest.json')
@@ -1887,7 +1887,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
         })
       );
 
-      const modsProjectIDs = (manifest?.files || []).map(v => v?.projectID);
+      const modsprojectIds = (manifest?.files || []).map(v => v?.projectID);
 
       dispatch(
         updateInstanceConfig(instanceName, prev =>
@@ -1895,7 +1895,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
             {
               ...prev,
               mods: prev.mods.filter(
-                v => !modsProjectIDs.includes(v?.projectID)
+                v => !modsprojectIds.includes(v?.projectID)
               )
             },
             ['overrides']
@@ -1904,7 +1904,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
       );
 
       await Promise.all(
-        modsProjectIDs.map(async projectID => {
+        modsprojectIds.map(async projectID => {
           const modFound = instance.mods?.find(v => v?.projectID === projectID);
           if (modFound?.fileName) {
             try {
@@ -1924,7 +1924,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
       const imageURL = addon?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
 
       const newManifest = await downloadAddonZip(
-        instance.loader?.addonID,
+        instance.loader?.projectID,
         newModpackData.id,
         path.join(_getInstancesPath(state), instanceName),
         path.join(tempPath, instanceName)
@@ -1947,8 +1947,8 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           newManifest.minecraft.version,
           state.app.forgeManifest
         ),
-        fileId: instance.loader?.fileId,
-        addonID: instance.loader?.addonID,
+        fileID: instance.loader?.fileID,
+        projectID: instance.loader?.projectID,
         source: instance.loader?.source
       };
 
@@ -1973,7 +1973,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
       );
 
       const newModpack = await getFTBModpackVersionData(
-        instance.loader?.addonID,
+        instance.loader?.projectID,
         newModpackData.id
       );
 
@@ -1986,8 +1986,8 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           newModpack.targets[1].version,
           state.app.forgeManifest
         ),
-        fileId: newModpack?.id,
-        addonID: instance.loader?.addonID,
+        fileID: newModpack?.id,
+        projectID: instance.loader?.projectID,
         source: instance.loader?.source
       };
 
@@ -2061,10 +2061,10 @@ export const startListener = () => {
             if (exactMatch) {
               let addon = null;
               try {
-                addon = (await getAddon(exactMatch.file.projectId)).data;
+                addon = (await getAddon(exactMatch.file.projectID)).data;
                 mod = normalizeModData(
                   exactMatch.file,
-                  exactMatch.file.projectId,
+                  exactMatch.file.projectID,
                   addon.name
                 );
                 mod.fileName = path.basename(fileName);
@@ -2764,14 +2764,14 @@ export function installMod(
           // type 6: include
 
           if (dep.type === 3) {
-            if (instance.mods.some(x => x.projectID === dep.addonID)) return;
-            const depList = await getAddonFiles(dep.addonID);
+            if (instance.mods.some(x => x.projectID === dep.projectID)) return;
+            const depList = await getAddonFiles(dep.projectID);
             const depData = depList.data.find(v =>
               v.gameVersion.includes(gameVersion)
             );
             await dispatch(
               installMod(
-                dep.addonID,
+                dep.projectID,
                 depData.id,
                 instanceName,
                 gameVersion,

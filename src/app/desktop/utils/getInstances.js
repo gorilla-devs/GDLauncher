@@ -20,7 +20,7 @@ const getInstances = async instancesPath => {
           mcVersion,
           loaderVersion,
           fileId,
-          addonID,
+          addonId,
           source
         ] = config.modloader;
 
@@ -30,11 +30,31 @@ const getInstances = async instancesPath => {
             loaderType,
             mcVersion,
             ...(loaderVersion && { loaderVersion }),
-            ...(fileId && { fileId }),
-            ...(addonID && { addonID }),
+            ...(fileId && { fileID: fileId }),
+            ...(addonId && { projectID: addonId }),
             ...(source && { source })
           }
         };
+
+        await fse.writeFile(configPath, JSON.stringify(patchedConfig));
+
+        return { ...patchedConfig, name: instance };
+      }
+
+      if (config.loader?.fileId || config.loader?.addonId) {
+        const { fileId, addonId } = config.loader;
+
+        const patchedConfig = {
+          ...config,
+          loader: {
+            ...config.loader,
+            ...(fileId && { fileID: fileId }),
+            ...(addonId && { projectID: addonId })
+          }
+        };
+
+        delete patchedConfig.loader.fileId;
+        delete patchedConfig.loader.addonId;
 
         await fse.writeFile(configPath, JSON.stringify(patchedConfig));
 

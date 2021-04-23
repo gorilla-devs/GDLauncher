@@ -222,6 +222,8 @@ const InstanceManager = ({ instanceName }) => {
     }
   }, [instance?.mods]);
 
+
+
   return (
     <Modal
       css={`
@@ -259,7 +261,7 @@ const InstanceManager = ({ instanceName }) => {
                   instance?.loader?.loaderType !== FORGE &&
                   instance?.loader?.loaderType !== FABRIC) ||
                 (tab.name === menuEntries.modpack.name &&
-                  !instance?.loader?.fileId)
+                  !instance?.loader?.fileID)
               ) {
                 return null;
               }
@@ -278,8 +280,8 @@ const InstanceManager = ({ instanceName }) => {
         <Content>
           <ContentComponent
             instanceName={instanceName}
-            modpackId={instance?.loader?.addonID}
-            fileId={instance?.loader?.fileId}
+            modpackId={instance?.loader?.projectID}
+            fileID={instance?.loader?.fileID}
             background={background}
             manifest={manifest}
           />
