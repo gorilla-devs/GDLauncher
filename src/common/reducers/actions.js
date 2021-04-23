@@ -1986,7 +1986,6 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           newModpack.targets[1].version,
           state.app.forgeManifest
         ),
-        // loaderVersion: newModpack.targets[0].version,
         fileId: newModpack?.id,
         addonID: instance.loader?.addonID,
         source: instance.loader?.source
