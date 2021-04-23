@@ -1131,8 +1131,7 @@ export function downloadForge(instanceName) {
     const sevenZipPath = await get7zPath();
     const pre152 = lte(coerce(loader?.mcVersion), coerce('1.5.2'));
     const pre132 = lte(coerce(loader?.mcVersion), coerce('1.3.2'));
-    const baseUrl =
-      'https://files.minecraftforge.net/maven/net/minecraftforge/forge';
+    const baseUrl = 'https://maven.minecraftforge.net/net/minecraftforge/forge';
     const tempInstaller = path.join(
       _getTempPath(state),
       `${loader?.loaderVersion}.jar`
@@ -1165,7 +1164,7 @@ export function downloadForge(instanceName) {
         await fs.access(forgeJsonPath);
       }
       const { data: hashes } = await axios.get(
-        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${loader?.loaderVersion}/meta.json`
+        `https://files.minecraftforge.net/net/minecraftforge/forge/${loader?.loaderVersion}/meta.json`
       );
       const fileMd5 = await getFileHash(expectedInstaller, 'md5');
       let expectedMd5 = hashes?.classifiers?.installer?.jar;
