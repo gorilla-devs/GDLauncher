@@ -187,7 +187,7 @@ export const getMcManifest = () => {
 };
 
 export const getForgeManifest = () => {
-  const url = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.json?timestamp=${new Date().getTime()}`;
+  const url = `https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.json?timestamp=${new Date().getTime()}`;
   return axios.get(url);
 };
 

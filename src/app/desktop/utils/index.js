@@ -111,7 +111,7 @@ export const librariesMapper = (libraries, librariesPath) => {
           let { url } = lib.downloads.artifact;
           // Handle special case for forge universal where the url is "".
           if (lib.downloads.artifact.url === '') {
-            url = `https://files.minecraftforge.net/maven/${mavenToArray(
+            url = `https://files.minecraftforge.net/${mavenToArray(
               lib.name
             ).join('/')}`;
           }
