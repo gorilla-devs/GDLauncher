@@ -86,7 +86,6 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
 
   useEffect(() => {
     initData();
-    console.log('IDDDDD', modpackId);
   }, []);
 
   const getReleaseType = id => {

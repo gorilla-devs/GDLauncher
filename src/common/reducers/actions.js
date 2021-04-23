@@ -1991,8 +1991,6 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
         source: instance.loader?.source
       };
 
-      console.log('UPDATE', loader);
-
       dispatch(
         addToQueue(
           instanceName,
@@ -2061,10 +2059,10 @@ export const startListener = () => {
             if (exactMatch) {
               let addon = null;
               try {
-                addon = (await getAddon(exactMatch.file.projectID)).data;
+                addon = (await getAddon(exactMatch.file.projectId)).data;
                 mod = normalizeModData(
                   exactMatch.file,
-                  exactMatch.file.projectID,
+                  exactMatch.file.projectId,
                   addon.name
                 );
                 mod.fileName = path.basename(fileName);
