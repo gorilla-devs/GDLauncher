@@ -77,7 +77,7 @@ const InstanceName = ({
     if (!modpack) return null;
     // Curseforge
     if (!modpack.synopsis) {
-      return modpack?.attachments?.find(v => v.isDefault).thumbnailUrl;
+      return modpack?.attachments?.find(v => v?.isDefault)?.thumbnailUrl;
     } else {
       // FTB
       const image = modpack?.art?.reduce((prev, curr) => {
@@ -122,14 +122,18 @@ const InstanceName = ({
           path.join(tempPath, localInstanceName)
         );
       }
-      await downloadFile(
-        path.join(
-          instancesPath,
-          localInstanceName,
-          `background${path.extname(imageURL)}`
-        ),
-        imageURL
-      );
+
+      if (imageURL) {
+        await downloadFile(
+          path.join(
+            instancesPath,
+            localInstanceName,
+            `background${path.extname(imageURL)}`
+          ),
+          imageURL
+        );
+      }
+
       if (version?.loaderType === FORGE) {
         const loader = {
           loaderType: version?.loaderType,
@@ -149,7 +153,7 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            `background${path.extname(imageURL)}`
+            imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
       } else if (version?.loaderType === FABRIC) {

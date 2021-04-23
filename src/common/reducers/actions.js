@@ -1509,6 +1509,10 @@ export function processFTBManifest(instanceName) {
       fileHashes[item.file.packageFingerprint] = item;
     }
 
+    mappedFiles = mappedFiles.filter(
+      v => v.name.split(/\.(?=[^.]+$)/)[1] === 'jar'
+    );
+
     await pMap(
       mappedFiles,
       async item => {
@@ -1517,46 +1521,43 @@ export function processFTBManifest(instanceName) {
         /* eslint-disable no-await-in-loop */
         do {
           tries += 1;
+
           if (tries !== 1) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
           try {
-            const ext = item.name.split(/\.(?=[^.]+$)/)[1];
-            const isJarFile = ext === 'jar';
-            if (isJarFile) {
-              const exactMatch = fileHashes[item.murmur2];
+            const exactMatch = fileHashes[item.murmur2];
 
-              if (exactMatch) {
-                const { projectId } = exactMatch.file;
-                try {
-                  const { data: addon } = await getAddon(projectId);
-                  const mod = normalizeModData(
-                    exactMatch.file,
-                    projectId,
-                    addon.name
-                  );
-                  mod.fileName = path.basename(item.name);
-                  modManifests = modManifests.concat(mod);
-                } catch {
-                  modManifests = modManifests.concat({
-                    fileName: path.basename(item.name),
-                    displayName: path.basename(item.name),
-                    packageFingerprint: item.murmur2
-                  });
-                }
-              } else {
+            if (exactMatch) {
+              const { projectId } = exactMatch.file;
+              try {
+                const { data: addon } = await getAddon(projectId);
+                const mod = normalizeModData(
+                  exactMatch.file,
+                  projectId,
+                  addon.name
+                );
+                mod.fileName = path.basename(item.name);
+                modManifests = modManifests.concat(mod);
+              } catch {
                 modManifests = modManifests.concat({
-                  fileName: item.name,
-                  displayName: item.name,
-                  version: item.version,
-                  downloadUrl: item.url,
-                  FTBmodId: item.id
+                  fileName: path.basename(item.name),
+                  displayName: path.basename(item.name),
+                  packageFingerprint: item.murmur2
                 });
               }
+            } else {
+              modManifests = modManifests.concat({
+                fileName: item.name,
+                displayName: item.name,
+                version: item.version,
+                downloadUrl: item.url,
+                FTBmodId: item.id
+              });
             }
 
-            const percentage =
-              (modManifests.length * 100) / manifest.files.length - 1;
+            const percentage = (modManifests.length * 100) / mappedFiles.length;
+
             dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
             ok = true;
           } catch (err) {
