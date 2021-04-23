@@ -297,10 +297,14 @@ export const getFTBModpackVersionData = async (modpackId, versionId) => {
     return { status: 'error' };
   }
 };
-
-export const getFTBChangelog = (modpackId, versionId) => {
-  const url = `https://api.modpacks.ch/public/modpack/${modpackId}/${versionId}/changelog`;
-  return axios.get(url);
+export const getFTBChangelog = async (modpackId, versionId) => {
+  try {
+    const url = `https://api.modpacks.ch/public/modpack/${modpackId}/${versionId}/changelog`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
 };
 
 export const getFTBMostPlayed = async () => {

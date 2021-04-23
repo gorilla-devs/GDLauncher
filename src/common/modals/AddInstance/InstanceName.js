@@ -116,7 +116,7 @@ const InstanceName = ({
         );
       } else {
         manifest = await downloadAddonZip(
-          version?.addonId,
+          version?.addonID,
           version?.fileId,
           path.join(instancesPath, localInstanceName),
           path.join(tempPath, localInstanceName)
@@ -140,7 +140,7 @@ const InstanceName = ({
             forgeManifest
           ),
           fileId: version?.fileId,
-          addonId: version?.addonId,
+          addonID: version?.addonID,
           source: version?.source
         };
 
@@ -158,7 +158,7 @@ const InstanceName = ({
           mcVersion: manifest.minecraft.version,
           loaderVersion: manifest.minecraft.modLoaders[0].yarn,
           fileId: manifest.minecraft.modLoaders[0].loader,
-          addonId: version?.addonId,
+          addonID: version?.addonID,
           source: version?.source
         };
         dispatch(
@@ -190,7 +190,7 @@ const InstanceName = ({
       // Fetch mc version
 
       const data = await getFTBModpackVersionData(
-        version?.addonId,
+        version?.addonID,
         version?.fileId
       );
 
@@ -206,7 +206,7 @@ const InstanceName = ({
           forgeManifest
         ),
         fileId: version?.fileId,
-        addonId: version?.addonId,
+        addonID: version?.addonID,
         source: FTB
       };
 

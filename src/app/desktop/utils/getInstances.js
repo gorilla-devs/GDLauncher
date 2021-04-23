@@ -20,7 +20,7 @@ const getInstances = async instancesPath => {
           mcVersion,
           loaderVersion,
           fileId,
-          addonId,
+          addonID,
           source
         ] = config.modloader;
 
@@ -31,7 +31,7 @@ const getInstances = async instancesPath => {
             mcVersion,
             ...(loaderVersion && { loaderVersion }),
             ...(fileId && { fileId }),
-            ...(addonId && { addonId }),
+            ...(addonID && { addonID }),
             ...(source && { source })
           }
         };

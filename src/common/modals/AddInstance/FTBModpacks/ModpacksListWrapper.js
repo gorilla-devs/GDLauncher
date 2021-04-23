@@ -10,7 +10,7 @@ import { FTB } from '../../../utils/constants';
 import { getFTBModpackVersionData } from '../../../api';
 
 const selectFTBModpack = async (modpack, setVersion, setModpack, setStep) => {
-  const addonId = modpack.id;
+  const addonID = modpack.id;
   const fileId = modpack.versions[modpack.versions.length - 1].id;
 
   const data = await getFTBModpackVersionData(modpack.id, fileId);
@@ -21,7 +21,7 @@ const selectFTBModpack = async (modpack, setVersion, setModpack, setStep) => {
   setVersion({
     loaderType: forgeModloader?.type,
     mcVersion,
-    addonId,
+    addonID,
     fileId,
     source: FTB
   });

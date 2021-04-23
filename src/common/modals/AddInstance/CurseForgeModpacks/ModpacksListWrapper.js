@@ -87,7 +87,7 @@ const ModpacksListWrapper = ({
             onClick={() => {
               setVersion({
                 loaderType: FORGE,
-                addonId: modpack.id,
+                addonID: modpack.id,
                 fileId: modpack.latestFiles[modpack.latestFiles.length - 1].id,
                 source: CURSEFORGE
               });

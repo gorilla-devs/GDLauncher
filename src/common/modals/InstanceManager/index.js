@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
-import { FORGE, FABRIC, CURSEFORGE } from '../../utils/constants';
+import { FORGE, FABRIC, CURSEFORGE, FTB } from '../../utils/constants';
 import Modpack from './Modpack';
 import {
   initLatestMods,
@@ -278,7 +278,8 @@ const InstanceManager = ({ instanceName }) => {
         <Content>
           <ContentComponent
             instanceName={instanceName}
-            modpackId={instance?.loader?.fileId}
+            modpackId={instance?.loader?.addonID}
+            fileId={instance?.loader?.fileId}
             background={background}
             manifest={manifest}
           />

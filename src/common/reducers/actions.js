@@ -57,7 +57,7 @@ import {
   getAddonFiles,
   getAddon,
   // getFTBModpackData,
-  // getFTBModpackVersionData,
+  getFTBModpackVersionData,
   getAddonCategories,
   msAuthenticateXBL,
   msExchangeCodeForAccessToken,
@@ -161,9 +161,10 @@ export function initManifests() {
       mc.versions.forEach(v => {
         if (forge[v.id]) {
           // Monkeypatch manifest since forge changed the format
-          forgeVersions[v.id] = forge[v.id].map(forgeV =>
-            forgePatcher(forgeV, v.id)
-          );
+
+          if (v.id.includes('-'))
+            forge[v.id].map(forgeV => forgePatcher(forgeV, v.id));
+          else forgeVersions[v.id] = forge[v.id];
         }
       });
 
@@ -1865,94 +1866,143 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
     const tempPath = _getTempPath(state);
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
-    const { data: addon } = await getAddon(instance.loader?.fileId);
+    if (instance.loader.source === CURSEFORGE) {
+      const { data: addon } = await getAddon(instance.loader?.addonID);
 
-    const manifest = await fse.readJson(
-      path.join(instancePath, 'manifest.json')
-    );
+      const manifest = await fse.readJson(
+        path.join(instancePath, 'manifest.json')
+      );
 
-    await fse.remove(path.join(instancePath, 'manifest.json'));
+      await fse.remove(path.join(instancePath, 'manifest.json'));
 
-    // Delete prev overrides
-    await Promise.all(
-      (instance?.overrides || []).map(async v => {
-        try {
-          await fs.stat(path.join(instancePath, v));
-          await fse.remove(path.join(instancePath, v));
-        } catch {
-          // Swallow error
-        }
-      })
-    );
-
-    const modsProjectIDs = (manifest?.files || []).map(v => v?.projectID);
-
-    dispatch(
-      updateInstanceConfig(instanceName, prev =>
-        omit(
-          {
-            ...prev,
-            mods: prev.mods.filter(v => !modsProjectIDs.includes(v?.projectID))
-          },
-          ['overrides']
-        )
-      )
-    );
-
-    await Promise.all(
-      modsProjectIDs.map(async projectID => {
-        const modFound = instance.mods?.find(v => v?.projectID === projectID);
-        if (modFound?.fileName) {
+      // Delete prev overrides
+      await Promise.all(
+        (instance?.overrides || []).map(async v => {
           try {
-            await fs.stat(path.join(instancePath, 'mods', modFound?.fileName));
-            await fse.remove(
-              path.join(instancePath, 'mods', modFound?.fileName)
-            );
+            await fs.stat(path.join(instancePath, v));
+            await fse.remove(path.join(instancePath, v));
           } catch {
             // Swallow error
           }
-        }
-      })
-    );
+        })
+      );
 
-    const imageURL = addon?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
+      const modsProjectIDs = (manifest?.files || []).map(v => v?.projectID);
 
-    const newManifest = await downloadAddonZip(
-      instance.loader?.fileId,
-      newModpackData.id,
-      path.join(_getInstancesPath(state), instanceName),
-      path.join(tempPath, instanceName)
-    );
+      dispatch(
+        updateInstanceConfig(instanceName, prev =>
+          omit(
+            {
+              ...prev,
+              mods: prev.mods.filter(
+                v => !modsProjectIDs.includes(v?.projectID)
+              )
+            },
+            ['overrides']
+          )
+        )
+      );
 
-    await downloadFile(
-      path.join(
-        _getInstancesPath(state),
-        instanceName,
-        `background${path.extname(imageURL)}`
-      ),
-      imageURL
-    );
+      await Promise.all(
+        modsProjectIDs.map(async projectID => {
+          const modFound = instance.mods?.find(v => v?.projectID === projectID);
+          if (modFound?.fileName) {
+            try {
+              await fs.stat(
+                path.join(instancePath, 'mods', modFound?.fileName)
+              );
+              await fse.remove(
+                path.join(instancePath, 'mods', modFound?.fileName)
+              );
+            } catch {
+              // Swallow error
+            }
+          }
+        })
+      );
 
-    const loader = {
-      loaderType: instance.loader?.loaderType,
-      mcVersion: newManifest.minecraft.version,
-      loaderVersion: convertcurseForgeToCanonical(
-        newManifest.minecraft.modLoaders.find(v => v.primary).id,
-        newManifest.minecraft.version,
-        state.app.forgeManifest
-      ),
-      fileId: instance.loader?.fileId,
-      addonId: newModpackData.id
-    };
+      const imageURL = addon?.attachments?.find(v => v.isDefault)?.thumbnailUrl;
 
-    dispatch(
-      addToQueue(
-        instanceName,
-        loader,
-        newManifest,
-        `background${path.extname(imageURL)}`
-      )
-    );
+      const newManifest = await downloadAddonZip(
+        instance.loader?.addonID,
+        newModpackData.id,
+        path.join(_getInstancesPath(state), instanceName),
+        path.join(tempPath, instanceName)
+      );
+
+      await downloadFile(
+        path.join(
+          _getInstancesPath(state),
+          instanceName,
+          `background${path.extname(imageURL)}`
+        ),
+        imageURL
+      );
+
+      const loader = {
+        loaderType: instance.loader?.loaderType,
+        mcVersion: newManifest.minecraft.version,
+        loaderVersion: convertcurseForgeToCanonical(
+          newManifest.minecraft.modLoaders.find(v => v.primary).id,
+          newManifest.minecraft.version,
+          state.app.forgeManifest
+        ),
+        fileId: instance.loader?.fileId,
+        addonID: instance.loader?.addonID,
+        source: instance.loader?.source
+      };
+
+      dispatch(
+        addToQueue(
+          instanceName,
+          loader,
+          newManifest,
+          `background${path.extname(imageURL)}`
+        )
+      );
+    } else if (instance.loader.source === FTB) {
+      const imageURL = newModpackData.imageUrl;
+
+      await downloadFile(
+        path.join(
+          _getInstancesPath(state),
+          instanceName,
+          `background${path.extname(imageURL)}`
+        ),
+        imageURL
+      );
+
+      const newModpack = await getFTBModpackVersionData(
+        instance.loader?.addonID,
+        newModpackData.id
+      );
+
+      const loader = {
+        loaderType: instance.loader?.loaderType,
+
+        mcVersion: newModpack.targets[1].version,
+        loaderVersion: convertcurseForgeToCanonical(
+          `forge-${newModpack.targets[0].version}`,
+          newModpack.targets[1].version,
+          state.app.forgeManifest
+        ),
+        // loaderVersion: newModpack.targets[0].version,
+        fileId: newModpack?.id,
+        addonID: instance.loader?.addonID,
+        source: instance.loader?.source
+      };
+
+      console.log('UPDATE', loader);
+
+      dispatch(
+        addToQueue(
+          instanceName,
+          loader,
+          null,
+          `background${path.extname(imageURL)}`
+        )
+      );
+    }
   };
 };
 
@@ -2715,14 +2765,14 @@ export function installMod(
           // type 6: include
 
           if (dep.type === 3) {
-            if (instance.mods.some(x => x.projectID === dep.addonId)) return;
-            const depList = await getAddonFiles(dep.addonId);
+            if (instance.mods.some(x => x.projectID === dep.addonID)) return;
+            const depList = await getAddonFiles(dep.addonID);
             const depData = depList.data.find(v =>
               v.gameVersion.includes(gameVersion)
             );
             await dispatch(
               installMod(
-                dep.addonId,
+                dep.addonID,
                 depData.id,
                 instanceName,
                 gameVersion,
