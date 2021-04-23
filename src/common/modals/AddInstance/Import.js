@@ -12,7 +12,7 @@ import { _getTempPath } from '../../utils/selectors';
 import { useSelector } from 'react-redux';
 import { getAddon, getAddonFiles } from '../../api';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, FORGE, VANILLA } from '../../utils/constants';
+import { CURSEFORGE, FABRIC, FORGE, VANILLA } from '../../utils/constants';
 import { transparentize } from 'polished';
 
 const Import = ({
@@ -96,12 +96,13 @@ const Import = ({
     const manifest = await fse.readJson(path.join(tempPath, 'manifest.json'));
     await fse.remove(path.join(tempPath, 'manifest.json'));
     let addon = null;
+
     if (manifest.projectID) {
       const { data } = await getAddon(manifest.projectID);
       addon = data;
       setModpack(addon);
     } else {
-      setModpack({ name: manifest.name });
+      setModpack({ name: manifest.name, attachments: [] });
     }
     const isForge = (manifest?.minecraft?.modLoaders || []).find(
       v => v.id.includes(FORGE) && v.primary
@@ -122,6 +123,10 @@ const Import = ({
     }
 
     const loader = { loaderType: VANILLA };
+
+    if (manifest.manifestType === 'minecraftModpack') {
+      loader.source = CURSEFORGE;
+    }
 
     if (isForge) loader.loaderType = FORGE;
     else if (isFabric) loader.loaderType = FABRIC;
