@@ -127,7 +127,7 @@ const Import = ({
     else if (isFabric) loader.loaderType = FABRIC;
 
     if (manifest.projectID) {
-      loader.addonId = manifest.projectID;
+      loader.projectID = manifest.projectID;
     }
 
     setVersion(loader);

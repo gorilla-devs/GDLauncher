@@ -149,16 +149,9 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 ? `background${path.extname(config?.background)}`
                 : null;
 
-              const isModpack =
-                defaultValue?.source === CURSEFORGE ||
-                defaultValue?.source === FTB;
-
               const isVanilla = selectedVersion[0] === VANILLA;
               const isFabric = selectedVersion[0] === FABRIC;
               const isForge = selectedVersion[0] === FORGE;
-
-              const isSameLoader =
-                selectedVersion[0] === patchedDefaultValue[0];
 
               if (isVanilla) {
                 dispatch(
@@ -177,14 +170,12 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                 dispatch(
                   addToQueue(
                     instanceName,
-                    isModpack && isSameLoader
-                      ? { ...defaultValue }
-                      : {
-                          loaderType: FABRIC,
-                          mcVersion: selectedVersion[2],
-                          loaderVersion: selectedVersion[3],
-                          ...defaultValue
-                        },
+                    {
+                      ...defaultValue,
+                      loaderType: FORGE,
+                      mcVersion: selectedVersion[1],
+                      loaderVersion: selectedVersion[2]
+                    },
                     null,
                     background
                   )
@@ -194,10 +185,10 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                   addToQueue(
                     instanceName,
                     {
+                      ...defaultValue,
                       loaderType: FABRIC,
                       mcVersion: selectedVersion[2],
-                      loaderVersion: selectedVersion[3],
-                      ...defaultValue
+                      loaderVersion: selectedVersion[3]
                     },
                     null,
                     background

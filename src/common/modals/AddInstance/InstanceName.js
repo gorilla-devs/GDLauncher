@@ -116,8 +116,8 @@ const InstanceName = ({
         );
       } else {
         manifest = await downloadAddonZip(
-          version?.addonId,
-          version?.fileId,
+          version?.projectID,
+          version?.fileID,
           path.join(instancesPath, localInstanceName),
           path.join(tempPath, localInstanceName)
         );
@@ -139,8 +139,8 @@ const InstanceName = ({
             manifest.minecraft.version,
             forgeManifest
           ),
-          fileId: version?.fileId,
-          addonId: version?.addonId,
+          fileID: version?.fileID,
+          projectID: version?.projectID,
           source: version?.source
         };
 
@@ -157,8 +157,8 @@ const InstanceName = ({
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: manifest.minecraft.modLoaders[0].yarn,
-          fileId: manifest.minecraft.modLoaders[0].loader,
-          addonId: version?.addonId,
+          fileID: manifest.minecraft.modLoaders[0].loader,
+          projectID: version?.projectID,
           source: version?.source
         };
         dispatch(
@@ -174,7 +174,7 @@ const InstanceName = ({
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: version?.loaderVersion,
-          fileId: version?.fileId
+          fileID: version?.fileID
         };
 
         dispatch(
@@ -190,8 +190,8 @@ const InstanceName = ({
       // Fetch mc version
 
       const data = await getFTBModpackVersionData(
-        version?.addonId,
-        version?.fileId
+        version?.projectID,
+        version?.fileID
       );
 
       const forgeModloader = data.targets.find(v => v.type === 'modloader');
@@ -205,8 +205,8 @@ const InstanceName = ({
           mcVersion,
           forgeManifest
         ),
-        fileId: version?.fileId,
-        addonId: version?.addonId,
+        fileID: version?.fileID,
+        projectID: version?.projectID,
         source: FTB
       };
 
@@ -252,7 +252,7 @@ const InstanceName = ({
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: manifest.minecraft.modLoaders[0].yarn,
-          fileId: manifest.minecraft.modLoaders[0].loader
+          fileID: manifest.minecraft.modLoaders[0].loader
         };
 
         dispatch(addToQueue(localInstanceName, loader, manifest));
