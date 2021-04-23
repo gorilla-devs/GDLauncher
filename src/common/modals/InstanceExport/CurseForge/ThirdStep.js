@@ -73,7 +73,7 @@ export default function ThirdStep({
         loaderObj = {
           id: modloaderName,
           yarn: loader?.loaderVersion,
-          loader: loader?.fileId,
+          loader: loader?.fileID,
           primary: true
         };
         break;
@@ -101,7 +101,7 @@ export default function ThirdStep({
       author: packAuthor,
       projectID:
         modloaderName === 'forge' && loader.length > 3
-          ? parseInt(loader?.fileId, 10)
+          ? parseInt(loader?.fileID, 10)
           : undefined,
       name: packZipName,
       files: modsArray

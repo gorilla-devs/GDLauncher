@@ -309,10 +309,15 @@ const ModpackDescription = ({
             disabled={!selectedId}
             onClick={() => {
               const modpackFile = files.find(file => file.id === selectedId);
-              dispatch(closeModal());
-              setVersion([FORGE, modpack.id, modpackFile.id]);
+              setVersion({
+                loaderType: FORGE,
+                projectID: modpack.id,
+                fileID: modpackFile.id,
+                source: type
+              });
               setModpack(modpack);
               setStep(1);
+              dispatch(closeModal());
             }}
           >
             Download

@@ -3,33 +3,84 @@ import styled from 'styled-components';
 import { Select, Button } from 'antd';
 import { useDispatch } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
-import { getAddonFiles, getAddonFileChangelog } from '../../api';
+import {
+  getAddonFiles,
+  getAddonFileChangelog,
+  getFTBModpackData,
+  getFTBChangelog,
+  getFTBModpackVersionData
+} from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
 
-const Modpack = ({ modpackId, instanceName, manifest }) => {
+const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const [files, setFiles] = useState([]);
+  const [versionName, setVersionName] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [loading, setLoading] = useState(false);
   const [installing, setInstalling] = useState(false);
   const dispatch = useDispatch();
 
+  const convertFtbReleaseType = type => {
+    switch (type) {
+      case 'Release':
+        return 1;
+      case 'Beta':
+        return 2;
+      default:
+        return 3;
+    }
+  };
+
   const initData = async () => {
     setLoading(true);
-    const { data } = await getAddonFiles(modpackId);
-    const mappedFiles = await Promise.all(
-      data.map(async v => {
-        const { data: changelog } = await getAddonFileChangelog(
-          modpackId,
-          v.id
-        );
-        return {
-          ...v,
-          changelog
-        };
-      })
-    );
-    setFiles(mappedFiles);
+    if (manifest) {
+      setVersionName(`${manifest?.name} - ${manifest?.version}`);
+      const { data } = await getAddonFiles(modpackId);
+      const mappedFiles = await Promise.all(
+        data.map(async v => {
+          const { data: changelog } = await getAddonFileChangelog(
+            modpackId,
+            v.id
+          );
+          return {
+            ...v,
+            changelog
+          };
+        })
+      );
+      setFiles(mappedFiles);
+    } else {
+      const ftbModpack = await getFTBModpackData(modpackId);
+
+      setVersionName(
+        `${ftbModpack.name} - ${
+          ftbModpack.versions.find(modpack => modpack.id === fileID).name
+        }`
+      );
+
+      const mappedVersions = await Promise.all(
+        ftbModpack.versions.map(async version => {
+          const changelog = await getFTBChangelog(modpackId, version.id);
+          const newModpack = await getFTBModpackVersionData(
+            modpackId,
+            version.id
+          );
+
+          return {
+            displayName: `${ftbModpack.name} ${version.name}`,
+            id: version.id,
+            gameVersion: [newModpack.targets[1]?.version],
+            releaseType: convertFtbReleaseType(version.type),
+            fileDate: version.updated * 1000,
+            imageUrl: ftbModpack.art[0].url,
+            changelog: changelog.content
+          };
+        })
+      );
+
+      setFiles(mappedVersions);
+    }
     setLoading(false);
   };
 
@@ -74,10 +125,9 @@ const Modpack = ({ modpackId, instanceName, manifest }) => {
   };
 
   const handleChange = value => setSelectedIndex(value);
-
   return (
     <Container>
-      Installed version: {manifest?.name} - {manifest?.version}
+      Installed version: {versionName}
       <div
         css={`
           display: flex;
