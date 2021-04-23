@@ -10,10 +10,10 @@ import { FTB } from '../../../utils/constants';
 import { getFTBModpackVersionData } from '../../../api';
 
 const selectFTBModpack = async (modpack, setVersion, setModpack, setStep) => {
-  const addonId = modpack.id;
-  const fileId = modpack.versions[modpack.versions.length - 1].id;
+  const projectID = modpack.id;
+  const fileID = modpack.versions[modpack.versions.length - 1].id;
 
-  const data = await getFTBModpackVersionData(modpack.id, fileId);
+  const data = await getFTBModpackVersionData(modpack.id, fileID);
 
   const forgeModloader = data.targets.find(v => v.type === 'modloader');
   const mcVersion = data.targets.find(v => v.type === 'game').version;
@@ -21,8 +21,8 @@ const selectFTBModpack = async (modpack, setVersion, setModpack, setStep) => {
   setVersion({
     loaderType: forgeModloader?.type,
     mcVersion,
-    addonId,
-    fileId,
+    projectID,
+    fileID,
     source: FTB
   });
   setModpack(modpack);
