@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import path from 'path';
 import fse from 'fs-extra';
+import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 import { promises as fs } from 'fs';
 import { extractFull } from 'node-7z';
 import { get7zPath, isMod } from '../../../app/desktop/utils';
@@ -45,10 +47,10 @@ const Import = ({
   const onClick = async () => {
     if (loading || !localValue) return;
     setLoading(true);
-    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*).zip$/;
+    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
     const isUrlRegex = urlRegex.test(localValue);
-
-    const tempFilePath = path.join(tempPath, path.basename(localValue));
+    const hash = uuidv4();
+    let tempFilePath = path.join(tempPath, `${hash}.zip`);
 
     if (isUrlRegex) {
       try {
@@ -72,6 +74,7 @@ const Import = ({
     } catch {
       await fse.remove(path.join(tempPath, 'manifest.json'));
     }
+
     const extraction = extractFull(
       isUrlRegex ? tempFilePath : localValue,
       tempPath,

@@ -1,5 +1,6 @@
 import makeDir from 'make-dir';
 import fss from 'fs';
+import fse from 'fs-extra';
 import axios from 'axios';
 import pMap from 'p-map';
 import path from 'path';
@@ -110,35 +111,50 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
 
 export const downloadFile = async (fileName, url, onProgress) => {
   await makeDir(path.dirname(fileName));
-
-  const { data, headers } = await axios.get(url, {
-    responseType: 'stream',
-    responseEncoding: null,
-    adapter
-  });
   const out = fss.createWriteStream(fileName, { encoding: null });
-  data.pipe(out);
-
-  // Save variable to know progress
-  let receivedBytes = 0;
-  const totalBytes = parseInt(headers['content-length'], 10);
-
-  data.on('data', chunk => {
-    // Update the received bytes
-    receivedBytes += chunk.length;
-    if (onProgress) {
-      onProgress(((receivedBytes * 100) / totalBytes).toFixed(1));
-    }
-  });
-
-  return new Promise((resolve, reject) => {
-    data.on('end', () => {
-      out.end();
-      resolve();
+  try {
+    const { data, headers } = await axios.get(url, {
+      responseType: 'stream',
+      responseEncoding: null,
+      adapter
     });
 
-    data.on('error', () => {
-      reject();
+    data.pipe(out);
+
+    // Save variable to know progress
+    let receivedBytes = 0;
+    const totalBytes = parseInt(headers['content-length'], 10);
+
+    data.on('data', chunk => {
+      // Update the received bytes
+      receivedBytes += chunk.length;
+      if (onProgress) {
+        onProgress(((receivedBytes * 100) / totalBytes).toFixed(1));
+      }
     });
-  });
+
+    return new Promise((resolve, reject) => {
+      data.on('end', () => {
+        out.end();
+        resolve();
+      });
+
+      data.on('error', () => {
+        reject();
+      });
+    });
+  } catch (error) {
+    if (error.response.status === 403) {
+      const { data } = await axios.get(url, {
+        responseType: 'arraybuffer',
+        headers: {
+          'Content-Type': 'application/octet-stream'
+        }
+      });
+
+      const dataView = new DataView(data);
+
+      await fse.writeFile(fileName, dataView, 'binary');
+    } else throw error;
+  }
 };
