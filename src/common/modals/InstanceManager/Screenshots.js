@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { promises as fs, watch, createReadStream } from 'fs';
 import { clipboard, ipcRenderer } from 'electron';
 import fse from 'fs-extra';
@@ -105,7 +105,6 @@ const Screenshots = ({ instanceName }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [progressUpdate, setProgressUpdate] = useState(null);
   const [uploadingFileName, setUploadingFileName] = useState(null);
-  const [contextMenuOpen, setContextMenuOpen] = useState(false);
   const dispatch = useDispatch();
 
   const isImageCopied = progressUpdate => {
@@ -122,8 +121,6 @@ const Screenshots = ({ instanceName }) => {
       return 'Busy! Wait before uploading another image';
     } else return 'Share the image via url';
   };
-
-  const containerRef = useRef(null);
 
   const selectAll = useCallback(() => {
     if (
@@ -180,22 +177,8 @@ const Screenshots = ({ instanceName }) => {
     return () => watcher?.close();
   }, []);
 
-  useEffect(() => {
-    if (containerRef.current) {
-      const eventHandler = e => {
-        if (contextMenuOpen) {
-          e.preventDefault();
-          containerRef.current.scrollTop = 0;
-        }
-      };
-      containerRef.current.addEventListener('wheel', eventHandler);
-      return () =>
-        containerRef.current.removeEventListener('wheel', eventHandler);
-    }
-  }, [containerRef.current, contextMenuOpen]);
-
   return (
-    <ExternalContainer ref={containerRef}>
+    <ExternalContainer>
       <Bar>
         <GlobalCheckbox
           onChange={selectAll}
@@ -278,7 +261,6 @@ const Screenshots = ({ instanceName }) => {
                       <StyledContexMenu
                         id={file.name}
                         onShow={() => {
-                          setContextMenuOpen(true);
                           if (
                             selectedItems.length === 0 ||
                             !selectedItems.includes(file.name)
@@ -292,7 +274,6 @@ const Screenshots = ({ instanceName }) => {
                           }
                         }}
                         onHide={() => {
-                          setContextMenuOpen(false);
                           if (!selectedItems.includes(file.name)) {
                             setSelectedItems([file.name]);
                           }
