@@ -61,8 +61,8 @@ export default createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 4px;
+    height: 4px;
     border-radius: 1px;
   }
 
@@ -72,8 +72,7 @@ export default createGlobalStyle`
   }
 
   ::-webkit-scrollbar-track {
-    background-color: ${props => props.theme.palette.grey[900]};
-    border-radius: 1px;
+    background-color: transparent;
   }
 
   :not(input):not(textarea):not(button):not(span):not(div):not(a):not(i):not(span):not(svg):not(path),

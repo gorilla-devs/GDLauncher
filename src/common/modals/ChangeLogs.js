@@ -23,7 +23,7 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        <Section>
+        {/* <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -43,7 +43,7 @@ const ChangeLogs = () => {
               </li>
             </ul>
           </div>
-        </Section>
+        </Section> */}
         <Section>
           <SectionTitle
             css={`
@@ -54,12 +54,9 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed copy/paste on macOS.</li>
-              <li>Fixed crash when browsing curseforge modpacks.</li>
-              <li>Fixed duplicated news.</li>
-              <li>Fixed avatar images sometimes now showing correctly.</li>
-              <li>Fixed auto updates on portable-win.</li>
-              <li>Fixed crash when adding a new instance.</li>
+              <li>Fixed icons in mods browser.</li>
+              <li>Fixed updating modpacks not working.</li>
+              <li>Fixed some styling.</li>
             </ul>
           </div>
         </Section>
