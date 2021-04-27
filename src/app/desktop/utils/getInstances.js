@@ -37,6 +37,8 @@ const getInstances = async instancesPath => {
           }
         };
 
+        delete patchedConfig.modloader;
+
         await fse.writeFile(configPath, JSON.stringify(patchedConfig));
 
         return { ...patchedConfig, name: instance };
