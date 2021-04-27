@@ -20,8 +20,8 @@ const getInstances = async instancesPath => {
           loaderType,
           mcVersion,
           loaderVersion,
-          fileID,
           projectID,
+          fileID,
           source
         ] = config.modloader;
 
@@ -44,15 +44,20 @@ const getInstances = async instancesPath => {
         return { ...patchedConfig, name: instance };
       }
 
-      if (config.loader?.fileId || config.loader?.addonId) {
-        const { fileId, addonId } = config.loader;
+      if (
+        config.loader?.fileId ||
+        config.loader?.addonId ||
+        config.loader?.addonID
+      ) {
+        const { fileId, addonId, addonID } = config.loader;
 
         const patchedConfig = {
           ...config,
           loader: {
             ...config.loader,
             ...(fileId && { fileID: fileId }),
-            ...(addonId && { projectID: addonId })
+            ...(addonId && { projectID: addonId }),
+            ...(addonID && { projectID: addonID })
           }
         };
 
