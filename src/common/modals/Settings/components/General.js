@@ -459,9 +459,9 @@ const General = () => {
             text-align: start;
           `}
         >
-          <Select.Option value={1}>Alphabetical</Select.Option>
-          <Select.Option value={2}>Last Played</Select.Option>
-          <Select.Option value={3}>Most Played</Select.Option>
+          <Select.Option value={0}>Alphabetical</Select.Option>
+          <Select.Option value={1}>Last Played</Select.Option>
+          <Select.Option value={2}>Most Played</Select.Option>
         </Select>
       </ParallelDownload>
       <Hr />

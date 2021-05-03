@@ -46,11 +46,11 @@ const getInstances = () => {
   );
 
   switch (instanceSortOrder) {
-    case 1:
+    case 0:
       return sortAlphabetical(instances);
-    case 2:
+    case 1:
       return sortByLastPlayed(instances);
-    case 3:
+    case 2:
       return sortByMostPlayed(instances);
     default:
       return instances;
