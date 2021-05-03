@@ -15,7 +15,8 @@ import {
   faToilet,
   faNewspaper,
   faFolder,
-  faFire
+  faFire,
+  faSort
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
@@ -29,6 +30,7 @@ import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
+  updateInstanceSortType,
   updateShowNews,
   updateCurseReleaseChannel
 } from '../../../reducers/settings/actions';
@@ -203,7 +205,7 @@ function dashUuid(UUID) {
   // Then dashes are added between.
 
   // eslint-disable-next-line
-  return `${UUID.substring(0, 8)}-${UUID.substring(8, 12)}-${UUID.substring(
+    return `${UUID.substring(0, 8)}-${UUID.substring(8, 12)}-${UUID.substring(
     12,
     16
   )}-${UUID.substring(16, 20)}-${UUID.substring(20, 32)}`;
@@ -220,6 +222,9 @@ const General = () => {
   const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
   const concurrentDownloads = useSelector(
     state => state.settings.concurrentDownloads
+  );
+  const instanceSortMethod = useSelector(
+    state => state.settings.instanceSortOrder
   );
   const updateAvailable = useSelector(state => state.updateAvailable);
   const dataStorePath = useSelector(_getDataStorePath);
@@ -430,6 +435,33 @@ const General = () => {
                 {x}
               </Select.Option>
             ))}
+        </Select>
+      </ParallelDownload>
+      <Hr />
+      <Title>
+        Instance Sorting &nbsp; <FontAwesomeIcon icon={faSort} />
+      </Title>
+      <ParallelDownload>
+        <p
+          css={`
+            margin: 0;
+            width: 400px;
+          `}
+        >
+          Select the method in which instances should be sorted.
+        </p>
+
+        <Select
+          onChange={v => dispatch(updateInstanceSortType(v))}
+          value={instanceSortMethod}
+          css={`
+            width: 136px;
+            text-align: start;
+          `}
+        >
+          <Select.Option value={1}>Alphabetical</Select.Option>
+          <Select.Option value={2}>Last Played</Select.Option>
+          <Select.Option value={3}>Most Played</Select.Option>
         </Select>
       </ParallelDownload>
       <Hr />

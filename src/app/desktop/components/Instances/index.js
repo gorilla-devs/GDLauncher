@@ -23,9 +23,42 @@ const SubNoInstance = styled.div`
   font-size: 15px;
   margin-top: 20px;
 `;
+const sortAlphabetical = instances =>
+  instances.sort((a, b) => (a.name > b.name ? 1 : -1));
+
+const sortByLastPlayed = instances =>
+  instances.sort((a, b) => (a.lastPlayed < b.lastPlayed ? 1 : -1));
+
+const sortByMostPlayed = instances =>
+  instances.sort((a, b) => (a.timePlayed < b.timePlayed ? 1 : -1));
+
+const getInstances = () => {
+  // Data normalization for missing fields
+  const instances = useSelector(_getInstances).map(instance => {
+    return {
+      ...instance,
+      timePlayed: instance.timePlayed || 0,
+      lastPlayed: instance.lastPlayed || 0
+    };
+  });
+  const instanceSortOrder = useSelector(
+    state => state.settings.instanceSortOrder
+  );
+
+  switch (instanceSortOrder) {
+    case 1:
+      return sortAlphabetical(instances);
+    case 2:
+      return sortByLastPlayed(instances);
+    case 3:
+      return sortByMostPlayed(instances);
+    default:
+      return instances;
+  }
+};
 
 const Instances = () => {
-  const instances = useSelector(_getInstances);
+  const instances = getInstances();
 
   return (
     <Container>

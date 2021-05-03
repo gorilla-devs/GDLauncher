@@ -45,6 +45,15 @@ export function updatePotatoPcMode(value) {
   };
 }
 
+export function updateInstanceSortType(value) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_INSTANCE_SORT_METHOD,
+      value
+    });
+  };
+}
+
 export function updateResolution(resolution) {
   return dispatch => {
     dispatch({
