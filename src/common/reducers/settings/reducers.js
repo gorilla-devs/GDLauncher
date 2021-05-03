@@ -26,7 +26,6 @@ function releaseChannel(state = 0, action) {
 
 // 0 is Alphabetical, 1 is last played, 2 is most played
 function instanceSortOrder(state = 0, action) {
-  console.log(action);
   switch (action.type) {
     case ActionTypes.UPDATE_INSTANCE_SORT_METHOD:
       return action.value;
