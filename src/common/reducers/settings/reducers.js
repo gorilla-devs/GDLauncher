@@ -25,6 +25,17 @@ function releaseChannel(state = 0, action) {
 }
 
 // 0 is stable, 1 is beta
+function instanceSortOrder(state = 1, action) {
+  console.log(action);
+  switch (action.type) {
+    case ActionTypes.UPDATE_INSTANCE_SORT_METHOD:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
+// 0 is stable, 1 is beta
 function concurrentDownloads(state = 3, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CONCURRENT_DOWNLOADS:
@@ -118,6 +129,7 @@ function java(
 export default combineReducers({
   sounds,
   releaseChannel,
+  instanceSortOrder,
   concurrentDownloads,
   discordRPC,
   hideWindowOnGameLaunch,
