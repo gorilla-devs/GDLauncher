@@ -205,7 +205,7 @@ function dashUuid(UUID) {
   // Then dashes are added between.
 
   // eslint-disable-next-line
-    return `${UUID.substring(0, 8)}-${UUID.substring(8, 12)}-${UUID.substring(
+  return `${UUID.substring(0, 8)}-${UUID.substring(8, 12)}-${UUID.substring(
     12,
     16
   )}-${UUID.substring(16, 20)}-${UUID.substring(20, 32)}`;
