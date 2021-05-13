@@ -170,7 +170,7 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            `background${path.extname(imageURL)}`
+            imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
       } else if (version?.loaderType === VANILLA) {
@@ -186,7 +186,7 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            `background${path.extname(imageURL)}`
+            imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
       }
