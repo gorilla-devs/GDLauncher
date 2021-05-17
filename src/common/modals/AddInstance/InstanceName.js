@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import path from 'path';
+import os from 'os';
 import fse from 'fs-extra';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
@@ -13,7 +14,7 @@ import {
 import { Input } from 'antd';
 import { transparentize } from 'polished';
 import { addToQueue } from '../../reducers/actions';
-import { closeModal } from '../../reducers/modals/actions';
+import { closeModal, openModal } from '../../reducers/modals/actions';
 import {
   downloadAddonZip,
   importAddonZip,
@@ -216,6 +217,29 @@ const InstanceName = ({
         source: FTB
       };
 
+      let ramAmount = null;
+      if (loader.loaderType === FABRIC) {
+        const userMemory = Math.round(os.totalmem() / 1024 / 1024);
+
+        if (userMemory < data?.specs?.minimum) {
+          await new Promise((resolve, reject) => {
+            dispatch(
+              openModal('ActionConfirmation', {
+                message:
+                  "You don't have enough memory to run this instance, do you still want to proceed?",
+                confirmCallback: resolve,
+                abortCallback: reject,
+                title: 'Not enough memory warning'
+              })
+            );
+          });
+        }
+        if (userMemory >= data?.specs?.recommended) {
+          ramAmount = data?.specs?.recommended;
+        } else if (userMemory >= data?.specs?.minimum) {
+          ramAmount = data?.specs?.minimum;
+        }
+      }
       await downloadFile(
         path.join(
           instancesPath,
@@ -230,7 +254,9 @@ const InstanceName = ({
           localInstanceName,
           loader,
           data,
-          `background${path.extname(imageURL)}`
+          `background${path.extname(imageURL)}`,
+          null,
+          ramAmount ? { javaMemory: ramAmount } : null
         )
       );
     } else if (importZipPath) {
