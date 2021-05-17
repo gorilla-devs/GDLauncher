@@ -217,14 +217,10 @@ const InstanceName = ({
         source: FTB
       };
 
-      console.log('PORCONE', data, os.totalmem() / 1024 / 1024);
-
-      // os.totalmem() / 1024 / 1024
-
       let ramAmount = null;
       if (loader.loaderType === FABRIC) {
         const userMemory = Math.round(os.totalmem() / 1024 / 1024);
-        // const javaMemory = state.settings.java.memory;
+
         if (userMemory < data.specs.minimum) {
           await new Promise((resolve, reject) => {
             dispatch(
