@@ -218,28 +218,32 @@ const InstanceName = ({
       };
 
       let ramAmount = null;
-      if (loader.loaderType === FABRIC) {
-        const userMemory = Math.round(os.totalmem() / 1024 / 1024);
 
-        if (userMemory < data?.specs?.minimum) {
+      const userMemory = Math.round(os.totalmem() / 1024 / 1024);
+
+      if (userMemory < data?.specs?.minimum) {
+        try {
           await new Promise((resolve, reject) => {
             dispatch(
               openModal('ActionConfirmation', {
-                message:
-                  "You don't have enough memory to run this instance, do you still want to proceed?",
-                confirmCallback: resolve,
-                abortCallback: reject,
-                title: 'Not enough memory warning'
+                message: `At least ${data?.specs?.minimum}MB of RAM are required to play this modpack and you only have ${userMemory}MB. You might still be able to play it but probably with low performance. Do you want to continue?`,
+                confirmCallback: () => resolve(),
+                abortCallback: () => reject(),
+                title: 'Low Memory Warning'
               })
             );
           });
-        }
-        if (userMemory >= data?.specs?.recommended) {
-          ramAmount = data?.specs?.recommended;
-        } else if (userMemory >= data?.specs?.minimum) {
-          ramAmount = data?.specs?.minimum;
+        } catch {
+          setClicked(false);
+          return;
         }
       }
+      if (userMemory >= data?.specs?.recommended) {
+        ramAmount = data?.specs?.recommended;
+      } else if (userMemory >= data?.specs?.minimum) {
+        ramAmount = data?.specs?.minimum;
+      }
+
       await downloadFile(
         path.join(
           instancesPath,
