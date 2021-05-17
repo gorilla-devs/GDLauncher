@@ -1019,6 +1019,8 @@ export function addToQueue(
   return async (dispatch, getState) => {
     const state = getState();
     const { currentDownload } = state;
+    const patchedSettings =
+      typeof settings === 'object' && settings !== null ? settings : {};
 
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
@@ -1026,7 +1028,7 @@ export function addToQueue(
       loader,
       manifest,
       background,
-      ...settings
+      ...patchedSettings
     });
 
     await makeDir(path.join(_getInstancesPath(state), instanceName));
@@ -1047,7 +1049,7 @@ export function addToQueue(
             timePlayed: prev.timePlayed || timePlayed || 0,
             background,
             mods: prev.mods || [],
-            ...settings
+            ...patchedSettings
           };
         },
         true

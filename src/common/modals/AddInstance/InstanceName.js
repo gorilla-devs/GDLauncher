@@ -221,23 +221,23 @@ const InstanceName = ({
       if (loader.loaderType === FABRIC) {
         const userMemory = Math.round(os.totalmem() / 1024 / 1024);
 
-        if (userMemory < data.specs.minimum) {
+        if (userMemory < data?.specs?.minimum) {
           await new Promise((resolve, reject) => {
             dispatch(
               openModal('ActionConfirmation', {
                 message:
-                  'You have less ram than the recommended one, do you still want to proceed?',
+                  "You don't have enough memory to run this instance, do you still want to proceed?",
                 confirmCallback: resolve,
                 abortCallback: reject,
-                title: 'Confirm'
+                title: 'Not enough memory warning'
               })
             );
           });
         }
-        if (userMemory >= data.specs.recommended) {
-          ramAmount = data.specs.recommended;
-        } else if (userMemory >= data.specs.minimum) {
-          ramAmount = data.specs.minimum;
+        if (userMemory >= data?.specs?.recommended) {
+          ramAmount = data?.specs?.recommended;
+        } else if (userMemory >= data?.specs?.minimum) {
+          ramAmount = data?.specs?.minimum;
         }
       }
       await downloadFile(
