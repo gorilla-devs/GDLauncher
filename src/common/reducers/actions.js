@@ -2762,14 +2762,14 @@ export function installMod(
           // type 6: include
 
           if (dep.type === 3) {
-            if (instance.mods.some(x => x.projectID === dep.projectID)) return;
-            const depList = await getAddonFiles(dep.projectID);
+            if (instance.mods.some(x => x.addonId === dep.addonId)) return;
+            const depList = await getAddonFiles(dep.addonId);
             const depData = depList.data.find(v =>
               v.gameVersion.includes(gameVersion)
             );
             await dispatch(
               installMod(
-                dep.projectID,
+                dep.addonId,
                 depData.id,
                 instanceName,
                 gameVersion,
