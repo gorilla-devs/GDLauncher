@@ -1013,7 +1013,8 @@ export function addToQueue(
   loader,
   manifest,
   background,
-  timePlayed
+  timePlayed,
+  settings = {}
 ) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -1024,7 +1025,8 @@ export function addToQueue(
       instanceName,
       loader,
       manifest,
-      background
+      background,
+      ...settings
     });
 
     await makeDir(path.join(_getInstancesPath(state), instanceName));
@@ -1044,7 +1046,8 @@ export function addToQueue(
             loader,
             timePlayed: prev.timePlayed || timePlayed || 0,
             background,
-            mods: prev.mods || []
+            mods: prev.mods || [],
+            ...settings
           };
         },
         true

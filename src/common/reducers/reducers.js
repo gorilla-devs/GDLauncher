@@ -40,7 +40,8 @@ function downloadQueue(state = {}, action) {
           status: null,
           currentPhase: 1,
           totalPhases: action.phases,
-          manifest: action.manifest
+          manifest: action.manifest,
+          ...[action.settings || {}]
         }
       };
     case ActionTypes.REMOVE_DOWNLOAD_FROM_QUEUE:
