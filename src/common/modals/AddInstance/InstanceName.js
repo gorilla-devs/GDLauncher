@@ -200,15 +200,17 @@ const InstanceName = ({
 
       const forgeModloader = data.targets.find(v => v.type === 'modloader');
       const mcVersion = data.targets.find(v => v.type === 'game').version;
-
       const loader = {
         loaderType: forgeModloader?.name,
         mcVersion,
-        loaderVersion: convertcurseForgeToCanonical(
-          forgeModloader?.version,
-          mcVersion,
-          forgeManifest
-        ),
+        loaderVersion:
+          data.targets[0].name === FABRIC
+            ? forgeModloader?.version
+            : convertcurseForgeToCanonical(
+                forgeModloader?.version,
+                mcVersion,
+                forgeManifest
+              ),
         fileID: version?.fileID,
         projectID: version?.projectID,
         source: FTB
