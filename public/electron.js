@@ -203,6 +203,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
+      sandbox: false,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
     }
