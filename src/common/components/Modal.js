@@ -30,11 +30,17 @@ const Modal = ({
   backBtn,
   children,
   className,
-  removePadding
+  removePadding,
+  closeCallback
 }) => {
   const dispatch = useDispatch();
 
-  useKey(['Escape'], () => dispatch(closeModal()));
+  const closeFunc = () => {
+    if (closeCallback) closeCallback();
+    dispatch(closeModal());
+  };
+
+  useKey(['Escape'], closeFunc);
 
   return (
     <div
@@ -53,7 +59,7 @@ const Modal = ({
       {(header === undefined || header === true) && (
         <HeaderComponent>
           <h3>{title || 'Modal'}</h3>
-          <CloseButton onClick={() => dispatch(closeModal())} />
+          <CloseButton onClick={closeFunc} />
         </HeaderComponent>
       )}
       <div
@@ -74,9 +80,7 @@ const Modal = ({
           position: relative;
         `}
       >
-        <span onClick={() => dispatch(closeModal())}>
-          {backBtn !== undefined && backBtn}
-        </span>
+        <span onClick={closeFunc}>{backBtn !== undefined && backBtn}</span>
         {children}
       </div>
     </div>

@@ -23,7 +23,7 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        {/* <Section>
+        <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -33,17 +33,15 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Added FTB support.</li>
-              <li>Added Microsoft accounts support.</li>
-              <li>Added confirmation modal when deleting all shared data.</li>
-              <li>Added a per-instance java path setting.</li>
+              <li>Confirmation prompt on uninstall to delete user data.</li>
               <li>
-                Added a progress state in the taskbar icon when downloading an
-                instance.
+                Automatically set recommended/minimum RAM amount for FTB
+                modpacks, and eventually show a confirmation modal in case the
+                user has not enough.
               </li>
             </ul>
           </div>
-        </Section> */}
+        </Section>
         <Section>
           <SectionTitle
             css={`
@@ -54,9 +52,9 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed icons in mods browser.</li>
-              <li>Fixed updating modpacks not working.</li>
-              <li>Fixed some styling.</li>
+              <li>Fixed mod dependencies not being downloaded.</li>
+              <li>Fixed FTB fabric modpacks not downloading correctly.</li>
+              <li>Fixed crash when searching FTB modpacks.</li>
             </ul>
           </div>
         </Section>

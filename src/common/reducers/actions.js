@@ -1013,18 +1013,22 @@ export function addToQueue(
   loader,
   manifest,
   background,
-  timePlayed
+  timePlayed,
+  settings = {}
 ) {
   return async (dispatch, getState) => {
     const state = getState();
     const { currentDownload } = state;
+    const patchedSettings =
+      typeof settings === 'object' && settings !== null ? settings : {};
 
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,
       loader,
       manifest,
-      background
+      background,
+      ...patchedSettings
     });
 
     await makeDir(path.join(_getInstancesPath(state), instanceName));
@@ -1044,7 +1048,8 @@ export function addToQueue(
             loader,
             timePlayed: prev.timePlayed || timePlayed || 0,
             background,
-            mods: prev.mods || []
+            mods: prev.mods || [],
+            ...patchedSettings
           };
         },
         true
@@ -2762,14 +2767,14 @@ export function installMod(
           // type 6: include
 
           if (dep.type === 3) {
-            if (instance.mods.some(x => x.projectID === dep.projectID)) return;
-            const depList = await getAddonFiles(dep.projectID);
+            if (instance.mods.some(x => x.addonId === dep.addonId)) return;
+            const depList = await getAddonFiles(dep.addonId);
             const depData = depList.data.find(v =>
               v.gameVersion.includes(gameVersion)
             );
             await dispatch(
               installMod(
-                dep.projectID,
+                dep.addonId,
                 depData.id,
                 instanceName,
                 gameVersion,

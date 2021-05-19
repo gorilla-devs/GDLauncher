@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import path from 'path';
+import os from 'os';
 import fse from 'fs-extra';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
@@ -13,7 +14,7 @@ import {
 import { Input } from 'antd';
 import { transparentize } from 'polished';
 import { addToQueue } from '../../reducers/actions';
-import { closeModal } from '../../reducers/modals/actions';
+import { closeModal, openModal } from '../../reducers/modals/actions';
 import {
   downloadAddonZip,
   importAddonZip,
@@ -170,7 +171,7 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            `background${path.extname(imageURL)}`
+            imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
       } else if (version?.loaderType === VANILLA) {
@@ -186,7 +187,7 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            `background${path.extname(imageURL)}`
+            imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
       }
@@ -200,19 +201,48 @@ const InstanceName = ({
 
       const forgeModloader = data.targets.find(v => v.type === 'modloader');
       const mcVersion = data.targets.find(v => v.type === 'game').version;
-
       const loader = {
         loaderType: forgeModloader?.name,
         mcVersion,
-        loaderVersion: convertcurseForgeToCanonical(
-          forgeModloader?.version,
-          mcVersion,
-          forgeManifest
-        ),
+        loaderVersion:
+          data.targets[0].name === FABRIC
+            ? forgeModloader?.version
+            : convertcurseForgeToCanonical(
+                forgeModloader?.version,
+                mcVersion,
+                forgeManifest
+              ),
         fileID: version?.fileID,
         projectID: version?.projectID,
         source: FTB
       };
+
+      let ramAmount = null;
+
+      const userMemory = Math.round(os.totalmem() / 1024 / 1024);
+
+      if (userMemory < data?.specs?.minimum) {
+        try {
+          await new Promise((resolve, reject) => {
+            dispatch(
+              openModal('ActionConfirmation', {
+                message: `At least ${data?.specs?.minimum}MB of RAM are required to play this modpack and you only have ${userMemory}MB. You might still be able to play it but probably with low performance. Do you want to continue?`,
+                confirmCallback: () => resolve(),
+                abortCallback: () => reject(),
+                title: 'Low Memory Warning'
+              })
+            );
+          });
+        } catch {
+          setClicked(false);
+          return;
+        }
+      }
+      if (userMemory >= data?.specs?.recommended) {
+        ramAmount = data?.specs?.recommended;
+      } else if (userMemory >= data?.specs?.minimum) {
+        ramAmount = data?.specs?.minimum;
+      }
 
       await downloadFile(
         path.join(
@@ -228,7 +258,9 @@ const InstanceName = ({
           localInstanceName,
           loader,
           data,
-          `background${path.extname(imageURL)}`
+          `background${path.extname(imageURL)}`,
+          null,
+          ramAmount ? { javaMemory: ramAmount } : null
         )
       );
     } else if (importZipPath) {
