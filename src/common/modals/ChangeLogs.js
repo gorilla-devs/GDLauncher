@@ -2,7 +2,7 @@
 import React, { memo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
-import { ipcRenderer } from 'electron-nightly';
+import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import Modal from '../components/Modal';
