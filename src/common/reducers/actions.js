@@ -19,7 +19,7 @@ import Seven, { extractFull } from 'node-7z';
 import { push } from 'connected-react-router';
 import { spawn } from 'child_process';
 import symlink from 'symlink-dir';
-import { promises as fs } from 'fs';
+import fss, { promises as fs } from 'fs';
 import originalFs from 'original-fs';
 import pMap from 'p-map';
 import makeDir from 'make-dir';
@@ -964,9 +964,9 @@ export function updateInstanceConfig(
       );
       // Remove queue and name, they are augmented in the reducer and we don't want them in the config file
       const newConfig = updateFunction(omit(instance, ['queue', 'name']));
+      const JsonString = JSON.stringify(newConfig);
       // Ensure that the new config is actually valid to write
       try {
-        const JsonString = JSON.stringify(newConfig);
         const isJson = JSON.parse(JsonString);
         if (!isJson || typeof isJson !== 'object') {
           const err = `Cannot write this JSON to ${instanceName}. Not an object`;
@@ -979,15 +979,50 @@ export function updateInstanceConfig(
         throw new Error(err);
       }
 
-      try {
-        await fs.lstat(configPath);
+      const writeFileToDisk = async (content, tempP, p) => {
+        await new Promise((resolve, reject) => {
+          fss.open(tempP, 'w', async (err, fd) => {
+            if (err) reject(err);
 
-        await fse.outputJson(tempConfigPath, newConfig);
-        await fse.rename(tempConfigPath, configPath);
+            const buffer = Buffer.from(content);
+            fss.write(
+              fd,
+              buffer,
+              0,
+              buffer.length,
+              null,
+              (err1, bytesWritten, writtenBuffer) => {
+                if (err1) reject(err1);
+
+                if (
+                  buffer.length !== bytesWritten ||
+                  Buffer.compare(buffer, writtenBuffer) !== 0
+                ) {
+                  reject(new Error('Content corrupted'));
+                }
+
+                fss.close(fd, () => resolve());
+              }
+            );
+          });
+        });
+
+        const readBuff = Buffer.alloc(50);
+        const newFile = await fs.open(tempP, 'r');
+        await newFile.read(readBuff, 0, 50, null);
+
+        if (readBuff.every(v => v === 0)) {
+          throw new Error('Corrupted file');
+        }
+        await fs.rename(tempP, p);
+      };
+
+      try {
+        await fs.access(configPath);
+        await writeFileToDisk(JsonString, tempConfigPath, configPath);
       } catch {
         if (forceWrite) {
-          await fse.outputJson(tempConfigPath, newConfig);
-          await fse.rename(tempConfigPath, configPath);
+          await writeFileToDisk(JsonString, tempConfigPath, configPath);
         }
       }
       dispatch({
@@ -2477,6 +2512,10 @@ export function launchInstance(instanceName) {
 
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
+    const configPath = path.join(instancePath, 'config.json');
+    const backupConfigPath = path.join(instancePath, 'config.bak.json');
+    await fs.copyFile(configPath, backupConfigPath);
+
     const instanceJLFPath = path.join(
       _getInstancesPath(state),
       instanceName,
@@ -2675,6 +2714,7 @@ export function launchInstance(instanceName) {
       dispatch(removeStartedInstance(instanceName));
       await fse.remove(instanceJLFPath);
       if (process.platform === 'win32') fse.remove(symLinkDirPath);
+      await fs.unlink(backupConfigPath);
       if (code !== 0 && errorLogs) {
         dispatch(
           openModal('InstanceCrashed', {
