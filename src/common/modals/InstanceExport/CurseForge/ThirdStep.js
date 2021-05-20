@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import pMap from 'p-map';
 import { get7zPath } from '../../../../app/desktop/utils';
 import { FABRIC, VANILLA, FORGE } from '../../../utils/constants';
+import { getAddon } from '../../../api';
 
 /**
  *
@@ -114,6 +115,42 @@ export default function ThirdStep({
     };
   };
 
+  const createModListHtml = async () => {
+    const mappedMods = await Promise.all(
+      mods
+        .filter(mod => mod.projectID)
+        .map(async mod => {
+          let ok = false;
+          let tries = 0;
+
+          do {
+            try {
+              tries += 1;
+              if (tries !== 1) {
+                await new Promise(resolve => setTimeout(resolve, 5000));
+              }
+              const { data } = await getAddon(mod.projectID);
+
+              ok = true;
+              return {
+                name: data.name,
+                url: data.websiteUrl,
+                author: data.authors[0].name
+              };
+            } catch (e) {
+              console.error(e);
+            }
+          } while (!ok && tries <= 3);
+        })
+    );
+
+    return `<ul>${mappedMods
+      .map(
+        mod => `<li><a href=${mod?.url}>${mod?.name}(${mod?.author})</a></li>`
+      )
+      .join('')}</ul>`;
+  };
+
   useEffect(() => {
     if (page !== 2) return;
     const workOnFiles = async () => {
@@ -171,8 +208,14 @@ export default function ThirdStep({
       const manifestString = await createManifest(filteredCurseforgeMods);
       await fse.outputJson(manifestPath, manifestString);
 
+      // Create modlist.html file
+      const modlistHtmlPath = path.join(path.join(tempExport, 'modlist.html'));
+      const modlistHtmlContent = await createModListHtml();
+      await fse.writeFile(modlistHtmlPath, modlistHtmlContent);
+
       // Create zipped export file
       const filesToZip = [
+        path.join(tempExport, 'modlist.html'),
         path.join(tempExport, 'overrides'),
         path.join(tempExport, 'manifest.json')
       ];
