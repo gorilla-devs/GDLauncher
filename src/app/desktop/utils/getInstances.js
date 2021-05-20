@@ -33,7 +33,8 @@ const getInstances = async instancesPath => {
         await fs.rename(backupConfigPath, configPath);
       }
 
-      const config = JSON.parse(rawConfig);
+      const newRawConfig = await fs.readFile(configPath);
+      const config = JSON.parse(newRawConfig);
 
       // if the launcher has the modloader as an array, convert it to object
       if (Array.isArray(config.modloader)) {
