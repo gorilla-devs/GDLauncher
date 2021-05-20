@@ -113,9 +113,15 @@ const commonConfig = {
     appId: 'org.gorilladevs.GDLauncher',
     files: [
       '!node_modules/**/*',
-      'node_modules/7zip-bin/linux/x64/7za',
-      'node_modules/7zip-bin/mac/7za',
-      'node_modules/7zip-bin/win/x64/7za.exe',
+      ...(process.platform === 'linux'
+        ? ['node_modules/7zip-bin/linux/x64/7za']
+        : []),
+      ...(process.platform === 'darwin'
+        ? ['node_modules/7zip-bin/mac/7za']
+        : []),
+      ...(process.platform === 'win32'
+        ? ['node_modules/7zip-bin/win/x64/7za.exe']
+        : []),
       'build/**/*',
       'package.json',
       'public/icon.png'
