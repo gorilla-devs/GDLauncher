@@ -39,6 +39,7 @@ const ChangeLogs = () => {
                 modpacks, and eventually show a confirmation modal in case the
                 user has not enough.
               </li>
+              <li>Added modlist.html when exporting instances.</li>
             </ul>
           </div>
         </Section>
@@ -55,6 +56,7 @@ const ChangeLogs = () => {
               <li>Fixed mod dependencies not being downloaded.</li>
               <li>Fixed FTB fabric modpacks not downloading correctly.</li>
               <li>Fixed crash when searching FTB modpacks.</li>
+              <li>Hopefully fixed instances disappearing.</li>
             </ul>
           </div>
         </Section>
