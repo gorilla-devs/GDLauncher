@@ -1,5 +1,6 @@
 import path from 'path';
 import fse from 'fs-extra';
+import { promises as fs } from 'fs';
 import pMap from 'p-map';
 import { getDirectories } from '.';
 import { CURSEFORGE } from '../../../common/utils/constants';
@@ -10,7 +11,29 @@ const getInstances = async instancesPath => {
       const configPath = path.join(
         path.join(instancesPath, instance, 'config.json')
       );
-      const config = await fse.readJSON(configPath);
+      const rawConfig = await fs.readFile(configPath);
+
+      // Remove temp config if present
+      try {
+        const tempConfigPath = path.join(
+          path.join(instancesPath, instance, 'config_new_temp.json')
+        );
+        await fs.unlink(tempConfigPath);
+      } catch {
+        // Nothing
+      }
+
+      // Restore config in case of crash
+      if (rawConfig.every(v => v === 0)) {
+        const backupConfigPath = path.join(
+          path.join(instancesPath, instance, 'config.bak.json')
+        );
+        const backupConfig = await fs.readFile(backupConfigPath);
+        JSON.parse(backupConfig);
+        await fs.rename(backupConfigPath, configPath);
+      }
+
+      const config = JSON.parse(rawConfig);
 
       // if the launcher has the modloader as an array, convert it to object
       if (Array.isArray(config.modloader)) {
