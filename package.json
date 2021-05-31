@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -124,7 +124,7 @@
     "copy-webpack-plugin": "^6.4.1",
     "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
-    "electron": "^12.0.9",
+    "electron": "^13.0.1",
     "electron-builder": "^22.10.5",
     "eslint": "^7.17.0",
     "eslint-config-airbnb": "^18.2.1",
