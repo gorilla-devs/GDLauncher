@@ -23,7 +23,7 @@ const ChangeLogs = () => {
       title={`What's new in ${version}`}
     >
       <Container>
-        <Section>
+        {/* <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
@@ -33,7 +33,6 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Confirmation prompt on uninstall to delete user data.</li>
               <li>
                 Automatically set recommended/minimum RAM amount for FTB
                 modpacks, and eventually show a confirmation modal in case the
@@ -42,7 +41,7 @@ const ChangeLogs = () => {
               <li>Added modlist.html when exporting instances.</li>
             </ul>
           </div>
-        </Section>
+        </Section> */}
         <Section>
           <SectionTitle
             css={`
@@ -53,10 +52,9 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed mod dependencies not being downloaded.</li>
-              <li>Fixed FTB fabric modpacks not downloading correctly.</li>
-              <li>Fixed crash when searching FTB modpacks.</li>
-              <li>Hopefully fixed instances disappearing.</li>
+              <li>Fixed FTB downloads.</li>
+              <li>Fixed macOS menu.</li>
+              <li>Other minor fixes.</li>
             </ul>
           </div>
         </Section>
