@@ -120,7 +120,7 @@ const edit = [
 ];
 
 // app.allowRendererProcessReuse = true;
-Menu.setApplicationMenu(Menu.buildFromTemplate([edit]));
+Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
 
 let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
 
