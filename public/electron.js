@@ -68,31 +68,56 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
-const edit = {
-  label: 'Edit',
-  submenu: [
-    {
-      label: 'Cut',
-      accelerator: 'CmdOrCtrl+X',
-      selector: 'cut:'
-    },
-    {
-      label: 'Copy',
-      accelerator: 'CmdOrCtrl+C',
-      selector: 'copy:'
-    },
-    {
-      label: 'Paste',
-      accelerator: 'CmdOrCtrl+V',
-      selector: 'paste:'
-    },
-    {
-      label: 'Select All',
-      accelerator: 'CmdOrCtrl+A',
-      selector: 'selectAll:'
-    }
-  ]
-};
+const edit = [
+  ...(process.platform === 'darwin'
+    ? {
+        label: 'GDLauncher',
+        submenu: [
+          {
+            label: 'Hide',
+            accelerator: 'Command+H',
+            selector: 'hide:'
+          },
+          { type: 'separator' },
+          {
+            label: 'Quit',
+            accelerator: 'Command+Q',
+            click: () => {
+              app.quit();
+            }
+          }
+        ]
+      }
+    : {}),
+  {
+    label: 'Edit',
+    submenu: [
+      {
+        label: 'Cut',
+        accelerator: 'CmdOrCtrl+X',
+        selector: 'cut:'
+      },
+      {
+        label: 'Copy',
+        accelerator: 'CmdOrCtrl+C',
+        selector: 'copy:'
+      },
+      {
+        label: 'Paste',
+        accelerator: 'CmdOrCtrl+V',
+        selector: 'paste:'
+      },
+      {
+        label: 'Select All',
+        accelerator: 'CmdOrCtrl+A',
+        selector: 'selectAll:'
+      },
+      { type: 'separator' },
+      { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+      { label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' }
+    ]
+  }
+];
 
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu(Menu.buildFromTemplate([edit]));
