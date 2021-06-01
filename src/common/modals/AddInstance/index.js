@@ -13,7 +13,7 @@ const AddInstance = ({ defaultPage }) => {
   const [step, setStep] = useState(0);
   const [modpack, setModpack] = useState(null);
   const [importZipPath, setImportZipPath] = useState('');
-  const [importUpdate, setImportUpdate] = useState(false);
+  const [importUpdate, setImportUpdate] = useState('');
   const [page, setPage] = useState(defaultPage);
 
   return (

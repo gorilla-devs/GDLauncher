@@ -24,6 +24,7 @@ const Import = ({
   setOverrideNextStepOnClick
 }) => {
   const [localValue, setLocalValue] = useState(null);
+  const [updateChecked, setUpdateChecked] = useState(false);
   const tempPath = useSelector(_getTempPath);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -35,7 +36,10 @@ const Import = ({
   useEffect(() => {
     setImportZipPath(localValue?.length > 0 ? localValue : null);
     setVersion(null);
-  }, [localValue]);
+
+    if (updateChecked) setImportUpdate(localValue);
+    else setImportUpdate('');
+  }, [localValue, updateChecked]);
 
   const openFileDialog = async () => {
     const dialog = await ipcRenderer.invoke('openFileDialog');
@@ -66,7 +70,7 @@ const Import = ({
         throw err;
       }
     } else {
-      // setImportUpdate(false);
+      setImportUpdate('');
     }
 
     const sevenZipPath = await get7zPath();
@@ -180,7 +184,7 @@ const Import = ({
           `}
         >
           Update the instance during launch
-          <Switch onChange={checked => {setImportUpdate(checked);}}/>
+          <Switch onChange={checked => {setUpdateChecked(checked);}}/>
         </div>
         <div
           show={error}
