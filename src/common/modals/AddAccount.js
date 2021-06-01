@@ -105,7 +105,11 @@ const AddAccount = ({ username }) => {
       title=" "
     >
       <Container>
-        <Menu mode="horizontal" selectedKeys={[accountType]}>
+        <Menu
+          mode="horizontal"
+          selectedKeys={[accountType]}
+          overflowedIndicator={null}
+        >
           <StyledAccountMenuItem
             key={ACCOUNT_MOJANG}
             onClick={() => setAccountType(ACCOUNT_MOJANG)}
