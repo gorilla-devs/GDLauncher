@@ -2500,21 +2500,17 @@ export function launchInstance(instanceName) {
       const tempPath = _getTempPath(state);
       const instancesPath = _getInstancesPath(state);
       const { forgeManifest } = state.app;
-      const addonPathZip = path.join(
-        _getTempPath(state),
-        instanceName,
-        'addon.zip'
-      );
+      const addonPathZip = path.join(_getTempPath(state), instanceName);
 
       await downloadFile(path.join(tempPath, path.basename(zipUrl)), zipUrl);
-
-      await fse.remove(addonPathZip);
       const manifest = await importAddonZip(
         path.join(tempPath, path.basename(zipUrl)),
         path.join(instancesPath, instanceName),
         path.join(tempPath, instanceName),
         tempPath
       );
+      fse.remove(addonPathZip);
+
       let newLoader = null;
 
       const isForge = (manifest?.minecraft?.modLoaders || []).find(
