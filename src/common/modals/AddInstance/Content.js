@@ -20,13 +20,14 @@ import ftbIcon from '../../assets/ftbIcon.webp';
 const Content = ({
   in: inProp,
   setStep,
-  page,
   setPage,
+  page,
   setVersion,
   version,
   setModpack,
+  setImportZipPath,
   importZipPath,
-  setImportZipPath
+  setImportUpdate
 }) => {
   const [overrideNextStepOnClick, setOverrideNextStepOnClick] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -41,8 +42,9 @@ const Content = ({
     <Import
       setVersion={setVersion}
       setModpack={setModpack}
-      importZipPath={importZipPath}
       setImportZipPath={setImportZipPath}
+      importZipPath={importZipPath}
+      setImportUpdate={setImportUpdate}
       setOverrideNextStepOnClick={setOverrideNextStepOnClick}
     />,
     <FTBModpacks

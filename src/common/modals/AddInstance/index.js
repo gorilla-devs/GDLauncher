@@ -13,6 +13,7 @@ const AddInstance = ({ defaultPage }) => {
   const [step, setStep] = useState(0);
   const [modpack, setModpack] = useState(null);
   const [importZipPath, setImportZipPath] = useState('');
+  const [importUpdate, setImportUpdate] = useState(false);
   const [page, setPage] = useState(defaultPage);
 
   return (
@@ -27,8 +28,8 @@ const AddInstance = ({ defaultPage }) => {
     >
       <Content
         in={step === 0}
-        page={page}
         setPage={setPage}
+        page={page}
         setStep={setStep}
         setVersion={setVersion}
         version={version}
@@ -36,16 +37,18 @@ const AddInstance = ({ defaultPage }) => {
         modpack={modpack}
         setImportZipPath={setImportZipPath}
         importZipPath={importZipPath}
+        setImportUpdate={setImportUpdate}
       />
       <InstanceName
-        version={version}
         in={step === 1}
         setStep={setStep}
-        modpack={modpack}
-        setVersion={setVersion}
-        setModpack={setModpack}
-        importZipPath={importZipPath}
         step={step}
+        setVersion={setVersion}
+        version={version}
+        setModpack={setModpack}
+        modpack={modpack}
+        importZipPath={importZipPath}
+        importUpdate={importUpdate}
       />
     </Modal>
   );

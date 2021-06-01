@@ -7,7 +7,7 @@ import { promises as fs } from 'fs';
 import { extractFull } from 'node-7z';
 import { get7zPath, isMod } from '../../../app/desktop/utils';
 import { ipcRenderer } from 'electron';
-import { Button, Input } from 'antd';
+import { Button, Input, Switch } from 'antd';
 import { _getTempPath } from '../../utils/selectors';
 import { useSelector } from 'react-redux';
 import { getAddon, getAddonFiles } from '../../api';
@@ -16,10 +16,11 @@ import { CURSEFORGE, FABRIC, FORGE, VANILLA } from '../../utils/constants';
 import { transparentize } from 'polished';
 
 const Import = ({
-  setModpack,
   setVersion,
-  importZipPath,
+  setModpack,
   setImportZipPath,
+  importZipPath,
+  setImportUpdate,
   setOverrideNextStepOnClick
 }) => {
   const [localValue, setLocalValue] = useState(null);
@@ -64,6 +65,8 @@ const Import = ({
         setLoading(false);
         throw err;
       }
+    } else {
+      // setImportUpdate(false);
     }
 
     const sevenZipPath = await get7zPath();
@@ -168,6 +171,16 @@ const Import = ({
           <Button disabled={loading} type="primary" onClick={openFileDialog}>
             Browse
           </Button>
+        </div>
+        <div
+          css={`
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+          `}
+        >
+          Update the instance during launch
+          <Switch onChange={checked => {setImportUpdate(checked);}}/>
         </div>
         <div
           show={error}
