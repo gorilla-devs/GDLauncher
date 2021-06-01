@@ -158,9 +158,9 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                   addToQueue(
                     instanceName,
                     {
-                      loaderType: selectedVersion[0],
-                      loaderVersion: selectedVersion[2],
-                      ...defaultValue
+                      ...defaultValue,
+                      loaderType: VANILLA,
+                      mcVersion: selectedVersion[2]
                     },
                     null,
                     background
