@@ -70,25 +70,27 @@ app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
 const edit = [
   ...(process.platform === 'darwin'
-    ? {
-        label: 'GDLauncher',
-        submenu: [
-          {
-            label: 'Hide',
-            accelerator: 'Command+H',
-            selector: 'hide:'
-          },
-          { type: 'separator' },
-          {
-            label: 'Quit',
-            accelerator: 'Command+Q',
-            click: () => {
-              app.quit();
+    ? [
+        {
+          label: 'GDLauncher',
+          submenu: [
+            {
+              label: 'Hide',
+              accelerator: 'Command+H',
+              selector: 'hide:'
+            },
+            { type: 'separator' },
+            {
+              label: 'Quit',
+              accelerator: 'Command+Q',
+              click: () => {
+                app.quit();
+              }
             }
-          }
-        ]
-      }
-    : {}),
+          ]
+        }
+      ]
+    : []),
   {
     label: 'Edit',
     submenu: [

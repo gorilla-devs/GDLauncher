@@ -72,13 +72,11 @@ const ChangeLogs = () => {
           </p>
           <Button
             css={`
-              width: 200px;
-              height: 40px;
               font-size: 20px;
-              padding: 4px !important;
               margin-top: 20px;
             `}
             type="primary"
+            size="large"
             href="https://discord.gg/4cGYzen"
           >
             <FontAwesomeIcon icon={faDiscord} />
