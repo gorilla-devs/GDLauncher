@@ -185,6 +185,10 @@ const Overview = ({ instanceName, background, manifest }) => {
   const [screenResolution, setScreenResolution] = useState(null);
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
+  const [downloadInstanceZip, setDownloadInstanceZip] = useState(
+    config?.updateInstanceZip
+  );
+  const [zipUrl, setZipUrl] = useState(config?.zipUrl);
 
   const dispatch = useDispatch();
 
@@ -261,6 +265,28 @@ const Overview = ({ instanceName, background, manifest }) => {
     fss.rename(
       path.join(instancesPath, instanceName),
       path.join(instancesPath, newName)
+    );
+  };
+
+  const debouncedZipUrlUpdate = useDebouncedCallback(
+    v => {
+      dispatch(
+        updateInstanceConfig(instanceName, prev => ({
+          ...prev,
+          zipUrl: v
+        }))
+      );
+    },
+    400,
+    { maxWait: 700, leading: false }
+  );
+
+  const updateDownloadInstanceZip = v => {
+    dispatch(
+      updateInstanceConfig(instanceName, prev => ({
+        ...prev,
+        downloadInstanceZip: v
+      }))
     );
   };
 
@@ -578,6 +604,25 @@ const Overview = ({ instanceName, background, manifest }) => {
                 <FontAwesomeIcon icon={faUndo} />
               </JavaResetButton>
             </JavaManagerRow>
+          )}
+          <JavaManagerRow>
+            <div>Update instance upon launching</div>
+            <Switch
+              checked={downloadInstanceZip}
+              onChange={v => {
+                setDownloadInstanceZip(v);
+                updateDownloadInstanceZip(v);
+              }}
+            />
+          </JavaManagerRow>
+          {downloadInstanceZip && (
+            <Input
+              value={zipUrl}
+              onChange={e => {
+                setZipUrl(e.target.value);
+                debouncedZipUrlUpdate.callback(e.target.value);
+              }}
+            />
           )}
         </OverviewCard>
       </Column>

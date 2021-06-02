@@ -2492,129 +2492,140 @@ export const startListener = () => {
 
 export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
-    const { zipUrl } = _getInstance(getState())(instanceName);
+    const { downloadInstanceZip, zipUrl } = _getInstance(getState())(
+      instanceName
+    );
     // We need to download the .zip file again and parse it
-    if (zipUrl !== undefined) {
+    if (zipUrl && downloadInstanceZip) {
       let state = getState();
       const { loader, mods } = _getInstance(state)(instanceName);
       const tempPath = _getTempPath(state);
       const instancesPath = _getInstancesPath(state);
       const { forgeManifest } = state.app;
       const addonPathZip = path.join(_getTempPath(state), instanceName);
+      let zipDownloaded = true;
 
-      await downloadFile(path.join(tempPath, path.basename(zipUrl)), zipUrl);
-      const manifest = await importAddonZip(
-        path.join(tempPath, path.basename(zipUrl)),
-        path.join(instancesPath, instanceName),
-        path.join(tempPath, instanceName),
-        tempPath
-      );
-      fse.remove(addonPathZip);
-
-      let newLoader = null;
-
-      const isForge = (manifest?.minecraft?.modLoaders || []).find(
-        v => v.id.includes(FORGE) && v.primary
-      );
-
-      const isFabric = (manifest?.minecraft?.modLoaders || []).find(
-        v => v.id.includes(FABRIC) && v.primary
-      );
-
-      const isVanilla = (manifest?.minecraft?.modLoaders || []).find(
-        v => v.id.includes(VANILLA) && v.primary
-      );
-
-      if (isForge) {
-        newLoader = {
-          ...loader,
-          loaderType: FORGE,
-          mcVersion: manifest.minecraft.version,
-          loaderVersion: convertcurseForgeToCanonical(
-            manifest.minecraft.modLoaders.find(v => v.primary).id,
-            manifest.minecraft.version,
-            forgeManifest
-          )
-        };
-      } else if (isFabric) {
-        newLoader = {
-          ...loader,
-          loaderType: FABRIC,
-          mcVersion: manifest.minecraft.version,
-          loaderVersion: manifest.minecraft.modLoaders[0].yarn,
-          fileID: manifest.minecraft.modLoaders[0].loader
-        };
-      } else if (isVanilla) {
-        newLoader = {
-          ...loader,
-          loaderType: VANILLA,
-          mcVersion: manifest.minecraft.version
-        };
-        delete newLoader.loaderVersion;
+      try {
+        await downloadFile(path.join(tempPath, path.basename(zipUrl)), zipUrl);
+      } catch {
+        zipDownloaded = false;
+        log.log(`Impossible to download ${zipUrl}.`);
       }
 
-      if (JSON.stringify(loader) !== JSON.stringify(newLoader)) {
-        dispatch(addToQueue(instanceName, newLoader, manifest));
+      if (zipDownloaded) {
+        const manifest = await importAddonZip(
+          path.join(tempPath, path.basename(zipUrl)),
+          path.join(instancesPath, instanceName),
+          path.join(tempPath, instanceName),
+          tempPath
+        );
+        fse.remove(addonPathZip);
 
-        // wait for the game to install
-        do {
-          await new Promise(resolve => setTimeout(resolve, 300));
-          state = getState();
-        } while (_getDownloadQueue(state)[instanceName] !== undefined);
-      }
+        let newLoader = null;
 
-      if (manifest.files === [])
-        mods.forEach(mod => dispatch(deleteMod(instanceName, mod)));
+        const isForge = (manifest?.minecraft?.modLoaders || []).find(
+          v => v.id.includes(FORGE) && v.primary
+        );
 
-      let modsDone = 0;
-      let modsModified = 0;
-      const originalMods = [...mods];
-      manifest.files.forEach(newMod => {
-        const presentMod = originalMods.filter(
-          mod => mod.projectID === newMod.projectID
-        )[0];
+        const isFabric = (manifest?.minecraft?.modLoaders || []).find(
+          v => v.id.includes(FABRIC) && v.primary
+        );
 
-        if (presentMod) {
-          originalMods.splice(originalMods.indexOf(presentMod), 1);
+        const isVanilla = (manifest?.minecraft?.modLoaders || []).find(
+          v => v.id.includes(VANILLA) && v.primary
+        );
 
-          if (presentMod.fileID !== newMod.fileID) {
+        if (isForge) {
+          newLoader = {
+            ...loader,
+            loaderType: FORGE,
+            mcVersion: manifest.minecraft.version,
+            loaderVersion: convertcurseForgeToCanonical(
+              manifest.minecraft.modLoaders.find(v => v.primary).id,
+              manifest.minecraft.version,
+              forgeManifest
+            )
+          };
+        } else if (isFabric) {
+          newLoader = {
+            ...loader,
+            loaderType: FABRIC,
+            mcVersion: manifest.minecraft.version,
+            loaderVersion: manifest.minecraft.modLoaders[0].yarn,
+            fileID: manifest.minecraft.modLoaders[0].loader
+          };
+        } else if (isVanilla) {
+          newLoader = {
+            ...loader,
+            loaderType: VANILLA,
+            mcVersion: manifest.minecraft.version
+          };
+          delete newLoader.loaderVersion;
+        }
+
+        if (JSON.stringify(loader) !== JSON.stringify(newLoader)) {
+          dispatch(addToQueue(instanceName, newLoader, manifest));
+
+          // wait for the game to install
+          do {
+            await new Promise(resolve => setTimeout(resolve, 300));
+            state = getState();
+          } while (_getDownloadQueue(state)[instanceName] !== undefined);
+        }
+
+        if (manifest.files === [])
+          mods.forEach(mod => dispatch(deleteMod(instanceName, mod)));
+
+        let modsDone = 0;
+        let modsModified = 0;
+        const originalMods = [...mods];
+        manifest.files.forEach(newMod => {
+          const presentMod = originalMods.filter(
+            mod => mod.projectID === newMod.projectID
+          )[0];
+
+          if (presentMod) {
+            originalMods.splice(originalMods.indexOf(presentMod), 1);
+
+            if (presentMod.fileID !== newMod.fileID) {
+              modsModified += 1;
+              dispatch(
+                updateMod(
+                  instanceName,
+                  presentMod,
+                  newMod.fileID,
+                  newLoader.mcVersion,
+                  p => {
+                    if (p === '100.0') modsDone += 1;
+                  }
+                )
+              );
+            }
+          } else {
             modsModified += 1;
             dispatch(
-              updateMod(
-                instanceName,
-                presentMod,
+              installMod(
+                newMod.projectID,
                 newMod.fileID,
+                instanceName,
                 newLoader.mcVersion,
+                false,
                 p => {
                   if (p === '100.0') modsDone += 1;
                 }
               )
             );
           }
-        } else {
-          modsModified += 1;
-          dispatch(
-            installMod(
-              newMod.projectID,
-              newMod.fileID,
-              instanceName,
-              newLoader.mcVersion,
-              false,
-              p => {
-                if (p === '100.0') modsDone += 1;
-              }
-            )
-          );
-        }
-      });
+        });
 
-      originalMods.forEach(mod => dispatch(deleteMod(instanceName, mod)));
+        originalMods.forEach(mod => dispatch(deleteMod(instanceName, mod)));
 
-      do {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        log.log('wait', modsDone, 'sur', modsModified);
-      } while (modsDone < modsModified);
-      log.log('done');
+        do {
+          await new Promise(resolve => setTimeout(resolve, 300));
+          log.log('wait', modsDone, 'sur', modsModified);
+        } while (modsDone < modsModified);
+        log.log('done');
+      }
     }
 
     const state = getState();
