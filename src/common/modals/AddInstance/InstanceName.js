@@ -157,7 +157,7 @@ const InstanceName = ({
             manifest,
             imageURL ? `background${path.extname(imageURL)}` : null,
             0,
-            importUpdate !== '' ? {zipUrl: importUpdate} : {}
+            importUpdate !== '' ? {zipUrl: importUpdate, downloadInstanceZip: true} : {}
           )
         );
       } else if (version?.loaderType === FABRIC) {
@@ -176,7 +176,7 @@ const InstanceName = ({
             manifest,
             imageURL ? `background${path.extname(imageURL)}` : null,
             0,
-            importUpdate !== '' ? {zipUrl: importUpdate} : {}
+            importUpdate !== '' ? {zipUrl: importUpdate, downloadInstanceZip: true} : {}
           )
         );
       } else if (version?.loaderType === VANILLA) {
@@ -194,7 +194,7 @@ const InstanceName = ({
             manifest,
             imageURL ? `background${path.extname(imageURL)}` : null,
             0,
-            importUpdate !== '' ? {zipUrl: importUpdate} : {}
+            importUpdate !== '' ? {zipUrl: importUpdate, downloadInstanceZip: true} : {}
           )
         );
       }
