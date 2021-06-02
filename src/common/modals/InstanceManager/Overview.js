@@ -186,7 +186,7 @@ const Overview = ({ instanceName, background, manifest }) => {
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
   const [downloadInstanceZip, setDownloadInstanceZip] = useState(
-    config?.updateInstanceZip
+    config?.downloadInstanceZip
   );
   const [zipUrl, setZipUrl] = useState(config?.zipUrl);
 
