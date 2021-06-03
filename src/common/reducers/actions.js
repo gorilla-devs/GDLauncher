@@ -2497,9 +2497,8 @@ export function launchInstance(instanceName) {
     const librariesPath = _getLibrariesPath(state);
     const assetsPath = _getAssetsPath(state);
     const { memory, args } = state.settings.java;
-    const {
-      resolution: globalMinecraftResolution
-    } = state.settings.minecraftSettings;
+    const { resolution: globalMinecraftResolution } =
+      state.settings.minecraftSettings;
     const {
       loader,
       javaArgs,
