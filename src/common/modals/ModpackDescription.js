@@ -235,6 +235,7 @@ const ModpackDescription = ({
               listHeight={400}
               loading={loading}
               disabled={loading}
+              virtual={false}
             >
               {(files || []).map(file => (
                 <Select.Option

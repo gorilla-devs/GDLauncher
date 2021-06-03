@@ -257,6 +257,7 @@ export default function MyAccountPreferences() {
               const h = parseInt(v.split('x')[1], 10);
               dispatch(updateResolution({ height: h, width: w }));
             }}
+            virtual={false}
           >
             {resolutionPresets.map(v => {
               const w = parseInt(v.split('x')[0], 10);

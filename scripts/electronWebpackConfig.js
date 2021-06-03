@@ -3,13 +3,19 @@
  */
 
 const path = require('path');
+const fse = require('fs-extra');
 // eslint-disable-next-line
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const os = require('os');
 const TerserPlugin = require('terser-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+fse.copySync(
+  path.resolve(__dirname, '../', 'public', 'native'),
+  path.resolve(__dirname, '../', 'build', 'native'),
+  {}
+);
 
 const baseConfig = {
   externals: [],
@@ -61,10 +67,6 @@ const baseConfig = {
       NODE_ENV: process.env.NODE_ENV,
       REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE
     }),
-    new CopyWebpackPlugin({
-      patterns: [{ from: './public/native', to: './build/native' }]
-    }),
-
     new webpack.NamedModulesPlugin()
   ]
 };

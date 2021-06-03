@@ -451,6 +451,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
             defaultValue={filterType}
             onChange={setFilterType}
             disabled={areModsLoading}
+            virtual={false}
           >
             <Select.Option value="Featured">Featured</Select.Option>
             <Select.Option value="Popularity">Popularity</Select.Option>
@@ -467,7 +468,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
-              loadMoreModsDebounced.callback(e.target.value, true);
+              loadMoreModsDebounced(e.target.value, true);
             }}
             allowClear
           />

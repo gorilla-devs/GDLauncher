@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Select, Input } from 'antd';
+import { Input } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ModpacksListWrapper from './ModpacksListWrapper';
@@ -33,7 +33,7 @@ const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
         ({ data } = await getFTBSearch(searchText));
       }
       setModpackIds(data.packs || []);
-      updateModpacks.callback();
+      updateModpacks();
     };
     init();
   }, [searchText]);

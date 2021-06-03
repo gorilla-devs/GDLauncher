@@ -141,6 +141,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
           listHeight={400}
           loading={loading}
           disabled={loading}
+          virtual={false}
         >
           {(files || []).map((file, index) => (
             <Select.Option title={file.displayName} key={file.id} value={index}>
