@@ -14,6 +14,23 @@ const Logo = styled.svg`
     }
   }
 `;
+const LogoContainer = styled.div`
+  &:hover {
+    transform: scale(1.04);
+  }
+  padding: 10px;
+  transition: transform 0.3s ease-in-out;
+`;
+
+const CustomLogo = styled.svg`
+  width: ${props => props.size}px;
+  transform-origin: 50% 50%;
+  cursor: ${props => (props.pointer ? 'cursor' : 'pointer')};
+  * {
+    cursor: ${props => (props.pointer ? 'cursor' : 'pointer')};
+    transition: 0.2s;
+  }
+`;
 
 const isPrideMonth = () => {
   const today = new Date();
@@ -33,24 +50,25 @@ const HorizontalLogo = ({ size, pointer, onClick }) => {
   switch (checkMonthfestivity()) {
     case 'pride':
       return (
-        <Logo
-          version="1.1"
-          id="Layer_1"
-          x="0px"
-          pointer={pointer}
-          y="0px"
-          viewBox="0 0 1024 312"
-          size={size}
-          fill="none"
-          xmlSpace="preserve"
-          onClick={onClick}
-        >
-          <g>
+        <LogoContainer>
+          <CustomLogo
+            version="1.1"
+            id="Layer_1"
+            x="0px"
+            pointer={pointer}
+            y="0px"
+            viewBox="0 0 1024 312"
+            size={size}
+            fill="none"
+            xmlSpace="preserve"
+            onClick={onClick}
+          >
             <g>
-              <defs>
-                <path
-                  id="SVGID_1_"
-                  d="M399.11,125.04l-15.83,15.6c-3.72-3.66-8.74-6.09-15.78-6.09c-11.7,0-19.97,8.98-19.97,21.92
+              <g>
+                <defs>
+                  <path
+                    id="SVGID_1_"
+                    d="M399.11,125.04l-15.83,15.6c-3.72-3.66-8.74-6.09-15.78-6.09c-11.7,0-19.97,8.98-19.97,21.92
 				c0,15.07,9.75,22.57,20.32,22.57c10.4,0,16.37-4.08,18.73-12.17H367.2v-16.43h41.12c0.35,2.6,0.47,5.08,0.47,7.44
 				c0,27.59-20.5,41.42-39.94,41.42c-26,0-44.31-17.73-44.31-42.84c0-25.17,18.32-42.89,44.31-42.89
 				C381.98,113.58,392.08,117.89,399.11,125.04z M497.09,156.47c0,24.93-17.02,41.36-42.89,41.36h-36.51v-82.71h36.51
@@ -72,185 +90,186 @@ const HorizontalLogo = ({ size, pointer, onClick }) => {
 				C931.37,155.35,928.47,157.54,927.11,162.09z M1014.22,138.28l-1.18,21.03c-2.42-0.65-5.85-1.36-9.22-1.36
 				c-5.85,0-9.39,2.07-9.39,8.51v31.37h-21.09v-58.55h20.09v5.91c3.25-5.2,8.39-7.5,15.54-7.5
 				C1011.26,137.68,1013.39,138.1,1014.22,138.28z"
-                />
-              </defs>
-              <clipPath id="SVGID_2_">
-                <use href="#SVGID_1_" css={{ overflow: 'visible' }} />
-              </clipPath>
-              <g className="st7" css={{ clipPath: 'url(#SVGID_2_)' }}>
-                <rect
-                  x="498.26"
-                  y="-588.46"
-                  transform="matrix(0.5 0.866 -0.866 0.5 263.6845 -468.3455)"
-                  className="st0"
-                  css={{ fill: '#E31E26' }}
-                  width="78.37"
-                  height="1165.3"
-                />
-
-                <rect
-                  x="537.44"
-                  y="-520.6"
-                  transform="matrix(0.5 0.866 -0.866 0.5 342.0525 -468.3454)"
-                  className="st1"
-                  css={{ fill: '#F68C1F' }}
-                  width="78.37"
-                  height="1165.3"
-                />
-
-                <rect
-                  x="576.48"
-                  y="-452.97"
-                  transform="matrix(0.5 0.866 -0.866 0.5 420.1367 -468.3454)"
-                  className="st2"
-                  css={{ fill: '#FDEC05' }}
-                  width="78.37"
-                  height="1165.3"
-                />
-
-                <rect
-                  x="615.67"
-                  y="-385.1"
-                  transform="matrix(0.5 0.866 -0.866 0.5 498.5046 -468.3454)"
-                  className="st3"
-                  css={{ fill: '#0D8140' }}
-                  width="78.37"
-                  height="1165.3"
-                />
-
-                <rect
-                  x="654.85"
-                  y="-317.24"
-                  transform="matrix(0.5 0.866 -0.866 0.5 576.8726 -468.3454)"
-                  className="st4"
-                  css={{ fill: '#405FAB' }}
-                  width="78.37"
-                  height="1165.3"
-                />
-
-                <rect
-                  x="694.04"
-                  y="-249.37"
-                  transform="matrix(0.5 0.866 -0.866 0.5 655.2405 -468.3454)"
-                  className="st5"
-                  css={{ fill: '#722A83' }}
-                  width="78.37"
-                  height="1165.3"
-                />
-              </g>
-            </g>
-            <g>
-              <g>
-                <defs>
-                  <polygon
-                    id="SVGID_3_"
-                    points="271.85,80.35 140.82,4.69 9.78,80.35 9.78,231.65 140.82,307.31 271.85,231.65 				"
                   />
                 </defs>
-                <clipPath id="SVGID_4_">
-                  <use href="#SVGID_3_" css={{ overflow: 'visible' }} />
+                <clipPath id="SVGID_2_">
+                  <use href="#SVGID_1_" css={{ overflow: 'visible' }} />
                 </clipPath>
-                <g className="st8" css={{ clipPath: 'url(#SVGID_4_)' }}>
+                <g className="st7" css={{ clipPath: 'url(#SVGID_2_)' }}>
                   <rect
-                    x="54.94"
-                    y="-315.39"
-                    transform="matrix(0.5 0.866 -0.866 0.5 82.8859 -43.942)"
+                    x="498.26"
+                    y="-588.46"
+                    transform="matrix(0.5 0.866 -0.866 0.5 263.6845 -468.3455)"
                     className="st0"
                     css={{ fill: '#E31E26' }}
-                    width="49.12"
-                    height="730.4"
+                    width="78.37"
+                    height="1165.3"
                   />
 
                   <rect
-                    x="79.5"
-                    y="-272.85"
-                    transform="matrix(0.5 0.866 -0.866 0.5 132.0061 -43.942)"
+                    x="537.44"
+                    y="-520.6"
+                    transform="matrix(0.5 0.866 -0.866 0.5 342.0525 -468.3454)"
                     className="st1"
                     css={{ fill: '#F68C1F' }}
-                    width="49.12"
-                    height="730.4"
+                    width="78.37"
+                    height="1165.3"
                   />
 
                   <rect
-                    x="103.97"
-                    y="-230.46"
-                    transform="matrix(0.5 0.866 -0.866 0.5 180.9484 -43.9419)"
+                    x="576.48"
+                    y="-452.97"
+                    transform="matrix(0.5 0.866 -0.866 0.5 420.1367 -468.3454)"
                     className="st2"
                     css={{ fill: '#FDEC05' }}
-                    width="49.12"
-                    height="730.4"
+                    width="78.37"
+                    height="1165.3"
                   />
 
                   <rect
-                    x="128.53"
-                    y="-187.92"
-                    transform="matrix(0.5 0.866 -0.866 0.5 230.0686 -43.9419)"
+                    x="615.67"
+                    y="-385.1"
+                    transform="matrix(0.5 0.866 -0.866 0.5 498.5046 -468.3454)"
                     className="st3"
                     css={{ fill: '#0D8140' }}
-                    width="49.12"
-                    height="730.4"
+                    width="78.37"
+                    height="1165.3"
                   />
 
                   <rect
-                    x="153.09"
-                    y="-145.38"
-                    transform="matrix(0.5 0.866 -0.866 0.5 279.1888 -43.9419)"
+                    x="654.85"
+                    y="-317.24"
+                    transform="matrix(0.5 0.866 -0.866 0.5 576.8726 -468.3454)"
                     className="st4"
                     css={{ fill: '#405FAB' }}
-                    width="49.12"
-                    height="730.4"
+                    width="78.37"
+                    height="1165.3"
                   />
 
                   <rect
-                    x="177.65"
-                    y="-102.84"
-                    transform="matrix(0.5 0.866 -0.866 0.5 328.309 -43.9419)"
+                    x="694.04"
+                    y="-249.37"
+                    transform="matrix(0.5 0.866 -0.866 0.5 655.2405 -468.3454)"
                     className="st5"
                     css={{ fill: '#722A83' }}
-                    width="49.12"
-                    height="730.4"
+                    width="78.37"
+                    height="1165.3"
                   />
                 </g>
               </g>
-              <path
-                className="st9"
-                css={{ fill: '#FFFFFF' }}
-                d="M140.82,230L140.82,230c22.32,0,40.42-18.1,40.42-40.42v-6.88c0-0.59,0.35-1.11,0.89-1.33
+              <g>
+                <g>
+                  <defs>
+                    <polygon
+                      id="SVGID_3_"
+                      points="271.85,80.35 140.82,4.69 9.78,80.35 9.78,231.65 140.82,307.31 271.85,231.65 				"
+                    />
+                  </defs>
+                  <clipPath id="SVGID_4_">
+                    <use href="#SVGID_3_" css={{ overflow: 'visible' }} />
+                  </clipPath>
+                  <g className="st8" css={{ clipPath: 'url(#SVGID_4_)' }}>
+                    <rect
+                      x="54.94"
+                      y="-315.39"
+                      transform="matrix(0.5 0.866 -0.866 0.5 82.8859 -43.942)"
+                      className="st0"
+                      css={{ fill: '#E31E26' }}
+                      width="49.12"
+                      height="730.4"
+                    />
+
+                    <rect
+                      x="79.5"
+                      y="-272.85"
+                      transform="matrix(0.5 0.866 -0.866 0.5 132.0061 -43.942)"
+                      className="st1"
+                      css={{ fill: '#F68C1F' }}
+                      width="49.12"
+                      height="730.4"
+                    />
+
+                    <rect
+                      x="103.97"
+                      y="-230.46"
+                      transform="matrix(0.5 0.866 -0.866 0.5 180.9484 -43.9419)"
+                      className="st2"
+                      css={{ fill: '#FDEC05' }}
+                      width="49.12"
+                      height="730.4"
+                    />
+
+                    <rect
+                      x="128.53"
+                      y="-187.92"
+                      transform="matrix(0.5 0.866 -0.866 0.5 230.0686 -43.9419)"
+                      className="st3"
+                      css={{ fill: '#0D8140' }}
+                      width="49.12"
+                      height="730.4"
+                    />
+
+                    <rect
+                      x="153.09"
+                      y="-145.38"
+                      transform="matrix(0.5 0.866 -0.866 0.5 279.1888 -43.9419)"
+                      className="st4"
+                      css={{ fill: '#405FAB' }}
+                      width="49.12"
+                      height="730.4"
+                    />
+
+                    <rect
+                      x="177.65"
+                      y="-102.84"
+                      transform="matrix(0.5 0.866 -0.866 0.5 328.309 -43.9419)"
+                      className="st5"
+                      css={{ fill: '#722A83' }}
+                      width="49.12"
+                      height="730.4"
+                    />
+                  </g>
+                </g>
+                <path
+                  className="st9"
+                  css={{ fill: '#FFFFFF' }}
+                  d="M140.82,230L140.82,230c22.32,0,40.42-18.1,40.42-40.42v-6.88c0-0.59,0.35-1.11,0.89-1.33
 			c6.28-2.52,43.29-19.01,38.4-55.51c-5.26-39.33-54.11-33.16-78.73-9.66c-0.56,0.53-1.41,0.53-1.97,0
 			c-24.62-23.49-73.47-29.66-78.73,9.66c-4.88,36.5,32.13,52.99,38.4,55.51c0.54,0.22,0.89,0.74,0.89,1.33v6.88
 			C100.4,211.91,118.49,230,140.82,230L140.82,230L140.82,230z"
-              />
-              <g>
-                <path
-                  className="st10"
-                  css={{ fill: '#375177' }}
-                  d="M123.51,152.1c0.12,1.39-1.59,2.15-2.51,1.09c-2.97-3.44-8.61-8.35-18.07-10.97
+                />
+                <g>
+                  <path
+                    className="st10"
+                    css={{ fill: '#375177' }}
+                    d="M123.51,152.1c0.12,1.39-1.59,2.15-2.51,1.09c-2.97-3.44-8.61-8.35-18.07-10.97
 				c-15.53-4.3,0.94-13.47,7.3-10.48C115.98,134.44,122.32,138.2,123.51,152.1z"
-                />
-                <path
-                  className="st10"
-                  css={{ fill: '#375177' }}
-                  d="M158.12,152.1c-0.12,1.39,1.59,2.15,2.51,1.09c2.97-3.44,8.61-8.35,18.07-10.97
+                  />
+                  <path
+                    className="st10"
+                    css={{ fill: '#375177' }}
+                    d="M158.12,152.1c-0.12,1.39,1.59,2.15,2.51,1.09c2.97-3.44,8.61-8.35,18.07-10.97
 				c15.53-4.3-0.94-13.47-7.3-10.48C165.66,134.44,159.31,138.2,158.12,152.1z"
-                />
-              </g>
-              <g>
-                <path
-                  className="st10"
-                  css={{ fill: '#375177' }}
-                  d="M149.96,172.69c2.12,4.7,5.51,14.07,2.55,20.71c-0.41,0.93-1.68,1.09-2.35,0.33
+                  />
+                </g>
+                <g>
+                  <path
+                    className="st10"
+                    css={{ fill: '#375177' }}
+                    d="M149.96,172.69c2.12,4.7,5.51,14.07,2.55,20.71c-0.41,0.93-1.68,1.09-2.35,0.33
 				c-2.42-2.73-6.77-9.6-2.87-20.89C147.72,171.6,149.43,171.5,149.96,172.69z"
-                />
-                <path
-                  className="st10"
-                  css={{ fill: '#375177' }}
-                  d="M131.67,172.69c-2.12,4.7-5.51,14.07-2.55,20.71c0.41,0.93,1.68,1.09,2.35,0.33
+                  />
+                  <path
+                    className="st10"
+                    css={{ fill: '#375177' }}
+                    d="M131.67,172.69c-2.12,4.7-5.51,14.07-2.55,20.71c0.41,0.93,1.68,1.09,2.35,0.33
 				c2.42-2.73,6.77-9.6,2.87-20.89C133.91,171.6,132.21,171.5,131.67,172.69z"
-                />
+                  />
+                </g>
               </g>
             </g>
-          </g>
-        </Logo>
+          </CustomLogo>
+        </LogoContainer>
       );
     default:
       return (
