@@ -5,7 +5,7 @@ const isPrideMonth = () => {
   const currentMonth = today.getMonth();
   const currentDay = today.getDate();
 
-  if (currentMonth == 5 && (currentDay >= 1 || currentDay <= 30)) {
+  if (currentMonth === 5 && (currentDay >= 1 || currentDay <= 30)) {
     return true;
   }
 };
