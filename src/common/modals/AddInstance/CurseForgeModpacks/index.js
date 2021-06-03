@@ -69,7 +69,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
   };
 
   useEffect(() => {
-    updateModpacks.callback();
+    updateModpacks();
   }, [searchText, sortBy, minecraftVersion, categoryId]);
 
   return (
@@ -79,6 +79,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
           placeholder="Minecraft Version"
           onChange={setMinecraftVersion}
           defaultValue={null}
+          virtual={false}
         >
           <Select.Option value={null}>All Versions</Select.Option>
           {(mcVersions || [])
@@ -93,6 +94,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
           placeholder="Minecraft Category"
           onChange={setCategoryId}
           defaultValue={null}
+          virtual={false}
         >
           <Select.Option key={'allcategories'} value={null}>
             All Categories
@@ -127,6 +129,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
           placeholder="Sort by"
           defaultValue="Featured"
           onChange={setSortBy}
+          virtual={false}
         >
           <Select.Option key="Featured" value="Featured">
             Featured

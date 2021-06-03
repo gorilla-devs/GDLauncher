@@ -451,6 +451,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                     }))
                   );
                 }}
+                virtual={false}
               >
                 {resolutionPresets.map(v => {
                   const w = parseInt(v.split('x')[0], 10);
@@ -524,7 +525,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 value={javaLocalArguments}
                 onChange={e => {
                   setJavaLocalArguments(e.target.value);
-                  debouncedArgumentsUpdate.callback(e.target.value);
+                  debouncedArgumentsUpdate(e.target.value);
                 }}
               />
               <JavaResetButton onClick={resetJavaArguments}>
@@ -556,7 +557,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 value={customJavaPath}
                 onChange={e => {
                   setCustomJavaPath(e.target.value);
-                  debouncedJavaPathUpdate.callback(e.target.value);
+                  debouncedJavaPathUpdate(e.target.value);
                 }}
               />
 

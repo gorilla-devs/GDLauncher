@@ -13,10 +13,9 @@ if (os.platform() === 'win32') {
 
 const addonPromise = filePath => {
   return new Promise((resolve, reject) => {
-    addon.thread_callback(filePath, value => {
-      if (value) resolve(value);
-      // eslint-disable-next-line
-      reject(`Error calculating murmur2 for ${filePath}`);
+    addon.thread_callback(filePath, (err, value) => {
+      if (err) reject(err);
+      resolve(value);
     });
   });
 };
