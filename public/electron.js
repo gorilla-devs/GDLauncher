@@ -21,8 +21,8 @@ const {
   default: { fromBase64: toBase64URL }
 } = require('base64url');
 const { URL } = require('url');
-const murmur = require('./native/murmur2.js');
-const nsfw = require('./native/nsfw.js');
+const murmur = require('./native/murmur2');
+const nsfw = require('./native/nsfw');
 
 const fs = fss.promises;
 
