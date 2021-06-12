@@ -184,7 +184,7 @@ async function extract7z() {
 
   let zipLocationAsar = path.join(baseDir, 'linux', 'x64', '7za');
   if (process.platform === 'darwin') {
-    zipLocationAsar = path.join(baseDir, 'mac', '7za');
+    zipLocationAsar = path.join(baseDir, 'mac', 'x64', '7za');
   }
   if (process.platform === 'win32') {
     zipLocationAsar = path.join(baseDir, 'win', 'x64', '7za.exe');
