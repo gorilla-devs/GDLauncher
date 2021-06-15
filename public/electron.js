@@ -75,15 +75,35 @@ const edit = [
           label: 'GDLauncher',
           submenu: [
             {
-              label: 'Hide',
-              accelerator: 'Command+H',
-              selector: 'hide:'
+              label: `About GDLauncher`,
+              role: 'about'
             },
             { type: 'separator' },
             {
-              label: 'Quit',
+              label: 'Services',
+              role: 'services',
+              submenu: []
+            },
+            { type: 'separator' },
+            {
+              label: `Hide GDLauncher`,
+              accelerator: 'Command+H',
+              role: 'hide'
+            },
+            {
+              label: 'Hide Others',
+              accelerator: 'Command+Alt+H',
+              role: 'hideOthers'
+            },
+            {
+              label: 'Show All',
+              role: 'unhide'
+            },
+            { type: 'separator' },
+            {
+              label: `Quit GDLauncher`,
               accelerator: 'Command+Q',
-              click: () => {
+              click() {
                 app.quit();
               }
             }
