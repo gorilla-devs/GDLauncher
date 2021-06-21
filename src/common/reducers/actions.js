@@ -2054,7 +2054,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         dispatch(
           updateMessage({
-            content: `Syncronizing mods. ${queueLength} left.`,
+            content: `Synchronizing mods. ${queueLength} left.`,
             duration: 0
           })
         );
@@ -2065,7 +2065,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         dispatch(
           updateMessage({
-            content: `Syncronizing mods. ${queueLength} left.`,
+            content: `Synchronizing mods. ${queueLength} left.`,
             duration: 0
           })
         );

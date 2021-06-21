@@ -102,7 +102,8 @@ const marks = {
   2048: '2048 MB',
   4096: '4096 MB',
   8192: '8192 MB',
-  16384: '16384 MB'
+  16384: '16384 MB',
+  32768: '32768 MB'
 };
 
 export default function MyAccountPreferences() {
@@ -309,7 +310,7 @@ export default function MyAccountPreferences() {
           }}
           defaultValue={javaMemory}
           min={1024}
-          max={16384}
+          max={32768}
           step={512}
           marks={marks}
           valueLabelDisplay="auto"
