@@ -135,6 +135,14 @@ const RowContainerBackground = styled.div`
   opacity: ${props => (props.disabled || props.selected ? 1 : 0)};
 `;
 
+const NotItemsAvailable = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const DragEnterEffect = styled.div`
   position: absolute;
   display: flex;
@@ -806,6 +814,9 @@ const Mods = ({ instanceName }) => {
             </DragEnterEffect>
           )}
         </Transition>
+        {mods.length === 0 && (
+          <NotItemsAvailable>No Mods Available</NotItemsAvailable>
+        )}
         <AutoSizer>
           {({ height, width }) => (
             <List

@@ -360,7 +360,7 @@ const createItemData = memoize(
 
 let lastRequest;
 const ModsBrowser = ({ instanceName, gameVersion }) => {
-  const itemsNumber = 63;
+  const itemsNumber = 50;
 
   const [mods, setMods] = useState([]);
   const [areModsLoading, setAreModsLoading] = useState(true);
