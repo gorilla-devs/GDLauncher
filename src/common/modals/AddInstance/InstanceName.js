@@ -158,10 +158,17 @@ const InstanceName = ({
           )
         );
       } else if (version?.loaderType === FABRIC) {
+        // Backwards compatability for manifest entries that use the `yarn`
+        // property to set the fabric loader version. Newer manifests use the
+        // format `fabric-<version>` in the id.
+        let loaderVersion = manifest.minecraft.modLoaders[0].yarn;
+        if (!loaderVersion) {
+          loaderVersion = manifest.minecraft.modLoaders[0].id.split('-', 2)[1];
+        }
         const loader = {
           loaderType: version?.loaderType,
           mcVersion: manifest.minecraft.version,
-          loaderVersion: manifest.minecraft.modLoaders[0].yarn,
+          loaderVersion,
           fileID: manifest.minecraft.modLoaders[0].loader,
           projectID: version?.projectID,
           source: version?.source
