@@ -86,7 +86,7 @@ const edit = [
             },
             { type: 'separator' },
             {
-              label: `Hide GDLauncher`,
+              label: 'Hide GDLauncher',
               accelerator: 'Command+H',
               role: 'hide'
             },
