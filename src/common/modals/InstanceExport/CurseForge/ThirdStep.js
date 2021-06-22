@@ -72,8 +72,7 @@ export default function ThirdStep({
         break;
       case FABRIC:
         loaderObj = {
-          id: modloaderName,
-          yarn: loader?.loaderVersion,
+          id: `${modloaderName}-${loader?.loaderVersion}`,
           loader: loader?.fileID,
           primary: true
         };
