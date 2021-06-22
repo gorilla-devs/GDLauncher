@@ -101,7 +101,7 @@ const edit = [
             },
             { type: 'separator' },
             {
-              label: `Quit GDLauncher`,
+              label: 'Quit GDLauncher',
               accelerator: 'Command+Q',
               click: () => {
                 app.quit();
