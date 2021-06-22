@@ -33,7 +33,12 @@ const ProfileSettings = () => {
       title="Account Manager"
     >
       <Container>
-        <AccountsContainer>
+        <AccountsContainer
+          css={`
+            overflow: auto;
+            padding-right: 2px;
+          `}
+        >
           {accounts.map(account => {
             if (!account || !currentAccount) return;
             return (
