@@ -75,7 +75,7 @@ const edit = [
           label: 'GDLauncher',
           submenu: [
             {
-              label: `About GDLauncher`,
+              label: 'About GDLauncher',
               role: 'about'
             },
             { type: 'separator' },
@@ -103,7 +103,7 @@ const edit = [
             {
               label: `Quit GDLauncher`,
               accelerator: 'Command+Q',
-              click() {
+              click: () => {
                 app.quit();
               }
             }
