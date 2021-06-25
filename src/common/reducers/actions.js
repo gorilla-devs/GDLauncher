@@ -1526,7 +1526,11 @@ export function processFTBManifest(instanceName) {
     });
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading FTB files...'));
-    await downloadInstanceFiles(mappedFiles, updatePercentage);
+    await downloadInstanceFiles(
+        mappedFiles,
+        updatePercentage,
+        state.settings.concurrentDownloads
+        );
 
     mappedFiles = await pMap(
       files,
