@@ -1508,8 +1508,14 @@ export function processFTBManifest(instanceName) {
 
     let modManifests = [];
 
+    let prev = 0;
     const updatePercentage = downloaded => {
-      dispatch(updateDownloadProgress((downloaded * 100) / files.length));
+      const percentage = (downloaded * 100) / files.length;
+      const progress = parseInt(percentage, 10);
+      if (progress !== prev) {
+        prev = progress;
+        dispatch(updateDownloadProgress(progress));
+      }
     };
 
     let mappedFiles = files.map(async item => {
