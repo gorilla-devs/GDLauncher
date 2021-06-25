@@ -52,9 +52,7 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed FTB downloads.</li>
-              <li>Fixed macOS menu.</li>
-              <li>Other minor fixes.</li>
+              <li>Various QoL fixes.</li>
             </ul>
           </div>
         </Section>

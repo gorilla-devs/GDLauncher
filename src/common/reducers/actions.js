@@ -1508,8 +1508,14 @@ export function processFTBManifest(instanceName) {
 
     let modManifests = [];
 
+    let prev = 0;
     const updatePercentage = downloaded => {
-      dispatch(updateDownloadProgress((downloaded * 100) / files.length));
+      const percentage = (downloaded * 100) / files.length;
+      const progress = parseInt(percentage, 10);
+      if (progress !== prev) {
+        prev = progress;
+        dispatch(updateDownloadProgress(progress));
+      }
     };
 
     let mappedFiles = files.map(async item => {
@@ -1520,7 +1526,11 @@ export function processFTBManifest(instanceName) {
     });
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading FTB files...'));
-    await downloadInstanceFiles(mappedFiles, updatePercentage);
+    await downloadInstanceFiles(
+      mappedFiles,
+      updatePercentage,
+      state.settings.concurrentDownloads
+    );
 
     mappedFiles = await pMap(
       files,
@@ -2054,7 +2064,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         dispatch(
           updateMessage({
-            content: `Syncronizing mods. ${queueLength} left.`,
+            content: `Synchronizing mods. ${queueLength} left.`,
             duration: 0
           })
         );
@@ -2065,7 +2075,7 @@ export const startListener = () => {
       if (queueLength > 1) {
         dispatch(
           updateMessage({
-            content: `Syncronizing mods. ${queueLength} left.`,
+            content: `Synchronizing mods. ${queueLength} left.`,
             duration: 0
           })
         );
