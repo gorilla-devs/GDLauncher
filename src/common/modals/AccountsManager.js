@@ -33,12 +33,7 @@ const ProfileSettings = () => {
       title="Account Manager"
     >
       <Container>
-        <AccountsContainer
-          css={`
-            overflow: auto;
-            padding-right: 2px;
-          `}
-        >
+        <AccountsContainer>
           {accounts.map(account => {
             if (!account || !currentAccount) return;
             return (
@@ -202,6 +197,8 @@ const HoverContainer = styled.div`
 const AccountsContainer = styled.div`
   width: 100%;
   height: 100%;
+  overflow: auto;
+  padding-right: 2px;
 `;
 
 const AccountContainer = styled.div`
