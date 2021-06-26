@@ -88,7 +88,7 @@ const ChangeLogs = () => {
 
 export default memo(ChangeLogs);
 
-const Container = styled.div`
+export const Container = styled.div`
   width: 100%;
   height: 100%;
   text-align: center;

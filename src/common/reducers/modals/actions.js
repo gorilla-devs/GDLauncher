@@ -39,3 +39,24 @@ export function closeAllModals() {
     }, 220);
   };
 }
+
+export function reopenModal(modalType, modalProps = {}) {
+  return dispatch => {
+    dispatch({
+      type: UNMOUNTING_MODAL
+    });
+    setTimeout(
+        () => {
+            dispatch({
+              type: CLOSE_MODAL
+            });
+            dispatch({
+              type: OPEN_MODAL,
+              modalType,
+              modalProps
+            })
+        },
+        70
+    );
+  };
+}
