@@ -220,7 +220,7 @@ const AutomaticSetup = () => {
     const downloadLocation = path.join(tempFolder, path.basename(url));
 
     await downloadFile(downloadLocation, url, p => {
-      ipcRenderer.invoke('update-progress-bar', parseInt(p, 10));
+      ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
       setDownloadPercentage(parseInt(p, 10));
     });
 
