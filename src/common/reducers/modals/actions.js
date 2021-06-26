@@ -45,18 +45,15 @@ export function reopenModal(modalType, modalProps = {}) {
     dispatch({
       type: UNMOUNTING_MODAL
     });
-    setTimeout(
-        () => {
-            dispatch({
-              type: CLOSE_MODAL
-            });
-            dispatch({
-              type: OPEN_MODAL,
-              modalType,
-              modalProps
-            })
-        },
-        70
-    );
+    setTimeout(() => {
+      dispatch({
+        type: CLOSE_MODAL
+      });
+      dispatch({
+        type: OPEN_MODAL,
+        modalType,
+        modalProps
+      });
+    }, 70);
   };
 }

@@ -153,14 +153,17 @@ export default function MyAccountPreferences() {
         >
           Disable this to specify a custom java path to use instead of using
           openJDK shipped with GDLauncher if that is the case select the path to
-          your Java executable.<br/>
-          <b><a
-            onClick={() => {
-              dispatch(openModal('JavaFindHelp'));
-            }}
-          >
-            How to find my java Executable?
-          </a></b>
+          your Java executable.
+          <br />
+          <b>
+            <a
+              onClick={() => {
+                dispatch(openModal('JavaFindHelp'));
+              }}
+            >
+              How to find my java Executable?
+            </a>
+          </b>
         </Paragraph>
         <Switch
           color="primary"
