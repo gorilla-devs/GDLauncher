@@ -33,14 +33,12 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Added FTB support.</li>
-              <li>Added Microsoft accounts support.</li>
-              <li>Added confirmation modal when deleting all shared data.</li>
-              <li>Added a per-instance java path setting.</li>
               <li>
-                Added a progress state in the taskbar icon when downloading an
-                instance.
+                Automatically set recommended/minimum RAM amount for FTB
+                modpacks, and eventually show a confirmation modal in case the
+                user has not enough.
               </li>
+              <li>Added modlist.html when exporting instances.</li>
             </ul>
           </div>
         </Section> */}
@@ -54,9 +52,7 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              <li>Fixed icons in mods browser.</li>
-              <li>Fixed updating modpacks not working.</li>
-              <li>Fixed some styling.</li>
+              <li>Various QoL fixes.</li>
             </ul>
           </div>
         </Section>
@@ -74,13 +70,11 @@ const ChangeLogs = () => {
           </p>
           <Button
             css={`
-              width: 200px;
-              height: 40px;
               font-size: 20px;
-              padding: 4px !important;
               margin-top: 20px;
             `}
             type="primary"
+            size="large"
             href="https://discord.gg/4cGYzen"
           >
             <FontAwesomeIcon icon={faDiscord} />

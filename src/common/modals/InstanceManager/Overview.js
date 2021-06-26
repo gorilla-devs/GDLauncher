@@ -119,7 +119,8 @@ const marks = {
   2048: '2048 MB',
   4096: '4096 MB',
   8192: '8192 MB',
-  16384: '16384 MB'
+  16384: '16384 MB',
+  32768: '32768 MB'
 };
 
 const Card = memo(
@@ -451,6 +452,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                     }))
                   );
                 }}
+                virtual={false}
               >
                 {resolutionPresets.map(v => {
                   const w = parseInt(v.split('x')[0], 10);
@@ -493,7 +495,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 onChange={setJavaLocalMemory}
                 value={javaLocalMemory}
                 min={1024}
-                max={16384}
+                max={32768}
                 step={512}
                 marks={marks}
                 valueLabelDisplay="auto"
@@ -524,7 +526,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 value={javaLocalArguments}
                 onChange={e => {
                   setJavaLocalArguments(e.target.value);
-                  debouncedArgumentsUpdate.callback(e.target.value);
+                  debouncedArgumentsUpdate(e.target.value);
                 }}
               />
               <JavaResetButton onClick={resetJavaArguments}>
@@ -556,7 +558,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 value={customJavaPath}
                 onChange={e => {
                   setCustomJavaPath(e.target.value);
-                  debouncedJavaPathUpdate.callback(e.target.value);
+                  debouncedJavaPathUpdate(e.target.value);
                 }}
               />
 

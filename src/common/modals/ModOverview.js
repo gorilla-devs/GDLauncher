@@ -237,6 +237,7 @@ const ModOverview = ({
             onChange={handleChange}
             listItemHeight={50}
             listHeight={400}
+            virtual={false}
           >
             {(files || []).map(file => (
               <Select.Option
