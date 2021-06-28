@@ -1,5 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { totalmem } from 'os';
 import fss from 'fs-extra';
 import path from 'path';
 import omit from 'lodash/omit';
@@ -115,13 +116,18 @@ const ResolutionInputContainer = styled.div`
   }
 `;
 
-const marks = {
-  2048: '2048 MB',
-  4096: '4096 MB',
-  8192: '8192 MB',
-  16384: '16384 MB',
-  32768: '32768 MB'
-};
+const maxMemorySlider = Math.round(totalmem() / 1024 / 1024 / 1024) * 1024;
+
+function getMarks() {
+  const totalMarks = {};
+  const totalMemory = Math.round(totalmem() / 1024 / 1024 / 1024);
+  const b2TotalMemory = Math.floor(Math.log2(totalMemory));
+  for (let b2Counter = b2TotalMemory; b2Counter > 0; b2Counter -= 1) {
+    const mbOfRAM = 2 ** b2Counter * 1024;
+    totalMarks[mbOfRAM] = `${mbOfRAM} MB`;
+  }
+  return totalMarks;
+}
 
 const Card = memo(
   ({ title, children, color, icon, instanceName, defaultValue }) => {
@@ -495,9 +501,9 @@ const Overview = ({ instanceName, background, manifest }) => {
                 onChange={setJavaLocalMemory}
                 value={javaLocalMemory}
                 min={1024}
-                max={32768}
+                max={maxMemorySlider}
                 step={512}
-                marks={marks}
+                marks={getMarks()}
                 valueLabelDisplay="auto"
               />
             </div>
