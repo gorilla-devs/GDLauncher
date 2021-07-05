@@ -124,6 +124,21 @@ const InstanceName = ({
         );
       }
 
+      const isForgeModpack = (manifest?.minecraft?.modLoaders || []).some(
+        v => v.id.includes(FORGE) && v.primary
+      );
+
+      const isFabricModpack = (manifest?.minecraft?.modLoaders || []).some(
+        v => v.id.includes(FABRIC) && v.primary
+      );
+
+      let curseForgeLoaderType = VANILLA;
+      if (isForgeModpack) {
+        curseForgeLoaderType = FORGE;
+      } else if (isFabricModpack) {
+        curseForgeLoaderType = FABRIC;
+      }
+
       if (imageURL) {
         await downloadFile(
           path.join(
@@ -135,9 +150,9 @@ const InstanceName = ({
         );
       }
 
-      if (version?.loaderType === FORGE) {
+      if (curseForgeLoaderType === FORGE) {
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: curseForgeLoaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: convertcurseForgeToCanonical(
             manifest.minecraft.modLoaders.find(v => v.primary).id,
@@ -157,7 +172,7 @@ const InstanceName = ({
             imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
-      } else if (version?.loaderType === FABRIC) {
+      } else if (curseForgeLoaderType === FABRIC) {
         // Backwards compatability for manifest entries that use the `yarn`
         // property to set the fabric loader version. Newer manifests use the
         // format `fabric-<version>` in the id.
@@ -166,7 +181,7 @@ const InstanceName = ({
           loaderVersion = manifest.minecraft.modLoaders[0].id.split('-', 2)[1];
         }
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: curseForgeLoaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion,
           fileID: manifest.minecraft.modLoaders[0].loader,
@@ -181,9 +196,9 @@ const InstanceName = ({
             imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
-      } else if (version?.loaderType === VANILLA) {
+      } else if (curseForgeLoaderType === VANILLA) {
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: curseForgeLoaderType,
           mcVersion: manifest.minecraft.version,
           loaderVersion: version?.loaderVersion,
           fileID: version?.fileID
