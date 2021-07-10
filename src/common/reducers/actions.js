@@ -101,7 +101,8 @@ import {
   getPatchedInstanceType,
   convertCompletePathToInstance,
   downloadAddonZip,
-  convertcurseForgeToCanonical
+  convertcurseForgeToCanonical,
+  extractFabricVersionFromManifest
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -1989,14 +1990,21 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
         imageURL
       );
 
-      const loader = {
-        loaderType: instance.loader?.loaderType,
-        mcVersion: newManifest.minecraft.version,
-        loaderVersion: convertcurseForgeToCanonical(
+      let loaderVersion;
+      if (instance.loader?.loaderType === FABRIC) {
+        loaderVersion = extractFabricVersionFromManifest(newManifest);
+      } else {
+        loaderVersion = convertcurseForgeToCanonical(
           newManifest.minecraft.modLoaders.find(v => v.primary).id,
           newManifest.minecraft.version,
           state.app.forgeManifest
-        ),
+        );
+      }
+
+      const loader = {
+        loaderType: instance.loader?.loaderType,
+        mcVersion: newManifest.minecraft.version,
+        loaderVersion,
         fileID: instance.loader?.fileID,
         projectID: instance.loader?.projectID,
         source: instance.loader?.source
