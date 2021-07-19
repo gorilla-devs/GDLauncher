@@ -80,15 +80,6 @@ function DesktopRoot({ store }) {
     let isJavaOK = javaPath;
     let isJava16OK = java16Path;
 
-    console.log(
-      'java Manifest',
-      isJava16OK,
-      isJavaOK,
-      !isJava16OK,
-      !isJavaOK,
-      manifests
-    );
-
     if (!isJava16OK) {
       isJava16OK = await isLatestJava16Downloaded(
         manifests.java16,

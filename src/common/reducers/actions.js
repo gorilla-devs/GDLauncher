@@ -2535,7 +2535,8 @@ export function launchInstance(instanceName) {
     // negative if v1 < v2
     // positive if v1 > v2
     // Nan if they in the wrong format
-    const versionGraterThan1dot17 = compareVersions(loader.version, '1.17') > 0;
+    const versionGraterThan1dot17 =
+      compareVersions(loader.mcVersion, '1.17') >= 0;
 
     const defaultJavaPathVersion = versionGraterThan1dot17
       ? defaultJava16Path

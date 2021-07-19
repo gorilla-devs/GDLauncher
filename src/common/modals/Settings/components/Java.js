@@ -38,6 +38,7 @@ const AutodetectPath = styled.div`
   justify-content: space-between;
   width: 100%;
   height: 40px;
+  margin-bottom: 30px;
 `;
 
 const SelectMemory = styled.div`
@@ -78,6 +79,7 @@ const Title = styled.h3`
 `;
 
 const Paragraph = styled.p`
+  max-width: 510px;
   color: ${props => props.theme.palette.text.third};
 `;
 
@@ -127,13 +129,6 @@ export default function MyAccountPreferences() {
       .catch(console.error);
   }, []);
 
-  console.log(
-    'aa',
-    !customJavaPath,
-    !customJava16Path,
-    !customJavaPath && !customJava16Path
-  );
-
   return (
     <JavaSettings>
       <MainTitle>Java</MainTitle>
@@ -176,20 +171,27 @@ export default function MyAccountPreferences() {
               dispatch(updateJava16Path(java16Path));
             }
           }}
-          checked={!customJavaPath && !customJava16Path}
+          checked={!customJavaPath || !customJava16Path}
         />
       </AutodetectPath>
       {customJavaPath && customJava16Path && (
         <>
           <div
             css={`
-              height: 40px;
+              height: 50px;
+              margin: 30px 0;
             `}
           >
+            <h3
+              css={`
+                text-align: left;
+              `}
+            >
+              Java 8
+            </h3>
             <div
               css={`
                 width: 100%;
-                margin: 20px 0;
               `}
             >
               <FontAwesomeIcon
@@ -222,13 +224,20 @@ export default function MyAccountPreferences() {
           </div>
           <div
             css={`
-              height: 40px;
+              height: 50px;
+              margin: 30px 0;
             `}
           >
+            <h3
+              css={`
+                text-align: left;
+              `}
+            >
+              Java 16
+            </h3>
             <div
               css={`
                 width: 100%;
-                margin: 20px 0;
               `}
             >
               <FontAwesomeIcon

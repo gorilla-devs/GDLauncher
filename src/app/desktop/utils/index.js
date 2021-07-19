@@ -938,24 +938,14 @@ export const getPatchedInstanceType = instance => {
 // positive if v1 > v2
 // Nan if they in the wrong format
 export const compareVersions = (v1, v2) => {
-  const v1parts = v1.split('.');
-  const v2parts = v2.split('.');
+  const v1parts = v1.split('.').map(Number);
+  const v2parts = v2.split('.').map(Number);
 
-  const isPositiveInteger = x => {
-    // http://stackoverflow.com/a/1019526/11236
+  const isValidPart = x => {
     return /^\d+$/.test(x);
   };
 
-  // First, validate both numbers are true version numbers
-  const validateParts = parts => {
-    for (let i = 0; i < parts.length; ++i) {
-      if (!isPositiveInteger(parts[i])) {
-        return false;
-      }
-    }
-    return true;
-  };
-  if (!validateParts(v1parts) || !validateParts(v2parts)) {
+  if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
     return NaN;
   }
 
@@ -964,10 +954,13 @@ export const compareVersions = (v1, v2) => {
       return 1;
     }
 
-    if (v1parts[i] > v2parts[i]) {
+    if (v1parts[i] === v2parts[i]) {
+      continue;
+    } else if (v1parts[i] > v2parts[i]) {
       return 1;
+    } else {
+      return -1;
     }
-    return -1;
   }
 
   if (v1parts.length !== v2parts.length) {

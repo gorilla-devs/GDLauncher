@@ -227,7 +227,7 @@ const ManualSetup = ({ setChoice }) => {
 
 const AutomaticSetup = () => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
-  const [currentStep, setCurrentStep] = useState('Downloading Java');
+  const [currentStep, setCurrentStep] = useState('Downloading Java 8');
   const javaManifest = useSelector(state => state.app.javaManifest);
   const java16Manifest = useSelector(state => state.app.java16Manifest);
   const userData = useSelector(state => state.userData);
@@ -257,14 +257,12 @@ const AutomaticSetup = () => {
     const downloadLocation = path.join(tempFolder, path.basename(url));
     const downloadjava16Location = path.join(tempFolder, path.basename(url16));
 
-    console.log('AAA', downloadjava16Location);
-
     await downloadFile(downloadLocation, url, p => {
       ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
       setDownloadPercentage(parseInt(p, 10));
     });
-    console.log('BBB');
     await downloadFile(downloadjava16Location, url16, p => {
+      setCurrentStep('Downloading Java 16');
       ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
       setDownloadPercentage(parseInt(p, 10));
     });
@@ -275,7 +273,7 @@ const AutomaticSetup = () => {
 
     const totalSteps = process.platform !== 'win32' ? 2 : 1;
 
-    setCurrentStep(`Extracting 1 / ${totalSteps}`);
+    setCurrentStep(`Extracting 1 / ${totalSteps} Java 8`);
     const sevenZipPath = await get7zPath();
     const firstExtraction = extractFull(downloadLocation, tempFolder, {
       $bin: sevenZipPath,
@@ -290,15 +288,13 @@ const AutomaticSetup = () => {
         resolve();
       });
       firstExtraction.on('error', err => {
-        console.log('ERRORE');
         reject(err);
       });
     });
-    console.log('CCC');
 
     await fse.remove(downloadLocation);
-    console.log('DDD', tempFolder);
 
+    setCurrentStep(`Extracting 1 / ${totalSteps} Java 16`);
     const firstExtractionJava16 = extractFull(
       downloadjava16Location,
       tempFolder,
@@ -307,7 +303,7 @@ const AutomaticSetup = () => {
         $progress: true
       }
     );
-    console.log('EEE');
+
     await new Promise((resolve, reject) => {
       firstExtractionJava16.on('progress', ({ percent }) => {
         ipcRenderer.invoke('update-progress-bar', percent);
@@ -317,28 +313,23 @@ const AutomaticSetup = () => {
         resolve();
       });
       firstExtractionJava16.on('error', err => {
-        console.log('ERR');
         reject(err);
       });
     });
 
     await fse.remove(downloadjava16Location);
-    console.log('FFF', downloadjava16Location);
 
     // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
     if (process.platform !== 'win32') {
       ipcRenderer.invoke('update-progress-bar', -1);
       setDownloadPercentage(null);
       await new Promise(resolve => setTimeout(resolve, 500));
-      setCurrentStep(`Extracting 2 / ${totalSteps}`);
-      console.log('TTT');
+      setCurrentStep(`Extracting 2 / ${totalSteps} Java 8`);
 
       const tempTarName = path.join(
         tempFolder,
         path.basename(url).replace('.tar.gz', '.tar')
       );
-
-      console.log('GGG', tempTarName);
 
       const secondExtraction = extractFull(tempTarName, tempFolder, {
         $bin: sevenZipPath,
@@ -359,7 +350,7 @@ const AutomaticSetup = () => {
 
       await fse.remove(tempTarName);
 
-      console.log('HHH');
+      setCurrentStep(`Extracting 2 / ${totalSteps} Java 16`);
 
       const tempTarName16 = path.join(
         tempFolder,
