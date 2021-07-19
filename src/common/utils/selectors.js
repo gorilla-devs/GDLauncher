@@ -10,6 +10,7 @@ const _currentAccountId = state => state.app.currentAccountId;
 const _currentDownload = state => state.currentDownload;
 const _downloadQueue = state => state.downloadQueue;
 const _javaManifest = state => state.app.javaManifest;
+const _java16Manifest = state => state.app.java16Manifest;
 const _userData = state => state.userData;
 
 export const _getInstances = createSelector(_instances, instances =>
@@ -58,6 +59,24 @@ export const _getJavaPath = createSelector(
     } = javaMeta;
     const filename = process.platform === 'win32' ? 'java.exe' : 'java';
     return path.join(userData, 'java', version, 'bin', filename);
+  }
+);
+export const _getJava16Path = createSelector(
+  _java16Manifest,
+  _java,
+  _userData,
+  (java16Manifest, java, userData) => {
+    if (java.path16) return java.path16;
+    const javaOs = convertOSToJavaFormat(process.platform);
+    const javaMeta = java16Manifest.find(
+      v =>
+        v.os === javaOs && v.architecture === 'x64' && v.binary_type === 'jre'
+    );
+    const {
+      version_data: { openjdk_version: version }
+    } = javaMeta;
+    const filename = process.platform === 'win32' ? 'java.exe' : 'java';
+    return path.join(userData, 'java16', version, 'bin', filename);
   }
 );
 

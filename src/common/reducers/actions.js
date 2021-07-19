@@ -64,7 +64,8 @@ import {
   msAuthenticateXSTS,
   msAuthenticateMinecraft,
   msMinecraftProfile,
-  msOAuthRefresh
+  msOAuthRefresh,
+  getJava16Manifest
 } from '../api';
 import {
   _getCurrentAccount,
@@ -77,7 +78,8 @@ import {
   _getAccounts,
   _getTempPath,
   _getInstance,
-  _getDataStorePath
+  _getDataStorePath,
+  _getJava16Path
 } from '../utils/selectors';
 import {
   librariesMapper,
@@ -101,7 +103,8 @@ import {
   getPatchedInstanceType,
   convertCompletePathToInstance,
   downloadAddonZip,
-  convertcurseForgeToCanonical
+  convertcurseForgeToCanonical,
+  compareVersions
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -145,6 +148,14 @@ export function initManifests() {
       });
       return java;
     };
+    const getJava16ManifestVersions = async () => {
+      const java = (await getJava16Manifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_JAVA16_MANIFEST,
+        data: java
+      });
+      return java;
+    };
     const getAddonCategoriesVersions = async () => {
       const curseforgeCategories = (await getAddonCategories()).data;
       dispatch({
@@ -175,9 +186,10 @@ export function initManifests() {
       return omitBy(forgeVersions, v => v.length === 0);
     };
     // Using reflect to avoid rejection
-    const [fabric, java, categories, forge] = await Promise.all([
+    const [fabric, java, java16, categories, forge] = await Promise.all([
       reflect(getFabricVersions()),
       reflect(getJavaManifestVersions()),
+      reflect(getJava16ManifestVersions()),
       reflect(getAddonCategoriesVersions()),
       reflect(getForgeVersions())
     ]);
@@ -190,6 +202,7 @@ export function initManifests() {
       mc: mc || app.vanillaManifest,
       fabric: fabric.status ? fabric.v : app.fabricManifest,
       java: java.status ? java.v : app.javaManifest,
+      java16: java16.status ? java16.v : app.java16Manifest,
       categories: categories.status ? categories.v : app.curseforgeCategories,
       forge: forge.status ? forge.v : app.forgeManifest
     };
@@ -2501,6 +2514,7 @@ export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const defaultJavaPath = _getJavaPath(state);
+    const defaultJava16Path = _getJava16Path(state);
 
     const { userData } = state;
     const account = _getCurrentAccount(state);
@@ -2517,7 +2531,16 @@ export function launchInstance(instanceName) {
       resolution: instanceResolution
     } = _getInstance(state)(instanceName);
 
-    const javaPath = customJavaPath || defaultJavaPath;
+    // 0 if they're identical
+    // negative if v1 < v2
+    // positive if v1 > v2
+    // Nan if they in the wrong format
+    const versionGraterThan1dot17 = compareVersions(loader.version, '1.17') > 0;
+
+    const defaultJavaPathVersion = versionGraterThan1dot17
+      ? defaultJava16Path
+      : defaultJavaPath;
+    const javaPath = customJavaPath || defaultJavaPathVersion;
 
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 

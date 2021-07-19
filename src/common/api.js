@@ -13,7 +13,8 @@ import {
   MICROSOFT_XBOX_LOGIN_URL,
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
-  FTB_API_URL
+  FTB_API_URL,
+  JAVA16_MANIFEST_URL
 } from './utils/constants';
 import { sortByDate } from './utils';
 
@@ -198,6 +199,11 @@ export const getFabricManifest = () => {
 
 export const getJavaManifest = () => {
   const url = JAVA_MANIFEST_URL;
+  return axios.get(url);
+};
+
+export const getJava16Manifest = () => {
+  const url = JAVA16_MANIFEST_URL;
   return axios.get(url);
 };
 

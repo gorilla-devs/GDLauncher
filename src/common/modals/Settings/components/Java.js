@@ -14,6 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Input, Switch, Select } from 'antd';
 import {
+  updateJava16Path,
   updateJavaArguments,
   updateJavaMemory,
   updateJavaPath,
@@ -23,7 +24,7 @@ import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
 } from '../../../../app/desktop/utils/constants';
-import { _getJavaPath } from '../../../utils/selectors';
+import { _getJava16Path, _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
 
 const JavaSettings = styled.div`
@@ -111,7 +112,9 @@ export default function MyAccountPreferences() {
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
   const javaPath = useSelector(_getJavaPath);
+  const java16Path = useSelector(_getJava16Path);
   const customJavaPath = useSelector(state => state.settings.java.path);
+  const customJava16Path = useSelector(state => state.settings.java.path16);
   const mcResolution = useSelector(
     state => state.settings.minecraftSettings.resolution
   );
@@ -123,6 +126,13 @@ export default function MyAccountPreferences() {
       .then(setScreenResolution)
       .catch(console.error);
   }, []);
+
+  console.log(
+    'aa',
+    !customJavaPath,
+    !customJava16Path,
+    !customJavaPath && !customJava16Path
+  );
 
   return (
     <JavaSettings>
@@ -160,14 +170,16 @@ export default function MyAccountPreferences() {
           onChange={c => {
             if (c) {
               dispatch(updateJavaPath(null));
+              dispatch(updateJava16Path(null));
             } else {
               dispatch(updateJavaPath(javaPath));
+              dispatch(updateJava16Path(java16Path));
             }
           }}
-          checked={!customJavaPath}
+          checked={!customJavaPath && !customJava16Path}
         />
       </AutodetectPath>
-      {customJavaPath && (
+      {customJavaPath && customJava16Path && (
         <>
           <div
             css={`
@@ -202,6 +214,45 @@ export default function MyAccountPreferences() {
                   );
                   if (!filePaths[0] || canceled) return;
                   dispatch(updateJavaPath(filePaths[0]));
+                }}
+              >
+                <FontAwesomeIcon icon={faFolder} />
+              </StyledButtons>
+            </div>
+          </div>
+          <div
+            css={`
+              height: 40px;
+            `}
+          >
+            <div
+              css={`
+                width: 100%;
+                margin: 20px 0;
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faLevelDownAlt}
+                flip="horizontal"
+                transform={{ rotate: 90 }}
+              />
+              <Input
+                css={`
+                  width: 75%;
+                  margin: 0 10px;
+                `}
+                onChange={e => dispatch(updateJava16Path(e.target.value))}
+                value={customJava16Path}
+              />
+              <StyledButtons
+                color="primary"
+                onClick={async () => {
+                  const { filePaths, canceled } = await ipcRenderer.invoke(
+                    'openFileDialog',
+                    javaPath
+                  );
+                  if (!filePaths[0] || canceled) return;
+                  dispatch(updateJava16Path(filePaths[0]));
                 }}
               >
                 <FontAwesomeIcon icon={faFolder} />
