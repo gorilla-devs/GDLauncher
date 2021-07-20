@@ -211,7 +211,7 @@ const ManualSetup = ({ setChoice }) => {
         </Button>
         <Button
           type="danger"
-          disabled={javaPath === ''}
+          disabled={javaPath === '' || java16Path === ''}
           onClick={() => {
             dispatch(updateJavaPath(javaPath));
             dispatch(updateJava16Path(java16Path));
@@ -251,9 +251,7 @@ const AutomaticSetup = () => {
     } = java16Meta;
 
     const javaBaseFolder = path.join(userData, 'java');
-    const java16BaseFolder = path.join(userData, 'java16');
     await fse.remove(javaBaseFolder);
-    await fse.remove(java16BaseFolder);
     const downloadLocation = path.join(tempFolder, path.basename(url));
     const downloadjava16Location = path.join(tempFolder, path.basename(url16));
 
@@ -386,7 +384,7 @@ const AutomaticSetup = () => {
       process.platform === 'darwin'
         ? path.join(tempFolder, `${releaseName16}-jre`, 'Contents', 'Home')
         : path.join(tempFolder, `${releaseName16}-jre`);
-    await fse.move(directoryToMove16, path.join(java16BaseFolder, version16));
+    await fse.move(directoryToMove16, path.join(javaBaseFolder, version16));
 
     await fse.remove(path.join(tempFolder, `${releaseName16}-jre`));
 
@@ -397,7 +395,7 @@ const AutomaticSetup = () => {
       await promisify(exec)(`chmod 755 "${execPath}"`);
 
       const execPath16 = path.join(
-        java16BaseFolder,
+        javaBaseFolder,
         version16,
         'bin',
         `java${ext}`

@@ -171,7 +171,7 @@ export default function MyAccountPreferences() {
               dispatch(updateJava16Path(java16Path));
             }
           }}
-          checked={!customJavaPath || !customJava16Path}
+          checked={!customJavaPath && !customJava16Path}
         />
       </AutodetectPath>
       {customJavaPath && customJava16Path && (

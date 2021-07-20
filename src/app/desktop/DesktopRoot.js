@@ -57,7 +57,7 @@ function DesktopRoot({ store }) {
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
   const javaPath = useSelector(state => state.settings.java.path);
-  const java16Path = useSelector(state => state.settings.java.java16Path);
+  const java16Path = useSelector(state => state.settings.java.path16);
   const location = useSelector(state => state.router.location);
   const modals = useSelector(state => state.modals);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
@@ -78,16 +78,16 @@ function DesktopRoot({ store }) {
     const manifests = await dispatch(initManifests());
 
     let isJavaOK = javaPath;
-    let isJava16OK = java16Path;
 
-    if (!isJava16OK) {
-      isJava16OK = await isLatestJavaDownloaded(manifests, userData, true, 16);
-    }
     if (!isJavaOK) {
       isJavaOK = await isLatestJavaDownloaded(manifests, userData, true, 8);
     }
 
-    if (!isJavaOK || !isJava16OK) {
+    if (isJavaOK && !java16Path) {
+      isJavaOK = await isLatestJavaDownloaded(manifests, userData, true, 16);
+    }
+
+    if (!isJavaOK) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
 
       // Super duper hacky solution to await the modal to be closed...

@@ -64,8 +64,7 @@ export const _getJavaPath = createSelector(
       } = javaMeta;
       const filename = process.platform === 'win32' ? 'java.exe' : 'java';
 
-      const javaFolderName = isVersion16 ? 'java16' : 'java';
-      return path.join(userData, javaFolderName, version, 'bin', filename);
+      return path.join(userData, 'java', version, 'bin', filename);
     });
   }
 );
