@@ -351,7 +351,7 @@ const AutomaticSetup = () => {
         path.basename(url16).replace('.tar.gz', '.tar')
       );
 
-      const secondExtractionJava16 = extractFull(tempTarName, tempFolder, {
+      const secondExtractionJava16 = extractFull(tempTarName16, tempFolder, {
         $bin: sevenZipPath,
         $progress: true
       });
