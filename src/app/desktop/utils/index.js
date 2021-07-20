@@ -265,7 +265,7 @@ export const isLatestJavaDownloaded = async (
   meta,
   userData,
   retry,
-  version
+  version = 8
 ) => {
   const javaOs = convertOSToJavaFormat(process.platform);
 
@@ -303,7 +303,7 @@ export const isLatestJavaDownloaded = async (
         }
       }
 
-      return isLatestJavaDownloaded(meta, userData);
+      return isLatestJavaDownloaded(meta, userData, null, version);
     }
 
     isValid = false;

@@ -47,8 +47,9 @@ export const _getJavaPath = createSelector(
   _java,
   _userData,
   (javaManifest, java, userData) => {
-    return memoize(v => {
-      const isVersion16 = v === 16;
+    // version
+    return memoize(ver => {
+      const isVersion16 = ver === 16;
       const manifest = isVersion16
         ? javaManifest.java16Manifest
         : javaManifest.javaManifest;

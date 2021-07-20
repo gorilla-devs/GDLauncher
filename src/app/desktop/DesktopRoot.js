@@ -80,7 +80,7 @@ function DesktopRoot({ store }) {
     let isJavaOK = javaPath;
 
     if (!isJavaOK) {
-      isJavaOK = await isLatestJavaDownloaded(manifests, userData, true, 8);
+      isJavaOK = await isLatestJavaDownloaded(manifests, userData, true);
     }
 
     if (isJavaOK && !java16Path) {
