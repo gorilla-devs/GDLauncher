@@ -57,8 +57,10 @@ export const _getJavaPath = createSelector(
       if (java.path) return java.path;
       const javaOs = convertOSToJavaFormat(process.platform);
       const javaMeta = manifest.find(
-        v =>
-          v.os === javaOs && v.architecture === 'x64' && v.binary_type === 'jre'
+        version =>
+          version.os === javaOs &&
+          version.architecture === 'x64' &&
+          version.binary_type === 'jre'
       );
       const {
         version_data: { openjdk_version: version }
