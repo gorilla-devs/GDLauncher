@@ -261,9 +261,19 @@ export const getFilteredVersions = (
   return versions;
 };
 
-export const isLatestJavaDownloaded = async (meta, userData, retry) => {
+export const isLatestJavaDownloaded = async (
+  meta,
+  userData,
+  retry,
+  version
+) => {
   const javaOs = convertOSToJavaFormat(process.platform);
-  const javaMeta = meta.find(v => v.os === javaOs);
+
+  const isJava8 = version === 8;
+
+  const manifest = isJava8 ? meta.java : meta.java16;
+
+  const javaMeta = manifest.find(v => v.os === javaOs);
   const javaFolder = path.join(
     userData,
     'java',
@@ -294,46 +304,6 @@ export const isLatestJavaDownloaded = async (meta, userData, retry) => {
       }
 
       return isLatestJavaDownloaded(meta, userData);
-    }
-
-    isValid = false;
-  }
-  return isValid;
-};
-
-export const isLatestJava16Downloaded = async (meta, userData, retry) => {
-  const javaOs = convertOSToJavaFormat(process.platform);
-  const javaMeta = meta.find(v => v.os === javaOs);
-  const javaFolder = path.join(
-    userData,
-    'java16',
-    javaMeta.version_data.openjdk_version
-  );
-  // Check if it's downloaded, if it's latest version and if it's a valid download
-  let isValid = true;
-
-  const javaExecutable = path.join(
-    javaFolder,
-    'bin',
-    `java${javaOs === 'windows' ? '.exe' : ''}`
-  );
-  try {
-    await fs.access(javaFolder);
-    await promisify(exec)(`"${javaExecutable}" -version`);
-  } catch (err) {
-    console.log(err);
-
-    if (retry) {
-      if (process.platform !== 'win32') {
-        try {
-          await promisify(exec)(`chmod +x "${javaExecutable}"`);
-          await promisify(exec)(`chmod 755 "${javaExecutable}"`);
-        } catch {
-          // swallow error
-        }
-      }
-
-      return isLatestJava16Downloaded(meta, userData);
     }
 
     isValid = false;
@@ -931,41 +901,4 @@ export const getPatchedInstanceType = instance => {
     return FORGE;
   }
   return FABRIC;
-};
-
-// 0 if they're identical
-// negative if v1 < v2
-// positive if v1 > v2
-// Nan if they in the wrong format
-export const compareVersions = (v1, v2) => {
-  const v1parts = v1.split('.').map(Number);
-  const v2parts = v2.split('.').map(Number);
-
-  const isValidPart = x => {
-    return /^\d+$/.test(x);
-  };
-
-  if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
-    return NaN;
-  }
-
-  for (let i = 0; i < v1parts.length; ++i) {
-    if (v2parts.length === i) {
-      return 1;
-    }
-
-    if (v1parts[i] === v2parts[i]) {
-      continue;
-    } else if (v1parts[i] > v2parts[i]) {
-      return 1;
-    } else {
-      return -1;
-    }
-  }
-
-  if (v1parts.length !== v2parts.length) {
-    return -1;
-  }
-
-  return 0;
 };

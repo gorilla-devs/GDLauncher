@@ -24,7 +24,7 @@ import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
 } from '../../../../app/desktop/utils/constants';
-import { _getJava16Path, _getJavaPath } from '../../../utils/selectors';
+import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
 
 const JavaSettings = styled.div`
@@ -113,8 +113,8 @@ export default function MyAccountPreferences() {
   const [screenResolution, setScreenResolution] = useState(null);
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
-  const javaPath = useSelector(_getJavaPath);
-  const java16Path = useSelector(_getJava16Path);
+  const javaPath = useSelector(state => _getJavaPath(state)(8));
+  const java16Path = useSelector(state => _getJavaPath(state)(16));
   const customJavaPath = useSelector(state => state.settings.java.path);
   const customJava16Path = useSelector(state => state.settings.java.path16);
   const mcResolution = useSelector(

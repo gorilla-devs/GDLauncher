@@ -9,8 +9,7 @@ const _java = state => state.settings.java;
 const _currentAccountId = state => state.app.currentAccountId;
 const _currentDownload = state => state.currentDownload;
 const _downloadQueue = state => state.downloadQueue;
-const _javaManifest = state => state.app.javaManifest;
-const _java16Manifest = state => state.app.java16Manifest;
+const _app = state => state.app;
 const _userData = state => state.userData;
 
 export const _getInstances = createSelector(_instances, instances =>
@@ -44,39 +43,30 @@ export const _getCurrentDownloadItem = createSelector(
 );
 
 export const _getJavaPath = createSelector(
-  _javaManifest,
+  _app,
   _java,
   _userData,
   (javaManifest, java, userData) => {
-    if (java.path) return java.path;
-    const javaOs = convertOSToJavaFormat(process.platform);
-    const javaMeta = javaManifest.find(
-      v =>
-        v.os === javaOs && v.architecture === 'x64' && v.binary_type === 'jre'
-    );
-    const {
-      version_data: { openjdk_version: version }
-    } = javaMeta;
-    const filename = process.platform === 'win32' ? 'java.exe' : 'java';
-    return path.join(userData, 'java', version, 'bin', filename);
-  }
-);
-export const _getJava16Path = createSelector(
-  _java16Manifest,
-  _java,
-  _userData,
-  (java16Manifest, java, userData) => {
-    if (java.path16) return java.path16;
-    const javaOs = convertOSToJavaFormat(process.platform);
-    const javaMeta = java16Manifest.find(
-      v =>
-        v.os === javaOs && v.architecture === 'x64' && v.binary_type === 'jre'
-    );
-    const {
-      version_data: { openjdk_version: version }
-    } = javaMeta;
-    const filename = process.platform === 'win32' ? 'java.exe' : 'java';
-    return path.join(userData, 'java16', version, 'bin', filename);
+    return memoize(v => {
+      const isVersion16 = v === 16;
+      const manifest = isVersion16
+        ? javaManifest.java16Manifest
+        : javaManifest.javaManifest;
+
+      if (java.path) return java.path;
+      const javaOs = convertOSToJavaFormat(process.platform);
+      const javaMeta = manifest.find(
+        v =>
+          v.os === javaOs && v.architecture === 'x64' && v.binary_type === 'jre'
+      );
+      const {
+        version_data: { openjdk_version: version }
+      } = javaMeta;
+      const filename = process.platform === 'win32' ? 'java.exe' : 'java';
+
+      const javaFolderName = isVersion16 ? 'java16' : 'java';
+      return path.join(userData, javaFolderName, version, 'bin', filename);
+    });
   }
 );
 

@@ -227,7 +227,7 @@ const ManualSetup = ({ setChoice }) => {
 
 const AutomaticSetup = () => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
-  const [currentStep, setCurrentStep] = useState('Downloading Java 8');
+  const [currentStep, setCurrentStep] = useState('Downloading Java');
   const javaManifest = useSelector(state => state.app.javaManifest);
   const java16Manifest = useSelector(state => state.app.java16Manifest);
   const userData = useSelector(state => state.userData);
@@ -262,7 +262,6 @@ const AutomaticSetup = () => {
       setDownloadPercentage(parseInt(p, 10));
     });
     await downloadFile(downloadjava16Location, url16, p => {
-      setCurrentStep('Downloading Java 16');
       ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
       setDownloadPercentage(parseInt(p, 10));
     });
@@ -273,7 +272,7 @@ const AutomaticSetup = () => {
 
     const totalSteps = process.platform !== 'win32' ? 2 : 1;
 
-    setCurrentStep(`Extracting 1 / ${totalSteps} Java 8`);
+    setCurrentStep(`Extracting 1 / ${totalSteps}`);
     const sevenZipPath = await get7zPath();
     const firstExtraction = extractFull(downloadLocation, tempFolder, {
       $bin: sevenZipPath,
@@ -294,7 +293,6 @@ const AutomaticSetup = () => {
 
     await fse.remove(downloadLocation);
 
-    setCurrentStep(`Extracting 1 / ${totalSteps} Java 16`);
     const firstExtractionJava16 = extractFull(
       downloadjava16Location,
       tempFolder,
@@ -324,7 +322,7 @@ const AutomaticSetup = () => {
       ipcRenderer.invoke('update-progress-bar', -1);
       setDownloadPercentage(null);
       await new Promise(resolve => setTimeout(resolve, 500));
-      setCurrentStep(`Extracting 2 / ${totalSteps} Java 8`);
+      setCurrentStep(`Extracting 2 / ${totalSteps}`);
 
       const tempTarName = path.join(
         tempFolder,
@@ -349,8 +347,6 @@ const AutomaticSetup = () => {
       });
 
       await fse.remove(tempTarName);
-
-      setCurrentStep(`Extracting 2 / ${totalSteps} Java 16`);
 
       const tempTarName16 = path.join(
         tempFolder,

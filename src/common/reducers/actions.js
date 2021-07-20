@@ -78,8 +78,7 @@ import {
   _getAccounts,
   _getTempPath,
   _getInstance,
-  _getDataStorePath,
-  _getJava16Path
+  _getDataStorePath
 } from '../utils/selectors';
 import {
   librariesMapper,
@@ -103,8 +102,7 @@ import {
   getPatchedInstanceType,
   convertCompletePathToInstance,
   downloadAddonZip,
-  convertcurseForgeToCanonical,
-  compareVersions
+  convertcurseForgeToCanonical
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -2513,8 +2511,8 @@ export const startListener = () => {
 export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const defaultJavaPath = _getJavaPath(state);
-    const defaultJava16Path = _getJava16Path(state);
+    const defaultJavaPath = _getJavaPath(state)(8);
+    const defaultJava16Path = _getJavaPath(state)(16);
 
     const { userData } = state;
     const account = _getCurrentAccount(state);
@@ -2531,12 +2529,10 @@ export function launchInstance(instanceName) {
       resolution: instanceResolution
     } = _getInstance(state)(instanceName);
 
-    // 0 if they're identical
-    // negative if v1 < v2
-    // positive if v1 > v2
-    // Nan if they in the wrong format
-    const versionGraterThan1dot17 =
-      compareVersions(loader.mcVersion, '1.17') >= 0;
+    const versionGraterThan1dot17 = gt(
+      coerce(loader?.mcVersion),
+      coerce('1.17')
+    );
 
     const defaultJavaPathVersion = versionGraterThan1dot17
       ? defaultJava16Path

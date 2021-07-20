@@ -28,7 +28,7 @@ import RouteBackground from '../../common/components/RouteBackground';
 import ga from '../../common/utils/analytics';
 import routes from './utils/routes';
 import { _getCurrentAccount } from '../../common/utils/selectors';
-import { isLatestJava16Downloaded, isLatestJavaDownloaded } from './utils';
+import { isLatestJavaDownloaded } from './utils';
 import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
 import { openModal } from '../../common/reducers/modals/actions';
@@ -81,14 +81,10 @@ function DesktopRoot({ store }) {
     let isJava16OK = java16Path;
 
     if (!isJava16OK) {
-      isJava16OK = await isLatestJava16Downloaded(
-        manifests.java16,
-        userData,
-        true
-      );
+      isJava16OK = await isLatestJavaDownloaded(manifests, userData, true, 16);
     }
     if (!isJavaOK) {
-      isJavaOK = await isLatestJavaDownloaded(manifests.java, userData, true);
+      isJavaOK = await isLatestJavaDownloaded(manifests, userData, true, 8);
     }
 
     if (!isJavaOK || !isJava16OK) {
