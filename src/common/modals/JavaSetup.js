@@ -169,7 +169,7 @@ const ManualSetup = ({ setChoice }) => {
         />
         <Button
           type="primary"
-          onClick={() => selectFolder()}
+          onClick={() => selectFolder(8)}
           css={`
             margin-left: 10px;
           `}
@@ -343,7 +343,7 @@ const AutomaticSetup = () => {
         path.basename(url).replace('.tar.gz', '.tar')
       );
 
-      const secondExtraction = extractFull(tempTarName, tempFolder, {
+      const secondExtraction = extractFull(tempTarName16, tempFolder, {
         $bin: sevenZipPath,
         $progress: true
       });
