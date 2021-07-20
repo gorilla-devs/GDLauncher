@@ -228,6 +228,7 @@ const ManualSetup = ({ setChoice }) => {
 const AutomaticSetup = () => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
   const [currentStep, setCurrentStep] = useState('Downloading Java');
+  const [currentStepPercentage, setCurrentStepPercentage] = useState(null);
   const javaManifest = useSelector(state => state.app.javaManifest);
   const java16Manifest = useSelector(state => state.app.java16Manifest);
   const userData = useSelector(state => state.userData);
@@ -255,13 +256,17 @@ const AutomaticSetup = () => {
     const downloadLocation = path.join(tempFolder, path.basename(url));
     const downloadjava16Location = path.join(tempFolder, path.basename(url16));
 
+    setCurrentStep('Java8 - Downloading');
     await downloadFile(downloadLocation, url, p => {
       ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
       setDownloadPercentage(parseInt(p, 10));
+      setCurrentStepPercentage(p / (100 / 27.5), 10);
     });
+    setCurrentStep('Java16 - Downloading');
     await downloadFile(downloadjava16Location, url16, p => {
       ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
       setDownloadPercentage(parseInt(p, 10));
+      setCurrentStepPercentage(27.5 + p / (100 / 27.5), 10);
     });
 
     ipcRenderer.invoke('update-progress-bar', -1);
@@ -270,7 +275,7 @@ const AutomaticSetup = () => {
 
     const totalSteps = process.platform !== 'win32' ? 2 : 1;
 
-    setCurrentStep(`Extracting 1 / ${totalSteps}`);
+    setCurrentStep(`Java8 - Extracting 1 / ${totalSteps}`);
     const sevenZipPath = await get7zPath();
     const firstExtraction = extractFull(downloadLocation, tempFolder, {
       $bin: sevenZipPath,
@@ -280,6 +285,10 @@ const AutomaticSetup = () => {
       firstExtraction.on('progress', ({ percent }) => {
         ipcRenderer.invoke('update-progress-bar', percent);
         setDownloadPercentage(percent);
+        setCurrentStepPercentage(
+          27.5 + 27,
+          5 + percent / (100 / totalSteps === 2 ? 10 : 20)
+        );
       });
       firstExtraction.on('end', () => {
         resolve();
@@ -291,6 +300,7 @@ const AutomaticSetup = () => {
 
     await fse.remove(downloadLocation);
 
+    setCurrentStep(`Java16 - Extracting 1 / ${totalSteps}`);
     const firstExtractionJava16 = extractFull(
       downloadjava16Location,
       tempFolder,
@@ -304,6 +314,12 @@ const AutomaticSetup = () => {
       firstExtractionJava16.on('progress', ({ percent }) => {
         ipcRenderer.invoke('update-progress-bar', percent);
         setDownloadPercentage(percent);
+        setCurrentStepPercentage(
+          27.5 +
+            27.5 +
+            (totalSteps === 2 ? 10 : 27.5) +
+            percent / (100 / (totalSteps === 2 ? 10 : 20))
+        );
       });
       firstExtractionJava16.on('end', () => {
         resolve();
@@ -320,7 +336,7 @@ const AutomaticSetup = () => {
       ipcRenderer.invoke('update-progress-bar', -1);
       setDownloadPercentage(null);
       await new Promise(resolve => setTimeout(resolve, 500));
-      setCurrentStep(`Extracting 2 / ${totalSteps}`);
+      setCurrentStep(`Java8 - Extracting 2 / ${totalSteps}`);
 
       const tempTarName = path.join(
         tempFolder,
@@ -335,6 +351,9 @@ const AutomaticSetup = () => {
         secondExtraction.on('progress', ({ percent }) => {
           ipcRenderer.invoke('update-progress-bar', percent);
           setDownloadPercentage(percent);
+          setCurrentStepPercentage(
+            27.5 + 27.5 + 10 + 10 + percent / (100 / 10)
+          );
         });
         secondExtraction.on('end', () => {
           resolve();
@@ -346,12 +365,13 @@ const AutomaticSetup = () => {
 
       await fse.remove(tempTarName);
 
+      setCurrentStep(`Java16 - Extracting 2 / ${totalSteps}`);
       const tempTarName16 = path.join(
         tempFolder,
         path.basename(url16).replace('.tar.gz', '.tar')
       );
 
-      const secondExtractionJava16 = extractFull(tempTarName, tempFolder, {
+      const secondExtractionJava16 = extractFull(tempTarName16, tempFolder, {
         $bin: sevenZipPath,
         $progress: true
       });
@@ -359,6 +379,9 @@ const AutomaticSetup = () => {
         secondExtractionJava16.on('progress', ({ percent }) => {
           ipcRenderer.invoke('update-progress-bar', percent);
           setDownloadPercentage(percent);
+          setCurrentStepPercentage(
+            27.5 + 27.5 + 10 + 10 + 10 + percent / (100 / 10)
+          );
         });
         secondExtractionJava16.on('end', () => {
           resolve();
@@ -369,6 +392,9 @@ const AutomaticSetup = () => {
       });
       await fse.remove(tempTarName16);
     }
+
+    setCurrentStep('Cleanup');
+    setCurrentStepPercentage(95);
 
     const directoryToMove =
       process.platform === 'darwin'
@@ -410,6 +436,7 @@ const AutomaticSetup = () => {
     setCurrentStep(`Java is ready!`);
     ipcRenderer.invoke('update-progress-bar', -1);
     setDownloadPercentage(null);
+    setCurrentStepPercentage(100);
     await new Promise(resolve => setTimeout(resolve, 2000));
     dispatch(closeModal());
   };
@@ -428,6 +455,17 @@ const AutomaticSetup = () => {
         align-items: center;
       `}
     >
+      <div
+        css={`
+          margin-top: -15px; //cheaty way to get up to the Modal title :P
+          margin-bottom: 50px;
+          width: 50%;
+        `}
+      >
+        {currentStepPercentage ? (
+          <Progress percent={currentStepPercentage} showInfo={false} />
+        ) : null}
+      </div>
       <div
         css={`
           margin-bottom: 50px;
