@@ -310,6 +310,8 @@ const AutomaticSetup = () => {
       }
     );
 
+    console.log('sevenZip', sevenZipPath);
+
     await new Promise((resolve, reject) => {
       firstExtractionJava16.on('progress', ({ percent }) => {
         ipcRenderer.invoke('update-progress-bar', percent);
@@ -343,7 +345,7 @@ const AutomaticSetup = () => {
         path.basename(url).replace('.tar.gz', '.tar')
       );
 
-      const secondExtraction = extractFull(tempTarName16, tempFolder, {
+      const secondExtraction = extractFull(tempTarName, tempFolder, {
         $bin: sevenZipPath,
         $progress: true
       });
