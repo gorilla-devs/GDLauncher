@@ -279,7 +279,7 @@ const AutomaticSetup = ({ forceInstall }) => {
       !(await isLatestJavaDownloaded(manifests, userData, true, 8))
     )
       javaToInstall.push(8);
-
+	  
     if (
       (forceInstall && forceInstall === true) ||
       !(await isLatestJavaDownloaded(manifests, userData, true, 16))
