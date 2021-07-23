@@ -293,20 +293,20 @@ const AutomaticSetup = ({ forceInstall }) => {
         (stepNumber / totalSteps + percentage / 100 / totalSteps) * 99
       );
     };
-    const javaBaseFolder = path.join(userData, 'java');
-    await fse.remove(javaBaseFolder);
     for (const javaVersion of javaToInstall) {
-      const index = javaToInstall.indexOf(javaVersion);
-      const addToSteps =
-        (index + 1) * (totalSteps / javaToInstall.length) -
-        totalSteps / javaToInstall.length;
-      // why has math to be so complicated?
-
       const {
         version_data: { openjdk_version: version },
         binary_link: url,
         release_name: releaseName
       } = javaVersion === 8 ? java8Meta : java16Meta;
+      const javaBaseFolder = path.join(userData, 'java');
+
+      await fse.remove(path.join(javaBaseFolder, version));
+      const index = javaToInstall.indexOf(javaVersion);
+      const addToSteps =
+        (index + 1) * (totalSteps / javaToInstall.length) -
+        totalSteps / javaToInstall.length;
+      // why has math to be so complicated?
 
       const downloadLocation = path.join(tempFolder, path.basename(url));
 
