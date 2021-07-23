@@ -25,6 +25,7 @@ import { updateJava16Path, updateJavaPath } from '../reducers/settings/actions';
 const JavaSetup = () => {
   const [step, setStep] = useState(0);
   const [choice, setChoice] = useState(null);
+  const [force, setForce] = useState(false);
   return (
     <Modal
       title="Java Setup"
@@ -67,11 +68,14 @@ const JavaSetup = () => {
                 & > div {
                   display: flex;
                   justify-content: center;
-                  margin-top: 30px;
                 }
               `}
             >
-              <div>
+              <div
+                css={`
+                  margin-top: 30px;
+                `}
+              >
                 <Button
                   type="primary"
                   css={`
@@ -80,12 +84,32 @@ const JavaSetup = () => {
                   onClick={() => {
                     setStep(1);
                     setChoice(0);
+                    setForce(false);
                   }}
                 >
                   Automatic Setup
                 </Button>
               </div>
               <div>
+                <Button
+                  type="default"
+                  css={`
+                    width: 150px;
+                  `}
+                  onClick={() => {
+                    setStep(1);
+                    setChoice(0);
+                    setForce(true);
+                  }}
+                >
+                  Force full install
+                </Button>
+              </div>
+              <div
+                css={`
+                  margin-top: 30px;
+                `}
+              >
                 <Button
                   type="danger"
                   css={`
@@ -116,7 +140,7 @@ const JavaSetup = () => {
               {choice === 0 ? 'Automatic' : 'Manual'} Setup
             </div>
             {choice === 0 ? (
-              <AutomaticSetup />
+              <AutomaticSetup forceInstall={force} />
             ) : (
               <ManualSetup setChoice={setChoice} />
             )}
@@ -229,7 +253,7 @@ const ManualSetup = ({ setChoice }) => {
   );
 };
 
-const AutomaticSetup = () => {
+const AutomaticSetup = ({ forceInstall }) => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
@@ -248,9 +272,19 @@ const AutomaticSetup = () => {
       java: javaManifest
     };
 
-    // TODO add forceDownload and isDownloaded
-    // temporarily
-    const javaToInstall = [8, 16];
+    const javaToInstall = [];
+
+    if (
+      (forceInstall && forceInstall === true) ||
+      !(await isLatestJavaDownloaded(manifests, userData, true, 8))
+    )
+      javaToInstall.push(8);
+
+    if (
+      (forceInstall && forceInstall === true) ||
+      !(await isLatestJavaDownloaded(manifests, userData, true, 16))
+    )
+      javaToInstall.push(16);
 
     const totalSteps =
       process.platform === 'win32' ? 2 : 3 * javaToInstall.length;
