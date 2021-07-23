@@ -73,37 +73,44 @@ const JavaSetup = () => {
             >
               <div
                 css={`
+                  display: flex;
+                  align-items: center;
                   margin-top: 30px;
                 `}
               >
-                <Button
-                  type="primary"
-                  css={`
-                    width: 150px;
-                  `}
-                  onClick={() => {
-                    setStep(1);
-                    setChoice(0);
-                    setForce(false);
-                  }}
-                >
-                  Automatic Setup
-                </Button>
-              </div>
-              <div>
-                <Button
-                  type="default"
-                  css={`
-                    width: 150px;
-                  `}
-                  onClick={() => {
-                    setStep(1);
-                    setChoice(0);
-                    setForce(true);
-                  }}
-                >
-                  Force full install
-                </Button>
+                <div>
+                  <Button
+                    type="primary"
+                    css={`
+                      width: 150px;
+                      margin-right: 10px;
+                    `}
+                    onClick={() => {
+                      setStep(1);
+                      setChoice(0);
+                      setForce(false);
+                    }}
+                  >
+                    Automatic Setup
+                  </Button>
+                </div>
+                or
+                <div>
+                  <Button
+                    type="default"
+                    css={`
+                      width: 150px;
+                      margin-left: 10px;
+                    `}
+                    onClick={() => {
+                      setStep(1);
+                      setChoice(0);
+                      setForce(true);
+                    }}
+                  >
+                    Force installation
+                  </Button>
+                </div>
               </div>
               <div
                 css={`
@@ -142,7 +149,7 @@ const JavaSetup = () => {
             {choice === 0 ? (
               <AutomaticSetup forceInstall={force} />
             ) : (
-              <ManualSetup setChoice={setChoice} />
+              <ManualSetup setStep={setStep} />
             )}
           </SecondStep>
         )}
@@ -151,7 +158,7 @@ const JavaSetup = () => {
   );
 };
 
-const ManualSetup = ({ setChoice }) => {
+const ManualSetup = ({ setStep }) => {
   const [javaPath, setJavaPath] = useState('');
   const [java16Path, setJava16Path] = useState('');
   const dispatch = useDispatch();
@@ -234,8 +241,8 @@ const ManualSetup = ({ setChoice }) => {
           margin-top: 60px;
         `}
       >
-        <Button type="primary" onClick={() => setChoice(0)}>
-          Go to Automatic Setup instead
+        <Button type="primary" onClick={() => setStep(0)}>
+          Go Back
         </Button>
         <Button
           type="danger"
@@ -274,17 +281,22 @@ const AutomaticSetup = ({ forceInstall }) => {
 
     const javaToInstall = [];
 
-    if (
-      (forceInstall && forceInstall === true) ||
-      !(await isLatestJavaDownloaded(manifests, userData, true, 8))
-    )
-      javaToInstall.push(8);
-	  
-    if (
-      (forceInstall && forceInstall === true) ||
-      !(await isLatestJavaDownloaded(manifests, userData, true, 16))
-    )
-      javaToInstall.push(16);
+    const isJava8Downloaded = await isLatestJavaDownloaded(
+      manifests,
+      userData,
+      true,
+      8
+    );
+    const isJava16Downloaded = await isLatestJavaDownloaded(
+      manifests,
+      userData,
+      true,
+      16
+    );
+
+    if (forceInstall || !isJava8Downloaded) javaToInstall.push(8);
+
+    if (forceInstall || !isJava16Downloaded) javaToInstall.push(16);
 
     const totalSteps =
       process.platform === 'win32' ? 2 : 3 * javaToInstall.length;
