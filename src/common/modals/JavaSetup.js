@@ -251,12 +251,14 @@ const AutomaticSetup = () => {
     const isJava8Downloaded = await isLatestJavaDownloaded(
       manifests,
       userData,
-      true
+      true,
+      8
     );
     const isJava16Downloaded = await isLatestJavaDownloaded(
       manifests,
       userData,
-      true
+      true,
+      16
     );
     const {
       version_data: { openjdk_version: version },
