@@ -78,12 +78,13 @@ function DesktopRoot({ store }) {
     const manifests = await dispatch(initManifests());
 
     let isJavaOK = javaPath;
+    if (isJavaOK) isJavaOK = java16Path;
 
-    if (!isJavaOK) {
+    if (isJavaOK) {
       isJavaOK = await isLatestJavaDownloaded(manifests, userData, true);
     }
 
-    if (isJavaOK && !java16Path) {
+    if (isJavaOK) {
       isJavaOK = await isLatestJavaDownloaded(manifests, userData, true, 16);
     }
 
