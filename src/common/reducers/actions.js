@@ -40,7 +40,8 @@ import {
   ACCOUNT_MOJANG,
   FTB,
   FABRIC,
-  CURSEFORGE
+  CURSEFORGE,
+  LITELOADER
 } from '../utils/constants';
 import {
   mcAuthenticate,
@@ -64,7 +65,9 @@ import {
   msAuthenticateXSTS,
   msAuthenticateMinecraft,
   msMinecraftProfile,
-  msOAuthRefresh
+  msOAuthRefresh,
+  getLiteLoaderManifest,
+  getLiteLoaderJson
 } from '../api';
 import {
   _getCurrentAccount,
@@ -137,6 +140,14 @@ export function initManifests() {
       });
       return fabric;
     };
+    const getLiteLoaderVersions = async () => {
+      const liteloader = (await getLiteLoaderManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_LITELOADER_MANIFEST,
+        data: liteloader
+      });
+      return liteloader;
+    };
     const getJavaManifestVersions = async () => {
       const java = (await getJavaManifest()).data;
       dispatch({
@@ -175,14 +186,15 @@ export function initManifests() {
       return omitBy(forgeVersions, v => v.length === 0);
     };
     // Using reflect to avoid rejection
-    const [fabric, java, categories, forge] = await Promise.all([
+    const [fabric, java, categories, forge, liteloader] = await Promise.all([
       reflect(getFabricVersions()),
       reflect(getJavaManifestVersions()),
       reflect(getAddonCategoriesVersions()),
-      reflect(getForgeVersions())
+      reflect(getForgeVersions()),
+      reflect(getLiteLoaderVersions())
     ]);
 
-    if (fabric.e || java.e || categories.e || forge.e) {
+    if (fabric.e || java.e || categories.e || forge.e || liteloader.e) {
       console.error(fabric, java, categories, forge);
     }
 
@@ -191,7 +203,8 @@ export function initManifests() {
       fabric: fabric.status ? fabric.v : app.fabricManifest,
       java: java.status ? java.v : app.javaManifest,
       categories: categories.status ? categories.v : app.curseforgeCategories,
-      forge: forge.status ? forge.v : app.forgeManifest
+      forge: forge.status ? forge.v : app.forgeManifest,
+      liteloader: liteloader.status ? liteloader.v : app.liteLoaderManifest
     };
   };
 }
@@ -1154,6 +1167,54 @@ export function downloadFabric(instanceName) {
   };
 }
 
+export function downloadLiteLoader(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { loader } = _getCurrentDownloadItem(state);
+
+    dispatch(
+      updateDownloadStatus(instanceName, 'Downloading liteloader files...')
+    );
+
+    let liteLoaderJson;
+    const liteLoaderJsonPath = path.join(
+      _getLibrariesPath(state),
+      'com',
+      'mumfrey',
+      'liteloader',
+      loader?.loaderVersion,
+      'install_profile.json'
+    );
+    try {
+      liteLoaderJson = await fse.readJson(liteLoaderJsonPath);
+    } catch (err) {
+      liteLoaderJson = (await getLiteLoaderJson(loader)).data;
+      await fse.outputJson(liteLoaderJsonPath, liteLoaderJson);
+    }
+
+    const libraries = librariesMapper(
+      liteLoaderJson.versionInfo.libraries,
+      _getLibrariesPath(state)
+    );
+
+    let prev = 0;
+    const updatePercentage = downloaded => {
+      const percentage = (downloaded * 100) / libraries.length;
+      const progress = parseInt(percentage, 10);
+      if (progress !== prev) {
+        prev = progress;
+        dispatch(updateDownloadProgress(progress));
+      }
+    };
+
+    await downloadInstanceFiles(
+      libraries,
+      updatePercentage,
+      state.settings.concurrentDownloads
+    );
+  };
+}
+
 export function downloadForge(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -1891,6 +1952,8 @@ export function downloadInstance(instanceName) {
       await dispatch(downloadFabric(instanceName));
     } else if (loader?.loaderType === FORGE) {
       await dispatch(downloadForge(instanceName));
+    } else if (loader?.loaderType === LITELOADER) {
+      await dispatch(downloadLiteLoader(instanceName));
     }
 
     // analyze source and do it for ftb and forge
@@ -2561,6 +2624,27 @@ export function launchInstance(instanceName) {
       libraries = libraries.concat(fabricLibraries);
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
+    } else if (loader && loader?.loaderType === 'liteloader') {
+      const liteloaderJsonPath = path.join(
+        _getLibrariesPath(state),
+        'com',
+        'mumfrey',
+        'liteloader',
+        loader?.loaderVersion,
+        'install_profile.json'
+      );
+      const liteloaderJson = await fse.readJson(liteloaderJsonPath);
+      const liteloaderLibraries = librariesMapper(
+        liteloaderJson.versionInfo.libraries,
+        librariesPath
+      );
+      libraries = libraries.concat(liteloaderLibraries);
+      // Replace classname
+      mcJson.mainClass = liteloaderJson.versionInfo.mainClass;
+      if (liteloaderJson.versionInfo.minecraftArguments) {
+        mcJson.minecraftArguments =
+          liteloaderJson.versionInfo.minecraftArguments;
+      }
     } else if (loader && loader?.loaderType === 'forge') {
       if (gt(coerce(loader?.mcVersion), coerce('1.5.2'))) {
         const getForgeLastVer = ver =>

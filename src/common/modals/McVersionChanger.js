@@ -10,21 +10,34 @@ import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
-import { FABRIC, VANILLA, FORGE, CURSEFORGE, FTB } from '../utils/constants';
+import {
+  FABRIC,
+  VANILLA,
+  FORGE,
+  CURSEFORGE,
+  FTB,
+  LITELOADER
+} from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
 
 const McVersionChanger = ({ instanceName, defaultValue }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
+  const liteLoaderManifest = useSelector(state => state.app.liteloaderManifest);
   const config = useSelector(state => _getInstance(state)(instanceName));
   const [selectedVersion, setSelectedVersion] = useState(null);
 
   const dispatch = useDispatch();
 
   const filteredVers = useMemo(() => {
-    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest);
-  }, [vanillaManifest, forgeManifest, fabricManifest]);
+    return getFilteredVersions(
+      vanillaManifest,
+      forgeManifest,
+      fabricManifest,
+      liteLoaderManifest
+    );
+  }, [vanillaManifest, forgeManifest, fabricManifest, liteLoaderManifest]);
 
   const patchedDefaultValue = useMemo(() => {
     const isFabric = defaultValue?.loaderType === FABRIC;
@@ -152,6 +165,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
               const isVanilla = selectedVersion[0] === VANILLA;
               const isFabric = selectedVersion[0] === FABRIC;
               const isForge = selectedVersion[0] === FORGE;
+              const isLiteLoader = selectedVersion[0] === LITELOADER;
 
               if (isVanilla) {
                 dispatch(
@@ -189,6 +203,20 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                       loaderType: FABRIC,
                       mcVersion: selectedVersion[2],
                       loaderVersion: selectedVersion[3]
+                    },
+                    null,
+                    background
+                  )
+                );
+              } else if (isLiteLoader) {
+                dispatch(
+                  addToQueue(
+                    instanceName,
+                    {
+                      ...defaultValue,
+                      loaderType: LITELOADER,
+                      mcVersion: selectedVersion[2],
+                      loaderVersion: selectedVersion[2]
                     },
                     null,
                     background

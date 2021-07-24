@@ -23,7 +23,7 @@ import {
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, VANILLA, FORGE, FTB, CURSEFORGE } from '../../utils/constants';
+import {FABRIC, VANILLA, FORGE, FTB, CURSEFORGE, LITELOADER} from '../../utils/constants';
 import { getFTBModpackVersionData } from '../../api';
 
 const InstanceName = ({
@@ -103,6 +103,7 @@ const InstanceName = ({
     const isVanilla = version?.loaderType === VANILLA;
     const isFabric = version?.loaderType === FABRIC;
     const isForge = version?.loaderType === FORGE;
+    const isLiteLoader = version?.loaderType === LITELOADER
     const isCurseForgeModpack = Boolean(modpack?.attachments);
     const isFTBModpack = Boolean(modpack?.art);
     let manifest;
@@ -317,6 +318,14 @@ const InstanceName = ({
       dispatch(
         addToQueue(localInstanceName, {
           loaderType: FABRIC,
+          mcVersion: version?.mcVersion,
+          loaderVersion: version?.loaderVersion
+        })
+      );
+    } else if (isLiteLoader) {
+      dispatch(
+        addToQueue(localInstanceName, {
+          loaderType: LITELOADER,
           mcVersion: version?.mcVersion,
           loaderVersion: version?.loaderVersion
         })

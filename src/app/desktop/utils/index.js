@@ -17,7 +17,8 @@ import {
 
 import {
   removeDuplicates,
-  sortByForgeVersionDesc
+  sortByForgeVersionDesc,
+  sortByLiteLoaderVersionDesc
 } from '../../../common/utils';
 import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
@@ -162,7 +163,8 @@ export const librariesMapper = (libraries, librariesPath) => {
 export const getFilteredVersions = (
   vanillaManifest,
   forgeManifest,
-  fabricManifest
+  fabricManifest,
+  liteloaderManifest
 ) => {
   const versions = [
     {
@@ -253,6 +255,34 @@ export const getFilteredVersions = (
                 value: c.version,
                 label: c.version
               }))
+            }))
+        }
+      ]
+    },
+    {
+      value: 'liteloader',
+      label: 'LiteLoader',
+      children: [
+        {
+          value: 'release',
+          label: 'Releases',
+          children: Object.entries(liteloaderManifest.versions)
+            .filter(v => v[1].repo.stream === 'RELEASE')
+            .sort(sortByLiteLoaderVersionDesc)
+            .map(k => ({
+              value: k[0],
+              label: k[0]
+            }))
+        },
+        {
+          value: 'snapshot',
+          label: 'Snapshots',
+          children: Object.entries(liteloaderManifest.versions)
+            .filter(v => v[1].repo.stream === 'SNAPSHOT')
+            .sort(sortByLiteLoaderVersionDesc)
+            .map(k => ({
+              value: k[0],
+              label: k[0]
             }))
         }
       ]

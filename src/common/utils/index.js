@@ -24,6 +24,24 @@ export function sortByForgeVersionDesc(a, b) {
   return 0;
 }
 
+export function sortByLiteLoaderVersionDesc(a, b) {
+  if (typeof a[0] === 'string' && typeof b[0] === 'string') {
+    const versionA = a[0].split('.');
+    const versionB = b[0].split('.');
+
+    for (let i = 0; i < versionA.length; i += 1) {
+      const verNumA = Number(versionA[i]) || 0;
+      const verNumB = Number(versionB[i]) || 0;
+
+      if (verNumA !== verNumB) {
+        return verNumB - verNumA;
+      }
+    }
+  }
+
+  return 0;
+}
+
 export const formatNumber = number => {
   // Alter numbers larger than 1k
   if (number >= 1e3) {

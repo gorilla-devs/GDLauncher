@@ -4,16 +4,17 @@ import { useSelector } from 'react-redux';
 import { Cascader } from 'antd';
 import styled from 'styled-components';
 import { getFilteredVersions } from '../../../app/desktop/utils';
-import { FABRIC, FORGE, VANILLA } from '../../utils/constants';
+import { FABRIC, FORGE, LITELOADER, VANILLA } from '../../utils/constants';
 
 const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
+  const liteloaderManifest = useSelector(state => state.app.liteloaderManifest);
 
   const filteredVers = useMemo(() => {
-    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest);
-  }, [vanillaManifest, forgeManifest, fabricManifest]);
+    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, liteloaderManifest);
+  }, [vanillaManifest, forgeManifest, fabricManifest, liteloaderManifest]);
 
   return (
     <Container>
@@ -34,6 +35,12 @@ const NewInstance = ({ setVersion, setModpack }) => {
               mcVersion: v[2],
               loaderVersion: v[3]
             });
+          if (v[0] === LITELOADER)
+            setVersion({
+              loaderType: v[0],
+              mcVersion: v[2],
+              loaderVersion: v[2]
+            })
           setModpack(null);
         }}
         placeholder="Select a version"

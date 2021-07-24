@@ -196,6 +196,11 @@ export const getFabricManifest = () => {
   return axios.get(url);
 };
 
+export const getLiteLoaderManifest = () => {
+  const url = `https://dl.liteloader.com/versions/versions.json`;
+  return axios.get(url);
+};
+
 export const getJavaManifest = () => {
   const url = JAVA_MANIFEST_URL;
   return axios.get(url);
@@ -206,6 +211,12 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
     `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
       mcVersion
     )}/${encodeURIComponent(loaderVersion)}/profile/json`
+  );
+};
+
+export const getLiteLoaderJson = ({ mcVersion }) => {
+  return axios.get(
+    `https://raw.githubusercontent.com/Mumfrey/LiteLoaderInstaller/${mcVersion}/src/main/resources/install_profile.json`
   );
 };
 

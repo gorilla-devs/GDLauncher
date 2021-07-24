@@ -22,6 +22,7 @@ export const IMGUR_CLIENT_ID = '509a564cf4466c9';
 export const FABRIC = 'fabric';
 export const FORGE = 'forge';
 export const VANILLA = 'vanilla';
+export const LITELOADER = 'liteloader';
 
 export const CURSEFORGE = 'curseforge';
 export const FTB = 'ftb';

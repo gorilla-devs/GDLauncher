@@ -24,7 +24,8 @@ const InstanceDeleteConfirmation = ({ instanceName }) => {
   const deleteInstance = async () => {
     setLoading(true);
     start();
-    fse.remove(path.join(instancesPath, instanceName));
+    // Without removeSync, LiteLoader instances with mods installed, fails to delete properly
+    fse.removeSync(path.join(instancesPath, instanceName));
   };
   const closeModalWindow = () => dispatch(closeModal());
   return (
