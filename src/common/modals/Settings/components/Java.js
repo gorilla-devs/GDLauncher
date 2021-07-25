@@ -311,7 +311,7 @@ export default function MyAccountPreferences() {
           }}
           defaultValue={javaMemory}
           min={1024}
-          max={process.getSystemMemoryInfo().total / 1000}
+          max={process.getSystemMemoryInfo().total / 1024}
           step={512}
           marks={marks}
           valueLabelDisplay="auto"
