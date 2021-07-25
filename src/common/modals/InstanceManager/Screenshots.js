@@ -216,7 +216,7 @@ const Screenshots = ({ instanceName }) => {
             if (selectedItems.length) {
               dispatch(
                 openModal('ActionConfirmation', {
-                  message: 'Are you sure you want to delete this images?',
+                  message: 'Are you sure you want to delete this image(s)?',
                   confirmCallback: deleteFile,
                   title: 'Confirm'
                 })
