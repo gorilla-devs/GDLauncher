@@ -25,7 +25,6 @@ import { updateJava16Path, updateJavaPath } from '../reducers/settings/actions';
 const JavaSetup = () => {
   const [step, setStep] = useState(0);
   const [choice, setChoice] = useState(null);
-  const [force, setForce] = useState(false);
   return (
     <Modal
       title="Java Setup"
@@ -71,46 +70,20 @@ const JavaSetup = () => {
                 }
               `}
             >
-              <div
-                css={`
-                  display: flex;
-                  align-items: center;
-                  margin-top: 30px;
-                `}
-              >
-                <div>
-                  <Button
-                    type="primary"
-                    css={`
-                      width: 150px;
-                      margin-right: 10px;
-                    `}
-                    onClick={() => {
-                      setStep(1);
-                      setChoice(0);
-                      setForce(false);
-                    }}
-                  >
-                    Automatic Setup
-                  </Button>
-                </div>
-                or
-                <div>
-                  <Button
-                    type="default"
-                    css={`
-                      width: 150px;
-                      margin-left: 10px;
-                    `}
-                    onClick={() => {
-                      setStep(1);
-                      setChoice(0);
-                      setForce(true);
-                    }}
-                  >
-                    Force installation
-                  </Button>
-                </div>
+              <div>
+                <Button
+                  type="primary"
+                  css={`
+                    width: 150px;
+                    margin-right: 10px;
+                  `}
+                  onClick={() => {
+                    setStep(1);
+                    setChoice(0);
+                  }}
+                >
+                  Automatic Setup
+                </Button>
               </div>
               <div
                 css={`
@@ -147,7 +120,7 @@ const JavaSetup = () => {
               {choice === 0 ? 'Automatic' : 'Manual'} Setup
             </div>
             {choice === 0 ? (
-              <AutomaticSetup forceInstall={force} />
+              <AutomaticSetup />
             ) : (
               <ManualSetup setStep={setStep} />
             )}
@@ -260,7 +233,7 @@ const ManualSetup = ({ setStep }) => {
   );
 };
 
-const AutomaticSetup = ({ forceInstall }) => {
+const AutomaticSetup = () => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
@@ -294,9 +267,9 @@ const AutomaticSetup = ({ forceInstall }) => {
       16
     );
 
-    if (forceInstall || !isJava8Downloaded) javaToInstall.push(8);
+    if (!isJava8Downloaded) javaToInstall.push(8);
 
-    if (forceInstall || !isJava16Downloaded) javaToInstall.push(16);
+    if (!isJava16Downloaded) javaToInstall.push(16);
 
     const totalSteps =
       process.platform === 'win32' ? 2 : 3 * javaToInstall.length;
