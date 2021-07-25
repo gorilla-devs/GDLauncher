@@ -495,7 +495,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 onChange={setJavaLocalMemory}
                 value={javaLocalMemory}
                 min={1024}
-                max={32768}
+                max={process.getSystemMemoryInfo().total / 1000}
                 step={512}
                 marks={marks}
                 valueLabelDisplay="auto"
