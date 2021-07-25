@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react';
 import { Button, Input } from 'antd';
@@ -37,10 +36,16 @@ const InstanceDuplicateName = ({ instanceName }) => {
         setAlreadyExists(false);
         return;
       }
-      fse.pathExists(path.join(instancesPath, newInstanceName)).then(exists => {
-        setAlreadyExists(exists);
-        setInvalidName(false);
-      });
+      fse
+        .pathExists(path.join(instancesPath, newInstanceName))
+        .then(exists => {
+          setAlreadyExists(exists);
+          setInvalidName(false);
+          return exists;
+        })
+        .catch(err => {
+          console.error(err);
+        });
     }
   }, [newInstanceName]);
 
@@ -57,7 +62,7 @@ const InstanceDuplicateName = ({ instanceName }) => {
     await makeDir(path.join(instancesPath, newInstanceName));
 
     // Copy the old config file, so the launcher can detect the instance
-    fse.copySync(
+    await fse.copy(
       path.join(instancesPath, oldInstanceName, 'config.json'),
       path.join(instancesPath, newInstanceName, 'config.json')
     );
@@ -69,20 +74,20 @@ const InstanceDuplicateName = ({ instanceName }) => {
     );
 
     // Remove curseforge manifest if one exists
-    if (
-      fse.pathExistsSync(
-        path.join(instancesPath, newInstanceName, 'manifest.json')
-      )
-    ) {
-      fse.rmSync(path.join(instancesPath, newInstanceName, 'manifest.json'));
-    }
+    await fse.unlink(
+      path.join(instancesPath, newInstanceName, 'manifest.json'),
+      err => {
+        if (err && err.code !== 'ENOENT') {
+          console.error(err);
+        }
+      }
+    );
 
-    // Reset the time played back to 0 and reset icon
+    // Reset the time played back to 0
     dispatch(
       updateInstanceConfig(newInstanceName, prev => ({
         ...omit(prev, path.join('loaderType', 'source')),
         timePlayed: 0,
-        background: null,
         lastPlayed: 0
       }))
     );
