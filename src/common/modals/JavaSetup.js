@@ -67,6 +67,7 @@ const JavaSetup = () => {
                 & > div {
                   display: flex;
                   justify-content: center;
+                  margin-top: 30px;
                 }
               `}
             >
@@ -85,11 +86,7 @@ const JavaSetup = () => {
                   Automatic Setup
                 </Button>
               </div>
-              <div
-                css={`
-                  margin-top: 30px;
-                `}
-              >
+              <div>
                 <Button
                   type="danger"
                   css={`
