@@ -269,9 +269,9 @@ export const isLatestJavaDownloaded = async (
 ) => {
   const javaOs = convertOSToJavaFormat(process.platform);
 
-  const isJava8 = version === 16;
+  const isJava16 = version === 16;
 
-  const manifest = isJava8 ? meta.java16 : meta.java;
+  const manifest = isJava16 ? meta.java16 : meta.java;
 
   const javaMeta = manifest.find(v => v.os === javaOs);
   const javaFolder = path.join(
