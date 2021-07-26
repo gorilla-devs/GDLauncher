@@ -872,6 +872,17 @@ export const getFilesRecursive = async dir => {
   return files.reduce((a, f) => a.concat(f), []);
 };
 
+export const extractFabricVersionFromManifest = manifest => {
+  // Backwards compatability for manifest entries that use the `yarn`
+  // property to set the fabric loader version. Newer manifests use the
+  // format `fabric-<version>` in the id.
+  let loaderVersion = manifest?.minecraft?.modLoaders[0]?.yarn;
+  if (!loaderVersion) {
+    loaderVersion = manifest?.minecraft?.modLoaders[0]?.id?.split('-', 2)[1];
+  }
+  return loaderVersion;
+};
+
 export const convertcurseForgeToCanonical = (
   curseForge,
   mcVersion,
