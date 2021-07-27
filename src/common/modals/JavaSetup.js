@@ -76,7 +76,6 @@ const JavaSetup = () => {
                   type="primary"
                   css={`
                     width: 150px;
-                    margin-right: 10px;
                   `}
                   onClick={() => {
                     setStep(1);
