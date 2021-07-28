@@ -197,6 +197,8 @@ const HoverContainer = styled.div`
 const AccountsContainer = styled.div`
   width: 100%;
   height: 100%;
+  overflow: auto;
+  padding-right: 2px;
 `;
 
 const AccountContainer = styled.div`
