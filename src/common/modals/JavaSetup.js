@@ -284,11 +284,8 @@ const AutomaticSetup = () => {
       const javaBaseFolder = path.join(userData, 'java');
 
       await fse.remove(path.join(javaBaseFolder, version));
-      const index = javaToInstall.indexOf(javaVersion);
       const addToSteps =
-        (index + 1) * (totalSteps / javaToInstall.length) -
-        totalSteps / javaToInstall.length;
-      // why has math to be so complicated?
+        javaToInstall.indexOf(javaVersion) === 0 ? 0 : totalSteps / 2;
 
       const downloadLocation = path.join(tempFolder, path.basename(url));
 
