@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Progress, Input } from 'antd';
 import { Transition } from 'react-transition-group';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { ipcRenderer } from 'electron';
 import fse from 'fs-extra';
 import { useSelector, useDispatch } from 'react-redux';
@@ -240,6 +240,8 @@ const AutomaticSetup = () => {
   const tempFolder = useSelector(_getTempPath);
   const dispatch = useDispatch();
 
+  const theme = useTheme();
+
   const installJava = async () => {
     const javaOs = convertOSToJavaFormat(process.platform);
     const java8Meta = javaManifest.find(v => v.os === javaOs);
@@ -418,7 +420,11 @@ const AutomaticSetup = () => {
         `}
       >
         {currentStepPercentage && (
-          <Progress percent={currentStepPercentage} showInfo={false} />
+          <Progress
+            percent={currentStepPercentage}
+            showInfo={false}
+            strokeColor={theme.palette.primary.main}
+          />
         )}
       </div>
       <div
