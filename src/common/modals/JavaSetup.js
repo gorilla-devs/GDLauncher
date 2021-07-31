@@ -152,12 +152,13 @@ const ManualSetup = ({ setStep }) => {
     >
       <div
         css={`
-          margin-bottom: 50px;
+          margin-bottom: 35px;
           font-size: 18px;
         `}
       >
         Select your java executable. We strongly suggest Java8, since any other
-        version won&apos;t completely work with modded Minecraft
+        version won&apos;t completely work with modded Minecraft. For version
+        1.17+ you need Java16 to run correctly.
       </div>
       <div
         css={`
@@ -167,7 +168,7 @@ const ManualSetup = ({ setStep }) => {
         `}
       >
         <Input
-          placeholder="Select your java executable"
+          placeholder="Select your Java8 executable"
           onChange={e => setJavaPath(e.target.value)}
           value={javaPath}
         />
@@ -188,7 +189,7 @@ const ManualSetup = ({ setStep }) => {
         `}
       >
         <Input
-          placeholder="Select your java16 executable"
+          placeholder="Select your Java16 executable"
           onChange={e => setJava16Path(e.target.value)}
           value={java16Path}
         />
@@ -207,7 +208,7 @@ const ManualSetup = ({ setStep }) => {
           width: 100%;
           display: flex;
           justify-content: space-between;
-          margin-top: 60px;
+          margin-top: 45px;
         `}
       >
         <Button type="primary" onClick={() => setStep(0)}>
@@ -283,11 +284,8 @@ const AutomaticSetup = () => {
       const javaBaseFolder = path.join(userData, 'java');
 
       await fse.remove(path.join(javaBaseFolder, version));
-      const index = javaToInstall.indexOf(javaVersion);
       const addToSteps =
-        (index + 1) * (totalSteps / javaToInstall.length) -
-        totalSteps / javaToInstall.length;
-      // why has math to be so complicated?
+        javaToInstall.indexOf(javaVersion) === 0 ? 0 : totalSteps / 2;
 
       const downloadLocation = path.join(tempFolder, path.basename(url));
 
