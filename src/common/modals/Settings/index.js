@@ -149,12 +149,47 @@ export default function Settings() {
               width: 200px;
               position: absolute;
               bottom: 0;
-              margin-bottom: 50px;
             `}
           >
+            <span
+              css={`
+                font-weight: bold;
+                font-size: 16px;
+              `}
+            >
+              Support GDLauncher
+            </span>
+            <div
+              css={`
+                img {
+                  border-radius: 30px;
+                  height: 40px;
+                  cursor: pointer;
+                  transition: transform 0.2s ease-in-out;
+                  &:hover {
+                    transform: scale(1.05);
+                  }
+                }
+              `}
+            >
+              <a href="https://ko-fi.com/gdlauncher">
+                <img
+                  src={KoFiButton}
+                  alt="Ko-Fi"
+                  css={`
+                    margin-bottom: 20px;
+                    margin-top: 20px;
+                  `}
+                />
+              </a>
+              <a href="https://patreon.com/gorilladevs">
+                <img src={PatreonButton} alt="Patreon" />
+              </a>
+            </div>
             <div
               css={`
                 display: flex;
+                margin-top: 20px;
                 margin-bottom: 20px;
                 a {
                   color: rgba(255, 255, 255, 0.85);
@@ -190,55 +225,10 @@ export default function Settings() {
                   <FontAwesomeIcon icon={faTwitter} size="lg" />
                 </div>
               </a>
-              <a href="https://facebook.com/gorilladevs">
-                <div>
-                  <FontAwesomeIcon icon={faFacebook} size="lg" />
-                </div>
-              </a>
-              <a href="https://instagram.com/gdlauncher">
-                <div>
-                  <FontAwesomeIcon icon={faInstagram} size="lg" />
-                </div>
-              </a>
               <a href="https://gdevs.io">
                 <div>
                   <FontAwesomeIcon icon={faGlobe} size="lg" />
                 </div>
-              </a>
-            </div>
-            <span
-              css={`
-                font-weight: bold;
-                font-size: 16px;
-              `}
-            >
-              Support GDLauncher
-            </span>
-            <div
-              css={`
-                img {
-                  border-radius: 30px;
-                  height: 40px;
-                  cursor: pointer;
-                  transition: transform 0.2s ease-in-out;
-                  &:hover {
-                    transform: scale(1.05);
-                  }
-                }
-              `}
-            >
-              <a href="https://ko-fi.com/gdlauncher">
-                <img
-                  src={KoFiButton}
-                  alt="Ko-Fi"
-                  css={`
-                    margin-bottom: 20px;
-                    margin-top: 20px;
-                  `}
-                />
-              </a>
-              <a href="https://patreon.com/gorilladevs">
-                <img src={PatreonButton} alt="Patreon" />
               </a>
             </div>
           </div>
