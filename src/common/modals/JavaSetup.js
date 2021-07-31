@@ -417,7 +417,9 @@ const AutomaticSetup = () => {
           width: 50%;
         `}
       >
-        <Progress percent={currentStepPercentage} showInfo={false} />
+        {currentStepPercentage && (
+          <Progress percent={currentStepPercentage} showInfo={false} />
+        )}
       </div>
       <div
         css={`
@@ -427,7 +429,7 @@ const AutomaticSetup = () => {
       >
         {currentSubStep}
       </div>
-      {downloadPercentage ? <Progress percent={downloadPercentage} /> : null}
+      {downloadPercentage && <Progress percent={downloadPercentage} />}
     </div>
   );
 };
