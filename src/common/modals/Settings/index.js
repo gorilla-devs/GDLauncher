@@ -2,13 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
-import Modal from '../../components/Modal';
-import General from './components/General';
-import Java from './components/Java';
-import CloseButton from '../../components/CloseButton';
-import { closeModal } from '../../reducers/modals/actions';
-import KoFiButton from '../../assets/ko-fi.png';
-import PatreonButton from '../../assets/patreon.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDiscord,
@@ -17,7 +10,14 @@ import {
   faInstagram,
   faTwitter
 } from '@fortawesome/free-brands-svg-icons';
-import { faGlobe, faLink } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe } from '@fortawesome/free-solid-svg-icons';
+import Modal from '../../components/Modal';
+import General from './components/General';
+import Java from './components/Java';
+import CloseButton from '../../components/CloseButton';
+import { closeModal } from '../../reducers/modals/actions';
+import KoFiButton from '../../assets/ko-fi.png';
+import PatreonButton from '../../assets/patreon.png';
 
 const Container = styled.div`
   display: flex;
