@@ -1388,7 +1388,7 @@ export function downloadForge(instanceName) {
             `${forgeJson.install.minecraft}.jar`
           ),
           _getLibrariesPath(state),
-          _getJavaPath(state),
+          _getJavaPath(state)(8),
           (d, t) => dispatch(updateDownloadProgress((d * 100) / t))
         );
       }
