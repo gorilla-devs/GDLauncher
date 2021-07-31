@@ -25,6 +25,25 @@ import { updateJava16Path, updateJavaPath } from '../reducers/settings/actions';
 const JavaSetup = () => {
   const [step, setStep] = useState(0);
   const [choice, setChoice] = useState(null);
+  const [isJava8Downloaded, setIsJava8Downloaded] = useState(false);
+  const [isJava16Downloaded, setIsJava16Downloaded] = useState(false);
+  const javaManifest = useSelector(state => state.app.javaManifest);
+  const java16Manifest = useSelector(state => state.app.java16Manifest);
+  const userData = useSelector(state => state.userData);
+  const manifests = {
+    java16: java16Manifest,
+    java: javaManifest
+  };
+
+  useEffect(() => {
+    isLatestJavaDownloaded(manifests, userData, true, 8)
+      .then(e => setIsJava8Downloaded(e))
+      .catch(err => console.error(err));
+    isLatestJavaDownloaded(manifests, userData, true, 16)
+      .then(e => setIsJava16Downloaded(e))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <Modal
       title="Java Setup"
@@ -53,7 +72,7 @@ const JavaSetup = () => {
             </div>
             <div
               css={`
-                margin-bottom: 50px;
+                margin-bottom: 20px;
                 font-size: 18px;
                 text-align: justify;
               `}
@@ -62,12 +81,24 @@ const JavaSetup = () => {
               for you. Only manually manage java if you know what you&apos;re
               doing, it may result in GDLauncher not working!
             </div>
+            {(!isJava8Downloaded || !isJava16Downloaded) && (
+              <div
+                css={`
+                  text-align: center;
+                `}
+              >
+                Missing java versions:
+                <br /> {!isJava8Downloaded && 'java 8'}
+                &nbsp;
+                {!isJava16Downloaded && 'java 16'}
+              </div>
+            )}
             <div
               css={`
                 & > div {
                   display: flex;
                   justify-content: center;
-                  margin-top: 30px;
+                  margin-top: 20px;
                 }
               `}
             >
@@ -118,7 +149,11 @@ const JavaSetup = () => {
             {choice === 0 ? (
               <AutomaticSetup />
             ) : (
-              <ManualSetup setStep={setStep} />
+              <ManualSetup
+                setStep={setStep}
+                isJava8Downloaded={isJava8Downloaded}
+                isJava16Downloaded={isJava16Downloaded}
+              />
             )}
           </SecondStep>
         )}
@@ -127,7 +162,7 @@ const JavaSetup = () => {
   );
 };
 
-const ManualSetup = ({ setStep }) => {
+const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
   const [javaPath, setJavaPath] = useState('');
   const [java16Path, setJava16Path] = useState('');
   const dispatch = useDispatch();
@@ -160,49 +195,53 @@ const ManualSetup = ({ setStep }) => {
         version won&apos;t completely work with modded Minecraft. For version
         1.17+ you need Java16 to run correctly.
       </div>
-      <div
-        css={`
-          width: 100%;
-          display: flex;
-          margin-bottom: 10px;
-        `}
-      >
-        <Input
-          placeholder="Select your Java8 executable"
-          onChange={e => setJavaPath(e.target.value)}
-          value={javaPath}
-        />
-        <Button
-          type="primary"
-          onClick={() => selectFolder(8)}
+      {!isJava8Downloaded && (
+        <div
           css={`
-            margin-left: 10px;
+            width: 100%;
+            display: flex;
+            margin-bottom: 10px;
           `}
         >
-          <FontAwesomeIcon icon={faFolder} />
-        </Button>
-      </div>
-      <div
-        css={`
-          width: 100%;
-          display: flex;
-        `}
-      >
-        <Input
-          placeholder="Select your Java16 executable"
-          onChange={e => setJava16Path(e.target.value)}
-          value={java16Path}
-        />
-        <Button
-          type="primary"
-          onClick={() => selectFolder(16)}
+          <Input
+            placeholder="Select your Java8 executable"
+            onChange={e => setJavaPath(e.target.value)}
+            value={javaPath}
+          />
+          <Button
+            type="primary"
+            onClick={() => selectFolder(8)}
+            css={`
+              margin-left: 10px;
+            `}
+          >
+            <FontAwesomeIcon icon={faFolder} />
+          </Button>
+        </div>
+      )}
+      {!isJava16Downloaded && (
+        <div
           css={`
-            margin-left: 10px;
+            width: 100%;
+            display: flex;
           `}
         >
-          <FontAwesomeIcon icon={faFolder} />
-        </Button>
-      </div>
+          <Input
+            placeholder="Select your Java16 executable"
+            onChange={e => setJava16Path(e.target.value)}
+            value={java16Path}
+          />
+          <Button
+            type="primary"
+            onClick={() => selectFolder(16)}
+            css={`
+              margin-left: 10px;
+            `}
+          >
+            <FontAwesomeIcon icon={faFolder} />
+          </Button>
+        </div>
+      )}
       <div
         css={`
           width: 100%;
@@ -419,13 +458,11 @@ const AutomaticSetup = () => {
           width: 50%;
         `}
       >
-        {currentStepPercentage && (
-          <Progress
-            percent={currentStepPercentage}
-            showInfo={false}
-            strokeColor={theme.palette.primary.main}
-          />
-        )}
+        <Progress
+          percent={currentStepPercentage}
+          showInfo={false}
+          strokeColor={theme.palette.primary.main}
+        />
       </div>
       <div
         css={`
@@ -435,7 +472,7 @@ const AutomaticSetup = () => {
       >
         {currentSubStep}
       </div>
-      {downloadPercentage && <Progress percent={downloadPercentage} />}
+      {downloadPercentage ? <Progress percent={downloadPercentage} /> : null}
     </div>
   );
 };
