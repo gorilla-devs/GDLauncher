@@ -87,12 +87,12 @@ const JavaSetup = () => {
                   display: flex;
                   align-items: center;
                   justify-content: space-evenly;
+                  margin-bottom: 40px;
 
                   * > h3 {
                     border-radius: 5px;
                     padding: 2px 4px;
-                    border: 2px dashed
-                      ${props => props.theme.palette.colors.red};
+                    background: ${props => props.theme.palette.colors.red};
                   }
                 `}
               >
@@ -142,7 +142,7 @@ const JavaSetup = () => {
               </div>
               <div>
                 <Button
-                  type="danger"
+                  type="text"
                   css={`
                     width: 150px;
                   `}
@@ -211,7 +211,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
     >
       <div
         css={`
-          margin-bottom: 35px;
+          margin-bottom: 50px;
           font-size: 18px;
         `}
       >
@@ -271,6 +271,8 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
           display: flex;
           justify-content: space-between;
           margin-top: 45px;
+          position: absolute;
+          bottom: 10px;
         `}
       >
         <Button type="primary" onClick={() => setStep(0)}>
@@ -375,9 +377,9 @@ const AutomaticSetup = () => {
       });
       await new Promise((resolve, reject) => {
         firstExtraction.on('progress', ({ percent }) => {
-          ipcRenderer.invoke('update-progress-bar', percent);
-          setDownloadPercentage(percent);
-          setStepPercentage(1 + addToSteps, percent);
+          ipcRenderer.invoke('update-progress-bar', parseInt(percent, 10));
+          setDownloadPercentage(parseInt(percent, 10));
+          setStepPercentage(1 + addToSteps, parseInt(percent, 10));
         });
         firstExtraction.on('end', () => {
           resolve();
@@ -409,9 +411,9 @@ const AutomaticSetup = () => {
         });
         await new Promise((resolve, reject) => {
           secondExtraction.on('progress', ({ percent }) => {
-            ipcRenderer.invoke('update-progress-bar', percent);
-            setDownloadPercentage(percent);
-            setStepPercentage(2 + addToSteps, percent);
+            ipcRenderer.invoke('update-progress-bar', parseInt(percent, 10));
+            setDownloadPercentage(parseInt(percent, 10));
+            setStepPercentage(2 + addToSteps, parseInt(percent, 10));
           });
           secondExtraction.on('end', () => {
             resolve();
@@ -483,7 +485,6 @@ const AutomaticSetup = () => {
       >
         <Progress
           percent={currentStepPercentage}
-          showInfo={false}
           strokeColor={theme.palette.primary.main}
         />
       </div>
