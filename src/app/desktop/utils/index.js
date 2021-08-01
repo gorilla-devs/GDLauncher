@@ -291,8 +291,6 @@ export const isLatestJavaDownloaded = async (
     await fs.access(javaFolder);
     await promisify(exec)(`"${javaExecutable}" -version`);
   } catch (err) {
-    console.log(err);
-
     if (retry) {
       if (process.platform !== 'win32') {
         try {

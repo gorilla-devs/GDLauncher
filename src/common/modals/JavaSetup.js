@@ -486,6 +486,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
         <Progress
           percent={currentStepPercentage}
           strokeColor={theme.palette.primary.main}
+          status="normal"
         />
       </div>
       <div
@@ -496,7 +497,13 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
       >
         {currentSubStep}
       </div>
-      {downloadPercentage ? <Progress percent={downloadPercentage} /> : null}
+      {downloadPercentage ? (
+        <Progress
+          percent={downloadPercentage}
+          strokeColor={theme.palette.primary.main}
+          status="normal"
+        />
+      ) : null}
     </div>
   );
 };
