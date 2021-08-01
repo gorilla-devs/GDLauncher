@@ -99,11 +99,14 @@ const GetOSHelp = ({ platform }) => {
 const Win32Help = () => {
   return (
     <HelpSection>
-      <b>How to find on Windows *placeholder*</b>
-      Sadly, no one was found by now who wanted to write this text :(
-      <br />
-      If you want a text here, write a description how to find the java.exe file
-      on Windows and send it to us.
+      <span>
+        Open your home menu by pressing the windows key and search for the
+        program &quot;cmd&quot;. Open it, type in <code>echo %JAVA_HOME%</code>{' '}
+        and press enter. This command should return the path to your default
+        java home directory. If this doesn&apos;t work, try to find it manually
+        in <code>C:\Program Files\Java\jdk...</code>. If the command works,
+        paste the path in and add <code>\bin\java.exe</code> to it.
+      </span>
     </HelpSection>
   );
 };
@@ -124,7 +127,8 @@ const MacOSHelp = () => {
       <li>
         <b>Option 2:</b>
         <br />
-        The default path of your Java installation should be <br />
+        The default path of your included system Java installation should be{' '}
+        <br />
         <code
           css={`
             line-break: anywhere;
