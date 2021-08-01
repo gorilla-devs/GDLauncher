@@ -82,52 +82,52 @@ const JavaSetup = () => {
               for you. Only manually manage java if you know what you&apos;re
               doing, it may result in GDLauncher not working!
             </div>
-            {(!isJava8Downloaded || !isJava16Downloaded) &&
-              isJava8Downloaded !== null &&
-              isJava16Downloaded !== null && (
+            {(!isJava8Downloaded || !isJava16Downloaded) && (
+              <div
+                css={`
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-evenly;
+                  margin-bottom: 40px;
+
+                  * > h3 {
+                    border-radius: 5px;
+                    padding: 2px 4px;
+                    background: ${props => props.theme.palette.colors.red};
+                  }
+                `}
+              >
+                <h3>Missing Versions:</h3>
                 <div
                   css={`
                     display: flex;
                     align-items: center;
-                    justify-content: space-evenly;
-                    margin-bottom: 40px;
-
-                    * > h3 {
-                      border-radius: 5px;
-                      padding: 2px 4px;
-                      background: ${props => props.theme.palette.colors.red};
+                    margin-right: 40px;
+                    h3 {
+                      width: 71px;
+                      display: flex;
+                      justify-content: center;
+                      align-content: center;
+                      padding: 2px;
+                      box-sizing: content-box;
                     }
                   `}
                 >
-                  <h3>Missing Versions:</h3>
-                  <div
-                    css={`
-                      display: flex;
-                      align-items: center;
-                      margin-right: 40px;
-                      h3 {
-                        width: 71px;
-                        display: flex;
-                        justify-content: center;
-                        align-content: center;
-                        padding: 2px;
-                        box-sizing: content-box;
-                      }
-                    `}
-                  >
-                    {!isJava8Downloaded && (
-                      <h3
-                        css={`
-                          margin-right: 20px;
-                        `}
-                      >
-                        Java 8
-                      </h3>
-                    )}
-                    {!isJava16Downloaded && <h3>Java 16</h3>}
-                  </div>
+                  {!isJava8Downloaded && isJava8Downloaded !== null && (
+                    <h3
+                      css={`
+                        margin-right: 20px;
+                      `}
+                    >
+                      Java 8
+                    </h3>
+                  )}
+                  {!isJava16Downloaded && isJava16Downloaded !== null && (
+                    <h3>Java 16</h3>
+                  )}
                 </div>
-              )}
+              </div>
+            )}
             <div
               css={`
                 & > div {
