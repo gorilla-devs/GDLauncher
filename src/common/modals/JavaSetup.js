@@ -180,7 +180,10 @@ const JavaSetup = () => {
               {choice === 0 ? 'Automatic' : 'Manual'} Setup
             </div>
             {choice === 0 ? (
-              <AutomaticSetup />
+              <AutomaticSetup
+                isJava8Downloaded={isJava8Downloaded}
+                isJava16Downloaded={isJava16Downloaded}
+              />
             ) : (
               <ManualSetup
                 setStep={setStep}
@@ -303,7 +306,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
   );
 };
 
-const AutomaticSetup = () => {
+const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
@@ -319,32 +322,15 @@ const AutomaticSetup = () => {
     const javaOs = convertOSToJavaFormat(process.platform);
     const java8Meta = javaManifest.find(v => v.os === javaOs);
     const java16Meta = java16Manifest.find(v => v.os === javaOs);
-    const manifests = {
-      java16: java16Manifest,
-      java: javaManifest
-    };
 
     const javaToInstall = [];
-
-    const isJava8Downloaded = await isLatestJavaDownloaded(
-      manifests,
-      userData,
-      true,
-      8
-    );
-    const isJava16Downloaded = await isLatestJavaDownloaded(
-      manifests,
-      userData,
-      true,
-      16
-    );
 
     if (!isJava8Downloaded) javaToInstall.push(8);
 
     if (!isJava16Downloaded) javaToInstall.push(16);
 
     const totalSteps =
-      (process.platform !== 'win32' ? 3 : 2) * javaToInstall.length;
+      (process.platform !== 'win32' ? 4 : 3) * javaToInstall.length;
 
     const setStepPercentage = (stepNumber, percentage) => {
       setCurrentStepPercentage(
@@ -378,7 +364,7 @@ const AutomaticSetup = () => {
       const totalExtractionSteps = process.platform !== 'win32' ? 2 : 1;
       const sevenZipPath = await get7zPath();
       setCurrentSubStep(
-        `Java${javaVersion} - Extracting 1 / ${totalExtractionSteps}`
+        `Java ${javaVersion} - Extracting 1 / ${totalExtractionSteps}`
       );
       const firstExtraction = extractFull(downloadLocation, tempFolder, {
         $bin: sevenZipPath,
@@ -409,9 +395,10 @@ const AutomaticSetup = () => {
       if (process.platform !== 'win32') {
         ipcRenderer.invoke('update-progress-bar', -1);
         setDownloadPercentage(null);
+        index += 1;
         await new Promise(resolve => setTimeout(resolve, 500));
         setCurrentSubStep(
-          `Java${javaVersion} - Extracting 2 / ${totalExtractionSteps}`
+          `Java ${javaVersion} - Extracting 2 / ${totalExtractionSteps}`
         );
 
         const tempTarName = path.join(
@@ -474,6 +461,7 @@ const AutomaticSetup = () => {
     setCurrentSubStep(`Java is ready!`);
     ipcRenderer.invoke('update-progress-bar', -1);
     setDownloadPercentage(null);
+    index += 1;
     setCurrentStepPercentage(100);
     await new Promise(resolve => setTimeout(resolve, 2000));
     dispatch(closeModal());
