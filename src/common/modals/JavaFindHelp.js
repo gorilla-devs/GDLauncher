@@ -2,7 +2,6 @@
 import React, { memo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { Container } from './ChangeLogs';
 import Modal from '../components/Modal';
 import { reopenModal } from '../reducers/modals/actions';
 
@@ -211,6 +210,14 @@ const SectionTitle = styled.h2`
     background: ${props => props.theme.palette.secondary.main};
     padding: 0 10px;
   }
+`;
+
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  overflow-y: auto;
+  color: ${props => props.theme.palette.text.primary};
 `;
 
 const Section = styled.div`
