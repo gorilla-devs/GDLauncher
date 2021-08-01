@@ -281,7 +281,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
           justify-content: space-between;
           margin-top: 45px;
           position: absolute;
-          bottom: 10px;
+          bottom: 0;
         `}
       >
         <Button type="primary" onClick={() => setStep(0)}>
@@ -347,13 +347,6 @@ const AutomaticSetup = () => {
       (process.platform !== 'win32' ? 3 : 2) * javaToInstall.length;
 
     const setStepPercentage = (stepNumber, percentage) => {
-      console.log(
-        totalSteps,
-        stepNumber,
-        percentage / totalSteps,
-        (stepNumber * 100) / totalSteps,
-        parseInt(percentage / totalSteps + (stepNumber * 100) / totalSteps, 10)
-      );
       setCurrentStepPercentage(
         parseInt(percentage / totalSteps + (stepNumber * 100) / totalSteps, 10)
       );
@@ -376,10 +369,10 @@ const AutomaticSetup = () => {
         setDownloadPercentage(parseInt(p, 10));
         setStepPercentage(index, parseInt(p, 10));
       });
-      index += 1;
 
       ipcRenderer.invoke('update-progress-bar', -1);
       setDownloadPercentage(null);
+      index += 1;
       await new Promise(resolve => setTimeout(resolve, 500));
 
       const totalExtractionSteps = process.platform !== 'win32' ? 2 : 1;
