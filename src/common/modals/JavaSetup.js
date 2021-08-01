@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import React, { useState, useEffect } from 'react';
 import { Button, Progress, Input } from 'antd';
 import { Transition } from 'react-transition-group';
@@ -87,12 +88,12 @@ const JavaSetup = () => {
                   display: flex;
                   align-items: center;
                   justify-content: space-evenly;
+                  margin-bottom: 40px;
 
                   * > h3 {
                     border-radius: 5px;
                     padding: 2px 4px;
-                    border: 2px dashed
-                      ${props => props.theme.palette.colors.red};
+                    background: ${props => props.theme.palette.colors.red};
                   }
                 `}
               >
@@ -102,6 +103,14 @@ const JavaSetup = () => {
                     display: flex;
                     align-items: center;
                     margin-right: 40px;
+                    h3 {
+                      width: 71px;
+                      display: flex;
+                      justify-content: center;
+                      align-content: center;
+                      padding: 2px;
+                      box-sizing: content-box;
+                    }
                   `}
                 >
                   {!isJava8Downloaded && (
@@ -142,7 +151,7 @@ const JavaSetup = () => {
               </div>
               <div>
                 <Button
-                  type="danger"
+                  type="text"
                   css={`
                     width: 150px;
                   `}
@@ -211,7 +220,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
     >
       <div
         css={`
-          margin-bottom: 35px;
+          margin-bottom: 50px;
           font-size: 18px;
         `}
       >
@@ -271,6 +280,8 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
           display: flex;
           justify-content: space-between;
           margin-top: 45px;
+          position: absolute;
+          bottom: 10px;
         `}
       >
         <Button type="primary" onClick={() => setStep(0)}>
@@ -333,12 +344,21 @@ const AutomaticSetup = () => {
     if (!isJava16Downloaded) javaToInstall.push(16);
 
     const totalSteps =
-      process.platform === 'win32' ? 2 : 3 * javaToInstall.length;
-    const setStepPercentage = (stepNumber = 1, percentage = 0) => {
+      (process.platform !== 'win32' ? 3 : 2) * javaToInstall.length;
+
+    const setStepPercentage = (stepNumber, percentage) => {
+      console.log(
+        totalSteps,
+        stepNumber,
+        percentage / totalSteps,
+        (stepNumber * 100) / totalSteps,
+        parseInt(percentage / totalSteps + (stepNumber * 100) / totalSteps, 10)
+      );
       setCurrentStepPercentage(
-        (stepNumber / totalSteps + percentage / 100 / totalSteps) * 99
+        parseInt(percentage / totalSteps + (stepNumber * 100) / totalSteps, 10)
       );
     };
+    let index = 0;
     for (const javaVersion of javaToInstall) {
       const {
         version_data: { openjdk_version: version },
@@ -348,17 +368,15 @@ const AutomaticSetup = () => {
       const javaBaseFolder = path.join(userData, 'java');
 
       await fse.remove(path.join(javaBaseFolder, version));
-      const addToSteps =
-        javaToInstall.indexOf(javaVersion) === 0 ? 0 : totalSteps / 2;
-
       const downloadLocation = path.join(tempFolder, path.basename(url));
 
-      setCurrentSubStep(`Java${javaVersion} - Downloading`);
+      setCurrentSubStep(`Java ${javaVersion} - Downloading`);
       await downloadFile(downloadLocation, url, p => {
         ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
         setDownloadPercentage(parseInt(p, 10));
-        setStepPercentage(addToSteps, parseInt(p, 10));
+        setStepPercentage(index, parseInt(p, 10));
       });
+      index += 1;
 
       ipcRenderer.invoke('update-progress-bar', -1);
       setDownloadPercentage(null);
@@ -375,9 +393,12 @@ const AutomaticSetup = () => {
       });
       await new Promise((resolve, reject) => {
         firstExtraction.on('progress', ({ percent }) => {
-          ipcRenderer.invoke('update-progress-bar', percent);
-          setDownloadPercentage(percent);
-          setStepPercentage(1 + addToSteps, percent);
+          ipcRenderer.invoke(
+            'update-progress-bar',
+            parseInt(percent, 10) / 100
+          );
+          setDownloadPercentage(parseInt(percent, 10));
+          setStepPercentage(index + 1, parseInt(percent, 10));
         });
         firstExtraction.on('end', () => {
           resolve();
@@ -386,6 +407,8 @@ const AutomaticSetup = () => {
           reject(err);
         });
       });
+      setDownloadPercentage(null);
+      index += 1;
 
       await fse.remove(downloadLocation);
 
@@ -409,9 +432,12 @@ const AutomaticSetup = () => {
         });
         await new Promise((resolve, reject) => {
           secondExtraction.on('progress', ({ percent }) => {
-            ipcRenderer.invoke('update-progress-bar', percent);
-            setDownloadPercentage(percent);
-            setStepPercentage(2 + addToSteps, percent);
+            ipcRenderer.invoke(
+              'update-progress-bar',
+              parseInt(percent, 10) / 100
+            );
+            setDownloadPercentage(parseInt(percent, 10));
+            setStepPercentage(index + 2, parseInt(percent, 10));
           });
           secondExtraction.on('end', () => {
             resolve();
@@ -420,12 +446,12 @@ const AutomaticSetup = () => {
             reject(err);
           });
         });
-
         await fse.remove(tempTarName);
       }
       setDownloadPercentage(null);
+      index += 1;
 
-      setCurrentSubStep(`Java${javaVersion} - Cleanup`);
+      setCurrentSubStep(`Java ${javaVersion} - Cleanup`);
 
       const directoryToMove =
         process.platform === 'darwin'
@@ -483,13 +509,12 @@ const AutomaticSetup = () => {
       >
         <Progress
           percent={currentStepPercentage}
-          showInfo={false}
           strokeColor={theme.palette.primary.main}
         />
       </div>
       <div
         css={`
-          margin-bottom: 50px;
+          margin-bottom: 20px;
           font-size: 18px;
         `}
       >
