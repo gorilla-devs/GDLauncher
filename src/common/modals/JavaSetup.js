@@ -84,13 +84,37 @@ const JavaSetup = () => {
             {(!isJava8Downloaded || !isJava16Downloaded) && (
               <div
                 css={`
-                  text-align: center;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-evenly;
+
+                  * > h3 {
+                    border-radius: 5px;
+                    padding: 2px 4px;
+                    border: 2px dashed
+                      ${props => props.theme.palette.colors.red};
+                  }
                 `}
               >
-                Missing java versions:
-                <br /> {!isJava8Downloaded && 'java 8'}
-                &nbsp;
-                {!isJava16Downloaded && 'java 16'}
+                <h3>Missing Versions:</h3>
+                <div
+                  css={`
+                    display: flex;
+                    align-items: center;
+                    margin-right: 40px;
+                  `}
+                >
+                  {!isJava8Downloaded && (
+                    <h3
+                      css={`
+                        margin-right: 20px;
+                      `}
+                    >
+                      Java 8
+                    </h3>
+                  )}
+                  {!isJava16Downloaded && <h3>Java 16</h3>}
+                </div>
               </div>
             )}
             <div
@@ -191,9 +215,8 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
           font-size: 18px;
         `}
       >
-        Select your java executable. We strongly suggest Java8, since any other
-        version won&apos;t completely work with modded Minecraft. For version
-        1.17+ you need Java16 to run correctly.
+        Enter the required paths to java. Java 8 will be used for all the
+        versions minor than 1.17, java 16 for versions greater than 1.17.
       </div>
       {!isJava8Downloaded && (
         <div
