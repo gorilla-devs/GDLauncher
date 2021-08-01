@@ -5,6 +5,10 @@
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![GitHub issues](https://img.shields.io/github/issues-raw/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/issues) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/213eb618fa59424fba7ccfcd4f1b6a09)](https://www.codacy.com/manual/gorilla-devs/GDLauncher?utm_source=github.com&utm_medium=referral&utm_content=gorilla-devs/GDLauncher&utm_campaign=Badge_Grade) [![GitHub pull requests](https://img.shields.io/github/issues-pr/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/pulls)[![PRs Welcome](https://img.shields.io/github/license/gorilla-devs/GDLauncher.svg)](http://makeapullrequest.com) ![Electron CD](https://github.com/gorilla-devs/GDLauncher/workflows/Electron%20CD/badge.svg?branch=next) ![Discord](https://img.shields.io/discord/398091532881756161.svg) ![David](https://img.shields.io/david/gorilla-devs/GDLauncher.svg) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/gorilla-devs/GDLauncher.svg)![](https://img.shields.io/github/release/gorilla-devs/GDLauncher.svg?style=flat)
 ![Github All Releases](https://img.shields.io/github/downloads/gorilla-devs/GDLauncher/total.svg)
 
+## 🦺 Support this project
+
+<a href='https://ko-fi.com/gdlauncher' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href='https://www.patreon.com/gorilladevs' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.assets-gdevs.com/patreonButton.png' border='0' alt='Become a Patron' /></a>
 <details>
  <summary><strong>Table of Contents</strong> (click to expand)
 </summary>

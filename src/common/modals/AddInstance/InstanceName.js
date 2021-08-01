@@ -18,7 +18,8 @@ import { closeModal, openModal } from '../../reducers/modals/actions';
 import {
   downloadAddonZip,
   importAddonZip,
-  convertcurseForgeToCanonical
+  convertcurseForgeToCanonical,
+  extractFabricVersionFromManifest,
 } from '../../../app/desktop/utils';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
@@ -100,13 +101,12 @@ const InstanceName = ({
 
     const initTimestamp = Date.now();
 
-    const isVanilla = version?.loaderType === VANILLA;
-    const isFabric = version?.loaderType === FABRIC;
-    const isForge = version?.loaderType === FORGE;
     const isCurseForgeModpack = Boolean(modpack?.attachments);
     const isFTBModpack = Boolean(modpack?.art);
     let manifest;
 
+    // If it's a curseforge modpack grab the manfiest and detect the loader
+    // type as we don't yet know what it is.
     if (isCurseForgeModpack) {
       if (importZipPath) {
         manifest = await importAddonZip(
@@ -124,6 +124,28 @@ const InstanceName = ({
         );
       }
 
+      const isForgeModpack = (manifest?.minecraft?.modLoaders || []).some(
+        v => v.id.includes(FORGE) && v.primary
+      );
+
+      const isFabricModpack = (manifest?.minecraft?.modLoaders || []).some(
+        v => v.id.includes(FABRIC) && v.primary
+      );
+
+      if (isForgeModpack) {
+        version.loaderType = FORGE;
+      } else if (isFabricModpack) {
+        version.loaderType = FABRIC;
+      } else {
+        version.loaderType = VANILLA;
+      }
+    }
+
+    const isVanilla = version?.loaderType === VANILLA;
+    const isFabric = version?.loaderType === FABRIC;
+    const isForge = version?.loaderType === FORGE;
+
+    if (isCurseForgeModpack) {
       if (imageURL) {
         await downloadFile(
           path.join(
@@ -135,9 +157,9 @@ const InstanceName = ({
         );
       }
 
-      if (version?.loaderType === FORGE) {
+      if (isForge) {
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: FORGE,
           mcVersion: manifest.minecraft.version,
           loaderVersion: convertcurseForgeToCanonical(
             manifest.minecraft.modLoaders.find(v => v.primary).id,
@@ -157,19 +179,12 @@ const InstanceName = ({
             imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
-      } else if (version?.loaderType === FABRIC) {
-        // Backwards compatability for manifest entries that use the `yarn`
-        // property to set the fabric loader version. Newer manifests use the
-        // format `fabric-<version>` in the id.
-        let loaderVersion = manifest.minecraft.modLoaders[0].yarn;
-        if (!loaderVersion) {
-          loaderVersion = manifest.minecraft.modLoaders[0].id.split('-', 2)[1];
-        }
+      } else if (isFabric) {
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: FABRIC,
           mcVersion: manifest.minecraft.version,
-          loaderVersion,
-          fileID: manifest.minecraft.modLoaders[0].loader,
+          loaderVersion: extractFabricVersionFromManifest(manifest),
+          fileID: version?.fileID,
           projectID: version?.projectID,
           source: version?.source
         };
@@ -181,9 +196,9 @@ const InstanceName = ({
             imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
-      } else if (version?.loaderType === VANILLA) {
+      } else if (isVanilla) {
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: VANILLA,
           mcVersion: manifest.minecraft.version,
           loaderVersion: version?.loaderVersion,
           fileID: version?.fileID
