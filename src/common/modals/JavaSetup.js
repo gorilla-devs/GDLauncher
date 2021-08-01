@@ -353,7 +353,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
 
       setCurrentSubStep(`Java ${javaVersion} - Downloading`);
       await downloadFile(downloadLocation, url, p => {
-        ipcRenderer.invoke('update-progress-bar', p / 100);
+        ipcRenderer.invoke('update-progress-bar', p);
         setDownloadPercentage(p);
         setStepPercentage(index, p);
       });
@@ -374,10 +374,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
       });
       await new Promise((resolve, reject) => {
         firstExtraction.on('progress', ({ percent }) => {
-          ipcRenderer.invoke(
-            'update-progress-bar',
-            parseInt(percent, 10) / 100
-          );
+          ipcRenderer.invoke('update-progress-bar', percent);
           setDownloadPercentage(percent);
           setStepPercentage(index, percent);
         });
@@ -414,10 +411,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
         });
         await new Promise((resolve, reject) => {
           secondExtraction.on('progress', ({ percent }) => {
-            ipcRenderer.invoke(
-              'update-progress-bar',
-              parseInt(percent, 10) / 100
-            );
+            ipcRenderer.invoke('update-progress-bar', percent);
             setDownloadPercentage(percent);
             setStepPercentage(index, percent);
           });
