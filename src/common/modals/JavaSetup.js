@@ -307,7 +307,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
 };
 
 const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
-  const [downloadPercentage, setDownloadPercentage] = useState(null);
+  const [downloadPercentage, setDownloadPercentage] = useState(0);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
   const javaManifest = useSelector(state => state.app.javaManifest);
@@ -329,14 +329,16 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
 
     if (!isJava16Downloaded) javaToInstall.push(16);
 
-    const totalSteps =
-      (process.platform !== 'win32' ? 4 : 3) * javaToInstall.length;
+    const totalExtractionSteps = process.platform !== 'win32' ? 2 : 1;
+    const totalSteps = (totalExtractionSteps + 1) * javaToInstall.length;
+    console.log(totalSteps);
 
     const setStepPercentage = (stepNumber, percentage) => {
       setCurrentStepPercentage(
         parseInt(percentage / totalSteps + (stepNumber * 100) / totalSteps, 10)
       );
     };
+
     let index = 0;
     for (const javaVersion of javaToInstall) {
       const {
@@ -351,17 +353,17 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
 
       setCurrentSubStep(`Java ${javaVersion} - Downloading`);
       await downloadFile(downloadLocation, url, p => {
-        ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
-        setDownloadPercentage(parseInt(p, 10));
-        setStepPercentage(index, parseInt(p, 10));
+        ipcRenderer.invoke('update-progress-bar', p / 100);
+        setDownloadPercentage(p);
+        setStepPercentage(index, p);
       });
 
       ipcRenderer.invoke('update-progress-bar', -1);
-      setDownloadPercentage(null);
       index += 1;
+      setDownloadPercentage(0);
+      setStepPercentage(index, 0);
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      const totalExtractionSteps = process.platform !== 'win32' ? 2 : 1;
       const sevenZipPath = await get7zPath();
       setCurrentSubStep(
         `Java ${javaVersion} - Extracting 1 / ${totalExtractionSteps}`
@@ -376,8 +378,8 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
             'update-progress-bar',
             parseInt(percent, 10) / 100
           );
-          setDownloadPercentage(parseInt(percent, 10));
-          setStepPercentage(index + 1, parseInt(percent, 10));
+          setDownloadPercentage(percent);
+          setStepPercentage(index, percent);
         });
         firstExtraction.on('end', () => {
           resolve();
@@ -386,16 +388,16 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
           reject(err);
         });
       });
-      setDownloadPercentage(null);
+
       index += 1;
+      setDownloadPercentage(0);
+      setStepPercentage(index, 0);
 
       await fse.remove(downloadLocation);
 
       // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
       if (process.platform !== 'win32') {
         ipcRenderer.invoke('update-progress-bar', -1);
-        setDownloadPercentage(null);
-        index += 1;
         await new Promise(resolve => setTimeout(resolve, 500));
         setCurrentSubStep(
           `Java ${javaVersion} - Extracting 2 / ${totalExtractionSteps}`
@@ -416,8 +418,8 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
               'update-progress-bar',
               parseInt(percent, 10) / 100
             );
-            setDownloadPercentage(parseInt(percent, 10));
-            setStepPercentage(index + 2, parseInt(percent, 10));
+            setDownloadPercentage(percent);
+            setStepPercentage(index, percent);
           });
           secondExtraction.on('end', () => {
             resolve();
@@ -427,11 +429,10 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
           });
         });
         await fse.remove(tempTarName);
+        index += 1;
+        setDownloadPercentage(0);
+        setStepPercentage(index, 0);
       }
-      setDownloadPercentage(null);
-      index += 1;
-
-      setCurrentSubStep(`Java ${javaVersion} - Cleanup`);
 
       const directoryToMove =
         process.platform === 'darwin'
@@ -460,8 +461,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
     dispatch(updateJava16Path(null));
     setCurrentSubStep(`Java is ready!`);
     ipcRenderer.invoke('update-progress-bar', -1);
-    setDownloadPercentage(null);
-    index += 1;
+    setDownloadPercentage(100);
     setCurrentStepPercentage(100);
     await new Promise(resolve => setTimeout(resolve, 2000));
     dispatch(closeModal());
