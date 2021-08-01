@@ -180,7 +180,10 @@ const JavaSetup = () => {
               {choice === 0 ? 'Automatic' : 'Manual'} Setup
             </div>
             {choice === 0 ? (
-              <AutomaticSetup />
+              <AutomaticSetup
+                isJava8Downloaded={isJava8Downloaded}
+                isJava16Downloaded={isJava16Downloaded}
+              />
             ) : (
               <ManualSetup
                 setStep={setStep}
@@ -303,7 +306,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
   );
 };
 
-const AutomaticSetup = () => {
+const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
   const [downloadPercentage, setDownloadPercentage] = useState(null);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
@@ -319,25 +322,8 @@ const AutomaticSetup = () => {
     const javaOs = convertOSToJavaFormat(process.platform);
     const java8Meta = javaManifest.find(v => v.os === javaOs);
     const java16Meta = java16Manifest.find(v => v.os === javaOs);
-    const manifests = {
-      java16: java16Manifest,
-      java: javaManifest
-    };
 
     const javaToInstall = [];
-
-    const isJava8Downloaded = await isLatestJavaDownloaded(
-      manifests,
-      userData,
-      true,
-      8
-    );
-    const isJava16Downloaded = await isLatestJavaDownloaded(
-      manifests,
-      userData,
-      true,
-      16
-    );
 
     if (!isJava8Downloaded) javaToInstall.push(8);
 
