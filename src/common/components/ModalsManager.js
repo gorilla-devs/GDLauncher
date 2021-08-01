@@ -34,7 +34,7 @@ const Modal = styled.div`
 `;
 
 const modalsComponentLookupTable = {
-  AddInstance,
+  AddInstance: AsyncComponent(lazy(() => import('../modals/AddInstance'))),
   AccountsManager: AsyncComponent(
     lazy(() => import('../modals/AccountsManager'))
   ),
