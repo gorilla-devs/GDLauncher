@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import React, { useState, useEffect } from 'react';
 import { Button, Progress, Input } from 'antd';
 import { Transition } from 'react-transition-group';
@@ -102,6 +103,14 @@ const JavaSetup = () => {
                     display: flex;
                     align-items: center;
                     margin-right: 40px;
+                    h3 {
+                      width: 71px;
+                      display: flex;
+                      justify-content: center;
+                      align-content: center;
+                      padding: 2px;
+                      box-sizing: content-box;
+                    }
                   `}
                 >
                   {!isJava8Downloaded && (
@@ -335,12 +344,21 @@ const AutomaticSetup = () => {
     if (!isJava16Downloaded) javaToInstall.push(16);
 
     const totalSteps =
-      process.platform === 'win32' ? 2 : 3 * javaToInstall.length;
-    const setStepPercentage = (stepNumber = 1, percentage = 0) => {
+      (process.platform !== 'win32' ? 3 : 2) * javaToInstall.length;
+
+    const setStepPercentage = (stepNumber, percentage) => {
+      console.log(
+        totalSteps,
+        stepNumber,
+        percentage / totalSteps,
+        (stepNumber * 100) / totalSteps,
+        parseInt(percentage / totalSteps + (stepNumber * 100) / totalSteps, 10)
+      );
       setCurrentStepPercentage(
-        (stepNumber / totalSteps + percentage / 100 / totalSteps) * 99
+        parseInt(percentage / totalSteps + (stepNumber * 100) / totalSteps, 10)
       );
     };
+    let index = 0;
     for (const javaVersion of javaToInstall) {
       const {
         version_data: { openjdk_version: version },
@@ -350,17 +368,15 @@ const AutomaticSetup = () => {
       const javaBaseFolder = path.join(userData, 'java');
 
       await fse.remove(path.join(javaBaseFolder, version));
-      const addToSteps =
-        javaToInstall.indexOf(javaVersion) === 0 ? 0 : totalSteps / 2;
-
       const downloadLocation = path.join(tempFolder, path.basename(url));
 
-      setCurrentSubStep(`Java${javaVersion} - Downloading`);
+      setCurrentSubStep(`Java ${javaVersion} - Downloading`);
       await downloadFile(downloadLocation, url, p => {
         ipcRenderer.invoke('update-progress-bar', parseInt(p, 10) / 100);
         setDownloadPercentage(parseInt(p, 10));
-        setStepPercentage(addToSteps, parseInt(p, 10));
+        setStepPercentage(index, parseInt(p, 10));
       });
+      index += 1;
 
       ipcRenderer.invoke('update-progress-bar', -1);
       setDownloadPercentage(null);
@@ -377,9 +393,12 @@ const AutomaticSetup = () => {
       });
       await new Promise((resolve, reject) => {
         firstExtraction.on('progress', ({ percent }) => {
-          ipcRenderer.invoke('update-progress-bar', parseInt(percent, 10));
+          ipcRenderer.invoke(
+            'update-progress-bar',
+            parseInt(percent, 10) / 100
+          );
           setDownloadPercentage(parseInt(percent, 10));
-          setStepPercentage(1 + addToSteps, parseInt(percent, 10));
+          setStepPercentage(index + 1, parseInt(percent, 10));
         });
         firstExtraction.on('end', () => {
           resolve();
@@ -388,6 +407,8 @@ const AutomaticSetup = () => {
           reject(err);
         });
       });
+      setDownloadPercentage(null);
+      index += 1;
 
       await fse.remove(downloadLocation);
 
@@ -411,9 +432,12 @@ const AutomaticSetup = () => {
         });
         await new Promise((resolve, reject) => {
           secondExtraction.on('progress', ({ percent }) => {
-            ipcRenderer.invoke('update-progress-bar', parseInt(percent, 10));
+            ipcRenderer.invoke(
+              'update-progress-bar',
+              parseInt(percent, 10) / 100
+            );
             setDownloadPercentage(parseInt(percent, 10));
-            setStepPercentage(2 + addToSteps, parseInt(percent, 10));
+            setStepPercentage(index + 2, parseInt(percent, 10));
           });
           secondExtraction.on('end', () => {
             resolve();
@@ -422,12 +446,12 @@ const AutomaticSetup = () => {
             reject(err);
           });
         });
-
         await fse.remove(tempTarName);
       }
       setDownloadPercentage(null);
+      index += 1;
 
-      setCurrentSubStep(`Java${javaVersion} - Cleanup`);
+      setCurrentSubStep(`Java ${javaVersion} - Cleanup`);
 
       const directoryToMove =
         process.platform === 'darwin'
@@ -490,7 +514,7 @@ const AutomaticSetup = () => {
       </div>
       <div
         css={`
-          margin-bottom: 50px;
+          margin-bottom: 20px;
           font-size: 18px;
         `}
       >
