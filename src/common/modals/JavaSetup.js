@@ -1,5 +1,5 @@
 /* eslint-disable no-loop-func */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Button, Progress, Input } from 'antd';
 import { Transition } from 'react-transition-group';
 import styled, { useTheme } from 'styled-components';
@@ -228,7 +228,8 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
         `}
       >
         Enter the required paths to java. Java 8 will be used for all the
-        versions minor than 1.17, java 16 for versions greater than 1.17.
+        versions {'<'} 1.17, java 16 for versions {'>='} 1.17. You can also use
+        the same executable but some versions might not run.
       </div>
       {!isJava8Downloaded && (
         <div
@@ -239,7 +240,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
           `}
         >
           <Input
-            placeholder="Select your Java8 executable"
+            placeholder="Select your Java8 executable (MC < 1.17)"
             onChange={e => setJavaPath(e.target.value)}
             value={javaPath}
           />
@@ -262,7 +263,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
           `}
         >
           <Input
-            placeholder="Select your Java16 executable"
+            placeholder="Select your Java16 executable (MC >= 1.17)"
             onChange={e => setJava16Path(e.target.value)}
             value={java16Path}
           />
@@ -500,7 +501,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
   );
 };
 
-export default JavaSetup;
+export default memo(JavaSetup);
 
 const FirstStep = styled.div`
   transition: 0.2s ease-in-out;
