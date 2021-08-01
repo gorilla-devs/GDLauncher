@@ -6,14 +6,13 @@ import { reopenModal } from '../reducers/modals/actions';
 
 const JavaFindHelp = ({ os }) => {
   const platform = os || process.platform;
-  const translateOS = os => {
-    const table = [
-      { platform: 'win32', name: 'Windows' },
-      { platform: 'darwin', name: 'MacOS' },
-      { platform: 'linux', name: 'Linux' }
-    ];
-    const found = table.find(item => item.platform === os);
-    return found ? found.name : os;
+  const translateOS = system => {
+    const table = {
+      win32: 'Windows',
+      darwin: 'MacOS',
+      linux: 'Linux'
+    };
+    return table[system];
   };
   const osName = translateOS(platform);
   const dispatch = useDispatch();
