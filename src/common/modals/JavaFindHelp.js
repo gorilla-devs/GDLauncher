@@ -1,12 +1,11 @@
-/* eslint-disable react/no-unescaped-entities */
 import React, { memo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import Modal from '../components/Modal';
 import { reopenModal } from '../reducers/modals/actions';
 
-const JavaFindHelp = (props = {}) => {
-  const platform = props.platform ? props.platform : process.platform;
+const JavaFindHelp = ({ os }) => {
+  const platform = os || process.platform;
   const translateOS = os => {
     const table = [
       { platform: 'win32', name: 'Windows' },
@@ -35,7 +34,7 @@ const JavaFindHelp = (props = {}) => {
                 /* eslint-disable-next-line react/no-array-index-key */
                 key={index}
                 onClick={() =>
-                  dispatch(reopenModal('JavaFindHelp', { platform: item }))
+                  dispatch(reopenModal('JavaFindHelp', { os: item }))
                 }
                 css={`
                   margin: 0 6%;
@@ -81,20 +80,16 @@ const JavaFindHelp = (props = {}) => {
 
 export default memo(JavaFindHelp);
 
-const GetOSHelp = (props = {}) => {
+const GetOSHelp = ({ platform }) => {
   const dispatch = useDispatch();
-  if (props.platform === 'win32') return <Win32Help />;
-  if (props.platform === 'darwin') return <MacOSHelp />;
-  if (props.platform === 'linux') return <LinuxHelp />;
+  if (platform === 'win32') return <Win32Help />;
+  if (platform === 'darwin') return <MacOSHelp />;
+  if (platform === 'linux') return <LinuxHelp />;
   return (
     <HelpSection>
       We´re sorry, but we could not find out you Operating System. You are
       probably running a unknown Linux Distribution, so it would be best to try{' '}
-      <a
-        onClick={() =>
-          dispatch(reopenModal('JavaFindHelp', { platform: 'linux' }))
-        }
-      >
+      <a onClick={() => dispatch(reopenModal('JavaFindHelp', { os: 'linux' }))}>
         Linux help
       </a>
       .
@@ -123,7 +118,8 @@ const MacOSHelp = () => {
         Open your Terminal program, type in{' '}
         <code>/usr/libexec/java_home -v 1.8</code> and press enter. The feedback
         of the command is the java home directory. Navigate to this directory
-        and open the folder "bin", there you´ll find the "java" executable.
+        and open the folder &quot;bin&quot;, there you´ll find the
+        &quot;java&quot; executable.
       </li>
       <br />
       <li>
@@ -137,8 +133,8 @@ const MacOSHelp = () => {
         >
           /Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/
         </code>{' '}
-        navigate there in the Finder and open the folder "bin", there you´ll
-        find the "java" executable.
+        navigate there in the Finder and open the folder &quot;bin&quot;, there
+        you´ll find the &quot;java&quot; executable.
       </li>
     </HelpSection>
   );
@@ -158,8 +154,8 @@ const LinuxHelp = () => {
         <br />
         Open your Terminal program, type in <code>echo %JAVA_HOME%</code> and
         press enter. The feedback of the command is the java home directory.
-        Navigate to this directory and open the folder "bin", there you´ll find
-        the "java" executable
+        Navigate to this directory and open the folder &quot;bin&quot;, there
+        you´ll find the &quot;java&quot; executable
         <br />
       </span>
       <br />
