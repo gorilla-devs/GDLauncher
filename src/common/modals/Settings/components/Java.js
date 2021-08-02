@@ -100,7 +100,6 @@ function resetJavaArguments(dispatch) {
 
 const marks = {
   2048: '2048 MB',
-  4096: '4096 MB',
   8192: '8192 MB',
   16384: '16384 MB',
   32768: '32768 MB'
@@ -304,15 +303,16 @@ export default function MyAccountPreferences() {
         </Paragraph>
         <Slider
           css={`
-            margin: 20px 20px 20px 0;
+            width: 90%;
+            margin: 20px;
           `}
           onAfterChange={e => {
             dispatch(updateJavaMemory(e));
           }}
           defaultValue={javaMemory}
           min={1024}
-          max={process.getSystemMemoryInfo().total / 1024}
-          step={512}
+          max={32768}
+          step={256}
           marks={marks}
           valueLabelDisplay="auto"
         />
