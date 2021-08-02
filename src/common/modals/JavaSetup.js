@@ -89,9 +89,11 @@ const JavaSetup = () => {
                 align-items: center;
                 justify-content: space-evenly;
                 margin-bottom: 40px;
-                opacity: ${!isJava8Downloaded || !isJava16Downloaded
-                  ? '1'
-                  : '0'};
+                opacity: 0;
+                opacity: ${isJava8Downloaded !== null &&
+                isJava16Downloaded !== null &&
+                (!isJava8Downloaded || !isJava16Downloaded) &&
+                '1'};
                 * > h3 {
                   border-radius: 5px;
                   padding: 2px 4px;
@@ -322,21 +324,19 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
   const dispatch = useDispatch();
 
   const theme = useTheme();
+  const javaToInstall = [];
+
+  if (!isJava8Downloaded) javaToInstall.push(8);
+
+  if (!isJava16Downloaded) javaToInstall.push(16);
 
   const installJava = async () => {
     const javaOs = convertOSToJavaFormat(process.platform);
     const java8Meta = javaManifest.find(v => v.os === javaOs);
     const java16Meta = java16Manifest.find(v => v.os === javaOs);
 
-    const javaToInstall = [];
-
-    if (!isJava8Downloaded) javaToInstall.push(8);
-
-    if (!isJava16Downloaded) javaToInstall.push(16);
-
     const totalExtractionSteps = process.platform !== 'win32' ? 2 : 1;
     const totalSteps = (totalExtractionSteps + 1) * javaToInstall.length;
-    console.log(totalSteps);
 
     const setStepPercentage = (stepNumber, percentage) => {
       setCurrentStepPercentage(
@@ -480,41 +480,47 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
         align-items: center;
       `}
     >
-      <div
-        css={`
-          margin-top: -15px; //cheaty way to get up to the Modal title :P
-          margin-bottom: 50px;
-          width: 50%;
-        `}
-      >
-        <Progress
-          percent={currentStepPercentage}
-          strokeColor={theme.palette.primary.main}
-          status="normal"
-        />
-      </div>
-      <div
-        css={`
-          margin-bottom: 20px;
-          font-size: 18px;
-        `}
-      >
-        {currentSubStep}
-      </div>
-      <div
-        css={`
-          padding: 0 10px;
-          width: 100%;
-        `}
-      >
-        {downloadPercentage ? (
-          <Progress
-            percent={downloadPercentage}
-            strokeColor={theme.palette.primary.main}
-            status="normal"
-          />
-        ) : null}
-      </div>
+      {javaToInstall.length > 0 ? (
+        <>
+          <div
+            css={`
+              margin-top: -15px; //cheaty way to get up to the Modal title :P
+              margin-bottom: 50px;
+              width: 50%;
+            `}
+          >
+            <Progress
+              percent={currentStepPercentage}
+              strokeColor={theme.palette.primary.main}
+              status="normal"
+            />
+          </div>
+          <div
+            css={`
+              margin-bottom: 20px;
+              font-size: 18px;
+            `}
+          >
+            {currentSubStep}
+          </div>
+          <div
+            css={`
+              padding: 0 10px;
+              width: 100%;
+            `}
+          >
+            {downloadPercentage ? (
+              <Progress
+                percent={downloadPercentage}
+                strokeColor={theme.palette.primary.main}
+                status="normal"
+              />
+            ) : null}
+          </div>
+        </>
+      ) : (
+        <h3>Java is already installed</h3>
+      )}
     </div>
   );
 };
