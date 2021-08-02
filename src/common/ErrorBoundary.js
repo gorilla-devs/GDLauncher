@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
-import { ipcRenderer } from 'electron';
-import creeper from '../../common/assets/creeper.png';
+import creeper from './assets/creeper.png';
 
 export default class ErrorBoundary extends React.Component {
   static getDerivedStateFromError(error) {
@@ -65,7 +64,10 @@ export default class ErrorBoundary extends React.Component {
           <Button
             type="primary"
             onClick={() => {
-              ipcRenderer.invoke('appRestart');
+              if (process?.env?.APP_TYPE !== 'web') {
+                // eslint-disable-next-line global-require
+                require('electron').ipcRenderer.invoke('appRestart');
+              }
             }}
             css={`
               margin-top: 30px;
