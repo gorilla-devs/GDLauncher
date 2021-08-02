@@ -109,10 +109,16 @@ function java(
       return { ...state, args: action.args };
     case ActionTypes.UPDATE_JAVA_MEMORY:
       return { ...state, memory: action.memory };
-    case ActionTypes.UPDATE_JAVA_PATH:
+    case ActionTypes.UPDATE_JAVA_PATH: {
+      if (!action.path)
+        return { ...state, path: action.path, path16: action.path };
       return { ...state, path: action.path };
-    case ActionTypes.UPDATE_JAVA16_PATH:
+    }
+    case ActionTypes.UPDATE_JAVA16_PATH: {
+      if (!action.path)
+        return { ...state, path16: action.path, path: action.path };
       return { ...state, path16: action.path };
+    }
     default:
       return state;
   }

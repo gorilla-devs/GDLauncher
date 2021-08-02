@@ -204,7 +204,13 @@ export default function MyAccountPreferences() {
                   width: 75%;
                   margin: 0 10px;
                 `}
-                onChange={e => dispatch(updateJavaPath(e.target.value))}
+                onChange={e =>
+                  dispatch(
+                    updateJavaPath(
+                      e.target.value === '' ? null : e.target.value
+                    )
+                  )
+                }
                 value={customJavaPath}
               />
               <StyledButtons
@@ -250,7 +256,13 @@ export default function MyAccountPreferences() {
                   width: 75%;
                   margin: 0 10px;
                 `}
-                onChange={e => dispatch(updateJava16Path(e.target.value))}
+                onChange={e => {
+                  dispatch(
+                    updateJava16Path(
+                      e.target.value === '' ? null : e.target.value
+                    )
+                  );
+                }}
                 value={customJava16Path}
               />
               <StyledButtons
