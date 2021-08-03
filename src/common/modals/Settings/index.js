@@ -25,6 +25,13 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   text-align: center;
+
+  .ant-slider-mark-text,
+  .ant-input,
+  .ant-select-selection-search-input,
+  .ant-btn {
+    -webkit-backface-visibility: hidden;
+  }
 `;
 const SideMenu = styled.div`
   flex: 0;
