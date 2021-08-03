@@ -143,6 +143,12 @@ function DesktopRoot({ store }) {
   useDidMount(init);
 
   useEffect(() => {
+    if (!currentAccount) {
+      dispatch(push('/'));
+    }
+  }, [currentAccount]);
+
+  useEffect(() => {
     if (clientToken && process.env.NODE_ENV !== 'development') {
       ga.setUserId(clientToken);
       ga.trackPage(location.pathname);
