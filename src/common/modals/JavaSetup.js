@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import path from 'path';
 import { extractFull } from 'node-7z';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolder } from '@fortawesome/free-solid-svg-icons';
+import { faFolder, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import Modal from '../components/Modal';
@@ -195,6 +195,8 @@ const JavaSetup = () => {
                 setStep={setStep}
                 isJava8Downloaded={isJava8Downloaded}
                 isJava16Downloaded={isJava16Downloaded}
+                setIsJava8Downloaded={setIsJava8Downloaded}
+                setIsJava16Downloaded={setIsJava16Downloaded}
               />
             )}
           </SecondStep>
@@ -204,10 +206,33 @@ const JavaSetup = () => {
   );
 };
 
-const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
+const ManualSetup = ({
+  setStep,
+  isJava8Downloaded,
+  isJava16Downloaded,
+  setIsJava8Downloaded,
+  setIsJava16Downloaded
+}) => {
+  const userData = useSelector(state => state.userData);
+  const javaBaseFolder = path.join(userData, 'java');
+  const java8Manifest = useSelector(state => state.app.javaManifest);
+  const java16Manifest = useSelector(state => state.app.java16Manifest);
+  const getJavaPath = javaVersion => {
+    const javaOs = convertOSToJavaFormat(process.platform);
+    const javaMeta =
+      javaVersion === 8
+        ? java8Manifest.find(v => v.os === javaOs)
+        : java16Manifest.find(v => v.os === javaOs);
+    const {
+      version_data: { openjdk_version: version }
+    } = javaMeta;
+
+    return path.join(javaBaseFolder, version);
+  };
   const [javaPath, setJavaPath] = useState('');
   const [java16Path, setJava16Path] = useState('');
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const selectFolder = async version => {
     const { filePaths, canceled } = await ipcRenderer.invoke('openFileDialog');
@@ -229,7 +254,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
     >
       <div
         css={`
-          margin-bottom: 50px;
+          margin-bottom: 35px;
           font-size: 18px;
         `}
       >
@@ -237,14 +262,33 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
         versions {'<'} 1.17, java 16 for versions {'>='} 1.17. You can also use
         the same executable but some versions might not run.
       </div>
-      {!isJava8Downloaded && (
-        <div
-          css={`
-            width: 100%;
-            display: flex;
-            margin-bottom: 10px;
-          `}
-        >
+      {isJava8Downloaded ? (
+        <PathContainer>
+          <div
+            css={`
+              width: 100%;
+              padding: 4px 12px;
+              border-radius: 2px;
+              background: ${theme.palette.grey['800']};
+            `}
+          >
+            Java 8 is already installed automatically. Delete to set manually
+          </div>
+          <Button
+            type="danger"
+            onClick={async () => {
+              await fse.remove(getJavaPath(8));
+              setIsJava8Downloaded(false);
+            }}
+            css={`
+              margin-left: 10px;
+            `}
+          >
+            <FontAwesomeIcon icon={faTrash} />
+          </Button>
+        </PathContainer>
+      ) : (
+        <PathContainer>
           <Input
             placeholder="Select your Java8 executable (MC < 1.17)"
             onChange={e => setJavaPath(e.target.value)}
@@ -259,15 +303,35 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
           >
             <FontAwesomeIcon icon={faFolder} />
           </Button>
-        </div>
+        </PathContainer>
       )}
-      {!isJava16Downloaded && (
-        <div
-          css={`
-            width: 100%;
-            display: flex;
-          `}
-        >
+      {isJava16Downloaded ? (
+        <PathContainer>
+          <div
+            css={`
+              width: 100%;
+              padding: 4px 12px;
+              border-radius: 2px;
+              background: ${theme.palette.grey['800']};
+            `}
+          >
+            Java 16 is already installed automatically. Delete to set manually
+          </div>
+          <Button
+            type="danger"
+            onClick={async () => {
+              await fse.remove(getJavaPath(16));
+              setIsJava16Downloaded(false);
+            }}
+            css={`
+              margin-left: 10px;
+            `}
+          >
+            <FontAwesomeIcon icon={faTrash} />
+          </Button>
+        </PathContainer>
+      ) : (
+        <PathContainer>
           <Input
             placeholder="Select your Java16 executable (MC >= 1.17)"
             onChange={e => setJava16Path(e.target.value)}
@@ -282,7 +346,7 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
           >
             <FontAwesomeIcon icon={faFolder} />
           </Button>
-        </div>
+        </PathContainer>
       )}
       <div
         css={`
@@ -299,7 +363,10 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
         </Button>
         <Button
           type="danger"
-          disabled={javaPath === '' || java16Path === ''}
+          disabled={
+            (javaPath === '' && !isJava8Downloaded) ||
+            (java16Path === '' && !isJava16Downloaded)
+          }
           onClick={() => {
             dispatch(updateJavaPath(javaPath));
             dispatch(updateJava16Path(java16Path));
@@ -551,4 +618,18 @@ const SecondStep = styled.div`
   transform: translateX(
     ${({ state }) => (state === 'entering' || state === 'entered' ? 0 : 101)}%
   );
+`;
+
+const PathContainer = styled.div`
+  width: 100%;
+  display: flex;
+  margin: 5px;
+
+  button {
+    margin-right: 2px;
+    transition: transform 0.2s ease-in-out;
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
 `;
