@@ -268,6 +268,7 @@ export const isLatestJavaDownloaded = async (
   version = 8
 ) => {
   const javaOs = convertOSToJavaFormat(process.platform);
+  let log = null;
 
   const isJava16 = version === 16;
 
@@ -289,7 +290,7 @@ export const isLatestJavaDownloaded = async (
   );
   try {
     await fs.access(javaFolder);
-    await promisify(exec)(`"${javaExecutable}" -version`);
+    log = await promisify(exec)(`"${javaExecutable}" -version`);
   } catch (err) {
     if (retry) {
       if (process.platform !== 'win32') {
@@ -306,7 +307,7 @@ export const isLatestJavaDownloaded = async (
 
     isValid = false;
   }
-  return isValid;
+  return { isValid, log: log?.stderr };
 };
 
 export const get7zPath = async () => {

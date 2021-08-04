@@ -28,6 +28,8 @@ const JavaSetup = () => {
   const [choice, setChoice] = useState(null);
   const [isJava8Downloaded, setIsJava8Downloaded] = useState(null);
   const [isJava16Downloaded, setIsJava16Downloaded] = useState(null);
+  const [java8Log, setJava8Log] = useState(null);
+  const [java16Log, setJava16Log] = useState(null);
   const javaManifest = useSelector(state => state.app.javaManifest);
   const java16Manifest = useSelector(state => state.app.java16Manifest);
   const userData = useSelector(state => state.userData);
@@ -38,10 +40,16 @@ const JavaSetup = () => {
 
   useEffect(() => {
     isLatestJavaDownloaded(manifests, userData, true, 8)
-      .then(e => setIsJava8Downloaded(e))
+      .then(e => {
+        setIsJava8Downloaded(e?.isValid);
+        return setJava8Log(e?.log);
+      })
       .catch(err => console.error(err));
     isLatestJavaDownloaded(manifests, userData, true, 16)
-      .then(e => setIsJava16Downloaded(e))
+      .then(e => {
+        setIsJava16Downloaded(e?.isValid);
+        return setJava16Log(e?.log);
+      })
       .catch(err => console.error(err));
   }, []);
 
@@ -189,13 +197,11 @@ const JavaSetup = () => {
               <AutomaticSetup
                 isJava8Downloaded={isJava8Downloaded}
                 isJava16Downloaded={isJava16Downloaded}
+                java8Log={java8Log}
+                java16Log={java16Log}
               />
             ) : (
-              <ManualSetup
-                setStep={setStep}
-                isJava8Downloaded={isJava8Downloaded}
-                isJava16Downloaded={isJava16Downloaded}
-              />
+              <ManualSetup setStep={setStep} />
             )}
           </SecondStep>
         )}
@@ -204,7 +210,7 @@ const JavaSetup = () => {
   );
 };
 
-const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
+const ManualSetup = ({ setStep }) => {
   const [javaPath, setJavaPath] = useState('');
   const [java16Path, setJava16Path] = useState('');
   const dispatch = useDispatch();
@@ -237,53 +243,52 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
         versions {'<'} 1.17, java 16 for versions {'>='} 1.17. You can also use
         the same executable but some versions might not run.
       </div>
-      {!isJava8Downloaded && (
-        <div
+
+      <div
+        css={`
+          width: 100%;
+          display: flex;
+          margin-bottom: 10px;
+        `}
+      >
+        <Input
+          placeholder="Select your Java8 executable (MC < 1.17)"
+          onChange={e => setJavaPath(e.target.value)}
+          value={javaPath}
+        />
+        <Button
+          type="primary"
+          onClick={() => selectFolder(8)}
           css={`
-            width: 100%;
-            display: flex;
-            margin-bottom: 10px;
+            margin-left: 10px;
           `}
         >
-          <Input
-            placeholder="Select your Java8 executable (MC < 1.17)"
-            onChange={e => setJavaPath(e.target.value)}
-            value={javaPath}
-          />
-          <Button
-            type="primary"
-            onClick={() => selectFolder(8)}
-            css={`
-              margin-left: 10px;
-            `}
-          >
-            <FontAwesomeIcon icon={faFolder} />
-          </Button>
-        </div>
-      )}
-      {!isJava16Downloaded && (
-        <div
+          <FontAwesomeIcon icon={faFolder} />
+        </Button>
+      </div>
+
+      <div
+        css={`
+          width: 100%;
+          display: flex;
+        `}
+      >
+        <Input
+          placeholder="Select your Java16 executable (MC >= 1.17)"
+          onChange={e => setJava16Path(e.target.value)}
+          value={java16Path}
+        />
+        <Button
+          type="primary"
+          onClick={() => selectFolder(16)}
           css={`
-            width: 100%;
-            display: flex;
+            margin-left: 10px;
           `}
         >
-          <Input
-            placeholder="Select your Java16 executable (MC >= 1.17)"
-            onChange={e => setJava16Path(e.target.value)}
-            value={java16Path}
-          />
-          <Button
-            type="primary"
-            onClick={() => selectFolder(16)}
-            css={`
-              margin-left: 10px;
-            `}
-          >
-            <FontAwesomeIcon icon={faFolder} />
-          </Button>
-        </div>
-      )}
+          <FontAwesomeIcon icon={faFolder} />
+        </Button>
+      </div>
+
       <div
         css={`
           width: 100%;
@@ -313,7 +318,12 @@ const ManualSetup = ({ setStep, isJava8Downloaded, isJava16Downloaded }) => {
   );
 };
 
-const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
+const AutomaticSetup = ({
+  isJava8Downloaded,
+  isJava16Downloaded,
+  java8Log,
+  java16Log
+}) => {
   const [downloadPercentage, setDownloadPercentage] = useState(0);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
@@ -519,7 +529,30 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded }) => {
           </div>
         </>
       ) : (
-        <h3>Java is already installed</h3>
+        <div
+          css={`
+            display: flex;
+            flex-direction: column;
+            div {
+              display: flex;
+              flex-direction: column;
+            }
+          `}
+        >
+          <h2>Java is already installed!</h2>
+          <div
+            css={`
+              margin-bottom: 10px;
+            `}
+          >
+            <h3>Java 8 details:</h3>
+            <code>{java8Log}</code>
+          </div>
+          <div>
+            <h3>Java 16 details:</h3>
+            <code>{java16Log}</code>
+          </div>
+        </div>
       )}
     </div>
   );
