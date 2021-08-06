@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { totalmem } from 'os';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -98,13 +99,18 @@ function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const marks = {
-  2048: '2048 MB',
-  4096: '4096 MB',
-  8192: '8192 MB',
-  16384: '16384 MB',
-  32768: '32768 MB'
-};
+const maxMemorySlider = Math.round(totalmem() / 1024 / 1024 / 1024) * 1024;
+
+function getMarks() {
+  const totalMarks = {};
+  const totalMemory = Math.round(totalmem() / 1024 / 1024 / 1024);
+  const b2TotalMemory = Math.floor(Math.log2(totalMemory));
+  for (let b2Counter = b2TotalMemory; b2Counter > 0; b2Counter -= 1) {
+    const mbOfRAM = 2 ** b2Counter * 1024;
+    totalMarks[mbOfRAM] = `${mbOfRAM} MB`;
+  }
+  return totalMarks;
+}
 
 export default function MyAccountPreferences() {
   const [screenResolution, setScreenResolution] = useState(null);
@@ -311,9 +317,9 @@ export default function MyAccountPreferences() {
           }}
           defaultValue={javaMemory}
           min={1024}
-          max={process.getSystemMemoryInfo().total / 1024}
+          max={maxMemorySlider}
           step={512}
-          marks={marks}
+          marks={getMarks()}
           valueLabelDisplay="auto"
         />
       </SelectMemory>
