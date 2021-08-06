@@ -885,6 +885,15 @@ export function removeStartedInstance(instanceName) {
   };
 }
 
+export function setHasStartedCliInstance(value) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_HAS_STARTED_CLI_INSTANCE,
+      value
+    });
+  };
+}
+
 export function removeDownloadFromQueue(instanceName) {
   return async (dispatch, getState) => {
     const lockFilePath = path.join(

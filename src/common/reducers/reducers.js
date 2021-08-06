@@ -104,6 +104,15 @@ function instances(state = { started: false, list: {} }, action) {
   }
 }
 
+function hasStartedCliInstance(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_HAS_STARTED_CLI_INSTANCE:
+      return true;
+    default:
+      return state;
+  }
+}
+
 function startedInstances(state = {}, action) {
   switch (action.type) {
     case ActionTypes.ADD_STARTED_INSTANCE:
@@ -167,6 +176,7 @@ export default {
   instances,
   startedInstances,
   selectedInstance,
+  hasStartedCliInstance,
   updateAvailable,
   latestModManifests
 };

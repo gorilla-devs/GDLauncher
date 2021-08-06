@@ -705,3 +705,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
     mainWindow.close();
   }
 });
+
+ipcMain.handle('get-instance-cli-arg', () => {
+  return app.commandLine.getSwitchValue('instance');
+});

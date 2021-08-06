@@ -1,8 +1,14 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { ipcRenderer } from 'electron';
+import { useDidMount } from 'rooks';
 import { _getInstances } from '../../../../common/utils/selectors';
 import Instance from './Instance';
+import {
+  launchInstance,
+  setHasStartedCliInstance
+} from '../../../../common/reducers/actions';
 
 const Container = styled.div`
   display: flex;
@@ -26,6 +32,22 @@ const SubNoInstance = styled.div`
 
 const Instances = () => {
   const instances = useSelector(_getInstances);
+  const hasStartedCliInstance = useSelector(
+    state => state.hasStartedCliInstance
+  );
+  const dispatch = useDispatch();
+
+  useDidMount(async () => {
+    if (hasStartedCliInstance) return;
+    const instanceToLaunch = await ipcRenderer.invoke('get-instance-cli-arg');
+    if (
+      instanceToLaunch &&
+      instances.find(instance => instance.name === instanceToLaunch)
+    ) {
+      dispatch(setHasStartedCliInstance(true));
+      dispatch(launchInstance(instanceToLaunch));
+    }
+  });
 
   return (
     <Container>
