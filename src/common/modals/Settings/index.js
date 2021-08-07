@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, lazy } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDiscord,
-  faFacebook,
   faGithub,
-  faInstagram,
-  faTwitter
+  faTwitter,
+  faFacebook,
+  faInstagram
 } from '@fortawesome/free-brands-svg-icons';
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../../components/Modal';
-import General from './components/General';
-import Java from './components/Java';
+import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
 import { closeModal } from '../../reducers/modals/actions';
 import KoFiButton from '../../assets/ko-fi.png';
@@ -25,6 +24,13 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   text-align: center;
+
+  .ant-slider-mark-text,
+  .ant-input,
+  .ant-select-selection-search-input,
+  .ant-btn {
+    -webkit-backface-visibility: hidden;
+  }
 `;
 const SideMenu = styled.div`
   flex: 0;
@@ -90,20 +96,22 @@ const SettingsTitle = styled.div`
   color: ${props => props.theme.palette.grey[50]};
 `;
 
-function Page(page) {
-  switch (page) {
-    case 'General':
-      return <General />;
-    case 'Java':
-      return <Java />;
-    default:
-      return null;
+const pages = {
+  General: {
+    name: 'General',
+    component: AsyncComponent(lazy(() => import('./components/General')))
+  },
+  Java: {
+    name: 'Java',
+    component: AsyncComponent(lazy(() => import('./components/Java')))
   }
-}
+};
 
 export default function Settings() {
   const [page, setPage] = useState('General');
   const dispatch = useDispatch();
+  const ContentComponent = pages[page].component;
+
   return (
     <Modal
       css={`
@@ -123,18 +131,15 @@ export default function Settings() {
         />
         <SideMenu>
           <SettingsTitle>General</SettingsTitle>
-          <SettingsButton
-            active={page === 'General'}
-            onClick={() => setPage('General')}
-          >
-            General
-          </SettingsButton>
-          <SettingsButton
-            active={page === 'Java'}
-            onClick={() => setPage('Java')}
-          >
-            Java
-          </SettingsButton>
+          {Object.values(pages).map(val => (
+            <SettingsButton
+              key={val.name}
+              active={page === val.name}
+              onClick={() => setPage(val.name)}
+            >
+              {val.name}
+            </SettingsButton>
+          ))}
           {/* <SettingsButton onClick={() => setPage("User Interface")}>
             User Interface
           </SettingsButton>
@@ -242,7 +247,7 @@ export default function Settings() {
                 overflow-x: hidden;
               `}
             >
-              {Page(page)}
+              <ContentComponent />
             </div>
           </SettingsColumn>
         </SettingsContainer>
