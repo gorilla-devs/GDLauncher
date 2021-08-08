@@ -22,8 +22,9 @@ import {
 import { _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { updateJava16Path, updateJavaPath } from '../reducers/settings/actions';
+import CloseButton from '../components/CloseButton';
 
-const JavaSetup = () => {
+const JavaSetup = ({ override }) => {
   const [step, setStep] = useState(0);
   const [choice, setChoice] = useState(null);
   const [isJava8Downloaded, setIsJava8Downloaded] = useState(null);
@@ -37,6 +38,8 @@ const JavaSetup = () => {
     java16: java16Manifest,
     java: javaManifest
   };
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     isLatestJavaDownloaded(manifests, userData, true, 8)
@@ -67,6 +70,17 @@ const JavaSetup = () => {
       `}
       header={false}
     >
+      {override && (
+        <CloseButton
+          css={`
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+          `}
+          onClick={() => dispatch(closeModal())}
+        />
+      )}
       <Transition in={step === 0} timeout={200}>
         {state => (
           <FirstStep state={state}>
@@ -199,6 +213,7 @@ const JavaSetup = () => {
                 isJava16Downloaded={isJava16Downloaded}
                 java8Log={java8Log}
                 java16Log={java16Log}
+                override={override}
               />
             ) : (
               <ManualSetup setStep={setStep} />
@@ -322,7 +337,8 @@ const AutomaticSetup = ({
   isJava8Downloaded,
   isJava16Downloaded,
   java8Log,
-  java16Log
+  java16Log,
+  override
 }) => {
   const [downloadPercentage, setDownloadPercentage] = useState(0);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
@@ -473,7 +489,7 @@ const AutomaticSetup = ({
     setDownloadPercentage(100);
     setCurrentStepPercentage(100);
     await new Promise(resolve => setTimeout(resolve, 2000));
-    dispatch(closeModal());
+    if (!override) dispatch(closeModal());
   };
 
   useEffect(() => {

@@ -6,9 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDiscord,
   faGithub,
-  faTwitter,
-  faFacebook,
-  faInstagram
+  faTwitter
 } from '@fortawesome/free-brands-svg-icons';
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../../components/Modal';
