@@ -59,6 +59,7 @@ const Title = styled.div`
   color: ${props => props.theme.palette.text.primary};
   z-index: 1;
   text-align: left;
+  -webkit-backface-visibility: hidden;
 `;
 
 const ProfileImage = styled.img`
