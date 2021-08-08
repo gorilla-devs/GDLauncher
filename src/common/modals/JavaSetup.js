@@ -95,7 +95,7 @@ const JavaSetup = () => {
               css={`
                 display: flex;
                 align-items: center;
-                justify-content: space-evenly;
+                justify-content: center;
                 margin-bottom: 40px;
                 opacity: 0;
                 opacity: ${isJava8Downloaded !== null &&
@@ -106,6 +106,13 @@ const JavaSetup = () => {
                   border-radius: 5px;
                   padding: 2px 4px;
                   background: ${props => props.theme.palette.colors.red};
+                  margin-right: 5px;
+                  width: 71px;
+                  display: flex;
+                  justify-content: center;
+                  align-content: center;
+                  box-sizing: content-box;
+                  margin-left: 5px;
                 }
               `}
             >
@@ -114,25 +121,11 @@ const JavaSetup = () => {
                 css={`
                   display: flex;
                   align-items: center;
-                  margin-right: 40px;
-                  h3 {
-                    width: 71px;
-                    display: flex;
-                    justify-content: center;
-                    align-content: center;
-                    padding: 2px;
-                    box-sizing: content-box;
-                  }
+                  margin-left: 5px;
                 `}
               >
                 {!isJava8Downloaded && isJava8Downloaded !== null && (
-                  <h3
-                    css={`
-                      margin-right: 20px;
-                    `}
-                  >
-                    Java 8
-                  </h3>
+                  <h3>Java 8</h3>
                 )}
                 {!isJava16Downloaded && isJava16Downloaded !== null && (
                   <h3>Java 16</h3>
