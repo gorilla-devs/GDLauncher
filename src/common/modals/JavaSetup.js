@@ -456,7 +456,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
     const java16Meta = java16Manifest.find(v => v.os === javaOs);
 
     const totalExtractionSteps = process.platform !== 'win32' ? 2 : 1;
-    const totalSteps = (totalExtractionSteps + 1) * javaToInstall.length;
+    const totalSteps = 2 * javaToInstall.length;
 
     const setStepPercentage = (stepNumber, percentage) => {
       setCurrentStepPercentage(
@@ -501,7 +501,10 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
         firstExtraction.on('progress', ({ percent }) => {
           ipcRenderer.invoke('update-progress-bar', percent);
           setDownloadPercentage(percent);
-          setStepPercentage(index, percent);
+          setStepPercentage(
+            index,
+            process.platform === 'win32' ? percent : percent / 2
+          );
         });
         firstExtraction.on('end', () => {
           resolve();
@@ -511,10 +514,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
         });
       });
 
-      index += 1;
       setDownloadPercentage(0);
-      setStepPercentage(index, 0);
-
       await fse.remove(downloadLocation);
 
       // If NOT windows then tar.gz instead of zip, so we need to extract 2 times.
@@ -538,7 +538,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
           secondExtraction.on('progress', ({ percent }) => {
             ipcRenderer.invoke('update-progress-bar', percent);
             setDownloadPercentage(percent);
-            setStepPercentage(index, percent);
+            setStepPercentage(index, percent / 2 + 50);
           });
           secondExtraction.on('end', () => {
             resolve();
@@ -548,10 +548,10 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
           });
         });
         await fse.remove(tempTarName);
-        index += 1;
-        setDownloadPercentage(0);
-        setStepPercentage(index, 0);
       }
+      index += 1;
+      setDownloadPercentage(0);
+      setStepPercentage(index, 0);
 
       const directoryToMove =
         process.platform === 'darwin'
