@@ -9,7 +9,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import path from 'path';
 import { extractFull } from 'node-7z';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolder } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAngleLeft,
+  faExclamationTriangle,
+  faFolder,
+  faTimes
+} from '@fortawesome/free-solid-svg-icons';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import Modal from '../components/Modal';
@@ -33,12 +38,14 @@ const JavaSetup = () => {
   const javaManifest = useSelector(state => state.app.javaManifest);
   const java16Manifest = useSelector(state => state.app.java16Manifest);
   const userData = useSelector(state => state.userData);
+  const dispatch = useDispatch();
+  const theme = useTheme();
   const manifests = {
     java16: java16Manifest,
     java: javaManifest
   };
 
-  useEffect(() => {
+  const checkJava = () => {
     isLatestJavaDownloaded(manifests, userData, true, 8)
       .then(e => {
         setIsJava8Downloaded(e?.isValid);
@@ -51,7 +58,12 @@ const JavaSetup = () => {
         return setJava16Log(e?.log);
       })
       .catch(err => console.error(err));
-  }, []);
+  };
+
+  useEffect(() => {
+    if (step === 2) checkJava();
+  }, [step]);
+  useEffect(() => checkJava(), []);
 
   return (
     <Modal
@@ -96,7 +108,7 @@ const JavaSetup = () => {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin-bottom: 40px;
+                margin-bottom: 20px;
                 opacity: 0;
                 opacity: ${isJava8Downloaded !== null &&
                 isJava16Downloaded !== null &&
@@ -138,7 +150,7 @@ const JavaSetup = () => {
                 & > div {
                   display: flex;
                   justify-content: center;
-                  margin-top: 20px;
+                  margin-top: 10px;
                 }
               `}
             >
@@ -170,31 +182,141 @@ const JavaSetup = () => {
                   Manual Setup
                 </Button>
               </div>
+              <div>
+                <Button
+                  type="text"
+                  css={`
+                    width: 150px;
+                  `}
+                  onClick={() => {
+                    setStep(2);
+                  }}
+                >
+                  Java information
+                </Button>
+              </div>
             </div>
           </FirstStep>
         )}
       </Transition>
-      <Transition in={step === 1} timeout={200}>
+      <Transition in={step >= 1} timeout={200}>
         {state => (
           <SecondStep state={state}>
-            <div
-              css={`
-                font-size: 28px;
-                text-align: center;
-                margin-bottom: 20px;
-              `}
-            >
-              {choice === 0 ? 'Automatic' : 'Manual'} Setup
-            </div>
-            {choice === 0 ? (
-              <AutomaticSetup
-                isJava8Downloaded={isJava8Downloaded}
-                isJava16Downloaded={isJava16Downloaded}
-                java8Log={java8Log}
-                java16Log={java16Log}
-              />
+            {step === 1 ? (
+              <>
+                <div
+                  css={`
+                    font-size: 28px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                  `}
+                >
+                  {choice === 0 ? 'Automatic' : 'Manual'} Setup
+                </div>
+                {choice === 0 ? (
+                  <AutomaticSetup
+                    isJava8Downloaded={isJava8Downloaded}
+                    isJava16Downloaded={isJava16Downloaded}
+                    setStep={setStep}
+                  />
+                ) : (
+                  <ManualSetup setStep={setStep} />
+                )}{' '}
+              </>
             ) : (
-              <ManualSetup setStep={setStep} />
+              <>
+                <div
+                  css={`
+                    display: flex;
+                    flex-direction: column;
+                    div {
+                      display: flex;
+                      flex-direction: column;
+                    }
+                  `}
+                >
+                  <h2>Java 8 and Java 16 are installed!</h2>
+                  <div>
+                    <h3>Java 8 details:</h3>
+                    <code>
+                      {!java8Log || java8Log === '' ? (
+                        <>
+                          <FontAwesomeIcon
+                            icon={faExclamationTriangle}
+                            color={theme.palette.colors.yellow}
+                          />
+                          {'  '}An error occurred whilst trying to check for the
+                          Java version!
+                        </>
+                      ) : (
+                        java8Log
+                      )}
+                    </code>
+                  </div>
+                  <div>
+                    <h3>Java 16 details:</h3>
+                    <code>
+                      {!java16Log || java16Log === '' ? (
+                        <>
+                          <FontAwesomeIcon
+                            icon={faExclamationTriangle}
+                            color={theme.palette.colors.yellow}
+                          />
+                          {'  '}An error occurred whilst trying to check for the
+                          Java version!
+                        </>
+                      ) : (
+                        java16Log
+                      )}
+                    </code>
+                  </div>
+                </div>
+                <div
+                  css={`
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    display: flex;
+                    flex-direction: row;
+                    div {
+                      cursor: pointer;
+                      width: 20px;
+                      font-size: 20px;
+                      display: flex;
+                      justify-content: center;
+                      border-radius: 3px;
+                      margin: 2px;
+                      transition: all 0.15s ease-in-out;
+                      background-color: ${theme.palette.primary.main};
+                    }
+                  `}
+                >
+                  <div
+                    css={`
+                      &:hover {
+                        background-color: ${theme.palette.primary.light};
+                      }
+                    `}
+                  >
+                    <FontAwesomeIcon
+                      onClick={() => setStep(0)}
+                      icon={faAngleLeft}
+                    />
+                  </div>
+                  <div
+                    css={`
+                      &:hover {
+                        background-color: ${theme.palette.error.main};
+                      }
+                    `}
+                  >
+                    <FontAwesomeIcon
+                      icon={faTimes}
+                      onClick={() => dispatch(closeModal())}
+                    />
+                  </div>
+                </div>
+              </>
             )}
           </SecondStep>
         )}
@@ -301,7 +423,7 @@ const ManualSetup = ({ setStep }) => {
           onClick={() => {
             dispatch(updateJavaPath(javaPath));
             dispatch(updateJava16Path(java16Path));
-            dispatch(closeModal());
+            setStep(2);
           }}
         >
           Continue with custom java
@@ -311,12 +433,7 @@ const ManualSetup = ({ setStep }) => {
   );
 };
 
-const AutomaticSetup = ({
-  isJava8Downloaded,
-  isJava16Downloaded,
-  java8Log,
-  java16Log
-}) => {
+const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
   const [downloadPercentage, setDownloadPercentage] = useState(0);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
@@ -465,8 +582,7 @@ const AutomaticSetup = ({
     ipcRenderer.invoke('update-progress-bar', -1);
     setDownloadPercentage(100);
     setCurrentStepPercentage(100);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    dispatch(closeModal());
+    setStep(2);
   };
 
   useEffect(() => {
@@ -483,70 +599,41 @@ const AutomaticSetup = ({
         align-items: center;
       `}
     >
-      {javaToInstall.length > 0 ? (
-        <>
-          <div
-            css={`
-              margin-top: -15px; //cheaty way to get up to the Modal title :P
-              margin-bottom: 50px;
-              width: 50%;
-            `}
-          >
-            <Progress
-              percent={currentStepPercentage}
-              strokeColor={theme.palette.primary.main}
-              status="normal"
-            />
-          </div>
-          <div
-            css={`
-              margin-bottom: 20px;
-              font-size: 18px;
-            `}
-          >
-            {currentSubStep}
-          </div>
-          <div
-            css={`
-              padding: 0 10px;
-              width: 100%;
-            `}
-          >
-            {downloadPercentage ? (
-              <Progress
-                percent={downloadPercentage}
-                strokeColor={theme.palette.primary.main}
-                status="normal"
-              />
-            ) : null}
-          </div>
-        </>
-      ) : (
-        <div
-          css={`
-            display: flex;
-            flex-direction: column;
-            div {
-              display: flex;
-              flex-direction: column;
-            }
-          `}
-        >
-          <h2>Java is already installed!</h2>
-          <div
-            css={`
-              margin-bottom: 10px;
-            `}
-          >
-            <h3>Java 8 details:</h3>
-            <code>{java8Log}</code>
-          </div>
-          <div>
-            <h3>Java 16 details:</h3>
-            <code>{java16Log}</code>
-          </div>
-        </div>
-      )}
+      <div
+        css={`
+          margin-top: -15px; //cheaty way to get up to the Modal title :P
+          margin-bottom: 50px;
+          width: 50%;
+        `}
+      >
+        <Progress
+          percent={currentStepPercentage}
+          strokeColor={theme.palette.primary.main}
+          status="normal"
+        />
+      </div>
+      <div
+        css={`
+          margin-bottom: 20px;
+          font-size: 18px;
+        `}
+      >
+        {currentSubStep}
+      </div>
+      <div
+        css={`
+          padding: 0 10px;
+          width: 100%;
+        `}
+      >
+        {downloadPercentage ? (
+          <Progress
+            percent={downloadPercentage}
+            strokeColor={theme.palette.primary.main}
+            status="normal"
+          />
+        ) : null}
+      </div>
     </div>
   );
 };
