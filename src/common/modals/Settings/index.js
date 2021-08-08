@@ -225,6 +225,16 @@ export default function Settings() {
                   <FontAwesomeIcon icon={faTwitter} size="lg" />
                 </div>
               </a>
+              <a href="https://facebook.com/gorilladevs">
+                <div>
+                  <FontAwesomeIcon icon={faFacebook} size="lg" />
+                </div>
+              </a>
+              <a href="https://instagram.com/gdlauncher">
+                <div>
+                  <FontAwesomeIcon icon={faInstagram} size="lg" />
+                </div>
+              </a>
               <a href="https://gdevs.io">
                 <div>
                   <FontAwesomeIcon icon={faGlobe} size="lg" />
