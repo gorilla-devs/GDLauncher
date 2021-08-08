@@ -14,6 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Switch, Slider, Select } from 'antd';
 import { ipcRenderer } from 'electron';
+import { coerce, lte } from 'semver';
 import {
   _getInstancesPath,
   _getInstance,
@@ -176,7 +177,12 @@ const Card = memo(
 const Overview = ({ instanceName, background, manifest }) => {
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
-  const defaultJavaPath = useSelector(state => _getJavaPath(state));
+  const javaVersion = lte(coerce(config?.loader.mcVersion), coerce('1.17'))
+    ? 8
+    : 16;
+  const defaultJavaPath = useSelector(state =>
+    _getJavaPath(state)(javaVersion)
+  );
   const [javaLocalMemory, setJavaLocalMemory] = useState(config?.javaMemory);
   const [javaLocalArguments, setJavaLocalArguments] = useState(
     config?.javaArgs
