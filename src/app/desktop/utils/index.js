@@ -1,26 +1,19 @@
-import { promises as fs } from 'fs';
-import originalFs from 'original-fs';
-import fse from 'fs-extra';
-import { extractFull } from 'node-7z';
-import jimp from 'jimp/es';
-import makeDir from 'make-dir';
-import { promisify } from 'util';
-import { ipcRenderer } from 'electron';
-import path from 'path';
-import crypto from 'crypto';
-import { exec, spawn } from 'child_process';
-import {
-  MC_LIBRARIES_URL,
-  FABRIC,
-  FORGE
-} from '../../../common/utils/constants';
+import { promises as fs } from "fs";
+import originalFs from "original-fs";
+import fse from "fs-extra";
+import { extractFull } from "node-7z";
+import jimp from "jimp/es";
+import makeDir from "make-dir";
+import { promisify } from "util";
+import { ipcRenderer } from "electron";
+import path from "path";
+import crypto from "crypto";
+import { exec, spawn } from "child_process";
+import { FABRIC, FORGE, MC_LIBRARIES_URL } from "../../../common/utils/constants";
 
-import {
-  removeDuplicates,
-  sortByForgeVersionDesc
-} from '../../../common/utils';
-import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
-import { downloadFile } from './downloader';
+import { removeDuplicates, sortByForgeVersionDesc } from "../../../common/utils";
+import { getAddonFile, mcGetPlayerSkin } from "../../../common/api";
+import { downloadFile } from "./downloader";
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -268,7 +261,6 @@ export const isLatestJavaDownloaded = async (
   version = 8
 ) => {
   const javaOs = convertOSToJavaFormat(process.platform);
-  let log = null;
 
   const isJava16 = version === 16;
 
@@ -280,6 +272,12 @@ export const isLatestJavaDownloaded = async (
     'java',
     javaMeta.version_data.openjdk_version
   );
+  return isJavaPathOK(javaFolder, retry);
+};
+
+export const isJavaPathOK = async (javaFolder, retry) => {
+  const javaOs = convertOSToJavaFormat(process.platform);
+  let log = null;
   // Check if it's downloaded, if it's latest version and if it's a valid download
   let isValid = true;
 
@@ -302,7 +300,7 @@ export const isLatestJavaDownloaded = async (
         }
       }
 
-      return isLatestJavaDownloaded(meta, userData, null, version);
+      return isJavaPathOK(javaFolder, false);
     }
 
     isValid = false;

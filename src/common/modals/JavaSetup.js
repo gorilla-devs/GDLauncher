@@ -22,6 +22,7 @@ import { downloadFile } from '../../app/desktop/utils/downloader';
 import {
   convertOSToJavaFormat,
   get7zPath,
+  isJavaPathOK,
   isLatestJavaDownloaded
 } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
@@ -46,18 +47,39 @@ const JavaSetup = () => {
   };
 
   const checkJava = () => {
-    isLatestJavaDownloaded(manifests, userData, true, 8)
-      .then(e => {
-        setIsJava8Downloaded(e?.isValid);
-        return setJava8Log(e?.log);
-      })
-      .catch(err => console.error(err));
-    isLatestJavaDownloaded(manifests, userData, true, 16)
-      .then(e => {
-        setIsJava16Downloaded(e?.isValid);
-        return setJava16Log(e?.log);
-      })
-      .catch(err => console.error(err));
+    if (choice === null || choice !== 1) {
+      isLatestJavaDownloaded(manifests, userData, true, 8)
+        .then(e => {
+          setIsJava8Downloaded(e?.isValid);
+          return setJava8Log(e?.log);
+        })
+        .catch(err => console.error(err));
+      isLatestJavaDownloaded(manifests, userData, true, 16)
+        .then(e => {
+          setIsJava16Downloaded(e?.isValid);
+          return setJava16Log(e?.log);
+        })
+        .catch(err => console.error(err));
+    } else {
+      isJavaPathOK(
+        useSelector(state => state.settings.java.path16),
+        true
+      )
+        .then(e => {
+          setIsJava16Downloaded(e?.isValid);
+          return setJava16Log(e?.log);
+        })
+        .catch(err => console.error(err));
+      isJavaPathOK(
+        useSelector(state => state.settings.java.path),
+        true
+      )
+        .then(e => {
+          setIsJava8Downloaded(e?.isValid);
+          return setJava8Log(e?.log);
+        })
+        .catch(err => console.error(err));
+    }
   };
 
   useEffect(() => {
