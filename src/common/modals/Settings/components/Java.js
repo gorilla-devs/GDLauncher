@@ -187,8 +187,8 @@ export default function MyAccountPreferences() {
               />
               <Input
                 css={`
-                  width: 75%;
-                  margin: 0 10px;
+                  width: 75% !important;
+                  margin: 0 10px !important;
                 `}
                 onChange={e => dispatch(updateJavaPath(e.target.value))}
                 value={customJavaPath}
@@ -344,9 +344,9 @@ export default function MyAccountPreferences() {
             onChange={e => dispatch(updateJavaArguments(e.target.value))}
             value={javaArgs}
             css={`
-              width: 83%;
-              height: 32px;
-              float: left;
+              width: 83% !important;
+              height: 32px !important;
+              float: left !important;
             `}
           />
           <StyledButtons
