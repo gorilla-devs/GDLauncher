@@ -58,6 +58,9 @@ const data = {
     {
       header: 'Updated dependencies',
       content: 'for security and performance improvements.'
+    },
+    {
+      header: 'Added usual MacOS default menu'
     }
   ],
   bugfixes: [
