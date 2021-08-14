@@ -2,16 +2,10 @@ import React, { useState, lazy } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faDiscord,
-  faGithub,
-  faTwitter
-} from '@fortawesome/free-brands-svg-icons';
-import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
+import SocialButtons from '../../components/SocialButtons';
 import { closeModal } from '../../reducers/modals/actions';
 import KoFiButton from '../../assets/ko-fi.png';
 import PatreonButton from '../../assets/patreon.png';
@@ -164,75 +158,10 @@ export default function Settings() {
             </span>
             <div
               css={`
-                img {
-                  border-radius: 30px;
-                  height: 40px;
-                  cursor: pointer;
-                  transition: transform 0.2s ease-in-out;
-                  &:hover {
-                    transform: scale(1.05);
-                  }
-                }
-              `}
-            >
-              <a href="https://ko-fi.com/gdlauncher">
-                <img
-                  src={KoFiButton}
-                  alt="Ko-Fi"
-                  css={`
-                    margin-bottom: 20px;
-                    margin-top: 20px;
-                  `}
-                />
-              </a>
-              <a href="https://patreon.com/gorilladevs">
-                <img src={PatreonButton} alt="Patreon" />
-              </a>
-            </div>
-            <div
-              css={`
-                display: flex;
-                margin-top: 20px;
                 margin-bottom: 20px;
-                a {
-                  color: rgba(255, 255, 255, 0.85);
-                }
-                div {
-                  padding: 6px;
-                  border-radius: 4px;
-                  &:hover {
-                    background: rgba(255, 255, 255, 0.5);
-                    transition: background 0.1s ease-in-out,
-                      transform 0.1s ease-in-out;
-                    transform: scale(1.2);
-                    cursor: pointer;
-                  }
-                }
-                div:first-child {
-                  margin-left: 0;
-                }
               `}
             >
-              <a href="https://discord.gg/4cGYzen">
-                <div>
-                  <FontAwesomeIcon icon={faDiscord} size="lg" />
-                </div>
-              </a>
-              <a href="https://github.com/gorilla-devs/GDLauncher">
-                <div>
-                  <FontAwesomeIcon icon={faGithub} size="lg" />
-                </div>
-              </a>
-              <a href="https://twitter.com/gdlauncher">
-                <div>
-                  <FontAwesomeIcon icon={faTwitter} size="lg" />
-                </div>
-              </a>
-              <a href="https://gdevs.io">
-                <div>
-                  <FontAwesomeIcon icon={faGlobe} size="lg" />
-                </div>
-              </a>
+              <SocialButtons />
             </div>
           </div>
         </SideMenu>

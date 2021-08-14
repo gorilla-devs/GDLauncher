@@ -49,6 +49,7 @@ jobs:
           RELEASE_TESTING: true
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
+          GA_ID: ${{ secrets.GA_ID }}
         run: |
           npm run release
       - name: npm run release for mac and linux
