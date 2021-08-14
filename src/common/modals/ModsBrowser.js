@@ -409,7 +409,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         filterType,
         filterType !== 'Author' && filterType !== 'Name',
         gameVersion,
-        getPatchedInstanceType(instance) === FABRIC ? 4780 : null
+        0,
+        getPatchedInstanceType(instance)
       ));
     } catch (err) {
       setError(err);
