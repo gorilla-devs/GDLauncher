@@ -116,6 +116,7 @@ const ChangeLogs = () => {
 
   const openBisectModal = () => {
     dispatch(openModal('BisectHosting'));
+    ga.sendCustomEvent('changelogModalOpenBisect');
   };
 
   return (
