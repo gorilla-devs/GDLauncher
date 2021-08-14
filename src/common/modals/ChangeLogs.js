@@ -4,14 +4,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBug,
-  faCheck,
-  faExternalLinkAlt,
-  faLink,
-  faStar,
-  faWrench
-} from '@fortawesome/free-solid-svg-icons';
+import { faBug, faStar, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { useInView } from 'react-intersection-observer';
 import Modal from '../components/Modal';
 import SocialButtons from '../components/SocialButtons';

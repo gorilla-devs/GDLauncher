@@ -2,15 +2,6 @@ import React, { useState, lazy } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faDiscord,
-  faGithub,
-  faTwitter,
-  faFacebook,
-  faInstagram
-} from '@fortawesome/free-brands-svg-icons';
-import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
