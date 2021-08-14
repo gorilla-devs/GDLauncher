@@ -1,87 +1,312 @@
 /* eslint-disable react/no-unescaped-entities */
 import React, { memo, useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { Button } from 'antd';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiscord } from '@fortawesome/free-brands-svg-icons';
+import {
+  faBug,
+  faCheck,
+  faExternalLinkAlt,
+  faLink,
+  faStar,
+  faWrench
+} from '@fortawesome/free-solid-svg-icons';
+import { useInView } from 'react-intersection-observer';
 import Modal from '../components/Modal';
+import SocialButtons from '../components/SocialButtons';
+import KoFiButton from '../assets/ko-fi.png';
+import PatreonButton from '../assets/patreon.png';
+import UpdateIllustration from '../assets/update_illustration.png';
+import { openModal } from '../reducers/modals/actions';
+import ga from '../utils/analytics';
+
+const UpdateRow = ({ header, content }) => {
+  return (
+    <li>
+      &bull; {header}{' '}
+      <span
+        css={`
+          color: ${props => props.theme.palette.text.third};
+        `}
+      >
+        {content}
+      </span>
+    </li>
+  );
+};
+
+const data = {
+  new: [
+    {
+      header: 'We now automatically take care of java16.',
+      content:
+        'You can now run Minecraft >1.17 without issues!. You can also individually select a manual path for both versions from the settings.'
+    }
+  ],
+  improvements: [
+    {
+      header: 'You can now select more java memory',
+      content: 'in the memory slider up to the amount available on your device.'
+    },
+    {
+      header: 'Improved the design of the changelog modal',
+      content: 'as you can clearly see from here 😃.'
+    },
+    {
+      header: 'Added social links to the settings sidebar',
+      content: ''
+    },
+    {
+      header: 'Drastically improved performance',
+      content:
+        'for modal pages such as instances creator, instances manager and settings.'
+    },
+    {
+      header: 'Updated dependencies',
+      content: 'for security and performance improvements.'
+    }
+  ],
+  bugfixes: [
+    {
+      header: 'Fixed accounts being hidden',
+      content: 'when too many were added.'
+    },
+    {
+      header: 'Fixed concurrent download preference',
+      content: 'not being used when downloading FTB modpacks.'
+    },
+    {
+      header: 'Fixed fabric mods not loading',
+      content: 'due to curseforge changing their backend structure.'
+    },
+    {
+      header:
+        "Fixed a bug where we didn't correctly detect the curseforge modloader.",
+      content: ''
+    }
+  ]
+};
 
 const ChangeLogs = () => {
   const [version, setVersion] = useState(null);
+  const [skipIObserver, setSkipIObserver] = useState(true);
+  const dispatch = useDispatch();
+  const { ref: intersectionObserverRef, inView: insectionObserverInView } =
+    useInView({
+      threshold: 0.3,
+      initialInView: false,
+      triggerOnce: true,
+      skip: skipIObserver
+    });
 
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
+    setTimeout(() => {
+      setSkipIObserver(false);
+    }, 300);
+    ga.sendCustomEvent('changelogModalOpen');
   }, []);
+
+  useEffect(() => {
+    if (insectionObserverInView) {
+      ga.sendCustomEvent('changelogModalReadAll');
+    }
+  }, [insectionObserverInView]);
+
+  const openBisectModal = () => {
+    dispatch(openModal('BisectHosting'));
+    ga.sendCustomEvent('changelogModalOpenBisect');
+  };
 
   return (
     <Modal
       css={`
-        height: 500px;
-        width: 650px;
+        height: 550px;
+        width: 450px;
       `}
       title={`What's new in ${version}`}
+      removePadding
     >
       <Container>
-        {/* <Section>
+        <Header>
+          <img
+            css={`
+              border-radius: 5px;
+            `}
+            src={UpdateIllustration}
+            alt="New Version"
+          />
+          <div
+            css={`
+              margin-top: 20px;
+              color: ${props => props.theme.palette.text.third};
+              span {
+                color: ${props => props.theme.palette.text.primary};
+                cursor: pointer;
+                text-decoration: underline;
+              }
+            `}
+          >
+            If you appreciate our work, please consider supporting us through a
+            donation or grab a server from our official partner{' '}
+            <span onClick={openBisectModal}>BisectHosting</span>
+          </div>
+          <div
+            css={`
+              display: flex;
+              align-items: center;
+              justify-content: start;
+              margin-bottom: 20px;
+              margin-top: 20px;
+              a:nth-child(1) {
+                margin-right: 20px;
+              }
+              img {
+                border-radius: 30px;
+                height: 40px;
+                cursor: pointer;
+                transition: transform 0.2s ease-in-out;
+                &:hover {
+                  transform: scale(1.05);
+                }
+              }
+            `}
+          >
+            <a href="https://ko-fi.com/gdlauncher">
+              <img src={KoFiButton} alt="Ko-Fi" />
+            </a>
+            <a href="https://patreon.com/gorilladevs">
+              <img src={PatreonButton} alt="Patreon" />
+            </a>
+          </div>
+        </Header>
+        <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.green};
             `}
           >
-            <span>New Features</span>
+            <span
+              css={`
+                display: flex;
+                align-items: center;
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faStar}
+                css={`
+                  margin-right: 10px;
+                  font-size: 20px;
+                `}
+              />
+              New
+            </span>
           </SectionTitle>
           <div>
             <ul>
-              <li>
-                Automatically set recommended/minimum RAM amount for FTB
-                modpacks, and eventually show a confirmation modal in case the
-                user has not enough.
-              </li>
-              <li>Added modlist.html when exporting instances.</li>
+              {data.new.map(item => (
+                <UpdateRow
+                  key={item.header}
+                  header={item.header}
+                  content={item.content}
+                />
+              ))}
             </ul>
           </div>
-        </Section> */}
+        </Section>
+        <Section>
+          <SectionTitle
+            css={`
+              color: ${props => props.theme.palette.colors.yellow};
+            `}
+          >
+            <span
+              css={`
+                display: flex;
+                align-items: center;
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faWrench}
+                css={`
+                  margin-right: 10px;
+                  font-size: 20px;
+                `}
+              />
+              Improved
+            </span>
+          </SectionTitle>
+          <div>
+            <ul>
+              {data.improvements.map(item => (
+                <UpdateRow
+                  key={item.header}
+                  header={item.header}
+                  content={item.content}
+                />
+              ))}
+            </ul>
+          </div>
+        </Section>
         <Section>
           <SectionTitle
             css={`
               color: ${props => props.theme.palette.colors.red};
             `}
           >
-            <span>Bug Fixes</span>
+            <span
+              css={`
+                display: flex;
+                align-items: center;
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faBug}
+                css={`
+                  margin-right: 10px;
+                  font-size: 20px;
+                `}
+              />
+              Bug Fixes
+            </span>
           </SectionTitle>
           <div>
-            <ul>
-              <li>Various QoL fixes.</li>
+            <ul ref={intersectionObserverRef}>
+              {data.bugfixes.map(item => (
+                <UpdateRow
+                  key={item.header}
+                  header={item.header}
+                  content={item.content}
+                />
+              ))}
             </ul>
           </div>
         </Section>
-        <Section>
-          <SectionTitle
-            css={`
-              color: ${props => props.theme.palette.colors.lavander};
-            `}
-          >
-            <span>Join Our Community</span>
-          </SectionTitle>
-          <p>
-            We love our users, that's why we have a dedicated Discord server
-            just to talk with all of them!
-          </p>
-          <Button
-            css={`
-              font-size: 20px;
-              margin-top: 20px;
-            `}
-            type="primary"
-            size="large"
-            href="https://discord.gg/4cGYzen"
-          >
-            <FontAwesomeIcon icon={faDiscord} />
-            &nbsp; Discord
-          </Button>
-        </Section>
       </Container>
+      <div
+        css={`
+          position: sticky;
+          bottom: 0;
+          height: 60px;
+          width: 100%;
+          background: ${props => props.theme.palette.grey[800]};
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          padding: 0 20px;
+        `}
+      >
+        <SocialButtons />
+        <span
+          css={`
+            padding-left: 20px;
+            color: ${props => props.theme.palette.text.secondary};
+          `}
+        >
+          Follow us for more updates
+        </span>
+      </div>
     </Modal>
   );
 };
@@ -90,43 +315,45 @@ export default memo(ChangeLogs);
 
 const Container = styled.div`
   width: 100%;
-  height: 100%;
-  text-align: center;
+  height: calc(100% - 60px);
   overflow-y: auto;
   color: ${props => props.theme.palette.text.primary};
+  padding: 20px;
 `;
 
 const SectionTitle = styled.h2`
   width: 100%;
-  text-align: center;
-  border-bottom: 1px solid;
-  line-height: 0.1em;
-  margin: 10px 0 20px;
-
-  span {
-    background: ${props => props.theme.palette.secondary.main};
-    padding: 0 10px;
-  }
+  margin: 0;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 22px;
 `;
 
 const Section = styled.div`
   width: 100%;
-  text-align: center;
   font-size: 16px;
+  p {
+    margin: 20px 0 !important;
+  }
   div {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     width: 100%;
-    margin: 40px 0;
+    margin: 20px 0;
     border-radius: 5px;
 
-    p {
-      margin: 20px 0;
+    ul {
+      padding: 0px;
+      list-style-position: inside;
     }
 
     li {
       text-align: start;
+      list-style-type: none;
+      margin: 10px 0;
     }
   }
+`;
+
+const Header = styled.div`
+  height: 150px;
+  margin-bottom: 200px;
 `;

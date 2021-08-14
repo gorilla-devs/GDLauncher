@@ -445,8 +445,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         <Header>
           <Select
             css={`
-              width: 160px;
-              margin: 0 10px;
+              width: 160px !important;
+              margin: 0 10px !important;
             `}
             defaultValue={filterType}
             onChange={setFilterType}
@@ -462,7 +462,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
           </Select>
           <Input
             css={`
-              height: 32px;
+              height: 32px !important;
             `}
             placeholder="Search for a mod"
             value={searchQuery}

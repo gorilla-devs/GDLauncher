@@ -161,8 +161,8 @@ const Import = ({
             value={localValue}
             onChange={e => setLocalValue(e.target.value)}
             css={`
-              width: 400px;
-              margin-right: 10px;
+              width: 400px !important;
+              margin-right: 10px !important;
             `}
           />
           <Button disabled={loading} type="primary" onClick={openFileDialog}>
