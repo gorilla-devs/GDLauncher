@@ -415,10 +415,10 @@ const InstanceName = ({
                       onChange={e => setInstanceName(e.target.value)}
                       css={`
                         opacity: ${({ state }) =>
-                          state === 'entering' || state === 'entered' ? 0 : 1};
-                        transition: 0.1s ease-in-out;
-                        width: 300px;
-                        align-self: center;
+                          state === 'entering' || state === 'entered' ? 0 : 1} !important;
+                        transition: 0.1s ease-in-out !important;
+                        width: 300px !important;
+                        align-self: center !important;
                       `}
                     />
                     <div
