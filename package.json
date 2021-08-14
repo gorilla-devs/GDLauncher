@@ -147,8 +147,8 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@loadable/babel-plugin": "^5.13.2",
     "7zip-bin": "^5.1.1",
+    "@loadable/babel-plugin": "^5.13.2",
     "antd": "4.16.11",
     "axios": "^0.21.1",
     "base64-stream": "^1.0.0",
@@ -184,6 +184,7 @@
     "react-contextmenu": "^2.14.0",
     "react-dom": "^17.0.2",
     "react-html-parser": "^2.0.2",
+    "react-intersection-observer": "^8.32.0",
     "react-markdown": "^7.0.0",
     "react-portal": "^4.2.1",
     "react-redux": "^7.2.4",
