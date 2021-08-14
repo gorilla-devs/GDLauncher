@@ -253,8 +253,8 @@ export default function MyAccountPreferences() {
               />
               <Input
                 css={`
-                  width: 75%;
-                  margin: 0 10px;
+                  width: 75% !important;
+                  margin: 0 10px !important;
                 `}
                 onChange={e => {
                   dispatch(
