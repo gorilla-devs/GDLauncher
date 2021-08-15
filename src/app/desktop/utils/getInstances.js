@@ -1,7 +1,9 @@
 import path from 'path';
 import fse from 'fs-extra';
+import { promises as fs } from 'fs';
 import pMap from 'p-map';
 import { getDirectories } from '.';
+import { CURSEFORGE } from '../../../common/utils/constants';
 
 const getInstances = async instancesPath => {
   const mapFolderToInstance = async instance => {
@@ -9,7 +11,30 @@ const getInstances = async instancesPath => {
       const configPath = path.join(
         path.join(instancesPath, instance, 'config.json')
       );
-      const config = await fse.readJSON(configPath);
+      const rawConfig = await fs.readFile(configPath);
+
+      // Remove temp config if present
+      try {
+        const tempConfigPath = path.join(
+          path.join(instancesPath, instance, 'config_new_temp.json')
+        );
+        await fs.unlink(tempConfigPath);
+      } catch {
+        // Nothing
+      }
+
+      // Restore config in case of crash
+      if (rawConfig.every(v => v === 0)) {
+        const backupConfigPath = path.join(
+          path.join(instancesPath, instance, 'config.bak.json')
+        );
+        const backupConfig = await fs.readFile(backupConfigPath);
+        JSON.parse(backupConfig);
+        await fs.rename(backupConfigPath, configPath);
+      }
+
+      const newRawConfig = await fs.readFile(configPath);
+      const config = JSON.parse(newRawConfig);
 
       // if the launcher has the modloader as an array, convert it to object
       if (Array.isArray(config.modloader)) {
@@ -19,8 +44,8 @@ const getInstances = async instancesPath => {
           loaderType,
           mcVersion,
           loaderVersion,
-          fileId,
-          addonId,
+          projectID,
+          fileID,
           source
         ] = config.modloader;
 
@@ -30,26 +55,33 @@ const getInstances = async instancesPath => {
             loaderType,
             mcVersion,
             ...(loaderVersion && { loaderVersion }),
-            ...(fileId && { fileID: fileId }),
-            ...(addonId && { projectID: addonId }),
-            ...(source && { source })
+            ...(fileID && { fileID }),
+            ...(projectID && { projectID }),
+            ...(!source && fileID && projectID && { source: CURSEFORGE })
           }
         };
+
+        delete patchedConfig.modloader;
 
         await fse.writeFile(configPath, JSON.stringify(patchedConfig));
 
         return { ...patchedConfig, name: instance };
       }
 
-      if (config.loader?.fileId || config.loader?.addonId) {
-        const { fileId, addonId } = config.loader;
+      if (
+        config.loader?.fileId ||
+        config.loader?.addonId ||
+        config.loader?.addonID
+      ) {
+        const { fileId, addonId, addonID } = config.loader;
 
         const patchedConfig = {
           ...config,
           loader: {
             ...config.loader,
             ...(fileId && { fileID: fileId }),
-            ...(addonId && { projectID: addonId })
+            ...(addonId && { projectID: addonId }),
+            ...(addonID && { projectID: addonID })
           }
         };
 

@@ -82,7 +82,6 @@ const RowContainer = styled.div.attrs(props => ({
   .rowCenterContent {
     flex: 1;
     display: flex;
-    justify-content: center;
     align-items: center;
     transition: color 0.1s ease-in-out;
     height: 100%;
@@ -133,6 +132,14 @@ const RowContainerBackground = styled.div`
   filter: brightness(60%);
   transition: opacity 0.1s ease-in-out;
   opacity: ${props => (props.disabled || props.selected ? 1 : 0)};
+`;
+
+const NotItemsAvailable = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const DragEnterEffect = styled.div`
@@ -760,7 +767,7 @@ const Mods = ({ instanceName }) => {
           defaultValue={search}
           onChange={e => setSearch(e.target.value)}
           css={`
-            width: 200px;
+            width: 200px !important;
           `}
           placeholder={`Search ${mods.length} mods`}
         />
@@ -806,6 +813,9 @@ const Mods = ({ instanceName }) => {
             </DragEnterEffect>
           )}
         </Transition>
+        {mods.length === 0 && (
+          <NotItemsAvailable>No Mods Available</NotItemsAvailable>
+        )}
         <AutoSizer>
           {({ height, width }) => (
             <List

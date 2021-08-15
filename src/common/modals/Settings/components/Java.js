@@ -102,7 +102,8 @@ const marks = {
   2048: '2048 MB',
   4096: '4096 MB',
   8192: '8192 MB',
-  16384: '16384 MB'
+  16384: '16384 MB',
+  32768: '32768 MB'
 };
 
 export default function MyAccountPreferences() {
@@ -151,7 +152,8 @@ export default function MyAccountPreferences() {
           `}
         >
           Disable this to specify a custom java path to use instead of using
-          openJDK shipped with GDLauncher. Please select the java.exe binary
+          openJDK shipped with GDLauncher if that is the case select the path to
+          your Java executable.
         </Paragraph>
         <Switch
           color="primary"
@@ -185,8 +187,8 @@ export default function MyAccountPreferences() {
               />
               <Input
                 css={`
-                  width: 75%;
-                  margin: 0 10px;
+                  width: 75% !important;
+                  margin: 0 10px !important;
                 `}
                 onChange={e => dispatch(updateJavaPath(e.target.value))}
                 value={customJavaPath}
@@ -257,6 +259,7 @@ export default function MyAccountPreferences() {
               const h = parseInt(v.split('x')[1], 10);
               dispatch(updateResolution({ height: h, width: w }));
             }}
+            virtual={false}
           >
             {resolutionPresets.map(v => {
               const w = parseInt(v.split('x')[0], 10);
@@ -308,7 +311,7 @@ export default function MyAccountPreferences() {
           }}
           defaultValue={javaMemory}
           min={1024}
-          max={16384}
+          max={process.getSystemMemoryInfo().total / 1024}
           step={512}
           marks={marks}
           valueLabelDisplay="auto"
@@ -341,9 +344,9 @@ export default function MyAccountPreferences() {
             onChange={e => dispatch(updateJavaArguments(e.target.value))}
             value={javaArgs}
             css={`
-              width: 83%;
-              height: 32px;
-              float: left;
+              width: 83% !important;
+              height: 32px !important;
+              float: left !important;
             `}
           />
           <StyledButtons

@@ -159,7 +159,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                     instanceName,
                     {
                       loaderType: selectedVersion[0],
-                      loaderVersion: selectedVersion[2],
+                      mcVersion: selectedVersion[2],
                       ...defaultValue
                     },
                     null,
