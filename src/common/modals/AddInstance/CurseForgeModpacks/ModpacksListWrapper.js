@@ -6,7 +6,7 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import ContentLoader from 'react-content-loader';
 import { transparentize } from 'polished';
 import { openModal } from '../../../reducers/modals/actions';
-import { FORGE, CURSEFORGE } from '../../../utils/constants';
+import { CURSEFORGE } from '../../../utils/constants';
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -86,7 +86,6 @@ const ModpacksListWrapper = ({
           <div
             onClick={() => {
               setVersion({
-                loaderType: FORGE,
                 projectID: modpack.id,
                 fileID: modpack.latestFiles[modpack.latestFiles.length - 1].id,
                 source: CURSEFORGE

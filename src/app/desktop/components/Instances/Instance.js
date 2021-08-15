@@ -14,7 +14,8 @@ import {
   faFolder,
   faTrash,
   faStop,
-  faBoxOpen
+  faBoxOpen,
+  faCopy
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -195,6 +196,9 @@ const Instance = ({ instanceName }) => {
   const instanceExportCurseForge = () => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));
   };
+  const openDuplicateNameDialog = () => {
+    dispatch(openModal('InstanceDuplicateName', { instanceName }));
+  };
   const killProcess = () => {
     console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
@@ -343,6 +347,15 @@ const Instance = ({ instanceName }) => {
               `}
             />
             Export Pack
+          </MenuItem>
+          <MenuItem onClick={openDuplicateNameDialog}>
+            <FontAwesomeIcon
+              icon={faCopy}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Duplicate
           </MenuItem>
           <MenuItem divider />
           <MenuItem
