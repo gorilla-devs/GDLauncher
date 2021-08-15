@@ -144,7 +144,9 @@ export default function MyAccountPreferences() {
             margin-left: 30px;
           `}
           onClick={() => {
-            dispatch(openModal('JavaSetup', { override: true }));
+            dispatch(
+              openModal('JavaSetup', { override: true, preventClose: true })
+            );
           }}
         >
           Run Java Setup again

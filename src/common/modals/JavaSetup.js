@@ -70,7 +70,7 @@ const JavaSetup = ({ override }) => {
       `}
       header={false}
     >
-      {override && (
+      {override && java16Log && java8Log && (
         <CloseButton
           css={`
             position: absolute;
@@ -489,7 +489,7 @@ const AutomaticSetup = ({
     setDownloadPercentage(100);
     setCurrentStepPercentage(100);
     await new Promise(resolve => setTimeout(resolve, 2000));
-    if (!override) dispatch(closeModal());
+    if (!java16Log || !java8Log) dispatch(closeModal());
   };
 
   useEffect(() => {
