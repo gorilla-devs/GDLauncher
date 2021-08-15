@@ -64,7 +64,8 @@ import {
   msAuthenticateXSTS,
   msAuthenticateMinecraft,
   msMinecraftProfile,
-  msOAuthRefresh
+  msOAuthRefresh,
+  getJava16Manifest
 } from '../api';
 import {
   _getCurrentAccount,
@@ -146,6 +147,14 @@ export function initManifests() {
       });
       return java;
     };
+    const getJava16ManifestVersions = async () => {
+      const java = (await getJava16Manifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_JAVA16_MANIFEST,
+        data: java
+      });
+      return java;
+    };
     const getAddonCategoriesVersions = async () => {
       const curseforgeCategories = (await getAddonCategories()).data;
       dispatch({
@@ -176,9 +185,10 @@ export function initManifests() {
       return omitBy(forgeVersions, v => v.length === 0);
     };
     // Using reflect to avoid rejection
-    const [fabric, java, categories, forge] = await Promise.all([
+    const [fabric, java, java16, categories, forge] = await Promise.all([
       reflect(getFabricVersions()),
       reflect(getJavaManifestVersions()),
+      reflect(getJava16ManifestVersions()),
       reflect(getAddonCategoriesVersions()),
       reflect(getForgeVersions())
     ]);
@@ -191,6 +201,7 @@ export function initManifests() {
       mc: mc || app.vanillaManifest,
       fabric: fabric.status ? fabric.v : app.fabricManifest,
       java: java.status ? java.v : app.javaManifest,
+      java16: java16.status ? java16.v : app.java16Manifest,
       categories: categories.status ? categories.v : app.curseforgeCategories,
       forge: forge.status ? forge.v : app.forgeManifest
     };
@@ -1377,7 +1388,7 @@ export function downloadForge(instanceName) {
             `${forgeJson.install.minecraft}.jar`
           ),
           _getLibrariesPath(state),
-          _getJavaPath(state),
+          _getJavaPath(state)(8),
           (d, t) => dispatch(updateDownloadProgress((d * 100) / t))
         );
       }
@@ -2505,10 +2516,24 @@ export const startListener = () => {
   };
 };
 
+export function getJavaVersionForMCVersion(mcVersion) {
+  return (_, getState) => {
+    const { app } = getState();
+    const { versions } = app?.vanillaManifest || {};
+    if (versions) {
+      const version = versions.find(v => v.id === mcVersion);
+      const java16InitialDate = new Date('2021-05-27T09:39:21+00:00');
+      if (new Date(version.releaseTime) < java16InitialDate) {
+        return 8;
+      }
+    }
+    return 16;
+  };
+}
+
 export function launchInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const defaultJavaPath = _getJavaPath(state);
 
     const { userData } = state;
     const account = _getCurrentAccount(state);
@@ -2525,7 +2550,10 @@ export function launchInstance(instanceName) {
       resolution: instanceResolution
     } = _getInstance(state)(instanceName);
 
-    const javaPath = customJavaPath || defaultJavaPath;
+    const defaultJavaPathVersion = _getJavaPath(state)(
+      dispatch(getJavaVersionForMCVersion(loader?.mcVersion))
+    );
+    const javaPath = customJavaPath || defaultJavaPathVersion;
 
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 

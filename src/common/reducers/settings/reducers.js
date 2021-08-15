@@ -98,6 +98,7 @@ function minecraftSettings(
 function java(
   state = {
     path: null,
+    path16: null,
     memory: DEFAULT_MEMORY,
     args: DEFAULT_JAVA_ARGS
   },
@@ -108,8 +109,12 @@ function java(
       return { ...state, args: action.args };
     case ActionTypes.UPDATE_JAVA_MEMORY:
       return { ...state, memory: action.memory };
-    case ActionTypes.UPDATE_JAVA_PATH:
+    case ActionTypes.UPDATE_JAVA_PATH: {
       return { ...state, path: action.path };
+    }
+    case ActionTypes.UPDATE_JAVA16_PATH: {
+      return { ...state, path16: action.path };
+    }
     default:
       return state;
   }
