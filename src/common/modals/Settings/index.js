@@ -146,16 +146,9 @@ export default function Settings() {
               width: 200px;
               position: absolute;
               bottom: 0;
-              margin-bottom: 50px;
+              margin-bottom: 30px;
             `}
           >
-            <div
-              css={`
-                margin-bottom: 20px;
-              `}
-            >
-              <SocialButtons />
-            </div>
             <span
               css={`
                 font-weight: bold;
@@ -190,6 +183,13 @@ export default function Settings() {
               <a href="https://patreon.com/gorilladevs">
                 <img src={PatreonButton} alt="Patreon" />
               </a>
+            </div>
+            <div
+              css={`
+                margin-top: 20px;
+              `}
+            >
+              <SocialButtons />
             </div>
           </div>
         </SideMenu>
