@@ -35,6 +35,11 @@ const data = {
       header: 'We now automatically take care of java16.',
       content:
         'You can now run Minecraft >1.17 without issues!. You can also individually select a manual path for both versions from the settings.'
+    },
+    {
+      header: 'You can now easily duplicate instances.',
+      content:
+        'Just right-click on an instance and duplicate it 😃.'
     }
   ],
   improvements: [
@@ -80,6 +85,10 @@ const data = {
       header:
         "Fixed a bug where we didn't correctly detect the curseforge modloader.",
       content: ''
+    },
+    {
+      header: 'Fixed imports from external sources.',
+      content: 'Both local zips and remote urls should now work correctly.'
     }
   ]
 };
