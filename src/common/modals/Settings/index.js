@@ -146,6 +146,7 @@ export default function Settings() {
               width: 200px;
               position: absolute;
               bottom: 0;
+              margin-bottom: 30px;
             `}
           >
             <span
@@ -159,6 +160,13 @@ export default function Settings() {
             <div
               css={`
                 margin-bottom: 20px;
+              `}
+            >
+              <SocialButtons />
+            </div>
+            <div
+              css={`
+                margin-top: 20px;
               `}
             >
               <SocialButtons />
