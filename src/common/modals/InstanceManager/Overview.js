@@ -14,7 +14,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button, Switch, Slider, Select } from 'antd';
 import { ipcRenderer } from 'electron';
-import { coerce, lte } from 'semver';
 import {
   _getInstancesPath,
   _getInstance,
