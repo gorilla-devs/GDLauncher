@@ -7,21 +7,22 @@ import { transparentize } from 'polished';
 import { useInterval } from 'rooks';
 import makeDir from 'make-dir';
 import { omit } from 'lodash';
-import Modal from '../../components/Modal';
-import { closeModal } from '../../reducers/modals/actions';
-import { _getInstancesPath } from '../../utils/selectors';
-import { updateInstanceConfig } from '../../reducers/actions';
+import Modal from '../components/Modal';
+import { closeModal } from '../reducers/modals/actions';
+import { _getInstance, _getInstancesPath } from '../utils/selectors';
+import { updateInstanceConfig } from '../reducers/actions';
 
 const InstanceDuplicateName = ({ instanceName }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const oldInstanceName = instanceName;
   const instancesPath = useSelector(_getInstancesPath);
+  const oldInstance = useSelector(state => _getInstance(state)(instanceName));
   const [newInstanceName, setNewInstanceName] = useState(
     `${oldInstanceName} copy`
   );
   const [alreadyExists, setAlreadyExists] = useState(false);
-  const [invalidName, setInvalidName] = useState(true);
+  const [invalidName, setInvalidName] = useState(false);
 
   useEffect(() => {
     if (newInstanceName) {
@@ -61,32 +62,17 @@ const InstanceDuplicateName = ({ instanceName }) => {
     start();
     await makeDir(path.join(instancesPath, newInstanceName));
 
-    // Copy the old config file, so the launcher can detect the instance
-    await fse.copy(
-      path.join(instancesPath, oldInstanceName, 'config.json'),
-      path.join(instancesPath, newInstanceName, 'config.json')
-    );
-
     // Copy the old instance to the new instance folder
     await fse.copy(
       path.join(instancesPath, oldInstanceName),
       path.join(instancesPath, newInstanceName)
     );
 
-    // Remove curseforge manifest if one exists
-    await fse.unlink(
-      path.join(instancesPath, newInstanceName, 'manifest.json'),
-      err => {
-        if (err && err.code !== 'ENOENT') {
-          console.error(err);
-        }
-      }
-    );
-
     // Reset the time played back to 0
     dispatch(
       updateInstanceConfig(newInstanceName, prev => ({
-        ...omit(prev, path.join('loaderType', 'source')),
+        ...oldInstance,
+        name: newInstanceName,
         timePlayed: 0,
         lastPlayed: 0
       }))
@@ -94,17 +80,16 @@ const InstanceDuplicateName = ({ instanceName }) => {
 
     setLoading(false);
   };
-  const closeModalWindow = () => !loading && dispatch(closeModal());
   return (
     <Modal
       css={`
-        height: 36%;
-        width: 50%;
+        height: 230px;
+        width: 550px;
         max-width: 550px;
         max-height: 235px;
         overflow-x: hidden;
       `}
-      title="Enter Name For New Instance"
+      title={`Duplicate Instance "${oldInstanceName}"`}
     >
       <div
         css={`
@@ -113,11 +98,7 @@ const InstanceDuplicateName = ({ instanceName }) => {
           justify-content: center;
         `}
       >
-        <p
-          css={`
-            text-align: center;
-          `}
-        >
+        <p>
           Please enter a new name for your copy of <b>{oldInstanceName}</b>
         </p>
         <Input
@@ -156,28 +137,18 @@ const InstanceDuplicateName = ({ instanceName }) => {
       </div>
       <div
         css={`
-          margin-top: 10px;
           display: flex;
           width: 100%;
-          justify-content: space-between;
+          justify-content: flex-end;
         `}
       >
-        <a
-          css={`
-            margin-top: 7px;
-            color: #54636d;
-          `}
-          disabled={loading}
-          onClick={closeModalWindow}
-        >
-          Cancel
-        </a>
         <Button
           onClick={duplicateInstance}
           loading={loading}
           disabled={invalidName || alreadyExists}
+          type="primary"
         >
-          Copy
+          Duplicate Instance
         </Button>
       </div>
     </Modal>
