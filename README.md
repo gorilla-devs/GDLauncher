@@ -14,21 +14,22 @@
 </summary>
 
 - [GDLauncher](#gdlauncher)
+  - [🦺 Support this project](#-support-this-project)
   - [🎮 What is GDLauncher](#-what-is-gdlauncher)
-  - [⚡️ Comparison with Twitch Launcher](#-comparison-with-twitch-launcher)
+  - [⚡️ Comparison with Twitch Launcher](#️-comparison-with-twitch-launcher)
   - [🚀 Getting Started](#-getting-started)
   - [🎮 Download](#-download)
   - [🎨 Features](#-features)
-    - [Our features:](#our-features)
-    - [You can also:](#you-can-also)
-    - [Some of the features we are still working on are:](#some-of-the-features-we-are-still-working-on-are)
+      - [Our features:](#our-features)
+      - [You can also:](#you-can-also)
+      - [Some of the features we are still working on are:](#some-of-the-features-we-are-still-working-on-are)
   - [💾 Compilation](#-compilation)
-    - [⚙️ Requirements](#%EF%B8%8F-requirements)
-    - [▶️ Steps](#%EF%B8%8F-steps)
+    - [⚙️ Requirements](#️-requirements)
+    - [▶️ Steps](#️-steps)
     - [🚚 Packaging](#-packaging)
   - [🚀 Technologies](#-technologies)
   - [🎁 Contributing](#-contributing)
-  - [❤️ Author](#-author)
+  - [❤️ Author](#️-author)
   - [📜 History](#-history)
   - [🎓 License](#-license)
   </details>
@@ -179,6 +180,6 @@ This project is licensed under the GNU GPL V3.0 - see the [LICENSE](LICENSE) fil
 
 If you need GDLauncher licensed under different conditions, please contact davide@gdevs.io
 
-A simple way to keep in terms of the license is by forking this repository and leaving it open source under the same license. We love free software, seeing people use our code and then not share the code, breaking the license, is saddening. So please take a look at the license and respect what we're doing.
+You are free to clone the repository and do whatever you want as long as you stick to the license above, just be aware that most of the assets available in the repository are licensed differently (check [COPYING.md](COPYING.md)) so you are not allowed to redistribute those. Also keep in mind that some features will not be working unless you set them up yourself (such as analytics, error tracking..) because the private API keys are stored secretly.
 
-Also, while we cannot enforce this under the license, you cannot use our CDN/files/assets on your own launcher. Again we cannot enforce this under the license, but needless to say, we'd be very unhappy if you did that and really would like to leave cease and desist letters as a last resort.
+We do not encourage clones of this project (to avoid fragmentation) so don't expect any help from us when trying to do that. We, however, encourage collaboration and growth on this official project and you're more than welcome to contribute.

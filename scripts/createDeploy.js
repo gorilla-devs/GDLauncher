@@ -100,6 +100,7 @@ const createDeployFiles = async () => {
 };
 
 const commonConfig = {
+  publish: 'never',
   config: {
     generateUpdatesFilesForAllChannels: true,
     npmRebuild: false,
@@ -184,16 +185,16 @@ const commonConfig = {
       }
     ]
   },
-  ...((!process.env.RELEASE_TESTING || process.platform === 'linux') && {
+  ...(process.platform === 'linux' && {
     linux:
       type === 'setup'
         ? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
         : ['snap:x64']
   }),
-  ...((!process.env.RELEASE_TESTING || process.platform === 'win32') && {
+  ...(process.platform === 'win32' && {
     win: [type === 'setup' ? 'nsis:x64' : 'zip:x64']
   }),
-  ...((!process.env.RELEASE_TESTING || process.platform === 'darwin') && {
+  ...(process.platform === 'darwin' && {
     mac: type === 'setup' ? ['dmg:x64'] : []
   })
 };
@@ -203,10 +204,7 @@ const main = async () => {
   await fse.remove(releasesFolder);
   await makeDir(deployFolder);
   await electronBuilder.build(commonConfig);
-  if (
-    type === 'portable' &&
-    (process.platform === 'win32' || !process.env.RELEASE_TESTING)
-  ) {
+  if (type === 'portable' && process.platform === 'win32') {
     await createDeployFiles();
   }
 
@@ -241,41 +239,19 @@ const main = async () => {
     }
   };
 
-  if (!process.env.RELEASE_TESTING) {
-    const filesToMove = allFiles[type];
+  const filesToMove = allFiles[type][process.platform];
 
-    await Promise.all(
-      Object.values(filesToMove).map(async target => {
-        return Promise.all(
-          target.map(async file => {
-            const stats = await fs.promises.stat(
-              path.join(releasesFolder, file)
-            );
-            if (stats.isFile()) {
-              await fse.move(
-                path.join(releasesFolder, file),
-                path.join(deployFolder, file.replace('nsis-web', ''))
-              );
-            }
-          })
+  await Promise.all(
+    filesToMove.map(async file => {
+      const stats = await fs.promises.stat(path.join(releasesFolder, file));
+      if (stats.isFile()) {
+        await fse.move(
+          path.join(releasesFolder, file),
+          path.join(deployFolder, file.replace('nsis-web', ''))
         );
-      })
-    );
-  } else {
-    const filesToMove = allFiles[type][process.platform];
-
-    await Promise.all(
-      filesToMove.map(async file => {
-        const stats = await fs.promises.stat(path.join(releasesFolder, file));
-        if (stats.isFile()) {
-          await fse.move(
-            path.join(releasesFolder, file),
-            path.join(deployFolder, file.replace('nsis-web', ''))
-          );
-        }
-      })
-    );
-  }
+      }
+    })
+  );
 
   await fse.remove(releasesFolder);
 };

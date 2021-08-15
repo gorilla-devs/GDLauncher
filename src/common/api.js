@@ -267,19 +267,21 @@ export const getSearch = (
   sort,
   isSortDescending,
   gameVersion,
-  categoryId
+  categoryId,
+  modLoaderType
 ) => {
   const url = `${FORGESVC_URL}/addon/search`;
   const params = {
     gameId: 432,
-    sectionId: type === 'mods' ? 6 : 4471,
     categoryId: categoryId || 0,
     pageSize,
+    index,
     sort,
     isSortDescending,
-    index,
-    searchFilter,
-    gameVersion: gameVersion || ''
+    gameVersion: gameVersion || '',
+    ...(modLoaderType === 'fabric' && { modLoaderType: 4 }),
+    sectionId: type === 'mods' ? 6 : 4471,
+    searchFilter
   };
   return axios.get(url, { params });
 };
