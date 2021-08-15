@@ -45,6 +45,7 @@ jobs:
           APPVEYOR_REPO_TAG_NAME: ''
           CIRCLE_TAG: ''
           BITRISE_GIT_TAG: ''
+          GITHUB_ACTIONS: ''
           CI_BUILD_TAG: ''
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
@@ -58,6 +59,7 @@ jobs:
           TRAVIS_TAG: ''
           APPVEYOR_REPO_TAG_NAME: ''
           CIRCLE_TAG: ''
+          GITHUB_ACTIONS: ''
           BITRISE_GIT_TAG: ''
           CI_BUILD_TAG: ''
           GA_ID: ${{ secrets.GA_ID }}
