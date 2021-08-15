@@ -203,6 +203,7 @@ const main = async () => {
   const releasesFolder = path.resolve(__dirname, '../', './release');
   await fse.remove(releasesFolder);
   await makeDir(deployFolder);
+  console.log(process.env);
   await electronBuilder.build(commonConfig);
   if (type === 'portable' && process.platform === 'win32') {
     await createDeployFiles();
