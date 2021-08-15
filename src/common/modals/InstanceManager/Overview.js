@@ -541,7 +541,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             </JavaManagerRow>
           )}
           <JavaManagerRow>
-            <div>Custom Java Path</div>
+            <div>Custom Java Path {`<Java ${javaVersion}>`} </div>
             <Switch
               checked={customJavaPath}
               onChange={v => {

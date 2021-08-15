@@ -22,9 +22,9 @@ import {
 import { _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { updateJava16Path, updateJavaPath } from '../reducers/settings/actions';
-import CloseButton from '../components/CloseButton';
+import { UPDATE_MODAL } from '../reducers/modals/actionTypes';
 
-const JavaSetup = ({ override }) => {
+const JavaSetup = () => {
   const [step, setStep] = useState(0);
   const [choice, setChoice] = useState(null);
   const [isJava8Downloaded, setIsJava8Downloaded] = useState(null);
@@ -38,8 +38,6 @@ const JavaSetup = ({ override }) => {
     java16: java16Manifest,
     java: javaManifest
   };
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     isLatestJavaDownloaded(manifests, userData, true, 8)
@@ -70,17 +68,6 @@ const JavaSetup = ({ override }) => {
       `}
       header={false}
     >
-      {override && java16Log && java8Log && (
-        <CloseButton
-          css={`
-            position: absolute;
-            top: 0;
-            right: 0;
-            z-index: 10;
-          `}
-          onClick={() => dispatch(closeModal())}
-        />
-      )}
       <Transition in={step === 0} timeout={200}>
         {state => (
           <FirstStep state={state}>
@@ -213,7 +200,6 @@ const JavaSetup = ({ override }) => {
                 isJava16Downloaded={isJava16Downloaded}
                 java8Log={java8Log}
                 java16Log={java16Log}
-                override={override}
               />
             ) : (
               <ManualSetup setStep={setStep} />
@@ -337,8 +323,7 @@ const AutomaticSetup = ({
   isJava8Downloaded,
   isJava16Downloaded,
   java8Log,
-  java16Log,
-  override
+  java16Log
 }) => {
   const [downloadPercentage, setDownloadPercentage] = useState(0);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
@@ -347,10 +332,30 @@ const AutomaticSetup = ({
   const java16Manifest = useSelector(state => state.app.java16Manifest);
   const userData = useSelector(state => state.userData);
   const tempFolder = useSelector(_getTempPath);
+  const modals = useSelector(state => state.modals);
   const dispatch = useDispatch();
 
   const theme = useTheme();
   const javaToInstall = [];
+  useEffect(() => {
+    if (javaToInstall.length > 0) {
+      const instanceManagerModalIndex = modals.findIndex(
+        x => x.modalType === 'JavaSetup'
+      );
+
+      dispatch({
+        type: UPDATE_MODAL,
+        modals: [
+          ...modals.slice(0, instanceManagerModalIndex),
+          {
+            modalType: 'JavaSetup',
+            modalProps: { preventClose: true }
+          },
+          ...modals.slice(instanceManagerModalIndex + 1)
+        ]
+      });
+    }
+  }, []);
 
   if (!isJava8Downloaded) javaToInstall.push(8);
 
@@ -569,6 +574,19 @@ const AutomaticSetup = ({
             <code>{java16Log}</code>
           </div>
         </div>
+      )}
+      {java16Log && java8Log && (
+        <Button
+          css={`
+            position: absolute;
+            bottom: 0;
+            right: 0;
+          `}
+          type="primary"
+          onClick={() => dispatch(closeModal())}
+        >
+          Close
+        </Button>
       )}
     </div>
   );
