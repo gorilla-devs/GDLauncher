@@ -49,7 +49,7 @@ const Notes = ({ instanceName }) => {
           value={value}
           onChange={notes => {
             setValue(notes);
-            updateNotes.callback(notes);
+            updateNotes(notes);
           }}
         >
           <Toolbar>

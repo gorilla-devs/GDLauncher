@@ -21,8 +21,8 @@ const {
   default: { fromBase64: toBase64URL }
 } = require('base64url');
 const { URL } = require('url');
-const murmur = require('./native/murmur2.js');
-const nsfw = require('./native/nsfw.js');
+const murmur = require('./native/murmur2');
+const nsfw = require('./native/nsfw');
 
 const fs = fss.promises;
 
@@ -68,34 +68,81 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
-const edit = {
-  label: 'Edit',
-  submenu: [
-    {
-      label: 'Cut',
-      accelerator: 'CmdOrCtrl+X',
-      selector: 'cut:'
-    },
-    {
-      label: 'Copy',
-      accelerator: 'CmdOrCtrl+C',
-      selector: 'copy:'
-    },
-    {
-      label: 'Paste',
-      accelerator: 'CmdOrCtrl+V',
-      selector: 'paste:'
-    },
-    {
-      label: 'Select All',
-      accelerator: 'CmdOrCtrl+A',
-      selector: 'selectAll:'
-    }
-  ]
-};
+const edit = [
+  ...(process.platform === 'darwin'
+    ? [
+        {
+          label: 'GDLauncher',
+          submenu: [
+            {
+              label: 'About GDLauncher',
+              role: 'about'
+            },
+            { type: 'separator' },
+            {
+              label: 'Services',
+              role: 'services',
+              submenu: []
+            },
+            { type: 'separator' },
+            {
+              label: 'Hide GDLauncher',
+              accelerator: 'Command+H',
+              role: 'hide'
+            },
+            {
+              label: 'Hide Others',
+              accelerator: 'Command+Alt+H',
+              role: 'hideOthers'
+            },
+            {
+              label: 'Show All',
+              role: 'unhide'
+            },
+            { type: 'separator' },
+            {
+              label: 'Quit GDLauncher',
+              accelerator: 'Command+Q',
+              click: () => {
+                app.quit();
+              }
+            }
+          ]
+        }
+      ]
+    : []),
+  {
+    label: 'Edit',
+    submenu: [
+      {
+        label: 'Cut',
+        accelerator: 'CmdOrCtrl+X',
+        selector: 'cut:'
+      },
+      {
+        label: 'Copy',
+        accelerator: 'CmdOrCtrl+C',
+        selector: 'copy:'
+      },
+      {
+        label: 'Paste',
+        accelerator: 'CmdOrCtrl+V',
+        selector: 'paste:'
+      },
+      {
+        label: 'Select All',
+        accelerator: 'CmdOrCtrl+A',
+        selector: 'selectAll:'
+      },
+      { type: 'separator' },
+      { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+      { label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' }
+    ]
+  }
+];
 
 // app.allowRendererProcessReuse = true;
-Menu.setApplicationMenu(Menu.buildFromTemplate([edit]));
+Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
 
 let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
 
@@ -157,7 +204,7 @@ async function extract7z() {
 
   let zipLocationAsar = path.join(baseDir, 'linux', 'x64', '7za');
   if (process.platform === 'darwin') {
-    zipLocationAsar = path.join(baseDir, 'mac', '7za');
+    zipLocationAsar = path.join(baseDir, 'mac', 'x64', '7za');
   }
   if (process.platform === 'win32') {
     zipLocationAsar = path.join(baseDir, 'win', 'x64', '7za.exe');
@@ -203,6 +250,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
+      sandbox: false,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
     }

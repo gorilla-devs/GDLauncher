@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
-import { Input, Button } from 'antd';
+import { Input, Button, Menu } from 'antd';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from '../components/Modal';
@@ -15,7 +15,7 @@ const AddAccount = ({ username }) => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState(username || '');
   const [password, setPassword] = useState('');
-  const [accountType, setAccountType] = useState('');
+  const [accountType, setAccountType] = useState(ACCOUNT_MOJANG);
   const [loginFailed, setloginFailed] = useState();
 
   const addAccount = () => {
@@ -96,44 +96,39 @@ const AddAccount = ({ username }) => {
     </Container>
   );
 
-  const renderChooseAccountType = () => (
-    <Container>
-      <FormContainer>
-        <h1
-          css={`
-            height: 80px;
-          `}
+  return (
+    <Modal
+      css={`
+        height: 450px;
+        width: 420px;
+      `}
+      title=" "
+    >
+      <Container>
+        <Menu
+          mode="horizontal"
+          selectedKeys={[accountType]}
+          overflowedIndicator={null}
         >
-          Choose Login Type
-        </h1>
-        <FormContainer>
-          <StyledAccountButton onClick={() => setAccountType(ACCOUNT_MOJANG)}>
+          <StyledAccountMenuItem
+            key={ACCOUNT_MOJANG}
+            onClick={() => setAccountType(ACCOUNT_MOJANG)}
+          >
             Mojang Account
-          </StyledAccountButton>
-          <StyledAccountButton
+          </StyledAccountMenuItem>
+          <StyledAccountMenuItem
+            key={ACCOUNT_MICROSOFT}
             onClick={() => {
               setAccountType(ACCOUNT_MICROSOFT);
               addMicrosoftAccount();
             }}
           >
             Microsoft Account
-          </StyledAccountButton>
-        </FormContainer>
-      </FormContainer>
-    </Container>
-  );
-
-  return (
-    <Modal
-      css={`
-        height: 400px;
-        width: 400px;
-      `}
-      title=" "
-    >
-      {accountType === '' ? renderChooseAccountType() : null}
-      {accountType === ACCOUNT_MOJANG ? renderAddMojangAccount() : null}
-      {accountType === ACCOUNT_MICROSOFT ? renderAddMicrosoftAccount() : null}
+          </StyledAccountMenuItem>
+        </Menu>
+        {accountType === ACCOUNT_MOJANG ? renderAddMojangAccount() : null}
+        {accountType === ACCOUNT_MICROSOFT ? renderAddMicrosoftAccount() : null}
+      </Container>
     </Modal>
   );
 };
@@ -145,23 +140,21 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledInput = styled(Input)`
-  margin-bottom: 20px;
+  margin-bottom: 20px !important;
 `;
 
 const LoginFailMessage = styled.div`
   color: ${props => props.theme.palette.colors.red};
 `;
 
-const StyledAccountButton = styled(StyledButton)`
+const StyledAccountMenuItem = styled(Menu.Item)`
   width: auto;
   height: auto;
-  font-size: 24px;
-  margin: 10px 0;
+  font-size: 18px;
 `;
 
 const FormContainer = styled.div`
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;

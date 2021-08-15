@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { closeModal } from '../reducers/modals/actions';
 import AsyncComponent from './AsyncComponent';
-import AddInstance from '../modals/AddInstance';
 import Settings from '../modals/Settings';
 
 const Overlay = styled.div`
@@ -34,7 +33,7 @@ const Modal = styled.div`
 `;
 
 const modalsComponentLookupTable = {
-  AddInstance,
+  AddInstance: AsyncComponent(lazy(() => import('../modals/AddInstance'))),
   AccountsManager: AsyncComponent(
     lazy(() => import('../modals/AccountsManager'))
   ),
@@ -55,6 +54,9 @@ const modalsComponentLookupTable = {
   ),
   InstanceExportCurseForge: AsyncComponent(
     lazy(() => import('../modals/InstanceExport/CurseForge'))
+  ),
+  InstanceDuplicateName: AsyncComponent(
+    lazy(() => import('../modals/InstanceDuplicateName'))
   ),
   AutoUpdatesNotAvailable: AsyncComponent(
     lazy(() => import('../modals/AutoUpdatesNotAvailable'))
@@ -78,7 +80,13 @@ const modalsComponentLookupTable = {
   )
 };
 
-const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
+const ModalContainer = ({
+  unmounting,
+  children,
+  preventClose,
+  modalType,
+  closeCallback
+}) => {
   const [modalStyle, setModalStyle] = useState({
     transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
     opacity: 0
@@ -111,6 +119,7 @@ const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
       }, 500);
       return;
     }
+    if (closeCallback) closeCallback();
     dispatch(closeModal());
   };
 
@@ -158,6 +167,7 @@ const ModalsManager = () => {
         unmounting={unmounting}
         key={modalType}
         preventClose={modalProps.preventClose}
+        closeCallback={modalProps.abortCallback}
         modalType={modalType}
       >
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}

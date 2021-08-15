@@ -174,7 +174,9 @@ const ModsListWrapper = ({
 
         <RowInnerContainer>
           <RowContainerImg
-            style={{ background: `url('${primaryImage?.thumbnailUrl}')` }}
+            style={{
+              background: `url('${primaryImage?.thumbnailUrl}') center center`
+            }}
           />
           <div
             css={`
@@ -358,7 +360,7 @@ const createItemData = memoize(
 
 let lastRequest;
 const ModsBrowser = ({ instanceName, gameVersion }) => {
-  const itemsNumber = 63;
+  const itemsNumber = 50;
 
   const [mods, setMods] = useState([]);
   const [areModsLoading, setAreModsLoading] = useState(true);
@@ -407,7 +409,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         filterType,
         filterType !== 'Author' && filterType !== 'Name',
         gameVersion,
-        getPatchedInstanceType(instance) === FABRIC ? 4780 : null
+        0,
+        getPatchedInstanceType(instance)
       ));
     } catch (err) {
       setError(err);
@@ -443,12 +446,13 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         <Header>
           <Select
             css={`
-              width: 160px;
-              margin: 0 10px;
+              width: 160px !important;
+              margin: 0 10px !important;
             `}
             defaultValue={filterType}
             onChange={setFilterType}
             disabled={areModsLoading}
+            virtual={false}
           >
             <Select.Option value="Featured">Featured</Select.Option>
             <Select.Option value="Popularity">Popularity</Select.Option>
@@ -459,13 +463,13 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
           </Select>
           <Input
             css={`
-              height: 32px;
+              height: 32px !important;
             `}
             placeholder="Search for a mod"
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
-              loadMoreModsDebounced.callback(e.target.value, true);
+              loadMoreModsDebounced(e.target.value, true);
             }}
             allowClear
           />

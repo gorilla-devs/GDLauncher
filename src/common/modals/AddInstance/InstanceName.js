@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import path from 'path';
+import os from 'os';
 import fse from 'fs-extra';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition } from 'react-transition-group';
@@ -13,11 +14,12 @@ import {
 import { Input } from 'antd';
 import { transparentize } from 'polished';
 import { addToQueue } from '../../reducers/actions';
-import { closeModal } from '../../reducers/modals/actions';
+import { closeModal, openModal } from '../../reducers/modals/actions';
 import {
   downloadAddonZip,
   importAddonZip,
-  convertcurseForgeToCanonical
+  convertcurseForgeToCanonical,
+  extractFabricVersionFromManifest,
 } from '../../../app/desktop/utils';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
@@ -99,13 +101,12 @@ const InstanceName = ({
 
     const initTimestamp = Date.now();
 
-    const isVanilla = version?.loaderType === VANILLA;
-    const isFabric = version?.loaderType === FABRIC;
-    const isForge = version?.loaderType === FORGE;
     const isCurseForgeModpack = Boolean(modpack?.attachments);
     const isFTBModpack = Boolean(modpack?.art);
     let manifest;
 
+    // If it's a curseforge modpack grab the manfiest and detect the loader
+    // type as we don't yet know what it is.
     if (isCurseForgeModpack) {
       if (importZipPath) {
         manifest = await importAddonZip(
@@ -123,6 +124,28 @@ const InstanceName = ({
         );
       }
 
+      const isForgeModpack = (manifest?.minecraft?.modLoaders || []).some(
+        v => v.id.includes(FORGE) && v.primary
+      );
+
+      const isFabricModpack = (manifest?.minecraft?.modLoaders || []).some(
+        v => v.id.includes(FABRIC) && v.primary
+      );
+
+      if (isForgeModpack) {
+        version.loaderType = FORGE;
+      } else if (isFabricModpack) {
+        version.loaderType = FABRIC;
+      } else {
+        version.loaderType = VANILLA;
+      }
+    }
+
+    const isVanilla = version?.loaderType === VANILLA;
+    const isFabric = version?.loaderType === FABRIC;
+    const isForge = version?.loaderType === FORGE;
+
+    if (isCurseForgeModpack) {
       if (imageURL) {
         await downloadFile(
           path.join(
@@ -134,9 +157,9 @@ const InstanceName = ({
         );
       }
 
-      if (version?.loaderType === FORGE) {
+      if (isForge) {
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: FORGE,
           mcVersion: manifest.minecraft.version,
           loaderVersion: convertcurseForgeToCanonical(
             manifest.minecraft.modLoaders.find(v => v.primary).id,
@@ -156,12 +179,12 @@ const InstanceName = ({
             imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
-      } else if (version?.loaderType === FABRIC) {
+      } else if (isFabric) {
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: FABRIC,
           mcVersion: manifest.minecraft.version,
-          loaderVersion: manifest.minecraft.modLoaders[0].yarn,
-          fileID: manifest.minecraft.modLoaders[0].loader,
+          loaderVersion: extractFabricVersionFromManifest(manifest),
+          fileID: version?.fileID,
           projectID: version?.projectID,
           source: version?.source
         };
@@ -170,12 +193,12 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            `background${path.extname(imageURL)}`
+            imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
-      } else if (version?.loaderType === VANILLA) {
+      } else if (isVanilla) {
         const loader = {
-          loaderType: version?.loaderType,
+          loaderType: VANILLA,
           mcVersion: manifest.minecraft.version,
           loaderVersion: version?.loaderVersion,
           fileID: version?.fileID
@@ -186,7 +209,7 @@ const InstanceName = ({
             localInstanceName,
             loader,
             manifest,
-            `background${path.extname(imageURL)}`
+            imageURL ? `background${path.extname(imageURL)}` : null
           )
         );
       }
@@ -200,19 +223,48 @@ const InstanceName = ({
 
       const forgeModloader = data.targets.find(v => v.type === 'modloader');
       const mcVersion = data.targets.find(v => v.type === 'game').version;
-
       const loader = {
         loaderType: forgeModloader?.name,
         mcVersion,
-        loaderVersion: convertcurseForgeToCanonical(
-          forgeModloader?.version,
-          mcVersion,
-          forgeManifest
-        ),
+        loaderVersion:
+          data.targets[0].name === FABRIC
+            ? forgeModloader?.version
+            : convertcurseForgeToCanonical(
+                forgeModloader?.version,
+                mcVersion,
+                forgeManifest
+              ),
         fileID: version?.fileID,
         projectID: version?.projectID,
         source: FTB
       };
+
+      let ramAmount = null;
+
+      const userMemory = Math.round(os.totalmem() / 1024 / 1024);
+
+      if (userMemory < data?.specs?.minimum) {
+        try {
+          await new Promise((resolve, reject) => {
+            dispatch(
+              openModal('ActionConfirmation', {
+                message: `At least ${data?.specs?.minimum}MB of RAM are required to play this modpack and you only have ${userMemory}MB. You might still be able to play it but probably with low performance. Do you want to continue?`,
+                confirmCallback: () => resolve(),
+                abortCallback: () => reject(),
+                title: 'Low Memory Warning'
+              })
+            );
+          });
+        } catch {
+          setClicked(false);
+          return;
+        }
+      }
+      if (userMemory >= data?.specs?.recommended) {
+        ramAmount = data?.specs?.recommended;
+      } else if (userMemory >= data?.specs?.minimum) {
+        ramAmount = data?.specs?.minimum;
+      }
 
       await downloadFile(
         path.join(
@@ -228,7 +280,9 @@ const InstanceName = ({
           localInstanceName,
           loader,
           data,
-          `background${path.extname(imageURL)}`
+          `background${path.extname(imageURL)}`,
+          null,
+          ramAmount ? { javaMemory: ramAmount } : null
         )
       );
     } else if (importZipPath) {
@@ -361,10 +415,10 @@ const InstanceName = ({
                       onChange={e => setInstanceName(e.target.value)}
                       css={`
                         opacity: ${({ state }) =>
-                          state === 'entering' || state === 'entered' ? 0 : 1};
-                        transition: 0.1s ease-in-out;
-                        width: 300px;
-                        align-self: center;
+                          state === 'entering' || state === 'entered' ? 0 : 1} !important;
+                        transition: 0.1s ease-in-out !important;
+                        width: 300px !important;
+                        align-self: center !important;
                       `}
                     />
                     <div

@@ -31,6 +31,10 @@ class GAnalytics {
     queue('send', 'event', 'idleForFiveMinutes', page);
   }
 
+  sendCustomEvent(eventName) {
+    queue('send', 'event', eventName, this.curPage);
+  }
+
   /* eslint-disable */
   setProperties(hash) {
     for (const key in hash) {

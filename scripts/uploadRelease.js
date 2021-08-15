@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const fse = require('fs-extra');
-const pMap = require('p-map');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -66,48 +65,44 @@ const main = async () => {
 
   console.log(`Found ${deployFiles.length} files to upload.`);
   let uploaded = 0;
-  await pMap(
-    deployFiles,
-    async file => {
-      const fileUploadUrl = uploadUrl.replace('{?name,label}', `?name=${file}`);
-      const stats = await stat(path.join(deployFolder, file));
-      const buffer = await fs.promises.readFile(path.join(deployFolder, file));
+  for (const file of deployFiles) {
+    const fileUploadUrl = uploadUrl.replace('{?name,label}', `?name=${file}`);
+    const stats = await stat(path.join(deployFolder, file));
+    const buffer = await fs.promises.readFile(path.join(deployFolder, file));
 
-      let contentType = null;
+    let contentType = null;
 
-      switch (path.extname(file)) {
-        case '.gz':
-          contentType = 'application/gzip';
-          break;
-        case '.zip':
-          contentType = 'application/zip';
-          break;
-        case '.json':
-          contentType = 'application/json';
-          break;
-        default:
-          contentType = 'application/octet-stream';
-      }
+    switch (path.extname(file)) {
+      case '.gz':
+        contentType = 'application/gzip';
+        break;
+      case '.zip':
+        contentType = 'application/zip';
+        break;
+      case '.json':
+        contentType = 'application/json';
+        break;
+      default:
+        contentType = 'application/octet-stream';
+    }
 
-      try {
-        await axios.default.post(fileUploadUrl, buffer, {
-          headers: {
-            'Content-Length': stats.size,
-            'Content-Type': contentType,
-            Authorization: `token ${process.env.GH_ACCESS_TOKEN_RELEASES}`
-          },
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity
-        });
-      } catch (err) {
-        console.error(err.message);
-        throw err;
-      }
-      uploaded += 1;
-      console.log(`Uploaded ${uploaded} / ${deployFiles.length} -- ${file}`);
-    },
-    { concurrency: 5 }
-  );
+    try {
+      await axios.default.post(fileUploadUrl, buffer, {
+        headers: {
+          'Content-Length': stats.size,
+          'Content-Type': contentType,
+          Authorization: `token ${process.env.GH_ACCESS_TOKEN_RELEASES}`
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      });
+    } catch (err) {
+      console.error(err.message);
+      throw err;
+    }
+    uploaded += 1;
+    console.log(`Uploaded ${uploaded} / ${deployFiles.length} -- ${file}`);
+  }
 };
 
 main().catch(err => {
