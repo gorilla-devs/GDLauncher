@@ -273,7 +273,7 @@ export const getSearch = (
     sort,
     isSortDescending,
     gameVersion: gameVersion || '',
-    modLoaderType: modLoaderType === 'fabric' && 4,
+    ...(modLoaderType === 'fabric' && { modLoaderType: 4 }),
     sectionId: type === 'mods' ? 6 : 4471,
     searchFilter
   };
