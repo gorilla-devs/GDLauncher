@@ -203,6 +203,8 @@ const main = async () => {
   const releasesFolder = path.resolve(__dirname, '../', './release');
   await fse.remove(releasesFolder);
   await makeDir(deployFolder);
+  const ci = require('ci-info');
+  console.log('Teesting CI:', ci.name, ci.isCI);
   console.log(process.env);
   await electronBuilder.build(commonConfig);
   if (type === 'portable' && process.platform === 'win32') {
