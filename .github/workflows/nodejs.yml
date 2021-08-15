@@ -40,12 +40,12 @@ jobs:
       - name: npm run release for windows
         if: matrix.os == 'windows-latest' && github.event_name == 'push'
         env:
-          CI: false
-          TRAVIS_TAG: false
-          APPVEYOR_REPO_TAG_NAME: false
-          CIRCLE_TAG: false
-          BITRISE_GIT_TAG: false
-          CI_BUILD_TAG: false
+          CI: ''
+          TRAVIS_TAG: ''
+          APPVEYOR_REPO_TAG_NAME: ''
+          CIRCLE_TAG: ''
+          BITRISE_GIT_TAG: ''
+          CI_BUILD_TAG: ''
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           GA_ID: ${{ secrets.GA_ID }}
@@ -54,12 +54,12 @@ jobs:
       - name: npm run release for mac and linux
         if: matrix.os != 'windows-latest' || github.event_name != 'push'
         env:
-          CI: false
-          TRAVIS_TAG: false
-          APPVEYOR_REPO_TAG_NAME: false
-          CIRCLE_TAG: false
-          BITRISE_GIT_TAG: false
-          CI_BUILD_TAG: false
+          CI: ''
+          TRAVIS_TAG: ''
+          APPVEYOR_REPO_TAG_NAME: ''
+          CIRCLE_TAG: ''
+          BITRISE_GIT_TAG: ''
+          CI_BUILD_TAG: ''
           GA_ID: ${{ secrets.GA_ID }}
         run: |
           npm run release
