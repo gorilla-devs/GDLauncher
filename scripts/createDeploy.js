@@ -100,7 +100,7 @@ const createDeployFiles = async () => {
 };
 
 const commonConfig = {
-  publish: [],
+  publish: 'never',
   config: {
     generateUpdatesFilesForAllChannels: true,
     npmRebuild: false,
