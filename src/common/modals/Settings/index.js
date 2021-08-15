@@ -159,10 +159,30 @@ export default function Settings() {
             </span>
             <div
               css={`
-                margin-bottom: 20px;
+                img {
+                  border-radius: 30px;
+                  height: 40px;
+                  cursor: pointer;
+                  transition: transform 0.2s ease-in-out;
+                  &:hover {
+                    transform: scale(1.05);
+                  }
+                }
               `}
             >
-              <SocialButtons />
+              <a href="https://ko-fi.com/gdlauncher">
+                <img
+                  src={KoFiButton}
+                  alt="Ko-Fi"
+                  css={`
+                    margin-bottom: 20px;
+                    margin-top: 20px;
+                  `}
+                />
+              </a>
+              <a href="https://patreon.com/gorilladevs">
+                <img src={PatreonButton} alt="Patreon" />
+              </a>
             </div>
             <div
               css={`

@@ -307,6 +307,9 @@ export const isLatestJavaDownloaded = async (
 
     isValid = false;
   }
+  // Return stderr because that garbage of a language which is java
+  // outputs the result of the version command to the error stream
+  // https://stackoverflow.com/questions/13483443/why-does-java-version-go-to-stderr
   return { isValid, log: log?.stderr };
 };
 

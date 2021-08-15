@@ -25,7 +25,10 @@ import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
 } from '../../../app/desktop/utils/constants';
-import { updateInstanceConfig } from '../../reducers/actions';
+import {
+  getJavaVersionForMCVersion,
+  updateInstanceConfig
+} from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 import { convertMinutesToHumanTime } from '../../utils';
 import { CURSEFORGE } from '../../utils/constants';
@@ -175,11 +178,12 @@ const Card = memo(
 );
 
 const Overview = ({ instanceName, background, manifest }) => {
+  const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
-  const javaVersion = lte(coerce(config?.loader.mcVersion), coerce('1.17'))
-    ? 8
-    : 16;
+  const javaVersion = dispatch(
+    getJavaVersionForMCVersion(config?.loader.mcVersion)
+  );
   const defaultJavaPath = useSelector(state =>
     _getJavaPath(state)(javaVersion)
   );
@@ -192,8 +196,6 @@ const Overview = ({ instanceName, background, manifest }) => {
   const [screenResolution, setScreenResolution] = useState(null);
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     ipcRenderer
