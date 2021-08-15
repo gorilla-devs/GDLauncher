@@ -100,8 +100,8 @@ const createDeployFiles = async () => {
 };
 
 const commonConfig = {
+  publish: [],
   config: {
-    publish: [],
     generateUpdatesFilesForAllChannels: true,
     npmRebuild: false,
     productName: 'GDLauncher',
