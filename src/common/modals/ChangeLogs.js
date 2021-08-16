@@ -38,8 +38,7 @@ const data = {
     },
     {
       header: 'You can now easily duplicate instances.',
-      content:
-        'Just right-click on an instance and duplicate it 😃.'
+      content: 'Just right-click on an instance and duplicate it 😃.'
     }
   ],
   improvements: [
