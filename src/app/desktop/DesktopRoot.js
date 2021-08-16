@@ -80,15 +80,22 @@ function DesktopRoot({ store }) {
     let isJava8OK = javaPath;
     let isJava16Ok = java16Path;
 
-    if (!javaPath?.isValid) {
+    if (!isJava8OK) {
       isJava8OK = await isLatestJavaDownloaded(manifests, userData, true);
     }
 
-    if (!java16Path?.isValid) {
+    if (!isJava16Ok) {
       isJava16Ok = await isLatestJavaDownloaded(manifests, userData, true, 16);
     }
 
-    if (!isJava8OK?.isValid || !isJava16Ok?.isValid) {
+    if (
+      (typeof isJava8OK === 'string'
+        ? isJava8OK.isEmpty
+        : !isJava8OK.isValid) ||
+      (typeof isJava16Ok === 'string'
+        ? isJava16Ok.isEmpty
+        : !isJava16Ok.isValid)
+    ) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
 
       // Super duper hacky solution to await the modal to be closed...
@@ -184,7 +191,7 @@ function DesktopRoot({ store }) {
         <RouteBackground />
         <Switch>
           {routes.map((route, i) => (
-            <RouteWithSubRoutes key={i} {...route} /> // eslint-disable-line
+                <RouteWithSubRoutes key={i} {...route} /> // eslint-disable-line
           ))}
         </Switch>
       </Container>
