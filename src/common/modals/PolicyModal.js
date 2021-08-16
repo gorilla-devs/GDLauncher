@@ -20,6 +20,12 @@ const policies = {
       lazy(() => import('../components/TermsAndConditions'))
     ),
     title: 'Terms and Conditions'
+  },
+  acceptableuse: {
+    component: AsyncComponent(
+      lazy(() => import('../components/AcceptableUsePolicy'))
+    ),
+    title: 'Acceptable Use Policy'
   }
 };
 

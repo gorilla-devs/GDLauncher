@@ -194,9 +194,6 @@ export default function Settings() {
             <div
               css={`
                 margin-top: 20px;
-                display: flex;
-                justify-content: center;
-                text-align: center;
                 div {
                   text-decoration: underline;
                   cursor: pointer;
@@ -216,6 +213,15 @@ export default function Settings() {
                 }
               >
                 Terms and Conditions
+              </div>
+              <div
+                onClick={() =>
+                  dispatch(
+                    openModal('PolicyModal', { policy: 'acceptableuse' })
+                  )
+                }
+              >
+                Acceptable Use Policy
               </div>
             </div>
           </div>
