@@ -194,27 +194,29 @@ export default function Settings() {
             <div
               css={`
                 margin-top: 20px;
-                div {
+                display: flex;
+                flex-direction: column;
+                span {
                   text-decoration: underline;
                   cursor: pointer;
                 }
               `}
             >
-              <div
+              <span
                 onClick={() =>
                   dispatch(openModal('PolicyModal', { policy: 'privacy' }))
                 }
               >
                 Privacy Policy
-              </div>
-              <div
+              </span>
+              <span
                 onClick={() =>
                   dispatch(openModal('PolicyModal', { policy: 'tos' }))
                 }
               >
                 Terms and Conditions
-              </div>
-              <div
+              </span>
+              <span
                 onClick={() =>
                   dispatch(
                     openModal('PolicyModal', { policy: 'acceptableuse' })
@@ -222,7 +224,7 @@ export default function Settings() {
                 }
               >
                 Acceptable Use Policy
-              </div>
+              </span>
             </div>
           </div>
         </SideMenu>

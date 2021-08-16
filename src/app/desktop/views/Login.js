@@ -27,7 +27,7 @@ const LoginButton = styled(Button)`
     props.active ? props.theme.palette.grey[600] : 'transparent'};
   border: 0;
   height: auto;
-  margin-top: 40px;
+  margin-top: 20px;
   text-align: center;
   color: ${props => props.theme.palette.text.primary};
   &:hover {
@@ -78,7 +78,7 @@ const Form = styled.div`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  margin: 40px 0 !important;
+  margin: 20px 0 !important;
 `;
 
 const Background = styled.div`
@@ -108,7 +108,7 @@ const Header = styled.div`
 
 const Footer = styled.div`
   position: absolute;
-  bottom: 0;
+  bottom: 4px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -228,7 +228,10 @@ const Login = () => {
             <Header>
               <HorizontalLogo size={200} />
             </Header>
-            <p>Sign in with your Mojang Account</p>
+            <p>
+              Sign in with your Mojang Account. By doing so, you accept all our
+              policies and terms stated below.
+            </p>
             <Form>
               <div>
                 <Input
@@ -281,12 +284,7 @@ const Login = () => {
               >
                 <FooterLinks>
                   <div>
-                    <a href="https://my.minecraft.net/en-us/store/minecraft/#register">
-                      CREATE AN ACCOUNT
-                    </a>
-                  </div>
-                  <div>
-                    <a href="https://my.minecraft.net/en-us/password/forgot/">
+                    <a href="https://www.minecraft.net/it-it/password/forgot">
                       FORGOT PASSWORD
                     </a>
                   </div>
@@ -299,6 +297,43 @@ const Login = () => {
                 >
                   v{version}
                 </div>
+              </div>
+              <div
+                css={`
+                  margin-top: 20px;
+                  display: flex;
+                  width: 100%;
+                  text-align: center;
+                  flex-direction: row;
+                  span {
+                    text-decoration: underline;
+                    cursor: pointer;
+                  }
+                `}
+              >
+                <span
+                  onClick={() =>
+                    dispatch(openModal('PolicyModal', { policy: 'privacy' }))
+                  }
+                >
+                  Privacy Policy
+                </span>
+                <span
+                  onClick={() =>
+                    dispatch(openModal('PolicyModal', { policy: 'tos' }))
+                  }
+                >
+                  Terms and Conditions
+                </span>
+                <span
+                  onClick={() =>
+                    dispatch(
+                      openModal('PolicyModal', { policy: 'acceptableuse' })
+                    )
+                  }
+                >
+                  Acceptable Use Policy
+                </span>
               </div>
               <Status>
                 Auth: <StatusIcon color={status['authserver.mojang.com']} />
