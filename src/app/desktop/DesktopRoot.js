@@ -80,15 +80,24 @@ function DesktopRoot({ store }) {
     let isJava8OK = javaPath;
     let isJava16Ok = java16Path;
 
-    if (!javaPath?.isValid) {
-      isJava8OK = await isLatestJavaDownloaded(manifests, userData, true);
+    if (!javaPath) {
+      ({ isValid: isJava8OK } = await isLatestJavaDownloaded(
+        manifests,
+        userData,
+        true
+      ));
     }
 
-    if (!java16Path?.isValid) {
-      isJava16Ok = await isLatestJavaDownloaded(manifests, userData, true, 16);
+    if (!java16Path) {
+      ({ isValid: isJava16Ok } = await isLatestJavaDownloaded(
+        manifests,
+        userData,
+        true,
+        16
+      ));
     }
 
-    if (!isJava8OK?.isValid || !isJava16Ok?.isValid) {
+    if (!isJava8OK || !isJava16Ok) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
 
       // Super duper hacky solution to await the modal to be closed...
