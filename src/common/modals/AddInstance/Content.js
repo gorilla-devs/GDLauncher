@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,7 +8,7 @@ import {
   faArchive
 } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Spin, Radio } from 'antd';
+import { Spin, Radio, Button } from 'antd';
 import CurseForgeModpacks from './CurseForgeModpacks';
 import FTBModpacks from './FTBModpacks';
 import Import from './Import';
@@ -30,6 +30,11 @@ const Content = ({
 }) => {
   const [overrideNextStepOnClick, setOverrideNextStepOnClick] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setError(false);
+  }, [importZipPath]);
 
   let pages = [
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
@@ -146,7 +151,8 @@ const Content = ({
                   props.page === 0 || props.page === 2 ? 1 : 0};
               `}
             >
-              <div
+              <Button
+                disabled={error}
                 version={version}
                 importZipPath={importZipPath}
                 css={`
@@ -178,7 +184,9 @@ const Content = ({
                     setLoading(true);
                     try {
                       await overrideNextStepOnClick();
+                      setError(false);
                     } catch {
+                      setError(true);
                       return;
                     } finally {
                       setLoading(false);
@@ -198,7 +206,7 @@ const Content = ({
                 ) : (
                   <FontAwesomeIcon icon={faLongArrowAltRight} />
                 )}
-              </div>
+              </Button>
             </div>
           </div>
         </Animation>

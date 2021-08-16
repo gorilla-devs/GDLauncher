@@ -19,7 +19,7 @@ import {
   downloadAddonZip,
   importAddonZip,
   convertcurseForgeToCanonical,
-  extractFabricVersionFromManifest,
+  extractFabricVersionFromManifest
 } from '../../../app/desktop/utils';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
@@ -415,7 +415,9 @@ const InstanceName = ({
                       onChange={e => setInstanceName(e.target.value)}
                       css={`
                         opacity: ${({ state }) =>
-                          state === 'entering' || state === 'entered' ? 0 : 1} !important;
+                          state === 'entering' || state === 'entered'
+                            ? 0
+                            : 1} !important;
                         transition: 0.1s ease-in-out !important;
                         width: 300px !important;
                         align-self: center !important;

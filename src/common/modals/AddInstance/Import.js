@@ -45,10 +45,11 @@ const Import = ({
   };
 
   const onClick = async () => {
+    const urlRegex =
+      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+    const isUrlRegex = urlRegex.test(localValue);
     if (loading || !localValue) return;
     setLoading(true);
-    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
-    const isUrlRegex = urlRegex.test(localValue);
     const hash = uuidv4();
     let tempFilePath = path.join(tempPath, `${hash}.zip`);
 
@@ -96,54 +97,60 @@ const Import = ({
         reject(err.stderr);
       });
     });
-    const manifest = await fse.readJson(path.join(tempPath, 'manifest.json'));
-    await fse.remove(path.join(tempPath, 'manifest.json'));
-    let addon = null;
+    try {
+      const manifest = await fse.readJson(path.join(tempPath, 'manifest.json'));
+      await fse.remove(path.join(tempPath, 'manifest.json'));
+      let addon = null;
 
-    if (manifest.projectID) {
-      const { data } = await getAddon(manifest.projectID);
-      addon = data;
-      setModpack(addon);
-    } else {
-      setModpack({ name: manifest.name, attachments: [] });
-    }
-    const isForge = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes(FORGE) && v.primary
-    );
+      if (manifest.projectID) {
+        const { data } = await getAddon(manifest.projectID);
+        addon = data;
+        setModpack(addon);
+      } else {
+        setModpack({ name: manifest.name, attachments: [] });
+      }
+      const isForge = (manifest?.minecraft?.modLoaders || []).find(
+        v => v.id.includes(FORGE) && v.primary
+      );
 
-    const isFabric = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes(FABRIC) && v.primary
-    );
+      const isFabric = (manifest?.minecraft?.modLoaders || []).find(
+        v => v.id.includes(FABRIC) && v.primary
+      );
 
-    const isVanilla = (manifest?.minecraft?.modLoaders || []).find(
-      v => v.id.includes(VANILLA) && v.primary
-    );
+      const isVanilla = (manifest?.minecraft?.modLoaders || []).find(
+        v => v.id.includes(VANILLA) && v.primary
+      );
 
-    if (!isForge && !isFabric && !isVanilla) {
-      setError(true);
+      if (!isForge && !isFabric && !isVanilla) {
+        setError(true);
+        setLoading(false);
+        return;
+      }
+
+      const loader = { loaderType: VANILLA };
+
+      if (manifest.manifestType === 'minecraftModpack') {
+        loader.source = CURSEFORGE;
+      }
+
+      if (isForge) loader.loaderType = FORGE;
+      else if (isFabric) loader.loaderType = FABRIC;
+
+      if (manifest.projectID) {
+        loader.projectID = manifest.projectID;
+      }
+
+      setVersion(loader);
+      if (isUrlRegex) {
+        setImportZipPath(tempFilePath);
+      }
       setLoading(false);
-      return;
+      setError(false);
+    } catch (err) {
+      setLoading(false);
+      setError(err);
+      throw new Error('url not valid');
     }
-
-    const loader = { loaderType: VANILLA };
-
-    if (manifest.manifestType === 'minecraftModpack') {
-      loader.source = CURSEFORGE;
-    }
-
-    if (isForge) loader.loaderType = FORGE;
-    else if (isFabric) loader.loaderType = FABRIC;
-
-    if (manifest.projectID) {
-      loader.projectID = manifest.projectID;
-    }
-
-    setVersion(loader);
-    if (isUrlRegex) {
-      setImportZipPath(tempFilePath);
-    }
-    setLoading(false);
-    setError(false);
   };
 
   setOverrideNextStepOnClick(() => onClick);
@@ -188,7 +195,9 @@ const Import = ({
               transparentize(0.7, props.theme.palette.grey[700])};
           `}
         >
-          {error && 'There was an issue while importing.'}
+          {typeof error === 'string'
+            ? error
+            : 'There was an issue while importing.'}
         </div>
       </div>
     </Container>
