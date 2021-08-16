@@ -34,9 +34,9 @@ jobs:
       - name: npm run install
         run: |
           npm i
-      # - name: npm run lint
-      #   run: |
-      #     npm run lint
+      - name: npm run lint
+        run: |
+          npm run lint
       - name: npm run release for windows
         if: matrix.os == 'windows-latest' && github.event_name == 'push'
         env:
