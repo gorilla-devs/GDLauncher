@@ -235,6 +235,7 @@ export default function Settings() {
                 max-width: 600px;
                 overflow-y: hidden;
                 overflow-x: hidden;
+                padding-bottom: 20px;
               `}
             >
               <ContentComponent />
