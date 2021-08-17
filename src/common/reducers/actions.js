@@ -1390,7 +1390,11 @@ export function downloadForge(instanceName) {
           path.join(_getTempPath(state), 'data', 'client.lzma'),
           path.join(
             _getLibrariesPath(state),
-            ...mavenToArray(universalPath, '-clientdata', '.lzma')
+            ...mavenToArray(
+              forgeJson.install.path || universalPath,
+              '-clientdata',
+              '.lzma'
+            )
           ),
           { overwrite: true }
         );
