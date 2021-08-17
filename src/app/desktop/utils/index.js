@@ -495,6 +495,11 @@ export const getJVMArguments113 = (
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   args.push(...jvmOptions);
 
+  // Eventually inject additional arguments (from 1.17 (?))
+  if (mcJson?.forge?.arguments?.jvm) {
+    args.push(...mcJson.forge.arguments.jvm);
+  }
+
   args.push(mcJson.mainClass);
 
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
@@ -609,6 +614,9 @@ export const patchForge113 = async (
   forgeJson,
   mainJar,
   librariesPath,
+  installerPath,
+  mcJsonPath,
+  universalPath,
   javaPath,
   updatePercentage
 ) => {
@@ -619,14 +627,20 @@ export const patchForge113 = async (
       // Handle special case
       if (finalArg === 'BINPATCH') {
         return `"${path
-          .join(librariesPath, ...mavenToArray(forgeJson.path))
+          .join(librariesPath, ...mavenToArray(forgeJson.path || universalPath))
           .replace('.jar', '-clientdata.lzma')}"`;
       }
       // Return replaced string
       return forgeJson.data[finalArg].client;
     }
-    // Return original string (checking for MINECRAFT_JAR)
-    return arg.replace('{MINECRAFT_JAR}', `"${mainJar}"`);
+    // Fix forge madness
+    return arg
+      .replace('{SIDE}', `client`)
+      .replace('{ROOT}', `"${path.dirname(installerPath)}"`)
+      .replace('{MINECRAFT_JAR}', `"${mainJar}"`)
+      .replace('{MINECRAFT_VERSION}', `"${mcJsonPath}"`)
+      .replace('{INSTALLER}', `"${installerPath}"`)
+      .replace('{LIBRARY_DIR}', `"${librariesPath}"`);
   };
   const computePathIfPossible = arg => {
     if (arg[0] === '[') {
