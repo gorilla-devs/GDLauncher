@@ -54,7 +54,6 @@ export const _getJavaPath = createSelector(
         ? javaManifest.java16Manifest
         : javaManifest.javaManifest;
 
-      if (java.path) return java.path;
       const javaOs = convertOSToJavaFormat(process.platform);
       const javaMeta = manifest.find(
         version =>
