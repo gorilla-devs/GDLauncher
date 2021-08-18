@@ -348,7 +348,10 @@ const Instance = ({ instanceName }) => {
             />
             Export Pack
           </MenuItem>
-          <MenuItem onClick={openDuplicateNameDialog}>
+          <MenuItem
+            disabled={Boolean(isInQueue)}
+            onClick={openDuplicateNameDialog}
+          >
             <FontAwesomeIcon
               icon={faCopy}
               css={`

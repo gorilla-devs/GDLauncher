@@ -77,7 +77,8 @@ const modalsComponentLookupTable = {
   ),
   McVersionChanger: AsyncComponent(
     lazy(() => import('../modals/McVersionChanger'))
-  )
+  ),
+  PolicyModal: AsyncComponent(lazy(() => import('../modals/PolicyModal')))
 };
 
 const ModalContainer = ({

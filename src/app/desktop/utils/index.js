@@ -261,9 +261,20 @@ export const getFilteredVersions = (
   return versions;
 };
 
-export const isLatestJavaDownloaded = async (meta, userData, retry) => {
+export const isLatestJavaDownloaded = async (
+  meta,
+  userData,
+  retry,
+  version = 8
+) => {
   const javaOs = convertOSToJavaFormat(process.platform);
-  const javaMeta = meta.find(v => v.os === javaOs);
+  let log = null;
+
+  const isJava16 = version === 16;
+
+  const manifest = isJava16 ? meta.java16 : meta.java;
+
+  const javaMeta = manifest.find(v => v.os === javaOs);
   const javaFolder = path.join(
     userData,
     'java',
@@ -279,10 +290,8 @@ export const isLatestJavaDownloaded = async (meta, userData, retry) => {
   );
   try {
     await fs.access(javaFolder);
-    await promisify(exec)(`"${javaExecutable}" -version`);
+    log = await promisify(exec)(`"${javaExecutable}" -version`);
   } catch (err) {
-    console.log(err);
-
     if (retry) {
       if (process.platform !== 'win32') {
         try {
@@ -293,12 +302,15 @@ export const isLatestJavaDownloaded = async (meta, userData, retry) => {
         }
       }
 
-      return isLatestJavaDownloaded(meta, userData);
+      return isLatestJavaDownloaded(meta, userData, null, version);
     }
 
     isValid = false;
   }
-  return isValid;
+  // Return stderr because that garbage of a language which is java
+  // outputs the result of the version command to the error stream
+  // https://stackoverflow.com/questions/13483443/why-does-java-version-go-to-stderr
+  return { isValid, log: log?.stderr };
 };
 
 export const get7zPath = async () => {
@@ -483,6 +495,11 @@ export const getJVMArguments113 = (
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   args.push(...jvmOptions);
 
+  // Eventually inject additional arguments (from 1.17 (?))
+  if (mcJson?.forge?.arguments?.jvm) {
+    args.push(...mcJson.forge.arguments.jvm);
+  }
+
   args.push(mcJson.mainClass);
 
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
@@ -597,6 +614,9 @@ export const patchForge113 = async (
   forgeJson,
   mainJar,
   librariesPath,
+  installerPath,
+  mcJsonPath,
+  universalPath,
   javaPath,
   updatePercentage
 ) => {
@@ -607,14 +627,20 @@ export const patchForge113 = async (
       // Handle special case
       if (finalArg === 'BINPATCH') {
         return `"${path
-          .join(librariesPath, ...mavenToArray(forgeJson.path))
+          .join(librariesPath, ...mavenToArray(forgeJson.path || universalPath))
           .replace('.jar', '-clientdata.lzma')}"`;
       }
       // Return replaced string
       return forgeJson.data[finalArg].client;
     }
-    // Return original string (checking for MINECRAFT_JAR)
-    return arg.replace('{MINECRAFT_JAR}', `"${mainJar}"`);
+    // Fix forge madness
+    return arg
+      .replace('{SIDE}', `client`)
+      .replace('{ROOT}', `"${path.dirname(installerPath)}"`)
+      .replace('{MINECRAFT_JAR}', `"${mainJar}"`)
+      .replace('{MINECRAFT_VERSION}', `"${mcJsonPath}"`)
+      .replace('{INSTALLER}', `"${installerPath}"`)
+      .replace('{LIBRARY_DIR}', `"${librariesPath}"`);
   };
   const computePathIfPossible = arg => {
     if (arg[0] === '[') {

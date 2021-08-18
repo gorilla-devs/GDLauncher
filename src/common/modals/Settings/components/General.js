@@ -391,7 +391,7 @@ const General = () => {
               setReleaseChannel(e);
               await fsa.writeFile(
                 path.join(appData, 'gdlauncher_next', 'rChannel'),
-                e
+                e.toString()
               );
             }}
             value={releaseChannel}

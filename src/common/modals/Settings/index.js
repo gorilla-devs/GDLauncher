@@ -6,7 +6,7 @@ import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
 import SocialButtons from '../../components/SocialButtons';
-import { closeModal } from '../../reducers/modals/actions';
+import { closeModal, openModal } from '../../reducers/modals/actions';
 import KoFiButton from '../../assets/ko-fi.png';
 import PatreonButton from '../../assets/patreon.png';
 
@@ -191,6 +191,41 @@ export default function Settings() {
             >
               <SocialButtons />
             </div>
+            <div
+              css={`
+                margin-top: 20px;
+                display: flex;
+                flex-direction: column;
+                span {
+                  text-decoration: underline;
+                  cursor: pointer;
+                }
+              `}
+            >
+              <span
+                onClick={() =>
+                  dispatch(openModal('PolicyModal', { policy: 'privacy' }))
+                }
+              >
+                Privacy Policy
+              </span>
+              <span
+                onClick={() =>
+                  dispatch(openModal('PolicyModal', { policy: 'tos' }))
+                }
+              >
+                Terms and Conditions
+              </span>
+              <span
+                onClick={() =>
+                  dispatch(
+                    openModal('PolicyModal', { policy: 'acceptableuse' })
+                  )
+                }
+              >
+                Acceptable Use Policy
+              </span>
+            </div>
           </div>
         </SideMenu>
         <SettingsContainer>
@@ -200,6 +235,7 @@ export default function Settings() {
                 max-width: 600px;
                 overflow-y: hidden;
                 overflow-x: hidden;
+                padding-bottom: 20px;
               `}
             >
               <ContentComponent />
