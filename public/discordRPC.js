@@ -33,7 +33,6 @@ exports.initRPC = () => {
 };
 
 exports.update = ({ details, state }) => {
-  activity.details = details;
   activity = {
     ...activity,
     startTimestamp: Math.floor(Date.now() / 1000),

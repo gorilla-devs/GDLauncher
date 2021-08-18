@@ -2793,10 +2793,10 @@ export function launchInstance(instanceName) {
 
     ps.on('close', async code => {
       clearInterval(playTimer);
-      ipcRenderer.invoke('reset-discord-rpc');
       if (!ps.killed) {
         ps.kill('SIGKILL');
       }
+      ipcRenderer.invoke('reset-discord-rpc');
       await new Promise(resolve => setTimeout(resolve, 200));
       ipcRenderer.invoke('show-window');
       dispatch(removeStartedInstance(instanceName));
