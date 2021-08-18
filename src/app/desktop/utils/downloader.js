@@ -144,8 +144,16 @@ export const downloadFile = async (fileName, url, onProgress) => {
       });
     });
   } catch (error) {
+    out.end();
     if (error.response.status === 403) {
-      const { data } = await axios.get(url, {
+      const { pathname } = new URL(url);
+      const lastPartOfUrl = pathname.substr(pathname.lastIndexOf('/') + 1);
+
+      // the redirect url format is https://www.curseforge.com/minecraft/modpacks/name/download/id/file
+      // if the url is https://www.curseforge.com/minecraft/modpacks/name/download/id we convert it to the correct one
+      const redirectUrl = lastPartOfUrl === 'file' ? url : `${url}/file`;
+
+      const { data } = await axios.get(redirectUrl, {
         responseType: 'arraybuffer',
         headers: {
           'Content-Type': 'application/octet-stream'
@@ -154,7 +162,9 @@ export const downloadFile = async (fileName, url, onProgress) => {
 
       const dataView = new DataView(data);
 
-      await fse.writeFile(fileName, dataView, 'binary');
+      await fs.writeFile(fileName, dataView, {
+        encoding: 'binary'
+      });
     } else throw error;
   }
 };

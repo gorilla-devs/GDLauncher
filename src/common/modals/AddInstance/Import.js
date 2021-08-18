@@ -63,7 +63,7 @@ const Import = ({
         await downloadFile(tempFilePath, localValue);
       } catch (err) {
         console.error(err);
-        setError(true);
+        setError('Error while downloading, probably the url is not correct');
         setLoading(false);
         throw err;
       }
@@ -75,7 +75,6 @@ const Import = ({
     } catch {
       await fse.remove(path.join(tempPath, 'manifest.json'));
     }
-
     const extraction = extractFull(
       isUrlRegex ? tempFilePath : localValue,
       tempPath,
@@ -92,7 +91,7 @@ const Import = ({
         resolve();
       });
       extraction.on('error', err => {
-        setError(true);
+        setError('Error while extracting the zip');
         setLoading(false);
         reject(err.stderr);
       });
