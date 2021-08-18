@@ -38,7 +38,16 @@ const data = {
     },
     {
       header: 'You can now easily duplicate instances.',
-      content: 'Just right-click on an instance and duplicate it 😃.'
+      content: 'Just right-click on an instance and duplicate it.'
+    },
+    {
+      header: 'Added support for forge 1.17!',
+      content: "Let's hope they don't change their stuff again anytime soon 😬."
+    },
+    {
+      header: 'Added privacy policy, ToS and acceptable use policy!',
+      content:
+        "You can go read them from the settings page if you're into legal stuff."
     }
   ],
   improvements: [
