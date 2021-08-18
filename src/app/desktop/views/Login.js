@@ -228,10 +228,6 @@ const Login = () => {
             <Header>
               <HorizontalLogo size={200} />
             </Header>
-            <p>
-              Sign in with your Mojang Account. By doing so, you accept all our
-              policies and terms stated below.
-            </p>
             <Form>
               <div>
                 <Input
@@ -298,9 +294,18 @@ const Login = () => {
                   v{version}
                 </div>
               </div>
+              <p
+                css={`
+                  font-size: 10px;
+                `}
+              >
+                Sign in with your Mojang Account. By doing so, you accept all
+                our policies and terms stated below.
+              </p>
               <div
                 css={`
                   margin-top: 20px;
+                  font-size: 10px;
                   display: flex;
                   width: 100%;
                   text-align: center;
