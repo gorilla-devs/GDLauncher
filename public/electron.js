@@ -587,7 +587,6 @@ ipcMain.handle('init-discord-rpc', () => {
 });
 
 ipcMain.handle('update-discord-rpc', (event, p) => {
-  discordRPC.updateDetails(p);
   discordRPC.update(p);
 });
 
