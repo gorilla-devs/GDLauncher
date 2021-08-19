@@ -154,7 +154,7 @@ const Content = ({
               <Button
                 disabled={error}
                 version={version}
-                importZipPath={importZipPath}
+                importzippath={importZipPath}
                 css={`
                   width: 70px;
                   height: 40px;
