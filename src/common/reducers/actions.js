@@ -2572,6 +2572,11 @@ export function launchInstance(instanceName) {
       resolution: instanceResolution
     } = _getInstance(state)(instanceName);
 
+    ipcRenderer.invoke('update-discord-rpc', {
+      details: instanceName,
+      state: 'playing'
+    });
+
     const defaultJavaPathVersion = _getJavaPath(state)(
       dispatch(getJavaVersionForMCVersion(loader?.mcVersion))
     );
@@ -2791,6 +2796,7 @@ export function launchInstance(instanceName) {
       if (!ps.killed) {
         ps.kill('SIGKILL');
       }
+      ipcRenderer.invoke('reset-discord-rpc');
       await new Promise(resolve => setTimeout(resolve, 200));
       ipcRenderer.invoke('show-window');
       dispatch(removeStartedInstance(instanceName));

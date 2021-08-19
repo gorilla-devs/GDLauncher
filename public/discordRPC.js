@@ -4,17 +4,19 @@ const log = require('electron-log');
 let client;
 let activity;
 
+const defaultValue = {
+  details: 'Playing GDLauncher',
+  state: 'Idle',
+  startTimestamp: Math.floor(Date.now() / 1000),
+  largeImageKey: 'default_big',
+  largeImageText: 'GDLauncher - A Custom Minecraft Launcher',
+  instance: false
+};
+
 exports.initRPC = () => {
   client = new Client({ transport: 'ipc' });
 
-  activity = {
-    details: 'Playing GDLauncher',
-    state: 'Idle',
-    startTimestamp: Math.floor(Date.now() / 1000),
-    largeImageKey: 'default_big',
-    largeImageText: 'GDLauncher - A Custom Minecraft Launcher',
-    instance: false
-  };
+  activity = defaultValue;
 
   client.on('ready', () => {
     log.log('Discord RPC Connected');
@@ -30,8 +32,18 @@ exports.initRPC = () => {
   });
 };
 
-exports.updateDetails = details => {
-  activity.details = details;
+exports.update = ({ details, state }) => {
+  activity = {
+    ...activity,
+    startTimestamp: Math.floor(Date.now() / 1000),
+    details,
+    state
+  };
+  client.setActivity(activity);
+};
+
+exports.reset = () => {
+  activity = defaultValue;
   client.setActivity(activity);
 };
 
