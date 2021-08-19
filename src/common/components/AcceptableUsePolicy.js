@@ -10,10 +10,14 @@ const AcceptableUsePolicy = () => {
           <p>
             This acceptable use policy (“Policy”) sets forth the general
             guidelines and acceptable and prohibited uses of the{' '}
-            <a target="_blank" rel="nofollow" href="https://gdlauncher.com">
+            <a
+              target="_blank"
+              rel="nofollow noreferrer"
+              href="https://gdlauncher.com"
+            >
               gdlauncher.com
             </a>{' '}
-            website (“Website”), “GDLauncher” application ("Application”) and
+            website (“Website”), “GDLauncher” application (“Application”) and
             any of their related products and services (collectively,
             “Services”). This Policy is a legally binding agreement between you
             (“User”, “you” or “your”) and this Website operator and Application
