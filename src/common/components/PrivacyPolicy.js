@@ -12,7 +12,11 @@ const PrivacyPolicy = () => {
             our compliance with this privacy policy (“Policy”). This Policy
             describes the types of information we may collect from you or that
             you may provide (“Personal Information”) on the{' '}
-            <a target="_blank" rel="nofollow" href="https://gdlauncher.com">
+            <a
+              target="_blank"
+              rel="nofollow noreferrer"
+              href="https://gdlauncher.com"
+            >
               gdlauncher.com
             </a>{' '}
             website (“Website”), “GDLauncher” application (“Application”), and
@@ -499,6 +503,7 @@ const PrivacyPolicy = () => {
             <a
               target="_blank"
               href="https://www.websitepolicies.com/blog/cookies"
+              rel="noreferrer"
             >
               here
             </a>
