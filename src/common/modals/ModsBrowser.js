@@ -18,7 +18,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { FixedSizeList as List } from 'react-window';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
-import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faBomb, faExclamationCircle, faWrench, faDownload } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
 import { getSearch, getAddonFiles } from '../api';
 import { openModal } from '../reducers/modals/actions';
@@ -207,25 +207,6 @@ const ModsListWrapper = ({
             <div>
               <Button
                 type="primary"
-                css={`
-                  margin-right: 10px;
-                `}
-                onClick={() => {
-                  dispatch(
-                    openModal('ModOverview', {
-                      gameVersion,
-                      projectID: item.id,
-                      ...(isInstalled && { fileID: isInstalled.fileID }),
-                      ...(isInstalled && { fileName: isInstalled.fileName }),
-                      instanceName
-                    })
-                  );
-                }}
-              >
-                Explore
-              </Button>
-              <Button
-                type="primary"
                 onClick={async e => {
                   setLoading(true);
                   e.stopPropagation();
@@ -286,7 +267,7 @@ const ModsListWrapper = ({
                 }}
                 loading={loading}
               >
-                Install
+                <FontAwesomeIcon icon={faDownload} />
               </Button>
             </div>
           )
@@ -305,7 +286,7 @@ const ModsListWrapper = ({
               );
             }}
           >
-            Change version / explore
+            <FontAwesomeIcon icon={faWrench} />
           </Button>
         )}
       </RowContainer>
@@ -465,7 +446,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
             css={`
               height: 32px !important;
             `}
-            placeholder="Search for a mod"
+            placeholder="Search..."
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);
