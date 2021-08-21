@@ -53,7 +53,7 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <script>
       (function () {
-        if (process.env.NODE_ENV !== 'development' && process.env.GA_ID) {
+        if (process.env.NODE_ENV !== 'development') {
           window.gaInitialized = true;
           window.ga =
             window.ga ||
@@ -61,7 +61,7 @@
               (ga.q = ga.q || []).push(arguments);
             };
           ga.l = +new Date();
-          ga('create', process.env.GA_ID, 'none');
+          ga('create', 'UA-147631204-1', 'none');
           ga('set', 'transport', 'xhr');
           ga('set', 'appName', 'GDLauncher');
           ga('set', 'checkProtocolTask', null);
