@@ -9,7 +9,7 @@ const _java = state => state.settings.java;
 const _currentAccountId = state => state.app.currentAccountId;
 const _currentDownload = state => state.currentDownload;
 const _downloadQueue = state => state.downloadQueue;
-const _javaManifest = state => state.app.javaManifest;
+const _app = state => state.app;
 const _userData = state => state.userData;
 
 export const _getInstances = createSelector(_instances, instances =>
@@ -43,21 +43,35 @@ export const _getCurrentDownloadItem = createSelector(
 );
 
 export const _getJavaPath = createSelector(
-  _javaManifest,
+  _app,
   _java,
   _userData,
   (javaManifest, java, userData) => {
-    if (java.path) return java.path;
-    const javaOs = convertOSToJavaFormat(process.platform);
-    const javaMeta = javaManifest.find(
-      v =>
-        v.os === javaOs && v.architecture === 'x64' && v.binary_type === 'jre'
-    );
-    const {
-      version_data: { openjdk_version: version }
-    } = javaMeta;
-    const filename = process.platform === 'win32' ? 'java.exe' : 'java';
-    return path.join(userData, 'java', version, 'bin', filename);
+    // version
+    return memoize((ver = 8) => {
+      const isVersion16 = ver === 16;
+      const manifest = isVersion16
+        ? javaManifest.java16Manifest
+        : javaManifest.javaManifest;
+
+      const customJava = ver === 16 ? java.path16 : java.path;
+
+      const javaOs = convertOSToJavaFormat(process.platform);
+      const javaMeta = manifest.find(
+        version =>
+          version.os === javaOs &&
+          version.architecture === 'x64' &&
+          version.binary_type === 'jre'
+      );
+      const {
+        version_data: { openjdk_version: version }
+      } = javaMeta;
+      const filename = process.platform === 'win32' ? 'java.exe' : 'java';
+
+      return (
+        customJava || path.join(userData, 'java', version, 'bin', filename)
+      );
+    });
   }
 );
 

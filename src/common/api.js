@@ -13,7 +13,8 @@ import {
   MICROSOFT_XBOX_LOGIN_URL,
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
-  FTB_API_URL
+  FTB_API_URL,
+  JAVA16_MANIFEST_URL
 } from './utils/constants';
 import { sortByDate } from './utils';
 
@@ -201,6 +202,11 @@ export const getJavaManifest = () => {
   return axios.get(url);
 };
 
+export const getJava16Manifest = () => {
+  const url = JAVA16_MANIFEST_URL;
+  return axios.get(url);
+};
+
 export const getFabricJson = ({ mcVersion, loaderVersion }) => {
   return axios.get(
     `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
@@ -261,19 +267,21 @@ export const getSearch = (
   sort,
   isSortDescending,
   gameVersion,
-  categoryId
+  categoryId,
+  modLoaderType
 ) => {
   const url = `${FORGESVC_URL}/addon/search`;
   const params = {
     gameId: 432,
-    sectionId: type === 'mods' ? 6 : 4471,
     categoryId: categoryId || 0,
     pageSize,
+    index,
     sort,
     isSortDescending,
-    index,
-    searchFilter,
-    gameVersion: gameVersion || ''
+    gameVersion: gameVersion || '',
+    ...(modLoaderType === 'fabric' && { modLoaderType: 4 }),
+    sectionId: type === 'mods' ? 6 : 4471,
+    searchFilter
   };
   return axios.get(url, { params });
 };

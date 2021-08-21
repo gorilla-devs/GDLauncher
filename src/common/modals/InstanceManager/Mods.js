@@ -82,7 +82,6 @@ const RowContainer = styled.div.attrs(props => ({
   .rowCenterContent {
     flex: 1;
     display: flex;
-    justify-content: center;
     align-items: center;
     transition: color 0.1s ease-in-out;
     height: 100%;
@@ -768,7 +767,7 @@ const Mods = ({ instanceName }) => {
           defaultValue={search}
           onChange={e => setSearch(e.target.value)}
           css={`
-            width: 200px;
+            width: 200px !important;
           `}
           placeholder={`Search ${mods.length} mods`}
         />

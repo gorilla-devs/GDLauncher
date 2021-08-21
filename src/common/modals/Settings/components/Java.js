@@ -14,6 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Input, Switch, Select } from 'antd';
 import {
+  updateJava16Path,
   updateJavaArguments,
   updateJavaMemory,
   updateJavaPath,
@@ -37,6 +38,7 @@ const AutodetectPath = styled.div`
   justify-content: space-between;
   width: 100%;
   height: 40px;
+  margin-bottom: 30px;
 `;
 
 const SelectMemory = styled.div`
@@ -77,6 +79,7 @@ const Title = styled.h3`
 `;
 
 const Paragraph = styled.p`
+  max-width: 510px;
   color: ${props => props.theme.palette.text.third};
 `;
 
@@ -110,8 +113,10 @@ export default function MyAccountPreferences() {
   const [screenResolution, setScreenResolution] = useState(null);
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
-  const javaPath = useSelector(_getJavaPath);
+  const javaPath = useSelector(state => _getJavaPath(state)(8));
+  const java16Path = useSelector(state => _getJavaPath(state)(16));
   const customJavaPath = useSelector(state => state.settings.java.path);
+  const customJava16Path = useSelector(state => state.settings.java.path16);
   const mcResolution = useSelector(
     state => state.settings.minecraftSettings.resolution
   );
@@ -152,31 +157,41 @@ export default function MyAccountPreferences() {
           `}
         >
           Disable this to specify a custom java path to use instead of using
-          openJDK shipped with GDLauncher. Please select the java.exe binary
+          openJDK shipped with GDLauncher if that is the case select the path to
+          your Java executable.
         </Paragraph>
         <Switch
           color="primary"
           onChange={c => {
             if (c) {
               dispatch(updateJavaPath(null));
+              dispatch(updateJava16Path(null));
             } else {
               dispatch(updateJavaPath(javaPath));
+              dispatch(updateJava16Path(java16Path));
             }
           }}
-          checked={!customJavaPath}
+          checked={!customJavaPath && !customJava16Path}
         />
       </AutodetectPath>
-      {customJavaPath && (
+      {customJavaPath && customJava16Path && (
         <>
           <div
             css={`
-              height: 40px;
+              height: 50px;
+              margin: 30px 0;
             `}
           >
+            <h3
+              css={`
+                text-align: left;
+              `}
+            >
+              Java 8
+            </h3>
             <div
               css={`
                 width: 100%;
-                margin: 20px 0;
               `}
             >
               <FontAwesomeIcon
@@ -186,10 +201,16 @@ export default function MyAccountPreferences() {
               />
               <Input
                 css={`
-                  width: 75%;
-                  margin: 0 10px;
+                  width: 75% !important;
+                  margin: 0 10px !important;
                 `}
-                onChange={e => dispatch(updateJavaPath(e.target.value))}
+                onChange={e =>
+                  dispatch(
+                    updateJavaPath(
+                      e.target.value === '' ? null : e.target.value
+                    )
+                  )
+                }
                 value={customJavaPath}
               />
               <StyledButtons
@@ -201,6 +222,58 @@ export default function MyAccountPreferences() {
                   );
                   if (!filePaths[0] || canceled) return;
                   dispatch(updateJavaPath(filePaths[0]));
+                }}
+              >
+                <FontAwesomeIcon icon={faFolder} />
+              </StyledButtons>
+            </div>
+          </div>
+          <div
+            css={`
+              height: 50px;
+              margin: 30px 0;
+            `}
+          >
+            <h3
+              css={`
+                text-align: left;
+              `}
+            >
+              Java 16
+            </h3>
+            <div
+              css={`
+                width: 100%;
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faLevelDownAlt}
+                flip="horizontal"
+                transform={{ rotate: 90 }}
+              />
+              <Input
+                css={`
+                  width: 75% !important;
+                  margin: 0 10px !important;
+                `}
+                onChange={e => {
+                  dispatch(
+                    updateJava16Path(
+                      e.target.value === '' ? null : e.target.value
+                    )
+                  );
+                }}
+                value={customJava16Path}
+              />
+              <StyledButtons
+                color="primary"
+                onClick={async () => {
+                  const { filePaths, canceled } = await ipcRenderer.invoke(
+                    'openFileDialog',
+                    javaPath
+                  );
+                  if (!filePaths[0] || canceled) return;
+                  dispatch(updateJava16Path(filePaths[0]));
                 }}
               >
                 <FontAwesomeIcon icon={faFolder} />
@@ -310,7 +383,7 @@ export default function MyAccountPreferences() {
           }}
           defaultValue={javaMemory}
           min={1024}
-          max={32768}
+          max={process.getSystemMemoryInfo().total / 1024}
           step={512}
           marks={marks}
           valueLabelDisplay="auto"
@@ -343,9 +416,9 @@ export default function MyAccountPreferences() {
             onChange={e => dispatch(updateJavaArguments(e.target.value))}
             value={javaArgs}
             css={`
-              width: 83%;
-              height: 32px;
-              float: left;
+              width: 83% !important;
+              height: 32px !important;
+              float: left !important;
             `}
           />
           <StyledButtons
