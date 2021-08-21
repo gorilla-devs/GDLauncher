@@ -2545,7 +2545,7 @@ export function getJavaVersionForMCVersion(mcVersion) {
     if (versions) {
       const version = versions.find(v => v.id === mcVersion);
       const java16InitialDate = new Date('2021-05-27T09:39:21+00:00');
-      if (new Date(version.releaseTime) < java16InitialDate) {
+      if (new Date(version?.releaseTime) < java16InitialDate) {
         return 8;
       }
     }
