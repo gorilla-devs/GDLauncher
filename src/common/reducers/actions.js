@@ -2572,10 +2572,13 @@ export function launchInstance(instanceName) {
       resolution: instanceResolution
     } = _getInstance(state)(instanceName);
 
-    ipcRenderer.invoke('update-discord-rpc', {
-      details: instanceName,
-      state: 'playing'
-    });
+    let discordRPCDetails = `Minecraft ${loader?.mcVersion}`;
+
+    if (loader.source && loader.sourceName) {
+      discordRPCDetails = `${loader.sourceName}`;
+    }
+
+    ipcRenderer.invoke('update-discord-rpc', discordRPCDetails);
 
     const defaultJavaPathVersion = _getJavaPath(state)(
       dispatch(getJavaVersionForMCVersion(loader?.mcVersion))
