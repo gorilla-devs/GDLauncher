@@ -74,6 +74,11 @@ const data = {
     },
     {
       header: 'Added usual MacOS default menu'
+    },
+    {
+      header: 'Improved Discord RPC.',
+      content:
+        "It now shows the modpack / MC version you're playing. The modpack name will only be shown for new instances."
     }
   ],
   bugfixes: [
