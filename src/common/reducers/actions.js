@@ -12,6 +12,7 @@ import gt from 'semver/functions/gt';
 import log from 'electron-log';
 import omitBy from 'lodash/omitBy';
 import { pipeline } from 'stream';
+import he from 'he';
 import zlib from 'zlib';
 import lockfile from 'lockfile';
 import omit from 'lodash/omit';
@@ -227,7 +228,13 @@ export function initNews() {
           })) || [];
         dispatch({
           type: ActionTypes.UPDATE_NEWS,
-          news: newsArr.splice(0, 10)
+          news: newsArr
+            .map(v => ({
+              ...v,
+              title: he.decode(v?.title),
+              description: he.decode(v?.description)
+            }))
+            .splice(0, 10)
         });
       } catch (err) {
         console.error(err.message);
