@@ -61,7 +61,7 @@ function DesktopRoot({ store }) {
   const location = useSelector(state => state.router.location);
   const modals = useSelector(state => state.modals);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
-  const [contentStyle, setContentStyle] = useState({ transform: 'scale(1)' });
+  // const [contentStyle, setContentStyle] = useState({ transform: 'scale(1)' });
 
   message.config({
     top: 45,
@@ -172,23 +172,23 @@ function DesktopRoot({ store }) {
 
   useTrackIdle(location.pathname);
 
-  useEffect(() => {
-    if (
-      modals[0] &&
-      modals[0].modalType === 'Settings' &&
-      !modals[0].unmounting
-    ) {
-      setContentStyle({ transform: 'scale(0.4)' });
-    } else {
-      setContentStyle({ transform: 'scale(1)' });
-    }
-  }, [modals]);
+  // useEffect(() => {
+  //   if (
+  //     modals[0] &&
+  //     modals[0].modalType === 'Settings' &&
+  //     !modals[0].unmounting
+  //   ) {
+  //     setContentStyle({ transform: 'scale(0.4)' });
+  //   } else {
+  //     setContentStyle({ transform: 'scale(1)' });
+  //   }
+  // }, [modals]);
 
   return (
     <Wrapper>
       <SystemNavbar />
       <Message />
-      <Container style={contentStyle}>
+      <Container>
         <GlobalStyles />
         <RouteBackground />
         <Switch>
