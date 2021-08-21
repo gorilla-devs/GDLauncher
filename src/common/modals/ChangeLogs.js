@@ -79,6 +79,10 @@ const data = {
       header: 'Improved Discord RPC.',
       content:
         "It now shows the modpack / MC version you're playing. The modpack name will only be shown for new instances."
+    },
+    {
+      header: 'Modal animation is now smoother and simpler.',
+      content: 'This should make it feel "faster".'
     }
   ],
   bugfixes: [
@@ -102,6 +106,22 @@ const data = {
     {
       header: 'Fixed imports from external sources.',
       content: 'Both local zips and remote urls should now work correctly.'
+    },
+    {
+      header: 'Fixed crash',
+      content: 'when renaming instances.'
+    },
+    {
+      header: 'Fixed news',
+      content: 'not being correctly parsed sometimes.'
+    },
+    {
+      header: 'Fixed export',
+      content: 'not exporting correctly lol.'
+    },
+    {
+      header: 'Fixed crash',
+      content: 'when browsing mods.'
     }
   ]
 };
