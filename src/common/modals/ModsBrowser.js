@@ -175,7 +175,7 @@ const ModsListWrapper = ({
         <RowInnerContainer>
           <RowContainerImg
             style={{
-              background: `url('${primaryImage?.thumbnailUrl}') center center`
+              backgroundImage: `url('${primaryImage?.thumbnailUrl}')`
             }}
           />
           <div
