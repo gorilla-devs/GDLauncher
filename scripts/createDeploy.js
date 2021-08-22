@@ -119,7 +119,7 @@ const commonConfig = {
         : []),
       'build/**/*',
       'package.json',
-      'public/1024x1024.png'
+      'public/icon.png'
     ],
     extraFiles:
       process.platform === 'win32'
@@ -171,7 +171,8 @@ const commonConfig = {
     }.${'${ext}'}`,
     /* eslint-enable */
     linux: {
-      category: 'Game'
+      category: 'Game',
+      icon: 'public/'
     },
     directories: {
       buildResources: 'public',
@@ -188,7 +189,8 @@ const commonConfig = {
   ...(process.platform === 'linux' && {
     linux:
       type === 'setup'
-        ? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
+        //? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
+        ? ['deb:x64']
         : ['snap:x64']
   }),
   ...(process.platform === 'win32' && {
