@@ -400,7 +400,6 @@ const AutomaticSetup = ({
       setStepPercentage(index, 0);
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      const sevenZipPath = await get7zPath();
       setCurrentSubStep(
         `Java ${javaVersion} - Extracting 1 / ${totalExtractionSteps}`
       );
