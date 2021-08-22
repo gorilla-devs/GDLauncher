@@ -4,13 +4,12 @@ import styled from 'styled-components';
 import path from 'path';
 import fse from 'fs-extra';
 import { promises as fs } from 'fs';
-import { extractFull } from 'node-7z';
-import { get7zPath, isMod } from '../../../app/desktop/utils';
+import { extractAll } from '../../../app/desktop/utils';
 import { ipcRenderer } from 'electron';
 import { Button, Input } from 'antd';
 import { _getTempPath } from '../../utils/selectors';
 import { useSelector } from 'react-redux';
-import { getAddon, getAddonFiles } from '../../api';
+import { getAddon } from '../../api';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
 import { CURSEFORGE, FABRIC, FORGE, VANILLA } from '../../utils/constants';
 import { transparentize } from 'polished';
@@ -45,7 +44,8 @@ const Import = ({
   const onClick = async () => {
     if (loading || !localValue) return;
     setLoading(true);
-    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*).zip$/;
+    const urlRegex =
+      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*).zip$/;
     const isUrlRegex = urlRegex.test(localValue);
 
     const tempFilePath = path.join(tempPath, path.basename(localValue));
@@ -66,33 +66,26 @@ const Import = ({
       }
     }
 
-    const sevenZipPath = await get7zPath();
     try {
       await fs.access(path.join(tempPath, 'manifest.json'));
     } catch {
       await fse.remove(path.join(tempPath, 'manifest.json'));
     }
-    const extraction = extractFull(
+    await extractAll(
       isUrlRegex ? tempFilePath : localValue,
       tempPath,
       {
         recursive: true,
-        $bin: sevenZipPath,
         yes: true,
         $cherryPick: 'manifest.json'
+      },
+      {
+        error: () => {
+          setError(true);
+          setLoading(false);
+        }
       }
     );
-
-    await new Promise((resolve, reject) => {
-      extraction.on('end', () => {
-        resolve();
-      });
-      extraction.on('error', err => {
-        setError(true);
-        setLoading(false);
-        reject(err.stderr);
-      });
-    });
     const manifest = await fse.readJson(path.join(tempPath, 'manifest.json'));
     await fse.remove(path.join(tempPath, 'manifest.json'));
     let addon = null;
