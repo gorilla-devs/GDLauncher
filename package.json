@@ -41,6 +41,7 @@
     "build-electron:setup": "cross-env-shell NODE_ENV=production REACT_APP_RELEASE_TYPE=setup webpack --config ./scripts/electronWebpackConfig.js --color",
     "build-electron:dev": "cross-env-shell NODE_ENV=development REACT_APP_RELEASE_TYPE=setup webpack --config ./scripts/electronWebpackConfig.js --color",
     "lint": "eslint .",
+    "lint-fix": "eslint . --fix",
     "dev": "npm run build-electron:dev && cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none \"npm run start-electron\"",
     "dev-web": "cross-env-shell NODE_ENV=development APP_TYPE=web npm run start",
     "deploy": "node ./scripts/createDeploy.js",
