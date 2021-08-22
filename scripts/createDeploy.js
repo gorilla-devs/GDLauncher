@@ -189,8 +189,7 @@ const commonConfig = {
   ...(process.platform === 'linux' && {
     linux:
       type === 'setup'
-        //? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
-        ? ['deb:x64']
+        ? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
         : ['snap:x64']
   }),
   ...(process.platform === 'win32' && {
