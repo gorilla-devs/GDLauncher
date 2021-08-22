@@ -16,7 +16,6 @@ import Modal from '../components/Modal';
 import { downloadFile } from '../../app/desktop/utils/downloader';
 import {
   convertOSToJavaFormat,
-  get7zPath,
   isLatestJavaDownloaded
 } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';

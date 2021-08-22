@@ -161,8 +161,8 @@ const DragEnterEffect = styled.div`
   backdrop-filter: blur(4px);
   background: linear-gradient(
     0deg,
-    rgba(0, 0, 0, .3) 40%,
-    rgba(0, 0, 0, .3) 40%
+    rgba(0, 0, 0, 0.3) 40%,
+    rgba(0, 0, 0, 0.3) 40%
   );
   opacity: ${({ transitionState }) =>
     transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
