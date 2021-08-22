@@ -145,7 +145,7 @@ const NotItemsAvailable = styled.div`
 const DragEnterEffect = styled.div`
   position: absolute;
   display: flex;
-  flex-direction; column;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   border: solid 5px ${props => props.theme.palette.primary.main};
