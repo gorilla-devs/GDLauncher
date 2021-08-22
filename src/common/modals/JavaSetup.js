@@ -16,7 +16,6 @@ import { downloadFile } from '../../app/desktop/utils/downloader';
 import {
   convertOSToJavaFormat,
   extractAll,
-  get7zPath,
   isLatestJavaDownloaded
 } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
