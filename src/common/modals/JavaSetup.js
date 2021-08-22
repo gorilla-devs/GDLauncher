@@ -7,7 +7,6 @@ import { ipcRenderer } from 'electron';
 import fse from 'fs-extra';
 import { useSelector, useDispatch } from 'react-redux';
 import path from 'path';
-import { extractFull } from 'node-7z';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolder } from '@fortawesome/free-solid-svg-icons';
 import { exec } from 'child_process';
@@ -16,6 +15,7 @@ import Modal from '../components/Modal';
 import { downloadFile } from '../../app/desktop/utils/downloader';
 import {
   convertOSToJavaFormat,
+  extractAll,
   isLatestJavaDownloaded
 } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
@@ -399,27 +399,23 @@ const AutomaticSetup = ({
       setStepPercentage(index, 0);
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      const sevenZipPath = await get7zPath();
       setCurrentSubStep(
         `Java ${javaVersion} - Extracting 1 / ${totalExtractionSteps}`
       );
-      const firstExtraction = extractFull(downloadLocation, tempFolder, {
-        $bin: sevenZipPath,
-        $progress: true
-      });
-      await new Promise((resolve, reject) => {
-        firstExtraction.on('progress', ({ percent }) => {
-          ipcRenderer.invoke('update-progress-bar', percent);
-          setDownloadPercentage(percent);
-          setStepPercentage(index, percent);
-        });
-        firstExtraction.on('end', () => {
-          resolve();
-        });
-        firstExtraction.on('error', err => {
-          reject(err);
-        });
-      });
+      await extractAll(
+        downloadLocation,
+        tempFolder,
+        {
+          $progress: true
+        },
+        {
+          update: percent => {
+            ipcRenderer.invoke('update-progress-bar', percent);
+            setDownloadPercentage(percent);
+            setStepPercentage(index, percent);
+          }
+        }
+      );
 
       index += 1;
       setDownloadPercentage(0);
@@ -440,23 +436,20 @@ const AutomaticSetup = ({
           path.basename(url).replace('.tar.gz', '.tar')
         );
 
-        const secondExtraction = extractFull(tempTarName, tempFolder, {
-          $bin: sevenZipPath,
-          $progress: true
-        });
-        await new Promise((resolve, reject) => {
-          secondExtraction.on('progress', ({ percent }) => {
-            ipcRenderer.invoke('update-progress-bar', percent);
-            setDownloadPercentage(percent);
-            setStepPercentage(index, percent);
-          });
-          secondExtraction.on('end', () => {
-            resolve();
-          });
-          secondExtraction.on('error', err => {
-            reject(err);
-          });
-        });
+        await extractAll(
+          tempTarName,
+          tempFolder,
+          {
+            $progress: true
+          },
+          {
+            update: percent => {
+              ipcRenderer.invoke('update-progress-bar', percent);
+              setDownloadPercentage(percent);
+              setStepPercentage(index, percent);
+            }
+          }
+        );
         await fse.remove(tempTarName);
         index += 1;
         setDownloadPercentage(0);
