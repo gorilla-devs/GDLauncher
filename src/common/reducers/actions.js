@@ -3044,7 +3044,11 @@ export const getAppLatestVersion = async () => {
   if (!isAppUpdated(latestStablerelease)) {
     return latestStablerelease;
   }
-  if (!isAppUpdated(latestPrerelease) && releaseChannel !== 0) {
+  if (
+    latestPrerelease &&
+    !isAppUpdated(latestPrerelease) &&
+    releaseChannel !== 0
+  ) {
     return latestPrerelease;
   }
 
