@@ -172,7 +172,7 @@ const commonConfig = {
     /* eslint-enable */
     linux: {
       category: 'Game',
-      icon: 'public/'
+      icon: 'public/linux-icons/'
     },
     directories: {
       buildResources: 'public',
