@@ -16,7 +16,7 @@ import he from 'he';
 import zlib from 'zlib';
 import lockfile from 'lockfile';
 import omit from 'lodash/omit';
-import Seven, { extractFull } from 'node-7z';
+import Seven from 'node-7z';
 import { push } from 'connected-react-router';
 import { spawn } from 'child_process';
 import symlink from 'symlink-dir';
@@ -104,7 +104,8 @@ import {
   convertCompletePathToInstance,
   downloadAddonZip,
   convertcurseForgeToCanonical,
-  extractFabricVersionFromManifest
+  extractFabricVersionFromManifest,
+  extractAll
 } from '../../app/desktop/utils';
 import {
   downloadFile,
@@ -1207,18 +1208,8 @@ export function downloadForge(instanceName) {
     );
 
     const extractSpecificFile = async from => {
-      const extraction = extractFull(tempInstaller, _getTempPath(state), {
-        $bin: sevenZipPath,
-        yes: true,
+      await extractAll(tempInstaller, _getTempPath(state), {
         $cherryPick: from
-      });
-      await new Promise((resolve, reject) => {
-        extraction.on('end', () => {
-          resolve();
-        });
-        extraction.on('error', error => {
-          reject(error.stderr);
-        });
       });
     };
 
@@ -1479,7 +1470,8 @@ export function downloadForge(instanceName) {
 
       const metaInfDeletion = Seven.delete(mcJarForgePath, 'META-INF', {
         $bin: sevenZipPath,
-        yes: true
+        yes: true,
+        $spawnOptions: { shell: true }
       });
       await new Promise((resolve, reject) => {
         metaInfDeletion.on('end', () => {
@@ -1493,22 +1485,10 @@ export function downloadForge(instanceName) {
       await fse.remove(path.join(_getTempPath(state), loader?.loaderVersion));
 
       // This is garbage, need to use a stream somehow to directly inject data from/to jar
-      const extraction = extractFull(
+      await extractAll(
         tempInstaller,
-        path.join(_getTempPath(state), loader?.loaderVersion),
-        {
-          $bin: sevenZipPath,
-          yes: true
-        }
+        path.join(_getTempPath(state), loader?.loaderVersion)
       );
-      await new Promise((resolve, reject) => {
-        extraction.on('end', () => {
-          resolve();
-        });
-        extraction.on('error', error => {
-          reject(error.stderr);
-        });
-      });
 
       dispatch(updateDownloadProgress(50));
 
@@ -1517,7 +1497,8 @@ export function downloadForge(instanceName) {
         `${path.join(_getTempPath(state), loader?.loaderVersion)}/*`,
         {
           $bin: sevenZipPath,
-          yes: true
+          yes: true,
+          $spawnOptions: { shell: true }
         }
       );
       await new Promise((resolve, reject) => {
@@ -1730,33 +1711,24 @@ export function processForgeManifest(instanceName) {
       instanceName,
       'addon.zip'
     );
-    const sevenZipPath = await get7zPath();
-    const extraction = extractFull(
+    let progress = 0;
+    await extractAll(
       addonPathZip,
       path.join(_getTempPath(state), instanceName),
       {
         recursive: true,
-        $bin: sevenZipPath,
-        yes: true,
         $cherryPick: 'overrides',
         $progress: true
+      },
+      {
+        progress: percent => {
+          if (percent !== progress) {
+            progress = percent;
+            dispatch(updateDownloadProgress(percent));
+          }
+        }
       }
     );
-    await new Promise((resolve, reject) => {
-      let progress = 0;
-      extraction.on('progress', ({ percent }) => {
-        if (percent !== progress) {
-          progress = percent;
-          dispatch(updateDownloadProgress(percent));
-        }
-      });
-      extraction.on('end', () => {
-        resolve();
-      });
-      extraction.on('error', err => {
-        reject(err.stderr);
-      });
-    });
 
     dispatch(updateDownloadStatus(instanceName, 'Finalizing overrides...'));
 
@@ -1915,7 +1887,7 @@ export function downloadInstance(instanceName) {
     );
 
     // Wait 400ms to avoid "The process cannot access the file because it is being used by another process."
-    await new Promise(resolve => setTimeout(() => resolve(), 400));
+    await new Promise(resolve => setTimeout(() => resolve(), 1000));
 
     await extractNatives(
       libraries,
@@ -3044,7 +3016,11 @@ export const getAppLatestVersion = async () => {
   if (!isAppUpdated(latestStablerelease)) {
     return latestStablerelease;
   }
-  if (!isAppUpdated(latestPrerelease) && releaseChannel !== 0) {
+  if (
+    latestPrerelease &&
+    !isAppUpdated(latestPrerelease) &&
+    releaseChannel !== 0
+  ) {
     return latestPrerelease;
   }
 

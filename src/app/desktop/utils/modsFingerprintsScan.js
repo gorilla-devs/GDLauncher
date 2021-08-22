@@ -149,9 +149,13 @@ const modsFingerprintsScan = async instancesPath => {
   };
 
   const folders = await getDirectories(instancesPath);
-  const instances = await pMap(folders, mapFolderToInstance, {
-    concurrency: 5
-  });
+  const instances = await pMap(
+    folders.filter(folder => folder !== '.DS_Store'),
+    mapFolderToInstance,
+    {
+      concurrency: 5
+    }
+  );
   const hashMap = {};
   // eslint-disable-next-line
   for (const instance of instances) {

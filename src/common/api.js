@@ -17,9 +17,17 @@ import {
   JAVA16_MANIFEST_URL
 } from './utils/constants';
 import { sortByDate } from './utils';
+import ga from './utils/analytics';
+
+const trackCurseForgeAPI = () => {
+  ga.sendCustomEvent('CurseForgeAPICall');
+};
+
+const trackFTBAPI = () => {
+  ga.sendCustomEvent('FTBAPICall');
+};
 
 // Microsoft Auth
-
 export const msExchangeCodeForAccessToken = (
   clientId,
   redirectUrl,
@@ -218,16 +226,19 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
 // FORGE ADDONS
 
 export const getAddon = projectID => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/addon/${projectID}`;
   return axios.get(url);
 };
 
 export const getMultipleAddons = async addons => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/addon`;
   return axios.post(url, addons);
 };
 
 export const getAddonFiles = projectID => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/addon/${projectID}/files`;
   return axios.get(url).then(res => ({
     ...res,
@@ -236,26 +247,31 @@ export const getAddonFiles = projectID => {
 };
 
 export const getAddonDescription = projectID => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/addon/${projectID}/description`;
   return axios.get(url);
 };
 
 export const getAddonFile = (projectID, fileID) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/addon/${projectID}/file/${fileID}`;
   return axios.get(url);
 };
 
 export const getAddonsByFingerprint = fingerprints => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/fingerprint`;
   return axios.post(url, fingerprints);
 };
 
 export const getAddonFileChangelog = (projectID, fileID) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/addon/${projectID}/file/${fileID}/changelog`;
   return axios.get(url);
 };
 
 export const getAddonCategories = () => {
+  trackCurseForgeAPI();
   return axios.get(FORGESVC_CATEGORIES);
 };
 
@@ -270,6 +286,7 @@ export const getSearch = (
   categoryId,
   modLoaderType
 ) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/addon/search`;
   const params = {
     gameId: 432,
@@ -287,6 +304,7 @@ export const getSearch = (
 };
 
 export const getFTBModpackData = async modpackId => {
+  trackFTBAPI();
   try {
     const url = `${FTB_API_URL}/modpack/${modpackId}`;
     const { data } = await axios.get(url);
@@ -297,6 +315,7 @@ export const getFTBModpackData = async modpackId => {
 };
 
 export const getFTBModpackVersionData = async (modpackId, versionId) => {
+  trackFTBAPI();
   try {
     const url = `${FTB_API_URL}/modpack/${modpackId}/${versionId}`;
     const { data } = await axios.get(url);
@@ -306,6 +325,7 @@ export const getFTBModpackVersionData = async (modpackId, versionId) => {
   }
 };
 export const getFTBChangelog = async (modpackId, versionId) => {
+  trackFTBAPI();
   try {
     const url = `https://api.modpacks.ch/public/modpack/${modpackId}/${versionId}/changelog`;
     const { data } = await axios.get(url);
@@ -316,11 +336,13 @@ export const getFTBChangelog = async (modpackId, versionId) => {
 };
 
 export const getFTBMostPlayed = async () => {
+  trackFTBAPI();
   const url = `${FTB_API_URL}/modpack/popular/plays/1000`;
   return axios.get(url);
 };
 
 export const getFTBSearch = async searchText => {
+  trackFTBAPI();
   const url = `${FTB_API_URL}/modpack/search/1000?term=${searchText}`;
   return axios.get(url);
 };
