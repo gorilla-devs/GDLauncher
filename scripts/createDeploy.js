@@ -119,7 +119,7 @@ const commonConfig = {
         : []),
       'build/**/*',
       'package.json',
-      'public/icon.png'
+      'public/1024x1024.png'
     ],
     extraFiles:
       process.platform === 'win32'
