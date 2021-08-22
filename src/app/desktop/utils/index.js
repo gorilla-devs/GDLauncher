@@ -350,6 +350,7 @@ export const extractAll = async (
       reject(err);
     });
   });
+  return extraction;
 };
 
 export const extractNatives = async (libraries, instancePath) => {
@@ -611,7 +612,7 @@ export const getJVMArguments113 = (
 };
 
 export const readJarManifest = async (jarPath, property) => {
-  const list = extractAll(jarPath, '.', {
+  const list = await extractAll(jarPath, '.', {
     toStdout: true,
     $cherryPick: 'META-INF/MANIFEST.MF'
   });
