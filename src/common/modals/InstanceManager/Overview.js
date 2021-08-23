@@ -24,7 +24,10 @@ import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
 } from '../../../app/desktop/utils/constants';
-import { updateInstanceConfig } from '../../reducers/actions';
+import {
+  getJavaVersionForMCVersion,
+  updateInstanceConfig
+} from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 import { convertMinutesToHumanTime } from '../../utils';
 import { CURSEFORGE } from '../../utils/constants';
@@ -119,7 +122,8 @@ const marks = {
   2048: '2048 MB',
   4096: '4096 MB',
   8192: '8192 MB',
-  16384: '16384 MB'
+  16384: '16384 MB',
+  32768: '32768 MB'
 };
 
 const Card = memo(
@@ -173,9 +177,15 @@ const Card = memo(
 );
 
 const Overview = ({ instanceName, background, manifest }) => {
+  const dispatch = useDispatch();
   const instancesPath = useSelector(_getInstancesPath);
   const config = useSelector(state => _getInstance(state)(instanceName));
-  const defaultJavaPath = useSelector(state => _getJavaPath(state));
+  const javaVersion = dispatch(
+    getJavaVersionForMCVersion(config?.loader?.mcVersion)
+  );
+  const defaultJavaPath = useSelector(state =>
+    _getJavaPath(state)(javaVersion)
+  );
   const [javaLocalMemory, setJavaLocalMemory] = useState(config?.javaMemory);
   const [javaLocalArguments, setJavaLocalArguments] = useState(
     config?.javaArgs
@@ -185,8 +195,6 @@ const Overview = ({ instanceName, background, manifest }) => {
   const [screenResolution, setScreenResolution] = useState(null);
   const [height, setHeight] = useState(config?.resolution?.height);
   const [width, setWidth] = useState(config?.resolution?.width);
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     ipcRenderer
@@ -494,7 +502,7 @@ const Overview = ({ instanceName, background, manifest }) => {
                 onChange={setJavaLocalMemory}
                 value={javaLocalMemory}
                 min={1024}
-                max={16384}
+                max={process.getSystemMemoryInfo().total / 1024}
                 step={512}
                 marks={marks}
                 valueLabelDisplay="auto"
@@ -534,7 +542,7 @@ const Overview = ({ instanceName, background, manifest }) => {
             </JavaManagerRow>
           )}
           <JavaManagerRow>
-            <div>Custom Java Path</div>
+            <div>Custom Java Path {`<Java ${javaVersion}>`} </div>
             <Switch
               checked={customJavaPath}
               onChange={v => {

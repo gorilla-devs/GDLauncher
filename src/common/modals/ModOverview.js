@@ -373,7 +373,7 @@ const Container = styled.div`
   perspective: 1px;
   transform-style: preserve-3d;
   height: calc(100% - 70px);
-  width; 100%;
+  width: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
 `;

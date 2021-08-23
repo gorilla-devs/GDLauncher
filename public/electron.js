@@ -75,13 +75,33 @@ const edit = [
           label: 'GDLauncher',
           submenu: [
             {
-              label: 'Hide',
-              accelerator: 'Command+H',
-              selector: 'hide:'
+              label: 'About GDLauncher',
+              role: 'about'
             },
             { type: 'separator' },
             {
-              label: 'Quit',
+              label: 'Services',
+              role: 'services',
+              submenu: []
+            },
+            { type: 'separator' },
+            {
+              label: 'Hide GDLauncher',
+              accelerator: 'Command+H',
+              role: 'hide'
+            },
+            {
+              label: 'Hide Others',
+              accelerator: 'Command+Alt+H',
+              role: 'hideOthers'
+            },
+            {
+              label: 'Show All',
+              role: 'unhide'
+            },
+            { type: 'separator' },
+            {
+              label: 'Quit GDLauncher',
               accelerator: 'Command+Q',
               click: () => {
                 app.quit();
@@ -184,7 +204,7 @@ async function extract7z() {
 
   let zipLocationAsar = path.join(baseDir, 'linux', 'x64', '7za');
   if (process.platform === 'darwin') {
-    zipLocationAsar = path.join(baseDir, 'mac', '7za');
+    zipLocationAsar = path.join(baseDir, 'mac', 'x64', '7za');
   }
   if (process.platform === 'win32') {
     zipLocationAsar = path.join(baseDir, 'win', 'x64', '7za.exe');
@@ -567,7 +587,11 @@ ipcMain.handle('init-discord-rpc', () => {
 });
 
 ipcMain.handle('update-discord-rpc', (event, p) => {
-  discordRPC.updateDetails(p);
+  discordRPC.update(p);
+});
+
+ipcMain.handle('reset-discord-rpc', () => {
+  discordRPC.reset();
 });
 
 ipcMain.handle('shutdown-discord-rpc', () => {

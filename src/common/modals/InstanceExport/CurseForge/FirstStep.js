@@ -193,7 +193,7 @@ export default function FirstStep({
                           defaultValue={packZipName}
                           maxLength={50}
                           css={`
-                            width: 300px;
+                            width: 300px !important;
                           `}
                           onChange={e => setPackZipName(e.target.value)}
                         />
@@ -217,7 +217,7 @@ export default function FirstStep({
                           maxLength={10}
                           allowClear="true"
                           css={`
-                            width: 300px;
+                            width: 300px !important;
                           `}
                           onChange={e => setPackVersion(e.target.value)}
                         />
@@ -245,7 +245,7 @@ export default function FirstStep({
                           maxLength={50}
                           allowClear="true"
                           css={`
-                            width: 300px;
+                            width: 300px !important;
                           `}
                           onChange={e => setPackAuthor(e.target.value)}
                         />
@@ -263,7 +263,7 @@ export default function FirstStep({
                         disabled
                         value={filePathDisplay()}
                         css={`
-                          margin-right: 10px;
+                          margin-right: 10px !important;
                         `}
                       />
                       <Button type="primary" onClick={showFileDialog}>
