@@ -24,7 +24,7 @@ import fss, { promises as fs } from 'fs';
 import originalFs from 'original-fs';
 import pMap from 'p-map';
 import makeDir from 'make-dir';
-import { parse } from 'semver';
+import { major, minor, patch, prerelease } from 'semver';
 import { generate as generateRandomString } from 'randomstring';
 import fxp from 'fast-xml-parser';
 import * as ActionTypes from './actionTypes';
@@ -2983,7 +2983,7 @@ export const initLatestMods = instanceName => {
   };
 };
 
-export const getAppLatestVersion = async () => {
+export const isNewVersionAvailable = async () => {
   const { data: latestReleases } = await axios.get(
     'https://api.github.com/repos/gorilla-devs/GDLauncher/releases?per_page=10'
   );
@@ -2991,37 +2991,40 @@ export const getAppLatestVersion = async () => {
   const latestPrerelease = latestReleases.find(v => v.prerelease);
   const latestStablerelease = latestReleases.find(v => !v.prerelease);
 
-  const appData = parse(await ipcRenderer.invoke('getAppdataPath'));
+  const appData = await ipcRenderer.invoke('getAppdataPath');
+
   let releaseChannel = 0;
 
   try {
     const rChannel = await fs.readFile(
       path.join(appData, 'gdlauncher_next', 'rChannel')
     );
-    releaseChannel = rChannel.toString();
+    releaseChannel = parseInt(rChannel.toString(), 10);
   } catch {
     // swallow error
   }
 
   const v = await ipcRenderer.invoke('getAppVersion');
 
-  const installedVersion = parse(v);
-  const isAppUpdated = r => !lt(installedVersion, parse(r.tag_name));
-
-  // If we're on beta but the release channel is stable, return latest stable to force an update
-  if (v.includes('beta') && releaseChannel === 0) {
-    return latestStablerelease;
-  }
-
-  if (!isAppUpdated(latestStablerelease)) {
-    return latestStablerelease;
-  }
+  const isAppUpdated = r => gte(v, r.tag_name);
   if (
-    latestPrerelease &&
-    !isAppUpdated(latestPrerelease) &&
-    releaseChannel !== 0
+    releaseChannel === 0 &&
+    (prerelease(v) || !isAppUpdated(latestStablerelease))
   ) {
-    return latestPrerelease;
+    return latestStablerelease;
+  }
+  if (releaseChannel !== 0) {
+    if (
+      !isAppUpdated(latestStablerelease) &&
+      (major(latestStablerelease.tag_name) > major(v) ||
+        minor(latestStablerelease.tag_name) > minor(v) ||
+        patch(latestStablerelease.tag_name) > patch(v))
+    ) {
+      return latestStablerelease;
+    }
+    if (latestPrerelease && !isAppUpdated(latestPrerelease)) {
+      return latestPrerelease;
+    }
   }
 
   return false;
@@ -3034,15 +3037,14 @@ export const checkForPortableUpdates = () => {
 
     const tempFolder = path.join(_getTempPath(state), `update`);
 
-    const latestVersion = await getAppLatestVersion();
+    const newVersion = await isNewVersionAvailable();
 
     // Latest version has a value only if the user is not using the latest
-    if (latestVersion) {
-      const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${latestVersion?.tag_name}`;
+    if (newVersion) {
+      const baseAssetUrl = `https://github.com/gorilla-devs/GDLauncher/releases/download/${newVersion?.tag_name}`;
       const { data: latestManifest } = await axios.get(
         `${baseAssetUrl}/${process.platform}_latest.json`
       );
-      console.log('inside', latestVersion);
       // Cleanup all files that are not required for the update
       await makeDir(tempFolder);
 
@@ -3152,6 +3154,6 @@ export const checkForPortableUpdates = () => {
         { concurrency: 3 }
       );
     }
-    return latestVersion;
+    return newVersion;
   };
 };
