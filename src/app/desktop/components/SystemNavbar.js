@@ -11,6 +11,7 @@ import {
   faCog,
   faDownload
 } from '@fortawesome/free-solid-svg-icons';
+import { faMinusSquare } from '@fortawesome/free-regular-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { openModal } from '../../../common/reducers/modals/actions';
 import {
@@ -227,6 +228,16 @@ const SystemNavbar = () => {
                 icon={isMaximized ? faWindowRestore : faWindowMaximize}
               />
             </div>
+            {!isWindows && (
+              <div
+                onClick={() => ipcRenderer.invoke('hide-window')}
+                css={`
+                  -webkit-app-region: no-drag;
+                `}
+              >
+                <FontAwesomeIcon icon={faMinusSquare} />
+              </div>
+            )}
             <div
               css={`
                 font-size: 18px;
@@ -265,6 +276,14 @@ const SystemNavbar = () => {
               `}
             >
               <FontAwesomeIcon icon={faWindowMinimize} />
+            </div>
+            <div
+              onClick={() => ipcRenderer.invoke('hide-window')}
+              css={`
+                -webkit-app-region: no-drag;
+              `}
+            >
+              <FontAwesomeIcon icon={faMinusSquare} />
             </div>
             {!isLocation('/') && !isLocation('/onboarding') && (
               <SettingsButton />

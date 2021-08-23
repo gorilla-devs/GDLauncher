@@ -385,6 +385,7 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
+  mainWindow.show();
 });
 
 ipcMain.handle(
