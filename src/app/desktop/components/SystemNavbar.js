@@ -173,6 +173,7 @@ const SystemNavbar = () => {
               rel="noopener noreferrer"
               css={`
                 margin-top: 5px;
+                margin-right: 5px;
                 -webkit-app-region: no-drag;
               `}
             >
@@ -294,6 +295,7 @@ const SystemNavbar = () => {
               rel="noopener noreferrer"
               css={`
                 margin-top: 5px;
+                margin-right: 5px;
                 -webkit-app-region: no-drag;
               `}
             >
