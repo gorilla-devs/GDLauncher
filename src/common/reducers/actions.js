@@ -1577,7 +1577,9 @@ export function processFTBManifest(instanceName) {
     const { exactMatches } = data || {};
 
     for (const item of exactMatches) {
-      fileHashes[item.file.packageFingerprint] = item;
+      if (item.file) {
+        fileHashes[item.file.packageFingerprint] = item;
+      }
     }
 
     mappedFiles = mappedFiles.filter(
