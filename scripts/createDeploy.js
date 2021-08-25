@@ -99,6 +99,26 @@ const createDeployFiles = async () => {
   );
 };
 
+const extraFiles = [];
+let sevenZipPath = null;
+if (process.platform === 'win32') {
+  sevenZipPath = 'node_modules/7zip-bin/win/x64/7za.exe';
+  extraFiles.push({
+    from: 'vcredist/',
+    to: './',
+    filter: '**/*'
+  });
+} else if (process.platform === 'linux') {
+  sevenZipPath = 'node_modules/7zip-bin/linux/x64/7za';
+} else if (process.platform === 'darwin') {
+  sevenZipPath = 'node_modules/7zip-bin/mac/x64/7za';
+}
+
+extraFiles.push({
+  from: sevenZipPath,
+  to: './'
+});
+
 const commonConfig = {
   publish: 'never',
   config: {
@@ -108,29 +128,11 @@ const commonConfig = {
     appId: 'org.gorilladevs.GDLauncher',
     files: [
       '!node_modules/**/*',
-      ...(process.platform === 'linux'
-        ? ['node_modules/7zip-bin/linux/x64/7za']
-        : []),
-      ...(process.platform === 'darwin'
-        ? ['node_modules/7zip-bin/mac/x64/7za']
-        : []),
-      ...(process.platform === 'win32'
-        ? ['node_modules/7zip-bin/win/x64/7za.exe']
-        : []),
       'build/**/*',
       'package.json',
       'public/icon.png'
     ],
-    extraFiles:
-      process.platform === 'win32'
-        ? [
-            {
-              from: 'vcredist/',
-              to: './',
-              filter: '**/*'
-            }
-          ]
-        : [],
+    extraFiles,
     asar: {
       smartUnpack: false
     },

@@ -34,6 +34,8 @@ const discordRPC = require('./discordRPC');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
+const isDev = process.env.NODE_ENV === 'development';
+
 // Prevent multiple instances
 if (gotTheLock) {
   app.on('second-instance', (e, argv) => {
@@ -197,44 +199,26 @@ if (
 
 log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
 
-const isDev = process.env.NODE_ENV === 'development';
-
-async function extract7z() {
-  const baseDir = path.join(app.getAppPath(), 'node_modules', '7zip-bin');
-
-  let zipLocationAsar = path.join(baseDir, 'linux', 'x64', '7za');
-  if (process.platform === 'darwin') {
-    zipLocationAsar = path.join(baseDir, 'mac', 'x64', '7za');
+async function patchSevenZip() {
+  let sevenZipPath = null;
+  const baseDir = path.dirname(app.getPath('exe'));
+  if (process.platform === 'darwin' || process.platform === 'linux') {
+    sevenZipPath = path.join(baseDir, '7za');
+  } else {
+    sevenZipPath = path.join(baseDir, '7za.exe');
   }
-  if (process.platform === 'win32') {
-    zipLocationAsar = path.join(baseDir, 'win', 'x64', '7za.exe');
-  }
+
   try {
-    await fs.copyFile(
-      zipLocationAsar,
-      path.join(app.getPath('userData'), path.basename(zipLocationAsar))
-    );
-
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await promisify(exec)(
-        `chmod +x "${path.join(
-          app.getPath('userData'),
-          path.basename(zipLocationAsar)
-        )}"`
-      );
-      await promisify(exec)(
-        `chmod 755 "${path.join(
-          app.getPath('userData'),
-          path.basename(zipLocationAsar)
-        )}"`
-      );
+      await promisify(exec)(`chmod +x "${sevenZipPath}"`);
+      await promisify(exec)(`chmod 755 "${sevenZipPath}"`);
     }
   } catch (e) {
     log.error(e);
   }
 }
 
-extract7z();
+if (!isDev) patchSevenZip();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
