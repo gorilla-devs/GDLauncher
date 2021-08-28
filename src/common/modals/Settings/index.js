@@ -174,7 +174,7 @@ export default function Settings() {
                   src={KoFiButton}
                   alt="Ko-Fi"
                   css={`
-                    margin-bottom: 20px;
+                    margin-bottom: 0px;
                     margin-top: 20px;
                   `}
                 />
@@ -191,6 +191,7 @@ export default function Settings() {
               css={`
                 margin-top: 20px;
                 display: flex;
+                font-size: 10px;
                 flex-direction: column;
                 span {
                   text-decoration: underline;

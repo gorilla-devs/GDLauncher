@@ -138,10 +138,18 @@ const ChangeLogs = () => {
     });
 
   useEffect(() => {
-    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
-    setTimeout(() => {
-      setSkipIObserver(false);
-    }, 300);
+    ipcRenderer
+      .invoke('getAppVersion')
+      .then(v => {
+        setVersion(v);
+        if (!v.includes('beta')) {
+          setTimeout(() => {
+            setSkipIObserver(false);
+          }, 300);
+        }
+        return v;
+      })
+      .catch(console.error);
     ga.sendCustomEvent('changelogModalOpen');
   }, []);
 
