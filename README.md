@@ -8,7 +8,6 @@
 ## 🦺 Support this project
 
 <a href='https://ko-fi.com/gdlauncher' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
-<a href='https://www.patreon.com/gorilladevs' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.assets-gdevs.com/patreonButton.png' border='0' alt='Become a Patron' /></a>
 <details>
  <summary><strong>Table of Contents</strong> (click to expand)
 </summary>

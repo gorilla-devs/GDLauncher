@@ -16,7 +16,7 @@ import { openModal } from '../../../common/reducers/modals/actions';
 import {
   checkForPortableUpdates,
   updateUpdateAvailable,
-  getAppLatestVersion
+  isNewVersionAvailable
 } from '../../../common/reducers/actions';
 import BisectHosting from '../../../ui/BisectHosting';
 import Logo from '../../../ui/Logo';
@@ -53,7 +53,7 @@ const SystemNavbar = () => {
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     } else {
-      dispatch(getAppLatestVersion())
+      dispatch(isNewVersionAvailable())
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     }
