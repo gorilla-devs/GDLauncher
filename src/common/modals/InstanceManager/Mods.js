@@ -305,13 +305,17 @@ const Row = memo(({ index, style, data }) => {
     gameVersion,
     selectedMods,
     setSelectedMods,
-    latestMods
+    latestMods,
+    checkUpdates
   } = data;
   const item = items[index];
+
   const isUpdateAvailable =
+    checkUpdates &&
     latestMods[item.projectID] &&
     latestMods[item.projectID].id !== item.fileID &&
     latestMods[item.projectID].releaseType <= curseReleaseChannel;
+
   const dispatch = useDispatch();
 
   const name = item.fileName
@@ -499,7 +503,8 @@ const createItemData = memoize(
     gameVersion,
     selectedMods,
     setSelectedMods,
-    latestMods
+    latestMods,
+    checkUpdates
   ) => ({
     items,
     instanceName,
@@ -507,7 +512,8 @@ const createItemData = memoize(
     gameVersion,
     selectedMods,
     setSelectedMods,
-    latestMods
+    latestMods,
+    checkUpdates
   })
 );
 
@@ -549,6 +555,7 @@ const Mods = ({ instanceName }) => {
   const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
   const [dragCompleted, setDragCompleted] = useState({});
   const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
+  const [checkUpdates, setCheckUpdates] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -606,7 +613,8 @@ const Mods = ({ instanceName }) => {
     instance.loader?.mcVersion,
     selectedMods,
     setSelectedMods,
-    latestMods
+    latestMods,
+    checkUpdates
   );
 
   const onDragOver = e => {
@@ -747,6 +755,9 @@ const Mods = ({ instanceName }) => {
               <FontAwesomeIcon icon={faEllipsisV} />
             </Dropdown>
           </StyledDropdown>
+          <Button onClick={() => setCheckUpdates(prev => !prev)}>
+            check updates
+          </Button>
         </div>
         <Button
           type="primary"
