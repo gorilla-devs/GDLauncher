@@ -9,7 +9,6 @@ import { useInView } from 'react-intersection-observer';
 import Modal from '../components/Modal';
 import SocialButtons from '../components/SocialButtons';
 import KoFiButton from '../assets/ko-fi.png';
-import PatreonButton from '../assets/patreon.png';
 import UpdateIllustration from '../assets/update_illustration.png';
 import { openModal } from '../reducers/modals/actions';
 import ga from '../utils/analytics';
@@ -139,10 +138,18 @@ const ChangeLogs = () => {
     });
 
   useEffect(() => {
-    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
-    setTimeout(() => {
-      setSkipIObserver(false);
-    }, 300);
+    ipcRenderer
+      .invoke('getAppVersion')
+      .then(v => {
+        setVersion(v);
+        if (!v.includes('beta')) {
+          setTimeout(() => {
+            setSkipIObserver(false);
+          }, 300);
+        }
+        return v;
+      })
+      .catch(console.error);
     ga.sendCustomEvent('changelogModalOpen');
   }, []);
 
@@ -213,9 +220,6 @@ const ChangeLogs = () => {
           >
             <a href="https://ko-fi.com/gdlauncher">
               <img src={KoFiButton} alt="Ko-Fi" />
-            </a>
-            <a href="https://patreon.com/gorilladevs">
-              <img src={PatreonButton} alt="Patreon" />
             </a>
           </div>
         </Header>

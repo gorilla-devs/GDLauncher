@@ -2963,23 +2963,30 @@ export const initLatestMods = instanceName => {
     const manifests = await pMap(
       modsToInit,
       async mod => {
-        const { data } = await getAddonFiles(mod);
+        let data = null;
+        try {
+          ({ data } = await getAddonFiles(mod));
+        } catch {
+          // nothing
+        }
         return { projectID: mod, data };
       },
       { concurrency: 40 }
     );
     const manifestsObj = {};
-    manifests.map(v => {
-      // Find latest version for each mod
-      const [latestMod] =
-        getPatchedInstanceType(instance) === FORGE || v.projectID === 361988
-          ? filterForgeFilesByVersion(v.data, instance.loader?.mcVersion)
-          : filterFabricFilesByVersion(v.data, instance.loader?.mcVersion);
-      if (latestMod) {
-        manifestsObj[v.projectID] = latestMod;
-      }
-      return null;
-    });
+    manifests
+      .filter(v => v.data)
+      .map(v => {
+        // Find latest version for each mod
+        const [latestMod] =
+          getPatchedInstanceType(instance) === FORGE || v.projectID === 361988
+            ? filterForgeFilesByVersion(v.data, instance.loader?.mcVersion)
+            : filterFabricFilesByVersion(v.data, instance.loader?.mcVersion);
+        if (latestMod) {
+          manifestsObj[v.projectID] = latestMod;
+        }
+        return null;
+      });
 
     dispatch(updateLatestModManifests(manifestsObj));
   };

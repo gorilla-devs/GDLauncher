@@ -28,7 +28,8 @@ import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import {
   updateInstanceConfig,
   deleteMod,
-  updateMod
+  updateMod,
+  initLatestMods
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 
@@ -546,6 +547,7 @@ const Mods = ({ instanceName }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [fileDrag, setFileDrag] = useState(false);
   const [fileDrop, setFileDrop] = useState(false);
+  const [loadingModUpdates, setLoadingModUpdates] = useState(false);
   const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
   const [dragCompleted, setDragCompleted] = useState({});
   const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
@@ -731,6 +733,21 @@ const Mods = ({ instanceName }) => {
             }
             icon={faFolder}
           />
+          <Button
+            onClick={async () => {
+              if (instance.name && instance?.mods?.length) {
+                try {
+                  setLoadingModUpdates(true);
+                  await dispatch(initLatestMods(instance.name));
+                } finally {
+                  setLoadingModUpdates(false);
+                }
+              }
+            }}
+            loading={loadingModUpdates}
+          >
+            Check for Updates
+          </Button>
           <StyledDropdown
             onClick={() => {
               if (!isMenuOpen) {
