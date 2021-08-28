@@ -21,16 +21,21 @@ import ga from './utils/analytics';
 
 const trackCurseForgeAPI = (url, params = {}, method = 'get') => {
   ga.sendCustomEvent('CurseForgeAPICall');
-  const patchedUrl = url.replace(FORGESVC_URL, `${GDL_SERVE_API}/curseforge`);
-  let req = null;
-  if (method === 'get') {
-    req = axios.get(patchedUrl, { params });
-  } else if (method === 'post') {
-    req = axios.post(patchedUrl, params);
-  }
 
-  if (req) {
-    req.catch(console.error);
+  // Temporarily disable this
+  const switcher = false;
+  if (switcher) {
+    const patchedUrl = url.replace(FORGESVC_URL, `${GDL_SERVE_API}/curseforge`);
+    let req = null;
+    if (method === 'get') {
+      req = axios.get(patchedUrl, { params });
+    } else if (method === 'post') {
+      req = axios.post(patchedUrl, params);
+    }
+
+    if (req) {
+      req.catch(console.error);
+    }
   }
 };
 
