@@ -261,9 +261,20 @@ export const getFilteredVersions = (
   return versions;
 };
 
-export const isLatestJavaDownloaded = async (meta, userData, retry) => {
+export const isLatestJavaDownloaded = async (
+  meta,
+  userData,
+  retry,
+  version = 8
+) => {
   const javaOs = convertOSToJavaFormat(process.platform);
-  const javaMeta = meta.find(v => v.os === javaOs);
+  let log = null;
+
+  const isJava16 = version === 16;
+
+  const manifest = isJava16 ? meta.java16 : meta.java;
+
+  const javaMeta = manifest.find(v => v.os === javaOs);
   const javaFolder = path.join(
     userData,
     'java',
@@ -279,10 +290,8 @@ export const isLatestJavaDownloaded = async (meta, userData, retry) => {
   );
   try {
     await fs.access(javaFolder);
-    await promisify(exec)(`"${javaExecutable}" -version`);
+    log = await promisify(exec)(`"${javaExecutable}" -version`);
   } catch (err) {
-    console.log(err);
-
     if (retry) {
       if (process.platform !== 'win32') {
         try {
@@ -293,41 +302,77 @@ export const isLatestJavaDownloaded = async (meta, userData, retry) => {
         }
       }
 
-      return isLatestJavaDownloaded(meta, userData);
+      return isLatestJavaDownloaded(meta, userData, null, version);
     }
 
     isValid = false;
   }
-  return isValid;
+  // Return stderr because that garbage of a language which is java
+  // outputs the result of the version command to the error stream
+  // https://stackoverflow.com/questions/13483443/why-does-java-version-go-to-stderr
+  return { isValid, log: log?.stderr };
 };
 
 export const get7zPath = async () => {
   // Get userData from ipc because we can't always get this from redux
-  const baseDir = await ipcRenderer.invoke('getUserData');
+  let baseDir = await ipcRenderer.invoke('getExecutablePath');
+  if (process.env.NODE_ENV === 'development') {
+    baseDir = path.resolve(baseDir, '../../');
+    if (process.platform === 'win32') {
+      baseDir = path.join(baseDir, '7zip-bin/win/x64');
+    } else if (process.platform === 'linux') {
+      baseDir = path.join(baseDir, '7zip-bin/linux/x64');
+    } else if (process.platform === 'darwin') {
+      baseDir = path.join(baseDir, '7zip-bin/mac/x64');
+    }
+  }
   if (process.platform === 'darwin' || process.platform === 'linux') {
     return path.join(baseDir, '7za');
   }
   return path.join(baseDir, '7za.exe');
 };
 
+get7zPath();
+
+export const extractAll = async (
+  source,
+  destination,
+  args = {},
+  funcs = {}
+) => {
+  const sevenZipPath = await get7zPath();
+  const extraction = extractFull(source, destination, {
+    ...args,
+    yes: true,
+    $bin: sevenZipPath,
+    $spawnOptions: { shell: true }
+  });
+  await new Promise((resolve, reject) => {
+    if (funcs.progress) {
+      extraction.on('progress', ({ percent }) => {
+        funcs.progress(percent);
+      });
+    }
+    extraction.on('end', () => {
+      funcs.end?.();
+      resolve();
+    });
+    extraction.on('error', err => {
+      funcs.error?.();
+      reject(err);
+    });
+  });
+  return extraction;
+};
+
 export const extractNatives = async (libraries, instancePath) => {
   const extractLocation = path.join(instancePath, 'natives');
-  const sevenZipPath = await get7zPath();
   await Promise.all(
     libraries
       .filter(l => l.natives)
       .map(async l => {
-        const extraction = extractFull(l.path, extractLocation, {
-          $bin: sevenZipPath,
+        await extractAll(l.path, extractLocation, {
           $raw: ['-xr!META-INF']
-        });
-        await new Promise((resolve, reject) => {
-          extraction.on('end', () => {
-            resolve();
-          });
-          extraction.on('error', err => {
-            reject(err);
-          });
         });
       })
   );
@@ -483,6 +528,11 @@ export const getJVMArguments113 = (
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   args.push(...jvmOptions);
 
+  // Eventually inject additional arguments (from 1.17 (?))
+  if (mcJson?.forge?.arguments?.jvm) {
+    args.push(...mcJson.forge.arguments.jvm);
+  }
+
   args.push(mcJson.mainClass);
 
   args.push(...mcJson.arguments.game.filter(v => !skipLibrary(v)));
@@ -573,20 +623,10 @@ export const getJVMArguments113 = (
   return args;
 };
 
-export const readJarManifest = async (jarPath, sevenZipPath, property) => {
-  const list = extractFull(jarPath, '.', {
-    $bin: sevenZipPath,
+export const readJarManifest = async (jarPath, property) => {
+  const list = await extractAll(jarPath, '.', {
     toStdout: true,
     $cherryPick: 'META-INF/MANIFEST.MF'
-  });
-
-  await new Promise((resolve, reject) => {
-    list.on('end', () => {
-      resolve();
-    });
-    list.on('error', error => {
-      reject(error.stderr);
-    });
   });
 
   if (list.info.has(property)) return list.info.get(property);
@@ -597,6 +637,9 @@ export const patchForge113 = async (
   forgeJson,
   mainJar,
   librariesPath,
+  installerPath,
+  mcJsonPath,
+  universalPath,
   javaPath,
   updatePercentage
 ) => {
@@ -607,14 +650,20 @@ export const patchForge113 = async (
       // Handle special case
       if (finalArg === 'BINPATCH') {
         return `"${path
-          .join(librariesPath, ...mavenToArray(forgeJson.path))
+          .join(librariesPath, ...mavenToArray(forgeJson.path || universalPath))
           .replace('.jar', '-clientdata.lzma')}"`;
       }
       // Return replaced string
       return forgeJson.data[finalArg].client;
     }
-    // Return original string (checking for MINECRAFT_JAR)
-    return arg.replace('{MINECRAFT_JAR}', `"${mainJar}"`);
+    // Fix forge madness
+    return arg
+      .replace('{SIDE}', `client`)
+      .replace('{ROOT}', `"${path.dirname(installerPath)}"`)
+      .replace('{MINECRAFT_JAR}', `"${mainJar}"`)
+      .replace('{MINECRAFT_VERSION}', `"${mcJsonPath}"`)
+      .replace('{INSTALLER}', `"${installerPath}"`)
+      .replace('{LIBRARY_DIR}', `"${librariesPath}"`);
   };
   const computePathIfPossible = arg => {
     if (arg[0] === '[') {
@@ -640,12 +689,7 @@ export const patchForge113 = async (
         cp => `"${path.join(librariesPath, ...mavenToArray(cp))}"`
       );
 
-      const sevenZipPath = await get7zPath();
-      const mainClass = await readJarManifest(
-        filePath,
-        sevenZipPath,
-        'Main-Class'
-      );
+      const mainClass = await readJarManifest(filePath, 'Main-Class');
 
       await new Promise(resolve => {
         const ps = spawn(
@@ -700,19 +744,10 @@ export const importAddonZip = async (
   await new Promise(resolve => {
     setTimeout(() => resolve(), 500);
   });
-  const sevenZipPath = await get7zPath();
-  const extraction = extractFull(tempZipFile, instancePath, {
-    $bin: sevenZipPath,
+
+  await extractAll(tempZipFile, instancePath, {
     yes: true,
     $cherryPick: 'manifest.json'
-  });
-  await new Promise((resolve, reject) => {
-    extraction.on('end', () => {
-      resolve();
-    });
-    extraction.on('error', err => {
-      reject(err.stderr);
-    });
   });
   const manifest = await fse.readJson(instanceManifest);
   return manifest;
@@ -727,19 +762,10 @@ export const downloadAddonZip = async (id, fileID, instancePath, tempPath) => {
   await new Promise(resolve => {
     setTimeout(() => resolve(), 500);
   });
-  const sevenZipPath = await get7zPath();
-  const extraction = extractFull(zipFile, instancePath, {
-    $bin: sevenZipPath,
+
+  await extractAll(zipFile, instancePath, {
     yes: true,
     $cherryPick: 'manifest.json'
-  });
-  await new Promise((resolve, reject) => {
-    extraction.on('end', () => {
-      resolve();
-    });
-    extraction.on('error', err => {
-      reject(err.stderr);
-    });
   });
   const manifest = await fse.readJson(instanceManifest);
   return manifest;

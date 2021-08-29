@@ -9,7 +9,6 @@ import { useInView } from 'react-intersection-observer';
 import Modal from '../components/Modal';
 import SocialButtons from '../components/SocialButtons';
 import KoFiButton from '../assets/ko-fi.png';
-import PatreonButton from '../assets/patreon.png';
 import UpdateIllustration from '../assets/update_illustration.png';
 import { openModal } from '../reducers/modals/actions';
 import ga from '../utils/analytics';
@@ -35,6 +34,19 @@ const data = {
       header: 'We now automatically take care of java16.',
       content:
         'You can now run Minecraft >1.17 without issues!. You can also individually select a manual path for both versions from the settings.'
+    },
+    {
+      header: 'You can now easily duplicate instances.',
+      content: 'Just right-click on an instance and duplicate it.'
+    },
+    {
+      header: 'Added support for forge 1.17!',
+      content: "Let's hope they don't change their stuff again anytime soon 😬."
+    },
+    {
+      header: 'Added privacy policy, ToS and acceptable use policy!',
+      content:
+        "You can go read them from the settings page if you're into legal stuff."
     }
   ],
   improvements: [
@@ -61,6 +73,15 @@ const data = {
     },
     {
       header: 'Added usual MacOS default menu'
+    },
+    {
+      header: 'Improved Discord RPC.',
+      content:
+        "It now shows the modpack / MC version you're playing. The modpack name will only be shown for new instances."
+    },
+    {
+      header: 'Modal animation is now smoother and simpler.',
+      content: 'This should make it feel "faster".'
     }
   ],
   bugfixes: [
@@ -80,6 +101,26 @@ const data = {
       header:
         "Fixed a bug where we didn't correctly detect the curseforge modloader.",
       content: ''
+    },
+    {
+      header: 'Fixed imports from external sources.',
+      content: 'Both local zips and remote urls should now work correctly.'
+    },
+    {
+      header: 'Fixed crash',
+      content: 'when renaming instances.'
+    },
+    {
+      header: 'Fixed news',
+      content: 'not being correctly parsed sometimes.'
+    },
+    {
+      header: 'Fixed export',
+      content: 'not exporting correctly lol.'
+    },
+    {
+      header: 'Fixed crash',
+      content: 'when browsing mods.'
     }
   ]
 };
@@ -97,10 +138,18 @@ const ChangeLogs = () => {
     });
 
   useEffect(() => {
-    ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
-    setTimeout(() => {
-      setSkipIObserver(false);
-    }, 300);
+    ipcRenderer
+      .invoke('getAppVersion')
+      .then(v => {
+        setVersion(v);
+        if (!v.includes('beta')) {
+          setTimeout(() => {
+            setSkipIObserver(false);
+          }, 300);
+        }
+        return v;
+      })
+      .catch(console.error);
     ga.sendCustomEvent('changelogModalOpen');
   }, []);
 
@@ -171,9 +220,6 @@ const ChangeLogs = () => {
           >
             <a href="https://ko-fi.com/gdlauncher">
               <img src={KoFiButton} alt="Ko-Fi" />
-            </a>
-            <a href="https://patreon.com/gorilladevs">
-              <img src={PatreonButton} alt="Patreon" />
             </a>
           </div>
         </Header>

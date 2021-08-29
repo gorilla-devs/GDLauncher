@@ -6,7 +6,6 @@ import path from 'path';
 import { transparentize } from 'polished';
 import { useInterval } from 'rooks';
 import makeDir from 'make-dir';
-import { omit } from 'lodash';
 import Modal from '../components/Modal';
 import { closeModal } from '../reducers/modals/actions';
 import { _getInstance, _getInstancesPath } from '../utils/selectors';
@@ -70,7 +69,7 @@ const InstanceDuplicateName = ({ instanceName }) => {
 
     // Reset the time played back to 0
     dispatch(
-      updateInstanceConfig(newInstanceName, prev => ({
+      updateInstanceConfig(newInstanceName, () => ({
         ...oldInstance,
         name: newInstanceName,
         timePlayed: 0,

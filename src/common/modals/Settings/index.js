@@ -6,9 +6,8 @@ import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
 import SocialButtons from '../../components/SocialButtons';
-import { closeModal } from '../../reducers/modals/actions';
+import { closeModal, openModal } from '../../reducers/modals/actions';
 import KoFiButton from '../../assets/ko-fi.png';
-import PatreonButton from '../../assets/patreon.png';
 
 const Container = styled.div`
   display: flex;
@@ -175,13 +174,10 @@ export default function Settings() {
                   src={KoFiButton}
                   alt="Ko-Fi"
                   css={`
-                    margin-bottom: 20px;
+                    margin-bottom: 0px;
                     margin-top: 20px;
                   `}
                 />
-              </a>
-              <a href="https://patreon.com/gorilladevs">
-                <img src={PatreonButton} alt="Patreon" />
               </a>
             </div>
             <div
@@ -190,6 +186,42 @@ export default function Settings() {
               `}
             >
               <SocialButtons />
+            </div>
+            <div
+              css={`
+                margin-top: 20px;
+                display: flex;
+                font-size: 10px;
+                flex-direction: column;
+                span {
+                  text-decoration: underline;
+                  cursor: pointer;
+                }
+              `}
+            >
+              <span
+                onClick={() =>
+                  dispatch(openModal('PolicyModal', { policy: 'privacy' }))
+                }
+              >
+                Privacy Policy
+              </span>
+              <span
+                onClick={() =>
+                  dispatch(openModal('PolicyModal', { policy: 'tos' }))
+                }
+              >
+                Terms and Conditions
+              </span>
+              <span
+                onClick={() =>
+                  dispatch(
+                    openModal('PolicyModal', { policy: 'acceptableuse' })
+                  )
+                }
+              >
+                Acceptable Use Policy
+              </span>
             </div>
           </div>
         </SideMenu>
@@ -200,6 +232,7 @@ export default function Settings() {
                 max-width: 600px;
                 overflow-y: hidden;
                 overflow-x: hidden;
+                padding-bottom: 20px;
               `}
             >
               <ContentComponent />

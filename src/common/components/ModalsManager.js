@@ -77,18 +77,17 @@ const modalsComponentLookupTable = {
   ),
   McVersionChanger: AsyncComponent(
     lazy(() => import('../modals/McVersionChanger'))
-  )
+  ),
+  PolicyModal: AsyncComponent(lazy(() => import('../modals/PolicyModal')))
 };
 
 const ModalContainer = ({
   unmounting,
   children,
   preventClose,
-  modalType,
   closeCallback
 }) => {
   const [modalStyle, setModalStyle] = useState({
-    transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
     opacity: 0
   });
   const [bgStyle, setBgStyle] = useState({
@@ -126,7 +125,6 @@ const ModalContainer = ({
   const unMountStyle = () => {
     // css for unmount animation
     setModalStyle({
-      transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
       opacity: 1
     });
     setBgStyle({
@@ -138,7 +136,6 @@ const ModalContainer = ({
   const mountStyle = () => {
     // css for mount animation
     setModalStyle({
-      transform: 'scale(1)',
       opacity: 1
     });
 
