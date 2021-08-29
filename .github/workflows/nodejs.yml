@@ -45,10 +45,11 @@ jobs:
           APPVEYOR_REPO_TAG_NAME: ''
           CIRCLE_TAG: ''
           BITRISE_GIT_TAG: ''
+          GITHUB_ACTIONS: ''
           CI_BUILD_TAG: ''
-          RELEASE_TESTING: true
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
+          GA_ID: ${{ secrets.GA_ID }}
         run: |
           npm run release
       - name: npm run release for mac and linux
@@ -58,9 +59,10 @@ jobs:
           TRAVIS_TAG: ''
           APPVEYOR_REPO_TAG_NAME: ''
           CIRCLE_TAG: ''
+          GITHUB_ACTIONS: ''
           BITRISE_GIT_TAG: ''
           CI_BUILD_TAG: ''
-          RELEASE_TESTING: true
+          GA_ID: ${{ secrets.GA_ID }}
         run: |
           npm run release
       - name: upload release to gh releases

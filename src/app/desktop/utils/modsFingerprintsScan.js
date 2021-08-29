@@ -79,10 +79,7 @@ const modsFingerprintsScan = async instancesPath => {
                 const exactMatch = (data.exactMatches || []).find(
                   v => v.file.packageFingerprint === hash
                 );
-                const unmatched = (data.unmatchedFingerprints || []).find(
-                  v => v === hash
-                );
-                if (exactMatch) {
+                if (exactMatch?.file) {
                   let addonData = null;
                   try {
                     addonData = (await getAddon(exactMatch.file.projectId))
@@ -103,14 +100,11 @@ const modsFingerprintsScan = async instancesPath => {
                     };
                   }
                 }
-                if (unmatched) {
-                  return {
-                    fileName,
-                    displayName: fileName,
-                    packageFingerprint: hash
-                  };
-                }
-                return null;
+                return {
+                  fileName,
+                  displayName: fileName,
+                  packageFingerprint: hash
+                };
               })
             );
 
@@ -149,9 +143,13 @@ const modsFingerprintsScan = async instancesPath => {
   };
 
   const folders = await getDirectories(instancesPath);
-  const instances = await pMap(folders, mapFolderToInstance, {
-    concurrency: 5
-  });
+  const instances = await pMap(
+    folders.filter(folder => folder !== '.DS_Store'),
+    mapFolderToInstance,
+    {
+      concurrency: 5
+    }
+  );
   const hashMap = {};
   // eslint-disable-next-line
   for (const instance of instances) {

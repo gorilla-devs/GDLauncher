@@ -6,13 +6,14 @@ export const GDL_LEGACYJAVAFIXER_MOD_URL =
   'https://gdevs.io/legacyjavafixer-1.0.jar';
 export const MOJANG_APIS = 'https://authserver.mojang.com';
 export const JAVA_MANIFEST_URL = 'https://cdn.assets-gdevs.com/openjdk8.json';
+export const JAVA16_MANIFEST_URL =
+  'https://cdn.assets-gdevs.com/openjdk16.json';
 export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const FORGESVC_URL = 'https://addons-ecs.forgesvc.net/api/v2';
 export const FTB_API_URL = 'https://api.modpacks.ch/public';
 export const FTB_MODPACK_URL = 'https://feed-the-beast.com/modpack';
-export const FORGESVC_CATEGORIES =
-  'https://addons-ecs.forgesvc.net/api/v2/category?gameId=432';
+export const GDL_SERVE_API = 'https://api.gdlauncher.com/serve';
 export const NEWS_URL =
   'https://www.minecraft.net/en-us/feeds/community-content/rss';
 export const FMLLIBS_OUR_BASE_URL = 'https://fmllibs.gdevs.io';

@@ -143,7 +143,7 @@ const ModsListWrapper = ({
     const item = items[index];
 
     const isInstalled = installedMods.find(v => v.projectID === item?.id);
-    const primaryImage = item.attachments.find(v => v.isDefault);
+    const primaryImage = (item?.attachments || []).find(v => v?.isDefault);
 
     if (!item) {
       return (
@@ -175,7 +175,7 @@ const ModsListWrapper = ({
         <RowInnerContainer>
           <RowContainerImg
             style={{
-              background: `url('${primaryImage?.thumbnailUrl}') center center`
+              backgroundImage: `url('${primaryImage?.thumbnailUrl}')`
             }}
           />
           <div
@@ -409,7 +409,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         filterType,
         filterType !== 'Author' && filterType !== 'Name',
         gameVersion,
-        getPatchedInstanceType(instance) === FABRIC ? 4780 : null
+        0,
+        getPatchedInstanceType(instance)
       ));
     } catch (err) {
       setError(err);
@@ -445,8 +446,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         <Header>
           <Select
             css={`
-              width: 160px;
-              margin: 0 10px;
+              width: 160px !important;
+              margin: 0 10px !important;
             `}
             defaultValue={filterType}
             onChange={setFilterType}
@@ -462,7 +463,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
           </Select>
           <Input
             css={`
-              height: 32px;
+              height: 32px !important;
             `}
             placeholder="Search for a mod"
             value={searchQuery}
