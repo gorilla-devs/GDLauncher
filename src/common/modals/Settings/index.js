@@ -8,7 +8,6 @@ import CloseButton from '../../components/CloseButton';
 import SocialButtons from '../../components/SocialButtons';
 import { closeModal, openModal } from '../../reducers/modals/actions';
 import KoFiButton from '../../assets/ko-fi.png';
-import PatreonButton from '../../assets/patreon.png';
 
 const Container = styled.div`
   display: flex;
@@ -175,13 +174,10 @@ export default function Settings() {
                   src={KoFiButton}
                   alt="Ko-Fi"
                   css={`
-                    margin-bottom: 20px;
+                    margin-bottom: 0px;
                     margin-top: 20px;
                   `}
                 />
-              </a>
-              <a href="https://patreon.com/gorilladevs">
-                <img src={PatreonButton} alt="Patreon" />
               </a>
             </div>
             <div
@@ -195,6 +191,7 @@ export default function Settings() {
               css={`
                 margin-top: 20px;
                 display: flex;
+                font-size: 10px;
                 flex-direction: column;
                 span {
                   text-decoration: underline;

@@ -14,9 +14,7 @@ import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import { FORGE, FABRIC, CURSEFORGE, FTB } from '../../utils/constants';
-import Modpack from './Modpack';
 import {
-  initLatestMods,
   clearLatestModManifests,
   updateInstanceConfig
 } from '../../reducers/actions';
@@ -229,12 +227,6 @@ const InstanceManager = ({ instanceName }) => {
         .catch(console.error);
     }
   }, []);
-
-  useEffect(() => {
-    if (instance?.name) {
-      dispatch(initLatestMods(instance.name));
-    }
-  }, [instance?.mods]);
 
   return (
     <Modal
