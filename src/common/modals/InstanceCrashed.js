@@ -55,18 +55,18 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
     try {
       const files = await fs.readdir(crashReportsPath);
       await Promise.all(
-          files.map(async element => {
-            const stats = await fs.stat(path.join(crashReportsPath, element));
-            const fileBirthdate = new Date(stats.birthtimeMs);
-            const timeDiff = Date.now() - fileBirthdate;
-            const seconds = parseInt(Math.floor(timeDiff / 1000), 10);
-            if (seconds <= 3) {
-              const crashReport = await fs.readFile(
-                  path.join(crashReportsPath, element)
-              );
-              setCrashLog(crashReport.toString());
-            }
-          })
+        files.map(async element => {
+          const stats = await fs.stat(path.join(crashReportsPath, element));
+          const fileBirthdate = new Date(stats.birthtimeMs);
+          const timeDiff = Date.now() - fileBirthdate;
+          const seconds = parseInt(Math.floor(timeDiff / 1000), 10);
+          if (seconds <= 3) {
+            const crashReport = await fs.readFile(
+              path.join(crashReportsPath, element)
+            );
+            setCrashLog(crashReport.toString());
+          }
+        })
       );
     } catch (e) {
       console.error(e);
@@ -113,177 +113,177 @@ const InstanceCrashed = ({ instanceName, code, errorLogs }) => {
   }
 
   return (
-      <Modal
-          css={`
+    <Modal
+      css={`
         height: 580px;
         width: 630px;
       `}
-          title="The instance could not be launched"
-      >
-        <Container>
-          <InnerContainer>
-            <Logo size={100} />
-            <h3>
-              OOPSIE WOOPSIE!!
-              <br /> A creeper blew this instance up!
-            </h3>
-          </InnerContainer>
-          <Card
-              css={`
+      title="The instance could not be launched"
+    >
+      <Container>
+        <InnerContainer>
+          <Logo size={100} />
+          <h3>
+            OOPSIE WOOPSIE!!
+            <br /> A creeper blew this instance up!
+          </h3>
+        </InnerContainer>
+        <Card
+          css={`
             margin: 10px 0 20px 0;
           `}
-          >
-            <h3>Error: </h3>
-            <ErrorContainer>{calcError(code)}</ErrorContainer>
-            <h3>code: </h3>
-            <ErrorContainer>{code}</ErrorContainer>
-          </Card>
-          <Collapse
-              css={`
+        >
+          <h3>Error: </h3>
+          <ErrorContainer>{calcError(code)}</ErrorContainer>
+          <h3>code: </h3>
+          <ErrorContainer>{code}</ErrorContainer>
+        </Card>
+        <Collapse
+          css={`
             width: 100%;
           `}
-              defaultActiveKey={['1']}
-              accordion
-          >
-            <Panel
-                header={
-                  <div
-                      css={`
+          defaultActiveKey={['1']}
+          accordion
+        >
+          <Panel
+            header={
+              <div
+                css={`
                   display: flex;
                   flex-direction: row;
                   justify-content: space-between;
                   align-items: center;
                 `}
-                      key="1"
-                  >
-                    <>Error Log</> &nbsp;
-                    <div
-                        css={`
+                key="1"
+              >
+                <>Error Log</> &nbsp;
+                <div
+                  css={`
                     display: flex;
                   `}
-                    >
-                      <Tooltip
-                          title={copiedLog ? 'Copied Link' : 'Share'}
-                          placement="top"
-                      >
-                        <div
-                            css={`
+                >
+                  <Tooltip
+                    title={copiedLog ? 'Copied Link' : 'Share'}
+                    placement="top"
+                  >
+                    <div
+                      css={`
                         margin: 0;
                       `}
-                        >
-                          <FontAwesomeIcon
-                              css={`
+                    >
+                      <FontAwesomeIcon
+                        css={`
                           margin: 0 20px;
                         `}
-                              icon={faShare}
-                              onClick={e => share(e, errorLogs)}
-                          />
-                        </div>
-                      </Tooltip>
-                      <Tooltip
-                          title={copiedLog ? 'Copied' : 'Copy'}
-                          placement="top"
-                      >
-                        <div
-                            css={`
+                        icon={faShare}
+                        onClick={e => share(e, errorLogs)}
+                      />
+                    </div>
+                  </Tooltip>
+                  <Tooltip
+                    title={copiedLog ? 'Copied' : 'Copy'}
+                    placement="top"
+                  >
+                    <div
+                      css={`
                         margin: 0;
                       `}
-                        >
-                          <FontAwesomeIcon
-                              icon={faCopy}
-                              onClick={e => copy(e, errorLogs)}
-                          />
-                        </div>
-                      </Tooltip>
+                    >
+                      <FontAwesomeIcon
+                        icon={faCopy}
+                        onClick={e => copy(e, errorLogs)}
+                      />
                     </div>
-                  </div>
-                }
-                key="1"
-            >
-              <div
-                  css={`
+                  </Tooltip>
+                </div>
+              </div>
+            }
+            key="1"
+          >
+            <div
+              css={`
                 height: 100px;
                 word-break: break-all;
                 overflow-y: auto;
               `}
-              >
-                <p>{errorLogs || 'Unknown Error'}</p>
-              </div>
-            </Panel>
-            <Panel
-                header={
-                  <div
-                      css={`
+            >
+              <p>{errorLogs || 'Unknown Error'}</p>
+            </div>
+          </Panel>
+          <Panel
+            header={
+              <div
+                css={`
                   display: flex;
                   flex-direction: row;
                   justify-content: space-between;
                   align-items: center;
                 `}
-                      key="1"
-                  >
-                    <>Crash Log</> &nbsp;
-                    <div
-                        css={`
+                key="1"
+              >
+                <>Crash Log</> &nbsp;
+                <div
+                  css={`
                     display: flex;
                   `}
-                    >
-                      <Tooltip
-                          title={copiedLog ? 'Copied Link' : 'Share'}
-                          placement="top"
-                      >
-                        <div
-                            css={`
+                >
+                  <Tooltip
+                    title={copiedLog ? 'Copied Link' : 'Share'}
+                    placement="top"
+                  >
+                    <div
+                      css={`
                         margin: 0;
                       `}
-                        >
-                          <FontAwesomeIcon
-                              css={`
+                    >
+                      <FontAwesomeIcon
+                        css={`
                           margin: 0 20px;
                         `}
-                              icon={faShare}
-                              onClick={e => share(e, crashLog)}
-                          />
-                        </div>
-                      </Tooltip>
-                      <Tooltip
-                          title={copiedLog ? 'Copied' : 'Copy'}
-                          placement="top"
-                      >
-                        <div
-                            css={`
+                        icon={faShare}
+                        onClick={e => share(e, crashLog)}
+                      />
+                    </div>
+                  </Tooltip>
+                  <Tooltip
+                    title={copiedLog ? 'Copied' : 'Copy'}
+                    placement="top"
+                  >
+                    <div
+                      css={`
                         margin: 0;
                       `}
-                        >
-                          <FontAwesomeIcon
-                              icon={faCopy}
-                              onClick={e => copy(e, crashLog)}
-                          />
-                        </div>
-                      </Tooltip>
+                    >
+                      <FontAwesomeIcon
+                        icon={faCopy}
+                        onClick={e => copy(e, crashLog)}
+                      />
                     </div>
-                  </div>
-                }
-                key="2"
-            >
-              <div
-                  css={`
+                  </Tooltip>
+                </div>
+              </div>
+            }
+            key="2"
+          >
+            <div
+              css={`
                 max-height: 200px;
                 overflow: auto;
               `}
-              >
+            >
               <pre
-                  css={`
+                css={`
                   word-break: break-all;
                   text-align: start;
                 `}
               >
                 {crashLog || 'No crash log found'}
               </pre>
-              </div>
-            </Panel>
-          </Collapse>
-        </Container>
-      </Modal>
+            </div>
+          </Panel>
+        </Collapse>
+      </Container>
+    </Modal>
   );
 };
 
