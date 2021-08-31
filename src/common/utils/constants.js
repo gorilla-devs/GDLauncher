@@ -24,6 +24,9 @@ export const MINECRAFT_SERVICES_URL = 'https://api.minecraftservices.com';
 export const NEWS_URL =
   'https://www.minecraft.net/en-us/feeds/community-content/rss';
 
+// GDLauncher
+export const GDL_SERVE_API = 'https://api.gdlauncher.com/serve';
+
 // Mojang Account
 export const MOJANG_APIS = 'https://authserver.mojang.com';
 

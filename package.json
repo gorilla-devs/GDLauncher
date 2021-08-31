@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "1.1.11",
+  "version": "1.1.15-beta.3",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -163,6 +163,7 @@
     "fast-xml-parser": "^3.19.0",
     "fs-extra": "^10.0.0",
     "get-stream": "^6.0.1",
+    "he": "^1.2.0",
     "history": "^4.10.1",
     "inter-ui": "^3.19.3",
     "is-electron": "^2.2.0",
