@@ -18,7 +18,12 @@ import { useDebouncedCallback } from 'use-debounce';
 import { FixedSizeList as List } from 'react-window';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
-import { faBomb, faExclamationCircle, faWrench, faDownload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBomb,
+  faExclamationCircle,
+  faWrench,
+  faDownload
+} from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
 import { getSearch, getAddonFiles } from '../api';
 import { openModal } from '../reducers/modals/actions';
