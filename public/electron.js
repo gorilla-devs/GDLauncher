@@ -203,8 +203,8 @@ async function patchSevenZip() {
   let sevenZipPath = null;
   const baseDir = path.dirname(app.getPath('exe'));
   if (process.platform === 'darwin') {
-    sevenZipPath = path.resolve(sevenZipPath, '../');
     sevenZipPath = path.join(baseDir, '7za');
+    sevenZipPath = path.resolve(sevenZipPath, '../');
   } else if (process.platform === 'linux') {
     sevenZipPath = path.join(baseDir, '7za');
   } else {
