@@ -67,7 +67,8 @@ import {
   msAuthenticateMinecraft,
   msMinecraftProfile,
   msOAuthRefresh,
-  getJava16Manifest
+  getJava16Manifest,
+  getMultipleAddons
 } from '../api';
 import {
   _getCurrentAccount,
@@ -1664,6 +1665,36 @@ export function processForgeManifest(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading mods...'));
 
+    const addonsHashmap = {};
+    const addonsFilesHashmap = {};
+
+    const _getAddons = async () => {
+      const { data: addons } = await getMultipleAddons(
+        manifest.files.map(v => v.projectID)
+      );
+
+      addons.map(v => {
+        addonsHashmap[v.id] = v;
+      });
+    };
+
+    const _getAddonFiles = async () => {
+      await pMap(
+        manifest.files,
+        async item => {
+          const { data: modManifest } = await getAddonFile(
+            item.projectID,
+            item.fileID
+          );
+
+          addonsFilesHashmap[item.projectID] = modManifest;
+        },
+        { concurrency: concurrency + 10 }
+      );
+    };
+
+    await Promise.all([_getAddons(), _getAddonFiles()]);
+
     let modManifests = [];
     await pMap(
       manifest.files,
@@ -1677,10 +1708,8 @@ export function processForgeManifest(instanceName) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
           try {
-            const { data: addon } = await getAddon(item.projectID);
-            const modManifest = (
-              await getAddonFile(item.projectID, item.fileID)
-            ).data;
+            const addon = addonsHashmap[item.projectID];
+            const modManifest = addonsFilesHashmap[item.projectID];
             const destFile = path.join(
               _getInstancesPath(state),
               instanceName,
