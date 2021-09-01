@@ -202,7 +202,10 @@ log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
 async function patchSevenZip() {
   let sevenZipPath = null;
   const baseDir = path.dirname(app.getPath('exe'));
-  if (process.platform === 'darwin' || process.platform === 'linux') {
+  if (process.platform === 'darwin') {
+    sevenZipPath = path.resolve('../');
+    sevenZipPath = path.join(baseDir, '7za');
+  } else if (process.platform === 'linux') {
     sevenZipPath = path.join(baseDir, '7za');
   } else {
     sevenZipPath = path.join(baseDir, '7za.exe');
