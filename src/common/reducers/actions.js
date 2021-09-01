@@ -41,7 +41,8 @@ import {
   ACCOUNT_MOJANG,
   FTB,
   FABRIC,
-  CURSEFORGE
+  CURSEFORGE,
+  MC_STARTUP_METHODS
 } from '../utils/constants';
 import {
   mcAuthenticate,
@@ -2707,16 +2708,21 @@ export function launchInstance(instanceName) {
       javaArguments
     );
 
+    const mcStartupMethod = state.settings.mcStartupMethod;
+    let replaceWith = `..${path.sep}..`;
+
     const symLinkDirPath = path.join(userData.split('\\')[0], '_gdl');
+    if (MC_STARTUP_METHODS[mcStartupMethod] === MC_STARTUP_METHODS.SYMLINK) {
+      replaceWith = symLinkDirPath;
+      if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
+    }
 
     const replaceRegex = [
       process.platform === 'win32'
         ? new RegExp(userData.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
-      symLinkDirPath
+      replaceWith
     ];
-
-    if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
@@ -2738,7 +2744,7 @@ export function launchInstance(instanceName) {
     }
 
     const ps = spawn(
-      `"${javaPath.replace(...replaceRegex)}"`,
+      `"${javaPath}"`,
       jvmArguments.map(v => v.toString().replace(...replaceRegex)),
       {
         cwd: instancePath,
@@ -2785,8 +2791,15 @@ export function launchInstance(instanceName) {
       ipcRenderer.invoke('show-window');
       dispatch(removeStartedInstance(instanceName));
       await fse.remove(instanceJLFPath);
-      if (process.platform === 'win32') fse.remove(symLinkDirPath);
       await fs.unlink(backupConfigPath);
+
+      if (
+        process.platform === 'win32' &&
+        MC_STARTUP_METHODS[mcStartupMethod] === MC_STARTUP_METHODS.SYMLINK
+      ) {
+        fse.remove(symLinkDirPath);
+      }
+
       if (code !== 0 && errorLogs) {
         dispatch(
           openModal('InstanceCrashed', {
