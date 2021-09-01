@@ -2708,7 +2708,7 @@ export function launchInstance(instanceName) {
       javaArguments
     );
 
-    const mcStartupMethod = state.settings.mcStartupMethod;
+    const { mcStartupMethod } = state.settings;
     let replaceWith = `..${path.sep}..`;
 
     const symLinkDirPath = path.join(userData.split('\\')[0], '_gdl');
