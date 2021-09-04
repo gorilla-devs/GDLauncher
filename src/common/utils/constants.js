@@ -62,3 +62,10 @@ export const MICROSOFT_XSTS_AUTH_URL = 'https://xsts.auth.xboxlive.com';
 export const MICROSOFT_OAUTH_CLIENT_ID = 'b9336bf8-c6bb-4344-aabe-63d0bfa8db2e';
 export const MICROSOFT_OAUTH_REDIRECT_URL =
   'https://login.microsoftonline.com/common/oauth2/nativeclient';
+export const MINECRAFT_SERVICES_URL = 'https://api.minecraftservices.com';
+
+// Startup Methods
+export const MC_STARTUP_METHODS = {
+  SYMLINK: 'Symlink',
+  DEFAULT: 'Default'
+};

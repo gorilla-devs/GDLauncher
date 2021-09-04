@@ -361,7 +361,9 @@ app.on('before-quit', async () => {
     await watcher.stop();
     watcher = null;
   }
-  mainWindow.removeAllListeners('close');
+  if (mainWindow) {
+    mainWindow.removeAllListeners('close');
+  }
   mainWindow = null;
 });
 
