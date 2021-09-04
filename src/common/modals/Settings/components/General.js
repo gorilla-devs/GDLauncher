@@ -50,7 +50,6 @@ const PersonalData = styled.div`
 const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
   margin: 0 500px 20px 0;
-  margin-bottom: 20px;
 `;
 
 const Title = styled.div`
@@ -133,7 +132,7 @@ const ReleaseChannel = styled.div`
   }
   select {
     margin-left: auto;
-    self-align: end;
+    align-self: end;
   }
 `;
 
@@ -308,7 +307,7 @@ const General = () => {
       }
     }
     setLoadingMoveUserData(false);
-    ipcRenderer.invoke('appRestart');
+    await ipcRenderer.invoke('appRestart');
   };
 
   const openFolder = async () => {
@@ -350,8 +349,7 @@ const General = () => {
                     css={`
                       width: 13px;
                       height: 14px;
-                      margin: 0;
-                      margin-left: 10px;
+                      margin: 0 0 0 10px;
                     `}
                   >
                     <FontAwesomeIcon
@@ -371,6 +369,7 @@ const General = () => {
         </PersonalDataContainer>
       </PersonalData>
       <Hr />
+      <Title>Release Channel</Title>
       <ReleaseChannel>
         <Title>Release Channel</Title>
         <div>
@@ -466,7 +465,7 @@ const General = () => {
       <Hr />
       <Title
         css={`
-          margin-top: 0px;
+          margin-top: 0;
         `}
       >
         Discord Integration &nbsp; <FontAwesomeIcon icon={faDiscord} />
@@ -495,7 +494,7 @@ const General = () => {
       <Hr />
       <Title
         css={`
-          margin-top: 0px;
+          margin-top: 0;
         `}
       >
         Minecraft News &nbsp; <FontAwesomeIcon icon={faNewspaper} />
@@ -518,7 +517,7 @@ const General = () => {
       <Hr />
       <Title
         css={`
-          margin-top: 0px;
+          margin-top: 0;
         `}
       >
         Hide Launcher While Playing &nbsp; <FontAwesomeIcon icon={faPlay} />
@@ -546,7 +545,7 @@ const General = () => {
       <Hr />
       <Title
         css={`
-          margin-top: 0px;
+          margin-top: 0;
         `}
       >
         Potato PC Mode &nbsp; <FontAwesomeIcon icon={faToilet} />
