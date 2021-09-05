@@ -1673,7 +1673,7 @@ export function processForgeManifest(instanceName) {
         manifest.files.map(v => v.projectID)
       );
 
-      addons.map(v => {
+      addons.forEach(v => {
         addonsHashmap[v.id] = v;
       });
     };
