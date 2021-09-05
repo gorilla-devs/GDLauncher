@@ -30,10 +30,6 @@ import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
 import { MC_STARTUP_METHODS } from '../../../utils/constants';
 
-const JavaSettings = styled.div`
-  width: 100%;
-`;
-
 const AutodetectPath = styled.div`
   display: flex;
   flex-direction: row;
@@ -147,7 +143,7 @@ export default function MyAccountPreferences() {
   }, []);
 
   return (
-    <JavaSettings>
+    <>
       <MainTitle>Java</MainTitle>
       <Title
         css={`
@@ -479,6 +475,6 @@ export default function MyAccountPreferences() {
           </Select>
         </McStartupMethodRow>
       </McStartupMethod>
-    </JavaSettings>
+    </>
   );
 }
