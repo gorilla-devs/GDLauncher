@@ -459,7 +459,7 @@ export default function MyAccountPreferences() {
             `}
           >
             Select the preferred Minecraft startup method. Only change this if
-            you're experiencing issues with the default one.
+            you&apos;re experiencing issues with the default one.
           </Paragraph>
           <Select
             value={mcStartupMethod}
