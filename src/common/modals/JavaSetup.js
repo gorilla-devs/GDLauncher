@@ -10,6 +10,7 @@ import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faAngleLeft,
+  faCheck,
   faExclamationTriangle,
   faFolder,
   faTimes
@@ -24,7 +25,7 @@ import {
   isJavaPathOK,
   isLatestJavaDownloaded
 } from '../../app/desktop/utils';
-import { _getTempPath } from '../utils/selectors';
+import { _getTempPath, _getJavaPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import { updateJava16Path, updateJavaPath } from '../reducers/settings/actions';
 import { UPDATE_MODAL } from '../reducers/modals/actionTypes';
@@ -36,56 +37,48 @@ const JavaSetup = () => {
   const [isJava16Downloaded, setIsJava16Downloaded] = useState(null);
   const [java8Log, setJava8Log] = useState(null);
   const [java16Log, setJava16Log] = useState(null);
-  const javaManifest = useSelector(state => state.app.javaManifest);
-  const java16Manifest = useSelector(state => state.app.java16Manifest);
   const userData = useSelector(state => state.userData);
-  const manifests = {
-    java16: java16Manifest,
-    java: javaManifest
-  };
+  const shippedJava8Path = useSelector(state => state.settings.java.path);
+  const shippedJava16Path = useSelector(state => state.settings.java.path16);
+  const oldJava8Path = useSelector(state => _getJavaPath(state)(8));
+  const oldJava16Path = useSelector(state => _getJavaPath(state)(16));
   const dispatch = useDispatch();
   const theme = useTheme();
+  const manifests = {
+    java16: useSelector(state => state.app.java16Manifest),
+    java: useSelector(state => state.app.javaManifest)
+  };
 
-  const checkJava = () => {
-    if (choice === null || choice !== 1) {
-      isLatestJavaDownloaded(manifests, userData, true, 8)
-        .then(e => {
-          setIsJava8Downloaded(e?.isValid);
-          return setJava8Log(e?.log);
-        })
-        .catch(err => console.error(err));
-      isLatestJavaDownloaded(manifests, userData, true, 16)
-        .then(e => {
-          setIsJava16Downloaded(e?.isValid);
-          return setJava16Log(e?.log);
-        })
-        .catch(err => console.error(err));
-    } else {
-      isJavaPathOK(
-        useSelector(state => state.settings.java.path16),
-        true
-      )
-        .then(e => {
-          setIsJava16Downloaded(e?.isValid);
-          return setJava16Log(e?.log);
-        })
-        .catch(err => console.error(err));
-      isJavaPathOK(
-        useSelector(state => state.settings.java.path),
-        true
-      )
-        .then(e => {
-          setIsJava8Downloaded(e?.isValid);
-          return setJava8Log(e?.log);
-        })
-        .catch(err => console.error(err));
-    }
+  const checkJava = (path8, path16) => {
+    let java8Promise;
+    if (path8 && path8 !== '') java8Promise = isJavaPathOK(path8, true);
+    else if (!shippedJava8Path || shippedJava8Path === '')
+      java8Promise = isLatestJavaDownloaded(manifests, userData, true, 8);
+    else java8Promise = isJavaPathOK(oldJava8Path, true);
+
+    let java16Promise;
+    if (path16 && path16 !== '') java16Promise = isJavaPathOK(path16, true);
+    else if (!shippedJava16Path || shippedJava16Path === '')
+      java16Promise = isLatestJavaDownloaded(manifests, userData, true, 16);
+    else java16Promise = isJavaPathOK(oldJava16Path, true);
+
+    java8Promise
+      .then(e => {
+        setIsJava8Downloaded(e?.isValid);
+        return setJava8Log(e?.log);
+      })
+      .catch(err => console.error(err));
+    java16Promise
+      .then(e => {
+        setIsJava16Downloaded(e?.isValid);
+        return setJava16Log(e?.log);
+      })
+      .catch(err => console.error(err));
   };
 
   useEffect(() => {
-    if (step === 2) checkJava();
-  }, [step]);
-  useEffect(() => checkJava(), []);
+    checkJava();
+  }, []);
 
   return (
     <Modal
@@ -206,6 +199,7 @@ const JavaSetup = () => {
               </div>
               <div>
                 <Button
+                  disabled={!isJava8Downloaded || !isJava8Downloaded}
                   type="text"
                   css={`
                     width: 150px;
@@ -239,10 +233,20 @@ const JavaSetup = () => {
                   <AutomaticSetup
                     isJava8Downloaded={isJava8Downloaded}
                     isJava16Downloaded={isJava16Downloaded}
+                    checkJava={checkJava}
                     setStep={setStep}
                   />
                 ) : (
-                  <ManualSetup setStep={setStep} />
+                  <ManualSetup
+                    setStep={setStep}
+                    checkJava={checkJava}
+                    isJava8Downloaded={isJava8Downloaded}
+                    setIsJava8Downloaded={setIsJava8Downloaded}
+                    shippedJava8Path={shippedJava8Path}
+                    isJava16Downloaded={isJava16Downloaded}
+                    setIsJava16Downloaded={setIsJava16Downloaded}
+                    shippedJava16Path={shippedJava16Path}
+                  />
                 )}{' '}
               </>
             ) : (
@@ -347,10 +351,71 @@ const JavaSetup = () => {
   );
 };
 
-const ManualSetup = ({ setStep }) => {
-  const [javaPath, setJavaPath] = useState('');
-  const [java16Path, setJava16Path] = useState('');
+const ManualSetup = ({
+  setStep,
+  isJava8Downloaded,
+  setIsJava8Downloaded,
+  shippedJava8Path,
+  isJava16Downloaded,
+  setIsJava16Downloaded,
+  shippedJava16Path,
+  checkJava
+}) => {
+  const [javaPath, setJavaPath] = useState(
+    path.resolve(
+      useSelector(state => _getJavaPath(state)(8)),
+      shippedJava8Path && shippedJava8Path !== '' ? './' : '../../'
+    )
+  );
+  const [java16Path, setJava16Path] = useState(
+    path.resolve(
+      useSelector(state => _getJavaPath(state)(16)),
+      shippedJava16Path && shippedJava16Path !== '' ? './' : '../../'
+    )
+  );
+  const [changedContent, setChangedContent] = useState(false);
+
   const dispatch = useDispatch();
+  const theme = useTheme();
+  useEffect(() => {
+    if (!fse.existsSync(javaPath)) setJavaPath('');
+    if (!fse.existsSync(java16Path)) setJava16Path('');
+  }, []);
+
+  const getColor = (p, latestDownloaded) => {
+    if (!fse.existsSync(p)) return theme.palette.warn.main;
+    if (latestDownloaded) return theme.palette.success.main;
+    return theme.palette.error.main;
+  };
+
+  const getSymbol = (p, latestDownloaded) => {
+    if (!fse.existsSync(p)) return faExclamationTriangle;
+    if (latestDownloaded) return faCheck;
+    return faTimes;
+  };
+
+  const ErrorMessage = () => {
+    let message;
+    if (!fse.existsSync(javaPath) || !fse.existsSync(java16Path))
+      message = 'No such file or directory';
+    if (!changedContent && !isJava16Downloaded)
+      message = 'Error checking for Java 16';
+    if (!changedContent && !isJava8Downloaded)
+      message = 'Error checking for Java 8';
+    if (!changedContent && !isJava8Downloaded && !isJava16Downloaded)
+      message = 'Error checking for Java 8 and 16';
+
+    if (!message) return null;
+    return (
+      <span
+        css={`
+          margin-right: 10px;
+        `}
+      >
+        {message}
+      </span>
+    );
+  };
 
   const selectFolder = async version => {
     const { filePaths, canceled } = await ipcRenderer.invoke('openFileDialog');
@@ -390,7 +455,11 @@ const ManualSetup = ({ setStep }) => {
       >
         <Input
           placeholder="Select your Java8 executable (MC < 1.17)"
-          onChange={e => setJavaPath(e.target.value)}
+          onChange={e => {
+            setIsJava8Downloaded(false);
+            setChangedContent(true);
+            setJavaPath(e.target.value);
+          }}
           value={javaPath}
         />
         <Button
@@ -402,6 +471,21 @@ const ManualSetup = ({ setStep }) => {
         >
           <FontAwesomeIcon icon={faFolder} />
         </Button>
+        <div
+          css={`
+            display: flex;
+            width: 40px;
+            border-radius: 4px;
+            margin-left: 10px;
+            justify-content: center;
+            align-items: center;
+          `}
+        >
+          <FontAwesomeIcon
+            icon={getSymbol(javaPath, isJava8Downloaded)}
+            color={getColor(javaPath, isJava8Downloaded)}
+          />
+        </div>
       </div>
 
       <div
@@ -412,7 +496,11 @@ const ManualSetup = ({ setStep }) => {
       >
         <Input
           placeholder="Select your Java16 executable (MC >= 1.17)"
-          onChange={e => setJava16Path(e.target.value)}
+          onChange={e => {
+            setIsJava16Downloaded(false);
+            setChangedContent(true);
+            setJava16Path(e.target.value);
+          }}
           value={java16Path}
         />
         <Button
@@ -424,6 +512,21 @@ const ManualSetup = ({ setStep }) => {
         >
           <FontAwesomeIcon icon={faFolder} />
         </Button>
+        <div
+          css={`
+            display: flex;
+            width: 40px;
+            border-radius: 4px;
+            margin-left: 10px;
+            justify-content: center;
+            align-items: center;
+          `}
+        >
+          <FontAwesomeIcon
+            icon={getSymbol(java16Path, isJava16Downloaded)}
+            color={getColor(java16Path, isJava16Downloaded)}
+          />
+        </div>
       </div>
 
       <div
@@ -436,26 +539,56 @@ const ManualSetup = ({ setStep }) => {
           bottom: 0;
         `}
       >
-        <Button type="primary" onClick={() => setStep(0)}>
-          Go Back
-        </Button>
         <Button
-          type="danger"
-          disabled={javaPath === '' || java16Path === ''}
+          type="primary"
           onClick={() => {
-            dispatch(updateJavaPath(javaPath));
-            dispatch(updateJava16Path(java16Path));
-            setStep(2);
+            checkJava();
+            setStep(0);
           }}
         >
-          Continue with custom java
+          Go Back
         </Button>
+        {!isJava8Downloaded || !isJava16Downloaded ? (
+          <div>
+            <ErrorMessage />
+            <Button
+              type="primary"
+              disabled={
+                !fse.existsSync(javaPath) ||
+                !fse.existsSync(java16Path) ||
+                ((!isJava16Downloaded || !isJava8Downloaded) && !changedContent)
+              }
+              onClick={() => {
+                checkJava(javaPath, java16Path);
+                setChangedContent(false);
+              }}
+            >
+              Check Java
+            </Button>
+          </div>
+        ) : (
+          <Button
+            type="danger"
+            onClick={() => {
+              dispatch(updateJavaPath(javaPath));
+              dispatch(updateJava16Path(java16Path));
+              setStep(2);
+            }}
+          >
+            Continue with custom java
+          </Button>
+        )}
       </div>
     </div>
   );
 };
 
-const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
+const AutomaticSetup = ({
+  isJava8Downloaded,
+  isJava16Downloaded,
+  setStep,
+  checkJava
+}) => {
   const [downloadPercentage, setDownloadPercentage] = useState(0);
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
@@ -618,6 +751,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
     ipcRenderer.invoke('update-progress-bar', -1);
     setDownloadPercentage(100);
     setCurrentStepPercentage(100);
+    checkJava();
     setStep(2);
   };
 
