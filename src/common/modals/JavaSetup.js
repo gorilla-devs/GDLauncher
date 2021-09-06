@@ -39,8 +39,8 @@ const JavaSetup = () => {
   const [java8Log, setJava8Log] = useState(null);
   const [java16Log, setJava16Log] = useState(null);
   const userData = useSelector(state => state.userData);
-  const shippedJava8Path = useSelector(state => state.settings.java.path);
-  const shippedJava16Path = useSelector(state => state.settings.java.path16);
+  const customJava8Path = useSelector(state => state.settings.java.path);
+  const customJava16Path = useSelector(state => state.settings.java.path16);
   const oldJava8Path = useSelector(state => _getJavaPath(state)(8));
   const oldJava16Path = useSelector(state => _getJavaPath(state)(16));
   const dispatch = useDispatch();
@@ -53,13 +53,13 @@ const JavaSetup = () => {
   const checkJava = (path8, path16) => {
     let java8Promise;
     if (path8 && path8 !== '') java8Promise = isJavaPathOK(path8, true);
-    else if (!shippedJava8Path || shippedJava8Path === '')
+    else if (!customJava8Path || customJava8Path === '')
       java8Promise = isLatestJavaDownloaded(manifests, userData, true, 8);
     else java8Promise = isJavaPathOK(oldJava8Path, true);
 
     let java16Promise;
     if (path16 && path16 !== '') java16Promise = isJavaPathOK(path16, true);
-    else if (!shippedJava16Path || shippedJava16Path === '')
+    else if (!customJava16Path || customJava16Path === '')
       java16Promise = isLatestJavaDownloaded(manifests, userData, true, 16);
     else java16Promise = isJavaPathOK(oldJava16Path, true);
 
@@ -243,10 +243,10 @@ const JavaSetup = () => {
                     checkJava={checkJava}
                     isJava8Downloaded={isJava8Downloaded}
                     setIsJava8Downloaded={setIsJava8Downloaded}
-                    shippedJava8Path={shippedJava8Path}
+                    customJava8Path={customJava8Path}
                     isJava16Downloaded={isJava16Downloaded}
                     setIsJava16Downloaded={setIsJava16Downloaded}
-                    shippedJava16Path={shippedJava16Path}
+                    customJava16Path={customJava16Path}
                   />
                 )}{' '}
               </>
@@ -356,10 +356,10 @@ const ManualSetup = ({
   setStep,
   isJava8Downloaded,
   setIsJava8Downloaded,
-  shippedJava8Path,
+  customJava8Path,
   isJava16Downloaded,
   setIsJava16Downloaded,
-  shippedJava16Path,
+  customJava16Path,
   checkJava
 }) => {
   const userData = useSelector(state => state.userData);
@@ -369,23 +369,23 @@ const ManualSetup = ({
   const [javaPath, setJavaPath] = useState(
     path.resolve(
       useSelector(state => _getJavaPath(state)(8)),
-      shippedJava8Path && shippedJava8Path !== '' ? './' : '../../'
+      customJava8Path && customJava8Path !== '' ? './' : '../../'
     )
   );
   const [java16Path, setJava16Path] = useState(
     path.resolve(
       useSelector(state => _getJavaPath(state)(16)),
-      shippedJava16Path && shippedJava16Path !== '' ? './' : '../../'
+      customJava16Path && customJava16Path !== '' ? './' : '../../'
     )
   );
   const [changedContent, setChangedContent] = useState(false);
   const dispatch = useDispatch();
   const theme = useTheme();
   useEffect(() => {
+    console.log(customJava8Path, customJava16Path);
     if (!fse.existsSync(javaPath)) setJavaPath('');
     if (!fse.existsSync(java16Path)) setJava16Path('');
   }, []);
-
   const getJavaPath = javaVersion => {
     const javaOs = convertOSToJavaFormat(process.platform);
     const javaMeta =
@@ -398,6 +398,8 @@ const ManualSetup = ({
 
     return path.join(javaBaseFolder, version);
   };
+  const defaultJava8Path = getJavaPath(8);
+  const defaultJava16Path = getJavaPath(16);
 
   const getColor = (p, latestDownloaded) => {
     if (!fse.existsSync(p)) return theme.palette.warn.main;
@@ -462,7 +464,7 @@ const ManualSetup = ({
         versions {'<'} 1.17, java 16 for versions {'>='} 1.17. You can also use
         the same executable but some versions might not run.
       </div>
-      {isJava8Downloaded ? (
+      {defaultJava8Path && defaultJava8Path === javaPath ? (
         <PathContainer>
           <div
             css={`
@@ -478,6 +480,7 @@ const ManualSetup = ({
             type="danger"
             onClick={async () => {
               await fse.remove(getJavaPath(8));
+              setJavaPath('');
               setIsJava8Downloaded(false);
             }}
             css={`
@@ -524,7 +527,7 @@ const ManualSetup = ({
           </div>
         </PathContainer>
       )}
-      {isJava16Downloaded ? (
+      {defaultJava16Path && defaultJava16Path === java16Path ? (
         <PathContainer>
           <div
             css={`
@@ -540,6 +543,7 @@ const ManualSetup = ({
             type="danger"
             onClick={async () => {
               await fse.remove(getJavaPath(16));
+              setJavaPath('');
               setIsJava16Downloaded(false);
             }}
             css={`
@@ -548,21 +552,6 @@ const ManualSetup = ({
           >
             <FontAwesomeIcon icon={faTrash} />
           </Button>
-          <div
-            css={`
-            display: flex;
-            width: 40px;
-            border-radius: 4px;
-            margin-left: 10px;
-            justify-content: center;
-            align-items: center;
-          `}
-          >
-            <FontAwesomeIcon
-              icon={getSymbol(java16Path, isJava16Downloaded)}
-              color={getColor(java16Path, isJava16Downloaded)}
-            />
-          </div>
         </PathContainer>
       ) : (
         <PathContainer>
@@ -584,6 +573,21 @@ const ManualSetup = ({
           >
             <FontAwesomeIcon icon={faFolder} />
           </Button>
+          <div
+            css={`
+              display: flex;
+              width: 40px;
+              border-radius: 4px;
+              margin-left: 10px;
+              justify-content: center;
+              align-items: center;
+            `}
+          >
+            <FontAwesomeIcon
+              icon={getSymbol(java16Path, isJava16Downloaded)}
+              color={getColor(java16Path, isJava16Downloaded)}
+            />
+          </div>
         </PathContainer>
       )}
       <div
