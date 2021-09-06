@@ -21,6 +21,7 @@ import { downloadFile } from '../../app/desktop/utils/downloader';
 import {
   convertOSToJavaFormat,
   extractAll,
+  isJavaPathOK,
   isLatestJavaDownloaded
 } from '../../app/desktop/utils';
 import { _getTempPath } from '../utils/selectors';
@@ -46,18 +47,39 @@ const JavaSetup = () => {
   const theme = useTheme();
 
   const checkJava = () => {
-    isLatestJavaDownloaded(manifests, userData, true, 8)
-      .then(e => {
-        setIsJava8Downloaded(e?.isValid);
-        return setJava8Log(e?.log);
-      })
-      .catch(err => console.error(err));
-    isLatestJavaDownloaded(manifests, userData, true, 16)
-      .then(e => {
-        setIsJava16Downloaded(e?.isValid);
-        return setJava16Log(e?.log);
-      })
-      .catch(err => console.error(err));
+    if (choice === null || choice !== 1) {
+      isLatestJavaDownloaded(manifests, userData, true, 8)
+        .then(e => {
+          setIsJava8Downloaded(e?.isValid);
+          return setJava8Log(e?.log);
+        })
+        .catch(err => console.error(err));
+      isLatestJavaDownloaded(manifests, userData, true, 16)
+        .then(e => {
+          setIsJava16Downloaded(e?.isValid);
+          return setJava16Log(e?.log);
+        })
+        .catch(err => console.error(err));
+    } else {
+      isJavaPathOK(
+        useSelector(state => state.settings.java.path16),
+        true
+      )
+        .then(e => {
+          setIsJava16Downloaded(e?.isValid);
+          return setJava16Log(e?.log);
+        })
+        .catch(err => console.error(err));
+      isJavaPathOK(
+        useSelector(state => state.settings.java.path),
+        true
+      )
+        .then(e => {
+          setIsJava8Downloaded(e?.isValid);
+          return setJava8Log(e?.log);
+        })
+        .catch(err => console.error(err));
+    }
   };
 
   useEffect(() => {
@@ -476,7 +498,7 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
     const java16Meta = java16Manifest.find(v => v.os === javaOs);
 
     const totalExtractionSteps = process.platform !== 'win32' ? 2 : 1;
-    const totalSteps = (totalExtractionSteps + 1) * javaToInstall.length;
+    const totalSteps = 2 * javaToInstall.length;
 
     const setStepPercentage = (stepNumber, percentage) => {
       setCurrentStepPercentage(
@@ -522,14 +544,15 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
           update: percent => {
             ipcRenderer.invoke('update-progress-bar', percent);
             setDownloadPercentage(percent);
-            setStepPercentage(index, percent);
+            setStepPercentage(
+              index,
+              process.platform === 'win32' ? percent : percent / 2
+            );
           }
         }
       );
 
-      index += 1;
       setDownloadPercentage(0);
-      setStepPercentage(index, 0);
 
       await fse.remove(downloadLocation);
 
@@ -556,15 +579,15 @@ const AutomaticSetup = ({ isJava8Downloaded, isJava16Downloaded, setStep }) => {
             update: percent => {
               ipcRenderer.invoke('update-progress-bar', percent);
               setDownloadPercentage(percent);
-              setStepPercentage(index, percent);
+              setStepPercentage(index, percent / 2 + 50);
             }
           }
         );
         await fse.remove(tempTarName);
-        index += 1;
-        setDownloadPercentage(0);
-        setStepPercentage(index, 0);
       }
+      index += 1;
+      setDownloadPercentage(0);
+      setStepPercentage(index, 0);
 
       const directoryToMove =
         process.platform === 'darwin'

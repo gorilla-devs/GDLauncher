@@ -268,7 +268,6 @@ export const isLatestJavaDownloaded = async (
   version = 8
 ) => {
   const javaOs = convertOSToJavaFormat(process.platform);
-  let log = null;
 
   const isJava16 = version === 16;
 
@@ -280,6 +279,12 @@ export const isLatestJavaDownloaded = async (
     'java',
     javaMeta.version_data.openjdk_version
   );
+  return isJavaPathOK(javaFolder, retry);
+};
+
+export const isJavaPathOK = async (javaFolder, retry) => {
+  const javaOs = convertOSToJavaFormat(process.platform);
+  let log = null;
   // Check if it's downloaded, if it's latest version and if it's a valid download
   let isValid = true;
 
@@ -302,7 +307,7 @@ export const isLatestJavaDownloaded = async (
         }
       }
 
-      return isLatestJavaDownloaded(meta, userData, null, version);
+      return isJavaPathOK(javaFolder, false);
     }
 
     isValid = false;
