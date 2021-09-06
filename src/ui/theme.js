@@ -19,6 +19,16 @@ module.exports = {
       main: '#D64441',
       dark: '#952f2d'
     },
+    warn: {
+      light: '#faff5e',
+      main: '#ebfc00',
+      dark: '#a7ad00'
+    },
+    success: {
+      light: '#76ff7a',
+      main: '#02ff0f',
+      dark: '#008407'
+    },
     grey: {
       50: '#B7C5C8',
       100: '#A3B1B6',
