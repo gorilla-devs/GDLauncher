@@ -99,43 +99,40 @@ const createDeployFiles = async () => {
   );
 };
 
+const extraFiles = [];
+let sevenZipPath = null;
+if (process.platform === 'win32') {
+  sevenZipPath = 'node_modules/7zip-bin/win/x64/7za.exe';
+  extraFiles.push({
+    from: 'vcredist/',
+    to: './',
+    filter: '**/*'
+  });
+} else if (process.platform === 'linux') {
+  sevenZipPath = 'node_modules/7zip-bin/linux/x64/7za';
+} else if (process.platform === 'darwin') {
+  sevenZipPath = 'node_modules/7zip-bin/mac/x64/7za';
+}
+
+extraFiles.push({
+  from: sevenZipPath,
+  to: './'
+});
+
 const commonConfig = {
+  publish: 'never',
   config: {
-    publish: {
-      owner: 'gorilla-devs',
-      repo: 'GDLauncher',
-      provider: 'github',
-      private: false
-    },
     generateUpdatesFilesForAllChannels: true,
     npmRebuild: false,
     productName: 'GDLauncher',
     appId: 'org.gorilladevs.GDLauncher',
     files: [
       '!node_modules/**/*',
-      ...(process.platform === 'linux'
-        ? ['node_modules/7zip-bin/linux/x64/7za']
-        : []),
-      ...(process.platform === 'darwin'
-        ? ['node_modules/7zip-bin/mac/x64/7za']
-        : []),
-      ...(process.platform === 'win32'
-        ? ['node_modules/7zip-bin/win/x64/7za.exe']
-        : []),
       'build/**/*',
       'package.json',
       'public/icon.png'
     ],
-    extraFiles:
-      process.platform === 'win32'
-        ? [
-            {
-              from: 'vcredist/',
-              to: './',
-              filter: '**/*'
-            }
-          ]
-        : [],
+    extraFiles,
     asar: {
       smartUnpack: false
     },
@@ -176,7 +173,8 @@ const commonConfig = {
     }.${'${ext}'}`,
     /* eslint-enable */
     linux: {
-      category: 'Game'
+      category: 'Game',
+      icon: 'public/linux-icons/'
     },
     directories: {
       buildResources: 'public',
@@ -190,16 +188,16 @@ const commonConfig = {
       }
     ]
   },
-  ...((!process.env.RELEASE_TESTING || process.platform === 'linux') && {
+  ...(process.platform === 'linux' && {
     linux:
       type === 'setup'
         ? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
         : ['snap:x64']
   }),
-  ...((!process.env.RELEASE_TESTING || process.platform === 'win32') && {
+  ...(process.platform === 'win32' && {
     win: [type === 'setup' ? 'nsis:x64' : 'zip:x64']
   }),
-  ...((!process.env.RELEASE_TESTING || process.platform === 'darwin') && {
+  ...(process.platform === 'darwin' && {
     mac: type === 'setup' ? ['dmg:x64'] : []
   })
 };
@@ -209,10 +207,7 @@ const main = async () => {
   await fse.remove(releasesFolder);
   await makeDir(deployFolder);
   await electronBuilder.build(commonConfig);
-  if (
-    type === 'portable' &&
-    (process.platform === 'win32' || !process.env.RELEASE_TESTING)
-  ) {
+  if (type === 'portable' && process.platform === 'win32') {
     await createDeployFiles();
   }
 
@@ -247,41 +242,19 @@ const main = async () => {
     }
   };
 
-  if (!process.env.RELEASE_TESTING) {
-    const filesToMove = allFiles[type];
+  const filesToMove = allFiles[type][process.platform];
 
-    await Promise.all(
-      Object.values(filesToMove).map(async target => {
-        return Promise.all(
-          target.map(async file => {
-            const stats = await fs.promises.stat(
-              path.join(releasesFolder, file)
-            );
-            if (stats.isFile()) {
-              await fse.move(
-                path.join(releasesFolder, file),
-                path.join(deployFolder, file.replace('nsis-web', ''))
-              );
-            }
-          })
+  await Promise.all(
+    filesToMove.map(async file => {
+      const stats = await fs.promises.stat(path.join(releasesFolder, file));
+      if (stats.isFile()) {
+        await fse.move(
+          path.join(releasesFolder, file),
+          path.join(deployFolder, file.replace('nsis-web', ''))
         );
-      })
-    );
-  } else {
-    const filesToMove = allFiles[type][process.platform];
-
-    await Promise.all(
-      filesToMove.map(async file => {
-        const stats = await fs.promises.stat(path.join(releasesFolder, file));
-        if (stats.isFile()) {
-          await fse.move(
-            path.join(releasesFolder, file),
-            path.join(deployFolder, file.replace('nsis-web', ''))
-          );
-        }
-      })
-    );
-  }
+      }
+    })
+  );
 
   await fse.remove(releasesFolder);
 };

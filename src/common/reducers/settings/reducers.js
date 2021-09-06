@@ -4,6 +4,7 @@ import {
   DEFAULT_JAVA_ARGS,
   DEFAULT_MEMORY
 } from '../../../app/desktop/utils/constants';
+import { MC_STARTUP_METHODS } from '../../utils/constants';
 
 function sounds(state = true, action) {
   switch (action.type) {
@@ -95,6 +96,15 @@ function minecraftSettings(
   }
 }
 
+function mcStartupMethod(state = MC_STARTUP_METHODS.DEFAULT, action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_MC_STARTUP_METHOD:
+      return action.method;
+    default:
+      return state;
+  }
+}
+
 function java(
   state = {
     path: null,
@@ -110,13 +120,9 @@ function java(
     case ActionTypes.UPDATE_JAVA_MEMORY:
       return { ...state, memory: action.memory };
     case ActionTypes.UPDATE_JAVA_PATH: {
-      if (!action.path)
-        return { ...state, path: action.path, path16: action.path };
       return { ...state, path: action.path };
     }
     case ActionTypes.UPDATE_JAVA16_PATH: {
-      if (!action.path)
-        return { ...state, path16: action.path, path: action.path };
       return { ...state, path16: action.path };
     }
     default:
@@ -134,5 +140,6 @@ export default combineReducers({
   showNews,
   curseReleaseChannel,
   java,
-  minecraftSettings
+  minecraftSettings,
+  mcStartupMethod
 });

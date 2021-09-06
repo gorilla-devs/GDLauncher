@@ -18,7 +18,12 @@ import { useDebouncedCallback } from 'use-debounce';
 import { FixedSizeList as List } from 'react-window';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
-import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBomb,
+  faExclamationCircle,
+  faWrench,
+  faDownload
+} from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
 import { getSearch, getAddonFiles } from '../api';
 import { openModal } from '../reducers/modals/actions';
@@ -143,7 +148,7 @@ const ModsListWrapper = ({
     const item = items[index];
 
     const isInstalled = installedMods.find(v => v.projectID === item?.id);
-    const primaryImage = item.attachments.find(v => v.isDefault);
+    const primaryImage = (item?.attachments || []).find(v => v?.isDefault);
 
     if (!item) {
       return (
@@ -175,7 +180,7 @@ const ModsListWrapper = ({
         <RowInnerContainer>
           <RowContainerImg
             style={{
-              background: `url('${primaryImage?.thumbnailUrl}') center center`
+              backgroundImage: `url('${primaryImage?.thumbnailUrl}')`
             }}
           />
           <div
@@ -205,25 +210,6 @@ const ModsListWrapper = ({
         {!isInstalled ? (
           error || (
             <div>
-              <Button
-                type="primary"
-                css={`
-                  margin-right: 10px;
-                `}
-                onClick={() => {
-                  dispatch(
-                    openModal('ModOverview', {
-                      gameVersion,
-                      projectID: item.id,
-                      ...(isInstalled && { fileID: isInstalled.fileID }),
-                      ...(isInstalled && { fileName: isInstalled.fileName }),
-                      instanceName
-                    })
-                  );
-                }}
-              >
-                Explore
-              </Button>
               <Button
                 type="primary"
                 onClick={async e => {
@@ -286,7 +272,7 @@ const ModsListWrapper = ({
                 }}
                 loading={loading}
               >
-                Install
+                <FontAwesomeIcon icon={faDownload} />
               </Button>
             </div>
           )
@@ -305,7 +291,7 @@ const ModsListWrapper = ({
               );
             }}
           >
-            Change version / explore
+            <FontAwesomeIcon icon={faWrench} />
           </Button>
         )}
       </RowContainer>
@@ -409,7 +395,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         filterType,
         filterType !== 'Author' && filterType !== 'Name',
         gameVersion,
-        getPatchedInstanceType(instance) === FABRIC ? 4780 : null
+        0,
+        getPatchedInstanceType(instance)
       ));
     } catch (err) {
       setError(err);
@@ -445,8 +432,8 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
         <Header>
           <Select
             css={`
-              width: 160px;
-              margin: 0 10px;
+              width: 160px !important;
+              margin: 0 10px !important;
             `}
             defaultValue={filterType}
             onChange={setFilterType}
@@ -462,9 +449,9 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
           </Select>
           <Input
             css={`
-              height: 32px;
+              height: 32px !important;
             `}
-            placeholder="Search for a mod"
+            placeholder="Search..."
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value);

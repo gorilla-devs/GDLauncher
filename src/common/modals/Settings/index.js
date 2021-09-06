@@ -2,21 +2,12 @@ import React, { useState, lazy } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faDiscord,
-  faFacebook,
-  faGithub,
-  faInstagram,
-  faTwitter
-} from '@fortawesome/free-brands-svg-icons';
-import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
-import { closeModal } from '../../reducers/modals/actions';
+import SocialButtons from '../../components/SocialButtons';
+import { closeModal, openModal } from '../../reducers/modals/actions';
 import KoFiButton from '../../assets/ko-fi.png';
-import PatreonButton from '../../assets/patreon.png';
 
 const Container = styled.div`
   display: flex;
@@ -154,6 +145,7 @@ export default function Settings() {
               width: 200px;
               position: absolute;
               bottom: 0;
+              margin-bottom: 30px;
             `}
           >
             <span
@@ -182,69 +174,54 @@ export default function Settings() {
                   src={KoFiButton}
                   alt="Ko-Fi"
                   css={`
-                    margin-bottom: 20px;
+                    margin-bottom: 0px;
                     margin-top: 20px;
                   `}
                 />
               </a>
-              <a href="https://patreon.com/gorilladevs">
-                <img src={PatreonButton} alt="Patreon" />
-              </a>
             </div>
             <div
               css={`
-                display: flex;
                 margin-top: 20px;
-                margin-bottom: 20px;
-                a {
-                  color: rgba(255, 255, 255, 0.85);
-                }
-                div {
-                  padding: 6px;
-                  border-radius: 4px;
-                  &:hover {
-                    background: rgba(255, 255, 255, 0.5);
-                    transition: background 0.1s ease-in-out,
-                      transform 0.1s ease-in-out;
-                    transform: scale(1.2);
-                    cursor: pointer;
-                  }
-                }
-                div:first-child {
-                  margin-left: 0;
+              `}
+            >
+              <SocialButtons />
+            </div>
+            <div
+              css={`
+                margin-top: 20px;
+                display: flex;
+                font-size: 10px;
+                flex-direction: column;
+                span {
+                  text-decoration: underline;
+                  cursor: pointer;
                 }
               `}
             >
-              <a href="https://discord.gg/4cGYzen">
-                <div>
-                  <FontAwesomeIcon icon={faDiscord} size="lg" />
-                </div>
-              </a>
-              <a href="https://github.com/gorilla-devs/GDLauncher">
-                <div>
-                  <FontAwesomeIcon icon={faGithub} size="lg" />
-                </div>
-              </a>
-              <a href="https://twitter.com/gdlauncher">
-                <div>
-                  <FontAwesomeIcon icon={faTwitter} size="lg" />
-                </div>
-              </a>
-              <a href="https://facebook.com/gorilladevs">
-                <div>
-                  <FontAwesomeIcon icon={faFacebook} size="lg" />
-                </div>
-              </a>
-              <a href="https://instagram.com/gdlauncher">
-                <div>
-                  <FontAwesomeIcon icon={faInstagram} size="lg" />
-                </div>
-              </a>
-              <a href="https://gdevs.io">
-                <div>
-                  <FontAwesomeIcon icon={faGlobe} size="lg" />
-                </div>
-              </a>
+              <span
+                onClick={() =>
+                  dispatch(openModal('PolicyModal', { policy: 'privacy' }))
+                }
+              >
+                Privacy Policy
+              </span>
+              <span
+                onClick={() =>
+                  dispatch(openModal('PolicyModal', { policy: 'tos' }))
+                }
+              >
+                Terms and Conditions
+              </span>
+              <span
+                onClick={() =>
+                  dispatch(
+                    openModal('PolicyModal', { policy: 'acceptableuse' })
+                  )
+                }
+              >
+                Acceptable Use Policy
+              </span>
             </div>
           </div>
         </SideMenu>
@@ -255,6 +232,7 @@ export default function Settings() {
                 max-width: 600px;
                 overflow-y: hidden;
                 overflow-x: hidden;
+                padding-bottom: 20px;
               `}
             >
               <ContentComponent />

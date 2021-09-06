@@ -28,7 +28,8 @@ import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import {
   updateInstanceConfig,
   deleteMod,
-  updateMod
+  updateMod,
+  initLatestMods
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
 
@@ -82,7 +83,6 @@ const RowContainer = styled.div.attrs(props => ({
   .rowCenterContent {
     flex: 1;
     display: flex;
-    justify-content: center;
     align-items: center;
     transition: color 0.1s ease-in-out;
     height: 100%;
@@ -146,7 +146,7 @@ const NotItemsAvailable = styled.div`
 const DragEnterEffect = styled.div`
   position: absolute;
   display: flex;
-  flex-direction; column;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   border: solid 5px ${props => props.theme.palette.primary.main};
@@ -162,8 +162,8 @@ const DragEnterEffect = styled.div`
   backdrop-filter: blur(4px);
   background: linear-gradient(
     0deg,
-    rgba(0, 0, 0, .3) 40%,
-    rgba(0, 0, 0, .3) 40%
+    rgba(0, 0, 0, 0.3) 40%,
+    rgba(0, 0, 0, 0.3) 40%
   );
   opacity: ${({ transitionState }) =>
     transitionState === 'entering' || transitionState === 'entered' ? 1 : 0};
@@ -547,6 +547,7 @@ const Mods = ({ instanceName }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [fileDrag, setFileDrag] = useState(false);
   const [fileDrop, setFileDrop] = useState(false);
+  const [loadingModUpdates, setLoadingModUpdates] = useState(false);
   const [numOfDraggedFiles, setNumOfDraggedFiles] = useState(0);
   const [dragCompleted, setDragCompleted] = useState({});
   const [dragCompletedPopulated, setDragCompletedPopulated] = useState(false);
@@ -732,6 +733,21 @@ const Mods = ({ instanceName }) => {
             }
             icon={faFolder}
           />
+          <Button
+            onClick={async () => {
+              if (instance.name && instance?.mods?.length) {
+                try {
+                  setLoadingModUpdates(true);
+                  await dispatch(initLatestMods(instance.name));
+                } finally {
+                  setLoadingModUpdates(false);
+                }
+              }
+            }}
+            loading={loadingModUpdates}
+          >
+            Check for Updates
+          </Button>
           <StyledDropdown
             onClick={() => {
               if (!isMenuOpen) {
@@ -768,7 +784,7 @@ const Mods = ({ instanceName }) => {
           defaultValue={search}
           onChange={e => setSearch(e.target.value)}
           css={`
-            width: 200px;
+            width: 200px !important;
           `}
           placeholder={`Search ${mods.length} mods`}
         />

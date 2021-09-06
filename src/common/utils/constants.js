@@ -13,8 +13,7 @@ export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const FORGESVC_URL = 'https://addons-ecs.forgesvc.net/api/v2';
 export const FTB_API_URL = 'https://api.modpacks.ch/public';
 export const FTB_MODPACK_URL = 'https://feed-the-beast.com/modpack';
-export const FORGESVC_CATEGORIES =
-  'https://addons-ecs.forgesvc.net/api/v2/category?gameId=432';
+export const GDL_SERVE_API = 'https://api.gdlauncher.com/serve';
 export const NEWS_URL =
   'https://www.minecraft.net/en-us/feeds/community-content/rss';
 export const FMLLIBS_OUR_BASE_URL = 'https://fmllibs.gdevs.io';
@@ -38,3 +37,8 @@ export const MICROSOFT_OAUTH_CLIENT_ID = 'b9336bf8-c6bb-4344-aabe-63d0bfa8db2e';
 export const MICROSOFT_OAUTH_REDIRECT_URL =
   'https://login.microsoftonline.com/common/oauth2/nativeclient';
 export const MINECRAFT_SERVICES_URL = 'https://api.minecraftservices.com';
+
+export const MC_STARTUP_METHODS = {
+  SYMLINK: 'Symlink',
+  DEFAULT: 'Default'
+};

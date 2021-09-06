@@ -54,7 +54,8 @@ export const _getJavaPath = createSelector(
         ? javaManifest.java16Manifest
         : javaManifest.javaManifest;
 
-      if (java.path) return java.path;
+      const customJava = ver === 16 ? java.path16 : java.path;
+
       const javaOs = convertOSToJavaFormat(process.platform);
       const javaMeta = manifest.find(
         version =>
@@ -67,7 +68,9 @@ export const _getJavaPath = createSelector(
       } = javaMeta;
       const filename = process.platform === 'win32' ? 'java.exe' : 'java';
 
-      return path.join(userData, 'java', version, 'bin', filename);
+      return (
+        customJava || path.join(userData, 'java', version, 'bin', filename)
+      );
     });
   }
 );
