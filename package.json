@@ -76,9 +76,6 @@
   "cpu": [
     "x64"
   ],
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": {
     "production": [
       ">0.2%",
