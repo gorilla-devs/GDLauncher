@@ -2689,7 +2689,7 @@ export function launchInstance(instanceName) {
               arg => {
                 return arg
                   .replace(/\${version_name}/g, mcJson.id)
-                  .replace(/\${library_directory}/g, _getLibrariesPath(state))
+                  .replace(/\${library_directory}/g, `"${_getLibrariesPath(state)}"`)
                   .replace(
                     /\${classpath_separator}/g,
                     process.platform === 'win32' ? ';' : ':'

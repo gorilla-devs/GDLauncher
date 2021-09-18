@@ -199,17 +199,30 @@ if (
 
 log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
 
-async function patchSevenZip() {
-  let sevenZipPath = null;
-  const baseDir = path.dirname(app.getPath('exe'));
-  if (process.platform === 'darwin' || process.platform === 'linux') {
-    sevenZipPath = path.join(baseDir, '7za');
-  } else {
-    sevenZipPath = path.join(baseDir, '7za.exe');
+const get7zPath = async () => {
+  let baseDir = path.dirname(app.getPath('exe'));
+  if (process.env.NODE_ENV === 'development') {
+    baseDir = path.resolve(baseDir, '../../');
+    if (process.platform === 'win32') {
+      baseDir = path.join(baseDir, '7zip-bin/win/x64');
+    } else if (process.platform === 'linux') {
+      baseDir = path.join(baseDir, '7zip-bin/linux/x64');
+    } else if (process.platform === 'darwin') {
+      baseDir = path.resolve(baseDir, '../../../', '7zip-bin/mac/x64');
+    }
   }
+  if (process.platform === 'linux') {
+    return path.join(baseDir, '7za');
+  } else if (process.platform === 'darwin') {
+    return path.resolve(baseDir, '../', '7za');
+  }
+  return path.join(baseDir, '7za.exe');
+};
 
+async function patchSevenZip() {
   try {
     if (process.platform === 'linux' || process.platform === 'darwin') {
+      const sevenZipPath = await get7zPath();
       await promisify(exec)(`chmod +x "${sevenZipPath}"`);
       await promisify(exec)(`chmod 755 "${sevenZipPath}"`);
     }
@@ -218,7 +231,7 @@ async function patchSevenZip() {
   }
 }
 
-if (!isDev) patchSevenZip();
+patchSevenZip();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
