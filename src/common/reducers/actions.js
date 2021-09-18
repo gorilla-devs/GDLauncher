@@ -263,7 +263,7 @@ export function switchToFirstValidAccount(id) {
     let found = null;
     for (let i = 0; i < accounts.length; i += 1) {
       if (found || accounts[i].selectedProfile.id === currentAccountId)
-                continue; //eslint-disable-line
+        continue; //eslint-disable-line
       try {
         dispatch(updateCurrentAccountId(accounts[i].selectedProfile.id));
         // eslint-disable-next-line no-await-in-loop
@@ -2688,7 +2688,10 @@ export function launchInstance(instanceName) {
               arg => {
                 return arg
                   .replace(/\${version_name}/g, mcJson.id)
-                  .replace(/\${library_directory}/g, `"${_getLibrariesPath(state)}"`)
+                  .replace(
+                    /\${library_directory}/g,
+                    `"${_getLibrariesPath(state)}"`
+                  )
                   .replace(
                     /\${classpath_separator}/g,
                     process.platform === 'win32' ? ';' : ':'
@@ -3165,12 +3168,12 @@ export const checkForPortableUpdates = () => {
               let sha1Matched = false;
               while (maxTries <= 5 && !sha1Matched) {
                 // eslint-disable-next-line
-                                await downloadFile(
+                await downloadFile(
                   compressedFile,
                   `${baseAssetUrl}/${file.compressedFile}`
                 );
                 // eslint-disable-next-line
-                                const fileSha1 = await getFileHash(compressedFile);
+                const fileSha1 = await getFileHash(compressedFile);
                 if (fileSha1.toString() === file.compressedSha1) {
                   sha1Matched = true;
                 }
