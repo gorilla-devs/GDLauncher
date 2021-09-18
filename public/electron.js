@@ -213,7 +213,8 @@ const get7zPath = async () => {
   }
   if (process.platform === 'linux') {
     return path.join(baseDir, '7za');
-  } else if (process.platform === 'darwin') {
+  }
+  if (process.platform === 'darwin') {
     return path.resolve(baseDir, '../', '7za');
   }
   return path.join(baseDir, '7za.exe');
