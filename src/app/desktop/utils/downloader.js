@@ -127,7 +127,7 @@ export const downloadFile = async (fileName, url, onProgress) => {
     // Update the received bytes
     receivedBytes += chunk.length;
     if (onProgress) {
-      onProgress(((receivedBytes * 100) / totalBytes).toFixed(1));
+      onProgress(parseInt(((receivedBytes * 100) / totalBytes).toFixed(1), 10));
     }
   });
 

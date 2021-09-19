@@ -140,7 +140,7 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledInput = styled(Input)`
-  margin-bottom: 20px;
+  margin-bottom: 20px !important;
 `;
 
 const LoginFailMessage = styled.div`

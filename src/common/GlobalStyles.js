@@ -155,6 +155,7 @@ export default createGlobalStyle`
     0% { transform: scale(1.01) }
     30% { transform: scale(0.99) }
     60% { transform: scale(1.01) }
-    90% { transform: scale(0.99)}
-    100% {transform: scale(1) }
+    90% { transform: scale(0.99) }
+    100% { transform: scale(1) }
+  }
 `;

@@ -1,30 +1,24 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import fse from 'fs-extra';
 import { promises as fs } from 'fs';
 import path from 'path';
-import Modal from '../../components/Modal';
-import Overview from './Overview';
 import { ipcRenderer } from 'electron';
-import Screenshots from './Screenshots';
-import ResourcePacks from './ResourcePacks';
-import Notes from './Notes';
-import Mods from './Mods';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import omit from 'lodash/omit';
 import { useSelector, useDispatch } from 'react-redux';
+import Modal from '../../components/Modal';
+import AsyncComponent from '../../components/AsyncComponent';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
 import { FORGE, FABRIC, CURSEFORGE, FTB } from '../../utils/constants';
-import Modpack from './Modpack';
 import {
-  initLatestMods,
   clearLatestModManifests,
   updateInstanceConfig
 } from '../../reducers/actions';
 import instanceDefaultBackground from '../../../common/assets/instance_default.png';
-import omit from 'lodash/omit';
 
 const SideMenu = styled.div`
   display: flex;
@@ -141,14 +135,32 @@ const InstanceBackground = styled.div`
 `;
 
 const menuEntries = {
-  overview: { name: 'Overview', component: Overview },
-  mods: { name: 'Mods', component: Mods },
-  modpack: { name: 'Modpack', component: Modpack },
-  notes: { name: 'Notes', component: Notes },
-  resourcePacks: { name: 'Resource Packs', component: ResourcePacks },
+  overview: {
+    name: 'Overview',
+    component: AsyncComponent(lazy(() => import('./Overview')))
+  },
+  mods: {
+    name: 'Mods',
+    component: AsyncComponent(lazy(() => import('./Mods')))
+  },
+  modpack: {
+    name: 'Modpack',
+    component: AsyncComponent(lazy(() => import('./Modpack')))
+  },
+  notes: {
+    name: 'Notes',
+    component: AsyncComponent(lazy(() => import('./Notes')))
+  },
+  resourcePacks: {
+    name: 'Resource Packs',
+    component: AsyncComponent(lazy(() => import('./ResourcePacks')))
+  },
   // resourcePacks: { name: "Resource Packs", component: Overview },
   // worlds: { name: "Worlds", component: Overview },
-  screenshots: { name: 'Screenshots', component: Screenshots }
+  screenshots: {
+    name: 'Screenshots',
+    component: AsyncComponent(lazy(() => import('./Screenshots')))
+  }
   // settings: { name: "Settings", component: Overview },
   // servers: { name: "Servers", component: Overview }
 };
@@ -215,14 +227,6 @@ const InstanceManager = ({ instanceName }) => {
         .catch(console.error);
     }
   }, []);
-
-  useEffect(() => {
-    if (instance?.name) {
-      dispatch(initLatestMods(instance.name));
-    }
-  }, [instance?.mods]);
-
-
 
   return (
     <Modal

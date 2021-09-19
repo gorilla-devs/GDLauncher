@@ -22,11 +22,15 @@ import { getAddon } from '../../../api';
  */
 const createZip = async (archiveName, zipDestPath, filesArray) => {
   const sevenZipPath = await get7zPath();
-  const zipCreation = add7z(`${archiveName}.zip`, filesArray, {
-    $bin: sevenZipPath,
-    $raw: ['-tzip'],
-    $spawnOptions: { cwd: zipDestPath }
-  });
+  const zipCreation = add7z(
+    path.join(zipDestPath, `${archiveName}.zip`),
+    filesArray,
+    {
+      $bin: sevenZipPath,
+      $raw: ['-tzip'],
+      $spawnOptions: { cwd: zipDestPath, shell: true }
+    }
+  );
   await new Promise((resolve, reject) => {
     zipCreation.on('end', () => {
       resolve();

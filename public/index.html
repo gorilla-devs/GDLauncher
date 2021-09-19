@@ -54,6 +54,7 @@
     <script>
       (function () {
         if (process.env.NODE_ENV !== 'development') {
+          window.gaInitialized = true;
           window.ga =
             window.ga ||
             function () {
@@ -99,13 +100,12 @@
         <div class="loader">
           <svg
             version="1.1"
-            id="Livello_1"
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
             x="0px"
             y="0px"
             viewBox="0 0 1080 1080"
-            style="enable-background: new 0 0 1080 1080;"
+            style="enable-background: new 0 0 1080 1080"
             xml:space="preserve"
           >
             <style type="text/css">
