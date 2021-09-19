@@ -15,7 +15,8 @@ import {
   faToilet,
   faNewspaper,
   faFolder,
-  faFire
+  faFire,
+  faSort
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
@@ -29,6 +30,7 @@ import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
+  updateInstanceSortType,
   updateShowNews,
   updateCurseReleaseChannel
 } from '../../../reducers/settings/actions';
@@ -162,9 +164,18 @@ const General = () => {
   const showNews = useSelector(state => state.settings.showNews);
   const DiscordRPC = useSelector(state => state.settings.discordRPC);
   const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
-  const concurrentDownloads = useSelector(state => state.settings.concurrentDownloads);
-  const curseReleaseChannel = useSelector(state => state.settings.curseReleaseChannel);
-  const hideWindowOnGameLaunch = useSelector(state => state.settings.hideWindowOnGameLaunch);
+  const concurrentDownloads = useSelector(
+    state => state.settings.concurrentDownloads
+  );
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
+  const hideWindowOnGameLaunch = useSelector(
+    state => state.settings.hideWindowOnGameLaunch
+  );
+  const instanceSortMethod = useSelector(
+    state => state.settings.instanceSortOrder
+  );
   /* eslint-enable */
 
   const [dataPath, setDataPath] = useState(userData);
@@ -355,6 +366,32 @@ const General = () => {
                 {x}
               </Select.Option>
             ))}
+        </Select>
+      </Content>
+      <Title>
+        Instance Sorting &nbsp; <FontAwesomeIcon icon={faSort} />
+      </Title>
+      <Content>
+        <p
+          css={`
+            margin: 0;
+            width: 400px;
+          `}
+        >
+          Select the method in which instances should be sorted.
+        </p>
+
+        <Select
+          onChange={v => dispatch(updateInstanceSortType(v))}
+          value={instanceSortMethod}
+          css={`
+            width: 136px;
+            text-align: start;
+          `}
+        >
+          <Select.Option value={0}>Alphabetical</Select.Option>
+          <Select.Option value={1}>Last Played</Select.Option>
+          <Select.Option value={2}>Most Played</Select.Option>
         </Select>
       </Content>
       <Title>
