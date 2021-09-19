@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { _getInstances } from '../../../../common/utils/selectors';
@@ -55,16 +55,19 @@ const getInstances = (instances, sortOrder) => {
 };
 
 const Instances = () => {
-  // const instances = getInstances();
   const instanceSortOrder = useSelector(
     state => state.settings.instanceSortOrder
   );
-  const instances = getInstances(useSelector(_getInstances), instanceSortOrder);
+  const instances = useSelector(_getInstances);
+  const memoInstances = useMemo(
+    () => getInstances(instances || [], instanceSortOrder),
+    [instances, instanceSortOrder]
+  );
 
   return (
     <Container>
-      {instances.length > 0 ? (
-        instances.map(i => <Instance key={i.name} instanceName={i.name} />)
+      {memoInstances.length > 0 ? (
+        memoInstances.map(i => <Instance key={i.name} instanceName={i.name} />)
       ) : (
         <NoInstance>
           No Instance has been installed
