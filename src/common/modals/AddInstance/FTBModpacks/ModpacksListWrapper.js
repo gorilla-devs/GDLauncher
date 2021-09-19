@@ -6,6 +6,28 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import ContentLoader from 'react-content-loader';
 import { transparentize } from 'polished';
 import { openModal } from '../../../reducers/modals/actions';
+import { FTB } from '../../../utils/constants';
+import { getFTBModpackVersionData } from '../../../api';
+
+const selectFTBModpack = async (modpack, setVersion, setModpack, setStep) => {
+  const projectID = modpack.id;
+  const fileID = modpack.versions[modpack.versions.length - 1].id;
+
+  const data = await getFTBModpackVersionData(modpack.id, fileID);
+
+  const forgeModloader = data.targets.find(v => v.type === 'modloader');
+  const mcVersion = data.targets.find(v => v.type === 'game').version;
+
+  setVersion({
+    loaderType: forgeModloader?.type,
+    mcVersion,
+    projectID,
+    fileID,
+    source: FTB
+  });
+  setModpack(modpack);
+  setStep(1);
+};
 
 const ModpacksListWrapper = ({
   // Are there more items to load?
@@ -26,6 +48,8 @@ const ModpacksListWrapper = ({
   setStep,
 
   setModpack,
+
+  setVersion,
   // Callback function responsible for loading the next page of items.
   loadNextPage,
 
@@ -48,9 +72,10 @@ const ModpacksListWrapper = ({
         <ModpackLoader
           hasNextPage={hasNextPage}
           isNextPageLoading={isNextPageLoading}
-          width={width}
           loadNextPage={loadNextPage}
-          top={style.top + 8}
+          top={style.top + (index === 0 ? 0 : 8)}
+          width={width}
+          height={style.height - (index === 0 ? 0 : 8)}
         />
       );
     }
@@ -65,15 +90,15 @@ const ModpacksListWrapper = ({
         // eslint-disable-next-line
         style={{
           ...style,
-          top: style.top + 8,
-          height: style.height - 8,
+          top: style.top + (index === 0 ? 0 : 8),
+          height: style.height - (index === 0 ? 0 : 8),
           background: `url('${primaryImage.url}')`,
           position: 'absolute',
-          width: '100%',
+          width: width - 8,
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          margin: '10px 0',
+          margin: 0,
           borderRadius: 4
         }}
         key={modpack.id}
@@ -84,13 +109,7 @@ const ModpacksListWrapper = ({
         <ModpackHover>
           <div
             onClick={() => {
-              // setVersion([
-              //   FORGE,
-              //   modpack.id,
-              //   modpack.latestFiles[modpack.latestFiles.length - 1].id
-              // ]);
-              setModpack(modpack);
-              setStep(1);
+              selectFTBModpack(modpack, setVersion, setModpack, setStep);
             }}
           >
             Download Latest
@@ -101,6 +120,8 @@ const ModpacksListWrapper = ({
                 openModal('ModpackDescription', {
                   modpack,
                   setStep,
+                  setVersion,
+                  setModpack,
                   type: 'ftb'
                 })
               );
@@ -119,7 +140,7 @@ const ModpacksListWrapper = ({
       // eslint-disable-next-line react/forbid-dom-props
       style={{
         ...style,
-        paddingTop: 8
+        paddingTop: 0
       }}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...rest}
@@ -198,7 +219,7 @@ const ModpackHover = styled.div`
 `;
 
 const ModpackLoader = memo(
-  ({ width, top, isNextPageLoading, hasNextPage, loadNextPage }) => {
+  ({ width, top, height, isNextPageLoading, hasNextPage, loadNextPage }) => {
     const ContextTheme = useContext(ThemeContext);
 
     useEffect(() => {
@@ -212,15 +233,18 @@ const ModpackLoader = memo(
         foregroundColor={ContextTheme.palette.grey[900]}
         backgroundColor={ContextTheme.palette.grey[800]}
         title={false}
+        height={height}
         style={{
           width: width - 8,
-          height: '100px',
-          paddingTop: 8,
+          height,
           position: 'absolute',
-          top
+          margin: 0,
+          padding: 0,
+          top,
+          borderRadius: 4
         }}
       >
-        <rect x="0" y="0" width="100%" height="92px" />
+        <rect x="0" y="0" width="100%" height={height} />
       </ContentLoader>
     );
   }

@@ -24,8 +24,11 @@ Some ideas of how you would solve this issue, if possible
 If applicable, add screenshots to help explain your problem.
 
 **Operating System:**
- - OS: [e.g. Windows]
- - Version [e.g. 10]
+- OS: [e.g. Windows]
+- Version: [e.g. 10]
+- Java Version: [e.g. 8/16]
+- Minecraft Version: [e.g. 1.16.5]
+- Mod Loader: [e.g. Forge/Fabric]
 
 **Additional context**
 Add any other context about the problem here.

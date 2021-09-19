@@ -40,7 +40,7 @@ const ModsUpdater = ({ instanceName }) => {
             instanceName,
             mod,
             latestMods[mod.projectID].id,
-            instance.modloader[1],
+            instance.loader?.mcVersion,
             // eslint-disable-next-line
             p => {
               if (!cancel) setInstallProgress(p);

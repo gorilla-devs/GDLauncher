@@ -13,8 +13,6 @@ const {
 const path = require('path');
 const { spawn, exec } = require('child_process');
 const { autoUpdater } = require('electron-updater');
-const nsfw = require('nsfw');
-const murmur = require('murmur2-calculator');
 const log = require('electron-log');
 const fss = require('fs');
 const { promisify } = require('util');
@@ -23,6 +21,8 @@ const {
   default: { fromBase64: toBase64URL }
 } = require('base64url');
 const { URL } = require('url');
+const murmur = require('./native/murmur2');
+const nsfw = require('./native/nsfw');
 
 const fs = fss.promises;
 
@@ -33,6 +33,8 @@ let watcher;
 const discordRPC = require('./discordRPC');
 
 const gotTheLock = app.requestSingleInstanceLock();
+
+const isDev = process.env.NODE_ENV === 'development';
 
 // Prevent multiple instances
 if (gotTheLock) {
@@ -68,34 +70,81 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
-const edit = {
-  label: 'Edit',
-  submenu: [
-    {
-      label: 'Cut',
-      accelerator: 'CmdOrCtrl+X',
-      selector: 'cut:'
-    },
-    {
-      label: 'Copy',
-      accelerator: 'CmdOrCtrl+C',
-      selector: 'copy:'
-    },
-    {
-      label: 'Paste',
-      accelerator: 'CmdOrCtrl+V',
-      selector: 'paste:'
-    },
-    {
-      label: 'Select All',
-      accelerator: 'CmdOrCtrl+A',
-      selector: 'selectAll:'
-    }
-  ]
-};
+const edit = [
+  ...(process.platform === 'darwin'
+    ? [
+        {
+          label: 'GDLauncher',
+          submenu: [
+            {
+              label: 'About GDLauncher',
+              role: 'about'
+            },
+            { type: 'separator' },
+            {
+              label: 'Services',
+              role: 'services',
+              submenu: []
+            },
+            { type: 'separator' },
+            {
+              label: 'Hide GDLauncher',
+              accelerator: 'Command+H',
+              role: 'hide'
+            },
+            {
+              label: 'Hide Others',
+              accelerator: 'Command+Alt+H',
+              role: 'hideOthers'
+            },
+            {
+              label: 'Show All',
+              role: 'unhide'
+            },
+            { type: 'separator' },
+            {
+              label: 'Quit GDLauncher',
+              accelerator: 'Command+Q',
+              click: () => {
+                app.quit();
+              }
+            }
+          ]
+        }
+      ]
+    : []),
+  {
+    label: 'Edit',
+    submenu: [
+      {
+        label: 'Cut',
+        accelerator: 'CmdOrCtrl+X',
+        selector: 'cut:'
+      },
+      {
+        label: 'Copy',
+        accelerator: 'CmdOrCtrl+C',
+        selector: 'copy:'
+      },
+      {
+        label: 'Paste',
+        accelerator: 'CmdOrCtrl+V',
+        selector: 'paste:'
+      },
+      {
+        label: 'Select All',
+        accelerator: 'CmdOrCtrl+A',
+        selector: 'selectAll:'
+      },
+      { type: 'separator' },
+      { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+      { label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' }
+    ]
+  }
+];
 
 // app.allowRendererProcessReuse = true;
-Menu.setApplicationMenu(Menu.buildFromTemplate([edit]));
+Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
 
 let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
 
@@ -126,6 +175,9 @@ if (releaseChannelExists) {
   if (releaseId === 1) {
     allowUnstableReleases = true;
   }
+} else if (!releaseChannelExists && app.getVersion().includes('beta')) {
+  fss.writeFileSync(path.join(app.getPath('userData'), 'rChannel'), '1');
+  allowUnstableReleases = true;
 }
 
 if (
@@ -147,44 +199,40 @@ if (
 
 log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
 
-const isDev = process.env.NODE_ENV === 'development';
-
-async function extract7z() {
-  const baseDir = path.join(app.getAppPath(), 'node_modules', '7zip-bin');
-
-  let zipLocationAsar = path.join(baseDir, 'linux', 'x64', '7za');
+const get7zPath = async () => {
+  let baseDir = path.dirname(app.getPath('exe'));
+  if (process.env.NODE_ENV === 'development') {
+    baseDir = path.resolve(baseDir, '../../');
+    if (process.platform === 'win32') {
+      baseDir = path.join(baseDir, '7zip-bin/win/x64');
+    } else if (process.platform === 'linux') {
+      baseDir = path.join(baseDir, '7zip-bin/linux/x64');
+    } else if (process.platform === 'darwin') {
+      baseDir = path.resolve(baseDir, '../../../', '7zip-bin/mac/x64');
+    }
+  }
+  if (process.platform === 'linux') {
+    return path.join(baseDir, '7za');
+  }
   if (process.platform === 'darwin') {
-    zipLocationAsar = path.join(baseDir, 'mac', '7za');
+    return path.resolve(baseDir, '../', '7za');
   }
-  if (process.platform === 'win32') {
-    zipLocationAsar = path.join(baseDir, 'win', 'x64', '7za.exe');
-  }
-  try {
-    await fs.copyFile(
-      zipLocationAsar,
-      path.join(app.getPath('userData'), path.basename(zipLocationAsar))
-    );
+  return path.join(baseDir, '7za.exe');
+};
 
+async function patchSevenZip() {
+  try {
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await promisify(exec)(
-        `chmod +x "${path.join(
-          app.getPath('userData'),
-          path.basename(zipLocationAsar)
-        )}"`
-      );
-      await promisify(exec)(
-        `chmod 755 "${path.join(
-          app.getPath('userData'),
-          path.basename(zipLocationAsar)
-        )}"`
-      );
+      const sevenZipPath = await get7zPath();
+      await promisify(exec)(`chmod +x "${sevenZipPath}"`);
+      await promisify(exec)(`chmod 755 "${sevenZipPath}"`);
     }
   } catch (e) {
     log.error(e);
   }
 }
 
-extract7z();
+patchSevenZip();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -198,7 +246,9 @@ function createWindow() {
     webPreferences: {
       experimentalFeatures: true,
       nodeIntegration: true,
+      contextIsolation: false,
       enableRemoteModule: true,
+      sandbox: false,
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !isDev
     }
@@ -325,7 +375,9 @@ app.on('before-quit', async () => {
     await watcher.stop();
     watcher = null;
   }
-  mainWindow.removeAllListeners('close');
+  if (mainWindow) {
+    mainWindow.removeAllListeners('close');
+  }
   mainWindow = null;
 });
 
@@ -385,7 +437,9 @@ ipcMain.handle(
         show: false,
         parent: mainWindow,
         autoHideMenuBar: true,
-        'node-integration': false
+        webPreferences: {
+          nodeIntegration: false
+        }
       });
 
       oAuthWindow.webContents.session.clearStorageData();
@@ -420,7 +474,7 @@ ipcMain.handle(
 );
 
 ipcMain.handle('update-progress-bar', (event, p) => {
-  mainWindow.setProgressBar(p);
+  mainWindow.setProgressBar(p / 100);
 });
 
 ipcMain.handle('hide-window', () => {
@@ -448,7 +502,12 @@ ipcMain.handle('show-window', () => {
   }
 });
 
-ipcMain.handle('quit-app', () => {
+ipcMain.handle('quit-app', async () => {
+  if (watcher) {
+    log.log('Stopping listener');
+    await watcher.stop();
+    watcher = null;
+  }
   mainWindow.close();
   mainWindow = null;
 });
@@ -508,8 +567,13 @@ ipcMain.handle('openFileDialog', (e, filters) => {
   });
 });
 
-ipcMain.handle('appRestart', () => {
+ipcMain.handle('appRestart', async () => {
   log.log('Restarting app');
+  if (watcher) {
+    log.log('Stopping listener');
+    await watcher.stop();
+    watcher = null;
+  }
   app.relaunch();
   mainWindow.close();
 });
@@ -523,7 +587,11 @@ ipcMain.handle('init-discord-rpc', () => {
 });
 
 ipcMain.handle('update-discord-rpc', (event, p) => {
-  discordRPC.updateDetails(p);
+  discordRPC.update(p);
+});
+
+ipcMain.handle('reset-discord-rpc', () => {
+  discordRPC.reset();
 });
 
 ipcMain.handle('shutdown-discord-rpc', () => {
@@ -570,7 +638,8 @@ ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
 
 if (process.env.REACT_APP_RELEASE_TYPE === 'setup') {
   autoUpdater.autoDownload = false;
-  autoUpdater.allowDowngrade = !allowUnstableReleases;
+  autoUpdater.allowDowngrade =
+    !allowUnstableReleases && app.getVersion().includes('beta');
   autoUpdater.allowPrerelease = allowUnstableReleases;
   autoUpdater.setFeedURL({
     owner: 'gorilla-devs',

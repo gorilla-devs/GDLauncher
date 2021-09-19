@@ -188,9 +188,9 @@ const Screenshots = ({ instanceName }) => {
           containerRef.current.scrollTop = 0;
         }
       };
-      containerRef.current.addEventListener('wheel', eventHandler);
+      containerRef?.current?.addEventListener('wheel', eventHandler);
       return () =>
-        containerRef.current.removeEventListener('wheel', eventHandler);
+        containerRef?.current?.removeEventListener('wheel', eventHandler);
     }
   }, [containerRef.current, contextMenuOpen]);
 
@@ -216,7 +216,7 @@ const Screenshots = ({ instanceName }) => {
             if (selectedItems.length) {
               dispatch(
                 openModal('ActionConfirmation', {
-                  message: 'Are you sure you want to delete this images?',
+                  message: 'Are you sure you want to delete this image(s)?',
                   confirmCallback: deleteFile,
                   title: 'Confirm'
                 })
@@ -563,6 +563,7 @@ const Photo = styled.img`
   width: 100px;
   max-width: 200px;
   margin: 10px;
+  object-fit: cover;
   background: ${props => props.theme.palette.secondary.light};
   border-radius: 5px;
   transition: transform 0.2s ease-in-out;

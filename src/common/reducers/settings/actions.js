@@ -1,3 +1,4 @@
+import { MC_STARTUP_METHODS } from '../../utils/constants';
 import * as ActionTypes from './actionTypes';
 
 export function updateSoundsSetting(sounds) {
@@ -59,6 +60,26 @@ export function updateJavaPath(path) {
     dispatch({
       type: ActionTypes.UPDATE_JAVA_PATH,
       path
+    });
+  };
+}
+export function updateJava16Path(path) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_JAVA16_PATH,
+      path
+    });
+  };
+}
+
+export function updateMcStartupMethod(method) {
+  return dispatch => {
+    if (!MC_STARTUP_METHODS[method])
+      throw new Error('Unknown mc startup method');
+
+    dispatch({
+      type: ActionTypes.UPDATE_MC_STARTUP_METHOD,
+      method
     });
   };
 }

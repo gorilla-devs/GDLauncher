@@ -16,7 +16,7 @@ import { openModal } from '../../../common/reducers/modals/actions';
 import {
   checkForPortableUpdates,
   updateUpdateAvailable,
-  getAppLatestVersion
+  isNewVersionAvailable
 } from '../../../common/reducers/actions';
 import BisectHosting from '../../../ui/BisectHosting';
 import Logo from '../../../ui/Logo';
@@ -47,13 +47,13 @@ const SystemNavbar = () => {
       });
     } else if (
       process.platform === 'win32' &&
-      process.env.REACT_APP_RELEASE_TYPE === 'portable'
+      process.env.REACT_APP_RELEASE_TYPE !== 'setup'
     ) {
       dispatch(checkForPortableUpdates())
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     } else {
-      dispatch(getAppLatestVersion())
+      dispatch(isNewVersionAvailable())
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     }
@@ -75,7 +75,6 @@ const SystemNavbar = () => {
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') return;
     setTimeout(() => {
-      console.log(process.env.REACT_APP_RELEASE_TYPE);
       checkForUpdates();
       setInterval(() => {
         checkForUpdates();
@@ -174,6 +173,7 @@ const SystemNavbar = () => {
               rel="noopener noreferrer"
               css={`
                 margin-top: 5px;
+                margin-right: 5px;
                 -webkit-app-region: no-drag;
               `}
             >
@@ -187,7 +187,13 @@ const SystemNavbar = () => {
               height: 100%;
             `}
           >
-            Partnered with &nbsp;&nbsp;
+            <div
+              css={`
+                white-space: nowrap;
+              `}
+            >
+              Partnered with &nbsp;&nbsp;
+            </div>
             <BisectHosting
               showPointerCursor
               onClick={() => dispatch(openModal('BisectHosting'))}
@@ -289,6 +295,7 @@ const SystemNavbar = () => {
               rel="noopener noreferrer"
               css={`
                 margin-top: 5px;
+                margin-right: 5px;
                 -webkit-app-region: no-drag;
               `}
             >

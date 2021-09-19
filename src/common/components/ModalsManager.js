@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { closeModal } from '../reducers/modals/actions';
 import AsyncComponent from './AsyncComponent';
-import AddInstance from '../modals/AddInstance';
 import Settings from '../modals/Settings';
 
 const Overlay = styled.div`
@@ -34,7 +33,7 @@ const Modal = styled.div`
 `;
 
 const modalsComponentLookupTable = {
-  AddInstance,
+  AddInstance: AsyncComponent(lazy(() => import('../modals/AddInstance'))),
   AccountsManager: AsyncComponent(
     lazy(() => import('../modals/AccountsManager'))
   ),
@@ -56,6 +55,9 @@ const modalsComponentLookupTable = {
   InstanceExportCurseForge: AsyncComponent(
     lazy(() => import('../modals/InstanceExport/CurseForge'))
   ),
+  InstanceDuplicateName: AsyncComponent(
+    lazy(() => import('../modals/InstanceDuplicateName'))
+  ),
   AutoUpdatesNotAvailable: AsyncComponent(
     lazy(() => import('../modals/AutoUpdatesNotAvailable'))
   ),
@@ -75,12 +77,17 @@ const modalsComponentLookupTable = {
   ),
   McVersionChanger: AsyncComponent(
     lazy(() => import('../modals/McVersionChanger'))
-  )
+  ),
+  PolicyModal: AsyncComponent(lazy(() => import('../modals/PolicyModal')))
 };
 
-const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
+const ModalContainer = ({
+  unmounting,
+  children,
+  preventClose,
+  closeCallback
+}) => {
   const [modalStyle, setModalStyle] = useState({
-    transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
     opacity: 0
   });
   const [bgStyle, setBgStyle] = useState({
@@ -111,13 +118,13 @@ const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
       }, 500);
       return;
     }
+    if (closeCallback) closeCallback();
     dispatch(closeModal());
   };
 
   const unMountStyle = () => {
     // css for unmount animation
     setModalStyle({
-      transform: `scale(${modalType === 'Settings' ? 2 : 0})`,
       opacity: 1
     });
     setBgStyle({
@@ -129,7 +136,6 @@ const ModalContainer = ({ unmounting, children, preventClose, modalType }) => {
   const mountStyle = () => {
     // css for mount animation
     setModalStyle({
-      transform: 'scale(1)',
       opacity: 1
     });
 
@@ -158,6 +164,7 @@ const ModalsManager = () => {
         unmounting={unmounting}
         key={modalType}
         preventClose={modalProps.preventClose}
+        closeCallback={modalProps.abortCallback}
         modalType={modalType}
       >
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}

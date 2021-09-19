@@ -14,7 +14,8 @@ import {
   faFolder,
   faTrash,
   faStop,
-  faBoxOpen
+  faBoxOpen,
+  faCopy
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -195,6 +196,9 @@ const Instance = ({ instanceName }) => {
   const instanceExportCurseForge = () => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));
   };
+  const openDuplicateNameDialog = () => {
+    dispatch(openModal('InstanceDuplicateName', { instanceName }));
+  };
   const killProcess = () => {
     console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
@@ -227,7 +231,7 @@ const Instance = ({ instanceName }) => {
 
               {convertMinutesToHumanTime(instance.timePlayed)}
             </TimePlayed>
-            <MCVersion>{(instance.modloader || [])[1]}</MCVersion>
+            <MCVersion>{instance.loader?.mcVersion}</MCVersion>
             {instanceName}
           </InstanceContainer>
           <HoverContainer
@@ -329,9 +333,9 @@ const Instance = ({ instanceName }) => {
             disabled={
               Boolean(isInQueue) ||
               !(
-                instance.modloader[0] === FORGE ||
-                instance.modloader[0] === FABRIC ||
-                instance.modloader[0] === VANILLA
+                instance.loader?.loaderType === FORGE ||
+                instance.loader?.loaderType === FABRIC ||
+                instance.loader?.loaderType === VANILLA
               )
             }
           >
@@ -343,6 +347,18 @@ const Instance = ({ instanceName }) => {
               `}
             />
             Export Pack
+          </MenuItem>
+          <MenuItem
+            disabled={Boolean(isInQueue)}
+            onClick={openDuplicateNameDialog}
+          >
+            <FontAwesomeIcon
+              icon={faCopy}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Duplicate
           </MenuItem>
           <MenuItem divider />
           <MenuItem

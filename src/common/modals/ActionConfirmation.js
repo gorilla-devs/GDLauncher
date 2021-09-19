@@ -41,7 +41,7 @@ const applyChoice = async (
 
 export default function ActionConfirmation({
   confirmCallback,
-  abortCallback,
+  abortCallback = () => {},
   message,
   fileName,
   delay,
@@ -58,6 +58,7 @@ export default function ActionConfirmation({
         overflow: hidden;
       `}
       title={title}
+      closeCallback={abortCallback}
     >
       <Container>
         {message}

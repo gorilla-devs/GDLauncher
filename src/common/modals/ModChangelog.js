@@ -20,7 +20,7 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
     let data;
     try {
       if (type === 'ftb') {
-        ({ data } = await getFTBChangelog(modpackId, id));
+        data = await getFTBChangelog(modpackId, id);
       } else {
         ({ data } = await getAddonFileChangelog(modpackId, id));
       }
@@ -73,6 +73,7 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
             loadChangelog(v);
           }}
           placeholder="Select a version"
+          virtual={false}
         >
           {(files || []).map(v => (
             <Select.Option

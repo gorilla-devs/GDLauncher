@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Select, Input } from 'antd';
+import { Input } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ModpacksListWrapper from './ModpacksListWrapper';
@@ -15,7 +15,7 @@ import {
 import pMap from 'p-map';
 
 let lastRequest;
-const FTBModpacks = ({ setStep, setModpack }) => {
+const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
   const infiniteLoaderRef = useRef(null);
   const [modpackIds, setModpackIds] = useState([]);
   const [modpacks, setModpacks] = useState([]);
@@ -32,8 +32,8 @@ const FTBModpacks = ({ setStep, setModpack }) => {
       } else {
         ({ data } = await getFTBSearch(searchText));
       }
-      setModpackIds(data.packs);
-      updateModpacks.callback();
+      setModpackIds(data.packs || []);
+      updateModpacks();
     };
     init();
   }, [searchText]);
@@ -80,8 +80,6 @@ const FTBModpacks = ({ setStep, setModpack }) => {
     }
   };
 
-  console.log(modpacks);
-
   return (
     <Container>
       <HeaderContainer>
@@ -126,6 +124,7 @@ const FTBModpacks = ({ setStep, setModpack }) => {
                   height={height}
                   setStep={setStep}
                   setModpack={setModpack}
+                  setVersion={setVersion}
                   infiniteLoaderRef={infiniteLoaderRef}
                 />
               )}
@@ -162,11 +161,6 @@ export default React.memo(FTBModpacks);
 const Container = styled.div`
   width: 100%;
   height: 100%;
-`;
-
-const StyledSelect = styled(Select)`
-  width: 170px;
-  margin-right: 20px;
 `;
 
 const StyledInput = styled(Input.Search)``;

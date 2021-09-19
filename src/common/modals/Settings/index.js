@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, lazy } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
 import Modal from '../../components/Modal';
-import General from './components/General';
-import Java from './components/Java';
+import AsyncComponent from '../../components/AsyncComponent';
 import CloseButton from '../../components/CloseButton';
-import { closeModal } from '../../reducers/modals/actions';
+import SocialButtons from '../../components/SocialButtons';
+import { closeModal, openModal } from '../../reducers/modals/actions';
+import KoFiButton from '../../assets/ko-fi.png';
 
 const Container = styled.div`
   display: flex;
@@ -14,6 +15,13 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   text-align: center;
+
+  .ant-slider-mark-text,
+  .ant-input,
+  .ant-select-selection-search-input,
+  .ant-btn {
+    -webkit-backface-visibility: hidden;
+  }
 `;
 const SideMenu = styled.div`
   flex: 0;
@@ -79,20 +87,22 @@ const SettingsTitle = styled.div`
   color: ${props => props.theme.palette.grey[50]};
 `;
 
-function Page(page) {
-  switch (page) {
-    case 'General':
-      return <General />;
-    case 'Java':
-      return <Java />;
-    default:
-      return null;
+const pages = {
+  General: {
+    name: 'General',
+    component: AsyncComponent(lazy(() => import('./components/General')))
+  },
+  Java: {
+    name: 'Java',
+    component: AsyncComponent(lazy(() => import('./components/Java')))
   }
-}
+};
 
 export default function Settings() {
   const [page, setPage] = useState('General');
   const dispatch = useDispatch();
+  const ContentComponent = pages[page].component;
+
   return (
     <Modal
       css={`
@@ -112,24 +122,108 @@ export default function Settings() {
         />
         <SideMenu>
           <SettingsTitle>General</SettingsTitle>
-          <SettingsButton
-            active={page === 'General'}
-            onClick={() => setPage('General')}
-          >
-            General
-          </SettingsButton>
-          <SettingsButton
-            active={page === 'Java'}
-            onClick={() => setPage('Java')}
-          >
-            Java
-          </SettingsButton>
+          {Object.values(pages).map(val => (
+            <SettingsButton
+              key={val.name}
+              active={page === val.name}
+              onClick={() => setPage(val.name)}
+            >
+              {val.name}
+            </SettingsButton>
+          ))}
           {/* <SettingsButton onClick={() => setPage("User Interface")}>
             User Interface
           </SettingsButton>
           <SettingsTitle>Game Settings</SettingsTitle>
           <SettingsButton>Graphic Settings</SettingsButton>
           <SettingsButton>Sound Settings</SettingsButton> */}
+          <div
+            css={`
+              align-items: left;
+              justify-content: left;
+              text-align: left;
+              width: 200px;
+              position: absolute;
+              bottom: 0;
+              margin-bottom: 30px;
+            `}
+          >
+            <span
+              css={`
+                font-weight: bold;
+                font-size: 16px;
+              `}
+            >
+              Support GDLauncher
+            </span>
+            <div
+              css={`
+                img {
+                  border-radius: 30px;
+                  height: 40px;
+                  cursor: pointer;
+                  transition: transform 0.2s ease-in-out;
+                  &:hover {
+                    transform: scale(1.05);
+                  }
+                }
+              `}
+            >
+              <a href="https://ko-fi.com/gdlauncher">
+                <img
+                  src={KoFiButton}
+                  alt="Ko-Fi"
+                  css={`
+                    margin-bottom: 0px;
+                    margin-top: 20px;
+                  `}
+                />
+              </a>
+            </div>
+            <div
+              css={`
+                margin-top: 20px;
+              `}
+            >
+              <SocialButtons />
+            </div>
+            <div
+              css={`
+                margin-top: 20px;
+                display: flex;
+                font-size: 10px;
+                flex-direction: column;
+                span {
+                  text-decoration: underline;
+                  cursor: pointer;
+                }
+              `}
+            >
+              <span
+                onClick={() =>
+                  dispatch(openModal('PolicyModal', { policy: 'privacy' }))
+                }
+              >
+                Privacy Policy
+              </span>
+              <span
+                onClick={() =>
+                  dispatch(openModal('PolicyModal', { policy: 'tos' }))
+                }
+              >
+                Terms and Conditions
+              </span>
+              <span
+                onClick={() =>
+                  dispatch(
+                    openModal('PolicyModal', { policy: 'acceptableuse' })
+                  )
+                }
+              >
+                Acceptable Use Policy
+              </span>
+            </div>
+          </div>
         </SideMenu>
         <SettingsContainer>
           <SettingsColumn>
@@ -138,9 +232,10 @@ export default function Settings() {
                 max-width: 600px;
                 overflow-y: hidden;
                 overflow-x: hidden;
+                padding-bottom: 20px;
               `}
             >
-              {Page(page)}
+              <ContentComponent />
             </div>
           </SettingsColumn>
         </SettingsContainer>

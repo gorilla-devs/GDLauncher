@@ -20,7 +20,13 @@ import { closeModal, openModal } from '../reducers/modals/actions';
 import { FORGE, CURSEFORGE_URL, FTB_MODPACK_URL } from '../utils/constants';
 import { formatNumber, formatDate } from '../utils';
 
-const AddInstance = ({ modpack, setStep, setModpack, setVersion, type }) => {
+const ModpackDescription = ({
+  modpack,
+  setStep,
+  setModpack,
+  setVersion,
+  type
+}) => {
   const dispatch = useDispatch();
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState(null);
@@ -229,6 +235,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion, type }) => {
               listHeight={400}
               loading={loading}
               disabled={loading}
+              virtual={false}
             >
               {(files || []).map(file => (
                 <Select.Option
@@ -303,10 +310,15 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion, type }) => {
             disabled={!selectedId}
             onClick={() => {
               const modpackFile = files.find(file => file.id === selectedId);
-              dispatch(closeModal());
-              setVersion([FORGE, modpack.id, modpackFile.id]);
+              setVersion({
+                loaderType: FORGE,
+                projectID: modpack.id,
+                fileID: modpackFile.id,
+                source: type
+              });
               setModpack(modpack);
               setStep(1);
+              dispatch(closeModal());
             }}
           >
             Download
@@ -317,7 +329,7 @@ const AddInstance = ({ modpack, setStep, setModpack, setVersion, type }) => {
   );
 };
 
-export default React.memo(AddInstance);
+export default React.memo(ModpackDescription);
 
 const StyledSelect = styled(Select)`
   width: 650px;

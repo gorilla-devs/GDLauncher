@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import pMap from 'p-map';
 import { get7zPath } from '../../../../app/desktop/utils';
 import { FABRIC, VANILLA, FORGE } from '../../../utils/constants';
+import { getAddon } from '../../../api';
 
 /**
  *
@@ -21,11 +22,15 @@ import { FABRIC, VANILLA, FORGE } from '../../../utils/constants';
  */
 const createZip = async (archiveName, zipDestPath, filesArray) => {
   const sevenZipPath = await get7zPath();
-  const zipCreation = add7z(`${archiveName}.zip`, filesArray, {
-    $bin: sevenZipPath,
-    $raw: ['-tzip'],
-    $spawnOptions: { cwd: zipDestPath }
-  });
+  const zipCreation = add7z(
+    path.join(zipDestPath, `${archiveName}.zip`),
+    filesArray,
+    {
+      $bin: sevenZipPath,
+      $raw: ['-tzip'],
+      $spawnOptions: { cwd: zipDestPath, shell: true }
+    }
+  );
   await new Promise((resolve, reject) => {
     zipCreation.on('end', () => {
       resolve();
@@ -51,32 +56,33 @@ export default function ThirdStep({
   page
 }) {
   const [isCompleted, setIsCompleted] = useState(false);
-  const { modloader, mods } = instanceConfig;
-  const mcVersion = modloader[1];
-  const modloaderName = modloader[0];
+  const { loader, mods } = instanceConfig;
+  const mcVersion = loader?.mcVersion;
+  const modloaderName = loader?.loaderType;
   const dispatch = useDispatch();
   const tempExport = path.join(tempPath, instanceName);
 
   // Construct manifest contents
   const createManifest = async (modsArray = mods) => {
-    let loader = {};
+    let loaderObj = {};
     switch (modloaderName) {
       case FORGE:
-        loader = {
-          id: `${modloaderName}-${modloader[2].slice(mcVersion.length + 1)}`,
+        loaderObj = {
+          id: `${modloaderName}-${loader?.loaderVersion.slice(
+            mcVersion.length + 1
+          )}`,
           primary: true
         };
         break;
       case FABRIC:
-        loader = {
-          id: modloaderName,
-          yarn: modloader[2],
-          loader: modloader[3],
+        loaderObj = {
+          id: `${modloaderName}-${loader?.loaderVersion}`,
+          loader: loader?.fileID,
           primary: true
         };
         break;
       case VANILLA:
-        loader = {
+        loaderObj = {
           id: modloaderName,
           primary: true
         };
@@ -90,7 +96,7 @@ export default function ThirdStep({
     return {
       minecraft: {
         version: mcVersion,
-        modLoaders: [loader]
+        modLoaders: [loaderObj]
       },
       manifestType: 'minecraftModpack',
       overrides: 'overrides',
@@ -98,8 +104,8 @@ export default function ThirdStep({
       version: packVersion,
       author: packAuthor,
       projectID:
-        modloaderName === 'forge' && modloader.length > 3
-          ? parseInt(modloader[3], 10)
+        modloaderName === 'forge' && loader.length > 3
+          ? parseInt(loader?.fileID, 10)
           : undefined,
       name: packZipName,
       files: modsArray
@@ -110,6 +116,42 @@ export default function ThirdStep({
           required: true
         }))
     };
+  };
+
+  const createModListHtml = async () => {
+    const mappedMods = await Promise.all(
+      mods
+        .filter(mod => mod.projectID)
+        .map(async mod => {
+          let ok = false;
+          let tries = 0;
+
+          do {
+            try {
+              tries += 1;
+              if (tries !== 1) {
+                await new Promise(resolve => setTimeout(resolve, 5000));
+              }
+              const { data } = await getAddon(mod.projectID);
+
+              ok = true;
+              return {
+                name: data.name,
+                url: data.websiteUrl,
+                author: data.authors[0].name
+              };
+            } catch (e) {
+              console.error(e);
+            }
+          } while (!ok && tries <= 3);
+        })
+    );
+
+    return `<ul>${mappedMods
+      .map(
+        mod => `<li><a href=${mod?.url}>${mod?.name}(${mod?.author})</a></li>`
+      )
+      .join('')}</ul>`;
   };
 
   useEffect(() => {
@@ -169,8 +211,14 @@ export default function ThirdStep({
       const manifestString = await createManifest(filteredCurseforgeMods);
       await fse.outputJson(manifestPath, manifestString);
 
+      // Create modlist.html file
+      const modlistHtmlPath = path.join(path.join(tempExport, 'modlist.html'));
+      const modlistHtmlContent = await createModListHtml();
+      await fse.writeFile(modlistHtmlPath, modlistHtmlContent);
+
       // Create zipped export file
       const filesToZip = [
+        path.join(tempExport, 'modlist.html'),
         path.join(tempExport, 'overrides'),
         path.join(tempExport, 'manifest.json')
       ];

@@ -30,6 +30,7 @@ const Content = ({
 }) => {
   const [overrideNextStepOnClick, setOverrideNextStepOnClick] = useState(null);
   const [loading, setLoading] = useState(false);
+
   let pages = [
     <NewInstance setVersion={setVersion} setModpack={setModpack} />,
     <CurseForgeModpacks
@@ -206,7 +207,7 @@ const Content = ({
   );
 };
 
-export default React.memo(Content);
+export default Content;
 
 const Animation = styled.div`
   transition: 0.2s ease-in-out;
