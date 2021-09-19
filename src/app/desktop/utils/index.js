@@ -323,11 +323,14 @@ export const get7zPath = async () => {
     } else if (process.platform === 'linux') {
       baseDir = path.join(baseDir, '7zip-bin/linux/x64');
     } else if (process.platform === 'darwin') {
-      baseDir = path.join(baseDir, '7zip-bin/mac/x64');
+      baseDir = path.resolve(baseDir, '../../../', '7zip-bin/mac/x64');
     }
   }
-  if (process.platform === 'darwin' || process.platform === 'linux') {
+  if (process.platform === 'linux') {
     return path.join(baseDir, '7za');
+  }
+  if (process.platform === 'darwin') {
+    return path.resolve(baseDir, '../', '7za');
   }
   return path.join(baseDir, '7za.exe');
 };

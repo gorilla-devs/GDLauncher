@@ -29,89 +29,90 @@ import { generate as generateRandomString } from 'randomstring';
 import fxp from 'fast-xml-parser';
 import * as ActionTypes from './actionTypes';
 import {
-  NEWS_URL,
-  MC_RESOURCES_URL,
-  GDL_LEGACYJAVAFIXER_MOD_URL,
-  FORGE,
-  FMLLIBS_OUR_BASE_URL,
-  FMLLIBS_FORGE_BASE_URL,
-  MICROSOFT_OAUTH_CLIENT_ID,
-  MICROSOFT_OAUTH_REDIRECT_URL,
   ACCOUNT_MICROSOFT,
   ACCOUNT_MOJANG,
-  FTB,
+  CURSEFORGE,
   FABRIC,
-  CURSEFORGE
+  FMLLIBS_FORGE_BASE_URL,
+  FMLLIBS_OUR_BASE_URL,
+  FORGE,
+  FTB,
+  GDL_LEGACYJAVAFIXER_MOD_URL,
+  MC_RESOURCES_URL,
+  MC_STARTUP_METHODS,
+  MICROSOFT_OAUTH_CLIENT_ID,
+  MICROSOFT_OAUTH_REDIRECT_URL,
+  NEWS_URL
 } from '../utils/constants';
 import {
-  mcAuthenticate,
-  mcRefresh,
-  mcInvalidate,
-  getFabricManifest,
-  getMcManifest,
-  getForgeManifest,
-  mcValidate,
-  getFabricJson,
-  getAddonFile,
-  getJavaManifest,
-  getAddonsByFingerprint,
-  getAddonFiles,
   getAddon,
-  // getFTBModpackData,
-  getFTBModpackVersionData,
   getAddonCategories,
-  msAuthenticateXBL,
-  msExchangeCodeForAccessToken,
-  msAuthenticateXSTS,
+  getAddonFile,
+  getAddonFiles,
+  getAddonsByFingerprint,
+  getFabricJson,
+  getFabricManifest,
+  getForgeManifest,
+  getFTBModpackVersionData,
+  getJava16Manifest,
+  getJavaManifest,
+  getMcManifest,
+  getMultipleAddons,
+  mcAuthenticate,
+  mcInvalidate,
+  mcRefresh,
+  mcValidate,
   msAuthenticateMinecraft,
+  msAuthenticateXBL,
+  msAuthenticateXSTS,
+  msExchangeCodeForAccessToken,
   msMinecraftProfile,
-  msOAuthRefresh,
-  getJava16Manifest
+  msOAuthRefresh
 } from '../api';
 import {
+  _getAccounts,
+  _getAssetsPath,
   _getCurrentAccount,
   _getCurrentDownloadItem,
-  _getJavaPath,
-  _getMinecraftVersionsPath,
-  _getAssetsPath,
-  _getInstancesPath,
-  _getLibrariesPath,
-  _getAccounts,
-  _getTempPath,
+  _getDataStorePath,
   _getInstance,
-  _getDataStorePath
+  _getInstancesPath,
+  _getJavaPath,
+  _getLibrariesPath,
+  _getMinecraftVersionsPath,
+  _getTempPath
 } from '../utils/selectors';
 import {
-  librariesMapper,
-  get7zPath,
-  extractNatives,
-  getJVMArguments112,
-  copyAssetsToResources,
-  getJVMArguments113,
-  patchForge113,
-  mavenToArray,
+  convertCompletePathToInstance,
+  convertcurseForgeToCanonical,
   copyAssetsToLegacy,
-  getPlayerSkin,
-  normalizeModData,
-  reflect,
-  isMod,
-  isInstanceFolderPath,
+  copyAssetsToResources,
+  downloadAddonZip,
+  extractAll,
+  extractFabricVersionFromManifest,
+  extractNatives,
+  filterFabricFilesByVersion,
+  filterForgeFilesByVersion,
+  get7zPath,
   getFileHash,
   getFilesRecursive,
-  filterForgeFilesByVersion,
-  filterFabricFilesByVersion,
+  getJVMArguments112,
+  getJVMArguments113,
   getPatchedInstanceType,
-  convertCompletePathToInstance,
-  downloadAddonZip,
-  convertcurseForgeToCanonical,
-  extractFabricVersionFromManifest,
-  extractAll
+  getPlayerSkin,
+  isInstanceFolderPath,
+  isMod,
+  librariesMapper,
+  mavenToArray,
+  normalizeModData,
+  patchForge113,
+  reflect
 } from '../../app/desktop/utils';
 import {
   downloadFile,
   downloadInstanceFiles
 } from '../../app/desktop/utils/downloader';
-import { removeDuplicates, getFileMurmurHash2 } from '../utils';
+import { getFileMurmurHash2, removeDuplicates } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
@@ -1663,6 +1664,36 @@ export function processForgeManifest(instanceName) {
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading mods...'));
 
+    const addonsHashmap = {};
+    const addonsFilesHashmap = {};
+
+    const _getAddons = async () => {
+      const { data: addons } = await getMultipleAddons(
+        manifest.files.map(v => v.projectID)
+      );
+
+      addons.forEach(v => {
+        addonsHashmap[v.id] = v;
+      });
+    };
+
+    const _getAddonFiles = async () => {
+      await pMap(
+        manifest.files,
+        async item => {
+          const { data: modManifest } = await getAddonFile(
+            item.projectID,
+            item.fileID
+          );
+
+          addonsFilesHashmap[item.projectID] = modManifest;
+        },
+        { concurrency: concurrency + 10 }
+      );
+    };
+
+    await Promise.all([_getAddons(), _getAddonFiles()]);
+
     let modManifests = [];
     await pMap(
       manifest.files,
@@ -1676,10 +1707,8 @@ export function processForgeManifest(instanceName) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
           try {
-            const { data: addon } = await getAddon(item.projectID);
-            const modManifest = (
-              await getAddonFile(item.projectID, item.fileID)
-            ).data;
+            const addon = addonsHashmap[item.projectID];
+            const modManifest = addonsFilesHashmap[item.projectID];
             const destFile = path.join(
               _getInstancesPath(state),
               instanceName,
@@ -2659,7 +2688,10 @@ export function launchInstance(instanceName) {
               arg => {
                 return arg
                   .replace(/\${version_name}/g, mcJson.id)
-                  .replace(/\${library_directory}/g, _getLibrariesPath(state))
+                  .replace(
+                    /\${library_directory}/g,
+                    `"${_getLibrariesPath(state)}"`
+                  )
                   .replace(
                     /\${classpath_separator}/g,
                     process.platform === 'win32' ? ';' : ':'
@@ -2707,16 +2739,21 @@ export function launchInstance(instanceName) {
       javaArguments
     );
 
+    const { mcStartupMethod } = state.settings;
+    let replaceWith = `..${path.sep}..`;
+
     const symLinkDirPath = path.join(userData.split('\\')[0], '_gdl');
+    if (MC_STARTUP_METHODS[mcStartupMethod] === MC_STARTUP_METHODS.SYMLINK) {
+      replaceWith = symLinkDirPath;
+      if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
+    }
 
     const replaceRegex = [
       process.platform === 'win32'
         ? new RegExp(userData.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
-      symLinkDirPath
+      replaceWith
     ];
-
-    if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
@@ -2738,7 +2775,7 @@ export function launchInstance(instanceName) {
     }
 
     const ps = spawn(
-      `"${javaPath.replace(...replaceRegex)}"`,
+      `"${javaPath}"`,
       jvmArguments.map(v => v.toString().replace(...replaceRegex)),
       {
         cwd: instancePath,
@@ -2785,8 +2822,15 @@ export function launchInstance(instanceName) {
       ipcRenderer.invoke('show-window');
       dispatch(removeStartedInstance(instanceName));
       await fse.remove(instanceJLFPath);
-      if (process.platform === 'win32') fse.remove(symLinkDirPath);
       await fs.unlink(backupConfigPath);
+
+      if (
+        process.platform === 'win32' &&
+        MC_STARTUP_METHODS[mcStartupMethod] === MC_STARTUP_METHODS.SYMLINK
+      ) {
+        fse.remove(symLinkDirPath);
+      }
+
       if (code !== 0 && errorLogs) {
         dispatch(
           openModal('InstanceCrashed', {

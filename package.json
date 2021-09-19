@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "1.1.15-beta.3",
+  "version": "1.1.15-beta.4",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -76,9 +76,6 @@
   "cpu": [
     "x64"
   ],
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -119,7 +116,7 @@
     "concurrently": "^6.2.1",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
-    "electron": "^13.1.9",
+    "electron": "^14.0.1",
     "electron-builder": "^22.11.7",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",

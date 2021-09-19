@@ -10,7 +10,8 @@ import {
   faUndo,
   faLevelDownAlt,
   faList,
-  faDesktop
+  faDesktop,
+  faPlay
 } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Input, Switch, Select } from 'antd';
 import {
@@ -18,6 +19,7 @@ import {
   updateJavaArguments,
   updateJavaMemory,
   updateJavaPath,
+  updateMcStartupMethod,
   updateResolution
 } from '../../../reducers/settings/actions';
 import {
@@ -26,11 +28,7 @@ import {
 } from '../../../../app/desktop/utils/constants';
 import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
-
-const JavaSettings = styled.div`
-  width: 100%;
-  height: 400px;
-`;
+import { MC_STARTUP_METHODS } from '../../../utils/constants';
 
 const AutodetectPath = styled.div`
   display: flex;
@@ -49,6 +47,20 @@ const SelectMemory = styled.div`
 const Resolution = styled.div`
   width: 100%;
   height: 100px;
+`;
+
+const McStartupMethod = styled.div`
+  width: 100%;
+  height: 100px;
+`;
+
+const McStartupMethodRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+  margin-bottom: 30px;
 `;
 
 const ResolutionInputContainer = styled.div`
@@ -117,6 +129,7 @@ export default function MyAccountPreferences() {
   const java16Path = useSelector(state => _getJavaPath(state)(16));
   const customJavaPath = useSelector(state => state.settings.java.path);
   const customJava16Path = useSelector(state => state.settings.java.path16);
+  const mcStartupMethod = useSelector(state => state.settings.mcStartupMethod);
   const mcResolution = useSelector(
     state => state.settings.minecraftSettings.resolution
   );
@@ -130,7 +143,7 @@ export default function MyAccountPreferences() {
   }, []);
 
   return (
-    <JavaSettings>
+    <>
       <MainTitle>Java</MainTitle>
       <Title
         css={`
@@ -429,6 +442,39 @@ export default function MyAccountPreferences() {
           </StyledButtons>
         </div>
       </JavaCustomArguments>
-    </JavaSettings>
+      <Hr />
+      <McStartupMethod>
+        <Title
+          css={`
+            width: 70%;
+            text-align: left;
+          `}
+        >
+          Minecraft Startup Method &nbsp; <FontAwesomeIcon icon={faPlay} />
+        </Title>
+        <McStartupMethodRow>
+          <Paragraph
+            css={`
+              text-align: left;
+            `}
+          >
+            Select the preferred Minecraft startup method. Only change this if
+            you&apos;re experiencing issues with the default one.
+          </Paragraph>
+          <Select
+            value={mcStartupMethod}
+            onChange={v => dispatch(updateMcStartupMethod(v))}
+          >
+            {Object.entries(MC_STARTUP_METHODS).map(([k, v]) => {
+              return (
+                <Select.Option key={k} value={k}>
+                  {v}
+                </Select.Option>
+              );
+            })}
+          </Select>
+        </McStartupMethodRow>
+      </McStartupMethod>
+    </>
   );
 }
