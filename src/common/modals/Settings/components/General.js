@@ -164,9 +164,6 @@ const General = () => {
   const showNews = useSelector(state => state.settings.showNews);
   const DiscordRPC = useSelector(state => state.settings.discordRPC);
   const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
-  const instanceSortMethod = useSelector(
-    state => state.settings.instanceSortOrder
-  );
   const concurrentDownloads = useSelector(
     state => state.settings.concurrentDownloads
   );
@@ -175,6 +172,9 @@ const General = () => {
   );
   const hideWindowOnGameLaunch = useSelector(
     state => state.settings.hideWindowOnGameLaunch
+  );
+  const instanceSortMethod = useSelector(
+    state => state.settings.instanceSortOrder
   );
   /* eslint-enable */
 
