@@ -164,10 +164,18 @@ const General = () => {
   const showNews = useSelector(state => state.settings.showNews);
   const DiscordRPC = useSelector(state => state.settings.discordRPC);
   const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
-  const concurrentDownloads = useSelector(state => state.settings.concurrentDownloads);
-  const curseReleaseChannel = useSelector(state => state.settings.curseReleaseChannel);
-  const hideWindowOnGameLaunch = useSelector(state => state.settings.hideWindowOnGameLaunch);
-  const instanceSortMethod = useSelector(state => state.settings.instanceSortOrder);
+  const instanceSortMethod = useSelector(
+    state => state.settings.instanceSortOrder
+  );
+  const concurrentDownloads = useSelector(
+    state => state.settings.concurrentDownloads
+  );
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
+  const hideWindowOnGameLaunch = useSelector(
+    state => state.settings.hideWindowOnGameLaunch
+  );
   /* eslint-enable */
 
   const [dataPath, setDataPath] = useState(userData);
@@ -363,7 +371,7 @@ const General = () => {
       <Title>
         Instance Sorting &nbsp; <FontAwesomeIcon icon={faSort} />
       </Title>
-      <ParallelDownload>
+      <Content>
         <p
           css={`
             margin: 0;
@@ -385,8 +393,7 @@ const General = () => {
           <Select.Option value={1}>Last Played</Select.Option>
           <Select.Option value={2}>Most Played</Select.Option>
         </Select>
-      </ParallelDownload>
-      <Hr />
+      </Content>
       <Title>
         Preferred Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
       </Title>
