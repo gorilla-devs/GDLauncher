@@ -32,33 +32,34 @@ const sortByLastPlayed = instances =>
 const sortByMostPlayed = instances =>
   instances.sort((a, b) => (a.timePlayed < b.timePlayed ? 1 : -1));
 
-const getInstances = () => {
+const getInstances = (instances, sortOrder) => {
   // Data normalization for missing fields
-  const instances = useSelector(_getInstances).map(instance => {
+  const inst = instances.map(instance => {
     return {
       ...instance,
       timePlayed: instance.timePlayed || 0,
       lastPlayed: instance.lastPlayed || 0
     };
   });
-  const instanceSortOrder = useSelector(
-    state => state.settings.instanceSortOrder
-  );
 
-  switch (instanceSortOrder) {
+  switch (sortOrder) {
     case 0:
-      return sortAlphabetical(instances);
+      return sortAlphabetical(inst);
     case 1:
-      return sortByLastPlayed(instances);
+      return sortByLastPlayed(inst);
     case 2:
-      return sortByMostPlayed(instances);
+      return sortByMostPlayed(inst);
     default:
-      return instances;
+      return inst;
   }
 };
 
 const Instances = () => {
-  const instances = getInstances();
+  // const instances = getInstances();
+  const instanceSortOrder = useSelector(
+    state => state.settings.instanceSortOrder
+  );
+  const instances = getInstances(useSelector(_getInstances), instanceSortOrder);
 
   return (
     <Container>
