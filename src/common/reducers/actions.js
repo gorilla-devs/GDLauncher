@@ -29,91 +29,90 @@ import { generate as generateRandomString } from 'randomstring';
 import fxp from 'fast-xml-parser';
 import * as ActionTypes from './actionTypes';
 import {
-  NEWS_URL,
-  MC_RESOURCES_URL,
-  GDL_LEGACYJAVAFIXER_MOD_URL,
-  FORGE,
-  FMLLIBS_OUR_BASE_URL,
-  FMLLIBS_FORGE_BASE_URL,
-  MICROSOFT_OAUTH_CLIENT_ID,
-  MICROSOFT_OAUTH_REDIRECT_URL,
   ACCOUNT_MICROSOFT,
   ACCOUNT_MOJANG,
-  FTB,
-  FABRIC,
   CURSEFORGE,
-  MC_STARTUP_METHODS
+  FABRIC,
+  FMLLIBS_FORGE_BASE_URL,
+  FMLLIBS_OUR_BASE_URL,
+  FORGE,
+  FTB,
+  GDL_LEGACYJAVAFIXER_MOD_URL,
+  MC_RESOURCES_URL,
+  MC_STARTUP_METHODS,
+  MICROSOFT_OAUTH_CLIENT_ID,
+  MICROSOFT_OAUTH_REDIRECT_URL,
+  NEWS_URL
 } from '../utils/constants';
 import {
-  mcAuthenticate,
-  mcRefresh,
-  mcInvalidate,
-  getFabricManifest,
-  getMcManifest,
-  getForgeManifest,
-  mcValidate,
-  getFabricJson,
-  getAddonFile,
-  getJavaManifest,
-  getAddonsByFingerprint,
-  getAddonFiles,
   getAddon,
-  // getFTBModpackData,
-  getFTBModpackVersionData,
   getAddonCategories,
-  msAuthenticateXBL,
-  msExchangeCodeForAccessToken,
-  msAuthenticateXSTS,
-  msAuthenticateMinecraft,
-  msMinecraftProfile,
-  msOAuthRefresh,
+  getAddonFile,
+  getAddonFiles,
+  getAddonsByFingerprint,
+  getFabricJson,
+  getFabricManifest,
+  getForgeManifest,
+  getFTBModpackVersionData,
   getJava16Manifest,
-  getMultipleAddons
+  getJavaManifest,
+  getMcManifest,
+  getMultipleAddons,
+  mcAuthenticate,
+  mcInvalidate,
+  mcRefresh,
+  mcValidate,
+  msAuthenticateMinecraft,
+  msAuthenticateXBL,
+  msAuthenticateXSTS,
+  msExchangeCodeForAccessToken,
+  msMinecraftProfile,
+  msOAuthRefresh
 } from '../api';
 import {
+  _getAccounts,
+  _getAssetsPath,
   _getCurrentAccount,
   _getCurrentDownloadItem,
-  _getJavaPath,
-  _getMinecraftVersionsPath,
-  _getAssetsPath,
-  _getInstancesPath,
-  _getLibrariesPath,
-  _getAccounts,
-  _getTempPath,
+  _getDataStorePath,
   _getInstance,
-  _getDataStorePath
+  _getInstancesPath,
+  _getJavaPath,
+  _getLibrariesPath,
+  _getMinecraftVersionsPath,
+  _getTempPath
 } from '../utils/selectors';
 import {
-  librariesMapper,
-  get7zPath,
-  extractNatives,
-  getJVMArguments112,
-  copyAssetsToResources,
-  getJVMArguments113,
-  patchForge113,
-  mavenToArray,
+  convertCompletePathToInstance,
+  convertcurseForgeToCanonical,
   copyAssetsToLegacy,
-  getPlayerSkin,
-  normalizeModData,
-  reflect,
-  isMod,
-  isInstanceFolderPath,
+  copyAssetsToResources,
+  downloadAddonZip,
+  extractAll,
+  extractFabricVersionFromManifest,
+  extractNatives,
+  filterFabricFilesByVersion,
+  filterForgeFilesByVersion,
+  get7zPath,
   getFileHash,
   getFilesRecursive,
-  filterForgeFilesByVersion,
-  filterFabricFilesByVersion,
+  getJVMArguments112,
+  getJVMArguments113,
   getPatchedInstanceType,
-  convertCompletePathToInstance,
-  downloadAddonZip,
-  convertcurseForgeToCanonical,
-  extractFabricVersionFromManifest,
-  extractAll
+  getPlayerSkin,
+  isInstanceFolderPath,
+  isMod,
+  librariesMapper,
+  mavenToArray,
+  normalizeModData,
+  patchForge113,
+  reflect
 } from '../../app/desktop/utils';
 import {
   downloadFile,
   downloadInstanceFiles
 } from '../../app/desktop/utils/downloader';
-import { removeDuplicates, getFileMurmurHash2 } from '../utils';
+import { getFileMurmurHash2, removeDuplicates } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
@@ -2689,7 +2688,10 @@ export function launchInstance(instanceName) {
               arg => {
                 return arg
                   .replace(/\${version_name}/g, mcJson.id)
-                  .replace(/\${library_directory}/g, _getLibrariesPath(state))
+                  .replace(
+                    /\${library_directory}/g,
+                    `"${_getLibrariesPath(state)}"`
+                  )
                   .replace(
                     /\${classpath_separator}/g,
                     process.platform === 'win32' ? ';' : ':'

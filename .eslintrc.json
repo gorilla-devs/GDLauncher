@@ -4,6 +4,7 @@
     "es6": true,
     "node": true
   },
+  "root": true,
   "extends": ["airbnb", "prettier", "plugin:prettier/recommended"],
   "globals": {
     "Atomics": "readonly",

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { _getInstances } from '../../../../common/utils/selectors';
@@ -23,14 +23,51 @@ const SubNoInstance = styled.div`
   font-size: 15px;
   margin-top: 20px;
 `;
+const sortAlphabetical = instances =>
+  instances.sort((a, b) => (a.name > b.name ? 1 : -1));
+
+const sortByLastPlayed = instances =>
+  instances.sort((a, b) => (a.lastPlayed < b.lastPlayed ? 1 : -1));
+
+const sortByMostPlayed = instances =>
+  instances.sort((a, b) => (a.timePlayed < b.timePlayed ? 1 : -1));
+
+const getInstances = (instances, sortOrder) => {
+  // Data normalization for missing fields
+  const inst = instances.map(instance => {
+    return {
+      ...instance,
+      timePlayed: instance.timePlayed || 0,
+      lastPlayed: instance.lastPlayed || 0
+    };
+  });
+
+  switch (sortOrder) {
+    case 0:
+      return sortAlphabetical(inst);
+    case 1:
+      return sortByLastPlayed(inst);
+    case 2:
+      return sortByMostPlayed(inst);
+    default:
+      return inst;
+  }
+};
 
 const Instances = () => {
+  const instanceSortOrder = useSelector(
+    state => state.settings.instanceSortOrder
+  );
   const instances = useSelector(_getInstances);
+  const memoInstances = useMemo(
+    () => getInstances(instances || [], instanceSortOrder),
+    [instances, instanceSortOrder]
+  );
 
   return (
     <Container>
-      {instances.length > 0 ? (
-        instances.map(i => <Instance key={i.name} instanceName={i.name} />)
+      {memoInstances.length > 0 ? (
+        memoInstances.map(i => <Instance key={i.name} instanceName={i.name} />)
       ) : (
         <NoInstance>
           No Instance has been installed
