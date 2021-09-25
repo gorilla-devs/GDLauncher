@@ -46,6 +46,7 @@ export default function ThirdStep({
   instancesPath,
   instanceConfig,
   filePath, // Destionation path for zip
+  openExportFolder,
   packVersion,
   tempPath,
   packAuthor,
@@ -284,6 +285,17 @@ export default function ThirdStep({
                           `}
                         />
                       </h1>
+                      <div>
+                        <Button
+                          type="primary"
+                          onClick={openExportFolder}
+                          css={`
+                            margin-top: 20px;
+                          `}
+                        >
+                          Open Export Folder
+                        </Button>
+                      </div>
                       <div>
                         <Button
                           type="primary"
