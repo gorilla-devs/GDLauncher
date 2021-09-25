@@ -320,8 +320,8 @@ const General = () => {
       <Title>Release Channel</Title>
       <Content>
         <p>
-          Stable updates once a month. Beta updates more often, but it may
-          have more bugs.
+          Stable updates once a month. Beta updates more often, but it may have
+          more bugs.
         </p>
         <Select
           css={`
