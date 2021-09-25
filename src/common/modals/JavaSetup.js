@@ -256,9 +256,13 @@ const JavaSetup = ({ beginChoice }) => {
                   css={`
                     display: flex;
                     flex-direction: column;
-                    div {
+                    > div {
                       display: flex;
                       flex-direction: column;
+                      margin: 10px 0;
+                      p {
+                        margin: 0;
+                      }
                     }
                   `}
                 >
@@ -276,7 +280,18 @@ const JavaSetup = ({ beginChoice }) => {
                           Java version!
                         </>
                       ) : (
-                        java8Log
+                        <>
+                          {java8Log
+                            .split('\n')
+                            .splice(0, java8Log.split('\n').length - 1)
+                            .map((e, index) => (
+                              // eslint-disable-next-line react/no-array-index-key
+                              <p key={index}>
+                                {e}
+                                <br />
+                              </p>
+                            ))}
+                        </>
                       )}
                     </code>
                   </div>
@@ -293,7 +308,18 @@ const JavaSetup = ({ beginChoice }) => {
                           Java version!
                         </>
                       ) : (
-                        java16Log
+                        <>
+                          {java16Log
+                            .split('\n')
+                            .splice(0, java16Log.split('\n').length - 1)
+                            .map((e, index) => (
+                              // eslint-disable-next-line react/no-array-index-key
+                              <p key={index}>
+                                {e}
+                                <br />
+                              </p>
+                            ))}
+                        </>
                       )}
                     </code>
                   </div>

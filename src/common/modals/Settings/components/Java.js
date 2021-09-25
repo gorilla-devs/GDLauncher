@@ -362,20 +362,19 @@ export default function MyAccountPreferences() {
         >
           Select the preferred amount of memory to use when launching the game
         </Paragraph>
-        <Slider
-          css={`
-            margin: 20px 20px 20px 0;
-          `}
-          onAfterChange={e => {
-            dispatch(updateJavaMemory(e));
-          }}
-          defaultValue={javaMemory}
-          min={1024}
-          max={process.getSystemMemoryInfo().total / 1024}
-          step={512}
-          marks={marks}
-          valueLabelDisplay="auto"
-        />
+        <div css="margin-right:20px">
+          <Slider
+            onAfterChange={e => {
+              dispatch(updateJavaMemory(e));
+            }}
+            defaultValue={javaMemory}
+            min={1024}
+            max={process.getSystemMemoryInfo().total / 1024}
+            step={512}
+            marks={marks}
+            valueLabelDisplay="auto"
+          />
+        </div>
       </SelectMemory>
       <Hr />
       <JavaCustomArguments>
