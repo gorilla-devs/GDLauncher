@@ -402,9 +402,9 @@ const ManualSetup = ({
   const defaultJava16Path = getJavaPath(16);
 
   const getColor = (p, latestDownloaded) => {
-    if (!fse.existsSync(p)) return theme.palette.warn.main;
-    if (latestDownloaded) return theme.palette.success.main;
-    return theme.palette.error.main;
+    if (!fse.existsSync(p)) return '#cb6418';
+    if (latestDownloaded) return '#55d90b';
+    return '#D64441';
   };
 
   const getSymbol = (p, latestDownloaded) => {
@@ -543,7 +543,7 @@ const ManualSetup = ({
             type="danger"
             onClick={async () => {
               await fse.remove(getJavaPath(16));
-              setJavaPath('');
+              setJava16Path('');
               setIsJava16Downloaded(false);
             }}
             css={`
@@ -735,7 +735,7 @@ const AutomaticSetup = ({
           $progress: true
         },
         {
-          update: percent => {
+          progress: percent => {
             ipcRenderer.invoke('update-progress-bar', percent);
             setDownloadPercentage(percent);
             setStepPercentage(
@@ -770,7 +770,7 @@ const AutomaticSetup = ({
             $progress: true
           },
           {
-            update: percent => {
+            progress: percent => {
               ipcRenderer.invoke('update-progress-bar', percent);
               setDownloadPercentage(percent);
               setStepPercentage(index, percent / 2 + 50);
