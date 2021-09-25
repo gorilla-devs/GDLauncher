@@ -348,7 +348,7 @@ const General = () => {
       <Content>
         <p>
           Select the number of concurrent downloads. If you have a slow
-          connection, select at max 3.
+          connection, select at most 3.
         </p>
         <Select
           onChange={v => dispatch(updateConcurrentDownloads(v))}
@@ -483,8 +483,8 @@ const General = () => {
       </Title>
       <Content>
         <p>
-          Deletes all the shared files between instances. Doing this will result
-          in the complete loss of the instances data.
+          Deletes all the shared files between instances. Doing this will remove
+          ALL instance data.
         </p>
         <Button
           onClick={() => {
