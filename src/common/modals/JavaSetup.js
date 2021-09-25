@@ -31,13 +31,13 @@ import { closeModal } from '../reducers/modals/actions';
 import { updateJava16Path, updateJavaPath } from '../reducers/settings/actions';
 import { UPDATE_MODAL } from '../reducers/modals/actionTypes';
 
-const JavaSetup = () => {
-  const [step, setStep] = useState(0);
-  const [choice, setChoice] = useState(null);
+const JavaSetup = ({ beginChoice }) => {
+  const [step, setStep] = useState(beginChoice ? 1 : 0);
+  const [choice, setChoice] = useState(beginChoice || null);
   const [isJava8Downloaded, setIsJava8Downloaded] = useState(null);
   const [isJava16Downloaded, setIsJava16Downloaded] = useState(null);
-  const [java8Log, setJava8Log] = useState(null);
-  const [java16Log, setJava16Log] = useState(null);
+  const [java8Log, setJava8Log] = useState('');
+  const [java16Log, setJava16Log] = useState('');
   const userData = useSelector(state => state.userData);
   const customJava8Path = useSelector(state => state.settings.java.path);
   const customJava16Path = useSelector(state => state.settings.java.path16);
@@ -178,7 +178,7 @@ const JavaSetup = () => {
                   `}
                   onClick={() => {
                     setStep(1);
-                    setChoice(0);
+                    setChoice(1);
                   }}
                 >
                   Automatic Setup
@@ -192,7 +192,7 @@ const JavaSetup = () => {
                   `}
                   onClick={() => {
                     setStep(1);
-                    setChoice(1);
+                    setChoice(2);
                   }}
                 >
                   Manual Setup
@@ -228,9 +228,9 @@ const JavaSetup = () => {
                     margin-bottom: 20px;
                   `}
                 >
-                  {choice === 0 ? 'Automatic' : 'Manual'} Setup
+                  {choice === 1 ? 'Automatic' : 'Manual'} Setup
                 </div>
-                {choice === 0 ? (
+                {choice === 1 ? (
                   <AutomaticSetup
                     isJava8Downloaded={isJava8Downloaded}
                     isJava16Downloaded={isJava16Downloaded}
@@ -631,12 +631,18 @@ const ManualSetup = ({
           <Button
             type="danger"
             onClick={() => {
-              dispatch(updateJavaPath(javaPath));
-              dispatch(updateJava16Path(java16Path));
+              if (javaPath !== defaultJava8Path)
+                dispatch(updateJavaPath(javaPath));
+              if (java16Path !== defaultJava16Path)
+                dispatch(updateJava16Path(java16Path));
               setStep(2);
             }}
           >
-            Continue with custom java
+            Continue with{' '}
+            {javaPath === defaultJava8Path && java16Path === defaultJava16Path
+              ? 'Automatic '
+              : 'Custom '}
+            Java
           </Button>
         )}
       </div>
