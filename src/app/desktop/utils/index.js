@@ -321,7 +321,8 @@ export const isJavaPathOK = async (javaFolder, retry) => {
 export const get7zPath = async () => {
   // Get userData from ipc because we can't always get this from redux
   let baseDir = await ipcRenderer.invoke('getExecutablePath');
-  if (process.env.NODE_ENV === 'development') {
+  const isDev = process.env.NODE_ENV === 'development';
+  if (isDev) {
     baseDir = path.resolve(baseDir, '../../');
     if (process.platform === 'win32') {
       baseDir = path.join(baseDir, '7zip-bin/win/x64');
@@ -335,7 +336,7 @@ export const get7zPath = async () => {
     return path.join(baseDir, '7za');
   }
   if (process.platform === 'darwin') {
-    return path.resolve(baseDir, '../', '7za');
+    return path.resolve(baseDir, isDev ? '' : '../', '7za');
   }
   return path.join(baseDir, '7za.exe');
 };
