@@ -7,7 +7,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
 [![GitHub issues](https://img.shields.io/github/issues-raw/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/issues) 
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/pulls) 
-![Electron CD](https://github.com/gorilla-devs/GDLauncher/workflows/Electron%20CD/badge.svg?branch=main) 
+![Electron CD](https://github.com/gorilla-devs/GDLauncher/workflows/Electron%20CD/badge.svg?branch=master) 
 ![Discord](https://img.shields.io/discord/398091532881756161.svg)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/gorilla-devs/GDLauncher.svg) 
 ![](https://img.shields.io/github/release/gorilla-devs/GDLauncher.svg?style=flat)
@@ -16,12 +16,16 @@
 ## 🦺 Support this project
 
 <a href='https://ko-fi.com/gdlauncher' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+## 🎉 Join our community
+
+<a href='https://discord.gdlauncher.com' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.gdlauncher.com/assets/socials/Discord-Logo+Wordmark-Color.png' border='0' alt='GDLauncher Discord Server' /></a>
 <details>
  <summary><strong>Table of Contents</strong> (click to expand)
 </summary>
 
 - [GDLauncher](#gdlauncher)
   - [🦺 Support this project](#-support-this-project)
+  - [🎉 Join our community](#-join-our-community)
   - [🎮 What is GDLauncher](#-what-is-gdlauncher)
   - [⚡️ Comparison with Twitch Launcher](#️-comparison-with-twitch-launcher)
   - [🚀 Getting Started](#-getting-started)
