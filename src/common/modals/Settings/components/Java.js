@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faJava } from '@fortawesome/free-brands-svg-icons';
 import {
   faMemory,
+  faFolder,
   faUndo,
+  faLevelDownAlt,
   faList,
   faDesktop,
-  faPlay,
-  faExchangeAlt
+  faPlay
 } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Input, Switch, Select } from 'antd';
 import {
+  updateJava16Path,
   updateJavaArguments,
   updateJavaMemory,
+  updateJavaPath,
   updateMcStartupMethod,
   updateResolution
 } from '../../../reducers/settings/actions';
@@ -23,6 +26,7 @@ import {
   DEFAULT_JAVA_ARGS,
   resolutionPresets
 } from '../../../../app/desktop/utils/constants';
+import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
 import { MC_STARTUP_METHODS } from '../../../utils/constants';
 
@@ -121,6 +125,8 @@ export default function MyAccountPreferences() {
   const [screenResolution, setScreenResolution] = useState(null);
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
+  const javaPath = useSelector(state => _getJavaPath(state)(8));
+  const java16Path = useSelector(state => _getJavaPath(state)(16));
   const customJavaPath = useSelector(state => state.settings.java.path);
   const customJava16Path = useSelector(state => state.settings.java.path16);
   const mcStartupMethod = useSelector(state => state.settings.mcStartupMethod);
@@ -128,7 +134,6 @@ export default function MyAccountPreferences() {
     state => state.settings.minecraftSettings.resolution
   );
   const dispatch = useDispatch();
-  const theme = useTheme();
 
   useEffect(() => {
     ipcRenderer
@@ -165,108 +170,128 @@ export default function MyAccountPreferences() {
           `}
         >
           Disable this to specify a custom java path to use instead of using
-          openJDK shipped with GDLauncher. If that is the case select the path
+          OpenJDK shipped with GDLauncher. If that is the case, select the path
           to the Java Runtime Environment to use.
         </Paragraph>
         <Switch
           color="primary"
           onChange={c => {
             if (c) {
-              dispatch(openModal('JavaSetup', { beginChoice: 1 }));
+              dispatch(updateJavaPath(null));
+              dispatch(updateJava16Path(null));
             } else {
-              dispatch(openModal('JavaSetup', { beginChoice: 2 }));
+              dispatch(updateJavaPath(javaPath));
+              dispatch(updateJava16Path(java16Path));
             }
           }}
           checked={!customJavaPath && !customJava16Path}
         />
       </AutodetectPath>
-      {(customJavaPath || customJava16Path) && (
+      {customJavaPath && customJava16Path && (
         <>
           <div
             css={`
-              margin: 10px 0;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              text-align: left;
-              h3 {
-                margin: 0;
-                width: 65px;
-              }
-              span {
-                width: 75% !important;
-                padding-left: 12px;
-              }
-              pre {
-                width: 75% !important;
-                margin: 0;
-                padding: 0 8px;
-                border: 5px solid ${theme.palette.grey['800']};
-                border-radius: 2px;
-                background-color: ${theme.palette.grey['800']};
-                font-family: 'Inter';
-                &::-webkit-scrollbar {
-                  display: none;
-                }
+              height: 50px;
+              margin: 30px 0;
             `}
           >
-            <h3>Java 8 </h3>
-            {customJavaPath ? (
-              <pre>{customJavaPath}</pre>
-            ) : (
-              <span>Shipped OpenJDK</span>
-            )}
-            <StyledButtons
-              color="primary"
-              onClick={() =>
-                dispatch(openModal('JavaSetup', { beginChoice: 2 }))
-              }
+            <h3
+              css={`
+                text-align: left;
+              `}
             >
-              <FontAwesomeIcon icon={faExchangeAlt} />
-            </StyledButtons>
+              Java 8
+            </h3>
+            <div
+              css={`
+                width: 100%;
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faLevelDownAlt}
+                flip="horizontal"
+                transform={{ rotate: 90 }}
+              />
+              <Input
+                css={`
+                  width: 75% !important;
+                  margin: 0 10px !important;
+                `}
+                onChange={e =>
+                  dispatch(
+                    updateJavaPath(
+                      e.target.value === '' ? null : e.target.value
+                    )
+                  )
+                }
+                value={customJavaPath}
+              />
+              <StyledButtons
+                color="primary"
+                onClick={async () => {
+                  const { filePaths, canceled } = await ipcRenderer.invoke(
+                    'openFileDialog',
+                    javaPath
+                  );
+                  if (!filePaths[0] || canceled) return;
+                  dispatch(updateJavaPath(filePaths[0]));
+                }}
+              >
+                <FontAwesomeIcon icon={faFolder} />
+              </StyledButtons>
+            </div>
           </div>
           <div
             css={`
-              margin: 10px 0;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              h3 {
-                margin: 0;
-                width: 65px;
-              }
-              span {
-                width: 75% !important;
-                padding-left: 12px;
-              }
-              pre {
-                width: 75% !important;
-                margin: 0;
-                padding: 0 8px;
-                border: 5px solid ${theme.palette.grey['800']};
-                border-radius: 2px;
-                background-color: ${theme.palette.grey['800']};
-                font-family: 'Inter';
-                &::-webkit-scrollbar {
-                  display: none;
-                }
-              }
+              height: 50px;
+              margin: 30px 0;
             `}
           >
-            <h3>Java 16 </h3>
-            {customJava16Path ? (
-              <pre>{customJava16Path}</pre>
-            ) : (
-              <span>Shipped OpenJDK</span>
-            )}
-            <StyledButtons
-              color="primary"
-              onClick={() =>
-                dispatch(openModal('JavaSetup', { beginChoice: 2 }))
-              }
+            <h3
+              css={`
+                text-align: left;
+              `}
             >
-              <FontAwesomeIcon icon={faExchangeAlt} />
-            </StyledButtons>
+              Java 16
+            </h3>
+            <div
+              css={`
+                width: 100%;
+              `}
+            >
+              <FontAwesomeIcon
+                icon={faLevelDownAlt}
+                flip="horizontal"
+                transform={{ rotate: 90 }}
+              />
+              <Input
+                css={`
+                  width: 75% !important;
+                  margin: 0 10px !important;
+                `}
+                onChange={e => {
+                  dispatch(
+                    updateJava16Path(
+                      e.target.value === '' ? null : e.target.value
+                    )
+                  );
+                }}
+                value={customJava16Path}
+              />
+              <StyledButtons
+                color="primary"
+                onClick={async () => {
+                  const { filePaths, canceled } = await ipcRenderer.invoke(
+                    'openFileDialog',
+                    javaPath
+                  );
+                  if (!filePaths[0] || canceled) return;
+                  dispatch(updateJava16Path(filePaths[0]));
+                }}
+              >
+                <FontAwesomeIcon icon={faFolder} />
+              </StyledButtons>
+            </div>
           </div>
         </>
       )}
@@ -362,19 +387,20 @@ export default function MyAccountPreferences() {
         >
           Select the preferred amount of memory to use when launching the game
         </Paragraph>
-        <div css="margin-right:20px">
-          <Slider
-            onAfterChange={e => {
-              dispatch(updateJavaMemory(e));
-            }}
-            defaultValue={javaMemory}
-            min={1024}
-            max={process.getSystemMemoryInfo().total / 1024}
-            step={512}
-            marks={marks}
-            valueLabelDisplay="auto"
-          />
-        </div>
+        <Slider
+          css={`
+            margin: 20px 20px 20px 0;
+          `}
+          onAfterChange={e => {
+            dispatch(updateJavaMemory(e));
+          }}
+          defaultValue={javaMemory}
+          min={1024}
+          max={process.getSystemMemoryInfo().total / 1024}
+          step={512}
+          marks={marks}
+          valueLabelDisplay="auto"
+        />
       </SelectMemory>
       <Hr />
       <JavaCustomArguments>
