@@ -161,7 +161,13 @@ try {
   // Do nothing
 }
 
-app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
+if (!isDev)
+  app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
+else {
+  const devPath = path.join(app.getPath('appData'), 'gdlauncher_next_dev');
+  if (!fss.existsSync(devPath)) fss.mkdirSync(devPath);
+  app.setPath('userData', devPath);
+}
 
 let allowUnstableReleases = false;
 const releaseChannelExists = fss.existsSync(

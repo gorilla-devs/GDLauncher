@@ -152,7 +152,6 @@ function dashUuid(UUID) {
 }
 
 const General = () => {
-  /* eslint-disable prettier/prettier */
   const tempPath = useSelector(_getTempPath);
   const dataStorePath = useSelector(_getDataStorePath);
   const instancesPath = useSelector(_getInstancesPath);
@@ -176,7 +175,6 @@ const General = () => {
   const instanceSortMethod = useSelector(
     state => state.settings.instanceSortOrder
   );
-  /* eslint-enable */
 
   const [dataPath, setDataPath] = useState(userData);
   const [copiedUuid, setCopiedUuid] = useState(false);
@@ -193,18 +191,20 @@ const General = () => {
     Object.keys(queuedInstances).length > 0 ||
     Object.keys(isPlaying).length > 0;
 
+  const appDataPath = path.join(
+    `${ipcRenderer.invoke('getAppdataPath')}`,
+    process.env.NODE_ENV === 'development'
+      ? 'gdlauncher_next_dev'
+      : 'gdlauncher_next'
+  );
+
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
     extractFace(currentAccount.skin).then(setProfileImage).catch(console.error);
-    ipcRenderer
-      .invoke('getAppdataPath')
-      .then(appData =>
-        fsa
-          .readFile(path.join(appData, 'gdlauncher_next', 'rChannel'))
-          .then(v => setReleaseChannel(parseInt(v.toString(), 10)))
-          .catch(() => setReleaseChannel(0))
-      )
-      .catch(console.error);
+    fsa
+      .readFile(path.join(appDataPath, 'rChannel'))
+      .then(v => setReleaseChannel(parseInt(v.toString(), 10)))
+      .catch(() => setReleaseChannel(0));
   }, []);
 
   const clearSharedData = async () => {
@@ -221,8 +221,6 @@ const General = () => {
 
   const changeDataPath = async () => {
     setLoadingMoveUserData(true);
-    const appData = await ipcRenderer.invoke('getAppdataPath');
-    const appDataPath = path.join(appData, 'gdlauncher_next');
 
     const notCopiedFiles = [
       'Cache',
@@ -328,10 +326,9 @@ const General = () => {
             width: 100px;
           `}
           onChange={async e => {
-            const appData = await ipcRenderer.invoke('getAppdataPath');
             setReleaseChannel(e);
             await fsa.writeFile(
-              path.join(appData, 'gdlauncher_next', 'rChannel'),
+              path.join(appDataPath, 'rChannel'),
               e.toString()
             );
           }}
@@ -508,11 +505,7 @@ const General = () => {
           css={`
             margin-left: 30px;
           `}
-          onClick={async () => {
-            const appData = await ipcRenderer.invoke('getAppdataPath');
-            const appDataPath = path.join(appData, 'gdlauncher_next');
-            setDataPath(appDataPath);
-          }}
+          onClick={async () => setDataPath(appDataPath)}
         >
           Reset Path
         </a>

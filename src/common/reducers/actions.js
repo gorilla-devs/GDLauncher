@@ -3044,14 +3044,17 @@ export const isNewVersionAvailable = async () => {
   const latestPrerelease = latestReleases.find(v => v.prerelease);
   const latestStablerelease = latestReleases.find(v => !v.prerelease);
 
-  const appData = await ipcRenderer.invoke('getAppdataPath');
+  const appDataPath = path.join(
+    `${ipcRenderer.invoke('getAppdataPath')}`,
+    process.env.NODE_ENV === 'development'
+      ? 'gdlauncher_next_dev'
+      : 'gdlauncher_next'
+  );
 
   let releaseChannel = 0;
 
   try {
-    const rChannel = await fs.readFile(
-      path.join(appData, 'gdlauncher_next', 'rChannel')
-    );
+    const rChannel = await fs.readFile(path.join(appDataPath, 'rChannel'));
     releaseChannel = parseInt(rChannel.toString(), 10);
   } catch {
     // swallow error
