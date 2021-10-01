@@ -15,7 +15,8 @@ import {
   faToilet,
   faNewspaper,
   faFolder,
-  faFire
+  faFire,
+  faSort
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
@@ -29,6 +30,7 @@ import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
+  updateInstanceSortType,
   updateShowNews,
   updateCurseReleaseChannel
 } from '../../../reducers/settings/actions';
@@ -162,9 +164,18 @@ const General = () => {
   const showNews = useSelector(state => state.settings.showNews);
   const DiscordRPC = useSelector(state => state.settings.discordRPC);
   const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
-  const concurrentDownloads = useSelector(state => state.settings.concurrentDownloads);
-  const curseReleaseChannel = useSelector(state => state.settings.curseReleaseChannel);
-  const hideWindowOnGameLaunch = useSelector(state => state.settings.hideWindowOnGameLaunch);
+  const concurrentDownloads = useSelector(
+    state => state.settings.concurrentDownloads
+  );
+  const curseReleaseChannel = useSelector(
+    state => state.settings.curseReleaseChannel
+  );
+  const hideWindowOnGameLaunch = useSelector(
+    state => state.settings.hideWindowOnGameLaunch
+  );
+  const instanceSortMethod = useSelector(
+    state => state.settings.instanceSortOrder
+  );
   /* eslint-enable */
 
   const [dataPath, setDataPath] = useState(userData);
@@ -309,8 +320,8 @@ const General = () => {
       <Title>Release Channel</Title>
       <Content>
         <p>
-          Stable updates once a month, beta does update more often but it may
-          have more bugs.
+          Stable updates once a month. Beta updates more often, but it may have
+          more bugs.
         </p>
         <Select
           css={`
@@ -337,7 +348,7 @@ const General = () => {
       <Content>
         <p>
           Select the number of concurrent downloads. If you have a slow
-          connection, select max 3
+          connection, select at most 3.
         </p>
         <Select
           onChange={v => dispatch(updateConcurrentDownloads(v))}
@@ -358,12 +369,38 @@ const General = () => {
         </Select>
       </Content>
       <Title>
+        Instance Sorting &nbsp; <FontAwesomeIcon icon={faSort} />
+      </Title>
+      <Content>
+        <p
+          css={`
+            margin: 0;
+            width: 400px;
+          `}
+        >
+          Select the method in which instances should be sorted.
+        </p>
+
+        <Select
+          onChange={v => dispatch(updateInstanceSortType(v))}
+          value={instanceSortMethod}
+          css={`
+            width: 136px;
+            text-align: start;
+          `}
+        >
+          <Select.Option value={0}>Alphabetical</Select.Option>
+          <Select.Option value={1}>Last Played</Select.Option>
+          <Select.Option value={2}>Most Played</Select.Option>
+        </Select>
+      </Content>
+      <Title>
         Preferred Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
       </Title>
       <Content>
         <p>
           Select the preferred release channel for downloading Curse projects.
-          This also applies for mods update.
+          This also applies for mod updates.
         </p>
         <Select
           css={`
@@ -417,7 +454,7 @@ const General = () => {
       <Content>
         <p>
           Automatically hide the launcher when launching an instance. You will
-          still be able to open it from the icon tray
+          still be able to open it from the icon tray.
         </p>
         <Switch
           onChange={e => {
@@ -432,7 +469,7 @@ const General = () => {
       <Content>
         <p>
           You got a potato PC? Don&apos;t worry! We got you covered. Enable this
-          and all animations and special effects will be disabled
+          and all animations and special effects will be disabled.
         </p>
         <Switch
           onChange={e => {
@@ -446,8 +483,8 @@ const General = () => {
       </Title>
       <Content>
         <p>
-          Deletes all the shared files between instances. Doing this will result
-          in the complete loss of the instances data
+          Deletes all the shared files between instances. Doing this will remove
+          ALL instance data.
         </p>
         <Button
           onClick={() => {
@@ -569,8 +606,8 @@ const General = () => {
         </div>
         <p>
           {updateAvailable
-            ? 'There is an update available to be installed. Click on update to install it and restart the launcher'
-            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available'}
+            ? 'There is an update available to be installed. Click on update to install it and restart the launcher.'
+            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available.'}
         </p>
         <div
           css={`
