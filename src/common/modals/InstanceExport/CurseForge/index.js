@@ -38,10 +38,6 @@ const InstanceExportCurseForge = ({ instanceName }) => {
     setFilePath(dialog.filePaths[0]);
   };
 
-  const openExportFolder = async () => {
-    await ipcRenderer.invoke('openFolder', filePath);
-  };
-
   return (
     <Modal
       css={`
@@ -82,7 +78,6 @@ const InstanceExportCurseForge = ({ instanceName }) => {
       <ThirdStep
         packZipName={packZipName}
         filePath={filePath}
-        openExportFolder={openExportFolder}
         page={page}
         instanceName={instanceName}
         instanceConfig={instanceConfig}
