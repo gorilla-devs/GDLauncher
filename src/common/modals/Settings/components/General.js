@@ -320,8 +320,8 @@ const General = () => {
       <Title>Release Channel</Title>
       <Content>
         <p>
-          Stable updates once a month, beta does update more often but it may
-          have more bugs.
+          Stable updates once a month. Beta updates more often, but it may have
+          more bugs.
         </p>
         <Select
           css={`
@@ -348,7 +348,7 @@ const General = () => {
       <Content>
         <p>
           Select the number of concurrent downloads. If you have a slow
-          connection, select max 3
+          connection, select at most 3.
         </p>
         <Select
           onChange={v => dispatch(updateConcurrentDownloads(v))}
@@ -400,7 +400,7 @@ const General = () => {
       <Content>
         <p>
           Select the preferred release channel for downloading Curse projects.
-          This also applies for mods update.
+          This also applies for mod updates.
         </p>
         <Select
           css={`
@@ -454,7 +454,7 @@ const General = () => {
       <Content>
         <p>
           Automatically hide the launcher when launching an instance. You will
-          still be able to open it from the icon tray
+          still be able to open it from the icon tray.
         </p>
         <Switch
           onChange={e => {
@@ -469,7 +469,7 @@ const General = () => {
       <Content>
         <p>
           You got a potato PC? Don&apos;t worry! We got you covered. Enable this
-          and all animations and special effects will be disabled
+          and all animations and special effects will be disabled.
         </p>
         <Switch
           onChange={e => {
@@ -483,8 +483,8 @@ const General = () => {
       </Title>
       <Content>
         <p>
-          Deletes all the shared files between instances. Doing this will result
-          in the complete loss of the instances data
+          Deletes all the shared files between instances. Doing this will remove
+          ALL instance data.
         </p>
         <Button
           onClick={() => {
@@ -606,8 +606,8 @@ const General = () => {
         </div>
         <p>
           {updateAvailable
-            ? 'There is an update available to be installed. Click on update to install it and restart the launcher'
-            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available'}
+            ? 'There is an update available to be installed. Click on update to install it and restart the launcher.'
+            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available.'}
         </p>
         <div
           css={`
