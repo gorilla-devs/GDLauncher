@@ -201,7 +201,7 @@ log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
 
 const get7zPath = async () => {
   let baseDir = path.dirname(app.getPath('exe'));
-  if (process.env.NODE_ENV === 'development') {
+  if (isDev) {
     baseDir = path.resolve(baseDir, '../../');
     if (process.platform === 'win32') {
       baseDir = path.join(baseDir, '7zip-bin/win/x64');
@@ -215,7 +215,7 @@ const get7zPath = async () => {
     return path.join(baseDir, '7za');
   }
   if (process.platform === 'darwin') {
-    return path.resolve(baseDir, '../', '7za');
+    return path.resolve(baseDir, isDev ? '' : '../', '7za');
   }
   return path.join(baseDir, '7za.exe');
 };
