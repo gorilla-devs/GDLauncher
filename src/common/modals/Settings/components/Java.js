@@ -170,8 +170,8 @@ export default function MyAccountPreferences() {
           `}
         >
           Disable this to specify a custom java path to use instead of using
-          openJDK shipped with GDLauncher if that is the case select the path to
-          your Java executable.
+          OpenJDK shipped with GDLauncher. If that is the case, select the path
+          to your Java executable.
         </Paragraph>
         <Switch
           color="primary"
@@ -315,7 +315,7 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          Select the initial game resolution in pixels (width x height)
+          Select the initial game resolution in pixels (width x height).
         </Paragraph>
         <ResolutionInputContainer>
           <div>
@@ -385,7 +385,7 @@ export default function MyAccountPreferences() {
             margin: 0;
           `}
         >
-          Select the preferred amount of memory to use when launching the game
+          Select the preferred amount of memory to use when launching the game.
         </Paragraph>
         <Slider
           css={`
@@ -417,7 +417,7 @@ export default function MyAccountPreferences() {
             text-align: left;
           `}
         >
-          Select the preferred custom arguments to use when launching the game
+          Select the preferred custom arguments to use when launching the game.
         </Paragraph>
         <div
           css={`
