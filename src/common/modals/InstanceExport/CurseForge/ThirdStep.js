@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { ipcRenderer } from 'electron';
 import { Button } from 'antd';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -61,6 +62,10 @@ export default function ThirdStep({
   const modloaderName = loader?.loaderType;
   const dispatch = useDispatch();
   const tempExport = path.join(tempPath, instanceName);
+
+  const openExportLocation = async () => {
+    await ipcRenderer.invoke('openFolder', filePath);
+  };
 
   // Construct manifest contents
   const createManifest = async (modsArray = mods) => {
@@ -284,6 +289,17 @@ export default function ThirdStep({
                           `}
                         />
                       </h1>
+                      <div>
+                        <Button
+                          type="primary"
+                          onClick={openExportLocation}
+                          css={`
+                            margin-top: 20px;
+                          `}
+                        >
+                          Open Export Location
+                        </Button>
+                      </div>
                       <div>
                         <Button
                           type="primary"
