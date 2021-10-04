@@ -95,7 +95,7 @@ const JavaManagerRow = styled.div`
 `;
 
 const JavaMemorySlider = styled(Slider)`
-  margin: 30px 0 55px 0;
+  margin: 30px 10px 55px 0 !important;
 `;
 
 const JavaResetButton = styled(Button)`

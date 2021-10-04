@@ -389,7 +389,7 @@ export default function MyAccountPreferences() {
         </Paragraph>
         <Slider
           css={`
-            margin: 20px 20px 20px 0;
+            margin: 20px 20px 20px 0 !important;
           `}
           onAfterChange={e => {
             dispatch(updateJavaMemory(e));
