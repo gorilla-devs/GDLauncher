@@ -464,14 +464,13 @@ export default function MyAccountPreferences() {
           <Select
             value={mcStartupMethod}
             onChange={v => dispatch(updateMcStartupMethod(v))}
+            disabled={process.platform !== 'win32'}
           >
-            {Object.entries(MC_STARTUP_METHODS).map(([k, v]) => {
-              return (
-                <Select.Option key={k} value={k}>
-                  {v}
-                </Select.Option>
-              );
-            })}
+            {Object.entries(MC_STARTUP_METHODS).map(([k, v]) => (
+              <Select.Option key={k} value={k}>
+                {v}
+              </Select.Option>
+            ))}
           </Select>
         </McStartupMethodRow>
       </McStartupMethod>
