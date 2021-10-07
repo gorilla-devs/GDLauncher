@@ -247,9 +247,10 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              {data.new.map(item => (
+              {data.new.map((item, index) => (
                 <UpdateRow
-                  key={item.header}
+                  /* eslint-disable-next-line react/no-array-index-key */
+                  key={index}
                   header={item.header}
                   content={item.content}
                 />
@@ -281,9 +282,10 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              {data.improvements.map(item => (
+              {data.improvements.map((item, index) => (
                 <UpdateRow
-                  key={item.header}
+                  /* eslint-disable-next-line react/no-array-index-key */
+                  key={index}
                   header={item.header}
                   content={item.content}
                 />
@@ -315,9 +317,10 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul ref={intersectionObserverRef}>
-              {data.bugfixes.map(item => (
+              {data.bugfixes.map((item, index) => (
                 <UpdateRow
-                  key={item.header}
+                  /* eslint-disable-next-line react/no-array-index-key */
+                  key={index}
                   header={item.header}
                   content={item.content}
                 />
