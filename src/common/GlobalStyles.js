@@ -19,6 +19,7 @@ export default createGlobalStyle`
     height: 100%;
     overflow: hidden;
     margin: 0;
+    padding: 2px;
     display: flex;
     box-sizing: border-box;
   }
