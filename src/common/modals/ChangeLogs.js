@@ -13,7 +13,8 @@ import UpdateIllustration from '../assets/update_illustration.png';
 import { openModal } from '../reducers/modals/actions';
 import ga from '../utils/analytics';
 
-const UpdateRow = ({ header, content }) => {
+const UpdateRow = ({ header, content, advanced }) => {
+  const prSplit = advanced?.pr?.split('/');
   return (
     <li>
       &bull; {header}{' '}
@@ -24,6 +25,42 @@ const UpdateRow = ({ header, content }) => {
       >
         {content}
       </span>
+      {advanced && (
+        <>
+          <div
+            css={`
+              color: ${props => props.theme.palette.text.third};
+              font-size: 12px;
+              a {
+                color: ${props => props.theme.palette.primary.light};
+              }
+              a:hover {
+                color: ${props => props.theme.palette.primary.main};
+              }
+            `}
+          >
+            <a
+              href={`https://github.com/gorilla-devs/GDLauncher/commit/${advanced.cm}`}
+            >
+              {advanced.cm}
+            </a>
+            {prSplit && (
+              <>
+                {' | '}
+                {/* Yes, this was the best (and shortest) version to do this I could come up with */}
+                <a
+                  href={`https://github.com/gorilla-devs/GDLauncher/pull/${
+                    prSplit[0]
+                  }${prSplit.length > 1 ? `/commits/${prSplit[1]}` : ''}`}
+                >
+                  #{advanced.pr}
+                </a>
+              </>
+            )}
+            {advanced.ms && <> | {advanced.ms}</>}
+          </div>
+        </>
+      )}
     </li>
   );
 };
@@ -128,6 +165,7 @@ const data = {
 const ChangeLogs = () => {
   const [version, setVersion] = useState(null);
   const [skipIObserver, setSkipIObserver] = useState(true);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const dispatch = useDispatch();
   const { ref: intersectionObserverRef, inView: insectionObserverInView } =
     useInView({
@@ -168,7 +206,7 @@ const ChangeLogs = () => {
     <Modal
       css={`
         height: 550px;
-        width: 450px;
+        width: 475px;
       `}
       title={`What's new in ${version}`}
       removePadding
@@ -222,6 +260,17 @@ const ChangeLogs = () => {
               <img src={KoFiButton} alt="Ko-Fi" />
             </a>
           </div>
+          <a
+            css={`
+              margin-top: 20px;
+              color: ${props => props.theme.palette.primary.light};
+            `}
+            onClick={() => setShowAdvanced(!showAdvanced)}
+          >
+            {showAdvanced
+              ? 'Hide extended information'
+              : 'Show extended information'}
+          </a>
         </Header>
         <Section>
           <SectionTitle
@@ -253,6 +302,7 @@ const ChangeLogs = () => {
                   key={index}
                   header={item.header}
                   content={item.content}
+                  advanced={showAdvanced && item.advanced}
                 />
               ))}
             </ul>
@@ -288,6 +338,7 @@ const ChangeLogs = () => {
                   key={index}
                   header={item.header}
                   content={item.content}
+                  advanced={showAdvanced && item.advanced}
                 />
               ))}
             </ul>
@@ -323,6 +374,7 @@ const ChangeLogs = () => {
                   key={index}
                   header={item.header}
                   content={item.content}
+                  advanced={showAdvanced && item.advanced}
                 />
               ))}
             </ul>
@@ -399,6 +451,5 @@ const Section = styled.div`
 `;
 
 const Header = styled.div`
-  height: 150px;
-  margin-bottom: 200px;
+  margin-bottom: 20px;
 `;
