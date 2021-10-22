@@ -34,6 +34,7 @@ const SideMenu = styled.div`
 `;
 
 const SettingsContainer = styled.div`
+  margin-right: 3px;
   flex: 1;
   flex-grow: 3;
 `;
