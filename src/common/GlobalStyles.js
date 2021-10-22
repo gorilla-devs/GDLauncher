@@ -19,7 +19,6 @@ export default createGlobalStyle`
     height: 100%;
     overflow: hidden;
     margin: 0;
-    padding: 2px;
     display: flex;
     box-sizing: border-box;
   }
@@ -62,8 +61,8 @@ export default createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
     border-radius: 1px;
   }
 
