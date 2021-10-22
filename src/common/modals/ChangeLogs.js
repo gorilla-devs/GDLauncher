@@ -342,19 +342,17 @@ const ChangeLogs = () => {
               New
             </span>
           </SectionTitle>
-          <div>
-            <ul>
-              {data.new.map((item, index) => (
-                <UpdateRow
-                  /* eslint-disable-next-line react/no-array-index-key */
-                  key={index}
-                  header={item.header}
-                  content={item.content}
-                  advanced={showAdvanced && item.advanced}
-                />
-              ))}
-            </ul>
-          </div>
+          <ul>
+            {data.new.map((item, index) => (
+              <UpdateRow
+                /* eslint-disable-next-line react/no-array-index-key */
+                key={index}
+                header={item.header}
+                content={item.content}
+                advanced={showAdvanced && item.advanced}
+              />
+            ))}
+          </ul>
         </Section>
         <Section>
           <SectionTitle
@@ -378,19 +376,17 @@ const ChangeLogs = () => {
               Improved
             </span>
           </SectionTitle>
-          <div>
-            <ul>
-              {data.improvements.map((item, index) => (
-                <UpdateRow
-                  /* eslint-disable-next-line react/no-array-index-key */
-                  key={index}
-                  header={item.header}
-                  content={item.content}
-                  advanced={showAdvanced && item.advanced}
-                />
-              ))}
-            </ul>
-          </div>
+          <ul>
+            {data.improvements.map((item, index) => (
+              <UpdateRow
+                /* eslint-disable-next-line react/no-array-index-key */
+                key={index}
+                header={item.header}
+                content={item.content}
+                advanced={showAdvanced && item.advanced}
+              />
+            ))}
+          </ul>
         </Section>
         <Section>
           <SectionTitle
@@ -414,19 +410,17 @@ const ChangeLogs = () => {
               Bug Fixes
             </span>
           </SectionTitle>
-          <div>
-            <ul ref={intersectionObserverRef}>
-              {data.bugfixes.map((item, index) => (
-                <UpdateRow
-                  /* eslint-disable-next-line react/no-array-index-key */
-                  key={index}
-                  header={item.header}
-                  content={item.content}
-                  advanced={showAdvanced && item.advanced}
-                />
-              ))}
-            </ul>
-          </div>
+          <ul ref={intersectionObserverRef}>
+            {data.bugfixes.map((item, index) => (
+              <UpdateRow
+                /* eslint-disable-next-line react/no-array-index-key */
+                key={index}
+                header={item.header}
+                content={item.content}
+                advanced={showAdvanced && item.advanced}
+              />
+            ))}
+          </ul>
         </Section>
       </Container>
       <div
@@ -480,21 +474,18 @@ const Section = styled.div`
   p {
     margin: 20px 0 !important;
   }
-  > div {
+  ul {
+    padding: 0px;
+    list-style-position: inside;
     width: 100%;
     margin: 20px 0;
     border-radius: 5px;
+  }
 
-    ul {
-      padding: 0px;
-      list-style-position: inside;
-    }
-
-    li {
-      text-align: start;
-      list-style-type: none;
-      margin: 10px 0;
-    }
+  li {
+    text-align: start;
+    list-style-type: none;
+    margin: 10px 0;
   }
 `;
 
