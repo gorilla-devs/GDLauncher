@@ -6,12 +6,13 @@ import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBug, faStar, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { useInView } from 'react-intersection-observer';
-import Modal from '../components/Modal';
-import SocialButtons from '../components/SocialButtons';
-import KoFiButton from '../assets/ko-fi.png';
-import UpdateIllustration from '../assets/update_illustration.png';
-import { openModal } from '../reducers/modals/actions';
-import ga from '../utils/analytics';
+import Modal from '../../components/Modal';
+import SocialButtons from '../../components/SocialButtons';
+import KoFiButton from '../../assets/ko-fi.png';
+import UpdateIllustration from '../../assets/update_illustration.png';
+import { openModal } from '../../reducers/modals/actions';
+import ga from '../../utils/analytics';
+import changelog from './changeLog';
 
 const UpdateRow = ({ header, content }) => {
   return (
@@ -26,103 +27,6 @@ const UpdateRow = ({ header, content }) => {
       </span>
     </li>
   );
-};
-
-const data = {
-  new: [
-    {
-      header: 'We now automatically take care of java16.',
-      content:
-        'You can now run Minecraft >1.17 without issues!. You can also individually select a manual path for both versions from the settings.'
-    },
-    {
-      header: 'You can now easily duplicate instances.',
-      content: 'Just right-click on an instance and duplicate it.'
-    },
-    {
-      header: 'Added support for forge 1.17!',
-      content: "Let's hope they don't change their stuff again anytime soon 😬."
-    },
-    {
-      header: 'Added privacy policy, ToS and acceptable use policy!',
-      content:
-        "You can go read them from the settings page if you're into legal stuff."
-    }
-  ],
-  improvements: [
-    {
-      header: 'You can now select more java memory',
-      content: 'in the memory slider up to the amount available on your device.'
-    },
-    {
-      header: 'Improved the design of the changelog modal',
-      content: 'as you can clearly see from here 😃.'
-    },
-    {
-      header: 'Added social links to the settings sidebar',
-      content: ''
-    },
-    {
-      header: 'Drastically improved performance',
-      content:
-        'for modal pages such as instances creator, instances manager and settings.'
-    },
-    {
-      header: 'Updated dependencies',
-      content: 'for security and performance improvements.'
-    },
-    {
-      header: 'Added usual MacOS default menu'
-    },
-    {
-      header: 'Improved Discord RPC.',
-      content:
-        "It now shows the modpack / MC version you're playing. The modpack name will only be shown for new instances."
-    },
-    {
-      header: 'Modal animation is now smoother and simpler.',
-      content: 'This should make it feel "faster".'
-    }
-  ],
-  bugfixes: [
-    {
-      header: 'Fixed accounts being hidden',
-      content: 'when too many were added.'
-    },
-    {
-      header: 'Fixed concurrent download preference',
-      content: 'not being used when downloading FTB modpacks.'
-    },
-    {
-      header: 'Fixed fabric mods not loading',
-      content: 'due to curseforge changing their backend structure.'
-    },
-    {
-      header:
-        "Fixed a bug where we didn't correctly detect the curseforge modloader.",
-      content: ''
-    },
-    {
-      header: 'Fixed imports from external sources.',
-      content: 'Both local zips and remote urls should now work correctly.'
-    },
-    {
-      header: 'Fixed crash',
-      content: 'when renaming instances.'
-    },
-    {
-      header: 'Fixed news',
-      content: 'not being correctly parsed sometimes.'
-    },
-    {
-      header: 'Fixed export',
-      content: 'not exporting correctly lol.'
-    },
-    {
-      header: 'Fixed crash',
-      content: 'when browsing mods.'
-    }
-  ]
 };
 
 const ChangeLogs = () => {
@@ -247,7 +151,7 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              {data.new.map((item, index) => (
+              {changelog.new.map((item, index) => (
                 <UpdateRow
                   /* eslint-disable-next-line react/no-array-index-key */
                   key={index}
@@ -282,7 +186,7 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul>
-              {data.improvements.map((item, index) => (
+              {changelog.improvements.map((item, index) => (
                 <UpdateRow
                   /* eslint-disable-next-line react/no-array-index-key */
                   key={index}
@@ -317,7 +221,7 @@ const ChangeLogs = () => {
           </SectionTitle>
           <div>
             <ul ref={intersectionObserverRef}>
-              {data.bugfixes.map((item, index) => (
+              {changelog.bugfixes.map((item, index) => (
                 <UpdateRow
                   /* eslint-disable-next-line react/no-array-index-key */
                   key={index}

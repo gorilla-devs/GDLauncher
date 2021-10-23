@@ -4,6 +4,7 @@ const path = require('path');
 const axios = require('axios');
 const fse = require('fs-extra');
 const dotenv = require('dotenv');
+const rawChangeLog = require('../src/common/modals/ChangeLogs/changeLog');
 
 dotenv.config();
 
@@ -43,13 +44,38 @@ const main = async () => {
     }
   } catch (err) {
     console.log(err);
+
+    const getChangeLog = () => {
+      let changeLog = '';
+      for (const element in rawChangeLog) {
+        if (rawChangeLog[element].length > 0) {
+          changeLog += `### ${element
+            .charAt(0)
+            .toUpperCase()}${element.substring(1)}\n`;
+          // eslint-disable-next-line no-loop-func
+          rawChangeLog[element].forEach(e => {
+            const prSplit = e.advanced?.pr?.split('/');
+            /* eslint-disable */// Eslint makes this even uglier, don't even try ~Code-Ac
+            const advanced = ` ([${e.advanced?.cm}](https://github.com/gorilla-devs/GDLauncher/commit/${e.advanced?.cm})` +
+              `${prSplit? ` | [#${e.advanced.pr}](https://github.com/gorilla-devs/GDLauncher/pull/${prSplit[0]}` + 
+                `${prSplit.length > 1 ? `/commits/${prSplit[1]}` : ''})`: ''})`;
+            /* eslint-enable */
+            const notes = `- **${e.header}** ${e.content}`;
+            changeLog += `${notes + advanced}\n`;
+          });
+        }
+      }
+      return changeLog;
+    };
+
     const { data: newRelease } = await axios.default.post(
       'https://api.github.com/repos/gorilla-devs/GDLauncher/releases',
       {
         tag_name: `v${version}`,
         name: `v${version}`,
         draft: true,
-        prerelease: version.includes('beta')
+        prerelease: version.includes('beta'),
+        body: getChangeLog()
       },
       {
         headers: {
