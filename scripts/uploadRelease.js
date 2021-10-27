@@ -56,11 +56,11 @@ const main = async () => {
           rawChangeLog[element].forEach(e => {
             const prSplit = e.advanced?.pr?.split('/');
             /* eslint-disable */// Eslint makes this even uglier, don't even try ~Code-Ac
-            const advanced = ` ([${e.advanced?.cm}](https://github.com/gorilla-devs/GDLauncher/commit/${e.advanced?.cm})` +
-              `${prSplit? ` | [#${e.advanced.pr}](https://github.com/gorilla-devs/GDLauncher/pull/${prSplit[0]}` + 
+            const advanced = ` ([${e?.advanced?.cm}](https://github.com/gorilla-devs/GDLauncher/commit/${e?.advanced?.cm})` +
+              `${prSplit ? ` | [#${e?.advanced.pr}](https://github.com/gorilla-devs/GDLauncher/pull/${prSplit[0]}` + 
                 `${prSplit.length > 1 ? `/commits/${prSplit[1]}` : ''})`: ''})`;
             /* eslint-enable */
-            const notes = `- **${e.header}** ${e.content}`;
+            const notes = `- **${e?.header}** ${e?.content}`;
             changeLog += `${notes + advanced}\n`;
           });
         }
