@@ -48,6 +48,8 @@ const main = async () => {
     const getChangeLog = () => {
       let changeLog = '';
       for (const element in rawChangeLog) {
+        if(!e?.advanced?.cm || !e?.header)
+          continue;
         if (rawChangeLog[element].length > 0) {
           changeLog += `### ${element
             .charAt(0)
@@ -60,7 +62,7 @@ const main = async () => {
               `${prSplit ? ` | [#${e?.advanced.pr}](https://github.com/gorilla-devs/GDLauncher/pull/${prSplit[0]}` + 
                 `${prSplit.length > 1 ? `/commits/${prSplit[1]}` : ''})`: ''})`;
             /* eslint-enable */
-            const notes = `- **${e?.header}** ${e?.content}`;
+            const notes = `- **${e?.header && e.header}** ${e?.content && e.content}`;
             changeLog += `${notes + advanced}\n`;
           });
         }
