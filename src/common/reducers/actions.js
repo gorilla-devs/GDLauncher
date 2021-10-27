@@ -60,6 +60,8 @@ import {
   getJavaManifest,
   getMcManifest,
   getMultipleAddons,
+  getTechnicAddDownload,
+  getTechnicAddRun,
   getTechnicModpackData,
   getTechnicSolderData,
   mcAuthenticate,
@@ -1770,6 +1772,8 @@ export function processTechnicManifest(instanceName) {
 
     await downloadInstanceFiles(mappedFiles, () => {}, 1);
 
+    await getTechnicAddDownload(loader.projectID);
+
     dispatch(updateDownloadStatus(instanceName, 'Finalizing Technic files...'));
 
     await extractAll(
@@ -3220,6 +3224,8 @@ export function launchInstance(instanceName) {
       }))
     );
     dispatch(addStartedInstance({ instanceName, pid: ps.pid }));
+
+    await getTechnicAddRun(loader.projectID);
 
     ps.stdout.on('data', data => {
       console.log(data.toString());

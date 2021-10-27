@@ -340,6 +340,32 @@ export const getTechnicSearch = searchFilter => {
   return axios.get(url, { params });
 };
 
+export const getTechnicAddDownload = async name => {
+  const url = `${TECHNIC_API_URL}/modpack/${name}/stat/download`;
+  const params = {
+    build: TECHNIC_CLIENT_BUILD
+  };
+  trackTechnicAPI(url, params);
+  try {
+    return await axios.get(url, { params });
+  } catch (e) {
+    return null;
+  }
+};
+
+export const getTechnicAddRun = async name => {
+  const url = `${TECHNIC_API_URL}/modpack/${name}/stat/run`;
+  const params = {
+    build: TECHNIC_CLIENT_BUILD
+  };
+  trackTechnicAPI(url, params);
+  try {
+    return await axios.get(url, { params });
+  } catch (e) {
+    return null;
+  }
+};
+
 export const getTechnicModpackData = name => {
   const url = `${TECHNIC_API_URL}/modpack/${name}`;
   const params = {
