@@ -48,7 +48,7 @@ const main = async () => {
     const getChangeLog = () => {
       let changeLog = '';
       for (const element in rawChangeLog) {
-        if (rawChangeLog[element].length > 0) {
+        if (rawChangeLog[element].length) {
           changeLog += `### ${element
             .charAt(0)
             .toUpperCase()}${element.substring(1)}\n`;
@@ -57,13 +57,13 @@ const main = async () => {
             if (!e?.advanced?.cm || !e?.header || !e?.content) {
               continue;
             }
-            const prSplit = e.advanced?.pr?.split('/');
+            const prSplit = (e?.advanced?.pr || '').split('/');
             const advanced =
               ` ([${e?.advanced?.cm}](https://github.com/gorilla-devs/GDLauncher/commit/${e?.advanced?.cm})` +
               `${
-                prSplit
+                prSplit.length
                   ? ` | [#${e?.advanced.pr}](https://github.com/gorilla-devs/GDLauncher/pull/${prSplit[0]}` +
-                    `${prSplit.length > 1 ? `/commits/${prSplit[1]}` : ''})`
+                    `${prSplit?.[1] ? `/commits/${prSplit[1]}` : ''})`
                   : ''
               })`;
             const notes = `- **${e?.header || ''}** ${e?.content || ''}`;
