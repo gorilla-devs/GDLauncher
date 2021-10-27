@@ -8,12 +8,15 @@ import {
   getAddonFileChangelog,
   getFTBModpackData,
   getFTBChangelog,
-  getFTBModpackVersionData
+  getFTBModpackVersionData,
+  getTechnicModpackData,
+  getTechnicSolderData
 } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
+import { TECHNIC, TECHNIC_SOLDER } from '../../utils/constants';
 
-const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
+const Modpack = ({ modpackId, instanceName, manifest, fileID, loader }) => {
   const [files, setFiles] = useState([]);
   const [versionName, setVersionName] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -50,6 +53,50 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
         })
       );
       setFiles(mappedFiles);
+    } else if (loader?.source === TECHNIC_SOLDER) {
+      const solderModpack = (
+        await getTechnicSolderData(loader.solder, 'modpack', modpackId)
+      ).data;
+      setVersionName(`${solderModpack.display_name} - ${fileID}`);
+      setFiles(
+        await Promise.all(
+          solderModpack.builds
+            .slice(0)
+            .reverse()
+            .map(async b => {
+              const versionData = (
+                await getTechnicSolderData(
+                  loader.solder,
+                  'modpack',
+                  modpackId,
+                  b
+                )
+              ).data;
+              return {
+                releaseType: 1,
+                gameVersion: [versionData?.minecraft],
+                displayName: `${solderModpack.display_name} ${b}`,
+                id: b,
+                fileDate: 'Invalid'
+              };
+            })
+        )
+      );
+    } else if (loader?.source === TECHNIC) {
+      const technicModpack = (await getTechnicModpackData(modpackId)).data;
+      setVersionName(
+        `${technicModpack.displayName} - ${technicModpack.version}`
+      );
+      setFiles([
+        {
+          releaseType: 1,
+          gameVersion: [technicModpack.minecraft],
+          displayName: `${technicModpack.displayName} ${technicModpack.version}`,
+          id: technicModpack.version,
+          fileDate: technicModpack.feed?.[0]?.date * 1000,
+          url: technicModpack.url
+        }
+      ]);
     } else {
       const ftbModpack = await getFTBModpackData(modpackId);
 

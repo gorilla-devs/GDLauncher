@@ -42,7 +42,9 @@ import {
   MC_STARTUP_METHODS,
   MICROSOFT_OAUTH_CLIENT_ID,
   MICROSOFT_OAUTH_REDIRECT_URL,
-  NEWS_URL
+  NEWS_URL,
+  TECHNIC,
+  TECHNIC_SOLDER
 } from '../utils/constants';
 import {
   getAddon,
@@ -58,6 +60,8 @@ import {
   getJavaManifest,
   getMcManifest,
   getMultipleAddons,
+  getTechnicModpackData,
+  getTechnicSolderData,
   mcAuthenticate,
   mcInvalidate,
   mcRefresh,
@@ -1656,6 +1660,304 @@ export function processFTBManifest(instanceName) {
   };
 }
 
+async function loadModsMetadata(
+  instancePath,
+  concurrency,
+  modManifests,
+  updateCallback
+) {
+  const modFiles = await fse.readdir(path.join(instancePath, 'mods'));
+  const mappedJarFiles = (
+    await pMap(
+      modFiles,
+      async file => {
+        if (path.extname(file) === '.jar') {
+          const filePath = path.join(instancePath, 'mods', file);
+          const hash = await getFileMurmurHash2(filePath);
+
+          return {
+            fileName: file,
+            displayName: file,
+            path: filePath,
+            packageFingerprint: hash
+          };
+        }
+      },
+      { concurrency: 10 }
+    )
+  ).filter(v => Boolean(v));
+
+  const { data } = await getAddonsByFingerprint(
+    mappedJarFiles.map(v => v.packageFingerprint)
+  );
+
+  const { exactMatches } = data || {};
+  const fileHashes = {};
+
+  for (const item of exactMatches) {
+    if (item.file) {
+      fileHashes[item.file.packageFingerprint] = item;
+    }
+  }
+
+  await pMap(
+    mappedJarFiles,
+    async item => {
+      let ok = false;
+      let tries = 0;
+      /* eslint-disable no-await-in-loop */
+      do {
+        tries += 1;
+
+        if (tries !== 1) {
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+        try {
+          const exactMatch = fileHashes[item.packageFingerprint];
+
+          if (exactMatch) {
+            const { projectId } = exactMatch.file;
+            try {
+              const { data: addon } = await getAddon(projectId);
+              const mod = normalizeModData(
+                exactMatch.file,
+                projectId,
+                addon.name
+              );
+              mod.fileName = item.fileName;
+              modManifests.push(mod);
+            } catch {
+              modManifests.push(item);
+            }
+          } else {
+            modManifests.push(item);
+          }
+
+          const percentage =
+            (modManifests.length * 100) / mappedJarFiles.length;
+
+          await updateCallback(percentage > 0 ? percentage : 0);
+          ok = true;
+        } catch (err) {
+          console.error(err);
+        }
+      } while (!ok && tries <= 3);
+      /* eslint-enable no-await-in-loop */
+    },
+    { concurrency }
+  );
+}
+
+export function processTechnicManifest(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { manifest, loader } = _getCurrentDownloadItem(state);
+    const instancesPath = _getInstancesPath(state);
+    const instancePath = path.join(instancesPath, instanceName);
+
+    const { files } = manifest;
+
+    const mappedFiles = files.map(async item => {
+      return {
+        ...item,
+        path: path.join(instancePath, item.path, item.name)
+      };
+    });
+
+    dispatch(
+      updateDownloadStatus(instanceName, 'Downloading Technic modpack file')
+    );
+
+    await downloadInstanceFiles(mappedFiles, () => {}, 1);
+
+    dispatch(updateDownloadStatus(instanceName, 'Finalizing Technic files...'));
+
+    await extractAll(
+      (
+        await mappedFiles[0]
+      ).path,
+      instancePath,
+      {
+        recursive: true,
+        $progress: true
+      },
+      { progress: percent => dispatch(updateDownloadProgress(percent)) }
+    );
+
+    dispatch(
+      updateDownloadStatus(instanceName, 'Reading Technic modpack metadata...')
+    );
+
+    const fabricPath = path.join(instancePath, 'bin', 'version.json');
+
+    const loaderType = (await fse.pathExists(fabricPath)) ? FABRIC : FORGE;
+    let loaderVersion = null;
+
+    dispatch(updateDownloadProgress(15));
+
+    if (loaderType === FABRIC) {
+      const versionJSON = await fse.readJson(fabricPath);
+      dispatch(updateDownloadProgress(30));
+      loaderVersion = versionJSON.libraries
+        .find(l => l.name.startsWith('net.fabricmc:fabric-loader:'))
+        ?.name?.replace('net.fabricmc:fabric-loader:', '');
+
+      loader.loaderVersion = loaderVersion;
+      dispatch(updateDownloadProgress(100));
+    } else {
+      const versionPath = _getTempPath(state);
+      await extractAll(
+        path.join(instancePath, 'bin', 'modpack.jar'),
+        versionPath,
+        {
+          $cherryPick: 'version.json'
+        }
+      );
+      dispatch(updateDownloadProgress(40));
+      const versionJSON = await fse.readJson(
+        path.join(versionPath, 'version.json')
+      );
+      dispatch(updateDownloadProgress(60));
+
+      loaderVersion = versionJSON.libraries
+        .find(l => l.name.startsWith('net.minecraftforge:forge:'))
+        ?.name?.replace('net.minecraftforge:forge:', '');
+
+      loader.loaderVersion = loaderVersion;
+      dispatch(updateDownloadProgress(100));
+    }
+    loader.loaderType = loaderType;
+
+    if (loaderType === FABRIC) {
+      await dispatch(downloadFabric(instanceName));
+    } else {
+      await dispatch(downloadForge(instanceName));
+    }
+
+    dispatch(updateDownloadStatus(instanceName, 'Loading mods metadata...'));
+
+    const modManifests = [];
+    await loadModsMetadata(
+      instancePath,
+      state.settings.concurrentDownloads,
+      modManifests,
+      async percentage => dispatch(updateDownloadProgress(percentage))
+    );
+
+    await dispatch(
+      updateInstanceConfig(instanceName, config => {
+        return {
+          ...config,
+          loader: { ...config.loader, loaderType, loaderVersion },
+          mods: [...(config.mods || []), ...modManifests]
+        };
+      })
+    );
+
+    await fse.remove(path.join(_getTempPath(state), instanceName));
+  };
+}
+
+export function processTechnicSolderManifest(instanceName) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const { manifest, loader } = _getCurrentDownloadItem(state);
+    const instancesPath = _getInstancesPath(state);
+    const instancePath = path.join(instancesPath, instanceName);
+
+    const { files } = manifest;
+
+    let prev = 0;
+
+    const updatePercentage = downloaded => {
+      const percentage = (downloaded * 100) / files.length;
+      const progress = parseInt(percentage, 10);
+      if (progress !== prev) {
+        prev = progress;
+        dispatch(updateDownloadProgress(progress));
+      }
+    };
+
+    const mappedFiles = files
+      .filter(async item => {
+        const filePath = path.join(_getTempPath(state), item.path, item.name);
+        return !(
+          (await fse.pathExists(filePath)) &&
+          (await getFileHash(filePath, 'md5')) === item.md5
+        );
+      })
+      .map(async item => {
+        return {
+          ...item,
+          path: path.join(_getTempPath(state), item.path, item.name)
+        };
+      });
+
+    dispatch(
+      updateDownloadStatus(instanceName, 'Downloading Technic Solder files...')
+    );
+
+    await downloadInstanceFiles(
+      mappedFiles,
+      updatePercentage,
+      state.settings.concurrentDownloads
+    );
+
+    dispatch(
+      updateDownloadStatus(instanceName, 'Finalizing Technic Solder files...')
+    );
+
+    await pMap(
+      files,
+      async file => {
+        return extractAll(
+          path.join(_getTempPath(state), file.path, file.name),
+          path.join(instancePath, file.path),
+          {
+            recursive: true,
+            $progress: true
+          },
+          { progress: updatePercentage }
+        );
+      },
+      { concurrency: 10 }
+    );
+
+    dispatch(updateDownloadStatus(instanceName, 'Loading mods metadata...'));
+
+    const modManifests = [];
+    if (loader.loaderType === FORGE) {
+      const concurrency = state.settings.concurrentDownloads;
+      await loadModsMetadata(
+        instancePath,
+        concurrency,
+        modManifests,
+        async percentage => dispatch(updateDownloadProgress(percentage))
+      );
+
+      await extractAll(
+        path.join(instancePath, 'bin', 'modpack.jar'),
+        path.join(instancePath, 'bin'),
+        {
+          $cherryPick: 'version.json'
+        }
+      );
+    }
+
+    await dispatch(
+      updateInstanceConfig(instanceName, config => {
+        return {
+          ...config,
+          loader: { ...config.loader },
+          mods: [...(config.mods || []), ...modManifests]
+        };
+      })
+    );
+
+    await fse.remove(path.join(_getTempPath(state), instanceName));
+  };
+}
+
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -1937,12 +2239,16 @@ export function downloadInstance(instanceName) {
       await dispatch(downloadForge(instanceName));
     }
 
-    // analyze source and do it for ftb and forge
+    // analyze source and do it for ftb, technic and forge
 
     if (manifest && loader?.source === FTB)
       await dispatch(processFTBManifest(instanceName));
     else if (manifest && loader?.source === CURSEFORGE)
       await dispatch(processForgeManifest(instanceName));
+    else if (manifest && loader?.source === TECHNIC)
+      await dispatch(processTechnicManifest(instanceName));
+    else if (manifest && loader?.source === TECHNIC_SOLDER)
+      await dispatch(processTechnicSolderManifest(instanceName));
 
     dispatch(updateDownloadProgress(0));
 
@@ -2098,6 +2404,121 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           loader,
           null,
           `background${path.extname(imageURL)}`
+        )
+      );
+    } else if (instance.loader.source === TECHNIC) {
+      const modpack = (await getTechnicModpackData(instance.loader.projectID))
+        .data;
+
+      // Technic only provides one modpack zip file
+      const manifest = {
+        files: [
+          {
+            path: '',
+            name: `modpack${path.extname(modpack.url.split('?')[0])}`,
+            url: modpack.url
+          }
+        ]
+      };
+      const imageURL = modpack.logo?.url ?? modpack.background?.url;
+      const backgroundFilename = `background${path.extname(
+        imageURL.split('?')[0]
+      )}`;
+
+      if (imageURL) {
+        await downloadFile(
+          path.join(_getInstancesPath(state), instanceName, backgroundFilename),
+          imageURL
+        );
+      }
+
+      await dispatch(
+        updateInstanceConfig(instanceName, config => {
+          return {
+            ...config,
+            mods: []
+          };
+        })
+      );
+
+      dispatch(
+        addToQueue(
+          instanceName,
+          instance.loader,
+          manifest,
+          imageURL ? backgroundFilename : null,
+          instance.timePlayed,
+          instance.settings
+        )
+      );
+    } else if (instance.loader.source === TECHNIC_SOLDER) {
+      const modpack = (
+        await getTechnicSolderData(
+          instance.loader.solder,
+          'modpack',
+          instance.loader.projectID,
+          newModpackData.id
+        )
+      ).data;
+      const technicModpack = (
+        await getTechnicModpackData(instance.loader.projectID)
+      ).data;
+
+      // Solder provides multiple zip files that are to be extracted in the root directory
+      const manifest = {
+        files: modpack.mods.map(m => {
+          return {
+            path: '',
+            name: `${m.name}-${m.version}${path.extname(m.url.split('?')[0])}`,
+            url: m.url
+          };
+        })
+      };
+
+      const loader = {
+        loaderType: instance.loader.loaderType, // Solder does not support other loaders at the moment
+        mcVersion: modpack.minecraft,
+        loaderVersion: instance.loader.loaderVersion,
+        fileID: newModpackData.id,
+        projectID: instance.loader.projectID,
+        source: TECHNIC_SOLDER,
+        sourceName: instance.name,
+        solder: instance.loader.solder
+      };
+
+      const imageURL =
+        modpack.logo ??
+        technicModpack.logo?.url ??
+        modpack.background ??
+        technicModpack.background?.url;
+      const backgroundFilename = `background${path.extname(
+        imageURL.split('?')[0]
+      )}`;
+
+      if (imageURL) {
+        await downloadFile(
+          path.join(_getInstancesPath(state), instanceName, backgroundFilename),
+          imageURL
+        );
+      }
+
+      await dispatch(
+        updateInstanceConfig(instanceName, config => {
+          return {
+            ...config,
+            mods: []
+          };
+        })
+      );
+
+      dispatch(
+        addToQueue(
+          instanceName,
+          loader,
+          manifest,
+          imageURL ? backgroundFilename : null,
+          instance.timePlayed,
+          instance.settings
         )
       );
     }

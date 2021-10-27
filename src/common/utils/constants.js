@@ -11,6 +11,9 @@ export const JAVA16_MANIFEST_URL =
 export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const FORGESVC_URL = 'https://addons-ecs.forgesvc.net/api/v2';
+export const TECHNIC_API_URL = 'https://api.technicpack.net';
+export const TECHNIC_SOLDER_API_URL = 'https://solder.technicpack.net/api/';
+export const TECHNIC_CLIENT_BUILD = '695'; // Requests to technic api need build id
 export const FTB_API_URL = 'https://api.modpacks.ch/public';
 export const FTB_MODPACK_URL = 'https://feed-the-beast.com/modpack';
 export const GDL_SERVE_API = 'https://api.gdlauncher.com/serve';
@@ -24,6 +27,8 @@ export const FABRIC = 'fabric';
 export const FORGE = 'forge';
 export const VANILLA = 'vanilla';
 
+export const TECHNIC = 'technic';
+export const TECHNIC_SOLDER = 'technic solder';
 export const CURSEFORGE = 'curseforge';
 export const FTB = 'ftb';
 

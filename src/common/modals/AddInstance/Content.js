@@ -15,7 +15,9 @@ import Import from './Import';
 import NewInstance from './NewInstance';
 import minecraftIcon from '../../assets/minecraftIcon.png';
 import curseForgeIcon from '../../assets/curseforgeIcon.webp';
+import technicIcon from '../../assets/technicIcon.png';
 import ftbIcon from '../../assets/ftbIcon.webp';
+import TechnicModpacks from "./TechnicModpacks";
 
 const Content = ({
   in: inProp,
@@ -46,6 +48,11 @@ const Content = ({
       setOverrideNextStepOnClick={setOverrideNextStepOnClick}
     />,
     <FTBModpacks
+      setVersion={setVersion}
+      setStep={setStep}
+      setModpack={setModpack}
+    />,
+    <TechnicModpacks
       setVersion={setVersion}
       setStep={setStep}
       setModpack={setModpack}
@@ -103,8 +110,18 @@ const Content = ({
                     />
                     CurseForge
                   </Radio.Button>
-                  {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button>
-                  <Radio.Button value={4} disabled>Technic</Radio.Button> */}
+                  {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button> */}
+                  <Radio.Button value={4}>
+                    <img
+                      src={technicIcon}
+                      width="20px"
+                      css={`
+                        margin-right: 4px;
+                        cursor: pointer;
+                      `}
+                    />
+                    Technic
+                  </Radio.Button>
                   <Radio.Button value={3}>
                     <img
                       src={ftbIcon}

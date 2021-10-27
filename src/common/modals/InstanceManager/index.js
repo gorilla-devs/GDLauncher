@@ -285,6 +285,7 @@ const InstanceManager = ({ instanceName }) => {
           <ContentComponent
             instanceName={instanceName}
             modpackId={instance?.loader?.projectID}
+            loader={instance?.loader}
             fileID={instance?.loader?.fileID}
             background={background}
             manifest={manifest}

@@ -24,8 +24,16 @@ import {
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, VANILLA, FORGE, FTB, CURSEFORGE } from '../../utils/constants';
-import { getFTBModpackVersionData } from '../../api';
+import {
+  FABRIC,
+  VANILLA,
+  FORGE,
+  FTB,
+  CURSEFORGE,
+  TECHNIC,
+  TECHNIC_SOLDER
+} from '../../utils/constants';
+import { getFTBModpackVersionData, getTechnicSolderData } from '../../api';
 
 const InstanceName = ({
   in: inProp,
@@ -78,9 +86,7 @@ const InstanceName = ({
   const imageURL = useMemo(() => {
     if (!modpack) return null;
     // Curseforge
-    if (!modpack.synopsis) {
-      return modpack?.attachments?.find(v => v?.isDefault)?.thumbnailUrl;
-    } else {
+    if (modpack.synopsis) {
       // FTB
       const image = modpack?.art?.reduce((prev, curr) => {
         if (!prev || curr.size < prev.size) return curr;
@@ -88,6 +94,19 @@ const InstanceName = ({
       });
       return image.url;
     }
+    if (Object.prototype.hasOwnProperty.call(modpack, 'solder')) {
+      // Technic
+      if (modpack.solder) {
+        return (
+          modpack.solderLogo ??
+          modpack.logo?.url ??
+          modpack.solderBackground ??
+          modpack.background?.url
+        );
+      }
+      return modpack.logo?.url ?? modpack.background?.url;
+    }
+    return modpack?.attachments?.find(v => v?.isDefault)?.thumbnailUrl;
   }, [modpack]);
 
   const wait = t => {
@@ -103,6 +122,11 @@ const InstanceName = ({
 
     const isCurseForgeModpack = Boolean(modpack?.attachments);
     const isFTBModpack = Boolean(modpack?.art);
+    const isTechnicModpack = Object.prototype.hasOwnProperty.call(
+      modpack,
+      'solder'
+    );
+    const isTechnicSolderModpack = isTechnicModpack && modpack.solder;
     let manifest;
 
     // If it's a curseforge modpack grab the manfiest and detect the loader
@@ -286,6 +310,135 @@ const InstanceName = ({
           `background${path.extname(imageURL)}`,
           null,
           ramAmount ? { javaMemory: ramAmount } : null
+        )
+      );
+    } else if (isTechnicSolderModpack) {
+      const modpackData = (
+        await getTechnicSolderData(
+          modpack.solder,
+          'modpack',
+          version.projectID,
+          version.fileID
+        )
+      ).data;
+
+      const newManifest = {
+        files: modpackData.mods.map(m => {
+          return {
+            path: '',
+            name: `${m.name}-${m.version}${path.extname(m.url.split('?')[0])}`,
+            url: m.url
+          };
+        })
+      };
+
+      const isVanillaLoader = version?.projectID === 'vanilla';
+      let forgeVersion = null;
+      if (!isVanilla) {
+        forgeVersion = modpackData.forge
+          ? forgeManifest[modpackData.minecraft].find(v =>
+              v.endsWith(modpackData.forge)
+            )
+          : forgeManifest[modpackData.minecraft][0];
+      }
+
+      const loader = {
+        loaderType: isVanillaLoader ? VANILLA : FORGE, // Solder does not support other loaders at the moment
+        mcVersion: modpackData.minecraft,
+        loaderVersion: forgeVersion,
+        fileID: version?.fileID,
+        projectID: version?.projectID,
+        source: TECHNIC_SOLDER,
+        sourceName: modpack.name,
+        solder: modpack.solder
+      };
+
+      const backgroundFilename = `background${path.extname(
+        imageURL.split('?')[0]
+      )}`;
+
+      await downloadFile(
+        path.join(instancesPath, localInstanceName, backgroundFilename),
+        imageURL
+      );
+
+      let ramAmount = null;
+
+      const userMemory = Math.round(os.totalmem() / 1024 / 1024);
+
+      if (userMemory < modpackData.memory) {
+        try {
+          await new Promise((resolve, reject) => {
+            dispatch(
+              openModal('ActionConfirmation', {
+                message: `${modpackData.memory}MB of RAM is recommended to play this modpack and you only have ${userMemory}MB. You might still be able to play it but probably with low performance. Do you want to continue?`,
+                confirmCallback: () => resolve(),
+                abortCallback: () => reject(),
+                title: 'Low Memory Warning'
+              })
+            );
+          });
+        } catch {
+          setClicked(false);
+          return;
+        }
+      }
+      const recommendedMemory = Math.floor(modpackData.memory * 1.2);
+      if (userMemory >= recommendedMemory) {
+        ramAmount = recommendedMemory;
+      } else if (userMemory >= modpackData.memory) {
+        ramAmount = modpackData.memory;
+      }
+
+      dispatch(
+        addToQueue(
+          localInstanceName,
+          loader,
+          newManifest,
+          backgroundFilename,
+          null,
+          modpackData.memory ? { javaMemory: ramAmount } : null
+        )
+      );
+    } else if (isTechnicModpack) {
+      const loader = {
+        loaderType: null,
+        mcVersion: modpack.minecraft,
+        loaderVersion: null,
+        fileID: version?.fileID,
+        projectID: version?.projectID,
+        source: TECHNIC,
+        sourceName: modpack.name
+      };
+      const backgroundFilename = `background${path.extname(
+        imageURL.split('?')[0]
+      )}`;
+
+      if (imageURL) {
+        await downloadFile(
+          path.join(instancesPath, localInstanceName, backgroundFilename),
+          imageURL
+        );
+      }
+
+      const newManifest = {
+        files: [
+          {
+            path: '',
+            name: `modpack${path.extname(modpack.url.split('?')[0])}`,
+            url: modpack.url
+          }
+        ]
+      };
+
+      dispatch(
+        addToQueue(
+          localInstanceName,
+          loader,
+          newManifest,
+          imageURL ? backgroundFilename : null,
+          null,
+          null
         )
       );
     } else if (importZipPath) {

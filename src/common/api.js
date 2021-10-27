@@ -14,7 +14,9 @@ import {
   MINECRAFT_SERVICES_URL,
   FTB_API_URL,
   JAVA16_MANIFEST_URL,
-  GDL_SERVE_API
+  GDL_SERVE_API,
+  TECHNIC_API_URL,
+  TECHNIC_CLIENT_BUILD
 } from './utils/constants';
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
@@ -41,6 +43,14 @@ const trackCurseForgeAPI = (url, params = {}, method = 'get') => {
 
 const trackFTBAPI = () => {
   ga.sendCustomEvent('FTBAPICall');
+};
+
+const trackTechnicAPI = () => {
+  ga.sendCustomEvent('TechnicAPICall');
+};
+
+const trackTechnicSolderAPI = () => {
+  ga.sendCustomEvent('TechnicSolderAPICall');
 };
 
 // Microsoft Auth
@@ -318,6 +328,43 @@ export const getSearch = (
   };
   trackCurseForgeAPI(url, params);
   return axios.get(url, { params });
+};
+
+export const getTechnicSearch = searchFilter => {
+  const url = `${TECHNIC_API_URL}/search`;
+  const params = {
+    build: TECHNIC_CLIENT_BUILD,
+    q: searchFilter
+  };
+  trackTechnicAPI(url, params);
+  return axios.get(url, { params });
+};
+
+export const getTechnicModpackData = name => {
+  const url = `${TECHNIC_API_URL}/modpack/${name}`;
+  const params = {
+    build: TECHNIC_CLIENT_BUILD
+  };
+  trackTechnicAPI(url, params);
+  return axios.get(url, { params });
+};
+
+export const getTechnicSolderMultiple = (solder, type) => {
+  const url = `${solder}/${type}`;
+  const params = {
+    include: 'full'
+  };
+  trackTechnicSolderAPI(url, params);
+  return axios.get(url, { params });
+};
+
+export const getTechnicSolderData = (solder, type, name, version = null) => {
+  let url = `${solder}${type}/${name}`;
+  if (version) {
+    url += `/${version}`;
+  }
+  trackTechnicSolderAPI(url, {});
+  return axios.get(url, {});
 };
 
 export const getFTBModpackData = async modpackId => {

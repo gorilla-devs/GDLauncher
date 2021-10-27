@@ -13,11 +13,18 @@ import { transparentize } from 'polished';
 import {
   getAddonDescription,
   getAddonFiles,
-  getAddonFileChangelog
+  getAddonFileChangelog,
+  getTechnicSolderData
 } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
-import { FORGE, CURSEFORGE_URL, FTB_MODPACK_URL } from '../utils/constants';
+import {
+  FORGE,
+  CURSEFORGE_URL,
+  FTB_MODPACK_URL,
+  TECHNIC,
+  TECHNIC_SOLDER
+} from '../utils/constants';
 import { formatNumber, formatDate } from '../utils';
 
 const ModpackDescription = ({
@@ -55,6 +62,45 @@ const ModpackDescription = ({
       } else if (type === 'ftb') {
         setDescription(modpack.description);
         setFiles(modpack.versions.slice().reverse());
+        setLoading(false);
+      } else if (type === TECHNIC) {
+        setDescription(modpack.description);
+        setFiles([
+          {
+            releaseType: 1,
+            gameVersion: [modpack.minecraft],
+            displayName: `${modpack.displayName} ${modpack.version}`,
+            id: modpack.version,
+            fileDate: modpack.feed?.[0]?.date * 1000
+          }
+        ]);
+        setLoading(false);
+      } else if (type === TECHNIC_SOLDER) {
+        setDescription(modpack.description);
+        setFiles(
+          await Promise.all(
+            modpack.builds
+              .slice()
+              .reverse()
+              .map(async b => {
+                const versionData = (
+                  await getTechnicSolderData(
+                    modpack.solder,
+                    'modpack',
+                    modpack.name,
+                    b
+                  )
+                ).data;
+                return {
+                  releaseType: 1,
+                  gameVersion: [versionData?.minecraft],
+                  displayName: `${modpack.displayName} ${b}`,
+                  id: b,
+                  fileDate: 'Invalid'
+                };
+              })
+          )
+        );
         setLoading(false);
       }
     };
@@ -114,12 +160,72 @@ const ModpackDescription = ({
   const primaryImage = useMemo(() => {
     if (type === 'curseforge') {
       return modpack.attachments.find(v => v.isDefault).thumbnailUrl;
-    } else if (type === 'ftb') {
+    }
+    if (type === 'ftb') {
       const image = modpack.art.reduce((prev, curr) => {
         if (!prev || curr.size < prev.size) return curr;
         return prev;
       });
       return image.url;
+    }
+    if (type === TECHNIC) {
+      return modpack.background?.url;
+    }
+    if (type === TECHNIC_SOLDER) {
+      return modpack.background?.url;
+    }
+  }, [modpack, type]);
+
+  const downloads = useMemo(() => {
+    switch (type) {
+      case 'ftb':
+        return modpack.installs;
+      case 'curseforge':
+        return modpack.downloadCount;
+      case TECHNIC:
+      case TECHNIC_SOLDER:
+        return modpack.downloads;
+    }
+  }, [modpack, type]);
+
+  const lastUpdate = useMemo(() => {
+    switch (type) {
+      case 'ftb':
+        return formatDate(modpack.refreshed * 1000);
+      case 'curseforge':
+        return formatDate(modpack.dateModified);
+      case TECHNIC:
+      case TECHNIC_SOLDER:
+        return formatDate(modpack.feed?.[0]?.date * 1000) ?? 'Unknown';
+    }
+  }, [modpack, type]);
+
+  const mcVersion = useMemo(() => {
+    switch (type) {
+      case 'ftb':
+        return modpack.tags[0]?.name || '-';
+      case 'curseforge':
+        return modpack.gameVersionLatestFiles[0].gameVersion;
+      case TECHNIC:
+        return modpack.minecraft;
+      case TECHNIC_SOLDER:
+        return modpack.name === 'vanilla' ? modpack.latest : modpack.minecraft;
+    }
+  }, [modpack, type]);
+
+  const modpackUrl = useMemo(() => {
+    switch (type) {
+      case 'ftb':
+        return parseLink(modpack.name);
+      case 'curseforge':
+        return modpack.websiteUrl;
+      case TECHNIC:
+      case TECHNIC_SOLDER:
+        return (
+          modpack.homeUrl ??
+          modpack.platformUrl ??
+          `https://www.technicpack.net/modpack/${modpack.name}`
+        );
     }
   }, [modpack, type]);
 
@@ -140,37 +246,31 @@ const ModpackDescription = ({
           <Parallax bg={primaryImage}>
             <ParallaxContent>
               <ParallaxInnerContent>
-                {modpack.name}
+                {type === TECHNIC || type === TECHNIC_SOLDER
+                  ? modpack.displayName
+                  : modpack.name}
                 <ParallaxContentInfos>
                   <div>
                     <label>Author: </label>
-                    {modpack.authors[0].name}
+                    {type === TECHNIC || type === TECHNIC_SOLDER
+                      ? modpack.user
+                      : modpack.authors[0].name}
                   </div>
                   <div>
                     <label>Downloads: </label>
-                    {type === 'ftb'
-                      ? formatNumber(modpack.installs)
-                      : formatNumber(modpack.downloadCount)}
+                    {formatNumber(downloads)}
                   </div>
                   <div>
                     <label>Last Update: </label>
-                    {type === 'ftb'
-                      ? formatDate(modpack.refreshed * 1000)
-                      : formatDate(modpack.dateModified)}
+                    {lastUpdate}
                   </div>
                   <div>
                     <label>MC version: </label>
-                    {type === 'ftb'
-                      ? modpack.tags[0]?.name || '-'
-                      : modpack.gameVersionLatestFiles[0].gameVersion}
+                    {mcVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
-                  href={
-                    type === 'ftb'
-                      ? parseLink(modpack.name)
-                      : modpack.websiteUrl
-                  }
+                  href={modpackUrl}
                   css={`
                     position: absolute;
                     top: 20px;
@@ -310,13 +410,26 @@ const ModpackDescription = ({
             disabled={!selectedId}
             onClick={() => {
               const modpackFile = files.find(file => file.id === selectedId);
-              setVersion({
-                loaderType: FORGE,
-                projectID: modpack.id,
-                fileID: modpackFile.id,
-                source: type
-              });
-              setModpack(modpack);
+              setVersion(
+                type === TECHNIC || type === TECHNIC_SOLDER
+                  ? {
+                      loaderType: null,
+                      projectID: modpack.name,
+                      fileID: modpackFile.id,
+                      source: type
+                    }
+                  : {
+                      loaderType: FORGE,
+                      projectID: modpack.id,
+                      fileID: modpackFile.id,
+                      source: type
+                    }
+              );
+              setModpack(
+                type === TECHNIC || type === TECHNIC_SOLDER
+                  ? { ...modpack, name: modpack.displayName }
+                  : modpack
+              );
               setStep(1);
               dispatch(closeModal());
             }}
