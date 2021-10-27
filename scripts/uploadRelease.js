@@ -54,14 +54,16 @@ const main = async () => {
             .toUpperCase()}${element.substring(1)}\n`;
           // eslint-disable-next-line no-loop-func
           rawChangeLog[element].forEach(e => {
-            if(!e?.advanced?.cm || !e?.header) {
+            if (!e?.advanced?.cm || !e?.header) {
               const prSplit = e.advanced?.pr?.split('/');
               /* eslint-disable */// Eslint makes this even uglier, don't even try ~Code-Ac
               const advanced = ` ([${e?.advanced?.cm}](https://github.com/gorilla-devs/GDLauncher/commit/${e?.advanced?.cm})` +
                 `${prSplit ? ` | [#${e?.advanced.pr}](https://github.com/gorilla-devs/GDLauncher/pull/${prSplit[0]}` + 
                   `${prSplit.length > 1 ? `/commits/${prSplit[1]}` : ''})`: ''})`;
               /* eslint-enable */
-              const notes = `- **${e?.header && e.header}** ${e?.content && e.content}`;
+              const notes = `- **${e?.header ? e.header : ''}** ${
+                e?.content ? e.content : ''
+              }`;
               changeLog += `${notes + advanced}\n`;
             }
           });
