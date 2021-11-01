@@ -488,8 +488,7 @@ export function loginWithOAuthAccessToken(redirect = true) {
         } catch (error) {
           console.error(error);
           throw new Error(
-            'Error occurred while fetching token from Xbox Secure Token Service. ' +
-            'This is likely due to Microsoft account age being under 18.'
+            'Error occurred while fetching token from Xbox Secure Token Service. This is likely due to Microsoft account age being under 18.'
           );
         }
 
