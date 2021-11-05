@@ -278,30 +278,6 @@ const ChangeLogs = () => {
             ))}
           </ul>
         </Section>
-        <div
-          css={`
-            font-size: 16px;
-            padding-top: 20px;
-            div {
-              padding-left: 5px;
-            }
-          `}
-        >
-          <b>Regards, your GDL Developers for v1.1.15:</b>
-          <div>
-            <a href="https://github.com/Code-Ac">Code-Ac</a>, your new changelog
-            writer whit <a href="https://github.com/killpowa">Davide</a>, the
-            project leader, <a href="https://github.com/huantianad">Huantian</a>
-            , a team member and active contributor,{' '}
-            <a href="https://github.com/coehlrich">Coehlrich</a> who has an eye
-            on dependencies, <a href="https://github.com/oitsjustjose">Jose</a>,
-            your instance sorter and{' '}
-            <a href="https://github.com/ladvace">Gianmarco</a>, who was one of
-            the best contributors to this project until he sadly left our team
-            lately and so will no longer contribute to the project. Goodbye and
-            have a great time Ladvace!
-          </div>
-        </div>
       </Container>
       <div
         css={`
