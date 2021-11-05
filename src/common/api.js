@@ -23,14 +23,13 @@ const trackCurseForgeAPI = (url, params = {}, method = 'get') => {
   ga.sendCustomEvent('CurseForgeAPICall');
 
   // Temporarily disable this
-  const switcher = false;
+  const switcher = true;
   if (switcher) {
-    const patchedUrl = url.replace(FORGESVC_URL, `${GDL_SERVE_API}/curseforge`);
     let req = null;
     if (method === 'get') {
-      req = axios.get(patchedUrl, { params });
+      req = axios.get(url, { params });
     } else if (method === 'post') {
-      req = axios.post(patchedUrl, params);
+      req = axios.post(url, params);
     }
 
     if (req) {
@@ -243,19 +242,22 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
 
 export const getAddon = projectID => {
   const url = `${FORGESVC_URL}/addon/${projectID}`;
-  trackCurseForgeAPI(url);
+  const myUrl = `${GDL_SERVE_API}/mods/${projectID}`;
+  trackCurseForgeAPI(myUrl);
   return axios.get(url);
 };
 
 export const getMultipleAddons = async addons => {
   const url = `${FORGESVC_URL}/addon`;
-  trackCurseForgeAPI(url, addons, 'post');
+  const myUrl = `${GDL_SERVE_API}/mods`;
+  trackCurseForgeAPI(myUrl, addons, 'post');
   return axios.post(url, addons);
 };
 
 export const getAddonFiles = projectID => {
   const url = `${FORGESVC_URL}/addon/${projectID}/files`;
-  trackCurseForgeAPI(url);
+  const myUrl = `${GDL_SERVE_API}/mods/${projectID}/files`;
+  trackCurseForgeAPI(myUrl);
   return axios.get(url).then(res => ({
     ...res,
     data: res.data.sort(sortByDate)
@@ -264,31 +266,41 @@ export const getAddonFiles = projectID => {
 
 export const getAddonDescription = projectID => {
   const url = `${FORGESVC_URL}/addon/${projectID}/description`;
-  trackCurseForgeAPI(url);
+  const myUrl = `${GDL_SERVE_API}/mods/${projectID}/description`;
+
+  trackCurseForgeAPI(myUrl);
   return axios.get(url);
 };
 
 export const getAddonFile = (projectID, fileID) => {
   const url = `${FORGESVC_URL}/addon/${projectID}/file/${fileID}`;
-  trackCurseForgeAPI(url);
+  const myUrl = `${GDL_SERVE_API}/mods/${projectID}/files/${fileID}`;
+
+  trackCurseForgeAPI(myUrl);
   return axios.get(url);
 };
 
 export const getAddonsByFingerprint = fingerprints => {
   const url = `${FORGESVC_URL}/fingerprint`;
-  trackCurseForgeAPI(url, fingerprints, 'post');
+  const myUrl = `${GDL_SERVE_API}/fingerprints`;
+
+  trackCurseForgeAPI(myUrl, fingerprints, 'post');
   return axios.post(url, fingerprints);
 };
 
 export const getAddonFileChangelog = (projectID, fileID) => {
   const url = `${FORGESVC_URL}/addon/${projectID}/file/${fileID}/changelog`;
-  trackCurseForgeAPI(url);
+  const myUrl = `${GDL_SERVE_API}/mods/${projectID}/files/${fileID}/changelog`;
+
+  trackCurseForgeAPI(myUrl);
   return axios.get(url);
 };
 
 export const getAddonCategories = () => {
   const url = `${FORGESVC_URL}/category?gameId=432`;
-  trackCurseForgeAPI(url);
+  const myUrl = `${GDL_SERVE_API}/categories?gameId=432`;
+
+  trackCurseForgeAPI(myUrl);
   return axios.get(url);
 };
 
@@ -304,6 +316,8 @@ export const getSearch = (
   modLoaderType
 ) => {
   const url = `${FORGESVC_URL}/addon/search`;
+  const myUrl = `${GDL_SERVE_API}/mods/search`;
+
   const params = {
     gameId: 432,
     categoryId: categoryId || 0,
@@ -316,7 +330,7 @@ export const getSearch = (
     sectionId: type === 'mods' ? 6 : 4471,
     searchFilter
   };
-  trackCurseForgeAPI(url, params);
+  trackCurseForgeAPI(myUrl, { ...params, pageSize: 20 });
   return axios.get(url, { params });
 };
 
