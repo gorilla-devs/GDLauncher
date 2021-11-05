@@ -6,13 +6,10 @@ import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowRight,
-  faExclamationCircle,
-  faCheckCircle,
   faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { Input, Button } from 'antd';
 import { useKey } from 'rooks';
-import axios from 'axios';
 import { login, loginOAuth } from '../../../common/reducers/actions';
 import { load, requesting } from '../../../common/reducers/loading/actions';
 import features from '../../../common/reducers/loading/features';
@@ -116,13 +113,6 @@ const Footer = styled.div`
   width: calc(100% - 80px);
 `;
 
-const Status = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: ${props => props.theme.palette.text.third};
-`;
-
 const FooterLinks = styled.div`
   font-size: 0.75rem;
   margin: 0 !important;
@@ -152,29 +142,12 @@ const LoginFailMessage = styled.div`
   color: ${props => props.theme.palette.colors.red};
 `;
 
-const StatusIcon = ({ color }) => {
-  return (
-    <FontAwesomeIcon
-      icon={color === 'red' ? faExclamationCircle : faCheckCircle}
-      color={color}
-      css={`
-        margin: 0 5px;
-        color: ${props =>
-          props.color === 'green'
-            ? props.theme.palette.colors.green
-            : props.theme.palette.error.main};
-      `}
-    />
-  );
-};
-
 const Login = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [version, setVersion] = useState(null);
   const [loginFailed, setLoginFailed] = useState(false);
-  const [status, setStatus] = useState({});
   const loading = useSelector(
     state => state.loading.accountAuthentication.isRequesting
   );
@@ -206,18 +179,10 @@ const Login = () => {
     }, 1000);
   };
 
-  const fetchStatus = async () => {
-    const { data } = await axios.get('https://status.mojang.com/check');
-    const result = {};
-    Object.assign(result, ...data);
-    setStatus(result);
-  };
-
   useKey(['Enter'], authenticate);
 
   useEffect(() => {
     ipcRenderer.invoke('getAppVersion').then(setVersion).catch(console.error);
-    fetchStatus().catch(console.error);
   }, []);
 
   return (
@@ -340,12 +305,6 @@ const Login = () => {
                   Acceptable Use Policy
                 </span>
               </div>
-              <Status>
-                Auth: <StatusIcon color={status['authserver.mojang.com']} />
-                Session: <StatusIcon color={status['session.minecraft.net']} />
-                Skins: <StatusIcon color={status['textures.minecraft.net']} />
-                API: <StatusIcon color={status['api.mojang.com']} />
-              </Status>
             </Footer>
           </LeftSide>
           <Background transitionState={transitionState}>
