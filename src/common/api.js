@@ -13,7 +13,7 @@ import {
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
   FTB_API_URL,
-  JAVA16_MANIFEST_URL,
+  JAVA_LATEST_MANIFEST_URL,
   GDL_SERVE_API
 } from './utils/constants';
 import { sortByDate } from './utils';
@@ -225,8 +225,8 @@ export const getJavaManifest = () => {
   return axios.get(url);
 };
 
-export const getJava16Manifest = () => {
-  const url = JAVA16_MANIFEST_URL;
+export const getJavaLatestManifest = () => {
+  const url = JAVA_LATEST_MANIFEST_URL;
   return axios.get(url);
 };
 
