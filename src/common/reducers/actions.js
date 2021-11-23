@@ -555,11 +555,12 @@ export function loginWithOAuthAccessToken(redirect = true) {
             })
           );
         }
+      } catch (err) {
+        console.warn('Could not fetch skin');
+      } finally {
         if (redirect) {
           dispatch(push('/home'));
         }
-      } catch (err) {
-        console.warn('Could not fetch skin');
       }
     }
   };
