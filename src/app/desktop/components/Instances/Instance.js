@@ -25,10 +25,14 @@ import {
   _getInstancesPath,
   _getDownloadQueue
 } from '../../../../common/utils/selectors';
-import { launchInstance } from '../../../../common/reducers/actions';
+import {
+  addStartedInstance,
+  launchInstance
+} from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
+import BisectHostingLogo from '../../../../ui/BisectHosting';
 import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
 
 const Container = styled.div`
@@ -182,7 +186,9 @@ const Instance = ({ instanceName }) => {
 
   const startInstance = () => {
     if (isInQueue || isPlaying) return;
+    dispatch(addStartedInstance({ instanceName }));
     dispatch(launchInstance(instanceName));
+    dispatch(openModal('InstanceStartupAd', { instanceName }));
   };
   const openFolder = () => {
     ipcRenderer.invoke('openFolder', path.join(instancesPath, instance.name));
@@ -192,6 +198,9 @@ const Instance = ({ instanceName }) => {
   };
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
+  };
+  const openBisectModal = () => {
+    dispatch(openModal('BisectHosting'));
   };
   const instanceExportCurseForge = () => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));
@@ -284,7 +293,19 @@ const Instance = ({ instanceName }) => {
                   </div>
                 )}
                 {isInQueue && 'In Queue'}
-                {!isInQueue && !isPlaying && 'PLAY'}
+                {!isInQueue && !isPlaying && (
+                  <span
+                    css={`
+                      padding: 8px 20px;
+                      border-radius: 5px;
+                      background: ${({ theme }) => theme.palette.colors.green};
+                      box-shadow: 0px 0px 15px 1px
+                        ${({ theme }) => theme.palette.colors.green}80;
+                    `}
+                  >
+                    PLAY
+                  </span>
+                )}
               </>
             )}
           </HoverContainer>
@@ -297,6 +318,25 @@ const Instance = ({ instanceName }) => {
           onHide={() => setIsHovered(false)}
         >
           <MenuInstanceName>{instanceName}</MenuInstanceName>
+          <MenuItem
+            onClick={openBisectModal}
+            preventClose
+            css={`
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+              height: 100px;
+              font-size: 18px;
+              // font-weight: bold;
+              border: 2px solid #04cbeb;
+              border-radius: 5px;
+            `}
+          >
+            <BisectHostingLogo hover showPointerCursor />
+            Create Server
+          </MenuItem>
           {isPlaying && (
             <MenuItem onClick={killProcess}>
               <FontAwesomeIcon

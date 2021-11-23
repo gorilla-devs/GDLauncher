@@ -72,10 +72,10 @@ export function updateJavaPath(path) {
     });
   };
 }
-export function updateJava16Path(path) {
+export function updateJavaLatestPath(path) {
   return dispatch => {
     dispatch({
-      type: ActionTypes.UPDATE_JAVA16_PATH,
+      type: ActionTypes.UPDATE_JAVA_LATEST_PATH,
       path
     });
   };

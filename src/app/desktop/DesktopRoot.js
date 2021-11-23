@@ -33,7 +33,10 @@ import SystemNavbar from './components/SystemNavbar';
 import useTrackIdle from './utils/useTrackIdle';
 import { openModal } from '../../common/reducers/modals/actions';
 import Message from './components/Message';
-import { ACCOUNT_MICROSOFT } from '../../common/utils/constants';
+import {
+  ACCOUNT_MICROSOFT,
+  LATEST_JAVA_VERSION
+} from '../../common/utils/constants';
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -57,7 +60,7 @@ function DesktopRoot({ store }) {
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
   const javaPath = useSelector(state => state.settings.java.path);
-  const java16Path = useSelector(state => state.settings.java.path16);
+  const javaLatestPath = useSelector(state => state.settings.java.latest);
   const location = useSelector(state => state.router.location);
   // const modals = useSelector(state => state.modals);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);
@@ -78,7 +81,7 @@ function DesktopRoot({ store }) {
     const manifests = await dispatch(initManifests());
 
     let isJava8OK = javaPath;
-    let isJava16Ok = java16Path;
+    let isJavaLatestOk = javaLatestPath;
 
     if (!javaPath) {
       ({ isValid: isJava8OK } = await isLatestJavaDownloaded(
@@ -88,16 +91,16 @@ function DesktopRoot({ store }) {
       ));
     }
 
-    if (!java16Path) {
-      ({ isValid: isJava16Ok } = await isLatestJavaDownloaded(
+    if (!isJavaLatestOk) {
+      ({ isValid: isJavaLatestOk } = await isLatestJavaDownloaded(
         manifests,
         userData,
         true,
-        16
+        LATEST_JAVA_VERSION
       ));
     }
 
-    if (!isJava8OK || !isJava16Ok) {
+    if (!isJava8OK || !isJavaLatestOk) {
       dispatch(openModal('JavaSetup', { preventClose: true }));
 
       // Super duper hacky solution to await the modal to be closed...

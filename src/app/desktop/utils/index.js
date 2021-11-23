@@ -12,7 +12,8 @@ import { exec, spawn } from 'child_process';
 import {
   MC_LIBRARIES_URL,
   FABRIC,
-  FORGE
+  FORGE,
+  LATEST_JAVA_VERSION
 } from '../../../common/utils/constants';
 
 import {
@@ -270,11 +271,16 @@ export const isLatestJavaDownloaded = async (
   const javaOs = convertOSToJavaFormat(process.platform);
   let log = null;
 
-  const isJava16 = version === 16;
+  const isJavaLatest = version === LATEST_JAVA_VERSION;
 
-  const manifest = isJava16 ? meta.java16 : meta.java;
+  const manifest = isJavaLatest ? meta.javaLatest : meta.java;
 
-  const javaMeta = manifest.find(v => v.os === javaOs);
+  const javaMeta = manifest.find(
+    v =>
+      v.os === javaOs &&
+      v.architecture === 'x64' &&
+      (v.binary_type === 'jre' || v.binary_type === 'jdk')
+  );
   const javaFolder = path.join(
     userData,
     'java',
@@ -351,22 +357,28 @@ export const extractAll = async (
     $bin: sevenZipPath,
     $spawnOptions: { shell: true }
   });
+  let extractedParentDir = null;
   await new Promise((resolve, reject) => {
     if (funcs.progress) {
       extraction.on('progress', ({ percent }) => {
         funcs.progress(percent);
       });
     }
+    extraction.on('data', data => {
+      if (!extractedParentDir) {
+        [extractedParentDir] = data.file.split('/');
+      }
+    });
     extraction.on('end', () => {
       funcs.end?.();
-      resolve();
+      resolve(extractedParentDir);
     });
     extraction.on('error', err => {
       funcs.error?.();
       reject(err);
     });
   });
-  return extraction;
+  return { extraction, extractedParentDir };
 };
 
 export const extractNatives = async (libraries, instancePath) => {
