@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { LoadingOutlined } from '@ant-design/icons';
 import Modal from '../components/Modal';
 import { closeModal, openModal } from '../reducers/modals/actions';
 import BisectHosting from '../../ui/BisectHosting';
@@ -49,10 +50,8 @@ const InstanceStartupAd = ({ instanceName }) => {
   return (
     <Modal
       css={`
-        height: 60%;
-        width: 60%;
-        max-width: 650px;
-        max-height: 460px;
+        height: 330px;
+        width: 650px;
         overflow-x: hidden;
       `}
       title={`Starting up ${instanceName}`}
@@ -67,24 +66,34 @@ const InstanceStartupAd = ({ instanceName }) => {
       >
         <span
           css={`
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             margin-bottom: 30px;
+            margin-top: 20px;
           `}
         >
           Your instance is starting...
+          <LoadingOutlined
+            css={`
+              margin-left: 30px;
+              font-size: 50px;
+            `}
+          />
         </span>
         <div
           css={`
             display: flex;
             align-items: center;
             justify-content: center;
+
+            & > * {
+              margin: 0 20px;
+            }
           `}
         >
           <span
             css={`
-              margin-right: 30px;
-              font-size: 18px;
+              font-size: 14px;
             `}
           >
             Grab a server from <br /> our official partner
@@ -96,21 +105,22 @@ const InstanceStartupAd = ({ instanceName }) => {
           >
             <BisectHosting
               onClick={openBisectHostingModal}
-              size={100}
+              size={60}
               showPointerCursor
             />
           </div>
+          <div>
+            <span
+              css={`
+                font-size: 70px;
+                color: ${({ theme }) => theme.palette.colors.red};
+              `}
+            >
+              &#10084;
+            </span>
+            <div>Thank you!</div>
+          </div>
         </div>
-        <span
-          css={`
-            font-size: 70px;
-            color: ${({ theme }) => theme.palette.colors.red};
-            margin-top: 10px;
-          `}
-        >
-          &#10084;
-        </span>
-        <div>Thank you!</div>
       </div>
     </Modal>
   );
