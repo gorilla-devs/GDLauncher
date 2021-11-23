@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "1.1.16-beta.1",
+  "version": "1.1.16",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -144,10 +144,10 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@loadable/babel-plugin": "^5.13.2",
     "7zip-bin": "^5.1.1",
+    "@loadable/babel-plugin": "^5.13.2",
     "antd": "4.16.11",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "base64-stream": "^1.0.0",
     "base64url": "^3.0.1",
     "connected-react-router": "^6.9.1",
@@ -198,7 +198,7 @@
     "reselect": "^4.0.0",
     "rooks": "^5.4.6",
     "semver": "^7.3.5",
-    "slate": "^0.65.3",
+    "slate": "^0.71.0",
     "slate-history": "^0.65.3",
     "slate-react": "^0.65.3",
     "styled-components": "^5.3.0",
