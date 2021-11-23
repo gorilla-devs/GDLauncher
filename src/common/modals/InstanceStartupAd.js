@@ -50,7 +50,7 @@ const InstanceStartupAd = ({ instanceName }) => {
   return (
     <Modal
       css={`
-        height: 330px;
+        height: 300px;
         width: 650px;
         overflow-x: hidden;
       `}
@@ -61,6 +61,7 @@ const InstanceStartupAd = ({ instanceName }) => {
           display: flex;
           justify-content: center;
           flex-direction: column;
+          height: 100%;
           text-align: center;
         `}
       >
@@ -68,8 +69,10 @@ const InstanceStartupAd = ({ instanceName }) => {
           css={`
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 30px;
-            margin-top: 20px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
           `}
         >
           Your instance is starting...
@@ -83,6 +86,7 @@ const InstanceStartupAd = ({ instanceName }) => {
         <div
           css={`
             display: flex;
+            flex-direction: row;
             align-items: center;
             justify-content: center;
 
@@ -118,7 +122,14 @@ const InstanceStartupAd = ({ instanceName }) => {
             >
               &#10084;
             </span>
-            <div>Thank you!</div>
+            <p
+              css={`
+                margin-top: -25px;
+                margin-bottom: 25px;
+              `}
+            >
+              Thank you!
+            </p>
           </div>
         </div>
       </div>
