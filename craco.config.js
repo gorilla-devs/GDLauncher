@@ -78,6 +78,8 @@ module.exports = () => {
             }
           }
         };
+        console.log(process.env.SOURCE_MAPS_UPLOAD);
+        // webpackConfig.plugins.push();
         webpackConfig.resolve.aliasFields = [];
         webpackConfig.resolve.mainFields = ['module', 'main'];
         return webpackConfig;

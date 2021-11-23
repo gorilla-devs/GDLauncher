@@ -50,6 +50,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           GA_ID: ${{ secrets.GA_ID }}
+          SOURCE_MAPS_UPLOAD: "${{ github.ref == 'refs/heads/releases' && 'UPLOAD' || 'RELEASE' }}"
         run: |
           npm run release
       - name: npm run release for mac and linux
@@ -63,6 +64,7 @@ jobs:
           BITRISE_GIT_TAG: ''
           CI_BUILD_TAG: ''
           GA_ID: ${{ secrets.GA_ID }}
+          SOURCE_MAPS_UPLOAD: "${{ github.ref == 'refs/heads/releases' && 'UPLOAD' || 'RELEASE' }}"
         run: |
           npm run release
       - name: upload release to gh releases
