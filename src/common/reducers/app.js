@@ -74,9 +74,9 @@ function javaManifest(state = {}, action) {
   }
 }
 
-function java16Manifest(state = {}, action) {
+function javaLatestManifest(state = {}, action) {
   switch (action.type) {
-    case ActionTypes.UPDATE_JAVA16_MANIFEST:
+    case ActionTypes.UPDATE_JAVA_LATEST_MANIFEST:
       return action.data;
     default:
       return state;
@@ -117,7 +117,7 @@ export default combineReducers({
   forgeManifest,
   fabricManifest,
   javaManifest,
-  java16Manifest,
+  javaLatestManifest,
   curseforgeCategories,
   clientToken,
   isNewUser,
