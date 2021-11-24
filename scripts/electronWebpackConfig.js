@@ -65,8 +65,7 @@ const baseConfig = {
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: process.env.NODE_ENV,
-      REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE,
-      REACT_APP_GA_ID: process.env.GA_ID
+      REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE
     }),
     new webpack.NamedModulesPlugin()
   ]

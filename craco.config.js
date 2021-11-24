@@ -9,11 +9,9 @@
 /* eslint-disable no-param-reassign */
 
 const CracoAntDesignPlugin = require('craco-antd');
+const webpack = require('webpack');
 
 module.exports = () => {
-  // const isEnvDevelopment = env === 'development';
-  // const isEnvProduction = env === 'production';
-
   return {
     babel: {
       presets: [
@@ -78,8 +76,11 @@ module.exports = () => {
             }
           }
         };
-        console.log(process.env.SOURCE_MAPS_UPLOAD);
-        // webpackConfig.plugins.push();
+        webpackConfig.plugins.push(
+          new webpack.EnvironmentPlugin({
+            REACT_APP_GA_ID: process.env.GA_ID
+          })
+        );
         webpackConfig.resolve.aliasFields = [];
         webpackConfig.resolve.mainFields = ['module', 'main'];
         return webpackConfig;
