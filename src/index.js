@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import { ipcRenderer } from 'electron';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ConnectedRouter } from 'connected-react-router';
 import { configureStore, history } from './common/store/configureStore';
@@ -36,6 +37,35 @@ window.addEventListener('mouseup', e => {
     e.preventDefault();
   }
 });
+
+setTimeout(() => {
+  if (process.env.NODE_ENV !== 'development') {
+    ipcRenderer
+      .invoke('getGaId')
+      .then(v => {
+        window.gaInitialized = true;
+        window.ga =
+          window.ga ||
+          // eslint-disable-next-line func-names
+          function () {
+            // eslint-disable-next-line prefer-rest-params
+            (window.ga.q = window.ga.q || []).push(arguments);
+          };
+        window.ga.l = +new Date();
+        window.ga('create', v, 'none');
+        window.ga('set', 'transport', 'xhr');
+        window.ga('set', 'appName', 'GDLauncher');
+        window.ga('set', 'checkProtocolTask', null);
+        window.ga('set', 'checkStorageTask', null);
+        window.ga('set', 'storage', 'none');
+        window.ga('set', 'storeGac', null);
+        window.ga('set', 'anonymizeIp', true);
+        window.ga('set', 'ds', 'app');
+        return window;
+      })
+      .catch(console.error);
+  }
+}, 0);
 
 ReactDOM.render(
   <Provider store={store}>

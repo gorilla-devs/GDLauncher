@@ -9,9 +9,6 @@
 /* eslint-disable no-param-reassign */
 
 const CracoAntDesignPlugin = require('craco-antd');
-const webpack = require('webpack');
-
-console.log('GA_ID', process.env.GA_ID);
 
 module.exports = () => {
   return {
@@ -78,12 +75,6 @@ module.exports = () => {
             }
           }
         };
-        console.log('GA_ID', process.env.GA_ID);
-        webpackConfig.plugins.push(
-          new webpack.DefinePlugin({
-            REACT_APP_GA_ID: JSON.stringify(process.env.GA_ID)
-          })
-        );
         webpackConfig.resolve.aliasFields = [];
         webpackConfig.resolve.mainFields = ['module', 'main'];
         return webpackConfig;
