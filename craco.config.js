@@ -11,6 +11,8 @@
 const CracoAntDesignPlugin = require('craco-antd');
 const webpack = require('webpack');
 
+console.log('GA_ID', process.env.GA_ID);
+
 module.exports = () => {
   return {
     babel: {
