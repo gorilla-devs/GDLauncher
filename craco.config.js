@@ -76,9 +76,10 @@ module.exports = () => {
             }
           }
         };
+        console.log('GA_ID', process.env.GA_ID);
         webpackConfig.plugins.push(
-          new webpack.EnvironmentPlugin({
-            REACT_APP_GA_ID: process.env.GA_ID
+          new webpack.DefinePlugin({
+            REACT_APP_GA_ID: JSON.stringify(process.env.GA_ID)
           })
         );
         webpackConfig.resolve.aliasFields = [];
