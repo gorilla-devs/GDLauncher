@@ -61,7 +61,7 @@
               (ga.q = ga.q || []).push(arguments);
             };
           ga.l = +new Date();
-          ga('create', 'UA-147631204-1', 'none');
+          ga('create', process.env.REACT_APP_GA_ID, 'none');
           ga('set', 'transport', 'xhr');
           ga('set', 'appName', 'GDLauncher');
           ga('set', 'checkProtocolTask', null);
