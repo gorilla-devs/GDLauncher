@@ -49,7 +49,6 @@ jobs:
           CI_BUILD_TAG: ''
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
-          GA_ID: "${{ github.ref == 'refs/heads/releases' && secrets.GA_ID || '' }}"
           SENTRY_DSN: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_DSN || '' }}"
           SOURCE_MAPS_UPLOAD: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_UPLOAD_SOURCE_MAPS_URL || '' }}"
           SENTRY_AUTH: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_AUTH || '' }}"
@@ -65,7 +64,6 @@ jobs:
           GITHUB_ACTIONS: ''
           BITRISE_GIT_TAG: ''
           CI_BUILD_TAG: ''
-          GA_ID: "${{ github.ref == 'refs/heads/releases' && secrets.GA_ID || '' }}"
           SENTRY_DSN: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_DSN || '' }}"
           SOURCE_MAPS_UPLOAD: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_UPLOAD_SOURCE_MAPS_URL || '' }}"
           SENTRY_AUTH: "${{ github.ref == 'refs/heads/releases' && secrets.SENTRY_AUTH || '' }}"

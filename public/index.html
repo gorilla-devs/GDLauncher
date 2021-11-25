@@ -51,6 +51,28 @@
       /* @keyframes spin { 100% {  transform:rotate(360deg); } } */
     </style>
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <script>
+      (function () {
+        if (process.env.NODE_ENV !== 'development') {
+          window.gaInitialized = true;
+          window.ga =
+            window.ga ||
+            function () {
+              (ga.q = ga.q || []).push(arguments);
+            };
+          ga.l = +new Date();
+          ga('create', 'UA-147631204-1', 'none');
+          ga('set', 'transport', 'xhr');
+          ga('set', 'appName', 'GDLauncher');
+          ga('set', 'checkProtocolTask', null);
+          ga('set', 'checkStorageTask', null);
+          ga('set', 'storage', 'none');
+          ga('set', 'storeGac', null);
+          ga('set', 'anonymizeIp', true);
+          ga('set', 'ds', 'app');
+        }
+      })();
+    </script>
     <script async src="https://www.google-analytics.com/analytics.js"></script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
