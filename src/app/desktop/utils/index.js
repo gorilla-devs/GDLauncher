@@ -640,7 +640,7 @@ export const getJVMArguments113 = (
 };
 
 export const readJarManifest = async (jarPath, property) => {
-  const list = await extractAll(jarPath, '.', {
+  const { extraction: list } = await extractAll(jarPath, '.', {
     toStdout: true,
     $cherryPick: 'META-INF/MANIFEST.MF'
   });

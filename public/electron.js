@@ -529,6 +529,14 @@ ipcMain.handle('getUserData', () => {
   return app.getPath('userData');
 });
 
+ipcMain.handle('getGaId', () => {
+  return process.env.GA_ID;
+});
+
+ipcMain.handle('getSentryDsn', () => {
+  return process.env.SENTRY_DSN;
+});
+
 ipcMain.handle('getOldLauncherUserData', () => {
   return oldLauncherUserData;
 });
