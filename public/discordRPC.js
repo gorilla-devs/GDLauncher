@@ -43,6 +43,7 @@ exports.update = details => {
 };
 
 exports.reset = () => {
+  if (!client) return;
   activity = defaultValue;
   activity.startTimestamp = initialAppStartup;
   client.setActivity(activity);
