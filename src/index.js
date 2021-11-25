@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
 import { basename } from 'path';
+import os from 'os';
 import { RewriteFrames as RewriteFramesIntegration } from '@sentry/integrations';
 import { Provider } from 'react-redux';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
@@ -118,7 +119,7 @@ ipcRenderer
       ],
       tracesSampleRate: 1.0,
       release: version,
-      dist: process.env.REACT_APP_RELEASE_TYPE
+      dist: `${process.env.REACT_APP_RELEASE_TYPE}-${os.platform()}`
     });
   })
   .catch(console.error);
