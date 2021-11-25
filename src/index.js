@@ -44,39 +44,6 @@ window.addEventListener('mouseup', e => {
   }
 });
 
-setTimeout(() => {
-  if (process.env.NODE_ENV !== 'development') {
-    ipcRenderer
-      .invoke('getGaId')
-      .then(v => {
-        if (!v) {
-          console.warn('No analytics token provided.');
-          return;
-        }
-        window.gaInitialized = true;
-        window.ga =
-          window.ga ||
-          // eslint-disable-next-line func-names
-          function () {
-            // eslint-disable-next-line prefer-rest-params
-            (window.ga.q = window.ga.q || []).push(arguments);
-          };
-        window.ga.l = +new Date();
-        window.ga('create', v, 'none');
-        window.ga('set', 'transport', 'xhr');
-        window.ga('set', 'appName', 'GDLauncher');
-        window.ga('set', 'checkProtocolTask', null);
-        window.ga('set', 'checkStorageTask', null);
-        window.ga('set', 'storage', 'none');
-        window.ga('set', 'storeGac', null);
-        window.ga('set', 'anonymizeIp', true);
-        window.ga('set', 'ds', 'app');
-        return window;
-      })
-      .catch(console.error);
-  }
-}, 0);
-
 ipcRenderer
   .invoke('getSentryDsn')
   .then(dsn => {
