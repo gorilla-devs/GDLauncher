@@ -34,6 +34,7 @@ exports.initRPC = () => {
 };
 
 exports.update = details => {
+  if (!client) return;
   activity = {
     ...activity,
     startTimestamp: Math.floor(Date.now() / 1000),

@@ -81,7 +81,7 @@ module.exports = () => {
         if (process.env.SOURCE_MAPS_UPLOAD) {
           webpackConfig.plugins.push(
             new SentryCliPlugin({
-              include: ['./build/static/js', './build/static/css'],
+              include: ['./build'],
               ignore: ['native'],
               org: 'gdlauncher',
               project: 'react',
