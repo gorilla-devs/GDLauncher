@@ -9,6 +9,8 @@
 /* eslint-disable no-param-reassign */
 
 const CracoAntDesignPlugin = require('craco-antd');
+const SentryCliPlugin = require('@sentry/webpack-plugin');
+const packageJson = require('./package.json');
 
 module.exports = () => {
   return {
@@ -75,6 +77,22 @@ module.exports = () => {
             }
           }
         };
+        if (process.env.SOURCE_MAPS_UPLOAD) {
+          webpackConfig.plugins.push(
+            new SentryCliPlugin({
+              include: ['./build/static/js', './build/static/css'],
+              ignore: ['native'],
+              org: 'gdlauncher',
+              project: 'react',
+              authToken: process.env.SENTRY_AUTH,
+              url: process.env.SOURCE_MAPS_UPLOAD,
+              release: packageJson.version,
+              dist: process.env.REACT_APP_RELEASE_TYPE
+            })
+          );
+        } else {
+          console.log('Not a release. Skipping source maps upload.');
+        }
         webpackConfig.resolve.aliasFields = [];
         webpackConfig.resolve.mainFields = ['module', 'main'];
         return webpackConfig;
