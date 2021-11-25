@@ -10,6 +10,7 @@
 
 const CracoAntDesignPlugin = require('craco-antd');
 const SentryCliPlugin = require('@sentry/webpack-plugin');
+const os = require('os');
 const packageJson = require('./package.json');
 
 module.exports = () => {
@@ -87,7 +88,7 @@ module.exports = () => {
               authToken: process.env.SENTRY_AUTH,
               url: process.env.SOURCE_MAPS_UPLOAD,
               release: packageJson.version,
-              dist: process.env.REACT_APP_RELEASE_TYPE
+              dist: `${process.env.REACT_APP_RELEASE_TYPE}-${os.platform()}`
             })
           );
         } else {
