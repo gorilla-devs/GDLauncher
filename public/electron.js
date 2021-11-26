@@ -529,6 +529,10 @@ ipcMain.handle('getUserData', () => {
   return app.getPath('userData');
 });
 
+ipcMain.handle('getSentryDsn', () => {
+  return process.env.SENTRY_DSN;
+});
+
 ipcMain.handle('getOldLauncherUserData', () => {
   return oldLauncherUserData;
 });

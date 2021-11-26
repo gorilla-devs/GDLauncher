@@ -15,7 +15,8 @@ import {
   faTrash,
   faStop,
   faBoxOpen,
-  faCopy
+  faCopy,
+  faServer
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -32,7 +33,6 @@ import {
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
-import BisectHostingLogo from '../../../../ui/BisectHosting';
 import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
 
 const Container = styled.div`
@@ -213,7 +213,9 @@ const Instance = ({ instanceName }) => {
     psTree(isPlaying.pid, (err, children) => {
       if (children.length) {
         children.forEach(el => {
-          process.kill(el.PID);
+          if (el) {
+            process.kill(el.PID);
+          }
         });
       } else {
         process.kill(isPlaying.pid);
@@ -318,25 +320,6 @@ const Instance = ({ instanceName }) => {
           onHide={() => setIsHovered(false)}
         >
           <MenuInstanceName>{instanceName}</MenuInstanceName>
-          <MenuItem
-            onClick={openBisectModal}
-            preventClose
-            css={`
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              text-align: center;
-              height: 100px;
-              font-size: 18px;
-              // font-weight: bold;
-              border: 2px solid #04cbeb;
-              border-radius: 5px;
-            `}
-          >
-            <BisectHostingLogo hover showPointerCursor />
-            Create Server
-          </MenuItem>
           {isPlaying && (
             <MenuItem onClick={killProcess}>
               <FontAwesomeIcon
@@ -412,6 +395,23 @@ const Instance = ({ instanceName }) => {
               `}
             />
             Delete
+          </MenuItem>
+          <MenuItem divider />
+          <MenuItem
+            onClick={openBisectModal}
+            preventClose
+            css={`
+              border: 2px solid #04cbeb;
+              border-radius: 5px;
+            `}
+          >
+            <FontAwesomeIcon
+              icon={faServer}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Create Server
           </MenuItem>
         </ContextMenu>
       </Portal>
