@@ -34,6 +34,7 @@ exports.initRPC = () => {
 };
 
 exports.update = details => {
+  if (!client) return;
   activity = {
     ...activity,
     startTimestamp: Math.floor(Date.now() / 1000),
@@ -43,6 +44,7 @@ exports.update = details => {
 };
 
 exports.reset = () => {
+  if (!client) return;
   activity = defaultValue;
   activity.startTimestamp = initialAppStartup;
   client.setActivity(activity);

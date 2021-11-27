@@ -6,6 +6,7 @@ const Logo = styled.svg`
   -webkit-app-region: no-drag;
   * {
     transition: opacity 0.1s ease-in-out;
+    ${props => (props.showPointerCursor ? 'cursor: pointer' : '')}
   }
  ${props =>
    !props.hover

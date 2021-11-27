@@ -15,7 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Slider, Button, Input, Switch, Select } from 'antd';
 import {
-  updateJava16Path,
+  updateJavaLatestPath,
   updateJavaArguments,
   updateJavaMemory,
   updateJavaPath,
@@ -28,7 +28,10 @@ import {
 } from '../../../../app/desktop/utils/constants';
 import { _getJavaPath } from '../../../utils/selectors';
 import { openModal } from '../../../reducers/modals/actions';
-import { MC_STARTUP_METHODS } from '../../../utils/constants';
+import {
+  LATEST_JAVA_VERSION,
+  MC_STARTUP_METHODS
+} from '../../../utils/constants';
 
 const AutodetectPath = styled.div`
   display: flex;
@@ -126,9 +129,13 @@ export default function MyAccountPreferences() {
   const javaArgs = useSelector(state => state.settings.java.args);
   const javaMemory = useSelector(state => state.settings.java.memory);
   const javaPath = useSelector(state => _getJavaPath(state)(8));
-  const java16Path = useSelector(state => _getJavaPath(state)(16));
+  const javaLatestPath = useSelector(state =>
+    _getJavaPath(state)(LATEST_JAVA_VERSION)
+  );
   const customJavaPath = useSelector(state => state.settings.java.path);
-  const customJava16Path = useSelector(state => state.settings.java.path16);
+  const customJavaLatestPath = useSelector(
+    state => state.settings.java.pathLatest
+  );
   const mcStartupMethod = useSelector(state => state.settings.mcStartupMethod);
   const mcResolution = useSelector(
     state => state.settings.minecraftSettings.resolution
@@ -178,16 +185,16 @@ export default function MyAccountPreferences() {
           onChange={c => {
             if (c) {
               dispatch(updateJavaPath(null));
-              dispatch(updateJava16Path(null));
+              dispatch(updateJavaLatestPath(null));
             } else {
               dispatch(updateJavaPath(javaPath));
-              dispatch(updateJava16Path(java16Path));
+              dispatch(updateJavaLatestPath(javaLatestPath));
             }
           }}
-          checked={!customJavaPath && !customJava16Path}
+          checked={!customJavaPath && !customJavaLatestPath}
         />
       </AutodetectPath>
-      {customJavaPath && customJava16Path && (
+      {customJavaPath && customJavaLatestPath && (
         <>
           <div
             css={`
@@ -252,7 +259,7 @@ export default function MyAccountPreferences() {
                 text-align: left;
               `}
             >
-              Java 16
+              Java {LATEST_JAVA_VERSION}
             </h3>
             <div
               css={`
@@ -271,12 +278,12 @@ export default function MyAccountPreferences() {
                 `}
                 onChange={e => {
                   dispatch(
-                    updateJava16Path(
+                    updateJavaLatestPath(
                       e.target.value === '' ? null : e.target.value
                     )
                   );
                 }}
-                value={customJava16Path}
+                value={customJavaLatestPath}
               />
               <StyledButtons
                 color="primary"
@@ -286,7 +293,7 @@ export default function MyAccountPreferences() {
                     javaPath
                   );
                   if (!filePaths[0] || canceled) return;
-                  dispatch(updateJava16Path(filePaths[0]));
+                  dispatch(updateJavaLatestPath(filePaths[0]));
                 }}
               >
                 <FontAwesomeIcon icon={faFolder} />
@@ -389,7 +396,7 @@ export default function MyAccountPreferences() {
         </Paragraph>
         <Slider
           css={`
-            margin: 20px 20px 20px 0;
+            margin: 20px 20px 20px 0 !important;
           `}
           onAfterChange={e => {
             dispatch(updateJavaMemory(e));
@@ -464,14 +471,13 @@ export default function MyAccountPreferences() {
           <Select
             value={mcStartupMethod}
             onChange={v => dispatch(updateMcStartupMethod(v))}
+            disabled={process.platform !== 'win32'}
           >
-            {Object.entries(MC_STARTUP_METHODS).map(([k, v]) => {
-              return (
-                <Select.Option key={k} value={k}>
-                  {v}
-                </Select.Option>
-              );
-            })}
+            {Object.entries(MC_STARTUP_METHODS).map(([k, v]) => (
+              <Select.Option key={k} value={k}>
+                {v}
+              </Select.Option>
+            ))}
           </Select>
         </McStartupMethodRow>
       </McStartupMethod>

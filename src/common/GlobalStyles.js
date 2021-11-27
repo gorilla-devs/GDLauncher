@@ -90,7 +90,7 @@ export default createGlobalStyle`
     border-radius: 4px;
     color: ${props => props.theme.palette.text.primary};
     font-size: 16px;
-    min-width: 180px;
+    min-width: 220px;
     outline: none;
     transform-origin: top left;
     pointer-events: none;
@@ -105,7 +105,7 @@ export default createGlobalStyle`
     transition: opacity 150ms;
     opacity: 1;
     pointer-events: auto;
-    z-index: 9999;
+    z-index: 999999;
   }
   
   .react-contextmenu-item {
@@ -148,6 +148,14 @@ export default createGlobalStyle`
     cursor: inherit;
     margin-bottom: 3px;
     padding: 2px 0;
+  }
+
+  .ant-cascader-menus {
+    z-index: 99999999 !important;
+  }
+
+  .ant-select-dropdown {
+    z-index: 99999999 !important;
   }
 
 

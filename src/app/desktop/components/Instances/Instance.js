@@ -15,7 +15,8 @@ import {
   faTrash,
   faStop,
   faBoxOpen,
-  faCopy
+  faCopy,
+  faServer
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -25,7 +26,10 @@ import {
   _getInstancesPath,
   _getDownloadQueue
 } from '../../../../common/utils/selectors';
-import { launchInstance } from '../../../../common/reducers/actions';
+import {
+  addStartedInstance,
+  launchInstance
+} from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
@@ -182,7 +186,9 @@ const Instance = ({ instanceName }) => {
 
   const startInstance = () => {
     if (isInQueue || isPlaying) return;
+    dispatch(addStartedInstance({ instanceName }));
     dispatch(launchInstance(instanceName));
+    dispatch(openModal('InstanceStartupAd', { instanceName }));
   };
   const openFolder = () => {
     ipcRenderer.invoke('openFolder', path.join(instancesPath, instance.name));
@@ -192,6 +198,9 @@ const Instance = ({ instanceName }) => {
   };
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
+  };
+  const openBisectModal = () => {
+    dispatch(openModal('BisectHosting'));
   };
   const instanceExportCurseForge = () => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));
@@ -204,7 +213,9 @@ const Instance = ({ instanceName }) => {
     psTree(isPlaying.pid, (err, children) => {
       if (children.length) {
         children.forEach(el => {
-          process.kill(el.PID);
+          if (el) {
+            process.kill(el.PID);
+          }
         });
       } else {
         process.kill(isPlaying.pid);
@@ -284,7 +295,19 @@ const Instance = ({ instanceName }) => {
                   </div>
                 )}
                 {isInQueue && 'In Queue'}
-                {!isInQueue && !isPlaying && 'PLAY'}
+                {!isInQueue && !isPlaying && (
+                  <span
+                    css={`
+                      padding: 8px 20px;
+                      border-radius: 5px;
+                      background: ${({ theme }) => theme.palette.colors.green};
+                      box-shadow: 0px 0px 15px 1px
+                        ${({ theme }) => theme.palette.colors.green}80;
+                    `}
+                  >
+                    PLAY
+                  </span>
+                )}
               </>
             )}
           </HoverContainer>
@@ -372,6 +395,23 @@ const Instance = ({ instanceName }) => {
               `}
             />
             Delete
+          </MenuItem>
+          <MenuItem divider />
+          <MenuItem
+            onClick={openBisectModal}
+            preventClose
+            css={`
+              border: 2px solid #04cbeb;
+              border-radius: 5px;
+            `}
+          >
+            <FontAwesomeIcon
+              icon={faServer}
+              css={`
+                margin-right: 10px;
+              `}
+            />
+            Create Server
           </MenuItem>
         </ContextMenu>
       </Portal>

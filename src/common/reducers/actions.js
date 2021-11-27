@@ -38,6 +38,7 @@ import {
   FORGE,
   FTB,
   GDL_LEGACYJAVAFIXER_MOD_URL,
+  LATEST_JAVA_VERSION,
   MC_RESOURCES_URL,
   MC_STARTUP_METHODS,
   MICROSOFT_OAUTH_CLIENT_ID,
@@ -54,7 +55,7 @@ import {
   getFabricManifest,
   getForgeManifest,
   getFTBModpackVersionData,
-  getJava16Manifest,
+  getJavaLatestManifest,
   getJavaManifest,
   getMcManifest,
   getMultipleAddons,
@@ -150,10 +151,10 @@ export function initManifests() {
       });
       return java;
     };
-    const getJava16ManifestVersions = async () => {
-      const java = (await getJava16Manifest()).data;
+    const getJavaLatestManifestVersions = async () => {
+      const java = (await getJavaLatestManifest()).data;
       dispatch({
-        type: ActionTypes.UPDATE_JAVA16_MANIFEST,
+        type: ActionTypes.UPDATE_JAVA_LATEST_MANIFEST,
         data: java
       });
       return java;
@@ -188,10 +189,10 @@ export function initManifests() {
       return omitBy(forgeVersions, v => v.length === 0);
     };
     // Using reflect to avoid rejection
-    const [fabric, java, java16, categories, forge] = await Promise.all([
+    const [fabric, java, javaLatest, categories, forge] = await Promise.all([
       reflect(getFabricVersions()),
       reflect(getJavaManifestVersions()),
-      reflect(getJava16ManifestVersions()),
+      reflect(getJavaLatestManifestVersions()),
       reflect(getAddonCategoriesVersions()),
       reflect(getForgeVersions())
     ]);
@@ -204,7 +205,7 @@ export function initManifests() {
       mc: mc || app.vanillaManifest,
       fabric: fabric.status ? fabric.v : app.fabricManifest,
       java: java.status ? java.v : app.javaManifest,
-      java16: java16.status ? java16.v : app.java16Manifest,
+      javaLatest: javaLatest.status ? javaLatest.v : app.javaLatestManifest,
       categories: categories.status ? categories.v : app.curseforgeCategories,
       forge: forge.status ? forge.v : app.forgeManifest
     };
@@ -554,11 +555,12 @@ export function loginWithOAuthAccessToken(redirect = true) {
             })
           );
         }
+      } catch (err) {
+        console.warn('Could not fetch skin');
+      } finally {
         if (redirect) {
           dispatch(push('/home'));
         }
-      } catch (err) {
-        console.warn('Could not fetch skin');
       }
     }
   };
@@ -2554,12 +2556,12 @@ export function getJavaVersionForMCVersion(mcVersion) {
     const { versions } = app?.vanillaManifest || {};
     if (versions) {
       const version = versions.find(v => v.id === mcVersion);
-      const java16InitialDate = new Date('2021-05-27T09:39:21+00:00');
-      if (new Date(version?.releaseTime) < java16InitialDate) {
+      const javaLatestInitialDate = new Date('2021-05-27T09:39:21+00:00');
+      if (new Date(version?.releaseTime) < javaLatestInitialDate) {
         return 8;
       }
     }
-    return 16;
+    return LATEST_JAVA_VERSION;
   };
 }
 
@@ -2798,11 +2800,14 @@ export function launchInstance(instanceName) {
         lastPlayed: Date.now()
       }))
     );
-    dispatch(addStartedInstance({ instanceName, pid: ps.pid }));
+    dispatch(updateStartedInstance({ instanceName, pid: ps.pid }));
 
     ps.stdout.on('data', data => {
       console.log(data.toString());
-      if (data.toString().includes('Setting user:')) {
+      if (
+        data.toString().includes('Setting user:') ||
+        data.toString().includes('Initializing LWJGL OpenAL')
+      ) {
         dispatch(updateStartedInstance({ instanceName, initialized: true }));
       }
     });

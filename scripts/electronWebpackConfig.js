@@ -66,14 +66,14 @@ const baseConfig = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: process.env.NODE_ENV,
       REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE,
-      GA_ID: process.env.GA_ID
+      SENTRY_DSN: process.env.SENTRY_DSN
     }),
     new webpack.NamedModulesPlugin()
   ]
 };
 
 module.exports = merge(baseConfig, {
-  devtool: 'eval-cheap-module-source-map',
+  devtool: 'source-map',
 
   mode: process.env.NODE_ENV,
 

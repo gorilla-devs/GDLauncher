@@ -43,6 +43,7 @@
     "jsx-a11y/click-events-have-key-events": "off",
     "no-underscore-dangle": "off",
     "no-console": "off",
+    "no-continue": "off",
     "no-use-before-define": "off",
     "no-await-in-loop": "off",
     "promise/param-names": "error",
