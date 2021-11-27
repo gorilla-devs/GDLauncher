@@ -119,7 +119,7 @@ function startedInstances(state = {}, action) {
         ...state,
         [action.instance.instanceName]: {
           ...state[action.instance.instanceName],
-          initialized: true
+          ...omit(action.instance, ['instanceName'])
         }
       };
     case ActionTypes.REMOVE_STARTED_INSTANCE:

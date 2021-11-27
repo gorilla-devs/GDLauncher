@@ -28,40 +28,52 @@ import {
 } from '../../app/desktop/utils';
 import { _getTempPath, _getJavaPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
-import { updateJava16Path, updateJavaPath } from '../reducers/settings/actions';
+import {
+  updateJavaLatestPath,
+  updateJavaPath
+} from '../reducers/settings/actions';
 import { UPDATE_MODAL } from '../reducers/modals/actionTypes';
+import { LATEST_JAVA_VERSION } from '../utils/constants';
 
 const JavaSetup = ({ beginChoice }) => {
   const [step, setStep] = useState(beginChoice ? 1 : 0);
   const [choice, setChoice] = useState(beginChoice || null);
   const [isJava8Downloaded, setIsJava8Downloaded] = useState(null);
-  const [isJava16Downloaded, setIsJava16Downloaded] = useState(null);
+  const [isJavaLatestDownloaded, setIsJavaLatestDownloaded] = useState(null);
   const [java8Log, setJava8Log] = useState('');
-  const [java16Log, setJava16Log] = useState('');
+  const [javaLatestLog, setJavaLatestLog] = useState('');
   const userData = useSelector(state => state.userData);
   const customJava8Path = useSelector(state => state.settings.java.path);
-  const customJava16Path = useSelector(state => state.settings.java.path16);
+  const customJavaLatestPath = useSelector(state => state.settings.java.latest);
   const oldJava8Path = useSelector(state => _getJavaPath(state)(8));
-  const oldJava16Path = useSelector(state => _getJavaPath(state)(16));
+  const oldJavaLatestPath = useSelector(state =>
+    _getJavaPath(state)(LATEST_JAVA_VERSION)
+  );
   const dispatch = useDispatch();
   const theme = useTheme();
   const manifests = {
-    java16: useSelector(state => state.app.java16Manifest),
+    javaLatest: useSelector(state => state.app.javaLatestManifest),
     java: useSelector(state => state.app.javaManifest)
   };
 
-  const checkJava = (path8, path16) => {
+  const checkJava = (path8, pathLatest) => {
     let java8Promise;
     if (path8 && path8 !== '') java8Promise = isJavaPathOK(path8, true);
     else if (!customJava8Path || customJava8Path === '')
       java8Promise = isLatestJavaDownloaded(manifests, userData, true, 8);
     else java8Promise = isJavaPathOK(oldJava8Path, true);
 
-    let java16Promise;
-    if (path16 && path16 !== '') java16Promise = isJavaPathOK(path16, true);
-    else if (!customJava16Path || customJava16Path === '')
-      java16Promise = isLatestJavaDownloaded(manifests, userData, true, 16);
-    else java16Promise = isJavaPathOK(oldJava16Path, true);
+    let javaLatestPromise;
+    if (pathLatest && pathLatest !== '')
+      javaLatestPromise = isJavaPathOK(pathLatest, true);
+    else if (!customJavaLatestPath || customJavaLatestPath === '')
+      javaLatestPromise = isLatestJavaDownloaded(
+        manifests,
+        userData,
+        true,
+        LATEST_JAVA_VERSION
+      );
+    else javaLatestPromise = isJavaPathOK(oldJavaLatestPath, true);
 
     java8Promise
       .then(e => {
@@ -69,10 +81,10 @@ const JavaSetup = ({ beginChoice }) => {
         return setJava8Log(e?.log);
       })
       .catch(err => console.error(err));
-    java16Promise
+    javaLatestPromise
       .then(e => {
-        setIsJava16Downloaded(e?.isValid);
-        return setJava16Log(e?.log);
+        setIsJavaLatestDownloaded(e?.isValid);
+        return setJavaLatestLog(e?.log);
       })
       .catch(err => console.error(err));
   };
@@ -127,8 +139,8 @@ const JavaSetup = ({ beginChoice }) => {
                 margin-bottom: 20px;
                 opacity: 0;
                 opacity: ${isJava8Downloaded !== null &&
-                isJava16Downloaded !== null &&
-                (!isJava8Downloaded || !isJava16Downloaded) &&
+                isJavaLatestDownloaded !== null &&
+                (!isJava8Downloaded || !isJavaLatestDownloaded) &&
                 '1'};
                 * > h3 {
                   border-radius: 5px;
@@ -155,8 +167,8 @@ const JavaSetup = ({ beginChoice }) => {
                 {!isJava8Downloaded && isJava8Downloaded !== null && (
                   <h3>Java 8</h3>
                 )}
-                {!isJava16Downloaded && isJava16Downloaded !== null && (
-                  <h3>Java 16</h3>
+                {!isJavaLatestDownloaded && isJavaLatestDownloaded !== null && (
+                  <h3>Java {LATEST_JAVA_VERSION}</h3>
                 )}
               </div>
             </div>
@@ -233,7 +245,7 @@ const JavaSetup = ({ beginChoice }) => {
                 {choice === 1 ? (
                   <AutomaticSetup
                     isJava8Downloaded={isJava8Downloaded}
-                    isJava16Downloaded={isJava16Downloaded}
+                    isJavaLatestDownloaded={isJavaLatestDownloaded}
                     checkJava={checkJava}
                     setStep={setStep}
                   />
@@ -244,9 +256,9 @@ const JavaSetup = ({ beginChoice }) => {
                     isJava8Downloaded={isJava8Downloaded}
                     setIsJava8Downloaded={setIsJava8Downloaded}
                     customJava8Path={customJava8Path}
-                    isJava16Downloaded={isJava16Downloaded}
-                    setIsJava16Downloaded={setIsJava16Downloaded}
-                    customJava16Path={customJava16Path}
+                    isJavaLatestDownloaded={isJavaLatestDownloaded}
+                    setJavaLatestDownloaded={setIsJavaLatestDownloaded}
+                    customJavaLatestPath={customJavaLatestPath}
                   />
                 )}{' '}
               </>
@@ -266,7 +278,7 @@ const JavaSetup = ({ beginChoice }) => {
                     }
                   `}
                 >
-                  <h2>Java 8 and Java 16 are installed!</h2>
+                  <h2>Java 8 and Java {LATEST_JAVA_VERSION} are installed!</h2>
                   <div>
                     <h3>Java 8 details:</h3>
                     <code>
@@ -296,9 +308,9 @@ const JavaSetup = ({ beginChoice }) => {
                     </code>
                   </div>
                   <div>
-                    <h3>Java 16 details:</h3>
+                    <h3>Java {LATEST_JAVA_VERSION} details:</h3>
                     <code>
-                      {!java16Log || java16Log === '' ? (
+                      {!javaLatestLog || javaLatestLog === '' ? (
                         <>
                           <FontAwesomeIcon
                             icon={faExclamationTriangle}
@@ -309,9 +321,9 @@ const JavaSetup = ({ beginChoice }) => {
                         </>
                       ) : (
                         <>
-                          {java16Log
+                          {javaLatestLog
                             .split('\n')
-                            .splice(0, java16Log.split('\n').length - 1)
+                            .splice(0, javaLatestLog.split('\n').length - 1)
                             .map((e, index) => (
                               // eslint-disable-next-line react/no-array-index-key
                               <p key={index}>
@@ -383,25 +395,25 @@ const ManualSetup = ({
   isJava8Downloaded,
   setIsJava8Downloaded,
   customJava8Path,
-  isJava16Downloaded,
-  setIsJava16Downloaded,
-  customJava16Path,
+  isJavaLatestDownloaded,
+  setIsJavaLatestDownloaded,
+  customJavaLatestPath,
   checkJava
 }) => {
   const userData = useSelector(state => state.userData);
   const javaBaseFolder = path.join(userData, 'java');
   const java8Manifest = useSelector(state => state.app.javaManifest);
-  const java16Manifest = useSelector(state => state.app.java16Manifest);
+  const javaLatestManifest = useSelector(state => state.app.javaLatestManifest);
   const [javaPath, setJavaPath] = useState(
     path.resolve(
       useSelector(state => _getJavaPath(state)(8)),
       customJava8Path && customJava8Path !== '' ? './' : '../../'
     )
   );
-  const [java16Path, setJava16Path] = useState(
+  const [javaLatestPath, setJavaLatestPath] = useState(
     path.resolve(
-      useSelector(state => _getJavaPath(state)(16)),
-      customJava16Path && customJava16Path !== '' ? './' : '../../'
+      useSelector(state => _getJavaPath(state)(LATEST_JAVA_VERSION)),
+      customJavaLatestPath && customJavaLatestPath !== '' ? './' : '../../'
     )
   );
   const [changedContent, setChangedContent] = useState(false);
@@ -410,14 +422,14 @@ const ManualSetup = ({
   const theme = useTheme();
   useEffect(() => {
     if (!fse.existsSync(javaPath)) setJavaPath('');
-    if (!fse.existsSync(java16Path)) setJava16Path('');
+    if (!fse.existsSync(javaLatestPath)) setJavaLatestPath('');
   }, []);
   const getJavaPath = javaVersion => {
     const javaOs = convertOSToJavaFormat(process.platform);
     const javaMeta =
       javaVersion === 8
         ? java8Manifest.find(v => v.os === javaOs)
-        : java16Manifest.find(v => v.os === javaOs);
+        : javaLatestManifest.find(v => v.os === javaOs);
     const {
       version_data: { openjdk_version: version }
     } = javaMeta;
@@ -425,7 +437,7 @@ const ManualSetup = ({
     return path.join(javaBaseFolder, version);
   };
   const defaultJava8Path = getJavaPath(8);
-  const defaultJava16Path = getJavaPath(16);
+  const defaultJavaLatestPath = getJavaPath(LATEST_JAVA_VERSION);
 
   const getColor = (p, latestDownloaded) => {
     if (!fse.existsSync(p)) return '#cb6418';
@@ -441,14 +453,14 @@ const ManualSetup = ({
 
   const ErrorMessage = () => {
     let message;
-    if (!fse.existsSync(javaPath) || !fse.existsSync(java16Path))
+    if (!fse.existsSync(javaPath) || !fse.existsSync(javaLatestPath))
       message = 'No such file or directory';
-    if (!changedContent && !isJava16Downloaded)
-      message = 'Error checking for Java 16';
+    if (!changedContent && !isJavaLatestDownloaded)
+      message = `Error checking for Java ${LATEST_JAVA_VERSION}`;
     if (!changedContent && !isJava8Downloaded)
       message = 'Error checking for Java 8';
-    if (!changedContent && !isJava8Downloaded && !isJava16Downloaded)
-      message = 'Error checking for Java 8 and 16';
+    if (!changedContent && !isJava8Downloaded && !isJavaLatestDownloaded)
+      message = `Error checking for Java 8 and ${LATEST_JAVA_VERSION}`;
 
     if (!message) return null;
     return (
@@ -465,8 +477,8 @@ const ManualSetup = ({
   const selectFolder = async version => {
     const { filePaths, canceled } = await ipcRenderer.invoke('openFileDialog');
     if (!canceled) {
-      if (version === 16) {
-        setJava16Path(filePaths[0]);
+      if (version === LATEST_JAVA_VERSION) {
+        setJavaLatestPath(filePaths[0]);
       } else setJavaPath(filePaths[0]);
     }
   };
@@ -487,8 +499,9 @@ const ManualSetup = ({
         `}
       >
         Enter the required paths to java. Java 8 will be used for all the
-        versions {'<'} 1.17, java 16 for versions {'>='} 1.17. You can also use
-        the same executable but some versions might not run.
+        versions {'<'} 1.17, java {LATEST_JAVA_VERSION} for versions {'>='}{' '}
+        1.17. You can also use the same executable but some versions might not
+        run.
       </div>
       {defaultJava8Path && defaultJava8Path === javaPath ? (
         <PathContainer>
@@ -519,7 +532,7 @@ const ManualSetup = ({
       ) : (
         <PathContainer>
           <Input
-            placeholder="Select your Java8 executable (MC < 1.17)"
+            placeholder="Select your Java 8 executable (MC < 1.17)"
             onChange={e => {
               setIsJava8Downloaded(false);
               setChangedContent(true);
@@ -553,7 +566,7 @@ const ManualSetup = ({
           </div>
         </PathContainer>
       )}
-      {defaultJava16Path && defaultJava16Path === java16Path ? (
+      {defaultJavaLatestPath && defaultJavaLatestPath === javaLatestPath ? (
         <PathContainer>
           <div
             css={`
@@ -563,14 +576,15 @@ const ManualSetup = ({
               background: ${theme.palette.grey['800']};
             `}
           >
-            Java 16 is already installed automatically. Delete to set manually
+            Java {LATEST_JAVA_VERSION} is already installed automatically.
+            Delete to set manually
           </div>
           <Button
             type="danger"
             onClick={async () => {
-              await fse.remove(getJavaPath(16));
-              setJava16Path('');
-              setIsJava16Downloaded(false);
+              await fse.remove(getJavaPath(LATEST_JAVA_VERSION));
+              setJavaLatestPath('');
+              setIsJavaLatestDownloaded(false);
             }}
             css={`
               margin-left: 10px;
@@ -582,17 +596,17 @@ const ManualSetup = ({
       ) : (
         <PathContainer>
           <Input
-            placeholder="Select your Java16 executable (MC >= 1.17)"
+            placeholder={`Select your Java ${LATEST_JAVA_VERSION} executable (MC >= 1.17)`}
             onChange={e => {
-              setIsJava16Downloaded(false);
+              setIsJavaLatestDownloaded(false);
               setChangedContent(true);
-              setJava16Path(e.target.value);
+              setJavaLatestPath(e.target.value);
             }}
-            value={java16Path}
+            value={javaLatestPath}
           />
           <Button
             type="primary"
-            onClick={() => selectFolder(16)}
+            onClick={() => selectFolder(LATEST_JAVA_VERSION)}
             css={`
               margin-left: 10px;
             `}
@@ -610,8 +624,8 @@ const ManualSetup = ({
             `}
           >
             <FontAwesomeIcon
-              icon={getSymbol(java16Path, isJava16Downloaded)}
-              color={getColor(java16Path, isJava16Downloaded)}
+              icon={getSymbol(javaLatestPath, isJavaLatestDownloaded)}
+              color={getColor(javaLatestPath, isJavaLatestDownloaded)}
             />
           </div>
         </PathContainer>
@@ -635,18 +649,19 @@ const ManualSetup = ({
         >
           Go Back
         </Button>
-        {!isJava8Downloaded || !isJava16Downloaded ? (
+        {!isJava8Downloaded || !isJavaLatestDownloaded ? (
           <div>
             <ErrorMessage />
             <Button
               type="primary"
               disabled={
                 !fse.existsSync(javaPath) ||
-                !fse.existsSync(java16Path) ||
-                ((!isJava16Downloaded || !isJava8Downloaded) && !changedContent)
+                !fse.existsSync(javaLatestPath) ||
+                ((!isJavaLatestDownloaded || !isJava8Downloaded) &&
+                  !changedContent)
               }
               onClick={() => {
-                checkJava(javaPath, java16Path);
+                checkJava(javaPath, javaLatestPath);
                 setChangedContent(false);
               }}
             >
@@ -659,13 +674,14 @@ const ManualSetup = ({
             onClick={() => {
               if (javaPath !== defaultJava8Path)
                 dispatch(updateJavaPath(javaPath));
-              if (java16Path !== defaultJava16Path)
-                dispatch(updateJava16Path(java16Path));
+              if (javaLatestPath !== defaultJavaLatestPath)
+                dispatch(updateJavaLatestPath(javaLatestPath));
               setStep(2);
             }}
           >
             Continue with{' '}
-            {javaPath === defaultJava8Path && java16Path === defaultJava16Path
+            {javaPath === defaultJava8Path &&
+            javaLatestPath === defaultJavaLatestPath
               ? 'Automatic '
               : 'Custom '}
             Java
@@ -678,7 +694,7 @@ const ManualSetup = ({
 
 const AutomaticSetup = ({
   isJava8Downloaded,
-  isJava16Downloaded,
+  isJavaLatestDownloaded,
   setStep,
   checkJava
 }) => {
@@ -686,7 +702,7 @@ const AutomaticSetup = ({
   const [currentSubStep, setCurrentSubStep] = useState('Downloading Java');
   const [currentStepPercentage, setCurrentStepPercentage] = useState(0);
   const javaManifest = useSelector(state => state.app.javaManifest);
-  const java16Manifest = useSelector(state => state.app.java16Manifest);
+  const javaLatestManifest = useSelector(state => state.app.javaLatestManifest);
   const userData = useSelector(state => state.userData);
   const tempFolder = useSelector(_getTempPath);
   const modals = useSelector(state => state.modals);
@@ -716,12 +732,17 @@ const AutomaticSetup = ({
 
   if (!isJava8Downloaded) javaToInstall.push(8);
 
-  if (!isJava16Downloaded) javaToInstall.push(16);
+  if (!isJavaLatestDownloaded) javaToInstall.push(LATEST_JAVA_VERSION);
 
   const installJava = async () => {
     const javaOs = convertOSToJavaFormat(process.platform);
     const java8Meta = javaManifest.find(v => v.os === javaOs);
-    const java16Meta = java16Manifest.find(v => v.os === javaOs);
+    const javaLatestMeta = javaLatestManifest.find(
+      v =>
+        v.os === javaOs &&
+        v.architecture === 'x64' &&
+        (v.binary_type === 'jre' || v.binary_type === 'jdk')
+    );
 
     const totalExtractionSteps = process.platform !== 'win32' ? 2 : 1;
     const totalSteps = 2 * javaToInstall.length;
@@ -736,9 +757,8 @@ const AutomaticSetup = ({
     for (const javaVersion of javaToInstall) {
       const {
         version_data: { openjdk_version: version },
-        binary_link: url,
-        release_name: releaseName
-      } = javaVersion === 8 ? java8Meta : java16Meta;
+        binary_link: url
+      } = javaVersion === 8 ? java8Meta : javaLatestMeta;
       const javaBaseFolder = path.join(userData, 'java');
 
       await fse.remove(path.join(javaBaseFolder, version));
@@ -760,7 +780,7 @@ const AutomaticSetup = ({
       setCurrentSubStep(
         `Java ${javaVersion} - Extracting 1 / ${totalExtractionSteps}`
       );
-      await extractAll(
+      let { extractedParentDir } = await extractAll(
         downloadLocation,
         tempFolder,
         {
@@ -795,7 +815,7 @@ const AutomaticSetup = ({
           path.basename(url).replace('.tar.gz', '.tar')
         );
 
-        await extractAll(
+        ({ extractedParentDir } = await extractAll(
           tempTarName,
           tempFolder,
           {
@@ -808,7 +828,7 @@ const AutomaticSetup = ({
               setStepPercentage(index, percent / 2 + 50);
             }
           }
-        );
+        ));
         await fse.remove(tempTarName);
       }
       index += 1;
@@ -817,11 +837,11 @@ const AutomaticSetup = ({
 
       const directoryToMove =
         process.platform === 'darwin'
-          ? path.join(tempFolder, `${releaseName}-jre`, 'Contents', 'Home')
-          : path.join(tempFolder, `${releaseName}-jre`);
+          ? path.join(tempFolder, extractedParentDir, 'Contents', 'Home')
+          : path.join(tempFolder, extractedParentDir);
       await fse.move(directoryToMove, path.join(javaBaseFolder, version));
 
-      await fse.remove(path.join(tempFolder, `${releaseName}-jre`));
+      await fse.remove(path.join(tempFolder, extractedParentDir));
 
       const ext = process.platform === 'win32' ? '.exe' : '';
 
@@ -839,7 +859,7 @@ const AutomaticSetup = ({
     }
 
     dispatch(updateJavaPath(null));
-    dispatch(updateJava16Path(null));
+    dispatch(updateJavaLatestPath(null));
     setCurrentSubStep(`Java is ready!`);
     ipcRenderer.invoke('update-progress-bar', -1);
     setDownloadPercentage(100);

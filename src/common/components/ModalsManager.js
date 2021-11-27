@@ -14,7 +14,7 @@ const Overlay = styled.div`
   backdrop-filter: blur(4px);
   will-change: opacity;
   transition: opacity 300ms cubic-bezier(0.165, 0.84, 0.44, 1);
-  z-index: 1000;
+  z-index: 9999999;
 `;
 
 const Modal = styled.div`
@@ -29,7 +29,7 @@ const Modal = styled.div`
   transition: transform 300ms;
   will-change: transform;
   transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
-  z-index: 1001;
+  z-index: 9999999;
 `;
 
 const modalsComponentLookupTable = {
@@ -78,7 +78,10 @@ const modalsComponentLookupTable = {
   McVersionChanger: AsyncComponent(
     lazy(() => import('../modals/McVersionChanger'))
   ),
-  PolicyModal: AsyncComponent(lazy(() => import('../modals/PolicyModal')))
+  PolicyModal: AsyncComponent(lazy(() => import('../modals/PolicyModal'))),
+  InstanceStartupAd: AsyncComponent(
+    lazy(() => import('../modals/InstanceStartupAd'))
+  )
 };
 
 const ModalContainer = ({
@@ -105,7 +108,8 @@ const ModalContainer = ({
     if (unmounting) unMountStyle();
   }, [unmounting]);
 
-  const back = () => {
+  const back = e => {
+    e.stopPropagation();
     if (preventClose) {
       setModalStyle({
         animation: `modalShake 0.25s linear infinite`

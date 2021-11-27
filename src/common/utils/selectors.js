@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 import path from 'path';
 import memoize from 'lodash/memoize';
 import { convertOSToJavaFormat } from '../../app/desktop/utils';
+import { LATEST_JAVA_VERSION } from './constants';
 
 const _instances = state => state.instances;
 const _accounts = state => state.app.accounts;
@@ -49,19 +50,20 @@ export const _getJavaPath = createSelector(
   (javaManifest, java, userData) => {
     // version
     return memoize((ver = 8) => {
-      const isVersion16 = ver === 16;
-      const manifest = isVersion16
-        ? javaManifest.java16Manifest
+      const isVersionLatest = ver === LATEST_JAVA_VERSION;
+      const manifest = isVersionLatest
+        ? javaManifest.javaLatestManifest
         : javaManifest.javaManifest;
 
-      const customJava = ver === 16 ? java.path16 : java.path;
+      const customJava =
+        ver === LATEST_JAVA_VERSION ? java.pathLatest : java.path;
 
       const javaOs = convertOSToJavaFormat(process.platform);
       const javaMeta = manifest.find(
         version =>
           version.os === javaOs &&
           version.architecture === 'x64' &&
-          version.binary_type === 'jre'
+          (version.binary_type === 'jre' || version.binary_type === 'jdk')
       );
       const {
         version_data: { openjdk_version: version }
