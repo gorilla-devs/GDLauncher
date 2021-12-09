@@ -118,7 +118,7 @@ import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
-import { openModal } from './modals/actions';
+import { openModal, closeModal } from './modals/actions';
 import forgePatcher from '../utils/forgePatcher';
 
 export function initManifests() {
@@ -2776,6 +2776,8 @@ export function launchInstance(instanceName) {
       await ipcRenderer.invoke('hide-window');
     }
 
+    let closed = false;
+
     const ps = spawn(
       `"${javaPath}"`,
       jvmArguments.map(v => v.toString().replace(...replaceRegex)),
@@ -2802,12 +2804,29 @@ export function launchInstance(instanceName) {
     );
     dispatch(updateStartedInstance({ instanceName, pid: ps.pid }));
 
+    setTimeout(() => {
+      if (
+        !closed &&
+        getState().modals.find(v => v.modalType === 'InstanceStartupAd')
+      ) {
+        closed = true;
+        dispatch(closeModal());
+      }
+    }, 5000);
+
     ps.stdout.on('data', data => {
       console.log(data.toString());
       if (
         data.toString().includes('Setting user:') ||
         data.toString().includes('Initializing LWJGL OpenAL')
       ) {
+        if (
+          !closed &&
+          getState().modals.find(v => v.modalType === 'InstanceStartupAd')
+        ) {
+          closed = true;
+          dispatch(closeModal());
+        }
         dispatch(updateStartedInstance({ instanceName, initialized: true }));
       }
     });
@@ -2836,13 +2855,21 @@ export function launchInstance(instanceName) {
         fse.remove(symLinkDirPath);
       }
 
+      if (
+        !closed &&
+        getState().modals.find(v => v.modalType === 'InstanceStartupAd')
+      ) {
+        dispatch(closeModal());
+      }
       if (code !== 0 && errorLogs) {
-        dispatch(
-          openModal('InstanceCrashed', {
-            code,
-            errorLogs: errorLogs?.toString('utf8')
-          })
-        );
+        setTimeout(() => {
+          dispatch(
+            openModal('InstanceCrashed', {
+              code,
+              errorLogs: errorLogs?.toString('utf8')
+            })
+          );
+        }, 225);
         console.warn(`Process exited with code ${code}. Not too good..`);
       }
     });

@@ -696,6 +696,9 @@ export const patchForge113 = async (
   for (const key in processors) {
     if (Object.prototype.hasOwnProperty.call(processors, key)) {
       const p = processors[key];
+      if (p?.sides && !(p?.sides || []).includes('client')) {
+        continue;
+      }
       const filePath = path.join(librariesPath, ...mavenToArray(p.jar));
       const args = p.args
         .map(arg => replaceIfPossible(arg))
