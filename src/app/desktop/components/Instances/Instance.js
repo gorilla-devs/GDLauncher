@@ -295,19 +295,7 @@ const Instance = ({ instanceName }) => {
                   </div>
                 )}
                 {isInQueue && 'In Queue'}
-                {!isInQueue && !isPlaying && (
-                  <span
-                    css={`
-                      padding: 8px 20px;
-                      border-radius: 5px;
-                      background: ${({ theme }) => theme.palette.colors.green};
-                      box-shadow: 0px 0px 15px 1px
-                        ${({ theme }) => theme.palette.colors.green}80;
-                    `}
-                  >
-                    PLAY
-                  </span>
-                )}
+                {!isInQueue && !isPlaying && <span>PLAY</span>}
               </>
             )}
           </HoverContainer>
