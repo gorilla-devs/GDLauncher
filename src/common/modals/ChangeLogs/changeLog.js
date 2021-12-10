@@ -34,7 +34,7 @@ module.exports = {
       header: 'Fixed a critical security bug',
       content:
         'in Minecraft that allows people to remotely execute code on your computer. Mojang will probably release a fix soon but in the meanwhile we are trying to minimize the impact.',
-      advanced: { cm: '' }
+      advanced: { cm: 'e2cfde4' }
     }
   ]
 };
