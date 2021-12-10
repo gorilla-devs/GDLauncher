@@ -454,7 +454,7 @@ export const getJVMArguments112 = (
   args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   // Temporary fix to mitigate log4j security issue (possibly fixed in https://github.com/apache/logging-log4j2/pull/608)
-  args.push(`-Dlog4js.formatMsgNoLookups=true`);
+  args.push(`-Dlog4j2.formatMsgNoLookups=true`);
 
   args.push(mcJson.mainClass);
 
@@ -545,7 +545,7 @@ export const getJVMArguments113 = (
   args.push(`-Xms${memory}m`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   // Temporary fix to mitigate log4j security issue (possibly fixed in https://github.com/apache/logging-log4j2/pull/608)
-  args.push(`-Dlog4js.formatMsgNoLookups=true`);
+  args.push(`-Dlog4j2.formatMsgNoLookups=true`);
   args.push(...jvmOptions);
 
   // Eventually inject additional arguments (from 1.17 (?))
