@@ -83,7 +83,7 @@ module.exports = () => {
             new SentryCliPlugin({
               include: [
                 './build/electron.js',
-                './build/discordRPC.js',
+                './build/electron.js.map',
                 './build/static/js/*'
               ],
               ignore: ['native'],
