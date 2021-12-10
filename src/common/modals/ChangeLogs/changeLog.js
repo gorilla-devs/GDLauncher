@@ -35,6 +35,11 @@ module.exports = {
       content:
         'in Minecraft that allows people to remotely execute code on your computer. Mojang will probably release a fix soon but in the meanwhile we are trying to minimize the impact.',
       advanced: { cm: 'e2cfde4' }
+    },
+    {
+      header: 'Fixed the "update all mods" button.',
+      content: 'Sorry for the inconvenience.',
+      advanced: { cm: 'd58a46d' }
     }
   ]
 };

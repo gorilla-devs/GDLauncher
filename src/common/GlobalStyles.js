@@ -150,11 +150,7 @@ export default createGlobalStyle`
     padding: 2px 0;
   }
 
-  .ant-cascader-menus {
-    z-index: 99999999 !important;
-  }
-
-  .ant-select-dropdown {
+  .ant-select-dropdown, .ant-dropdown, .ant-cascader-menus {
     z-index: 99999999 !important;
   }
 
