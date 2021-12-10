@@ -1895,6 +1895,23 @@ export function downloadInstance(instanceName) {
       })
     );
 
+    if (mcJson.logging) {
+      const {
+        sha1: loggingHash,
+        id: loggingId,
+        url: loggingUrl
+      } = mcJson.logging.client.file;
+      downloadFile(
+        path.join(
+          _getAssetsPath(state),
+          'objects',
+          loggingHash.substring(0, 2),
+          loggingId
+        ),
+        loggingUrl
+      );
+    }
+
     const libraries = librariesMapper(
       mcJson.libraries,
       _getLibrariesPath(state)
@@ -2615,6 +2632,26 @@ export function launchInstance(instanceName) {
     const mcJson = await fse.readJson(
       path.join(_getMinecraftVersionsPath(state), `${loader?.mcVersion}.json`)
     );
+
+    if (mcJson.logging) {
+      const {
+        sha1: loggingHash,
+        id: loggingId,
+        url: loggingUrl
+      } = mcJson.logging.client.file;
+      const loggingPath = path.join(
+        _getAssetsPath(state),
+        'objects',
+        loggingHash.substring(0, 2),
+        loggingId
+      );
+      try {
+        await fs.access(loggingPath);
+      } catch {
+        await downloadFile(loggingPath, loggingUrl);
+      }
+    }
+
     let libraries = [];
     let mcMainFile = {
       url: mcJson.downloads.client.url,
