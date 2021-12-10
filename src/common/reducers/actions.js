@@ -2804,16 +2804,6 @@ export function launchInstance(instanceName) {
     );
     dispatch(updateStartedInstance({ instanceName, pid: ps.pid }));
 
-    setTimeout(() => {
-      if (
-        !closed &&
-        getState().modals.find(v => v.modalType === 'InstanceStartupAd')
-      ) {
-        closed = true;
-        dispatch(closeModal());
-      }
-    }, 5000);
-
     ps.stdout.on('data', data => {
       console.log(data.toString());
       if (
@@ -2861,6 +2851,7 @@ export function launchInstance(instanceName) {
       ) {
         dispatch(closeModal());
       }
+
       if (code !== 0 && errorLogs) {
         setTimeout(() => {
           dispatch(
