@@ -81,7 +81,11 @@ module.exports = () => {
         if (process.env.SOURCE_MAPS_UPLOAD) {
           webpackConfig.plugins.push(
             new SentryCliPlugin({
-              include: ['./build'],
+              include: [
+                './build/electron.js',
+                './build/discordRPC.js',
+                './build/static/js/*'
+              ],
               ignore: ['native'],
               org: 'gdlauncher',
               project: 'react',
