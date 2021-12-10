@@ -16,6 +16,11 @@ module.exports = {
       content:
         'This way we will be able to fix issues even before they are reported!',
       advanced: { cm: '09c8873' }
+    },
+    {
+      header: 'Minecraft Forge 1.18',
+      content: 'is now supported',
+      advanced: { cm: 'a0b8bec' }
     }
   ],
   improvements: [],
@@ -24,6 +29,12 @@ module.exports = {
       header: 'Fixed Microsoft login',
       content: 'not working when offline.',
       advanced: { cm: '14346e2' }
+    },
+    {
+      header: 'Fixed a critical security bug',
+      content:
+        'in Minecraft that allows people to remotely execute code on your computer. Mojang will probably release a fix soon but in the meanwhile we are trying to minimize the impact.',
+      advanced: { cm: 'e2cfde4' }
     }
   ]
 };
