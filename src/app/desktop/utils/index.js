@@ -453,8 +453,23 @@ export const getJVMArguments112 = (
   args.push(...jvmOptions);
   args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
-  // Temporary fix to mitigate log4j security issue (possibly fixed in https://github.com/apache/logging-log4j2/pull/608)
-  args.push(`-Dlog4j2.formatMsgNoLookups=true`);
+  if (mcJson.logging) {
+    const { sha1: loggingHash, id: loggingId } =
+      mcJson?.logging?.client?.file || {};
+    const loggingPath = path.join(
+      assetsPath,
+      'objects',
+      loggingHash.substring(0, 2),
+      loggingId
+    );
+    args.push(
+      (mcJson?.logging?.client?.argument || '').replace(
+        // eslint-disable-next-line no-template-curly-in-string
+        '${path}',
+        `"${loggingPath}"`
+      )
+    );
+  }
 
   args.push(mcJson.mainClass);
 
@@ -544,8 +559,23 @@ export const getJVMArguments113 = (
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
-  // Temporary fix to mitigate log4j security issue (possibly fixed in https://github.com/apache/logging-log4j2/pull/608)
-  args.push(`-Dlog4j2.formatMsgNoLookups=true`);
+  if (mcJson.logging) {
+    const { sha1: loggingHash, id: loggingId } =
+      mcJson?.logging?.client?.file || {};
+    const loggingPath = path.join(
+      assetsPath,
+      'objects',
+      loggingHash.substring(0, 2),
+      loggingId
+    );
+    args.push(
+      (mcJson?.logging?.client?.argument || '').replace(
+        // eslint-disable-next-line no-template-curly-in-string
+        '${path}',
+        `"${loggingPath}"`
+      )
+    );
+  }
   args.push(...jvmOptions);
 
   // Eventually inject additional arguments (from 1.17 (?))
