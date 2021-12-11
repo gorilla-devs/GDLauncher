@@ -2756,6 +2756,25 @@ export function launchInstance(instanceName) {
       'url'
     );
 
+    const missingLibraries = [];
+    // Check all libraries
+    for (const lib of libraries) {
+      try {
+        await fs.access(lib.path);
+      } catch {
+        missingLibraries.push(lib);
+      }
+    }
+
+    if (missingLibraries.length) {
+      console.log('Found missing libraries', missingLibraries);
+      try {
+        await downloadInstanceFiles(missingLibraries);
+      } catch {
+        // Swallow error, the instance will probably crash
+      }
+    }
+
     const getJvmArguments =
       mcJson.assets !== 'legacy' && gte(coerce(mcJson.assets), coerce('1.13'))
         ? getJVMArguments113
