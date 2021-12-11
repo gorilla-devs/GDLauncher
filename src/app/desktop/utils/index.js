@@ -107,7 +107,7 @@ export const librariesMapper = (libraries, librariesPath) => {
       .filter(v => !skipLibrary(v))
       .reduce((acc, lib) => {
         const tempArr = [];
-        // Normal libs
+        // Forge libs
         if (lib.downloads && lib.downloads.artifact) {
           let { url } = lib.downloads.artifact;
           // Handle special case for forge universal where the url is "".
@@ -154,7 +154,54 @@ export const librariesMapper = (libraries, librariesPath) => {
             ...(native && { natives: true })
           });
         }
-        return acc.concat(tempArr);
+
+        // Patch log4j versions https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228
+        for (const k in tempArr) {
+          if (lib?.name?.includes('log4j')) {
+            // Get rid of all log4j aside from official
+            if (!tempArr[k].url.includes('libraries.minecraft.net')) {
+              tempArr[k] = null;
+              continue;
+            }
+
+            if (lib.name.includes('2.0-beta9')) {
+              tempArr[k] = {
+                url: tempArr[k].url
+                  .replace(
+                    'libraries.minecraft.net',
+                    'cdn.assets-gdevs.com/maven'
+                  )
+                  .replace(/2.0-beta9/g, '2.0-beta9-fixed'),
+                path: tempArr[k].path.replace(/2.0-beta9/g, '2.0-beta9-fixed'),
+                sha1: tempArr[k].url.includes('log4j-api')
+                  ? 'b61eaf2e64d8b0277e188262a8b771bbfa1502b3'
+                  : '677991ea2d7426f76309a73739cecf609679492c'
+              };
+            } else {
+              const log4jLib = tempArr[k].url.includes('log4j-api')
+                ? 'log4j-api'
+                : 'log4j-core';
+
+              const splitName = lib.name.split(':');
+              splitName[splitName.length - 1] = '2.15.0';
+              const patchedName = splitName.join(':');
+
+              // Assuming we can use 2.15
+              tempArr[k] = {
+                url: `https://cdn.assets-gdevs.com/maven/org/apache/logging/log4j/${log4jLib}/2.15.0/${log4jLib}-2.15.0.jar`,
+                path: path.join(
+                  librariesPath,
+                  ...mavenToArray(patchedName, native)
+                ),
+                sha1: tempArr[k].url.includes('log4j-api')
+                  ? '42319af9991a86b4475ab3316633a3d03e2d29e1'
+                  : '9bd89149d5083a2a3ab64dcc88b0227da14152ec'
+              };
+            }
+          }
+        }
+
+        return acc.concat(tempArr.filter(_ => _));
       }, []),
     'url'
   );
