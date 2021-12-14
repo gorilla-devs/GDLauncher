@@ -157,14 +157,14 @@ export const librariesMapper = (libraries, librariesPath) => {
 
         // Patch log4j versions https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228
         for (const k in tempArr) {
-          if (lib?.name?.includes('log4j')) {
+          if (lib?.url?.includes('log4j')) {
             // Get rid of all log4j aside from official
             if (!tempArr[k].url.includes('libraries.minecraft.net')) {
               tempArr[k] = null;
               continue;
             }
 
-            if (lib.name.includes('2.0-beta9')) {
+            if (lib.url.includes('2.0-beta9')) {
               tempArr[k] = {
                 url: tempArr[k].url
                   .replace(
@@ -178,9 +178,15 @@ export const librariesMapper = (libraries, librariesPath) => {
                   : '677991ea2d7426f76309a73739cecf609679492c'
               };
             } else {
-              const log4jLib = tempArr[k].url.includes('log4j-api')
-                ? 'log4j-api'
-                : 'log4j-core';
+              let log4jLib = '';
+
+              if (lib.url.includes('log4j-api')) {
+                log4jLib = 'log4j-api';
+              } else if (lib.url.includes('log4j-core')) {
+                log4jLib = 'log4j-core';
+              } else if (lib.url.includes('log4j-slf4j-impl')) {
+                log4jLib = 'log4j-slf4j-impl';
+              }
 
               const splitName = lib.name.split(':');
               splitName[splitName.length - 1] = '2.15.0';
@@ -501,21 +507,7 @@ export const getJVMArguments112 = (
   args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   if (mcJson.logging) {
-    const { sha1: loggingHash, id: loggingId } =
-      mcJson?.logging?.client?.file || {};
-    const loggingPath = path.join(
-      assetsPath,
-      'objects',
-      loggingHash.substring(0, 2),
-      loggingId
-    );
-    args.push(
-      (mcJson?.logging?.client?.argument || '').replace(
-        // eslint-disable-next-line no-template-curly-in-string
-        '${path}',
-        `"${loggingPath}"`
-      )
-    );
+    args.push(mcJson?.logging?.client?.argument || '');
   }
 
   args.push(mcJson.mainClass);
@@ -607,21 +599,7 @@ export const getJVMArguments113 = (
   args.push(`-Xms${memory}m`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
   if (mcJson.logging) {
-    const { sha1: loggingHash, id: loggingId } =
-      mcJson?.logging?.client?.file || {};
-    const loggingPath = path.join(
-      assetsPath,
-      'objects',
-      loggingHash.substring(0, 2),
-      loggingId
-    );
-    args.push(
-      (mcJson?.logging?.client?.argument || '').replace(
-        // eslint-disable-next-line no-template-curly-in-string
-        '${path}',
-        `"${loggingPath}"`
-      )
-    );
+    args.push(mcJson?.logging?.client?.argument || '');
   }
   args.push(...jvmOptions);
 

@@ -188,7 +188,6 @@ const Instance = ({ instanceName }) => {
     if (isInQueue || isPlaying) return;
     dispatch(addStartedInstance({ instanceName }));
     dispatch(launchInstance(instanceName));
-    dispatch(openModal('InstanceStartupAd', { instanceName }));
   };
   const openFolder = () => {
     ipcRenderer.invoke('openFolder', path.join(instancesPath, instance.name));

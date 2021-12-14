@@ -1901,7 +1901,7 @@ export function downloadInstance(instanceName) {
         id: loggingId,
         url: loggingUrl
       } = mcJson.logging.client.file;
-      downloadFile(
+      await downloadFile(
         path.join(
           _getAssetsPath(state),
           'objects',
@@ -2593,13 +2593,19 @@ export function launchInstance(instanceName) {
     const { memory, args } = state.settings.java;
     const { resolution: globalMinecraftResolution } =
       state.settings.minecraftSettings;
+    const instanceState = _getInstance(state)(instanceName);
     const {
       loader,
       javaArgs,
       javaMemory,
       customJavaPath,
       resolution: instanceResolution
-    } = _getInstance(state)(instanceName);
+    } = instanceState;
+
+    const mcJsonPath = path.join(
+      _getMinecraftVersionsPath(state),
+      `${loader?.mcVersion}.json`
+    );
 
     let discordRPCDetails = `Minecraft ${loader?.mcVersion}`;
 
@@ -2613,6 +2619,36 @@ export function launchInstance(instanceName) {
       dispatch(getJavaVersionForMCVersion(loader?.mcVersion))
     );
     const javaPath = customJavaPath || defaultJavaPathVersion;
+    let missingResource = false;
+
+    const verifyResource = async resourcePath => {
+      try {
+        await fs.access(resourcePath);
+        return true;
+      } catch {
+        console.warn(`Missing resource: ${resourcePath}`);
+        dispatch(
+          addToQueue(
+            instanceName,
+            instanceState.loader,
+            null,
+            instanceState.background
+          )
+        );
+
+        await new Promise(resolve => {
+          const unsubscribe = window.__store.subscribe(() => {
+            if (!getState().downloadQueue[instanceName]) {
+              unsubscribe();
+              return resolve();
+            }
+          });
+        });
+
+        dispatch(launchInstance(instanceName));
+        return false;
+      }
+    };
 
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
@@ -2629,28 +2665,61 @@ export function launchInstance(instanceName) {
 
     let errorLogs = '';
 
-    const mcJson = await fse.readJson(
-      path.join(_getMinecraftVersionsPath(state), `${loader?.mcVersion}.json`)
-    );
+    // Verify main jar JSON
+    let verified = await verifyResource(mcJsonPath);
+    if (!verified) return;
+
+    const mcJson = await fse.readJson(mcJsonPath);
 
     if (mcJson.logging) {
-      const {
-        sha1: loggingHash,
-        id: loggingId,
-        url: loggingUrl
-      } = mcJson.logging.client.file;
+      // Verify logging xml
+      const { sha1: loggingHash, id: loggingId } = mcJson.logging.client.file;
       const loggingPath = path.join(
         _getAssetsPath(state),
         'objects',
         loggingHash.substring(0, 2),
         loggingId
       );
-      try {
-        await fs.access(loggingPath);
-      } catch {
-        await downloadFile(loggingPath, loggingUrl);
-      }
+      verified = await verifyResource(loggingPath);
+      if (!verified) return;
     }
+
+    // Verify assets
+    const assetsFile = path.join(
+      _getAssetsPath(state),
+      'indexes',
+      `${mcJson.assets}.json`
+    );
+    verified = await verifyResource(assetsFile);
+    if (!verified) return;
+    await fse.readJson(assetsFile);
+    const assetsJson = await fse.readJson(assetsFile);
+
+    const assets = Object.entries(assetsJson.objects).map(
+      ([assetKey, { hash }]) => ({
+        url: `${MC_RESOURCES_URL}/${hash.substring(0, 2)}/${hash}`,
+        type: 'asset',
+        sha1: hash,
+        path: path.join(
+          _getAssetsPath(state),
+          'objects',
+          hash.substring(0, 2),
+          hash
+        ),
+        resourcesPath: path.join(
+          _getInstancesPath(state),
+          instanceName,
+          'resources',
+          assetKey
+        ),
+        legacyPath: path.join(
+          _getAssetsPath(state),
+          'virtual',
+          'legacy',
+          assetKey
+        )
+      })
+    );
 
     let libraries = [];
     let mcMainFile = {
@@ -2658,6 +2727,8 @@ export function launchInstance(instanceName) {
       sha1: mcJson.downloads.client.sha1,
       path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
     };
+    verified = await verifyResource(mcMainFile.path);
+    if (!verified) return;
 
     if (loader && loader?.loaderType === 'fabric') {
       const fabricJsonPath = path.join(
@@ -2668,6 +2739,10 @@ export function launchInstance(instanceName) {
         loader?.loaderVersion,
         'fabric.json'
       );
+
+      verified = await verifyResource(fabricJsonPath);
+      if (!verified) return;
+
       const fabricJson = await fse.readJson(fabricJsonPath);
       const fabricLibraries = librariesMapper(
         fabricJson.libraries,
@@ -2677,6 +2752,16 @@ export function launchInstance(instanceName) {
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
     } else if (loader && loader?.loaderType === 'forge') {
+      const forgeJsonPath = path.join(
+        _getLibrariesPath(state),
+        'net',
+        'minecraftforge',
+        loader?.loaderVersion,
+        `${loader?.loaderVersion}.json`
+      );
+      verified = await verifyResource(forgeJsonPath);
+      if (!verified) return;
+
       if (gt(coerce(loader?.mcVersion), coerce('1.5.2'))) {
         const getForgeLastVer = ver =>
           Number.parseInt(ver.split('.')[ver.split('.').length - 1], 10);
@@ -2689,7 +2774,7 @@ export function launchInstance(instanceName) {
         ) {
           const moveJavaLegacyFixerToInstance = async () => {
             await fs.lstat(path.join(_getDataStorePath(state), '__JLF__.jar'));
-            await fse.move(
+            await fse.copy(
               path.join(_getDataStorePath(state), '__JLF__.jar'),
               instanceJLFPath
             );
@@ -2701,14 +2786,6 @@ export function launchInstance(instanceName) {
             await moveJavaLegacyFixerToInstance();
           }
         }
-
-        const forgeJsonPath = path.join(
-          _getLibrariesPath(state),
-          'net',
-          'minecraftforge',
-          loader?.loaderVersion,
-          `${loader?.loaderVersion}.json`
-        );
         const forgeJson = await fse.readJson(forgeJsonPath);
         const forgeLibraries = librariesMapper(
           forgeJson.version.libraries,
@@ -2728,8 +2805,12 @@ export function launchInstance(instanceName) {
                 return arg
                   .replace(/\${version_name}/g, mcJson.id)
                   .replace(
+                    /=\${library_directory}/g,
+                    `="${_getLibrariesPath(state)}"`
+                  )
+                  .replace(
                     /\${library_directory}/g,
-                    `"${_getLibrariesPath(state)}"`
+                    `${_getLibrariesPath(state)}`
                   )
                   .replace(
                     /\${classpath_separator}/g,
@@ -2756,24 +2837,39 @@ export function launchInstance(instanceName) {
       'url'
     );
 
-    const missingLibraries = [];
-    // Check all libraries
-    for (const lib of libraries) {
+    for (const resource of [...libraries, ...assets]) {
       try {
-        await fs.access(lib.path);
+        await fs.access(resource.path);
       } catch {
-        missingLibraries.push(lib);
+        console.warn(`Missing resource: ${resource.path}`);
+        missingResource = true;
       }
     }
 
-    if (missingLibraries.length) {
-      console.log('Found missing libraries', missingLibraries);
-      try {
-        await downloadInstanceFiles(missingLibraries);
-      } catch {
-        // Swallow error, the instance will probably crash
-      }
+    if (missingResource) {
+      dispatch(
+        addToQueue(
+          instanceName,
+          instanceState.loader,
+          null,
+          instanceState.background
+        )
+      );
+
+      await new Promise(resolve => {
+        const unsubscribe = window.__store.subscribe(() => {
+          if (!getState().downloadQueue[instanceName]) {
+            unsubscribe();
+            return resolve();
+          }
+        });
+      });
+
+      dispatch(launchInstance(instanceName));
+      return;
     }
+
+    dispatch(openModal('InstanceStartupAd', { instanceName }));
 
     const getJvmArguments =
       mcJson.assets !== 'legacy' && gte(coerce(mcJson.assets), coerce('1.13'))
@@ -2813,6 +2909,15 @@ export function launchInstance(instanceName) {
       replaceWith
     ];
 
+    const { sha1: loggingHash, id: loggingId } =
+      mcJson?.logging?.client?.file || {};
+    const loggingPath = path.join(
+      assetsPath,
+      'objects',
+      loggingHash.substring(0, 2),
+      loggingId
+    );
+
     console.log(
       `"${javaPath}" ${getJvmArguments(
         libraries,
@@ -2825,7 +2930,13 @@ export function launchInstance(instanceName) {
         gameResolution,
         true,
         javaArguments
-      ).join(' ')}`.replace(...replaceRegex)
+      ).join(' ')}`
+        .replace(...replaceRegex)
+        .replace(
+          // eslint-disable-next-line no-template-curly-in-string
+          '-Dlog4j.configurationFile=${path}',
+          `-Dlog4j.configurationFile="${loggingPath}"`
+        )
     );
 
     if (state.settings.hideWindowOnGameLaunch) {
@@ -2836,7 +2947,16 @@ export function launchInstance(instanceName) {
 
     const ps = spawn(
       `"${javaPath}"`,
-      jvmArguments.map(v => v.toString().replace(...replaceRegex)),
+      jvmArguments.map(v =>
+        v
+          .toString()
+          .replace(...replaceRegex)
+          .replace(
+            // eslint-disable-next-line no-template-curly-in-string
+            '-Dlog4j.configurationFile=${path}',
+            `-Dlog4j.configurationFile="${loggingPath}"`
+          )
+      ),
       {
         cwd: instancePath,
         shell: true

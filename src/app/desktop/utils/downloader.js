@@ -42,10 +42,11 @@ export const downloadInstanceFiles = async (
       } while (!res && counter < 3);
       downloaded += 1;
       if (
-        (updatePercentage && downloaded % 5 === 0) ||
-        downloaded === arr.length
-      )
+        updatePercentage &&
+        (downloaded % 5 === 0 || downloaded === arr.length)
+      ) {
         updatePercentage(downloaded);
+      }
     },
     { concurrency: threads }
   );
