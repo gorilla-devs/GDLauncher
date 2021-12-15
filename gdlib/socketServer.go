@@ -1,9 +1,9 @@
 package gdlib
 
 import (
-	"GDLauncher/gdlib/events"
 	"encoding/json"
 	"fmt"
+	"gdl-s/gdlib/events"
 	"log"
 	"net/http"
 	"os"
@@ -12,16 +12,18 @@ import (
 )
 
 type Message struct {
-	Type    int           `json:"type"`
-	Payload SocketRequest `json:"payload"`
+	Type    int            `json:"type"`
+	Id      string         `json:"id"`
+	Payload PayloadRequest `json:"payload"`
 }
 
-type SocketRequest struct {
+type PayloadRequest struct {
 	Data []byte `json:"data"`
 }
 
 type SocketResponse struct {
 	Data interface{} `json:"data"`
+	Id   string      `json:"id"`
 }
 
 var upgrader = websocket.Upgrader{}
@@ -75,6 +77,7 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 		return
 	}
 
+	fmt.Println("Received:", message.Id)
 	var response interface{}
 	switch message.Type {
 	case events.Ping:
@@ -88,14 +91,17 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 		return
 	}
 
-	newResp := SocketResponse{Data: response}
+	newResp := SocketResponse{
+		Data: response,
+		Id:   message.Id,
+	}
 
 	marshaled, err := json.Marshal(newResp)
 	if err != nil {
 		c.WriteMessage(mt, sendErrorResponse(err))
 		return
 	}
-	fmt.Printf("%+v\n", newResp)
+	fmt.Printf("Response: %+v\n", newResp)
 	err = c.WriteMessage(mt, []byte(marshaled))
 	if err != nil {
 		c.WriteMessage(mt, sendErrorResponse(err))

@@ -1683,12 +1683,21 @@ export function processForgeManifest(instanceName) {
       await pMap(
         manifest.files,
         async item => {
-          const { data: modManifest } = await getAddonFile(
-            item.projectID,
-            item.fileID
-          );
+          let tries = 0;
+          let ok = false;
+          do {
+            if (tries !== 1) {
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+            const { data: modManifest } = await getAddonFile(
+              item.projectID,
+              item.fileID
+            );
 
-          addonsFilesHashmap[item.projectID] = modManifest;
+            addonsFilesHashmap[item.projectID] = modManifest;
+            ok = true;
+            // eslint-disable-next-line no-plusplus
+          } while (tries++ < 3 && !ok);
         },
         { concurrency: concurrency + 10 }
       );

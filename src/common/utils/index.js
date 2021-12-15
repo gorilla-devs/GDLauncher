@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron';
+import socketClient, { events } from '../../app/desktop/utils/socketClient';
 
 export const sortByDate = (a, b) => {
   const dateA = new Date(a.fileDate);
@@ -68,7 +68,7 @@ export const generateRandomString = () => {
 
 // Create the murmur hash of a mod
 export const getFileMurmurHash2 = async filePath => {
-  return ipcRenderer.invoke('calculateMurmur2FromPath', filePath);
+  return socketClient.sendMessage(events.murmur2, { filePath });
 };
 
 export const numberToRoundedWord = number => {

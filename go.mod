@@ -1,4 +1,4 @@
-module GDLauncher
+module gdl-s
 
 go 1.17
 

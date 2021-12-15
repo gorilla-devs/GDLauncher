@@ -21,7 +21,6 @@ const {
   default: { fromBase64: toBase64URL }
 } = require('base64url');
 const { URL } = require('url');
-const murmur = require('./native/murmur2');
 const nsfw = require('./native/nsfw');
 
 const fs = fss.promises;
@@ -234,7 +233,22 @@ async function patchSevenZip() {
 
 patchSevenZip();
 
+let gdlS = null;
+
 function createWindow() {
+  gdlS = spawn(path.join(__dirname, 'gdl-s.exe'), {
+    cwd: __dirname,
+    shell: true
+  });
+
+  gdlS.stdout.on('data', data => {
+    console.log('GDL-S', data.toString());
+  });
+
+  gdlS.stderr.on('data', data => {
+    console.error('GDL-S', data.toString());
+  });
+
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 700,
@@ -371,6 +385,11 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', async () => {
+  if (gdlS) {
+    console.log('Killing GDL-S');
+    gdlS.kill();
+  }
+
   if (watcher) {
     await watcher.stop();
     watcher = null;
@@ -627,15 +646,6 @@ ipcMain.handle('stop-listener', async () => {
     await watcher.stop();
     watcher = null;
   }
-});
-
-ipcMain.handle('calculateMurmur2FromPath', (e, filePath) => {
-  return new Promise((resolve, reject) => {
-    return murmur(filePath).then(v => {
-      if (v.toString().length === 0) reject();
-      return resolve(v);
-    });
-  });
 });
 
 // AutoUpdater
