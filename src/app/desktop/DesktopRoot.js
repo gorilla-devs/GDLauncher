@@ -37,6 +37,7 @@ import {
   ACCOUNT_MICROSOFT,
   LATEST_JAVA_VERSION
 } from '../../common/utils/constants';
+import './utils/socketClient';
 
 const Wrapper = styled.div`
   height: 100vh;
