@@ -37,7 +37,7 @@ import {
   ACCOUNT_MICROSOFT,
   LATEST_JAVA_VERSION
 } from '../../common/utils/constants';
-import './utils/socketClient';
+import socketClient, { events } from './utils/socketClient';
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -55,6 +55,11 @@ const Container = styled.div`
   transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
   will-change: transform;
 `;
+
+window.onbeforeunload = () => {
+  socketClient.sendMessage(events.quit, {});
+  return null;
+};
 
 function DesktopRoot({ store }) {
   const dispatch = useDispatch();

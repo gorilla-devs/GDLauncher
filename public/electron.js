@@ -235,11 +235,13 @@ patchSevenZip();
 
 let gdlS = null;
 
-function createWindow() {
-  gdlS = spawn(path.join(__dirname, 'gdl-s.exe'), {
-    cwd: __dirname,
-    shell: true
-  });
+function startServer() {
+  gdlS = spawn(
+    path.join(__dirname, `gdl-s${process.platform !== 'win32' ? '.exe' : ''}`),
+    {
+      cwd: __dirname
+    }
+  );
 
   gdlS.stdout.on('data', data => {
     console.log('GDL-S', data.toString());
@@ -248,7 +250,21 @@ function createWindow() {
   gdlS.stderr.on('data', data => {
     console.error('GDL-S', data.toString());
   });
+}
 
+async function closeServer() {
+  // eslint-disable-next-line global-require
+  const fkill = require('esm')('fkill');
+  if (!gdlS.killed) {
+    console.log('Killing GDL-S');
+    gdlS.removeAllListeners();
+    await fkill(gdlS.pid);
+    console.log('Killing GDL-S', gdlS.killed);
+  }
+}
+
+function createWindow() {
+  startServer();
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 700,
@@ -379,17 +395,14 @@ app.on('window-all-closed', () => {
     watcher.stop();
     watcher = null;
   }
+
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 app.on('before-quit', async () => {
-  if (gdlS) {
-    console.log('Killing GDL-S');
-    gdlS.kill();
-  }
-
+  closeServer();
   if (watcher) {
     await watcher.stop();
     watcher = null;

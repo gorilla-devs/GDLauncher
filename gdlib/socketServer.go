@@ -65,6 +65,7 @@ func sendErrorResponse(err error) []byte {
 
 func StartServer() {
 	http.HandleFunc("/v1", handleRequest)
+	fmt.Println("GDLib listening on port 7890")
 	log.Fatal(http.ListenAndServe("localhost:7890", nil))
 }
 
@@ -84,6 +85,10 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 		response, err = processPing(message.Payload.Data)
 	case events.MurmurHash2:
 		response, err = processMurmurHash2(message.Payload.Data)
+	case events.Quit:
+		response, err = processQuit(message.Payload.Data)
+	case events.FSWatcher:
+		response, err = processFSWatcher(message.Payload.Data, c)
 	}
 
 	if err != nil {
@@ -147,4 +152,14 @@ func processMurmurHash2(payload []byte) (uint32, error) {
 	murmur2 := MurmurHash2(res)
 
 	return murmur2, nil
+}
+
+func processQuit(payload []byte) (uint32, error) {
+	os.Exit(0)
+	return 0, nil
+}
+
+func processFSWatcher(payload []byte, c *websocket.Conn) (uint32, error) {
+	go startListener()
+	return 0, nil
 }
