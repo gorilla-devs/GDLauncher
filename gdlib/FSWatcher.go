@@ -4,36 +4,42 @@ import (
 	"io/fs"
 	"log"
 	"os"
-	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
-func startListener() {
-	// Start listener
+var dirsToWatch []string
 
-	dirsToWatch := []string{}
-	dirsToWatch = append(dirsToWatch, "./")
+func startFSWatcher(directory string, c *websocket.Conn, done chan<- error) {
+	// Check if we're not watching that directory already
+	dirsToWatch = append(dirsToWatch, directory)
 
-	var wg sync.WaitGroup
-
-	wg.Add(1)
 	for _, dir := range dirsToWatch {
-		go watchDirectory(dir)
+		// This should release the channel as soon as it's done initializing
+		go watchDirectory(dir, done)
 	}
-
-	wg.Wait()
 }
 
-func watchDirectory(directory string) {
-	hashmap := make(map[string]string)
+func stopFSWatcher(directory string, c *websocket.Conn, done chan<- error) {
 
+	done <- nil
+}
+
+// This function should release the channel as soon as it's done initializing
+func watchDirectory(directory string, done chan<- error) {
+	hashmap := make(map[string]string)
 	res, err := readAllFiles(directory)
 	if err != nil {
-		log.Fatal(err)
+		done <- err
 	}
 	for _, v := range res {
 		hashmap[v.Name()] = v.Name()
 	}
+
+	// Return status to the outside world
+	done <- nil
+
 	for {
 		filesOnDisk, err := readAllFiles(directory)
 		if err != nil {

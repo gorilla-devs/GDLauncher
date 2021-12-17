@@ -57,7 +57,8 @@ class ClientSocket {
 export const events = {
   ping: 0,
   murmur2: 1,
-  quit: 2
+  quit: 2,
+  fsWatcher: 3
 };
 
 export default new ClientSocket();

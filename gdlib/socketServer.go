@@ -2,6 +2,7 @@ package gdlib
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"gdl-s/gdlib/events"
 	"log"
@@ -27,6 +28,12 @@ type SocketResponse struct {
 	Id   string      `json:"id"`
 	Err  string      `json:"error,omitempty"`
 }
+
+const (
+	FS_START = iota
+	FS_STOP
+	FS_LIST
+)
 
 var shouldQuit = true
 var upgrader = websocket.Upgrader{}
@@ -58,8 +65,9 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 func sendErrorResponse(err error, id string) []byte {
 	errorResp, err := json.Marshal(SocketResponse{
-		Err: err.Error(),
-		Id:  id,
+		Err:  err.Error(),
+		Id:   id,
+		Data: 1,
 	})
 	if err != nil {
 		log.Fatal("error:", err)
@@ -95,7 +103,7 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 	}
 
 	fmt.Println("Received:", message.Id, "event of type", message.Type)
-	var response interface{}
+	var response int
 	// Response should be 0 if the status is ok
 	switch message.Type {
 	case events.Ping:
@@ -131,13 +139,13 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 	}
 }
 
-func processPing(payload []byte) (uint32, error) {
+func processPing(payload []byte) (int, error) {
 	fmt.Printf("PING %v", payload)
 	shouldQuit = false
 	return 123456789, nil
 }
 
-func processMurmurHash2(payload []byte) (uint32, error) {
+func processMurmurHash2(payload []byte) (int, error) {
 	hashmap := make(map[string]string)
 	err := json.Unmarshal(payload, &hashmap)
 	if err != nil {
@@ -169,16 +177,46 @@ func processMurmurHash2(payload []byte) (uint32, error) {
 
 	murmur2 := MurmurHash2(res)
 
-	return murmur2, nil
+	return int(murmur2), nil
 }
 
-func processQuit(payload []byte) (uint32, error) {
+func processQuit(payload []byte) (int, error) {
 	fmt.Println("QUITTING")
 	os.Exit(0)
 	return 0, nil
 }
 
-func processFSWatcher(payload []byte, c *websocket.Conn) (uint32, error) {
-	go startListener()
-	return 0, nil
+func processFSWatcher(payload []byte, c *websocket.Conn) (int, error) {
+	hashmap := make(map[string]interface{})
+	err := json.Unmarshal(payload, &hashmap)
+	if err != nil {
+		return 0, err
+	}
+
+	if err != nil {
+		return 0, err
+	}
+
+	directory := hashmap["action"].(string)
+
+	var done = make(chan error)
+	switch hashmap["action"].(float64) {
+	default:
+	case FS_START:
+		startFSWatcher(directory, c, done)
+	case FS_STOP:
+		stopFSWatcher(directory, c, done)
+	case FS_LIST:
+		fmt.Println("FSWatcher: List")
+	}
+
+	select {
+	case v := <-done:
+		if v != nil {
+			return 1, v
+		}
+		return 0, nil
+	case <-time.After(5 * time.Second):
+		return 1, errors.New("timeout waiting for FSWatcher action to finish")
+	}
 }
