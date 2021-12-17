@@ -3,6 +3,9 @@ class ClientSocket {
     this.webSocket = new WebSocket('ws://localhost:7890/v1');
     this.webSocket.onopen = () => {
       console.log('Connected to gdlib');
+      this.sendMessage(events.ping, {})
+        .then(res => console.log(res))
+        .catch(console.error);
     };
     this.webSocket.onclose = () => {
       console.log('Disconnected from gdlib');
