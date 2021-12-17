@@ -24,9 +24,10 @@ type PayloadRequest struct {
 }
 
 type SocketResponse struct {
-	Data interface{} `json:"data"`
+	Type int         `json:"type"`
 	Id   string      `json:"id"`
 	Err  string      `json:"error,omitempty"`
+	Data interface{} `json:"data"`
 }
 
 const (
@@ -63,12 +64,15 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	<-semaphore
 }
 
-func sendErrorResponse(err error, id string) []byte {
-	errorResp, err := json.Marshal(SocketResponse{
+func sendErrorResponse(err error, request Message) []byte {
+	resp := SocketResponse{
 		Err:  err.Error(),
-		Id:   id,
+		Id:   request.Id,
 		Data: 1,
-	})
+		Type: request.Type,
+	}
+	fmt.Printf("Response Error: %+v\n", resp)
+	errorResp, err := json.Marshal(resp)
 	if err != nil {
 		log.Fatal("error:", err)
 	}
@@ -89,7 +93,7 @@ func StartServer() {
 	}()
 
 	http.HandleFunc("/v1", handleRequest)
-	fmt.Println("GDLib listening on port", PORT)
+	fmt.Println("Listening on port", PORT)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%d", PORT), nil))
 }
 
@@ -98,11 +102,11 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 	var message Message
 	err = json.Unmarshal(payload, &message)
 	if err != nil {
-		c.WriteMessage(mt, sendErrorResponse(err, message.Id))
+		c.WriteMessage(mt, sendErrorResponse(err, message))
 		return
 	}
 
-	fmt.Println("Received:", message.Id, "event of type", message.Type)
+	fmt.Println("Request:", message.Id, "event of type", message.Type)
 	var response int
 	// Response should be 0 if the status is ok
 	switch message.Type {
@@ -117,34 +121,44 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 	}
 
 	if err != nil {
-		c.WriteMessage(mt, sendErrorResponse(err, message.Id))
+		c.WriteMessage(mt, sendErrorResponse(err, message))
 		return
 	}
 
 	newResp := SocketResponse{
 		Data: response,
 		Id:   message.Id,
+		Type: message.Type,
 	}
 
 	marshaled, err := json.Marshal(newResp)
 	if err != nil {
-		c.WriteMessage(mt, sendErrorResponse(err, message.Id))
+		c.WriteMessage(mt, sendErrorResponse(err, message))
 		return
 	}
 	fmt.Printf("Response: %+v\n", newResp)
 	err = c.WriteMessage(mt, []byte(marshaled))
 	if err != nil {
-		c.WriteMessage(mt, sendErrorResponse(err, message.Id))
+		c.WriteMessage(mt, sendErrorResponse(err, message))
 		return
 	}
 }
 
+// Sends an init signal. If none is received within 10 seconds, the program
+// will quit
+//
+// payload: {}
 func processPing(payload []byte) (int, error) {
-	fmt.Printf("PING %v", payload)
+	fmt.Printf("PING %v\n", payload)
 	shouldQuit = false
 	return 123456789, nil
 }
 
+// Computes the murmur2 hash of the file at the given path
+//
+// payload: {
+//     path: string - path to the file to calculate the hash for
+// }
 func processMurmurHash2(payload []byte) (int, error) {
 	hashmap := make(map[string]string)
 	err := json.Unmarshal(payload, &hashmap)
@@ -152,7 +166,7 @@ func processMurmurHash2(payload []byte) (int, error) {
 		return 0, err
 	}
 
-	filePath := hashmap["filePath"]
+	filePath := hashmap["path"]
 	fd, err := os.Open(filePath)
 	if err != nil {
 		return 0, err
@@ -180,12 +194,21 @@ func processMurmurHash2(payload []byte) (int, error) {
 	return int(murmur2), nil
 }
 
+// Quits the server
+//
+// payload: {}
 func processQuit(payload []byte) (int, error) {
-	fmt.Println("QUITTING")
+	fmt.Println("Quitting")
 	os.Exit(0)
 	return 0, nil
 }
 
+// Processes the FS watcher event. The event can have an action which defines the behaviour of this function.
+//
+// payload: {
+//     path: string - path to file / directory to watch
+//     action: int  - 0 for start, 1 for stop, 2 for list
+// }
 func processFSWatcher(payload []byte, c *websocket.Conn) (int, error) {
 	hashmap := make(map[string]interface{})
 	err := json.Unmarshal(payload, &hashmap)
@@ -197,15 +220,15 @@ func processFSWatcher(payload []byte, c *websocket.Conn) (int, error) {
 		return 0, err
 	}
 
-	directory := hashmap["action"].(string)
+	directory := hashmap["path"].(string)
 
 	var done = make(chan error)
 	switch hashmap["action"].(float64) {
 	default:
 	case FS_START:
-		startFSWatcher(directory, c, done)
+		go startFSWatcher(directory, c, done)
 	case FS_STOP:
-		stopFSWatcher(directory, c, done)
+		go stopFSWatcher(directory, c, done)
 	case FS_LIST:
 		fmt.Println("FSWatcher: List")
 	}

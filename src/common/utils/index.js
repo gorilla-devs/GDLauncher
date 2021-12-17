@@ -68,7 +68,7 @@ export const generateRandomString = () => {
 
 // Create the murmur hash of a mod
 export const getFileMurmurHash2 = async filePath => {
-  return socketClient.sendMessage(events.murmur2, { filePath });
+  return socketClient.sendMessage(events.murmur2, { path: filePath });
 };
 
 export const numberToRoundedWord = number => {
