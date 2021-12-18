@@ -70,17 +70,6 @@ const UpdateRow = ({ header, content, advanced }) => {
 };
 
 const ChangeLogs = () => {
-  // TODO: Remove testing json
-  const exampleChLog = [
-    { version: 'v18', new: { header: 'v18' } },
-    { version: 'v18-beta.2', new: { header: 'v18-beta.2' } },
-    { version: 'v18-beta.1', new: { header: 'v18-beta.1' } },
-    { version: 'v1.18', new: { header: 'v1.18' } },
-    { version: 'v1.18-beta.1', new: { header: 'v1.18-beta.1' } },
-    { version: 'v1.1.18', new: { header: 'v1.1.18' } },
-    { version: 'v1.1.18-beta.1', new: { header: 'v1.1.18-beta.1' } }
-  ];
-
   const getVersionChangelog = (version, useBeta) => {
     const finalChangelog = { version, new: [], improvements: [], bugfixes: [] };
     changelog.forEach(i => {
