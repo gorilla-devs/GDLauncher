@@ -4,7 +4,7 @@ const path = require('path');
 const axios = require('axios');
 const fse = require('fs-extra');
 const dotenv = require('dotenv');
-const rawChangeLog = require('../src/common/modals/ChangeLogs/changeLog');
+const rawChangelog = require('../src/common/modals/ChangeLogs/changeLog');
 
 dotenv.config();
 
@@ -45,15 +45,48 @@ const main = async () => {
   } catch (err) {
     console.log(err);
 
-    const getChangeLog = () => {
-      let changeLog = '';
-      for (const element in rawChangeLog) {
-        if (rawChangeLog[element].length) {
-          changeLog += `### ${element
+    const getChangelog = logVersion => {
+      const finalChangelog = {
+        logVersion,
+        new: [],
+        improvements: [],
+        bugfixes: []
+      };
+      rawChangelog.forEach(i => {
+        if (
+          i.version === logVersion || // include anyway if selected version
+          (i.version.startsWith(logVersion) && // Has to match same version
+            i.version.indexOf('-beta') === logVersion.length)
+          // if beginning of version matches, make sure there is no sub-version until the beta begins
+          // yes, this condition chaos is the best solution I could come up with.
+        ) {
+          console.log(`Included version ${i.version}`);
+          if (i.new) finalChangelog.new.push(...i.new);
+          if (i.improvements)
+            finalChangelog.improvements.push(...i.improvements);
+          if (i.bugfixes) finalChangelog.bugfixes.push(...i.bugfixes);
+        }
+      });
+      if (logVersion && logVersion.indexOf('-beta') === -1) {
+        const removeIfBeta = (elem, i, arr) => {
+          if (elem.betaOnly) arr.splice(i, 1);
+        };
+        finalChangelog.new.forEach(removeIfBeta);
+        finalChangelog.improvements.forEach(removeIfBeta);
+        finalChangelog.bugfixes.forEach(removeIfBeta);
+      }
+      return finalChangelog;
+    };
+
+    const formatChangelog = raw => {
+      let changelog = '';
+      for (const element in raw) {
+        if (raw[element].length) {
+          changelog += `### ${element
             .charAt(0)
             .toUpperCase()}${element.substring(1)}\n`;
 
-          for (const e of rawChangeLog[element]) {
+          for (const e of raw[element]) {
             if (!e?.advanced?.cm || !e?.header || !e?.content) {
               continue;
             }
@@ -67,11 +100,11 @@ const main = async () => {
                   : ''
               })`;
             const notes = `- **${e?.header || ''}** ${e?.content || ''}`;
-            changeLog += `${notes + advanced} \n`;
+            changelog += `${notes + advanced} \n`;
           }
         }
       }
-      return changeLog;
+      return changelog;
     };
 
     const { data: newRelease } = await axios.default.post(
@@ -81,7 +114,7 @@ const main = async () => {
         name: `v${version}`,
         draft: true,
         prerelease: version.includes('beta'),
-        body: getChangeLog()
+        body: formatChangelog(getChangelog(version))
       },
       {
         headers: {

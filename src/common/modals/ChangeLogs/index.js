@@ -1,11 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBug, faStar, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { useInView } from 'react-intersection-observer';
+import { Select } from 'antd';
 import Modal from '../../components/Modal';
 import SocialButtons from '../../components/SocialButtons';
 import KoFiButton from '../../assets/ko-fi.png';
@@ -15,6 +16,8 @@ import ga from '../../utils/analytics';
 import changelog from './changeLog';
 
 const UpdateRow = ({ header, content, advanced }) => {
+  if (!header) return <></>;
+
   const prSplit = advanced?.pr?.split('/');
   return (
     <li>
@@ -67,9 +70,52 @@ const UpdateRow = ({ header, content, advanced }) => {
 };
 
 const ChangeLogs = () => {
+  // TODO: Remove testing json
+  const exampleChLog = [
+    { version: 'v18', new: { header: 'v18' } },
+    { version: 'v18-beta.2', new: { header: 'v18-beta.2' } },
+    { version: 'v18-beta.1', new: { header: 'v18-beta.1' } },
+    { version: 'v1.18', new: { header: 'v1.18' } },
+    { version: 'v1.18-beta.1', new: { header: 'v1.18-beta.1' } },
+    { version: 'v1.1.18', new: { header: 'v1.1.18' } },
+    { version: 'v1.1.18-beta.1', new: { header: 'v1.1.18-beta.1' } }
+  ];
+
+  const getVersionChangelog = (version, useBeta) => {
+    const finalChangelog = { version, new: [], improvements: [], bugfixes: [] };
+    changelog.forEach(i => {
+      if (
+        i.version === version || // include anyway if selected version
+        (useBeta && // only include beta versions if wanted
+          i.version.startsWith(version) && // Has to match same version
+          i.version.indexOf('-beta') === version.length)
+        // if beginning of version matches, make sure there is no sub-version until the beta begins
+        // yes, this condition chaos is the best solution I could come up with.
+      ) {
+        if (i.new) finalChangelog.new.push(...i.new);
+        if (i.improvements) finalChangelog.improvements.push(...i.improvements);
+        if (i.bugfixes) finalChangelog.bugfixes.push(...i.bugfixes);
+      }
+    });
+    if (version && version.indexOf('-beta') === -1) {
+      const removeIfBeta = (elem, i, arr) => {
+        if (elem.betaOnly) arr.splice(i, 1);
+      };
+      finalChangelog.new.forEach(removeIfBeta);
+      finalChangelog.improvements.forEach(removeIfBeta);
+      finalChangelog.bugfixes.forEach(removeIfBeta);
+    }
+    return finalChangelog;
+  };
+
   const [version, setVersion] = useState(null);
-  const [skipIObserver, setSkipIObserver] = useState(true);
+  const [includeBeta, setIncludeBeta] = useState(true);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [skipIObserver, setSkipIObserver] = useState(true);
+  const [currentVersion, setCurrentVersion] = useState(null);
+  const [currentChangelog, setCurrentChangelog] = useState(
+    getVersionChangelog('empty')
+  );
   const dispatch = useDispatch();
   const { ref: intersectionObserverRef, inView: insectionObserverInView } =
     useInView({
@@ -80,10 +126,15 @@ const ChangeLogs = () => {
     });
 
   useEffect(() => {
+    setCurrentChangelog(getVersionChangelog(currentVersion, includeBeta));
+  }, [currentVersion]);
+
+  useEffect(() => {
     ipcRenderer
       .invoke('getAppVersion')
       .then(v => {
         setVersion(v);
+        setCurrentVersion(`v${v}`);
         if (!v.includes('beta')) {
           setTimeout(() => {
             setSkipIObserver(false);
@@ -109,8 +160,8 @@ const ChangeLogs = () => {
   return (
     <Modal
       css={`
-        height: 550px;
-        width: 475px;
+        height: 600px;
+        width: 500px;
       `}
       title={`What's new in ${version}`}
       removePadding
@@ -120,6 +171,7 @@ const ChangeLogs = () => {
           <img
             css={`
               border-radius: 5px;
+              width: 100%;
             `}
             src={UpdateIllustration}
             alt="New Version"
@@ -164,20 +216,9 @@ const ChangeLogs = () => {
               <img src={KoFiButton} alt="Ko-Fi" />
             </a>
           </div>
-          <a
-            css={`
-              margin-top: 20px;
-              color: ${props => props.theme.palette.primary.light};
-            `}
-            onClick={() => setShowAdvanced(!showAdvanced)}
-          >
-            {showAdvanced
-              ? 'Hide extended information'
-              : 'Show extended information'}
-          </a>
         </Header>
         <Section>
-          {changelog.new.length ? (
+          {currentChangelog.new.length ? (
             <SectionTitle
               css={`
                 color: ${props => props.theme.palette.colors.green};
@@ -201,7 +242,7 @@ const ChangeLogs = () => {
             </SectionTitle>
           ) : null}
           <ul>
-            {changelog.new.map((item, index) => (
+            {currentChangelog.new.map((item, index) => (
               <UpdateRow
                 /* eslint-disable-next-line react/no-array-index-key */
                 key={index}
@@ -213,7 +254,7 @@ const ChangeLogs = () => {
           </ul>
         </Section>
         <Section>
-          {changelog.improvements.length ? (
+          {currentChangelog.improvements.length ? (
             <SectionTitle
               css={`
                 color: ${props => props.theme.palette.colors.yellow};
@@ -237,7 +278,7 @@ const ChangeLogs = () => {
             </SectionTitle>
           ) : null}
           <ul>
-            {changelog.improvements.map((item, index) => (
+            {currentChangelog.improvements.map((item, index) => (
               <UpdateRow
                 /* eslint-disable-next-line react/no-array-index-key */
                 key={index}
@@ -249,7 +290,7 @@ const ChangeLogs = () => {
           </ul>
         </Section>
         <Section>
-          {changelog.bugfixes.length ? (
+          {currentChangelog.bugfixes.length ? (
             <SectionTitle
               css={`
                 color: ${props => props.theme.palette.colors.red};
@@ -273,7 +314,7 @@ const ChangeLogs = () => {
             </SectionTitle>
           ) : null}
           <ul ref={intersectionObserverRef}>
-            {changelog.bugfixes.map((item, index) => (
+            {currentChangelog.bugfixes.map((item, index) => (
               <UpdateRow
                 /* eslint-disable-next-line react/no-array-index-key */
                 key={index}
@@ -284,6 +325,81 @@ const ChangeLogs = () => {
             ))}
           </ul>
         </Section>
+        <div
+          css={`
+            background-color: #00000016;
+            box-shadow: 5px 4px 3px #00000026;
+            border-radius: 5px;
+            height: 80px;
+            padding: 0 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          `}
+        >
+          <div
+            css={`
+              width: 150px;
+            `}
+          >
+            <span
+              css={`
+                margin-bottom: -10px;
+                margin-left: 2px;
+                color: ${props => props.theme.palette.text.secondary};
+              `}
+            >
+              Selected Changelog
+            </span>
+            <Select
+              css={`
+                width: 100%;
+              `}
+              onChange={e => setCurrentVersion(e)}
+              value={currentVersion}
+            >
+              {changelog.map(current => {
+                return (
+                  <Select.Option value={current.version} key={current.version}>
+                    {current.version}
+                  </Select.Option>
+                );
+              })}
+            </Select>
+          </div>
+          <div
+            css={`
+              display: flex;
+              flex-direction: column;
+              height: 100%;
+              justify-content: space-evenly;
+              width: 185px;
+
+              span {
+                color: ${props => props.theme.palette.primary.light};
+                text-align: right;
+              }
+            `}
+          >
+            <a onClick={() => setShowAdvanced(!showAdvanced)}>
+              {showAdvanced
+                ? 'Hide extended information'
+                : 'Show extended information'}
+            </a>
+            <a
+              onClick={() => {
+                setIncludeBeta(!includeBeta);
+                setCurrentChangelog(
+                  getVersionChangelog(currentVersion, !includeBeta)
+                );
+              }}
+            >
+              {includeBeta
+                ? 'Exclude beta changelogs'
+                : 'Include beta changelogs'}
+            </a>
+          </div>
+        </div>
       </Container>
       <div
         css={`
@@ -337,7 +453,7 @@ const Section = styled.div`
     margin: 20px 0 !important;
   }
   ul {
-    padding: 0px;
+    padding: 0;
     list-style-position: inside;
     width: 100%;
     margin: 20px 0;
