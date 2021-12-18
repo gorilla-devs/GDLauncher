@@ -49,7 +49,8 @@
     "upload": "node ./scripts/uploadRelease.js",
     "release": "rimraf ./deploy && npm run release:setup && npm run release:portable",
     "prepare": "husky install",
-    "build-gdlib": "go build -o ./build/ ./"
+    "build-gdlib": "go build -o ./build/ ./",
+    "test-go": "go test ./gdlib"
   },
   "lint-staged": {
     "*.{js,jsx}": [

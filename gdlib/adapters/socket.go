@@ -1,9 +1,10 @@
-package gdlib
+package adapters
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gdl-s/gdlib"
 	"gdl-s/gdlib/events"
 	"log"
 	"net/http"
@@ -31,9 +32,9 @@ type SocketResponse struct {
 }
 
 const (
-	FS_START = iota
-	FS_STOP
-	FS_LIST
+	FS_WATCHER_START = iota
+	FS_WATCHER_STOP
+	FS_WATCHER_LIST
 )
 
 var shouldQuit = true
@@ -165,31 +166,13 @@ func processMurmurHash2(payload []byte) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-
 	filePath := hashmap["path"]
-	fd, err := os.Open(filePath)
-	if err != nil {
-		return 0, err
-	}
-	stat, err := fd.Stat()
-	if err != nil {
-		return 0, err
-	}
-	defer fd.Close()
-	buffer := make([]byte, stat.Size())
-	_, err = fd.Read(buffer)
-	if err != nil {
-		return 0, err
-	}
 
-	res := buffer[:0]
-	for _, v := range buffer {
-		if v != 9 && v != 10 && v != 13 && v != 32 {
-			res = append(res, v)
-		}
-	}
+	murmur2, err := gdlib.ComputeMurmur2(filePath)
 
-	murmur2 := MurmurHash2(res)
+	if err != nil {
+		return 0, err
+	}
 
 	return int(murmur2), nil
 }
@@ -222,14 +205,18 @@ func processFSWatcher(payload []byte, c *websocket.Conn) (int, error) {
 
 	directory := hashmap["path"].(string)
 
+	updateFunc := func(data gdlib.FSEvent) {
+		fmt.Println(data)
+	}
+
 	var done = make(chan error)
 	switch hashmap["action"].(float64) {
 	default:
-	case FS_START:
-		go startFSWatcher(directory, c, done)
-	case FS_STOP:
-		go stopFSWatcher(directory, c, done)
-	case FS_LIST:
+	case FS_WATCHER_START:
+		go gdlib.StartFSWatcher(directory, updateFunc, done)
+	case FS_WATCHER_STOP:
+		go gdlib.StopFSWatcher(directory, updateFunc, done)
+	case FS_WATCHER_LIST:
 		fmt.Println("FSWatcher: List")
 	}
 

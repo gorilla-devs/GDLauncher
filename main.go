@@ -1,10 +1,9 @@
 package main
 
 import (
-	"gdl-s/gdlib"
+	"gdl-s/gdlib/adapters"
 )
 
 func main() {
-	gdlib.StartServer()
-
+	adapters.StartServer()
 }

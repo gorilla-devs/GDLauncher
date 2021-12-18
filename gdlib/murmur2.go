@@ -1,5 +1,33 @@
 package gdlib
 
+import "os"
+
+func ComputeMurmur2(filePath string) (uint32, error) {
+	fd, err := os.Open(filePath)
+	if err != nil {
+		return 0, err
+	}
+	stat, err := fd.Stat()
+	if err != nil {
+		return 0, err
+	}
+	defer fd.Close()
+	buffer := make([]byte, stat.Size())
+	_, err = fd.Read(buffer)
+	if err != nil {
+		return 0, err
+	}
+
+	res := buffer[:0]
+	for _, v := range buffer {
+		if v != 9 && v != 10 && v != 13 && v != 32 {
+			res = append(res, v)
+		}
+	}
+
+	return murmurHash2(res), nil
+}
+
 const (
 	M     = 0x5bd1e995
 	BIG_M = 0xc6a4a7935bd1e995
@@ -16,7 +44,7 @@ func mmix(h uint32, k uint32) (uint32, uint32) {
 	return h, k
 }
 
-func MurmurHash2(data []byte) (h uint32) {
+func murmurHash2(data []byte) (h uint32) {
 	var k uint32
 	h = 1 ^ uint32(len(data))
 	for l := len(data); l >= 4; l -= 4 {

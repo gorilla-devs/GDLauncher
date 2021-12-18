@@ -7,14 +7,23 @@ import (
 	"log"
 	"os"
 	"time"
-
-	"github.com/gorilla/websocket"
 )
 
-var dirsToWatch []string
-var stopChans = make(map[string]chan bool, 20)
+const (
+	FS_CREATE = iota
+	FS_DELETE
+	FS_RENAME
+)
 
-func startFSWatcher(directory string, c *websocket.Conn, done chan<- error) {
+type FSEvent struct {
+	Type int
+	Path string
+}
+
+var dirsToWatch []string
+var stopChans = make(map[string](chan bool), 20)
+
+func StartFSWatcher(directory string, updateFunc func(FSEvent), done chan<- error) {
 	alreadyWatching := false
 	for _, v := range dirsToWatch {
 		if v == directory {
@@ -30,10 +39,10 @@ func startFSWatcher(directory string, c *websocket.Conn, done chan<- error) {
 	// Check if we're not watching that directory already
 	dirsToWatch = append(dirsToWatch, directory)
 	// This should release the channel as soon as it's done initializing
-	watchDirectory(directory, done)
+	watchDirectory(directory, updateFunc, done)
 }
 
-func stopFSWatcher(directory string, c *websocket.Conn, done chan<- error) {
+func StopFSWatcher(directory string, updateFunc func(FSEvent), done chan<- error) {
 	stopChans[directory] <- true
 	delete(stopChans, directory)
 	fmt.Println("Stopped watching directory:", directory)
@@ -41,7 +50,7 @@ func stopFSWatcher(directory string, c *websocket.Conn, done chan<- error) {
 }
 
 // This function should release the channel as soon as it's done initializing
-func watchDirectory(directory string, done chan<- error) {
+func watchDirectory(directory string, updateFunc func(FSEvent), done chan<- error) {
 	hashmap := make(map[string]string)
 	res, err := readAllFiles(directory)
 	if err != nil {
@@ -60,14 +69,13 @@ func watchDirectory(directory string, done chan<- error) {
 	for {
 		select {
 		case <-stopChans[directory]:
-			fmt.Println("Stopped watching directory FROM INSIDE:", directory)
 			delete(stopChans, directory)
 			return
 		case <-time.After(200 * time.Millisecond):
 			{
 				filesOnDisk, err := readAllFiles(directory)
 				if err != nil {
-					log.Fatal(err)
+					log.Fatal(err) // TODO: FIX
 				}
 
 				hashmapLen := len(hashmap)
@@ -78,10 +86,10 @@ func watchDirectory(directory string, done chan<- error) {
 				for _, file := range filesOnDisk {
 					if _, ok := hashmap[file.Name()]; !ok {
 						if hashmapLen == len(filesOnDisk) {
-							log.Println("rename:", file.Name())
+							updateFunc(FSEvent{FS_RENAME, file.Name()})
 							renamed[file.Name()] = file.Name()
 						} else {
-							log.Println("new file detected:", file.Name())
+							updateFunc(FSEvent{FS_CREATE, file.Name()})
 						}
 						hashmap[file.Name()] = file.Name()
 					}
@@ -97,7 +105,7 @@ func watchDirectory(directory string, done chan<- error) {
 					}
 					if !found {
 						if hashmapLen != len(filesOnDisk) {
-							log.Println("file removed:", v, hashmapLen, len(filesOnDisk))
+							updateFunc(FSEvent{FS_DELETE, v})
 						}
 						delete(hashmap, v)
 					}

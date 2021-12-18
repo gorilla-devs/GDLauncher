@@ -34,6 +34,9 @@ jobs:
       - name: npm run install
         run: |
           npm i
+      - name: npm run test-go
+        run: |
+          npm run test-go
       - name: npm run lint
         run: |
           npm run lint
