@@ -30,7 +30,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '16.12.0'
-
+      steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17.5'
+      - run: go version
+      
       - name: npm run install
         run: |
           npm i
