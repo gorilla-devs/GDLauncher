@@ -50,7 +50,7 @@
     "release": "npm i && rimraf ./deploy && npm run release:setup && npm run release:portable",
     "prepare": "husky install",
     "build-gdlib": "go build -o ./build/ ./",
-    "test-go": "go test ./gdlib"
+    "test-go": "go test -test.v ./gdlib/..."
   },
   "lint-staged": {
     "*.{js,jsx}": [

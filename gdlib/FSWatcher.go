@@ -24,16 +24,11 @@ var dirsToWatch []string
 var stopChans = make(map[string](chan bool), 20)
 
 func StartFSWatcher(directory string, updateFunc func(FSEvent), done chan<- error) {
-	alreadyWatching := false
 	for _, v := range dirsToWatch {
 		if v == directory {
-			alreadyWatching = true
-			break
+			done <- errors.New("directory already being watched")
+			return
 		}
-	}
-	if alreadyWatching {
-		done <- errors.New("directory already being watched")
-		return
 	}
 
 	// Check if we're not watching that directory already

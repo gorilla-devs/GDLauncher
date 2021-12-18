@@ -14,13 +14,9 @@ import (
 )
 
 type Message struct {
-	Type    int            `json:"type"`
-	Id      string         `json:"id"`
-	Payload PayloadRequest `json:"payload"`
-}
-
-type PayloadRequest struct {
-	Data []byte `json:"data"`
+	Type    int         `json:"type"`
+	Id      string      `json:"id"`
+	Payload interface{} `json:"payload"`
 }
 
 type SocketResponse struct {
@@ -116,18 +112,19 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 		return
 	}
 
-	fmt.Println("Request:", message.Id, "event of type", message.Type)
+	fmt.Println("Request:", message)
+	payloadData := message.Payload.(map[string]interface{})
 	var response int
 	// Response should be 0 if the status is ok
 	switch message.Type {
 	case events.Ping:
-		response, err = processPing(message.Payload.Data)
+		response, err = processPing(payloadData)
 	case events.MurmurHash2:
-		response, err = processMurmurHash2(message.Payload.Data)
+		response, err = processMurmurHash2(payloadData)
 	case events.Quit:
-		response, err = processQuit(message.Payload.Data)
+		response, err = processQuit(payloadData)
 	case events.FSWatcher:
-		response, err = processFSWatcher(message.Payload.Data, c)
+		response, err = processFSWatcher(payloadData, c)
 	}
 
 	if err != nil {
@@ -158,7 +155,7 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 // will quit
 //
 // payload: {}
-func processPing(payload []byte) (int, error) {
+func processPing(payload map[string]interface{}) (int, error) {
 	fmt.Printf("PING %v\n", payload)
 	shouldQuit = false
 	return 123456789, nil
@@ -169,13 +166,16 @@ func processPing(payload []byte) (int, error) {
 // payload: {
 //     path: string - path to the file to calculate the hash for
 // }
-func processMurmurHash2(payload []byte) (int, error) {
-	hashmap := make(map[string]string)
-	err := json.Unmarshal(payload, &hashmap)
-	if err != nil {
-		return 0, err
+func processMurmurHash2(payload map[string]interface{}) (int, error) {
+	fp, ok := payload["path"]
+	if !ok {
+		return 1, errors.New("path not specified in payload")
 	}
-	filePath := hashmap["path"]
+
+	filePath, ok := fp.(string)
+	if !ok {
+		return 1, errors.New("path not a string")
+	}
 
 	murmur2, err := gdlib.ComputeMurmur2(filePath)
 
@@ -189,7 +189,7 @@ func processMurmurHash2(payload []byte) (int, error) {
 // Quits the server
 //
 // payload: {}
-func processQuit(payload []byte) (int, error) {
+func processQuit(payload map[string]interface{}) (int, error) {
 	quitError <- errors.New("quitting")
 	return 0, nil
 }
@@ -200,25 +200,33 @@ func processQuit(payload []byte) (int, error) {
 //     path: string - path to file / directory to watch
 //     action: int  - 0 for start, 1 for stop, 2 for list
 // }
-func processFSWatcher(payload []byte, c *websocket.Conn) (int, error) {
-	hashmap := make(map[string]interface{})
-	err := json.Unmarshal(payload, &hashmap)
-	if err != nil {
-		return 0, err
+func processFSWatcher(payload map[string]interface{}, c *websocket.Conn) (int, error) {
+	directoryParam, ok := payload["path"]
+	if !ok {
+		return 1, errors.New("path not specified in payload")
 	}
 
-	if err != nil {
-		return 0, err
+	directory, ok := directoryParam.(string)
+	if !ok {
+		return 1, errors.New("path not a string")
 	}
 
-	directory := hashmap["path"].(string)
+	actionParam, ok := payload["action"]
+	if !ok {
+		return 1, errors.New("path not specified in payload")
+	}
+
+	action, ok := actionParam.(float64)
+	if !ok {
+		return 1, errors.New("path not a float64")
+	}
 
 	updateFunc := func(data gdlib.FSEvent) {
 		fmt.Println(data)
 	}
 
 	var done = make(chan error)
-	switch hashmap["action"].(float64) {
+	switch action {
 	default:
 	case FS_WATCHER_START:
 		go gdlib.StartFSWatcher(directory, updateFunc, done)
