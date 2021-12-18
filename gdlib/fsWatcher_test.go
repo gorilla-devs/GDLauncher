@@ -56,7 +56,7 @@ func TestStartFSWatcher(t *testing.T) {
 	// Test file rename
 	go func() {
 		time.Sleep(time.Second)
-		os.Rename("./test_dir/test1/mock_file_temp", "./test_dir/mock_file_temp2")
+		os.Rename("./test_dir/test1/mock_file_temp", "./test_dir/test1/mock_file_temp2")
 	}()
 
 	select {

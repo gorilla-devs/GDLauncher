@@ -8,7 +8,6 @@ import (
 	"gdl-s/gdlib/events"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -41,7 +40,13 @@ var shouldQuit = true
 var upgrader = websocket.Upgrader{}
 var semaphore = make(chan int, 1)
 
+var quitError = make(chan error)
+
 const PORT = 7890
+
+func init() {
+	http.HandleFunc("/v1", handleRequest)
+}
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	semaphore <- 1
@@ -80,7 +85,7 @@ func sendErrorResponse(err error, request Message) []byte {
 	return errorResp
 }
 
-func StartServer() {
+func StartServer() error {
 	// If we don't receive a ping signal within 10 seconds, we should quit
 	go func() {
 		// Intentionally not passing shouldQuit as parameter because we want to
@@ -88,14 +93,18 @@ func StartServer() {
 		// race but it isn't in this case
 		time.Sleep(10 * time.Second)
 		if shouldQuit {
-			fmt.Println("Quitting caused by no ping received within 10s from startup")
-			os.Exit(0)
+			quitError <- errors.New("quitting caused by no ping received within 10s from startup")
 		}
 	}()
 
-	http.HandleFunc("/v1", handleRequest)
 	fmt.Println("Listening on port", PORT)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%d", PORT), nil))
+	go func() {
+		err := http.ListenAndServe(fmt.Sprintf("localhost:%d", PORT), nil)
+		quitError <- err
+	}()
+
+	err := <-quitError
+	return err
 }
 
 func processEvent(payload []byte, mt int, c *websocket.Conn) {
@@ -181,8 +190,7 @@ func processMurmurHash2(payload []byte) (int, error) {
 //
 // payload: {}
 func processQuit(payload []byte) (int, error) {
-	fmt.Println("Quitting")
-	os.Exit(0)
+	quitError <- errors.New("quitting")
 	return 0, nil
 }
 
