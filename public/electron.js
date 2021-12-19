@@ -237,7 +237,7 @@ let gdlS = null;
 
 function startServer() {
   gdlS = spawn(
-    path.join(__dirname, `gdl-s${process.platform !== 'win32' ? '.exe' : ''}`),
+    path.join(__dirname, `gdl-s${process.platform === 'win32' ? '.exe' : ''}`),
     {
       cwd: __dirname
     }
