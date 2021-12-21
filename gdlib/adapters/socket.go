@@ -226,6 +226,8 @@ func processFSWatcher(payload map[string]interface{}, c *websocket.Conn) (int, e
 	}
 
 	var done = make(chan error)
+	defer close(done)
+
 	switch action {
 	default:
 	case FS_WATCHER_START:

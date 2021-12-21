@@ -6,6 +6,14 @@ class ClientSocket {
       this.sendMessage(events.ping, {})
         .then(res => console.log(res))
         .catch(console.error);
+      this.sendMessage(events.fsWatcher, { action: 0, path: './' })
+        .then(res => console.log(res))
+        .catch(console.error);
+      setTimeout(() => {
+        this.sendMessage(events.fsWatcher, { action: 1, path: './' })
+          .then(res => console.log(res))
+          .catch(console.error);
+      }, 20000);
     };
     this.webSocket.onclose = () => {
       console.log('Disconnected from gdlib');
@@ -36,7 +44,7 @@ class ClientSocket {
       JSON.stringify({
         type: socketEvent,
         id: messageId,
-        payload: Buffer.from(JSON.stringify(payload))
+        payload
       })
     );
 

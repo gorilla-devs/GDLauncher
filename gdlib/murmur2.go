@@ -7,11 +7,11 @@ func ComputeMurmur2(filePath string) (uint32, error) {
 	if err != nil {
 		return 0, err
 	}
+	defer fd.Close()
 	stat, err := fd.Stat()
 	if err != nil {
 		return 0, err
 	}
-	defer fd.Close()
 	buffer := make([]byte, stat.Size())
 	_, err = fd.Read(buffer)
 	if err != nil {

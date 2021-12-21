@@ -253,13 +253,12 @@ function startServer() {
 }
 
 async function closeServer() {
-  if (!gdlS.killed) {
+  if (!gdlS.killed && gdlS.pid) {
     // eslint-disable-next-line global-require
-    const fkill = require('esm')('fkill');
-    console.log('Killing GDL-S');
+    console.log('Fallback kill GDL-S');
     gdlS.removeAllListeners();
-    await fkill(gdlS.pid);
-    console.log('Killed GDL-S status?:', gdlS.killed);
+    process.kill(gdlS.pid);
+    console.log('Fallback kill GDL-S status?:', gdlS.killed);
   }
 }
 

@@ -45,11 +45,13 @@ func StopFSWatcher(directory string, updateFunc func(FSEvent), done chan<- error
 }
 
 // This function should release the channel as soon as it's done initializing
+// In the future, we might implement native os fs events, for now it just takes too much time and effort
 func watchDirectory(directory string, updateFunc func(FSEvent), done chan<- error) {
 	hashmap := make(map[string]string)
 	res, err := readAllFiles(directory)
 	if err != nil {
 		done <- err
+		return
 	}
 	for _, v := range res {
 		hashmap[v.Name()] = v.Name()
@@ -70,7 +72,9 @@ func watchDirectory(directory string, updateFunc func(FSEvent), done chan<- erro
 			{
 				filesOnDisk, err := readAllFiles(directory)
 				if err != nil {
-					log.Fatal(err) // TODO: FIX
+					delete(stopChans, directory)
+					done <- err
+					return
 				}
 
 				hashmapLen := len(hashmap)
