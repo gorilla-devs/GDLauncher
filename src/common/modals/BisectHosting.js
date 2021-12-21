@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
 import BisectHostingLogo from '../../ui/BisectHosting';
+import ga from '../utils/analytics';
 
 const BisectHosting = () => {
   return (
@@ -57,6 +58,9 @@ const BisectHosting = () => {
             css={`
               margin-top: 25px;
             `}
+            onClick={() => {
+              ga.sendCustomEvent('BHClickAdLink');
+            }}
           >
             Go to BisectHosting.com &nbsp;
             <FontAwesomeIcon icon={faExternalLinkAlt} />

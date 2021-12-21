@@ -4,6 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import Modal from '../components/Modal';
 import { closeModal, openModal } from '../reducers/modals/actions';
 import BisectHosting from '../../ui/BisectHosting';
+import ga from '../utils/analytics';
 
 let timer;
 
@@ -17,6 +18,7 @@ const InstanceStartupAd = ({ instanceName }) => {
     }
     dispatch(closeModal());
     setTimeout(() => {
+      ga.sendCustomEvent('BHAdViewNavbar');
       dispatch(openModal('BisectHosting'));
     }, 225);
   };
