@@ -117,6 +117,23 @@ const ChangeLogs = () => {
     >
       <Container>
         <Header>
+          {new Date().getMonth() === 11 &&
+          [20, 21, 22, 23, 24, 25, 26, 27, 28, 29].includes(
+            new Date().getDate()
+          ) ? (
+            <h1>
+              Happy Christmas!{' '}
+              <span
+                css={`
+                  font-size: 16px;
+                `}
+              >
+                from the GDL Team
+              </span>
+            </h1>
+          ) : (
+            ''
+          )}
           <img
             css={`
               border-radius: 5px;
