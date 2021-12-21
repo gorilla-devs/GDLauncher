@@ -109,6 +109,7 @@ import {
   patchForge113,
   reflect
 } from '../../app/desktop/utils';
+import ga from '../utils/analytics';
 import {
   downloadFile,
   downloadInstanceFiles
@@ -2869,7 +2870,7 @@ export function launchInstance(instanceName, forceQuit = false) {
       dispatch(launchInstance(instanceName, true));
       return;
     }
-
+    ga.sendCustomEvent('launchedInstance');
     dispatch(openModal('InstanceStartupAd', { instanceName }));
 
     const getJvmArguments =
