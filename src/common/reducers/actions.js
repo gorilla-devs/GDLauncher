@@ -1662,7 +1662,7 @@ export function processFTBManifest(instanceName) {
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { manifest } = _getCurrentDownloadItem(state);
+    const { manifest, loader } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading mods...'));
@@ -1740,7 +1740,7 @@ export function processForgeManifest(instanceName) {
       { concurrency }
     );
 
-    const validAddon = false;
+    let validAddon = false;
     const addonPathZip = path.join(
       _getTempPath(state),
       instanceName,
@@ -1749,8 +1749,18 @@ export function processForgeManifest(instanceName) {
 
     try {
       await fs.stat(addonPathZip);
+      validAddon = true;
     } catch {
-      // NO-OP
+      // If project and file id are provided, we download it on the spot
+      if (loader.projectID && loader.fileID) {
+        const { data } = await getAddonFile(loader.projectID, loader.fileID);
+        try {
+          await downloadFile(addonPathZip, data.downloadUrl);
+          validAddon = true;
+        } catch {
+          // NO-OP
+        }
+      }
     }
 
     if (validAddon) {
@@ -2283,7 +2293,7 @@ export const startListener = () => {
       const processChange = async () => {
         const newState = getState();
         const instances = newState.instances.list;
-        const modData = instances[oldInstanceName].mods.find(
+        const modData = (instances[oldInstanceName].mods || []).find(
           m => m.fileName === path.basename(fileName)
         );
         if (modData) {
@@ -2703,14 +2713,16 @@ export function launchInstance(instanceName, forceQuit = false) {
     if (mcJson.logging) {
       // Verify logging xml
       const { sha1: loggingHash, id: loggingId } = mcJson.logging.client.file;
-      const loggingPath = path.join(
-        _getAssetsPath(state),
-        'objects',
-        loggingHash.substring(0, 2),
-        loggingId
-      );
-      verified = await verifyResource(loggingPath);
-      if (!verified) return;
+      if (loggingHash && loggingId) {
+        const loggingPath = path.join(
+          _getAssetsPath(state),
+          'objects',
+          loggingHash.substring(0, 2),
+          loggingId
+        );
+        verified = await verifyResource(loggingPath);
+        if (!verified) return;
+      }
     }
 
     // Verify assets
