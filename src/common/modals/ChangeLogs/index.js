@@ -1,8 +1,9 @@
 /* eslint-disable react/no-unescaped-entities */
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
+import TypeAnimation from 'react-type-animation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBug, faStar, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { useInView } from 'react-intersection-observer';
@@ -10,6 +11,7 @@ import Modal from '../../components/Modal';
 import SocialButtons from '../../components/SocialButtons';
 import KoFiButton from '../../assets/ko-fi.png';
 import UpdateIllustration from '../../assets/update_illustration.png';
+import UpdateIllustrationChristmas from '../../assets/update_illustration_christmas.png';
 import { openModal } from '../../reducers/modals/actions';
 import ga from '../../utils/analytics';
 import changelog from './changeLog';
@@ -79,6 +81,33 @@ const ChangeLogs = () => {
       skip: skipIObserver
     });
 
+  const typingSequence = useMemo(() => {
+    const completText = 'Merry Christmas!';
+    let textSoFar = '';
+    const newArr = [];
+    let timeToWait = 1300;
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < completText.length; i++) {
+      textSoFar += completText[i];
+      newArr.push(textSoFar, 50);
+      timeToWait += 50;
+    }
+
+    const completTextGDL = 'from the GDL Team';
+    let textSoFarGDL = '';
+    const fromGDLArr = [timeToWait];
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < completTextGDL.length; i++) {
+      textSoFarGDL += completTextGDL[i];
+      fromGDLArr.push(textSoFarGDL, 50);
+    }
+
+    return {
+      merryChristmas: newArr,
+      fromGDL: fromGDLArr
+    };
+  }, []);
+
   useEffect(() => {
     ipcRenderer
       .invoke('getAppVersion')
@@ -106,6 +135,10 @@ const ChangeLogs = () => {
     ga.sendCustomEvent('changelogModalOpenBisect');
   };
 
+  const isChristmas =
+    new Date().getMonth() === 11 &&
+    [21, 22, 23, 24, 25, 26, 27, 28, 29].includes(new Date().getDate());
+
   return (
     <Modal
       css={`
@@ -117,28 +150,45 @@ const ChangeLogs = () => {
     >
       <Container>
         <Header>
-          {new Date().getMonth() === 11 &&
-          [20, 21, 22, 23, 24, 25, 26, 27, 28, 29].includes(
-            new Date().getDate()
-          ) ? (
-            <h1>
-              Happy Christmas!{' '}
-              <span
+          {isChristmas ? (
+            <div
+              css={`
+                width: 430px;
+              `}
+            >
+              <h1
                 css={`
-                  font-size: 16px;
+                  font-weight: bold;
                 `}
               >
-                from the GDL Team
-              </span>
-            </h1>
+                <TypeAnimation
+                  cursor={false}
+                  sequence={typingSequence.merryChristmas}
+                  wrapper="span"
+                />{' '}
+                <span
+                  css={`
+                    font-size: 16px;
+                    font-weight: normal;
+                  `}
+                >
+                  <TypeAnimation
+                    cursor={false}
+                    sequence={typingSequence.fromGDL}
+                    wrapper="span"
+                  />
+                </span>
+              </h1>
+            </div>
           ) : (
             ''
           )}
           <img
             css={`
               border-radius: 5px;
+              width: 401px;
             `}
-            src={UpdateIllustration}
+            src={isChristmas ? UpdateIllustrationChristmas : UpdateIllustration}
             alt="New Version"
           />
           <div
