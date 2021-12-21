@@ -1,5 +1,11 @@
 module.exports = {
-  new: [],
+  new: [
+    {
+      header: 'Added "Repair Instance" option.',
+      content: '',
+      advanced: { cm: '4317ced' }
+    }
+  ],
   improvements: [
     {
       header: 'Instance resources will now be checked at startup.',

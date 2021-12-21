@@ -16,7 +16,8 @@ import {
   faStop,
   faBoxOpen,
   faCopy,
-  faServer
+  faServer,
+  faHammer
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -28,6 +29,7 @@ import {
 } from '../../../../common/utils/selectors';
 import {
   addStartedInstance,
+  addToQueue,
   launchInstance
 } from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
@@ -313,6 +315,7 @@ const Instance = ({ instanceName }) => {
                 icon={faStop}
                 css={`
                   margin-right: 10px;
+                  width: 25px !important;
                 `}
               />
               Kill
@@ -323,6 +326,7 @@ const Instance = ({ instanceName }) => {
               icon={faWrench}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Manage
@@ -332,6 +336,7 @@ const Instance = ({ instanceName }) => {
               icon={faFolder}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Open Folder
@@ -353,7 +358,7 @@ const Instance = ({ instanceName }) => {
               icon={faBoxOpen}
               css={`
                 margin-right: 10px;
-                width: 16px !important;
+                width: 25px !important;
               `}
             />
             Export Pack
@@ -366,11 +371,46 @@ const Instance = ({ instanceName }) => {
               icon={faCopy}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Duplicate
           </MenuItem>
           <MenuItem divider />
+          <MenuItem
+            disabled={Boolean(isInQueue) || Boolean(isPlaying)}
+            onClick={async () => {
+              let manifest = null;
+              try {
+                manifest = JSON.parse(
+                  await fs.readFile(
+                    path.join(instancesPath, instanceName, 'manifest.json')
+                  )
+                );
+              } catch {
+                // NO-OP
+              }
+
+              dispatch(
+                addToQueue(
+                  instanceName,
+                  instance.loader,
+                  manifest,
+                  instance.background,
+                  instance.timePlayed
+                )
+              );
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faHammer}
+              css={`
+                margin-right: 10px;
+                width: 25px !important;
+              `}
+            />
+            Repair
+          </MenuItem>
           <MenuItem
             disabled={Boolean(isInQueue) || Boolean(isPlaying)}
             onClick={openConfirmationDeleteModal}
@@ -379,6 +419,7 @@ const Instance = ({ instanceName }) => {
               icon={faTrash}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Delete
@@ -396,6 +437,7 @@ const Instance = ({ instanceName }) => {
               icon={faServer}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Create Server
