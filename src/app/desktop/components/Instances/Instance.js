@@ -210,7 +210,7 @@ const Instance = ({ instanceName }) => {
   const killProcess = () => {
     console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
-      if (children.length) {
+      if (children?.length) {
         children.forEach(el => {
           if (el) {
             process.kill(el.PID);

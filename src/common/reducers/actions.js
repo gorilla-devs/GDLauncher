@@ -1005,7 +1005,7 @@ export function updateInstanceConfig(
       const writeFileToDisk = async (content, tempP, p) => {
         await new Promise((resolve, reject) => {
           fss.open(tempP, 'w', async (err, fd) => {
-            if (err) reject(err);
+            if (err || !fd) reject(err);
 
             const buffer = Buffer.from(content);
             fss.write(
