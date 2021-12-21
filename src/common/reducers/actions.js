@@ -1701,6 +1701,7 @@ export function processForgeManifest(instanceName) {
     await pMap(
       manifest.files,
       async item => {
+        if (!addonsHashmap[item.projectID]) return;
         let ok = false;
         let tries = 0;
         /* eslint-disable no-await-in-loop */
@@ -1739,82 +1740,108 @@ export function processForgeManifest(instanceName) {
       { concurrency }
     );
 
-    dispatch(updateDownloadStatus(instanceName, 'Copying overrides...'));
+    const validAddon = false;
     const addonPathZip = path.join(
       _getTempPath(state),
       instanceName,
       'addon.zip'
     );
-    let progress = 0;
-    await extractAll(
-      addonPathZip,
-      path.join(_getTempPath(state), instanceName),
-      {
-        recursive: true,
-        $cherryPick: 'overrides',
-        $progress: true
-      },
-      {
-        progress: percent => {
-          if (percent !== progress) {
-            progress = percent;
-            dispatch(updateDownloadProgress(percent));
+
+    try {
+      await fs.stat(addonPathZip);
+    } catch {
+      // NO-OP
+    }
+
+    if (validAddon) {
+      dispatch(updateDownloadStatus(instanceName, 'Copying overrides...'));
+      let progress = 0;
+      await extractAll(
+        addonPathZip,
+        path.join(_getTempPath(state), instanceName),
+        {
+          recursive: true,
+          $cherryPick: 'overrides',
+          $progress: true
+        },
+        {
+          progress: percent => {
+            if (percent !== progress) {
+              progress = percent;
+              dispatch(updateDownloadProgress(percent));
+            }
           }
         }
-      }
-    );
-
-    dispatch(updateDownloadStatus(instanceName, 'Finalizing overrides...'));
-
-    const overrideFiles = await getFilesRecursive(
-      path.join(_getTempPath(state), instanceName, 'overrides')
-    );
-    await dispatch(
-      updateInstanceConfig(instanceName, config => {
-        return {
-          ...config,
-          mods: [...(config.mods || []), ...modManifests],
-          overrides: overrideFiles.map(v =>
-            path.relative(
-              path.join(_getTempPath(state), instanceName, 'overrides'),
-              v
-            )
-          )
-        };
-      })
-    );
-
-    await new Promise(resolve => {
-      // Force premature unlock to let our listener catch mods from override
-      lockfile.unlock(
-        path.join(
-          _getInstancesPath(getState()),
-          instanceName,
-          'installing.lock'
-        ),
-        err => {
-          if (err) console.error(err);
-          resolve();
-        }
       );
-    });
 
-    await Promise.all(
-      overrideFiles.map(v => {
-        const relativePath = path.relative(
-          path.join(_getTempPath(state), instanceName, 'overrides'),
-          v
-        );
-        const newPath = path.join(
-          _getInstancesPath(state),
-          instanceName,
-          relativePath
-        );
-        return fse.copy(v, newPath, { overwrite: true });
-      })
-    );
+      dispatch(updateDownloadStatus(instanceName, 'Finalizing overrides...'));
 
-    await fse.remove(addonPathZip);
+      const overrideFiles = await getFilesRecursive(
+        path.join(_getTempPath(state), instanceName, 'overrides')
+      );
+      await dispatch(
+        updateInstanceConfig(instanceName, config => {
+          return {
+            ...config,
+            mods: [...(config.mods || []), ...modManifests],
+            overrides: overrideFiles.map(v =>
+              path.relative(
+                path.join(_getTempPath(state), instanceName, 'overrides'),
+                v
+              )
+            )
+          };
+        })
+      );
+
+      await new Promise(resolve => {
+        // Force premature unlock to let our listener catch mods from override
+        lockfile.unlock(
+          path.join(
+            _getInstancesPath(getState()),
+            instanceName,
+            'installing.lock'
+          ),
+          err => {
+            if (err) console.error(err);
+            resolve();
+          }
+        );
+      });
+
+      await Promise.all(
+        overrideFiles.map(v => {
+          const relativePath = path.relative(
+            path.join(_getTempPath(state), instanceName, 'overrides'),
+            v
+          );
+          const newPath = path.join(
+            _getInstancesPath(state),
+            instanceName,
+            relativePath
+          );
+          return fse.copy(v, newPath, { overwrite: true });
+        })
+      );
+
+      await fse.remove(addonPathZip);
+    } else {
+      await new Promise(resolve => {
+        // Force premature unlock to let our listener catch mods from override
+        lockfile.unlock(
+          path.join(
+            _getInstancesPath(getState()),
+            instanceName,
+            'installing.lock'
+          ),
+          err => {
+            if (err) console.error(err);
+            resolve();
+          }
+        );
+      });
+    }
+
     await fse.remove(path.join(_getTempPath(state), instanceName));
   };
 }
