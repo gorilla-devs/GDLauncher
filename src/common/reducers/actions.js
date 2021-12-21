@@ -2582,7 +2582,7 @@ export function getJavaVersionForMCVersion(mcVersion) {
   };
 }
 
-export function launchInstance(instanceName) {
+export function launchInstance(instanceName, forceQuit = false) {
   return async (dispatch, getState) => {
     const state = getState();
 
@@ -2622,6 +2622,7 @@ export function launchInstance(instanceName) {
     let missingResource = false;
 
     const verifyResource = async resourcePath => {
+      if (forceQuit) return true;
       try {
         await fs.access(resourcePath);
         return true;
@@ -2865,7 +2866,7 @@ export function launchInstance(instanceName) {
         });
       });
 
-      dispatch(launchInstance(instanceName));
+      dispatch(launchInstance(instanceName, true));
       return;
     }
 
