@@ -1,0 +1,12 @@
+# Wails bin directory
+build/bin
+build
+
+# IDEs
+.idea
+.vscode
+
+# The black hole that is...
+node_modules
+frontend/dist
+frontend/wailsjs

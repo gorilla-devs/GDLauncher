@@ -1,0 +1,20 @@
+{
+  "name": "gdlauncher",
+  "frontend:build": "npm run build",
+  "frontend:install": "npm install",
+  "frontend:dev": "",
+  "wailsjsdir": "./frontend/src",
+  "version": "2",
+  "Path": "",
+  "BuildDir": "",
+  "outputfilename": "gdlauncher.exe",
+  "OutputType": "",
+  "Platform": "",
+  "Author": {
+    "name": "Davide",
+    "email": "davide.ceschia@gmail.com"
+  },
+  "debounceMS": 100,
+  "devserverurl": "http://localhost:34115",
+  "appargs": ""
+}
