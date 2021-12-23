@@ -54,7 +54,7 @@ const SystemNavbar = () => {
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     } else {
-      dispatch(isNewVersionAvailable())
+      isNewVersionAvailable()
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     }
