@@ -1,0 +1,15 @@
+{
+	"fixed": {
+		"file_version": "1.0.0"
+	},
+	"info": {
+		"0000": {
+			"ProductVersion": "1.0.0",
+			"CompanyName": "gdlauncher",
+			"FileDescription": "gdlauncher",
+			"LegalCopyright": "Copyright.........",
+			"ProductName": "gdlauncher",
+			"Comments": "Built using Wails (https://wails.app)"
+		}
+	}
+}
