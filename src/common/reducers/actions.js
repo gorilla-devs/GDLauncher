@@ -2923,7 +2923,7 @@ export function launchInstance(instanceName) {
     const loggingPath = path.join(
       assetsPath,
       'objects',
-      loggingHash.substring(0, 2),
+      (loggingHash || '').substring(0, 2),
       loggingId
     );
 

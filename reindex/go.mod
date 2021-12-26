@@ -1,4 +1,4 @@
-module changeme
+module gdlauncher
 
 go 1.17
 

@@ -2,7 +2,6 @@
   "name": "gdlauncher",
   "frontend:build": "npm run build",
   "frontend:install": "npm install",
-  "frontend:dev": "",
   "wailsjsdir": "./frontend/src",
   "version": "2",
   "Path": "",

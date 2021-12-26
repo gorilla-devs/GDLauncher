@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 )
 
 // App application struct
@@ -33,5 +34,12 @@ func (b *App) shutdown(ctx context.Context) {
 
 // Greet returns a greeting for the given name
 func (b *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s!", name)
+	time.Sleep(time.Second * 2)
+	return fmt.Sprintf("Hello 2 %s!", name)
+}
+
+// Greet returns a greeting for the given name
+func (b *App) LaunchInstance(name string) string {
+	time.Sleep(time.Second * 4)
+	return fmt.Sprint("Launch later 4", "Hi")
 }

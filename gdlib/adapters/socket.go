@@ -32,6 +32,10 @@ const (
 	FS_WATCHER_LIST
 )
 
+const (
+	GET_INSTANCES = iota
+)
+
 var shouldQuit = true
 var upgrader = websocket.Upgrader{}
 var semaphore = make(chan int, 1)
@@ -125,6 +129,8 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 		response, err = processQuit(payloadData)
 	case events.FSWatcher:
 		response, err = processFSWatcher(payloadData, c)
+	case events.Instances:
+		response, err = processInstances(payloadData, c)
 	}
 
 	if err != nil {
@@ -247,4 +253,10 @@ func processFSWatcher(payload map[string]interface{}, c *websocket.Conn) (int, e
 	case <-time.After(5 * time.Second):
 		return 1, errors.New("timeout waiting for FSWatcher action to finish")
 	}
+}
+
+func processInstances(payload map[string]interface{}, c *websocket.Conn) (int, error) {
+	// Do stuff
+
+	return 0, nil
 }

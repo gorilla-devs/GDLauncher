@@ -1,5 +1,6 @@
 <script context="module">
-	export const prerender = true;
+	export const prerender = false;
+	export const router = true;
 </script>
 
 <script>
@@ -19,13 +20,23 @@
 			</picture>
 		</div>
 
-		to your new<br />SvelteKit app
+		to your new<br />SvelteKit apppxxddd
 	</h1>
 
 	<h2>
 		try editing <strong>src/routes/index.svelte</strong>
 	</h2>
 
+	<button
+		on:click={() => {
+			window.go.main.App.Greet('HI').then(console.log);
+		}}>2</button
+	>
+	<button
+		on:click={() => {
+			window.go.main.App.LaunchInstance('HI').then(console.log);
+		}}>4</button
+	>
 	<Counter />
 </section>
 
