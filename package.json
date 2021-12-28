@@ -10,6 +10,7 @@
     "dev": "turbo run dev -parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "web:build": "turbo run build --scope=web",
     "app:dev": "concurrently \"tauri dev\" \"turbo run dev --scope=gdlib --scope=app\"",
     "web:dev": "turbo run dev --scope=web",
     "all:dev": "concurrently \"npm run web:dev\" \"npm run app:dev\""
