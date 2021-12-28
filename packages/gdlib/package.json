@@ -1,0 +1,9 @@
+{
+  "name": "gdlib",
+  "version": "0.0.0",
+  "description": "Styles and components for use in svelte websites",
+  "license": "MIT",
+  "scripts": {
+    "dev": "go run gdlib"
+  }
+}
