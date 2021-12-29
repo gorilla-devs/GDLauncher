@@ -5,6 +5,9 @@ import (
 	"gdlib/internal/account"
 	"os"
 	"path"
+	"strings"
+
+	"github.com/natefinch/atomic"
 )
 
 type Settings struct {
@@ -25,29 +28,10 @@ func init() {
 
 	settingsBytes, err := os.ReadFile(path.Join(getSettingsFilePath(), "config.json"))
 	if err != nil {
-		fd, err := os.Create(path.Join(getSettingsFilePath(), "config_temp.json"))
-		if err != nil {
-			panic(err)
-		}
-
-		if _, err = fd.WriteString(`{}`); err != nil {
-			panic(err)
-		}
-
-		if err = fd.Sync(); err != nil {
-			panic(err)
-		}
-		settingsBytes = []byte(`{}`)
-		defer func() {
-			err = fd.Close()
-			if err != nil {
-				panic(err)
-			}
-		}()
+		r := strings.NewReader("{}")
+		settingsBytes = []byte("{}")
+		atomic.WriteFile(path.Join(getSettingsFilePath(), "config.json"), r)
 	}
-
-	// Apply atomic rename
-	os.Rename(path.Join(getSettingsFilePath(), "config_temp.json"), path.Join(getSettingsFilePath(), "config.json"))
 
 	if err = json.Unmarshal(settingsBytes, &settings); err != nil {
 		panic(err)
