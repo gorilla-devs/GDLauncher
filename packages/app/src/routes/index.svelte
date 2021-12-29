@@ -1,11 +1,21 @@
 <script context="module">
-	export const prerender = false;
-	export const router = true;
+	export const prerender = true;
 </script>
 
 <script>
-	import Counter from '$lib/Counter.svelte';
+	import { getContext } from 'svelte';
+	const { theme, changeTheme, getThemes } = getContext('theme');
 	import { Button } from 'ui';
+
+	const themes = getThemes();
+	let currentTheme = theme.name;
+
+	console.log('THEME', currentTheme);
+
+	// theme.subscribe((value) => {
+	// 	currentTheme = value;
+	// });
+	// console.log(currentTheme);
 </script>
 
 <svelte:head>
@@ -13,47 +23,47 @@
 </svelte:head>
 
 <section>
-	<h1>
-		<div class="welcome">
-			<picture>
-				<source srcset="svelte-welcome.webp" type="image/webp" />
-				<img src="svelte-welcome.png" alt="Welcome" />
-			</picture>
-		</div>
-
-		to your new<br />SvelteKit APPLICATION
-	</h1>
-
-	<Button />
-
-	<h2>
-		try editing <strong>src/routes/index.svelte</strong>
-	</h2>
-
+	<h1>TEST</h1>
+	<!-- <select bind:value={currentTheme}>
+		{#each themes as themee}
+			<option value={themee}>
+				{themee.name}
+			</option>
+		{/each}
+	</select>
 	<button
 		on:click={() => {
-			window.go.main.App.Greet('HI').then(console.log);
-		}}>2</button
-	>
-
-	<button
-		on:click={() => {
-			window.go.main.App.LaunchInstance('HI').then(console.log);
-		}}>4</button
-	>
-	<Counter />
+			console.log('TT', currentTheme);
+			changeTheme(currentTheme.name);
+		}}>{$theme.name}</button
+	> -->
+	<Button size="small" icon="DDDD" slot="prefix">Large</Button>
+	<!-- <Button size="medium">Normal</Button> -->
+	<!-- <Button size="small">Small</Button> -->
 </section>
 
 <style>
+	:global(html) {
+		background-color: var(--theme-background);
+		color: var(--theme-text);
+	}
 	section {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		flex: 1;
+		position: absolute;
+	}
+
+	.square {
+		height: 50px;
+		width: 50px;
+		background: var(--theme-color);
 	}
 
 	h1 {
+		color: var(--theme-text);
 		width: 100%;
 	}
 
