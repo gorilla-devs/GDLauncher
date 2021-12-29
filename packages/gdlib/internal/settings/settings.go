@@ -2,17 +2,17 @@ package settings
 
 import (
 	"encoding/json"
-	"gdlauncher/internal/account"
+	"gdlib/internal/account"
 	"os"
 	"path"
 )
 
 type Settings struct {
-	BasePath         string
-	OverrideJavaArgs []string
-	OverrideJavaPath string
-	Language         string
-	Accounts         []account.Account
+	BasePath         string            `json:"basePath"`
+	OverrideJavaArgs []string          `json:"overrideJavaArgs"`
+	OverrideJavaPath string            `json:"overrideJavaPath"`
+	Language         string            `json:"language"`
+	Accounts         []account.Account `json:"accounts"`
 }
 
 var settings Settings
@@ -23,11 +23,31 @@ func init() {
 		panic(err)
 	}
 
-	settingsBytes, err := os.ReadFile(getSettingsFilePath())
+	settingsBytes, err := os.ReadFile(path.Join(getSettingsFilePath(), "config.json"))
 	if err != nil {
-		// TODO: Create settings file
-		panic(err)
+		fd, err := os.Create(path.Join(getSettingsFilePath(), "config_temp.json"))
+		if err != nil {
+			panic(err)
+		}
+
+		if _, err = fd.WriteString(`{}`); err != nil {
+			panic(err)
+		}
+
+		if err = fd.Sync(); err != nil {
+			panic(err)
+		}
+		settingsBytes = []byte(`{}`)
+		defer func() {
+			err = fd.Close()
+			if err != nil {
+				panic(err)
+			}
+		}()
 	}
+
+	// Apply atomic rename
+	os.Rename(path.Join(getSettingsFilePath(), "config_temp.json"), path.Join(getSettingsFilePath(), "config.json"))
 
 	if err = json.Unmarshal(settingsBytes, &settings); err != nil {
 		panic(err)
