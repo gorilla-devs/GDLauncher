@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/mitchellh/mapstructure"
 )
 
 type Message struct {
@@ -20,17 +21,12 @@ type Message struct {
 }
 
 type SocketResponse struct {
-	Type int         `json:"type"`
-	Id   string      `json:"id"`
-	Err  string      `json:"error,omitempty"`
-	Data interface{} `json:"data"`
+	Type      int         `json:"type"`
+	Id        string      `json:"id"`
+	Timestamp int64       `json:"timestamp"`
+	Err       string      `json:"error,omitempty"`
+	Data      interface{} `json:"data"`
 }
-
-const (
-	FS_WATCHER_START = iota
-	FS_WATCHER_STOP
-	FS_WATCHER_LIST
-)
 
 const (
 	GET_INSTANCES = iota
@@ -60,22 +56,24 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	defer c.Close()
 	for {
-		mt, message, err := c.ReadMessage()
+		var message Message
+		err := c.ReadJSON(&message)
 		if err != nil {
 			log.Println("read:", err)
 			break
 		}
-		processEvent(message, mt, c)
+		processEvent(message, c)
 	}
 	<-semaphore
 }
 
 func sendErrorResponse(err error, request Message) []byte {
 	resp := SocketResponse{
-		Err:  err.Error(),
-		Id:   request.Id,
-		Data: 1,
-		Type: request.Type,
+		Err:       err.Error(),
+		Id:        request.Id,
+		Data:      1,
+		Timestamp: time.Now().Unix(),
+		Type:      request.Type,
 	}
 	fmt.Printf("Response Error: %+v\n", resp)
 	errorResp, err := json.Marshal(resp)
@@ -107,14 +105,8 @@ func StartServer() error {
 	return err
 }
 
-func processEvent(payload []byte, mt int, c *websocket.Conn) {
+func processEvent(message Message, c *websocket.Conn) {
 	var err error
-	var message Message
-	err = json.Unmarshal(payload, &message)
-	if err != nil {
-		c.WriteMessage(mt, sendErrorResponse(err, message))
-		return
-	}
 
 	fmt.Println("Request:", message)
 	payloadData := message.Payload.(map[string]interface{})
@@ -134,56 +126,48 @@ func processEvent(payload []byte, mt int, c *websocket.Conn) {
 	}
 
 	if err != nil {
-		c.WriteMessage(mt, sendErrorResponse(err, message))
+		c.WriteJSON(sendErrorResponse(err, message))
 		return
 	}
 
 	newResp := SocketResponse{
-		Data: response,
-		Id:   message.Id,
-		Type: message.Type,
+		Data:      response,
+		Id:        message.Id,
+		Timestamp: time.Now().Unix(),
+		Type:      message.Type,
 	}
 
 	marshaled, err := json.Marshal(newResp)
 	if err != nil {
-		c.WriteMessage(mt, sendErrorResponse(err, message))
+		c.WriteJSON(sendErrorResponse(err, message))
 		return
 	}
 	fmt.Printf("Response: %+v\n", newResp)
-	err = c.WriteMessage(mt, []byte(marshaled))
+	err = c.WriteJSON([]byte(marshaled))
 	if err != nil {
-		c.WriteMessage(mt, sendErrorResponse(err, message))
+		c.WriteJSON(sendErrorResponse(err, message))
 		return
 	}
 }
 
-// Sends an init signal. If none is received within 10 seconds, the program
-// will quit
-//
-// payload: {}
 func processPing(payload map[string]interface{}) (int, error) {
 	fmt.Printf("PING %v\n", payload)
 	shouldQuit = false
 	return 123456789, nil
 }
 
-// Computes the murmur2 hash of the file at the given path
-//
-// payload: {
-//     path: string - path to the file to calculate the hash for
-// }
+type murmur2Event struct {
+	Path string `mapstructure:",omitempty"`
+}
+
 func processMurmurHash2(payload map[string]interface{}) (int, error) {
-	fp, ok := payload["path"]
-	if !ok {
-		return 1, errors.New("path not specified in payload")
+	var data murmur2Event
+	err := mapstructure.Decode(payload, &data)
+	if err != nil {
+		return 0, err
 	}
 
-	filePath, ok := fp.(string)
-	if !ok {
-		return 1, errors.New("path not a string")
-	}
-
-	murmur2, err := internal.ComputeMurmur2(filePath)
+	murmur2, err := internal.ComputeMurmur2(data.Path)
 
 	if err != nil {
 		return 0, err
@@ -192,39 +176,29 @@ func processMurmurHash2(payload map[string]interface{}) (int, error) {
 	return int(murmur2), nil
 }
 
-// Quits the server
-//
-// payload: {}
 func processQuit(payload map[string]interface{}) (int, error) {
 	quitError <- errors.New("quitting")
 	return 0, nil
 }
 
-// Processes the FS watcher event. The event can have an action which defines the behaviour of this function.
-//
-// payload: {
-//     path: string - path to file / directory to watch
-//     action: int  - 0 for start, 1 for stop, 2 for list
-// }
+type FSWatcherT int
+
+const (
+	FS_WATCHER_START FSWatcherT = iota
+	FS_WATCHER_STOP
+	FS_WATCHER_LIST
+)
+
+type fsWatcherEvent struct {
+	Path   string     `mapstructure:",omitempty"`
+	Action FSWatcherT `mapstructure:",omitempty"`
+}
+
 func processFSWatcher(payload map[string]interface{}, c *websocket.Conn) (int, error) {
-	directoryParam, ok := payload["path"]
-	if !ok {
-		return 1, errors.New("path not specified in payload")
-	}
-
-	directory, ok := directoryParam.(string)
-	if !ok {
-		return 1, errors.New("path not a string")
-	}
-
-	actionParam, ok := payload["action"]
-	if !ok {
-		return 1, errors.New("path not specified in payload")
-	}
-
-	action, ok := actionParam.(float64)
-	if !ok {
-		return 1, errors.New("path not a float64")
+	var data fsWatcherEvent
+	err := mapstructure.Decode(payload, &data)
+	if err != nil {
+		return 0, err
 	}
 
 	updateFunc := func(data internal.FSEvent) {
@@ -234,12 +208,12 @@ func processFSWatcher(payload map[string]interface{}, c *websocket.Conn) (int, e
 	var done = make(chan error)
 	defer close(done)
 
-	switch action {
+	switch data.Action {
 	default:
 	case FS_WATCHER_START:
-		go internal.StartFSWatcher(directory, updateFunc, done)
+		go internal.StartFSWatcher(data.Path, updateFunc, done)
 	case FS_WATCHER_STOP:
-		go internal.StopFSWatcher(directory, updateFunc, done)
+		go internal.StopFSWatcher(data.Path, updateFunc, done)
 	case FS_WATCHER_LIST:
 		fmt.Println("FSWatcher: List")
 	}
@@ -251,7 +225,7 @@ func processFSWatcher(payload map[string]interface{}, c *websocket.Conn) (int, e
 		}
 		return 0, nil
 	case <-time.After(5 * time.Second):
-		return 1, errors.New("timeout waiting for FSWatcher action to finish")
+		return 0, errors.New("timeout waiting for FSWatcher action to finish")
 	}
 }
 

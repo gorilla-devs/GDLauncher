@@ -2,24 +2,27 @@ package settings
 
 import (
 	"encoding/json"
+	"fmt"
 	"gdlib/internal/account"
 	"os"
 	"path"
 	"strings"
+	"sync"
 
-	"github.com/natefinch/atomic"
+	atom "github.com/natefinch/atomic"
 )
 
-type Settings struct {
-	BasePath         string            `json:"basePath"`
-	OverrideJavaArgs []string          `json:"overrideJavaArgs"`
-	OverrideJavaPath string            `json:"overrideJavaPath"`
-	Language         string            `json:"language"`
-	Accounts         []account.Account `json:"accounts"`
+type SettingsT struct {
+	BasePath         string            `json:"basePath,omitempty"`
+	OverrideJavaArgs []string          `json:"overrideJavaArgs,omitempty"`
+	OverrideJavaPath string            `json:"overrideJavaPath,omitempty"`
+	Language         string            `json:"language,omitempty"`
+	Accounts         []account.Account `json:"accounts,omitempty"`
 }
 
-var settings Settings
+var settings SettingsT
 var IsInitialized = false
+var mux sync.Mutex
 
 func init() {
 	if err := os.MkdirAll(getSettingsFilePath(), os.ModePerm); err != nil {
@@ -30,7 +33,7 @@ func init() {
 	if err != nil {
 		r := strings.NewReader("{}")
 		settingsBytes = []byte("{}")
-		atomic.WriteFile(path.Join(getSettingsFilePath(), "config.json"), r)
+		atom.WriteFile(path.Join(getSettingsFilePath(), "config.json"), r)
 	}
 
 	if err = json.Unmarshal(settingsBytes, &settings); err != nil {
@@ -40,6 +43,7 @@ func init() {
 }
 
 func UpdateSettings() error {
+	mux.Lock()
 	b, err := json.Marshal(settings)
 	if err != nil {
 		return err
@@ -50,14 +54,17 @@ func UpdateSettings() error {
 		return err
 	}
 
-	err = os.WriteFile(getSettingsFilePath(), b, os.ModePerm)
+	r := strings.NewReader(string(b))
+	atom.WriteFile(path.Join(getSettingsFilePath(), "config.json"), r)
 	if err != nil {
 		return err
 	}
+	fmt.Println("WROTE")
+	mux.Unlock()
 	return nil
 }
 
-func GetSettings() Settings {
+func GetSettings() SettingsT {
 	return settings
 }
 
