@@ -2,6 +2,7 @@ package settings
 
 import (
 	"encoding/json"
+	"gdlib/internal"
 	"gdlib/internal/account"
 	"os"
 	"path"
@@ -23,16 +24,12 @@ var settings SettingsT
 var IsInitialized = false
 var mux sync.Mutex
 
-func init() {
-	if err := os.MkdirAll(getSettingsFilePath(), os.ModePerm); err != nil {
-		panic(err)
-	}
-
-	settingsBytes, err := os.ReadFile(path.Join(getSettingsFilePath(), "config.json"))
+func Init() {
+	settingsBytes, err := os.ReadFile(path.Join(internal.GDL_USER_DATA, "config.json"))
 	if err != nil {
 		r := strings.NewReader("{}")
 		settingsBytes = []byte("{}")
-		atom.WriteFile(path.Join(getSettingsFilePath(), "config.json"), r)
+		atom.WriteFile(path.Join(internal.GDL_USER_DATA, "config.json"), r)
 	}
 
 	if err = json.Unmarshal(settingsBytes, &settings); err != nil {
@@ -59,23 +56,10 @@ func writeSettings() error {
 		return err
 	}
 
-	err = os.MkdirAll(getSettingsFilePath(), os.ModePerm)
-	if err != nil {
-		return err
-	}
-
 	r := strings.NewReader(string(b))
-	atom.WriteFile(path.Join(getSettingsFilePath(), "config.json"), r)
+	atom.WriteFile(path.Join(internal.GDL_USER_DATA, "config.json"), r)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func getSettingsFilePath() string {
-	userData, err := os.UserConfigDir()
-	if err != nil {
-		panic(err)
-	}
-	return path.Join(userData, "gdlauncher_next")
 }

@@ -61,16 +61,9 @@ const (
 )
 
 var instances map[string]Instance = make(map[string]Instance, 20)
-var userData string
 
-func init() {
-	var err error
-	userData, err = os.UserConfigDir()
-	if err != nil {
-		panic(err)
-	}
-
-	instancesPath := path.Join(userData, "gdlauncher_next", "instances")
+func Init() {
+	instancesPath := path.Join(internal.GDL_USER_DATA, "instances")
 	instancesFromDir, err := os.ReadDir(instancesPath)
 	if err != nil {
 		panic(err)
@@ -97,11 +90,7 @@ type InstanceFSEvent struct {
 }
 
 func WatchInstances(c *websocket.Conn) error {
-	userData, err := os.UserConfigDir()
-	if err != nil {
-		panic(err)
-	}
-	instancesPath := path.Join(userData, "gdlauncher_next", "instances")
+	instancesPath := path.Join(internal.GDL_USER_DATA, "instances")
 
 	updateFunc := func(data internal.FSEvent) {
 		respData := InstanceFSEvent{
@@ -129,7 +118,7 @@ func WatchInstances(c *websocket.Conn) error {
 			Type:      events.Instances,
 		}
 
-		err = c.WriteJSON(newResp)
+		err := c.WriteJSON(newResp)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -153,7 +142,7 @@ func WatchInstances(c *websocket.Conn) error {
 
 func readInstanceConfig(instanceName string) (Instance, error) {
 	// Read config.json
-	instancesPath := path.Join(userData, "gdlauncher_next", "instances")
+	instancesPath := path.Join(internal.GDL_USER_DATA, "instances")
 	instanceConfig, err := os.ReadFile(path.Join(instancesPath, instanceName, "config.json"))
 	if err != nil {
 		fmt.Println(err)

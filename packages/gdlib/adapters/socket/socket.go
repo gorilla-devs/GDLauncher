@@ -66,7 +66,7 @@ func sendErrorResponse(err error, request Message) []byte {
 	resp := internal.SocketResponse{
 		Err:       err.Error(),
 		Id:        request.Id,
-		Data:      1,
+		Data:      0,
 		Timestamp: time.Now().Unix(),
 		Type:      request.Type,
 	}

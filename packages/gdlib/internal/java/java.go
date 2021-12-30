@@ -1,1 +1,5 @@
 package java
+
+func Init() {
+
+}
