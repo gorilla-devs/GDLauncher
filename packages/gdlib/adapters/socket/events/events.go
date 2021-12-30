@@ -7,4 +7,6 @@ const (
 	Quit        = 2
 	FSWatcher   = 3
 	Instances   = 4
+	JavaDetect  = 5
+	JavaInstall = 6
 )

@@ -7,6 +7,7 @@ import (
 	"gdlib/adapters/socket/events"
 	"gdlib/internal"
 	"gdlib/internal/instance"
+	"gdlib/internal/java"
 	"log"
 	"net/http"
 	"time"
@@ -120,6 +121,10 @@ func processEvent(message Message, c *websocket.Conn) {
 		response, err = processQuit(payloadData)
 	case events.Instances:
 		response, err = processInstances(payloadData, c)
+	case events.JavaDetect:
+		response, err = processJavaDetect(payloadData, c)
+	case events.JavaInstall:
+		response, err = processJavaInstall(payloadData, c)
 	}
 
 	if err != nil {
@@ -194,4 +199,104 @@ func processInstances(payload map[string]interface{}, c *websocket.Conn) (map[st
 	}
 
 	return map[string]instance.Instance{}, nil
+}
+
+// Detect java version
+//
+// payload: {}
+// To fix, actually is broken
+func processJavaDetect(payload map[string]interface{}, c *websocket.Conn) ([]string, error) {
+
+	e := make(chan error)
+	result := make(chan string)
+	var versions []string
+	done := make(chan bool)
+
+	go java.JavaDetect(result, e, done)
+
+	for i := 0; i < 10; i++ {
+		select {
+		case v := <-e:
+
+			if v != nil {
+				return nil, v
+			}
+		case r := <-result:
+			if r != "" {
+				versions = append(versions, r)
+			}
+		case d := <-done:
+			if d {
+				return versions, nil
+			}
+
+		case <-time.After(5 * time.Second):
+			return nil, errors.New("timeout waiting for JavaDetect action to finish")
+		}
+	}
+
+	return versions, nil
+}
+
+// Install java
+//
+// payload: {
+//     javaVersion: string - java version to install, { "java8" | "java17" }
+// }
+type StatusInstallation struct {
+	Status int `json:"status,omitempty"`
+}
+
+func processJavaInstall(payload map[string]interface{}, c *websocket.Conn) (int, error) {
+
+	javaVersion, ok := payload["javaVersion"]
+
+	updateFunc := func(status int) {
+
+		respData := StatusInstallation{
+			Status: status,
+		}
+
+		newResp := internal.SocketResponse{
+			Data:      respData,
+			Id:        fmt.Sprint(time.Now().Unix()),
+			Timestamp: time.Now().Unix(),
+			Type:      events.JavaInstall,
+		}
+
+		err := c.WriteJSON(newResp)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	if !ok {
+		return 1, errors.New("path not specified in payload")
+	}
+
+	jv, ok := javaVersion.(string)
+	if !ok {
+		return 1, errors.New("javaVersion is not a string")
+	}
+
+	if jv == "java8" || jv == "java17" {
+		// updateProgress := func(process int) {
+		// 	fmt.Println(process)
+		// }
+
+		e := make(chan error)
+		go java.JavaInstall(e, updateFunc, jv)
+
+		select {
+		case v := <-e:
+			if v != nil {
+				return 1, v
+			}
+			return 0, nil
+		case <-time.After(15 * time.Second):
+			return 1, errors.New("timeout waiting for JavaInstall action to finish")
+		}
+	} else {
+		return 1, errors.New("\njava version not expected\njava versions expected are java8 or java17")
+	}
 }
