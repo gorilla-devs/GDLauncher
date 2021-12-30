@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"gdlib/adapters/socket/events"
 	"gdlib/internal"
+	"gdlib/internal/instance"
 	"log"
 	"net/http"
 	"time"
@@ -50,6 +51,12 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	c, err := upgrader.Upgrade(w, r, nil)
 
+	go func() {
+		err := instance.WatchInstances(c)
+		if err != nil {
+			log.Println("Error watching instances:", err)
+		}
+	}()
 	if err != nil {
 		log.Fatal("Upgrade:", err)
 	}
@@ -84,16 +91,16 @@ func sendErrorResponse(err error, request Message) []byte {
 }
 
 func StartServer() error {
-	// If we don't receive a ping signal within 10 seconds, we should quit
-	// go func() {
-	// 	// Intentionally not passing shouldQuit as parameter because we want to
-	// 	// always read the latest value. This should usually be considered a data
-	// 	// race but it isn't in this case
-	// 	time.Sleep(10 * time.Second)
-	// 	if shouldQuit {
-	// 		quitError <- errors.New("quitting caused by no ping received within 10s from startup")
-	// 	}
-	// }()
+	// If we don't receive a signal within 10 seconds, we should quit
+	go func() {
+		// Intentionally not passing shouldQuit as parameter because we want to
+		// always read the latest value. This should usually be considered a data
+		// race but it isn't in this case
+		time.Sleep(10 * time.Second)
+		if shouldQuit {
+			quitError <- errors.New("quitting caused by no ping received within 10s from startup")
+		}
+	}()
 
 	fmt.Println("Listening on port", PORT)
 	go func() {
@@ -107,8 +114,11 @@ func StartServer() error {
 
 func processEvent(message Message, c *websocket.Conn) {
 	var err error
-
+	shouldQuit = false
 	fmt.Println("Request:", message)
+	if message.Payload == nil {
+		return
+	}
 	payloadData := message.Payload.(map[string]interface{})
 	var response int
 	// Response should be 0 if the status is ok
@@ -119,8 +129,6 @@ func processEvent(message Message, c *websocket.Conn) {
 		response, err = processMurmurHash2(payloadData)
 	case events.Quit:
 		response, err = processQuit(payloadData)
-	case events.FSWatcher:
-		response, err = processFSWatcher(payloadData, c)
 	case events.Instances:
 		response, err = processInstances(payloadData, c)
 	}
@@ -152,7 +160,6 @@ func processEvent(message Message, c *websocket.Conn) {
 
 func processPing(payload map[string]interface{}) (int, error) {
 	fmt.Printf("PING %v\n", payload)
-	shouldQuit = false
 	return 123456789, nil
 }
 
@@ -181,52 +188,14 @@ func processQuit(payload map[string]interface{}) (int, error) {
 	return 0, nil
 }
 
-type FSWatcherT int
+type InstanceEventT int
 
 const (
-	FS_WATCHER_START FSWatcherT = iota
-	FS_WATCHER_STOP
-	FS_WATCHER_LIST
+	GET_ALL_INSTANCES InstanceEventT = iota
 )
 
-type fsWatcherEvent struct {
-	Path   string     `mapstructure:",omitempty"`
-	Action FSWatcherT `mapstructure:",omitempty"`
-}
-
-func processFSWatcher(payload map[string]interface{}, c *websocket.Conn) (int, error) {
-	var data fsWatcherEvent
-	err := mapstructure.Decode(payload, &data)
-	if err != nil {
-		return 0, err
-	}
-
-	updateFunc := func(data internal.FSEvent) {
-		fmt.Println(data)
-	}
-
-	var done = make(chan error)
-	defer close(done)
-
-	switch data.Action {
-	default:
-	case FS_WATCHER_START:
-		go internal.StartFSWatcher(data.Path, updateFunc, done)
-	case FS_WATCHER_STOP:
-		go internal.StopFSWatcher(data.Path, updateFunc, done)
-	case FS_WATCHER_LIST:
-		fmt.Println("FSWatcher: List")
-	}
-
-	select {
-	case v := <-done:
-		if v != nil {
-			return 1, v
-		}
-		return 0, nil
-	case <-time.After(5 * time.Second):
-		return 0, errors.New("timeout waiting for FSWatcher action to finish")
-	}
+type instanceEvent struct {
+	Action InstanceEventT `mapstructure:",omitempty"`
 }
 
 func processInstances(payload map[string]interface{}, c *websocket.Conn) (int, error) {
