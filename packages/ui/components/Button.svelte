@@ -1,7 +1,7 @@
 <script>
   import "./main.svelte";
 
-  export let variant;
+  export let variant = "";
   export let theme;
   export let icon;
   export let slot;
@@ -44,20 +44,19 @@
     on:click={() => {
       if (onClick) onClick();
     }}
-    on:mouseup={() => {
+    on:mousedown={() => {
       glow = true;
-      setTimeout(() => {
-        glow = false;
-      }, 100);
+    }}
+    on:mouseup={() => {
+      glow = false;
     }}
     class="button {variant}"
-    class:glow
     style="--gd-button-size: {mapSizeToVar(size)}; 
   font-size: {mapSizeToFontSize(size)};
   {theme && `background-color: var(--gd-${theme}-color);`}
   "
   >
-    <div class="button-container">
+    <div class="button-container {variant}" class:glow>
       <span class="prefix">
         {#if slot === "prefix" && icon}
           {icon}
@@ -117,37 +116,6 @@
     border-radius: var(--gd-border-radius-m);
   }
 
-  @keyframes glow {
-    from {
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
-    to {
-      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-    }
-  }
-
-  @keyframes glowPrimary {
-    from {
-      /* text-shadow: 0 0 30px rgba(255, 255, 255); */
-      text-shadow: 0 0 10px rgb(255, 255, 255), 0 0 20px rgb(255, 255, 255),
-        0 0 30px rgb(255, 255, 255);
-    }
-    to {
-      text-shadow: 0 0 20px rgb(255, 255, 255), 0 0 30px rgb(255, 255, 255),
-        0 0 40px rgb(255, 255, 255);
-    }
-  }
-
-  .glow {
-    animation: glowPrimary 0.1s ease-in-out;
-  }
-
-  /* .button:active {
-    -webkit-animation: glow 0.1s ease-in-out;
-    -moz-animation: glow 0.1s ease-in-out;
-    animation: glow 0.1s ease-in-out;
-  } */
-
   .button-container {
     display: inline-flex;
     align-items: center;
@@ -163,6 +131,34 @@
     box-shadow: none;
   }
 
+  .button-container::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: currentColor;
+    border-radius: inherit;
+    opacity: 0;
+
+    transition: opacity 1.4s, transform 0.1s;
+    filter: blur(8px);
+  }
+
+  .button-container.primary.glow::after {
+    opacity: 0.2;
+    transition-duration: 0s, 0s;
+    transform: scale(0);
+  }
+
+  .button-container.glow::after {
+    opacity: 0.1;
+    transition-duration: 0s, 0s;
+    transform: scale(0);
+  }
+
   .primary {
     background-color: var(
       --_gd-button-primary-background-color,
@@ -172,12 +168,6 @@
     font-weight: 600;
     min-width: calc(var(--gd-button-size) * 2.5);
   }
-  /* 
-  .primary:active {
-    -webkit-animation: glowPrimary 0.4s ease-in-out !important;
-    -moz-animation: glowPrimary 0.4s ease-in-out !important;
-    animation: glowPrimary 0.4s ease-in-out !important;
-  } */
 
   .third {
     padding: 0 calc(var(--gd-button-size) / 6);

@@ -37,7 +37,7 @@
 			changeTheme(currentTheme.name);
 		}}>{$theme.name}</button
 	> -->
-	<Button size="large" variant="second" theme="error" onClick={() => console.log('TEST')}>Large</Button>
+	<Button size="large" variant="third" onClick={() => console.log('TEST')}>Large</Button>
 	<!-- <Button size="medium">Normal</Button> -->
 	<!-- <Button size="small">Small</Button> -->
 </section>
