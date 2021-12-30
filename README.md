@@ -104,6 +104,7 @@ You need the following software installed:
 - [NodeJS](https://nodejs.org/en/download/) (> v16.13.1 x64)
 - [Rust](https://www.rust-lang.org/)
 - [Python2](https://www.python.org/)(Mac and linux)
+- [Go](https://go.dev/)
 - C++ compiler (g++ or windows build tools)
 
 ### ▶️ Steps
@@ -138,17 +139,10 @@ $ npm run release
 ## 🚀 Technologies
 
 - [Javascript](https://developer.mozilla.org/bm/docs/Web/JavaScript)
-- [React](https://reactjs.org/)
-- [Redux](https://redux.js.org/)
-- [NodeJS](https://nodejs.org/en/)
-- [Electron](https://electronjs.org/)
-- [Codacy](https://www.codacy.com/)
-- [Webpack](https://webpack.js.org/)
-- [Babel](https://babeljs.io/)
-- [ESLint](https://eslint.org/)
-- [Ant Design](https://ant.design/)
-- [Styled Components](https://styled-components.com/)
+- [Svelte](https://kit.svelte.dev/)
+- [Tauri](https://tauri.studio/)
 - [Rust](https://www.rust-lang.org/)
+- [Go](https://go.dev/)
 
 ## 🎁 Contributing
 
