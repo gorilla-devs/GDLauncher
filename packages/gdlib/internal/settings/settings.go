@@ -2,7 +2,6 @@ package settings
 
 import (
 	"encoding/json"
-	"fmt"
 	"gdlib/internal/account"
 	"os"
 	"path"
@@ -42,8 +41,19 @@ func init() {
 	IsInitialized = true
 }
 
-func UpdateSettings() error {
+func GetSettings() SettingsT {
+	return settings
+}
+
+func SetSettings(s SettingsT) error {
 	mux.Lock()
+	settings = s
+	err := writeSettings()
+	mux.Unlock()
+	return err
+}
+
+func writeSettings() error {
 	b, err := json.Marshal(settings)
 	if err != nil {
 		return err
@@ -59,13 +69,7 @@ func UpdateSettings() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("WROTE")
-	mux.Unlock()
 	return nil
-}
-
-func GetSettings() SettingsT {
-	return settings
 }
 
 func getSettingsFilePath() string {
