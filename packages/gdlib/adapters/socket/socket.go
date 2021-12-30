@@ -79,12 +79,13 @@ func sendErrorResponse(err error, request Message) []byte {
 }
 
 func StartServer() error {
-	// If we don't receive a signal within 10 seconds, we should quit
+	// If we don't receive a signal within 60 seconds, we should quit
 	go func() {
+		shouldQuit = true
 		// Intentionally not passing shouldQuit as parameter because we want to
 		// always read the latest value. This should usually be considered a data
 		// race but it isn't in this case
-		time.Sleep(10 * time.Second)
+		time.Sleep(60 * time.Second)
 		if shouldQuit {
 			quitError <- errors.New("quitting caused by no ping received within 10s from startup")
 		}
