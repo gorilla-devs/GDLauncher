@@ -3,6 +3,46 @@
 	import Sidebar from '$lib/sidebar/Sidebar.svelte';
 	import ThemeContext from '$lib/theme/ThemeContext.svelte';
 	import '../app.css';
+
+	const ws = new WebSocket('ws://127.0.0.1:7890/v1');
+	ws.onopen = () => {
+		console.log('CONNESSO');
+	};
+
+	ws.onclose = () => {
+		console.log('DISCONNESSO');
+	};
+
+	ws.onerror = () => {
+		console.log('ERRORINO');
+	};
+
+	ws.onmessage = (msg) => {
+		let j = JSON.parse(msg.data);
+		console.log('MSG', j);
+	};
+
+	setTimeout(() => {
+		ws.send(
+			JSON.stringify({
+				type: 4,
+				id: 'ciaopippo',
+				payload: {
+					action: 0
+				}
+			})
+		);
+	}, 5000);
+
+	setTimeout(() => {
+		ws.send(
+			JSON.stringify({
+				type: 0,
+				id: 'ping-ping',
+				payload: {}
+			})
+		);
+	}, 50_000);
 </script>
 
 <ThemeContext>

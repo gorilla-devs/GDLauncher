@@ -1,11 +1,13 @@
 <script>
   import "./main.svelte";
+
+  export let variant;
+  export let color;
   export let icon;
   export let slot;
   export let size;
   export let onClick;
 
-  function handleClick() {}
   const mapSizeToVar = (size) => {
     switch (size) {
       case "large":
@@ -33,16 +35,17 @@
 </script>
 
 <div
-  on:click={() => onClick()}
-  class="button"
+  on:click={() => {
+    if (onClick) onClick();
+  }}
+  class="button {variant}"
   style="--lumo-button-size: {mapSizeToVar(
     size
   )}; font-size: {mapSizeToFontSize(size)}"
-  on:click={handleClick}
 >
   <div class="button-container">
     <span class="prefix">
-      {#if slot === "prefix"}
+      {#if slot === "prefix" && icon}
         {icon}
       {/if}
     </span>
@@ -50,7 +53,7 @@
       <slot />
     </span>
     <span class="suffix">
-      {#if slot === "suffix"}
+      {#if slot === "suffix" && icon}
         {icon}
       {/if}
     </span>
@@ -90,6 +93,15 @@
     }
   }
 
+  @keyframes glowPrimary {
+    from {
+      text-shadow: 0 0 30px rgba(255, 255, 255);
+    }
+    to {
+      text-shadow: 0 0 40px rgb(255, 255, 255);
+    }
+  }
+
   .button:active {
     -webkit-animation: glow 0.1s ease-in-out;
     -moz-animation: glow 0.1s ease-in-out;
@@ -109,5 +121,31 @@
     padding: 0;
     border: none;
     box-shadow: none;
+  }
+
+  .primary {
+    background-color: var(
+      --_lumo-button-primary-background-color,
+      var(--lumo-primary-color)
+    );
+    color: var(
+      --_lumo-button-primary-color,
+      var(--lumo-primary-contrast-color)
+    );
+    font-weight: 600;
+    min-width: calc(var(--lumo-button-size) * 2.5);
+  }
+
+  .primary:active {
+    -webkit-animation: glowPrimary 0.4s ease-in-out !important;
+    -moz-animation: glowPrimary 0.4s ease-in-out !important;
+    animation: glowPrimary 0.4s ease-in-out !important;
+    animation-delay: 1s;
+  }
+
+  .third {
+    padding: 0 calc(var(--lumo-button-size) / 6);
+    background-color: transparent !important;
+    min-width: 0;
   }
 </style>
