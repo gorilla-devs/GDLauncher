@@ -2,86 +2,119 @@
   import "./main.svelte";
 
   export let variant;
-  export let color;
+  export let theme;
   export let icon;
   export let slot;
   export let size;
   export let onClick;
 
+  let glow = false;
+
   const mapSizeToVar = (size) => {
     switch (size) {
       case "large":
-        return "var(--lumo-size-l)";
+        return "var(--gd-size-l)";
       case "medium":
-        return "var(--lumo-size-m)";
+        return "var(--gd-size-m)";
       case "small":
-        return "var(--lumo-size-s)";
+        return "var(--gd-size-s)";
       default:
-        return "var(--lumo-size-m)";
+        return "var(--gd-size-m)";
     }
   };
   const mapSizeToFontSize = (size) => {
     switch (size) {
       case "large":
-        return "var(--lumo-font-size-l)";
+        return "var(--gd-font-size-l)";
       case "medium":
-        return "var(--lumo-font-size-m)";
+        return "var(--gd-font-size-m)";
       case "small":
-        return "var(--lumo-font-size-s)";
+        return "var(--gd-font-size-s)";
       default:
-        return "var(--lumo-font-size-m)";
+        return "var(--gd-font-size-m)";
     }
   };
 </script>
 
-<div
-  on:click={() => {
-    if (onClick) onClick();
-  }}
-  class="button {variant}"
-  style="--lumo-button-size: {mapSizeToVar(
-    size
-  )}; font-size: {mapSizeToFontSize(size)}"
->
-  <div class="button-container">
-    <span class="prefix">
-      {#if slot === "prefix" && icon}
-        {icon}
-      {/if}
-    </span>
-    <span class="label">
-      <slot />
-    </span>
-    <span class="suffix">
-      {#if slot === "suffix" && icon}
-        {icon}
-      {/if}
-    </span>
+<div style="position: relative;">
+  {#if variant === "primary"}
+    <div class="overlay" />
+  {/if}
+  <div
+    on:click={() => {
+      if (onClick) onClick();
+    }}
+    on:mouseup={() => {
+      glow = true;
+      setTimeout(() => {
+        glow = false;
+      }, 100);
+    }}
+    class="button {variant}"
+    class:glow
+    style="--gd-button-size: {mapSizeToVar(size)}; 
+  font-size: {mapSizeToFontSize(size)};
+  {theme && `background-color: var(--gd-${theme}-color);`}
+  "
+  >
+    <div class="button-container">
+      <span class="prefix">
+        {#if slot === "prefix" && icon}
+          {icon}
+        {/if}
+      </span>
+      <span class="label">
+        <slot />
+      </span>
+      <span class="suffix">
+        {#if slot === "suffix" && icon}
+          {icon}
+        {/if}
+      </span>
+    </div>
   </div>
 </div>
 
 <style>
   .button {
+    position: relative;
     cursor: pointer;
     user-select: none;
-    min-width: calc(var(--lumo-button-size) * 2);
-    height: var(--lumo-button-size);
-    padding: 0
-      calc(var(--lumo-button-size) / 3 + var(--lumo-border-radius-m) / 2);
-    margin: var(--lumo-space-xs) 0;
+    min-width: calc(var(--gd-button-size) * 2);
+    height: var(--gd-button-size);
+    padding: 0 calc(var(--gd-button-size) / 3 + var(--gd-border-radius-m) / 2);
+    margin: var(--gd-space-xs) 0;
     box-sizing: border-box;
-    font-family: var(--lumo-font-family);
-    font-size: var(--lumo-font-size-m);
+    font-family: var(--gd-font-family);
+    font-size: var(--gd-font-size-m);
     font-weight: 500;
-    color: var(--_lumo-button-color, var(--lumo-primary-text-color));
+    color: var(--_gd-button-color, var(--gd-primary-text-color));
     background-color: var(
-      --_lumo-button-background-color,
-      var(--lumo-contrast-5pct)
+      --_gd-button-background-color,
+      var(--gd-contrast-5pct)
     );
-    border-radius: var(--lumo-border-radius-m);
-    cursor: var(--lumo-clickable-cursor);
+    border-radius: var(--gd-border-radius-m);
+    cursor: var(--gd-clickable-cursor);
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
+    transition: opacity ease-in-out 0.1s;
+  }
+
+  .button:hover {
+    opacity: 0.95;
+  }
+  .button:active {
+    opacity: 0.88;
+  }
+
+  .overlay {
+    position: absolute;
+    background: black;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border-radius: var(--gd-border-radius-m);
   }
 
   @keyframes glow {
@@ -95,18 +128,25 @@
 
   @keyframes glowPrimary {
     from {
-      text-shadow: 0 0 30px rgba(255, 255, 255);
+      /* text-shadow: 0 0 30px rgba(255, 255, 255); */
+      text-shadow: 0 0 10px rgb(255, 255, 255), 0 0 20px rgb(255, 255, 255),
+        0 0 30px rgb(255, 255, 255);
     }
     to {
-      text-shadow: 0 0 40px rgb(255, 255, 255);
+      text-shadow: 0 0 20px rgb(255, 255, 255), 0 0 30px rgb(255, 255, 255),
+        0 0 40px rgb(255, 255, 255);
     }
   }
 
-  .button:active {
+  .glow {
+    animation: glowPrimary 0.1s ease-in-out;
+  }
+
+  /* .button:active {
     -webkit-animation: glow 0.1s ease-in-out;
     -moz-animation: glow 0.1s ease-in-out;
     animation: glow 0.1s ease-in-out;
-  }
+  } */
 
   .button-container {
     display: inline-flex;
@@ -125,26 +165,22 @@
 
   .primary {
     background-color: var(
-      --_lumo-button-primary-background-color,
-      var(--lumo-primary-color)
+      --_gd-button-primary-background-color,
+      var(--gd-primary-color)
     );
-    color: var(
-      --_lumo-button-primary-color,
-      var(--lumo-primary-contrast-color)
-    );
+    color: var(--_gd-button-primary-color, var(--gd-primary-contrast-color));
     font-weight: 600;
-    min-width: calc(var(--lumo-button-size) * 2.5);
+    min-width: calc(var(--gd-button-size) * 2.5);
   }
-
+  /* 
   .primary:active {
     -webkit-animation: glowPrimary 0.4s ease-in-out !important;
     -moz-animation: glowPrimary 0.4s ease-in-out !important;
     animation: glowPrimary 0.4s ease-in-out !important;
-    animation-delay: 1s;
-  }
+  } */
 
   .third {
-    padding: 0 calc(var(--lumo-button-size) / 6);
+    padding: 0 calc(var(--gd-button-size) / 6);
     background-color: transparent !important;
     min-width: 0;
   }
