@@ -21,18 +21,6 @@ type Message struct {
 	Payload interface{} `json:"payload"`
 }
 
-type SocketResponse struct {
-	Type      int         `json:"type"`
-	Id        string      `json:"id"`
-	Timestamp int64       `json:"timestamp"`
-	Err       string      `json:"error,omitempty"`
-	Data      interface{} `json:"data"`
-}
-
-const (
-	GET_INSTANCES = iota
-)
-
 var shouldQuit = true
 var upgrader = websocket.Upgrader{}
 var semaphore = make(chan int, 1)
@@ -75,7 +63,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendErrorResponse(err error, request Message) []byte {
-	resp := SocketResponse{
+	resp := internal.SocketResponse{
 		Err:       err.Error(),
 		Id:        request.Id,
 		Data:      1,
@@ -120,7 +108,7 @@ func processEvent(message Message, c *websocket.Conn) {
 		return
 	}
 	payloadData := message.Payload.(map[string]interface{})
-	var response int
+	var response interface{}
 	// Response should be 0 if the status is ok
 	switch message.Type {
 	case events.Ping:
@@ -138,20 +126,14 @@ func processEvent(message Message, c *websocket.Conn) {
 		return
 	}
 
-	newResp := SocketResponse{
+	newResp := internal.SocketResponse{
 		Data:      response,
 		Id:        message.Id,
 		Timestamp: time.Now().Unix(),
 		Type:      message.Type,
 	}
-
-	marshaled, err := json.Marshal(newResp)
-	if err != nil {
-		c.WriteJSON(sendErrorResponse(err, message))
-		return
-	}
-	fmt.Printf("Response: %+v\n", newResp)
-	err = c.WriteJSON([]byte(marshaled))
+	fmt.Printf("Response")
+	err = c.WriteJSON(newResp)
 	if err != nil {
 		c.WriteJSON(sendErrorResponse(err, message))
 		return
@@ -188,18 +170,27 @@ func processQuit(payload map[string]interface{}) (int, error) {
 	return 0, nil
 }
 
-type InstanceEventT int
+type InstanceEventTypes int
 
 const (
-	GET_ALL_INSTANCES InstanceEventT = iota
+	GET_ALL_INSTANCES InstanceEventTypes = iota
 )
 
 type instanceEvent struct {
-	Action InstanceEventT `mapstructure:",omitempty"`
+	Action InstanceEventTypes `mapstructure:",omitempty"`
 }
 
-func processInstances(payload map[string]interface{}, c *websocket.Conn) (int, error) {
-	// Do stuff
+func processInstances(payload map[string]interface{}, c *websocket.Conn) (map[string]instance.Instance, error) {
+	var data instanceEvent
+	err := mapstructure.Decode(payload, &data)
+	if err != nil {
+		return map[string]instance.Instance{}, err
+	}
 
-	return 0, nil
+	switch data.Action {
+	case GET_ALL_INSTANCES:
+		return instance.GetInstances(), nil
+	}
+
+	return map[string]instance.Instance{}, nil
 }
