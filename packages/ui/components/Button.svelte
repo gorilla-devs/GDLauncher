@@ -2,7 +2,7 @@
   import "./main.svelte";
 
   export let variant = "";
-  export let theme;
+  export let theme = "primary";
   export let icon;
   export let slot;
   export let size;
@@ -53,7 +53,9 @@
     class="button {variant}"
     style="--gd-button-size: {mapSizeToVar(size)}; 
   font-size: {mapSizeToFontSize(size)};
-  {theme && `background-color: var(--gd-${theme}-color);`}
+  {theme &&
+      variant === 'primary' &&
+      `background-color: var(--gd-${theme}-color) !important;`}
   "
   >
     <div class="button-container {variant}" class:glow>
@@ -62,7 +64,12 @@
           {icon}
         {/if}
       </span>
-      <span class="label">
+      <span
+        class="label"
+        style={theme &&
+          variant !== "primary" &&
+          `color:  var(--gd-${theme}-text-color);`}
+      >
         <slot />
       </span>
       <span class="suffix">
@@ -142,7 +149,6 @@
     background-color: currentColor;
     border-radius: inherit;
     opacity: 0;
-
     transition: opacity 1.4s, transform 0.1s;
     filter: blur(8px);
   }
@@ -160,18 +166,16 @@
   }
 
   .primary {
-    background-color: var(
-      --_gd-button-primary-background-color,
-      var(--gd-primary-color)
-    );
     color: var(--_gd-button-primary-color, var(--gd-primary-contrast-color));
     font-weight: 600;
     min-width: calc(var(--gd-button-size) * 2.5);
   }
 
   .third {
-    padding: 0 calc(var(--gd-button-size) / 6);
     background-color: transparent !important;
     min-width: 0;
+  }
+  .button.third:active {
+    background-color: var(--gd-contrast-5pct) !important;
   }
 </style>
