@@ -3,6 +3,7 @@
 
   export let variant = "";
   export let theme = "primary";
+  export let disabled = false;
   export let icon;
   export let slot;
   export let size;
@@ -51,14 +52,16 @@
       glow = false;
     }}
     class="button {variant}"
+    class:disabled
     style="--gd-button-size: {mapSizeToVar(size)}; 
   font-size: {mapSizeToFontSize(size)};
   {theme &&
       variant === 'primary' &&
+      !disabled &&
       `background-color: var(--gd-${theme}-color) !important;`}
   "
   >
-    <div class="button-container {variant}" class:glow>
+    <div class="button-container {variant}" class:glow class:disabled>
       <span class="prefix">
         {#if slot === "prefix" && icon}
           {icon}
@@ -66,6 +69,7 @@
       </span>
       <span
         class="label"
+        class:disabled
         style={theme &&
           variant !== "primary" &&
           `color:  var(--gd-${theme}-text-color);`}
@@ -177,5 +181,20 @@
   }
   .button.third:active {
     background-color: var(--gd-contrast-5pct) !important;
+  }
+
+  .button.disabled {
+    pointer-events: none;
+    color: var(--gd-disabled-text-color) !important;
+  }
+  
+  .label.disabled{
+    color: var(--gd-disabled-text-color) !important;
+  }
+
+  .button.primary.disabled {
+    pointer-events: none;
+    background-color: var(--gd-contrast-30pct) !important;
+    color: var(--gd-base-color) !important;
   }
 </style>
