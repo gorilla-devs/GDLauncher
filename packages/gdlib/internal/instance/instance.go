@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"gdlib/adapters/socket/events"
 	"gdlib/internal"
-	"gdlib/internal/modloader"
-	"gdlib/internal/modplatform"
+	"gdlib/internal/minecraft"
 	"os"
 	"path"
 	"time"
@@ -15,58 +14,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type Instance struct {
-	Name   string `json:"name,omitempty"`
-	Loader struct {
-		Modloader            modloader.Modloader     `json:"loaderType,omitempty"`
-		ModloaderVersion     string                  `json:"loaderVersion,omitempty"`
-		Modplatform          modplatform.Modplatform `json:"source,omitempty"`
-		ModplatformProjectId int                     `json:"projectID,omitempty"`
-		ModplatformFileId    int                     `json:"fileID,omitempty"`
-		MinecraftVersion     string                  `json:"mcVersion,omitempty"`
-	} `json:"loader,omitempty"`
-
-	ModplatformOverrides    []string `json:"modplatformOverrides,omitempty"`
-	OriginalModplatformName string   `json:"originalModplatformName,omitempty"`
-	TimePlayed              int      `json:"timePlayed,omitempty"`
-	CustomBackground        string   `json:"background,omitempty"`
-	OverrideJavaArgs        []string `json:"overrideJavaArgs,omitempty"`
-	OverrideJavaPath        string   `json:"overrideJavaPath,omitempty"`
-	OverrideMinecraftJar    string   `json:"overrideMinecraftJar,omitempty"`
-	Mods                    []struct {
-		DisplayName         string   `json:"displayName,omitempty"`
-		FileName            string   `json:"fileName,omitempty"`
-		FileDate            string   `json:"fileDate,omitempty"`
-		DownloadUrl         string   `json:"downloadUrl,omitempty"`
-		PackageFingerprint  uint64   `json:"packageFingerprint,omitempty"`
-		GameVersion         []string `json:"gameVersion,omitempty"`
-		SortableGameVersion []struct {
-			GameVersion            string `json:"gameVersion,omitempty"`
-			GameVersionReleaseDate string `json:"gameVersionReleaseDate,omitempty"`
-			GameVersionName        string `json:"gameVersionName,omitempty"`
-		} `json:"sortableGameVersion,omitempty"`
-		CategorySectionPackageType uint   `json:"categorySectionPackageType,omitempty"`
-		ProjectStatus              uint   `json:"projectStatus,omitempty"`
-		ProjectId                  uint   `json:"projectId,omitempty"`
-		FileId                     uint   `json:"fileId,omitempty"`
-		IsServerPack               bool   `json:"isServerPack,omitempty"`
-		ServerPackFileId           uint   `json:"serverPackFileId,omitempty"`
-		DownloadCount              uint   `json:"downloadCount,omitempty"`
-		Name                       string `json:"name,omitempty"`
-	} `json:"mods,omitempty"`
-}
-
-const (
-	INSTANCE_PATH_NAME = "instance"
-)
-
-var instances map[string]Instance = make(map[string]Instance, 20)
+var instances map[string]internal.Instance = make(map[string]internal.Instance, 20)
 
 func Init() {
 	instancesPath := path.Join(internal.GDL_USER_DATA, "instances")
 	instancesFromDir, err := os.ReadDir(instancesPath)
 	if err != nil {
-		panic(err)
+		err = os.MkdirAll(instancesPath, 0755)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	for _, instance := range instancesFromDir {
@@ -79,14 +36,14 @@ func Init() {
 	}
 }
 
-func GetInstances() map[string]Instance {
+func GetInstances() map[string]internal.Instance {
 	return instances
 }
 
 type InstanceFSEvent struct {
-	EventType int      `json:"eventType,omitempty"`
-	Path      string   `json:"path,omitempty"`
-	Instance  Instance `json:"instance,omitempty"`
+	EventType int               `json:"eventType,omitempty"`
+	Path      string            `json:"path,omitempty"`
+	Instance  internal.Instance `json:"instance,omitempty"`
 }
 
 func WatchInstances(c *websocket.Conn) error {
@@ -140,24 +97,46 @@ func WatchInstances(c *websocket.Conn) error {
 	}
 }
 
-func readInstanceConfig(instanceName string) (Instance, error) {
+func StartInstance(instanceFolderPath string) error {
+	instance, ok := instances[instanceFolderPath]
+	if !ok {
+		return errors.New("instance not found")
+	}
+
+	if instance.Type == internal.INSTANCE_TYPE_SERVER {
+		serverJarPath := path.Join(
+			internal.GDL_USER_DATA,
+			internal.GDL_DATASTORE_PREFIX,
+			internal.GDL_SERVERS_PREFIX,
+			fmt.Sprint(instance.Loader.MinecraftVersion, ".jar"),
+		)
+		return minecraft.StartServer(serverJarPath, instanceFolderPath, instance)
+	}
+
+	return nil
+}
+
+func readInstanceConfig(instanceName string) (internal.Instance, error) {
 	// Read config.json
-	instancesPath := path.Join(internal.GDL_USER_DATA, "instances")
+	instancesPath := path.Join(internal.GDL_USER_DATA, internal.GDL_INSTANCES_PREFIX)
 	instanceConfig, err := os.ReadFile(path.Join(instancesPath, instanceName, "config.json"))
 	if err != nil {
 		fmt.Println(err)
-		return Instance{}, err
+		return internal.Instance{}, err
 	}
 	// Parse config.json
-	var config Instance
+	var config internal.Instance
 	err = json.Unmarshal(instanceConfig, &config)
 	if err != nil {
 		fmt.Println(err)
-		return Instance{}, err
+		return internal.Instance{}, err
 	}
 
 	if config.Name == "" {
 		config.Name = instanceName
+	}
+	if config.Type == internal.INSTANCE_TYPE_UNDEFINED {
+		config.Type = internal.INSTANCE_TYPE_CLIENT
 	}
 
 	return config, nil

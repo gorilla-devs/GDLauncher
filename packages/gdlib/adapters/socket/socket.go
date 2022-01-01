@@ -158,6 +158,7 @@ type murmur2Event struct {
 func processMurmurHash2(payload map[string]interface{}) (int, error) {
 	var data murmur2Event
 	err := mapstructure.Decode(payload, &data)
+
 	if err != nil {
 		return 0, err
 	}
@@ -186,11 +187,11 @@ type instanceEvent struct {
 	Action InstanceEventTypes `mapstructure:",omitempty"`
 }
 
-func processInstances(payload map[string]interface{}, c *websocket.Conn) (map[string]instance.Instance, error) {
+func processInstances(payload map[string]interface{}, c *websocket.Conn) (map[string]internal.Instance, error) {
 	var data instanceEvent
 	err := mapstructure.Decode(payload, &data)
 	if err != nil {
-		return map[string]instance.Instance{}, err
+		return map[string]internal.Instance{}, err
 	}
 
 	switch data.Action {
@@ -198,7 +199,7 @@ func processInstances(payload map[string]interface{}, c *websocket.Conn) (map[st
 		return instance.GetInstances(), nil
 	}
 
-	return map[string]instance.Instance{}, nil
+	return map[string]internal.Instance{}, nil
 }
 
 // Detect java version
