@@ -116,13 +116,18 @@ function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
 
-const marks = {
-  2048: '2048 MB',
-  4096: '4096 MB',
-  8192: '8192 MB',
-  16384: '16384 MB',
-  32768: '32768 MB'
-};
+const scaleMem = x => Math.log2(x / 1024);
+const scaleMemInv = x => 1024 * 2 ** x;
+const sysMemScaled = Math.round(
+  scaleMem(process.getSystemMemoryInfo().total / 1024)
+);
+const marksScaled = Array.from({ length: sysMemScaled + 1 }, (_, i) =>
+  scaleMemInv(i)
+);
+const marks =
+  sysMemScaled > 6
+    ? marksScaled.map(x => `${x / 1024} GB`)
+    : marksScaled.map(x => `${x} MB`);
 
 export default function MyAccountPreferences() {
   const [screenResolution, setScreenResolution] = useState(null);
@@ -396,15 +401,16 @@ export default function MyAccountPreferences() {
         </Paragraph>
         <Slider
           css={`
-            margin: 20px 20px 20px 0 !important;
+            margin: 20px 40px !important;
+            white-space: nowrap;
           `}
-          onAfterChange={e => {
-            dispatch(updateJavaMemory(e));
-          }}
-          defaultValue={javaMemory}
-          min={1024}
-          max={process.getSystemMemoryInfo().total / 1024}
-          step={512}
+          onAfterChange={e =>
+            dispatch(updateJavaMemory(Math.round(scaleMemInv(e))))
+          }
+          defaultValue={scaleMem(javaMemory)}
+          min={0}
+          max={sysMemScaled}
+          step={0.1}
           marks={marks}
           valueLabelDisplay="auto"
         />

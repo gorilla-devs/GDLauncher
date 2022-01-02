@@ -84,7 +84,7 @@ ipcRenderer
           }
         })
       ],
-      tracesSampleRate: 1.0,
+      tracesSampleRate: 0.5,
       release: version,
       dist: `${process.env.REACT_APP_RELEASE_TYPE}-${os.platform()}`
     });
