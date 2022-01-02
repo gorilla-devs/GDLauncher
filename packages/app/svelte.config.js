@@ -10,8 +10,9 @@ const config = {
 		// hydrate the <div id="svelte"> element in src/app.html
 		target: '#svelte',
 		ssr: false,
+		hydrate: true,
 		prerender: {
-			enabled: false
+			enabled: true
 		}
 	}
 };

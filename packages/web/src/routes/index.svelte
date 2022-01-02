@@ -1,10 +1,26 @@
-<script context="module">
-	export const prerender = false;
-	export const router = true;
-</script>
-
 <script>
 	import Counter from '$lib/Counter.svelte';
+    import { browser } from '$app/env';
+	import '@vaadin/button';
+
+	function setAttributes(node, attributes) {
+		const applyAttributes = () => {
+		Object.entries(attributes).forEach(([k, v]) => {
+			if (v !== undefined) {
+			node.setAttribute(k, v);
+			} else {
+			node.removeAttribute(k);
+			}
+		});
+		};
+		applyAttributes();
+		return {
+		update(updatedAttributes) {
+			attributes = updatedAttributes;
+			applyAttributes();
+		},
+		};
+	}
 
 	let selected = {};
 	function switcher(id) {
@@ -38,6 +54,7 @@
 
 		to your new<br />SvelteKit WEB
 	</h1>
+	<vaadin-button use:setAttributes={{ theme: "primary success" }}>Primary</vaadin-button>
 
 	<h2>
 		try editing <strong>src/routes/index.svelte</strong>
