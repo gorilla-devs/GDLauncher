@@ -42,9 +42,6 @@
     <div class="overlay" />
   {/if}
   <div
-    on:click={() => {
-      if (onClick) onClick();
-    }}
     on:mousedown={() => {
       glow = true;
     }}
@@ -60,6 +57,10 @@
       !disabled &&
       `background-color: var(--gd-${theme}-color) !important;`}
   "
+    on:click={() => {
+      if (onClick && !disabled) onClick();
+    }}
+    on:dblclick
   >
     <div class="button-container {variant}" class:glow class:disabled>
       <span class="prefix">
@@ -187,8 +188,8 @@
     pointer-events: none;
     color: var(--gd-disabled-text-color) !important;
   }
-  
-  .label.disabled{
+
+  .label.disabled {
     color: var(--gd-disabled-text-color) !important;
   }
 
