@@ -1,6 +1,5 @@
-<script>
+<script lang="typescript">
     import "@vaadin/button"
-    import { setAttributes } from "@utils";
 
     var name = "GDLauncher"
 
@@ -8,7 +7,6 @@
 
 <div class="main">
     <h1>GDLauncher</h1>
-	<vaadin-button use:setAttributes={{ theme: "primary success" }}>Primary</vaadin-button>
     <h1>Welcome to {name}!</h1>
 </div>
 

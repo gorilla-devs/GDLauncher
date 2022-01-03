@@ -10,10 +10,10 @@
     "dev": "turbo run dev -parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "web:build": "turbo run build --scope=web",
     "app:dev": "concurrently \"tauri dev\" \"turbo run dev --scope=gdlib --scope=app\"",
+    "app:build": "\"turbo run build --scope=gdlib --scope=app\" && tauri build",
     "web:dev": "turbo run dev --scope=web",
-    "all:dev": "concurrently \"npm run web:dev\" \"npm run app:dev\""
+    "web:build": "turbo run build --scope=web"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.0.0-beta.10",

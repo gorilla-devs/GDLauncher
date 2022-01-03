@@ -1,9 +1,14 @@
 {
   "name": "gdlib",
-  "version": "2.0.0",
+  "version": "0.0.0",
   "description": "Styles and components for use in svelte websites",
   "license": "MIT",
   "scripts": {
-    "dev": "go run gdlib"
-  }
+    "dev": "go run gdlib",
+    "build": "go build -o build/ gdlib && node targetTriple.js"
+  },
+  "dependencies": {
+    "execa": "^6.0.0"
+  },
+  "type": "module"
 }

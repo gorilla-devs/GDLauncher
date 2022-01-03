@@ -3,17 +3,12 @@ import adapter from '@sveltejs/adapter-static';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		adapter: adapter({
-			fallback: 'index.html'
-		}),
+		adapter: adapter(),
 
 		// hydrate the <div id="svelte"> element in src/app.html
 		target: '#svelte',
-		ssr: false,
+		ssr: true,
 		hydrate: true,
-		prerender: {
-			enabled: true
-		}
 	}
 };
 
