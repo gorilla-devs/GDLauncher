@@ -5,7 +5,7 @@
 	"type": "module",
 	"module": "index.mjs",
 	"svelte": "index.mjs",
-	"license": "MIT",
+	"license": "GPL-3.0",
 	"devDependencies": {
 		"svelte": "^3.44.3"
 	},

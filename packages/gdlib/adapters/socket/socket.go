@@ -119,8 +119,8 @@ func processEvent(message Message, c *websocket.Conn) {
 		response, err = processMurmurHash2(payloadData)
 	case events.Quit:
 		response, err = processQuit(payloadData)
-	case events.Instances:
-		response, err = processInstances(payloadData, c)
+	case events.GetAllInstances:
+		response, err = processGetAllInstances(payloadData)
 	case events.JavaDetect:
 		response, err = processJavaDetect(payloadData, c)
 	case events.JavaInstall:
@@ -177,29 +177,28 @@ func processQuit(payload map[string]interface{}) (int, error) {
 	return 0, nil
 }
 
-type InstanceEventTypes int
-
-const (
-	GET_ALL_INSTANCES InstanceEventTypes = iota
-)
-
-type instanceEvent struct {
-	Action InstanceEventTypes `mapstructure:",omitempty"`
+func processGetAllInstances(payload map[string]interface{}) (map[string]internal.Instance, error) {
+	return instance.GetInstances(), nil
 }
 
-func processInstances(payload map[string]interface{}, c *websocket.Conn) (map[string]internal.Instance, error) {
-	var data instanceEvent
+type launchInstance struct {
+	InstanceFolderName string `mapstructure:",omitempty"`
+}
+
+func processLaunchInstance(payload map[string]interface{}, c *websocket.Conn) (int, error) {
+	var data launchInstance
 	err := mapstructure.Decode(payload, &data)
+
 	if err != nil {
-		return map[string]internal.Instance{}, err
+		return 0, err
 	}
 
-	switch data.Action {
-	case GET_ALL_INSTANCES:
-		return instance.GetInstances(), nil
+	err = instance.StartInstance(data.InstanceFolderName)
+	if err != nil {
+		return 0, err
 	}
 
-	return map[string]internal.Instance{}, nil
+	return 0, nil
 }
 
 // Detect java version

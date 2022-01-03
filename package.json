@@ -5,6 +5,7 @@
   "workspaces": [
     "packages/*"
   ],
+  "license": "GPL-3.0",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev -parallel",
@@ -12,6 +13,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "app:dev": "concurrently \"tauri dev\" \"turbo run dev --scope=gdlib --scope=app\"",
     "app:build": "\"turbo run build --scope=gdlib --scope=app\" && tauri build",
+    "tauri": "tauri",
     "web:dev": "turbo run dev --scope=web",
     "web:build": "turbo run build --scope=web"
   },

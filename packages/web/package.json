@@ -1,6 +1,7 @@
 {
 	"name": "web",
 	"version": "2.0.0",
+	"license": "GPL-3.0",
 	"scripts": {
 		"dev": "cross-env SETUP=browser svelte-kit dev --port 5001 --open",
 		"build": "svelte-kit build",

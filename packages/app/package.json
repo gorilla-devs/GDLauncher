@@ -1,6 +1,7 @@
 {
   "name": "app",
   "version": "2.0.0",
+  "license": "GPL-3.0",
   "scripts": {
     "build": "routify -b && vite build",
     "build:routify": "routify",

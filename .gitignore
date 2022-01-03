@@ -20,7 +20,6 @@
 .idea
 *.iml
 .eslintcache
-/reindex/frontend/src/wailsjs
 
 # misc
 .DS_Store

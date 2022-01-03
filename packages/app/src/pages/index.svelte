@@ -1,6 +1,4 @@
 <script lang="typescript">
-    import "@vaadin/button"
-
     var name = "GDLauncher"
 
 </script>
