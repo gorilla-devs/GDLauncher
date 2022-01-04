@@ -20,6 +20,7 @@ import {
 } from '../../../common/reducers/actions';
 import BisectHosting from '../../../ui/BisectHosting';
 import Logo from '../../../ui/Logo';
+import ga from '../../../common/utils/analytics';
 
 const SystemNavbar = () => {
   const dispatch = useDispatch();
@@ -53,7 +54,7 @@ const SystemNavbar = () => {
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     } else {
-      dispatch(isNewVersionAvailable())
+      isNewVersionAvailable()
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     }
@@ -196,7 +197,10 @@ const SystemNavbar = () => {
             </div>
             <BisectHosting
               showPointerCursor
-              onClick={() => dispatch(openModal('BisectHosting'))}
+              onClick={() => {
+                ga.sendCustomEvent('BHAdViewNavbar');
+                dispatch(openModal('BisectHosting'));
+              }}
             />
             {/* <PulsatingCircle /> */}
           </div>

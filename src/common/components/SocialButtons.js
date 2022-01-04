@@ -14,11 +14,17 @@ const SocialButtons = () => {
     <div
       css={`
         display: flex;
+        justify-content: space-between;
+        margin-right: 30px;
         a {
           color: rgba(255, 255, 255, 0.85);
         }
         div {
-          padding: 6px;
+          width: 28px;
+          height: 28px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
           border-radius: 4px;
           transition: background 0.1s ease-in-out, transform 0.1s ease-in-out;
           &:hover {
@@ -32,7 +38,7 @@ const SocialButtons = () => {
         }
       `}
     >
-      <a href="https://discord.gg/4cGYzen">
+      <a href="https://discord.gdlauncher.com">
         <div>
           <FontAwesomeIcon icon={faDiscord} size="lg" />
         </div>

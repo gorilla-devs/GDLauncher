@@ -673,13 +673,13 @@ const Mods = ({ instanceName }) => {
     <Menu>
       <Menu.Item
         key="0"
-        onClick={async () => {
+        disabled={!hasModUpdates}
+        onClick={() => {
           dispatch(openModal('ModsUpdater', { instanceName }));
           setIsMenuOpen(false);
         }}
-        disabled={!hasModUpdates}
       >
-        Update all mods
+        Update All Mods
       </Menu.Item>
     </Menu>
   );
@@ -689,6 +689,9 @@ const Mods = ({ instanceName }) => {
       css={`
         flex: 1;
       `}
+      onClick={() => {
+        setIsMenuOpen(false);
+      }}
     >
       <Header>
         <div
@@ -748,22 +751,44 @@ const Mods = ({ instanceName }) => {
           >
             Check for Updates
           </Button>
-          <StyledDropdown
-            onClick={() => {
-              if (!isMenuOpen) {
-                setIsMenuOpen(true);
-              }
+          <span
+            onClick={e => {
+              e.stopPropagation();
+              setIsMenuOpen(!isMenuOpen);
             }}
           >
-            <Dropdown
-              overlay={menu}
-              visible={isMenuOpen}
-              onVisibleChange={setIsMenuOpen}
-              trigger={['click']}
+            <StyledDropdown
+              onClick={e => {
+                if (!isMenuOpen) {
+                  e.stopPropagation();
+                  setIsMenuOpen(!isMenuOpen);
+                }
+              }}
             >
-              <FontAwesomeIcon icon={faEllipsisV} />
-            </Dropdown>
-          </StyledDropdown>
+              <span
+                onClick={e => {
+                  e.stopPropagation();
+                  setIsMenuOpen(!isMenuOpen);
+                }}
+              >
+                <Dropdown
+                  overlay={menu}
+                  visible={isMenuOpen}
+                  onVisibleChange={setIsMenuOpen}
+                  trigger={['click']}
+                >
+                  <span
+                    css={`
+                      width: 100%;
+                      height: 100%;
+                    `}
+                  >
+                    <FontAwesomeIcon icon={faEllipsisV} />
+                  </span>
+                </Dropdown>
+              </span>
+            </StyledDropdown>
+          </span>
         </div>
         <Button
           type="primary"

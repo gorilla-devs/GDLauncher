@@ -15,7 +15,8 @@ import {
   faToilet,
   faNewspaper,
   faFolder,
-  faFire
+  faFire,
+  faSort
 } from '@fortawesome/free-solid-svg-icons';
 import { Select, Tooltip, Button, Switch, Input, Checkbox } from 'antd';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
@@ -29,17 +30,36 @@ import {
   updateDiscordRPC,
   updateHideWindowOnGameLaunch,
   updatePotatoPcMode,
+  updateInstanceSortType,
   updateShowNews,
   updateCurseReleaseChannel
 } from '../../../reducers/settings/actions';
-import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
+import HorizontalLogo from '../../../../ui/HorizontalLogo';
 import { extractFace } from '../../../../app/desktop/utils';
 
-const MyAccountPrf = styled.div`
+const Title = styled.div`
+  margin-top: 30px;
+  margin-bottom: 5px;
+  font-size: 15px;
+  font-weight: 700;
+  color: ${props => props.theme.palette.text.primary};
+  z-index: 1;
+  text-align: left;
+  -webkit-backface-visibility: hidden;
+`;
+
+const Content = styled.div`
   width: 100%;
-  height: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  *:first-child {
+    margin-right: 15px;
+  }
 `;
 
 const PersonalData = styled.div`
@@ -50,16 +70,6 @@ const PersonalData = styled.div`
 const MainTitle = styled.h1`
   color: ${props => props.theme.palette.text.primary};
   margin: 0 500px 20px 0;
-  margin-bottom: 20px;
-`;
-
-const Title = styled.div`
-  font-size: 15px;
-  font-weight: 700;
-  color: ${props => props.theme.palette.text.primary};
-  z-index: 1;
-  text-align: left;
-  -webkit-backface-visibility: hidden;
 `;
 
 const ProfileImage = styled.img`
@@ -69,23 +79,6 @@ const ProfileImage = styled.img`
   background: #212b36;
   width: 50px;
   height: 50px;
-`;
-
-const ImagePlaceHolder = styled.div`
-  position: relative;
-  top: 20px;
-  left: 20px;
-  background: #212b36;
-  width: 50px;
-  height: 50px;
-`;
-
-const UsernameContainer = styled.div`
-  text-align: left;
-`;
-
-const UuidContainer = styled.div`
-  text-align: left;
 `;
 
 const Uuid = styled.div`
@@ -110,58 +103,6 @@ const PersonalDataContainer = styled.div`
   border-radius: ${props => props.theme.shape.borderRadius};
 `;
 
-const Hr = styled.div`
-  height: 25px;
-`;
-
-const ReleaseChannel = styled.div`
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  width: 100%;
-  height: 90px;
-  color: ${props => props.theme.palette.text.third};
-  p {
-    margin-bottom: 7px;
-    color: ${props => props.theme.palette.text.secondary};
-  }
-  div {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-  select {
-    margin-left: auto;
-    self-align: end;
-  }
-`;
-
-const ParallelDownload = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 60px;
-  p {
-    text-align: left;
-    color: ${props => props.theme.palette.text.third};
-  }
-`;
-
-const DiscordRpc = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  height: 40px;
-  p {
-    text-align: left;
-    color: ${props => props.theme.palette.text.third};
-  }
-`;
-
 const LauncherVersion = styled.div`
   margin: 30px 0;
   p {
@@ -174,11 +115,11 @@ const LauncherVersion = styled.div`
     color: ${props => props.theme.palette.text.primary};
   }
 `;
+
 const CustomDataPathContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 140px;
   border-radius: ${props => props.theme.shape.borderRadius};
 
   h1 {
@@ -211,34 +152,40 @@ function dashUuid(UUID) {
 }
 
 const General = () => {
-  const [version, setVersion] = useState(null);
-  const [releaseChannel, setReleaseChannel] = useState(null);
+  /* eslint-disable prettier/prettier */
+  const tempPath = useSelector(_getTempPath);
+  const dataStorePath = useSelector(_getDataStorePath);
+  const instancesPath = useSelector(_getInstancesPath);
   const currentAccount = useSelector(_getCurrentAccount);
-  const hideWindowOnGameLaunch = useSelector(
-    state => state.settings.hideWindowOnGameLaunch
-  );
+  const userData = useSelector(state => state.userData);
+  const isPlaying = useSelector(state => state.startedInstances);
+  const queuedInstances = useSelector(state => state.downloadQueue);
+  const updateAvailable = useSelector(state => state.updateAvailable);
+  const showNews = useSelector(state => state.settings.showNews);
   const DiscordRPC = useSelector(state => state.settings.discordRPC);
   const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
   const concurrentDownloads = useSelector(
     state => state.settings.concurrentDownloads
   );
-  const updateAvailable = useSelector(state => state.updateAvailable);
-  const dataStorePath = useSelector(_getDataStorePath);
-  const instancesPath = useSelector(_getInstancesPath);
-  const isPlaying = useSelector(state => state.startedInstances);
-  const queuedInstances = useSelector(state => state.downloadQueue);
-  const tempPath = useSelector(_getTempPath);
-  const [copiedUuid, setCopiedUuid] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
-  const [deletingInstances, setDeletingInstances] = useState(false);
-  const userData = useSelector(state => state.userData);
-  const [dataPath, setDataPath] = useState(userData);
-  const [moveUserData, setMoveUserData] = useState(false);
-  const showNews = useSelector(state => state.settings.showNews);
-  const [loadingMoveUserData, setLoadingMoveUserData] = useState(false);
   const curseReleaseChannel = useSelector(
     state => state.settings.curseReleaseChannel
   );
+  const hideWindowOnGameLaunch = useSelector(
+    state => state.settings.hideWindowOnGameLaunch
+  );
+  const instanceSortMethod = useSelector(
+    state => state.settings.instanceSortOrder
+  );
+  /* eslint-enable */
+
+  const [dataPath, setDataPath] = useState(userData);
+  const [copiedUuid, setCopiedUuid] = useState(false);
+  const [moveUserData, setMoveUserData] = useState(false);
+  const [deletingInstances, setDeletingInstances] = useState(false);
+  const [loadingMoveUserData, setLoadingMoveUserData] = useState(false);
+  const [version, setVersion] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
+  const [releaseChannel, setReleaseChannel] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -308,7 +255,7 @@ const General = () => {
       }
     }
     setLoadingMoveUserData(false);
-    ipcRenderer.invoke('appRestart');
+    await ipcRenderer.invoke('appRestart');
   };
 
   const openFolder = async () => {
@@ -321,26 +268,27 @@ const General = () => {
   };
 
   return (
-    <MyAccountPrf>
+    <>
       <PersonalData>
         <MainTitle>General</MainTitle>
         <PersonalDataContainer>
-          {profileImage ? (
-            <ProfileImage src={`data:image/jpeg;base64,${profileImage}`} />
-          ) : (
-            <ImagePlaceHolder />
-          )}
+          <ProfileImage
+            src={profileImage ? `data:image/jpeg;base64,${profileImage}` : null}
+          />
           <div
             css={`
               margin: 20px 20px 20px 40px;
               width: 330px;
+              * {
+                text-align: left;
+              }
             `}
           >
-            <UsernameContainer>
+            <div>
               Username <br />
               <Username>{currentAccount.selectedProfile.name}</Username>
-            </UsernameContainer>
-            <UuidContainer>
+            </div>
+            <div>
               UUID
               <br />
               <Uuid>
@@ -350,8 +298,7 @@ const General = () => {
                     css={`
                       width: 13px;
                       height: 14px;
-                      margin: 0;
-                      margin-left: 10px;
+                      margin: 0 0 0 10px;
                     `}
                   >
                     <FontAwesomeIcon
@@ -366,62 +313,48 @@ const General = () => {
                   </div>
                 </Tooltip>
               </Uuid>
-            </UuidContainer>
+            </div>
           </div>
         </PersonalDataContainer>
       </PersonalData>
-      <Hr />
-      <ReleaseChannel>
-        <Title>Release Channel</Title>
-        <div>
-          <div
-            css={`
-              width: 400px;
-            `}
-          >
-            Stable updates once a month, beta does update more often but it may
-            have more bugs.
-          </div>
-          <Select
-            css={`
-              width: 100px;
-            `}
-            onChange={async e => {
-              const appData = await ipcRenderer.invoke('getAppdataPath');
-              setReleaseChannel(e);
-              await fsa.writeFile(
-                path.join(appData, 'gdlauncher_next', 'rChannel'),
-                e.toString()
-              );
-            }}
-            value={releaseChannel}
-            virtual={false}
-          >
-            <Select.Option value={0}>Stable</Select.Option>
-            <Select.Option value={1}>Beta</Select.Option>
-          </Select>
-        </div>
-      </ReleaseChannel>
-      <Hr />
+      <Title>Release Channel</Title>
+      <Content>
+        <p>
+          Stable updates once a month. Beta updates more often, but it may have
+          more bugs.
+        </p>
+        <Select
+          css={`
+            width: 100px;
+          `}
+          onChange={async e => {
+            const appData = await ipcRenderer.invoke('getAppdataPath');
+            setReleaseChannel(e);
+            await fsa.writeFile(
+              path.join(appData, 'gdlauncher_next', 'rChannel'),
+              e.toString()
+            );
+          }}
+          value={releaseChannel}
+          virtual={false}
+        >
+          <Select.Option value={0}>Stable</Select.Option>
+          <Select.Option value={1}>Beta</Select.Option>
+        </Select>
+      </Content>
       <Title>
         Concurrent Downloads &nbsp; <FontAwesomeIcon icon={faTachometerAlt} />
       </Title>
-      <ParallelDownload>
-        <p
-          css={`
-            margin: 0;
-            width: 400px;
-          `}
-        >
+      <Content>
+        <p>
           Select the number of concurrent downloads. If you have a slow
-          connection, select max 3
+          connection, select at most 3.
         </p>
-
         <Select
           onChange={v => dispatch(updateConcurrentDownloads(v))}
           value={concurrentDownloads}
           css={`
-            width: 100px;
+            width: 70px;
             text-align: start;
           `}
           virtual={false}
@@ -434,20 +367,40 @@ const General = () => {
               </Select.Option>
             ))}
         </Select>
-      </ParallelDownload>
-      <Hr />
+      </Content>
       <Title>
-        Preferred Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
+        Instance Sorting &nbsp; <FontAwesomeIcon icon={faSort} />
       </Title>
-      <ParallelDownload>
+      <Content>
         <p
           css={`
             margin: 0;
             width: 400px;
           `}
         >
+          Select the method in which instances should be sorted.
+        </p>
+
+        <Select
+          onChange={v => dispatch(updateInstanceSortType(v))}
+          value={instanceSortMethod}
+          css={`
+            width: 136px;
+            text-align: start;
+          `}
+        >
+          <Select.Option value={0}>Alphabetical</Select.Option>
+          <Select.Option value={1}>Last Played</Select.Option>
+          <Select.Option value={2}>Most Played</Select.Option>
+        </Select>
+      </Content>
+      <Title>
+        Preferred Curse Release Channel &nbsp; <FontAwesomeIcon icon={faFire} />
+      </Title>
+      <Content>
+        <p>
           Select the preferred release channel for downloading Curse projects.
-          This also applies for mods update.
+          This also applies for mod updates.
         </p>
         <Select
           css={`
@@ -462,21 +415,12 @@ const General = () => {
           <Select.Option value={2}>Beta</Select.Option>
           <Select.Option value={3}>Alpha</Select.Option>
         </Select>
-      </ParallelDownload>
-      <Hr />
-      <Title
-        css={`
-          margin-top: 0px;
-        `}
-      >
+      </Content>
+      <Title>
         Discord Integration &nbsp; <FontAwesomeIcon icon={faDiscord} />
       </Title>
-      <DiscordRpc>
-        <p
-          css={`
-            width: 350px;
-          `}
-        >
+      <Content>
+        <p>
           Enable / disable Discord Integration. This displays what you are
           playing in Discord.
         </p>
@@ -491,50 +435,26 @@ const General = () => {
           }}
           checked={DiscordRPC}
         />
-      </DiscordRpc>
-      <Hr />
-      <Title
-        css={`
-          margin-top: 0px;
-        `}
-      >
+      </Content>
+      <Title>
         Minecraft News &nbsp; <FontAwesomeIcon icon={faNewspaper} />
       </Title>
-      <DiscordRpc>
-        <p
-          css={`
-            width: 350px;
-          `}
-        >
-          Enable / disable Minecraft news.
-        </p>
+      <Content>
+        <p>Enable / disable Minecraft news.</p>
         <Switch
           onChange={e => {
             dispatch(updateShowNews(e));
           }}
           checked={showNews}
         />
-      </DiscordRpc>
-      <Hr />
-      <Title
-        css={`
-          margin-top: 0px;
-        `}
-      >
+      </Content>
+      <Title>
         Hide Launcher While Playing &nbsp; <FontAwesomeIcon icon={faPlay} />
       </Title>
-      <DiscordRpc
-        css={`
-          margin-bottom: 30px;
-        `}
-      >
-        <p
-          css={`
-            width: 500px;
-          `}
-        >
+      <Content>
+        <p>
           Automatically hide the launcher when launching an instance. You will
-          still be able to open it from the icon tray
+          still be able to open it from the icon tray.
         </p>
         <Switch
           onChange={e => {
@@ -542,27 +462,14 @@ const General = () => {
           }}
           checked={hideWindowOnGameLaunch}
         />
-      </DiscordRpc>
-      <Hr />
-      <Title
-        css={`
-          margin-top: 0px;
-        `}
-      >
+      </Content>
+      <Title>
         Potato PC Mode &nbsp; <FontAwesomeIcon icon={faToilet} />
       </Title>
-      <DiscordRpc
-        css={`
-          margin-bottom: 30px;
-        `}
-      >
-        <p
-          css={`
-            width: 500px;
-          `}
-        >
+      <Content>
+        <p>
           You got a potato PC? Don&apos;t worry! We got you covered. Enable this
-          and all animations and special effects will be disabled
+          and all animations and special effects will be disabled.
         </p>
         <Switch
           onChange={e => {
@@ -570,37 +477,14 @@ const General = () => {
           }}
           checked={potatoPcMode}
         />
-      </DiscordRpc>
-      <Hr />
-      <Title
-        css={`
-          width: 300px;
-          float: left;
-        `}
-      >
+      </Content>
+      <Title>
         Clear Shared Data&nbsp; <FontAwesomeIcon icon={faTrash} />
       </Title>
-      <div
-        css={`
-          display: flex;
-          justify-content: space-between;
-          text-align: left;
-          width: 100%;
-          margin-bottom: 30px;
-          p {
-            text-align: left;
-            color: ${props => props.theme.palette.text.third};
-          }
-        `}
-      >
-        <p
-          css={`
-            margin: 0;
-            width: 500px;
-          `}
-        >
-          Deletes all the shared files between instances. Doing this will result
-          in the complete loss of the instances data
+      <Content>
+        <p>
+          Deletes all the shared files between instances. Doing this will remove
+          ALL instance data.
         </p>
         <Button
           onClick={() => {
@@ -617,30 +501,23 @@ const General = () => {
         >
           Clear
         </Button>
-      </div>
-      <Hr />
-      {/* {process.env.REACT_APP_RELEASE_TYPE === 'setup' && ( */}
-      <CustomDataPathContainer>
-        <Title
+      </Content>
+      <Title>
+        User Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
+        <a
           css={`
-            width: 400px;
-            float: left;
+            margin-left: 30px;
           `}
+          onClick={async () => {
+            const appData = await ipcRenderer.invoke('getAppdataPath');
+            const appDataPath = path.join(appData, 'gdlauncher_next');
+            setDataPath(appDataPath);
+          }}
         >
-          User Data Path&nbsp; <FontAwesomeIcon icon={faFolder} />
-          <a
-            css={`
-              margin-left: 30px;
-            `}
-            onClick={async () => {
-              const appData = await ipcRenderer.invoke('getAppdataPath');
-              const appDataPath = path.join(appData, 'gdlauncher_next');
-              setDataPath(appDataPath);
-            }}
-          >
-            Reset Path
-          </a>
-        </Title>
+          Reset Path
+        </a>
+      </Title>
+      <CustomDataPathContainer>
         <div
           css={`
             display: flex;
@@ -648,7 +525,7 @@ const General = () => {
             text-align: left;
             width: 100%;
             height: 30px;
-            margin: 20px 0 10px 0;
+            margin-bottom: 10px;
             p {
               text-align: left;
               color: ${props => props.theme.palette.text.third};
@@ -706,8 +583,6 @@ const General = () => {
           </Checkbox>
         </div>
       </CustomDataPathContainer>
-      {/* )} */}
-      <Hr />
       <LauncherVersion>
         <div
           css={`
@@ -731,8 +606,8 @@ const General = () => {
         </div>
         <p>
           {updateAvailable
-            ? 'There is an update available to be installed. Click on update to install it and restart the launcher'
-            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available'}
+            ? 'There is an update available to be installed. Click on update to install it and restart the launcher.'
+            : 'You’re currently on the latest version. We automatically check for updates and we will inform you whenever one is available.'}
         </p>
         <div
           css={`
@@ -768,7 +643,7 @@ const General = () => {
           )}
         </div>
       </LauncherVersion>
-    </MyAccountPrf>
+    </>
   );
 };
 

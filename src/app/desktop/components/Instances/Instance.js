@@ -15,7 +15,9 @@ import {
   faTrash,
   faStop,
   faBoxOpen,
-  faCopy
+  faCopy,
+  faServer,
+  faHammer
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -25,7 +27,11 @@ import {
   _getInstancesPath,
   _getDownloadQueue
 } from '../../../../common/utils/selectors';
-import { launchInstance } from '../../../../common/reducers/actions';
+import {
+  addStartedInstance,
+  addToQueue,
+  launchInstance
+} from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
 import { convertMinutesToHumanTime } from '../../../../common/utils';
@@ -182,6 +188,7 @@ const Instance = ({ instanceName }) => {
 
   const startInstance = () => {
     if (isInQueue || isPlaying) return;
+    dispatch(addStartedInstance({ instanceName }));
     dispatch(launchInstance(instanceName));
   };
   const openFolder = () => {
@@ -193,6 +200,9 @@ const Instance = ({ instanceName }) => {
   const manageInstance = () => {
     dispatch(openModal('InstanceManager', { instanceName }));
   };
+  const openBisectModal = () => {
+    dispatch(openModal('BisectHosting'));
+  };
   const instanceExportCurseForge = () => {
     dispatch(openModal('InstanceExportCurseForge', { instanceName }));
   };
@@ -202,9 +212,11 @@ const Instance = ({ instanceName }) => {
   const killProcess = () => {
     console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
-      if (children.length) {
+      if (children?.length) {
         children.forEach(el => {
-          process.kill(el.PID);
+          if (el) {
+            process.kill(el.PID);
+          }
         });
       } else {
         process.kill(isPlaying.pid);
@@ -284,7 +296,7 @@ const Instance = ({ instanceName }) => {
                   </div>
                 )}
                 {isInQueue && 'In Queue'}
-                {!isInQueue && !isPlaying && 'PLAY'}
+                {!isInQueue && !isPlaying && <span>PLAY</span>}
               </>
             )}
           </HoverContainer>
@@ -303,6 +315,7 @@ const Instance = ({ instanceName }) => {
                 icon={faStop}
                 css={`
                   margin-right: 10px;
+                  width: 25px !important;
                 `}
               />
               Kill
@@ -313,6 +326,7 @@ const Instance = ({ instanceName }) => {
               icon={faWrench}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Manage
@@ -322,6 +336,7 @@ const Instance = ({ instanceName }) => {
               icon={faFolder}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Open Folder
@@ -343,7 +358,7 @@ const Instance = ({ instanceName }) => {
               icon={faBoxOpen}
               css={`
                 margin-right: 10px;
-                width: 16px !important;
+                width: 25px !important;
               `}
             />
             Export Pack
@@ -356,11 +371,46 @@ const Instance = ({ instanceName }) => {
               icon={faCopy}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Duplicate
           </MenuItem>
           <MenuItem divider />
+          <MenuItem
+            disabled={Boolean(isInQueue) || Boolean(isPlaying)}
+            onClick={async () => {
+              let manifest = null;
+              try {
+                manifest = JSON.parse(
+                  await fs.readFile(
+                    path.join(instancesPath, instanceName, 'manifest.json')
+                  )
+                );
+              } catch {
+                // NO-OP
+              }
+
+              dispatch(
+                addToQueue(
+                  instanceName,
+                  instance.loader,
+                  manifest,
+                  instance.background,
+                  instance.timePlayed
+                )
+              );
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faHammer}
+              css={`
+                margin-right: 10px;
+                width: 25px !important;
+              `}
+            />
+            Repair
+          </MenuItem>
           <MenuItem
             disabled={Boolean(isInQueue) || Boolean(isPlaying)}
             onClick={openConfirmationDeleteModal}
@@ -369,9 +419,28 @@ const Instance = ({ instanceName }) => {
               icon={faTrash}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Delete
+          </MenuItem>
+          <MenuItem divider />
+          <MenuItem
+            onClick={openBisectModal}
+            preventClose
+            css={`
+              border: 2px solid #04cbeb;
+              border-radius: 5px;
+            `}
+          >
+            <FontAwesomeIcon
+              icon={faServer}
+              css={`
+                margin-right: 10px;
+                width: 25px !important;
+              `}
+            />
+            Create Server
           </MenuItem>
         </ContextMenu>
       </Portal>

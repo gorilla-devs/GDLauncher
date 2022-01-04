@@ -29,94 +29,97 @@ import { generate as generateRandomString } from 'randomstring';
 import fxp from 'fast-xml-parser';
 import * as ActionTypes from './actionTypes';
 import {
-  NEWS_URL,
-  MC_RESOURCES_URL,
-  GDL_LEGACYJAVAFIXER_MOD_URL,
-  FORGE,
-  FMLLIBS_OUR_BASE_URL,
-  FMLLIBS_FORGE_BASE_URL,
-  MICROSOFT_OAUTH_CLIENT_ID,
-  MICROSOFT_OAUTH_REDIRECT_URL,
   ACCOUNT_MICROSOFT,
   ACCOUNT_MOJANG,
-  FTB,
+  CURSEFORGE,
   FABRIC,
-  CURSEFORGE
+  FMLLIBS_FORGE_BASE_URL,
+  FMLLIBS_OUR_BASE_URL,
+  FORGE,
+  FTB,
+  GDL_LEGACYJAVAFIXER_MOD_URL,
+  LATEST_JAVA_VERSION,
+  MC_RESOURCES_URL,
+  MC_STARTUP_METHODS,
+  MICROSOFT_OAUTH_CLIENT_ID,
+  MICROSOFT_OAUTH_REDIRECT_URL,
+  NEWS_URL
 } from '../utils/constants';
 import {
-  mcAuthenticate,
-  mcRefresh,
-  mcInvalidate,
-  getFabricManifest,
-  getMcManifest,
-  getForgeManifest,
-  mcValidate,
-  getFabricJson,
-  getAddonFile,
-  getJavaManifest,
-  getAddonsByFingerprint,
-  getAddonFiles,
   getAddon,
-  // getFTBModpackData,
-  getFTBModpackVersionData,
   getAddonCategories,
-  msAuthenticateXBL,
-  msExchangeCodeForAccessToken,
-  msAuthenticateXSTS,
+  getAddonFile,
+  getAddonFiles,
+  getAddonsByFingerprint,
+  getFabricJson,
+  getFabricManifest,
+  getForgeManifest,
+  getFTBModpackVersionData,
+  getJavaLatestManifest,
+  getJavaManifest,
+  getMcManifest,
+  getMultipleAddons,
+  mcAuthenticate,
+  mcInvalidate,
+  mcRefresh,
+  mcValidate,
   msAuthenticateMinecraft,
+  msAuthenticateXBL,
+  msAuthenticateXSTS,
+  msExchangeCodeForAccessToken,
   msMinecraftProfile,
-  msOAuthRefresh,
-  getJava16Manifest
+  msOAuthRefresh
 } from '../api';
 import {
+  _getAccounts,
+  _getAssetsPath,
   _getCurrentAccount,
   _getCurrentDownloadItem,
-  _getJavaPath,
-  _getMinecraftVersionsPath,
-  _getAssetsPath,
-  _getInstancesPath,
-  _getLibrariesPath,
-  _getAccounts,
-  _getTempPath,
+  _getDataStorePath,
   _getInstance,
-  _getDataStorePath
+  _getInstancesPath,
+  _getJavaPath,
+  _getLibrariesPath,
+  _getMinecraftVersionsPath,
+  _getTempPath
 } from '../utils/selectors';
 import {
-  librariesMapper,
-  get7zPath,
-  extractNatives,
-  getJVMArguments112,
-  copyAssetsToResources,
-  getJVMArguments113,
-  patchForge113,
-  mavenToArray,
+  convertCompletePathToInstance,
+  convertcurseForgeToCanonical,
   copyAssetsToLegacy,
-  getPlayerSkin,
-  normalizeModData,
-  reflect,
-  isMod,
-  isInstanceFolderPath,
+  copyAssetsToResources,
+  downloadAddonZip,
+  extractAll,
+  extractFabricVersionFromManifest,
+  extractNatives,
+  filterFabricFilesByVersion,
+  filterForgeFilesByVersion,
+  get7zPath,
   getFileHash,
   getFilesRecursive,
-  filterForgeFilesByVersion,
-  filterFabricFilesByVersion,
+  getJVMArguments112,
+  getJVMArguments113,
   getPatchedInstanceType,
-  convertCompletePathToInstance,
-  downloadAddonZip,
-  convertcurseForgeToCanonical,
-  extractFabricVersionFromManifest,
-  extractAll
+  getPlayerSkin,
+  isInstanceFolderPath,
+  isMod,
+  librariesMapper,
+  mavenToArray,
+  normalizeModData,
+  patchForge113,
+  reflect
 } from '../../app/desktop/utils';
+import ga from '../utils/analytics';
 import {
   downloadFile,
   downloadInstanceFiles
 } from '../../app/desktop/utils/downloader';
-import { removeDuplicates, getFileMurmurHash2 } from '../utils';
+import { getFileMurmurHash2, removeDuplicates } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
-import { openModal } from './modals/actions';
+import { openModal, closeModal } from './modals/actions';
 import forgePatcher from '../utils/forgePatcher';
 
 export function initManifests() {
@@ -149,10 +152,10 @@ export function initManifests() {
       });
       return java;
     };
-    const getJava16ManifestVersions = async () => {
-      const java = (await getJava16Manifest()).data;
+    const getJavaLatestManifestVersions = async () => {
+      const java = (await getJavaLatestManifest()).data;
       dispatch({
-        type: ActionTypes.UPDATE_JAVA16_MANIFEST,
+        type: ActionTypes.UPDATE_JAVA_LATEST_MANIFEST,
         data: java
       });
       return java;
@@ -187,10 +190,10 @@ export function initManifests() {
       return omitBy(forgeVersions, v => v.length === 0);
     };
     // Using reflect to avoid rejection
-    const [fabric, java, java16, categories, forge] = await Promise.all([
+    const [fabric, java, javaLatest, categories, forge] = await Promise.all([
       reflect(getFabricVersions()),
       reflect(getJavaManifestVersions()),
-      reflect(getJava16ManifestVersions()),
+      reflect(getJavaLatestManifestVersions()),
       reflect(getAddonCategoriesVersions()),
       reflect(getForgeVersions())
     ]);
@@ -203,7 +206,7 @@ export function initManifests() {
       mc: mc || app.vanillaManifest,
       fabric: fabric.status ? fabric.v : app.fabricManifest,
       java: java.status ? java.v : app.javaManifest,
-      java16: java16.status ? java16.v : app.java16Manifest,
+      javaLatest: javaLatest.status ? javaLatest.v : app.javaLatestManifest,
       categories: categories.status ? categories.v : app.curseforgeCategories,
       forge: forge.status ? forge.v : app.forgeManifest
     };
@@ -553,11 +556,12 @@ export function loginWithOAuthAccessToken(redirect = true) {
             })
           );
         }
+      } catch (err) {
+        console.warn('Could not fetch skin');
+      } finally {
         if (redirect) {
           dispatch(push('/home'));
         }
-      } catch (err) {
-        console.warn('Could not fetch skin');
       }
     }
   };
@@ -1011,7 +1015,7 @@ export function updateInstanceConfig(
       const writeFileToDisk = async (content, tempP, p) => {
         await new Promise((resolve, reject) => {
           fss.open(tempP, 'w', async (err, fd) => {
-            if (err) reject(err);
+            if (err || !fd) reject(err);
 
             const buffer = Buffer.from(content);
             fss.write(
@@ -1667,15 +1671,46 @@ export function processFTBManifest(instanceName) {
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { manifest } = _getCurrentDownloadItem(state);
+    const { manifest, loader } = _getCurrentDownloadItem(state);
     const concurrency = state.settings.concurrentDownloads;
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading mods...'));
+
+    const addonsHashmap = {};
+    const addonsFilesHashmap = {};
+
+    const _getAddons = async () => {
+      const { data: addons } = await getMultipleAddons(
+        manifest.files.map(v => v.projectID)
+      );
+
+      addons.forEach(v => {
+        addonsHashmap[v.id] = v;
+      });
+    };
+
+    const _getAddonFiles = async () => {
+      await pMap(
+        manifest.files,
+        async item => {
+          const { data: modManifest } = await getAddonFile(
+            item.projectID,
+            item.fileID
+          );
+
+          addonsFilesHashmap[item.projectID] = modManifest;
+        },
+        { concurrency: concurrency + 10 }
+      );
+    };
+
+    await Promise.all([_getAddons(), _getAddonFiles()]);
 
     let modManifests = [];
     await pMap(
       manifest.files,
       async item => {
+        if (!addonsHashmap[item.projectID]) return;
         let ok = false;
         let tries = 0;
         /* eslint-disable no-await-in-loop */
@@ -1685,10 +1720,8 @@ export function processForgeManifest(instanceName) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
           try {
-            const { data: addon } = await getAddon(item.projectID);
-            const modManifest = (
-              await getAddonFile(item.projectID, item.fileID)
-            ).data;
+            const addon = addonsHashmap[item.projectID];
+            const modManifest = addonsFilesHashmap[item.projectID];
             const destFile = path.join(
               _getInstancesPath(state),
               instanceName,
@@ -1716,82 +1749,118 @@ export function processForgeManifest(instanceName) {
       { concurrency }
     );
 
-    dispatch(updateDownloadStatus(instanceName, 'Copying overrides...'));
+    let validAddon = false;
     const addonPathZip = path.join(
       _getTempPath(state),
       instanceName,
       'addon.zip'
     );
-    let progress = 0;
-    await extractAll(
-      addonPathZip,
-      path.join(_getTempPath(state), instanceName),
-      {
-        recursive: true,
-        $cherryPick: 'overrides',
-        $progress: true
-      },
-      {
-        progress: percent => {
-          if (percent !== progress) {
-            progress = percent;
-            dispatch(updateDownloadProgress(percent));
-          }
+
+    try {
+      await fs.stat(addonPathZip);
+      validAddon = true;
+    } catch {
+      // If project and file id are provided, we download it on the spot
+      if (loader.projectID && loader.fileID) {
+        const { data } = await getAddonFile(loader.projectID, loader.fileID);
+        try {
+          await downloadFile(addonPathZip, data.downloadUrl);
+          validAddon = true;
+        } catch {
+          // NO-OP
         }
       }
-    );
+    }
 
-    dispatch(updateDownloadStatus(instanceName, 'Finalizing overrides...'));
-
-    const overrideFiles = await getFilesRecursive(
-      path.join(_getTempPath(state), instanceName, 'overrides')
-    );
-    await dispatch(
-      updateInstanceConfig(instanceName, config => {
-        return {
-          ...config,
-          mods: [...(config.mods || []), ...modManifests],
-          overrides: overrideFiles.map(v =>
-            path.relative(
-              path.join(_getTempPath(state), instanceName, 'overrides'),
-              v
-            )
-          )
-        };
-      })
-    );
-
-    await new Promise(resolve => {
-      // Force premature unlock to let our listener catch mods from override
-      lockfile.unlock(
-        path.join(
-          _getInstancesPath(getState()),
-          instanceName,
-          'installing.lock'
-        ),
-        err => {
-          if (err) console.error(err);
-          resolve();
+    if (validAddon) {
+      dispatch(updateDownloadStatus(instanceName, 'Copying overrides...'));
+      let progress = 0;
+      await extractAll(
+        addonPathZip,
+        path.join(_getTempPath(state), instanceName),
+        {
+          recursive: true,
+          $cherryPick: 'overrides',
+          $progress: true
+        },
+        {
+          progress: percent => {
+            if (percent !== progress) {
+              progress = percent;
+              dispatch(updateDownloadProgress(percent));
+            }
+          }
         }
       );
-    });
 
-    await Promise.all(
-      overrideFiles.map(v => {
-        const relativePath = path.relative(
-          path.join(_getTempPath(state), instanceName, 'overrides'),
-          v
-        );
-        const newPath = path.join(
-          _getInstancesPath(state),
-          instanceName,
-          relativePath
-        );
-        return fse.copy(v, newPath, { overwrite: true });
-      })
-    );
+      dispatch(updateDownloadStatus(instanceName, 'Finalizing overrides...'));
 
-    await fse.remove(addonPathZip);
+      const overrideFiles = await getFilesRecursive(
+        path.join(_getTempPath(state), instanceName, 'overrides')
+      );
+      await dispatch(
+        updateInstanceConfig(instanceName, config => {
+          return {
+            ...config,
+            mods: [...(config.mods || []), ...modManifests],
+            overrides: overrideFiles.map(v =>
+              path.relative(
+                path.join(_getTempPath(state), instanceName, 'overrides'),
+                v
+              )
+            )
+          };
+        })
+      );
+
+      await new Promise(resolve => {
+        // Force premature unlock to let our listener catch mods from override
+        lockfile.unlock(
+          path.join(
+            _getInstancesPath(getState()),
+            instanceName,
+            'installing.lock'
+          ),
+          err => {
+            if (err) console.error(err);
+            resolve();
+          }
+        );
+      });
+
+      await Promise.all(
+        overrideFiles.map(v => {
+          const relativePath = path.relative(
+            path.join(_getTempPath(state), instanceName, 'overrides'),
+            v
+          );
+          const newPath = path.join(
+            _getInstancesPath(state),
+            instanceName,
+            relativePath
+          );
+          return fse.copy(v, newPath, { overwrite: true });
+        })
+      );
+
+      await fse.remove(addonPathZip);
+    } else {
+      await new Promise(resolve => {
+        // Force premature unlock to let our listener catch mods from override
+        lockfile.unlock(
+          path.join(
+            _getInstancesPath(getState()),
+            instanceName,
+            'installing.lock'
+          ),
+          err => {
+            if (err) console.error(err);
+            resolve();
+          }
+        );
+      });
+    }
+
     await fse.remove(path.join(_getTempPath(state), instanceName));
   };
 }
@@ -1872,6 +1941,23 @@ export function downloadInstance(instanceName) {
         )
       })
     );
+
+    if (mcJson.logging) {
+      const {
+        sha1: loggingHash,
+        id: loggingId,
+        url: loggingUrl
+      } = mcJson.logging.client.file;
+      await downloadFile(
+        path.join(
+          _getAssetsPath(state),
+          'objects',
+          loggingHash.substring(0, 2),
+          loggingId
+        ),
+        loggingUrl
+      );
+    }
 
     const libraries = librariesMapper(
       mcJson.libraries,
@@ -2216,7 +2302,7 @@ export const startListener = () => {
       const processChange = async () => {
         const newState = getState();
         const instances = newState.instances.list;
-        const modData = instances[oldInstanceName].mods.find(
+        const modData = (instances[oldInstanceName].mods || []).find(
           m => m.fileName === path.basename(fileName)
         );
         if (modData) {
@@ -2534,16 +2620,16 @@ export function getJavaVersionForMCVersion(mcVersion) {
     const { versions } = app?.vanillaManifest || {};
     if (versions) {
       const version = versions.find(v => v.id === mcVersion);
-      const java16InitialDate = new Date('2021-05-27T09:39:21+00:00');
-      if (new Date(version?.releaseTime) < java16InitialDate) {
+      const javaLatestInitialDate = new Date('2021-05-27T09:39:21+00:00');
+      if (new Date(version?.releaseTime) < javaLatestInitialDate) {
         return 8;
       }
     }
-    return 16;
+    return LATEST_JAVA_VERSION;
   };
 }
 
-export function launchInstance(instanceName) {
+export function launchInstance(instanceName, forceQuit = false) {
   return async (dispatch, getState) => {
     const state = getState();
 
@@ -2554,13 +2640,19 @@ export function launchInstance(instanceName) {
     const { memory, args } = state.settings.java;
     const { resolution: globalMinecraftResolution } =
       state.settings.minecraftSettings;
+    const instanceState = _getInstance(state)(instanceName);
     const {
       loader,
       javaArgs,
       javaMemory,
       customJavaPath,
       resolution: instanceResolution
-    } = _getInstance(state)(instanceName);
+    } = instanceState;
+
+    const mcJsonPath = path.join(
+      _getMinecraftVersionsPath(state),
+      `${loader?.mcVersion}.json`
+    );
 
     let discordRPCDetails = `Minecraft ${loader?.mcVersion}`;
 
@@ -2574,6 +2666,37 @@ export function launchInstance(instanceName) {
       dispatch(getJavaVersionForMCVersion(loader?.mcVersion))
     );
     const javaPath = customJavaPath || defaultJavaPathVersion;
+    let missingResource = false;
+
+    const verifyResource = async resourcePath => {
+      if (forceQuit) return true;
+      try {
+        await fs.access(resourcePath);
+        return true;
+      } catch {
+        console.warn(`Missing resource: ${resourcePath}`);
+        dispatch(
+          addToQueue(
+            instanceName,
+            instanceState.loader,
+            null,
+            instanceState.background
+          )
+        );
+
+        await new Promise(resolve => {
+          const unsubscribe = window.__store.subscribe(() => {
+            if (!getState().downloadQueue[instanceName]) {
+              unsubscribe();
+              return resolve();
+            }
+          });
+        });
+
+        dispatch(launchInstance(instanceName));
+        return false;
+      }
+    };
 
     const instancePath = path.join(_getInstancesPath(state), instanceName);
 
@@ -2590,15 +2713,72 @@ export function launchInstance(instanceName) {
 
     let errorLogs = '';
 
-    const mcJson = await fse.readJson(
-      path.join(_getMinecraftVersionsPath(state), `${loader?.mcVersion}.json`)
+    // Verify main jar JSON
+    let verified = await verifyResource(mcJsonPath);
+    if (!verified) return;
+
+    const mcJson = await fse.readJson(mcJsonPath);
+
+    if (mcJson.logging) {
+      // Verify logging xml
+      const { sha1: loggingHash, id: loggingId } = mcJson.logging.client.file;
+      if (loggingHash && loggingId) {
+        const loggingPath = path.join(
+          _getAssetsPath(state),
+          'objects',
+          loggingHash.substring(0, 2),
+          loggingId
+        );
+        verified = await verifyResource(loggingPath);
+        if (!verified) return;
+      }
+    }
+
+    // Verify assets
+    const assetsFile = path.join(
+      _getAssetsPath(state),
+      'indexes',
+      `${mcJson.assets}.json`
     );
+    verified = await verifyResource(assetsFile);
+    if (!verified) return;
+    await fse.readJson(assetsFile);
+    const assetsJson = await fse.readJson(assetsFile);
+
+    const assets = Object.entries(assetsJson.objects).map(
+      ([assetKey, { hash }]) => ({
+        url: `${MC_RESOURCES_URL}/${hash.substring(0, 2)}/${hash}`,
+        type: 'asset',
+        sha1: hash,
+        path: path.join(
+          _getAssetsPath(state),
+          'objects',
+          hash.substring(0, 2),
+          hash
+        ),
+        resourcesPath: path.join(
+          _getInstancesPath(state),
+          instanceName,
+          'resources',
+          assetKey
+        ),
+        legacyPath: path.join(
+          _getAssetsPath(state),
+          'virtual',
+          'legacy',
+          assetKey
+        )
+      })
+    );
+
     let libraries = [];
     let mcMainFile = {
       url: mcJson.downloads.client.url,
       sha1: mcJson.downloads.client.sha1,
       path: path.join(_getMinecraftVersionsPath(state), `${mcJson.id}.jar`)
     };
+    verified = await verifyResource(mcMainFile.path);
+    if (!verified) return;
 
     if (loader && loader?.loaderType === 'fabric') {
       const fabricJsonPath = path.join(
@@ -2609,6 +2789,10 @@ export function launchInstance(instanceName) {
         loader?.loaderVersion,
         'fabric.json'
       );
+
+      verified = await verifyResource(fabricJsonPath);
+      if (!verified) return;
+
       const fabricJson = await fse.readJson(fabricJsonPath);
       const fabricLibraries = librariesMapper(
         fabricJson.libraries,
@@ -2618,6 +2802,16 @@ export function launchInstance(instanceName) {
       // Replace classname
       mcJson.mainClass = fabricJson.mainClass;
     } else if (loader && loader?.loaderType === 'forge') {
+      const forgeJsonPath = path.join(
+        _getLibrariesPath(state),
+        'net',
+        'minecraftforge',
+        loader?.loaderVersion,
+        `${loader?.loaderVersion}.json`
+      );
+      verified = await verifyResource(forgeJsonPath);
+      if (!verified) return;
+
       if (gt(coerce(loader?.mcVersion), coerce('1.5.2'))) {
         const getForgeLastVer = ver =>
           Number.parseInt(ver.split('.')[ver.split('.').length - 1], 10);
@@ -2630,7 +2824,7 @@ export function launchInstance(instanceName) {
         ) {
           const moveJavaLegacyFixerToInstance = async () => {
             await fs.lstat(path.join(_getDataStorePath(state), '__JLF__.jar'));
-            await fse.move(
+            await fse.copy(
               path.join(_getDataStorePath(state), '__JLF__.jar'),
               instanceJLFPath
             );
@@ -2642,14 +2836,6 @@ export function launchInstance(instanceName) {
             await moveJavaLegacyFixerToInstance();
           }
         }
-
-        const forgeJsonPath = path.join(
-          _getLibrariesPath(state),
-          'net',
-          'minecraftforge',
-          loader?.loaderVersion,
-          `${loader?.loaderVersion}.json`
-        );
         const forgeJson = await fse.readJson(forgeJsonPath);
         const forgeLibraries = librariesMapper(
           forgeJson.version.libraries,
@@ -2668,7 +2854,14 @@ export function launchInstance(instanceName) {
               arg => {
                 return arg
                   .replace(/\${version_name}/g, mcJson.id)
-                  .replace(/\${library_directory}/g, _getLibrariesPath(state))
+                  .replace(
+                    /=\${library_directory}/g,
+                    `="${_getLibrariesPath(state)}"`
+                  )
+                  .replace(
+                    /\${library_directory}/g,
+                    `${_getLibrariesPath(state)}`
+                  )
                   .replace(
                     /\${classpath_separator}/g,
                     process.platform === 'win32' ? ';' : ':'
@@ -2694,6 +2887,40 @@ export function launchInstance(instanceName) {
       'url'
     );
 
+    for (const resource of [...libraries, ...assets]) {
+      try {
+        await fs.access(resource.path);
+      } catch {
+        console.warn(`Missing resource: ${resource.path}`);
+        missingResource = true;
+      }
+    }
+
+    if (missingResource) {
+      dispatch(
+        addToQueue(
+          instanceName,
+          instanceState.loader,
+          null,
+          instanceState.background
+        )
+      );
+
+      await new Promise(resolve => {
+        const unsubscribe = window.__store.subscribe(() => {
+          if (!getState().downloadQueue[instanceName]) {
+            unsubscribe();
+            return resolve();
+          }
+        });
+      });
+
+      dispatch(launchInstance(instanceName, true));
+      return;
+    }
+    ga.sendCustomEvent('launchedInstance');
+    dispatch(openModal('InstanceStartupAd', { instanceName }));
+
     const getJvmArguments =
       mcJson.assets !== 'legacy' && gte(coerce(mcJson.assets), coerce('1.13'))
         ? getJVMArguments113
@@ -2716,16 +2943,30 @@ export function launchInstance(instanceName) {
       javaArguments
     );
 
+    const { mcStartupMethod } = state.settings;
+    let replaceWith = `..${path.sep}..`;
+
     const symLinkDirPath = path.join(userData.split('\\')[0], '_gdl');
+    if (MC_STARTUP_METHODS[mcStartupMethod] === MC_STARTUP_METHODS.SYMLINK) {
+      replaceWith = symLinkDirPath;
+      if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
+    }
 
     const replaceRegex = [
       process.platform === 'win32'
         ? new RegExp(userData.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
-      symLinkDirPath
+      replaceWith
     ];
 
-    if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
+    const { sha1: loggingHash, id: loggingId } =
+      mcJson?.logging?.client?.file || {};
+    const loggingPath = path.join(
+      assetsPath,
+      'objects',
+      loggingHash.substring(0, 2),
+      loggingId
+    );
 
     console.log(
       `"${javaPath}" ${getJvmArguments(
@@ -2739,16 +2980,33 @@ export function launchInstance(instanceName) {
         gameResolution,
         true,
         javaArguments
-      ).join(' ')}`.replace(...replaceRegex)
+      ).join(' ')}`
+        .replace(...replaceRegex)
+        .replace(
+          // eslint-disable-next-line no-template-curly-in-string
+          '-Dlog4j.configurationFile=${path}',
+          `-Dlog4j.configurationFile="${loggingPath}"`
+        )
     );
 
     if (state.settings.hideWindowOnGameLaunch) {
       await ipcRenderer.invoke('hide-window');
     }
 
+    let closed = false;
+
     const ps = spawn(
-      `"${javaPath.replace(...replaceRegex)}"`,
-      jvmArguments.map(v => v.toString().replace(...replaceRegex)),
+      `"${javaPath}"`,
+      jvmArguments.map(v =>
+        v
+          .toString()
+          .replace(...replaceRegex)
+          .replace(
+            // eslint-disable-next-line no-template-curly-in-string
+            '-Dlog4j.configurationFile=${path}',
+            `-Dlog4j.configurationFile="${loggingPath}"`
+          )
+      ),
       {
         cwd: instancePath,
         shell: true
@@ -2770,11 +3028,21 @@ export function launchInstance(instanceName) {
         lastPlayed: Date.now()
       }))
     );
-    dispatch(addStartedInstance({ instanceName, pid: ps.pid }));
+    dispatch(updateStartedInstance({ instanceName, pid: ps.pid }));
 
     ps.stdout.on('data', data => {
       console.log(data.toString());
-      if (data.toString().includes('Setting user:')) {
+      if (
+        data.toString().includes('Setting user:') ||
+        data.toString().includes('Initializing LWJGL OpenAL')
+      ) {
+        if (
+          !closed &&
+          getState().modals.find(v => v.modalType === 'InstanceStartupAd')
+        ) {
+          closed = true;
+          dispatch(closeModal());
+        }
         dispatch(updateStartedInstance({ instanceName, initialized: true }));
       }
     });
@@ -2794,15 +3062,31 @@ export function launchInstance(instanceName) {
       ipcRenderer.invoke('show-window');
       dispatch(removeStartedInstance(instanceName));
       await fse.remove(instanceJLFPath);
-      if (process.platform === 'win32') fse.remove(symLinkDirPath);
       await fs.unlink(backupConfigPath);
+
+      if (
+        process.platform === 'win32' &&
+        MC_STARTUP_METHODS[mcStartupMethod] === MC_STARTUP_METHODS.SYMLINK
+      ) {
+        fse.remove(symLinkDirPath);
+      }
+
+      if (
+        !closed &&
+        getState().modals.find(v => v.modalType === 'InstanceStartupAd')
+      ) {
+        dispatch(closeModal());
+      }
+
       if (code !== 0 && errorLogs) {
-        dispatch(
-          openModal('InstanceCrashed', {
-            code,
-            errorLogs: errorLogs?.toString('utf8')
-          })
-        );
+        setTimeout(() => {
+          dispatch(
+            openModal('InstanceCrashed', {
+              code,
+              errorLogs: errorLogs?.toString('utf8')
+            })
+          );
+        }, 225);
         console.warn(`Process exited with code ${code}. Not too good..`);
       }
     });

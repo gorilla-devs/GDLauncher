@@ -12,7 +12,8 @@ import { exec, spawn } from 'child_process';
 import {
   MC_LIBRARIES_URL,
   FABRIC,
-  FORGE
+  FORGE,
+  LATEST_JAVA_VERSION
 } from '../../../common/utils/constants';
 
 import {
@@ -106,7 +107,7 @@ export const librariesMapper = (libraries, librariesPath) => {
       .filter(v => !skipLibrary(v))
       .reduce((acc, lib) => {
         const tempArr = [];
-        // Normal libs
+        // Forge libs
         if (lib.downloads && lib.downloads.artifact) {
           let { url } = lib.downloads.artifact;
           // Handle special case for forge universal where the url is "".
@@ -118,7 +119,8 @@ export const librariesMapper = (libraries, librariesPath) => {
           tempArr.push({
             url,
             path: path.join(librariesPath, lib.downloads.artifact.path),
-            sha1: lib.downloads.artifact.sha1
+            sha1: lib.downloads.artifact.sha1,
+            name: lib.name
           });
         }
 
@@ -140,7 +142,8 @@ export const librariesMapper = (libraries, librariesPath) => {
               lib.downloads.classifiers[native].path
             ),
             sha1: lib.downloads.classifiers[native].sha1,
-            natives: true
+            natives: true,
+            name: lib.name
           });
         }
         if (tempArr.length === 0) {
@@ -150,10 +153,57 @@ export const librariesMapper = (libraries, librariesPath) => {
               native && `-${native}`
             ).join('/')}`,
             path: path.join(librariesPath, ...mavenToArray(lib.name, native)),
-            ...(native && { natives: true })
+            ...(native && { natives: true }),
+            name: lib.name
           });
         }
-        return acc.concat(tempArr);
+        // Patch log4j versions https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228
+        for (const k in tempArr) {
+          if (tempArr[k]?.url?.includes('log4j')) {
+            // Get rid of all log4j aside from official
+            if (!tempArr[k].url.includes('libraries.minecraft.net')) {
+              tempArr[k] = null;
+              continue;
+            }
+
+            if (tempArr[k].url.includes('2.0-beta9')) {
+              tempArr[k] = {
+                url: tempArr[k].url
+                  .replace(
+                    'libraries.minecraft.net',
+                    'cdn.gdlauncher.com/maven'
+                  )
+                  .replace(/2.0-beta9/g, '2.0-beta9-fixed'),
+                path: tempArr[k].path.replace(/2.0-beta9/g, '2.0-beta9-fixed'),
+                sha1: tempArr[k].url.includes('log4j-api')
+                  ? 'b61eaf2e64d8b0277e188262a8b771bbfa1502b3'
+                  : '677991ea2d7426f76309a73739cecf609679492c',
+                name: tempArr[k].name
+              };
+            } else {
+              const splitName = tempArr[k].name.split(':');
+              splitName[splitName.length - 1] = '2.15.0';
+              const patchedName = splitName.join(':');
+
+              // Assuming we can use 2.15
+              tempArr[k] = {
+                url: `https://cdn.gdlauncher.com/maven/${mavenToArray(
+                  patchedName,
+                  native
+                ).join(path.sep)}`,
+                path: path.join(
+                  librariesPath,
+                  ...mavenToArray(patchedName, native)
+                ),
+                sha1: tempArr[k].url.includes('log4j-api')
+                  ? '42319af9991a86b4475ab3316633a3d03e2d29e1'
+                  : '9bd89149d5083a2a3ab64dcc88b0227da14152ec'
+              };
+            }
+          }
+        }
+
+        return acc.concat(tempArr.filter(_ => _));
       }, []),
     'url'
   );
@@ -270,11 +320,16 @@ export const isLatestJavaDownloaded = async (
   const javaOs = convertOSToJavaFormat(process.platform);
   let log = null;
 
-  const isJava16 = version === 16;
+  const isJavaLatest = version === LATEST_JAVA_VERSION;
 
-  const manifest = isJava16 ? meta.java16 : meta.java;
+  const manifest = isJavaLatest ? meta.javaLatest : meta.java;
 
-  const javaMeta = manifest.find(v => v.os === javaOs);
+  const javaMeta = manifest.find(
+    v =>
+      v.os === javaOs &&
+      v.architecture === 'x64' &&
+      (v.binary_type === 'jre' || v.binary_type === 'jdk')
+  );
   const javaFolder = path.join(
     userData,
     'java',
@@ -316,18 +371,22 @@ export const isLatestJavaDownloaded = async (
 export const get7zPath = async () => {
   // Get userData from ipc because we can't always get this from redux
   let baseDir = await ipcRenderer.invoke('getExecutablePath');
-  if (process.env.NODE_ENV === 'development') {
+  const isDev = process.env.NODE_ENV === 'development';
+  if (isDev) {
     baseDir = path.resolve(baseDir, '../../');
     if (process.platform === 'win32') {
       baseDir = path.join(baseDir, '7zip-bin/win/x64');
     } else if (process.platform === 'linux') {
       baseDir = path.join(baseDir, '7zip-bin/linux/x64');
     } else if (process.platform === 'darwin') {
-      baseDir = path.join(baseDir, '7zip-bin/mac/x64');
+      baseDir = path.resolve(baseDir, '../../../', '7zip-bin/mac/x64');
     }
   }
-  if (process.platform === 'darwin' || process.platform === 'linux') {
+  if (process.platform === 'linux') {
     return path.join(baseDir, '7za');
+  }
+  if (process.platform === 'darwin') {
+    return path.resolve(baseDir, isDev ? '' : '../', '7za');
   }
   return path.join(baseDir, '7za.exe');
 };
@@ -347,22 +406,28 @@ export const extractAll = async (
     $bin: sevenZipPath,
     $spawnOptions: { shell: true }
   });
+  let extractedParentDir = null;
   await new Promise((resolve, reject) => {
     if (funcs.progress) {
       extraction.on('progress', ({ percent }) => {
         funcs.progress(percent);
       });
     }
+    extraction.on('data', data => {
+      if (!extractedParentDir) {
+        [extractedParentDir] = data.file.split('/');
+      }
+    });
     extraction.on('end', () => {
       funcs.end?.();
-      resolve();
+      resolve(extractedParentDir);
     });
     extraction.on('error', err => {
       funcs.error?.();
       reject(err);
     });
   });
-  return extraction;
+  return { extraction, extractedParentDir };
 };
 
 export const extractNatives = async (libraries, instancePath) => {
@@ -437,6 +502,9 @@ export const getJVMArguments112 = (
   args.push(...jvmOptions);
   args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
+  if (mcJson.logging) {
+    args.push(mcJson?.logging?.client?.argument || '');
+  }
 
   args.push(mcJson.mainClass);
 
@@ -526,6 +594,9 @@ export const getJVMArguments113 = (
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
+  if (mcJson.logging) {
+    args.push(mcJson?.logging?.client?.argument || '');
+  }
   args.push(...jvmOptions);
 
   // Eventually inject additional arguments (from 1.17 (?))
@@ -624,7 +695,7 @@ export const getJVMArguments113 = (
 };
 
 export const readJarManifest = async (jarPath, property) => {
-  const list = await extractAll(jarPath, '.', {
+  const { extraction: list } = await extractAll(jarPath, '.', {
     toStdout: true,
     $cherryPick: 'META-INF/MANIFEST.MF'
   });
@@ -680,6 +751,9 @@ export const patchForge113 = async (
   for (const key in processors) {
     if (Object.prototype.hasOwnProperty.call(processors, key)) {
       const p = processors[key];
+      if (p?.sides && !(p?.sides || []).includes('client')) {
+        continue;
+      }
       const filePath = path.join(librariesPath, ...mavenToArray(p.jar));
       const args = p.args
         .map(arg => replaceIfPossible(arg))
