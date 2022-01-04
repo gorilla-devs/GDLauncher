@@ -72,7 +72,7 @@ func WatchInstances(c *websocket.Conn) error {
 			Data:      respData,
 			Id:        fmt.Sprint(time.Now().Unix()),
 			Timestamp: time.Now().Unix(),
-			Type:      events.Instances,
+			Type:      events.InstanceUpdate,
 		}
 
 		err := c.WriteJSON(newResp)

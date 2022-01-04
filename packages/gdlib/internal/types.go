@@ -26,106 +26,17 @@ type MojangMeta struct {
 			Value []string `json:"value"`
 		} `json:"jvm"`
 	} `json:"arguments"`
-	AssetIndex struct {
-		ID        string `json:"id"`
-		Sha1      string `json:"sha1"`
-		Size      int64  `json:"size"`
-		TotalSize int64  `json:"totalSize"`
-		URL       string `json:"url"`
-	} `json:"assetIndex"`
-	Assets          string `json:"assets"`
-	ComplianceLevel int64  `json:"complianceLevel"`
-	Downloads       struct {
-		Client struct {
-			Sha1 string `json:"sha1"`
-			Size int64  `json:"size"`
-			URL  string `json:"url"`
-		} `json:"client"`
-		ClientMappings struct {
-			Sha1 string `json:"sha1"`
-			Size int64  `json:"size"`
-			URL  string `json:"url"`
-		} `json:"client_mappings"`
-		Server struct {
-			Sha1 string `json:"sha1"`
-			Size int64  `json:"size"`
-			URL  string `json:"url"`
-		} `json:"server"`
-		ServerMappings struct {
-			Sha1 string `json:"sha1"`
-			Size int64  `json:"size"`
-			URL  string `json:"url"`
-		} `json:"server_mappings"`
-	} `json:"downloads"`
-	ID          string `json:"id"`
-	JavaVersion struct {
+	AssetIndex      MojangMetaIndex     `json:"assetIndex"`
+	Assets          string              `json:"assets"`
+	ComplianceLevel int64               `json:"complianceLevel"`
+	Downloads       MojangMetaDownloads `json:"downloads"`
+	ID              string              `json:"id"`
+	JavaVersion     struct {
 		Component    string `json:"component"`
 		MajorVersion int64  `json:"majorVersion"`
 	} `json:"javaVersion"`
-	Libraries []struct {
-		Downloads struct {
-			Artifact struct {
-				Path string `json:"path"`
-				Sha1 string `json:"sha1"`
-				Size int64  `json:"size"`
-				URL  string `json:"url"`
-			} `json:"artifact"`
-			Classifiers struct {
-				Javadoc struct {
-					Path string `json:"path"`
-					Sha1 string `json:"sha1"`
-					Size int64  `json:"size"`
-					URL  string `json:"url"`
-				} `json:"javadoc"`
-				Natives_linux struct {
-					Path string `json:"path"`
-					Sha1 string `json:"sha1"`
-					Size int64  `json:"size"`
-					URL  string `json:"url"`
-				} `json:"natives-linux"`
-				Natives_macos struct {
-					Path string `json:"path"`
-					Sha1 string `json:"sha1"`
-					Size int64  `json:"size"`
-					URL  string `json:"url"`
-				} `json:"natives-macos"`
-				Natives_osx struct {
-					Path string `json:"path"`
-					Sha1 string `json:"sha1"`
-					Size int64  `json:"size"`
-					URL  string `json:"url"`
-				} `json:"natives-osx"`
-				Natives_windows struct {
-					Path string `json:"path"`
-					Sha1 string `json:"sha1"`
-					Size int64  `json:"size"`
-					URL  string `json:"url"`
-				} `json:"natives-windows"`
-				Sources struct {
-					Path string `json:"path"`
-					Sha1 string `json:"sha1"`
-					Size int64  `json:"size"`
-					URL  string `json:"url"`
-				} `json:"sources"`
-			} `json:"classifiers"`
-		} `json:"downloads"`
-		Extract struct {
-			Exclude []string `json:"exclude"`
-		} `json:"extract"`
-		Name    string `json:"name"`
-		Natives struct {
-			Linux   string `json:"linux"`
-			Osx     string `json:"osx"`
-			Windows string `json:"windows"`
-		} `json:"natives"`
-		Rules []struct {
-			Action string `json:"action"`
-			Os     struct {
-				Name string `json:"name"`
-			} `json:"os"`
-		} `json:"rules"`
-	} `json:"libraries"`
-	Logging struct {
+	Libraries []MojangMetaLibrary `json:"libraries"`
+	Logging   struct {
 		Client struct {
 			Argument string `json:"argument"`
 			File     struct {
@@ -138,10 +49,89 @@ type MojangMeta struct {
 		} `json:"client"`
 	} `json:"logging"`
 	MainClass              string `json:"mainClass"`
+	MinecraftArguments     string `json:"minecraftArguments"`
 	MinimumLauncherVersion int64  `json:"minimumLauncherVersion"`
 	ReleaseTime            string `json:"releaseTime"`
 	Time                   string `json:"time"`
 	Type                   string `json:"type"`
+}
+
+type MojangMetaDownloads struct {
+	Client         MojangMetaDownloadsClient `json:"client"`
+	ClientMappings struct {
+		Sha1 string `json:"sha1"`
+		Size int64  `json:"size"`
+		URL  string `json:"url"`
+	} `json:"client_mappings"`
+	Server         MojangMetaDownloadsServer `json:"server"`
+	ServerMappings struct {
+		Sha1 string `json:"sha1"`
+		Size int64  `json:"size"`
+		URL  string `json:"url"`
+	} `json:"server_mappings"`
+}
+
+type MojangMetaDownloadsClient struct {
+	Sha1 string `json:"sha1"`
+	Size int64  `json:"size"`
+	URL  string `json:"url"`
+}
+
+type MojangMetaIndex struct {
+	ID        string `json:"id"`
+	Sha1      string `json:"sha1"`
+	Size      int64  `json:"size"`
+	TotalSize int64  `json:"totalSize"`
+	URL       string `json:"url"`
+}
+
+type MojangMetaLibrary struct {
+	Downloads struct {
+		Artifact struct {
+			Path string `json:"path"`
+			Sha1 string `json:"sha1"`
+			Size int    `json:"size"`
+			URL  string `json:"url"`
+		} `json:"artifact"`
+		Classifiers struct {
+			Javadoc         MojangMetaLibraryNative `json:"javadoc"`
+			Natives_linux   MojangMetaLibraryNative `json:"natives-linux"`
+			Natives_macos   MojangMetaLibraryNative `json:"natives-macos"`
+			Natives_osx     MojangMetaLibraryNative `json:"natives-osx"`
+			Natives_windows MojangMetaLibraryNative `json:"natives-windows"`
+			Sources         MojangMetaLibraryNative `json:"sources"`
+		} `json:"classifiers"`
+	} `json:"downloads"`
+	Extract struct {
+		Exclude []string `json:"exclude"`
+	} `json:"extract"`
+	Name    string `json:"name"`
+	Natives struct {
+		Linux   string `json:"linux"`
+		Osx     string `json:"osx"`
+		Windows string `json:"windows"`
+	} `json:"natives"`
+	Rules []MojangMetaLibraryRule `json:"rules"`
+}
+
+type MojangMetaLibraryNative struct {
+	Path string `json:"path"`
+	Sha1 string `json:"sha1"`
+	Size int    `json:"size"`
+	URL  string `json:"url"`
+}
+
+type MojangMetaLibraryRule struct {
+	Action string `json:"action"`
+	Os     struct {
+		Name string `json:"name"`
+	} `json:"os"`
+}
+
+type MojangMetaDownloadsServer struct {
+	Sha1 string `json:"sha1"`
+	Size int64  `json:"size"`
+	URL  string `json:"url"`
 }
 
 type InstanceType string

@@ -10,8 +10,11 @@ var GDL_USER_DATA = ""
 
 const GDL_USER_DATA_PREFIX = "gdlauncher_next"
 
-func GetGDLUserData() {
+func init() {
+	getGDLUserData()
+}
 
+func getGDLUserData() {
 	userData, err := os.UserConfigDir()
 	if err != nil {
 		panic(err)

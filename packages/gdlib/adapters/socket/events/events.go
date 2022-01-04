@@ -10,3 +10,8 @@ const (
 	JavaDetect      = 5
 	JavaInstall     = 6
 )
+
+// Response events
+const (
+	InstanceUpdate = 3000
+)
