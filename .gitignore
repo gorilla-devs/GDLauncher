@@ -12,6 +12,7 @@
 
 # production
 /build
+dist
 /release
 /deploy
 /gdlib/build

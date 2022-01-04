@@ -142,17 +142,20 @@ const (
 	INSTANCE_TYPE_CLIENT    InstanceType = "client"
 )
 
+type InstanceLoader struct {
+	Modloader modloader.Modloader `json:"loaderType,omitempty"`
+	// If modloader is vanilla, ModloaderVersion should be empty
+	ModloaderVersion     string                  `json:"loaderVersion,omitempty"`
+	Modplatform          modplatform.Modplatform `json:"source,omitempty"`
+	ModplatformProjectId int                     `json:"projectID,omitempty"`
+	ModplatformFileId    int                     `json:"fileID,omitempty"`
+	MinecraftVersion     string                  `json:"mcVersion,omitempty"`
+}
+
 type Instance struct {
-	Name   string       `json:"name,omitempty"`
-	Type   InstanceType `json:"type,omitempty"`
-	Loader struct {
-		Modloader            modloader.Modloader     `json:"loaderType,omitempty"`
-		ModloaderVersion     string                  `json:"loaderVersion,omitempty"`
-		Modplatform          modplatform.Modplatform `json:"source,omitempty"`
-		ModplatformProjectId int                     `json:"projectID,omitempty"`
-		ModplatformFileId    int                     `json:"fileID,omitempty"`
-		MinecraftVersion     string                  `json:"mcVersion,omitempty"`
-	} `json:"loader,omitempty"`
+	Name   string         `json:"name,omitempty"`
+	Type   InstanceType   `json:"type,omitempty"`
+	Loader InstanceLoader `json:"loader,omitempty"`
 
 	ModplatformOverrides    []string `json:"modplatformOverrides,omitempty"`
 	OriginalModplatformName string   `json:"originalModplatformName,omitempty"`

@@ -1,16 +1,14 @@
 {
-	"name": "ui",
-	"version": "2.0.0",
-	"description": "Styles and components for use in svelte websites",
-	"type": "module",
-	"module": "index.mjs",
-	"svelte": "index.mjs",
-	"license": "GPL-3.0",
-	"devDependencies": {
-		"svelte": "^3.44.3"
-	},
-	"files": [
-		"index.mjs",
-		"components"
-	]
+  "name": "ui",
+  "version": "2.0.0",
+  "description": "Styles and components for use in svelte websites",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "files": [
+    "src/**"
+  ],
+  "main": "./src/index.js"
 }

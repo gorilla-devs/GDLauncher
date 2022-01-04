@@ -10,17 +10,17 @@
     "build": "turbo run build",
     "dev": "turbo run dev -parallel",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"**/*.{js,jsx,md}\"",
     "app:dev": "concurrently \"tauri dev\" \"turbo run dev --scope=gdlib --scope=app\"",
     "app:build": "\"turbo run build --scope=gdlib --scope=app\" && tauri build",
     "tauri": "tauri",
     "web:dev": "turbo run dev --scope=web",
-    "web:build": "turbo run build --scope=web"
+    "web:build": "turbo run build --scope=web",
+    "test:quick": ""
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.0.0-beta.10",
     "concurrently": "^6.5.1",
-    "prettier": "^2.5.1",
     "turbo": "1.0.24"
   },
   "turbo": {
@@ -31,7 +31,7 @@
         ],
         "outputs": [
           "build/**",
-          ".svelte-kit/**"
+          "dist/**"
         ]
       },
       "lint": {
@@ -45,5 +45,8 @@
   "engines": {
     "npm": ">=7.0.0",
     "node": ">=16.0.0"
+  },
+  "lint-staged": {
+    "*.{jsx,js}": "eslint --cache --fix"
   }
 }

@@ -1,0 +1,26 @@
+{
+  "name": "scripts",
+  "version": "2.0.0",
+  "license": "GPL-3.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "eslint": "^8.6.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-i18next": "^5.1.2",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "git-commit-msg-linter": "^3.2.8",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.5",
+    "prettier": "^2.5.1",
+    "pretty-quick": "^3.1.3"
+  },
+  "lint-staged": {
+    "*.{mjs,jsx,js}": "eslint --cache --fix"
+  }
+}

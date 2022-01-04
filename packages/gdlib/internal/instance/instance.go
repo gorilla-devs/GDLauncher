@@ -11,6 +11,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -97,6 +98,27 @@ func WatchInstances(c *websocket.Conn) error {
 	}
 }
 
+func CreateInstance(i internal.Instance) error {
+	instanceFolderPath := uuid.New().String()
+
+	// Generate instanceFolderPath name
+	instancePath := path.Join(internal.GDL_USER_DATA, internal.GDL_INSTANCES_PREFIX, instanceFolderPath)
+	// Create instance folder
+	err := os.MkdirAll(instancePath, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	b, err := json.Marshal(i)
+	if err != nil {
+		return err
+	}
+
+	os.WriteFile(path.Join(instancePath, "config.json"), b, os.ModePerm)
+
+	return nil
+}
+
 func StartInstance(instanceFolderPath string) error {
 	instance, ok := instances[instanceFolderPath]
 	if !ok {
@@ -111,6 +133,8 @@ func StartInstance(instanceFolderPath string) error {
 			fmt.Sprint(instance.Loader.MinecraftVersion, ".jar"),
 		)
 		return minecraft.StartServer(serverJarPath, instanceFolderPath, instance)
+	} else if instance.Type == internal.INSTANCE_TYPE_CLIENT {
+		return minecraft.LaunchClient(instanceFolderPath, instance.Loader.MinecraftVersion)
 	}
 
 	return nil

@@ -5,8 +5,6 @@ import (
 	"gdlib/internal/instance"
 	"gdlib/internal/java"
 	"gdlib/internal/meta"
-	"gdlib/internal/minecraft"
-	"gdlib/internal/net"
 	"gdlib/internal/settings"
 )
 
@@ -16,15 +14,16 @@ func main() {
 	meta.InitManifests()
 	java.Init()
 
-	err := net.DownloadClientMC("1.12.2")
-	if err != nil {
-		panic(err)
-	}
-
-	err = minecraft.Launch("hello", "1.12.2")
-	if err != nil {
-		panic(err)
-	}
+	// for i := 0; i < 100; i++ {
+	// 	instance.CreateInstance(internal.Instance{
+	// 		Name: "test",
+	// 		Type: internal.INSTANCE_TYPE_CLIENT,
+	// 		Loader: internal.InstanceLoader{
+	// 			Modloader:        modloader.Vanilla,
+	// 			MinecraftVersion: "1.12.2",
+	// 		},
+	// 	})
+	// }
 
 	socket.StartServer()
 
