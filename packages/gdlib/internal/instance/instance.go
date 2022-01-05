@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"gdlib/adapters/socket/events"
 	"gdlib/internal"
+	"gdlib/internal/mcNet"
 	"gdlib/internal/minecraft"
 	"os"
 	"path"
@@ -99,10 +100,10 @@ func WatchInstances(c *websocket.Conn) error {
 }
 
 func CreateInstance(i internal.Instance) error {
-	instanceFolderPath := uuid.New().String()
+	instanceUUID := uuid.New().String()
 
-	// Generate instanceFolderPath name
-	instancePath := path.Join(internal.GDL_USER_DATA, internal.GDL_INSTANCES_PREFIX, instanceFolderPath)
+	// Generate instanceUUID name
+	instancePath := path.Join(internal.GDL_USER_DATA, internal.GDL_INSTANCES_PREFIX, instanceUUID)
 	// Create instance folder
 	err := os.MkdirAll(instancePath, os.ModePerm)
 	if err != nil {
@@ -116,11 +117,18 @@ func CreateInstance(i internal.Instance) error {
 
 	os.WriteFile(path.Join(instancePath, "config.json"), b, os.ModePerm)
 
+	// TODO: download depending on incoming instance
+	err = mcNet.DownloadClientMC(i.Loader.MinecraftVersion)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Instance created")
+
 	return nil
 }
 
-func StartInstance(instanceFolderPath string) error {
-	instance, ok := instances[instanceFolderPath]
+func StartInstance(instanceUUID string) error {
+	instance, ok := instances[instanceUUID]
 	if !ok {
 		return errors.New("instance not found")
 	}
@@ -132,9 +140,9 @@ func StartInstance(instanceFolderPath string) error {
 			internal.GDL_SERVERS_PREFIX,
 			fmt.Sprint(instance.Loader.MinecraftVersion, ".jar"),
 		)
-		return minecraft.StartServer(serverJarPath, instanceFolderPath, instance)
+		return minecraft.StartServer(serverJarPath, instanceUUID, instance)
 	} else if instance.Type == internal.INSTANCE_TYPE_CLIENT {
-		return minecraft.LaunchClient(instanceFolderPath, instance.Loader.MinecraftVersion)
+		return minecraft.LaunchClient(instanceUUID, instance.Loader.MinecraftVersion)
 	}
 
 	return nil

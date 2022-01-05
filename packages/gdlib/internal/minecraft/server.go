@@ -10,11 +10,11 @@ import (
 	"time"
 )
 
-func StartServer(serverJarPath string, instanceFolderName string, instance internal.Instance) error {
+func StartServer(serverJarPath string, InstanceUUID string, instance internal.Instance) error {
 	cwd := path.Join(
 		internal.GDL_USER_DATA,
 		internal.GDL_INSTANCES_PREFIX,
-		instanceFolderName,
+		InstanceUUID,
 	)
 
 	eulaPath := path.Join(cwd, "eula.txt")

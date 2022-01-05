@@ -121,6 +121,10 @@ func processEvent(message Message, c *websocket.Conn) {
 		response, err = processQuit(payloadData)
 	case events.GetAllInstances:
 		response, err = processGetAllInstances(payloadData)
+	case events.StartInstance:
+		response, err = processLaunchInstance(payloadData, c)
+	case events.CreateInstance:
+		response, err = processCreateInstance(payloadData, c)
 	case events.JavaDetect:
 		response, err = processJavaDetect(payloadData, c)
 	case events.JavaInstall:
@@ -182,7 +186,7 @@ func processGetAllInstances(payload map[string]interface{}) (map[string]internal
 }
 
 type launchInstance struct {
-	InstanceFolderName string `mapstructure:",omitempty"`
+	InstanceUUID string `mapstructure:",omitempty"`
 }
 
 func processLaunchInstance(payload map[string]interface{}, c *websocket.Conn) (int, error) {
@@ -193,7 +197,33 @@ func processLaunchInstance(payload map[string]interface{}, c *websocket.Conn) (i
 		return 0, err
 	}
 
-	err = instance.StartInstance(data.InstanceFolderName)
+	err = instance.StartInstance(data.InstanceUUID)
+	if err != nil {
+		return 0, err
+	}
+
+	return 0, nil
+}
+
+type createInstance struct {
+	Name      string `mapstructure:",omitempty"`
+	McVersion string `mapstructure:",omitempty"`
+}
+
+func processCreateInstance(payload map[string]interface{}, c *websocket.Conn) (int, error) {
+	var data createInstance
+	err := mapstructure.Decode(payload, &data)
+
+	if err != nil {
+		return 0, err
+	}
+
+	err = instance.CreateInstance(internal.Instance{
+		Name: data.Name,
+		Loader: internal.InstanceLoader{
+			MinecraftVersion: data.McVersion,
+		},
+	})
 	if err != nil {
 		return 0, err
 	}

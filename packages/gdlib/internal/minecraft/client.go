@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func LaunchClient(instanceFolderPath string, mcVersion string) error {
+func LaunchClient(instanceUUID string, mcVersion string) error {
 
 	mcMeta, err := ReadMojangMetaJson(mcVersion)
 
@@ -18,14 +18,15 @@ func LaunchClient(instanceFolderPath string, mcVersion string) error {
 	}
 
 	libraries := GatherLibraries(mcMeta.Libraries)
-	instancePath := path.Join(internal.GDL_USER_DATA, internal.GDL_INSTANCES_PREFIX, instanceFolderPath)
+	instancePath := path.Join(internal.GDL_USER_DATA, internal.GDL_INSTANCES_PREFIX, instanceUUID)
 
 	// Extract natives
-	err = ExtractNatives(instanceFolderPath, libraries)
+	err = ExtractNatives(instanceUUID, libraries)
 
 	if err != nil {
 		return err
 	}
+
 	defer func() {
 		err = os.RemoveAll(path.Join(instancePath, "natives"))
 		if err != nil {
@@ -36,11 +37,6 @@ func LaunchClient(instanceFolderPath string, mcVersion string) error {
 	startupString := []string{}
 	startupString = append(
 		startupString,
-		"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
-		"-Dos.name=Windows 10",
-		"-Dos.version=10.0",
-		"-Dos.arch=x64",
-		"-Djava.library.path=\""+path.Join(instancePath, "natives")+"\"",
 		"-cp",
 	)
 
@@ -76,12 +72,33 @@ func LaunchClient(instanceFolderPath string, mcVersion string) error {
 		startupString,
 		"-Xmx4096m",
 		"-Xms4096m",
-		"-Dminecraft.applet.TargetDirectory\""+path.Join(instancePath)+"\"",
+		"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
+		"-Djava.library.path="+path.Join(instancePath, "natives"),
+		"-Dminecraft.applet.TargetDirectory="+path.Join(instancePath),
 		"-Dfml.ignorePatchDiscrepancies=true",
 		"-Dfml.ignoreInvalidMinecraftCertificates=true",
-		"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
-		mcMeta.MainClass,
 	)
+
+	// Check for logging
+	if mcMeta.Logging.Client.File.ID != "" {
+		startupString = append(
+			startupString,
+			strings.ReplaceAll(
+				mcMeta.Logging.Client.Argument,
+				"${path}",
+				path.Join(
+					internal.GDL_USER_DATA,
+					internal.GDL_DATASTORE_PREFIX,
+					"assets",
+					"objects",
+					mcMeta.Logging.Client.File.Sha1[:2],
+					mcMeta.Logging.Client.File.ID,
+				),
+			),
+		)
+	}
+
+	startupString = append(startupString, mcMeta.MainClass)
 
 	assetsPath := path.Join(
 		internal.GDL_USER_DATA,
@@ -92,7 +109,7 @@ func LaunchClient(instanceFolderPath string, mcVersion string) error {
 	mcArgs := strings.Split(mcMeta.MinecraftArguments, " ")
 	for _, arg := range mcArgs {
 		if strings.Contains(arg, "${auth_player_name}") {
-			startupString = append(startupString, strings.Replace(arg, "${auth_player_name}", "killpowa", 1))
+			startupString = append(startupString, strings.Replace(arg, "${auth_player_name}", "XYZ", 1))
 		} else if strings.Contains(arg, "${version_name}") {
 			startupString = append(startupString, strings.Replace(arg, "${version_name}", mcVersion, 1))
 		} else if strings.Contains(arg, "${game_directory}") {
@@ -102,9 +119,9 @@ func LaunchClient(instanceFolderPath string, mcVersion string) error {
 		} else if strings.Contains(arg, "${assets_index_name}") {
 			startupString = append(startupString, strings.Replace(arg, "${assets_index_name}", mcMeta.Assets, 1))
 		} else if strings.Contains(arg, "${auth_uuid}") {
-			startupString = append(startupString, strings.Replace(arg, "${auth_uuid}", "XXX", 1))
+			startupString = append(startupString, strings.Replace(arg, "${auth_uuid}", "XYZ", 1))
 		} else if strings.Contains(arg, "${auth_access_token}") {
-			startupString = append(startupString, strings.Replace(arg, "${auth_access_token}", "XXX", 1))
+			startupString = append(startupString, strings.Replace(arg, "${auth_access_token}", "XYZ", 1))
 		} else if strings.Contains(arg, "${user_type}") {
 			startupString = append(startupString, strings.Replace(arg, "${user_type}", "mojang", 1))
 		} else if strings.Contains(arg, "${version_type}") {
@@ -114,8 +131,8 @@ func LaunchClient(instanceFolderPath string, mcVersion string) error {
 		}
 	}
 
-	fmt.Println(startupString)
 	ps := exec.Command("java", startupString...)
+	fmt.Println(ps.Args)
 	ps.Stdout = os.Stdout
 	ps.Stderr = os.Stderr
 	ps.Dir = instancePath

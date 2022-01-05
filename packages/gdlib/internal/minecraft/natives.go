@@ -8,9 +8,9 @@ import (
 	"runtime"
 )
 
-func IsLibraryNative(lib internal.MojangMetaLibrary) (string, internal.MojangMetaLibraryNative, bool) {
+func IsLibraryNative(lib internal.MojangMetaLibrary) (string, internal.MojangMetaLibraryEntity, bool) {
 	var natives string
-	var nativesData internal.MojangMetaLibraryNative
+	var nativesData internal.MojangMetaLibraryEntity
 	switch runtime.GOOS {
 	case "darwin":
 		natives = lib.Natives.Osx
@@ -26,11 +26,11 @@ func IsLibraryNative(lib internal.MojangMetaLibrary) (string, internal.MojangMet
 	return natives, nativesData, natives != ""
 }
 
-func ExtractNatives(instanceFolderPath string, libraries []internal.MojangMetaLibrary) error {
+func ExtractNatives(instanceUUID string, libraries []internal.MojangMetaLibrary) error {
 	nativesPath := path.Join(
 		internal.GDL_USER_DATA,
 		internal.GDL_INSTANCES_PREFIX,
-		instanceFolderPath,
+		instanceUUID,
 		"natives",
 	)
 	for _, lib := range libraries {
@@ -57,6 +57,11 @@ func ExtractNatives(instanceFolderPath string, libraries []internal.MojangMetaLi
 			}
 
 			err = internal.ExtractJar(archive, nativesPath)
+			if err != nil {
+				return err
+			}
+
+			err = os.RemoveAll(path.Join(nativesPath, "META-INF"))
 			if err != nil {
 				return err
 			}

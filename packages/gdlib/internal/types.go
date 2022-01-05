@@ -35,25 +35,14 @@ type MojangMeta struct {
 		Component    string `json:"component"`
 		MajorVersion int64  `json:"majorVersion"`
 	} `json:"javaVersion"`
-	Libraries []MojangMetaLibrary `json:"libraries"`
-	Logging   struct {
-		Client struct {
-			Argument string `json:"argument"`
-			File     struct {
-				ID   string `json:"id"`
-				Sha1 string `json:"sha1"`
-				Size int64  `json:"size"`
-				URL  string `json:"url"`
-			} `json:"file"`
-			Type string `json:"type"`
-		} `json:"client"`
-	} `json:"logging"`
-	MainClass              string `json:"mainClass"`
-	MinecraftArguments     string `json:"minecraftArguments"`
-	MinimumLauncherVersion int64  `json:"minimumLauncherVersion"`
-	ReleaseTime            string `json:"releaseTime"`
-	Time                   string `json:"time"`
-	Type                   string `json:"type"`
+	Libraries              []MojangMetaLibrary      `json:"libraries"`
+	Logging                MojangMetaLibraryLogging `json:"logging"`
+	MainClass              string                   `json:"mainClass"`
+	MinecraftArguments     string                   `json:"minecraftArguments"`
+	MinimumLauncherVersion int64                    `json:"minimumLauncherVersion"`
+	ReleaseTime            string                   `json:"releaseTime"`
+	Time                   string                   `json:"time"`
+	Type                   string                   `json:"type"`
 }
 
 type MojangMetaDownloads struct {
@@ -94,12 +83,12 @@ type MojangMetaLibrary struct {
 			URL  string `json:"url"`
 		} `json:"artifact"`
 		Classifiers struct {
-			Javadoc         MojangMetaLibraryNative `json:"javadoc"`
-			Natives_linux   MojangMetaLibraryNative `json:"natives-linux"`
-			Natives_macos   MojangMetaLibraryNative `json:"natives-macos"`
-			Natives_osx     MojangMetaLibraryNative `json:"natives-osx"`
-			Natives_windows MojangMetaLibraryNative `json:"natives-windows"`
-			Sources         MojangMetaLibraryNative `json:"sources"`
+			Javadoc         MojangMetaLibraryEntity `json:"javadoc"`
+			Natives_linux   MojangMetaLibraryEntity `json:"natives-linux"`
+			Natives_macos   MojangMetaLibraryEntity `json:"natives-macos"`
+			Natives_osx     MojangMetaLibraryEntity `json:"natives-osx"`
+			Natives_windows MojangMetaLibraryEntity `json:"natives-windows"`
+			Sources         MojangMetaLibraryEntity `json:"sources"`
 		} `json:"classifiers"`
 	} `json:"downloads"`
 	Extract struct {
@@ -114,7 +103,7 @@ type MojangMetaLibrary struct {
 	Rules []MojangMetaLibraryRule `json:"rules"`
 }
 
-type MojangMetaLibraryNative struct {
+type MojangMetaLibraryEntity struct {
 	Path string `json:"path"`
 	Sha1 string `json:"sha1"`
 	Size int    `json:"size"`
@@ -132,6 +121,19 @@ type MojangMetaDownloadsServer struct {
 	Sha1 string `json:"sha1"`
 	Size int64  `json:"size"`
 	URL  string `json:"url"`
+}
+
+type MojangMetaLibraryLogging struct {
+	Client struct {
+		Argument string `json:"argument"`
+		File     struct {
+			ID   string `json:"id"`
+			Sha1 string `json:"sha1"`
+			Size int    `json:"size"`
+			URL  string `json:"url"`
+		} `json:"file"`
+		Type string `json:"type"`
+	} `json:"client"`
 }
 
 type InstanceType string

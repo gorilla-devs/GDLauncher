@@ -24,8 +24,10 @@ func ConvertMavenToPath(maven string, native string) []string {
 
 	if strings.Contains(fileName, "@") {
 		fileName = strings.ReplaceAll(fileName, "@", ".")
-	} else {
+	} else if native != "" {
 		fileName = fmt.Sprint(fileName, "-", native, ".jar")
+	} else {
+		fileName = fmt.Sprint(fileName, ".jar")
 	}
 
 	result := strings.Split(slice[0], ".")

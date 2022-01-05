@@ -1,4 +1,4 @@
-package net
+package mcNet
 
 import (
 	"crypto/sha1"
@@ -57,6 +57,13 @@ func DownloadClientMC(mcVersion string) error {
 		return err
 	}
 
+	if mcMeta.Logging.Client.File.ID != "" {
+		err = downloadLoggingLibrary(mcMeta.Logging)
+		if err != nil {
+			return err
+		}
+	}
+
 	// Retrieve libs and assets
 	objects, ok := assetsMeta["objects"]
 	if !ok {
@@ -65,7 +72,7 @@ func DownloadClientMC(mcVersion string) error {
 
 	var wg sync.WaitGroup
 	semaphore := make(chan bool, runtime.NumCPU())
-	for _, v := range objects.(map[string]interface{}) {
+	for k, v := range objects.(map[string]interface{}) {
 		semaphore <- true
 		wg.Add(1)
 		asset := v.(map[string]interface{})
@@ -73,13 +80,13 @@ func DownloadClientMC(mcVersion string) error {
 			return fmt.Errorf("no hash in asset %s", asset["hash"].(string))
 		}
 
-		go func(asset interface{}) {
+		go func(asset interface{}, k string) {
 			var a Asset
 			mapstructure.Decode(asset, &a)
-			downloadAsset(a)
+			downloadAsset(a, k)
 			wg.Done()
 			<-semaphore
-		}(asset)
+		}(asset, k)
 	}
 
 	wg.Wait()
@@ -99,7 +106,7 @@ func DownloadClientMC(mcVersion string) error {
 	return nil
 }
 
-func downloadServerMC(mcVersion string) error {
+func DownloadServerMC(mcVersion string) error {
 	return downloadServerClient(mcVersion)
 }
 
@@ -148,10 +155,12 @@ func downloadVersionInfo(url string) (internal.MojangMeta, error) {
 
 func downloadClient(mcId string, client internal.MojangMetaDownloadsClient) error {
 	return downloadFile(
-		path.Join(
-			minecraftNetPath,
-			fmt.Sprint(mcId, ".jar"),
-		),
+		[]string{
+			path.Join(
+				minecraftNetPath,
+				fmt.Sprint(mcId, ".jar"),
+			),
+		},
 		client.URL,
 		client.Sha1,
 		0,
@@ -201,15 +210,35 @@ func downloadServerClient(mcVersion string) error {
 		return fmt.Errorf("no server url for %s", mcVersion)
 	}
 	return downloadFile(
-		path.Join(
-			internal.GDL_USER_DATA,
-			internal.GDL_DATASTORE_PREFIX,
-			internal.GDL_SERVERS_PREFIX,
-			fmt.Sprint(mcMeta.ID, ".jar"),
-		),
+		[]string{
+			path.Join(
+				internal.GDL_USER_DATA,
+				internal.GDL_DATASTORE_PREFIX,
+				internal.GDL_SERVERS_PREFIX,
+				fmt.Sprint(mcMeta.ID, ".jar"),
+			),
+		},
 		mcMeta.Downloads.Server.URL,
 		mcMeta.Downloads.Server.Sha1,
 		0,
+	)
+}
+
+func downloadLoggingLibrary(lib internal.MojangMetaLibraryLogging) error {
+	return downloadFile(
+		[]string{
+			path.Join(
+				internal.GDL_USER_DATA,
+				internal.GDL_DATASTORE_PREFIX,
+				"assets",
+				"objects",
+				lib.Client.File.Sha1[:2],
+				lib.Client.File.ID,
+			),
+		},
+		lib.Client.File.URL,
+		"",
+		lib.Client.File.Size,
 	)
 }
 
@@ -258,7 +287,7 @@ type Asset struct {
 	Size int
 }
 
-func downloadAsset(asset Asset) {
+func downloadAsset(asset Asset, key string) {
 	assetUrl := fmt.Sprintf("https://resources.download.minecraft.net/%s/%s", asset.Hash[:2], asset.Hash)
 	assetPath := path.Join(
 		internal.GDL_USER_DATA,
@@ -268,12 +297,24 @@ func downloadAsset(asset Asset) {
 		asset.Hash[:2],
 		asset.Hash,
 	)
+	legacyPath := path.Join(
+		internal.GDL_USER_DATA,
+		internal.GDL_DATASTORE_PREFIX,
+		"assets",
+		"virtual",
+		"legacy",
+		key,
+	)
+
 	resp, err := http.Get(assetUrl)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	downloadFile(assetPath, assetUrl, "", asset.Size)
+	downloadFile([]string{
+		assetPath,
+		legacyPath,
+	}, assetUrl, "", asset.Size)
 }
 
 func downloadLibrary(lib internal.MojangMetaLibrary) error {
@@ -301,7 +342,7 @@ func downloadLibrary(lib internal.MojangMetaLibrary) error {
 	)
 	libraryPath = append(libraryPath, internal.ConvertMavenToPath(lib.Name, natives)...)
 	downloadFile(
-		path.Join(libraryPath...),
+		[]string{path.Join(libraryPath...)},
 		downloadUrl,
 		"",
 		downloadSize,
@@ -310,32 +351,40 @@ func downloadLibrary(lib internal.MojangMetaLibrary) error {
 	return nil
 }
 
-func downloadFile(filePath string, url string, hash string, size int) error {
-	os.MkdirAll(path.Dir(filePath), os.ModePerm)
-	h := sha1.New()
+func downloadFile(filePaths []string, url string, hash string, size int) error {
+	writePaths := map[string]string{}
 
-	// If sha1 is provided, verify it
-	if hash != "" {
-		if v, err := os.Open(filePath); err == nil {
-			io.Copy(h, v)
-			if fmt.Sprintf("%x", h.Sum(nil)) == hash {
-				return nil
+	for _, filePath := range filePaths {
+		h := sha1.New()
+		os.MkdirAll(path.Dir(filePath), os.ModePerm)
+
+		// If sha1 is provided, verify it
+		if hash != "" {
+			if v, err := os.Open(filePath); err == nil {
+				io.Copy(h, v)
+				if fmt.Sprintf("%x", h.Sum(nil)) == hash {
+					continue
+				}
+				v.Close()
 			}
-			v.Close()
+		} else if size > 0 {
+			if v, err := os.Stat(filePath); err == nil {
+				if v.Size() == int64(size) {
+					continue
+				}
+			}
 		}
+
+		writePaths[filePath] = ""
 	}
 
-	// If size is provided, verify it
-	if size > 0 {
-		if v, err := os.Stat(filePath); err == nil {
-			if v.Size() == int64(size) {
-				return nil
-			}
-		}
+	if len(writePaths) == 0 {
+		return nil
 	}
 
 	tries := 0
 	const MAX_TRIES = 4
+	h := sha1.New()
 	for {
 		if tries > MAX_TRIES {
 			return fmt.Errorf("failed to download %s", url)
@@ -349,14 +398,18 @@ func downloadFile(filePath string, url string, hash string, size int) error {
 		}
 		defer resp.Body.Close()
 
-		// Create the file
-		out, err := os.Create(filePath)
-		if err != nil {
-			return err
+		writers := []io.Writer{h}
+		for filePath, _ := range writePaths {
+			// Create the file
+			out, err := os.Create(filePath)
+			if err != nil {
+				return err
+			}
+			writers = append(writers, out)
+			defer out.Close()
 		}
-		defer out.Close()
 
-		w := io.MultiWriter(out, h)
+		w := io.MultiWriter(writers...)
 		_, err = io.Copy(w, resp.Body)
 		if err != nil {
 			return err
@@ -370,6 +423,6 @@ func downloadFile(filePath string, url string, hash string, size int) error {
 			continue
 		}
 
-		return err
+		return nil
 	}
 }
