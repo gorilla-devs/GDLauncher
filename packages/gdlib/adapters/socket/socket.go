@@ -218,7 +218,7 @@ func processCreateInstance(payload map[string]interface{}, c *websocket.Conn) (i
 		return 0, err
 	}
 
-	err = instance.CreateInstance(internal.Instance{
+	_, err = instance.CreateInstance(internal.Instance{
 		Name: data.Name,
 		Loader: internal.InstanceLoader{
 			MinecraftVersion: data.McVersion,

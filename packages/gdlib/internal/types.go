@@ -15,16 +15,8 @@ type SocketResponse struct {
 
 type MojangMeta struct {
 	Arguments struct {
-		Game []interface{} `json:"game"`
-		Jvm  []struct {
-			Rules []struct {
-				Action string `json:"action"`
-				Os     struct {
-					Name string `json:"name"`
-				} `json:"os"`
-			} `json:"rules"`
-			Value []string `json:"value"`
-		} `json:"jvm"`
+		Game interface{} `json:"game"`
+		Jvm  interface{} `json:"jvm"`
 	} `json:"arguments"`
 	AssetIndex      MojangMetaIndex     `json:"assetIndex"`
 	Assets          string              `json:"assets"`

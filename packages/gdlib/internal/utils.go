@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -84,4 +85,11 @@ func QuotifyIfHasWhitespace(str string) string {
 		return fmt.Sprintf("\"%s\"", str)
 	}
 	return str
+}
+
+func GetPathDelimiter() string {
+	if runtime.GOOS == "windows" {
+		return ";"
+	}
+	return ":"
 }

@@ -99,7 +99,7 @@ func WatchInstances(c *websocket.Conn) error {
 	}
 }
 
-func CreateInstance(i internal.Instance) error {
+func CreateInstance(i internal.Instance) (string, error) {
 	instanceUUID := uuid.New().String()
 
 	// Generate instanceUUID name
@@ -107,12 +107,12 @@ func CreateInstance(i internal.Instance) error {
 	// Create instance folder
 	err := os.MkdirAll(instancePath, os.ModePerm)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	b, err := json.Marshal(i)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	os.WriteFile(path.Join(instancePath, "config.json"), b, os.ModePerm)
@@ -120,11 +120,13 @@ func CreateInstance(i internal.Instance) error {
 	// TODO: download depending on incoming instance
 	err = mcNet.DownloadClientMC(i.Loader.MinecraftVersion)
 	if err != nil {
-		return err
+		return "", err
 	}
 	fmt.Println("Instance created")
 
-	return nil
+	instances[instanceUUID] = i
+
+	return instanceUUID, nil
 }
 
 func StartInstance(instanceUUID string) error {

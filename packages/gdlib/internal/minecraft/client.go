@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
 )
 
 func LaunchClient(instanceUUID string, mcVersion string) error {
@@ -66,17 +67,21 @@ func LaunchClient(instanceUUID string, mcVersion string) error {
 		),
 	)
 
-	startupString = append(startupString, strings.Join(libs, ";"))
+	startupString = append(startupString, strings.Join(libs, internal.GetPathDelimiter()))
 
 	startupString = append(
 		startupString,
 		"-Xmx4096m",
 		"-Xms4096m",
-		"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
 		"-Djava.library.path="+path.Join(instancePath, "natives"),
 		"-Dminecraft.applet.TargetDirectory="+path.Join(instancePath),
 		"-Dfml.ignorePatchDiscrepancies=true",
 		"-Dfml.ignoreInvalidMinecraftCertificates=true",
+	)
+
+	startupString = append(
+		startupString,
+		GetVanillaJVMArgs()...,
 	)
 
 	// Check for logging
@@ -105,9 +110,40 @@ func LaunchClient(instanceUUID string, mcVersion string) error {
 		internal.GDL_DATASTORE_PREFIX,
 		"assets",
 	)
+	mcArgs := []string{}
 
-	mcArgs := strings.Split(mcMeta.MinecraftArguments, " ")
+	releaseTime113, err := time.Parse(time.RFC3339, "2018-07-18T15:11:46+00:00")
+	if err != nil {
+		return err
+	}
+	mcMetaReleaseTime, err := time.Parse(time.RFC3339, mcMeta.ReleaseTime)
+	if err != nil {
+		return err
+	}
+
+	if mcMetaReleaseTime.Sub(releaseTime113) > 0 {
+		// >= 1.13
+		for _, arg := range mcMeta.Arguments.Game.([]interface{}) {
+			// try to convert to string
+			argString, ok := arg.(string)
+			if !ok {
+				continue
+			}
+			mcArgs = append(mcArgs, argString)
+		}
+	} else {
+		// < 1.13
+		mcArgs = strings.Split(mcMeta.MinecraftArguments, " ")
+	}
+
 	for _, arg := range mcArgs {
+		// Skip microsoft madness
+		// clientId is a unique ID of the launcher install
+		// xuid is the Xbox ID
+		if arg == "--clientId" || arg == "${clientid}" || arg == "--xuid" || arg == "${auth_xuid}" {
+			continue
+		}
+
 		if strings.Contains(arg, "${auth_player_name}") {
 			startupString = append(startupString, strings.Replace(arg, "${auth_player_name}", "XYZ", 1))
 		} else if strings.Contains(arg, "${version_name}") {
