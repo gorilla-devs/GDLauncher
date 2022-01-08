@@ -21,6 +21,8 @@ dist
 .idea
 *.iml
 .eslintcache
+.vs
+.vscode
 
 # misc
 .DS_Store
