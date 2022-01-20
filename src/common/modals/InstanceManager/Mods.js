@@ -303,7 +303,7 @@ const Row = memo(({ index, style, data }) => {
     items,
     instanceName,
     instancePath,
-    gameVersion,
+    gameVersions,
     selectedMods,
     setSelectedMods,
     latestMods
@@ -364,7 +364,7 @@ const Row = memo(({ index, style, data }) => {
                   projectID: item.projectID,
                   fileID: item.fileID,
                   fileName: item.fileName,
-                  gameVersion,
+                  gameVersions,
                   instanceName
                 })
               );
@@ -397,7 +397,7 @@ const Row = memo(({ index, style, data }) => {
                         instanceName,
                         item,
                         latestMods[item.projectID].id,
-                        gameVersion
+                        gameVersions
                       )
                     );
                     setUpdateLoading(false);
@@ -497,7 +497,7 @@ const createItemData = memoize(
     items,
     instanceName,
     instancePath,
-    gameVersion,
+    gameVersions,
     selectedMods,
     setSelectedMods,
     latestMods
@@ -505,7 +505,7 @@ const createItemData = memoize(
     items,
     instanceName,
     instancePath,
-    gameVersion,
+    gameVersions,
     selectedMods,
     setSelectedMods,
     latestMods
@@ -795,7 +795,7 @@ const Mods = ({ instanceName }) => {
           onClick={() => {
             dispatch(
               openModal('ModsBrowser', {
-                gameVersion: instance.loader?.mcVersion,
+                gameVersions: instance.loader?.mcVersion,
                 instanceName
               })
             );

@@ -11,7 +11,7 @@ export const JAVA_LATEST_MANIFEST_URL =
   'https://cdn.gdlauncher.com/openjdk17.json';
 export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
-export const FORGESVC_URL = 'https://addons-ecs.forgesvc.net/api/v2';
+export const FORGESVC_URL = 'https://api.gdlauncher.com/cf';
 export const FTB_API_URL = 'https://api.modpacks.ch/public';
 export const FTB_MODPACK_URL = 'https://feed-the-beast.com/modpack';
 export const GDL_SERVE_API = 'https://api.gdlauncher.com/cf';
