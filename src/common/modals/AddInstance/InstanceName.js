@@ -101,7 +101,7 @@ const InstanceName = ({
 
     const initTimestamp = Date.now();
 
-    const isCurseForgeModpack = Boolean(modpack?.screenshots);
+    const isCurseForgeModpack = Boolean(version?.source === CURSEFORGE);
     const isFTBModpack = Boolean(modpack?.art);
     let manifest;
 
