@@ -81,6 +81,9 @@ const modalsComponentLookupTable = {
   PolicyModal: AsyncComponent(lazy(() => import('../modals/PolicyModal'))),
   InstanceStartupAd: AsyncComponent(
     lazy(() => import('../modals/InstanceStartupAd'))
+  ),
+  InstanceDownloadFailed: AsyncComponent(
+    lazy(() => import('../modals/InstanceDownloadFailed'))
   )
 };
 

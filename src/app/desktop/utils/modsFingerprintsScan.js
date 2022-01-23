@@ -70,7 +70,7 @@ const modsFingerprintsScan = async instancesPath => {
 
         while (!success || tries > 10) {
           try {
-            const { data } = await getAddonsByFingerprint(
+            const data = await getAddonsByFingerprint(
               Object.values(missingMods)
             );
 
@@ -82,8 +82,7 @@ const modsFingerprintsScan = async instancesPath => {
                 if (exactMatch?.file) {
                   let addonData = null;
                   try {
-                    addonData = (await getAddon(exactMatch.file.projectId))
-                      .data;
+                    addonData = await getAddon(exactMatch.file.projectId);
                     return {
                       ...normalizeModData(
                         exactMatch.file,

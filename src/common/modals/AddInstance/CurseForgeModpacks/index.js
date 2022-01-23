@@ -14,6 +14,7 @@ let lastRequest;
 const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
   const mcVersions = useSelector(state => state.app.vanillaManifest?.versions);
   const categories = useSelector(state => state.app.curseforgeCategories);
+  const CFVersionIds = useSelector(state => state.app.curseforgeVersionIds);
   const infiniteLoaderRef = useRef(null);
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,16 +47,17 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
       if (error) {
         setError(false);
       }
-      ({ data } = await getSearch(
+      const gameVersionId = CFVersionIds[minecraftVersion] || null
+      data = await getSearch(
         'modpacks',
         searchText,
         40,
         reset ? 0 : modpacks.length,
         sortBy,
         true,
-        minecraftVersion,
+        gameVersionId,
         categoryId
-      ));
+      );
     } catch (err) {
       setError(err);
       return;
@@ -100,7 +102,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
             All Categories
           </Select.Option>
           {(categories || [])
-            .filter(v => v?.rootGameCategoryId === 4471)
+            .filter(v => v?.classId === 4471)
             .sort((a, b) => a?.name.localeCompare(b?.name))
             .map(v => (
               <Select.Option value={v?.id} key={v?.id}>
@@ -113,7 +115,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                   `}
                 >
                   <img
-                    src={v?.avatarUrl}
+                    src={v?.iconUrl}
                     css={`
                       height: 16px;
                       width: 16px;

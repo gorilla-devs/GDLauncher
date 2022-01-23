@@ -22,7 +22,7 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
       if (type === 'ftb') {
         data = await getFTBChangelog(modpackId, id);
       } else {
-        ({ data } = await getAddonFileChangelog(modpackId, id));
+        data = await getAddonFileChangelog(modpackId, id);
       }
     } catch (err) {
       console.error(err);

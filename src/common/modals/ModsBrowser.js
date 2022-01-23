@@ -143,12 +143,12 @@ const ModsListWrapper = ({
       state => state.settings.curseReleaseChannel
     );
     const dispatch = useDispatch();
-    const { instanceName, gameVersion, installedMods, instance } = data;
+    const { instanceName, gameVersions, installedMods, instance } = data;
 
     const item = items[index];
 
     const isInstalled = installedMods.find(v => v.projectID === item?.id);
-    const primaryImage = (item?.attachments || []).find(v => v?.isDefault);
+    const primaryImage = item?.logo;
 
     if (!item) {
       return (
@@ -195,7 +195,7 @@ const ModsListWrapper = ({
             onClick={() => {
               dispatch(
                 openModal('ModOverview', {
-                  gameVersion,
+                  gameVersions,
                   projectID: item.id,
                   ...(isInstalled && { fileID: isInstalled.fileID }),
                   ...(isInstalled && { fileName: isInstalled.fileName }),
@@ -215,7 +215,7 @@ const ModsListWrapper = ({
                 onClick={async e => {
                   setLoading(true);
                   e.stopPropagation();
-                  const files = (await getAddonFiles(item?.id)).data;
+                  const files = await getAddonFiles(item?.id);
 
                   const isFabric = getPatchedInstanceType(instance) === FABRIC;
                   const isForge = getPatchedInstanceType(instance) === FORGE;
@@ -225,12 +225,12 @@ const ModsListWrapper = ({
                   if (isFabric) {
                     filteredFiles = filterFabricFilesByVersion(
                       files,
-                      gameVersion
+                      gameVersions
                     );
                   } else if (isForge) {
                     filteredFiles = filterForgeFilesByVersion(
                       files,
-                      gameVersion
+                      gameVersions
                     );
                   }
 
@@ -243,7 +243,7 @@ const ModsListWrapper = ({
                     setLoading(false);
                     setError('Mod Not Available');
                     console.error(
-                      `Could not find any release candidate for addon: ${item?.id} / ${gameVersion}`
+                      `Could not find any release candidate for addon: ${item?.id} / ${gameVersions}`
                     );
                     return;
                   }
@@ -254,7 +254,7 @@ const ModsListWrapper = ({
                       item?.id,
                       preferredFile?.id,
                       instanceName,
-                      gameVersion,
+                      gameVersions,
                       true,
                       p => {
                         if (parseInt(p, 10) !== prev) {
@@ -282,7 +282,7 @@ const ModsListWrapper = ({
             onClick={() => {
               dispatch(
                 openModal('ModOverview', {
-                  gameVersion,
+                  gameVersions,
                   projectID: item.id,
                   ...(isInstalled && { fileID: isInstalled.fileID }),
                   ...(isInstalled && { fileName: isInstalled.fileName }),
@@ -330,14 +330,14 @@ const createItemData = memoize(
   (
     items,
     instanceName,
-    gameVersion,
+    gameVersions,
     installedMods,
     instance,
     isNextPageLoading
   ) => ({
     items,
     instanceName,
-    gameVersion,
+    gameVersions,
     installedMods,
     instance,
     isNextPageLoading
@@ -345,7 +345,7 @@ const createItemData = memoize(
 );
 
 let lastRequest;
-const ModsBrowser = ({ instanceName, gameVersion }) => {
+const ModsBrowser = ({ instanceName, gameVersions }) => {
   const itemsNumber = 50;
 
   const [mods, setMods] = useState([]);
@@ -355,6 +355,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [error, setError] = useState(false);
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const CFVersionIds = useSelector(state => state.app.curseforgeVersionIds);
 
   const installedMods = instance?.mods;
 
@@ -387,17 +388,18 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
       if (error) {
         setError(false);
       }
-      ({ data } = await getSearch(
+      const gameVersionId = CFVersionIds[gameVersions] || null;
+      data = await getSearch(
         'mods',
         searchP,
         itemsNumber,
         isReset ? 0 : mods.length,
         filterType,
         filterType !== 'Author' && filterType !== 'Name',
-        gameVersion,
+        gameVersionId,
         0,
         getPatchedInstanceType(instance)
-      ));
+      );
     } catch (err) {
       setError(err);
     }
@@ -413,7 +415,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
   const itemData = createItemData(
     mods,
     instanceName,
-    gameVersion,
+    gameVersions,
     installedMods,
     instance,
     areModsLoading
@@ -493,7 +495,7 @@ const ModsBrowser = ({ instanceName, gameVersion }) => {
                   height={height - 50}
                   loadNextPage={loadMoreMods}
                   searchQuery={searchQuery}
-                  version={gameVersion}
+                  version={gameVersions}
                   installedMods={installedMods}
                   instanceName={instanceName}
                   itemData={itemData}
