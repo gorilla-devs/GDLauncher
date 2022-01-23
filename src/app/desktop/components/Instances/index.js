@@ -87,7 +87,6 @@ const Instances = () => {
     [instances, instanceSortOrder]
   );
 
-
   return (
     <Container>
       {memoInstances.length > 0 ? (
