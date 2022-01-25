@@ -868,11 +868,13 @@ export const extractFace = async buffer => {
 export const normalizeModData = (data, projectID, modName) => {
   const temp = data;
   temp.name = modName;
+  if (data.fileFingerprint) {
+    temp.packageFingerprint = data.fileFingerprint;
+  }
   if (data.projectID && data.fileID) return temp;
   if (data.id) {
     temp.projectID = projectID;
-    temp.fileID = data.id;
-    delete temp.id;
+    temp.fileID = data.file.id;
   }
   return temp;
 };

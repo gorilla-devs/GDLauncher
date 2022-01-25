@@ -14,7 +14,6 @@ let lastRequest;
 const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
   const mcVersions = useSelector(state => state.app.vanillaManifest?.versions);
   const categories = useSelector(state => state.app.curseforgeCategories);
-  const CFVersionIds = useSelector(state => state.app.curseforgeVersionIds);
   const infiniteLoaderRef = useRef(null);
   const [modpacks, setModpacks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +46,6 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
       if (error) {
         setError(false);
       }
-      const gameVersionId = CFVersionIds[minecraftVersion] || null
       data = await getSearch(
         'modpacks',
         searchText,
@@ -55,7 +53,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
         reset ? 0 : modpacks.length,
         sortBy,
         true,
-        gameVersionId,
+        minecraftVersion,
         categoryId
       );
     } catch (err) {

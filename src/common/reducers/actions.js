@@ -1603,7 +1603,7 @@ export function processFTBManifest(instanceName) {
 
     for (const item of exactMatches) {
       if (item.file) {
-        fileHashes[item.file.packageFingerprint] = item;
+        fileHashes[item.file.fileFingerprint] = item;
       }
     }
 
@@ -1627,12 +1627,12 @@ export function processFTBManifest(instanceName) {
             const exactMatch = fileHashes[item.murmur2];
 
             if (exactMatch) {
-              const { projectId } = exactMatch.file;
+              const { modId } = exactMatch.file;
               try {
-                const addon = await getAddon(projectId);
+                const addon = await getAddon(modId);
                 const mod = normalizeModData(
                   exactMatch.file,
-                  projectId,
+                  modId,
                   addon.name
                 );
                 mod.fileName = path.basename(item.name);
@@ -2243,10 +2243,10 @@ export const startListener = () => {
             if (exactMatch) {
               let addon = null;
               try {
-                addon = await getAddon(exactMatch.file.projectId);
+                addon = await getAddon(exactMatch.file.modId);
                 mod = normalizeModData(
                   exactMatch.file,
-                  exactMatch.file.projectId,
+                  exactMatch.file.modId,
                   addon.name
                 );
                 mod.fileName = path.basename(fileName);

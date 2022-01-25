@@ -355,7 +355,6 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [error, setError] = useState(false);
   const instance = useSelector(state => _getInstance(state)(instanceName));
-  const CFVersionIds = useSelector(state => state.app.curseforgeVersionIds);
 
   const installedMods = instance?.mods;
 
@@ -388,7 +387,6 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
       if (error) {
         setError(false);
       }
-      const gameVersionId = CFVersionIds[gameVersions] || null;
       data = await getSearch(
         'mods',
         searchP,
@@ -396,7 +394,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
         isReset ? 0 : mods.length,
         filterType,
         filterType !== 'Author' && filterType !== 'Name',
-        gameVersionId,
+        gameVersions,
         0,
         getPatchedInstanceType(instance)
       );

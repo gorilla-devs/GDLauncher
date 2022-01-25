@@ -238,10 +238,19 @@ export const getMultipleAddons = async addons => {
 };
 
 export const getAddonFiles = async projectID => {
-  const url = `${FORGESVC_URL}/mods/${projectID}/files`;
-  const { data } = await axios.get(url);
+  // Aggregate results in case of multiple pages
+  const results = [];
+  let hasMore = true;
 
-  return data?.data ? data?.data.sort(sortByDate) : undefined;
+  while (hasMore) {
+    const url = `${FORGESVC_URL}/mods/${projectID}/files?pageSize=400&index=${results.length}`;
+    const { data } = await axios.get(url);
+    results.push(...(data.data || []));
+
+    hasMore = data.pagination.totalCount > results.length;
+  }
+
+  return results.sort(sortByDate);
 };
 
 export const getAddonDescription = async projectID => {
@@ -258,7 +267,7 @@ export const getAddonFile = async (projectID, fileID) => {
 
 export const getAddonsByFingerprint = async fingerprints => {
   const url = `${FORGESVC_URL}/fingerprints`;
-  const { data } = await axios.post(url, fingerprints);
+  const { data } = await axios.post(url, { fingerprints });
 
   return data?.data;
 };
@@ -289,7 +298,7 @@ export const getSearch = async (
   index,
   sort,
   isSortDescending,
-  gameVersionId,
+  gameVersion,
   categoryId,
   modLoaderType
 ) => {
@@ -326,7 +335,7 @@ export const getSearch = async (
     index,
     sortField,
     sortOrder: isSortDescending ? 'desc' : 'asc',
-    gameVersionTypeId: gameVersionId || '',
+    gameVersion: gameVersion || '',
     ...(modLoaderType === 'fabric' && { modLoaderType: 'Fabric' }),
     classId: type === 'mods' ? 6 : 4471,
     searchFilter
