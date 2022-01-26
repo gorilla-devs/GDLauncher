@@ -874,7 +874,7 @@ export const normalizeModData = (data, projectID, modName) => {
   if (data.projectID && data.fileID) return temp;
   if (data.id) {
     temp.projectID = projectID;
-    temp.fileID = data.file.id;
+    temp.fileID = data?.file?.id || data.id;
   }
   return temp;
 };

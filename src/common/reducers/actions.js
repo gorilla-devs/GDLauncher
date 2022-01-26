@@ -3133,7 +3133,6 @@ export function installMod(
     if (useTempMiddleware) {
       await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
     }
-
     let needToAddMod = true;
     await dispatch(
       updateInstanceConfig(instanceName, prev => {
@@ -3163,7 +3162,7 @@ export function installMod(
       try {
         await fse.access(destFile);
         const murmur2 = await getFileMurmurHash2(destFile);
-        if (murmur2 !== mainModData.packageFingerprint) {
+        if (murmur2 !== mainModData.fileFingerprint) {
           await downloadFile(destFile, mainModData.downloadUrl, onProgress);
         }
       } catch {
