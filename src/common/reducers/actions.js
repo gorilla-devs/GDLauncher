@@ -2981,8 +2981,8 @@ export function launchInstance(instanceName, forceQuit = false) {
     const loggingPath = path.join(
       assetsPath,
       'objects',
-      loggingHash.substring(0, 2),
-      loggingId
+      loggingHash?.substring(0, 2) || '',
+      loggingId || ''
     );
 
     console.log(
@@ -3067,6 +3067,20 @@ export function launchInstance(instanceName, forceQuit = false) {
     ps.stderr.on('data', data => {
       console.error(`ps stderr: ${data}`);
       errorLogs += data || '';
+
+      if (
+        data.toString().includes('Setting user:') ||
+        data.toString().includes('Initializing LWJGL OpenAL')
+      ) {
+        if (
+          !closed &&
+          getState().modals.find(v => v.modalType === 'InstanceStartupAd')
+        ) {
+          closed = true;
+          dispatch(closeModal());
+        }
+        dispatch(updateStartedInstance({ instanceName, initialized: true }));
+      }
     });
 
     ps.on('close', async code => {
