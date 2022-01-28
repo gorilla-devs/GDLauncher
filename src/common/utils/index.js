@@ -130,3 +130,16 @@ export const convertMinutesToHumanTime = minutes => {
       return '';
   }
 };
+
+export const scaleMem = x => Math.log2(x / 1024);
+export const scaleMemInv = x => 1024 * 2 ** x;
+export const sysMemScaled = Math.round(
+  scaleMem(process.getSystemMemoryInfo().total / 1024)
+);
+export const marksScaled = Array.from({ length: sysMemScaled + 1 }, (_, i) =>
+  scaleMemInv(i)
+);
+export const marks =
+  sysMemScaled > 6
+    ? marksScaled.map(x => `${x / 1024} GB`)
+    : marksScaled.map(x => `${x} MB`);
