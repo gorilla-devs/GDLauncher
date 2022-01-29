@@ -1,14 +1,14 @@
-/* eslint-disable */
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Select, Input } from 'antd';
 import { useDebouncedCallback } from 'use-debounce';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { getSearch } from '../../../api';
-import ModpacksListWrapper from './ModpacksListWrapper';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { getSearch } from '../../../api';
+import ModpacksListWrapper from './ModpacksListWrapper';
 
 let lastRequest;
 const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
@@ -96,7 +96,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
           defaultValue={null}
           virtual={false}
         >
-          <Select.Option key={'allcategories'} value={null}>
+          <Select.Option key="allcategories" value={null}>
             All Categories
           </Select.Option>
           {(categories || [])
@@ -119,6 +119,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
                       width: 16px;
                       margin-right: 10px;
                     `}
+                    alt="icon"
                   />
                   {v?.name}
                 </div>
@@ -159,7 +160,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
       </HeaderContainer>
       <ModpacksContainer>
         {!error ? (
-          !loading && modpacks.length == 0 ? (
+          !loading && modpacks.length === 0 ? (
             <div
               css={`
                 margin-top: 120px;

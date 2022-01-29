@@ -353,8 +353,10 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
   const [filterType, setFilterType] = useState('Featured');
   const [searchQuery, setSearchQuery] = useState('');
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [categoryId, setCategoryId] = useState(null);
   const [error, setError] = useState(false);
   const instance = useSelector(state => _getInstance(state)(instanceName));
+  const categories = useSelector(state => state.app.curseforgeCategories);
 
   const installedMods = instance?.mods;
 
@@ -368,7 +370,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
 
   useEffect(() => {
     loadMoreMods(searchQuery, true);
-  }, [filterType]);
+  }, [filterType, categoryId]);
 
   useEffect(() => {
     loadMoreMods();
@@ -395,7 +397,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
         filterType,
         filterType !== 'Author' && filterType !== 'Name',
         gameVersions,
-        0,
+        categoryId,
         getPatchedInstanceType(instance)
       );
     } catch (err) {
@@ -446,6 +448,46 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
             <Select.Option value="Name">Name</Select.Option>
             <Select.Option value="Author">Author</Select.Option>
             <Select.Option value="TotalDownloads">Downloads</Select.Option>
+          </Select>
+          <Select
+            placeholder="Minecraft Category"
+            onChange={setCategoryId}
+            defaultValue={null}
+            virtual={false}
+            css={`
+              width: 500px !important;
+              margin-right: 10px !important;
+            `}
+          >
+            <Select.Option key="allcategories" value={null}>
+              All Categories
+            </Select.Option>
+            {(categories || [])
+              .filter(v => v?.classId === 6)
+              .sort((a, b) => a?.name.localeCompare(b?.name))
+              .map(v => (
+                <Select.Option value={v?.id} key={v?.id}>
+                  <div
+                    css={`
+                      display: flex;
+                      align-items: center;
+                      width: 100%;
+                      height: 100%;
+                    `}
+                  >
+                    <img
+                      src={v?.iconUrl}
+                      css={`
+                        height: 16px;
+                        width: 16px;
+                        margin-right: 10px;
+                      `}
+                      alt="icon"
+                    />
+                    {v?.name}
+                  </div>
+                </Select.Option>
+              ))}
           </Select>
           <Input
             css={`
