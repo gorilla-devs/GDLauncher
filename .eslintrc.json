@@ -46,6 +46,10 @@
     "no-continue": "off",
     "no-use-before-define": "off",
     "no-await-in-loop": "off",
+    "default-param-last": "off",
+    "no-promise-executor-return": "off",
+    "import/no-import-module-exports": "off",
+    "react/destructuring-assignment": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",
     "promise/catch-or-return": "error",
@@ -65,6 +69,7 @@
     "react/jsx-no-bind": "off",
     "react/jsx-filename-extension": "off",
     "react/prop-types": "off",
+    "react/function-component-definition": "off",
     "react/forbid-dom-props": [2, { "forbid": ["style"] }],
     "import/no-anonymous-default-export": [
       "error",

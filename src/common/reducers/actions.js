@@ -26,7 +26,7 @@ import pMap from 'p-map';
 import makeDir from 'make-dir';
 import { major, minor, patch, prerelease } from 'semver';
 import { generate as generateRandomString } from 'randomstring';
-import fxp from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
 import * as ActionTypes from './actionTypes';
 import {
   ACCOUNT_MICROSOFT,
@@ -243,8 +243,9 @@ export function initNews() {
     if (news.length === 0 && !minecraftNews.isRequesting) {
       try {
         const { data: newsXml } = await axios.get(NEWS_URL);
+        const parser = new XMLParser();
         const newsArr =
-          fxp.parse(newsXml)?.rss?.channel?.item?.map(newsEntry => ({
+          parser.parse(newsXml)?.rss?.channel?.item?.map(newsEntry => ({
             title: newsEntry.title,
             description: newsEntry.description,
             image: `https://minecraft.net${newsEntry.imageURL}`,
