@@ -1,23 +1,36 @@
 module.exports = {
   new: [
     {
-      header: 'Added "Repair Instance" option.',
-      content: '',
-      advanced: { cm: '4317ced' }
+      header: 'Added Play Button to instance manager.',
+      content:
+        'You can start and stop instances from there while managing your mods.',
+      advanced: { cm: '' }
+    },
+    {
+      header: 'Added category selection in the mods browser.',
+      content:
+        'You can select the category from the dropdown and the mods will be filtered.',
+      advanced: { cm: '' }
     }
   ],
   improvements: [
     {
-      header: 'Instance resources will now be checked at startup.',
-      content: 'If they are missing they will be downloaded again.',
-      advanced: { cm: 'd970328' }
+      header: 'CurseForge APIs migrated to new ones.',
+      content:
+        'Things might not work, feel free to report anything not working on our discord.',
+      advanced: { cm: '' }
+    },
+    {
+      header: 'Ram memory slider now shows the selected amount.',
+      content: 'It should be way easier to use.',
+      advanced: { cm: '' }
     }
   ],
   bugfixes: [
     {
-      header: 'Deprecated our old cdn',
-      content: 'in favor of the new one.',
-      advanced: { cm: 'dbc658f' }
+      header: 'Fixed old instances not starting',
+      content: '',
+      advanced: { cm: '' }
     }
   ]
 };
