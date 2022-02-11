@@ -5,6 +5,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
+import axios from 'axios';
 // import { promises as fs } from 'fs';
 // import path from 'path';
 import Instances from '../components/Instances';
@@ -46,29 +47,8 @@ const Home = () => {
     dispatch(openModal('AccountsManager'));
   };
 
-  // const getOldInstances = async () => {
-  //   const oldLauncherUserData = await ipcRenderer.invoke(
-  //     'getOldLauncherUserData'
-  //   );
-  //   let files = [];
-  //   try {
-  //     files = await fs.readdir(path.join(oldLauncherUserData, 'packs'));
-  //   } catch {
-  //     // Swallow error
-  //   }
-  //   return (
-  //     await Promise.all(
-  //       files.map(async f => {
-  //         const stat = await fs.stat(
-  //           path.join(oldLauncherUserData, 'packs', f)
-  //         );
-  //         return stat.isDirectory() ? f : null;
-  //       })
-  //     )
-  //   ).filter(v => v);
-  // };
-
   const [profileImage, setProfileImage] = useState(null);
+  const [annoucement, setAnnoucement] = useState(null);
 
   useEffect(() => {
     const init = async () => {
@@ -77,15 +57,10 @@ const Home = () => {
         dispatch(updateLastUpdateVersion(appVersion));
         dispatch(openModal('ChangeLogs'));
       }
-
-      // const oldInstances = await getOldInstances();
-      // if (
-      //   oldInstances.length > 0 &&
-      //   instances.length === 0 &&
-      //   process.env.NODE_ENV !== 'development'
-      // ) {
-      //   dispatch(openModal('InstancesMigration', { preventClose: true }));
-      // }
+      const { data } = await axios.get(
+        'https://api.gdlauncher.com/announcement'
+      );
+      setAnnoucement(data || null);
     };
 
     init();
@@ -98,6 +73,19 @@ const Home = () => {
   return (
     <div>
       <News news={news} />
+      {annoucement ? (
+        <div
+          css={`
+            margin-top: 10px;
+            padding: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: ${props => props.theme.palette.error.main};
+          `}
+        >
+          {annoucement}
+        </div>
+      ) : null}
       <Instances />
       <AddInstanceIcon type="primary" onClick={() => openAddInstanceModal(0)}>
         <FontAwesomeIcon icon={faPlus} />
