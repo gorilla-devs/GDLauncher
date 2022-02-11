@@ -22,6 +22,10 @@ const trackFTBAPI = () => {
   ga.sendCustomEvent('FTBAPICall');
 };
 
+const trackCurseForgeAPI = () => {
+  ga.sendCustomEvent('CurseForgeAPICall');
+};
+
 // Microsoft Auth
 export const msExchangeCodeForAccessToken = (
   clientId,
@@ -221,12 +225,14 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
 // FORGE ADDONS
 
 export const getAddon = async projectID => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/${projectID}`;
   const { data } = await axios.get(url);
   return data?.data;
 };
 
 export const getMultipleAddons = async addons => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods`;
   const { data } = await axios.post(
     url,
@@ -238,6 +244,7 @@ export const getMultipleAddons = async addons => {
 };
 
 export const getAddonFiles = async projectID => {
+  trackCurseForgeAPI();
   // Aggregate results in case of multiple pages
   const results = [];
   let hasMore = true;
@@ -254,18 +261,21 @@ export const getAddonFiles = async projectID => {
 };
 
 export const getAddonDescription = async projectID => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/${projectID}/description`;
   const { data } = await axios.get(url);
   return data?.data;
 };
 
 export const getAddonFile = async (projectID, fileID) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/${projectID}/files/${fileID}`;
   const { data } = await axios.get(url);
   return data?.data;
 };
 
 export const getAddonsByFingerprint = async fingerprints => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/fingerprints`;
   const { data } = await axios.post(url, { fingerprints });
 
@@ -273,6 +283,7 @@ export const getAddonsByFingerprint = async fingerprints => {
 };
 
 export const getAddonFileChangelog = async (projectID, fileID) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/${projectID}/files/${fileID}/changelog`;
   const { data } = await axios.get(url);
 
@@ -280,12 +291,14 @@ export const getAddonFileChangelog = async (projectID, fileID) => {
 };
 
 export const getAddonCategories = async () => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/categories?gameId=432`;
   const { data } = await axios.get(url);
   return data.data;
 };
 
 export const getCFVersionIds = async () => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/games/432/versions`;
   const { data } = await axios.get(url);
   return data.data;
@@ -302,6 +315,7 @@ export const getSearch = async (
   categoryId,
   modLoaderType
 ) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/search`;
 
   // Map sort to sortField

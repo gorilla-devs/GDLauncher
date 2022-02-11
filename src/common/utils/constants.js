@@ -14,7 +14,6 @@ export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
 export const FORGESVC_URL = 'https://api.gdlauncher.com/cf';
 export const FTB_API_URL = 'https://api.modpacks.ch/public';
 export const FTB_MODPACK_URL = 'https://feed-the-beast.com/modpack';
-export const GDL_SERVE_API = 'https://api.gdlauncher.com/cf';
 export const NEWS_URL =
   'https://www.minecraft.net/en-us/feeds/community-content/rss';
 export const FMLLIBS_OUR_BASE_URL = 'https://fmllibs.gdevs.io';
