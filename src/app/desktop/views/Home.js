@@ -80,7 +80,7 @@ const Home = () => {
             padding: 30px;
             font-size: 18px;
             font-weight: bold;
-            color: ${props => props.theme.palette.error.main};
+            color: ${props => props.theme.palette.colors.yellow};
           `}
         >
           {annoucement}
