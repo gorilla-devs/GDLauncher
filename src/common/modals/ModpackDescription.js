@@ -158,7 +158,7 @@ const ModpackDescription = ({
                     <label>MC version: </label>
                     {type === 'ftb'
                       ? modpack.tags[0]?.name || '-'
-                      : modpack.latestFilesIndexes[0].gameVersions}
+                      : modpack.latestFilesIndexes[0].gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
