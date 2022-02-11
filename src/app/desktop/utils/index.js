@@ -828,7 +828,7 @@ export const importAddonZip = async (
 };
 
 export const downloadAddonZip = async (id, fileID, instancePath, tempPath) => {
-  const { data } = await getAddonFile(id, fileID);
+  const data = await getAddonFile(id, fileID);
   const instanceManifest = path.join(instancePath, 'manifest.json');
   const zipFile = path.join(tempPath, 'addon.zip');
   await downloadFile(zipFile, data.downloadUrl);
@@ -868,11 +868,13 @@ export const extractFace = async buffer => {
 export const normalizeModData = (data, projectID, modName) => {
   const temp = data;
   temp.name = modName;
+  if (data.fileFingerprint) {
+    temp.packageFingerprint = data.fileFingerprint;
+  }
   if (data.projectID && data.fileID) return temp;
   if (data.id) {
     temp.projectID = projectID;
-    temp.fileID = data.id;
-    delete temp.id;
+    temp.fileID = data?.file?.id || data.id;
   }
   return temp;
 };
@@ -903,27 +905,27 @@ export const isInstanceFolderPath = (f, instancesPath) =>
 
 export const isFileModFabric = file => {
   return (
-    (file.gameVersion.includes('Fabric') ||
+    (file.gameVersions.includes('Fabric') ||
       file.modules.find(v => v.foldername === 'fabric.mod.json')) &&
-    !file.gameVersion.includes('Forge')
+    !file.gameVersions.includes('Forge')
   );
 };
 
 export const filterFabricFilesByVersion = (files, version) => {
   return files.filter(v => {
-    if (Array.isArray(v.gameVersion)) {
-      return v.gameVersion.includes(version) && isFileModFabric(v);
+    if (Array.isArray(v.gameVersions)) {
+      return v.gameVersions.includes(version) && isFileModFabric(v);
     }
-    return v.gameVersion === version;
+    return v.gameVersions === version;
   });
 };
 
 export const filterForgeFilesByVersion = (files, version) => {
   return files.filter(v => {
-    if (Array.isArray(v.gameVersion)) {
-      return v.gameVersion.includes(version) && !isFileModFabric(v);
+    if (Array.isArray(v.gameVersions)) {
+      return v.gameVersions.includes(version) && !isFileModFabric(v);
     }
-    return v.gameVersion === version;
+    return v.gameVersions === version;
   });
 };
 

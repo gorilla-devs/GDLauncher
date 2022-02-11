@@ -32,6 +32,7 @@ import {
   LATEST_JAVA_VERSION,
   MC_STARTUP_METHODS
 } from '../../../utils/constants';
+import { marks, scaleMem, scaleMemInv, sysMemScaled } from '../../../utils';
 
 const AutodetectPath = styled.div`
   display: flex;
@@ -115,19 +116,6 @@ const StyledButtons = styled(Button)`
 function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
-
-const scaleMem = x => Math.log2(x / 1024);
-const scaleMemInv = x => 1024 * 2 ** x;
-const sysMemScaled = Math.round(
-  scaleMem(process.getSystemMemoryInfo().total / 1024)
-);
-const marksScaled = Array.from({ length: sysMemScaled + 1 }, (_, i) =>
-  scaleMemInv(i)
-);
-const marks =
-  sysMemScaled > 6
-    ? marksScaled.map(x => `${x / 1024} GB`)
-    : marksScaled.map(x => `${x} MB`);
 
 export default function MyAccountPreferences() {
   const [screenResolution, setScreenResolution] = useState(null);
@@ -399,21 +387,37 @@ export default function MyAccountPreferences() {
         >
           Select the preferred amount of memory to use when launching the game.
         </Paragraph>
-        <Slider
+        <div
           css={`
-            margin: 20px 40px !important;
-            white-space: nowrap;
+            display: flex;
           `}
-          onAfterChange={e =>
-            dispatch(updateJavaMemory(Math.round(scaleMemInv(e))))
-          }
-          defaultValue={scaleMem(javaMemory)}
-          min={0}
-          max={sysMemScaled}
-          step={0.1}
-          marks={marks}
-          valueLabelDisplay="auto"
-        />
+        >
+          <Slider
+            css={`
+              margin: 20px 40px !important;
+              white-space: nowrap;
+              flex: 1;
+            `}
+            onChange={e =>
+              dispatch(updateJavaMemory(Math.round(scaleMemInv(e))))
+            }
+            defaultValue={scaleMem(javaMemory)}
+            min={0}
+            max={sysMemScaled}
+            step={0.1}
+            marks={marks}
+            valueLabelDisplay="auto"
+          />
+          <div
+            css={`
+              display: grid;
+              place-items: center;
+              width: 100px;
+            `}
+          >
+            {javaMemory} MB
+          </div>
+        </div>
       </SelectMemory>
       <Hr />
       <JavaCustomArguments>

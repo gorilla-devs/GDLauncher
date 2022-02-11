@@ -60,7 +60,7 @@ const ModpacksListWrapper = ({
       );
     }
 
-    const primaryImage = modpack.attachments.find(v => v.isDefault);
+    const primaryImage = modpack?.logo;
     return (
       <div
         // eslint-disable-next-line

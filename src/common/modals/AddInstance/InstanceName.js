@@ -79,7 +79,7 @@ const InstanceName = ({
     if (!modpack) return null;
     // Curseforge
     if (!modpack.synopsis) {
-      return modpack?.attachments?.find(v => v?.isDefault)?.thumbnailUrl;
+      return modpack?.logo?.thumbnailUrl;
     } else {
       // FTB
       const image = modpack?.art?.reduce((prev, curr) => {
@@ -101,7 +101,7 @@ const InstanceName = ({
 
     const initTimestamp = Date.now();
 
-    const isCurseForgeModpack = Boolean(modpack?.attachments);
+    const isCurseForgeModpack = Boolean(version?.source === CURSEFORGE);
     const isFTBModpack = Boolean(modpack?.art);
     let manifest;
 

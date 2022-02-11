@@ -36,13 +36,10 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
     setLoading(true);
     if (manifest) {
       setVersionName(`${manifest?.name} - ${manifest?.version}`);
-      const { data } = await getAddonFiles(modpackId);
+      const data = await getAddonFiles(modpackId);
       const mappedFiles = await Promise.all(
         data.map(async v => {
-          const { data: changelog } = await getAddonFileChangelog(
-            modpackId,
-            v.id
-          );
+          const changelog = await getAddonFileChangelog(modpackId, v.id);
           return {
             ...v,
             changelog
@@ -70,7 +67,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
           return {
             displayName: `${ftbModpack.name} ${version.name}`,
             id: version.id,
-            gameVersion: [newModpack.targets[1]?.version],
+            gameVersions: [newModpack.targets[1]?.version],
             releaseType: convertFtbReleaseType(version.type),
             fileDate: version.updated * 1000,
             imageUrl: ftbModpack.art[0].url,
@@ -168,7 +165,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
                     flex-direction: column;
                   `}
                 >
-                  <div>{file.gameVersion[0]}</div>
+                  <div>{file.gameVersions[0]}</div>
                   <div>{getReleaseType(file.releaseType)}</div>
                 </div>
                 <div

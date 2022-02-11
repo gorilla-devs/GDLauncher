@@ -29,40 +29,38 @@ const UpdateRow = ({ header, content, advanced }) => {
         {content}
       </span>
       {advanced && (
-        <>
-          <div
-            css={`
-              color: ${props => props.theme.palette.text.third};
-              font-size: 12px;
-              a {
-                color: ${props => props.theme.palette.primary.light};
-              }
-              a:hover {
-                color: ${props => props.theme.palette.primary.main};
-              }
-            `}
+        <div
+          css={`
+            color: ${props => props.theme.palette.text.third};
+            font-size: 12px;
+            a {
+              color: ${props => props.theme.palette.primary.light};
+            }
+            a:hover {
+              color: ${props => props.theme.palette.primary.main};
+            }
+          `}
+        >
+          <a
+            href={`https://github.com/gorilla-devs/GDLauncher/commit/${advanced.cm}`}
           >
-            <a
-              href={`https://github.com/gorilla-devs/GDLauncher/commit/${advanced.cm}`}
-            >
-              {advanced.cm}
-            </a>
-            {prSplit && (
-              <>
-                {' | '}
-                {/* Yes, this was the best (and shortest) version to do this I could come up with */}
-                <a
-                  href={`https://github.com/gorilla-devs/GDLauncher/pull/${
-                    prSplit[0]
-                  }${prSplit.length > 1 ? `/commits/${prSplit[1]}` : ''}`}
-                >
-                  #{advanced.pr}
-                </a>
-              </>
-            )}
-            {advanced.ms && <> | {advanced.ms}</>}
-          </div>
-        </>
+            {advanced.cm}
+          </a>
+          {prSplit && (
+            <>
+              {' | '}
+              {/* Yes, this was the best (and shortest) version to do this I could come up with */}
+              <a
+                href={`https://github.com/gorilla-devs/GDLauncher/pull/${
+                  prSplit[0]
+                }${prSplit.length > 1 ? `/commits/${prSplit[1]}` : ''}`}
+              >
+                #{advanced.pr}
+              </a>
+            </>
+          )}
+          {advanced.ms && <> | {advanced.ms}</>}
+        </div>
       )}
     </li>
   );
