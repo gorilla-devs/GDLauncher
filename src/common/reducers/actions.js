@@ -1,4 +1,3 @@
-import axios from 'axios';
 import path from 'path';
 import { ipcRenderer } from 'electron';
 import { v5 as uuid } from 'uuid';
@@ -27,6 +26,7 @@ import makeDir from 'make-dir';
 import { major, minor, patch, prerelease } from 'semver';
 import { generate as generateRandomString } from 'randomstring';
 import { XMLParser } from 'fast-xml-parser';
+import axios from '../axios-shim';
 import * as ActionTypes from './actionTypes';
 import {
   ACCOUNT_MICROSOFT,

@@ -5,7 +5,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
-import axios from 'axios';
+import axios from '../../../common/axios-shim';
 // import { promises as fs } from 'fs';
 // import path from 'path';
 import Instances from '../components/Instances';

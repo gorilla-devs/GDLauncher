@@ -1,6 +1,6 @@
 // @flow
-import axios from 'axios';
 import qs from 'querystring';
+import axios from './axios-shim';
 import {
   MOJANG_APIS,
   FORGESVC_URL,

@@ -1,9 +1,9 @@
 import makeDir from 'make-dir';
 import fss from 'fs';
-import axios from 'axios';
 import pMap from 'p-map';
 import path from 'path';
 import adapter from 'axios/lib/adapters/http';
+import axios from '../../../common/axios-shim';
 import computeFileHash from './computeFileHash';
 
 const fs = fss.promises;
