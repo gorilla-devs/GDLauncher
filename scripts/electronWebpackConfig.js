@@ -67,7 +67,7 @@ const baseConfig = {
       NODE_ENV: process.env.NODE_ENV,
       REACT_APP_RELEASE_TYPE: process.env.REACT_APP_RELEASE_TYPE,
       SENTRY_DSN: process.env.SENTRY_DSN,
-      CF_API_KEY: process.env.CF_API_KEY
+      REACT_CF_API_KEY: process.env.CF_API_KEY
     }),
     new webpack.NamedModulesPlugin()
   ]

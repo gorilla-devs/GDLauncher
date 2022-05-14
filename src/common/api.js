@@ -20,7 +20,7 @@ import ga from './utils/analytics';
 
 const axioInstance = axios.create({
   headers: {
-    'X-API-KEY': process.env.CF_API_KEY,
+    'X-API-KEY': process.env.REACT_CF_API_KEY,
     'Content-Type': 'application/json',
     Accept: 'application/json'
   }
