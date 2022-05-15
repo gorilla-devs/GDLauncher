@@ -9,7 +9,6 @@
 /* eslint-disable no-param-reassign */
 
 const CracoAntDesignPlugin = require('craco-antd');
-const webpack = require('webpack');
 // const SentryCliPlugin = require('@sentry/webpack-plugin');
 // const os = require('os');
 // const packageJson = require('./package.json');
@@ -100,13 +99,6 @@ module.exports = () => {
         //   console.log('Not a release. Skipping source maps upload.');
         // }
 
-        if (process.env.REACT_CF_API_KEY) {
-          webpackConfig.plugins.push(
-            new webpack.EnvironmentPlugin({
-              REACT_CF_API_KEY: process.env.REACT_CF_API_KEY
-            })
-          );
-        }
         webpackConfig.resolve.aliasFields = [];
         webpackConfig.resolve.mainFields = ['module', 'main'];
         webpackConfig.resolve.alias = {
