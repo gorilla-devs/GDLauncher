@@ -2874,7 +2874,7 @@ export function launchInstance(instanceName, forceQuit = false) {
                   .replace(/\${version_name}/g, mcJson.id)
                   .replace(
                     /=\${library_directory}/g,
-                    `="${_getLibrariesPath(state)}"`
+                    `=${_getLibrariesPath(state)}`
                   )
                   .replace(
                     /\${library_directory}/g,
@@ -2998,12 +2998,12 @@ export function launchInstance(instanceName, forceQuit = false) {
         gameResolution,
         true,
         javaArguments
-      ).join(' ')}`
+      ).join('\n')}`
         .replace(...replaceRegex)
         .replace(
           // eslint-disable-next-line no-template-curly-in-string
           '-Dlog4j.configurationFile=${path}',
-          `-Dlog4j.configurationFile="${loggingPath}"`
+          `-Dlog4j.configurationFile=${loggingPath}`
         )
     );
 
@@ -3014,7 +3014,7 @@ export function launchInstance(instanceName, forceQuit = false) {
     let closed = false;
 
     const ps = spawn(
-      `"${javaPath}"`,
+      javaPath,
       jvmArguments.map(v =>
         v
           .toString()
@@ -3026,8 +3026,7 @@ export function launchInstance(instanceName, forceQuit = false) {
           )
       ),
       {
-        cwd: instancePath,
-        shell: true
+        cwd: instancePath
       }
     );
 

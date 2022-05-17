@@ -690,7 +690,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
 
     await fs.writeFile(
       path.join(tempFolder, updaterVbs),
-      `Set WshShell = CreateObject("WScript.Shell") 
+      `Set WshShell = CreateObject("WScript.Shell")
           WshShell.Run chr(34) & "${path.join(
             tempFolder,
             updaterBat
@@ -702,7 +702,6 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
     const updateSpawn = spawn(path.join(tempFolder, updaterVbs), {
       cwd: path.dirname(app.getPath('exe')),
       detached: true,
-      shell: true,
       stdio: [
         'ignore' /* stdin */,
         'ignore' /* stdout */,
