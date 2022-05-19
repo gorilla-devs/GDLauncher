@@ -683,9 +683,9 @@ export const getJVMArguments113 = (
   }
 
   if (resolution) {
-    args.push("--width");
+    args.push('--width');
     args.push(resolution.width.toString());
-    args.push("--height");
+    args.push('--height');
     args.push(resolution.height.toString());
   }
 
@@ -768,6 +768,7 @@ export const patchForge113 = async (
       const mainClass = await readJarManifest(filePath, 'Main-Class');
 
       await new Promise(resolve => {
+        /* eslint-disable prettier/prettier */
         const ps = spawn(
           javaPath,
           [
@@ -777,6 +778,7 @@ export const patchForge113 = async (
             ...args
           ]
         );
+        /* eslint-enable prettier/prettier */
 
         ps.stdout.on('data', data => {
           console.log(data.toString());
