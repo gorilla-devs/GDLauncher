@@ -1095,7 +1095,8 @@ export function addToQueue(
   manifest,
   background,
   timePlayed,
-  settings = {}
+  settings = {},
+  isUpdate
 ) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -1109,6 +1110,7 @@ export function addToQueue(
       loader,
       manifest,
       background,
+      isUpdate,
       ...patchedSettings
     });
 
@@ -1873,8 +1875,9 @@ export function processForgeManifest(instanceName) {
 
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
+    const state = getState();
+    const { loader, manifest, isUpdate } = _getCurrentDownloadItem(state);
     try {
-      const state = getState();
       const {
         app: {
           vanillaManifest: { versions: mcVersions }
@@ -1882,8 +1885,6 @@ export function downloadInstance(instanceName) {
       } = state;
 
       dispatch(updateDownloadStatus(instanceName, 'Downloading game files...'));
-
-      const { loader, manifest } = _getCurrentDownloadItem(state);
 
       const mcVersion = loader?.mcVersion;
 
@@ -2030,7 +2031,8 @@ export function downloadInstance(instanceName) {
         openModal('InstanceDownloadFailed', {
           instanceName,
           preventClose: true,
-          error: err
+          error: err,
+          isUpdate
         })
       );
     }
@@ -2142,7 +2144,10 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           instanceName,
           loader,
           newManifest,
-          `background${path.extname(imageURL)}`
+          `background${path.extname(imageURL)}`,
+          undefined,
+          undefined,
+          true
         )
       );
     } else if (instance.loader.source === FTB) {

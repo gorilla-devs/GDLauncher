@@ -1,8 +1,10 @@
 import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { Select, Button } from 'antd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
+import path from 'path';
+import fse from 'fs-extra';
 import {
   getAddonFiles,
   getAddonFileChangelog,
@@ -12,6 +14,7 @@ import {
 } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
+import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 
 const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const [files, setFiles] = useState([]);
@@ -20,6 +23,8 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const [loading, setLoading] = useState(false);
   const [installing, setInstalling] = useState(false);
   const dispatch = useDispatch();
+  const tempPath = useSelector(_getTempPath);
+  const instancesPath = useSelector(_getInstancesPath);
 
   const convertFtbReleaseType = type => {
     switch (type) {
@@ -122,6 +127,14 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   };
 
   const handleChange = value => setSelectedIndex(value);
+
+  const copyInstance = async () => {
+    await fse.copy(
+      path.join(instancesPath, instanceName),
+      path.join(tempPath, instanceName)
+    );
+  };
+
   return (
     <Container>
       Installed version: {versionName}
@@ -202,6 +215,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
           await dispatch(
             changeModpackVersion(instanceName, files[selectedIndex])
           );
+          await copyInstance();
           setInstalling(false);
           dispatch(closeModal());
         }}

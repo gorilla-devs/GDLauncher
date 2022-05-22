@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { remove } from 'fs-extra';
+import { copy, remove } from 'fs-extra';
 import path from 'path';
+import lockfile from 'lockfile';
+import { readdir, unlink } from 'fs/promises';
 import Modal from '../components/Modal';
 import {
   addNextInstanceToCurrentDownload,
@@ -10,12 +12,13 @@ import {
   removeDownloadFromQueue
 } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
-import { _getInstancesPath } from '../utils/selectors';
+import { _getInstancesPath, _getTempPath } from '../utils/selectors';
 
-const InstanceDownloadFailed = ({ instanceName, error }) => {
+const InstanceDownloadFailed = ({ instanceName, error, isUpdate }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const instancesPath = useSelector(_getInstancesPath);
+  const tempPath = useSelector(_getTempPath);
 
   const ellipsedName =
     instanceName.length > 20
@@ -26,7 +29,69 @@ const InstanceDownloadFailed = ({ instanceName, error }) => {
     await dispatch(removeDownloadFromQueue(instanceName));
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await remove(path.join(instancesPath, instanceName));
+
+    const instancePath = path.join(instancesPath, instanceName);
+
+    if (isUpdate) {
+      await new Promise(resolve => {
+        // Force premature unlock to let our listener catch mods from override
+        lockfile.unlock(
+          path.join(instancePath, instanceName, 'installing.lock'),
+          err => {
+            if (err) console.error(err);
+            resolve();
+          }
+        );
+      });
+
+      const contentDir = await readdir(instancePath);
+
+      await Promise.all(
+        contentDir.map(async f => {
+          try {
+            if (f !== 'config.json' || f !== 'installing.lock') {
+              const filePath = path.join(instancesPath, f);
+              await unlink(filePath);
+            }
+          } catch (err) {
+            console.error(err);
+          }
+          return null;
+        })
+      );
+
+      const oldInstanceContentDir = await readdir(
+        path.join(tempPath, instanceName)
+      );
+
+      await Promise.all(
+        oldInstanceContentDir.map(async f => {
+          try {
+            if (f !== 'config.json' || f !== 'installing.lock') {
+              const tempFilePath = path.join(tempPath, f);
+              const newFilePath = path.join(instancesPath, f);
+              await copy(tempFilePath, newFilePath);
+            }
+          } catch (err) {
+            console.error(err);
+          }
+          return null;
+        })
+      );
+
+      await new Promise(resolve => {
+        // Force premature unlock to let our listener catch mods from override
+        lockfile.unlock(
+          path.join(instancesPath, instanceName, 'installing.lock'),
+          err => {
+            if (err) console.error(err);
+            resolve();
+          }
+        );
+      });
+    }
+
+    if (!isUpdate) await remove(instancePath);
     setLoading(false);
     dispatch(addNextInstanceToCurrentDownload());
     dispatch(closeModal());
