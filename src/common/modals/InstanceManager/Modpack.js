@@ -4,7 +4,7 @@ import { Select, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import path from 'path';
-import fse from 'fs-extra';
+import fse, { access } from 'fs-extra';
 import {
   getAddonFiles,
   getAddonFileChangelog,
@@ -127,12 +127,18 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   };
 
   const handleChange = value => setSelectedIndex(value);
+  const newInstancePath = path.join(tempPath, instanceName);
 
   const copyInstance = async () => {
-    await fse.copy(
-      path.join(instancesPath, instanceName),
-      path.join(tempPath, instanceName)
-    );
+    try {
+      await access(newInstancePath);
+      await fse.remove(newInstancePath);
+    } finally {
+      await fse.copy(path.join(instancesPath, instanceName), newInstancePath, {
+        recursive: true,
+        overwrite: true
+      });
+    }
   };
 
   return (
@@ -212,10 +218,10 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
         disabled={selectedIndex === null}
         onClick={async () => {
           setInstalling(true);
+          await copyInstance();
           await dispatch(
             changeModpackVersion(instanceName, files[selectedIndex])
           );
-          await copyInstance();
           setInstalling(false);
           dispatch(closeModal());
         }}
