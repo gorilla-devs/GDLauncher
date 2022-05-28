@@ -1742,8 +1742,6 @@ export function processForgeManifest(instanceName) {
           );
 
           if (!modManifest.downloadUrl) {
-            console.log('TEST', modManifest, addon?.categorySection?.path);
-
             optedOutMods.push({ addon, modManifest });
             return;
           }
@@ -1765,8 +1763,6 @@ export function processForgeManifest(instanceName) {
       },
       { concurrency }
     );
-
-    console.log('AAA', optedOutMods, addonsHashmap);
 
     const modDestFile = path.join(
       _getInstancesPath(state),

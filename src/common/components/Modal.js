@@ -37,12 +37,13 @@ const Modal = ({
   const dispatch = useDispatch();
 
   const closeFunc = () => {
-    if (preventClose) return;
     if (closeCallback) closeCallback();
     dispatch(closeModal());
   };
 
-  useKey(['Escape'], closeFunc);
+  useKey(['Escape'], () => {
+    if (!preventClose) closeFunc();
+  });
 
   return (
     <div

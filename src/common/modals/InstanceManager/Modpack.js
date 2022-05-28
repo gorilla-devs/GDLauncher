@@ -4,7 +4,6 @@ import { Select, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import path from 'path';
-import fse, { access } from 'fs-extra';
 import {
   getAddonFiles,
   getAddonFileChangelog,
@@ -15,6 +14,7 @@ import {
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
+import { copyInstance } from '../../utils';
 
 const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const [files, setFiles] = useState([]);
@@ -129,18 +129,6 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const handleChange = value => setSelectedIndex(value);
   const newInstancePath = path.join(tempPath, instanceName);
 
-  const copyInstance = async () => {
-    try {
-      await access(newInstancePath);
-      await fse.remove(newInstancePath);
-    } finally {
-      await fse.copy(path.join(instancesPath, instanceName), newInstancePath, {
-        recursive: true,
-        overwrite: true
-      });
-    }
-  };
-
   return (
     <Container>
       Installed version: {versionName}
@@ -218,7 +206,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
         disabled={selectedIndex === null}
         onClick={async () => {
           setInstalling(true);
-          await copyInstance();
+          await copyInstance(newInstancePath, instancesPath, instanceName);
           await dispatch(
             changeModpackVersion(instanceName, files[selectedIndex])
           );

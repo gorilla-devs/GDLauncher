@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spin } from 'antd';
@@ -6,6 +6,7 @@ import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import Modal from '../components/Modal';
 import { UPDATE_MODAL } from '../reducers/modals/actionTypes';
+import { closeModal } from '../reducers/modals/actions';
 
 const Container = styled.div`
   width: 100%;
@@ -45,16 +46,17 @@ const RowContainer = styled.div`
   }
 `;
 
-const ModRow = ({ mod, loadingMods }) => {
+const ModRow = ({ mod, loadedMods, currentMod }) => {
   const { modManifest } = mod;
-  const loaded = loadingMods.includes(modManifest.id);
+  const loaded = loadedMods.includes(modManifest.id);
+
+  const isCurrentMod = currentMod?.modManifest?.id === modManifest.id;
 
   return (
     <RowContainer>
       <div>{modManifest?.displayName}</div>
-      {loaded ? (
-        <div className="dot" />
-      ) : (
+      {loaded && <div className="dot" />}
+      {!loaded && isCurrentMod && (
         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
       )}
     </RowContainer>
@@ -68,7 +70,7 @@ const OptedOutModsList = ({
   reject,
   preventClose
 }) => {
-  const [loadingMods, setLoadingMods] = useState([]);
+  const [loadedMods, setLoadedMods] = useState([]);
   const [downloading, setDownloading] = useState(false);
 
   const dispatch = useDispatch();
@@ -78,16 +80,22 @@ const OptedOutModsList = ({
     x => x.modalType === 'OptedOutModsList'
   );
 
-  ipcRenderer.on('opted-out-download-mod-status', (e, status) => {
-    if (!status.error) {
-      if (optedOutMods.length === loadingMods.length + 1) {
-        resolve();
+  const currentMod = downloading ? optedOutMods[loadedMods.length] : null;
+
+  useEffect(() => {
+    ipcRenderer.once('opted-out-download-mod-status', (e, status) => {
+      if (!status.error) {
+        if (optedOutMods.length === loadedMods.length + 1) {
+          dispatch(closeModal());
+          resolve();
+        }
+        setLoadedMods(prev => [...prev, status.modId]);
+      } else {
+        dispatch(closeModal());
+        reject(status.error);
       }
-      setLoadingMods(prev => [...prev, status.modId]);
-    } else {
-      reject(status.error);
-    }
-  });
+    });
+  }, [loadedMods]);
 
   return (
     <Modal
@@ -97,12 +105,15 @@ const OptedOutModsList = ({
         overflow-x: hidden;
       `}
       preventClose={preventClose}
+      closeCallback={() =>
+        setTimeout(() => reject(new Error('Download Aborted by the user')), 300)
+      }
       title="Opted out mods list"
     >
       <Container>
         {optedOutMods &&
           optedOutMods.map(mod => (
-            <ModRow mod={mod} loadingMods={loadingMods} />
+            <ModRow mod={mod} loadedMods={loadedMods} currentMod={currentMod} />
           ))}
         <div
           css={`
@@ -118,7 +129,13 @@ const OptedOutModsList = ({
             type="primary"
             danger
             disabled={downloading}
-            onClick={() => {}}
+            onClick={() => {
+              dispatch(closeModal());
+              setTimeout(
+                () => reject(new Error('Download Aborted by the user')),
+                300
+              );
+            }}
           >
             Cancel
           </Button>

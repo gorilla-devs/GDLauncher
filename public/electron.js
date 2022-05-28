@@ -604,7 +604,7 @@ ipcMain.handle('shutdown-discord-rpc', () => {
 
 ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
   let win = new BrowserWindow({
-    closable: false
+    frame: false
   });
   for (const mod of mods) {
     const { modManifest, addon } = mod;

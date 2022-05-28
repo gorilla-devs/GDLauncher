@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { copy, remove, readJson } from 'fs-extra';
-import path from 'path';
-import lockfile from 'lockfile';
-import { readdir, unlink } from 'fs/promises';
 import Modal from '../components/Modal';
 import {
   addNextInstanceToCurrentDownload,
@@ -14,8 +10,14 @@ import {
 } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
 import { _getInstancesPath, _getTempPath } from '../utils/selectors';
+import { rollBackInstanceZip } from '../utils';
 
-const InstanceDownloadFailed = ({ instanceName, error, isUpdate }) => {
+const InstanceDownloadFailed = ({
+  instanceName,
+  error,
+  isUpdate,
+  preventClose
+}) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const instancesPath = useSelector(_getInstancesPath);
@@ -31,72 +33,15 @@ const InstanceDownloadFailed = ({ instanceName, error, isUpdate }) => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const instancePath = path.join(instancesPath, instanceName);
+    await rollBackInstanceZip(
+      isUpdate,
+      instancesPath,
+      instanceName,
+      tempPath,
+      dispatch,
+      updateInstanceConfig
+    );
 
-    if (isUpdate) {
-      await new Promise(resolve => {
-        lockfile.lock(path.join(instancePath, 'installing.lock'), err => {
-          if (err) console.error(err);
-          resolve();
-        });
-      });
-
-      const contentDir = await readdir(instancePath);
-
-      await Promise.all(
-        contentDir.map(async f => {
-          try {
-            if (f !== 'config.json' && f !== 'installing.lock') {
-              const filePath = path.join(instancesPath, instanceName, f);
-              await unlink(filePath);
-            }
-          } catch (err) {
-            console.error(err);
-          }
-          return null;
-        })
-      );
-
-      const oldInstanceContentDir = await readdir(
-        path.join(tempPath, instanceName)
-      );
-
-      await Promise.all(
-        oldInstanceContentDir.map(async f => {
-          try {
-            if (f !== 'installing.lock') {
-              const tempFilePath = path.join(tempPath, instanceName, f);
-              const newFilePath = path.join(instancesPath, instanceName, f);
-
-              await copy(tempFilePath, newFilePath, {
-                overwrite: true,
-                recursive: true
-              });
-            }
-          } catch (err) {
-            console.error(err);
-          }
-          return null;
-        })
-      );
-
-      const currentConfig = await readJson(
-        path.join(instancePath, 'config.json')
-      );
-
-      dispatch(updateInstanceConfig(instanceName, () => currentConfig));
-
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      await new Promise(resolve => {
-        lockfile.unlock(path.join(instancePath, 'installing.lock'), err => {
-          if (err) console.error(err);
-          resolve();
-        });
-      });
-    }
-
-    if (!isUpdate) await remove(instancePath);
     setLoading(false);
     dispatch(addNextInstanceToCurrentDownload());
     dispatch(closeModal());
@@ -115,6 +60,7 @@ const InstanceDownloadFailed = ({ instanceName, error, isUpdate }) => {
         max-width: 550px;
         overflow-x: hidden;
       `}
+      preventClose={preventClose}
       title={`Instance Download Failed - ${ellipsedName}`}
     >
       <div>

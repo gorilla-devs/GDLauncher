@@ -1,4 +1,8 @@
 import { ipcRenderer } from 'electron';
+import lockfile from 'lockfile';
+import path from 'path';
+import { access, copy, readJson, remove } from 'fs-extra';
+import { readdir, unlink } from 'fs/promises';
 
 export const sortByDate = (a, b) => {
   const dateA = new Date(a.fileDate);
@@ -128,6 +132,98 @@ export const convertMinutesToHumanTime = minutes => {
       return '0 minutes';
     default:
       return '';
+  }
+};
+
+export const rollBackInstanceZip = async (
+  isUpdate,
+  instancesPath,
+  instanceName,
+  tempPath,
+  dispatch,
+  updateInstanceConfig
+) => {
+  const instancePath = path.join(instancesPath, instanceName);
+
+  if (isUpdate) {
+    await new Promise(resolve => {
+      lockfile.lock(path.join(instancePath, 'installing.lock'), err => {
+        if (err) console.error(err);
+        resolve();
+      });
+    });
+
+    const contentDir = await readdir(instancePath);
+
+    await Promise.all(
+      contentDir.map(async f => {
+        try {
+          if (f !== 'config.json' && f !== 'installing.lock') {
+            const filePath = path.join(instancesPath, instanceName, f);
+            await unlink(filePath);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        return null;
+      })
+    );
+
+    const oldInstanceContentDir = await readdir(
+      path.join(tempPath, instanceName)
+    );
+
+    await Promise.all(
+      oldInstanceContentDir.map(async f => {
+        try {
+          if (f !== 'installing.lock') {
+            const tempFilePath = path.join(tempPath, instanceName, f);
+            const newFilePath = path.join(instancesPath, instanceName, f);
+
+            await copy(tempFilePath, newFilePath, {
+              overwrite: true,
+              recursive: true
+            });
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        return null;
+      })
+    );
+
+    const currentConfig = await readJson(
+      path.join(instancePath, 'config.json')
+    );
+
+    dispatch(updateInstanceConfig(instanceName, () => currentConfig));
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await new Promise(resolve => {
+      lockfile.unlock(path.join(instancePath, 'installing.lock'), err => {
+        if (err) console.error(err);
+        resolve();
+      });
+    });
+  }
+
+  if (!isUpdate) await remove(instancePath);
+};
+
+export const copyInstance = async (
+  newInstancePath,
+  instancesPath,
+  instanceName
+) => {
+  try {
+    await access(newInstancePath);
+    await remove(newInstancePath);
+  } finally {
+    await copy(path.join(instancesPath, instanceName), newInstancePath, {
+      recursive: true,
+      overwrite: true
+    });
   }
 };
 
