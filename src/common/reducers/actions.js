@@ -1719,6 +1719,7 @@ export function processForgeManifest(instanceName) {
     await Promise.all([_getAddons(), _getAddonFiles()]);
 
     let modManifests = [];
+    const optedOutMods = [];
     await pMap(
       manifest.files,
       async item => {
@@ -1739,6 +1740,14 @@ export function processForgeManifest(instanceName) {
             addon?.categorySection?.path || 'mods',
             modManifest.fileName
           );
+
+          if (!modManifest.downloadUrl) {
+            console.log('TEST', modManifest, addon?.categorySection?.path);
+
+            optedOutMods.push({ addon, modManifest });
+            return;
+          }
+
           const fileExists = await fse.pathExists(destFile);
           if (!fileExists) {
             await downloadFile(destFile, modManifest.downloadUrl);
@@ -1756,6 +1765,24 @@ export function processForgeManifest(instanceName) {
       },
       { concurrency }
     );
+
+    console.log('AAA', optedOutMods, addonsHashmap);
+
+    const modDestFile = path.join(
+      _getInstancesPath(state),
+      instanceName,
+      'mods'
+    );
+    await new Promise((resolve, reject) => {
+      dispatch(
+        openModal('OptedOutModsList', {
+          optedOutMods,
+          modDestFile,
+          resolve,
+          reject
+        })
+      );
+    });
 
     let validAddon = false;
     const addonPathZip = path.join(

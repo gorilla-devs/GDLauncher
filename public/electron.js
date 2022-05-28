@@ -602,6 +602,56 @@ ipcMain.handle('shutdown-discord-rpc', () => {
   discordRPC.shutdownRPC();
 });
 
+ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
+  let win = new BrowserWindow({
+    closable: false
+  });
+  for (const mod of mods) {
+    const { modManifest, addon } = mod;
+    try {
+      // eslint-disable-next-line no-loop-func
+      await new Promise((resolve, reject) => {
+        const modUrlDownloadPage = `https://www.curseforge.com/minecraft/mc-mods/${addon.slug}/download`;
+        win.loadURL(modUrlDownloadPage);
+        win.webContents.session.on('will-download', (_, item) => {
+          item.setSavePath(path.join(modDestFile, modManifest.fileName));
+
+          const timer = setTimeout(() => {
+            reject(new Error(`Download for ${modManifest.fileName} timed out`));
+          }, 30000);
+
+          item.once('updated', () => {
+            clearTimeout(timer);
+          });
+
+          item.once('done', (event, state) => {
+            if (state === 'completed') {
+              resolve();
+            } else {
+              reject(new Error(`Download for ${modManifest.fileName} failed`));
+            }
+          });
+        });
+      });
+      // send success event to front end
+      mainWindow.webContents.send('opted-out-download-mod-status', {
+        modId: modManifest.id,
+        error: false
+      });
+    } catch (err) {
+      // send error event to front end
+      mainWindow.webContents.send('opted-out-download-mod-status', {
+        modId: modManifest.id,
+        error: err
+      });
+    }
+  }
+  win.close();
+  win.on('closed', () => {
+    win = null;
+  });
+});
+
 ipcMain.handle('start-listener', async (e, dirPath) => {
   try {
     log.log('Trying to start listener');
