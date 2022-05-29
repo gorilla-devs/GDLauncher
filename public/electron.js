@@ -603,22 +603,43 @@ ipcMain.handle('shutdown-discord-rpc', () => {
 });
 
 ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
-  let win = new BrowserWindow({
-    closable: false
+  let win = new BrowserWindow();
+
+  const mainWindowListener = () => {
+    if (win) {
+      win.removeAllListeners();
+      win.close();
+      win = null;
+    }
+  };
+
+  let cleanupFn = null;
+  win.once('closed', () => {
+    mainWindow.webContents.send('opted-out-window-closed-unexpected');
+    if (cleanupFn) cleanupFn(`Window has been closed unexpectedly`);
+    mainWindow.removeListener('closed', mainWindowListener);
   });
+
+  mainWindow.on('closed', mainWindowListener);
+
   for (const mod of mods) {
+    if (!win) return;
     const { modManifest, addon } = mod;
     try {
       // eslint-disable-next-line no-loop-func
       await new Promise((resolve, reject) => {
         const modUrlDownloadPage = `https://www.curseforge.com/minecraft/mc-mods/${addon.slug}/download`;
         win.loadURL(modUrlDownloadPage);
-        win.webContents.session.on('will-download', (_, item) => {
+        cleanupFn = err => {
+          mainWindowListener();
+          reject(new Error(err));
+        };
+        const timer = setTimeout(
+          () => cleanupFn(`Download for ${modManifest.fileName} timed out`),
+          40000
+        );
+        win.webContents.session.once('will-download', (_, item) => {
           item.setSavePath(path.join(modDestFile, modManifest.fileName));
-
-          const timer = setTimeout(() => {
-            reject(new Error(`Download for ${modManifest.fileName} timed out`));
-          }, 30000);
 
           item.once('updated', () => {
             clearTimeout(timer);
@@ -633,24 +654,31 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
           });
         });
       });
-      // send success event to front end
-      mainWindow.webContents.send('opted-out-download-mod-status', {
-        modId: modManifest.id,
-        error: false
-      });
+      if (mainWindow?.webContents) {
+        // send success event to front end
+        mainWindow.webContents.send('opted-out-download-mod-status', {
+          modId: modManifest.id,
+          error: false
+        });
+      }
     } catch (err) {
-      // send error event to front end
-      mainWindow.webContents.send('opted-out-download-mod-status', {
-        modId: modManifest.id,
-        error: err
-      });
+      if (mainWindow?.webContents && win) {
+        // send error event to front end
+        mainWindow.webContents.send('opted-out-download-mod-status', {
+          modId: modManifest.id,
+          error: err
+        });
+      }
     }
   }
-  win.closable = true;
-  win.close();
-  win.on('closed', () => {
-    win = null;
-  });
+
+  if (win) {
+    win.removeAllListeners();
+    win.close();
+    win.once('closed', () => {
+      win = null;
+    });
+  }
 });
 
 ipcMain.handle('start-listener', async (e, dirPath) => {

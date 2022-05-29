@@ -1747,13 +1747,12 @@ export function processForgeManifest(instanceName) {
             modManifest.fileName
           );
 
-          if (!modManifest.downloadUrl) {
-            optedOutMods.push({ addon, modManifest });
-            return;
-          }
-
           const fileExists = await fse.pathExists(destFile);
           if (!fileExists) {
+            if (!modManifest.downloadUrl) {
+              optedOutMods.push({ addon, modManifest });
+              return;
+            }
             await downloadFile(destFile, modManifest.downloadUrl);
           }
           modManifests = modManifests.concat(
@@ -1770,21 +1769,35 @@ export function processForgeManifest(instanceName) {
       { concurrency }
     );
 
-    const modDestFile = path.join(
-      _getInstancesPath(state),
-      instanceName,
-      'mods'
-    );
-    await new Promise((resolve, reject) => {
-      dispatch(
-        openModal('OptedOutModsList', {
-          optedOutMods,
-          modDestFile,
-          resolve,
-          reject
-        })
+    if (optedOutMods.length) {
+      const modDestFile = path.join(
+        _getInstancesPath(state),
+        instanceName,
+        'mods'
       );
-    });
+      await new Promise((resolve, reject) => {
+        dispatch(
+          openModal('OptedOutModsList', {
+            optedOutMods,
+            modDestFile,
+            resolve,
+            reject,
+            abortCallback: () => {
+              setTimeout(
+                () => reject(new Error('Download Aborted by the user')),
+                300
+              );
+            }
+          })
+        );
+      });
+    }
+
+    modManifests = modManifests.concat(
+      ...optedOutMods.map(v =>
+        normalizeModData(v.modManifest, v.modManifest.projectID, v.addon.name)
+      )
+    );
 
     let validAddon = false;
     const addonPathZip = path.join(
@@ -1918,16 +1931,22 @@ export function downloadInstance(instanceName) {
       const instancesPath = _getInstancesPath(getState());
 
       if (isUpdate) {
-        dispatch(updateDownloadStatus(instanceName, 'Copying files...'));
+        dispatch(
+          updateDownloadStatus(instanceName, 'Creating restore point...')
+        );
 
         const oldInstancePath = path.join(instancesPath, instanceName);
 
         const sizeSrc = await getSize(oldInstancePath);
 
         const interval = setInterval(async () => {
-          const sizeDest = await getSize(newInstancePath);
-          const progress = (100 * sizeDest) / sizeSrc;
-          dispatch(updateDownloadProgress(progress));
+          try {
+            const sizeDest = await getSize(newInstancePath);
+            const progress = (100 * sizeDest) / sizeSrc;
+            dispatch(updateDownloadProgress(progress));
+          } catch {
+            // Doesn't matter too much
+          }
         }, 400);
 
         try {
@@ -2290,6 +2309,12 @@ export const startListener = () => {
         const isInConfig = (instance?.mods || []).find(
           mod => mod.fileName === path.basename(fileName)
         );
+
+        console.log(
+          isMod(fileName, instancesPath),
+          convertCompletePathToInstance(fileName, instancesPath)
+        );
+
         try {
           const stat = await fs.lstat(fileName);
 

@@ -83,18 +83,49 @@ const OptedOutModsList = ({
   const currentMod = downloading ? optedOutMods[loadedMods.length] : null;
 
   useEffect(() => {
-    ipcRenderer.once('opted-out-download-mod-status', (e, status) => {
+    const listener = () => {
+      dispatch(closeModal());
+      setTimeout(() => {
+        reject('Download window closed unexpectedly');
+      }, 300);
+    };
+
+    ipcRenderer.once('opted-out-window-closed-unexpected', listener);
+
+    return () => {
+      ipcRenderer.removeListener(
+        'opted-out-window-closed-unexpected',
+        listener
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    const listener = (e, status) => {
       if (!status.error) {
         if (optedOutMods.length === loadedMods.length + 1) {
           dispatch(closeModal());
-          resolve();
+          setTimeout(() => {
+            resolve();
+          }, 300);
         }
         setLoadedMods(prev => [...prev, status.modId]);
       } else {
         dispatch(closeModal());
-        reject(status.error);
+        setTimeout(() => {
+          reject(status.error);
+        }, 300);
       }
-    });
+    };
+
+    ipcRenderer.once('opted-out-download-mod-status', listener);
+
+    return () => {
+      ipcRenderer.removeListener(
+        'opted-out-window-closed-unexpected',
+        listener
+      );
+    };
   }, [loadedMods]);
 
   return (
@@ -105,9 +136,12 @@ const OptedOutModsList = ({
         overflow-x: hidden;
       `}
       preventClose={preventClose}
-      closeCallback={() =>
-        setTimeout(() => reject(new Error('Download Aborted by the user')), 300)
-      }
+      closeCallback={() => {
+        setTimeout(
+          () => reject(new Error('Download Aborted by the user')),
+          300
+        );
+      }}
       title="Opted out mods list"
     >
       <Container>

@@ -894,7 +894,7 @@ export const convertCompletePathToInstance = (f, instancesPath) => {
 };
 
 export const isMod = (fileName, instancesPath) =>
-  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
+  /^(\\|\/)([\w\d\-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(([^\\/])*))(\.jar|\.disabled))$/.test(
     convertCompletePathToInstance(fileName, instancesPath)
   );
 
