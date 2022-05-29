@@ -156,8 +156,6 @@ export const rollBackInstanceZip = async (
 
     const contentDir = await readdir(instancePath);
 
-    console.log('DIR', contentDir);
-
     await Promise.all(
       contentDir.map(async f => {
         try {
@@ -198,8 +196,6 @@ export const rollBackInstanceZip = async (
     const currentConfig = await readJson(
       path.join(instancePath, 'config.json')
     );
-
-    console.log('CONFIG', currentConfig);
 
     dispatch(updateInstanceConfig(instanceName, () => currentConfig));
 
@@ -247,7 +243,6 @@ export const marks =
 
 export const getSize = async dir => {
   return new Promise((resolve, reject) => {
-    console.log('SIZE', dir);
     getSizeCallback(dir)
       .then(({ size, errors }) => {
         if (errors) return reject(errors);
