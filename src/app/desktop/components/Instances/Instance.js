@@ -25,8 +25,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   _getInstance,
   _getInstancesPath,
-  _getDownloadQueue,
-  _getTempPath
+  _getDownloadQueue
 } from '../../../../common/utils/selectors';
 import {
   addStartedInstance,
@@ -35,10 +34,7 @@ import {
 } from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
 import instanceDefaultBackground from '../../../../common/assets/instance_default.png';
-import {
-  convertMinutesToHumanTime,
-  copyInstance
-} from '../../../../common/utils';
+import { convertMinutesToHumanTime } from '../../../../common/utils';
 import { FABRIC, FORGE, VANILLA } from '../../../../common/utils/constants';
 
 const Container = styled.div`
@@ -175,8 +171,6 @@ const Instance = ({ instanceName }) => {
   const startedInstances = useSelector(state => state.startedInstances);
   const instancesPath = useSelector(_getInstancesPath);
   const isInQueue = downloadQueue[instanceName];
-  const tempPath = useSelector(_getTempPath);
-  const newInstancePath = path.join(tempPath, instanceName);
 
   const isPlaying = startedInstances[instanceName];
 
@@ -394,8 +388,6 @@ const Instance = ({ instanceName }) => {
           <MenuItem
             disabled={Boolean(isInQueue) || Boolean(isPlaying)}
             onClick={async () => {
-              await copyInstance(newInstancePath, instancesPath, instanceName);
-
               let manifest = null;
               try {
                 manifest = JSON.parse(

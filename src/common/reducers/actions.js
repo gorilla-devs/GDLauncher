@@ -115,7 +115,12 @@ import {
   downloadFile,
   downloadInstanceFiles
 } from '../../app/desktop/utils/downloader';
-import { getFileMurmurHash2, removeDuplicates } from '../utils';
+import {
+  copyInstance,
+  getFileMurmurHash2,
+  getSize,
+  removeDuplicates
+} from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
@@ -1138,6 +1143,7 @@ export function addToQueue(
         true
       )
     );
+
     if (!currentDownload) {
       dispatch(updateCurrentDownload(instanceName));
       dispatch(downloadInstance(instanceName));
@@ -1906,6 +1912,32 @@ export function downloadInstance(instanceName) {
           vanillaManifest: { versions: mcVersions }
         }
       } = state;
+
+      const tempPath = _getTempPath(state);
+      const newInstancePath = path.join(tempPath, instanceName);
+      const instancesPath = _getInstancesPath(getState());
+
+      if (isUpdate) {
+        dispatch(updateDownloadStatus(instanceName, 'Copying files...'));
+
+        const oldInstancePath = path.join(instancesPath, instanceName);
+
+        const sizeSrc = await getSize(oldInstancePath);
+
+        const interval = setInterval(async () => {
+          const sizeDest = await getSize(newInstancePath);
+          const progress = (100 * sizeDest) / sizeSrc;
+          dispatch(updateDownloadProgress(progress));
+        }, 400);
+
+        try {
+          await copyInstance(newInstancePath, instancesPath, instanceName);
+        } catch (e) {
+          clearInterval(interval);
+          throw e;
+        }
+        clearInterval(interval);
+      }
 
       dispatch(updateDownloadStatus(instanceName, 'Downloading game files...'));
 

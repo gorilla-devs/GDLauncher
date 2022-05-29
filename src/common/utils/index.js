@@ -2,7 +2,8 @@ import { ipcRenderer } from 'electron';
 import lockfile from 'lockfile';
 import path from 'path';
 import { access, copy, readJson, remove } from 'fs-extra';
-import { readdir, unlink } from 'fs/promises';
+import { readdir } from 'fs/promises';
+import getSizeCallback from 'get-folder-size';
 
 export const sortByDate = (a, b) => {
   const dateA = new Date(a.fileDate);
@@ -155,12 +156,14 @@ export const rollBackInstanceZip = async (
 
     const contentDir = await readdir(instancePath);
 
+    console.log('DIR', contentDir);
+
     await Promise.all(
       contentDir.map(async f => {
         try {
           if (f !== 'config.json' && f !== 'installing.lock') {
             const filePath = path.join(instancesPath, instanceName, f);
-            await unlink(filePath);
+            await remove(filePath);
           }
         } catch (err) {
           console.error(err);
@@ -195,6 +198,8 @@ export const rollBackInstanceZip = async (
     const currentConfig = await readJson(
       path.join(instancePath, 'config.json')
     );
+
+    console.log('CONFIG', currentConfig);
 
     dispatch(updateInstanceConfig(instanceName, () => currentConfig));
 
@@ -239,3 +244,15 @@ export const marks =
   sysMemScaled > 6
     ? marksScaled.map(x => `${x / 1024} GB`)
     : marksScaled.map(x => `${x} MB`);
+
+export const getSize = async dir => {
+  return new Promise((resolve, reject) => {
+    console.log('SIZE', dir);
+    getSizeCallback(dir)
+      .then(({ size, errors }) => {
+        if (errors) return reject(errors);
+        return resolve(size);
+      })
+      .catch(e => reject(e));
+  });
+};
