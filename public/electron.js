@@ -613,6 +613,10 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
     }
   };
 
+  win.once('close', () => {
+    win = null;
+  });
+
   let cleanupFn = null;
   win.once('closed', () => {
     mainWindow.webContents.send('opted-out-window-closed-unexpected');
