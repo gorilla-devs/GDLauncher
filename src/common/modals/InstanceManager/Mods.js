@@ -513,20 +513,20 @@ const createItemData = memoize(
 );
 
 const sort = arr =>
-  arr.slice().sort((a, b) => a.fileName.localeCompare(b.fileName));
+  arr.slice().sort((a, b) => a.fileName?.localeCompare(b.fileName));
 
 const filter = (arr, search) =>
   arr.filter(
     mod =>
-      mod.fileName.toLowerCase().includes(search.toLowerCase()) ||
-      mod.displayName.toLowerCase().includes(search.toLowerCase())
+      mod.fileName?.toLowerCase()?.includes(search?.toLowerCase()) ||
+      mod.displayName?.toLowerCase()?.includes(search?.toLowerCase())
   );
 
 const getFileType = file => {
   const fileName = file.name;
   let fileType = '';
 
-  const splitFileName = fileName.split('.');
+  const splitFileName = fileName?.split('.');
   if (splitFileName.length) {
     fileType = splitFileName[splitFileName.length - 1];
   }

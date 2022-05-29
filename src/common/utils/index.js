@@ -217,15 +217,21 @@ export const copyInstance = async (
   instancesPath,
   instanceName
 ) => {
-  try {
-    await access(newInstancePath);
-    await remove(newInstancePath);
-  } finally {
-    await copy(path.join(instancesPath, instanceName), newInstancePath, {
-      recursive: true,
-      overwrite: true
-    });
-  }
+  access(newInstancePath, async error => {
+    if (error) {
+      await copy(path.join(instancesPath, instanceName), newInstancePath, {
+        recursive: true,
+        overwrite: true
+      });
+    } else {
+      await access(newInstancePath);
+      await remove(newInstancePath);
+      await copy(path.join(instancesPath, instanceName), newInstancePath, {
+        recursive: true,
+        overwrite: true
+      });
+    }
+  });
 };
 
 export const scaleMem = x => Math.log2(x / 1024);
