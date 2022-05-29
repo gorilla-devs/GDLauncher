@@ -1754,10 +1754,10 @@ export function processForgeManifest(instanceName) {
               return;
             }
             await downloadFile(destFile, modManifest.downloadUrl);
+            modManifests = modManifests.concat(
+              normalizeModData(modManifest, item.projectID, addon.name)
+            );
           }
-          modManifests = modManifests.concat(
-            normalizeModData(modManifest, item.projectID, addon.name)
-          );
           const percentage =
             (modManifests.length * 100) / manifest.files.length - 1;
 
