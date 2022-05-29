@@ -14,7 +14,7 @@ import {
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
-import { copyInstance } from '../../utils';
+import { makeInstanceRestorePoint } from '../../utils';
 
 const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const [files, setFiles] = useState([]);
@@ -127,7 +127,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   };
 
   const handleChange = value => setSelectedIndex(value);
-  const newInstancePath = path.join(tempPath, instanceName);
+  const newInstancePath = path.join(tempPath, `${instanceName}__RESTORE`);
 
   return (
     <Container>
@@ -206,7 +206,11 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
         disabled={selectedIndex === null}
         onClick={async () => {
           setInstalling(true);
-          await copyInstance(newInstancePath, instancesPath, instanceName);
+          await makeInstanceRestorePoint(
+            newInstancePath,
+            instancesPath,
+            instanceName
+          );
           await dispatch(
             changeModpackVersion(instanceName, files[selectedIndex])
           );

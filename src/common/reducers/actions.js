@@ -3,7 +3,7 @@ import path from 'path';
 import { ipcRenderer } from 'electron';
 import { v5 as uuid } from 'uuid';
 import { machineId } from 'node-machine-id';
-import fse from 'fs-extra';
+import fse, { remove } from 'fs-extra';
 import coerce from 'semver/functions/coerce';
 import gte from 'semver/functions/gte';
 import lt from 'semver/functions/lt';
@@ -116,9 +116,9 @@ import {
   downloadInstanceFiles
 } from '../../app/desktop/utils/downloader';
 import {
-  copyInstance,
   getFileMurmurHash2,
   getSize,
+  makeInstanceRestorePoint,
   removeDuplicates
 } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
@@ -1919,15 +1919,16 @@ export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const { loader, manifest, isUpdate } = _getCurrentDownloadItem(state);
-    try {
-      const {
-        app: {
-          vanillaManifest: { versions: mcVersions }
-        }
-      } = state;
+    const {
+      app: {
+        vanillaManifest: { versions: mcVersions }
+      }
+    } = state;
 
-      const tempPath = _getTempPath(state);
-      const newInstancePath = path.join(tempPath, instanceName);
+    const tempPath = _getTempPath(state);
+    const tempInstancePath = path.join(tempPath, `${instanceName}__RESTORE`);
+
+    try {
       const instancesPath = _getInstancesPath(getState());
 
       if (isUpdate) {
@@ -1941,7 +1942,7 @@ export function downloadInstance(instanceName) {
 
         const interval = setInterval(async () => {
           try {
-            const sizeDest = await getSize(newInstancePath);
+            const sizeDest = await getSize(tempInstancePath);
             const progress = (100 * sizeDest) / sizeSrc;
             dispatch(updateDownloadProgress(progress));
           } catch {
@@ -1950,12 +1951,16 @@ export function downloadInstance(instanceName) {
         }, 400);
 
         try {
-          await copyInstance(newInstancePath, instancesPath, instanceName);
-        } catch (e) {
+          await makeInstanceRestorePoint(
+            tempInstancePath,
+            instancesPath,
+            instanceName
+          );
           clearInterval(interval);
-          throw e;
+        } catch (e) {
+          console.warn(e);
+          clearInterval(interval);
         }
-        clearInterval(interval);
       }
 
       dispatch(updateDownloadStatus(instanceName, 'Downloading game files...'));
@@ -2109,6 +2114,8 @@ export function downloadInstance(instanceName) {
           isUpdate
         })
       );
+    } finally {
+      await remove(tempInstancePath);
     }
   };
 }
