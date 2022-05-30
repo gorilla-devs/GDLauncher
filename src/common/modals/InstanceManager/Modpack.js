@@ -129,7 +129,7 @@ const Modpack = ({ modpackId, instanceName, manifest }) => {
 
   const handleChange = value => setSelectedIndex(value);
   const newInstancePath = path.join(tempPath, `${instanceName}__RESTORE`);
-  console.log('files', files);
+
   return (
     <Container>
       Installed version: {versionName}
