@@ -14,11 +14,19 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-conter: space-between;
-  gap: 10px;
-  overflow-y: auto;
   align-items: center;
   text-align: center;
   color: ${props => props.theme.palette.text.primary};
+`;
+
+const ModsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  width: 100%;
+  height: 100%;
+  max-height: 250px;
 `;
 
 const RowContainer = styled.div`
@@ -80,6 +88,7 @@ const OptedOutModsList = ({
     x => x.modalType === 'OptedOutModsList'
   );
 
+  console.log('optedOutMods', optedOutMods);
   const currentMod = downloading ? optedOutMods[loadedMods.length] : null;
 
   useEffect(() => {
@@ -145,10 +154,16 @@ const OptedOutModsList = ({
       title="Opted out mods list"
     >
       <Container>
-        {optedOutMods &&
-          optedOutMods.map(mod => (
-            <ModRow mod={mod} loadedMods={loadedMods} currentMod={currentMod} />
-          ))}
+        <ModsContainer>
+          {optedOutMods &&
+            optedOutMods.map(mod => (
+              <ModRow
+                mod={mod}
+                loadedMods={loadedMods}
+                currentMod={currentMod}
+              />
+            ))}
+        </ModsContainer>
         <div
           css={`
             display: flex;
