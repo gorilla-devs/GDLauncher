@@ -231,12 +231,17 @@ export const makeInstanceRestorePoint = async (
   try {
     await access(newInstancePath);
     await remove(newInstancePath);
-  } finally {
-    await makeDir(newInstancePath);
+  } catch (e) {
+    console.warn(e);
+  }
+  await makeDir(newInstancePath);
+  try {
     await copy(path.join(instancesPath, instanceName), newInstancePath, {
       recursive: true,
       overwrite: true
     });
+  } catch (e) {
+    console.warn(e);
   }
 };
 

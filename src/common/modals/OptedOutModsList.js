@@ -88,7 +88,6 @@ const OptedOutModsList = ({
     x => x.modalType === 'OptedOutModsList'
   );
 
-  console.log('optedOutMods', optedOutMods);
   const currentMod = downloading ? optedOutMods[loadedMods.length] : null;
 
   useEffect(() => {

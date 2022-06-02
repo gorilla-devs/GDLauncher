@@ -1101,13 +1101,15 @@ export function addToQueue(
   background,
   timePlayed,
   settings = {},
-  isUpdate
+  updateOptions
 ) {
   return async (dispatch, getState) => {
     const state = getState();
     const { currentDownload } = state;
     const patchedSettings =
       typeof settings === 'object' && settings !== null ? settings : {};
+
+    const { isUpdate, bypassCopy } = updateOptions || {};
 
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
@@ -1116,6 +1118,7 @@ export function addToQueue(
       manifest,
       background,
       isUpdate,
+      bypassCopy,
       ...patchedSettings
     });
 
@@ -1738,16 +1741,19 @@ export function processForgeManifest(instanceName) {
           if (tries !== 1) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
+
           const addon = addonsHashmap[item.projectID];
+          const isResourcePack = addon.classId === 12;
           const modManifest = addonsFilesHashmap[item.projectID];
           const destFile = path.join(
             _getInstancesPath(state),
             instanceName,
-            addon?.categorySection?.path || 'mods',
+            isResourcePack ? 'resourcepacks' : 'mods',
             modManifest.fileName
           );
 
           const fileExists = await fse.pathExists(destFile);
+
           if (!fileExists) {
             if (!modManifest.downloadUrl) {
               optedOutMods.push({ addon, modManifest });
@@ -1918,7 +1924,8 @@ export function processForgeManifest(instanceName) {
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
-    const { loader, manifest, isUpdate } = _getCurrentDownloadItem(state);
+    const { loader, manifest, isUpdate, bypassCopy } =
+      _getCurrentDownloadItem(state);
     const {
       app: {
         vanillaManifest: { versions: mcVersions }
@@ -1931,7 +1938,7 @@ export function downloadInstance(instanceName) {
     try {
       const instancesPath = _getInstancesPath(getState());
 
-      if (isUpdate) {
+      if (isUpdate && !bypassCopy) {
         dispatch(
           updateDownloadStatus(instanceName, 'Creating restore point...')
         );
@@ -2228,7 +2235,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           `background${path.extname(imageURL)}`,
           undefined,
           undefined,
-          true
+          { isUpdate: true, bypassCopy: true }
         )
       );
     } else if (instance.loader.source === FTB) {
@@ -2315,11 +2322,6 @@ export const startListener = () => {
         const instance = _getInstance(newState)(instanceName);
         const isInConfig = (instance?.mods || []).find(
           mod => mod.fileName === path.basename(fileName)
-        );
-
-        console.log(
-          isMod(fileName, instancesPath),
-          convertCompletePathToInstance(fileName, instancesPath)
         );
 
         try {

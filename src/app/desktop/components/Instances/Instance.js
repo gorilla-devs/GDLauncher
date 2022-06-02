@@ -407,7 +407,7 @@ const Instance = ({ instanceName }) => {
                   instance.background,
                   instance.timePlayed,
                   {},
-                  true
+                  { isUpdate: true }
                 )
               );
             }}

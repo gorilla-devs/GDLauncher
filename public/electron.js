@@ -632,17 +632,14 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
     try {
       // eslint-disable-next-line no-loop-func
       await new Promise((resolve, reject) => {
-        // not sure if there is another way to check if it's a resourcePack or a mod
-        const isResourcePack = modManifest.fileName.includes('.zip');
-        const modUrlDownloadPage = `https://www.curseforge.com/minecraft/mc-mods/${addon.slug}/download/${addon.mainFileId}`;
-        const resourcePackUrlDownloadPage = `https://www.curseforge.com/minecraft/texture-packs/${addon.slug}/download/${addon.mainFileId}`;
+        const urlDownloadPage = `${addon.links.websiteUrl}/download/${addon.mainFileId}`;
 
-        win.loadURL(
-          isResourcePack ? resourcePackUrlDownloadPage : modUrlDownloadPage
-        );
-        cleanupFn = err => {
-          mainWindowListener();
+        win.loadURL(urlDownloadPage);
+        cleanupFn = async err => {
           reject(new Error(err));
+          // eslint-disable-next-line promise/param-names
+          await new Promise(r => setTimeout(r, 50));
+          mainWindowListener();
         };
         const timer = setTimeout(
           () => cleanupFn(`Download for ${modManifest.fileName} timed out`),
