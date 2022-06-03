@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import originalFs from 'original-fs';
 import fse from 'fs-extra';
-import { extractFull } from 'node-7z';
+import * as Seven from 'node-7z';
 import jimp from 'jimp/es';
 import makeDir from 'make-dir';
 import { promisify } from 'util';
@@ -393,6 +393,43 @@ export const get7zPath = async () => {
 
 get7zPath();
 
+export const extract = async (
+  source,
+  destination,
+  args = {},
+  funcs = {}
+) => {
+  const sevenZipPath = await get7zPath();
+  const extraction = Seven.extract(source, destination, {
+    ...args,
+    yes: true,
+    $bin: sevenZipPath,
+    $spawnOptions: { shell: true }
+  });
+  let extractedParentDir = null;
+  await new Promise((resolve, reject) => {
+    if (funcs.progress) {
+      extraction.on('progress', ({ percent }) => {
+        funcs.progress(percent);
+      });
+    }
+    extraction.on('data', data => {
+      if (!extractedParentDir) {
+        [extractedParentDir] = data.file.split('/');
+      }
+    });
+    extraction.on('end', () => {
+      funcs.end?.();
+      resolve(extractedParentDir);
+    });
+    extraction.on('error', err => {
+      funcs.error?.();
+      reject(err);
+    });
+  });
+  return { extraction, extractedParentDir };
+};
+
 export const extractAll = async (
   source,
   destination,
@@ -400,7 +437,7 @@ export const extractAll = async (
   funcs = {}
 ) => {
   const sevenZipPath = await get7zPath();
-  const extraction = extractFull(source, destination, {
+  const extraction = Seven.extractFull(source, destination, {
     ...args,
     yes: true,
     $bin: sevenZipPath,

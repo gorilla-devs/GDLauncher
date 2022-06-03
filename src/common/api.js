@@ -13,10 +13,16 @@ import {
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
   FTB_API_URL,
+  MODRINTH_API_URL,
   JAVA_LATEST_MANIFEST_URL
 } from './utils/constants';
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
+import { downloadFile } from '../app/desktop/utils/downloader';
+import { extractAll } from '../app/desktop/utils';
+import path from 'path';
+import fse from 'fs-extra';
+import os from 'os';
 
 const axioInstance = axios.create({
   headers: {
@@ -28,6 +34,10 @@ const axioInstance = axios.create({
 
 const trackFTBAPI = () => {
   ga.sendCustomEvent('FTBAPICall');
+};
+
+const trackModrinthAPI = () => {
+  //ga.sendCustomEvent('ModrinthAPICall');
 };
 
 const trackCurseForgeAPI = () => {
@@ -409,4 +419,150 @@ export const getFTBSearch = async searchText => {
   trackFTBAPI();
   const url = `${FTB_API_URL}/modpack/search/1000?term=${searchText}`;
   return axios.get(url);
+};
+
+export const getModrinthMostPlayedModpacks = async (offset = 0) => {
+  trackModrinthAPI();
+  const url = `${MODRINTH_API_URL}/search?limit=20&offset=${offset}&index=downloads&facets=[["project_type:modpack"]]`;
+  const { data } = await axios.get(url);
+  return data;
+};
+
+export const getModrinthSearchResults = async (searchText, offset = 0) => {
+  trackModrinthAPI();
+  const url = `${MODRINTH_API_URL}/search?limit=20&offset=${offset}&query=${searchText}&index=relevance&facets=[["project_type:modpack"]]`;
+  const { data } = await axios.get(url);
+  return data;
+};
+
+export const getModrinthModpack = async modpackId => {
+  trackModrinthAPI();
+  try {
+    const url = `${MODRINTH_API_URL}/project/${modpackId}`;
+    const { data } = await axios.get(url);
+    return fixModrinthModpackObject(data);
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getModrinthModpacks = async modpackIds => {
+  trackModrinthAPI();
+  try {
+    const url = `${MODRINTH_API_URL}/projects?ids=${JSON.stringify(
+      modpackIds
+    )}`;
+    const { data } = await axios.get(url);
+    return data.map(fixModrinthModpackObject);
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getModrinthModpackVersionList = async modpackId => {
+  trackModrinthAPI();
+  try {
+    const url = `${MODRINTH_API_URL}/project/${modpackId}/versions`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getModrinthModpackVersion = async versionId => {
+  trackModrinthAPI();
+  try {
+    const url = `${MODRINTH_API_URL}/version/${versionId}`;
+    const { data } = await axios.get(url);
+    return fixModrinthModpackObject(data);
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+// TODO: Move override logic out of this function
+// TODO: Do overrides need to be applied after the pack is installed?
+export const getModrinthModpackVersionManifest = async (
+  versionId,
+  instancePath
+) => {
+  try {
+    // get download link for the metadata archive
+    const version = await getModrinthModpackVersion(versionId);
+    const file = version.files.find(file => file.filename.endsWith('.mrpack'));
+
+    // clean temp directory
+    const tmp = path.join(os.tmpdir(), 'GDLauncher_Download');
+    await fse.rm(tmp, { recursive: true, force: true });
+
+    // download metadata archive
+    await downloadFile(path.join(tmp, file.filename), file.url);
+
+    // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
+    await new Promise(resolve => {
+      setTimeout(() => resolve(), 500);
+    });
+
+    // extract archive to temp folder
+    await extractAll(path.join(tmp, file.filename), tmp, { yes: true });
+
+    await fse.move(path.join(tmp, 'overrides'), path.join(instancePath), {
+      overwrite: true
+    });
+
+    // move manifest to instance root
+    await fse.move(
+      path.join(tmp, 'modrinth.index.json'),
+      path.join(instancePath, 'modrinth.index.json'),
+      { overwrite: true }
+    );
+
+    // clean temp directory
+    await fse.rm(tmp, { recursive: true, force: true });
+
+    const manifest = await fse.readJson(
+      path.join(instancePath, 'modrinth.index.json')
+    );
+
+    return manifest;
+  } catch (err) {
+    console.error(err);
+
+    return { status: 'error' };
+  }
+};
+
+export const getModrinthModpackVersions = async versionIds => {
+  trackModrinthAPI();
+  try {
+    const url = `${MODRINTH_API_URL}/versions?ids=${JSON.stringify(
+      versionIds
+    )}`;
+    const { data } = await axios.get(url);
+    return data || [];
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const getModrinthModpackVersionChangelog = async versionId => {
+  return (await getModrinthModpackVersion(versionId)).changelog;
+};
+
+export const getModrinthUser = async userId => {
+  trackModrinthAPI();
+  try {
+    const url = `${MODRINTH_API_URL}/user/${userId}`;
+    const { data } = await axios.get(url);
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fixModrinthModpackObject = modpack => {
+  modpack.name = modpack.title;
+  delete modpack.title;
+  return modpack;
 };

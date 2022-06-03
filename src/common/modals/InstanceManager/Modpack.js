@@ -8,12 +8,17 @@ import {
   getAddonFileChangelog,
   getFTBModpackData,
   getFTBChangelog,
-  getFTBModpackVersionData
+  getFTBModpackVersionData,
+  getModrinthModpack,
+  getModrinthModpackVersion,
+  getModrinthModpackVersions
 } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
+import { CURSEFORGE, FTB, MODRINTH } from '../../utils/constants';
+import pMap from 'p-map';
 
-const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
+const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
   const [files, setFiles] = useState([]);
   const [versionName, setVersionName] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -32,51 +37,100 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
     }
   };
 
+  const convertModrinthReleaseType = type => {
+    switch (type) {
+      case 'release':
+        return 1;
+      case 'beta':
+        return 2;
+      default:
+        return 3;
+    }
+  };
+
   const initData = async () => {
     setLoading(true);
-    if (manifest) {
-      setVersionName(`${manifest?.name} - ${manifest?.version}`);
-      const data = await getAddonFiles(modpackId);
-      const mappedFiles = await Promise.all(
-        data.map(async v => {
-          const changelog = await getAddonFileChangelog(modpackId, v.id);
+
+    switch (source) {
+      case CURSEFORGE: {
+        setVersionName(`${manifest?.name} - ${manifest?.version}`);
+        const data = await getAddonFiles(modpackId);
+        const mappedFiles = await Promise.all(
+          data.map(async v => {
+            const changelog = await getAddonFileChangelog(modpackId, v.id);
+            return {
+              ...v,
+              changelog
+            };
+          })
+        );
+        setFiles(mappedFiles);
+        break;
+      }
+      case FTB: {
+        const ftbModpack = await getFTBModpackData(modpackId);
+
+        setVersionName(
+          `${ftbModpack.name} - ${
+            ftbModpack.versions.find(modpack => modpack.id === fileID).name
+          }`
+        );
+
+        const mappedVersions = await Promise.all(
+          ftbModpack.versions.map(async version => {
+            const changelog = await getFTBChangelog(modpackId, version.id);
+            const newModpack = await getFTBModpackVersionData(
+              modpackId,
+              version.id
+            );
+
+            return {
+              displayName: `${ftbModpack.name} ${version.name}`,
+              id: version.id,
+              gameVersions: [newModpack.targets[1]?.version],
+              releaseType: convertFtbReleaseType(version.type),
+              fileDate: version.updated * 1000,
+              imageUrl: ftbModpack.art[0].url,
+              changelog: changelog.content
+            };
+          })
+        );
+
+        setFiles(mappedVersions);
+        break;
+      }
+      case MODRINTH: {
+        const modpack = await getModrinthModpack(modpackId);
+        const versions = (
+          await getModrinthModpackVersions(modpack.versions)
+        ).sort(
+          (a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)
+        );
+        setVersionName(
+          `${modpack.name} - ${
+            versions.find(version => version.id === fileID).name
+          }`
+        );
+
+        const mappedVersions = await pMap(versions, async version => {
           return {
-            ...v,
-            changelog
-          };
-        })
-      );
-      setFiles(mappedFiles);
-    } else {
-      const ftbModpack = await getFTBModpackData(modpackId);
-
-      setVersionName(
-        `${ftbModpack.name} - ${
-          ftbModpack.versions.find(modpack => modpack.id === fileID).name
-        }`
-      );
-
-      const mappedVersions = await Promise.all(
-        ftbModpack.versions.map(async version => {
-          const changelog = await getFTBChangelog(modpackId, version.id);
-          const newModpack = await getFTBModpackVersionData(
-            modpackId,
-            version.id
-          );
-
-          return {
-            displayName: `${ftbModpack.name} ${version.name}`,
+            displayName: `${modpack.name} ${version.name}`,
             id: version.id,
-            gameVersions: [newModpack.targets[1]?.version],
-            releaseType: convertFtbReleaseType(version.type),
-            fileDate: version.updated * 1000,
-            imageUrl: ftbModpack.art[0].url,
-            changelog: changelog.content
+            gameVersions: version.game_versions,
+            releaseType: convertModrinthReleaseType(version.version_type),
+            fileDate: Date.parse(version.date_published),
+            imageUrl:
+              modpack.gallery?.find(img => img.featured)?.url ||
+              modpack.gallery?.at(0)?.url ||
+              modpack.icon_url ||
+              '',
+            changelog: version.changelog
           };
-        })
-      );
+        });
 
-      setFiles(mappedVersions);
+        setFiles(mappedVersions || []);
+        break;
+      }
     }
     setLoading(false);
   };
@@ -140,7 +194,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
           disabled={loading}
           virtual={false}
         >
-          {(files || []).map((file, index) => (
+          {files.map((file, index) => (
             <Select.Option title={file.displayName} key={file.id} value={index}>
               <div
                 css={`
