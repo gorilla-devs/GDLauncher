@@ -167,14 +167,13 @@ const OptedOutModsList = ({
           css={`
             display: flex;
             width: 100%;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
             gap: 20px;
             margin-top: 20px;
           `}
         >
           <Button
-            type="primary"
             danger
             disabled={downloading}
             onClick={() => {
