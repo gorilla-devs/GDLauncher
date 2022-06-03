@@ -632,7 +632,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
     try {
       // eslint-disable-next-line no-loop-func
       await new Promise((resolve, reject) => {
-        const urlDownloadPage = `${addon.links.websiteUrl}/download/${addon.mainFileId}`;
+        const urlDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
 
         win.loadURL(urlDownloadPage);
         cleanupFn = async err => {
