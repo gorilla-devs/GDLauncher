@@ -1879,10 +1879,7 @@ export function processModrinthManifest(instanceName) {
     const state = getState();
     const { manifest, loader } = _getCurrentDownloadItem(state);
     const { files } = manifest;
-    // TODO: Filter files here to only allow domains listed here: https://docs.modrinth.com/docs/modpacks/format_definition/
-    const totalModsRequired = files.filter(
-      file => file.env?.client === 'required'
-    ).length;
+    const totalModsRequired = files.length;
 
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
@@ -1923,14 +1920,18 @@ export function processModrinthManifest(instanceName) {
         const sha512 = crypto.createHash('sha512').update(buf).digest('hex');
 
         if (sha1 === item.hashes.sha1 && sha512 === item.hashes.sha512)
+        {
           return {
             ...item,
             path: filePath,
             //sha1,
             sha512
           };
-
-        return null;
+        } else {
+          console.error(`Mod at "${item.path}" failed to download: hashes did not match`);
+          // TODO: Attempt to re-download here?
+          return null;
+        }
       },
       { concurrency }
     );
@@ -2336,7 +2337,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           default:
             // TODO: Show the user an error message here, as an unsupported loader was requested
             console.error(
-              `Instance "${instanceName}" requires and unsupported loader: ${loaderType}`
+              `Instance "${instanceName}" requires an unsupported loader: ${loaderType}`
             );
             return;
         }
