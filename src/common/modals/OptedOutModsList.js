@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spin } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
 import Modal from '../components/Modal';
@@ -54,16 +56,25 @@ const RowContainer = styled.div`
   }
 `;
 
-const ModRow = ({ mod, loadedMods, currentMod }) => {
-  const { modManifest } = mod;
+const ModRow = ({ mod, loadedMods, currentMod, missingMods }) => {
+  const { modManifest, addon } = mod;
   const loaded = loadedMods.includes(modManifest.id);
+  const missing = missingMods.includes(modManifest.id);
 
   const isCurrentMod = currentMod?.modManifest?.id === modManifest.id;
 
   return (
     <RowContainer>
-      <div>{modManifest?.displayName}</div>
-      {loaded && <div className="dot" />}
+      <div>{`${addon?.name} - ${modManifest?.displayName}`}</div>
+      {loaded && !missing && <div className="dot" />}
+      {loaded && missing && (
+        <FontAwesomeIcon
+          icon={faExclamationTriangle}
+          css={`
+            color: ${props => props.theme.palette.colors.yellow};
+          `}
+        />
+      )}
       {!loaded && isCurrentMod && (
         <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
       )}
@@ -79,6 +90,7 @@ const OptedOutModsList = ({
   preventClose
 }) => {
   const [loadedMods, setLoadedMods] = useState([]);
+  const [missingMods, setMissingMods] = useState([]);
   const [downloading, setDownloading] = useState(false);
 
   const dispatch = useDispatch();
@@ -112,12 +124,13 @@ const OptedOutModsList = ({
     const listener = (e, status) => {
       if (!status.error) {
         if (optedOutMods.length === loadedMods.length + 1) {
-          dispatch(closeModal());
+          if (missingMods.length === 0) dispatch(closeModal());
           setTimeout(() => {
             resolve();
           }, 300);
         }
         setLoadedMods(prev => [...prev, status.modId]);
+        if (status.warning) setMissingMods(prev => [...prev, status.modId]);
       } else {
         dispatch(closeModal());
         setTimeout(() => {
@@ -134,7 +147,7 @@ const OptedOutModsList = ({
         listener
       );
     };
-  }, [loadedMods]);
+  }, [loadedMods, missingMods]);
 
   return (
     <Modal
@@ -160,6 +173,7 @@ const OptedOutModsList = ({
                 mod={mod}
                 loadedMods={loadedMods}
                 currentMod={currentMod}
+                missingMods={missingMods}
               />
             ))}
         </ModsContainer>
@@ -186,37 +200,51 @@ const OptedOutModsList = ({
           >
             Cancel
           </Button>
-          <Button
-            type="primary"
-            disabled={downloading}
-            onClick={() => {
-              setDownloading(true);
+          {missingMods.length === 0 && (
+            <Button
+              type="primary"
+              disabled={downloading}
+              onClick={() => {
+                setDownloading(true);
 
-              dispatch({
-                type: UPDATE_MODAL,
-                modals: [
-                  ...modals.slice(0, optedOutModalIndex),
-                  {
-                    modalType: 'OptedOutModsList',
-                    modalProps: {
-                      ...modals[optedOutModalIndex].modalProps,
-                      preventClose: true
-                    }
-                  },
-                  ...modals.slice(optedOutModalIndex + 1)
-                ]
-              });
-              ipcRenderer.invoke('download-optedout-mods', {
-                mods: optedOutMods,
-                modDestFile
-              });
-            }}
-            css={`
-              background-color: ${props => props.theme.palette.colors.green};
-            `}
-          >
-            Confirm
-          </Button>
+                dispatch({
+                  type: UPDATE_MODAL,
+                  modals: [
+                    ...modals.slice(0, optedOutModalIndex),
+                    {
+                      modalType: 'OptedOutModsList',
+                      modalProps: {
+                        ...modals[optedOutModalIndex].modalProps,
+                        preventClose: true
+                      }
+                    },
+                    ...modals.slice(optedOutModalIndex + 1)
+                  ]
+                });
+                ipcRenderer.invoke('download-optedout-mods', {
+                  mods: optedOutMods,
+                  modDestFile
+                });
+              }}
+              css={`
+                background-color: ${props => props.theme.palette.colors.green};
+              `}
+            >
+              Confirm
+            </Button>
+          )}
+          {missingMods.length > 0 && (
+            <Button
+              type="primary"
+              disabled={downloading}
+              onClick={() => dispatch(closeModal())}
+              css={`
+                background-color: ${props => props.theme.palette.colors.green};
+              `}
+            >
+              Continue
+            </Button>
+          )}
         </div>
       </Container>
     </Modal>

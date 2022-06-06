@@ -634,6 +634,20 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
       await new Promise((resolve, reject) => {
         const urlDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
 
+        win.webContents.session.webRequest.onCompleted(
+          { urls: [urlDownloadPage] },
+          details => {
+            if (details.statusCode === 404) {
+              resolve();
+              mainWindow.webContents.send('opted-out-download-mod-status', {
+                modId: modManifest.id,
+                error: false,
+                warning: true
+              });
+            }
+          }
+        );
+
         win.loadURL(urlDownloadPage);
         cleanupFn = async err => {
           reject(new Error(err));
