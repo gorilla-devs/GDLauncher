@@ -1,4 +1,4 @@
-// Data from https://docs.modrinth.com/api-spec/
+// Modrinth type data from https://docs.modrinth.com/api-spec/
 
 /**
  * @typedef {Object} ModrinthProject Projects can be mods or modpacks and are created by users.
@@ -27,8 +27,9 @@
  * @property {'approved'|'rejected'|'draft'|'unlisted'|'archived'|'processing'|'unknown'} status The status of the project
  * @property {ModrinthLicense?} license The license of the project
  * @property {string[]} versions A list of the version IDs of the project (will never be empty unless `draft` status)
- * @property {ModrinthGalleryImage[]} A list of images that have been uploaded to the project's gallery
+ * @property {ModrinthGalleryImage[]} gallery A list of images that have been uploaded to the project's gallery
  */
+
 
 /**
  * @typedef {Object} ModrinthVersion Versions contain download links to files with additional metadata.
