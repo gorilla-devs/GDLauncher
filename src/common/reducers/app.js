@@ -74,6 +74,15 @@ function curseforgeVersionIds(state = {}, action) {
   }
 }
 
+function modrinthCategories(state = [], action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_MODRINTH_CATEGORIES:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function javaManifest(state = {}, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_JAVA_MANIFEST:
@@ -131,5 +140,6 @@ export default combineReducers({
   clientToken,
   isNewUser,
   lastUpdateVersion,
-  curseforgeVersionIds
+  curseforgeVersionIds,
+  modrinthCategories
 });

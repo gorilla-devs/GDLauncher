@@ -34,7 +34,9 @@ import {
 } from '../../utils/constants';
 import {
   getFTBModpackVersionData,
-  getModrinthModpackVersionManifest
+  getModrinthModpackVersion,
+  getModrinthModpackVersionManifest,
+  getModrinthModpackVersions
 } from '../../api';
 
 const InstanceName = ({
@@ -309,27 +311,32 @@ const InstanceName = ({
         )
       );
     } else if (isModrinthModpack) {
+      //! manifest.dependencies and fullVersion.dependencies are different things!
+      // manifest.dependencies contains only the game version and loader version (referred to here as mainDependencies)
+      // fullVersion.dependencies contains objects with mod ids
+
+      const fullVersion = await getModrinthModpackVersion(version?.fileID);
+
       const manifest = await getModrinthModpackVersionManifest(
         version?.fileID,
         path.join(instancesPath, localInstanceName)
       );
 
       const mcVersion = manifest.dependencies.minecraft;
-      const dependencies = Object.keys(manifest.dependencies);
+      const mainDependencies = Object.keys(manifest.dependencies);
       let loaderType;
       let loaderVersion;
-      if (dependencies.includes('fabric-loader')) {
+      if (mainDependencies.includes('fabric-loader')) {
         loaderType = FABRIC;
         loaderVersion = manifest.dependencies['fabric-loader'];
-      } else if (dependencies.includes('forge')) {
+      } else if (mainDependencies.includes('forge')) {
         loaderType = FORGE;
         loaderVersion = convertcurseForgeToCanonical(
           manifest.dependencies['forge'],
           mcVersion,
           forgeManifest
         );
-      }
-      else if (dependencies.includes('quilt-loader')) {
+      } else if (mainDependencies.includes('quilt-loader')) {
         // we don't support Quilt yet, so we can't proceed with the installation
         // TODO: an error message should be shown to the user
         console.error('Quilt modpacks are not yet supported.');
@@ -338,6 +345,17 @@ const InstanceName = ({
 
         // loaderType = QUILT;
         // loaderVersion = manifest.dependencies['quilt-loader'];
+      }
+
+      if (fullVersion.dependencies.length > 0) {
+        // the pack author has set up their pack using modrinth dependencies, so replace whatever was in the manifest
+        manifest.dependencies = await getModrinthModpackVersions(
+          fullVersion.dependencies.map(dep => dep.version_id)
+        );
+        // TODO: Mods may have dependencies of their own, should this be resolved here?
+      } else {
+        // the pack author has not defined any modrinth dependencies, we'll have to make do with what we have
+        manifest.dependencies = null;
       }
 
       const loader = {
@@ -350,14 +368,16 @@ const InstanceName = ({
         sourceName: originalMcName
       };
 
-      await downloadFile(
-        path.join(
-          instancesPath,
-          localInstanceName,
-          `background${path.extname(imageURL)}`
-        ),
-        imageURL
-      );
+      if (imageURL) {
+        await downloadFile(
+          path.join(
+            instancesPath,
+            localInstanceName,
+            `background${path.extname(imageURL)}`
+          ),
+          imageURL
+        );
+      }
 
       dispatch(
         addToQueue(

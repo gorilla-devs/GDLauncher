@@ -48,7 +48,7 @@ import {
 } from '../utils/constants';
 import {
   getAddon,
-  getAddonCategories,
+  getCurseForgeCategories,
   getAddonFile,
   getAddonFiles,
   getAddonsByFingerprint,
@@ -61,6 +61,7 @@ import {
   getJavaManifest,
   getMcManifest,
   getModrinthModpackVersionManifest,
+  getModrinthCategories,
   getMultipleAddons,
   mcAuthenticate,
   mcInvalidate,
@@ -71,7 +72,10 @@ import {
   msAuthenticateXSTS,
   msExchangeCodeForAccessToken,
   msMinecraftProfile,
-  msOAuthRefresh
+  msOAuthRefresh,
+  getModrinthModpackVersion,
+  getModrinthModpackVersions,
+  getModrinthModpack
 } from '../api';
 import {
   _getAccounts,
@@ -164,13 +168,23 @@ export function initManifests() {
       });
       return java;
     };
-    const getAddonCategoriesVersions = async () => {
-      const curseforgeCategories = await getAddonCategories();
+    const getCurseForgeCategoriesVersions = async () => {
+      const curseforgeCategories = await getCurseForgeCategories();
       dispatch({
         type: ActionTypes.UPDATE_CURSEFORGE_CATEGORIES_MANIFEST,
         data: curseforgeCategories
       });
       return curseforgeCategories;
+    };
+    const getModrinthCategoriesList = async () => {
+      const categories = await getModrinthCategories();
+
+      dispatch({
+        type: ActionTypes.UPDATE_MODRINTH_CATEGORIES,
+        data: categories
+      });
+
+      return categories;
     };
     const getCurseForgeVersionIds = async () => {
       const versionIds = await getCFVersionIds();
@@ -208,19 +222,41 @@ export function initManifests() {
       });
       return omitBy(forgeVersions, v => v.length === 0);
     };
-    // Using reflect to avoid rejection
-    const [fabric, java, javaLatest, categories, forge, CFVersionIds] =
-      await Promise.all([
-        reflect(getFabricVersions()),
-        reflect(getJavaManifestVersions()),
-        reflect(getJavaLatestManifestVersions()),
-        reflect(getAddonCategoriesVersions()),
-        reflect(getForgeVersions()),
-        reflect(getCurseForgeVersionIds())
-      ]);
 
-    if (fabric.e || java.e || categories.e || forge.e || CFVersionIds.e) {
-      console.error(fabric, java, categories, forge);
+    // Using reflect to avoid rejection
+    const [
+      fabric,
+      java,
+      javaLatest,
+      curseForgeCategories,
+      modrinthCategories,
+      forge,
+      CFVersionIds
+    ] = await Promise.all([
+      reflect(getFabricVersions()),
+      reflect(getJavaManifestVersions()),
+      reflect(getJavaLatestManifestVersions()),
+      reflect(getCurseForgeCategoriesVersions()),
+      reflect(getModrinthCategoriesList()),
+      reflect(getForgeVersions()),
+      reflect(getCurseForgeVersionIds())
+    ]);
+
+    if (
+      fabric.e ||
+      java.e ||
+      curseForgeCategories.e ||
+      modrinthCategories.e ||
+      forge.e ||
+      CFVersionIds.e
+    ) {
+      console.error(
+        fabric,
+        java,
+        curseForgeCategories,
+        modrinthCategories.e,
+        forge
+      );
     }
 
     return {
@@ -228,7 +264,12 @@ export function initManifests() {
       fabric: fabric.status ? fabric.v : app.fabricManifest,
       java: java.status ? java.v : app.javaManifest,
       javaLatest: javaLatest.status ? javaLatest.v : app.javaLatestManifest,
-      categories: categories.status ? categories.v : app.curseforgeCategories,
+      curseForgeCategories: curseForgeCategories.status
+        ? curseForgeCategories.v
+        : app.curseforgeCategories,
+      modrinthCategories: modrinthCategories.status
+        ? modrinthCategories.v
+        : app.modrinthCategories,
       forge: forge.status ? forge.v : app.forgeManifest,
       curseforgeVersionIds: CFVersionIds.status
         ? CFVersionIds.v
@@ -1878,8 +1919,29 @@ export function processModrinthManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
     const { manifest, loader } = _getCurrentDownloadItem(state);
-    const { files } = manifest;
-    const totalModsRequired = files.length;
+    let { dependencies } = manifest;
+
+    // some packs don't have proper Modrinth dependencies set up yet
+    // the best we can do is substitute in the download links they provide in the mrpack
+    // this lack of metadata means we can't highlight installed mods in the Mod Browser or recommend updated versions
+    if (!dependencies) {
+      dependencies = manifest.files.map(file => {
+        return {
+          id: 'UNKNOWN',
+          project_id: 'UNKNOWN',
+          version_number: 'UNKNOWN',
+          files: file.downloads.map(url => {
+            return {
+              filename: file.path.slice(5),
+              hashes: file.hashes,
+              url,
+              size: file.fileSize
+            };
+          })
+        };
+      });
+    }
+    const totalModsRequired = dependencies.length;
 
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
@@ -1888,7 +1950,7 @@ export function processModrinthManifest(instanceName) {
 
     let prev = 0;
     const updatePercentage = downloaded => {
-      const percentage = (downloaded * 100) / files.length;
+      const percentage = (downloaded * 100) / dependencies.length;
       const progress = parseInt(percentage, 10);
       if (progress !== prev) {
         prev = progress;
@@ -1899,67 +1961,69 @@ export function processModrinthManifest(instanceName) {
     // TODO: If the download fails, we should attempt the next link in the downloads array
     dispatch(updateDownloadStatus(instanceName, 'Downloading pack...'));
     await downloadInstanceFiles(
-      files.map(item => {
-        return {
-          path: path.join(instancePath, item.path),
-          url: item.downloads[0],
-          sha1: item.hashes.sha1
-        };
-      }),
+      dependencies
+        .flatMap(item => item.files[0])
+        .map(file => {
+          return {
+            path: path.join(instancePath, 'mods', file.filename),
+            url: file.url,
+            sha1: file.hashes.sha1
+          };
+        }),
       updatePercentage,
       state.settings.concurrentDownloads
     );
 
     // verify that the mods downloaded correctly
-    let mappedFiles = await pMap(
-      files,
+    dependencies = await pMap(
+      dependencies,
       async item => {
-        const filePath = path.join(instancePath, item.path);
+        const file = item.files[0];
+        const filePath = path.join(instancePath, 'mods', file.filename);
         const buf = await fs.readFile(filePath);
         const sha1 = crypto.createHash('sha1').update(buf).digest('hex');
         const sha512 = crypto.createHash('sha512').update(buf).digest('hex');
 
-        if (sha1 === item.hashes.sha1 && sha512 === item.hashes.sha512)
-        {
-          return {
-            ...item,
-            path: filePath,
-            //sha1,
-            sha512
-          };
+        if (sha1 === file.hashes.sha1 && sha512 === file.hashes.sha512) {
+          return item;
         } else {
-          console.error(`Mod at "${item.path}" failed to download: hashes did not match`);
+          console.error(
+            `Mod "${file.filename}" failed to download: hashes did not match`
+          );
           // TODO: Attempt to re-download here?
           return null;
         }
       },
       { concurrency }
     );
-    mappedFiles = mappedFiles.filter(item => item !== null);
+    dependencies = dependencies.filter(item => item !== null);
 
-    if (mappedFiles.length !== totalModsRequired) {
+    if (dependencies.length !== totalModsRequired) {
       // the number of valid mods we have does not match the expected amount
       // this means the download has failed and should be restarted
       // ideally this would be done on a per-mod basis
 
-      throw `One or more mods failed to download (expected ${totalModsRequired}, but got ${mappedFiles.length})`;
+      throw `One or more mods failed to download (expected ${totalModsRequired}, but got ${dependencies.length})`;
     }
 
     dispatch(updateDownloadStatus(instanceName, 'Finalizing files...'));
 
     let modManifests = [];
     await pMap(
-      mappedFiles,
+      dependencies,
       async item => {
-        const fileName = path.basename(item.path);
+        // TODO: Remember which file was actually downloaded and put it here instead of just using the first one
+        const fileName = path.basename(item.files[0].filename);
         modManifests = modManifests.concat({
+          projectID: item.project_id,
+          fileID: item.id,
           fileName: fileName,
           displayName: fileName,
-          //version: null,
-          downloadUrl: item.downloads[0]
+          version: item.version_number,
+          downloadUrl: item.files[0].url
         });
 
-        const percentage = (modManifests.length * 100) / mappedFiles.length;
+        const percentage = (modManifests.length * 100) / dependencies.length;
 
         dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
       },
@@ -3409,6 +3473,100 @@ export function installMod(
     }
     return destFile;
   };
+}
+
+/**
+ * @param {ModrinthVersion} version
+ * @param {string} instanceName
+ * @param {Function} onProgress
+ */
+export function installModrinthMod(version, instanceName, onProgress) {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const instancesPath = _getInstancesPath(state);
+    const instancePath = path.join(instancesPath, instanceName);
+    const instance = _getInstance(state)(instanceName);
+
+    // Get mods that are already installed so we can skip them
+    let existingMods = [];
+    await dispatch(
+      updateInstanceConfig(instanceName, config => {
+        existingMods = config.mods;
+        return config;
+      })
+    );
+
+    const dependencies = (await resolveModrinthDependencies(version)).filter(
+      dep => {
+        existingMods.find(mod => mod.fileID === dep.id) === undefined;
+      }
+    );
+
+    // install dependencies and the mod that we want
+    await pMap(
+      [...dependencies, version],
+      async version => {
+        const primaryFile = version.files.find(f => f.primary);
+
+        const destFile = path.join(instancePath, 'mods', primaryFile.filename);
+        const tempFile = path.join(_getTempPath(state), primaryFile.filename);
+
+        // download the mod
+        await downloadFile(tempFile, primaryFile.url, onProgress);
+
+        // add mod to the mods list in the instance's config file
+        await dispatch(
+          updateInstanceConfig(instanceName, config => {
+            return {
+              ...config,
+              mods: [
+                ...config.mods,
+                ...[
+                  {
+                    source: MODRINTH,
+                    projectID: version.project_id,
+                    fileID: version.id,
+                    fileName: primaryFile.filename,
+                    displayName: primaryFile.filename,
+                    downloadUrl: primaryFile.url
+                  }
+                ]
+              ]
+            };
+          })
+        );
+
+        await fse.move(tempFile, destFile, { overwrite: true });
+      },
+      { concurrency: 2 }
+    );
+  };
+}
+
+/**
+ * Recursively gets all the dependent versions of a given version and returns them in one array
+ * @param {ModrinthVersion} version
+ * @returns {Promise<ModrinthVersion[]>}
+ */
+async function resolveModrinthDependencies(version) {
+  // TODO: Ideally this function should be aware of mods the user already has installed and ignore them
+
+  // Get the IDs for this version's required dependencies
+  const depVersionIDs = version.dependencies
+    .filter(v => v.dependency_type === 'required')
+    .map(v => v.version_id);
+
+  // If this version does not depend on anything, return nothing
+  if (depVersionIDs.length === 0) return [];
+
+  // If we do have dependencies, get the version objects for each of those and recurse on those
+  const depVersions = await getModrinthModpackVersions(depVersionIDs);
+  const subDepVersions = await pMap(
+    depVersions,
+    async v => await resolveModrinthDependencies(v)
+  );
+
+  return [...depVersions, ...subDepVersions];
 }
 
 export const deleteMod = (instanceName, mod) => {

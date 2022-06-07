@@ -38,7 +38,7 @@ const ModrinthModpacks = ({ setStep, setModpack, setVersion }) => {
     const searchResult =
       searchText.length < 3
         ? await getModrinthMostPlayedModpacks()
-        : await getModrinthSearchResults(searchText);
+        : await getModrinthSearchResults(searchText, 'MODPACK');
 
     if (!searchResult || modpacks.length == searchResult.total_hits) return;
 
@@ -56,7 +56,14 @@ const ModrinthModpacks = ({ setStep, setModpack, setVersion }) => {
       data =
         searchText.length < 3
           ? await getModrinthMostPlayedModpacks(offset)
-          : await getModrinthSearchResults(searchText, offset);
+          : await getModrinthSearchResults(
+              searchText,
+              'MODPACK',
+              null,
+              [],
+              null,
+              offset
+            );
     } catch (err) {
       setError(err);
       return;

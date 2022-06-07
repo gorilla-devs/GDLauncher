@@ -238,8 +238,8 @@ const ModpackDescription = ({
                   onClick={() => {
                     dispatch(
                       openModal('ModChangelog', {
-                        modpackId: modpack.id,
-                        modpackName: modpack.name,
+                        projectID: modpack.id,
+                        projectName: modpack.name,
                         files,
                         type
                       })

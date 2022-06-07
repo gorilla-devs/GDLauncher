@@ -13,7 +13,7 @@ import {
 import { CURSEFORGE, FTB, FORGE, MODRINTH } from '../utils/constants';
 
 let latest = {};
-const ModChangelog = ({ modpackId, files, type, modpackName }) => {
+const ModChangelog = ({ projectID, files, type, projectName }) => {
   const [changelog, setChangelog] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -26,11 +26,10 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
     try {
       switch (type) {
         case FTB:
-          data = await getFTBChangelog(modpackId, id);
+          data = await getFTBChangelog(projectID, id);
           break;
-        case FORGE:
         case CURSEFORGE:
-          data = await getAddonFileChangelog(modpackId, id);
+          data = await getAddonFileChangelog(projectID, id);
           break;
         case MODRINTH:
           data = await getModrinthModpackVersionChangelog(id);
@@ -91,14 +90,14 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
             <Select.Option
               title={
                 type === 'ftb' || type === MODRINTH
-                  ? `${modpackName} - ${v.name}`
+                  ? `${projectName} - ${v.name}`
                   : v.displayName
               }
               key={v.id}
               value={v.id}
             >
               {type === 'ftb' || type === MODRINTH
-                ? `${modpackName} - ${v.name}`
+                ? `${projectName} - ${v.name}`
                 : v.displayName}
             </Select.Option>
           ))}
@@ -113,7 +112,7 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
                 `}
               >
                 {type === 'ftb' || type === MODRINTH
-                  ? `${modpackName} - ${
+                  ? `${projectName} - ${
                       (files || []).find(v => v.id === selectedId)?.name
                     }`
                   : (files || []).find(v => v.id === selectedId)?.displayName}

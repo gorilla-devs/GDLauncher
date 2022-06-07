@@ -359,6 +359,7 @@ const Row = memo(({ index, style, data }) => {
           <div
             onClick={() => {
               if (!item.fileID) return;
+              // TODO: Determine which source a mod is from
               dispatch(
                 openModal('ModOverview', {
                   projectID: item.projectID,
