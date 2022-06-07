@@ -13,7 +13,7 @@ import { transparentize } from 'polished';
 import {
   getAddonDescription,
   getAddonFiles,
-  getModrinthModpackVersions,
+  getModrinthVersions,
   getModrinthUser
 } from '../api';
 import CloseButton from '../components/CloseButton';
@@ -90,7 +90,7 @@ const ModpackDescription = ({
         case MODRINTH: {
           setDescription(modpack.body);
           const versions = (
-            await getModrinthModpackVersions(modpack.versions)
+            await getModrinthVersions(modpack.versions)
           ).sort(
             (a, b) =>
               Date.parse(b.date_published) - Date.parse(a.date_published)

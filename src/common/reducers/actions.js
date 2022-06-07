@@ -60,7 +60,7 @@ import {
   getJavaLatestManifest,
   getJavaManifest,
   getMcManifest,
-  getModrinthModpackVersionManifest,
+  getModrinthVersionManifest,
   getModrinthCategories,
   getMultipleAddons,
   mcAuthenticate,
@@ -73,9 +73,9 @@ import {
   msExchangeCodeForAccessToken,
   msMinecraftProfile,
   msOAuthRefresh,
-  getModrinthModpackVersion,
-  getModrinthModpackVersions,
-  getModrinthModpack
+  getModrinthVersion,
+  getModrinthVersions,
+  getModrinthProject
 } from '../api';
 import {
   _getAccounts,
@@ -2378,7 +2378,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
         break;
       }
       case MODRINTH: {
-        const manifest = await getModrinthModpackVersionManifest(
+        const manifest = await getModrinthVersionManifest(
           newModpackData?.id,
           path.join(_getInstancesPath(state), instanceName)
         );
@@ -3560,7 +3560,7 @@ async function resolveModrinthDependencies(version) {
   if (depVersionIDs.length === 0) return [];
 
   // If we do have dependencies, get the version objects for each of those and recurse on those
-  const depVersions = await getModrinthModpackVersions(depVersionIDs);
+  const depVersions = await getModrinthVersions(depVersionIDs);
   const subDepVersions = await pMap(
     depVersions,
     async v => await resolveModrinthDependencies(v)

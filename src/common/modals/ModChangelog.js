@@ -8,9 +8,9 @@ import Modal from '../components/Modal';
 import {
   getAddonFileChangelog,
   getFTBChangelog,
-  getModrinthModpackVersionChangelog
+  getModrinthVersionChangelog
 } from '../api';
-import { CURSEFORGE, FTB, FORGE, MODRINTH } from '../utils/constants';
+import { CURSEFORGE, FTB, MODRINTH } from '../utils/constants';
 
 let latest = {};
 const ModChangelog = ({ projectID, files, type, projectName }) => {
@@ -32,7 +32,7 @@ const ModChangelog = ({ projectID, files, type, projectName }) => {
           data = await getAddonFileChangelog(projectID, id);
           break;
         case MODRINTH:
-          data = await getModrinthModpackVersionChangelog(id);
+          data = await getModrinthVersionChangelog(id);
           break;
       }
     } catch (err) {

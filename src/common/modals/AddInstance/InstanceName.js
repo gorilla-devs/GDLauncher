@@ -34,9 +34,9 @@ import {
 } from '../../utils/constants';
 import {
   getFTBModpackVersionData,
-  getModrinthModpackVersion,
-  getModrinthModpackVersionManifest,
-  getModrinthModpackVersions
+  getModrinthVersion,
+  getModrinthVersionManifest,
+  getModrinthVersions
 } from '../../api';
 
 const InstanceName = ({
@@ -315,9 +315,9 @@ const InstanceName = ({
       // manifest.dependencies contains only the game version and loader version (referred to here as mainDependencies)
       // fullVersion.dependencies contains objects with mod ids
 
-      const fullVersion = await getModrinthModpackVersion(version?.fileID);
+      const fullVersion = await getModrinthVersion(version?.fileID);
 
-      const manifest = await getModrinthModpackVersionManifest(
+      const manifest = await getModrinthVersionManifest(
         version?.fileID,
         path.join(instancesPath, localInstanceName)
       );
@@ -349,7 +349,7 @@ const InstanceName = ({
 
       if (fullVersion.dependencies.length > 0) {
         // the pack author has set up their pack using modrinth dependencies, so replace whatever was in the manifest
-        manifest.dependencies = await getModrinthModpackVersions(
+        manifest.dependencies = await getModrinthVersions(
           fullVersion.dependencies.map(dep => dep.version_id)
         );
         // TODO: Mods may have dependencies of their own, should this be resolved here?

@@ -9,9 +9,8 @@ import {
   getFTBModpackData,
   getFTBChangelog,
   getFTBModpackVersionData,
-  getModrinthModpack,
-  getModrinthModpackVersion,
-  getModrinthModpackVersions
+  getModrinthProject,
+  getModrinthVersions
 } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
@@ -100,9 +99,9 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
         break;
       }
       case MODRINTH: {
-        const modpack = await getModrinthModpack(modpackId);
+        const modpack = await getModrinthProject(modpackId);
         const versions = (
-          await getModrinthModpackVersions(modpack.versions)
+          await getModrinthVersions(modpack.versions)
         ).sort(
           (a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)
         );

@@ -422,7 +422,7 @@ export const getFTBSearch = async searchText => {
 };
 
 /**
- * @param {number} offset 
+ * @param {number} offset
  * @returns {Promise<ModrinthSearchResult[]>}
  */
 export const getModrinthMostPlayedModpacks = async (offset = 0) => {
@@ -433,12 +433,12 @@ export const getModrinthMostPlayedModpacks = async (offset = 0) => {
 };
 
 /**
- * @param {string} query 
- * @param {'mod'|'modpack'} projectType 
- * @param {string} gameVersion 
- * @param {string[]} categories 
- * @param {number} index 
- * @param {number} offset 
+ * @param {string} query
+ * @param {'mod'|'modpack'} projectType
+ * @param {string} gameVersion
+ * @param {string[]} categories
+ * @param {number} index
+ * @param {number} offset
  * @returns {Promise<ModrinthSearchResult[]>}
  */
 export const getModrinthSearchResults = async (
@@ -482,45 +482,38 @@ export const getModrinthSearchResults = async (
 };
 
 /**
- * @param {string} modpackId
+ * @param {string} projectId
  * @returns {Promise<ModrinthProject>}
  */
-export const getModrinthModpack = async modpackId => {
-  trackModrinthAPI();
-  try {
-    const url = `${MODRINTH_API_URL}/project/${modpackId}`;
-    const { data } = await axios.get(url);
-    return fixModrinthModpackObject(data);
-  } catch {
-    return { status: 'error' };
-  }
+export const getModrinthProject = async projectId => {
+  return await getModrinthProjects([projectId]);
 };
 
 /**
- * @param {string[]} modpackIds 
+ * @param {string[]} projectIds
  * @returns {Promise<ModrinthProject[]>}
  */
-export const getModrinthModpacks = async modpackIds => {
+export const getModrinthProjects = async projectIds => {
   trackModrinthAPI();
   try {
     const url = `${MODRINTH_API_URL}/projects?ids=${JSON.stringify(
-      modpackIds
+      projectIds
     )}`;
     const { data } = await axios.get(url);
-    return data.map(fixModrinthModpackObject);
+    return data.map(fixModrinthProjectObject);
   } catch {
     return { status: 'error' };
   }
 };
 
 /**
- * @param {string} modpackId 
+ * @param {string} projectId
  * @returns {Promise<ModrinthVersion[]>}
  */
-export const getModrinthModpackVersionList = async modpackId => {
+export const getModrinthProjectVersions = async projectId => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/project/${modpackId}/version`;
+    const url = `${MODRINTH_API_URL}/project/${projectId}/version`;
     const { data } = await axios.get(url);
     return data;
   } catch {
@@ -529,29 +522,36 @@ export const getModrinthModpackVersionList = async modpackId => {
 };
 
 /**
- * @param {string} versionId 
+ * @param {string} versionId
  * @returns {Promise<ModrinthVersion>}
  */
-export const getModrinthModpackVersion = async versionId => {
+export const getModrinthVersion = async versionId => {
+  return await getModrinthVersions([versionId]);
+};
+
+/**
+ * @param {string[]} versionIds
+ * @returns {Promise<ModrinthVersion[]>}
+ */
+export const getModrinthVersions = async versionIds => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/version/${versionId}`;
+    const url = `${MODRINTH_API_URL}/versions?ids=${JSON.stringify(
+      versionIds
+    )}`;
     const { data } = await axios.get(url);
-    return fixModrinthModpackObject(data);
-  } catch {
-    return { status: 'error' };
+    return data || [];
+  } catch (err) {
+    console.error(err);
   }
 };
 
 // TODO: Move override logic out of this function
 // TODO: Do overrides need to be applied after the pack is installed?
-export const getModrinthModpackVersionManifest = async (
-  versionId,
-  instancePath
-) => {
+export const getModrinthVersionManifest = async (versionId, instancePath) => {
   try {
     // get download link for the metadata archive
-    const version = await getModrinthModpackVersion(versionId);
+    const version = await getModrinthVersion(versionId);
     const file = version.files.find(file => file.filename.endsWith('.mrpack'));
 
     // clean temp directory
@@ -596,32 +596,15 @@ export const getModrinthModpackVersionManifest = async (
 };
 
 /**
- * @param {string[]} versionIds 
- * @returns {Promise<ModrinthVersion[]>}
- */
-export const getModrinthModpackVersions = async versionIds => {
-  trackModrinthAPI();
-  try {
-    const url = `${MODRINTH_API_URL}/versions?ids=${JSON.stringify(
-      versionIds
-    )}`;
-    const { data } = await axios.get(url);
-    return data || [];
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-/**
- * @param {string} versionId 
+ * @param {string} versionId
  * @returns {Promise<string>}
  */
-export const getModrinthModpackVersionChangelog = async versionId => {
-  return (await getModrinthModpackVersion(versionId)).changelog;
+export const getModrinthVersionChangelog = async versionId => {
+  return (await getModrinthVersion(versionId)).changelog;
 };
 
 /**
- * @param {string} userId 
+ * @param {string} userId
  * @returns {Promise<ModrinthUser>}
  */
 export const getModrinthUser = async userId => {
@@ -636,10 +619,10 @@ export const getModrinthUser = async userId => {
 };
 
 //! HACK
-const fixModrinthModpackObject = modpack => {
-  modpack.name = modpack.title;
-  delete modpack.title;
-  return modpack;
+const fixModrinthProjectObject = project => {
+  project.name = project.title;
+  delete project.title;
+  return project;
 };
 
 /**

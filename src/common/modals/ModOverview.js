@@ -14,8 +14,8 @@ import {
   getAddonDescription,
   getAddonFiles,
   getAddon,
-  getModrinthModpack,
-  getModrinthModpackVersions,
+  getModrinthProject,
+  getModrinthVersions,
   getModrinthUser
 } from '../api';
 import CloseButton from '../components/CloseButton';
@@ -105,12 +105,12 @@ const ModOverview = ({
           })
         ]);
       } else if (modSource === MODRINTH) {
-        const project = await getModrinthModpack(projectID);
+        const project = await getModrinthProject(projectID);
         setMod(project);
 
         setDescription(project.body);
         const versions = (
-          await getModrinthModpackVersions(project.versions)
+          await getModrinthVersions(project.versions)
         ).sort(
           (a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)
         );

@@ -7,7 +7,7 @@ import ContentLoader from 'react-content-loader';
 import { transparentize } from 'polished';
 import { openModal } from '../../../reducers/modals/actions';
 import { MODRINTH } from '../../../utils/constants';
-import { getModrinthModpack, getModrinthModpackVersions } from '../../../api';
+import { getModrinthProject, getModrinthVersions } from '../../../api';
 
 const selectModrinthModpack = async (
   projectID,
@@ -15,9 +15,9 @@ const selectModrinthModpack = async (
   setModpack,
   setStep
 ) => {
-  // with a bit more fiddling the `getModrinthModpack` call can be removed
-  const modpack = await getModrinthModpack(projectID);
-  const version = (await getModrinthModpackVersions(modpack.versions)).sort(
+  // with a bit more fiddling the `getModrinthProject` call can be removed
+  const modpack = await getModrinthProject(projectID);
+  const version = (await getModrinthVersions(modpack.versions)).sort(
     (a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)
   )[0];
 
@@ -125,7 +125,7 @@ const ModpacksListWrapper = ({
           </div>
           <div
             onClick={async () => {
-              const realModpack = await getModrinthModpack(modpack.project_id);
+              const realModpack = await getModrinthProject(modpack.project_id);
               dispatch(
                 openModal('ModpackDescription', {
                   modpack: realModpack,

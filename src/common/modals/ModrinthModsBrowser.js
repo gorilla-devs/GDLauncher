@@ -26,7 +26,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {
   getModrinthSearchResults,
-  getModrinthModpackVersionList
+  getModrinthProjectVersions
 } from '../api';
 import { openModal } from '../reducers/modals/actions';
 import { _getInstance } from '../utils/selectors';
@@ -217,7 +217,7 @@ const ModsListWrapper = ({
 
                   // Get the latest compatible version and give it to the installer
                   const availableModVersions =
-                    await getModrinthModpackVersionList(item.project_id);
+                    await getModrinthProjectVersions(item.project_id);
                   const compatibleModVersions = availableModVersions
                     .filter(v => v.game_versions.includes(gameVersion))
                     .sort((a, b) => a.date_published - b.date_published);
