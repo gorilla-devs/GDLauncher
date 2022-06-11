@@ -57,7 +57,6 @@ const Experimental = () => {
         </p>
       </Content>
       <Content>
-        {' '}
         <p>
           As such, we provide a default API key (hidden below) that can
           successfully download mods whose authors permit third-party launcher
@@ -66,7 +65,6 @@ const Experimental = () => {
         </p>
       </Content>
       <Content>
-        {' '}
         <p>
           <b>
             For ordinary users, this setting should not need to be changed!!
@@ -74,7 +72,6 @@ const Experimental = () => {
         </p>
       </Content>
       <Content>
-        {' '}
         <p>
           If you run into any issues downloading mods, you can revert to
           GDLuancher&apos;s granted API Key using the button below the box.
