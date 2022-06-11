@@ -127,6 +127,7 @@ import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
 import { openModal, closeModal } from './modals/actions';
 import forgePatcher from '../utils/forgePatcher';
+import browserDownload from '../utils/browserDownload';
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -3226,7 +3227,8 @@ export function installMod(
   gameVersions,
   installDeps = true,
   onProgress,
-  useTempMiddleware
+  useTempMiddleware,
+  item
 ) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -3238,83 +3240,133 @@ export function installMod(
     mainModData.projectID = projectID;
     const destFile = path.join(instancePath, 'mods', mainModData.fileName);
     const tempFile = path.join(_getTempPath(state), mainModData.fileName);
+    const installedMods = [];
 
-    if (useTempMiddleware) {
-      await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
-    }
-    let needToAddMod = true;
-    await dispatch(
-      updateInstanceConfig(instanceName, prev => {
-        needToAddMod = !prev.mods.find(
-          v => v.fileID === fileID && v.projectID === projectID
-        );
-        return {
-          ...prev,
-          mods: [
-            ...prev.mods,
-            ...(needToAddMod
-              ? [normalizeModData(mainModData, projectID, addon.name)]
-              : [])
-          ]
-        };
-      })
-    );
-
-    if (!needToAddMod) {
+    try {
       if (useTempMiddleware) {
-        await fse.remove(tempFile);
+        await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
       }
-      return;
-    }
+      let needToAddMod = true;
+      await dispatch(
+        updateInstanceConfig(instanceName, prev => {
+          needToAddMod = !prev.mods.find(
+            v => v.fileID === fileID && v.projectID === projectID
+          );
+          return {
+            ...prev,
+            mods: [
+              ...prev.mods,
+              ...(needToAddMod
+                ? [normalizeModData(mainModData, projectID, addon.name)]
+                : [])
+            ]
+          };
+        })
+      );
+      installedMods.push({ mod: addon, projectID, needToAddMod });
 
-    if (!useTempMiddleware) {
-      try {
-        await fse.access(destFile);
-        const murmur2 = await getFileMurmurHash2(destFile);
-        if (murmur2 !== mainModData.fileFingerprint) {
-          await downloadFile(destFile, mainModData.downloadUrl, onProgress);
+      if (!needToAddMod) {
+        if (useTempMiddleware) {
+          await fse.remove(tempFile);
         }
-      } catch {
-        await downloadFile(destFile, mainModData.downloadUrl, onProgress);
+        return;
       }
-    } else {
-      await fse.move(tempFile, destFile, { overwrite: true });
-    }
 
-    if (installDeps) {
-      await pMap(
-        mainModData.dependencies,
-        async dep => {
-          // type 1: embedded
-          // type 2: optional
-          // type 3: required
-          // type 4: tool
-          // type 5: incompatible
-          // type 6: include
+      const urlDownloadPage = `https://www.curseforge.com/minecraft/mc-mods/${item.slug}/download/${mainModData.id}`;
+      if (!useTempMiddleware) {
+        try {
+          await fse.access(destFile);
+          const murmur2 = await getFileMurmurHash2(destFile);
+          if (murmur2 !== mainModData.fileFingerprint) {
+            if (!mainModData.downloadUrl) {
+              try {
+                await browserDownload(urlDownloadPage, destFile);
+              } catch {
+                dispatch(
+                  openModal('InfoModal', {
+                    modName: mainModData.name,
+                    preventClose: false,
+                    error: new Error('Error 404, Mod page not found')
+                  })
+                );
+              }
+            } else {
+              await downloadFile(destFile, mainModData.downloadUrl, onProgress);
+            }
+          }
+        } catch {
+          if (!mainModData.downloadUrl) {
+            try {
+              await browserDownload(urlDownloadPage, destFile);
+            } catch {
+              dispatch(
+                openModal('InfoModal', {
+                  modName: mainModData.name,
+                  preventClose: false,
+                  error: new Error('Error 404, Mod page not found')
+                })
+              );
+            }
+          } else {
+            await downloadFile(destFile, mainModData.downloadUrl, onProgress);
+          }
+        }
+      } else {
+        await fse.move(tempFile, destFile, { overwrite: true });
+      }
 
-          if (dep.type === 3) {
-            if (instance.mods.some(x => x.addonId === dep.addonId)) return;
-            const depList = await getAddonFiles(dep.addonId);
-            const depData = depList.find(v =>
-              v.gameVersions.includes(gameVersions)
-            );
+      if (installDeps) {
+        await pMap(
+          mainModData.dependencies,
+          async dep => {
+            // type 1: embedded
+            // type 2: optional
+            // type 3: required
+            // type 4: tool
+            // type 5: incompatible
+            // type 6: include
+
+            if (dep.relationType === 3) {
+              if (instance.mods.some(x => x.addonId === dep.modId)) return;
+              const depList = await getAddonFiles(dep.modId);
+              const depData = depList.find(v =>
+                v.gameVersions.includes(gameVersions)
+              );
+
+              await dispatch(
+                installMod(
+                  dep.modId,
+                  depData.id,
+                  instanceName,
+                  gameVersions,
+                  installDeps,
+                  onProgress,
+                  useTempMiddleware,
+                  item
+                )
+              );
+            }
+          },
+          { concurrency: 2 }
+        );
+      }
+      return destFile;
+    } catch {
+      await Promise.all(
+        installedMods.map(async mod => {
+          if (mod.needToAddMod) {
             await dispatch(
-              installMod(
-                dep.addonId,
-                depData.id,
-                instanceName,
-                gameVersions,
-                installDeps,
-                onProgress,
-                useTempMiddleware
-              )
+              updateInstanceConfig(instanceName, prev => {
+                return {
+                  ...prev,
+                  mods: [...prev.mods.filter(m => m.id !== mod.addon.id)]
+                };
+              })
             );
           }
-        },
-        { concurrency: 2 }
+        })
       );
     }
-    return destFile;
   };
 }
 

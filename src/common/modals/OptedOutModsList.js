@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spin } from 'antd';
@@ -60,11 +60,23 @@ const ModRow = ({ mod, loadedMods, currentMod, missingMods }) => {
   const { modManifest, addon } = mod;
   const loaded = loadedMods.includes(modManifest.id);
   const missing = missingMods.includes(modManifest.id);
+  const ref = useRef();
 
   const isCurrentMod = currentMod?.modManifest?.id === modManifest.id;
 
+  useEffect(() => {
+    if (!loaded && isCurrentMod) {
+      ref.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+        inline: 'nearest'
+      });
+    }
+  }, [isCurrentMod, loaded]);
+
+  console.log('LOAD', loaded, missing, isCurrentMod);
   return (
-    <RowContainer>
+    <RowContainer ref={ref}>
       <div>{`${addon?.name} - ${modManifest?.displayName}`}</div>
       {loaded && !missing && <div className="dot" />}
       {loaded && missing && (
@@ -124,13 +136,15 @@ const OptedOutModsList = ({
     const listener = (e, status) => {
       if (!status.error) {
         if (optedOutMods.length === loadedMods.length + 1) {
-          if (missingMods.length === 0) dispatch(closeModal());
-          setTimeout(() => {
+          setDownloading(false);
+          if (missingMods.length === 0) {
             resolve();
-          }, 300);
+            dispatch(closeModal());
+          }
+        } else {
+          setLoadedMods(prev => [...prev, status.modId]);
+          if (status.warning) setMissingMods(prev => [...prev, status.modId]);
         }
-        setLoadedMods(prev => [...prev, status.modId]);
-        if (status.warning) setMissingMods(prev => [...prev, status.modId]);
       } else {
         dispatch(closeModal());
         setTimeout(() => {
@@ -166,6 +180,17 @@ const OptedOutModsList = ({
       title="Opted out mods list"
     >
       <Container>
+        <div
+          css={`
+            text-align: left;
+            margin-bottom: 2rem;
+          `}
+        >
+          Hey oh! It looks like some developers opted out from showing their
+          mods on third-party launchers. We can still attempt to download them
+          automatically. Please click continue and wait for all downloads to
+          finish. Please don&apos;t click anything inside the browser.
+        </div>
         <ModsContainer>
           {optedOutMods &&
             optedOutMods.map(mod => (
@@ -189,7 +214,8 @@ const OptedOutModsList = ({
         >
           <Button
             danger
-            disabled={downloading}
+            type="text"
+            disabled={downloading && optedOutMods.length === loadedMods.length}
             onClick={() => {
               dispatch(closeModal());
               setTimeout(
@@ -237,7 +263,10 @@ const OptedOutModsList = ({
             <Button
               type="primary"
               disabled={downloading}
-              onClick={() => dispatch(closeModal())}
+              onClick={() => {
+                resolve();
+                dispatch(closeModal());
+              }}
               css={`
                 background-color: ${props => props.theme.palette.colors.green};
               `}

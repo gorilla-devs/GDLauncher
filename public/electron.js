@@ -602,6 +602,97 @@ ipcMain.handle('shutdown-discord-rpc', () => {
   discordRPC.shutdownRPC();
 });
 
+ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
+  let win = new BrowserWindow();
+
+  const mainWindowListener = () => {
+    if (win) {
+      win.removeAllListeners();
+      win.close();
+      win = null;
+    }
+  };
+
+  win.once('close', () => {
+    win = null;
+  });
+
+  let cleanupFn = null;
+  win.once('closed', () => {
+    mainWindow.webContents.send('opted-out-window-closed-unexpected');
+    if (cleanupFn) cleanupFn(`Window has been closed unexpectedly`);
+    mainWindow.removeListener('closed', mainWindowListener);
+  });
+
+  mainWindow.on('closed', mainWindowListener);
+
+  if (!win) return;
+  try {
+    // eslint-disable-next-line no-loop-func
+    await new Promise((resolve, reject) => {
+      win.webContents.session.webRequest.onCompleted(
+        { urls: [url] },
+        details => {
+          if (details.statusCode === 404) {
+            mainWindow.webContents.send('opted-out-download-mod-status', {
+              error: new Error('Error 404, Mod page not found')
+            });
+            reject();
+          }
+        }
+      );
+
+      win.loadURL(url);
+      cleanupFn = async err => {
+        reject(new Error(err));
+        // eslint-disable-next-line promise/param-names
+        await new Promise(r => setTimeout(r, 50));
+        mainWindowListener();
+      };
+      const timer = setTimeout(
+        () => cleanupFn(`Download for ${url} timed out`),
+        40000
+      );
+      win.webContents.session.once('will-download', (_, item) => {
+        item.setSavePath(filePath);
+
+        item.once('updated', () => {
+          clearTimeout(timer);
+        });
+
+        item.once('done', (event, state) => {
+          if (state === 'completed') {
+            resolve();
+          } else {
+            reject(new Error(`Download for ${url} failed`));
+          }
+        });
+      });
+    });
+    if (mainWindow?.webContents) {
+      // send success event to front end
+      mainWindow.webContents.send('opted-out-download-mod-status', {
+        error: false
+      });
+    }
+  } catch (err) {
+    if (mainWindow?.webContents && win) {
+      // send error event to front end
+      mainWindow.webContents.send('opted-out-download-mod-status', {
+        error: err
+      });
+    }
+  }
+
+  if (win) {
+    win.removeAllListeners();
+    win.close();
+    win.once('closed', () => {
+      win = null;
+    });
+  }
+});
+
 ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
   let win = new BrowserWindow();
 

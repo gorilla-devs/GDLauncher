@@ -87,7 +87,8 @@ const modalsComponentLookupTable = {
   ),
   InstanceDownloadFailed: AsyncComponent(
     lazy(() => import('../modals/InstanceDownloadFailed'))
-  )
+  ),
+  InfoModal: AsyncComponent(lazy(() => import('../modals/InfoModal')))
 };
 
 const ModalContainer = ({
