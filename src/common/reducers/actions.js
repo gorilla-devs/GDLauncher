@@ -3242,6 +3242,23 @@ export function installMod(
     const tempFile = path.join(_getTempPath(state), mainModData.fileName);
     const installedMods = [];
 
+    const removeModFromConfig = async () => {
+      await Promise.all(
+        installedMods.map(async mod => {
+          if (mod.needToAddMod) {
+            await dispatch(
+              updateInstanceConfig(instanceName, prev => {
+                return {
+                  ...prev,
+                  mods: [...prev.mods.filter(m => m.modId !== mod.addon.id)]
+                };
+              })
+            );
+          }
+        })
+      );
+    };
+
     try {
       if (useTempMiddleware) {
         await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
@@ -3263,7 +3280,7 @@ export function installMod(
           };
         })
       );
-      installedMods.push({ mod: addon, projectID, needToAddMod });
+      installedMods.push({ addon, projectID, needToAddMod });
 
       if (!needToAddMod) {
         if (useTempMiddleware) {
@@ -3281,12 +3298,13 @@ export function installMod(
             if (!mainModData.downloadUrl) {
               try {
                 await browserDownload(urlDownloadPage, destFile);
-              } catch {
+              } catch (e) {
+                await removeModFromConfig();
                 dispatch(
                   openModal('InfoModal', {
                     modName: mainModData.name,
                     preventClose: false,
-                    error: new Error('Error 404, Mod page not found')
+                    error: e
                   })
                 );
               }
@@ -3298,12 +3316,13 @@ export function installMod(
           if (!mainModData.downloadUrl) {
             try {
               await browserDownload(urlDownloadPage, destFile);
-            } catch {
+            } catch (e) {
+              await removeModFromConfig();
               dispatch(
                 openModal('InfoModal', {
                   modName: mainModData.name,
                   preventClose: false,
-                  error: new Error('Error 404, Mod page not found')
+                  error: e
                 })
               );
             }
@@ -3352,20 +3371,7 @@ export function installMod(
       }
       return destFile;
     } catch {
-      await Promise.all(
-        installedMods.map(async mod => {
-          if (mod.needToAddMod) {
-            await dispatch(
-              updateInstanceConfig(instanceName, prev => {
-                return {
-                  ...prev,
-                  mods: [...prev.mods.filter(m => m.id !== mod.addon.id)]
-                };
-              })
-            );
-          }
-        })
-      );
+      await removeModFromConfig();
     }
   };
 }

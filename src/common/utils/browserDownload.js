@@ -8,7 +8,7 @@ export default function browserDownload(url, filePath) {
     });
 
     ipcRenderer.once('opted-out-window-closed-unexpected', () => {
-      reject();
+      reject(new Error('Download window closed unexpectedly'));
     });
 
     ipcRenderer.once('opted-out-download-mod-status', (e, status) => {

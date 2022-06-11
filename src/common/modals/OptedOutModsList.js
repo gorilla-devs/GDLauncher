@@ -74,7 +74,6 @@ const ModRow = ({ mod, loadedMods, currentMod, missingMods }) => {
     }
   }, [isCurrentMod, loaded]);
 
-  console.log('LOAD', loaded, missing, isCurrentMod);
   return (
     <RowContainer ref={ref}>
       <div>{`${addon?.name} - ${modManifest?.displayName}`}</div>
@@ -135,8 +134,9 @@ const OptedOutModsList = ({
   useEffect(() => {
     const listener = (e, status) => {
       if (!status.error) {
-        if (optedOutMods.length === loadedMods.length + 1) {
+        if (optedOutMods.length === loadedMods.length + 1)
           setDownloading(false);
+        if (optedOutMods.length === loadedMods.length) {
           if (missingMods.length === 0) {
             resolve();
             dispatch(closeModal());
@@ -215,7 +215,7 @@ const OptedOutModsList = ({
           <Button
             danger
             type="text"
-            disabled={downloading && optedOutMods.length === loadedMods.length}
+            disabled={downloading || loadedMods.length !== 0}
             onClick={() => {
               dispatch(closeModal());
               setTimeout(
