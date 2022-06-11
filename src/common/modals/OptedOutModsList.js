@@ -134,17 +134,15 @@ const OptedOutModsList = ({
   useEffect(() => {
     const listener = (e, status) => {
       if (!status.error) {
-        if (optedOutMods.length === loadedMods.length + 1)
-          setDownloading(false);
-        if (optedOutMods.length === loadedMods.length) {
+        if (optedOutMods.length === loadedMods.length + 1) {
           if (missingMods.length === 0) {
             resolve();
             dispatch(closeModal());
           }
-        } else {
-          setLoadedMods(prev => [...prev, status.modId]);
-          if (status.warning) setMissingMods(prev => [...prev, status.modId]);
+          setDownloading(false);
         }
+        setLoadedMods(prev => [...prev, status.modId]);
+        if (status.warning) setMissingMods(prev => [...prev, status.modId]);
       } else {
         dispatch(closeModal());
         setTimeout(() => {
