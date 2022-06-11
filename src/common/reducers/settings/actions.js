@@ -1,3 +1,4 @@
+import { setCurseforgeApiKey } from '../../api';
 import { MC_STARTUP_METHODS } from '../../utils/constants';
 import * as ActionTypes from './actionTypes';
 
@@ -125,6 +126,25 @@ export function updateCurseReleaseChannel(curseReleaseChannel) {
     dispatch({
       type: ActionTypes.UPDATE_CURSE_RELEASE_CHANNEL,
       curseReleaseChannel
+    });
+  };
+}
+
+export function updateCurseForgeApiKey(value) {
+  setCurseforgeApiKey(value);
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.UPDATE_CURSEFORGE_API_KEY,
+      value
+    });
+  };
+}
+
+export function hideThirdPartyLauncherNotice() {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.HIDE_CURSEFORGE_THIRD_PARTY_DOWNLOADS_NOTICE,
+      value: true
     });
   };
 }

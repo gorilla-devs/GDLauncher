@@ -17,6 +17,7 @@ import {
 } from '../../../common/utils/selectors';
 import { extractFace } from '../utils';
 import { updateLastUpdateVersion } from '../../../common/reducers/actions';
+import CurseForgeApiNotice from '../components/CurseForgeApiNotice';
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
@@ -73,6 +74,7 @@ const Home = () => {
   return (
     <div>
       <News news={news} />
+      <CurseForgeApiNotice />
       {annoucement ? (
         <div
           css={`

@@ -35,6 +35,27 @@ function instanceSortOrder(state = 0, action) {
   }
 }
 
+function curseForgeApiKey(
+  state = '$2a$10$5BgCleD8.rLQ5Ix17Xm2lOjgfoeTJV26a1BXmmpwrOemgI517.nuC',
+  action
+) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_CURSEFORGE_API_KEY:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
+function hideCurseforgeThirdPartyDownloadsNotice(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.HIDE_CURSEFORGE_THIRD_PARTY_DOWNLOADS_NOTICE:
+      return action.value;
+    default:
+      return state;
+  }
+}
+
 // 0 is stable, 1 is beta
 function concurrentDownloads(state = 3, action) {
   switch (action.type) {
@@ -152,5 +173,7 @@ export default combineReducers({
   curseReleaseChannel,
   java,
   minecraftSettings,
-  mcStartupMethod
+  mcStartupMethod,
+  curseForgeApiKey,
+  hideCurseforgeThirdPartyDownloadsNotice
 });

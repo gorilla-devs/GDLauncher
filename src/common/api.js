@@ -18,13 +18,26 @@ import {
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
 
-const axioInstance = axios.create({
+export const DefaultCfApiKey =
+  '$2a$10$5BgCleD8.rLQ5Ix17Xm2lOjgfoeTJV26a1BXmmpwrOemgI517.nuC';
+
+let axioInstance = axios.create({
   headers: {
-    'X-API-KEY': '$2a$10$5BgCleD8.rLQ5Ix17Xm2lOjgfoeTJV26a1BXmmpwrOemgI517.nuC',
+    'X-API-KEY': DefaultCfApiKey,
     'Content-Type': 'application/json',
     Accept: 'application/json'
   }
 });
+
+export const setCurseforgeApiKey = key => {
+  axioInstance = axios.create({
+    headers: {
+      'X-API-KEY': key,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    }
+  });
+};
 
 const trackFTBAPI = () => {
   ga.sendCustomEvent('FTBAPICall');

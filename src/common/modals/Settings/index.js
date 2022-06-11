@@ -95,6 +95,10 @@ const pages = {
   Java: {
     name: 'Java',
     component: AsyncComponent(lazy(() => import('./components/Java')))
+  },
+  Experimental: {
+    name: 'Experimental',
+    component: AsyncComponent(lazy(() => import('./components/Experimental')))
   }
 };
 
