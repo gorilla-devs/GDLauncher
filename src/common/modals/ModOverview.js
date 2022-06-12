@@ -315,7 +315,10 @@ const ModOverview = ({
                   selectedItem,
                   instanceName,
                   gameVersions,
-                  !installedData.fileID
+                  !installedData.fileID,
+                  null,
+                  null,
+                  addon
                 )
               );
               setInstalledData({ fileID: selectedItem, fileName: newFile });
