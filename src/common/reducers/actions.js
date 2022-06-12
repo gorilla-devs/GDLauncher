@@ -3259,9 +3259,25 @@ export function installMod(
       );
     };
 
+    const urlDownloadPage = `https://www.curseforge.com/minecraft/mc-mods/${item.slug}/download/${mainModData.id}`;
     try {
       if (useTempMiddleware) {
-        await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
+        if (!mainModData.downloadUrl) {
+          try {
+            await browserDownload(urlDownloadPage, destFile);
+          } catch (e) {
+            await removeModFromConfig();
+            dispatch(
+              openModal('InfoModal', {
+                modName: mainModData.name,
+                preventClose: false,
+                error: e
+              })
+            );
+          }
+        } else {
+          await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
+        }
       }
       let needToAddMod = true;
       await dispatch(
@@ -3289,7 +3305,6 @@ export function installMod(
         return;
       }
 
-      const urlDownloadPage = `https://www.curseforge.com/minecraft/mc-mods/${item.slug}/download/${mainModData.id}`;
       if (!useTempMiddleware) {
         try {
           await fse.access(destFile);
@@ -3370,7 +3385,7 @@ export function installMod(
         );
       }
       return destFile;
-    } catch {
+    } catch (e) {
       await removeModFromConfig();
     }
   };
@@ -3399,6 +3414,8 @@ export const updateMod = (
   onProgress
 ) => {
   return async dispatch => {
+    const addon = await getAddon(mod.modId);
+    const item = { ...mod, slug: addon.slug };
     await dispatch(
       installMod(
         mod.projectID,
@@ -3407,7 +3424,8 @@ export const updateMod = (
         gameVersions,
         false,
         onProgress,
-        true
+        true,
+        item
       )
     );
     await dispatch(deleteMod(instanceName, mod));

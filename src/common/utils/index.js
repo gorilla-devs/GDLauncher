@@ -245,6 +245,23 @@ export const makeInstanceRestorePoint = async (
   }
 };
 
+export const makeModRestorePoint = async (newModPath, modsPath, modName) => {
+  try {
+    await access(newModPath);
+    await remove(newModPath);
+  } catch (e) {
+    console.warn(e);
+  }
+  try {
+    await copy(path.join(modsPath, modName), newModPath, {
+      recursive: true,
+      overwrite: true
+    });
+  } catch (e) {
+    console.warn(e);
+  }
+};
+
 export const scaleMem = x => Math.log2(x / 1024);
 export const scaleMemInv = x => 1024 * 2 ** x;
 export const sysMemScaled = Math.round(

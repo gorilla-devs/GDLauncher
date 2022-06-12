@@ -24,7 +24,11 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import fse from 'fs-extra';
 import makeDir from 'make-dir';
 import curseForgeIcon from '../../assets/curseforgeIcon.webp';
-import { _getInstance, _getInstancesPath } from '../../utils/selectors';
+import {
+  _getInstance,
+  _getInstancesPath,
+  _getTempPath
+} from '../../utils/selectors';
 import {
   updateInstanceConfig,
   deleteMod,
@@ -32,6 +36,7 @@ import {
   initLatestMods
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
+import { makeModRestorePoint } from '../../utils';
 
 const Header = styled.div`
   height: 40px;
@@ -315,6 +320,10 @@ const Row = memo(({ index, style, data }) => {
     latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
 
+  const tempPath = useSelector(_getTempPath);
+  const newModPath = path.join(tempPath, `${item.fileName}__RESTORE`);
+  const modsPath = path.join(instancePath, 'mods');
+
   const name = item.fileName
     .replace('.jar', '')
     .replace('.zip', '')
@@ -392,6 +401,12 @@ const Row = memo(({ index, style, data }) => {
                   icon={faDownload}
                   onClick={async () => {
                     setUpdateLoading(true);
+                    await makeModRestorePoint(
+                      newModPath,
+                      modsPath,
+                      item.fileName
+                    );
+
                     await dispatch(
                       updateMod(
                         instanceName,
