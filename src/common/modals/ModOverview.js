@@ -122,7 +122,6 @@ const ModOverview = ({
   };
 
   const handleChange = value => setSelectedItem(JSON.parse(value));
-
   const primaryImage = addon?.logo;
   return (
     <Modal
@@ -287,7 +286,9 @@ const ModOverview = ({
           </StyledSelect>
           <Button
             type="primary"
-            disabled={!selectedItem || installedData.fileID === selectedItem}
+            disabled={
+              (!selectedItem || installedData.fileID === selectedItem) && addon
+            }
             loading={loading}
             onClick={async () => {
               setLoading(true);
