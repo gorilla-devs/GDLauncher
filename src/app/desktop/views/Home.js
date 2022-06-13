@@ -18,7 +18,6 @@ import {
 import { extractFace } from '../utils';
 import { updateLastUpdateVersion } from '../../../common/reducers/actions';
 import CurseForgeApiNotice from '../components/CurseForgeApiNotice';
-import { setCurseforgeApiKey } from '../../../common/api';
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
@@ -38,9 +37,6 @@ const Home = () => {
   const dispatch = useDispatch();
   const account = useSelector(_getCurrentAccount);
   const news = useSelector(state => state.news);
-  const curseforgeApiKey = useSelector(
-    state => state.settings.curseForgeApiKey
-  );
   const lastUpdateVersion = useSelector(state => state.app.lastUpdateVersion);
   // const instances = useSelector(_getInstances);
 
@@ -67,10 +63,6 @@ const Home = () => {
       );
       setAnnoucement(data || null);
     };
-
-    if (curseforgeApiKey && curseforgeApiKey.length) {
-      setCurseforgeApiKey(curseforgeApiKey);
-    }
 
     init();
   }, []);

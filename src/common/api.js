@@ -23,7 +23,8 @@ export const DefaultCfApiKey =
 
 let axioInstance = axios.create({
   headers: {
-    'X-API-KEY': DefaultCfApiKey,
+    'X-API-KEY':
+      window.__store.getState().settings.curseForgeApiKey || DefaultCfApiKey,
     'Content-Type': 'application/json',
     Accept: 'application/json'
   }
