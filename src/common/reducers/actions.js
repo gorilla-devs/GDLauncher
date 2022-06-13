@@ -2026,11 +2026,10 @@ export function downloadInstance(instanceName) {
 
       // analyze source and do it for ftb and forge
 
-      if (manifest && loader?.source === FTB) {
+      if (manifest && loader?.source === FTB)
         await dispatch(processFTBManifest(instanceName));
-      } else if (manifest && loader?.source === CURSEFORGE) {
+      else if (manifest && loader?.source === CURSEFORGE)
         await dispatch(processForgeManifest(instanceName));
-      }
 
       dispatch(updateDownloadProgress(0));
 
