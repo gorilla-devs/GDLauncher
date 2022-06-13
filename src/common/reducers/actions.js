@@ -1760,12 +1760,14 @@ export function processForgeManifest(instanceName) {
       { concurrency }
     );
 
-    dispatch(
-      openModal('CfModDownloadFailed', {
-        instanceName,
-        failedModDownloads: failedDownloads
-      })
-    );
+    if (failedDownloads.length) {
+      dispatch(
+        openModal('CfModDownloadFailed', {
+          instanceName,
+          failedModDownloads: failedDownloads
+        })
+      );
+    }
 
     let validAddon = false;
     const addonPathZip = path.join(
