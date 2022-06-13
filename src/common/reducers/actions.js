@@ -1717,6 +1717,7 @@ export function processForgeManifest(instanceName) {
     await Promise.all([_getAddons(), _getAddonFiles()]);
 
     let modManifests = [];
+    const failedDownloads = [];
     await pMap(
       manifest.files,
       async item => {
@@ -1739,7 +1740,11 @@ export function processForgeManifest(instanceName) {
           );
           const fileExists = await fse.pathExists(destFile);
           if (!fileExists) {
-            await downloadFile(destFile, modManifest.downloadUrl);
+            try {
+              await downloadFile(destFile, modManifest.downloadUrl);
+            } catch (ex) {
+              failedDownloads.push(modManifest);
+            }
           }
           modManifests = modManifests.concat(
             normalizeModData(modManifest, item.projectID, addon.name)
@@ -1753,6 +1758,13 @@ export function processForgeManifest(instanceName) {
         /* eslint-enable no-await-in-loop */
       },
       { concurrency }
+    );
+
+    dispatch(
+      openModal('CfModDownloadFailed', {
+        instanceName,
+        failedModDownloads: failedDownloads
+      })
     );
 
     let validAddon = false;
@@ -2012,10 +2024,11 @@ export function downloadInstance(instanceName) {
 
       // analyze source and do it for ftb and forge
 
-      if (manifest && loader?.source === FTB)
+      if (manifest && loader?.source === FTB) {
         await dispatch(processFTBManifest(instanceName));
-      else if (manifest && loader?.source === CURSEFORGE)
+      } else if (manifest && loader?.source === CURSEFORGE) {
         await dispatch(processForgeManifest(instanceName));
+      }
 
       dispatch(updateDownloadProgress(0));
 
