@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { Progress } from 'antd';
 import path from 'path';
+import fse from 'fs-extra';
 import Modal from '../components/Modal';
 import { updateMod } from '../reducers/actions';
 import { closeModal } from '../reducers/modals/actions';
@@ -46,8 +47,8 @@ const ModsUpdater = ({ instanceName }) => {
       let i = 0;
       while (!cancel && i < totalMods.length) {
         const mod = totalMods[i];
-        const newModPath = path.join(tempPath, `${mod.fileName}__RESTORE`);
-        await makeModRestorePoint(newModPath, modsPath, mod.fileName);
+        const restoreModPath = path.join(tempPath, `${mod.fileName}__RESTORE`);
+        await makeModRestorePoint(restoreModPath, modsPath, mod.fileName);
 
         await dispatch(
           updateMod(
@@ -62,6 +63,7 @@ const ModsUpdater = ({ instanceName }) => {
           )
         );
         if (!cancel) {
+          await fse.remove(restoreModPath);
           setComputedMods(p => p + 1);
         }
         i += 1;

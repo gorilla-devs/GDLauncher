@@ -415,6 +415,7 @@ const Row = memo(({ index, style, data }) => {
                         gameVersions
                       )
                     );
+                    await fse.remove(newModPath);
                     setUpdateLoading(false);
                   }}
                 />
