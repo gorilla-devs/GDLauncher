@@ -693,7 +693,7 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
   }
 });
 
-ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
+ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
   let win = new BrowserWindow();
 
   const mainWindowListener = () => {
@@ -750,6 +750,14 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, modDestFile }) => {
           () => cleanupFn(`Download for ${modManifest.fileName} timed out`),
           40000
         );
+
+        const isResourcePack = addon.classId === 12;
+
+        const modDestFile = path.join(
+          instancePath,
+          isResourcePack ? 'resourcepacks' : 'mods'
+        );
+
         win.webContents.session.once('will-download', (_, item) => {
           item.setSavePath(path.join(modDestFile, modManifest.fileName));
 

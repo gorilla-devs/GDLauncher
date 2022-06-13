@@ -1777,16 +1777,11 @@ export function processForgeManifest(instanceName) {
     );
 
     if (optedOutMods.length) {
-      const modDestFile = path.join(
-        _getInstancesPath(state),
-        instanceName,
-        'mods'
-      );
       await new Promise((resolve, reject) => {
         dispatch(
           openModal('OptedOutModsList', {
             optedOutMods,
-            modDestFile,
+            instancePath: path.join(_getInstancesPath(state), instanceName),
             resolve,
             reject,
             abortCallback: () => {

@@ -95,7 +95,7 @@ const ModRow = ({ mod, loadedMods, currentMod, missingMods }) => {
 
 const OptedOutModsList = ({
   optedOutMods,
-  modDestFile,
+  instancePath,
   resolve,
   reject,
   preventClose
@@ -247,7 +247,7 @@ const OptedOutModsList = ({
                 });
                 ipcRenderer.invoke('download-optedout-mods', {
                   mods: optedOutMods,
-                  modDestFile
+                  instancePath
                 });
               }}
               css={`
