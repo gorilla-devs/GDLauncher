@@ -5,6 +5,7 @@ import {
   DEFAULT_MEMORY
 } from '../../../app/desktop/utils/constants';
 import { MC_STARTUP_METHODS } from '../../utils/constants';
+import { DefaultCfApiKey } from '../../api';
 
 function sounds(state = true, action) {
   switch (action.type) {
@@ -35,10 +36,7 @@ function instanceSortOrder(state = 0, action) {
   }
 }
 
-function curseForgeApiKey(
-  state = '$2a$10$5BgCleD8.rLQ5Ix17Xm2lOjgfoeTJV26a1BXmmpwrOemgI517.nuC',
-  action
-) {
+function curseForgeApiKey(state = DefaultCfApiKey, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_CURSEFORGE_API_KEY:
       return action.value;
