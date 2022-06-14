@@ -1745,14 +1745,11 @@ export function processForgeManifest(instanceName) {
                 modManifest.downloadUrl ?? item.downloadUrl
               );
             else {
-              let manifestId = modManifest.id.toString();
-              let downloadUrl =
-                'https://edge.forgecdn.net/files/' +
-                manifestId.substring(0, 4) +
-                '/' +
-                manifestId.substring(4) +
-                '/' +
-                modManifest.fileName;
+              const manifestId = modManifest.id.toString();
+              const downloadUrl = `https://edge.forgecdn.net/files/${manifestId.substring(
+                0,
+                4
+              )}/${manifestId.substring(4)}/${modManifest.fileName}`;
               await downloadFile(destFile, downloadUrl);
             }
           }
