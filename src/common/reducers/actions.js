@@ -1739,7 +1739,22 @@ export function processForgeManifest(instanceName) {
           );
           const fileExists = await fse.pathExists(destFile);
           if (!fileExists) {
-            await downloadFile(destFile, modManifest.downloadUrl);
+            if (modManifest.downloadUrl ?? item.downloadUrl)
+              await downloadFile(
+                destFile,
+                modManifest.downloadUrl ?? item.downloadUrl
+              );
+            else {
+              let manifestId = modManifest.id.toString();
+              let downloadUrl =
+                'https://edge.forgecdn.net/files/' +
+                manifestId.substring(0, 4) +
+                '/' +
+                manifestId.substring(4) +
+                '/' +
+                modManifest.fileName;
+              await downloadFile(destFile, downloadUrl);
+            }
           }
           modManifests = modManifests.concat(
             normalizeModData(modManifest, item.projectID, addon.name)
