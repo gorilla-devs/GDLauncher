@@ -30,8 +30,6 @@ let axioInstance = axios.create({
 });
 
 export const setCurseforgeApiKey = key => {
-  console.log('Creating new Axios Instance due to APIKey state change');
-  console.log(key);
   axioInstance = axios.create({
     headers: {
       'X-API-KEY': key,
