@@ -15,12 +15,14 @@ const { spawn, exec } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 const fss = require('fs');
+const os = require('os');
 const { promisify } = require('util');
 const { createHash } = require('crypto');
 const {
   default: { fromBase64: toBase64URL }
 } = require('base64url');
 const { URL } = require('url');
+const UserAgent = require('user-agents');
 const murmur = require('./native/murmur2');
 const nsfw = require('./native/nsfw');
 
@@ -142,6 +144,21 @@ const edit = [
     ]
   }
 ];
+
+let navPlatform = null;
+switch (os.platform()) {
+  case 'win32':
+    navPlatform = 'Win32';
+    break;
+  case 'darwin':
+    navPlatform = 'MacIntel';
+    break;
+  case 'linux':
+  default:
+    navPlatform = 'Linux';
+}
+
+const userAgent = new UserAgent({ platform: navPlatform }).toString();
 
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
@@ -642,7 +659,7 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
         }
       );
 
-      win.loadURL(url);
+      win.loadURL(url, { userAgent });
       cleanupFn = async err => {
         reject(new Error(err));
         // eslint-disable-next-line promise/param-names
@@ -716,7 +733,6 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
   });
 
   mainWindow.on('closed', mainWindowListener);
-
   for (const mod of mods) {
     if (!win) return;
     const { modManifest, addon } = mod;
@@ -739,7 +755,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
           }
         );
 
-        win.loadURL(urlDownloadPage);
+        win.loadURL(urlDownloadPage, { userAgent });
         cleanupFn = async err => {
           reject(new Error(err));
           // eslint-disable-next-line promise/param-names
