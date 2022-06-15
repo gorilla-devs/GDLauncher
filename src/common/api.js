@@ -23,14 +23,15 @@ export const DefaultCfApiKey =
 
 let axioInstance = axios.create({
   headers: {
-    'X-API-KEY':
-      window.__store.getState().settings.curseForgeApiKey || DefaultCfApiKey,
+    'X-API-KEY': DefaultCfApiKey,
     'Content-Type': 'application/json',
     Accept: 'application/json'
   }
 });
 
 export const setCurseforgeApiKey = key => {
+  console.log('Creating new Axios Instance due to APIKey state change');
+  console.log(key);
   axioInstance = axios.create({
     headers: {
       'X-API-KEY': key,

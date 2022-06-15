@@ -21,6 +21,7 @@ import ModalsManager from './common/components/ModalsManager';
 import 'typeface-roboto';
 import 'inter-ui';
 import ErrorBoundary from './common/ErrorBoundary';
+import { setCurseforgeApiKey } from './common/api';
 
 const Root =
   // eslint-disable-next-line no-nested-ternary
@@ -37,6 +38,9 @@ const ThemeProvider = ({ theme: themeUI, children }) => {
 const { store, persistor } = configureStore();
 
 window.__store = store;
+
+if (store.getState().settings.curseForgeApiKey)
+  setCurseforgeApiKey(store.getState().settings.curseForgeApiKey);
 
 window.addEventListener('mouseup', e => {
   if (e.button === 3 || e.button === 4 || e.button === 1) {
