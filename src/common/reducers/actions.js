@@ -1738,20 +1738,17 @@ export function processForgeManifest(instanceName) {
             modManifest.fileName
           );
           const fileExists = await fse.pathExists(destFile);
+          let { downloadUrl } = modManifest;
           if (!fileExists) {
-            if (modManifest.downloadUrl ?? item.downloadUrl)
-              await downloadFile(
-                destFile,
-                modManifest.downloadUrl ?? item.downloadUrl
-              );
-            else {
+            if (!downloadUrl) downloadUrl = item.downloadUrl;
+            if (!downloadUrl) {
               const manifestId = modManifest.id.toString();
-              const downloadUrl = `https://edge.forgecdn.net/files/${manifestId.substring(
+              downloadUrl = `https://edge.forgecdn.net/files/${manifestId.substring(
                 0,
                 4
               )}/${manifestId.substring(4)}/${modManifest.fileName}`;
-              await downloadFile(destFile, downloadUrl);
             }
+            await downloadFile(destFile, downloadUrl);
           }
           modManifests = modManifests.concat(
             normalizeModData(modManifest, item.projectID, addon.name)
