@@ -1,34 +1,36 @@
 module.exports = {
   new: [
     {
-      header: 'Added Play Button to instance manager.',
+      header:
+        "Curseforge's opted out mods can now be downloaded directly from GDLauncher!",
       content:
-        'You can start and stop instances from there while managing your mods.',
-      advanced: { cm: '' }
-    },
-    {
-      header: 'Added category selection in the mods browser.',
-      content:
-        'You can select the category from the dropdown and the mods will be filtered.',
+        'When a mod / modpack decided to opt out, we will open a browser window within GDLauncher and intercept the download.',
       advanced: { cm: '' }
     }
   ],
   improvements: [
     {
-      header: 'CurseForge APIs migrated to new ones.',
+      header:
+        'Before starting a modpack update GDLauncher will now create a restore point.',
       content:
-        'Things might not work, feel free to report anything not working on our discord.',
+        'If the update process fails, GDLauncher will rollback the last working backup.',
       advanced: { cm: '' }
     },
     {
-      header: 'Ram memory slider now shows the selected amount.',
-      content: 'It should be way easier to use.',
+      header:
+        'Updated electron to the latest version (Chrome 96 - Electron 19).',
+      content: 'This brings a lot of security and performance improvements.',
       advanced: { cm: '' }
     }
   ],
   bugfixes: [
     {
-      header: 'Fixed old instances not starting',
+      header: 'Fixed crashes in the mods manager.',
+      content: '',
+      advanced: { cm: '' }
+    },
+    {
+      header: 'Fixed resource packs not being saved in the correct location.',
       content: '',
       advanced: { cm: '' }
     }
