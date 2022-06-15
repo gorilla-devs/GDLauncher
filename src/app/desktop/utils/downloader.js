@@ -8,6 +8,10 @@ import computeFileHash from './computeFileHash';
 
 const fs = fss.promises;
 
+function isEncoded(uri) {
+  return uri !== decodeURIComponent(uri);
+}
+
 export const downloadInstanceFiles = async (
   arr,
   updatePercentage,
@@ -68,7 +72,9 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
       if (legacyPath) await makeDir(path.dirname(legacyPath));
     }
 
-    const { data } = await axios.get(url, {
+    const encodedUrl = isEncoded ? url : encodeURI(url);
+
+    const { data } = await axios.get(encodedUrl, {
       responseType: 'stream',
       responseEncoding: null,
       adapter,
@@ -114,7 +120,9 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
 export const downloadFile = async (fileName, url, onProgress) => {
   await makeDir(path.dirname(fileName));
 
-  const { data, headers } = await axios.get(url, {
+  const encodedUrl = isEncoded ? url : encodeURI(url);
+
+  const { data, headers } = await axios.get(encodedUrl, {
     responseType: 'stream',
     responseEncoding: null,
     adapter,

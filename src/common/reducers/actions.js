@@ -3,7 +3,7 @@ import path from 'path';
 import { ipcRenderer } from 'electron';
 import { v5 as uuid } from 'uuid';
 import { machineId } from 'node-machine-id';
-import fse from 'fs-extra';
+import fse, { remove } from 'fs-extra';
 import coerce from 'semver/functions/coerce';
 import gte from 'semver/functions/gte';
 import lt from 'semver/functions/lt';
@@ -115,13 +115,19 @@ import {
   downloadFile,
   downloadInstanceFiles
 } from '../../app/desktop/utils/downloader';
-import { getFileMurmurHash2, removeDuplicates } from '../utils';
+import {
+  getFileMurmurHash2,
+  getSize,
+  makeInstanceRestorePoint,
+  removeDuplicates
+} from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
 import PromiseQueue from '../../app/desktop/utils/PromiseQueue';
 import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
 import { openModal, closeModal } from './modals/actions';
 import forgePatcher from '../utils/forgePatcher';
+import browserDownload from '../utils/browserDownload';
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -1095,7 +1101,8 @@ export function addToQueue(
   manifest,
   background,
   timePlayed,
-  settings = {}
+  settings = {},
+  updateOptions
 ) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -1103,12 +1110,16 @@ export function addToQueue(
     const patchedSettings =
       typeof settings === 'object' && settings !== null ? settings : {};
 
+    const { isUpdate, bypassCopy } = updateOptions || {};
+
     dispatch({
       type: ActionTypes.ADD_DOWNLOAD_TO_QUEUE,
       instanceName,
       loader,
       manifest,
       background,
+      isUpdate,
+      bypassCopy,
       ...patchedSettings
     });
 
@@ -1136,6 +1147,7 @@ export function addToQueue(
         true
       )
     );
+
     if (!currentDownload) {
       dispatch(updateCurrentDownload(instanceName));
       dispatch(downloadInstance(instanceName));
@@ -1717,6 +1729,7 @@ export function processForgeManifest(instanceName) {
     await Promise.all([_getAddons(), _getAddonFiles()]);
 
     let modManifests = [];
+    const optedOutMods = [];
     await pMap(
       manifest.files,
       async item => {
@@ -1729,21 +1742,29 @@ export function processForgeManifest(instanceName) {
           if (tries !== 1) {
             await new Promise(resolve => setTimeout(resolve, 5000));
           }
+
           const addon = addonsHashmap[item.projectID];
+          const isResourcePack = addon.classId === 12;
           const modManifest = addonsFilesHashmap[item.projectID];
           const destFile = path.join(
             _getInstancesPath(state),
             instanceName,
-            addon?.categorySection?.path || 'mods',
+            isResourcePack ? 'resourcepacks' : 'mods',
             modManifest.fileName
           );
+
           const fileExists = await fse.pathExists(destFile);
+
           if (!fileExists) {
+            if (!modManifest.downloadUrl) {
+              optedOutMods.push({ addon, modManifest });
+              return;
+            }
             await downloadFile(destFile, modManifest.downloadUrl);
+            modManifests = modManifests.concat(
+              normalizeModData(modManifest, item.projectID, addon.name)
+            );
           }
-          modManifests = modManifests.concat(
-            normalizeModData(modManifest, item.projectID, addon.name)
-          );
           const percentage =
             (modManifests.length * 100) / manifest.files.length - 1;
 
@@ -1753,6 +1774,31 @@ export function processForgeManifest(instanceName) {
         /* eslint-enable no-await-in-loop */
       },
       { concurrency }
+    );
+
+    if (optedOutMods.length) {
+      await new Promise((resolve, reject) => {
+        dispatch(
+          openModal('OptedOutModsList', {
+            optedOutMods,
+            instancePath: path.join(_getInstancesPath(state), instanceName),
+            resolve,
+            reject,
+            abortCallback: () => {
+              setTimeout(
+                () => reject(new Error('Download Aborted by the user')),
+                300
+              );
+            }
+          })
+        );
+      });
+    }
+
+    modManifests = modManifests.concat(
+      ...optedOutMods.map(v =>
+        normalizeModData(v.modManifest, v.modManifest.projectID, v.addon.name)
+      )
     );
 
     let validAddon = false;
@@ -1873,17 +1919,54 @@ export function processForgeManifest(instanceName) {
 
 export function downloadInstance(instanceName) {
   return async (dispatch, getState) => {
+    const state = getState();
+    const { loader, manifest, isUpdate, bypassCopy } =
+      _getCurrentDownloadItem(state);
+    const {
+      app: {
+        vanillaManifest: { versions: mcVersions }
+      }
+    } = state;
+
+    const tempPath = _getTempPath(state);
+    const tempInstancePath = path.join(tempPath, `${instanceName}__RESTORE`);
+
     try {
-      const state = getState();
-      const {
-        app: {
-          vanillaManifest: { versions: mcVersions }
+      const instancesPath = _getInstancesPath(getState());
+
+      if (isUpdate && !bypassCopy) {
+        dispatch(
+          updateDownloadStatus(instanceName, 'Creating restore point...')
+        );
+
+        const oldInstancePath = path.join(instancesPath, instanceName);
+
+        const sizeSrc = await getSize(oldInstancePath);
+
+        const interval = setInterval(async () => {
+          try {
+            const sizeDest = await getSize(tempInstancePath);
+            const progress = (100 * sizeDest) / sizeSrc;
+            dispatch(updateDownloadProgress(progress));
+          } catch {
+            // Doesn't matter too much
+          }
+        }, 400);
+
+        try {
+          await makeInstanceRestorePoint(
+            tempInstancePath,
+            instancesPath,
+            instanceName
+          );
+          clearInterval(interval);
+        } catch (e) {
+          console.warn(e);
+          clearInterval(interval);
         }
-      } = state;
+      }
 
       dispatch(updateDownloadStatus(instanceName, 'Downloading game files...'));
-
-      const { loader, manifest } = _getCurrentDownloadItem(state);
 
       const mcVersion = loader?.mcVersion;
 
@@ -2030,9 +2113,12 @@ export function downloadInstance(instanceName) {
         openModal('InstanceDownloadFailed', {
           instanceName,
           preventClose: true,
-          error: err
+          error: err,
+          isUpdate
         })
       );
+    } finally {
+      await remove(tempInstancePath);
     }
   };
 }
@@ -2142,7 +2228,10 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           instanceName,
           loader,
           newManifest,
-          `background${path.extname(imageURL)}`
+          `background${path.extname(imageURL)}`,
+          undefined,
+          undefined,
+          { isUpdate: true, bypassCopy: true }
         )
       );
     } else if (instance.loader.source === FTB) {
@@ -2230,6 +2319,7 @@ export const startListener = () => {
         const isInConfig = (instance?.mods || []).find(
           mod => mod.fileName === path.basename(fileName)
         );
+
         try {
           const stat = await fs.lstat(fileName);
 
@@ -3132,7 +3222,8 @@ export function installMod(
   gameVersions,
   installDeps = true,
   onProgress,
-  useTempMiddleware
+  useTempMiddleware,
+  item
 ) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -3144,83 +3235,154 @@ export function installMod(
     mainModData.projectID = projectID;
     const destFile = path.join(instancePath, 'mods', mainModData.fileName);
     const tempFile = path.join(_getTempPath(state), mainModData.fileName);
+    const installedMods = [];
 
-    if (useTempMiddleware) {
-      await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
-    }
-    let needToAddMod = true;
-    await dispatch(
-      updateInstanceConfig(instanceName, prev => {
-        needToAddMod = !prev.mods.find(
-          v => v.fileID === fileID && v.projectID === projectID
-        );
-        return {
-          ...prev,
-          mods: [
-            ...prev.mods,
-            ...(needToAddMod
-              ? [normalizeModData(mainModData, projectID, addon.name)]
-              : [])
-          ]
-        };
-      })
-    );
-
-    if (!needToAddMod) {
-      if (useTempMiddleware) {
-        await fse.remove(tempFile);
-      }
-      return;
-    }
-
-    if (!useTempMiddleware) {
-      try {
-        await fse.access(destFile);
-        const murmur2 = await getFileMurmurHash2(destFile);
-        if (murmur2 !== mainModData.fileFingerprint) {
-          await downloadFile(destFile, mainModData.downloadUrl, onProgress);
-        }
-      } catch {
-        await downloadFile(destFile, mainModData.downloadUrl, onProgress);
-      }
-    } else {
-      await fse.move(tempFile, destFile, { overwrite: true });
-    }
-
-    if (installDeps) {
-      await pMap(
-        mainModData.dependencies,
-        async dep => {
-          // type 1: embedded
-          // type 2: optional
-          // type 3: required
-          // type 4: tool
-          // type 5: incompatible
-          // type 6: include
-
-          if (dep.type === 3) {
-            if (instance.mods.some(x => x.addonId === dep.addonId)) return;
-            const depList = await getAddonFiles(dep.addonId);
-            const depData = depList.find(v =>
-              v.gameVersions.includes(gameVersions)
-            );
+    const removeModFromConfig = async () => {
+      await Promise.all(
+        installedMods.map(async mod => {
+          if (mod.needToAddMod) {
             await dispatch(
-              installMod(
-                dep.addonId,
-                depData.id,
-                instanceName,
-                gameVersions,
-                installDeps,
-                onProgress,
-                useTempMiddleware
-              )
+              updateInstanceConfig(instanceName, prev => {
+                return {
+                  ...prev,
+                  mods: [...prev.mods.filter(m => m.modId !== mod.addon.id)]
+                };
+              })
             );
           }
-        },
-        { concurrency: 2 }
+        })
       );
+    };
+
+    const urlDownloadPage = `https://www.curseforge.com/minecraft/mc-mods/${item.slug}/download/${mainModData.id}`;
+    try {
+      if (useTempMiddleware) {
+        if (!mainModData.downloadUrl) {
+          try {
+            await browserDownload(urlDownloadPage, destFile);
+          } catch (e) {
+            await removeModFromConfig();
+            dispatch(
+              openModal('InfoModal', {
+                modName: mainModData.name,
+                preventClose: false,
+                error: e
+              })
+            );
+          }
+        } else {
+          await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
+        }
+      }
+      let needToAddMod = true;
+      await dispatch(
+        updateInstanceConfig(instanceName, prev => {
+          needToAddMod = !prev.mods.find(
+            v => v.fileID === fileID && v.projectID === projectID
+          );
+          return {
+            ...prev,
+            mods: [
+              ...prev.mods,
+              ...(needToAddMod
+                ? [normalizeModData(mainModData, projectID, addon.name)]
+                : [])
+            ]
+          };
+        })
+      );
+      installedMods.push({ addon, projectID, needToAddMod });
+
+      if (!needToAddMod) {
+        if (useTempMiddleware) {
+          await fse.remove(tempFile);
+        }
+        return;
+      }
+
+      if (!useTempMiddleware) {
+        try {
+          await fse.access(destFile);
+          const murmur2 = await getFileMurmurHash2(destFile);
+          if (murmur2 !== mainModData.fileFingerprint) {
+            if (!mainModData.downloadUrl) {
+              try {
+                await browserDownload(urlDownloadPage, destFile);
+              } catch (e) {
+                await removeModFromConfig();
+                dispatch(
+                  openModal('InfoModal', {
+                    modName: mainModData.name,
+                    preventClose: false,
+                    error: e
+                  })
+                );
+              }
+            } else {
+              await downloadFile(destFile, mainModData.downloadUrl, onProgress);
+            }
+          }
+        } catch {
+          if (!mainModData.downloadUrl) {
+            try {
+              await browserDownload(urlDownloadPage, destFile);
+            } catch (e) {
+              await removeModFromConfig();
+              dispatch(
+                openModal('InfoModal', {
+                  modName: mainModData.name,
+                  preventClose: false,
+                  error: e
+                })
+              );
+            }
+          } else {
+            await downloadFile(destFile, mainModData.downloadUrl, onProgress);
+          }
+        }
+      } else {
+        await fse.move(tempFile, destFile, { overwrite: true });
+      }
+
+      if (installDeps) {
+        await pMap(
+          mainModData.dependencies,
+          async dep => {
+            // type 1: embedded
+            // type 2: optional
+            // type 3: required
+            // type 4: tool
+            // type 5: incompatible
+            // type 6: include
+
+            if (dep.relationType === 3) {
+              if (instance.mods.some(x => x.addonId === dep.modId)) return;
+              const depList = await getAddonFiles(dep.modId);
+              const depData = depList.find(v =>
+                v.gameVersions.includes(gameVersions)
+              );
+
+              await dispatch(
+                installMod(
+                  dep.modId,
+                  depData.id,
+                  instanceName,
+                  gameVersions,
+                  installDeps,
+                  onProgress,
+                  useTempMiddleware,
+                  item
+                )
+              );
+            }
+          },
+          { concurrency: 2 }
+        );
+      }
+      return destFile;
+    } catch (e) {
+      await removeModFromConfig();
     }
-    return destFile;
   };
 }
 
@@ -3247,6 +3409,8 @@ export const updateMod = (
   onProgress
 ) => {
   return async dispatch => {
+    const addon = await getAddon(mod.modId);
+    const item = { ...mod, slug: addon.slug };
     await dispatch(
       installMod(
         mod.projectID,
@@ -3255,7 +3419,8 @@ export const updateMod = (
         gameVersions,
         false,
         onProgress,
-        true
+        true,
+        item
       )
     );
     await dispatch(deleteMod(instanceName, mod));

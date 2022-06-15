@@ -57,10 +57,14 @@ const Home = () => {
         dispatch(updateLastUpdateVersion(appVersion));
         dispatch(openModal('ChangeLogs'));
       }
-      const { data } = await axios.get(
-        'https://api.gdlauncher.com/announcement'
-      );
-      setAnnoucement(data || null);
+      try {
+        const { data } = await axios.get(
+          'https://api.gdlauncher.com/announcement'
+        );
+        setAnnoucement(data || null);
+      } catch (e) {
+        console.log('No announcement to show');
+      }
     };
 
     init();

@@ -264,7 +264,9 @@ const ModsListWrapper = ({
                             parseInt(p, 10) / 100
                           );
                         }
-                      }
+                      },
+                      undefined,
+                      item
                     )
                   );
                   ipcRenderer.invoke('update-progress-bar', 0);

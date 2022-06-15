@@ -15,12 +15,14 @@ const { spawn, exec } = require('child_process');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 const fss = require('fs');
+const os = require('os');
 const { promisify } = require('util');
 const { createHash } = require('crypto');
 const {
   default: { fromBase64: toBase64URL }
 } = require('base64url');
 const { URL } = require('url');
+const UserAgent = require('user-agents');
 const murmur = require('./native/murmur2');
 const nsfw = require('./native/nsfw');
 
@@ -142,6 +144,24 @@ const edit = [
     ]
   }
 ];
+
+let navPlatform = null;
+switch (os.platform()) {
+  case 'win32':
+    navPlatform = 'Win32';
+    break;
+  case 'darwin':
+    navPlatform = 'MacIntel';
+    break;
+  case 'linux':
+  default:
+    navPlatform = 'Linux x86_64';
+}
+
+const userAgent = new UserAgent({
+  platform: navPlatform,
+  deviceCategory: 'desktop'
+}).toString();
 
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
@@ -600,6 +620,204 @@ ipcMain.handle('reset-discord-rpc', () => {
 
 ipcMain.handle('shutdown-discord-rpc', () => {
   discordRPC.shutdownRPC();
+});
+
+ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
+  let win = new BrowserWindow();
+
+  const mainWindowListener = () => {
+    if (win) {
+      win.removeAllListeners();
+      win.close();
+      win = null;
+    }
+  };
+
+  win.once('close', () => {
+    win = null;
+  });
+
+  let cleanupFn = null;
+  win.once('closed', () => {
+    mainWindow.webContents.send('opted-out-window-closed-unexpected');
+    if (cleanupFn) cleanupFn(`Window has been closed unexpectedly`);
+    mainWindow.removeListener('closed', mainWindowListener);
+  });
+
+  mainWindow.on('closed', mainWindowListener);
+
+  if (!win) return;
+  try {
+    // eslint-disable-next-line no-loop-func
+    await new Promise((resolve, reject) => {
+      win.webContents.session.webRequest.onCompleted(
+        { urls: [url] },
+        details => {
+          if (details.statusCode === 404) {
+            mainWindow.webContents.send('opted-out-download-mod-status', {
+              error: new Error('Error 404, Mod page not found')
+            });
+            reject();
+          }
+        }
+      );
+
+      win.loadURL(url, { userAgent });
+      cleanupFn = async err => {
+        reject(new Error(err));
+        // eslint-disable-next-line promise/param-names
+        await new Promise(r => setTimeout(r, 50));
+        mainWindowListener();
+      };
+      const timer = setTimeout(
+        () => cleanupFn(`Download for ${url} timed out`),
+        40000
+      );
+      win.webContents.session.once('will-download', (_, item) => {
+        item.setSavePath(filePath);
+
+        item.once('updated', () => {
+          clearTimeout(timer);
+        });
+
+        item.once('done', (event, state) => {
+          if (state === 'completed') {
+            resolve();
+          } else {
+            reject(new Error(`Download for ${url} failed`));
+          }
+        });
+      });
+    });
+    if (mainWindow?.webContents) {
+      // send success event to front end
+      mainWindow.webContents.send('opted-out-download-mod-status', {
+        error: false
+      });
+    }
+  } catch (err) {
+    if (mainWindow?.webContents && win) {
+      // send error event to front end
+      mainWindow.webContents.send('opted-out-download-mod-status', {
+        error: err
+      });
+    }
+  }
+
+  if (win) {
+    win.removeAllListeners();
+    win.close();
+    win.once('closed', () => {
+      win = null;
+    });
+  }
+});
+
+ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
+  let win = new BrowserWindow();
+
+  const mainWindowListener = () => {
+    if (win) {
+      win.removeAllListeners();
+      win.close();
+      win = null;
+    }
+  };
+
+  win.once('close', () => {
+    win = null;
+  });
+
+  let cleanupFn = null;
+  win.once('closed', () => {
+    mainWindow.webContents.send('opted-out-window-closed-unexpected');
+    if (cleanupFn) cleanupFn(`Window has been closed unexpectedly`);
+    mainWindow.removeListener('closed', mainWindowListener);
+  });
+
+  mainWindow.on('closed', mainWindowListener);
+  for (const mod of mods) {
+    if (!win) return;
+    const { modManifest, addon } = mod;
+    try {
+      // eslint-disable-next-line no-loop-func
+      await new Promise((resolve, reject) => {
+        const urlDownloadPage = `${addon.links.websiteUrl}/download/${modManifest.id}`;
+
+        win.webContents.session.webRequest.onCompleted(
+          { urls: [urlDownloadPage] },
+          details => {
+            if (details.statusCode === 404) {
+              resolve();
+              mainWindow.webContents.send('opted-out-download-mod-status', {
+                modId: modManifest.id,
+                error: false,
+                warning: true
+              });
+            }
+          }
+        );
+
+        win.loadURL(urlDownloadPage, { userAgent });
+        cleanupFn = async err => {
+          reject(new Error(err));
+          // eslint-disable-next-line promise/param-names
+          await new Promise(r => setTimeout(r, 50));
+          mainWindowListener();
+        };
+        const timer = setTimeout(
+          () => cleanupFn(`Download for ${modManifest.fileName} timed out`),
+          40000
+        );
+
+        const isResourcePack = addon.classId === 12;
+
+        const modDestFile = path.join(
+          instancePath,
+          isResourcePack ? 'resourcepacks' : 'mods'
+        );
+
+        win.webContents.session.once('will-download', (_, item) => {
+          item.setSavePath(path.join(modDestFile, modManifest.fileName));
+
+          item.once('updated', () => {
+            clearTimeout(timer);
+          });
+
+          item.once('done', (event, state) => {
+            if (state === 'completed') {
+              resolve();
+            } else {
+              reject(new Error(`Download for ${modManifest.fileName} failed`));
+            }
+          });
+        });
+      });
+      if (mainWindow?.webContents) {
+        // send success event to front end
+        mainWindow.webContents.send('opted-out-download-mod-status', {
+          modId: modManifest.id,
+          error: false
+        });
+      }
+    } catch (err) {
+      if (mainWindow?.webContents && win) {
+        // send error event to front end
+        mainWindow.webContents.send('opted-out-download-mod-status', {
+          modId: modManifest.id,
+          error: err
+        });
+      }
+    }
+  }
+
+  if (win) {
+    win.removeAllListeners();
+    win.close();
+    win.once('closed', () => {
+      win = null;
+    });
+  }
 });
 
 ipcMain.handle('start-listener', async (e, dirPath) => {
