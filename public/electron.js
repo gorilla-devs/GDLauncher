@@ -671,7 +671,7 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
       };
       const timer = setTimeout(
         () => cleanupFn(`Download for ${url} timed out`),
-        40000
+        60 * 1000 * 2
       );
       win.webContents.session.once('will-download', (_, item) => {
         item.setSavePath(filePath);
@@ -767,7 +767,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
         };
         const timer = setTimeout(
           () => cleanupFn(`Download for ${modManifest.fileName} timed out`),
-          40000
+          60 * 1000 * 2
         );
 
         const isResourcePack = addon.classId === 12;
