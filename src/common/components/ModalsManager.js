@@ -61,6 +61,9 @@ const modalsComponentLookupTable = {
   AutoUpdatesNotAvailable: AsyncComponent(
     lazy(() => import('../modals/AutoUpdatesNotAvailable'))
   ),
+  OptedOutModsList: AsyncComponent(
+    lazy(() => import('../modals/OptedOutModsList'))
+  ),
   BisectHosting: AsyncComponent(lazy(() => import('../modals/BisectHosting'))),
   Onboarding: AsyncComponent(lazy(() => import('../modals/Onboarding'))),
   ModOverview: AsyncComponent(lazy(() => import('../modals/ModOverview'))),
@@ -87,14 +90,15 @@ const modalsComponentLookupTable = {
   ),
   CfModDownloadFailed: AsyncComponent(
     lazy(() => import('../modals/CfModDownloadFailed'))
-  )
+  ),
+  InfoModal: AsyncComponent(lazy(() => import('../modals/InfoModal')))
 };
 
 const ModalContainer = ({
   unmounting,
   children,
   preventClose,
-  closeCallback
+  abortCallback
 }) => {
   const [modalStyle, setModalStyle] = useState({
     opacity: 0
@@ -114,7 +118,7 @@ const ModalContainer = ({
     if (unmounting) unMountStyle();
   }, [unmounting]);
 
-  const back = e => {
+  const back = async e => {
     e.stopPropagation();
     if (preventClose) {
       setModalStyle({
@@ -128,7 +132,7 @@ const ModalContainer = ({
       }, 500);
       return;
     }
-    if (closeCallback) closeCallback();
+    if (abortCallback) await abortCallback();
     dispatch(closeModal());
   };
 
@@ -174,7 +178,7 @@ const ModalsManager = () => {
         unmounting={unmounting}
         key={modalType}
         preventClose={modalProps.preventClose}
-        closeCallback={modalProps.abortCallback}
+        abortCallback={modalProps.abortCallback}
         modalType={modalType}
       >
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}

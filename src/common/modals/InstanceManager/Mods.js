@@ -24,7 +24,11 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import fse from 'fs-extra';
 import makeDir from 'make-dir';
 import curseForgeIcon from '../../assets/curseforgeIcon.webp';
-import { _getInstance, _getInstancesPath } from '../../utils/selectors';
+import {
+  _getInstance,
+  _getInstancesPath,
+  _getTempPath
+} from '../../utils/selectors';
 import {
   updateInstanceConfig,
   deleteMod,
@@ -32,6 +36,7 @@ import {
   initLatestMods
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
+import { makeModRestorePoint } from '../../utils';
 
 const Header = styled.div`
   height: 40px;
@@ -315,6 +320,10 @@ const Row = memo(({ index, style, data }) => {
     latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
 
+  const tempPath = useSelector(_getTempPath);
+  const newModPath = path.join(tempPath, `${item.fileName}__RESTORE`);
+  const modsPath = path.join(instancePath, 'mods');
+
   const name = item.fileName
     .replace('.jar', '')
     .replace('.zip', '')
@@ -392,6 +401,12 @@ const Row = memo(({ index, style, data }) => {
                   icon={faDownload}
                   onClick={async () => {
                     setUpdateLoading(true);
+                    await makeModRestorePoint(
+                      newModPath,
+                      modsPath,
+                      item.fileName
+                    );
+
                     await dispatch(
                       updateMod(
                         instanceName,
@@ -400,6 +415,7 @@ const Row = memo(({ index, style, data }) => {
                         gameVersions
                       )
                     );
+                    await fse.remove(newModPath);
                     setUpdateLoading(false);
                   }}
                 />
@@ -513,20 +529,20 @@ const createItemData = memoize(
 );
 
 const sort = arr =>
-  arr.slice().sort((a, b) => a.fileName.localeCompare(b.fileName));
+  arr.slice().sort((a, b) => a.fileName?.localeCompare(b.fileName));
 
 const filter = (arr, search) =>
   arr.filter(
     mod =>
-      mod.fileName.toLowerCase().includes(search.toLowerCase()) ||
-      mod.displayName.toLowerCase().includes(search.toLowerCase())
+      mod.fileName?.toLowerCase()?.includes(search?.toLowerCase()) ||
+      mod.displayName?.toLowerCase()?.includes(search?.toLowerCase())
   );
 
 const getFileType = file => {
   const fileName = file.name;
   let fileType = '';
 
-  const splitFileName = fileName.split('.');
+  const splitFileName = fileName?.split('.');
   if (splitFileName.length) {
     fileType = splitFileName[splitFileName.length - 1];
   }

@@ -1,4 +1,10 @@
 import { ipcRenderer } from 'electron';
+import lockfile from 'lockfile';
+import path from 'path';
+import { access, copy, readJson, remove } from 'fs-extra';
+import { readdir } from 'fs/promises';
+import getSizeCallback from 'get-folder-size';
+import makeDir from 'make-dir';
 
 export const sortByDate = (a, b) => {
   const dateA = new Date(a.fileDate);
@@ -131,6 +137,131 @@ export const convertMinutesToHumanTime = minutes => {
   }
 };
 
+export const rollBackInstanceZip = async (
+  isUpdate,
+  instancesPath,
+  instanceName,
+  tempPath,
+  dispatch,
+  updateInstanceConfig
+) => {
+  if (isUpdate) {
+    await new Promise(resolve => {
+      lockfile.lock(
+        path.join(instancesPath, instanceName, 'installing.lock'),
+        err => {
+          if (err) console.warn(err);
+          resolve();
+        }
+      );
+    });
+
+    const contentDir = await readdir(path.join(instancesPath, instanceName));
+
+    await Promise.all(
+      contentDir.map(async f => {
+        try {
+          if (f !== 'config.json' && f !== 'installing.lock') {
+            await remove(path.join(instancesPath, instanceName, f));
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        return null;
+      })
+    );
+
+    const oldInstanceContentDir = await readdir(
+      path.join(tempPath, `${instanceName}__RESTORE`)
+    );
+
+    await Promise.all(
+      oldInstanceContentDir.map(async f => {
+        try {
+          if (f !== 'installing.lock') {
+            const tempFilePath = path.join(
+              tempPath,
+              `${instanceName}__RESTORE`,
+              f
+            );
+            const newFilePath = path.join(instancesPath, instanceName, f);
+
+            await copy(tempFilePath, newFilePath, {
+              overwrite: true,
+              recursive: true
+            });
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        return null;
+      })
+    );
+
+    const currentConfig = await readJson(
+      path.join(instancesPath, instanceName, 'config.json')
+    );
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    dispatch(updateInstanceConfig(instanceName, () => currentConfig));
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    await new Promise(resolve => {
+      lockfile.unlock(
+        path.join(instancesPath, instanceName, 'installing.lock'),
+        err => {
+          if (err) console.error(err);
+          resolve();
+        }
+      );
+    });
+
+    await remove(path.join(tempPath, `${instanceName}__RESTORE`));
+  } else {
+    await remove(path.join(instancesPath, instanceName));
+  }
+};
+
+export const makeInstanceRestorePoint = async (
+  newInstancePath,
+  instancesPath,
+  instanceName
+) => {
+  try {
+    await access(newInstancePath);
+    await remove(newInstancePath);
+  } catch (e) {
+    console.warn(e);
+  }
+  await makeDir(newInstancePath);
+  try {
+    await copy(path.join(instancesPath, instanceName), newInstancePath, {
+      recursive: true,
+      overwrite: true
+    });
+  } catch (e) {
+    console.warn(e);
+  }
+};
+
+export const makeModRestorePoint = async (newModPath, modsPath, modName) => {
+  try {
+    await access(newModPath);
+    await remove(newModPath);
+  } catch (e) {
+    console.warn(e);
+  }
+  try {
+    await copy(path.join(modsPath, modName), newModPath, {
+      recursive: true,
+      overwrite: true
+    });
+  } catch (e) {
+    console.warn(e);
+  }
+};
+
 export const scaleMem = x => Math.log2(x / 1024);
 export const scaleMemInv = x => 1024 * 2 ** x;
 export const sysMemScaled = Math.round(
@@ -143,3 +274,14 @@ export const marks =
   sysMemScaled > 6
     ? marksScaled.map(x => `${x / 1024} GB`)
     : marksScaled.map(x => `${x} MB`);
+
+export const getSize = async dir => {
+  return new Promise((resolve, reject) => {
+    getSizeCallback(dir)
+      .then(({ size, errors }) => {
+        if (errors) return reject(errors);
+        return resolve(size);
+      })
+      .catch(e => reject(e));
+  });
+};
