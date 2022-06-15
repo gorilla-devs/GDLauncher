@@ -20,18 +20,25 @@ const CfModDownloadFailed = ({ instanceName, failedModDownloads }) => {
             margin: 10px 0;
           `}
         >
-          {failedModDownloads
-            .map(x => x.fileName)
-            .map(x => (
-              <div>{x}</div>
-            ))}
+          {failedModDownloads.map(x => (
+            <div>
+              {x.name}
+              <div
+                css={`
+                  color: ${props => props.theme.palette.grey[300]};
+                  margin-left: 1rem;
+                `}
+              >
+                {x.fileName}
+              </div>
+            </div>
+          ))}
         </div>
         <div>
           You will need to download these from{' '}
           <a
             css={`
               color: ${props => {
-                console.log(props);
                 return props.theme.palette.colors.orange;
               }};
             `}
