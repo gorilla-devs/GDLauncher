@@ -74,7 +74,7 @@ const Experimental = () => {
       <Content>
         <p>
           If you run into any issues downloading mods, you can revert to
-          GDLuancher&apos;s granted API Key using the reset button beside the
+          GDLauncher&apos;s granted API Key using the reset button beside the
           text box.
         </p>
       </Content>
