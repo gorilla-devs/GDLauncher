@@ -10,7 +10,7 @@ import {
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin, Radio } from 'antd';
 import CurseForgeModpacks from './CurseForgeModpacks';
-// import FTBModpacks from './FTBModpacks';
+import FTBModpacks from './FTBModpacks';
 import Import from './Import';
 import NewInstance from './NewInstance';
 import minecraftIcon from '../../assets/minecraftIcon.png';
@@ -45,11 +45,11 @@ const Content = ({
       setImportZipPath={setImportZipPath}
       setOverrideNextStepOnClick={setOverrideNextStepOnClick}
     />,
-    // <FTBModpacks
-    //   setVersion={setVersion}
-    //   setStep={setStep}
-    //   setModpack={setModpack}
-    // />
+    <FTBModpacks
+      setVersion={setVersion}
+      setStep={setStep}
+      setModpack={setModpack}
+    />
   ];
 
   return (
@@ -105,7 +105,7 @@ const Content = ({
                   </Radio.Button>
                   {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button>
                   <Radio.Button value={4} disabled>Technic</Radio.Button> */}
-                  {/* <Radio.Button value={3}>
+                  <Radio.Button value={3}>
                     <img
                       src={ftbIcon}
                       css={`
@@ -115,7 +115,7 @@ const Content = ({
                       `}
                     />
                     FTB
-                  </Radio.Button> */}
+                  </Radio.Button>
                   <Radio.Button value={2}>
                     <FontAwesomeIcon
                       icon={faArchive}
