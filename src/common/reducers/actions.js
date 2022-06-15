@@ -3158,7 +3158,15 @@ export function installMod(
     const tempFile = path.join(_getTempPath(state), mainModData.fileName);
 
     if (useTempMiddleware) {
-      await downloadFile(tempFile, mainModData.downloadUrl, onProgress);
+      let { downloadUrl } = mainModData;
+      if (!downloadUrl) {
+        const manifestId = mainModData.id.toString();
+        downloadUrl = `https://edge.forgecdn.net/files/${manifestId.substring(
+          0,
+          4
+        )}/${manifestId.substring(4)}/${mainModData.fileName}`;
+      }
+      await downloadFile(tempFile, downloadUrl, onProgress);
     }
     let needToAddMod = true;
     await dispatch(
