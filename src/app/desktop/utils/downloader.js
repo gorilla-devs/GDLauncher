@@ -68,7 +68,9 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
       if (legacyPath) await makeDir(path.dirname(legacyPath));
     }
 
-    const { data } = await axios.get(url, {
+    const encodedUrl = encodeURI(url);
+
+    const { data } = await axios.get(encodedUrl, {
       responseType: 'stream',
       responseEncoding: null,
       adapter,
@@ -114,7 +116,9 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
 export const downloadFile = async (fileName, url, onProgress) => {
   await makeDir(path.dirname(fileName));
 
-  const { data, headers } = await axios.get(url, {
+  const encodedUrl = encodeURI(url);
+
+  const { data, headers } = await axios.get(encodedUrl, {
     responseType: 'stream',
     responseEncoding: null,
     adapter,
