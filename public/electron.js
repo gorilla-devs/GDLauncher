@@ -155,10 +155,13 @@ switch (os.platform()) {
     break;
   case 'linux':
   default:
-    navPlatform = 'Linux';
+    navPlatform = 'Linux x86_64';
 }
 
-const userAgent = new UserAgent({ platform: navPlatform }).toString();
+const userAgent = new UserAgent({
+  platform: navPlatform,
+  deviceCategory: 'desktop'
+}).toString();
 
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
