@@ -1756,8 +1756,6 @@ export function processForgeManifest(instanceName) {
           const fileExists = await fse.pathExists(destFile);
 
           if (!fileExists) {
-            await downloadFile(destFile, modManifest.downloadUrl);
-
             if (!modManifest.downloadUrl) {
               optedOutMods.push({ addon, modManifest });
               return;
