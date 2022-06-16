@@ -1729,7 +1729,6 @@ export function processForgeManifest(instanceName) {
     await Promise.all([_getAddons(), _getAddonFiles()]);
 
     let modManifests = [];
-    const failedDownloads = [];
     const optedOutMods = [];
     await pMap(
       manifest.files,
@@ -1757,11 +1756,7 @@ export function processForgeManifest(instanceName) {
           const fileExists = await fse.pathExists(destFile);
 
           if (!fileExists) {
-            try {
-              await downloadFile(destFile, modManifest.downloadUrl);
-            } catch (ex) {
-              failedDownloads.push(modManifest);
-            }
+            await downloadFile(destFile, modManifest.downloadUrl);
 
             if (!modManifest.downloadUrl) {
               optedOutMods.push({ addon, modManifest });
@@ -1782,15 +1777,6 @@ export function processForgeManifest(instanceName) {
       },
       { concurrency }
     );
-
-    if (failedDownloads.length) {
-      dispatch(
-        openModal('CfModDownloadFailed', {
-          instanceName,
-          failedModDownloads: failedDownloads
-        })
-      );
-    }
 
     if (optedOutMods.length) {
       await new Promise((resolve, reject) => {
