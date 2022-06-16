@@ -380,14 +380,12 @@ function createWindow() {
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
   if (watcher) {
-    watcher.stop();
+    await watcher.stop();
     watcher = null;
   }
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
 
 app.on('before-quit', async () => {
@@ -622,8 +620,22 @@ ipcMain.handle('shutdown-discord-rpc', () => {
   discordRPC.shutdownRPC();
 });
 
+const removeOriginHeader = (details, callback) => {
+  // Use a header to skip sending Origin on request.
+  const {
+    'X-Skip-Origin': xSkipOrigin,
+    Origin: _origin,
+    ...requestHeaders
+  } = details.requestHeaders;
+  delete requestHeaders.Origin;
+  callback({ cancel: false, requestHeaders });
+};
+
 ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
   let win = new BrowserWindow();
+  win.webContents.openDevTools();
+
+  win.webContents.session.webRequest.onBeforeSendHeaders(removeOriginHeader);
 
   const mainWindowListener = () => {
     if (win) {
@@ -715,6 +727,9 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
 
 ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
   let win = new BrowserWindow();
+  win.webContents.openDevTools();
+
+  win.webContents.session.webRequest.onBeforeSendHeaders(removeOriginHeader);
 
   const mainWindowListener = () => {
     if (win) {
