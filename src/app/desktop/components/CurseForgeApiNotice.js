@@ -30,8 +30,9 @@ const CurseForgeApiNotice = () => {
     >
       <p>
         CurseForge authors may prevent third-party launchers (such as this one)
-        from downloading their mods. As such you may need to download some mods
-        manually.
+        from downloading their mods. In order to keep the GDLauncher experience
+        as smooth as possible, we have a new automated workaround in the event a
+        mod developer has blocked third-party launcher downloads.
       </p>
       <div>
         <Button onClick={dismissCfApiNotification}>Dismiss</Button>
