@@ -153,7 +153,7 @@
     "@sentry/tracing": "^6.16.1",
     "@sentry/utils": "^6.16.1",
     "7zip-bin": "^5.1.1",
-    "antd": "4.16.11",
+    "antd": "^4.21.2",
     "axios": "^0.27.2",
     "base64-stream": "^1.0.0",
     "base64url": "^3.0.1",
