@@ -45,15 +45,6 @@ function curseForgeApiKey(state = DefaultCfApiKey, action) {
   }
 }
 
-function hideCurseforgeThirdPartyDownloadsNotice(state = false, action) {
-  switch (action.type) {
-    case ActionTypes.HIDE_CURSEFORGE_THIRD_PARTY_DOWNLOADS_NOTICE:
-      return action.value;
-    default:
-      return state;
-  }
-}
-
 // 0 is stable, 1 is beta
 function concurrentDownloads(state = 3, action) {
   switch (action.type) {
@@ -172,6 +163,5 @@ export default combineReducers({
   java,
   minecraftSettings,
   mcStartupMethod,
-  curseForgeApiKey,
-  hideCurseforgeThirdPartyDownloadsNotice
+  curseForgeApiKey
 });

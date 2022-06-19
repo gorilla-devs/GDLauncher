@@ -139,12 +139,3 @@ export function updateCurseForgeApiKey(value) {
     });
   };
 }
-
-export function hideThirdPartyLauncherNotice() {
-  return dispatch => {
-    dispatch({
-      type: ActionTypes.HIDE_CURSEFORGE_THIRD_PARTY_DOWNLOADS_NOTICE,
-      value: true
-    });
-  };
-}
