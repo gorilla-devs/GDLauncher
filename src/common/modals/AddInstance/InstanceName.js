@@ -338,10 +338,8 @@ const InstanceName = ({
         );
       } else if (mainDependencies.includes('quilt-loader')) {
         // we don't support Quilt yet, so we can't proceed with the installation
-        // TODO: an error message should be shown to the user
-        console.error('Quilt modpacks are not yet supported.');
         dispatch(closeModal());
-        return;
+        throw 'Quilt modpacks are not yet supported.';
 
         // loaderType = QUILT;
         // loaderVersion = manifest.dependencies['quilt-loader'];

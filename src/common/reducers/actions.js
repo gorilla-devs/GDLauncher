@@ -2380,11 +2380,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           //   break;
           // }
           default:
-            // TODO: Show the user an error message here, as an unsupported loader was requested
-            console.error(
-              `Instance "${instanceName}" requires an unsupported loader: ${loaderType}`
-            );
-            return;
+            throw `This instance (${instanceName}) requires an unsupported loader: ${loaderType}`;
         }
 
         const loader = {
