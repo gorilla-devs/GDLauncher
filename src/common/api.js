@@ -37,7 +37,7 @@ const trackFTBAPI = () => {
 };
 
 const trackModrinthAPI = () => {
-  //ga.sendCustomEvent('ModrinthAPICall');
+  ga.sendCustomEvent('ModrinthAPICall');
 };
 
 const trackCurseForgeAPI = () => {
