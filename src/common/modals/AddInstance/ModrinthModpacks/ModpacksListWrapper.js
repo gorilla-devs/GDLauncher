@@ -7,7 +7,7 @@ import ContentLoader from 'react-content-loader';
 import { transparentize } from 'polished';
 import { openModal } from '../../../reducers/modals/actions';
 import { MODRINTH } from '../../../utils/constants';
-import { getModrinthProject, getModrinthVersions } from '../../../api';
+import { getModrinthProject, getModrinthProjectVersions } from '../../../api';
 
 const selectModrinthModpack = async (
   projectID,
@@ -17,7 +17,7 @@ const selectModrinthModpack = async (
 ) => {
   // with a bit more fiddling the `getModrinthProject` call can be removed
   const modpack = await getModrinthProject(projectID);
-  const version = (await getModrinthVersions(modpack.versions)).sort(
+  const version = (await getModrinthProjectVersions(projectID)).sort(
     (a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)
   )[0];
 
@@ -118,7 +118,12 @@ const ModpacksListWrapper = ({
         <ModpackHover>
           <div
             onClick={() => {
-              selectModrinthModpack(modpack.project_id, setVersion, setModpack, setStep);
+              selectModrinthModpack(
+                modpack.project_id,
+                setVersion,
+                setModpack,
+                setStep
+              );
             }}
           >
             Download Latest

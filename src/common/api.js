@@ -486,7 +486,7 @@ export const getModrinthSearchResults = async (
  * @returns {Promise<ModrinthProject>}
  */
 export const getModrinthProject = async projectId => {
-  return await getModrinthProjects([projectId]);
+  return (await getModrinthProjects([projectId])).at(0) ?? null;
 };
 
 /**
@@ -526,7 +526,7 @@ export const getModrinthProjectVersions = async projectId => {
  * @returns {Promise<ModrinthVersion>}
  */
 export const getModrinthVersion = async versionId => {
-  return await getModrinthVersions([versionId]);
+  return (await getModrinthVersions([versionId])).at(0) ?? null;
 };
 
 /**
