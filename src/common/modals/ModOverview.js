@@ -162,7 +162,7 @@ const ModOverview = ({
                   </div>
                 </ParallaxContentInfos>
                 <Button
-                  href={addon?.websiteUrl}
+                  href={addon?.links?.websiteUrl}
                   css={`
                     position: absolute;
                     top: 20px;
