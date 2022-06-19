@@ -1921,26 +1921,6 @@ export function processModrinthManifest(instanceName) {
     const { manifest, loader } = _getCurrentDownloadItem(state);
     let { dependencies } = manifest;
 
-    // some packs don't have proper Modrinth dependencies set up yet
-    // the best we can do is substitute in the download links they provide in the mrpack
-    // this lack of metadata means we can't highlight installed mods in the Mod Browser or recommend updated versions
-    if (!dependencies) {
-      dependencies = manifest.files.map(file => {
-        return {
-          id: 'UNKNOWN',
-          project_id: 'UNKNOWN',
-          version_number: 'UNKNOWN',
-          files: file.downloads.map(url => {
-            return {
-              filename: file.path.slice(5),
-              hashes: file.hashes,
-              url,
-              size: file.fileSize
-            };
-          })
-        };
-      });
-    }
     const totalModsRequired = dependencies.length;
 
     const instancesPath = _getInstancesPath(state);
@@ -2020,7 +2000,8 @@ export function processModrinthManifest(instanceName) {
           fileName: fileName,
           displayName: fileName,
           version: item.version_number,
-          downloadUrl: item.files[0].url
+          downloadUrl: item.files[0].url,
+          modSource: MODRINTH
         });
 
         const percentage = (modManifests.length * 100) / dependencies.length;
