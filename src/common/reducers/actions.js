@@ -1757,7 +1757,13 @@ export function processForgeManifest(instanceName) {
 
           if (!fileExists) {
             if (!modManifest.downloadUrl) {
-              optedOutMods.push({ addon, modManifest });
+              const normalizedModData = normalizeModData(
+                modManifest,
+                item.projectID,
+                addon.name
+              );
+
+              optedOutMods.push({ addon, modManifest: normalizedModData });
               return;
             }
             await downloadFile(destFile, modManifest.downloadUrl);
