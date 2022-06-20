@@ -14,6 +14,15 @@
 /build
 /release
 /deploy
+/public/native/*/index.d.ts
+
+# rust target
+/target
+/napi/target
+/public/napi.node
+/napi/napi.node
+/napi/node_modules
+/napi/index.d.ts
 
 # IDEs
 .idea
