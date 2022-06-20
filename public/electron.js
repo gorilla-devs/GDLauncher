@@ -24,7 +24,7 @@ const {
 const { URL } = require('url');
 const UserAgent = require('user-agents');
 const nsfw = require('./native/nsfw');
-const napi = require('./napi.node');
+const napi = require('./native/napi');
 
 // console.log(napi.fibonacci(10));
 
