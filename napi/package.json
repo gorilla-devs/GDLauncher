@@ -1,0 +1,12 @@
+{
+  "name": "napi",
+  "version": "0.0.1",
+  "main": "./index.node",
+  "types": "./index.d.ts",
+  "scripts": {
+    "build": "node ../node_modules/cross-env/src/bin/cross-env-shell.js RUSTFLAGS=-Zsymbol-mangling-version=v0 node ../node_modules/@napi-rs/cli/scripts/index.js build --js false --release"
+  },
+  "napi": {
+    "name": "napi"
+  }
+}
