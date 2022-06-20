@@ -3,6 +3,7 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use std::io::Read;
 
+// Here for sentimental reasons.
 #[allow(dead_code)]
 #[napi]
 fn fibonacci(n: u32) -> u32 {

@@ -14,7 +14,6 @@
 /build
 /release
 /deploy
-/public/native/*/napi.node
 /public/native/*/index.d.ts
 
 # rust target
