@@ -31,7 +31,8 @@ const Modal = ({
   children,
   className,
   removePadding,
-  closeCallback
+  closeCallback,
+  preventClose
 }) => {
   const dispatch = useDispatch();
 
@@ -40,7 +41,9 @@ const Modal = ({
     dispatch(closeModal());
   };
 
-  useKey(['Escape'], closeFunc);
+  useKey(['Escape'], () => {
+    if (!preventClose) closeFunc();
+  });
 
   return (
     <div
@@ -59,7 +62,7 @@ const Modal = ({
       {(header === undefined || header === true) && (
         <HeaderComponent>
           <h3>{title || 'Modal'}</h3>
-          <CloseButton onClick={closeFunc} />
+          {!preventClose && <CloseButton onClick={closeFunc} />}
         </HeaderComponent>
       )}
       <div

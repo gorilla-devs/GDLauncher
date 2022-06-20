@@ -76,7 +76,7 @@ const ModOverview = ({
             setDownloadCount(addon.downloadCount);
             setUpdatedDate(Date.parse(addon.dateModified));
             setGameVersion(addon.latestFilesIndexes[0].gameVersion);
-            setUrl(addon.websiteUrl);
+            setUrl(addon.links?.websiteUrl);
           }),
           getAddonDescription(projectID).then(data => {
             // Replace the beginning of all relative URLs with the Curseforge URL
@@ -190,8 +190,8 @@ const ModOverview = ({
   };
 
   const handleChange = value => setSelectedItem(JSON.parse(value));
-  const primaryImage = addon?.logo?.url || mod?.icon_url;
 
+  const primaryImage = addon?.logo || mod?.icon_url;
   return (
     <Modal
       css={`
@@ -369,7 +369,9 @@ const ModOverview = ({
           </StyledSelect>
           <Button
             type="primary"
-            disabled={!selectedItem || installedData.fileID === selectedItem}
+            disabled={
+              (!selectedItem || installedData.fileID === selectedItem) && addon
+            }
             loading={loading}
             onClick={async () => {
               setLoading(true);
@@ -397,7 +399,10 @@ const ModOverview = ({
                   selectedItem,
                   instanceName,
                   gameVersions,
-                  !installedData.fileID
+                  !installedData.fileID,
+                  null,
+                  null,
+                  addon
                 )
               );
               setInstalledData({ fileID: selectedItem, fileName: newFile });

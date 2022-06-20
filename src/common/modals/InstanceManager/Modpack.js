@@ -1,8 +1,9 @@
 import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { Select, Button } from 'antd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
+import path from 'path';
 import {
   getAddonFiles,
   getAddonFileChangelog,
@@ -14,6 +15,8 @@ import {
 } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
+import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
+import { makeInstanceRestorePoint } from '../../utils';
 import { CURSEFORGE, FTB, MODRINTH } from '../../utils/constants';
 import pMap from 'p-map';
 
@@ -24,6 +27,8 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
   const [loading, setLoading] = useState(false);
   const [installing, setInstalling] = useState(false);
   const dispatch = useDispatch();
+  const tempPath = useSelector(_getTempPath);
+  const instancesPath = useSelector(_getInstancesPath);
 
   const convertFtbReleaseType = type => {
     switch (type) {
@@ -135,7 +140,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
   };
 
   useEffect(() => {
-    initData();
+    initData().catch(console.error);
   }, []);
 
   const getReleaseType = id => {
@@ -175,6 +180,8 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
   };
 
   const handleChange = value => setSelectedIndex(value);
+  const newInstancePath = path.join(tempPath, `${instanceName}__RESTORE`);
+
   return (
     <Container>
       Installed version: {versionName}
@@ -252,6 +259,11 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
         disabled={selectedIndex === null}
         onClick={async () => {
           setInstalling(true);
+          await makeInstanceRestorePoint(
+            newInstancePath,
+            instancesPath,
+            instanceName
+          );
           await dispatch(
             changeModpackVersion(instanceName, files[selectedIndex])
           );
