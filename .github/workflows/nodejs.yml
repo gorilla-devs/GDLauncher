@@ -32,6 +32,10 @@ jobs:
           node-version: '16.13.1'
 
 
+      - name: Install Nightly
+        run: |
+          rustup toolchain install nightly
+          
       - name: Install rust (Windows)
         if: matrix.os == 'windows-latest'
         run: |
