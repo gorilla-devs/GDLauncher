@@ -600,7 +600,16 @@ const InstanceName = ({
                     }
                   `}
                   onClick={() => {
-                    createInstance(instanceName || mcName);
+                    createInstance(instanceName || mcName).catch(error => {
+                      dispatch(
+                        openModal('InstanceDownloadFailed', {
+                          instanceName: instanceName || mcName,
+                          preventClose: true,
+                          error,
+                          unrecoverable: true
+                        })
+                      );
+                    });
                     setClicked(true);
                   }}
                 >

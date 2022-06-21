@@ -16,7 +16,8 @@ const InstanceDownloadFailed = ({
   instanceName,
   error,
   isUpdate,
-  preventClose
+  preventClose,
+  unrecoverable
 }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -33,14 +34,17 @@ const InstanceDownloadFailed = ({
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    await rollBackInstanceZip(
-      isUpdate,
-      instancesPath,
-      instanceName,
-      tempPath,
-      dispatch,
-      updateInstanceConfig
-    );
+    // if instanceName is ever empty, this will delete ALL instances, so don't run it if we don't have a name
+    if (instanceName) {
+      await rollBackInstanceZip(
+        isUpdate,
+        instancesPath,
+        instanceName,
+        tempPath,
+        dispatch,
+        updateInstanceConfig
+      );
+    }
 
     setLoading(false);
     dispatch(addNextInstanceToCurrentDownload());
@@ -75,27 +79,40 @@ const InstanceDownloadFailed = ({
           {'> '}
           {error.toString()}
         </div>
-        <div>What do you want to do?</div>
-        <div
-          css={`
-            margin-top: 50px;
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-          `}
-        >
+        {unrecoverable ? (
           <Button
             variant="contained"
             color="primary"
             onClick={cancelDownload}
             loading={loading}
           >
-            Cancel Download
+            OK
           </Button>
-          <Button danger type="primary" onClick={retry} disabled={loading}>
-            Retry Download
-          </Button>
-        </div>
+        ) : (
+          <>
+            <div>What do you want to do?</div>
+            <div
+              css={`
+                margin-top: 50px;
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+              `}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={cancelDownload}
+                loading={loading}
+              >
+                Cancel Download
+              </Button>
+              <Button danger type="primary" onClick={retry} disabled={loading}>
+                Retry Download
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </Modal>
   );

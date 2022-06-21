@@ -394,12 +394,7 @@ export const get7zPath = async () => {
 
 get7zPath();
 
-export const extract = async (
-  source,
-  destination,
-  args = {},
-  funcs = {}
-) => {
+export const extract = async (source, destination, args = {}, funcs = {}) => {
   const sevenZipPath = await get7zPath();
   const extraction = Seven.extract(source, destination, {
     ...args,
@@ -466,6 +461,75 @@ export const extractAll = async (
     });
   });
   return { extraction, extractedParentDir };
+};
+
+/**
+ * Heuristic check to see if there are any executable files/scripts in an archive (other than JAR)
+ * @param {string} pathToArchive
+ * @returns {Promise<boolean>}
+ */
+export const isArchiveSafe = async pathToArchive => {
+  const sevenZipPath = await get7zPath();
+
+  const dangerousExtensions = [
+    'ACTION',
+    'APP',
+    'BAT',
+    'BIN',
+    'CMD',
+    'COM',
+    'COMMAND',
+    'CPL',
+    'CSH',
+    'EX',
+    'EXE',
+    //'JS', // we cannot mark JS files as dangerous because KubeJS uses them for configuraion
+    'JSE',
+    'KSH',
+    'MSI',
+    'OSX',
+    'OUT',
+    'PS1',
+    'REG',
+    'RGS',
+    'RUN',
+    'SCR',
+    'SCT',
+    'SHS',
+    'VB',
+    'VBE',
+    'VBS',
+    'VBSCRIPT',
+    'WS',
+    'WSF',
+    'WSH'
+  ];
+
+  // scan for any executable files
+  const listStream = Seven.list(pathToArchive, {
+    recursive: true,
+    $bin: sevenZipPath
+  });
+  let isSafe = true;
+
+  // if the extension of at least one file in the archive is in the blacklist, the archive is considered unsafe
+  listStream.on('data', data => {
+    if (
+      !dangerousExtensions.every(ext => !data.file.toUpperCase().endsWith(ext))
+    ) {
+      isSafe = false;
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    listStream.on('end', () => {
+      resolve(isSafe);
+    });
+
+    listStream.on('error', err => {
+      reject(err.stderr);
+    });
+  });
 };
 
 export const extractNatives = async (libraries, instancePath) => {

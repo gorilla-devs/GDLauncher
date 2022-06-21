@@ -19,7 +19,7 @@ import {
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
 import { downloadFile } from '../app/desktop/utils/downloader';
-import { extractAll } from '../app/desktop/utils';
+import { extractAll, isArchiveSafe } from '../app/desktop/utils';
 import path from 'path';
 import fse from 'fs-extra';
 import os from 'os';
@@ -549,23 +549,23 @@ export const getModrinthVersions = async versionIds => {
 // TODO: Move override logic out of this function
 // TODO: Do overrides need to be applied after the pack is installed?
 export const getModrinthVersionManifest = async (versionId, instancePath) => {
-  try {
-    // get download link for the metadata archive
-    const version = await getModrinthVersion(versionId);
-    const file = version.files.find(file => file.filename.endsWith('.mrpack'));
+  // get download link for the metadata archive
+  const version = await getModrinthVersion(versionId);
+  const file = version.files.find(file => file.filename.endsWith('.mrpack'));
 
-    // clean temp directory
-    const tmp = path.join(os.tmpdir(), 'GDLauncher_Download');
-    await fse.rm(tmp, { recursive: true, force: true });
+  // clean temp directory
+  const tmp = path.join(os.tmpdir(), 'GDLauncher_Download');
+  await fse.rm(tmp, { recursive: true, force: true });
 
-    // download metadata archive
-    await downloadFile(path.join(tmp, file.filename), file.url);
+  // download metadata archive
+  await downloadFile(path.join(tmp, file.filename), file.url);
 
-    // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
-    await new Promise(resolve => {
-      setTimeout(() => resolve(), 500);
-    });
+  // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
+  await new Promise(resolve => {
+    setTimeout(() => resolve(), 500);
+  });
 
+  if (await isArchiveSafe(path.join(tmp, file.filename))) {
     // extract archive to temp folder
     await extractAll(path.join(tmp, file.filename), tmp, { yes: true });
 
@@ -588,10 +588,9 @@ export const getModrinthVersionManifest = async (versionId, instancePath) => {
     );
 
     return manifest;
-  } catch (err) {
-    console.error(err);
-
-    return { status: 'error' };
+  } else {
+    // archive contains potentially dangerous files, give the user a generic warning so as not to scare them
+    throw 'This pack contains invalid data. Please try a different version.';
   }
 };
 
