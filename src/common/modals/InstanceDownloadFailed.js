@@ -16,8 +16,7 @@ const InstanceDownloadFailed = ({
   instanceName,
   error,
   isUpdate,
-  preventClose,
-  unrecoverable
+  preventClose
 }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -33,7 +32,7 @@ const InstanceDownloadFailed = ({
     await dispatch(removeDownloadFromQueue(instanceName, true));
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
-
+    
     // if instanceName is ever empty, this will delete ALL instances, so don't run it if we don't have a name
     if (instanceName) {
       await rollBackInstanceZip(
@@ -79,40 +78,27 @@ const InstanceDownloadFailed = ({
           {'> '}
           {error.toString()}
         </div>
-        {unrecoverable ? (
+        <div>What do you want to do?</div>
+        <div
+          css={`
+            margin-top: 50px;
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+          `}
+        >
           <Button
             variant="contained"
             color="primary"
             onClick={cancelDownload}
             loading={loading}
           >
-            OK
+            Cancel Download
           </Button>
-        ) : (
-          <>
-            <div>What do you want to do?</div>
-            <div
-              css={`
-                margin-top: 50px;
-                display: flex;
-                width: 100%;
-                justify-content: space-between;
-              `}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={cancelDownload}
-                loading={loading}
-              >
-                Cancel Download
-              </Button>
-              <Button danger type="primary" onClick={retry} disabled={loading}>
-                Retry Download
-              </Button>
-            </div>
-          </>
-        )}
+          <Button danger type="primary" onClick={retry} disabled={loading}>
+            Retry Download
+          </Button>
+        </div>
       </div>
     </Modal>
   );
