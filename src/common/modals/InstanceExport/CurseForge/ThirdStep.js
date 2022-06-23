@@ -137,7 +137,7 @@ export default function ThirdStep({
               if (tries !== 1) {
                 await new Promise(resolve => setTimeout(resolve, 5000));
               }
-              const { data } = await getAddon(mod.projectID);
+              const data = await getAddon(mod.projectID);
 
               ok = true;
               return {

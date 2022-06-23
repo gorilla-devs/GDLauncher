@@ -1,17 +1,15 @@
-import React, { memo, useEffect, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { memo } from 'react';
+import { useDispatch } from 'react-redux';
 import { LoadingOutlined } from '@ant-design/icons';
 import Modal from '../components/Modal';
 import { closeModal, openModal } from '../reducers/modals/actions';
 import BisectHosting from '../../ui/BisectHosting';
+import ga from '../utils/analytics';
 
 let timer;
 
 const InstanceStartupAd = ({ instanceName }) => {
   const dispatch = useDispatch();
-  const startedInstances = useSelector(state => state.startedInstances);
-  const isPlaying = startedInstances[instanceName];
-  const initTime = useMemo(() => Date.now(), []);
 
   const openBisectHostingModal = () => {
     if (timer) {
@@ -20,32 +18,10 @@ const InstanceStartupAd = ({ instanceName }) => {
     }
     dispatch(closeModal());
     setTimeout(() => {
+      ga.sendCustomEvent('BHAdViewNavbar');
       dispatch(openModal('BisectHosting'));
     }, 225);
   };
-
-  useEffect(() => {
-    if (!timer && (isPlaying?.initialized || !isPlaying)) {
-      if (Date.now() - initTime < 5000) {
-        timer = setTimeout(() => {
-          if (timer) {
-            dispatch(closeModal());
-            clearTimeout(timer);
-            timer = null;
-          }
-        }, Date.now() - initTime);
-      } else {
-        dispatch(closeModal());
-      }
-    }
-
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-        timer = null;
-      }
-    };
-  }, [isPlaying?.initialized]);
 
   return (
     <Modal

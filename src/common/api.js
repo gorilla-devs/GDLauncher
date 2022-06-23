@@ -13,33 +13,25 @@ import {
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
   FTB_API_URL,
-  JAVA_LATEST_MANIFEST_URL,
-  GDL_SERVE_API
+  JAVA_LATEST_MANIFEST_URL
 } from './utils/constants';
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
 
-const trackCurseForgeAPI = (url, params = {}, method = 'get') => {
-  ga.sendCustomEvent('CurseForgeAPICall');
-
-  // Temporarily disable this
-  const switcher = true;
-  if (switcher) {
-    let req = null;
-    if (method === 'get') {
-      req = axios.get(url, { params });
-    } else if (method === 'post') {
-      req = axios.post(url, params);
-    }
-
-    if (req) {
-      req.catch(console.error);
-    }
+const axioInstance = axios.create({
+  headers: {
+    'X-API-KEY': '$2a$10$5BgCleD8.rLQ5Ix17Xm2lOjgfoeTJV26a1BXmmpwrOemgI517.nuC',
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
   }
-};
+});
 
 const trackFTBAPI = () => {
   ga.sendCustomEvent('FTBAPICall');
+};
+
+const trackCurseForgeAPI = () => {
+  ga.sendCustomEvent('CurseForgeAPICall');
 };
 
 // Microsoft Auth
@@ -240,71 +232,87 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
 
 // FORGE ADDONS
 
-export const getAddon = projectID => {
-  const url = `${FORGESVC_URL}/addon/${projectID}`;
-  const myUrl = `${GDL_SERVE_API}/mods/${projectID}`;
-  trackCurseForgeAPI(myUrl);
-  return axios.get(url);
+export const getAddon = async projectID => {
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/mods/${projectID}`;
+  const { data } = await axioInstance.get(url);
+  return data?.data;
 };
 
 export const getMultipleAddons = async addons => {
-  const url = `${FORGESVC_URL}/addon`;
-  const myUrl = `${GDL_SERVE_API}/mods`;
-  trackCurseForgeAPI(myUrl, addons, 'post');
-  return axios.post(url, addons);
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/mods`;
+  const { data } = await axioInstance.post(
+    url,
+    JSON.stringify({
+      modIds: addons
+    })
+  );
+  return data?.data;
 };
 
-export const getAddonFiles = projectID => {
-  const url = `${FORGESVC_URL}/addon/${projectID}/files`;
-  const myUrl = `${GDL_SERVE_API}/mods/${projectID}/files`;
-  trackCurseForgeAPI(myUrl);
-  return axios.get(url).then(res => ({
-    ...res,
-    data: res.data.sort(sortByDate)
-  }));
+export const getAddonFiles = async projectID => {
+  trackCurseForgeAPI();
+  // Aggregate results in case of multiple pages
+  const results = [];
+  let hasMore = true;
+
+  while (hasMore) {
+    const url = `${FORGESVC_URL}/mods/${projectID}/files?pageSize=400&index=${results.length}`;
+    const { data } = await axioInstance.get(url);
+    results.push(...(data.data || []));
+
+    hasMore = data.pagination.totalCount > results.length;
+  }
+
+  return results.sort(sortByDate);
 };
 
-export const getAddonDescription = projectID => {
-  const url = `${FORGESVC_URL}/addon/${projectID}/description`;
-  const myUrl = `${GDL_SERVE_API}/mods/${projectID}/description`;
-
-  trackCurseForgeAPI(myUrl);
-  return axios.get(url);
+export const getAddonDescription = async projectID => {
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/mods/${projectID}/description`;
+  const { data } = await axioInstance.get(url);
+  return data?.data;
 };
 
-export const getAddonFile = (projectID, fileID) => {
-  const url = `${FORGESVC_URL}/addon/${projectID}/file/${fileID}`;
-  const myUrl = `${GDL_SERVE_API}/mods/${projectID}/files/${fileID}`;
-
-  trackCurseForgeAPI(myUrl);
-  return axios.get(url);
+export const getAddonFile = async (projectID, fileID) => {
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/mods/${projectID}/files/${fileID}`;
+  const { data } = await axioInstance.get(url);
+  return data?.data;
 };
 
-export const getAddonsByFingerprint = fingerprints => {
-  const url = `${FORGESVC_URL}/fingerprint`;
-  const myUrl = `${GDL_SERVE_API}/fingerprints`;
+export const getAddonsByFingerprint = async fingerprints => {
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/fingerprints`;
+  const { data } = await axioInstance.post(url, { fingerprints });
 
-  trackCurseForgeAPI(myUrl, fingerprints, 'post');
-  return axios.post(url, fingerprints);
+  return data?.data;
 };
 
-export const getAddonFileChangelog = (projectID, fileID) => {
-  const url = `${FORGESVC_URL}/addon/${projectID}/file/${fileID}/changelog`;
-  const myUrl = `${GDL_SERVE_API}/mods/${projectID}/files/${fileID}/changelog`;
+export const getAddonFileChangelog = async (projectID, fileID) => {
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/mods/${projectID}/files/${fileID}/changelog`;
+  const { data } = await axioInstance.get(url);
 
-  trackCurseForgeAPI(myUrl);
-  return axios.get(url);
+  return data?.data;
 };
 
-export const getAddonCategories = () => {
-  const url = `${FORGESVC_URL}/category?gameId=432`;
-  const myUrl = `${GDL_SERVE_API}/categories?gameId=432`;
-
-  trackCurseForgeAPI(myUrl);
-  return axios.get(url);
+export const getAddonCategories = async () => {
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/categories?gameId=432`;
+  const { data } = await axioInstance.get(url);
+  return data.data;
 };
 
-export const getSearch = (
+export const getCFVersionIds = async () => {
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/games/432/versions`;
+  const { data } = await axioInstance.get(url);
+  return data.data;
+};
+
+export const getSearch = async (
   type,
   searchFilter,
   pageSize,
@@ -315,23 +323,48 @@ export const getSearch = (
   categoryId,
   modLoaderType
 ) => {
-  const url = `${FORGESVC_URL}/addon/search`;
-  const myUrl = `${GDL_SERVE_API}/mods/search`;
+  trackCurseForgeAPI();
+  const url = `${FORGESVC_URL}/mods/search`;
+
+  // Map sort to sortField
+  let sortField = 1;
+  switch (sort) {
+    case 'Popularity':
+      sortField = 2;
+      break;
+    case 'LastUpdated':
+      sortField = 3;
+      break;
+    case 'Name':
+      sortField = 4;
+      break;
+    case 'Author':
+      sortField = 5;
+      break;
+    case 'TotalDownloads':
+      sortField = 6;
+      break;
+    case 'Featured':
+    default:
+      sortField = 1;
+      break;
+  }
 
   const params = {
     gameId: 432,
     categoryId: categoryId || 0,
     pageSize,
     index,
-    sort,
-    isSortDescending,
+    sortField,
+    sortOrder: isSortDescending ? 'desc' : 'asc',
     gameVersion: gameVersion || '',
-    ...(modLoaderType === 'fabric' && { modLoaderType: 4 }),
-    sectionId: type === 'mods' ? 6 : 4471,
+    ...(modLoaderType === 'fabric' && { modLoaderType: 'Fabric' }),
+    classId: type === 'mods' ? 6 : 4471,
     searchFilter
   };
-  trackCurseForgeAPI(myUrl, { ...params, pageSize: 20 });
-  return axios.get(url, { params });
+
+  const { data } = await axioInstance.get(url, { params });
+  return data?.data;
 };
 
 export const getFTBModpackData = async modpackId => {

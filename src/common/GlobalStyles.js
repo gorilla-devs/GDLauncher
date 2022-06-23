@@ -61,8 +61,8 @@ export default createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
     border-radius: 1px;
   }
 
@@ -150,12 +150,25 @@ export default createGlobalStyle`
     padding: 2px 0;
   }
 
-  .ant-cascader-menus {
+  .ant-select-dropdown, .ant-dropdown, .ant-cascader-menus {
     z-index: 99999999 !important;
   }
 
-  .ant-select-dropdown {
-    z-index: 99999999 !important;
+  .ant-radio-button-wrapper {
+    color: rgba(255, 255, 255, 0.65) !important;
+  }
+
+  .ant-radio-button-wrapper:hover, .ant-radio-button-wrapper-checked {
+    color: rgba(255, 255, 255, 0.95) !important;
+  }
+
+  .ant-radio-button-wrapper-checked {
+    border-color: rgba(255, 255, 255, 0.95) !important;
+  }
+
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before,
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover::before {
+    background-color: rgba(255, 255, 255, 0.95) !important;
   }
 
 

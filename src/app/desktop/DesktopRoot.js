@@ -60,7 +60,7 @@ function DesktopRoot({ store }) {
   const currentAccount = useSelector(_getCurrentAccount);
   const clientToken = useSelector(state => state.app.clientToken);
   const javaPath = useSelector(state => state.settings.java.path);
-  const javaLatestPath = useSelector(state => state.settings.java.latest);
+  const javaLatestPath = useSelector(state => state.settings.java.pathLatest);
   const location = useSelector(state => state.router.location);
   // const modals = useSelector(state => state.modals);
   const shouldShowDiscordRPC = useSelector(state => state.settings.discordRPC);

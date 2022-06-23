@@ -24,7 +24,11 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import fse from 'fs-extra';
 import makeDir from 'make-dir';
 import curseForgeIcon from '../../assets/curseforgeIcon.webp';
-import { _getInstance, _getInstancesPath } from '../../utils/selectors';
+import {
+  _getInstance,
+  _getInstancesPath,
+  _getTempPath
+} from '../../utils/selectors';
 import {
   updateInstanceConfig,
   deleteMod,
@@ -32,6 +36,7 @@ import {
   initLatestMods
 } from '../../reducers/actions';
 import { openModal } from '../../reducers/modals/actions';
+import { makeModRestorePoint } from '../../utils';
 
 const Header = styled.div`
   height: 40px;
@@ -303,7 +308,7 @@ const Row = memo(({ index, style, data }) => {
     items,
     instanceName,
     instancePath,
-    gameVersion,
+    gameVersions,
     selectedMods,
     setSelectedMods,
     latestMods
@@ -314,6 +319,10 @@ const Row = memo(({ index, style, data }) => {
     latestMods[item.projectID].id !== item.fileID &&
     latestMods[item.projectID].releaseType <= curseReleaseChannel;
   const dispatch = useDispatch();
+
+  const tempPath = useSelector(_getTempPath);
+  const newModPath = path.join(tempPath, `${item.fileName}__RESTORE`);
+  const modsPath = path.join(instancePath, 'mods');
 
   const name = item.fileName
     .replace('.jar', '')
@@ -364,7 +373,7 @@ const Row = memo(({ index, style, data }) => {
                   projectID: item.projectID,
                   fileID: item.fileID,
                   fileName: item.fileName,
-                  gameVersion,
+                  gameVersions,
                   instanceName
                 })
               );
@@ -392,14 +401,21 @@ const Row = memo(({ index, style, data }) => {
                   icon={faDownload}
                   onClick={async () => {
                     setUpdateLoading(true);
+                    await makeModRestorePoint(
+                      newModPath,
+                      modsPath,
+                      item.fileName
+                    );
+
                     await dispatch(
                       updateMod(
                         instanceName,
                         item,
                         latestMods[item.projectID].id,
-                        gameVersion
+                        gameVersions
                       )
                     );
+                    await fse.remove(newModPath);
                     setUpdateLoading(false);
                   }}
                 />
@@ -497,7 +513,7 @@ const createItemData = memoize(
     items,
     instanceName,
     instancePath,
-    gameVersion,
+    gameVersions,
     selectedMods,
     setSelectedMods,
     latestMods
@@ -505,7 +521,7 @@ const createItemData = memoize(
     items,
     instanceName,
     instancePath,
-    gameVersion,
+    gameVersions,
     selectedMods,
     setSelectedMods,
     latestMods
@@ -513,20 +529,20 @@ const createItemData = memoize(
 );
 
 const sort = arr =>
-  arr.slice().sort((a, b) => a.fileName.localeCompare(b.fileName));
+  arr.slice().sort((a, b) => a.fileName?.localeCompare(b.fileName));
 
 const filter = (arr, search) =>
   arr.filter(
     mod =>
-      mod.fileName.toLowerCase().includes(search.toLowerCase()) ||
-      mod.displayName.toLowerCase().includes(search.toLowerCase())
+      mod.fileName?.toLowerCase()?.includes(search?.toLowerCase()) ||
+      mod.displayName?.toLowerCase()?.includes(search?.toLowerCase())
   );
 
 const getFileType = file => {
   const fileName = file.name;
   let fileType = '';
 
-  const splitFileName = fileName.split('.');
+  const splitFileName = fileName?.split('.');
   if (splitFileName.length) {
     fileType = splitFileName[splitFileName.length - 1];
   }
@@ -673,13 +689,13 @@ const Mods = ({ instanceName }) => {
     <Menu>
       <Menu.Item
         key="0"
-        onClick={async () => {
+        disabled={!hasModUpdates}
+        onClick={() => {
           dispatch(openModal('ModsUpdater', { instanceName }));
           setIsMenuOpen(false);
         }}
-        disabled={!hasModUpdates}
       >
-        Update all mods
+        Update All Mods
       </Menu.Item>
     </Menu>
   );
@@ -689,6 +705,9 @@ const Mods = ({ instanceName }) => {
       css={`
         flex: 1;
       `}
+      onClick={() => {
+        setIsMenuOpen(false);
+      }}
     >
       <Header>
         <div
@@ -748,29 +767,51 @@ const Mods = ({ instanceName }) => {
           >
             Check for Updates
           </Button>
-          <StyledDropdown
-            onClick={() => {
-              if (!isMenuOpen) {
-                setIsMenuOpen(true);
-              }
+          <span
+            onClick={e => {
+              e.stopPropagation();
+              setIsMenuOpen(!isMenuOpen);
             }}
           >
-            <Dropdown
-              overlay={menu}
-              visible={isMenuOpen}
-              onVisibleChange={setIsMenuOpen}
-              trigger={['click']}
+            <StyledDropdown
+              onClick={e => {
+                if (!isMenuOpen) {
+                  e.stopPropagation();
+                  setIsMenuOpen(!isMenuOpen);
+                }
+              }}
             >
-              <FontAwesomeIcon icon={faEllipsisV} />
-            </Dropdown>
-          </StyledDropdown>
+              <span
+                onClick={e => {
+                  e.stopPropagation();
+                  setIsMenuOpen(!isMenuOpen);
+                }}
+              >
+                <Dropdown
+                  overlay={menu}
+                  visible={isMenuOpen}
+                  onVisibleChange={setIsMenuOpen}
+                  trigger={['click']}
+                >
+                  <span
+                    css={`
+                      width: 100%;
+                      height: 100%;
+                    `}
+                  >
+                    <FontAwesomeIcon icon={faEllipsisV} />
+                  </span>
+                </Dropdown>
+              </span>
+            </StyledDropdown>
+          </span>
         </div>
         <Button
           type="primary"
           onClick={() => {
             dispatch(
               openModal('ModsBrowser', {
-                gameVersion: instance.loader?.mcVersion,
+                gameVersions: instance.loader?.mcVersion,
                 instanceName
               })
             );
