@@ -52,8 +52,8 @@ GDLauncher is a custom open-source Minecraft launcher written from the ground up
 
 This is an example of the time that GDLauncher takes to install a modpack in comparison to Twitch. Both tests are running at the same time over a 1Gbps network to ensure that the network doesn't impact the comparison.
 
-- GDLauncher: `0.52m`
-- Twitch Launcher: `2.25m`
+- GDLauncher: `52s`
+- Twitch Launcher: `145s`
 
 <p align="center">
     <img width="800" height="auto" src="https://gdevs.io/comparison.gif" alt="GDLauncher" />
@@ -101,8 +101,8 @@ These are the steps to compile it yourself.
 
 You need the following software installed:
 
-- [NodeJS](https://nodejs.org/en/download/) (> v14.14.0 x64)
-- [Rust](https://www.rust-lang.org/)
+- [NodeJS](https://nodejs.org/en/download/) (16.13.1 x64)
+- [Rust Nightly](https://www.rust-lang.org/)
 - [Python2](https://www.python.org/)(Mac and linux)
 - C++ compiler (g++ or windows build tools)
 

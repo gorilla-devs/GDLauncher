@@ -1,8 +1,9 @@
 import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import { Select, Button } from 'antd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
+import path from 'path';
 import {
   getAddonFiles,
   getAddonFileChangelog,
@@ -12,6 +13,8 @@ import {
 } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
+import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
+import { makeInstanceRestorePoint } from '../../utils';
 
 const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const [files, setFiles] = useState([]);
@@ -20,6 +23,8 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const [loading, setLoading] = useState(false);
   const [installing, setInstalling] = useState(false);
   const dispatch = useDispatch();
+  const tempPath = useSelector(_getTempPath);
+  const instancesPath = useSelector(_getInstancesPath);
 
   const convertFtbReleaseType = type => {
     switch (type) {
@@ -36,13 +41,10 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
     setLoading(true);
     if (manifest) {
       setVersionName(`${manifest?.name} - ${manifest?.version}`);
-      const { data } = await getAddonFiles(modpackId);
+      const data = await getAddonFiles(modpackId);
       const mappedFiles = await Promise.all(
         data.map(async v => {
-          const { data: changelog } = await getAddonFileChangelog(
-            modpackId,
-            v.id
-          );
+          const changelog = await getAddonFileChangelog(modpackId, v.id);
           return {
             ...v,
             changelog
@@ -70,7 +72,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
           return {
             displayName: `${ftbModpack.name} ${version.name}`,
             id: version.id,
-            gameVersion: [newModpack.targets[1]?.version],
+            gameVersions: [newModpack.targets[1]?.version],
             releaseType: convertFtbReleaseType(version.type),
             fileDate: version.updated * 1000,
             imageUrl: ftbModpack.art[0].url,
@@ -85,7 +87,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   };
 
   useEffect(() => {
-    initData();
+    initData().catch(console.error);
   }, []);
 
   const getReleaseType = id => {
@@ -125,6 +127,8 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   };
 
   const handleChange = value => setSelectedIndex(value);
+  const newInstancePath = path.join(tempPath, `${instanceName}__RESTORE`);
+
   return (
     <Container>
       Installed version: {versionName}
@@ -168,7 +172,7 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
                     flex-direction: column;
                   `}
                 >
-                  <div>{file.gameVersion[0]}</div>
+                  <div>{file.gameVersions[0]}</div>
                   <div>{getReleaseType(file.releaseType)}</div>
                 </div>
                 <div
@@ -202,6 +206,11 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
         disabled={selectedIndex === null}
         onClick={async () => {
           setInstalling(true);
+          await makeInstanceRestorePoint(
+            newInstancePath,
+            instancesPath,
+            instanceName
+          );
           await dispatch(
             changeModpackVersion(instanceName, files[selectedIndex])
           );

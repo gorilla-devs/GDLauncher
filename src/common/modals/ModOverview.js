@@ -9,12 +9,7 @@ import { faExternalLinkAlt, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { Button, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
-import {
-  getAddonDescription,
-  getAddonFiles,
-  getAddon,
-  getAddonFileChangelog
-} from '../api';
+import { getAddonDescription, getAddonFiles, getAddon } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
 import { installMod, updateInstanceConfig } from '../reducers/actions';
@@ -31,7 +26,7 @@ import {
 const ModOverview = ({
   projectID,
   fileID,
-  gameVersion,
+  gameVersions,
   instanceName,
   fileName
 }) => {
@@ -50,10 +45,10 @@ const ModOverview = ({
     const init = async () => {
       setLoadingFiles(true);
       await Promise.all([
-        getAddon(projectID).then(data => setAddon(data.data)),
+        getAddon(projectID).then(data => setAddon(data)),
         getAddonDescription(projectID).then(data => {
           // Replace the beginning of all relative URLs with the Curseforge URL
-          const modifiedData = data.data.replace(
+          const modifiedData = data.replace(
             /href="(?!http)/g,
             `href="${CURSEFORGE_URL}`
           );
@@ -66,9 +61,9 @@ const ModOverview = ({
             getPatchedInstanceType(instance) === FORGE || projectID === 361988;
           let filteredFiles = [];
           if (isFabric) {
-            filteredFiles = filterFabricFilesByVersion(data.data, gameVersion);
+            filteredFiles = filterFabricFilesByVersion(data, gameVersions);
           } else if (isForge) {
-            filteredFiles = filterForgeFilesByVersion(data.data, gameVersion);
+            filteredFiles = filterForgeFilesByVersion(data, gameVersions);
           }
 
           setFiles(filteredFiles);
@@ -127,8 +122,7 @@ const ModOverview = ({
   };
 
   const handleChange = value => setSelectedItem(JSON.parse(value));
-
-  const primaryImage = (addon?.attachments || []).find(v => v.isDefault);
+  const primaryImage = addon?.logo;
   return (
     <Modal
       css={`
@@ -164,11 +158,11 @@ const ModOverview = ({
                   </div>
                   <div>
                     <label>MC version: </label>
-                    {addon?.gameVersionLatestFiles[0]?.gameVersion}
+                    {addon?.latestFilesIndexes[0]?.gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
-                  href={addon?.websiteUrl}
+                  href={addon?.links?.websiteUrl}
                   css={`
                     position: absolute;
                     top: 20px;
@@ -268,7 +262,7 @@ const ModOverview = ({
                       flex-direction: column;
                     `}
                   >
-                    <div>{gameVersion}</div>
+                    <div>{gameVersions}</div>
                     <div>{getReleaseType(file.releaseType)}</div>
                   </div>
                   <div
@@ -292,7 +286,9 @@ const ModOverview = ({
           </StyledSelect>
           <Button
             type="primary"
-            disabled={!selectedItem || installedData.fileID === selectedItem}
+            disabled={
+              (!selectedItem || installedData.fileID === selectedItem) && addon
+            }
             loading={loading}
             onClick={async () => {
               setLoading(true);
@@ -319,8 +315,11 @@ const ModOverview = ({
                   projectID,
                   selectedItem,
                   instanceName,
-                  gameVersion,
-                  !installedData.fileID
+                  gameVersions,
+                  !installedData.fileID,
+                  null,
+                  null,
+                  addon
                 )
               );
               setInstalledData({ fileID: selectedItem, fileName: newFile });

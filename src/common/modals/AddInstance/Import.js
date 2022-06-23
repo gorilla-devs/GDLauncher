@@ -91,11 +91,11 @@ const Import = ({
     let addon = null;
 
     if (manifest.projectID) {
-      const { data } = await getAddon(manifest.projectID);
+      const data = await getAddon(manifest.projectID);
       addon = data;
       setModpack(addon);
     } else {
-      setModpack({ name: manifest.name, attachments: [] });
+      setModpack({ name: manifest.name, logo: null });
     }
     const isForge = (manifest?.minecraft?.modLoaders || []).find(
       v => v.id.includes(FORGE) && v.primary

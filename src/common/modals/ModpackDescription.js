@@ -10,11 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
-import {
-  getAddonDescription,
-  getAddonFiles,
-  getAddonFileChangelog
-} from '../api';
+import { getAddonDescription, getAddonFiles } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
 import { FORGE, CURSEFORGE_URL, FTB_MODPACK_URL } from '../utils/constants';
@@ -40,7 +36,7 @@ const ModpackDescription = ({
         await Promise.all([
           getAddonDescription(modpack.id).then(data => {
             // Replace the beginning of all relative URLs with the Curseforge URL
-            const modifiedData = data.data.replace(
+            const modifiedData = data.replace(
               /href="(?!http)/g,
               `href="${CURSEFORGE_URL}`
             );
@@ -48,7 +44,7 @@ const ModpackDescription = ({
             setDescription(modifiedData);
           }),
           getAddonFiles(modpack.id).then(async data => {
-            setFiles(data.data);
+            setFiles(data);
             setLoading(false);
           })
         ]);
@@ -113,7 +109,7 @@ const ModpackDescription = ({
 
   const primaryImage = useMemo(() => {
     if (type === 'curseforge') {
-      return modpack.attachments.find(v => v.isDefault).thumbnailUrl;
+      return modpack.logo.thumbnailUrl;
     } else if (type === 'ftb') {
       const image = modpack.art.reduce((prev, curr) => {
         if (!prev || curr.size < prev.size) return curr;
@@ -162,7 +158,7 @@ const ModpackDescription = ({
                     <label>MC version: </label>
                     {type === 'ftb'
                       ? modpack.tags[0]?.name || '-'
-                      : modpack.gameVersionLatestFiles[0].gameVersion}
+                      : modpack.latestFilesIndexes[0].gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
@@ -275,7 +271,7 @@ const ModpackDescription = ({
                       <div>
                         {type === 'ftb'
                           ? modpack.tags[0]?.name || '-'
-                          : file.gameVersion[0]}
+                          : file.gameVersions[0]}
                       </div>
                       <div>
                         {getReleaseType(

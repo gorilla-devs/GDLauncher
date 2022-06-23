@@ -20,6 +20,77 @@ import {
 } from '../../../common/reducers/actions';
 import BisectHosting from '../../../ui/BisectHosting';
 import Logo from '../../../ui/Logo';
+import ga from '../../../common/utils/analytics';
+
+const isOsx = process.platform === 'darwin';
+const isLinux = process.platform === 'linux';
+const isWindows = process.platform === 'win32';
+
+const DevtoolButton = () => {
+  const openDevTools = () => {
+    ipcRenderer.invoke('open-devtools');
+  };
+
+  return (
+    <TerminalButton
+      css={`
+        margin: 0 10px;
+      `}
+      onClick={openDevTools}
+    >
+      <FontAwesomeIcon icon={faTerminal} />
+    </TerminalButton>
+  );
+};
+
+const SettingsButton = () => {
+  const dispatch = useDispatch();
+
+  const modals = useSelector(state => state.modals);
+
+  const areSettingsOpen = modals.find(
+    v => v.modalType === 'Settings' && !v.unmounting
+  );
+
+  return (
+    <TerminalButton
+      areSettingsOpen={areSettingsOpen}
+      css={`
+        margin: 0 20px 0 10px;
+        ${props =>
+          props.areSettingsOpen
+            ? `background: ${props.theme.palette.grey[700]};`
+            : null}
+      `}
+      onClick={() => {
+        dispatch(openModal('Settings'));
+      }}
+    >
+      <FontAwesomeIcon icon={faCog} />
+    </TerminalButton>
+  );
+};
+
+const UpdateButton = ({ isAppImage }) => {
+  const dispatch = useDispatch();
+
+  return (
+    <TerminalButton
+      onClick={() => {
+        if (isAppImage || isWindows) {
+          ipcRenderer.invoke('installUpdateAndQuitOrRestart');
+        } else {
+          dispatch(openModal('AutoUpdatesNotAvailable'));
+        }
+      }}
+      css={`
+        color: ${props => props.theme.palette.colors.green};
+      `}
+    >
+      <FontAwesomeIcon icon={faDownload} />
+    </TerminalButton>
+  );
+};
 
 const SystemNavbar = () => {
   const dispatch = useDispatch();
@@ -27,12 +98,6 @@ const SystemNavbar = () => {
   const isUpdateAvailable = useSelector(state => state.updateAvailable);
   const location = useSelector(state => state.router.location.pathname);
   const [isAppImage, setIsAppImage] = useState(false);
-
-  const modals = useSelector(state => state.modals);
-
-  const areSettingsOpen = modals.find(
-    v => v.modalType === 'Settings' && !v.unmounting
-  );
 
   const checkForUpdates = async () => {
     const isAppImageVar = await ipcRenderer.invoke('isAppImage');
@@ -53,7 +118,7 @@ const SystemNavbar = () => {
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     } else {
-      dispatch(isNewVersionAvailable())
+      isNewVersionAvailable()
         .then(v => dispatch(updateUpdateAvailable(Boolean(v))))
         .catch(console.error);
     }
@@ -81,60 +146,6 @@ const SystemNavbar = () => {
       }, 600000);
     }, 1500);
   }, []);
-
-  const openDevTools = () => {
-    ipcRenderer.invoke('open-devtools');
-  };
-
-  const isOsx = process.platform === 'darwin';
-  const isLinux = process.platform === 'linux';
-  const isWindows = process.platform === 'win32';
-
-  const DevtoolButton = () => (
-    <TerminalButton
-      css={`
-        margin: 0 10px;
-      `}
-      onClick={openDevTools}
-    >
-      <FontAwesomeIcon icon={faTerminal} />
-    </TerminalButton>
-  );
-
-  const SettingsButton = () => (
-    <TerminalButton
-      areSettingsOpen={areSettingsOpen}
-      css={`
-        margin: 0 20px 0 10px;
-        ${props =>
-          props.areSettingsOpen
-            ? `background: ${props.theme.palette.grey[700]};`
-            : null}
-      `}
-      onClick={() => {
-        dispatch(openModal('Settings'));
-      }}
-    >
-      <FontAwesomeIcon icon={faCog} />
-    </TerminalButton>
-  );
-
-  const UpdateButton = () => (
-    <TerminalButton
-      onClick={() => {
-        if (isAppImage || isWindows) {
-          ipcRenderer.invoke('installUpdateAndQuitOrRestart');
-        } else {
-          dispatch(openModal('AutoUpdatesNotAvailable'));
-        }
-      }}
-      css={`
-        color: ${props => props.theme.palette.colors.green};
-      `}
-    >
-      <FontAwesomeIcon icon={faDownload} />
-    </TerminalButton>
-  );
 
   const quitApp = () => {
     if (isUpdateAvailable && (isAppImage || !isLinux)) {
@@ -196,7 +207,10 @@ const SystemNavbar = () => {
             </div>
             <BisectHosting
               showPointerCursor
-              onClick={() => dispatch(openModal('BisectHosting'))}
+              onClick={() => {
+                ga.sendCustomEvent('BHAdViewNavbar');
+                dispatch(openModal('BisectHosting'));
+              }}
             />
             {/* <PulsatingCircle /> */}
           </div>
@@ -205,7 +219,7 @@ const SystemNavbar = () => {
       <Container os={isOsx}>
         {!isOsx ? (
           <>
-            {isUpdateAvailable && <UpdateButton />}
+            {isUpdateAvailable && <UpdateButton isAppImage={isAppImage} />}
             {!isLocation('/') && !isLocation('/onboarding') && (
               <SettingsButton />
             )}
@@ -269,7 +283,7 @@ const SystemNavbar = () => {
             {!isLocation('/') && !isLocation('/onboarding') && (
               <SettingsButton />
             )}
-            {isUpdateAvailable && <UpdateButton />}
+            {isUpdateAvailable && <UpdateButton isAppImage={isAppImage} />}
           </>
         )}
       </Container>

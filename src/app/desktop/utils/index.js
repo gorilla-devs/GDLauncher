@@ -20,8 +20,9 @@ import {
   removeDuplicates,
   sortByForgeVersionDesc
 } from '../../../common/utils';
-import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
+import { getAddon, getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
+import browserDownload from '../../../common/utils/browserDownload';
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -107,7 +108,7 @@ export const librariesMapper = (libraries, librariesPath) => {
       .filter(v => !skipLibrary(v))
       .reduce((acc, lib) => {
         const tempArr = [];
-        // Normal libs
+        // Forge libs
         if (lib.downloads && lib.downloads.artifact) {
           let { url } = lib.downloads.artifact;
           // Handle special case for forge universal where the url is "".
@@ -119,7 +120,8 @@ export const librariesMapper = (libraries, librariesPath) => {
           tempArr.push({
             url,
             path: path.join(librariesPath, lib.downloads.artifact.path),
-            sha1: lib.downloads.artifact.sha1
+            sha1: lib.downloads.artifact.sha1,
+            name: lib.name
           });
         }
 
@@ -141,7 +143,8 @@ export const librariesMapper = (libraries, librariesPath) => {
               lib.downloads.classifiers[native].path
             ),
             sha1: lib.downloads.classifiers[native].sha1,
-            natives: true
+            natives: true,
+            name: lib.name
           });
         }
         if (tempArr.length === 0) {
@@ -151,10 +154,57 @@ export const librariesMapper = (libraries, librariesPath) => {
               native && `-${native}`
             ).join('/')}`,
             path: path.join(librariesPath, ...mavenToArray(lib.name, native)),
-            ...(native && { natives: true })
+            ...(native && { natives: true }),
+            name: lib.name
           });
         }
-        return acc.concat(tempArr);
+        // Patch log4j versions https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228
+        for (const k in tempArr) {
+          if (tempArr[k]?.url?.includes('log4j')) {
+            // Get rid of all log4j aside from official
+            if (!tempArr[k].url.includes('libraries.minecraft.net')) {
+              tempArr[k] = null;
+              continue;
+            }
+
+            if (tempArr[k].url.includes('2.0-beta9')) {
+              tempArr[k] = {
+                url: tempArr[k].url
+                  .replace(
+                    'libraries.minecraft.net',
+                    'cdn.gdlauncher.com/maven'
+                  )
+                  .replace(/2.0-beta9/g, '2.0-beta9-fixed'),
+                path: tempArr[k].path.replace(/2.0-beta9/g, '2.0-beta9-fixed'),
+                sha1: tempArr[k].url.includes('log4j-api')
+                  ? 'b61eaf2e64d8b0277e188262a8b771bbfa1502b3'
+                  : '677991ea2d7426f76309a73739cecf609679492c',
+                name: tempArr[k].name
+              };
+            } else {
+              const splitName = tempArr[k].name.split(':');
+              splitName[splitName.length - 1] = '2.15.0';
+              const patchedName = splitName.join(':');
+
+              // Assuming we can use 2.15
+              tempArr[k] = {
+                url: `https://cdn.gdlauncher.com/maven/${mavenToArray(
+                  patchedName,
+                  native
+                ).join(path.sep)}`,
+                path: path.join(
+                  librariesPath,
+                  ...mavenToArray(patchedName, native)
+                ),
+                sha1: tempArr[k].url.includes('log4j-api')
+                  ? '42319af9991a86b4475ab3316633a3d03e2d29e1'
+                  : '9bd89149d5083a2a3ab64dcc88b0227da14152ec'
+              };
+            }
+          }
+        }
+
+        return acc.concat(tempArr.filter(_ => _));
       }, []),
     'url'
   );
@@ -458,6 +508,9 @@ export const getJVMArguments112 = (
   args.push(...jvmOptions);
   args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
+  if (mcJson.logging) {
+    args.push(mcJson?.logging?.client?.argument || '');
+  }
 
   args.push(mcJson.mainClass);
 
@@ -547,6 +600,9 @@ export const getJVMArguments113 = (
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
+  if (mcJson.logging) {
+    args.push(mcJson?.logging?.client?.argument || '');
+  }
   args.push(...jvmOptions);
 
   // Eventually inject additional arguments (from 1.17 (?))
@@ -701,6 +757,9 @@ export const patchForge113 = async (
   for (const key in processors) {
     if (Object.prototype.hasOwnProperty.call(processors, key)) {
       const p = processors[key];
+      if (p?.sides && !(p?.sides || []).includes('client')) {
+        continue;
+      }
       const filePath = path.join(librariesPath, ...mavenToArray(p.jar));
       const args = p.args
         .map(arg => replaceIfPossible(arg))
@@ -775,10 +834,17 @@ export const importAddonZip = async (
 };
 
 export const downloadAddonZip = async (id, fileID, instancePath, tempPath) => {
-  const { data } = await getAddonFile(id, fileID);
+  const data = await getAddonFile(id, fileID);
   const instanceManifest = path.join(instancePath, 'manifest.json');
   const zipFile = path.join(tempPath, 'addon.zip');
-  await downloadFile(zipFile, data.downloadUrl);
+  if (data.downloadUrl) {
+    await downloadFile(zipFile, data.downloadUrl);
+  } else {
+    const addon = await getAddon(id);
+
+    const addonZipUrl = `https://www.curseforge.com/minecraft/modpacks/${addon.slug}/download/${fileID}`;
+    await browserDownload(addonZipUrl, zipFile);
+  }
   // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
   await new Promise(resolve => {
     setTimeout(() => resolve(), 500);
@@ -815,11 +881,13 @@ export const extractFace = async buffer => {
 export const normalizeModData = (data, projectID, modName) => {
   const temp = data;
   temp.name = modName;
+  if (data.fileFingerprint) {
+    temp.packageFingerprint = data.fileFingerprint;
+  }
   if (data.projectID && data.fileID) return temp;
   if (data.id) {
     temp.projectID = projectID;
-    temp.fileID = data.id;
-    delete temp.id;
+    temp.fileID = data?.file?.id || data.id;
   }
   return temp;
 };
@@ -839,7 +907,7 @@ export const convertCompletePathToInstance = (f, instancesPath) => {
 };
 
 export const isMod = (fileName, instancesPath) =>
-  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
+  /^(\\|\/)([\w\d\-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(([^\\/])*))(\.jar|\.disabled))$/.test(
     convertCompletePathToInstance(fileName, instancesPath)
   );
 
@@ -850,27 +918,27 @@ export const isInstanceFolderPath = (f, instancesPath) =>
 
 export const isFileModFabric = file => {
   return (
-    (file.gameVersion.includes('Fabric') ||
+    (file.gameVersions.includes('Fabric') ||
       file.modules.find(v => v.foldername === 'fabric.mod.json')) &&
-    !file.gameVersion.includes('Forge')
+    !file.gameVersions.includes('Forge')
   );
 };
 
 export const filterFabricFilesByVersion = (files, version) => {
   return files.filter(v => {
-    if (Array.isArray(v.gameVersion)) {
-      return v.gameVersion.includes(version) && isFileModFabric(v);
+    if (Array.isArray(v.gameVersions)) {
+      return v.gameVersions.includes(version) && isFileModFabric(v);
     }
-    return v.gameVersion === version;
+    return v.gameVersions === version;
   });
 };
 
 export const filterForgeFilesByVersion = (files, version) => {
   return files.filter(v => {
-    if (Array.isArray(v.gameVersion)) {
-      return v.gameVersion.includes(version) && !isFileModFabric(v);
+    if (Array.isArray(v.gameVersions)) {
+      return v.gameVersions.includes(version) && !isFileModFabric(v);
     }
-    return v.gameVersion === version;
+    return v.gameVersions === version;
   });
 };
 

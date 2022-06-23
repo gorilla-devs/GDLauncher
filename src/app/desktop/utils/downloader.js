@@ -8,6 +8,10 @@ import computeFileHash from './computeFileHash';
 
 const fs = fss.promises;
 
+function getUri(url) {
+  return new URL(url).href;
+}
+
 export const downloadInstanceFiles = async (
   arr,
   updatePercentage,
@@ -42,16 +46,18 @@ export const downloadInstanceFiles = async (
       } while (!res && counter < 3);
       downloaded += 1;
       if (
-        (updatePercentage && downloaded % 5 === 0) ||
-        downloaded === arr.length
-      )
+        updatePercentage &&
+        (downloaded % 5 === 0 || downloaded === arr.length)
+      ) {
         updatePercentage(downloaded);
+      }
     },
     { concurrency: threads }
   );
 };
 
 const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
+  let encodedUrl;
   try {
     const filePath = path.dirname(fileName);
     try {
@@ -67,11 +73,15 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
       if (legacyPath) await makeDir(path.dirname(legacyPath));
     }
 
-    const { data } = await axios.get(url, {
+    encodedUrl = getUri(url);
+
+    const { data } = await axios.get(encodedUrl, {
       responseType: 'stream',
       responseEncoding: null,
-      adapter
+      adapter,
+      timeout: 60000 * 20
     });
+
     const wStream = fss.createWriteStream(fileName, {
       encoding: null
     });
@@ -102,7 +112,7 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
     return true;
   } catch (e) {
     console.error(
-      `Error while downloading <${url}> to <${fileName}> --> ${e.message}`
+      `Error while downloading <${url} | ${encodedUrl}> to <${fileName}> --> ${e.message}`
     );
     return false;
   }
@@ -111,11 +121,15 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
 export const downloadFile = async (fileName, url, onProgress) => {
   await makeDir(path.dirname(fileName));
 
-  const { data, headers } = await axios.get(url, {
+  const encodedUrl = getUri(url);
+
+  const { data, headers } = await axios.get(encodedUrl, {
     responseType: 'stream',
     responseEncoding: null,
-    adapter
+    adapter,
+    timeout: 60000 * 20
   });
+
   const out = fss.createWriteStream(fileName, { encoding: null });
   data.pipe(out);
 

@@ -5,16 +5,15 @@ export const FABRIC_APIS = 'https://meta.fabricmc.net/v2';
 export const GDL_LEGACYJAVAFIXER_MOD_URL =
   'https://gdevs.io/legacyjavafixer-1.0.jar';
 export const MOJANG_APIS = 'https://authserver.mojang.com';
-export const JAVA_MANIFEST_URL = 'https://cdn.assets-gdevs.com/openjdk8.json';
+export const JAVA_MANIFEST_URL = 'https://cdn.gdlauncher.com/openjdk8.json';
 export const LATEST_JAVA_VERSION = 17;
 export const JAVA_LATEST_MANIFEST_URL =
-  'https://cdn.assets-gdevs.com/openjdk17.json';
+  'https://cdn.gdlauncher.com/openjdk17.json';
 export const MAVEN_REPO = 'http://central.maven.org/maven2';
 export const MC_LIBRARIES_URL = 'https://libraries.minecraft.net';
-export const FORGESVC_URL = 'https://addons-ecs.forgesvc.net/api/v2';
+export const FORGESVC_URL = 'https://api.curseforge.com/v1';
 export const FTB_API_URL = 'https://api.modpacks.ch/public';
 export const FTB_MODPACK_URL = 'https://feed-the-beast.com/modpack';
-export const GDL_SERVE_API = 'https://api.gdlauncher.com/cf';
 export const NEWS_URL =
   'https://www.minecraft.net/en-us/feeds/community-content/rss';
 export const FMLLIBS_OUR_BASE_URL = 'https://fmllibs.gdevs.io';

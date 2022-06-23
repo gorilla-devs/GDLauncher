@@ -16,7 +16,8 @@ import {
   faStop,
   faBoxOpen,
   faCopy,
-  faServer
+  faServer,
+  faHammer
 } from '@fortawesome/free-solid-svg-icons';
 import psTree from 'ps-tree';
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
@@ -28,6 +29,7 @@ import {
 } from '../../../../common/utils/selectors';
 import {
   addStartedInstance,
+  addToQueue,
   launchInstance
 } from '../../../../common/reducers/actions';
 import { openModal } from '../../../../common/reducers/modals/actions';
@@ -188,7 +190,6 @@ const Instance = ({ instanceName }) => {
     if (isInQueue || isPlaying) return;
     dispatch(addStartedInstance({ instanceName }));
     dispatch(launchInstance(instanceName));
-    dispatch(openModal('InstanceStartupAd', { instanceName }));
   };
   const openFolder = () => {
     ipcRenderer.invoke('openFolder', path.join(instancesPath, instance.name));
@@ -211,14 +212,22 @@ const Instance = ({ instanceName }) => {
   const killProcess = () => {
     console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
-      if (children.length) {
+      if (children?.length) {
         children.forEach(el => {
           if (el) {
-            process.kill(el.PID);
+            try {
+              process.kill(el.PID);
+            } catch {
+              // No-op
+            }
           }
         });
       } else {
-        process.kill(isPlaying.pid);
+        try {
+          process.kill(isPlaying.pid);
+        } catch {
+          // No-op
+        }
       }
     });
   };
@@ -295,19 +304,7 @@ const Instance = ({ instanceName }) => {
                   </div>
                 )}
                 {isInQueue && 'In Queue'}
-                {!isInQueue && !isPlaying && (
-                  <span
-                    css={`
-                      padding: 8px 20px;
-                      border-radius: 5px;
-                      background: ${({ theme }) => theme.palette.colors.green};
-                      box-shadow: 0px 0px 15px 1px
-                        ${({ theme }) => theme.palette.colors.green}80;
-                    `}
-                  >
-                    PLAY
-                  </span>
-                )}
+                {!isInQueue && !isPlaying && <span>PLAY</span>}
               </>
             )}
           </HoverContainer>
@@ -326,6 +323,7 @@ const Instance = ({ instanceName }) => {
                 icon={faStop}
                 css={`
                   margin-right: 10px;
+                  width: 25px !important;
                 `}
               />
               Kill
@@ -336,6 +334,7 @@ const Instance = ({ instanceName }) => {
               icon={faWrench}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Manage
@@ -345,6 +344,7 @@ const Instance = ({ instanceName }) => {
               icon={faFolder}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Open Folder
@@ -366,7 +366,7 @@ const Instance = ({ instanceName }) => {
               icon={faBoxOpen}
               css={`
                 margin-right: 10px;
-                width: 16px !important;
+                width: 25px !important;
               `}
             />
             Export Pack
@@ -379,11 +379,48 @@ const Instance = ({ instanceName }) => {
               icon={faCopy}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Duplicate
           </MenuItem>
           <MenuItem divider />
+          <MenuItem
+            disabled={Boolean(isInQueue) || Boolean(isPlaying)}
+            onClick={async () => {
+              let manifest = null;
+              try {
+                manifest = JSON.parse(
+                  await fs.readFile(
+                    path.join(instancesPath, instanceName, 'manifest.json')
+                  )
+                );
+              } catch {
+                // NO-OP
+              }
+
+              dispatch(
+                addToQueue(
+                  instanceName,
+                  instance.loader,
+                  manifest,
+                  instance.background,
+                  instance.timePlayed,
+                  {},
+                  { isUpdate: true }
+                )
+              );
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faHammer}
+              css={`
+                margin-right: 10px;
+                width: 25px !important;
+              `}
+            />
+            Repair
+          </MenuItem>
           <MenuItem
             disabled={Boolean(isInQueue) || Boolean(isPlaying)}
             onClick={openConfirmationDeleteModal}
@@ -392,6 +429,7 @@ const Instance = ({ instanceName }) => {
               icon={faTrash}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Delete
@@ -409,6 +447,7 @@ const Instance = ({ instanceName }) => {
               icon={faServer}
               css={`
                 margin-right: 10px;
+                width: 25px !important;
               `}
             />
             Create Server

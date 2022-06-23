@@ -8,7 +8,11 @@ if (os.platform() === 'win32') {
 } else if (os.platform() === 'linux') {
   addon = require('./linux/murmur2.node');
 } else if (os.platform() === 'darwin') {
-  addon = require('./darwin/murmur2.node');
+  if (os.arch() === 'arm64') {
+    addon = require('./darwin/murmur2_aarch64.node');
+  } else {
+    addon = require('./darwin/murmur2.node');
+  }
 }
 
 const addonPromise = filePath => {

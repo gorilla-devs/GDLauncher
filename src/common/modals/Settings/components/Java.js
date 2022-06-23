@@ -32,6 +32,7 @@ import {
   LATEST_JAVA_VERSION,
   MC_STARTUP_METHODS
 } from '../../../utils/constants';
+import { marks, scaleMem, scaleMemInv, sysMemScaled } from '../../../utils';
 
 const AutodetectPath = styled.div`
   display: flex;
@@ -115,14 +116,6 @@ const StyledButtons = styled(Button)`
 function resetJavaArguments(dispatch) {
   dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
 }
-
-const marks = {
-  2048: '2048 MB',
-  4096: '4096 MB',
-  8192: '8192 MB',
-  16384: '16384 MB',
-  32768: '32768 MB'
-};
 
 export default function MyAccountPreferences() {
   const [screenResolution, setScreenResolution] = useState(null);
@@ -394,20 +387,37 @@ export default function MyAccountPreferences() {
         >
           Select the preferred amount of memory to use when launching the game
         </Paragraph>
-        <Slider
+        <div
           css={`
-            margin: 20px 20px 20px 0 !important;
+            display: flex;
           `}
-          onAfterChange={e => {
-            dispatch(updateJavaMemory(e));
-          }}
-          defaultValue={javaMemory}
-          min={1024}
-          max={process.getSystemMemoryInfo().total / 1024}
-          step={512}
-          marks={marks}
-          valueLabelDisplay="auto"
-        />
+        >
+          <Slider
+            css={`
+              margin: 20px 40px !important;
+              white-space: nowrap;
+              flex: 1;
+            `}
+            onChange={e =>
+              dispatch(updateJavaMemory(Math.round(scaleMemInv(e))))
+            }
+            defaultValue={scaleMem(javaMemory)}
+            min={0}
+            max={sysMemScaled}
+            step={0.1}
+            marks={marks}
+            valueLabelDisplay="auto"
+          />
+          <div
+            css={`
+              display: grid;
+              place-items: center;
+              width: 100px;
+            `}
+          >
+            {javaMemory} MB
+          </div>
+        </div>
       </SelectMemory>
       <Hr />
       <JavaCustomArguments>
