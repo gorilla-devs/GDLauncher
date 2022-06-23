@@ -1,11 +1,11 @@
 /* eslint-disable no-loop-func */
-import React, { useState, useEffect, memo } from 'react';
-import { Button, Progress, Input } from 'antd';
+import React, { memo, useEffect, useState } from 'react';
+import { Button, Input, Progress } from 'antd';
 import { Transition } from 'react-transition-group';
 import styled, { useTheme } from 'styled-components';
 import { ipcRenderer } from 'electron';
 import fse from 'fs-extra';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import path from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -26,7 +26,7 @@ import {
   isJavaPathOK,
   isLatestJavaDownloaded
 } from '../../app/desktop/utils';
-import { _getTempPath, _getJavaPath } from '../utils/selectors';
+import { _getJavaPath, _getTempPath } from '../utils/selectors';
 import { closeModal } from '../reducers/modals/actions';
 import {
   updateJavaLatestPath,
@@ -451,7 +451,7 @@ const ManualSetup = ({
     return faTimes;
   };
 
-  const ErrorMessage = () => {
+  const ErrorMessage = memo(() => {
     let message;
     if (!fse.existsSync(javaPath) || !fse.existsSync(javaLatestPath))
       message = 'No such file or directory';
@@ -472,7 +472,7 @@ const ManualSetup = ({
         {message}
       </span>
     );
-  };
+  });
 
   const selectFolder = async version => {
     const { filePaths, canceled } = await ipcRenderer.invoke('openFileDialog');
