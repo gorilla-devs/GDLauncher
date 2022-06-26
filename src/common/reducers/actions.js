@@ -3127,8 +3127,6 @@ export function launchInstance(instanceName, forceQuit = false) {
       }
     );
 
-    console.log('AAAA', jvmArguments);
-
     const playTimer = setInterval(() => {
       dispatch(
         updateInstanceConfig(instanceName, prev => ({
