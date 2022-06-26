@@ -489,7 +489,7 @@ export const getJVMArguments112 = (
   args.push(
     [...libraries, mcjar]
       .filter(l => !l.natives)
-      .map(l => `"${l.path}"`)
+      .map(l => `${l.path}`)
       .join(process.platform === 'win32' ? ';' : ':')
   );
 
@@ -501,8 +501,8 @@ export const getJVMArguments112 = (
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(...jvmOptions);
-  args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
-  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
+  args.push(`-Djava.library.path=${path.join(instancePath, 'natives')}`);
+  args.push(`-Dminecraft.applet.TargetDirectory=${instancePath}`);
   if (mcJson.logging) {
     args.push(mcJson?.logging?.client?.argument || '');
   }
@@ -524,13 +524,13 @@ export const getJVMArguments112 = (
           val = mcJson.id;
           break;
         case 'game_directory':
-          val = `"${instancePath}"`;
+          val = `${instancePath}`;
           break;
         case 'assets_root':
-          val = `"${assetsPath}"`;
+          val = `${assetsPath}`;
           break;
         case 'game_assets':
-          val = `"${path.join(assetsPath, 'virtual', 'legacy')}"`;
+          val = `${path.join(assetsPath, 'virtual', 'legacy')}`;
           break;
         case 'assets_index_name':
           val = mcJson.assets;
@@ -558,6 +558,9 @@ export const getJVMArguments112 = (
       }
       if (val != null) {
         mcArgs[i] = val;
+      }
+      if (typeof args[i] === 'string') {
+        args[i] = args[i].replaceAll('"', '');
       }
     }
   }
