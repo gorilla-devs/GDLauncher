@@ -2967,6 +2967,25 @@ export function launchInstance(instanceName, forceQuit = false) {
             mcJson.forge = { arguments: {} };
             mcJson.forge.arguments.jvm = forgeJson.version.arguments.jvm.map(
               arg => {
+                console.log(
+                  'AAA',
+                  arg
+                    .replace(/\${version_name}/g, mcJson.id)
+                    .replace(
+                      /=\${library_directory}/g,
+                      `="${_getLibrariesPath(state)}"`
+                    )
+                    .replace(
+                      /\${library_directory}/g,
+                      `"${_getLibrariesPath(state)}`
+                    )
+                    .replaceAll('.jar', '.jar"')
+                    .replace(
+                      /\${classpath_separator}/g,
+                      process.platform === 'win32' ? ';' : ':'
+                    )
+                );
+
                 return arg
                   .replace(/\${version_name}/g, mcJson.id)
                   .replace(
@@ -2975,8 +2994,9 @@ export function launchInstance(instanceName, forceQuit = false) {
                   )
                   .replace(
                     /\${library_directory}/g,
-                    `${_getLibrariesPath(state)}`
+                    `"${_getLibrariesPath(state)}`
                   )
+                  .replaceAll('.jar', '.jar"')
                   .replace(
                     /\${classpath_separator}/g,
                     process.platform === 'win32' ? ';' : ':'
