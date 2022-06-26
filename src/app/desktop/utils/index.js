@@ -490,7 +490,7 @@ export const getJVMArguments112 = (
   args.push(
     [...libraries, mcjar]
       .filter(l => !l.natives)
-      .map(l => `${l.path}`)
+      .map(l => `${addQuotes(needsQuote, l.path)}`)
       .join(process.platform === 'win32' ? ';' : ':')
   );
   const needsQuote = process.platform !== 'win32';
