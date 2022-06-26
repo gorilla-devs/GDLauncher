@@ -484,6 +484,7 @@ export const getJVMArguments112 = (
   hideAccessToken,
   jvmOptions = []
 ) => {
+  const needsQuote = process.platform !== 'win32';
   const args = [];
   args.push('-cp');
 
@@ -493,7 +494,6 @@ export const getJVMArguments112 = (
       .map(l => `${addQuotes(needsQuote, l.path)}`)
       .join(process.platform === 'win32' ? ';' : ':')
   );
-  const needsQuote = process.platform !== 'win32';
 
   // if (process.platform === "darwin") {
   //   args.push("-Xdock:name=instancename");
