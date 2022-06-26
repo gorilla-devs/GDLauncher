@@ -3123,7 +3123,7 @@ export function launchInstance(instanceName, forceQuit = false) {
       ),
       {
         cwd: instancePath,
-        shell: false
+        shell: process.platform === 'win32'
       }
     );
 
