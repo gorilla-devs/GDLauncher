@@ -285,3 +285,7 @@ export const getSize = async dir => {
       .catch(e => reject(e));
   });
 };
+
+export const addQuotes = (needsQuote, string) => {
+  return needsQuote ? `"${string}"` : string;
+};

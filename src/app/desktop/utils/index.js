@@ -17,6 +17,7 @@ import {
 } from '../../../common/utils/constants';
 
 import {
+  addQuotes,
   removeDuplicates,
   sortByForgeVersionDesc
 } from '../../../common/utils';
@@ -581,10 +582,6 @@ export const getJVMArguments112 = (
   }
 
   return args;
-};
-
-const addQuotes = (needsQuote, string) => {
-  return needsQuote ? `"${string}"` : string;
 };
 
 export const getJVMArguments113 = (

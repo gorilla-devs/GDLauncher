@@ -116,6 +116,7 @@ import {
   downloadInstanceFiles
 } from '../../app/desktop/utils/downloader';
 import {
+  addQuotes,
   getFileMurmurHash2,
   getSize,
   makeInstanceRestorePoint,
@@ -3082,8 +3083,10 @@ export function launchInstance(instanceName, forceQuit = false) {
       loggingId || ''
     );
 
+    const needsQuote = process.platform !== 'win32';
+
     console.log(
-      `${javaPath} ${getJvmArguments(
+      `${addQuotes(needsQuote, javaPath)} ${getJvmArguments(
         libraries,
         mcMainFile,
         instancePath,
@@ -3110,7 +3113,7 @@ export function launchInstance(instanceName, forceQuit = false) {
     let closed = false;
 
     const ps = spawn(
-      `${javaPath}`,
+      `${addQuotes(needsQuote, javaPath)}`,
       jvmArguments.map(v =>
         v
           .toString()
