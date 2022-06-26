@@ -3102,7 +3102,7 @@ export function launchInstance(instanceName, forceQuit = false) {
         .replace(
           // eslint-disable-next-line no-template-curly-in-string
           '-Dlog4j.configurationFile=${path}',
-          `-Dlog4j.configurationFile=${loggingPath}`
+          `-Dlog4j.configurationFile=${addQuotes(needsQuote, loggingPath)}`
         )
     );
 
@@ -3121,7 +3121,7 @@ export function launchInstance(instanceName, forceQuit = false) {
           .replace(
             // eslint-disable-next-line no-template-curly-in-string
             '-Dlog4j.configurationFile=${path}',
-            `-Dlog4j.configurationFile=${loggingPath}`
+            `-Dlog4j.configurationFile=${addQuotes(needsQuote, loggingPath)}`
           )
       ),
       {
