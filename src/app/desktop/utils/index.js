@@ -594,7 +594,7 @@ export const getJVMArguments113 = (
 
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
-  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
+  args.push(`-Dminecraft.applet.TargetDirectory=${instancePath}`);
   if (mcJson.logging) {
     args.push(mcJson?.logging?.client?.argument || '');
   }
@@ -612,9 +612,9 @@ export const getJVMArguments113 = (
   for (let i = 0; i < args.length; i += 1) {
     if (typeof args[i] === 'object' && args[i].rules) {
       if (typeof args[i].value === 'string') {
-        args[i] = `"${args[i].value}"`;
+        args[i] = `${args[i].value}`;
       } else if (typeof args[i].value === 'object') {
-        args.splice(i, 1, ...args[i].value.map(v => `"${v}"`));
+        args.splice(i, 1, ...args[i].value.map(v => `${v}`));
       }
       i -= 1;
     } else if (typeof args[i] === 'string') {
@@ -629,10 +629,10 @@ export const getJVMArguments113 = (
             val = mcJson.id;
             break;
           case 'game_directory':
-            val = `"${instancePath}"`;
+            val = `${instancePath}`;
             break;
           case 'assets_root':
-            val = `"${assetsPath}"`;
+            val = `${assetsPath}`;
             break;
           case 'assets_index_name':
             val = mcJson.assets;
@@ -658,7 +658,7 @@ export const getJVMArguments113 = (
           case 'natives_directory':
             val = args[i].replace(
               argDiscovery,
-              `"${path.join(instancePath, 'natives')}"`
+              `${path.join(instancePath, 'natives')}`
             );
             break;
           case 'launcher_name':
@@ -670,7 +670,7 @@ export const getJVMArguments113 = (
           case 'classpath':
             val = [...libraries, mcjar]
               .filter(l => !l.natives)
-              .map(l => `"${l.path}"`)
+              .map(l => `${l.path}`)
               .join(process.platform === 'win32' ? ';' : ':');
             break;
           default:
@@ -680,6 +680,7 @@ export const getJVMArguments113 = (
           args[i] = val;
         }
       }
+      args[i] = args[i].replaceAll('"', '');
     }
   }
 

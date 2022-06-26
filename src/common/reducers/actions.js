@@ -3083,7 +3083,7 @@ export function launchInstance(instanceName, forceQuit = false) {
     );
 
     console.log(
-      `"${javaPath}" ${getJvmArguments(
+      `${javaPath} ${getJvmArguments(
         libraries,
         mcMainFile,
         instancePath,
@@ -3099,7 +3099,7 @@ export function launchInstance(instanceName, forceQuit = false) {
         .replace(
           // eslint-disable-next-line no-template-curly-in-string
           '-Dlog4j.configurationFile=${path}',
-          `-Dlog4j.configurationFile="${loggingPath}"`
+          `-Dlog4j.configurationFile=${loggingPath}`
         )
     );
 
@@ -3110,7 +3110,7 @@ export function launchInstance(instanceName, forceQuit = false) {
     let closed = false;
 
     const ps = spawn(
-      `"${javaPath}"`,
+      `${javaPath}`,
       jvmArguments.map(v =>
         v
           .toString()
@@ -3118,14 +3118,16 @@ export function launchInstance(instanceName, forceQuit = false) {
           .replace(
             // eslint-disable-next-line no-template-curly-in-string
             '-Dlog4j.configurationFile=${path}',
-            `-Dlog4j.configurationFile="${loggingPath}"`
+            `-Dlog4j.configurationFile=${loggingPath}`
           )
       ),
       {
         cwd: instancePath,
-        shell: true
+        shell: false
       }
     );
+
+    console.log('AAAA', jvmArguments);
 
     const playTimer = setInterval(() => {
       dispatch(
