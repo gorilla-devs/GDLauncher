@@ -120,7 +120,8 @@ import {
   getFileMurmurHash2,
   getSize,
   makeInstanceRestorePoint,
-  removeDuplicates
+  removeDuplicates,
+  replaceLibraryDirectory
 } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
@@ -2967,40 +2968,18 @@ export function launchInstance(instanceName, forceQuit = false) {
             mcJson.forge = { arguments: {} };
             mcJson.forge.arguments.jvm = forgeJson.version.arguments.jvm.map(
               arg => {
-                console.log(
-                  'AAA',
+                return replaceLibraryDirectory(
                   arg
                     .replace(/\${version_name}/g, mcJson.id)
                     .replace(
                       /=\${library_directory}/g,
                       `="${_getLibrariesPath(state)}"`
-                    )
-                    .replace(
-                      /\${library_directory}/g,
-                      `"${_getLibrariesPath(state)}`
-                    )
-                    .replaceAll('.jar', '.jar"')
-                    .replace(
-                      /\${classpath_separator}/g,
-                      process.platform === 'win32' ? ';' : ':'
-                    )
+                    ),
+                  _getLibrariesPath(state)
+                ).replace(
+                  /\${classpath_separator}/g,
+                  process.platform === 'win32' ? '";' : '":'
                 );
-
-                return arg
-                  .replace(/\${version_name}/g, mcJson.id)
-                  .replace(
-                    /=\${library_directory}/g,
-                    `="${_getLibrariesPath(state)}"`
-                  )
-                  .replace(
-                    /\${library_directory}/g,
-                    `"${_getLibrariesPath(state)}`
-                  )
-                  .replaceAll('.jar', '.jar"')
-                  .replace(
-                    /\${classpath_separator}/g,
-                    process.platform === 'win32' ? ';' : ':'
-                  );
               }
             );
           }
