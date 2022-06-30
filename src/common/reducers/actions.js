@@ -75,7 +75,8 @@ import {
   msOAuthRefresh,
   getModrinthVersion,
   getModrinthVersions,
-  getModrinthProject
+  getModrinthProject,
+  getVersionsFromHashes
 } from '../api';
 import {
   _getAccounts,
@@ -1970,10 +1971,11 @@ export function processForgeManifest(instanceName) {
 export function processModrinthManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
+    /** @type {{manifest: ModrinthManifest}} */
     const { manifest, loader } = _getCurrentDownloadItem(state);
-    let { dependencies } = manifest;
+    let { files } = manifest;
 
-    const totalModsRequired = dependencies.length;
+    const totalModsRequired = files.length;
 
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
@@ -1982,7 +1984,7 @@ export function processModrinthManifest(instanceName) {
 
     let prev = 0;
     const updatePercentage = downloaded => {
-      const percentage = (downloaded * 100) / dependencies.length;
+      const percentage = (downloaded * 100) / files.length;
       const progress = parseInt(percentage, 10);
       if (progress !== prev) {
         prev = progress;
@@ -1993,31 +1995,27 @@ export function processModrinthManifest(instanceName) {
     // TODO: If the download fails, we should attempt the next link in the downloads array
     dispatch(updateDownloadStatus(instanceName, 'Downloading pack...'));
     await downloadInstanceFiles(
-      dependencies
-        .flatMap(item => item.files[0])
-        .map(file => {
-          return {
-            path: path.join(instancePath, 'mods', file.filename),
-            url: file.url,
-            sha1: file.hashes.sha1
-          };
-        }),
+      files.map(file => {
+        return {
+          path: path.join(instancePath, file.path),
+          url: file.downloads.at(0),
+          sha1: file.hashes.sha1
+        };
+      }),
       updatePercentage,
       state.settings.concurrentDownloads
     );
 
-    // verify that the mods downloaded correctly
-    dependencies = await pMap(
-      dependencies,
-      async item => {
-        const file = item.files[0];
-        const filePath = path.join(instancePath, 'mods', file.filename);
+    // verify that each mod downloaded correctly
+    files = files.filter(
+      async file => {
+        const filePath = path.join(instancePath, file.path);
         const buf = await fs.readFile(filePath);
         const sha1 = crypto.createHash('sha1').update(buf).digest('hex');
         const sha512 = crypto.createHash('sha512').update(buf).digest('hex');
 
         if (sha1 === file.hashes.sha1 && sha512 === file.hashes.sha512) {
-          return item;
+          return file;
         } else {
           console.error(
             `Mod "${file.filename}" failed to download: hashes did not match`
@@ -2028,35 +2026,45 @@ export function processModrinthManifest(instanceName) {
       },
       { concurrency }
     );
-    dependencies = dependencies.filter(item => item !== null);
 
-    if (dependencies.length !== totalModsRequired) {
+    if (files.length !== totalModsRequired) {
       // the number of valid mods we have does not match the expected amount
       // this means the download has failed and should be restarted
-      // ideally this would be done on a per-mod basis
+      // ideally this should be done on a per-mod basis
 
-      throw `One or more mods failed to download (expected ${totalModsRequired}, but got ${dependencies.length})`;
+      throw `One or more mods failed to download (expected ${totalModsRequired}, but got ${files.length})`;
     }
 
     dispatch(updateDownloadStatus(instanceName, 'Finalizing files...'));
 
+    const hashVersionMap = await getVersionsFromHashes(
+      files.map(file => file.hashes.sha512),
+      'sha512'
+    );
+
     let modManifests = [];
     await pMap(
-      dependencies,
-      async item => {
-        // TODO: Remember which file was actually downloaded and put it here instead of just using the first one
-        const fileName = path.basename(item.files[0].filename);
-        modManifests = modManifests.concat({
-          projectID: item.project_id,
-          fileID: item.id,
-          fileName: fileName,
-          displayName: fileName,
-          version: item.version_number,
-          downloadUrl: item.files[0].url,
-          modSource: MODRINTH
-        });
+      files,
+      async file => {
+        /** @type {ModrinthVersion} */
+        const version = hashVersionMap[file.hashes.sha512];
 
-        const percentage = (modManifests.length * 100) / dependencies.length;
+        // TODO: Remember which file was actually downloaded and put it here instead of just using the first one
+        const fileName = path.basename(file.path);
+        modManifests = [
+          ...modManifests,
+          {
+            projectID: version?.project_id ?? null,
+            fileID: version?.id ?? null,
+            fileName: fileName,
+            displayName: fileName,
+            version: version?.version_number ?? null,
+            downloadUrl: file.downloads.at(0),
+            modSource: MODRINTH
+          }
+        ];
+
+        const percentage = (modManifests.length * 100) / files.length;
 
         dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
       },

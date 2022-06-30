@@ -345,46 +345,6 @@ const InstanceName = ({
         // loaderVersion = manifest.dependencies['quilt-loader'];
       }
 
-      // we're done with this data, but we need the prop to store mod data when we add the manifest object to the queue
-      delete manifest.dependencies;
-
-      if (fullVersion.dependencies.length > 0) {
-        /*
-          The pack author has set up their pack using Modrinth dependencies.
-          On dependency objects, it seems that if `version_id` has a value `project_id` and `file_name` will be null.
-          It also seems that if `file_name` has a value, `version_id` and `project_id` and will be null.
-          We will just handle the entries with version_ids here, and assume anything without one is included in the mrpack
-          because we can't do anything else with it anyway.
-          Any required dependencies will be handled when downloading the mods.
-        */
-        manifest.dependencies = await getModrinthVersions(
-          fullVersion.dependencies
-            .map(dep => dep.version_id)
-            .filter(id => id !== null)
-        );
-      } else {
-        /*
-          The pack author has not defined any Modrinth dependencies.
-          The best we can do in this situation is substitute in the download links they provide in the mrpack file.
-          This lack of metadata means we can't show installed mods in the Mod Browser or recommend updated versions.
-        */
-        manifest.dependencies = manifest.files.map(file => {
-          return {
-            id: null,
-            project_id: null,
-            version_number: null,
-            files: file.downloads.map(url => {
-              return {
-                filename: file.path.slice(5), // slice 'mods/' off the start
-                hashes: file.hashes,
-                url,
-                size: file.fileSize
-              };
-            })
-          };
-        });
-      }
-
       const loader = {
         loaderType,
         mcVersion,

@@ -548,6 +548,11 @@ export const getModrinthVersions = async versionIds => {
 
 // TODO: Move override logic out of this function
 // TODO: Do overrides need to be applied after the pack is installed?
+/**
+ * @param {string} versionId
+ * @param {string} instancePath
+ * @returns {Promise<ModrinthManifest>}
+ */
 export const getModrinthVersionManifest = async (versionId, instancePath) => {
   try {
     // get download link for the metadata archive
@@ -648,6 +653,22 @@ export const getModrinthProjectMembers = async projectId => {
   try {
     const url = `${MODRINTH_API_URL}/project/${projectId}/members`;
     const { data } = await axios.get(url);
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/**
+ * @param {string[]} hashes
+ * @param {'sha1' | 'sha512'} algorithm
+ * @returns {Promise<{[hash: string]: ModrinthVersion}[]>}
+ */
+export const getVersionsFromHashes = async (hashes, algorithm) => {
+  trackModrinthAPI();
+  try {
+    const url = `${MODRINTH_API_URL}/version_files`;
+    const { data } = await axios.post(url, { hashes, algorithm });
     return data;
   } catch (err) {
     console.error(err);

@@ -6,8 +6,8 @@
  * @property {string} title The title or name of the project
  * @property {string} description A short description of the project
  * @property {string[]} categories A list of the categories that the project is in
- * @property {'required'|'optional'|'unsupported'} client_side The client side support of the project
- * @property {'required'|'optional'|'unsupported'} server_side The server side support of the project
+ * @property {ModrinthEnvironment} client_side The client side support of the project
+ * @property {ModrinthEnvironment} server_side The server side support of the project
  * @property {string} body A long form description of the project
  * @property {?string} issues_url An optional link to where to submit bugs or issues with the project
  * @property {?string} source_url An optional link to the source code of the project
@@ -29,7 +29,6 @@
  * @property {string[]} versions A list of the version IDs of the project (will never be empty unless `draft` status)
  * @property {ModrinthGalleryImage[]} gallery A list of images that have been uploaded to the project's gallery
  */
-
 
 /**
  * @typedef {Object} ModrinthVersion Versions contain download links to files with additional metadata.
@@ -72,8 +71,8 @@
  * @property {?string} title The title or name of the project
  * @property {?string} description A short description of the project
  * @property {string[]} categories A list of the categories that the project is in
- * @property {'required'|'optional'|'unsupported'} client_side The client side support of the project
- * @property {'required'|'optional'|'unsupported'} server_side The server side support of the project
+ * @property {ModrinthEnvironment} client_side The client side support of the project
+ * @property {ModrinthEnvironment} server_side The server side support of the project
  * @property {'mod'|'modpack'} project_type The project type of the project
  * @property {number} downloads The total number of downloads of the project
  * @property {?string} icon_url The URL of the project's icon
@@ -113,4 +112,36 @@
  * @property {string} icon
  * @property {string} name
  * @property {string} project_type
+ */
+
+/**
+ * @typedef ModrinthManifest
+ * @property {number} formatVersion The version of the format
+ * @property {string} game The game of the modpack
+ * @property {string} versionId A unique identifier for this specific version of the modpack
+ * @property {string} name Human-readable name of the modpack.
+ * @property {?string} summary A short description of this modpack
+ * @property {ModrinthManifestFile[]} files The files array contains a list of files for the modpack that needs to be downloaded
+ * @property {ModrinthManifestDependencies} dependencies This object contains a list of IDs and version numbers that launchers will use in order to know what to install
+ */
+
+/**
+ * @typedef ModrinthManifestFile
+ * @property {string} path The destination path of this file, relative to the Minecraft instance directory. For example, mods/MyMod.jar resolves to .minecraft/mods/MyMod.jar
+ * @property {{sha1: string, sha512: string}} hashes The hashes of the file specified
+ * @property {{client: ModrinthEnvironment, server: ModrinthEnvironment}} env For files that only exist on a specific environment, this field allows that to be specified. It's an object which contains a client and server value. This uses the Modrinth client/server type specifications.
+ * @property {string[]} downloads An array containing HTTPS URLs where this file may be downloaded
+ * @property {number} fileSize An integer containing the size of the file, in bytes. This is mostly provided as a utility for launchers to allow use of progress bars.
+ */
+
+/**
+ * @typedef ModrinthManifestDependencies
+ * @property {?string} minecraft The Minecraft game
+ * @property {?string} forge The Minecraft Forge mod loader
+ * @property {?string} fabric-loader The Fabric loader
+ * @property {?string} quilt-loader The Quilt loader
+ */
+
+/**
+ * @typedef {'required'|'optional'|'unsupported'} ModrinthEnvironment
  */
