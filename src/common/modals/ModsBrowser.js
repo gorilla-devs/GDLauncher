@@ -2,8 +2,27 @@
 import React, { memo, useState } from 'react';
 import styled from 'styled-components';
 import { Radio } from 'antd';
+import { ipcRenderer } from 'electron';
+import memoize from 'memoize-one';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { Button } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { FixedSizeList as List } from 'react-window';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
+import { faWrench, faDownload } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
+import { getAddonFiles } from '../api';
+import { openModal } from '../reducers/modals/actions';
 import { _getInstance } from '../utils/selectors';
+import { installMod } from '../reducers/actions';
+import { FABRIC, FORGE } from '../utils/constants';
+import {
+  getFirstPreferredCandidate,
+  filterFabricFilesByVersion,
+  filterForgeFilesByVersion,
+  getPatchedInstanceType
+} from '../../app/desktop/utils';
 import { CURSEFORGE, MODRINTH } from '../utils/constants';
 import CurseForgeModsBrowser from './CurseForgeModsBrowser';
 import ModrinthModsBrowser from './ModrinthModsBrowser';
