@@ -2488,7 +2488,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
 
         const loader = {
           loaderType,
-          mcVersion: newModpackData?.gameVersions[0],
+          mcVersion: newModpackData?.gameVersions.at(0),
           loaderVersion: manifest.dependencies[loaderDependencyName],
           fileID: newModpackData?.id,
           projectID: instance.loader?.projectID,
@@ -2508,7 +2508,7 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           addToQueue(
             instanceName,
             loader,
-            null,
+            manifest,
             `background${path.extname(imageURL)}`
           )
         );
