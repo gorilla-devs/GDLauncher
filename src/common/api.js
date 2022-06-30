@@ -18,8 +18,20 @@ import {
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
 
+const axioInstance = axios.create({
+  headers: {
+    'X-API-KEY': '$2a$10$5BgCleD8.rLQ5Ix17Xm2lOjgfoeTJV26a1BXmmpwrOemgI517.nuC',
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  }
+});
+
 const trackFTBAPI = () => {
   ga.sendCustomEvent('FTBAPICall');
+};
+
+const trackCurseForgeAPI = () => {
+  ga.sendCustomEvent('CurseForgeAPICall');
 };
 
 // Microsoft Auth
@@ -221,14 +233,16 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
 // FORGE ADDONS
 
 export const getAddon = async projectID => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/${projectID}`;
-  const { data } = await axios.get(url);
+  const { data } = await axioInstance.get(url);
   return data?.data;
 };
 
 export const getMultipleAddons = async addons => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods`;
-  const { data } = await axios.post(
+  const { data } = await axioInstance.post(
     url,
     JSON.stringify({
       modIds: addons
@@ -238,47 +252,63 @@ export const getMultipleAddons = async addons => {
 };
 
 export const getAddonFiles = async projectID => {
-  const url = `${FORGESVC_URL}/mods/${projectID}/files`;
-  const { data } = await axios.get(url);
+  trackCurseForgeAPI();
+  // Aggregate results in case of multiple pages
+  const results = [];
+  let hasMore = true;
 
-  return data?.data ? data?.data.sort(sortByDate) : undefined;
+  while (hasMore) {
+    const url = `${FORGESVC_URL}/mods/${projectID}/files?pageSize=400&index=${results.length}`;
+    const { data } = await axioInstance.get(url);
+    results.push(...(data.data || []));
+
+    hasMore = data.pagination.totalCount > results.length;
+  }
+
+  return results.sort(sortByDate);
 };
 
 export const getAddonDescription = async projectID => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/${projectID}/description`;
-  const { data } = await axios.get(url);
+  const { data } = await axioInstance.get(url);
   return data?.data;
 };
 
 export const getAddonFile = async (projectID, fileID) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/${projectID}/files/${fileID}`;
-  const { data } = await axios.get(url);
+  const { data } = await axioInstance.get(url);
   return data?.data;
 };
 
 export const getAddonsByFingerprint = async fingerprints => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/fingerprints`;
-  const { data } = await axios.post(url, fingerprints);
+  const { data } = await axioInstance.post(url, { fingerprints });
 
   return data?.data;
 };
 
 export const getAddonFileChangelog = async (projectID, fileID) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/${projectID}/files/${fileID}/changelog`;
-  const { data } = await axios.get(url);
+  const { data } = await axioInstance.get(url);
 
   return data?.data;
 };
 
 export const getAddonCategories = async () => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/categories?gameId=432`;
-  const { data } = await axios.get(url);
+  const { data } = await axioInstance.get(url);
   return data.data;
 };
 
 export const getCFVersionIds = async () => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/games/432/versions`;
-  const { data } = await axios.get(url);
+  const { data } = await axioInstance.get(url);
   return data.data;
 };
 
@@ -289,10 +319,11 @@ export const getSearch = async (
   index,
   sort,
   isSortDescending,
-  gameVersionId,
+  gameVersion,
   categoryId,
   modLoaderType
 ) => {
+  trackCurseForgeAPI();
   const url = `${FORGESVC_URL}/mods/search`;
 
   // Map sort to sortField
@@ -326,12 +357,13 @@ export const getSearch = async (
     index,
     sortField,
     sortOrder: isSortDescending ? 'desc' : 'asc',
-    gameVersionTypeId: gameVersionId || '',
+    gameVersion: gameVersion || '',
     ...(modLoaderType === 'fabric' && { modLoaderType: 'Fabric' }),
     classId: type === 'mods' ? 6 : 4471,
     searchFilter
   };
-  const { data } = await axios.get(url, { params });
+
+  const { data } = await axioInstance.get(url, { params });
   return data?.data;
 };
 

@@ -84,10 +84,10 @@ const Content = ({
                   <Radio.Button value={0}>
                     <img
                       src={minecraftIcon}
-                      width="22px"
                       css={`
                         margin-right: 4px;
                         cursor: pointer;
+                        width: 22px;
                       `}
                     />
                     Vanilla
@@ -95,10 +95,10 @@ const Content = ({
                   <Radio.Button value={1}>
                     <img
                       src={curseForgeIcon}
-                      width="20px"
                       css={`
                         margin-right: 4px;
                         cursor: pointer;
+                        width: 20px;
                       `}
                     />
                     CurseForge
@@ -108,10 +108,10 @@ const Content = ({
                   <Radio.Button value={3}>
                     <img
                       src={ftbIcon}
-                      width="20px"
                       css={`
                         margin-right: 4px;
                         cursor: pointer;
+                        width: 20px;
                       `}
                     />
                     FTB

@@ -122,7 +122,6 @@ const ModOverview = ({
   };
 
   const handleChange = value => setSelectedItem(JSON.parse(value));
-
   const primaryImage = addon?.logo;
   return (
     <Modal
@@ -159,11 +158,11 @@ const ModOverview = ({
                   </div>
                   <div>
                     <label>MC version: </label>
-                    {addon?.latestFilesIndexes[0]?.gameVersions}
+                    {addon?.latestFilesIndexes[0]?.gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
-                  href={addon?.websiteUrl}
+                  href={addon?.links?.websiteUrl}
                   css={`
                     position: absolute;
                     top: 20px;
@@ -287,7 +286,9 @@ const ModOverview = ({
           </StyledSelect>
           <Button
             type="primary"
-            disabled={!selectedItem || installedData.fileID === selectedItem}
+            disabled={
+              (!selectedItem || installedData.fileID === selectedItem) && addon
+            }
             loading={loading}
             onClick={async () => {
               setLoading(true);
@@ -315,7 +316,10 @@ const ModOverview = ({
                   selectedItem,
                   instanceName,
                   gameVersions,
-                  !installedData.fileID
+                  !installedData.fileID,
+                  null,
+                  null,
+                  addon
                 )
               );
               setInstalledData({ fileID: selectedItem, fileName: newFile });

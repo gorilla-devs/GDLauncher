@@ -89,7 +89,7 @@ const InstanceCrashed = ({ code, errorLogs }) => {
                   align-items: center;
                 `}
               >
-                <>Error Log</> &nbsp;
+                Error Log &nbsp;
                 <Tooltip title={copiedLog ? 'Copied' : 'Copy'} placement="top">
                   <div
                     css={`

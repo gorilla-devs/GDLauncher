@@ -215,11 +215,19 @@ const Instance = ({ instanceName }) => {
       if (children?.length) {
         children.forEach(el => {
           if (el) {
-            process.kill(el.PID);
+            try {
+              process.kill(el.PID);
+            } catch {
+              // No-op
+            }
           }
         });
       } else {
-        process.kill(isPlaying.pid);
+        try {
+          process.kill(isPlaying.pid);
+        } catch {
+          // No-op
+        }
       }
     });
   };
@@ -397,7 +405,9 @@ const Instance = ({ instanceName }) => {
                   instance.loader,
                   manifest,
                   instance.background,
-                  instance.timePlayed
+                  instance.timePlayed,
+                  {},
+                  { isUpdate: true }
                 )
               );
             }}

@@ -9,7 +9,11 @@ if (os.platform() === 'win32') {
 } else if (os.platform() === 'linux') {
   NSFW = require('./linux/nsfw.node');
 } else if (os.platform() === 'darwin') {
-  NSFW = require('./darwin/nsfw.node');
+  if (os.arch() === 'arm64') {
+    NSFW = require('./darwin/nsfw_aarch64.node');
+  } else {
+    NSFW = require('./darwin/nsfw.node');
+  }
 }
 
 function NSFWFilePoller(watchPath, eventCallback, debounceMS) {

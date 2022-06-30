@@ -14,6 +14,7 @@ const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  margin-bottom: 2rem;
 `;
 
 const NoInstance = styled.div`

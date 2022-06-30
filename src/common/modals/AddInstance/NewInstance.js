@@ -20,26 +20,29 @@ const NewInstance = ({ setVersion, setModpack }) => {
       <Cascader
         options={filteredVers}
         onChange={v => {
-          if (v[0] === VANILLA)
+          if (!v) {
+            setVersion(null);
+          } else if (v[0] === VANILLA) {
             setVersion({ loaderType: v[0], mcVersion: v[2] });
-          if (v[0] === FORGE)
+          } else if (v[0] === FORGE) {
             setVersion({
               loaderType: v[0],
               mcVersion: v[1],
               loaderVersion: v[2]
             });
-          if (v[0] === FABRIC)
+          } else if (v[0] === FABRIC) {
             setVersion({
               loaderType: v[0],
               mcVersion: v[2],
               loaderVersion: v[3]
             });
+          }
           setModpack(null);
         }}
         placeholder="Select a version"
         size="large"
         css={`
-          width: 400px;
+          width: 400px !important;
         `}
       />
     </Container>

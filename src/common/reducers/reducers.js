@@ -41,6 +41,8 @@ function downloadQueue(state = {}, action) {
           currentPhase: 1,
           totalPhases: action.phases,
           manifest: action.manifest,
+          ...(action.isUpdate && { isUpdate: action.isUpdate }),
+          ...(action.bypassCopy && { isUpdate: action.bypassCopy }),
           ...action.settings
         }
       };

@@ -77,16 +77,16 @@ const modsFingerprintsScan = async instancesPath => {
             const matches = await Promise.all(
               Object.entries(missingMods).map(async ([fileName, hash]) => {
                 const exactMatch = (data.exactMatches || []).find(
-                  v => v.file.packageFingerprint === hash
+                  v => v.file.fileFingerprint === hash
                 );
                 if (exactMatch?.file) {
                   let addonData = null;
                   try {
-                    addonData = await getAddon(exactMatch.file.projectId);
+                    addonData = await getAddon(exactMatch.file.modId);
                     return {
                       ...normalizeModData(
                         exactMatch.file,
-                        exactMatch.file.projectId,
+                        exactMatch.file.modId,
                         addonData.name
                       ),
                       fileName
