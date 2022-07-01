@@ -34,6 +34,8 @@ const ModChangelog = ({ projectID, files, type, projectName }) => {
         case MODRINTH:
           data = await getModrinthVersionChangelog(id);
           break;
+        default:
+          throw Error(`Unknown type: ${type}`);
       }
     } catch (err) {
       console.error(err);

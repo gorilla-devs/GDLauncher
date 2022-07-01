@@ -24,10 +24,7 @@ import {
   faWrench,
   faDownload
 } from '@fortawesome/free-solid-svg-icons';
-import {
-  getModrinthSearchResults,
-  getModrinthProjectVersions
-} from '../api';
+import { getModrinthSearchResults, getModrinthProjectVersions } from '../api';
 import { openModal } from '../reducers/modals/actions';
 import { _getInstance } from '../utils/selectors';
 import { installModrinthMod } from '../reducers/actions';
@@ -134,10 +131,10 @@ const ModsListWrapper = ({
 
   const Row = memo(({ index, style, data }) => {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [error] = useState(null);
     const dispatch = useDispatch();
 
-    const { instanceName, gameVersion, installedMods, instance } = data;
+    const { instanceName, gameVersion, installedMods } = data;
 
     const item = items[index];
 
@@ -216,8 +213,9 @@ const ModsListWrapper = ({
                   e.stopPropagation();
 
                   // Get the latest compatible version and give it to the installer
-                  const availableModVersions =
-                    await getModrinthProjectVersions(item.project_id);
+                  const availableModVersions = await getModrinthProjectVersions(
+                    item.project_id
+                  );
                   const compatibleModVersions = availableModVersions
                     .filter(v => v.game_versions.includes(gameVersion))
                     .sort((a, b) => a.date_published - b.date_published);
@@ -366,11 +364,12 @@ const ModrinthModsBrowser = ({ instanceName, gameVersion }) => {
     setAreModsLoading(true);
     setError(false);
 
-    let hits, total_hits;
+    let hits;
+    let totalHits;
 
     try {
       // this only supports filtering by 1 category, but the API supports multiple if we want to include that later
-      ({ hits, total_hits } = await getModrinthSearchResults(
+      ({ hits, total_hits: totalHits } = await getModrinthSearchResults(
         query,
         'MOD',
         gameVersion,
@@ -385,7 +384,7 @@ const ModrinthModsBrowser = ({ instanceName, gameVersion }) => {
 
     const newMods = reset ? hits : [...mods, ...hits];
 
-    setHasNextPage(newMods?.length < total_hits);
+    setHasNextPage(newMods?.length < totalHits);
     setMods(newMods || []);
     setAreModsLoading(false);
   };
@@ -407,7 +406,7 @@ const ModrinthModsBrowser = ({ instanceName, gameVersion }) => {
             width: 160px !important;
             margin: 0 10px !important;
           `}
-          defaultValue={'relevance'}
+          defaultValue="relevance"
           onChange={setFilterType}
           disabled={areModsLoading}
           virtual={false}
@@ -457,7 +456,7 @@ const ModrinthModsBrowser = ({ instanceName, gameVersion }) => {
                       width: 16px;
                       margin-right: 10px;
                     `}
-                    alt={cat.displayName + 'icon'}
+                    alt={`${cat.displayName}icon`}
                   />
                   {cat.displayName}
                 </div>

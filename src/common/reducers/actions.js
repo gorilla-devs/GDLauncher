@@ -27,6 +27,7 @@ import makeDir from 'make-dir';
 import { major, minor, patch, prerelease } from 'semver';
 import { generate as generateRandomString } from 'randomstring';
 import { XMLParser } from 'fast-xml-parser';
+import crypto from 'crypto';
 import * as ActionTypes from './actionTypes';
 import {
   ACCOUNT_MICROSOFT,
@@ -73,9 +74,7 @@ import {
   msExchangeCodeForAccessToken,
   msMinecraftProfile,
   msOAuthRefresh,
-  getModrinthVersion,
   getModrinthVersions,
-  getModrinthProject,
   getVersionsFromHashes
 } from '../api';
 import {
@@ -135,7 +134,6 @@ import fmlLibsMapping from '../../app/desktop/utils/fmllibs';
 import { openModal, closeModal } from './modals/actions';
 import forgePatcher from '../utils/forgePatcher';
 import browserDownload from '../utils/browserDownload';
-import crypto from 'crypto';
 
 export function initManifests() {
   return async (dispatch, getState) => {
@@ -1970,9 +1968,11 @@ export function processForgeManifest(instanceName) {
 
 export function processModrinthManifest(instanceName) {
   return async (dispatch, getState) => {
+    // TODO: Scan for existing files and skip them if they are in the download list
+
     const state = getState();
     /** @type {{manifest: ModrinthManifest}} */
-    const { manifest, loader } = _getCurrentDownloadItem(state);
+    const { manifest } = _getCurrentDownloadItem(state);
     let { files } = manifest;
 
     const totalModsRequired = files.length;
@@ -2016,13 +2016,13 @@ export function processModrinthManifest(instanceName) {
 
         if (sha1 === file.hashes.sha1 && sha512 === file.hashes.sha512) {
           return file;
-        } else {
-          console.error(
-            `Mod "${file.filename}" failed to download: hashes did not match`
-          );
-          // TODO: Attempt to re-download here?
-          return null;
         }
+
+        console.error(
+          `Mod "${file.filename}" failed to download: hashes did not match`
+        );
+        // TODO: Attempt to re-download here?
+        return null;
       },
       { concurrency }
     );
@@ -2032,7 +2032,9 @@ export function processModrinthManifest(instanceName) {
       // this means the download has failed and should be restarted
       // ideally this should be done on a per-mod basis
 
-      throw `One or more mods failed to download (expected ${totalModsRequired}, but got ${files.length})`;
+      throw Error(
+        `One or more mods failed to download (expected ${totalModsRequired}, but got ${files.length})`
+      );
     }
 
     dispatch(updateDownloadStatus(instanceName, 'Finalizing files...'));
@@ -2056,7 +2058,7 @@ export function processModrinthManifest(instanceName) {
           {
             projectID: version?.project_id ?? null,
             fileID: version?.id ?? null,
-            fileName: fileName,
+            fileName,
             displayName: fileName,
             version: version?.version_number ?? null,
             downloadUrl: file.downloads.at(0),
@@ -2276,6 +2278,9 @@ export function downloadInstance(instanceName) {
             await dispatch(processModrinthManifest(instanceName));
             break;
           }
+          default: {
+            console.error(`Unknown modpack source: ${loader?.source}`);
+          }
         }
       }
 
@@ -2483,7 +2488,9 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           //   break;
           // }
           default:
-            throw `This instance (${instanceName}) requires an unsupported loader: ${loaderType}`;
+            throw Error(
+              `This instance (${instanceName}) requires an unsupported loader: ${loaderType}`
+            );
         }
 
         const loader = {
@@ -2514,6 +2521,9 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
         );
 
         break;
+      }
+      default: {
+        console.error(`Unknown modpack source: ${instance.loader.source}`);
       }
     }
   };
@@ -3638,7 +3648,6 @@ export function installModrinthMod(version, instanceName, onProgress) {
     const state = getState();
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
-    const instance = _getInstance(state)(instanceName);
 
     // Get mods that are already installed so we can skip them
     let existingMods = [];
@@ -3650,16 +3659,14 @@ export function installModrinthMod(version, instanceName, onProgress) {
     );
 
     const dependencies = (await resolveModrinthDependencies(version)).filter(
-      dep => {
-        existingMods.find(mod => mod.fileID === dep.id) === undefined;
-      }
+      dep => existingMods.find(mod => mod.fileID === dep.id) === undefined
     );
 
     // install dependencies and the mod that we want
     await pMap(
       [...dependencies, version],
-      async version => {
-        const primaryFile = version.files.find(f => f.primary);
+      async v => {
+        const primaryFile = v.files.find(f => f.primary);
 
         const destFile = path.join(instancePath, 'mods', primaryFile.filename);
         const tempFile = path.join(_getTempPath(state), primaryFile.filename);
@@ -3677,8 +3684,8 @@ export function installModrinthMod(version, instanceName, onProgress) {
                 ...[
                   {
                     source: MODRINTH,
-                    projectID: version.project_id,
-                    fileID: version.id,
+                    projectID: v.project_id,
+                    fileID: v.id,
                     fileName: primaryFile.filename,
                     displayName: primaryFile.filename,
                     downloadUrl: primaryFile.url
@@ -3714,9 +3721,8 @@ async function resolveModrinthDependencies(version) {
 
   // If we do have dependencies, get the version objects for each of those and recurse on those
   const depVersions = await getModrinthVersions(depVersionIDs);
-  const subDepVersions = await pMap(
-    depVersions,
-    async v => await resolveModrinthDependencies(v)
+  const subDepVersions = await pMap(depVersions, async v =>
+    resolveModrinthDependencies(v)
   );
 
   return [...depVersions, ...subDepVersions];

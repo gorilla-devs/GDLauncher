@@ -1,6 +1,9 @@
 // @flow
 import axios from 'axios';
 import qs from 'querystring';
+import path from 'path';
+import fse from 'fs-extra';
+import os from 'os';
 import {
   MOJANG_APIS,
   FORGESVC_URL,
@@ -19,10 +22,8 @@ import {
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
 import { downloadFile } from '../app/desktop/utils/downloader';
+// eslint-disable-next-line import/no-cycle
 import { extractAll } from '../app/desktop/utils';
-import path from 'path';
-import fse from 'fs-extra';
-import os from 'os';
 
 const axioInstance = axios.create({
   headers: {
@@ -450,7 +451,7 @@ export const getModrinthSearchResults = async (
   offset = 0
 ) => {
   trackModrinthAPI();
-  let facets = [];
+  const facets = [];
 
   if (projectType === 'MOD') {
     facets.push(['project_type:mod']);
@@ -462,12 +463,11 @@ export const getModrinthSearchResults = async (
     facets.push([`versions:${gameVersion}`]);
   }
   // remove falsy values (i.e. null/undefined) from categories before constructing facets
-  categories = categories.filter(cat => !!cat);
-  if (categories) {
-    facets.push(...categories.map(cat => [`categories:${cat}`]));
+  const filteredCategories = categories.filter(cat => !!cat);
+  if (filteredCategories) {
+    facets.push(...filteredCategories.map(cat => [`categories:${cat}`]));
   }
 
-  //const url = `${MODRINTH_API_URL}/search?limit=20&offset=${offset}&query=${searchText}&index=relevance&facets=[["project_type:modpack"]]`;
   const { data } = await axios.get(`${MODRINTH_API_URL}/search`, {
     params: {
       limit: 20,
@@ -557,7 +557,7 @@ export const getModrinthVersionManifest = async (versionId, instancePath) => {
   try {
     // get download link for the metadata archive
     const version = await getModrinthVersion(versionId);
-    const file = version.files.find(file => file.filename.endsWith('.mrpack'));
+    const file = version.files.find(f => f.filename.endsWith('.mrpack'));
 
     // clean temp directory
     const tmp = path.join(os.tmpdir(), 'GDLauncher_Download');
@@ -625,9 +625,10 @@ export const getModrinthUser = async userId => {
 
 //! HACK
 const fixModrinthProjectObject = project => {
-  project.name = project.title;
-  delete project.title;
-  return project;
+  return {
+    ...project,
+    name: project.title
+  };
 };
 
 /**

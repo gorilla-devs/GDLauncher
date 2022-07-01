@@ -4,6 +4,7 @@ import { Select, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import path from 'path';
+import pMap from 'p-map';
 import {
   getAddonFiles,
   getAddonFileChangelog,
@@ -18,7 +19,6 @@ import { closeModal } from '../../reducers/modals/actions';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import { makeInstanceRestorePoint } from '../../utils';
 import { CURSEFORGE, FTB, MODRINTH } from '../../utils/constants';
-import pMap from 'p-map';
 
 const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
   const [files, setFiles] = useState([]);
@@ -105,9 +105,7 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
       }
       case MODRINTH: {
         const modpack = await getModrinthProject(modpackId);
-        const versions = (
-          await getModrinthVersions(modpack.versions)
-        ).sort(
+        const versions = (await getModrinthVersions(modpack.versions)).sort(
           (a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)
         );
         setVersionName(
@@ -134,6 +132,9 @@ const Modpack = ({ modpackId, instanceName, source, manifest, fileID }) => {
 
         setFiles(mappedVersions || []);
         break;
+      }
+      default: {
+        throw Error(`Unknown modpack source: ${source}`);
       }
     }
     setLoading(false);

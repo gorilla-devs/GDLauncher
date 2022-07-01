@@ -24,10 +24,7 @@ import {
   faWrench,
   faDownload
 } from '@fortawesome/free-solid-svg-icons';
-import {
-  getCurseForgeSearch as getCurseForgeSearch,
-  getAddonFiles
-} from '../api';
+import { getCurseForgeSearch, getAddonFiles } from '../api';
 import { openModal } from '../reducers/modals/actions';
 import { _getInstance } from '../utils/selectors';
 import { installMod } from '../reducers/actions';

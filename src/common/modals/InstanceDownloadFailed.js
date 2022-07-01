@@ -32,7 +32,7 @@ const InstanceDownloadFailed = ({
     await dispatch(removeDownloadFromQueue(instanceName, true));
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // if instanceName is ever empty, this will delete ALL instances, so don't run it if we don't have a name
     if (instanceName) {
       await rollBackInstanceZip(

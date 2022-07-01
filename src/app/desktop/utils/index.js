@@ -20,6 +20,7 @@ import {
   removeDuplicates,
   sortByForgeVersionDesc
 } from '../../../common/utils';
+// eslint-disable-next-line import/no-cycle
 import { getAddon, getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
 import browserDownload from '../../../common/utils/browserDownload';
@@ -394,12 +395,7 @@ export const get7zPath = async () => {
 
 get7zPath();
 
-export const extract = async (
-  source,
-  destination,
-  args = {},
-  funcs = {}
-) => {
+export const extract = async (source, destination, args = {}, funcs = {}) => {
   const sevenZipPath = await get7zPath();
   const extraction = Seven.extract(source, destination, {
     ...args,
