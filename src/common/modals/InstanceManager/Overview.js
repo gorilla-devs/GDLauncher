@@ -185,7 +185,9 @@ const Overview = ({ instanceName, background, manifest }) => {
   const defaultJavaPath = useSelector(state =>
     _getJavaPath(state)(javaVersion)
   );
-  const [javaLocalMemory, setJavaLocalMemory] = useState(config?.javaMemory);
+  const [javaLocalMemory, setJavaLocalMemory] = useState(
+    scaleMem(config?.javaMemory)
+  );
   const [javaLocalArguments, setJavaLocalArguments] = useState(
     config?.javaArgs
   );

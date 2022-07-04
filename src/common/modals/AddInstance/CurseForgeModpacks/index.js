@@ -7,7 +7,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { getSearch } from '../../../api';
+import { getCurseForgeSearch } from '../../../api';
 import ModpacksListWrapper from './ModpacksListWrapper';
 
 let lastRequest;
@@ -46,7 +46,7 @@ const CurseForgeModpacks = ({ setStep, setVersion, setModpack }) => {
       if (error) {
         setError(false);
       }
-      data = await getSearch(
+      data = await getCurseForgeSearch(
         'modpacks',
         searchText,
         40,

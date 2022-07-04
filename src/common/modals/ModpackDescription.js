@@ -10,10 +10,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Checkbox, TextField, Cascader, Button, Input, Select } from 'antd';
 import Modal from '../components/Modal';
 import { transparentize } from 'polished';
-import { getAddonDescription, getAddonFiles } from '../api';
+import {
+  getAddonDescription,
+  getAddonFiles,
+  getModrinthVersions,
+  getModrinthUser
+} from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
-import { FORGE, CURSEFORGE_URL, FTB_MODPACK_URL } from '../utils/constants';
+import {
+  FORGE,
+  CURSEFORGE_URL,
+  FTB_MODPACK_URL,
+  MODRINTH,
+  CURSEFORGE,
+  FTB
+} from '../utils/constants';
 import { formatNumber, formatDate } from '../utils';
 
 const ModpackDescription = ({
@@ -28,30 +40,73 @@ const ModpackDescription = ({
   const [files, setFiles] = useState(null);
   const [selectedId, setSelectedId] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [author, setAuthor] = useState('');
+  const [downloadCount, setDownloadCount] = useState(0);
+  const [updatedDate, setUpdatedDate] = useState(0);
+  const [gameVersion, setGameVersion] = useState('');
+  const [url, setUrl] = useState('');
 
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      if (type === 'curseforge') {
-        await Promise.all([
-          getAddonDescription(modpack.id).then(data => {
-            // Replace the beginning of all relative URLs with the Curseforge URL
-            const modifiedData = data.replace(
-              /href="(?!http)/g,
-              `href="${CURSEFORGE_URL}`
-            );
 
-            setDescription(modifiedData);
-          }),
-          getAddonFiles(modpack.id).then(async data => {
-            setFiles(data);
-            setLoading(false);
-          })
-        ]);
-      } else if (type === 'ftb') {
-        setDescription(modpack.description);
-        setFiles(modpack.versions.slice().reverse());
-        setLoading(false);
+      switch (type) {
+        case CURSEFORGE: {
+          await Promise.all([
+            getAddonDescription(modpack.id).then(data => {
+              // Replace the beginning of all relative URLs with the Curseforge URL
+              const modifiedData = data.replace(
+                /href="(?!http)/g,
+                `href="${CURSEFORGE_URL}`
+              );
+
+              setDescription(modifiedData);
+            }),
+            getAddonFiles(modpack.id).then(data => {
+              setFiles(data);
+              setAuthor(modpack.author || modpack.authors?.at(0).name);
+              setDownloadCount(modpack.downloadCount);
+              setUpdatedDate(Date.parse(modpack.dateModified));
+              setGameVersion(modpack.latestFilesIndexes[0].gameVersion);
+              setUrl(modpack.websiteUrl);
+            })
+          ]);
+
+          setLoading(false);
+          break;
+        }
+        case FTB: {
+          setDescription(modpack.description);
+          setFiles(modpack.versions.slice().reverse());
+          setAuthor(modpack.author || modpack.authors?.at(0).name);
+          setDownloadCount(modpack.installs);
+          setUpdatedDate(modpack.refreshed * 1000);
+          setGameVersion(modpack.tags[0]?.name || '-');
+          setUrl(parseLink(modpack.name));
+
+          setLoading(false);
+          break;
+        }
+        case MODRINTH: {
+          setDescription(modpack.body);
+          const versions = (
+            await getModrinthVersions(modpack.versions)
+          ).sort(
+            (a, b) =>
+              Date.parse(b.date_published) - Date.parse(a.date_published)
+          );
+          setFiles(versions);
+          getModrinthUser(versions[0].author_id).then(user => {
+            setAuthor(user.username);
+          });
+          setDownloadCount(modpack.downloads);
+          setUpdatedDate(Date.parse(modpack.updated));
+          setGameVersion(versions[0].game_versions[0]);
+          setUrl(`https://modrinth.com/modpack/${modpack.slug}`);
+
+          setLoading(false);
+          break;
+        }
       }
     };
     init();
@@ -60,9 +115,10 @@ const ModpackDescription = ({
   const handleChange = value => setSelectedId(value);
 
   const getReleaseType = id => {
+    if (typeof id === 'string') id = id.toUpperCase();
     switch (id) {
       case 1:
-      case 'Release':
+      case 'RELEASE':
         return (
           <span
             css={`
@@ -73,7 +129,7 @@ const ModpackDescription = ({
           </span>
         );
       case 2:
-      case 'Beta':
+      case 'BETA':
         return (
           <span
             css={`
@@ -84,7 +140,7 @@ const ModpackDescription = ({
           </span>
         );
       case 3:
-      case 'Alpha':
+      case 'ALPHA':
       default:
         return (
           <span
@@ -116,6 +172,13 @@ const ModpackDescription = ({
         return prev;
       });
       return image.url;
+    } else if (type === MODRINTH) {
+      return (
+        modpack.gallery?.find(img => img.featured)?.url ||
+        modpack.gallery?.at(0)?.url ||
+        modpack.icon_url ||
+        ''
+      );
     }
   }, [modpack, type]);
 
@@ -140,33 +203,23 @@ const ModpackDescription = ({
                 <ParallaxContentInfos>
                   <div>
                     <label>Author: </label>
-                    {modpack.authors[0].name}
+                    {author}
                   </div>
                   <div>
                     <label>Downloads: </label>
-                    {type === 'ftb'
-                      ? formatNumber(modpack.installs)
-                      : formatNumber(modpack.downloadCount)}
+                    {downloadCount}
                   </div>
                   <div>
                     <label>Last Update: </label>
-                    {type === 'ftb'
-                      ? formatDate(modpack.refreshed * 1000)
-                      : formatDate(modpack.dateModified)}
+                    {formatDate(updatedDate)}
                   </div>
                   <div>
                     <label>MC version: </label>
-                    {type === 'ftb'
-                      ? modpack.tags[0]?.name || '-'
-                      : modpack.latestFilesIndexes[0].gameVersion}
+                    {gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
-                  href={
-                    type === 'ftb'
-                      ? parseLink(modpack.name)
-                      : modpack.websiteUrl
-                  }
+                  href={url}
                   css={`
                     position: absolute;
                     top: 20px;
@@ -185,8 +238,8 @@ const ModpackDescription = ({
                   onClick={() => {
                     dispatch(
                       openModal('ModChangelog', {
-                        modpackId: modpack.id,
-                        modpackName: modpack.name,
+                        projectID: modpack.id,
+                        projectName: modpack.name,
                         files,
                         type
                       })
@@ -209,10 +262,10 @@ const ModpackDescription = ({
             </ParallaxContent>
           </Parallax>
           <Content>
-            {type === 'ftb' ? (
-              <ReactMarkdown>{description}</ReactMarkdown>
-            ) : (
+            {type === CURSEFORGE ? (
               ReactHtmlParser(description)
+            ) : (
+              <ReactMarkdown>{description}</ReactMarkdown>
             )}
           </Content>
         </Container>
@@ -256,9 +309,9 @@ const ModpackDescription = ({
                         align-items: center;
                       `}
                     >
-                      {type === 'ftb'
-                        ? `${modpack.name} - ${file.name}`
-                        : file.displayName}
+                      {type === CURSEFORGE
+                        ? file.displayName
+                        : `${modpack.name} - ${file.name}`}
                     </div>
                     <div
                       css={`
@@ -271,11 +324,17 @@ const ModpackDescription = ({
                       <div>
                         {type === 'ftb'
                           ? modpack.tags[0]?.name || '-'
-                          : file.gameVersions[0]}
+                          : type === CURSEFORGE
+                          ? file.gameVersions[0]
+                          : file.game_versions.sort().at(-1)}
                       </div>
                       <div>
                         {getReleaseType(
-                          type === 'ftb' ? file.type : file.releaseType
+                          type === 'ftb'
+                            ? file.type
+                            : type === CURSEFORGE
+                            ? file.releaseType
+                            : file.version_type
                         )}
                       </div>
                     </div>
@@ -288,7 +347,11 @@ const ModpackDescription = ({
                     >
                       <div>
                         {new Date(
-                          type === 'ftb' ? file.updated * 1000 : file.fileDate
+                          type === 'ftb'
+                            ? file.updated * 1000
+                            : type === CURSEFORGE
+                            ? file.fileDate
+                            : file.date_published
                         ).toLocaleDateString(undefined, {
                           year: 'numeric',
                           month: 'long',
