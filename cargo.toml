@@ -1,0 +1,9 @@
+[workspace]
+members = [
+	"napi",
+]
+
+[profile.release]
+opt-level = 3
+strip = "symbols"
+lto = true

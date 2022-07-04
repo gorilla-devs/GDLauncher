@@ -101,8 +101,8 @@ These are the steps to compile it yourself.
 
 You need the following software installed:
 
-- [NodeJS](https://nodejs.org/en/download/) (> v14.14.0 x64)
-- [Rust](https://www.rust-lang.org/)
+- [NodeJS](https://nodejs.org/en/download/) (16.13.1 x64)
+- [Rust Nightly](https://www.rust-lang.org/)
 - [Python2](https://www.python.org/)(Mac and linux)
 - C++ compiler (g++ or windows build tools)
 

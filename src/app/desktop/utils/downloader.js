@@ -8,6 +8,10 @@ import computeFileHash from './computeFileHash';
 
 const fs = fss.promises;
 
+function getUri(url) {
+  return new URL(url).href;
+}
+
 export const downloadInstanceFiles = async (
   arr,
   updatePercentage,
@@ -53,6 +57,7 @@ export const downloadInstanceFiles = async (
 };
 
 const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
+  let encodedUrl;
   try {
     const filePath = path.dirname(fileName);
     try {
@@ -68,7 +73,9 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
       if (legacyPath) await makeDir(path.dirname(legacyPath));
     }
 
-    const { data } = await axios.get(url, {
+    encodedUrl = getUri(url);
+
+    const { data } = await axios.get(encodedUrl, {
       responseType: 'stream',
       responseEncoding: null,
       adapter,
@@ -105,7 +112,7 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
     return true;
   } catch (e) {
     console.error(
-      `Error while downloading <${url}> to <${fileName}> --> ${e.message}`
+      `Error while downloading <${url} | ${encodedUrl}> to <${fileName}> --> ${e.message}`
     );
     return false;
   }
@@ -114,7 +121,9 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
 export const downloadFile = async (fileName, url, onProgress) => {
   await makeDir(path.dirname(fileName));
 
-  const { data, headers } = await axios.get(url, {
+  const encodedUrl = getUri(url);
+
+  const { data, headers } = await axios.get(encodedUrl, {
     responseType: 'stream',
     responseEncoding: null,
     adapter,

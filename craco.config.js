@@ -98,6 +98,7 @@ module.exports = () => {
         // } else {
         //   console.log('Not a release. Skipping source maps upload.');
         // }
+
         webpackConfig.resolve.aliasFields = [];
         webpackConfig.resolve.mainFields = ['module', 'main'];
         webpackConfig.resolve.alias = {

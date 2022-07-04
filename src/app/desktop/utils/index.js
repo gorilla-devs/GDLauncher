@@ -17,11 +17,13 @@ import {
 } from '../../../common/utils/constants';
 
 import {
+  addQuotes,
   removeDuplicates,
   sortByForgeVersionDesc
 } from '../../../common/utils';
-import { getAddonFile, mcGetPlayerSkin } from '../../../common/api';
+import { getAddon, getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
+import browserDownload from '../../../common/utils/browserDownload';
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -482,13 +484,14 @@ export const getJVMArguments112 = (
   hideAccessToken,
   jvmOptions = []
 ) => {
+  const needsQuote = process.platform !== 'win32';
   const args = [];
   args.push('-cp');
 
   args.push(
     [...libraries, mcjar]
       .filter(l => !l.natives)
-      .map(l => `"${l.path}"`)
+      .map(l => `${addQuotes(needsQuote, l.path)}`)
       .join(process.platform === 'win32' ? ';' : ':')
   );
 
@@ -500,8 +503,15 @@ export const getJVMArguments112 = (
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(...jvmOptions);
-  args.push(`-Djava.library.path="${path.join(instancePath, 'natives')}"`);
-  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
+  args.push(
+    `-Djava.library.path=${addQuotes(
+      needsQuote,
+      path.join(instancePath, 'natives')
+    )}`
+  );
+  args.push(
+    `-Dminecraft.applet.TargetDirectory=${addQuotes(needsQuote, instancePath)}`
+  );
   if (mcJson.logging) {
     args.push(mcJson?.logging?.client?.argument || '');
   }
@@ -523,13 +533,13 @@ export const getJVMArguments112 = (
           val = mcJson.id;
           break;
         case 'game_directory':
-          val = `"${instancePath}"`;
+          val = `${addQuotes(needsQuote, instancePath)}`;
           break;
         case 'assets_root':
-          val = `"${assetsPath}"`;
+          val = `${addQuotes(needsQuote, assetsPath)}`;
           break;
         case 'game_assets':
-          val = `"${path.join(assetsPath, 'virtual', 'legacy')}"`;
+          val = `${path.join(assetsPath, 'virtual', 'legacy')}`;
           break;
         case 'assets_index_name':
           val = mcJson.assets;
@@ -558,6 +568,9 @@ export const getJVMArguments112 = (
       if (val != null) {
         mcArgs[i] = val;
       }
+      if (typeof args[i] === 'string' && !needsQuote) {
+        args[i] = args[i].replaceAll('"', '');
+      }
     }
   }
 
@@ -585,6 +598,7 @@ export const getJVMArguments113 = (
 ) => {
   const argDiscovery = /\${*(.*)}/;
   let args = mcJson.arguments.jvm.filter(v => !skipLibrary(v));
+  const needsQuote = process.platform !== 'win32';
 
   // if (process.platform === "darwin") {
   //   args.push("-Xdock:name=instancename");
@@ -593,7 +607,9 @@ export const getJVMArguments113 = (
 
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
-  args.push(`-Dminecraft.applet.TargetDirectory="${instancePath}"`);
+  args.push(
+    `-Dminecraft.applet.TargetDirectory=${addQuotes(needsQuote, instancePath)}`
+  );
   if (mcJson.logging) {
     args.push(mcJson?.logging?.client?.argument || '');
   }
@@ -611,9 +627,9 @@ export const getJVMArguments113 = (
   for (let i = 0; i < args.length; i += 1) {
     if (typeof args[i] === 'object' && args[i].rules) {
       if (typeof args[i].value === 'string') {
-        args[i] = `"${args[i].value}"`;
+        args[i] = `${addQuotes(needsQuote, args[i].value)}`;
       } else if (typeof args[i].value === 'object') {
-        args.splice(i, 1, ...args[i].value.map(v => `"${v}"`));
+        args.splice(i, 1, ...args[i].value.map(v => `${v}`));
       }
       i -= 1;
     } else if (typeof args[i] === 'string') {
@@ -628,10 +644,10 @@ export const getJVMArguments113 = (
             val = mcJson.id;
             break;
           case 'game_directory':
-            val = `"${instancePath}"`;
+            val = `${addQuotes(needsQuote, instancePath)}`;
             break;
           case 'assets_root':
-            val = `"${assetsPath}"`;
+            val = `${addQuotes(needsQuote, assetsPath)}`;
             break;
           case 'assets_index_name':
             val = mcJson.assets;
@@ -657,7 +673,7 @@ export const getJVMArguments113 = (
           case 'natives_directory':
             val = args[i].replace(
               argDiscovery,
-              `"${path.join(instancePath, 'natives')}"`
+              `${addQuotes(needsQuote, path.join(instancePath, 'natives'))}`
             );
             break;
           case 'launcher_name':
@@ -669,7 +685,7 @@ export const getJVMArguments113 = (
           case 'classpath':
             val = [...libraries, mcjar]
               .filter(l => !l.natives)
-              .map(l => `"${l.path}"`)
+              .map(l => `${addQuotes(needsQuote, l.path)}`)
               .join(process.platform === 'win32' ? ';' : ':');
             break;
           default:
@@ -679,6 +695,7 @@ export const getJVMArguments113 = (
           args[i] = val;
         }
       }
+      if (!needsQuote) args[i] = args[i].replaceAll('"', '');
     }
   }
 
@@ -831,7 +848,14 @@ export const downloadAddonZip = async (id, fileID, instancePath, tempPath) => {
   const data = await getAddonFile(id, fileID);
   const instanceManifest = path.join(instancePath, 'manifest.json');
   const zipFile = path.join(tempPath, 'addon.zip');
-  await downloadFile(zipFile, data.downloadUrl);
+  if (data.downloadUrl) {
+    await downloadFile(zipFile, data.downloadUrl);
+  } else {
+    const addon = await getAddon(id);
+
+    const addonZipUrl = `https://www.curseforge.com/minecraft/modpacks/${addon.slug}/download/${fileID}`;
+    await browserDownload(addonZipUrl, zipFile);
+  }
   // Wait 500ms to avoid `The process cannot access the file because it is being used by another process.`
   await new Promise(resolve => {
     setTimeout(() => resolve(), 500);
@@ -894,7 +918,7 @@ export const convertCompletePathToInstance = (f, instancesPath) => {
 };
 
 export const isMod = (fileName, instancesPath) =>
-  /^(\\|\/)([\w\d-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(.*))(\.jar|\.disabled))$/.test(
+  /^(\\|\/)([\w\d\-.{}()[\]@#$%^&!\s])+((\\|\/)mods((\\|\/)(([^\\/])*))(\.jar|\.disabled))$/.test(
     convertCompletePathToInstance(fileName, instancesPath)
   );
 

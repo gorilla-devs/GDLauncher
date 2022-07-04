@@ -9,6 +9,7 @@ const Container = styled.div`
   flex-wrap: wrap;
   width: 100%;
   justify-content: center;
+  margin-bottom: 2rem;
 `;
 
 const NoInstance = styled.div`

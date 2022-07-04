@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "1.1.22-beta.1",
+  "version": "1.1.25",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -30,6 +30,7 @@
   "homepage": "./",
   "main": "build/electron.js",
   "scripts": {
+    "install": "npm run napi-build",
     "start": "cross-env-shell NODE_ENV=development craco start",
     "start-electron": "concurrently \"npm run start\" \"wait-on http://localhost:3000 && electron .\"",
     "start-prod": "electron .",
@@ -48,7 +49,8 @@
     "release:portable": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=portable \"npm run build\" && npm run build-electron:portable && npm run deploy portable",
     "upload": "node ./scripts/uploadRelease.js",
     "release": "rimraf ./deploy && npm run release:setup && npm run release:portable",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "napi-build": "cd napi && npm run build && node ../scripts/moveNapi.js"
   },
   "lint-staged": {
     "*.{js,jsx}": [
@@ -74,7 +76,8 @@
     "node": ">=14.16.0"
   },
   "cpu": [
-    "x64"
+    "x64",
+    "arm64"
   ],
   "browserslist": {
     "production": [
@@ -105,6 +108,7 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
+    "@napi-rs/cli": "^2.10.0",
     "@sentry/webpack-plugin": "^1.18.3",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.2.2",
@@ -117,9 +121,9 @@
     "concurrently": "^6.2.1",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
-    "electron": "^16.0.7",
-    "electron-builder": "^22.14.5",
-    "electron-updater": "^4.6.1",
+    "electron": "^19.0.4",
+    "electron-builder": "^23.0.3",
+    "electron-updater": "^5.0.1",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.3.0",
@@ -152,8 +156,8 @@
     "@sentry/tracing": "^6.16.1",
     "@sentry/utils": "^6.16.1",
     "7zip-bin": "^5.1.1",
-    "antd": "4.16.11",
-    "axios": "^0.21.1",
+    "antd": "^4.21.2",
+    "axios": "^0.27.2",
     "base64-stream": "^1.0.0",
     "base64url": "^3.0.1",
     "connected-react-router": "^6.9.2",
@@ -163,7 +167,8 @@
     "electron-log": "^4.4.5",
     "electron-store": "^8.0.1",
     "fast-xml-parser": "^4.0.1",
-    "fs-extra": "^10.0.0",
+    "fs-extra": "^10.1.0",
+    "get-folder-size": "^3.1.0",
     "get-stream": "^6.0.1",
     "he": "^1.2.0",
     "history": "^4.10.1",
@@ -212,6 +217,7 @@
     "symlink-dir": "^5.0.1",
     "typeface-roboto": "^1.1.13",
     "use-debounce": "^7.0.0",
+    "user-agents": "^1.0.1048",
     "uuid": "^8.3.2"
   }
 }

@@ -54,18 +54,16 @@ const main = async () => {
             .toUpperCase()}${element.substring(1)}\n`;
 
           for (const e of rawChangeLog[element]) {
-            if (!e?.advanced?.cm || !e?.header || !e?.content) {
-              continue;
-            }
             const prSplit = e?.advanced?.pr && e?.advanced?.pr.split('/');
             const advanced =
+              e?.advanced?.cm &&
               ` ([${e?.advanced?.cm}](https://github.com/gorilla-devs/GDLauncher/commit/${e?.advanced?.cm})` +
-              `${
-                prSplit
-                  ? ` | [#${e?.advanced.pr}](https://github.com/gorilla-devs/GDLauncher/pull/${prSplit[0]}` +
-                    `${prSplit?.[1] ? `/commits/${prSplit[1]}` : ''})`
-                  : ''
-              })`;
+                `${
+                  prSplit
+                    ? ` | [#${e?.advanced.pr}](https://github.com/gorilla-devs/GDLauncher/pull/${prSplit[0]}` +
+                      `${prSplit?.[1] ? `/commits/${prSplit[1]}` : ''})`
+                    : ''
+                })`;
             const notes = `- **${e?.header || ''}** ${e?.content || ''}`;
             changeLog += `${notes + advanced} \n`;
           }

@@ -35,7 +35,9 @@ const FTBModpacks = ({ setStep, setModpack, setVersion }) => {
       setModpackIds(data.packs || []);
       updateModpacks();
     };
-    init();
+    init().catch(e => {
+      setError(e);
+    });
   }, [searchText]);
 
   const updateModpacks = useDebouncedCallback(() => {
