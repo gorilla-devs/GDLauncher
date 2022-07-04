@@ -686,18 +686,24 @@ const Mods = ({ instanceName }) => {
   };
 
   const menu = (
-    <Menu>
-      <Menu.Item
-        key="0"
-        disabled={!hasModUpdates}
-        onClick={() => {
-          dispatch(openModal('ModsUpdater', { instanceName }));
-          setIsMenuOpen(false);
-        }}
-      >
-        Update All Mods
-      </Menu.Item>
-    </Menu>
+    <Menu
+      items={[
+        {
+          key: '0',
+          label: (
+            <div
+              disabled={!hasModUpdates}
+              onClick={() => {
+                dispatch(openModal('ModsUpdater', { instanceName }));
+                setIsMenuOpen(false);
+              }}
+            >
+              Update All Mods
+            </div>
+          )
+        }
+      ]}
+    />
   );
 
   return (
