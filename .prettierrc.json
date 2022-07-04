@@ -1,0 +1,16 @@
+{
+  "trailingComma": "none",
+  "endOfLine": "auto",
+  "tabWidth": 2,
+  "singleQuote": true,
+  "arrow-parens": "off",
+  "consistent-return": "off",
+  "comma-dangle": "off",
+  "no-underscore-dangle": "off",
+  "generator-star-spacing": "off",
+  "no-shadow": "off",
+  "no-console": "off",
+  "no-use-before-define": "off",
+  "no-multi-assign": "off",
+  "arrowParens": "avoid"
+}

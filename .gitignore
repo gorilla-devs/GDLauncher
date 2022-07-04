@@ -1,0 +1,44 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+/data
+
+# production
+/build
+/release
+/deploy
+/public/native/*/index.d.ts
+
+# rust target
+/target
+/napi/target
+/public/napi.node
+/napi/napi.node
+/napi/node_modules
+/napi/index.d.ts
+
+# IDEs
+.idea
+*.iml
+.eslintcache
+
+# misc
+.DS_Store
+.env.local
+.electron-builder.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+signCertificate.pfx
