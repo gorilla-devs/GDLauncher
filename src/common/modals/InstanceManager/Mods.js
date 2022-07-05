@@ -690,9 +690,9 @@ const Mods = ({ instanceName }) => {
       items={[
         {
           key: '0',
+          disabled: !hasModUpdates,
           label: (
             <div
-              disabled={!hasModUpdates}
               onClick={() => {
                 dispatch(openModal('ModsUpdater', { instanceName }));
                 setIsMenuOpen(false);
@@ -764,6 +764,8 @@ const Mods = ({ instanceName }) => {
                 try {
                   setLoadingModUpdates(true);
                   await dispatch(initLatestMods(instance.name));
+                } catch (e) {
+                  console.warn(e);
                 } finally {
                   setLoadingModUpdates(false);
                 }
@@ -776,27 +778,14 @@ const Mods = ({ instanceName }) => {
           <span
             onClick={e => {
               e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
+              setIsMenuOpen(prev => !prev);
             }}
           >
-            <StyledDropdown
-              onClick={e => {
-                if (!isMenuOpen) {
-                  e.stopPropagation();
-                  setIsMenuOpen(!isMenuOpen);
-                }
-              }}
-            >
-              <span
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsMenuOpen(!isMenuOpen);
-                }}
-              >
+            <StyledDropdown>
+              <span>
                 <Dropdown
                   overlay={menu}
                   visible={isMenuOpen}
-                  onVisibleChange={setIsMenuOpen}
                   trigger={['click']}
                 >
                   <span

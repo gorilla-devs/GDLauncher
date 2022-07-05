@@ -17,7 +17,11 @@ const withScroll = Component => {
             justify-content: center;
           `}
         >
-          <div>
+          <div
+            css={`
+              width: 1000px;
+            `}
+          >
             {/* eslint-disable-next-line react/jsx-props-no-spreading */}
             <Component {...props} />
           </div>
