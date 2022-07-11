@@ -4,6 +4,7 @@ import qs from 'querystring';
 import path from 'path';
 import fse from 'fs-extra';
 import os from 'os';
+import { version as appVersion } from '../../package.json';
 import {
   MOJANG_APIS,
   FORGESVC_URL,
@@ -30,6 +31,13 @@ const axioInstance = axios.create({
     'X-API-KEY': '$2a$10$5BgCleD8.rLQ5Ix17Xm2lOjgfoeTJV26a1BXmmpwrOemgI517.nuC',
     'Content-Type': 'application/json',
     Accept: 'application/json'
+  }
+});
+
+const modrinthClient = axios.create({
+  baseURL: MODRINTH_API_URL,
+  headers: {
+    'User-Agent': `gorilla-devs/GDLauncher/${appVersion}`
   }
 });
 
@@ -428,8 +436,8 @@ export const getFTBSearch = async searchText => {
  */
 export const getModrinthMostPlayedModpacks = async (offset = 0) => {
   trackModrinthAPI();
-  const url = `${MODRINTH_API_URL}/search?limit=20&offset=${offset}&index=downloads&facets=[["project_type:modpack"]]`;
-  const { data } = await axios.get(url);
+  const url = `/search?limit=20&offset=${offset}&index=downloads&facets=[["project_type:modpack"]]`;
+  const { data } = await modrinthClient.get(url);
   return data;
 };
 
@@ -468,7 +476,7 @@ export const getModrinthSearchResults = async (
     facets.push(...filteredCategories.map(cat => [`categories:${cat}`]));
   }
 
-  const { data } = await axios.get(`${MODRINTH_API_URL}/search`, {
+  const { data } = await modrinthClient.get(`/search`, {
     params: {
       limit: 20,
       query: query ?? undefined,
@@ -496,10 +504,8 @@ export const getModrinthProject = async projectId => {
 export const getModrinthProjects = async projectIds => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/projects?ids=${JSON.stringify(
-      projectIds
-    )}`;
-    const { data } = await axios.get(url);
+    const url = `/projects?ids=${JSON.stringify(projectIds)}`;
+    const { data } = await modrinthClient.get(url);
     return data.map(fixModrinthProjectObject);
   } catch {
     return { status: 'error' };
@@ -513,8 +519,8 @@ export const getModrinthProjects = async projectIds => {
 export const getModrinthProjectVersions = async projectId => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/project/${projectId}/version`;
-    const { data } = await axios.get(url);
+    const url = `/project/${projectId}/version`;
+    const { data } = await modrinthClient.get(url);
     return data;
   } catch {
     return { status: 'error' };
@@ -536,10 +542,8 @@ export const getModrinthVersion = async versionId => {
 export const getModrinthVersions = async versionIds => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/versions?ids=${JSON.stringify(
-      versionIds
-    )}`;
-    const { data } = await axios.get(url);
+    const url = `versions?ids=${JSON.stringify(versionIds)}`;
+    const { data } = await modrinthClient.get(url);
     return data || [];
   } catch (err) {
     console.error(err);
@@ -615,8 +619,8 @@ export const getModrinthVersionChangelog = async versionId => {
 export const getModrinthUser = async userId => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/user/${userId}`;
-    const { data } = await axios.get(url);
+    const url = `/user/${userId}`;
+    const { data } = modrinthClient.get(url);
     return data;
   } catch (err) {
     console.error(err);
@@ -637,8 +641,8 @@ const fixModrinthProjectObject = project => {
 export const getModrinthCategories = async () => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/tag/category`;
-    const { data } = await axios.get(url);
+    const url = '/tag/category';
+    const { data } = await modrinthClient.get(url);
     return data;
   } catch (err) {
     console.error(err);
@@ -652,8 +656,8 @@ export const getModrinthCategories = async () => {
 export const getModrinthProjectMembers = async projectId => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/project/${projectId}/members`;
-    const { data } = await axios.get(url);
+    const url = `/project/${projectId}/members`;
+    const { data } = await modrinthClient.get(url);
     return data;
   } catch (err) {
     console.error(err);
@@ -668,8 +672,8 @@ export const getModrinthProjectMembers = async projectId => {
 export const getVersionsFromHashes = async (hashes, algorithm) => {
   trackModrinthAPI();
   try {
-    const url = `${MODRINTH_API_URL}/version_files`;
-    const { data } = await axios.post(url, { hashes, algorithm });
+    const url = '/version_files';
+    const { data } = await modrinthClient.post(url, { hashes, algorithm });
     return data;
   } catch (err) {
     console.error(err);
