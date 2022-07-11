@@ -2,18 +2,19 @@
 import axios from 'axios';
 import qs from 'querystring';
 import {
-  MOJANG_APIS,
-  FORGESVC_URL,
-  MC_MANIFEST_URL,
   FABRIC_APIS,
-  JAVA_MANIFEST_URL,
+  FORGESVC_URL,
+  FTB_API_URL,
   IMGUR_CLIENT_ID,
+  JAVA_LATEST_MANIFEST_URL,
+  JAVA_MANIFEST_URL,
+  MC_MANIFEST_URL,
   MICROSOFT_LIVE_LOGIN_URL,
   MICROSOFT_XBOX_LOGIN_URL,
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
-  FTB_API_URL,
-  JAVA_LATEST_MANIFEST_URL
+  MOJANG_APIS,
+  TECHNIC_API_URL
 } from './utils/constants';
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
@@ -26,12 +27,22 @@ const axioInstance = axios.create({
   }
 });
 
+let technicClientBuild = '757'; // Requests to technic api need build id
+
 const trackFTBAPI = () => {
   ga.sendCustomEvent('FTBAPICall');
 };
 
 const trackCurseForgeAPI = () => {
   ga.sendCustomEvent('CurseForgeAPICall');
+};
+
+const trackTechnicAPI = () => {
+  ga.sendCustomEvent('TechnicAPICall');
+};
+
+const trackTechnicSolderAPI = () => {
+  ga.sendCustomEvent('TechnicSolderAPICall');
 };
 
 // Microsoft Auth
@@ -365,6 +376,91 @@ export const getSearch = async (
 
   const { data } = await axioInstance.get(url, { params });
   return data?.data;
+};
+
+export const getTechnicSearch = searchFilter => {
+  const url = `${TECHNIC_API_URL}/search`;
+  const params = {
+    build: technicClientBuild,
+    q: searchFilter
+  };
+  trackTechnicAPI(url, params);
+  return axios.get(url, { params });
+};
+
+export const getTechnicClientBuild = () => {
+  try {
+    const url = `${TECHNIC_API_URL}/launcher/version/stable4`;
+    trackTechnicAPI(url, {});
+    const { data } = axios.get(url);
+    technicClientBuild = data.build;
+    return data.build;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getTechnicChangelog = async changelogUrl => {
+  try {
+    trackTechnicAPI(changelogUrl, {});
+    const { data } = await axios.get(changelogUrl);
+    return data;
+  } catch {
+    return { status: 'error' };
+  }
+};
+
+export const getTechnicAddDownload = async name => {
+  const url = `${TECHNIC_API_URL}/modpack/${name}/stat/download`;
+  const params = {
+    build: technicClientBuild
+  };
+  trackTechnicAPI(url, params);
+  try {
+    return await axios.get(url, { params });
+  } catch (e) {
+    return null;
+  }
+};
+
+export const getTechnicAddRun = async name => {
+  const url = `${TECHNIC_API_URL}/modpack/${name}/stat/run`;
+  const params = {
+    build: technicClientBuild
+  };
+  trackTechnicAPI(url, params);
+  try {
+    return await axios.get(url, { params });
+  } catch (e) {
+    return null;
+  }
+};
+
+export const getTechnicModpackData = name => {
+  const url = `${TECHNIC_API_URL}/modpack/${name}`;
+  const params = {
+    build: technicClientBuild
+  };
+  trackTechnicAPI(url, params);
+  return axios.get(url, { params });
+};
+
+export const getTechnicSolderMultiple = (solder, type) => {
+  const url = `${solder}/${type}`;
+  const params = {
+    include: 'full'
+  };
+  trackTechnicSolderAPI(url, params);
+  return axios.get(url, { params });
+};
+
+export const getTechnicSolderData = (solder, type, name, version = null) => {
+  let url = `${solder}${type}/${name}`;
+  if (version) {
+    url += `/${version}`;
+  }
+  trackTechnicSolderAPI(url, {});
+  return axios.get(url, {});
 };
 
 export const getFTBModpackData = async modpackId => {

@@ -3,19 +3,18 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Transition } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faLongArrowAltRight,
-  faArchive
-} from '@fortawesome/free-solid-svg-icons';
+import { faArchive, faLongArrowAltRight } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Spin, Radio } from 'antd';
+import { Radio, Spin } from 'antd';
 import CurseForgeModpacks from './CurseForgeModpacks';
 import FTBModpacks from './FTBModpacks';
 import Import from './Import';
 import NewInstance from './NewInstance';
 import minecraftIcon from '../../assets/minecraftIcon.png';
 import curseForgeIcon from '../../assets/curseforgeIcon.webp';
+import technicIcon from '../../assets/technicIcon.webp';
 import ftbIcon from '../../assets/ftbIcon.webp';
+import TechnicModpacks from './TechnicModpacks';
 
 const Content = ({
   in: inProp,
@@ -46,6 +45,11 @@ const Content = ({
       setOverrideNextStepOnClick={setOverrideNextStepOnClick}
     />,
     <FTBModpacks
+      setVersion={setVersion}
+      setStep={setStep}
+      setModpack={setModpack}
+    />,
+    <TechnicModpacks
       setVersion={setVersion}
       setStep={setStep}
       setModpack={setModpack}
@@ -103,8 +107,18 @@ const Content = ({
                     />
                     CurseForge
                   </Radio.Button>
-                  {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button>
-                  <Radio.Button value={4} disabled>Technic</Radio.Button> */}
+                  {/* <Radio.Button value={3} disabled>ATLauncher</Radio.Button> */}
+                  <Radio.Button value={4}>
+                    <img
+                      src={technicIcon}
+                      css={`
+                        margin-right: 4px;
+                        cursor: pointer;
+                        width: 20px;
+                      `}
+                    />
+                    Technic
+                  </Radio.Button>
                   <Radio.Button value={3}>
                     <img
                       src={ftbIcon}

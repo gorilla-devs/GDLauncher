@@ -5,7 +5,12 @@ import ReactHtmlParser from 'react-html-parser';
 import { Select } from 'antd';
 import ReactMarkdown from 'react-markdown';
 import Modal from '../components/Modal';
-import { getAddonFileChangelog, getFTBChangelog } from '../api';
+import {
+  getAddonFileChangelog,
+  getFTBChangelog,
+  getTechnicChangelog
+} from '../api';
+import { CURSEFORGE, FTB, TECHNIC, TECHNIC_SOLDER } from '../utils/constants';
 
 let latest = {};
 const ModChangelog = ({ modpackId, files, type, modpackName }) => {
@@ -19,10 +24,30 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
     setLoading(true);
     let data;
     try {
-      if (type === 'ftb') {
-        data = await getFTBChangelog(modpackId, id);
-      } else {
-        data = await getAddonFileChangelog(modpackId, id);
+      switch (type) {
+        case CURSEFORGE:
+          data = await getAddonFileChangelog(modpackId, id);
+          break;
+        case FTB:
+          data = await getFTBChangelog(modpackId, id);
+          break;
+        case TECHNIC:
+        case TECHNIC_SOLDER: {
+          const file = files.find(f => f.id === id);
+          if (file === null) {
+            data = '';
+            break;
+          }
+          data = await getTechnicChangelog(file.url);
+          const tempEl = document.createElement('div');
+          tempEl.innerHTML = data;
+          data = tempEl.querySelector('.changelog').innerHTML;
+          tempEl.remove();
+          break;
+        }
+        default:
+          data = '';
+          break;
       }
     } catch (err) {
       console.error(err);
@@ -43,6 +68,32 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
     if (!changelog) {
       return 'Missing changelog';
     }
+  };
+
+  const getChangelogData = () => {
+    let changelogData;
+    switch (type) {
+      case CURSEFORGE:
+      case TECHNIC:
+      case TECHNIC_SOLDER:
+        changelogData = ReactHtmlParser(changelog);
+        break;
+      case FTB:
+        changelogData = (
+          <ReactMarkdown
+            css={`
+              font-size: 15px;
+              padding: 20px;
+            `}
+          >
+            {changelog.content}
+          </ReactMarkdown>
+        );
+        break;
+      default:
+        changelogData = changelog;
+    }
+    return changelogData;
   };
 
   return (
@@ -102,18 +153,7 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
                     }`
                   : (files || []).find(v => v.id === selectedId)?.displayName}
               </div>
-              {type === 'ftb' ? (
-                <ReactMarkdown
-                  css={`
-                    font-size: 15px;
-                    padding: 20px;
-                  `}
-                >
-                  {changelog.content}
-                </ReactMarkdown>
-              ) : (
-                ReactHtmlParser(changelog)
-              )}
+              {getChangelogData()}
             </>
           ) : (
             <h2
@@ -142,9 +182,11 @@ const Changelog = styled.div`
   overflow-x: hidden;
   overflow-y: scroll;
   font-size: 20px;
+
   p {
     text-align: center;
   }
+
   img {
     max-width: 100%;
     height: auto;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy } from 'react';
+import React, { lazy, useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Button } from 'antd';
 import fse from 'fs-extra';
@@ -13,11 +13,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import omit from 'lodash/omit';
 import psTree from 'ps-tree';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Modal from '../../components/Modal';
 import AsyncComponent from '../../components/AsyncComponent';
 import { _getInstance, _getInstancesPath } from '../../utils/selectors';
-import { FORGE, FABRIC, CURSEFORGE } from '../../utils/constants';
+import { CURSEFORGE, FABRIC, FORGE } from '../../utils/constants';
 import {
   addStartedInstance,
   clearLatestModManifests,
@@ -422,6 +422,7 @@ const InstanceManager = ({ instanceName }) => {
           <ContentComponent
             instanceName={instanceName}
             modpackId={instance?.loader?.projectID}
+            loader={instance?.loader}
             fileID={instance?.loader?.fileID}
             background={background}
             manifest={manifest}

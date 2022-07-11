@@ -1,22 +1,26 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Select, Button } from 'antd';
+import { Button, Select } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import path from 'path';
 import {
-  getAddonFiles,
   getAddonFileChangelog,
-  getFTBModpackData,
+  getAddonFiles,
   getFTBChangelog,
-  getFTBModpackVersionData
+  getFTBModpackData,
+  getFTBModpackVersionData,
+  getTechnicChangelog,
+  getTechnicModpackData,
+  getTechnicSolderData
 } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
+import { TECHNIC, TECHNIC_SOLDER } from '../../utils/constants';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import { makeInstanceRestorePoint } from '../../utils';
 
-const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
+const Modpack = ({ modpackId, instanceName, manifest, fileID, loader }) => {
   const [files, setFiles] = useState([]);
   const [versionName, setVersionName] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -52,6 +56,82 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
         })
       );
       setFiles(mappedFiles);
+    } else if (loader?.source === TECHNIC_SOLDER) {
+      const solderModpack = (
+        await getTechnicSolderData(loader.solder, 'modpack', modpackId)
+      ).data;
+      // Necessary to fetch data from technic api as well
+      const technicModpack = (await getTechnicModpackData(modpackId)).data;
+      setVersionName(`${solderModpack.display_name} - ${fileID}`);
+      setFiles(
+        await Promise.all(
+          solderModpack.builds
+            .slice(0)
+            .reverse()
+            .map(async b => {
+              const versionData = (
+                await getTechnicSolderData(
+                  loader.solder,
+                  'modpack',
+                  modpackId,
+                  b
+                )
+              ).data;
+              let changelog = technicModpack.feed.filter(
+                f => f.content.replace('Updated to version ', '') === b
+              );
+              changelog = changelog.length > 0 ? changelog[0] : '';
+              let changelogData = '';
+              if (changelog) {
+                changelogData = await getTechnicChangelog(changelog.url);
+                const tempEl = document.createElement('div');
+                tempEl.innerHTML = changelogData;
+                changelogData = tempEl.querySelector('.changelog').innerHTML;
+                tempEl.remove();
+              }
+              return {
+                releaseType: 1,
+                gameVersions: [versionData?.minecraft],
+                displayName: `${solderModpack.display_name} ${b}`,
+                id: b,
+                fileDate: changelog?.date ? changelog.date * 1000 : 'Unknown',
+                changelog: changelogData
+              };
+            })
+        )
+      );
+    } else if (loader?.source === TECHNIC) {
+      const technicModpack = (await getTechnicModpackData(modpackId)).data;
+      let changelog = technicModpack.feed.filter(
+        f =>
+          f.content.replace('Updated to version ', '') ===
+          technicModpack.version
+      );
+      changelog = changelog.length > 0 ? changelog[0] : null;
+      let changelogData = '';
+      if (changelog) {
+        changelogData = await getTechnicChangelog(changelog.url);
+        const tempEl = document.createElement('div');
+        tempEl.innerHTML = changelogData;
+        changelogData = tempEl.querySelector('.changelog').innerHTML;
+        tempEl.remove();
+      }
+      setVersionName(
+        `${technicModpack.displayName} - ${technicModpack.version}`
+      );
+      setFiles([
+        {
+          releaseType: 1,
+          gameVersions: [technicModpack.minecraft],
+          displayName: `${technicModpack.displayName} ${technicModpack.version}`,
+          id: technicModpack.version,
+          fileDate: technicModpack.feed?.[0]?.date
+            ? technicModpack.feed[0].date * 1000
+            : 'Unknown',
+          url: technicModpack.url,
+          changelog: changelogData
+        }
+      ]);
     } else {
       const ftbModpack = await getFTBModpackData(modpackId);
 
@@ -237,17 +317,21 @@ const StyledSelect = styled(Select)`
   width: 650px;
   height: 50px;
   margin-top: 20px;
+
   .ant-select-selection-placeholder {
     height: 50px !important;
     line-height: 50px !important;
   }
+
   .ant-select-selector {
     height: 50px !important;
     cursor: pointer !important;
   }
+
   .ant-select-selection-item {
     flex: 1;
     cursor: pointer;
+
     & > div {
       & > div:nth-child(2) {
         & > div:last-child {
@@ -271,18 +355,22 @@ const Changelog = styled.div`
   margin: 20px 40px;
   padding: 20px;
   font-size: 20px;
+
   * {
     color: ${props => props.theme.palette.text.primary} !important;
   }
+
   & > div:first-child {
     font-size: 24px;
     width: 100%;
     text-align: center;
     margin-bottom: 30px;
   }
+
   p {
     text-align: center;
   }
+
   img {
     max-width: 100%;
     height: auto;
