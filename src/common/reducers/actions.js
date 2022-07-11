@@ -27,7 +27,6 @@ import makeDir from 'make-dir';
 import { major, minor, patch, prerelease } from 'semver';
 import { generate as generateRandomString } from 'randomstring';
 import { XMLParser } from 'fast-xml-parser';
-import crypto from 'crypto';
 import * as ActionTypes from './actionTypes';
 import {
   ACCOUNT_MICROSOFT,
@@ -119,7 +118,8 @@ import {
 import ga from '../utils/analytics';
 import {
   downloadFile,
-  downloadInstanceFiles
+  downloadInstanceFiles,
+  downloadInstanceFilesWithFallbacks
 } from '../../app/desktop/utils/downloader';
 import {
   getFileMurmurHash2,
@@ -1968,14 +1968,10 @@ export function processForgeManifest(instanceName) {
 
 export function processModrinthManifest(instanceName) {
   return async (dispatch, getState) => {
-    // TODO: Scan for existing files and skip them if they are in the download list
-
     const state = getState();
     /** @type {{manifest: ModrinthManifest}} */
     const { manifest } = _getCurrentDownloadItem(state);
-    let { files } = manifest;
-
-    const totalModsRequired = files.length;
+    const { files } = manifest;
 
     const instancesPath = _getInstancesPath(state);
     const instancePath = path.join(instancesPath, instanceName);
@@ -1992,50 +1988,13 @@ export function processModrinthManifest(instanceName) {
       }
     };
 
-    // TODO: If the download fails, we should attempt the next link in the downloads array
     dispatch(updateDownloadStatus(instanceName, 'Downloading pack...'));
-    await downloadInstanceFiles(
-      files.map(file => {
-        return {
-          path: path.join(instancePath, file.path),
-          url: file.downloads.at(0),
-          sha1: file.hashes.sha1
-        };
-      }),
+    await downloadInstanceFilesWithFallbacks(
+      files,
+      instancePath,
       updatePercentage,
       state.settings.concurrentDownloads
     );
-
-    // verify that each mod downloaded correctly
-    files = files.filter(
-      async file => {
-        const filePath = path.join(instancePath, file.path);
-        const buf = await fs.readFile(filePath);
-        const sha1 = crypto.createHash('sha1').update(buf).digest('hex');
-        const sha512 = crypto.createHash('sha512').update(buf).digest('hex');
-
-        if (sha1 === file.hashes.sha1 && sha512 === file.hashes.sha512) {
-          return file;
-        }
-
-        console.error(
-          `Mod "${file.filename}" failed to download: hashes did not match`
-        );
-        // TODO: Attempt to re-download here?
-        return null;
-      },
-      { concurrency }
-    );
-
-    if (files.length !== totalModsRequired) {
-      // the number of valid mods we have does not match the expected amount
-      // this means the download has failed and should be restarted
-      // ideally this should be done on a per-mod basis
-
-      throw Error(
-        `One or more mods failed to download (expected ${totalModsRequired}, but got ${files.length})`
-      );
-    }
 
     dispatch(updateDownloadStatus(instanceName, 'Finalizing files...'));
 
