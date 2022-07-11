@@ -692,18 +692,24 @@ const Mods = ({ instanceName }) => {
   };
 
   const menu = (
-    <Menu>
-      <Menu.Item
-        key="0"
-        disabled={!hasModUpdates}
-        onClick={() => {
-          dispatch(openModal('ModsUpdater', { instanceName }));
-          setIsMenuOpen(false);
-        }}
-      >
-        Update All Mods
-      </Menu.Item>
-    </Menu>
+    <Menu
+      items={[
+        {
+          key: '0',
+          disabled: !hasModUpdates,
+          label: (
+            <div
+              onClick={() => {
+                dispatch(openModal('ModsUpdater', { instanceName }));
+                setIsMenuOpen(false);
+              }}
+            >
+              Update All Mods
+            </div>
+          )
+        }
+      ]}
+    />
   );
 
   return (
@@ -764,6 +770,8 @@ const Mods = ({ instanceName }) => {
                 try {
                   setLoadingModUpdates(true);
                   await dispatch(initLatestMods(instance.name));
+                } catch (e) {
+                  console.warn(e);
                 } finally {
                   setLoadingModUpdates(false);
                 }
@@ -776,27 +784,14 @@ const Mods = ({ instanceName }) => {
           <span
             onClick={e => {
               e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
+              setIsMenuOpen(prev => !prev);
             }}
           >
-            <StyledDropdown
-              onClick={e => {
-                if (!isMenuOpen) {
-                  e.stopPropagation();
-                  setIsMenuOpen(!isMenuOpen);
-                }
-              }}
-            >
-              <span
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsMenuOpen(!isMenuOpen);
-                }}
-              >
+            <StyledDropdown>
+              <span>
                 <Dropdown
                   overlay={menu}
                   visible={isMenuOpen}
-                  onVisibleChange={setIsMenuOpen}
                   trigger={['click']}
                 >
                   <span
