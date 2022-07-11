@@ -311,35 +311,29 @@ const InstanceName = ({
         )
       );
     } else if (isModrinthModpack) {
-      //! manifest.dependencies and fullVersion.dependencies are different things!
-      // manifest.dependencies contains only the game version and loader version (referred to here as mainDependencies)
-      // fullVersion.dependencies contains objects with mod ids
-
-      const fullVersion = await getModrinthVersion(version?.fileID);
-
       const manifest = await getModrinthVersionManifest(
         version?.fileID,
         path.join(instancesPath, localInstanceName)
       );
 
       const mcVersion = manifest.dependencies.minecraft;
-      const mainDependencies = Object.keys(manifest.dependencies);
+      const dependencies = Object.keys(manifest.dependencies);
       let loaderType;
       let loaderVersion;
-      if (mainDependencies.includes('fabric-loader')) {
+      if (dependencies.includes('fabric-loader')) {
         loaderType = FABRIC;
         loaderVersion = manifest.dependencies['fabric-loader'];
-      } else if (mainDependencies.includes('forge')) {
+      } else if (dependencies.includes('forge')) {
         loaderType = FORGE;
         loaderVersion = convertcurseForgeToCanonical(
           manifest.dependencies['forge'],
           mcVersion,
           forgeManifest
         );
-      } else if (mainDependencies.includes('quilt-loader')) {
+      } else if (dependencies.includes('quilt-loader')) {
         // we don't support Quilt yet, so we can't proceed with the installation
         dispatch(closeModal());
-        throw 'Quilt modpacks are not yet supported.';
+        throw Error('Quilt modpacks are not yet supported.');
 
         // loaderType = QUILT;
         // loaderVersion = manifest.dependencies['quilt-loader'];
