@@ -13,7 +13,8 @@ import {
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
   FTB_API_URL,
-  JAVA_LATEST_MANIFEST_URL
+  JAVA_LATEST_MANIFEST_URL,
+  QUILT_APIS
 } from './utils/constants';
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
@@ -212,6 +213,11 @@ export const getFabricManifest = () => {
   return axios.get(url);
 };
 
+export const getQuiltManifest = () => {
+  const url = `${QUILT_APIS}/versions`;
+  return axios.get(url);
+};
+
 export const getJavaManifest = () => {
   const url = JAVA_MANIFEST_URL;
   return axios.get(url);
@@ -223,6 +229,13 @@ export const getJavaLatestManifest = () => {
 };
 
 export const getFabricJson = ({ mcVersion, loaderVersion }) => {
+  return axios.get(
+    `${QUILT_APIS}/versions/loader/${encodeURIComponent(
+      mcVersion
+    )}/${encodeURIComponent(loaderVersion)}/profile/json`
+  );
+};
+export const getQuilt = ({ mcVersion, loaderVersion }) => {
   return axios.get(
     `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
       mcVersion
