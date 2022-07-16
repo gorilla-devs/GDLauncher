@@ -1,5 +1,6 @@
 import { MC_STARTUP_METHODS } from '../../utils/constants';
 import * as ActionTypes from './actionTypes';
+import {action} from "../../../ui/theme";
 
 export function updateSoundsSetting(sounds) {
   return dispatch => {
@@ -51,6 +52,15 @@ export function updateInstanceSortType(value) {
     dispatch({
       type: ActionTypes.UPDATE_INSTANCE_SORT_METHOD,
       value
+    });
+  };
+}
+
+export function updateThemes(switchThemes) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.THEMES,
+      switchThemes
     });
   };
 }

@@ -32,7 +32,7 @@ import {
   updatePotatoPcMode,
   updateInstanceSortType,
   updateShowNews,
-  updateCurseReleaseChannel
+  updateCurseReleaseChannel, updateThemes
 } from '../../../reducers/settings/actions';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
@@ -166,6 +166,9 @@ const General = () => {
   const potatoPcMode = useSelector(state => state.settings.potatoPcMode);
   const concurrentDownloads = useSelector(
     state => state.settings.concurrentDownloads
+  );
+  const switchThemes = useSelector(
+      state => state.settings.switchThemes
   );
   const curseReleaseChannel = useSelector(
     state => state.settings.curseReleaseChannel
@@ -436,6 +439,26 @@ const General = () => {
           checked={DiscordRPC}
         />
       </Content>
+      <Title>
+        <Content>
+          <p>
+            Test Theming here!
+          </p>
+          <Select
+            css={`
+            width: 100px;
+            text-align: start;
+          `}
+            onChange={e => dispatch(updateThemes(e))}
+            value={switchThemes}
+            virtual={false}
+            >
+            <Select.Option value={1}>Light</Select.Option>
+            <Select.Option value={2}>Main</Select.Option>
+            <Select.Option value={3}>Dark</Select.Option> 
+          </Select>
+        </Content>
+      </Title>
       <Title>
         Minecraft News &nbsp; <FontAwesomeIcon icon={faNewspaper} />
       </Title>
