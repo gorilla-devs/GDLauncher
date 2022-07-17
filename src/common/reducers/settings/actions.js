@@ -1,6 +1,5 @@
 import { MC_STARTUP_METHODS } from '../../utils/constants';
 import * as ActionTypes from './actionTypes';
-import {action} from "../../../ui/theme";
 
 export function updateSoundsSetting(sounds) {
   return dispatch => {

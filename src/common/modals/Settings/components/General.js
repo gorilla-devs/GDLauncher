@@ -32,7 +32,8 @@ import {
   updatePotatoPcMode,
   updateInstanceSortType,
   updateShowNews,
-  updateCurseReleaseChannel, updateThemes
+  updateCurseReleaseChannel,
+  updateThemes
 } from '../../../reducers/settings/actions';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
@@ -441,21 +442,19 @@ const General = () => {
       </Content>
       <Title>
         <Content>
-          <p>
-            Test Theming here!
-          </p>
+          <p>Test Theming here!</p>
           <Select
             css={`
-            width: 100px;
-            text-align: start;
-          `}
+              width: 100px;
+              text-align: start;
+            `}
             onChange={e => dispatch(updateThemes(e))}
             value={switchThemes}
             virtual={false}
-            >
+          >
             <Select.Option value={1}>Light</Select.Option>
             <Select.Option value={2}>Main</Select.Option>
-            <Select.Option value={3}>Dark</Select.Option> 
+            <Select.Option value={3}>Dark</Select.Option>
           </Select>
         </Content>
       </Title>
