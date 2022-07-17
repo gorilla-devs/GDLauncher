@@ -81,10 +81,10 @@ function showNews(state = true, action) {
   }
 }
 
-function switchThemes(state = 2, action) {
+function themes(state = 2, action) {
   switch (action.type) {
     case ActionTypes.THEMES:
-      return action.switchThemes;
+      return action.themes;
     default:
       return state;
   }
@@ -158,7 +158,7 @@ export default combineReducers({
   hideWindowOnGameLaunch,
   potatoPcMode,
   showNews,
-  switchThemes,
+  themes,
   curseReleaseChannel,
   java,
   minecraftSettings,

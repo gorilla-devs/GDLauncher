@@ -152,7 +152,7 @@ function dashUuid(UUID) {
   )}-${UUID.substring(16, 20)}-${UUID.substring(20, 32)}`;
 }
 
-const General = () => {
+export const General = () => {
   /* eslint-disable prettier/prettier */
   const tempPath = useSelector(_getTempPath);
   const dataStorePath = useSelector(_getDataStorePath);
@@ -168,15 +168,13 @@ const General = () => {
   const concurrentDownloads = useSelector(
     state => state.settings.concurrentDownloads
   );
-  const switchThemes = useSelector(
-      state => state.settings.switchThemes
-  );
   const curseReleaseChannel = useSelector(
     state => state.settings.curseReleaseChannel
   );
   const hideWindowOnGameLaunch = useSelector(
     state => state.settings.hideWindowOnGameLaunch
   );
+  const themes = useSelector(state => state.settings.themes);
   const instanceSortMethod = useSelector(
     state => state.settings.instanceSortOrder
   );
@@ -449,7 +447,8 @@ const General = () => {
               text-align: start;
             `}
             onChange={e => dispatch(updateThemes(e))}
-            value={switchThemes}
+            id="themeSwitcher"
+            value={themes}
             virtual={false}
           >
             <Select.Option value={1}>Light</Select.Option>

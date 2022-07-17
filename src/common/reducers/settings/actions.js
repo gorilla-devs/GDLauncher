@@ -55,11 +55,11 @@ export function updateInstanceSortType(value) {
   };
 }
 
-export function updateThemes(switchThemes) {
+export function updateThemes(themes) {
   return dispatch => {
     dispatch({
       type: ActionTypes.THEMES,
-      switchThemes
+      themes
     });
   };
 }
