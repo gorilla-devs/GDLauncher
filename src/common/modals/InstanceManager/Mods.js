@@ -370,7 +370,7 @@ const Row = memo(({ index, style, data }) => {
               if (item.fileID) {
                 dispatch(
                   openModal('ModOverview', {
-                    modSource: item.modSource,
+                    source: item.source,
                     projectID: item.projectID,
                     fileID: item.fileID,
                     fileName: item.fileName,

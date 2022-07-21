@@ -2021,7 +2021,7 @@ export function processModrinthManifest(instanceName) {
             displayName: fileName,
             version: version?.version_number ?? null,
             downloadUrl: file.downloads.at(0),
-            modSource: MODRINTH
+            source: MODRINTH
           }
         ];
 

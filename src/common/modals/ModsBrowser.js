@@ -10,7 +10,7 @@ import curseForgeIcon from '../assets/curseforgeIcon.webp';
 import modrinthIcon from '../assets/modrinthIcon.webp';
 
 const ModsBrowser = ({ instanceName, gameVersions }) => {
-  const [modSource, setModSource] = useState(CURSEFORGE);
+  const [source, setSource] = useState(CURSEFORGE);
 
   return (
     <Modal
@@ -25,7 +25,7 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
         <Header>
           <Radio.Group
             defaultValue={CURSEFORGE}
-            onChange={e => setModSource(e.target.value)}
+            onChange={e => setSource(e.target.value)}
           >
             <Radio.Button value={CURSEFORGE}>
               <img
@@ -54,12 +54,12 @@ const ModsBrowser = ({ instanceName, gameVersions }) => {
           </Radio.Group>
         </Header>
 
-        {modSource === CURSEFORGE ? (
+        {source === CURSEFORGE ? (
           <CurseForgeModsBrowser
             instanceName={instanceName}
             gameVersions={gameVersions}
           />
-        ) : modSource === MODRINTH ? (
+        ) : source === MODRINTH ? (
           <ModrinthModsBrowser
             instanceName={instanceName}
             gameVersion={gameVersions}

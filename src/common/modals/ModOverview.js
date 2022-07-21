@@ -43,7 +43,7 @@ import {
 } from '../../app/desktop/utils';
 
 const ModOverview = ({
-  modSource,
+  source,
   projectID,
   fileID,
   gameVersions,
@@ -73,7 +73,7 @@ const ModOverview = ({
     const init = async () => {
       setLoadingFiles(true);
 
-      if (modSource === CURSEFORGE) {
+      if (source === CURSEFORGE) {
         await Promise.all([
           getAddon(projectID).then(addon => {
             setAddon(addon);
@@ -109,7 +109,7 @@ const ModOverview = ({
             setLoadingFiles(false);
           })
         ]);
-      } else if (modSource === MODRINTH) {
+      } else if (source === MODRINTH) {
         const project = await getModrinthProject(projectID);
         setMod(project);
 
@@ -193,9 +193,9 @@ const ModOverview = ({
   };
 
   const handleChange = value => {
-    if (modSource === CURSEFORGE) {
+    if (source === CURSEFORGE) {
       setSelectedItem(JSON.parse(value));
-    } else if (modSource === MODRINTH) {
+    } else if (source === MODRINTH) {
       setSelectedItem(value);
     }
   };
@@ -261,7 +261,7 @@ const ModOverview = ({
                         projectID,
                         projectName: addon?.name || mod?.name,
                         files,
-                        type: modSource
+                        type: source
                       })
                     );
                   }}
@@ -282,7 +282,7 @@ const ModOverview = ({
             </ParallaxContent>
           </Parallax>
           <Content>
-            {modSource === CURSEFORGE ? (
+            {source === CURSEFORGE ? (
               ReactHtmlParser(description)
             ) : (
               <ReactMarkdown>{description}</ReactMarkdown>
@@ -345,7 +345,7 @@ const ModOverview = ({
                     `}
                   >
                     <div>
-                      {modSource === CURSEFORGE
+                      {source === CURSEFORGE
                         ? gameVersions
                         : file.game_versions[0]}
                     </div>
@@ -400,7 +400,7 @@ const ModOverview = ({
                   )
                 );
               }
-              if (modSource === CURSEFORGE) {
+              if (source === CURSEFORGE) {
                 const newFile = dispatch(
                   installMod(
                     projectID,
@@ -414,7 +414,7 @@ const ModOverview = ({
                   )
                 );
                 setInstalledData({ fileID: selectedItem, fileName: newFile });
-              } else if (modSource === MODRINTH) {
+              } else if (source === MODRINTH) {
                 const version = await getModrinthVersion(selectedItem);
                 const newFile = dispatch(
                   installModrinthMod(version, instanceName)
