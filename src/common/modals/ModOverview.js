@@ -16,11 +16,16 @@ import {
   getAddon,
   getModrinthProject,
   getModrinthVersions,
-  getModrinthUser
+  getModrinthUser,
+  getModrinthVersion
 } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
-import { installMod, updateInstanceConfig } from '../reducers/actions';
+import {
+  installMod,
+  installModrinthMod,
+  updateInstanceConfig
+} from '../reducers/actions';
 import { remove } from 'fs-extra';
 import { _getInstancesPath, _getInstance } from '../utils/selectors';
 import {
@@ -109,15 +114,13 @@ const ModOverview = ({
         setMod(project);
 
         setDescription(project.body);
-        const versions = (
-          await getModrinthVersions(project.versions)
-        ).sort(
+        const versions = (await getModrinthVersions(project.versions)).sort(
           (a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)
         );
         setFiles(versions);
         setLoadingFiles(false);
         getModrinthUser(versions[0].author_id).then(user => {
-          setAuthor(user.username);
+          setAuthor(user?.username || '');
         });
         setDownloadCount(project.downloads);
         setUpdatedDate(Date.parse(project.updated));
@@ -189,7 +192,13 @@ const ModOverview = ({
     }
   };
 
-  const handleChange = value => setSelectedItem(JSON.parse(value));
+  const handleChange = value => {
+    if (modSource === CURSEFORGE) {
+      setSelectedItem(JSON.parse(value));
+    } else if (modSource === MODRINTH) {
+      setSelectedItem(value);
+    }
+  };
 
   const primaryImage = addon?.logo || mod?.icon_url;
   return (
@@ -299,9 +308,7 @@ const ModOverview = ({
             loading={loadingFiles}
             disabled={loadingFiles}
             value={
-              files.length !== 0 &&
-              files.find(v => v.id === installedData.fileID) &&
-              selectedItem
+              files.find(v => v.id === installedData.fileID) && selectedItem
             }
             onChange={handleChange}
             listItemHeight={50}
@@ -376,7 +383,7 @@ const ModOverview = ({
             onClick={async () => {
               setLoading(true);
               if (installedData.fileID) {
-                await dispatch(
+                dispatch(
                   updateInstanceConfig(instanceName, prev => ({
                     ...prev,
                     mods: prev.mods.filter(
@@ -393,19 +400,28 @@ const ModOverview = ({
                   )
                 );
               }
-              const newFile = await dispatch(
-                installMod(
-                  projectID,
-                  selectedItem,
-                  instanceName,
-                  gameVersions,
-                  !installedData.fileID,
-                  null,
-                  null,
-                  addon
-                )
-              );
-              setInstalledData({ fileID: selectedItem, fileName: newFile });
+              if (modSource === CURSEFORGE) {
+                const newFile = dispatch(
+                  installMod(
+                    projectID,
+                    selectedItem,
+                    instanceName,
+                    gameVersions,
+                    !installedData.fileID,
+                    null,
+                    null,
+                    addon
+                  )
+                );
+                setInstalledData({ fileID: selectedItem, fileName: newFile });
+              } else if (modSource === MODRINTH) {
+                const version = await getModrinthVersion(selectedItem);
+                const newFile = dispatch(
+                  installModrinthMod(version, instanceName)
+                );
+                setInstalledData({ fileID: selectedItem, fileName: newFile });
+              }
+
               setLoading(false);
             }}
           >
