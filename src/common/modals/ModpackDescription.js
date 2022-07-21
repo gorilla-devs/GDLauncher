@@ -97,7 +97,7 @@ const ModpackDescription = ({
           );
           setFiles(versions);
           getModrinthUser(versions[0].author_id).then(user => {
-            setAuthor(user.username);
+            setAuthor(user?.username || '');
           });
           setDownloadCount(modpack.downloads);
           setUpdatedDate(Date.parse(modpack.updated));
