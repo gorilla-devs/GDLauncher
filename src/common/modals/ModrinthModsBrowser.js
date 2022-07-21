@@ -158,7 +158,7 @@ const ModsListWrapper = ({
     const openModOverview = () => {
       dispatch(
         openModal('ModOverview', {
-          modSource: MODRINTH,
+          source: MODRINTH,
           gameVersion,
           projectID: item.project_id,
           ...(isInstalled && { fileID: isInstalled.fileID }),

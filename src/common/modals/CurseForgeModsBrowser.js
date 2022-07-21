@@ -164,7 +164,7 @@ const ModsListWrapper = ({
     const openModOverview = () => {
       dispatch(
         openModal('ModOverview', {
-          modSource: CURSEFORGE,
+          source: CURSEFORGE,
           gameVersions,
           projectID: item.id,
           ...(isInstalled && { fileID: isInstalled.fileID }),
