@@ -40,9 +40,9 @@ module.exports = {
       advanced: { cm: '8ec97baa', pr: '1371' }
     },
     {
-      header: 'Fixed the X button in search bars',
-      content: 'not functioning.',
-      advanced: { cm: '8ec97baa', pr: '1371' }
+      header: 'Fixed FTB downloads',
+      content: 'not working.',
+      advanced: { cm: 'b8c7e774', pr: '1410' }
     }
   ]
 };
