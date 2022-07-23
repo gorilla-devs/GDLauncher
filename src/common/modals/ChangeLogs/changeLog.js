@@ -31,7 +31,6 @@ module.exports = {
       header: 'Fixed the X button in search bars',
       content: 'not functioning.',
       advanced: { cm: '8ec97baa' }
-    },
-
+    }
   ]
 };
