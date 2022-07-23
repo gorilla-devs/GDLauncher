@@ -19,7 +19,7 @@ module.exports = {
       advanced: { cm: '1d17f128' }
     },
     {
-      header: 'Fixed Forge 1.19,
+      header: 'Fixed Forge 1.19',
       content: 'erroring with "launch string to long".',
       advanced: { cm: '8ec97baa' }
     },
