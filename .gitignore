@@ -19,7 +19,7 @@
 # rust target
 /target
 /napi/target
-/public/napi.node
+napi.node
 /napi/napi.node
 /napi/node_modules
 /napi/index.d.ts
