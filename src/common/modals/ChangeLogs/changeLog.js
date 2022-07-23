@@ -4,7 +4,7 @@ module.exports = {
       header: 'Squashed Git Commit history',
       content: 'because it was around 0.5G big.',
       advanced: { cm: '8ec97baa' }
-  ],
+  ]
   improvements: [],
   bugfixes: [
     {
